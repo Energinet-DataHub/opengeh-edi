@@ -1,0 +1,56 @@
+<!--
+Copyright 2020 Energinet DataHub A/S
+
+Licensed under the Apache License, Version 2.0 (the "License2");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="dbup-sqlserver" Version="4.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Scripts\Script0001 - Add master data ODS view.sql" />
+    <EmbeddedResource Include="Scripts\Script0002 - Add distribution lists to master data ODS view.sql" />
+    <EmbeddedResource Include="Scripts\Script0003 - Set up MarketEvaluationPoint and MarketParticipant tables.sql" />
+    <EmbeddedResource Include="Scripts\Script0004 - Add MarketData mock data.sql" />
+    <EmbeddedResource Include="Scripts\Script0005 - Add Charges database model.sql" />
+    <EmbeddedResource Include="Scripts\Script0006 - Create mock data table for ODS view.sql" />
+    <EmbeddedResource Include="Scripts\Script0006 - Create OutgoingActorMessages table.sql" />
+    <EmbeddedResource Include="Scripts\Script0007 - Add data to mock data table.sql" />
+    <EmbeddedResource Include="Scripts\Script0007 - Add OutgoingActorMessages mock data.sql" />
+    <EmbeddedResource Include="Scripts\Script0008 - Change master data ODS view to reflect data from mock data table.sql" />
+    <EmbeddedResource Include="Scripts\Script0009 - Create view for grid loss and system correction metering points based on mock data table.sql" />
+    <EmbeddedResource Include="Scripts\Script0010 - Update data for metering points registered as GridLoss or SystemCorrection.sql" />
+    <EmbeddedResource Include="Scripts\Script0011 - Update Charges database model.sql" />
+    <EmbeddedResource Include="Scripts\Script0012 - Mock market participants for charges.sql" />
+    <EmbeddedResource Include="Scripts\Script0013 - Alter OutgoingActorMessages table.sql" />
+    <EmbeddedResource Include="Scripts\Script0014 - Add ValidationRuleConfiguration.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Scripts\Model" />
+    <Folder Include="Scripts\Seed" />
+    <Folder Include="Scripts\Test" />
+  </ItemGroup>
+
+</Project>

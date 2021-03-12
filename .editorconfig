@@ -197,7 +197,7 @@ csharp_style_throw_expression = true:suggestion
 csharp_style_conditional_delegate_call = true:suggestion
 
 # Code block preferences
-csharp_prefer_braces = true:error
+csharp_prefer_braces = true:suggestion
 csharp_braces_for_ifelse = required_for_multiline_statement
 
 # Unused value preferences
@@ -290,7 +290,6 @@ dotnet_diagnostic.CA1404.severity = warning
 dotnet_diagnostic.CA1405.severity = warning
 dotnet_diagnostic.CA1410.severity = warning
 dotnet_diagnostic.CA1415.severity = warning
-dotnet_diagnostic.CA1812.severity = suggestion
 dotnet_diagnostic.CA1821.severity = warning
 dotnet_diagnostic.CA1900.severity = warning
 dotnet_diagnostic.CA1901.severity = warning

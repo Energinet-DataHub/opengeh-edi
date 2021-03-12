@@ -1,0 +1,37 @@
+﻿[
+  {
+    "transaction":
+    {
+      "mrid": "2222222222"
+    },
+    "errors": [
+      {
+        "message": "Something is wrong",
+        "code": "B2B-001"
+      }
+    ]
+  },
+  {
+    "transaction":
+    {
+      "mrid": "33333333"
+    },
+    "errors": [
+      {
+        "message": "Oops",
+        "code": "B2B-001"
+      },
+      {
+        "message": "Oops we did it again",
+        "code": "B2B-002"
+      }
+    ]
+  },
+  {
+    "transaction":
+    {
+      "mrid": "11111111"
+    },
+    "errors": []
+  }
+]

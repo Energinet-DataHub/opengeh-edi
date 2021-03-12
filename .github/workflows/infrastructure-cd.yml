@@ -38,21 +38,21 @@ jobs:
             short: u,
             name: Development
           },
-          {
-            long: rg-DataHub-MarketRoles-T,
-            short: t,
-            name: Test
-          },
-          {
-            long: rg-DataHub-MarketRoles-B,
-            short: b,
-            name: Preprod
-          },
-          {
-            long: rg-DataHub-MarketRoles-P,
-            short: p,
-            name: Production
-          }
+          # {
+          #   long: rg-DataHub-MarketRoles-T,
+          #   short: t,
+          #   name: Test
+          # },
+          # {
+          #   long: rg-DataHub-MarketRoles-B,
+          #   short: b,
+          #   name: Preprod
+          # },
+          # {
+          #   long: rg-DataHub-MarketRoles-P,
+          #   short: p,
+          #   name: Production
+          # }
         ]
     environment:
       name: ${{ matrix.environment.long }}
