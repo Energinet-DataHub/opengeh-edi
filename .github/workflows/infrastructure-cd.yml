@@ -25,6 +25,7 @@ on:
 env:
   ORGANISATION_NAME: endk
   PROJECT_NAME: marketroles
+  MIGRATION_PROJECT_CSPROJ_FILE_PATH: 'source/business-workflow/source/Energinet.DataHub.MarketData.ApplyDBMigrationsApp/Energinet.DataHub.MarketData.ApplyDBMigrationsApp.csproj'
 
 jobs:
   infra_deploy:
@@ -38,21 +39,21 @@ jobs:
             short: u,
             name: Development
           },
-          # {
-          #   long: rg-DataHub-MarketRoles-T,
-          #   short: t,
-          #   name: Test
-          # },
-          # {
-          #   long: rg-DataHub-MarketRoles-B,
-          #   short: b,
-          #   name: Preprod
-          # },
-          # {
-          #   long: rg-DataHub-MarketRoles-P,
-          #   short: p,
-          #   name: Production
-          # }
+          {
+            long: rg-DataHub-MarketRoles-T,
+            short: t,
+            name: Test
+          },
+          {
+            long: rg-DataHub-MarketRoles-B,
+            short: b,
+            name: Preprod
+          },
+          {
+            long: rg-DataHub-MarketRoles-P,
+            short: p,
+            name: Production
+          }
         ]
     environment:
       name: ${{ matrix.environment.long }}
@@ -82,7 +83,6 @@ jobs:
       - name: Azure CLI Install and Login
         uses: ./.github/actions/azure-cli-install-login
 
-
       - name: Setup Authorization to pull TF modules
         run: |
           git config --local --remove-section http."https://github.com/"
@@ -111,6 +111,8 @@ jobs:
           echo "TF_VAR_organisation=${{ env.ORGANISATION_NAME }}" >> $GITHUB_ENV
           echo "TF_VAR_project=${{ env.PROJECT_NAME }}" >> $GITHUB_ENV
           echo "TF_VAR_resource_group_name=${{ matrix.environment.long }}" >> $GITHUB_ENV
+          echo "TF_VAR_sharedresources_keyvault_name=${{ secrets.SHAREDRESOURCES_KEYVAULT_NAME }}" >> $GITHUB_ENV
+          echo "TF_VAR_sharedresources_resource_group_name=${{ secrets.SHAREDRESOURCES_RESOURCE_GROUP_NAME }}" >> $GITHUB_ENV
 
       - name: Configure Terraform Backend
         uses: ./.github/actions/configure-terraform-backend
@@ -128,6 +130,17 @@ jobs:
         run: terraform plan
 
       - name: Terraform Apply
+        id: terraform-apply
         working-directory: ./build/infrastructure
-        run: terraform apply -no-color -auto-approve
+        run: |
+          terraform apply -no-color -auto-approve
+          echo "::set-output name=kv-market-roles-db-connection-string-secret-name::$(terraform output kv_market_roles_db_connection_string_secret_name)"
+          echo "::set-output name=kv-market-roles-name::$(terraform output kv_market_roles_name)"
         continue-on-error: false
+
+      - name: Applying market data migrations
+        uses: ./.github/actions/apply-database-migrations
+        with:
+          kv_market_roles_db_connection_string_secret_name: ${{ steps.terraform-apply.outputs.kv-market-roles-db-connection-string-secret-name }}
+          kv_market_roles_name: ${{ steps.terraform-apply.outputs.kv-market-roles-name }}
+          csproj_file_path: ${{ env.MIGRATION_PROJECT_CSPROJ_FILE_PATH }}

@@ -11,8 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-locals {
-  HUB_MRID = "5790001330552"
-  # Note: The following timezone name is using the naming scheme of the TZ Database. See https://en.wikipedia.org/wiki/List_of_tz_database_time_zones for list of possible values.
-  LOCAL_TIMEZONENAME = "Europe/Copenhagen"
+output "kv_market_roles_db_connection_string_secret_name" {
+  description = "Name of the secret in the keyvault containing the connection string for the market roles sql db"
+  value = module.kvs_marketroles_db_connection_string.name
+}
+
+output "kv_market_roles_name" {
+  description = "Name of the keyvault"
+  value = module.kv_marketroles.name
 }

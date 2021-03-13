@@ -21,17 +21,45 @@ module "azfun_asynchronousingestor" {
   app_service_plan_id                       = module.azfun_asynchronousingestor_plan.id
   application_insights_instrumentation_key  = module.appi.instrumentation_key
   tags                                      = data.azurerm_resource_group.main.tags
+  always_on                                 = true
   app_settings                              = {
     # Region: Default Values
-    WEBSITE_ENABLE_SYNC_UPDATE_SITE                   = true
-    WEBSITE_RUN_FROM_PACKAGE                          = 1
-    WEBSITES_ENABLE_APP_SERVICE_STORAGE               = true
-    FUNCTIONS_WORKER_RUNTIME                          = "dotnet"
+    WEBSITE_ENABLE_SYNC_UPDATE_SITE       = true
+    WEBSITE_RUN_FROM_PACKAGE              = 1
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE   = true
+    FUNCTIONS_WORKER_RUNTIME              = "dotnet"
+    # Endregion: Default Values
+    KAFKA_SECURITY_PROTOCOL               = "SaslSsl"
+    KAFKA_SASL_MECHANISM                  = "Plain"
+    KAFKA_MESSAGE_SEND_MAX_RETRIES        = 5
+    KAFKA_MESSAGE_TIMEOUT_MS              = 1000
+    KAFKA_USERNAME                        = "$ConnectionString"
+    KAFKA_SSL_CA_LOCATION                 = "C:\\cacert\\cacert.pem"
+    MARKET_DATA_URL                       = "${module.sbn_marketroles.name}.servicebus.windows.net:9093"
+    MARKET_DATA_QUEUE_CONNECTION_STRING   = module.sbnar_marketroles_sender.primary_connection_string
+    MARKET_DATA_QUEUE_NAME                = module.sbq_marketroles.name
+    MARKET_DATA_DATABASE_CONNECTION_STRING= module.kvs_marketroles_db_connection_string.value
+    CHARGE_QUEUE_CONNECTION_STRING        = "TO_BE_REMOVED"
+    CHARGE_QUEUE_NAME                     = "TO_BE_REMOVED"
+    TIMESERIES_QUEUE_TOPIC                = "TO_BE_REMOVED"
+    TIMESERIES_QUEUE_URL                  = "TO_BE_REMOVED"
+    TIMESERIES_QUEUE_CONNECTION_STRING    = "TO_BE_REMOVED"
+    REQUEST_QUEUE_CONNECTION_STRING       = module.evhar_requestqueue_listener.primary_connection_string
+    REQUEST_QUEUE_NAME                    = module.evh_requestqueue.name
+    HUB_MRID                              = local.HUB_MRID
+    LOCAL_TIMEZONENAME                    = local.LOCAL_TIMEZONENAME
+    VALIDATION_REPORTS_QUEUE_TOPIC        = data.azurerm_key_vault_secret.VALIDATION_REPORTS_QUEUE_TOPIC.value
+    VALIDATION_REPORTS_URL                = data.azurerm_key_vault_secret.VALIDATION_REPORTS_QUEUE_URL.value
+    VALIDATION_REPORTS_CONNECTION_STRING  = data.azurerm_key_vault_secret.VALIDATION_REPORTS_CONNECTION_STRING.value
   }
   dependencies                              = [
     module.appi.dependent_on,
     module.azfun_asynchronousingestor_plan.dependent_on,
     module.azfun_asynchronousingestor_stor.dependent_on,
+    module.sbnar_marketroles_sender.dependent_on,
+    module.sbq_marketroles.dependent_on,
+    module.evhar_requestqueue_listener.dependent_on,
+    module.evh_requestqueue.dependent_on,
   ]
 }
 
@@ -42,8 +70,8 @@ module "azfun_asynchronousingestor_plan" {
   location            = data.azurerm_resource_group.main.location
   kind                = "FunctionApp"
   sku                 = {
-    tier  = "Free"
-    size  = "F1"
+    tier  = "Basic"
+    size  = "B1"
   }
   tags                = data.azurerm_resource_group.main.tags
 }

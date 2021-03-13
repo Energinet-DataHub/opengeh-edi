@@ -29,3 +29,13 @@ variable "organisation" {
   type          = string
   description   = "Organisation that is running the infrastructure code"
 }
+
+variable "sharedresources_keyvault_name" {
+  type          = string
+  description   = "Name of the Core keyvault, that contains shared secrets"
+}
+
+variable "sharedresources_resource_group_name" {
+  type          = string
+  description   = "Resource group name of the Core keyvaults location"
+}

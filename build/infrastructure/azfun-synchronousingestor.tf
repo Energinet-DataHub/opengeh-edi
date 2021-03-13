@@ -23,15 +23,31 @@ module "azfun_synchronousingestor" {
   tags                                      = data.azurerm_resource_group.main.tags
   app_settings                              = {
     # Region: Default Values
-    WEBSITE_ENABLE_SYNC_UPDATE_SITE                   = true
-    WEBSITE_RUN_FROM_PACKAGE                          = 1
-    WEBSITES_ENABLE_APP_SERVICE_STORAGE               = true
-    FUNCTIONS_WORKER_RUNTIME                          = "dotnet"
+    WEBSITE_ENABLE_SYNC_UPDATE_SITE       = true
+    WEBSITE_RUN_FROM_PACKAGE              = 1
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE   = true
+    FUNCTIONS_WORKER_RUNTIME              = "dotnet"
+    # Endregion: Default Values
+    KAFKA_SECURITY_PROTOCOL               = "SaslSsl"
+    KAFKA_SASL_MECHANISM                  = "Plain"
+    KAFKA_SSL_CA_LOCATION                 = "C:\\cacert\\cacert.pem"
+    KAFKA_USERNAME                        = "$ConnectionString"
+    KAFKA_MESSAGE_SEND_MAX_RETRIES        = 5
+    KAFKA_MESSAGE_TIMEOUT_MS              = 1000
+    REQUEST_QUEUE_TOPIC                   = module.evh_requestqueue.name
+    REQUEST_QUEUE_URL                     = "${module.evhnm_requestqueue.name}.servicebus.windows.net:9093"
+    REQUEST_QUEUE_CONNECTION_STRING       = module.evhar_requestqueue_sender.primary_connection_string
+    VALIDATION_REPORTS_QUEUE_TOPIC        = data.azurerm_key_vault_secret.VALIDATION_REPORTS_QUEUE_TOPIC.value
+    VALIDATION_REPORTS_URL                = data.azurerm_key_vault_secret.VALIDATION_REPORTS_QUEUE_URL.value
+    VALIDATION_REPORTS_CONNECTION_STRING  = data.azurerm_key_vault_secret.VALIDATION_REPORTS_CONNECTION_STRING.value
   }
   dependencies                              = [
     module.appi.dependent_on,
     module.azfun_synchronousingestor_plan.dependent_on,
     module.azfun_synchronousingestor_stor.dependent_on,
+    module.evh_requestqueue.dependent_on,
+    module.evhnm_requestqueue.dependent_on,
+    module.evhar_requestqueue_sender.dependent_on,
   ]
 }
 
