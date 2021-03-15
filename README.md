@@ -1,5 +1,15 @@
-# YOUR DOMAIN README
+# MarketRoles
+
+## Intro
 
 This should be replaced by content that fits your domain.
 
-Before you start editing this repository, please read the [TEMPLATE README](./docs/template-readme/README.md)
+## Architecture
+
+![design](ARCHITECTURE.png)
+
+## Repository origin
+
+This repository was created using the Green Energy Hub template.
+
+Please read the [template documentation](./docs/template-readme/README.md) for details and introduction to the template.
