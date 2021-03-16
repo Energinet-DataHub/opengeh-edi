@@ -17,10 +17,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - source/business-workflow/**
-      - .github/workflows/businessworkflow-ci.yml
-      - .github/actions/dotnet-build-and-test/**
   workflow_dispatch: {}
 
 env:
@@ -40,8 +36,8 @@ jobs:
         with:
           github_token: ${{ github.token }}
           paths: '[
-            "source/hello-world/**",
-            ".github/workflows/hello-world-ci.yml",
+            "source/business-workflow/**",
+            ".github/workflows/businessworkflow-ci.yml",
             ".github/actions/dotnet-build-and-test/**"
           ]'
 
