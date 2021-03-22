@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 module "sbn_marketroles" {
-  source              = "git::https://github.com/Energinet-DataHub/green-energy-hub-core.git//terraform/modules/service-bus-namespace?ref=1.3.0"
+  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//service-bus-namespace?ref=1.0.0"
   name                = "sbn-${var.project}-${var.organisation}-${var.environment}"
   resource_group_name = data.azurerm_resource_group.main.name
   location            = data.azurerm_resource_group.main.location
@@ -21,7 +21,7 @@ module "sbn_marketroles" {
 }
 
 module "sbq_marketroles" {
-  source              = "git::https://github.com/Energinet-DataHub/green-energy-hub-core.git//terraform/modules/service-bus-queue?ref=1.3.0"
+  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//service-bus-queue?ref=1.0.0"
   name                = "sbq-marketroles"
   namespace_name      = module.sbn_marketroles.name
   resource_group_name = data.azurerm_resource_group.main.name
@@ -29,7 +29,7 @@ module "sbq_marketroles" {
 }
 
 module "sbnar_marketroles_listener" {
-  source                    = "git::https://github.com/Energinet-DataHub/green-energy-hub-core.git//terraform/modules/service-bus-namespace-auth-rule?ref=1.3.0"
+  source                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//service-bus-namespace-auth-rule?ref=1.0.0"
   name                      = "sbnar-marketroles-listener"
   namespace_name            = module.sbn_marketroles.name
   resource_group_name       = data.azurerm_resource_group.main.name
@@ -38,7 +38,7 @@ module "sbnar_marketroles_listener" {
 }
 
 module "sbnar_marketroles_sender" {
-  source                    = "git::https://github.com/Energinet-DataHub/green-energy-hub-core.git//terraform/modules/service-bus-namespace-auth-rule?ref=1.3.0"
+  source                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//service-bus-namespace-auth-rule?ref=1.0.0"
   name                      = "sbnar-marketroles-sender"
   namespace_name            = module.sbn_marketroles.name
   resource_group_name       = data.azurerm_resource_group.main.name
