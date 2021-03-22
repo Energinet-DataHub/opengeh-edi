@@ -36,7 +36,10 @@ namespace GreenEnergyHub.Messaging
         /// <inheritdoc cref="IRuleEngine{T}"/>
         public async Task<RuleResultCollection> ValidateAsync(T message)
         {
-            if (message == null) throw new ArgumentNullException(nameof(message));
+            if (message == null)
+            {
+                throw new ArgumentNullException(nameof(message));
+            }
 
             var context = new ValidationContext<T>(message);
 
