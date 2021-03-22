@@ -16,7 +16,7 @@ locals {
 }
 
 module "sqlsrv_marketroles" {
-  source                        = "git::https://github.com/Energinet-DataHub/green-energy-hub-core.git//terraform/modules/sql-server?ref=1.3.0"
+  source                        = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//sql-server?ref=1.0.0"
   name                          = "sqlsrv-${var.project}-${var.organisation}-${var.environment}"
   resource_group_name           = data.azurerm_resource_group.main.name
   location                      = data.azurerm_resource_group.main.location
@@ -26,7 +26,7 @@ module "sqlsrv_marketroles" {
 }
 
 module "sqldb_marketroles" {
-  source              = "git::https://github.com/Energinet-DataHub/green-energy-hub-core.git//terraform/modules/sql-database?ref=1.3.0"
+  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//sql-database?ref=1.0.0"
   name                = "sqldb-marketroles"
   resource_group_name = data.azurerm_resource_group.main.name
   location            = data.azurerm_resource_group.main.location
