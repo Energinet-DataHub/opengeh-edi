@@ -61,7 +61,7 @@ namespace Energinet.DataHub.MarketData.Infrastructure.Outbox
                 Recipient = message.Recipient,
                 Type = message.Type,
                 Version = "v1",
-                EffectuationDate = message.OccurredOn.ToTimestamp(),
+                CreationDate = message.OccurredOn.ToTimestamp(),
             };
         }
     }

@@ -34,7 +34,7 @@ namespace Energinet.DataHub.PostOffice.Contracts {
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Google.Protobuf.WellKnownTypes.TimestampReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Energinet.DataHub.PostOffice.Contracts.Document), global::Energinet.DataHub.PostOffice.Contracts.Document.Parser, new[]{ "Type", "EffectuationDate", "Recipient", "Content", "Version" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Energinet.DataHub.PostOffice.Contracts.Document), global::Energinet.DataHub.PostOffice.Contracts.Document.Parser, new[]{ "Type", "CreationDate", "Recipient", "Content", "Version" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Energinet.DataHub.PostOffice.Contracts.DocumentList), global::Energinet.DataHub.PostOffice.Contracts.DocumentList.Parser, new[]{ "Documents" }, null, null, null, null)
           }));
     }
@@ -72,7 +72,7 @@ namespace Energinet.DataHub.PostOffice.Contracts {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public Document(Document other) : this() {
       type_ = other.type_;
-      effectuationDate_ = other.effectuationDate_ != null ? other.effectuationDate_.Clone() : null;
+      creationDate_ = other.creationDate_ != null ? other.creationDate_.Clone() : null;
       recipient_ = other.recipient_;
       content_ = other.content_;
       version_ = other.version_;
@@ -95,14 +95,14 @@ namespace Energinet.DataHub.PostOffice.Contracts {
       }
     }
 
-    /// <summary>Field number for the "effectuationDate" field.</summary>
-    public const int EffectuationDateFieldNumber = 2;
-    private global::Google.Protobuf.WellKnownTypes.Timestamp effectuationDate_;
+    /// <summary>Field number for the "creationDate" field.</summary>
+    public const int CreationDateFieldNumber = 2;
+    private global::Google.Protobuf.WellKnownTypes.Timestamp creationDate_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Google.Protobuf.WellKnownTypes.Timestamp EffectuationDate {
-      get { return effectuationDate_; }
+    public global::Google.Protobuf.WellKnownTypes.Timestamp CreationDate {
+      get { return creationDate_; }
       set {
-        effectuationDate_ = value;
+        creationDate_ = value;
       }
     }
 
@@ -153,7 +153,7 @@ namespace Energinet.DataHub.PostOffice.Contracts {
         return true;
       }
       if (Type != other.Type) return false;
-      if (!object.Equals(EffectuationDate, other.EffectuationDate)) return false;
+      if (!object.Equals(CreationDate, other.CreationDate)) return false;
       if (Recipient != other.Recipient) return false;
       if (Content != other.Content) return false;
       if (Version != other.Version) return false;
@@ -164,7 +164,7 @@ namespace Energinet.DataHub.PostOffice.Contracts {
     public override int GetHashCode() {
       int hash = 1;
       if (Type.Length != 0) hash ^= Type.GetHashCode();
-      if (effectuationDate_ != null) hash ^= EffectuationDate.GetHashCode();
+      if (creationDate_ != null) hash ^= CreationDate.GetHashCode();
       if (Recipient.Length != 0) hash ^= Recipient.GetHashCode();
       if (Content.Length != 0) hash ^= Content.GetHashCode();
       if (Version.Length != 0) hash ^= Version.GetHashCode();
@@ -188,9 +188,9 @@ namespace Energinet.DataHub.PostOffice.Contracts {
         output.WriteRawTag(10);
         output.WriteString(Type);
       }
-      if (effectuationDate_ != null) {
+      if (creationDate_ != null) {
         output.WriteRawTag(18);
-        output.WriteMessage(EffectuationDate);
+        output.WriteMessage(CreationDate);
       }
       if (Recipient.Length != 0) {
         output.WriteRawTag(26);
@@ -217,9 +217,9 @@ namespace Energinet.DataHub.PostOffice.Contracts {
         output.WriteRawTag(10);
         output.WriteString(Type);
       }
-      if (effectuationDate_ != null) {
+      if (creationDate_ != null) {
         output.WriteRawTag(18);
-        output.WriteMessage(EffectuationDate);
+        output.WriteMessage(CreationDate);
       }
       if (Recipient.Length != 0) {
         output.WriteRawTag(26);
@@ -245,8 +245,8 @@ namespace Energinet.DataHub.PostOffice.Contracts {
       if (Type.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Type);
       }
-      if (effectuationDate_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(EffectuationDate);
+      if (creationDate_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(CreationDate);
       }
       if (Recipient.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Recipient);
@@ -271,11 +271,11 @@ namespace Energinet.DataHub.PostOffice.Contracts {
       if (other.Type.Length != 0) {
         Type = other.Type;
       }
-      if (other.effectuationDate_ != null) {
-        if (effectuationDate_ == null) {
-          EffectuationDate = new global::Google.Protobuf.WellKnownTypes.Timestamp();
+      if (other.creationDate_ != null) {
+        if (creationDate_ == null) {
+          CreationDate = new global::Google.Protobuf.WellKnownTypes.Timestamp();
         }
-        EffectuationDate.MergeFrom(other.EffectuationDate);
+        CreationDate.MergeFrom(other.CreationDate);
       }
       if (other.Recipient.Length != 0) {
         Recipient = other.Recipient;
@@ -305,10 +305,10 @@ namespace Energinet.DataHub.PostOffice.Contracts {
             break;
           }
           case 18: {
-            if (effectuationDate_ == null) {
-              EffectuationDate = new global::Google.Protobuf.WellKnownTypes.Timestamp();
+            if (creationDate_ == null) {
+              CreationDate = new global::Google.Protobuf.WellKnownTypes.Timestamp();
             }
-            input.ReadMessage(EffectuationDate);
+            input.ReadMessage(CreationDate);
             break;
           }
           case 26: {
@@ -342,10 +342,10 @@ namespace Energinet.DataHub.PostOffice.Contracts {
             break;
           }
           case 18: {
-            if (effectuationDate_ == null) {
-              EffectuationDate = new global::Google.Protobuf.WellKnownTypes.Timestamp();
+            if (creationDate_ == null) {
+              CreationDate = new global::Google.Protobuf.WellKnownTypes.Timestamp();
             }
-            input.ReadMessage(EffectuationDate);
+            input.ReadMessage(CreationDate);
             break;
           }
           case 26: {
