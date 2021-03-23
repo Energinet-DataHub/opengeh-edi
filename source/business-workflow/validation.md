@@ -38,7 +38,7 @@ All validations can be performed without doing any lookup in databases or other 
 
 A validation rule is not created for a specific `DTO`, but rather defined to work on any object with certain characteristics. Different rules can be combined into a composite which can the be reused across `DTO`.
 
-Since a semantic validation rule is `DTO` agonistic there is a need to combine validation rules. Combined rules are grouped in a `RuleSet` that is created per `DTO`. When a `RuleSet` is executed all rules must be checked.
+Since a semantic validation rule is `DTO` agnostic there is a need to combine validation rules. Combined rules are grouped in a `RuleSet` that is created per `DTO`. When a `RuleSet` is executed all rules must be checked.
 
 ![Class diagram](ValidationClassDiagram.png)
 

@@ -1,6 +1,4 @@
-﻿agonistic
-agonistic
-ApiGateway
+﻿ApiGateway
 ApplyDBMigrationsApp
 cacert
 ChangeOfSupplier
