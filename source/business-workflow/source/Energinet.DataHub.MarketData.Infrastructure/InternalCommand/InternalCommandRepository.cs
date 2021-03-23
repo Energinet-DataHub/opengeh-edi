@@ -18,6 +18,7 @@ using System.Data;
 using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.MarketData.Application.Common;
+using Energinet.DataHub.MarketData.Infrastructure.Outbox;
 
 namespace Energinet.DataHub.MarketData.Infrastructure.InternalCommand
 {
@@ -39,6 +40,16 @@ namespace Energinet.DataHub.MarketData.Infrastructure.InternalCommand
             {
                 Id = id,
             }).ConfigureAwait(false);
+        }
+
+        public async Task ProcessInternalCommandAsync(int id)
+        {
+            await Connection.ExecuteAsync(
+                    $"UPDATE InternalCommandQueue SET ProcessedDate = GETDATE() WHERE Id = @Id", param: new
+                    {
+                        Id = id,
+                    })
+                .ConfigureAwait(false);
         }
     }
 }

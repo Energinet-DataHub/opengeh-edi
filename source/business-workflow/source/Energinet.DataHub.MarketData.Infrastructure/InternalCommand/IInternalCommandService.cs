@@ -15,5 +15,11 @@ namespace Energinet.DataHub.MarketData.Infrastructure.InternalCommand
         /// <param name="id"></param>
         /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
         Task GetUnprocessedInternalCommandsInBatchesAsync(IAsyncCollector<dynamic> internalCommandServiceBus, int id = 0);
+
+        /// <summary>
+        /// Executes the internal command
+        /// </summary>
+        /// <param name="internalCommand"></param>
+        Task ExecuteInternalCommandAsync(InternalCommand internalCommand);
     }
 }

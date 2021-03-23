@@ -31,5 +31,13 @@ namespace Energinet.DataHub.MarketData.Infrastructure.InternalCommand
                 await GetUnprocessedInternalCommandsInBatchesAsync(internalCommandServiceBus, lastId);
             }
         }
+
+        public async Task ExecuteInternalCommandAsync(InternalCommand internalCommand)
+        {
+            // TODO: Forward the command to the command handler
+
+            // Set the command as processed
+            await _internalCommandRepository.ProcessInternalCommandAsync(internalCommand.Id).ConfigureAwait(false);
+        }
     }
 }
