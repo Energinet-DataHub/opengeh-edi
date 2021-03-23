@@ -81,6 +81,7 @@ namespace Energinet.DataHub.MarketData.EntryPoint
             builder.Services.AddScoped<IMeteringPointRepository, MeteringPointRepository>();
             builder.Services.AddScoped<IEnergySupplierRepository, EnergySupplierRepository>();
             builder.Services.AddScoped<IInternalCommandRepository, InternalCommandRepository>();
+            builder.Services.AddScoped<IInternalCommandService, InternalCommandService>();
             builder.Services.AddScoped<IForwardMessageRepository, ForwardMessageRepository>();
             builder.Services.AddScoped<IForwardMessageService, ForwardMessageService>();
             builder.Services.AddScoped<IPostOfficeService, PostOfficeService>();

@@ -18,7 +18,6 @@ using System.Data;
 using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.MarketData.Application.Common;
-using Energinet.DataHub.MarketData.Infrastructure.Outbox;
 
 namespace Energinet.DataHub.MarketData.Infrastructure.InternalCommand
 {
@@ -33,10 +32,13 @@ namespace Energinet.DataHub.MarketData.Infrastructure.InternalCommand
 
         private IDbConnection Connection => _connectionFactory.GetOpenConnection();
 
-        public async Task<IEnumerable<Outbox.InternalCommand>> GetUnprocessedInternalCommandsAsync()
+        public async Task<IEnumerable<InternalCommand>> GetUnprocessedInternalCommandsInBatchesAsync(int id)
         {
-            var query = "SELECT * FROM [dbo].[InternalCommandQueue] I WHERE I.ProcessedDate IS NULL and ScheduledDate <= GETUTCDATE()";
-            return await Connection.QueryAsync<Outbox.InternalCommand>(query).ConfigureAwait(false);
+            var query = "SELECT TOP (2) [Id], [Command] FROM [dbo].[InternalCommandQueue] I WHERE I.ProcessedDate IS NULL and ScheduledDate <= GETUTCDATE() and I.Id > @Id";
+            return await Connection.QueryAsync<InternalCommand>(query, new
+            {
+                Id = id,
+            }).ConfigureAwait(false);
         }
     }
 }

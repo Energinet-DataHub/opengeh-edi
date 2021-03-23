@@ -1,4 +1,4 @@
-﻿namespace Energinet.DataHub.MarketData.Infrastructure.Outbox
+﻿namespace Energinet.DataHub.MarketData.Infrastructure.InternalCommand
 {
     public class InternalCommand
     {

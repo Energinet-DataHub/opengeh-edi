@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketData.Infrastructure.InternalCommand;
 using Energinet.DataHub.MarketData.Infrastructure.Outbox;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
@@ -11,11 +12,11 @@ namespace Energinet.DataHub.MarketData.EntryPoint
 {
     public class InternalCommandDispatcher
     {
-        private readonly IInternalCommandRepository _internalCommandRepository;
+        private readonly IInternalCommandService _internalCommandService;
 
-        public InternalCommandDispatcher(IInternalCommandRepository internalCommandRepository)
+        public InternalCommandDispatcher(IInternalCommandService internalCommandService)
         {
-            _internalCommandRepository = internalCommandRepository;
+            _internalCommandService = internalCommandService;
         }
 
         [FunctionName("InternalCommandDispatcher")]
@@ -24,14 +25,7 @@ namespace Energinet.DataHub.MarketData.EntryPoint
             // TODO: Set up service bus in terraform
             [ServiceBus("commands", Connection = "INTERNAL_COMMAND_SERVICE_BUS")] IAsyncCollector<dynamic> internalCommandServiceBus)
         {
-            var tasks = new List<Task>();
-
-            foreach (var command in await _internalCommandRepository.GetUnprocessedInternalCommandsAsync())
-            {
-                tasks.Add(internalCommandServiceBus.AddAsync(command));
-            }
-
-            await Task.WhenAll(tasks.ToArray());
+            await _internalCommandService.GetUnprocessedInternalCommandsInBatchesAsync(internalCommandServiceBus).ConfigureAwait(false);
         }
     }
 }
