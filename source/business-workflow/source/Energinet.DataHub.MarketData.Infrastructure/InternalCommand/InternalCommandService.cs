@@ -9,10 +9,12 @@ namespace Energinet.DataHub.MarketData.Infrastructure.InternalCommand
     public class InternalCommandService : IInternalCommandService
     {
         private readonly IInternalCommandRepository _internalCommandRepository;
+        private readonly IInternalCommandQuerySettings _querySettings;
 
-        public InternalCommandService(IInternalCommandRepository internalCommandRepository)
+        public InternalCommandService(IInternalCommandRepository internalCommandRepository, IInternalCommandQuerySettings querySettings)
         {
             _internalCommandRepository = internalCommandRepository;
+            _querySettings = querySettings;
         }
 
         public async Task GetUnprocessedInternalCommandsInBatchesAsync(
@@ -26,7 +28,8 @@ namespace Energinet.DataHub.MarketData.Infrastructure.InternalCommand
 
             await Task.WhenAll(internalCommands.Select(command => internalCommandServiceBus.AddAsync(command)).ToArray());
 
-            if (internalCommands.Count > 0)
+            // If we're at the max batch size that means that there might be more unprocessed commands in the DB and we need to do another round
+            if (internalCommands.Count == _querySettings.BatchSize)
             {
                 await GetUnprocessedInternalCommandsInBatchesAsync(internalCommandServiceBus, lastId);
             }

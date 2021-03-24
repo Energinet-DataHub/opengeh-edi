@@ -25,19 +25,22 @@ namespace Energinet.DataHub.MarketData.Infrastructure.InternalCommand
     public class InternalCommandRepository : IInternalCommandRepository
     {
         private readonly IDbConnectionFactory _connectionFactory;
+        private readonly IInternalCommandQuerySettings _querySettings;
 
-        public InternalCommandRepository(IDbConnectionFactory connectionFactory)
+        public InternalCommandRepository(IDbConnectionFactory connectionFactory, IInternalCommandQuerySettings querySettings)
         {
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
+            _querySettings = querySettings;
         }
 
         private IDbConnection Connection => _connectionFactory.GetOpenConnection();
 
         public async Task<IEnumerable<InternalCommand>> GetUnprocessedInternalCommandsInBatchesAsync(int id)
         {
-            var query = "SELECT TOP (2) [Id], [Command] FROM [dbo].[InternalCommandQueue] I WHERE I.ProcessedDate IS NULL and ScheduledDate <= GETUTCDATE() and I.Id > @Id";
+            var query = "SELECT TOP (@BatchSize) [Id], [Command] FROM [dbo].[InternalCommandQueue] I WHERE I.ProcessedDate IS NULL and ScheduledDate <= GETUTCDATE() and I.Id > @Id";
             return await Connection.QueryAsync<InternalCommand>(query, new
             {
+                BatchSize = _querySettings.BatchSize,
                 Id = id,
             }).ConfigureAwait(false);
         }
