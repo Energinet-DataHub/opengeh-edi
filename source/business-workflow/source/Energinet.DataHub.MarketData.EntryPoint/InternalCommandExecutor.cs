@@ -10,22 +10,19 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketData.EntryPoint
 {
-    public class InternalCommandDispatcher
+    public class InternalCommandExecutor
     {
         private readonly IInternalCommandService _internalCommandService;
 
-        public InternalCommandDispatcher(IInternalCommandService internalCommandService)
+        public InternalCommandExecutor(IInternalCommandService internalCommandService)
         {
             _internalCommandService = internalCommandService;
         }
 
         [FunctionName("InternalCommandDispatcher")]
-        public async Task RunAsync(
-            [TimerTrigger("%INTERNAL_COMMAND_DISPATCH_TRIGGER_TIMER%")] TimerInfo timer,
-            // TODO: Set up service bus in terraform
-            [ServiceBus("commands", Connection = "INTERNAL_COMMAND_SERVICE_BUS")] IAsyncCollector<dynamic> internalCommandServiceBus)
+        public async Task RunAsync([TimerTrigger("%INTERNAL_COMMAND_DISPATCH_TRIGGER_TIMER%")] TimerInfo timer)
         {
-            await _internalCommandService.GetUnprocessedInternalCommandsInBatchesAsync(internalCommandServiceBus).ConfigureAwait(false);
+            await _internalCommandService.ExecuteUnprocessedInternalCommandsAsync().ConfigureAwait(false);
         }
     }
 }

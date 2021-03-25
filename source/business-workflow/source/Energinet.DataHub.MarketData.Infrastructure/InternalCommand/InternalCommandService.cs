@@ -1,7 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketData.Infrastructure.Outbox;
+using MediatR;
 using Microsoft.Azure.WebJobs;
 
 namespace Energinet.DataHub.MarketData.Infrastructure.InternalCommand
@@ -9,38 +14,34 @@ namespace Energinet.DataHub.MarketData.Infrastructure.InternalCommand
     public class InternalCommandService : IInternalCommandService
     {
         private readonly IInternalCommandRepository _internalCommandRepository;
-        private readonly IInternalCommandQuerySettings _querySettings;
+        private readonly IMediator _mediator;
 
-        public InternalCommandService(IInternalCommandRepository internalCommandRepository, IInternalCommandQuerySettings querySettings)
+        public InternalCommandService(IInternalCommandRepository internalCommandRepository, IMediator mediator)
         {
             _internalCommandRepository = internalCommandRepository;
-            _querySettings = querySettings;
+            _mediator = mediator;
         }
 
-        public async Task GetUnprocessedInternalCommandsInBatchesAsync(
-            IAsyncCollector<dynamic> internalCommandServiceBus, int id)
+        public async Task ExecuteUnprocessedInternalCommandsAsync()
         {
-            var commands = await _internalCommandRepository.GetUnprocessedInternalCommandsInBatchesAsync(id)
-                .ConfigureAwait(false);
-            var internalCommands = commands.ToList();
+            var command = await _internalCommandRepository.GetUnprocessedInternalCommandAsync().ConfigureAwait(false);
 
-            var lastId = internalCommands.Last().Id;
-
-            await Task.WhenAll(internalCommands.Select(command => internalCommandServiceBus.AddAsync(command)).ToArray());
-
-            // If we're at the max batch size that means that there might be more unprocessed commands in the DB and we need to do another round
-            if (internalCommands.Count == _querySettings.BatchSize)
+            if (command.Type != null)
             {
-                await GetUnprocessedInternalCommandsInBatchesAsync(internalCommandServiceBus, lastId);
+                // var o = Activator.CreateInstance("Energinet.DataHub.MarketData.Application", command.Type);
+                // var type = Type.GetType(command.Type);
+                //
+                //
+                // var bent = o?.Unwrap();
+                //
+                //
+                // if (bent == null) return;
+                var type = Type.GetType(command.Type) ?? throw new Exception();
+
+                var res = Convert.ChangeType(command.Data, type) ?? throw new Exception();
+
+                await _mediator.Send(res, CancellationToken.None);
             }
-        }
-
-        public async Task ExecuteInternalCommandAsync(InternalCommand internalCommand)
-        {
-            // TODO: Forward the command to the command handler
-
-            // Set the command as processed
-            await _internalCommandRepository.ProcessInternalCommandAsync(internalCommand.Id).ConfigureAwait(false);
         }
     }
 }

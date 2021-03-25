@@ -25,34 +25,18 @@ namespace Energinet.DataHub.MarketData.Infrastructure.InternalCommand
     public class InternalCommandRepository : IInternalCommandRepository
     {
         private readonly IDbConnectionFactory _connectionFactory;
-        private readonly IInternalCommandQuerySettings _querySettings;
 
-        public InternalCommandRepository(IDbConnectionFactory connectionFactory, IInternalCommandQuerySettings querySettings)
+        public InternalCommandRepository(IDbConnectionFactory connectionFactory)
         {
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
-            _querySettings = querySettings;
         }
 
         private IDbConnection Connection => _connectionFactory.GetOpenConnection();
 
-        public async Task<IEnumerable<InternalCommand>> GetUnprocessedInternalCommandsInBatchesAsync(int id)
+        public async Task<InternalCommand> GetUnprocessedInternalCommandAsync()
         {
-            var query = "SELECT TOP (@BatchSize) [Id], [Command] FROM [dbo].[InternalCommandQueue] I WHERE I.ProcessedDate IS NULL and ScheduledDate <= GETUTCDATE() and I.Id > @Id";
-            return await Connection.QueryAsync<InternalCommand>(query, new
-            {
-                BatchSize = _querySettings.BatchSize,
-                Id = id,
-            }).ConfigureAwait(false);
-        }
-
-        public async Task ProcessInternalCommandAsync(int id)
-        {
-            await Connection.ExecuteAsync(
-                    $"UPDATE InternalCommandQueue SET ProcessedDate = GETDATE() WHERE Id = @Id", param: new
-                    {
-                        Id = id,
-                    })
-                .ConfigureAwait(false);
+            var query = "SELECT TOP (1) Id, Data, Type FROM [dbo].[InternalCommandQueue] I WHERE I.ProcessedDate IS NULL and (ScheduledDate <= GETUTCDATE() OR ScheduledDate IS NULL)";
+            return await Connection.QueryFirstOrDefaultAsync<InternalCommand>(query).ConfigureAwait(false);
         }
     }
 }

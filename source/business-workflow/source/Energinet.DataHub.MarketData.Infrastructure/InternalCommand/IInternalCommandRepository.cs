@@ -9,14 +9,8 @@ namespace Energinet.DataHub.MarketData.Infrastructure.InternalCommand
     public interface IInternalCommandRepository
     {
         /// <summary>
-        /// Fetches all unprocessed commands from the database in batches of 100
+        /// Fetches the next unprocessed internal command
         /// </summary>
-        Task<IEnumerable<InternalCommand>> GetUnprocessedInternalCommandsInBatchesAsync(int id);
-
-        /// <summary>
-        /// Processes the InternalCommand as read
-        /// </summary>
-        /// <param name="id"></param>
-        Task ProcessInternalCommandAsync(int id);
+        Task<InternalCommand> GetUnprocessedInternalCommandAsync();
     }
 }
