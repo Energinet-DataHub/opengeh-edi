@@ -33,23 +33,10 @@ namespace Energinet.DataHub.MarketData.Infrastructure.InternalCommand
 
         private IDbConnection Connection => _connectionFactory.GetOpenConnection();
 
-        public async Task<IEnumerable<InternalCommand>> GetUnprocessedInternalCommandsInBatchesAsync(int id)
+        public async Task<InternalCommand> GetUnprocessedInternalCommandAsync()
         {
-            var query = "SELECT TOP (2) [Id], [Command] FROM [dbo].[InternalCommandQueue] I WHERE I.ProcessedDate IS NULL and ScheduledDate <= GETUTCDATE() and I.Id > @Id";
-            return await Connection.QueryAsync<InternalCommand>(query, new
-            {
-                Id = id,
-            }).ConfigureAwait(false);
-        }
-
-        public async Task ProcessInternalCommandAsync(int id)
-        {
-            await Connection.ExecuteAsync(
-                    $"UPDATE InternalCommandQueue SET ProcessedDate = GETDATE() WHERE Id = @Id", param: new
-                    {
-                        Id = id,
-                    })
-                .ConfigureAwait(false);
+            var query = "SELECT TOP (1) Id, Data, Type FROM [dbo].[InternalCommandQueue] I WHERE I.ProcessedDate IS NULL and (ScheduledDate <= GETUTCDATE() OR ScheduledDate IS NULL)";
+            return await Connection.QueryFirstOrDefaultAsync<InternalCommand>(query).ConfigureAwait(false);
         }
     }
 }

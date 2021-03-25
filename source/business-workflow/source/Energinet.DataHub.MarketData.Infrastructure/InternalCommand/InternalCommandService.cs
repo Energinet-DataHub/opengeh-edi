@@ -1,43 +1,43 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketData.Infrastructure.Outbox;
-using Microsoft.Azure.WebJobs;
+using Energinet.DataHub.MarketData.Application.ChangeOfSupplier;
+using GreenEnergyHub.Json;
+using MediatR;
 
 namespace Energinet.DataHub.MarketData.Infrastructure.InternalCommand
 {
     public class InternalCommandService : IInternalCommandService
     {
         private readonly IInternalCommandRepository _internalCommandRepository;
+        private readonly IMediator _mediator;
+        private readonly IJsonSerializer _jsonSerializer;
 
-        public InternalCommandService(IInternalCommandRepository internalCommandRepository)
+        public InternalCommandService(IInternalCommandRepository internalCommandRepository, IMediator mediator, IJsonSerializer jsonSerializer)
         {
             _internalCommandRepository = internalCommandRepository;
+            _mediator = mediator;
+            _jsonSerializer = jsonSerializer;
         }
 
-        public async Task GetUnprocessedInternalCommandsInBatchesAsync(
-            IAsyncCollector<dynamic> internalCommandServiceBus, int id)
+        public async Task ExecuteUnprocessedInternalCommandsAsync()
         {
-            var commands = await _internalCommandRepository.GetUnprocessedInternalCommandsInBatchesAsync(id)
-                .ConfigureAwait(false);
-            var internalCommands = commands.ToList();
+            var command = await _internalCommandRepository.GetUnprocessedInternalCommandAsync().ConfigureAwait(false);
 
-            var lastId = internalCommands.Last().Id;
-
-            await Task.WhenAll(internalCommands.Select(command => internalCommandServiceBus.AddAsync(command)).ToArray());
-
-            if (internalCommands.Count > 0)
+            if (command.Type != null)
             {
-                await GetUnprocessedInternalCommandsInBatchesAsync(internalCommandServiceBus, lastId);
+                // var o = Activator.CreateInstance("Energinet.DataHub.MarketData.Application", command.Type);
+                // var type = Type.GetType(command.Type);
+                //
+                //
+                // var bent = o?.Unwrap();
+                //
+                //
+                // if (bent == null) return;
+                // var type = Type.GetType("Energinet.DataHub.MarketData.Application.ChangeOfSupplier." + command.Type) ?? throw new Exception();
+                var res = _jsonSerializer.Deserialize<RequestChangeOfSupplier>(command.Data);
+                // var res = Convert.ChangeType(command.Data, typeof(RequestChangeOfSupplier)) ?? throw new Exception();
+                await _mediator.Send(res, CancellationToken.None);
             }
-        }
-
-        public async Task ExecuteInternalCommandAsync(InternalCommand internalCommand)
-        {
-            // TODO: Forward the command to the command handler
-
-            // Set the command as processed
-            await _internalCommandRepository.ProcessInternalCommandAsync(internalCommand.Id).ConfigureAwait(false);
         }
     }
 }
