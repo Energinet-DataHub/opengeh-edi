@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text.Json;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketData.Infrastructure.Outbox;
+using Energinet.DataHub.MarketData.Application.ChangeOfSupplier;
+using GreenEnergyHub.Json;
 using MediatR;
-using Microsoft.Azure.WebJobs;
 
 namespace Energinet.DataHub.MarketData.Infrastructure.InternalCommand
 {
@@ -15,11 +10,13 @@ namespace Energinet.DataHub.MarketData.Infrastructure.InternalCommand
     {
         private readonly IInternalCommandRepository _internalCommandRepository;
         private readonly IMediator _mediator;
+        private readonly IJsonSerializer _jsonSerializer;
 
-        public InternalCommandService(IInternalCommandRepository internalCommandRepository, IMediator mediator)
+        public InternalCommandService(IInternalCommandRepository internalCommandRepository, IMediator mediator, IJsonSerializer jsonSerializer)
         {
             _internalCommandRepository = internalCommandRepository;
             _mediator = mediator;
+            _jsonSerializer = jsonSerializer;
         }
 
         public async Task ExecuteUnprocessedInternalCommandsAsync()
@@ -36,10 +33,9 @@ namespace Energinet.DataHub.MarketData.Infrastructure.InternalCommand
                 //
                 //
                 // if (bent == null) return;
-                var type = Type.GetType(command.Type) ?? throw new Exception();
-
-                var res = Convert.ChangeType(command.Data, type) ?? throw new Exception();
-
+                // var type = Type.GetType("Energinet.DataHub.MarketData.Application.ChangeOfSupplier." + command.Type) ?? throw new Exception();
+                var res = _jsonSerializer.Deserialize<RequestChangeOfSupplier>(command.Data);
+                // var res = Convert.ChangeType(command.Data, typeof(RequestChangeOfSupplier)) ?? throw new Exception();
                 await _mediator.Send(res, CancellationToken.None);
             }
         }
