@@ -113,7 +113,8 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
             }
 
             _relationships.Add(new Relationship(energySupplierMrid,  RelationshipType.EnergySupplier, effectuationDate));
-            AddDomainEvent(new EnergySupplierChangeRegistered(GsrnNumber, energySupplierMrid, effectuationDate));
+            //TODO: Refactor along with new Comsumer/Supplier concepts
+            //AddDomainEvent(new EnergySupplierChangeRegistered(GsrnNumber, energySupplierMrid, effectuationDate));
         }
 
         public void CloseDown()
