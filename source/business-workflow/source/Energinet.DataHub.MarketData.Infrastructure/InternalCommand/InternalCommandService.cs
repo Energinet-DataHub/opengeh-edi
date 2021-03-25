@@ -27,8 +27,9 @@ namespace Energinet.DataHub.MarketData.Infrastructure.InternalCommand
 
             if (command.Type != null)
             {
-                Type type = Type.GetType("Energinet.DataHub.MarketData.Application.ChangeOfSupplier." + command.Type + ", Energinet.DataHub.MarketData.Application") ?? throw new Exception();
+                Type type = Type.GetType(command.Type + ", Energinet.DataHub.MarketData.Application") ?? throw new Exception();
                 var parsedCommand = _jsonSerializer.Deserialize(command.Data!, type);
+                // var parsedCommand = _jsonSerializer.Deserialize<IRequest>(command.Data);
 
                 // var res = Convert.ChangeType(command.Data, typeof(RequestChangeOfSupplier)) ?? throw new Exception();
                 await _mediator.Send(parsedCommand, CancellationToken.None);
