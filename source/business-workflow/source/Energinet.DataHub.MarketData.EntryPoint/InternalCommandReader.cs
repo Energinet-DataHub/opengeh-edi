@@ -23,7 +23,7 @@ namespace Energinet.DataHub.MarketData.EntryPoint
 
         [FunctionName("InternalCommandReader")]
         public async Task RunAsync(
-            [ServiceBusTrigger("commands", Connection = "INTERNAL_COMMAND_SERVICE_BUS_Listener")] string item)
+            [ServiceBusTrigger("commands", Connection = "INTERNAL_COMMAND_SERVICE_BUS_LISTENER")] string item)
         {
             await _internalCommandService.ExecuteInternalCommandAsync(JsonSerializer.Deserialize<InternalCommand>(item)).ConfigureAwait(false);
         }
