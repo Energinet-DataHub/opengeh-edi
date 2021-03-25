@@ -28,10 +28,10 @@ namespace Energinet.DataHub.MarketData.Infrastructure.InternalCommand
             if (command.Type != null)
             {
                 Type type = Type.GetType("Energinet.DataHub.MarketData.Application.ChangeOfSupplier." + command.Type + ", Energinet.DataHub.MarketData.Application") ?? throw new Exception();
-                var et_Tu_Brute = await _jsonSerializer.DeserializeAsync(new MemoryStream(Encoding.UTF8.GetBytes(command.Data!)), type).ConfigureAwait(false);
+                var parsedCommand = _jsonSerializer.Deserialize(command.Data!, type);
 
                 // var res = Convert.ChangeType(command.Data, typeof(RequestChangeOfSupplier)) ?? throw new Exception();
-                await _mediator.Send(et_Tu_Brute, CancellationToken.None);
+                await _mediator.Send(parsedCommand, CancellationToken.None);
             }
         }
     }

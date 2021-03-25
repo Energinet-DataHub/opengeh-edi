@@ -60,6 +60,23 @@ namespace GreenEnergyHub.Json
         TValue Deserialize<TValue>(string json);
 
         /// <summary>
+        /// Parse the text representing a single JSON value into an object of the type <paramref name="returnType"/>
+        /// </summary>
+        /// <returns>An object of the JSON value.</returns>
+        /// <param name="json">JSON text to parse.</param>
+        /// <param name="returnType">The type to parse the JSON value into</param>
+        /// <exception cref="System.ArgumentNullException">
+        /// Thrown if <paramref name="json"/> is null.
+        /// </exception>
+        /// <exception cref="JsonException">
+        /// Thrown when the JSON is invalid,
+        /// </exception>
+        /// <remarks>Using a <see cref="string"/> is not as efficient as using the
+        /// UTF-8 methods since the implementation natively uses UTF-8.
+        /// </remarks>
+        object Deserialize(string json, Type returnType);
+
+        /// <summary>
         /// Convert the provided value into a <see cref="string"/>.
         /// </summary>
         /// <returns>A <see cref="string"/> representation of the value.</returns>
