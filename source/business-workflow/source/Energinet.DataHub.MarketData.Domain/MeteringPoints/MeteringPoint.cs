@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Energinet.DataHub.MarketData.Domain.BusinessProcesses;
 using Energinet.DataHub.MarketData.Domain.MeteringPoints.Events;
 using Energinet.DataHub.MarketData.Domain.MeteringPoints.Rules.ChangeEnergySupplier;
 using Energinet.DataHub.MarketData.Domain.SeedWork;
@@ -114,7 +115,7 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
 
             _relationships.Add(new Relationship(energySupplierMrid,  RelationshipType.EnergySupplier, effectuationDate));
             //TODO: Refactor along with new Comsumer/Supplier concepts
-            //AddDomainEvent(new EnergySupplierChangeRegistered(GsrnNumber, energySupplierMrid, effectuationDate));
+            AddDomainEvent(new EnergySupplierChangeRegistered(GsrnNumber, new ProcessId("TODO"), effectuationDate));
         }
 
         public void CloseDown()
