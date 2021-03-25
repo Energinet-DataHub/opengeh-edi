@@ -1,6 +1,8 @@
-﻿using System.Threading;
+﻿using System;
+using System.IO;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketData.Application.ChangeOfSupplier;
 using GreenEnergyHub.Json;
 using MediatR;
 
@@ -25,18 +27,11 @@ namespace Energinet.DataHub.MarketData.Infrastructure.InternalCommand
 
             if (command.Type != null)
             {
-                // var o = Activator.CreateInstance("Energinet.DataHub.MarketData.Application", command.Type);
-                // var type = Type.GetType(command.Type);
-                //
-                //
-                // var bent = o?.Unwrap();
-                //
-                //
-                // if (bent == null) return;
-                // var type = Type.GetType("Energinet.DataHub.MarketData.Application.ChangeOfSupplier." + command.Type) ?? throw new Exception();
-                var res = _jsonSerializer.Deserialize<RequestChangeOfSupplier>(command.Data);
+                Type type = Type.GetType("Energinet.DataHub.MarketData.Application.ChangeOfSupplier." + command.Type + ", Energinet.DataHub.MarketData.Application") ?? throw new Exception();
+                var et_Tu_Brute = await _jsonSerializer.DeserializeAsync(new MemoryStream(Encoding.UTF8.GetBytes(command.Data!)), type).ConfigureAwait(false);
+
                 // var res = Convert.ChangeType(command.Data, typeof(RequestChangeOfSupplier)) ?? throw new Exception();
-                await _mediator.Send(res, CancellationToken.None);
+                await _mediator.Send(et_Tu_Brute, CancellationToken.None);
             }
         }
     }
