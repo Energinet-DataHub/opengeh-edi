@@ -1,3 +1,4 @@
-# Energinet Market Data
+# Read.ME
 
-Process changes to market data
+Created from template.
+`TODO`: expand this `README`
