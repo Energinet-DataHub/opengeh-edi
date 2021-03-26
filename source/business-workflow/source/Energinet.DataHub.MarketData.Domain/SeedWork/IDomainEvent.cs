@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using MediatR;
 using NodaTime;
 
 namespace Energinet.DataHub.MarketData.Domain.SeedWork
@@ -20,7 +21,7 @@ namespace Energinet.DataHub.MarketData.Domain.SeedWork
     /// <summary>
     /// Interface for domain events
     /// </summary>
-    public interface IDomainEvent
+    public interface IDomainEvent : INotification
     {
         /// <summary>
         /// Correlation id of event
