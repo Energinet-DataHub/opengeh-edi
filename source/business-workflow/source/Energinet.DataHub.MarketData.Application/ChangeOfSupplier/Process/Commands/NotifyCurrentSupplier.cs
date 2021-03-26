@@ -17,7 +17,7 @@ using Energinet.DataHub.MarketData.Domain.BusinessProcesses;
 
 namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process.Commands
 {
-    public class NotifyCurrentSupplier : IInternalCommand
+    public class NotifyCurrentSupplier : InternalCommandBase
     {
         public NotifyCurrentSupplier(ProcessId processId)
         {

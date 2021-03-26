@@ -19,13 +19,13 @@ namespace Energinet.DataHub.MarketData.Application.Common.Commands
 {
     public class EnqueuedCommand
     {
-        public EnqueuedCommand(IInternalCommand command, Instant? executionDate = null)
+        public EnqueuedCommand(InternalCommandBase command, Instant? executionDate = null)
         {
             Command = command ?? throw new ArgumentNullException(nameof(command));
             ExecutionDate = executionDate;
         }
 
-        public IInternalCommand Command { get; }
+        public InternalCommandBase Command { get; }
 
         public Instant? ExecutionDate { get; }
     }
