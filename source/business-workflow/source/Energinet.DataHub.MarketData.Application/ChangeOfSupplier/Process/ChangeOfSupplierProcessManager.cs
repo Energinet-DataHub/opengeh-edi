@@ -39,7 +39,9 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process
         {
             NotStarted,
             AwaitingConfirmationMessageDispatch,
-            AwaitingMasterDataDetailsDispatch,
+            AwaitingMeteringPointDetailsDispatch,
+            AwaitingConsumerDetailsDispatch,
+            AwaitingGridOperatorNotification,
             AwaitingCurrentSupplierNotificationDispatch,
             AwaitingSupplierChange,
             Completed,
@@ -68,8 +70,8 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process
             switch (_state)
             {
                 case State.AwaitingConfirmationMessageDispatch:
-                    SetInternalState(State.AwaitingMasterDataDetailsDispatch);
-                    SendCommand(new SendMasterDataDetails(_processId !));
+                    SetInternalState(State.AwaitingMeteringPointDetailsDispatch);
+                    SendCommand(new SendMeteringPointDetails(_processId !));
                     break;
                 default:
                     ThrowIfStateDoesNotMatch(@event);
@@ -77,11 +79,39 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process
             }
         }
 
-        public void When(MasterDataDetailsDispatched @event)
+        public void When(MeteringPointDetailsDispatched @event)
         {
             switch (_state)
             {
-                case State.AwaitingMasterDataDetailsDispatch:
+                case State.AwaitingMeteringPointDetailsDispatch:
+                    SetInternalState(State.AwaitingConsumerDetailsDispatch);
+                    SendCommand(new SendConsumerDetails(_processId!));
+                    break;
+                default:
+                    ThrowIfStateDoesNotMatch(@event);
+                    break;
+            }
+        }
+
+        public void When(ConsumerDetailsDispatched @event)
+        {
+            switch (_state)
+            {
+                case State.AwaitingConsumerDetailsDispatch:
+                    SetInternalState(State.AwaitingGridOperatorNotification);
+                    SendCommand(new NotifyGridOperator(_processId!));
+                    break;
+                default:
+                    ThrowIfStateDoesNotMatch(@event);
+                    break;
+            }
+        }
+
+        public void When(GridOperatorNotified @event)
+        {
+            switch (_state)
+            {
+                case State.AwaitingGridOperatorNotification:
                     SetInternalState(State.AwaitingCurrentSupplierNotificationDispatch);
                     ScheduleNotificationOfCurrentSupplier();
                     break;
