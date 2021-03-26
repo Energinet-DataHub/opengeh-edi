@@ -18,9 +18,9 @@ using Energinet.DataHub.MarketData.Domain.BusinessProcesses;
 
 namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process.Commands
 {
-    public class SendMasterDataDetails : IInternalCommand
+    public class SendMeteringPointDetails : IInternalCommand
     {
-        public SendMasterDataDetails(ProcessId processId)
+        public SendMeteringPointDetails(ProcessId processId)
         {
             ProcessId = processId ?? throw new ArgumentNullException(nameof(processId));
         }
