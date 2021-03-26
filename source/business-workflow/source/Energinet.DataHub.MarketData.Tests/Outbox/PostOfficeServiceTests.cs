@@ -51,7 +51,7 @@ namespace Energinet.DataHub.MarketData.Tests.Outbox
                 Recipient = "1234",
                 Type = typeof(RequestChangeOfSupplierRejected).ToString(),
                 Version = "v1",
-                EffectuationDate = SystemClock.Instance.GetCurrentInstant().ToTimestamp(),
+                CreationDate = SystemClock.Instance.GetCurrentInstant().ToTimestamp(),
             }.ToByteArray();
 
             await sut.SendMessageAsync(document).ConfigureAwait(false);

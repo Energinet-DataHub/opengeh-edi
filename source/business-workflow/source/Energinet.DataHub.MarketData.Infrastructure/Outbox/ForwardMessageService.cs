@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.PostOffice.Contracts;
 using Google.Protobuf;
@@ -42,6 +44,7 @@ namespace Energinet.DataHub.MarketData.Infrastructure.Outbox
             {
                 var postOfficeDocument = MapForwardMessageToPostOfficeDocument(message).ToByteArray();
 
+                // TODO: Implement some way of ordering and grouping messages. We need metering point created messages to arrive at the suppliers before the metering point info messages. See https://dev.azure.com/energinet/Datahub/_boards/board/t/Batman/Stories/?workitem=119557 for more info
                 await _postOfficeService.SendMessageAsync(postOfficeDocument);
                 await _forwardMessageRepository.MarkForwardedMessageAsProcessedAsync(message.Id).ConfigureAwait(false);
 
@@ -58,7 +61,7 @@ namespace Energinet.DataHub.MarketData.Infrastructure.Outbox
                 Recipient = message.Recipient,
                 Type = message.Type,
                 Version = "v1",
-                EffectuationDate = message.OccurredOn.ToTimestamp(),
+                CreationDate = message.OccurredOn.ToTimestamp(),
             };
         }
     }

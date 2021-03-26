@@ -27,7 +27,9 @@ namespace Energinet.DataHub.MarketData.Application.Common
         /// </summary>
         /// <param name="message"></param>
         /// <param name="recipient">The id of the message recipient</param>
+        /// <param name="grouping">Guid for the message group</param>
+        /// <param name="priority"></param>
         /// <returns><see cref="Task"/></returns>
-        Task PublishAsync<TMessage>(TMessage message, string recipient);
+        Task PublishAsync<TMessage>(TMessage message, string recipient, Guid grouping, int priority);
     }
 }

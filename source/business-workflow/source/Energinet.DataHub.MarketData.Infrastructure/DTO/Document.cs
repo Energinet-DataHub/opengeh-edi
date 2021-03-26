@@ -28,12 +28,14 @@ namespace Energinet.DataHub.PostOffice.Contracts {
             "cm90byKDAQoIRG9jdW1lbnQSDAoEdHlwZRgBIAEoCRI0ChBlZmZlY3R1YXRp",
             "b25EYXRlGAIgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIRCgly",
             "ZWNpcGllbnQYAyABKAkSDwoHY29udGVudBgEIAEoCRIPCgd2ZXJzaW9uGAUg",
-            "ASgJQimqAiZFbmVyZ2luZXQuRGF0YUh1Yi5Qb3N0T2ZmaWNlLkNvbnRyYWN0",
-            "c2IGcHJvdG8z"));
+            "ASgJIiwKDERvY3VtZW50TGlzdBIcCglkb2N1bWVudHMYASADKAsyCS5Eb2N1",
+            "bWVudEIpqgImRW5lcmdpbmV0LkRhdGFIdWIuUG9zdE9mZmljZS5Db250cmFj",
+            "dHNiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Google.Protobuf.WellKnownTypes.TimestampReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Energinet.DataHub.PostOffice.Contracts.Document), global::Energinet.DataHub.PostOffice.Contracts.Document.Parser, new[]{ "Type", "EffectuationDate", "Recipient", "Content", "Version" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Energinet.DataHub.PostOffice.Contracts.Document), global::Energinet.DataHub.PostOffice.Contracts.Document.Parser, new[]{ "Type", "CreationDate", "Recipient", "Content", "Version" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Energinet.DataHub.PostOffice.Contracts.DocumentList), global::Energinet.DataHub.PostOffice.Contracts.DocumentList.Parser, new[]{ "Documents" }, null, null, null, null)
           }));
     }
     #endregion
@@ -70,7 +72,7 @@ namespace Energinet.DataHub.PostOffice.Contracts {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public Document(Document other) : this() {
       type_ = other.type_;
-      effectuationDate_ = other.effectuationDate_ != null ? other.effectuationDate_.Clone() : null;
+      creationDate_ = other.creationDate_ != null ? other.creationDate_.Clone() : null;
       recipient_ = other.recipient_;
       content_ = other.content_;
       version_ = other.version_;
@@ -93,14 +95,14 @@ namespace Energinet.DataHub.PostOffice.Contracts {
       }
     }
 
-    /// <summary>Field number for the "effectuationDate" field.</summary>
-    public const int EffectuationDateFieldNumber = 2;
-    private global::Google.Protobuf.WellKnownTypes.Timestamp effectuationDate_;
+    /// <summary>Field number for the "creationDate" field.</summary>
+    public const int CreationDateFieldNumber = 2;
+    private global::Google.Protobuf.WellKnownTypes.Timestamp creationDate_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Google.Protobuf.WellKnownTypes.Timestamp EffectuationDate {
-      get { return effectuationDate_; }
+    public global::Google.Protobuf.WellKnownTypes.Timestamp CreationDate {
+      get { return creationDate_; }
       set {
-        effectuationDate_ = value;
+        creationDate_ = value;
       }
     }
 
@@ -151,7 +153,7 @@ namespace Energinet.DataHub.PostOffice.Contracts {
         return true;
       }
       if (Type != other.Type) return false;
-      if (!object.Equals(EffectuationDate, other.EffectuationDate)) return false;
+      if (!object.Equals(CreationDate, other.CreationDate)) return false;
       if (Recipient != other.Recipient) return false;
       if (Content != other.Content) return false;
       if (Version != other.Version) return false;
@@ -162,7 +164,7 @@ namespace Energinet.DataHub.PostOffice.Contracts {
     public override int GetHashCode() {
       int hash = 1;
       if (Type.Length != 0) hash ^= Type.GetHashCode();
-      if (effectuationDate_ != null) hash ^= EffectuationDate.GetHashCode();
+      if (creationDate_ != null) hash ^= CreationDate.GetHashCode();
       if (Recipient.Length != 0) hash ^= Recipient.GetHashCode();
       if (Content.Length != 0) hash ^= Content.GetHashCode();
       if (Version.Length != 0) hash ^= Version.GetHashCode();
@@ -186,9 +188,9 @@ namespace Energinet.DataHub.PostOffice.Contracts {
         output.WriteRawTag(10);
         output.WriteString(Type);
       }
-      if (effectuationDate_ != null) {
+      if (creationDate_ != null) {
         output.WriteRawTag(18);
-        output.WriteMessage(EffectuationDate);
+        output.WriteMessage(CreationDate);
       }
       if (Recipient.Length != 0) {
         output.WriteRawTag(26);
@@ -215,9 +217,9 @@ namespace Energinet.DataHub.PostOffice.Contracts {
         output.WriteRawTag(10);
         output.WriteString(Type);
       }
-      if (effectuationDate_ != null) {
+      if (creationDate_ != null) {
         output.WriteRawTag(18);
-        output.WriteMessage(EffectuationDate);
+        output.WriteMessage(CreationDate);
       }
       if (Recipient.Length != 0) {
         output.WriteRawTag(26);
@@ -243,8 +245,8 @@ namespace Energinet.DataHub.PostOffice.Contracts {
       if (Type.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Type);
       }
-      if (effectuationDate_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(EffectuationDate);
+      if (creationDate_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(CreationDate);
       }
       if (Recipient.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Recipient);
@@ -269,11 +271,11 @@ namespace Energinet.DataHub.PostOffice.Contracts {
       if (other.Type.Length != 0) {
         Type = other.Type;
       }
-      if (other.effectuationDate_ != null) {
-        if (effectuationDate_ == null) {
-          EffectuationDate = new global::Google.Protobuf.WellKnownTypes.Timestamp();
+      if (other.creationDate_ != null) {
+        if (creationDate_ == null) {
+          CreationDate = new global::Google.Protobuf.WellKnownTypes.Timestamp();
         }
-        EffectuationDate.MergeFrom(other.EffectuationDate);
+        CreationDate.MergeFrom(other.CreationDate);
       }
       if (other.Recipient.Length != 0) {
         Recipient = other.Recipient;
@@ -303,10 +305,10 @@ namespace Energinet.DataHub.PostOffice.Contracts {
             break;
           }
           case 18: {
-            if (effectuationDate_ == null) {
-              EffectuationDate = new global::Google.Protobuf.WellKnownTypes.Timestamp();
+            if (creationDate_ == null) {
+              CreationDate = new global::Google.Protobuf.WellKnownTypes.Timestamp();
             }
-            input.ReadMessage(EffectuationDate);
+            input.ReadMessage(CreationDate);
             break;
           }
           case 26: {
@@ -340,10 +342,10 @@ namespace Energinet.DataHub.PostOffice.Contracts {
             break;
           }
           case 18: {
-            if (effectuationDate_ == null) {
-              EffectuationDate = new global::Google.Protobuf.WellKnownTypes.Timestamp();
+            if (creationDate_ == null) {
+              CreationDate = new global::Google.Protobuf.WellKnownTypes.Timestamp();
             }
-            input.ReadMessage(EffectuationDate);
+            input.ReadMessage(CreationDate);
             break;
           }
           case 26: {
@@ -356,6 +358,167 @@ namespace Energinet.DataHub.PostOffice.Contracts {
           }
           case 42: {
             Version = input.ReadString();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  public sealed partial class DocumentList : pb::IMessage<DocumentList>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<DocumentList> _parser = new pb::MessageParser<DocumentList>(() => new DocumentList());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<DocumentList> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Energinet.DataHub.PostOffice.Contracts.DocumentReflection.Descriptor.MessageTypes[1]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public DocumentList() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public DocumentList(DocumentList other) : this() {
+      documents_ = other.documents_.Clone();
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public DocumentList Clone() {
+      return new DocumentList(this);
+    }
+
+    /// <summary>Field number for the "documents" field.</summary>
+    public const int DocumentsFieldNumber = 1;
+    private static readonly pb::FieldCodec<global::Energinet.DataHub.PostOffice.Contracts.Document> _repeated_documents_codec
+        = pb::FieldCodec.ForMessage(10, global::Energinet.DataHub.PostOffice.Contracts.Document.Parser);
+    private readonly pbc::RepeatedField<global::Energinet.DataHub.PostOffice.Contracts.Document> documents_ = new pbc::RepeatedField<global::Energinet.DataHub.PostOffice.Contracts.Document>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public pbc::RepeatedField<global::Energinet.DataHub.PostOffice.Contracts.Document> Documents {
+      get { return documents_; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as DocumentList);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(DocumentList other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if(!documents_.Equals(other.documents_)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      hash ^= documents_.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      documents_.WriteTo(output, _repeated_documents_codec);
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      documents_.WriteTo(ref output, _repeated_documents_codec);
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      size += documents_.CalculateSize(_repeated_documents_codec);
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(DocumentList other) {
+      if (other == null) {
+        return;
+      }
+      documents_.Add(other.documents_);
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            documents_.AddEntriesFrom(input, _repeated_documents_codec);
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            documents_.AddEntriesFrom(ref input, _repeated_documents_codec);
             break;
           }
         }
