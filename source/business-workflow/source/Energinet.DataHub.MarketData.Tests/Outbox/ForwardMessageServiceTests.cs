@@ -13,9 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketData.Infrastructure.Outbox;
@@ -28,7 +25,6 @@ using Xunit.Sdk;
 
 namespace Energinet.DataHub.MarketData.Tests.Outbox
 {
-    [Trait("Category", "Unit")]
     [Trait("Category", "Unit")]
     public class ForwardMessageServiceTests
     {
