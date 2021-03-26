@@ -44,8 +44,13 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Script0011 - Update Charges database model.sql" />
     <EmbeddedResource Include="Scripts\Script0012 - Mock market participants for charges.sql" />
     <EmbeddedResource Include="Scripts\Script0013 - Alter OutgoingActorMessages table.sql" />
-    <EmbeddedResource Include="Scripts\Script0015 - Alter OutgoingActorMessages table with grouping.sql" />
     <EmbeddedResource Include="Scripts\Script0014 - Add ValidationRuleConfiguration.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Scripts\Model" />
+    <Folder Include="Scripts\Seed" />
+    <Folder Include="Scripts\Test" />
   </ItemGroup>
 
 </Project>

@@ -16,7 +16,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketData.Application.ChangeOfSupplier.ActorMessages;
-using Energinet.DataHub.MarketData.Application.ChangeOfSupplier.MasterData;
 using Energinet.DataHub.MarketData.Application.Common;
 using MediatR;
 
@@ -25,12 +24,10 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier
     public class PublishActorMessageHandlerBehavior : IPipelineBehavior<RequestChangeOfSupplier, RequestChangeOfSupplierResult>
     {
         private readonly IActorMessagePublisher _messagePublisher;
-        private IMediator _mediator;
 
-        public PublishActorMessageHandlerBehavior(IActorMessagePublisher messagePublisher, IMediator mediator)
+        public PublishActorMessageHandlerBehavior(IActorMessagePublisher messagePublisher)
         {
             _messagePublisher = messagePublisher ?? throw new ArgumentNullException(nameof(messagePublisher));
-            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
         public async Task<RequestChangeOfSupplierResult> Handle(RequestChangeOfSupplier command, CancellationToken cancellationToken, RequestHandlerDelegate<RequestChangeOfSupplierResult> next)
@@ -45,45 +42,36 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier
                 throw new ArgumentNullException(nameof(next));
             }
 
-            var grouping = Guid.NewGuid();
             var result = await next().ConfigureAwait(false);
             if (result.Succeeded)
             {
-                await PublishAcceptedMessageAsync(command, grouping).ConfigureAwait(false);
-                await PublishMeteringPointMasterDataAsync(command, grouping);
+                await PublishAcceptedMessageAsync(command).ConfigureAwait(false);
             }
             else
             {
-                await PublishRejectionMessageAsync(command, result, grouping).ConfigureAwait(false);
+                await PublishRejectionMessageAsync(command, result).ConfigureAwait(false);
             }
 
             return result;
         }
 
-        private Task PublishAcceptedMessageAsync(RequestChangeOfSupplier command, Guid grouping)
+        private Task PublishAcceptedMessageAsync(RequestChangeOfSupplier command)
         {
             // TODO: <INSERT MESSAGE ID> will be replaced in another PR
-            var message = new RequestChangeOfSupplierApproved("<INSERT MESSAGE ID>", command.Transaction.MRID, command.MarketEvaluationPoint.MRid, command.EnergySupplier.MRID!, command.StartDate);
-            return SendMessageAsync(message, command.EnergySupplier.MRID!, grouping, 1);
+            var message = new RequestChangeOfSupplierApproved("<INSERT MESSAGE ID>", command.Transaction.MRID, command.MarketEvaluationPoint.MRid, command.EnergySupplier.MRID!);
+            return SendMessageAsync(message, command.EnergySupplier.MRID!);
         }
 
-        private Task PublishRejectionMessageAsync(RequestChangeOfSupplier command, RequestChangeOfSupplierResult result, Guid grouping)
+        private Task PublishRejectionMessageAsync(RequestChangeOfSupplier command, RequestChangeOfSupplierResult result)
         {
             // TODO: <INSERT MESSAGE ID> will be replaced in another PR
             var message = new RequestChangeOfSupplierRejected("<INSERT MESSAGE ID>", command.Transaction.MRID, command.MarketEvaluationPoint.MRid, result.Errors!);
-            return SendMessageAsync(message, command.EnergySupplier.MRID!, grouping, 1);
+            return SendMessageAsync(message, command.EnergySupplier.MRID!);
         }
 
-        private async Task PublishMeteringPointMasterDataAsync(RequestChangeOfSupplier command, Guid grouping)
+        private Task SendMessageAsync<TMessage>(TMessage message, string recipient)
         {
-            var queryMasterData = new QueryMasterData { GsrnNumber = command.MarketEvaluationPoint.MRid };
-            var masterData = await _mediator.Send(queryMasterData, CancellationToken.None).ConfigureAwait(false);
-            await SendMessageAsync(masterData, command.EnergySupplier.MRID!, grouping, 2);
-        }
-
-        private Task SendMessageAsync<TMessage>(TMessage message, string recipient, Guid grouping, int priority)
-        {
-            return _messagePublisher.PublishAsync(message, recipient, grouping, priority);
+            return _messagePublisher.PublishAsync(message, recipient);
         }
     }
 }

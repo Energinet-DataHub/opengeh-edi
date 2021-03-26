@@ -44,7 +44,7 @@ namespace Energinet.DataHub.MarketData.Infrastructure.DataPersistence.MarketEval
             }
 
             var meteringPointQuery =
-                $"SELECT * FROM [dbo].[MarketEvaluationPoints]" +
+                $"SELECT * FROM [dbo].[MarketEvaluationPoints] " +
                 "WHERE GsrnNumber = @GsrnNumber";
 
             var meteringPoint =
