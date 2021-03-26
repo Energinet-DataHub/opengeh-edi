@@ -33,7 +33,7 @@ namespace Energinet.DataHub.MarketData.Infrastructure.InternalCommand
 
         private IDbConnection Connection => _connectionFactory.GetOpenConnection();
 
-        public async Task<InternalCommand> GetUnprocessedInternalCommandAsync()
+        public async Task<InternalCommand?> GetUnprocessedInternalCommandAsync()
         {
             var query = "SELECT TOP (1) Id, Data, Type FROM [dbo].[InternalCommandQueue] I WHERE I.ProcessedDate IS NULL and (ScheduledDate <= GETUTCDATE() OR ScheduledDate IS NULL)";
             return await Connection.QueryFirstOrDefaultAsync<InternalCommand>(query).ConfigureAwait(false);

@@ -11,6 +11,6 @@ namespace Energinet.DataHub.MarketData.Infrastructure.InternalCommand
         /// <summary>
         /// Fetches the next unprocessed internal command
         /// </summary>
-        Task<InternalCommand> GetUnprocessedInternalCommandAsync();
+        Task<InternalCommand?> GetUnprocessedInternalCommandAsync();
     }
 }

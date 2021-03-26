@@ -72,13 +72,6 @@ namespace Energinet.DataHub.MarketData.EntryPoint
                 return client.CreateSender(topicName);
             });
 
-            builder.Services.AddScoped<IInternalCommandQuerySettings>(serviceProvider =>
-            {
-                var configuration = serviceProvider.GetService<IConfiguration>();
-                var batchSize = Convert.ToInt32(configuration.GetValue<string>("INTERNAL_COMMANDS_BATCH_SIZE"));
-                return new InternalCommandQuerySettings(batchSize);
-            });
-
             DapperNodaTimeSetup.Register();
 
             builder.Services.AddScoped<IUnitOfWorkCallback, UnitOfWorkCallback>();
