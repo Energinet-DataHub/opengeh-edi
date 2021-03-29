@@ -29,7 +29,6 @@ using Xunit.Sdk;
 namespace Energinet.DataHub.MarketData.Tests.Outbox
 {
     [Trait("Category", "Unit")]
-    [Trait("Category", "Unit")]
     public class ForwardMessageServiceTests
     {
         private readonly Mock<IForwardMessageRepository> _forwardMessageRepositoryMock;
