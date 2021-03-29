@@ -31,7 +31,6 @@ limitations under the License.
   <ItemGroup>
     <EmbeddedResource Include="Scripts\202103291100 Set up MarketEvaluationPoint and MarketParticipant tables.sql" />
     <EmbeddedResource Include="Scripts\202103291101 Add MarketData mock data.sql" />
-    <EmbeddedResource Include="Scripts\202103291102 Create mock data table for ODS view.sql" />
     <EmbeddedResource Include="Scripts\202103291103 Add OutgoingActorMessages mock data.sql" />
     <EmbeddedResource Include="Scripts\202103291104 Alter OutgoingActorMessages table.sql" />
     <EmbeddedResource Include="Scripts\202103291105 Create InternalCommandQueue.sql" />
