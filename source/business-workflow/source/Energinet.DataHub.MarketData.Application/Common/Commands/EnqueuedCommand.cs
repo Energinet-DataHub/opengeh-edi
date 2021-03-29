@@ -13,26 +13,20 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketData.Domain.SeedWork;
+using NodaTime;
 
-namespace Energinet.DataHub.MarketData.Domain.BusinessProcesses
+namespace Energinet.DataHub.MarketData.Application.Common.Commands
 {
-    public class ProcessId : ValueObject
+    public class EnqueuedCommand
     {
-        public ProcessId(string value)
+        public EnqueuedCommand(IInternalCommand command, Instant? executionDate = null)
         {
-            Value = value;
+            Command = command ?? throw new ArgumentNullException(nameof(command));
+            ExecutionDate = executionDate;
         }
 
-        public ProcessId()
-        {
-        }
+        public IInternalCommand Command { get; }
 
-        public string? Value { get; set; }
-
-        public override string ToString()
-        {
-            return Value ?? string.Empty;
-        }
+        public Instant? ExecutionDate { get; }
     }
 }

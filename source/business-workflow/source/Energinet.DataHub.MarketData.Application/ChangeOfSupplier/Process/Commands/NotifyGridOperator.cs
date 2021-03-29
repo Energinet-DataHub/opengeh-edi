@@ -12,27 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Energinet.DataHub.MarketData.Domain.SeedWork;
+using Energinet.DataHub.MarketData.Application.Common.Commands;
+using Energinet.DataHub.MarketData.Domain.BusinessProcesses;
 
-namespace Energinet.DataHub.MarketData.Domain.BusinessProcesses
+namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process.Commands
 {
-    public class ProcessId : ValueObject
+    public class NotifyGridOperator : IInternalCommand
     {
-        public ProcessId(string value)
+        public NotifyGridOperator(ProcessId processId)
         {
-            Value = value;
+            ProcessId = processId;
         }
 
-        public ProcessId()
+        public NotifyGridOperator()
         {
         }
 
-        public string? Value { get; set; }
-
-        public override string ToString()
-        {
-            return Value ?? string.Empty;
-        }
+        public ProcessId? ProcessId { get; set; }
     }
 }

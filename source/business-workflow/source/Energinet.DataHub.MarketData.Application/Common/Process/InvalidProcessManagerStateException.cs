@@ -12,27 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Energinet.DataHub.MarketData.Domain.SeedWork;
+using Energinet.DataHub.MarketData.Domain.BusinessProcesses.Exceptions;
 
-namespace Energinet.DataHub.MarketData.Domain.BusinessProcesses
+namespace Energinet.DataHub.MarketData.Application.Common.Process
 {
-    public class ProcessId : ValueObject
+    public class InvalidProcessManagerStateException : BusinessProcessException
     {
-        public ProcessId(string value)
+        public InvalidProcessManagerStateException(string? message)
+            : base(message)
         {
-            Value = value;
-        }
-
-        public ProcessId()
-        {
-        }
-
-        public string? Value { get; set; }
-
-        public override string ToString()
-        {
-            return Value ?? string.Empty;
         }
     }
 }

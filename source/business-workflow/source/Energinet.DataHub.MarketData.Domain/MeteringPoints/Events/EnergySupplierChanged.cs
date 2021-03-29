@@ -12,27 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Energinet.DataHub.MarketData.Domain.BusinessProcesses;
 using Energinet.DataHub.MarketData.Domain.SeedWork;
+using NodaTime;
 
-namespace Energinet.DataHub.MarketData.Domain.BusinessProcesses
+namespace Energinet.DataHub.MarketData.Domain.MeteringPoints.Events
 {
-    public class ProcessId : ValueObject
+    public class EnergySupplierChanged : DomainEventBase
     {
-        public ProcessId(string value)
+        public EnergySupplierChanged(string gsrnNumber, string processId, Instant effectiveDate)
         {
-            Value = value;
+            GsrnNumber = gsrnNumber;
+            ProcessId = processId;
+            EffectiveDate = effectiveDate;
         }
 
-        public ProcessId()
-        {
-        }
+        public string GsrnNumber { get; }
 
-        public string? Value { get; set; }
+        public string ProcessId { get; }
 
-        public override string ToString()
-        {
-            return Value ?? string.Empty;
-        }
+        public Instant EffectiveDate { get; }
     }
 }

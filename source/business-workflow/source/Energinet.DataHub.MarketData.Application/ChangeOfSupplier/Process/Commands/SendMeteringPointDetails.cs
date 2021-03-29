@@ -13,26 +13,22 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketData.Domain.SeedWork;
+using Energinet.DataHub.MarketData.Application.Common.Commands;
+using Energinet.DataHub.MarketData.Domain.BusinessProcesses;
 
-namespace Energinet.DataHub.MarketData.Domain.BusinessProcesses
+namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process.Commands
 {
-    public class ProcessId : ValueObject
+    public class SendMeteringPointDetails : IInternalCommand
     {
-        public ProcessId(string value)
+        public SendMeteringPointDetails(ProcessId processId)
         {
-            Value = value;
+            ProcessId = processId ?? throw new ArgumentNullException(nameof(processId));
         }
 
-        public ProcessId()
+        public SendMeteringPointDetails()
         {
         }
 
-        public string? Value { get; set; }
-
-        public override string ToString()
-        {
-            return Value ?? string.Empty;
-        }
+        public ProcessId? ProcessId { get; set; }
     }
 }

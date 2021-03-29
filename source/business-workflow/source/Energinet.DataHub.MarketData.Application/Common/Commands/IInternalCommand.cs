@@ -12,27 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Energinet.DataHub.MarketData.Domain.SeedWork;
-
-namespace Energinet.DataHub.MarketData.Domain.BusinessProcesses
+namespace Energinet.DataHub.MarketData.Application.Common.Commands
 {
-    public class ProcessId : ValueObject
+    /// <summary>
+    /// CQRS Command object
+    /// </summary>
+    public interface IInternalCommand
     {
-        public ProcessId(string value)
-        {
-            Value = value;
-        }
-
-        public ProcessId()
-        {
-        }
-
-        public string? Value { get; set; }
-
-        public override string ToString()
-        {
-            return Value ?? string.Empty;
-        }
     }
 }
