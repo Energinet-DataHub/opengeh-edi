@@ -48,10 +48,4 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Script0015 - Create InternalCommandQueue.sql" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Scripts\Model" />
-    <Folder Include="Scripts\Seed" />
-    <Folder Include="Scripts\Test" />
-  </ItemGroup>
-
 </Project>
