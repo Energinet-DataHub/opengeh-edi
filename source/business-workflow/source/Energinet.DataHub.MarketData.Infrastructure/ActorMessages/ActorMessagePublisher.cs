@@ -39,7 +39,7 @@ namespace Energinet.DataHub.MarketData.Infrastructure.ActorMessages
             _jsonSerializer = jsonSerializer;
         }
 
-        public Task PublishAsync<TMessage>(TMessage message, string recipient, Guid grouping, int priority)
+        public Task PublishAsync<TMessage>(TMessage message, string recipient)
         {
             if (message is null)
             {
@@ -49,7 +49,7 @@ namespace Energinet.DataHub.MarketData.Infrastructure.ActorMessages
             var messageType = message.GetType().Name;
             var payload = _jsonSerializer.Serialize(message);
 
-            var outboxMessage = new OutgoingActorMessage(_systemDateTimeProvider.Now(), messageType, payload, recipient, grouping, priority);
+            var outboxMessage = new OutgoingActorMessage(_systemDateTimeProvider.Now(), messageType, payload, recipient);
             _unitOfWorkCallback.RegisterNew(outboxMessage, this);
 
             return Task.CompletedTask;
@@ -64,7 +64,7 @@ namespace Energinet.DataHub.MarketData.Infrastructure.ActorMessages
                 throw new NullReferenceException(nameof(dataModel));
             }
 
-            var insertStatement = $"INSERT INTO [dbo].[OutgoingActorMessages] (OccurredOn, Type, Data, State, LastUpdatedOn, Recipient, Grouping, Priority) VALUES (@OccurredOn, @Type, @Data, @State, @LastUpdatedOn, @Recipient, @Grouping, @Priority)";
+            var insertStatement = $"INSERT INTO [dbo].[OutgoingActorMessages] (OccurredOn, Type, Data, State, LastUpdatedOn, Recipient, Grouping, Priority) VALUES (@OccurredOn, @Type, @Data, @State, @LastUpdatedOn, @Recipient)";
             await _connectionFactory.GetOpenConnection().ExecuteAsync(insertStatement, new
             {
                 OccurredOn = dataModel.OccurredOn,
@@ -73,8 +73,6 @@ namespace Energinet.DataHub.MarketData.Infrastructure.ActorMessages
                 State = OutboxState.Pending.Id,
                 LastUpdatedOn = SystemClock.Instance.GetCurrentInstant(),
                 Recipient = dataModel.Recipient,
-                Grouping = dataModel.Grouping,
-                Priority = dataModel.Priority,
             }).ConfigureAwait(false);
         }
     }

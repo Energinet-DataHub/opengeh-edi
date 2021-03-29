@@ -45,45 +45,44 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier
                 throw new ArgumentNullException(nameof(next));
             }
 
-            var grouping = Guid.NewGuid();
             var result = await next().ConfigureAwait(false);
             if (result.Succeeded)
             {
-                await PublishAcceptedMessageAsync(command, grouping).ConfigureAwait(false);
-                await PublishMeteringPointMasterDataAsync(command, grouping);
+                await PublishAcceptedMessageAsync(command).ConfigureAwait(false);
+                await PublishMeteringPointMasterDataAsync(command);
             }
             else
             {
-                await PublishRejectionMessageAsync(command, result, grouping).ConfigureAwait(false);
+                await PublishRejectionMessageAsync(command, result).ConfigureAwait(false);
             }
 
             return result;
         }
 
-        private Task PublishAcceptedMessageAsync(RequestChangeOfSupplier command, Guid grouping)
+        private Task PublishAcceptedMessageAsync(RequestChangeOfSupplier command)
         {
             // TODO: <INSERT MESSAGE ID> will be replaced in another PR
             var message = new RequestChangeOfSupplierApproved("<INSERT MESSAGE ID>", command.Transaction.MRID, command.MarketEvaluationPoint.MRid, command.EnergySupplier.MRID!, command.StartDate);
-            return SendMessageAsync(message, command.EnergySupplier.MRID!, grouping, 1);
+            return SendMessageAsync(message, command.EnergySupplier.MRID!);
         }
 
-        private Task PublishRejectionMessageAsync(RequestChangeOfSupplier command, RequestChangeOfSupplierResult result, Guid grouping)
+        private Task PublishRejectionMessageAsync(RequestChangeOfSupplier command, RequestChangeOfSupplierResult result)
         {
             // TODO: <INSERT MESSAGE ID> will be replaced in another PR
             var message = new RequestChangeOfSupplierRejected("<INSERT MESSAGE ID>", command.Transaction.MRID, command.MarketEvaluationPoint.MRid, result.Errors!);
-            return SendMessageAsync(message, command.EnergySupplier.MRID!, grouping, 1);
+            return SendMessageAsync(message, command.EnergySupplier.MRID!);
         }
 
-        private async Task PublishMeteringPointMasterDataAsync(RequestChangeOfSupplier command, Guid grouping)
+        private async Task PublishMeteringPointMasterDataAsync(RequestChangeOfSupplier command)
         {
             var queryMasterData = new QueryMasterData { GsrnNumber = command.MarketEvaluationPoint.MRid };
             var masterData = await _mediator.Send(queryMasterData, CancellationToken.None).ConfigureAwait(false);
-            await SendMessageAsync(masterData, command.EnergySupplier.MRID!, grouping, 2);
+            await SendMessageAsync(masterData, command.EnergySupplier.MRID!);
         }
 
-        private Task SendMessageAsync<TMessage>(TMessage message, string recipient, Guid grouping, int priority)
+        private Task SendMessageAsync<TMessage>(TMessage message, string recipient)
         {
-            return _messagePublisher.PublishAsync(message, recipient, grouping, priority);
+            return _messagePublisher.PublishAsync(message, recipient);
         }
     }
 }

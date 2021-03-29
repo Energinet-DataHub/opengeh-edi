@@ -31,14 +31,12 @@ namespace Energinet.DataHub.MarketData.Infrastructure.Outbox
             State = state;
         }
 
-        public OutgoingActorMessage(Instant occurredOn, string type, string data, string? recipient, Guid grouping, int priority)
+        public OutgoingActorMessage(Instant occurredOn, string type, string data, string? recipient)
         {
             OccurredOn = occurredOn;
             Type = type;
             Data = data;
             Recipient = recipient;
-            Grouping = grouping;
-            Priority = priority;
         }
 
         public OutgoingActorMessage(Instant occurredOn, string type, string data)
@@ -61,9 +59,5 @@ namespace Energinet.DataHub.MarketData.Infrastructure.Outbox
         public int State { get; set; }
 
         public Instant? ProcessedDate { get; set; }
-
-        public Guid Grouping { get; set; }
-
-        public int Priority { get; set; }
     }
 }
