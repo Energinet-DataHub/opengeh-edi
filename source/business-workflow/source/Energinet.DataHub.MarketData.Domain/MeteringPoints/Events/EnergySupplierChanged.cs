@@ -18,18 +18,18 @@ using NodaTime;
 
 namespace Energinet.DataHub.MarketData.Domain.MeteringPoints.Events
 {
-    public class EnergySupplierChangeRegistered : DomainEventBase
+    public class EnergySupplierChanged : DomainEventBase
     {
-        public EnergySupplierChangeRegistered(GsrnNumber gsrnNumber, ProcessId processId, Instant effectiveDate)
+        public EnergySupplierChanged(string gsrnNumber, string processId, Instant effectiveDate)
         {
             GsrnNumber = gsrnNumber;
             ProcessId = processId;
             EffectiveDate = effectiveDate;
         }
 
-        public GsrnNumber GsrnNumber { get; }
+        public string GsrnNumber { get; }
 
-        public ProcessId ProcessId { get; }
+        public string ProcessId { get; }
 
         public Instant EffectiveDate { get; }
     }
