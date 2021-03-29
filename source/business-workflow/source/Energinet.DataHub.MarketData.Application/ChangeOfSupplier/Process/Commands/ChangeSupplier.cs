@@ -5,11 +5,15 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process.Comm
 {
     public class ChangeSupplier : IInternalCommand
     {
+        public ChangeSupplier()
+        {
+        }
+
         public ChangeSupplier(ProcessId processId)
         {
             ProcessId = processId;
         }
 
-        public ProcessId ProcessId { get; }
+        public ProcessId? ProcessId { get; set; }
     }
 }
