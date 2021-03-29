@@ -13,14 +13,13 @@
 // limitations under the License.
 
 using System;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.MarketData.Application.Common;
 using Energinet.DataHub.MarketData.Domain.SeedWork;
 using Energinet.DataHub.MarketData.Infrastructure.DataPersistence;
 using Energinet.DataHub.MarketData.Infrastructure.Outbox;
-using Newtonsoft.Json.Linq;
+using GreenEnergyHub.Json;
 using NodaTime;
 
 namespace Energinet.DataHub.MarketData.Infrastructure.ActorMessages
@@ -30,12 +29,14 @@ namespace Energinet.DataHub.MarketData.Infrastructure.ActorMessages
         private readonly IDbConnectionFactory _connectionFactory;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
         private readonly IUnitOfWorkCallback _unitOfWorkCallback;
+        private readonly IJsonSerializer _jsonSerializer;
 
-        public ActorMessagePublisher(IDbConnectionFactory connectionFactory, ISystemDateTimeProvider systemDateTimeProvider, IUnitOfWorkCallback unitOfWorkCallback)
+        public ActorMessagePublisher(IDbConnectionFactory connectionFactory, ISystemDateTimeProvider systemDateTimeProvider, IUnitOfWorkCallback unitOfWorkCallback, IJsonSerializer jsonSerializer)
         {
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
             _systemDateTimeProvider = systemDateTimeProvider ?? throw new ArgumentNullException(nameof(systemDateTimeProvider));
             _unitOfWorkCallback = unitOfWorkCallback ?? throw new ArgumentNullException(nameof(unitOfWorkCallback));
+            _jsonSerializer = jsonSerializer;
         }
 
         public Task PublishAsync<TMessage>(TMessage message, string recipient)
@@ -46,7 +47,7 @@ namespace Energinet.DataHub.MarketData.Infrastructure.ActorMessages
             }
 
             var messageType = message.GetType().Name;
-            var payload = JsonSerializer.Serialize(message);
+            var payload = _jsonSerializer.Serialize(message);
 
             var outboxMessage = new OutgoingActorMessage(_systemDateTimeProvider.Now(), messageType, payload, recipient);
             _unitOfWorkCallback.RegisterNew(outboxMessage, this);
@@ -63,7 +64,7 @@ namespace Energinet.DataHub.MarketData.Infrastructure.ActorMessages
                 throw new NullReferenceException(nameof(dataModel));
             }
 
-            var insertStatement = $"INSERT INTO [dbo].[OutgoingActorMessages] (OccurredOn, Type, Data, State, LastUpdatedOn, Recipient) VALUES (@OccurredOn, @Type, @Data, @State, @LastUpdatedOn, @Recipient)";
+            var insertStatement = $"INSERT INTO [dbo].[OutgoingActorMessages] (OccurredOn, Type, Data, State, LastUpdatedOn, Recipient, Grouping, Priority) VALUES (@OccurredOn, @Type, @Data, @State, @LastUpdatedOn, @Recipient)";
             await _connectionFactory.GetOpenConnection().ExecuteAsync(insertStatement, new
             {
                 OccurredOn = dataModel.OccurredOn,

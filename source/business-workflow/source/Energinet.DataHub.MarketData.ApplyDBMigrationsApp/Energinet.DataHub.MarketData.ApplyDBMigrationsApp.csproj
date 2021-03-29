@@ -36,10 +36,4 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Script0013 - Alter OutgoingActorMessages table.sql" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Scripts\Model" />
-    <Folder Include="Scripts\Seed" />
-    <Folder Include="Scripts\Test" />
-  </ItemGroup>
-
 </Project>
