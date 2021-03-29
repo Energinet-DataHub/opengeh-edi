@@ -28,7 +28,7 @@ namespace Energinet.DataHub.MarketData.Infrastructure.InternalCommand
             if (command?.Type != null)
             {
                 Type type = Type.GetType(command.Type + ", Energinet.DataHub.MarketData.Application") ?? throw new Exception();
-                var parsedCommand = _jsonSerializer.Deserialize(command.Data!, type);
+                object parsedCommand = _jsonSerializer.Deserialize(command.Data, type);
 
                 await _mediator.Send(parsedCommand, CancellationToken.None);
 
