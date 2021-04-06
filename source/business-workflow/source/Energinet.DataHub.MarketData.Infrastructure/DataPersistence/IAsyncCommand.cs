@@ -16,7 +16,7 @@ using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Energinet.DataHub.MarketData.Infrastructure
+namespace Energinet.DataHub.MarketData.Infrastructure.DataPersistence
 {
     /// <summary>
     /// ExecuteNonQuery on the datastore

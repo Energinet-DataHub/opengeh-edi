@@ -24,6 +24,10 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process.Comm
             ProcessId = processId;
         }
 
-        public ProcessId ProcessId { get; }
+        public NotifyGridOperator()
+        {
+        }
+
+        public ProcessId? ProcessId { get; set; }
     }
 }
