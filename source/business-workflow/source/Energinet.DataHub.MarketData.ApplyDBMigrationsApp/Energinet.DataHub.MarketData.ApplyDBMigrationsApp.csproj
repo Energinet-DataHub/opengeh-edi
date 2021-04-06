@@ -34,7 +34,6 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202103291105 Create InternalCommandQueue.sql" />
     <EmbeddedResource Include="Scripts\Test\202103291101 Add MarketData mock data.sql" />
     <EmbeddedResource Include="Scripts\Test\202103291103 Add OutgoingActorMessages mock data.sql" />
-    <None Remove="Scripts\Model\202103291102 Create OutgoingActorMessages table.sql" />
     <EmbeddedResource Include="Scripts\Model\202103291102 Create OutgoingActorMessages table.sql" />
   </ItemGroup>
 
