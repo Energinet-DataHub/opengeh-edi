@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketData.Application.ChangeOfSupplier;
+using Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process.Commands;
 using Energinet.DataHub.MarketData.Infrastructure.InternalCommand;
 using GreenEnergyHub.Json;
 using MediatR;
@@ -25,7 +26,7 @@ namespace Energinet.DataHub.MarketData.Tests.InternalCommand
             _mediator.Setup(m => m.Send(It.IsAny<object>(), CancellationToken.None))
                 .ReturnsAsync(new object());
 
-            var fullyQualifiedPath = typeof(RequestChangeOfSupplier).ToString();
+            var fullyQualifiedPath = nameof(ChangeSupplier);
 
             _internalCommandRepository.SetupSequence(m => m.GetUnprocessedInternalCommandAsync())
                 .ReturnsAsync(new Infrastructure.InternalCommand.InternalCommand
