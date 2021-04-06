@@ -12,25 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketData.Domain.BusinessProcesses;
-using Energinet.DataHub.MarketData.Domain.SeedWork;
-using NodaTime;
+using Energinet.DataHub.MarketData.Domain.BusinessProcesses.Exceptions;
 
-namespace Energinet.DataHub.MarketData.Domain.MeteringPoints.Events
+namespace Energinet.DataHub.MarketData.Application.Common.Process
 {
-    public class EnergySupplierChangeRegistered : DomainEventBase
+    public class InvalidProcessManagerStateException : BusinessProcessException
     {
-        public EnergySupplierChangeRegistered(GsrnNumber gsrnNumber, ProcessId processId, Instant effectiveDate)
+        public InvalidProcessManagerStateException(string? message)
+            : base(message)
         {
-            GsrnNumber = gsrnNumber;
-            ProcessId = processId;
-            EffectiveDate = effectiveDate;
         }
-
-        public GsrnNumber GsrnNumber { get; }
-
-        public ProcessId ProcessId { get; }
-
-        public Instant EffectiveDate { get; }
     }
 }

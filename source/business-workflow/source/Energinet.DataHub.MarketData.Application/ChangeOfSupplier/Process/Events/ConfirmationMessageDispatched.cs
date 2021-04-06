@@ -12,25 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketData.Domain.BusinessProcesses;
 using Energinet.DataHub.MarketData.Domain.SeedWork;
-using NodaTime;
 
-namespace Energinet.DataHub.MarketData.Domain.MeteringPoints.Events
+namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process.Events
 {
-    public class EnergySupplierChangeRegistered : DomainEventBase
+    public class ConfirmationMessageDispatched : DomainEventBase
     {
-        public EnergySupplierChangeRegistered(GsrnNumber gsrnNumber, ProcessId processId, Instant effectiveDate)
+        public ConfirmationMessageDispatched(string processId)
         {
-            GsrnNumber = gsrnNumber;
             ProcessId = processId;
-            EffectiveDate = effectiveDate;
         }
 
-        public GsrnNumber GsrnNumber { get; }
-
-        public ProcessId ProcessId { get; }
-
-        public Instant EffectiveDate { get; }
+        public string ProcessId { get; }
     }
 }
