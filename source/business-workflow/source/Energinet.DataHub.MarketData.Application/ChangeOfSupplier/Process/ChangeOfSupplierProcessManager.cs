@@ -174,7 +174,7 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process
             _state = state;
         }
 
-        private void SendCommand(InternalCommandBase internalCommand, Instant? executionDate = null)
+        private void SendCommand(InternalCommand internalCommand, Instant? executionDate = null)
         {
             CommandsToSend.Add(new EnqueuedCommand(internalCommand, executionDate));
         }

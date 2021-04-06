@@ -17,7 +17,7 @@ using Energinet.DataHub.MarketData.Domain.BusinessProcesses;
 
 namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process.Commands
 {
-    public class NotifyGridOperator : InternalCommandBase
+    public class NotifyGridOperator : InternalCommand
     {
         public NotifyGridOperator(ProcessId processId)
         {

@@ -16,14 +16,14 @@ using System;
 
 namespace Energinet.DataHub.MarketData.Application.Common.Commands
 {
-    public abstract class InternalCommandBase : ICommand
+    public abstract class InternalCommand : ICommand
     {
-        protected InternalCommandBase(Guid id)
+        protected InternalCommand(Guid id)
         {
             Id = id;
         }
 
-        protected InternalCommandBase()
+        protected InternalCommand()
         {
             Id = Guid.NewGuid();
         }
