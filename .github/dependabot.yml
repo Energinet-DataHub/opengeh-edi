@@ -1,0 +1,35 @@
+# Basic dependabot.yml file with
+# minimum configuration for nuget
+# https://docs.github.com/en/free-pro-team@latest/github/administering-a-repository/keeping-your-dependencies-updated-automatically
+
+version: 2
+updates:
+  - package-ecosystem: "nuget"
+    directory: "/source/business-workflow"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/ingestion"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/shared/GreenEnergyHub"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/shared/messaging"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/queues"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/soap-to-json-adapter"
+    schedule:
+      interval: "weekly"
