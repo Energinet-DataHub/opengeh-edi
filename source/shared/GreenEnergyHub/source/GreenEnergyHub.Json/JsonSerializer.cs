@@ -43,6 +43,11 @@ namespace GreenEnergyHub.Json
             return System.Text.Json.JsonSerializer.Deserialize<TValue>(json, _options);
         }
 
+        public object Deserialize(string json, Type returnType)
+        {
+            return System.Text.Json.JsonSerializer.Deserialize(json, returnType, _options);
+        }
+
         public string Serialize<TValue>(TValue value)
         {
             return System.Text.Json.JsonSerializer.Serialize<object>(value, _options);

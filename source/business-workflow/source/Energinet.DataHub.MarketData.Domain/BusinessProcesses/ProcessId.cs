@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.MarketData.Domain.SeedWork;
 
 namespace Energinet.DataHub.MarketData.Domain.BusinessProcesses
@@ -23,11 +24,15 @@ namespace Energinet.DataHub.MarketData.Domain.BusinessProcesses
             Value = value;
         }
 
-        public string Value { get; }
+        public ProcessId()
+        {
+        }
+
+        public string? Value { get; set; }
 
         public override string ToString()
         {
-            return Value;
+            return Value ?? string.Empty;
         }
     }
 }

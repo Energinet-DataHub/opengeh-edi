@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using NodaTime;
+
 namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.ActorMessages
 {
     public class RequestChangeOfSupplierApproved
@@ -23,12 +25,13 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.ActorMessage
         {
         }
 
-        public RequestChangeOfSupplierApproved(string messageId, string transactionId, string meteringPointId, string requestingEnergySupplierId)
+        public RequestChangeOfSupplierApproved(string messageId, string transactionId, string meteringPointId, string requestingEnergySupplierId, Instant startDate)
         {
             MessageId = messageId;
             TransactionId = transactionId;
             MeteringPointId = meteringPointId;
             RequestingEnergySupplierId = requestingEnergySupplierId;
+            StartDate = startDate;
         }
 
         public string MessageId { get; set; }
@@ -38,5 +41,7 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.ActorMessage
         public string MeteringPointId { get; set; }
 
         public string RequestingEnergySupplierId { get; set; }
+
+        public Instant StartDate { get; set; }
     }
 }
