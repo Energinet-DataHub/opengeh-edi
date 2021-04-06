@@ -12,22 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketData.Application.Common.Commands;
-using Energinet.DataHub.MarketData.Domain.BusinessProcesses;
-
-namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process.Commands
+namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.MasterData
 {
-    public class NotifyGridOperator : InternalCommandBase
+    public class MasterDataResult
     {
-        public NotifyGridOperator(ProcessId processId)
-        {
-            ProcessId = processId;
-        }
-
-        public NotifyGridOperator()
-        {
-        }
-
-        public ProcessId? ProcessId { get; set; }
+        public string? GsrnNumber { get; set; }
     }
 }

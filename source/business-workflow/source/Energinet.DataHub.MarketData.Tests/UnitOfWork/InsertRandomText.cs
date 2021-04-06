@@ -18,6 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.MarketData.Infrastructure;
+using Energinet.DataHub.MarketData.Infrastructure.DataPersistence;
 
 namespace Energinet.DataHub.MarketData.Tests.UnitOfWork
 {

@@ -15,44 +15,28 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.MarketData.Application.Common;
-using Energinet.DataHub.MarketData.Infrastructure.DataPersistence;
 using Energinet.DataHub.MarketData.Infrastructure.Outbox;
 
-namespace Energinet.DataHub.MarketData.Infrastructure.Outbox
+namespace Energinet.DataHub.MarketData.Infrastructure.InternalCommand
 {
-    public class ForwardMessageRepository : IForwardMessageRepository
+    public class InternalCommandRepository : IInternalCommandRepository
     {
         private readonly IDbConnectionFactory _connectionFactory;
 
-        public ForwardMessageRepository(IDbConnectionFactory connectionFactory)
+        public InternalCommandRepository(IDbConnectionFactory connectionFactory)
         {
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
         }
 
         private IDbConnection Connection => _connectionFactory.GetOpenConnection();
 
-        public async Task<ForwardMessage?> GetUnprocessedForwardMessageAsync()
+        public async Task<InternalCommand?> GetUnprocessedInternalCommandAsync()
         {
-            var query = "SELECT TOP(1) * FROM [dbo].[OutgoingActorMessages] O WHERE O.State = @State";
-            return await Connection.QueryFirstOrDefaultAsync<ForwardMessage>(query, new
-            {
-                State = OutboxState.Pending.Id,
-            }).ConfigureAwait(false);
-        }
-
-        public async Task MarkForwardedMessageAsProcessedAsync(int id)
-        {
-            await Connection.ExecuteAsync(
-                    $"UPDATE OutgoingActorMessages SET LastUpdatedOn = GETDATE(), State = @State WHERE Id = @Id", param: new
-                    {
-                        State = OutboxState.Processed.Id,
-                        Id = id,
-                    })
-                .ConfigureAwait(false);
+            var query = "SELECT TOP (1) Id, Data, Type FROM [dbo].[InternalCommandQueue] I WHERE I.ProcessedDate IS NULL and (ScheduledDate <= GETUTCDATE() OR ScheduledDate IS NULL)";
+            return await Connection.QueryFirstOrDefaultAsync<InternalCommand>(query).ConfigureAwait(false);
         }
     }
 }

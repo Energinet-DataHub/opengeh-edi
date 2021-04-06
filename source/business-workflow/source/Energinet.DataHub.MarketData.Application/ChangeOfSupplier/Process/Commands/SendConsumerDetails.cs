@@ -25,6 +25,10 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process.Comm
             ProcessId = processId ?? throw new ArgumentNullException(nameof(processId));
         }
 
-        public ProcessId ProcessId { get; }
+        public SendConsumerDetails()
+        {
+        }
+
+        public ProcessId? ProcessId { get; set; }
     }
 }
