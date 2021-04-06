@@ -16,6 +16,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketData.Application.ChangeOfSupplier.ActorMessages;
+using Energinet.DataHub.MarketData.Application.ChangeOfSupplier.MasterData;
 using Energinet.DataHub.MarketData.Application.Common;
 using MediatR;
 
@@ -24,10 +25,12 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier
     public class PublishActorMessageHandlerBehavior : IPipelineBehavior<RequestChangeOfSupplier, RequestChangeOfSupplierResult>
     {
         private readonly IActorMessagePublisher _messagePublisher;
+        private IMediator _mediator;
 
-        public PublishActorMessageHandlerBehavior(IActorMessagePublisher messagePublisher)
+        public PublishActorMessageHandlerBehavior(IActorMessagePublisher messagePublisher, IMediator mediator)
         {
             _messagePublisher = messagePublisher ?? throw new ArgumentNullException(nameof(messagePublisher));
+            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
         public async Task<RequestChangeOfSupplierResult> Handle(RequestChangeOfSupplier command, CancellationToken cancellationToken, RequestHandlerDelegate<RequestChangeOfSupplierResult> next)
@@ -46,6 +49,7 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier
             if (result.Succeeded)
             {
                 await PublishAcceptedMessageAsync(command).ConfigureAwait(false);
+                await PublishMeteringPointMasterDataAsync(command);
             }
             else
             {
@@ -58,7 +62,7 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier
         private Task PublishAcceptedMessageAsync(RequestChangeOfSupplier command)
         {
             // TODO: <INSERT MESSAGE ID> will be replaced in another PR
-            var message = new RequestChangeOfSupplierApproved("<INSERT MESSAGE ID>", command.Transaction.MRID, command.MarketEvaluationPoint.MRid, command.EnergySupplier.MRID!);
+            var message = new RequestChangeOfSupplierApproved("<INSERT MESSAGE ID>", command.Transaction.MRID, command.MarketEvaluationPoint.MRid, command.EnergySupplier.MRID!, command.StartDate);
             return SendMessageAsync(message, command.EnergySupplier.MRID!);
         }
 
@@ -67,6 +71,13 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier
             // TODO: <INSERT MESSAGE ID> will be replaced in another PR
             var message = new RequestChangeOfSupplierRejected("<INSERT MESSAGE ID>", command.Transaction.MRID, command.MarketEvaluationPoint.MRid, result.Errors!);
             return SendMessageAsync(message, command.EnergySupplier.MRID!);
+        }
+
+        private async Task PublishMeteringPointMasterDataAsync(RequestChangeOfSupplier command)
+        {
+            var queryMasterData = new QueryMasterData { GsrnNumber = command.MarketEvaluationPoint.MRid };
+            var masterData = await _mediator.Send(queryMasterData, CancellationToken.None).ConfigureAwait(false);
+            await SendMessageAsync(masterData, command.EnergySupplier.MRID!);
         }
 
         private Task SendMessageAsync<TMessage>(TMessage message, string recipient)

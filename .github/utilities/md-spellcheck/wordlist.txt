@@ -1,5 +1,4 @@
-﻿agonistic
-ApiGateway
+﻿ApiGateway
 ApplyDBMigrationsApp
 cacert
 ChangeOfSupplier
@@ -38,6 +37,7 @@ pem
 POCO
 PropertyRule
 proto
+README
 RuleCollection
 RuleCollection
 RuleCollections
@@ -45,7 +45,7 @@ runtime
 SendTimeSeries
 sql
 Terraform
+TODO
 TSO
 xml
 yyyyMMddHHmm
-agonistic
