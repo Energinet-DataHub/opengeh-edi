@@ -12,23 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Energinet.DataHub.MarketData.Application.Common.Commands;
-using Energinet.DataHub.MarketData.Domain.BusinessProcesses;
+using MediatR;
 
-namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process.Commands
+namespace Energinet.DataHub.MarketData.Application.Common.Commands
 {
-    public class SendConsumerDetails : InternalCommand
+    /// <summary>
+    /// CQRS command object
+    /// </summary>
+    public interface ICommand : IRequest
     {
-        public SendConsumerDetails(ProcessId processId)
-        {
-            ProcessId = processId ?? throw new ArgumentNullException(nameof(processId));
-        }
+    }
 
-        public SendConsumerDetails()
-        {
-        }
-
-        public ProcessId? ProcessId { get; set; }
+    /// <summary>
+    /// CQRS command with result
+    /// </summary>
+    /// <typeparam name="TResult"><see cref="IRequest"/></typeparam>
+    public interface ICommand<out TResult> : IRequest<TResult>
+    {
     }
 }

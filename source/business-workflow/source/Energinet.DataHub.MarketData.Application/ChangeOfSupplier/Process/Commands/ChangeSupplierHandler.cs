@@ -12,12 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketData.Application.Common.Commands
+using System.Threading;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketData.Application.Common.Commands;
+using MediatR;
+
+namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process.Commands
 {
-    /// <summary>
-    /// CQRS Command object
-    /// </summary>
-    public interface IInternalCommand
+    public class ChangeSupplierHandler : ICommandHandler<ChangeSupplier>
     {
+        public Task<Unit> Handle(ChangeSupplier request, CancellationToken cancellationToken)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

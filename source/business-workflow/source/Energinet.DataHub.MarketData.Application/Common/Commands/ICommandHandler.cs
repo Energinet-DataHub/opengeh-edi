@@ -12,21 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using NodaTime;
+using MediatR;
 
 namespace Energinet.DataHub.MarketData.Application.Common.Commands
 {
-    public class EnqueuedCommand
+    /// <summary>
+    /// Handler for CQRS command
+    /// </summary>
+    /// <typeparam name="TCommand"><see cref="ICommand{TResult}"/></typeparam>
+    public interface ICommandHandler<in TCommand> : IRequestHandler<TCommand>
+        where TCommand : ICommand
     {
-        public EnqueuedCommand(InternalCommand command, Instant? executionDate = null)
-        {
-            Command = command ?? throw new ArgumentNullException(nameof(command));
-            ExecutionDate = executionDate;
-        }
+    }
 
-        public InternalCommand Command { get; }
-
-        public Instant? ExecutionDate { get; }
+    /// <summary>
+    /// Handler for CQRS command with result
+    /// </summary>
+    /// <typeparam name="TCommand"><see cref="ICommand{TResult}"/></typeparam>
+    /// <typeparam name="TResult">Type of result returned by handler</typeparam>
+    public interface ICommandHandler<in TCommand, TResult> : IRequestHandler<TCommand, TResult>
+        where TCommand : ICommand<TResult>
+    {
     }
 }

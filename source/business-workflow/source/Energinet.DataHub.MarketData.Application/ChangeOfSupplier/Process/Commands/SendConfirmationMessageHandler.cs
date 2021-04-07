@@ -12,23 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Energinet.DataHub.MarketData.Application.Common.Commands;
-using Energinet.DataHub.MarketData.Domain.BusinessProcesses;
+using MediatR;
 
 namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process.Commands
 {
-    public class SendConsumerDetails : InternalCommand
+    public class SendConfirmationMessageHandler : ICommandHandler<SendConfirmationMessage>
     {
-        public SendConsumerDetails(ProcessId processId)
+        public Task<Unit> Handle(SendConfirmationMessage request, CancellationToken cancellationToken)
         {
-            ProcessId = processId ?? throw new ArgumentNullException(nameof(processId));
+            throw new System.NotImplementedException();
         }
-
-        public SendConsumerDetails()
-        {
-        }
-
-        public ProcessId? ProcessId { get; set; }
     }
 }

@@ -17,7 +17,7 @@ using Energinet.DataHub.MarketData.Domain.BusinessProcesses;
 
 namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process.Commands
 {
-    public class SendConfirmationMessage : IInternalCommand
+    public class SendConfirmationMessage : InternalCommand
     {
         public SendConfirmationMessage(ProcessId processId)
         {

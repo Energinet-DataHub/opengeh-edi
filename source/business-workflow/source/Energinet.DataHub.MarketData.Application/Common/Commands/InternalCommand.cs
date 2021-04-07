@@ -13,22 +13,21 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketData.Application.Common.Commands;
-using Energinet.DataHub.MarketData.Domain.BusinessProcesses;
 
-namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process.Commands
+namespace Energinet.DataHub.MarketData.Application.Common.Commands
 {
-    public class SendConsumerDetails : InternalCommand
+    public abstract class InternalCommand : ICommand
     {
-        public SendConsumerDetails(ProcessId processId)
+        protected InternalCommand(Guid id)
         {
-            ProcessId = processId ?? throw new ArgumentNullException(nameof(processId));
+            Id = id;
         }
 
-        public SendConsumerDetails()
+        protected InternalCommand()
         {
+            Id = Guid.NewGuid();
         }
 
-        public ProcessId? ProcessId { get; set; }
+        public Guid Id { get; }
     }
 }
