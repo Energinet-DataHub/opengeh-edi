@@ -12,12 +12,12 @@ These are the processes maintained by this domain.
 | ------------- | 
 | Change of Supplier  | 
 | End of Supply   | 
+| Forced supplier change |
+| Incorrect supplier change |
 | Customer move in |
 | Customer move out |
-| Incorrect supplier change |
 | Incorrect move |
 | Forward customer master data by supplier |
-| Forced supplier change |
 | Forward contact address by supplier |
 
 ## Architecture
