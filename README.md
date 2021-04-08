@@ -38,4 +38,4 @@ TBD
 
 ## Where can I get more help?
 
-Code owners? Gitter versus Slack? Referral to geh_repo?
+Code owners? Gitter versus Slack? Referral to main repository?
