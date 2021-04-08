@@ -1,0 +1,1 @@
+﻿This file should reference code of conduct in main repo (https://github.com/Energinet-DataHub/green-energy-hub)
