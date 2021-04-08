@@ -1,1 +1,2 @@
-﻿This file should reference contributing.md in main repo (https://github.com/Energinet-DataHub/green-energy-hub)
+﻿# Contributing
+This file should reference contributing.md in main repo
