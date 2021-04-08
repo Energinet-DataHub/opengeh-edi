@@ -49,3 +49,8 @@ TODO
 TSO
 xml
 yyyyMMddHHmm
+md
+Roadmap
+repo
+TBD
+gitter
