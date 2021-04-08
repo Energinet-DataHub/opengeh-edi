@@ -1,1 +1,0 @@
-﻿This file should reference security.md in main repo (https://github.com/Energinet-DataHub/green-energy-hub)
