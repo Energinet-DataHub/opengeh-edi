@@ -4,7 +4,7 @@
 
 The market roles domain is in charge of supply and consumer relations.
 It handles changes in supply (who supplies/produces electricity),
-and changes in consumers (who is a customer), on market evaluation points.
+and changes in consumers/producers (who is a customer), on market evaluation points.
 
 These are the processes maintained by this domain.
 
