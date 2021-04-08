@@ -3,7 +3,7 @@
 ## Intro
 
 The market roles domain is in charge of supply and consumer relations. 
-It handles changes in supply (who supplies electricity), 
+It handles changes in supply/production (who supplies/produces electricity), 
 and changes in consumers (who is a customer), on market evaluation points.
 
 These are the processes maintained by this domain.
@@ -11,7 +11,6 @@ These are the processes maintained by this domain.
 | Process  | 
 | ------------- | 
 | Change of Supplier  | 
-| Customer initiated cancellation of change of supplier |
 | End of Supply   | 
 | Customer move in |
 | Customer move out |
@@ -19,7 +18,7 @@ These are the processes maintained by this domain.
 | Incorrect move |
 | Forward customer master data by supplier |
 | Forced supplier change |
-| Forward contact address |
+| Forward contact address by supplier |
 
 ## Architecture
 
