@@ -8,18 +8,18 @@ and changes in consumers/producers (who is a customer), on metering points.
 
 These are the processes maintained by this domain.
 
-| Process                                                              |
-| -------------------------------------------------------------------- |
-| [Change of Supplier](\docs\business-processes\change-of-supplier.md) |
-| [End of Supply](\docs\business-processes\end-of-supply.md)           |
-| Forced supplier change                                               |
-| Incorrect supplier change                                            |
-| Customer move in                                                     |
-| Customer move out                                                    |
-| Incorrect move                                                       |
-| Forward customer master data by supplier                             |
-| Forward contact address by grid operator                             |
-| ....                                                                 |
+| Process                                                               |
+| --------------------------------------------------------------------- |
+| [Change of Supplier](.\docs\business-processes\change-of-supplier.md) |
+| [End of Supply](.\docs\business-processes\end-of-supply.md)           |
+| Forced supplier change                                                |
+| Incorrect supplier change                                             |
+| Customer move in                                                      |
+| Customer move out                                                     |
+| Incorrect move                                                        |
+| Forward customer master data by supplier                              |
+| Forward contact address by grid operator                              |
+| ....                                                                  |
 
 ## Architecture
 
