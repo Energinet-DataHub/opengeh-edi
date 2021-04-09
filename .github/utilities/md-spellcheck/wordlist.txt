@@ -54,3 +54,12 @@ Roadmap
 repo
 TBD
 gitter
+receival
+CoS
+AwaitingConfirmationMessageDispatch
+AwaitingConsumerDetailsDispatch
+AwaitingCurrentSupplierNotificationDispatch
+AwaitingMeteringPointDetailsDispatch
+AwaitingSupplierChange
+NotStarted
+
