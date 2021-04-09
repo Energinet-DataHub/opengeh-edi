@@ -62,4 +62,4 @@ AwaitingCurrentSupplierNotificationDispatch
 AwaitingMeteringPointDetailsDispatch
 AwaitingSupplierChange
 NotStarted
-
+VAT
