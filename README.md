@@ -18,7 +18,7 @@ These are the processes maintained by this domain.
 | Consumer move out                                                                   |
 | Incorrect move                                                                      |
 | Forward consumer master data by Energy Supplier                                     |
-| Forward contact address by grid operator                                            |
+| Forward contact address by Grid Access Provider                                            |
 | Change of BRP for Energy Supplier                                                   |
 | ....                                                                                |
 
