@@ -8,19 +8,19 @@ and changes in consumers/producers (who is a consumer), on metering points.
 
 These are the processes maintained by this domain.
 
-| Process                                                                             |
-| ----------------------------------------------------------------------------------- |
-| [Change of Energy Supplier](.\docs\business-processes\change-of-energy-supplier.md) |
-| [End of Supply](.\docs\business-processes\end-of-supply.md)                         |
-| Forced Energy Supplier change                                                       |
-| Incorrect Energy Supplier change                                                    |
-| Consumer move in                                                                    |
-| Consumer move out                                                                   |
-| Incorrect move                                                                      |
-| Forward consumer master data by Energy Supplier                                     |
-| Forward contact address by Grid Access Provider                                            |
-| Change of BRP for Energy Supplier                                                   |
-| ....                                                                                |
+| Process                                                                                                                                           |
+| ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Change of Energy Supplier](https://github.com/Energinet-DataHub/geh-market-roles/blob/main/docs/business-processes/change-of-energy-supplier.md) |
+| [End of Supply](https://github.com/Energinet-DataHub/geh-market-roles/blob/main/docs/business-processes/end-of-supply.md)                         |
+| Forced Energy Supplier change                                                                                                                     |
+| Incorrect Energy Supplier change                                                                                                                  |
+| Consumer move in                                                                                                                                  |
+| Consumer move out                                                                                                                                 |
+| Incorrect move                                                                                                                                    |
+| Forward consumer master data by Energy Supplier                                                                                                   |
+| Forward contact address by Grid Access Provider                                                                                                   |
+| Change of BRP for Energy Supplier                                                                                                                 |
+| ....                                                                                                                                              |
 
 ## Architecture
 
