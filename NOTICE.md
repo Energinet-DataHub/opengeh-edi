@@ -15,7 +15,7 @@ We recommend you read their licenses, as their terms may differ from the terms d
 
 - MediatR ([Apache v2 License](https://github.com/Energinet-DataHub/geh-market-roles/blob/main/LICENSE))
 
-- Moq ([BSD 3-Clause LIcense](https://raw.githubusercontent.com/moq/moq4/master/License.txt))
+- Moq ([BSD 3-Clause License](https://raw.githubusercontent.com/moq/moq4/master/License.txt))
 
 - NodaTime ([Apache v2 License](https://github.com/Energinet-DataHub/geh-market-roles/blob/main/LICENSE))
 
