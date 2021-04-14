@@ -34,7 +34,6 @@ We recommend you read their licenses, as their terms may differ from the terms d
 | `xunit.runner.visualstudio`                        | 2.4.3   | <https://www.nuget.org/packages/xunit.runner.visualstudio/2.4.3>                        | MIT                                                                                           |
 
 <br/>
-
 ### Github Actions
 
 | Action                                               | Url                                                                  | License                |
