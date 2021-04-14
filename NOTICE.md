@@ -37,23 +37,23 @@ We recommend you read their licenses, as their terms may differ from the terms d
 
 ### Github Actions
 
-| Name                                              | Version                                              | Url                                                                  | License                |
-| ------------------------------------------------- | ---------------------------------------------------- | -------------------------------------------------------------------- | ---------------------- |
-| `Azure/functions-action`                          | `Azure/functions-action@v1`                          | <https://github.com/Azure/functions-action>                          | MIT                    |
-| `Checkout Master`                                 | `actions/checkout@master`                            | <https://github.com/actions/checkout>                                | MIT                    |
-| `Checkout V2`                                     | `actions/checkout@v2`                                | <https://github.com/actions/checkout>                                | MIT                    |
-| `Download-Artifact v2`                            | `actions/download-artifact@v2`                       | <https://github.com/actions/download-artifact>                       | MIT                    |
-| `Github Action - github-spellcheck-action`        | `rojopolis/spellcheck-github-actions@0.5.0`          | <https://github.com/rojopolis/spellcheck-github-actions>             | MIT                    |
-| `Github Action - Markdown lint check`             | `avto-dev/markdown-lint@v1`                          | <https://github.com/actionshub/markdownlint>                         | Apache-2.0             |
-| `GitHub Action - Markdown link check`             | `gaurav-nelson/github-action-markdown-link-check@v1` | <https://github.com/gaurav-nelson/github-action-markdown-link-check> | MIT                    |
-| `GitHub Actions for deploying to Azure Functions` | `Azure/functions-action@v1`                          | <https://github.com/Azure/functions-action>                          | MIT                    |
-| `Licence checker`                                 | `kt3k/license_checker@v1.0.3`                        | <https://github.com/kt3k/license_checker>                            | Blue Oak Model License |
-| `Repository Dispatch`                             | `peter-evans/repository-dispatch@v1`                 | <https://github.com/peter-evans/repository-dispatch>                 | MIT                    |
-| `setup-dotnet`                                    | `actions/setup-dotnet@v1`                            | <https://github.com/actions/setup-dotnet>                            | MIT                    |
-| `setup-terraform`                                 | `actions/hashicorp/setup-terraform@v1.2.1`           | <https://github.com/hashicorp/setup-terraform>                       | MPL-2.0                |
-| `setup-python V2`                                 | `actions/setup-python@v2`                            | <https://github.com/actions/setup-python>                            | MIT                    |
-| `Skip Duplicate`                                  | `fkirc/skip-duplicate-actions@v1.4.0`                | <https://github.com/fkirc/skip-duplicate-actions>                    | MIT                    |
-| `Upload-Artifact v2`                              | `actions/upload-artifact@v2`                         | <https://github.com/actions/upload-artifact>                         | MIT                    |
+| Action                                               | Url                                                                  | License                |
+| ---------------------------------------------------- | -------------------------------------------------------------------- | ---------------------- |
+| `Azure/functions-action@v1`                          | <https://github.com/Azure/functions-action>                          | MIT                    |
+| `actions/checkout@master`                            | <https://github.com/actions/checkout>                                | MIT                    |
+| `actions/checkout@v2`                                | <https://github.com/actions/checkout>                                | MIT                    |
+| `actions/download-artifact@v2`                       | <https://github.com/actions/download-artifact>                       | MIT                    |
+| `rojopolis/spellcheck-github-actions@0.5.0`          | <https://github.com/rojopolis/spellcheck-github-actions>             | MIT                    |
+| `avto-dev/markdown-lint@v1`                          | <https://github.com/actionshub/markdownlint>                         | Apache-2.0             |
+| `gaurav-nelson/github-action-markdown-link-check@v1` | <https://github.com/gaurav-nelson/github-action-markdown-link-check> | MIT                    |
+| `Azure/functions-action@v1`                          | <https://github.com/Azure/functions-action>                          | MIT                    |
+| `kt3k/license_checker@v1.0.3`                        | <https://github.com/kt3k/license_checker>                            | Blue Oak Model License |
+| `peter-evans/repository-dispatch@v1`                 | <https://github.com/peter-evans/repository-dispatch>                 | MIT                    |
+| `actions/setup-dotnet@v1`                            | <https://github.com/actions/setup-dotnet>                            | MIT                    |
+| `actions/hashicorp/setup-terraform@v1.2.1`           | <https://github.com/hashicorp/setup-terraform>                       | MPL-2.0                |
+| `actions/setup-python@v2`                            | <https://github.com/actions/setup-python>                            | MIT                    |
+| `fkirc/skip-duplicate-actions@v1.4.0`                | <https://github.com/fkirc/skip-duplicate-actions>                    | MIT                    |
+| `actions/upload-artifact@v2`                         | <https://github.com/actions/upload-artifact>                         | MIT                    |
 
 <br/>
 Energinet and any contributors reserve all others rights, whether under their respective copyrights, patents, licenses, or trademarks, whether by implication, estoppel or otherwise.
