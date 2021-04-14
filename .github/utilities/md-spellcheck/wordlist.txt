@@ -90,3 +90,5 @@ sqlserver
 terraform
 visualstudio
 www
+globaltool
+reportgenerator
