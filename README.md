@@ -49,10 +49,10 @@ In the long term all these [roles](https://github.com/Energinet-DataHub/green-en
 
 In this program increment we are working on finishing the happy flow MVP for Change of energy supplier. This includes:
 
-* Generation of all remaining messages to be generated in accordance to the sequence diagram in the [Change of energy supplier description](docs/business-processes/change-of-energy-supplier.md).
-* Allowing for process to be cancelled before expiration of cancellation period.
-* Notifying current energy supplier that his supply period is ending upon expiration of cancellation period.
-* Setting end date and on prior supplier once process is completed.
+- Generation of all remaining messages to be generated in accordance to the sequence diagram in the [Change of energy supplier description](docs/business-processes/change-of-energy-supplier.md).
+- Allowing for process to be cancelled before expiration of cancellation period.
+- Notifying current energy supplier that his supply period is ending upon expiration of cancellation period.
+- Setting end date and on prior supplier once process is completed.
 
 ## Getting Started
 
