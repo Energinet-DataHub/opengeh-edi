@@ -92,3 +92,15 @@ visualstudio
 www
 globaltool
 reportgenerator
+MPL
+actionshub
+fkirc
+gaurav
+hashicorp
+markdownlint
+rojopolis
+acknowledege
+dk
+energinet
+greenenergyhub
+thirdparty
