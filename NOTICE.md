@@ -55,9 +55,3 @@ The Green Energy Hub repository relies on open source libraries and tools. We re
 | `kt3k/license_checker@v1.0.3`                        | <https://github.com/kt3k/license_checker>                            | Blue Oak Model License |
 | `peter-evans/repository-dispatch@v1`                 | <https://github.com/peter-evans/repository-dispatch>                 | MIT                    |
 | `rojopolis/spellcheck-github-actions@0.5.0`          | <https://github.com/rojopolis/spellcheck-github-actions>             | MIT                    |
-
-<br/>
-Energinet and any contributors reserve all others rights, whether under their respective copyrights, patents, licenses, or trademarks, whether by implication, estoppel or otherwise.
-
-It is our intention to acknowledege all thirdparty product license used in this document.
-If you miss your a license please contact greenenergyhub@energinet.dk, and we will take action to change the file.
