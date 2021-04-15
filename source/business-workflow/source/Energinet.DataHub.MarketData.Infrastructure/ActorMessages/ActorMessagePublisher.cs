@@ -64,7 +64,7 @@ namespace Energinet.DataHub.MarketData.Infrastructure.ActorMessages
                 throw new NullReferenceException(nameof(dataModel));
             }
 
-            var insertStatement = $"INSERT INTO [dbo].[OutgoingActorMessages] (OccurredOn, Type, Data, State, LastUpdatedOn, Recipient, Grouping, Priority) VALUES (@OccurredOn, @Type, @Data, @State, @LastUpdatedOn, @Recipient)";
+            var insertStatement = $"INSERT INTO [dbo].[OutgoingActorMessages] (OccurredOn, Type, Data, State, LastUpdatedOn, Recipient) VALUES (@OccurredOn, @Type, @Data, @State, @LastUpdatedOn, @Recipient)";
             await _connectionFactory.GetOpenConnection().ExecuteAsync(insertStatement, new
             {
                 OccurredOn = dataModel.OccurredOn,
