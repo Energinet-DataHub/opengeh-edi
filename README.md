@@ -28,7 +28,7 @@ These are the processes maintained by this domain.
 
 ## Context Streams
 
-TBD
+<img width="405" alt="Market roles context streams" src="https://user-images.githubusercontent.com/25637982/114846333-e2e5a980-9ddc-11eb-9941-ac03cbcc8336.PNG">
 
 ## Market Participants
 
