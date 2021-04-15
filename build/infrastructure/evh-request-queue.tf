@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 module "evhnm_requestqueue" {
-  source                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//event-hub-namespace?ref=1.0.0"
+  source                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//event-hub-namespace?ref=1.1.0"
   name                      = "evhnm-request-queue-${var.project}-${var.organisation}-${var.environment}"
   resource_group_name       = data.azurerm_resource_group.main.name
   location                  = data.azurerm_resource_group.main.location
@@ -22,7 +22,7 @@ module "evhnm_requestqueue" {
 }
 
 module "evh_requestqueue" {
-  source                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//event-hub?ref=1.0.0"
+  source                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//event-hub?ref=1.1.0"
   name                      = "evh-request-queue"
   namespace_name            = module.evhnm_requestqueue.name
   resource_group_name       = data.azurerm_resource_group.main.name
@@ -32,7 +32,7 @@ module "evh_requestqueue" {
 }
 
 module "evhar_requestqueue_sender" {
-  source                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//event-hub-auth-rule?ref=1.0.0"
+  source                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//event-hub-auth-rule?ref=1.1.0"
   name                      = "evhar-request-sender"
   namespace_name            = module.evhnm_requestqueue.name
   eventhub_name             = module.evh_requestqueue.name
@@ -42,7 +42,7 @@ module "evhar_requestqueue_sender" {
 }
 
 module "evhar_requestqueue_listener" {
-  source                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//event-hub-auth-rule?ref=1.0.0"
+  source                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//event-hub-auth-rule?ref=1.1.0"
   name                      = "evhar-request-listener"
   namespace_name            = module.evhnm_requestqueue.name
   eventhub_name             = module.evh_requestqueue.name
