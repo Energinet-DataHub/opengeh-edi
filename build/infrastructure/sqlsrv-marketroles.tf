@@ -16,7 +16,7 @@ locals {
 }
 
 module "sqlsrv_marketroles" {
-  source                        = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//sql-server?ref=1.0.0"
+  source                        = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//sql-server?ref=1.2.0"
   name                          = "sqlsrv-${var.project}-${var.organisation}-${var.environment}"
   resource_group_name           = data.azurerm_resource_group.main.name
   location                      = data.azurerm_resource_group.main.location
@@ -26,7 +26,7 @@ module "sqlsrv_marketroles" {
 }
 
 module "sqldb_marketroles" {
-  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//sql-database?ref=1.0.0"
+  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//sql-database?ref=1.2.0"
   name                = "sqldb-marketroles"
   resource_group_name = data.azurerm_resource_group.main.name
   location            = data.azurerm_resource_group.main.location
@@ -46,5 +46,5 @@ resource "azurerm_sql_firewall_rule" "sqlsrv_md_fwrule" {
   resource_group_name = data.azurerm_resource_group.main.name
   server_name         = module.sqlsrv_marketroles.name
   start_ip_address    = "0.0.0.0"
-  end_ip_address      = "255.255.255.255"  
+  end_ip_address      = "255.255.255.255"
 }
