@@ -109,16 +109,11 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier
 
         private RequestChangeOfSupplierResult CheckBusinessRules(RequestChangeOfSupplier command, MeteringPoint meteringPoint)
         {
-            var businessOperationValidation =
+            var validationResult =
                 meteringPoint.CanChangeSupplier(new MarketParticipantMrid(command.EnergySupplier.MRID!), command.StartDate, _systemTimeProvider);
 
-            var brokenRuleErrors = businessOperationValidation.Rules
-                .Where(rule => rule.IsBroken)
-                .Select(rule => rule.Message)
-                .ToList();
-
-            return brokenRuleErrors.Count > 0
-                ? RequestChangeOfSupplierResult.Reject(brokenRuleErrors)
+            return validationResult.Success
+                ? RequestChangeOfSupplierResult.Reject(validationResult.Errors)
                 : RequestChangeOfSupplierResult.Success();
         }
 

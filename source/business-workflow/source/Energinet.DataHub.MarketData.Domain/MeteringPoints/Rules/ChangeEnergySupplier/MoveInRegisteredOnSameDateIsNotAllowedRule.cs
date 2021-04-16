@@ -24,7 +24,7 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints.Rules.ChangeEnergyS
         private readonly IReadOnlyList<Relationship> _processes;
         private readonly Instant _effectuationDate;
 
-        public MoveInRegisteredOnSameDateIsNotAllowedRule(IReadOnlyList<Relationship> processes, Instant effectuationDate)
+        internal MoveInRegisteredOnSameDateIsNotAllowedRule(IReadOnlyList<Relationship> processes, Instant effectuationDate)
         {
             _processes = processes;
             _effectuationDate = effectuationDate;

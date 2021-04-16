@@ -21,17 +21,19 @@ namespace Energinet.DataHub.MarketData.Domain.SeedWork
     {
         public BusinessRulesValidationResult(List<IBusinessRule> rules)
         {
-            Rules = rules;
-            DetermineAndSetSuccessValue();
+            SetValidationErrors(rules);
         }
 
-        public List<IBusinessRule> Rules { get; }
+        public bool Success => Errors.Count == 0;
 
-        public bool AreAnyBroken { get; private set; }
+        public List<ValidationError> Errors { get; private set; } = new List<ValidationError>();
 
-        private void DetermineAndSetSuccessValue()
+        private void SetValidationErrors(List<IBusinessRule> rules)
         {
-            AreAnyBroken = Rules.Any(r => r.IsBroken == true);
+            Errors = rules
+                .Where(r => r.IsBroken)
+                .Select(r => new ValidationError(r.Message, r.GetType()))
+                .ToList();
         }
     }
 }

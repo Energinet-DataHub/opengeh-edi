@@ -18,7 +18,7 @@ using Energinet.DataHub.MarketData.Domain.SeedWork;
 
 namespace Energinet.DataHub.MarketData.Domain.MeteringPoints.Rules.ChangeEnergySupplier
 {
-    public class MustHaveEnergySupplierAssociatedRule : IBusinessRule
+    internal class MustHaveEnergySupplierAssociatedRule : IBusinessRule
     {
         private readonly IReadOnlyList<Relationship> _relationships;
 

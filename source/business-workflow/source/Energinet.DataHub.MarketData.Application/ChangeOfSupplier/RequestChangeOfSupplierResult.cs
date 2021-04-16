@@ -13,35 +13,48 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using Energinet.DataHub.MarketData.Domain.SeedWork;
 
 namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier
 {
     public class RequestChangeOfSupplierResult
     {
-        private RequestChangeOfSupplierResult(bool success, List<string>? errors)
+        private RequestChangeOfSupplierResult(bool success, List<string>? inputValidationErrors, List<ValidationError>? businessRuleValidationErrors)
         {
             Succeeded = success;
-            Errors = errors;
+            if (inputValidationErrors != null) InputValidationErrors = inputValidationErrors;
+            if (businessRuleValidationErrors != null) BusinessRuleValidationErrors = businessRuleValidationErrors;
+        }
+
+        private RequestChangeOfSupplierResult()
+        {
+            Succeeded = true;
         }
 
         public bool Succeeded { get; private set; }
 
-        public List<string>? Errors { get; } = new List<string>();
+        public List<string> InputValidationErrors { get; } = new List<string>();
+
+        public List<ValidationError> BusinessRuleValidationErrors { get; } = new List<ValidationError>();
 
         public static RequestChangeOfSupplierResult Success()
         {
-            return new RequestChangeOfSupplierResult(true, null);
+            return new RequestChangeOfSupplierResult();
         }
 
-        public static RequestChangeOfSupplierResult Reject(List<string> errors)
+        public static RequestChangeOfSupplierResult Reject(List<string> inputValidationErrors)
         {
-            return new RequestChangeOfSupplierResult(false, errors);
+            return new RequestChangeOfSupplierResult(false, inputValidationErrors, null);
+        }
+
+        public static RequestChangeOfSupplierResult Reject(List<ValidationError> businessRuleValidationErrors)
+        {
+            return new RequestChangeOfSupplierResult(false, null, businessRuleValidationErrors);
         }
 
         public static RequestChangeOfSupplierResult Reject(string reason)
         {
-            return new RequestChangeOfSupplierResult(false, new List<string>()
-                { reason });
+            return new RequestChangeOfSupplierResult(false, new List<string>() { reason }, null);
         }
     }
 }

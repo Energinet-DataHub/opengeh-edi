@@ -17,7 +17,7 @@ using NodaTime;
 
 namespace Energinet.DataHub.MarketData.Domain.MeteringPoints.Rules.ChangeEnergySupplier
 {
-    public class EffectuationDateCannotBeInThePastRule : IBusinessRule
+    internal class EffectuationDateCannotBeInThePastRule : IBusinessRule
     {
         private readonly Instant _effectuationDate;
         private readonly Instant _currentDate;
