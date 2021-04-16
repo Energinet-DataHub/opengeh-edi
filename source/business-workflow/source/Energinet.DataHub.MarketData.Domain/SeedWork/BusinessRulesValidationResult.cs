@@ -24,7 +24,7 @@ namespace Energinet.DataHub.MarketData.Domain.SeedWork
             SetValidationErrors(rules);
         }
 
-        public bool AreAnyBroken => Errors.Count > 0;
+        public bool Success => Errors.Count == 0;
 
         public List<ValidationError> Errors { get; private set; } = new List<ValidationError>();
 

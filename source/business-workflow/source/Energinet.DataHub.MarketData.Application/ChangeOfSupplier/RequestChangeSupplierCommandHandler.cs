@@ -112,7 +112,7 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier
             var validationResult =
                 meteringPoint.CanChangeSupplier(new MarketParticipantMrid(command.EnergySupplier.MRID!), command.StartDate, _systemTimeProvider);
 
-            return validationResult.AreAnyBroken
+            return validationResult.Success
                 ? RequestChangeOfSupplierResult.Reject(validationResult.Errors)
                 : RequestChangeOfSupplierResult.Success();
         }

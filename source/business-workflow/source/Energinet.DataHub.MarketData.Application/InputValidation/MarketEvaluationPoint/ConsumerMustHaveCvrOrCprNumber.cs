@@ -30,12 +30,12 @@ namespace Energinet.DataHub.MarketData.Application.InputValidation.MarketEvaluat
 
         private static bool IsValidCvr(GreenEnergyHub.Messaging.MessageTypes.Common.MarketParticipant propertyValue)
         {
-            return propertyValue.Qualifier == "VA" && !CvrNumber.CheckRules(propertyValue.MRID).AreAnyBroken;
+            return propertyValue.Qualifier == "VA" && CvrNumber.CheckRules(propertyValue.MRID).Success;
         }
 
         private static bool IsValidCpr(GreenEnergyHub.Messaging.MessageTypes.Common.MarketParticipant propertyValue)
         {
-            return propertyValue.Qualifier == "ARR" && !CprNumber.CheckRules(propertyValue.MRID).AreAnyBroken;
+            return propertyValue.Qualifier == "ARR" && CprNumber.CheckRules(propertyValue.MRID).Success;
         }
     }
 }
