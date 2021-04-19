@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,17 +16,13 @@ using Energinet.DataHub.MarketData.Domain.SeedWork;
 
 namespace Energinet.DataHub.MarketData.Domain.MeteringPoints.Rules.ChangeEnergySupplier
 {
-    internal class MustHaveEnergySupplierAssociatedRule : IBusinessRule
+    internal class BusinessProcessStatus : EnumerationType
     {
-        private readonly SupplierRegistration? _supplierRegistration;
+        internal static readonly BusinessProcessStatus Pending = new BusinessProcessStatus(0, nameof(Pending));
 
-        public MustHaveEnergySupplierAssociatedRule(SupplierRegistration? supplierRegistration)
+        private BusinessProcessStatus(int id, string name)
+            : base(id, name)
         {
-            _supplierRegistration = supplierRegistration;
         }
-
-        public bool IsBroken => _supplierRegistration is null;
-
-        public string Message => $"An energy supplier must be associated.";
     }
 }

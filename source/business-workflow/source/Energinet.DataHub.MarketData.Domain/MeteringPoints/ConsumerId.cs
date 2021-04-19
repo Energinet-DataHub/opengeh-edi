@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,21 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.MarketData.Domain.SeedWork;
 
-namespace Energinet.DataHub.MarketData.Domain.MeteringPoints.Rules.ChangeEnergySupplier
+namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
 {
-    internal class MustHaveEnergySupplierAssociatedRule : IBusinessRule
+    public class ConsumerId : ValueObject
     {
-        private readonly SupplierRegistration? _supplierRegistration;
-
-        public MustHaveEnergySupplierAssociatedRule(SupplierRegistration? supplierRegistration)
+        public ConsumerId(string value)
         {
-            _supplierRegistration = supplierRegistration;
+            Value = !string.IsNullOrWhiteSpace(value) ? value : throw new ArgumentNullException(nameof(value));
         }
 
-        public bool IsBroken => _supplierRegistration is null;
-
-        public string Message => $"An energy supplier must be associated.";
+        public string Value { get; }
     }
 }

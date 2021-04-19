@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using Energinet.DataHub.MarketData.Domain.BusinessProcesses;
 using Energinet.DataHub.MarketData.Domain.MeteringPoints;
 using Energinet.DataHub.MarketData.Domain.MeteringPoints.Events;
 using Energinet.DataHub.MarketData.Domain.MeteringPoints.Rules.ChangeEnergySupplier;
@@ -34,7 +36,7 @@ namespace Energinet.DataHub.MarketData.Tests.Domain.MeteringPoints
 
         [Theory]
         [InlineData("exchange")]
-        public void Register_WhenMeteringPointTypeIsNotEligible_IsNotPossible(string meteringPointTypeName)
+        public void Accept_WhenMeteringPointTypeIsNotEligible_IsNotPossible(string meteringPointTypeName)
         {
             var meteringPointType = CreateMeteringPointTypeFromName(meteringPointTypeName);
             var meteringPoint = CreateMeteringPoint(meteringPointType);
@@ -45,7 +47,7 @@ namespace Energinet.DataHub.MarketData.Tests.Domain.MeteringPoints
         }
 
         [Fact]
-        public void Register_WhenProductionMeteringPointIsNotObligated_IsNotPossible()
+        public void Accept_WhenProductionMeteringPointIsNotObligated_IsNotPossible()
         {
             var meteringPoint = CreateMeteringPoint(MeteringPointType.Production);
 
@@ -55,7 +57,7 @@ namespace Energinet.DataHub.MarketData.Tests.Domain.MeteringPoints
         }
 
         [Fact]
-        public void Register_WhenMeteringPointIsClosedDown_IsNotPossible()
+        public void Accept_WhenMeteringPointIsClosedDown_IsNotPossible()
         {
             var meteringPoint = CreateMeteringPoint(MeteringPointType.Production);
             meteringPoint.CloseDown();
@@ -66,7 +68,7 @@ namespace Energinet.DataHub.MarketData.Tests.Domain.MeteringPoints
         }
 
         [Fact]
-        public void Register_WhenNoEnergySupplierIsAssociated_IsNotPossible()
+        public void Accept_WhenNoEnergySupplierIsAssociated_IsNotPossible()
         {
             var meteringPoint = CreateMeteringPoint(MeteringPointType.Production);
 
@@ -76,14 +78,17 @@ namespace Energinet.DataHub.MarketData.Tests.Domain.MeteringPoints
         }
 
         [Fact]
-        public void Register_WhenChangeOfSupplierIsRegisteredOnSameDate_IsNotPossible()
+        public void Accept_WhenChangeOfSupplierIsRegisteredOnSameDate_IsNotPossible()
         {
-            var customerId = CreateCustomerId();
-            var energySupplierId = CreateEnergySupplierId();
+            var consumerId = CreateConsumerId();
+            var energySupplierId = CreateSupplierId();
             var meteringPoint = CreateMeteringPoint(MeteringPointType.Consumption);
-            meteringPoint.RegisterMoveIn(customerId, energySupplierId, GetFakeEffectuationDate().Minus(Duration.FromDays(1)));
-            meteringPoint.ActivateMoveIn(customerId, energySupplierId);
-            meteringPoint.RegisterChangeOfEnergySupplier(CreateEnergySupplierId(), _systemDateTimeProvider.Now(), _systemDateTimeProvider);
+            var moveInDate = _systemDateTimeProvider.Now().Minus(Duration.FromDays(1));
+            var processId = CreateProcessId();
+
+            meteringPoint.AcceptConsumerMoveIn(consumerId, energySupplierId, moveInDate, processId);
+            meteringPoint.EffectuateConsumerMoveIn(processId, _systemDateTimeProvider);
+            meteringPoint.AcceptChangeOfSupplier(CreateSupplierId(), _systemDateTimeProvider.Now(), processId, _systemDateTimeProvider);
 
             var result = CanChangeSupplier(meteringPoint);
 
@@ -91,30 +96,33 @@ namespace Energinet.DataHub.MarketData.Tests.Domain.MeteringPoints
         }
 
         [Fact]
-        public void Register_WhenMoveInIsAlreadyRegisteredOnSameDate_IsNotPossible()
+        public void Accept_WhenMoveInIsAlreadyRegisteredOnSameDate_IsNotPossible()
         {
             var meteringPoint = CreateMeteringPoint(MeteringPointType.Consumption);
-            meteringPoint.RegisterMoveIn(CreateCustomerId(), CreateEnergySupplierId(), _systemDateTimeProvider.Now());
+            var moveInDate = _systemDateTimeProvider.Now();
+            meteringPoint.AcceptConsumerMoveIn(CreateConsumerId(), CreateSupplierId(), moveInDate, CreateProcessId());
 
             var result = CanChangeSupplier(meteringPoint);
 
             Assert.Contains(result.Errors, x => x.Rule == typeof(MoveInRegisteredOnSameDateIsNotAllowedRule));
         }
 
+        // TODO: Ignore Move related rules until implementation is in scope
+        // [Fact]
+        // public void Register_WhenMoveOutIsAlreadyRegisteredOnSameDate_IsNotPossible()
+        // {
+        //     var meteringPoint = CreateMeteringPoint(MeteringPointType.Consumption);
+        //
+        //     var moveInDate = _systemDateTimeProvider.Now().Minus(Duration.FromDays(1));
+        //     meteringPoint.AcceptConsumerMoveIn(CreateConsumerId(), CreateSupplierId(), moveInDate, CreateProcessId());
+        //     meteringPoint.RegisterMoveOut(CreateCustomerId(), _systemDateTimeProvider.Now());
+        //
+        //     var result = CanChangeSupplier(meteringPoint);
+        //
+        //     Assert.Contains(result.Errors, x => x.Rule == typeof(MoveOutRegisteredOnSameDateIsNotAllowedRule));
+        // }
         [Fact]
-        public void Register_WhenMoveOutIsAlreadyRegisteredOnSameDate_IsNotPossible()
-        {
-            var meteringPoint = CreateMeteringPoint(MeteringPointType.Consumption);
-            meteringPoint.RegisterMoveIn(CreateCustomerId(), CreateEnergySupplierId(), GetFakeEffectuationDate().Minus(Duration.FromDays(1)));
-            meteringPoint.RegisterMoveOut(CreateCustomerId(), _systemDateTimeProvider.Now());
-
-            var result = CanChangeSupplier(meteringPoint);
-
-            Assert.Contains(result.Errors, x => x.Rule == typeof(MoveOutRegisteredOnSameDateIsNotAllowedRule));
-        }
-
-        [Fact]
-        public void Register_WhenEffectuationDateIsInThePast_NotPossible()
+        public void Accept_WhenEffectuationDateIsInThePast_NotPossible()
         {
             var meteringPoint = CreateMeteringPoint(MeteringPointType.Consumption);
             var effectuationDate = _systemDateTimeProvider.Now().Minus(Duration.FromDays(1));
@@ -125,17 +133,34 @@ namespace Energinet.DataHub.MarketData.Tests.Domain.MeteringPoints
         }
 
         [Fact]
-        public void Register_WhenAllRulesAreSatisfied_Success()
+        public void Accept_WhenAllRulesAreSatisfied_Success()
         {
             var meteringPoint = CreateMeteringPoint(MeteringPointType.Consumption);
-            var customerId = CreateCustomerId();
-            var energySupplierId = CreateEnergySupplierId();
-            meteringPoint.RegisterMoveIn(customerId, energySupplierId, GetFakeEffectuationDate().Minus(Duration.FromDays(1)));
-            meteringPoint.ActivateMoveIn(customerId, energySupplierId);
+            var consumerId = CreateConsumerId();
+            var energySupplierId = CreateSupplierId();
+            var moveInDate = _systemDateTimeProvider.Now().Minus(Duration.FromDays(1));
+            var processId = CreateProcessId();
+            meteringPoint.AcceptConsumerMoveIn(consumerId, energySupplierId, moveInDate, processId);
+            meteringPoint.EffectuateConsumerMoveIn(processId, _systemDateTimeProvider);
 
-            meteringPoint.RegisterChangeOfEnergySupplier(CreateEnergySupplierId(), _systemDateTimeProvider.Now(), _systemDateTimeProvider);
+            meteringPoint.AcceptChangeOfSupplier(CreateSupplierId(), _systemDateTimeProvider.Now(), processId, _systemDateTimeProvider);
 
             Assert.Contains(meteringPoint.DomainEvents!, e => e is EnergySupplierChangeRegistered);
+        }
+
+        private static ProcessId CreateProcessId()
+        {
+            return new ProcessId(Guid.NewGuid().ToString());
+        }
+
+        private static ConsumerId CreateConsumerId()
+        {
+            return new ConsumerId("FakeConsumerId");
+        }
+
+        private static EnergySupplierId CreateSupplierId()
+        {
+            return new EnergySupplierId("FakeSupplierId");
         }
 
         private static MarketParticipantMrid CreateCustomerId()
@@ -143,15 +168,10 @@ namespace Energinet.DataHub.MarketData.Tests.Domain.MeteringPoints
             return new MarketParticipantMrid("1");
         }
 
-        private static MarketParticipantMrid CreateEnergySupplierId()
-        {
-            return new MarketParticipantMrid("FakeId");
-        }
-
-        private static MeteringPoint CreateMeteringPoint(MeteringPointType meteringPointType)
+        private static AccountingPoint CreateMeteringPoint(MeteringPointType meteringPointType)
         {
             var meteringPointId = CreateGsrnNumber();
-            return new MeteringPoint(meteringPointId, meteringPointType);
+            return new AccountingPoint(meteringPointId, meteringPointType);
         }
 
         private static GsrnNumber CreateGsrnNumber()
@@ -169,14 +189,14 @@ namespace Energinet.DataHub.MarketData.Tests.Domain.MeteringPoints
             return Instant.FromUtc(2000, 1, 1, 0, 0);
         }
 
-        private BusinessRulesValidationResult CanChangeSupplier(MeteringPoint meteringPoint)
+        private BusinessRulesValidationResult CanChangeSupplier(AccountingPoint accountingPoint)
         {
-            return meteringPoint.CanChangeSupplier(CreateEnergySupplierId(), _systemDateTimeProvider.Now(), _systemDateTimeProvider);
+            return accountingPoint.ChangeSupplierAcceptable(CreateSupplierId(), _systemDateTimeProvider.Now(), _systemDateTimeProvider);
         }
 
-        private BusinessRulesValidationResult CanChangeSupplier(MeteringPoint meteringPoint, Instant effectuationDate)
+        private BusinessRulesValidationResult CanChangeSupplier(AccountingPoint accountingPoint, Instant effectuationDate)
         {
-            return meteringPoint.CanChangeSupplier(CreateEnergySupplierId(), effectuationDate, _systemDateTimeProvider);
+            return accountingPoint.ChangeSupplierAcceptable(CreateSupplierId(), effectuationDate, _systemDateTimeProvider);
         }
     }
 }

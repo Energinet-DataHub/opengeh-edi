@@ -36,7 +36,7 @@ namespace Energinet.DataHub.MarketData.Infrastructure.DataPersistence.MarketEval
 
         private IDbConnection Connection => _connectionFactory.GetOpenConnection();
 
-        public async Task<MeteringPoint> GetByGsrnNumberAsync(GsrnNumber gsrnNumber)
+        public async Task<AccountingPoint> GetByGsrnNumberAsync(GsrnNumber gsrnNumber)
         {
             if (gsrnNumber is null)
             {
@@ -62,28 +62,28 @@ namespace Energinet.DataHub.MarketData.Infrastructure.DataPersistence.MarketEval
 
             var relationships = await GetRelationshipsDataModelAsync(meteringPoint.Id).ConfigureAwait(false);
 
-            return MeteringPoint.CreateFrom(CreateMarketEvaluationPointSnapshot(meteringPoint, relationships));
+            return AccountingPoint.CreateFrom(CreateMarketEvaluationPointSnapshot(meteringPoint, relationships));
         }
 
-        public void Add(MeteringPoint meteringPoint)
+        public void Add(AccountingPoint accountingPoint)
         {
-            if (meteringPoint is null)
+            if (accountingPoint is null)
             {
-                throw new ArgumentNullException(nameof(meteringPoint));
+                throw new ArgumentNullException(nameof(accountingPoint));
             }
 
-            var dataModel = CreateDataModelFrom(meteringPoint);
+            var dataModel = CreateDataModelFrom(accountingPoint);
             _unitOfWorkCallback.RegisterNew(dataModel, this);
         }
 
-        public void Save(MeteringPoint meteringPoint)
+        public void Save(AccountingPoint accountingPoint)
         {
-            if (meteringPoint is null)
+            if (accountingPoint is null)
             {
-                throw new ArgumentNullException(nameof(meteringPoint));
+                throw new ArgumentNullException(nameof(accountingPoint));
             }
 
-            var dataModel = CreateDataModelFrom(meteringPoint);
+            var dataModel = CreateDataModelFrom(accountingPoint);
             _unitOfWorkCallback.RegisterAmended(dataModel, this);
         }
 
@@ -112,12 +112,14 @@ namespace Energinet.DataHub.MarketData.Infrastructure.DataPersistence.MarketEval
             await UpdateRowVersionOrThrowAsync(dataModel).ConfigureAwait(false);
         }
 
-        private static MarketEvaluationPointDataModel CreateDataModelFrom(MeteringPoint aggregate)
+        private static MarketEvaluationPointDataModel CreateDataModelFrom(AccountingPoint aggregate)
         {
             var snapshot = aggregate.GetSnapshot();
-            var relationships = snapshot.Relationships
-                .Select(r => new RelationshipDataModel(r.Id, snapshot.Id, r.MarketParticipantMrid, r.Type, r.EffectuationDate, r.State))
-                .ToList();
+            var relationships = new List<RelationshipDataModel>();
+            // TODO: We must decide on a data model. Until then; use empty list
+            // var relationships = snapshot.BusinessProcesses
+            //     .Select(r => new RelationshipDataModel(r.Id, snapshot.Id, r.MarketParticipantMrid, r.Type, r.EffectuationDate, r.State))
+            //     .ToList();
             return new MarketEvaluationPointDataModel(snapshot.Id, snapshot.GsrnNumber, snapshot.MeteringPointType, relationships, snapshot.IsProductionObligated, snapshot.PhysicalState, snapshot.Version);
         }
 
@@ -141,15 +143,26 @@ namespace Energinet.DataHub.MarketData.Infrastructure.DataPersistence.MarketEval
                     new RelationshipSnapshot(r.Id, r.Mrid!, r.Type, r.EffectuationDate, r.State))
                 .ToList();
 
+            // TODO: We must decide on data model. Until then, return empty business processes, consumer and supplier registrations
+            // var meteringPointSnapshot = new MeteringPointSnapshot(
+            //     marketEvaluationPointDataModel.Id,
+            //     marketEvaluationPointDataModel.GsrnNumber,
+            //     marketEvaluationPointDataModel.Type,
+            //     relationshipsSnapshot,
+            //     marketEvaluationPointDataModel.ProductionObligated,
+            //     marketEvaluationPointDataModel.PhysicalState,
+            //     marketEvaluationPointDataModel.RowVersion);
+            //return meteringPointSnapshot;
             var meteringPointSnapshot = new MeteringPointSnapshot(
-                marketEvaluationPointDataModel.Id,
-                marketEvaluationPointDataModel.GsrnNumber,
-                marketEvaluationPointDataModel.Type,
-                relationshipsSnapshot,
-                marketEvaluationPointDataModel.ProductionObligated,
-                marketEvaluationPointDataModel.PhysicalState,
-                marketEvaluationPointDataModel.RowVersion);
-
+                 marketEvaluationPointDataModel.Id,
+                 marketEvaluationPointDataModel.GsrnNumber,
+                 marketEvaluationPointDataModel.Type,
+                 marketEvaluationPointDataModel.ProductionObligated,
+                 marketEvaluationPointDataModel.PhysicalState,
+                 marketEvaluationPointDataModel.RowVersion,
+                 new List<BusinessProcessSnapshot>(),
+                 new List<ConsumerRegistrationSnapshot>(),
+                 new List<SupplierRegistrationSnapshot>());
             return meteringPointSnapshot;
         }
 
