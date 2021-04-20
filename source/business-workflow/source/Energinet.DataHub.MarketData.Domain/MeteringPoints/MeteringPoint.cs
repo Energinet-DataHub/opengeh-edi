@@ -108,7 +108,7 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
 
         public void RegisterChangeOfEnergySupplier(MarketParticipantMrid energySupplierMrid, Instant effectuationDate, ISystemDateTimeProvider systemDateTimeProvider)
         {
-            if (CanChangeSupplier(energySupplierMrid, effectuationDate, systemDateTimeProvider).AreAnyBroken == true)
+            if (!CanChangeSupplier(energySupplierMrid, effectuationDate, systemDateTimeProvider).Success)
             {
                 throw new InvalidOperationException();
             }

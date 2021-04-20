@@ -50,7 +50,7 @@ namespace Energinet.DataHub.MarketData.Domain.Customers
         private static void ThrowIfInvalid(string cprValue)
         {
             var result = CheckRules(cprValue);
-            if (result.AreAnyBroken)
+            if (!result.Success)
             {
                 throw new InvalidCprNumberRuleException("Invalid CPR number.");
             }

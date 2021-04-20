@@ -22,16 +22,16 @@ namespace Energinet.DataHub.MarketData.Tests.Domain.CprNumbers
     public class CprNumberTests
     {
         [Theory]
-        [InlineData("123456", true)]
-        [InlineData("123456abcd", true)]
-        [InlineData("1234567890", true)]
-        [InlineData("12345678901", true)]
-        [InlineData("2601211234", false)]
-        public void Validate_Cpr_Number(string cprNumber, bool expectedIsBroken)
+        [InlineData("123456", false)]
+        [InlineData("123456abcd", false)]
+        [InlineData("1234567890", false)]
+        [InlineData("12345678901", false)]
+        [InlineData("2601211234", true)]
+        public void Validate_Cpr_Number(string cprNumber, bool expectedIsSuccess)
         {
-            var actualIsBroken = CprNumber.CheckRules(cprNumber).AreAnyBroken;
+            var actualIsSuccess = CprNumber.CheckRules(cprNumber).Success;
 
-            actualIsBroken.Should().Be(expectedIsBroken);
+            actualIsSuccess.Should().Be(expectedIsSuccess);
         }
     }
 }

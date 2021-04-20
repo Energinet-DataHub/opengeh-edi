@@ -12,21 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketData.Domain.SeedWork;
+using System;
 
-namespace Energinet.DataHub.MarketData.Domain.MeteringPoints.Rules.ChangeEnergySupplier
+namespace Energinet.DataHub.MarketData.Domain.SeedWork
 {
-    internal class CannotBeInStateOfClosedDownRule : IBusinessRule
+    public class ValidationError
     {
-        private readonly PhysicalState _physicalState;
-
-        public CannotBeInStateOfClosedDownRule(PhysicalState physicalState)
+        public ValidationError(string reason, Type rule)
         {
-            _physicalState = physicalState;
+            Reason = reason;
+            Rule = rule;
         }
 
-        public bool IsBroken => _physicalState == PhysicalState.ClosedDown;
+        public string Reason { get; }
 
-        public string Message => $"Metering point physical state cannot be {nameof(PhysicalState.ClosedDown)}.";
+        public Type Rule { get; }
     }
 }

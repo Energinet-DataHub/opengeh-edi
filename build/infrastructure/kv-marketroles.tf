@@ -14,7 +14,7 @@
 data "azurerm_client_config" "current" {}
 
 module "kv_marketroles" {
-  source                          = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//key-vault?ref=1.1.0"
+  source                          = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//key-vault?ref=1.2.0"
   name                            = "kv${var.project}${var.organisation}${var.environment}"
   resource_group_name             = data.azurerm_resource_group.main.name
   location                        = data.azurerm_resource_group.main.location
@@ -35,7 +35,7 @@ module "kv_marketroles" {
 }
 
 module "kvs_marketroles_db_connection_string" {
-  source                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//key-vault-secret?ref=1.1.0"
+  source                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//key-vault-secret?ref=1.2.0"
   name                      = "MARKET-ROLES-DB-CONNECTION-STRING"
   value                     = "Server=${module.sqlsrv_marketroles.fully_qualified_domain_name};Database=${module.sqldb_marketroles.name};Uid=${local.sqlServerAdminName};Pwd=${random_password.sqlsrv_admin_password.result};"
   key_vault_id              = module.kv_marketroles.id
