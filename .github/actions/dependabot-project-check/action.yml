@@ -1,0 +1,79 @@
+# Copyright 2020 Energinet DataHub A/S
+#
+# Licensed under the Apache License, Version 2.0 (the "License2");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+name: 'Check Dependabot projects'
+description: 'Checks that dependabot.yml gets updated with any added or removed csproj files'
+runs:
+  using: "composite"
+  steps:
+      # Code comments for each line:
+      # Fetch all changed files in this PR
+      # Return a concatenated string containing status and filename for each object
+      # Search for all strings containing .csproj - return true if none are found to avoid script exiting
+      # Return only the directory for all strings (dirname basically just cuts off the filename at the end and doesn't care about the start of our concatenated string) and only run if grep returned any values
+      #
+      # If no files are found tell the user and exit this step
+      #
+      # Encode all line breaks
+      #
+      # Use the dirs variable as output from this step
+    - name: Fetch csproj dirs with changes
+      id: fetchCsprojDirs
+      run: |
+        dirs=$(curl --location -s --request GET 'https://api.github.com/repos/Energinet-DataHub/geh-market-roles/pulls/${{ github.event.number }}/files' --header 'Authorization: Bearer ${{ github.token }}' | jq -c '.[] | .status + ";" + .filename' | (grep '.csproj' || true) | xargs --no-run-if-empty -n 1 dirname)
+        [ -z "$dirs" ] && echo "No changes to csproj files found in this PR. Proceeding to next step." && exit 0
+        dirs="${dirs//$'\n'/'%0A'}" # This currently seems to be the best fix to passing along multiline results https://github.community/t/set-output-truncates-multiline-strings/16852
+        echo "::set-output name=csproj_dirs::$dirs"
+      shell: bash
+
+      # Code comments for each line:
+      # Assign the error message to be used by printf
+      #
+      # Use the output variable from the fetchCsprojDirs step (Decoding the string happens automatically which means that we now have a list of directories available)
+      # Search for all the rows that say "added;" - return true if none are found to avoid script exiting
+      # Removed everything up to and including the semicolon
+      #
+      # If no files are found tell the user and exit this step
+      #
+      # For each directory check if dependabot.yml contains the given directory
+      # If the file doesn't contain the directory then throw an error telling the user to run the dependabot-generator.bat file.
+    - name: Check for added csproj files
+      run: |
+        errorMessage="The csproj file in %s has not been added to dependabot.yml. Please run dependabot-generator.bat and commit the updated dependabot.yml file."
+        dirs="$(echo '${{ steps.fetchCsprojDirs.outputs.csproj_dirs }}' | (grep 'added;' || true) | sed 's/.*;//')"
+        [ -z "$dirs" ] && echo "No csproj files added. Proceeding to next step." && exit 0
+        for dir in $dirs; do
+          grep -q -e "$dir" ./.github/dependabot.yml || { printf "$errorMessage" >&2 "$dir"; exit 1; }
+        done
+      shell: bash
+
+      # Code comments for each line:
+      # Assign the error message to be used by printf
+      #
+      # Use the output variable from the fetchCsprojDirs step (Decoding the string happens automatically which means that we now have a list of directories available)
+      # Search for all the rows that say "removed;" - return true if none are found to avoid script exiting
+      # Removed everything up to and including the semicolon
+      #
+      # If no files are found tell the user and exit this step
+      #
+      # For each directory check if dependabot.yml contains the given directory
+      # If the file contains the directory then throw an error telling the user to run the dependabot-generator.bat file.
+    - name: Check for removed csproj files
+      run: |
+        errorMessage="The csproj file in %s has been removed but still exists in dependabot.yml. Please run dependabot-generator.bat and commit the updated dependabot.yml file."
+        dirs="$(echo '${{ steps.fetchCsprojDirs.outputs.csproj_dirs }}' | (grep 'removed;' || true) | sed 's/.*;//')"
+        [ -z "$dirs" ] && echo "No csproj files removed. Proceeding to next step." && exit 0
+        for dir in $dirs; do
+          grep -q -e "$dir" ./.github/dependabot.yml && { printf "$errorMessage" >&2 "$dir"; exit 1; }
+        done
+      shell: bash
