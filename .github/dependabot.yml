@@ -40,6 +40,21 @@ updates:
       interval: "weekly"
 
   - package-ecosystem: "nuget"
+    directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.EntryPoints.Ingestion"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.EntryPoints.Outbox"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.EntryPoints.Processing"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
     directory: "/source/ingestion/source/Energinet.DataHub.Ingestion.Application"
     schedule:
       interval: "weekly"
@@ -96,11 +111,6 @@ updates:
 
   - package-ecosystem: "nuget"
     directory: "/source/shared/iso8601/GreenEnergyHub.Iso8601.Tests"
-    schedule:
-      interval: "weekly"
-
-  - package-ecosystem: "nuget"
-    directory: "/source/shared/iso8601/GreenEnergyHub.Iso8601.Tests/TestPleaseDelete"
     schedule:
       interval: "weekly"
 
