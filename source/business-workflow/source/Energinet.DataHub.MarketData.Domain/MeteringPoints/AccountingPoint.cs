@@ -131,9 +131,27 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
                     "Cannot accept change of supplier request due to violation of one or more business rules.");
             }
 
-            _businessProcesses.Add(new BusinessProcess(processId, supplyStartDate, BusinessProcessType.ChangeOfSupplier));
+            AddBusinessProcessOrThrow(processId, supplyStartDate, BusinessProcessType.ChangeOfSupplier);
+            _supplierRegistrations.Add(new SupplierRegistration(energySupplierId, processId));
 
             AddDomainEvent(new EnergySupplierChangeRegistered(GsrnNumber, processId, supplyStartDate));
+        }
+
+        public void EffectuateChangeOfSupplier(ProcessId processId, ISystemDateTimeProvider systemDateTimeProvider)
+        {
+            if (processId is null) throw new ArgumentNullException(nameof(processId));
+            if (systemDateTimeProvider == null) throw new ArgumentNullException(nameof(systemDateTimeProvider));
+
+            var businessProcess = GetBusinessProcessOrThrow(processId, BusinessProcessType.ChangeOfSupplier);
+            businessProcess.EffectuateOrThrow(systemDateTimeProvider);
+
+            var currentSupplier = GetCurrentSupplier(systemDateTimeProvider) !;
+            currentSupplier.MarkEndOfSupply(businessProcess.EffectiveDate);
+
+            var futureSupplier = _supplierRegistrations.Find(s => s.ProcessId.Equals(processId)) !;
+            futureSupplier.StartOfSupply(businessProcess.EffectiveDate);
+
+            AddDomainEvent(new EnergySupplierChanged(GsrnNumber.Value, processId.Value!, businessProcess.EffectiveDate));
         }
 
         public void CloseDown()
@@ -181,7 +199,7 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
                     "Cannot accept move in request due to violation of one or more business rules.");
             }
 
-            _businessProcesses.Add(new BusinessProcess(processId, moveInDate, BusinessProcessType.MoveIn));
+            AddBusinessProcessOrThrow(processId, moveInDate, BusinessProcessType.MoveIn);
             _consumerRegistrations.Add(new ConsumerRegistration(consumerId, processId));
             _supplierRegistrations.Add(new SupplierRegistration(energySupplierId, processId));
         }
@@ -190,9 +208,18 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
         {
             var businessProcess = GetBusinessProcessOrThrow(processId, BusinessProcessType.MoveIn);
 
-            businessProcess.Effectuate(systemDateTimeProvider);
+            businessProcess.EffectuateOrThrow(systemDateTimeProvider);
             var newSupplier = _supplierRegistrations.Find(supplier => supplier.ProcessId.Equals(processId)) !;
             newSupplier.StartOfSupply(businessProcess.EffectiveDate);
+        }
+
+        public void CancelChangeOfSupplier(ProcessId processId)
+        {
+            if (processId is null) throw new ArgumentNullException(nameof(processId));
+
+            var businessProcess = GetBusinessProcessOrThrow(processId, BusinessProcessType.ChangeOfSupplier);
+            businessProcess.CancelOrThrow();
+            AddDomainEvent(new ChangeOfSupplierCancelled(processId));
         }
 
         internal SupplierRegistration? GetCurrentSupplier(ISystemDateTimeProvider systemDateTimeProvider)
@@ -211,6 +238,16 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
             }
 
             return businessProcess;
+        }
+
+        private void AddBusinessProcessOrThrow(ProcessId processId, Instant effectiveDate, BusinessProcessType businessProcessType)
+        {
+            if (_businessProcesses.Any(p => p.ProcessId.Equals(processId)))
+            {
+                throw new BusinessProcessException($"Process id {processId.Value} does already exist.");
+            }
+
+            _businessProcesses.Add(new BusinessProcess(processId, effectiveDate, businessProcessType));
         }
     }
 }

@@ -36,7 +36,7 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
 
         public BusinessProcessType ProcessType { get; }
 
-        public BusinessProcessStatus Status { get; }
+        public BusinessProcessStatus Status { get; private set; }
 
         public static BusinessProcess CreateFrom(BusinessProcessSnapshot snapshot)
         {
@@ -51,15 +51,22 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
             return new BusinessProcessSnapshot(ProcessId.Value !, EffectiveDate, ProcessType.Id, Status.Id);
         }
 
-        public void Effectuate(ISystemDateTimeProvider systemDateTimeProvider)
+        public void EffectuateOrThrow(ISystemDateTimeProvider systemDateTimeProvider)
         {
             EnsureNotTooEarly(systemDateTimeProvider);
             EnsureStatus();
+            Status = BusinessProcessStatus.Completed;
+        }
+
+        public void CancelOrThrow()
+        {
+            EnsureStatus();
+            Status = BusinessProcessStatus.Cancelled;
         }
 
         private void EnsureNotTooEarly(ISystemDateTimeProvider systemDateTimeProvider)
         {
-            if (EffectiveDate >= systemDateTimeProvider.Now())
+            if (EffectiveDate.ToDateTimeUtc().Date > systemDateTimeProvider.Now().ToDateTimeUtc().Date)
             {
                 throw new BusinessProcessException(
                     "Pending business processes cannot be effectuated ahead of effective date.");
