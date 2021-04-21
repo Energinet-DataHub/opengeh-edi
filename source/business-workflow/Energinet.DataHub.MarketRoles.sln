@@ -1,0 +1,42 @@
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Copyright 2020 Energinet DataHub A/S
+#
+# Licensed under the Apache License, Version 2.0 (the "License2");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energinet.DataHub.MarketRoles.EntryPoints.Processing", "source\Energinet.DataHub.MarketRoles.EntryPoints.Processing\Energinet.DataHub.MarketRoles.EntryPoints.Processing.csproj", "{1A274305-4886-43D0-8A1C-D249DAEEC028}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energinet.DataHub.MarketRoles.EntryPoints.Ingestion", "source\Energinet.DataHub.MarketRoles.EntryPoints.Ingestion\Energinet.DataHub.MarketRoles.EntryPoints.Ingestion.csproj", "{654DA496-60D8-47D8-923E-F24F71A31F84}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energinet.DataHub.MarketRoles.EntryPoints.Outbox", "source\Energinet.DataHub.MarketRoles.EntryPoints.Outbox\Energinet.DataHub.MarketRoles.EntryPoints.Outbox.csproj", "{883CEA94-E42C-44B9-83C1-104998502B74}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1A274305-4886-43D0-8A1C-D249DAEEC028}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A274305-4886-43D0-8A1C-D249DAEEC028}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A274305-4886-43D0-8A1C-D249DAEEC028}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A274305-4886-43D0-8A1C-D249DAEEC028}.Release|Any CPU.Build.0 = Release|Any CPU
+		{654DA496-60D8-47D8-923E-F24F71A31F84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{654DA496-60D8-47D8-923E-F24F71A31F84}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{654DA496-60D8-47D8-923E-F24F71A31F84}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{654DA496-60D8-47D8-923E-F24F71A31F84}.Release|Any CPU.Build.0 = Release|Any CPU
+		{883CEA94-E42C-44B9-83C1-104998502B74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{883CEA94-E42C-44B9-83C1-104998502B74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{883CEA94-E42C-44B9-83C1-104998502B74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{883CEA94-E42C-44B9-83C1-104998502B74}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

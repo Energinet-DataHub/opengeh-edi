@@ -11,12 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-output "kv_market_roles_db_connection_string_secret_name" {
-  description = "Name of the secret in the keyvault containing the connection string for the market roles sql db"
-  value = module.kvs_marketroles_db_connection_string.name
-}
-
-output "kv_market_roles_name" {
-  description = "Name of the keyvault"
-  value = module.kv_marketroles.name
-}
+name: 'Azure Core Tools Install'
+description: 'Installs Azure Core Tools'
+runs:
+  using: "composite"
+  steps:
+    - run: |
+        wget -q https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb
+        sudo dpkg -i packages-microsoft-prod.deb
+        sudo apt-get update
+        sudo apt-get install azure-functions-core-tools-3
+      shell: bash
