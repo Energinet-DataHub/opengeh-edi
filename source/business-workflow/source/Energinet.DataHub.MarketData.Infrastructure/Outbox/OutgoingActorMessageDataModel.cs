@@ -12,24 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Data;
+using System;
+using NodaTime;
 
-namespace Energinet.DataHub.MarketData.Application.Common
+namespace Energinet.DataHub.MarketData.Infrastructure.Outbox
 {
-    /// <summary>
-    ///  Factory for creating database connection
-    /// </summary>
-    public interface IDbConnectionFactory
+    public class OutgoingActorMessageDataModel
     {
-        /// <summary>
-        /// Return the open connection. Creates new connection one does not exist.
-        /// </summary>
-        /// <returns><see cref="IDbConnection"/></returns>
-        IDbConnection GetOpenConnection();
+        public string? Recipient { get; set; }
 
-        /// <summary>
-        ///  Resets the existing connection
-        /// </summary>
-        void ResetConnection();
+        public Guid Id { get; set; }
+
+        public Instant OccurredOn { get; set; }
+
+        public string? Type { get; set; }
+
+        public string? Data { get; set; }
+
+        public int State { get; set; }
+
+        public Instant? LastUpdatedOn { get; set; }
     }
 }

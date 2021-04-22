@@ -14,31 +14,16 @@
 
 using System.Threading.Tasks;
 
-namespace Energinet.DataHub.MarketData.Infrastructure.DataPersistence
+namespace Energinet.DataHub.MarketData.Infrastructure.DatabaseAccess.Write
 {
     /// <summary>
-    /// Service for transaction management
+    /// Interact with our datastore
     /// </summary>
-    public interface IUnitOfWorkCallback
+    public interface IUnitOfWork
     {
         /// <summary>
-        /// Commits the transaction
+        /// Commit transaction and persist data in datastore
         /// </summary>
-        /// <returns><see cref="Task"/></returns>
         Task CommitAsync();
-
-        /// <summary>
-        /// Register updated or changed entity
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="repository"></param>
-        void RegisterAmended(IDataModel entity, ICanUpdateDataModel repository);
-
-        /// <summary>
-        /// Register new entity
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="repository"></param>
-        void RegisterNew(IDataModel entity, ICanInsertDataModel repository);
     }
 }

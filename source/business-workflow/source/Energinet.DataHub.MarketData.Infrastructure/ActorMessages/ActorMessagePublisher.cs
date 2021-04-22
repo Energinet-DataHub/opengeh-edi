@@ -14,32 +14,28 @@
 
 using System;
 using System.Threading.Tasks;
-using Dapper;
 using Energinet.DataHub.MarketData.Application.Common;
 using Energinet.DataHub.MarketData.Domain.SeedWork;
-using Energinet.DataHub.MarketData.Infrastructure.DataPersistence;
+using Energinet.DataHub.MarketData.Infrastructure.DatabaseAccess.Write;
 using Energinet.DataHub.MarketData.Infrastructure.Outbox;
 using GreenEnergyHub.Json;
-using NodaTime;
 
 namespace Energinet.DataHub.MarketData.Infrastructure.ActorMessages
 {
-    public class ActorMessagePublisher : IActorMessagePublisher, ICanInsertDataModel
+    public class ActorMessagePublisher : IActorMessagePublisher
     {
-        private readonly IDbConnectionFactory _connectionFactory;
+        private readonly IWriteDatabaseContext _writeDatabaseContext;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-        private readonly IUnitOfWorkCallback _unitOfWorkCallback;
         private readonly IJsonSerializer _jsonSerializer;
 
-        public ActorMessagePublisher(IDbConnectionFactory connectionFactory, ISystemDateTimeProvider systemDateTimeProvider, IUnitOfWorkCallback unitOfWorkCallback, IJsonSerializer jsonSerializer)
+        public ActorMessagePublisher(IWriteDatabaseContext writeDatabaseContext, ISystemDateTimeProvider systemDateTimeProvider, IJsonSerializer jsonSerializer)
         {
-            _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
+            _writeDatabaseContext = writeDatabaseContext;
             _systemDateTimeProvider = systemDateTimeProvider ?? throw new ArgumentNullException(nameof(systemDateTimeProvider));
-            _unitOfWorkCallback = unitOfWorkCallback ?? throw new ArgumentNullException(nameof(unitOfWorkCallback));
             _jsonSerializer = jsonSerializer;
         }
 
-        public Task PublishAsync<TMessage>(TMessage message, string recipient)
+        public async Task PublishAsync<TMessage>(TMessage message, string recipient)
         {
             if (message is null)
             {
@@ -50,30 +46,16 @@ namespace Energinet.DataHub.MarketData.Infrastructure.ActorMessages
             var payload = _jsonSerializer.Serialize(message);
 
             var outboxMessage = new OutgoingActorMessage(_systemDateTimeProvider.Now(), messageType, payload, recipient);
-            _unitOfWorkCallback.RegisterNew(outboxMessage, this);
-
-            return Task.CompletedTask;
-        }
-
-        public async Task PersistCreationOfAsync(IDataModel entity)
-        {
-            var dataModel = (OutgoingActorMessage)entity;
-
-            if (dataModel is null)
+            await _writeDatabaseContext.OutgoingActorMessageDataModels.AddAsync(new OutgoingActorMessageDataModel
             {
-                throw new NullReferenceException(nameof(dataModel));
-            }
-
-            var insertStatement = $"INSERT INTO [dbo].[OutgoingActorMessages] (OccurredOn, Type, Data, State, LastUpdatedOn, Recipient) VALUES (@OccurredOn, @Type, @Data, @State, @LastUpdatedOn, @Recipient)";
-            await _connectionFactory.GetOpenConnection().ExecuteAsync(insertStatement, new
-            {
-                OccurredOn = dataModel.OccurredOn,
-                Type = dataModel.Type,
-                Data = dataModel.Data,
-                State = OutboxState.Pending.Id,
-                LastUpdatedOn = SystemClock.Instance.GetCurrentInstant(),
-                Recipient = dataModel.Recipient,
-            }).ConfigureAwait(false);
+                Id = outboxMessage.Id,
+                Data = outboxMessage.Data,
+                Recipient = outboxMessage.Recipient,
+                State = outboxMessage.State,
+                Type = outboxMessage.Type,
+                OccurredOn = outboxMessage.OccurredOn,
+                LastUpdatedOn = _systemDateTimeProvider.Now(),
+            });
         }
     }
 }

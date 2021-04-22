@@ -12,19 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
+using System;
+using NodaTime;
 
-namespace Energinet.DataHub.MarketData.Infrastructure.DataPersistence
+namespace Energinet.DataHub.MarketData.Infrastructure.InternalCommand
 {
-    /// <summary>
-    /// Repository capable of updating entities
-    /// </summary>
-    public interface ICanUpdateDataModel
+    public class InternalCommandDataModel
     {
-        /// <summary>
-        /// Updates entity
-        /// </summary>
-        /// <param name="entity"></param>
-        Task PersistUpdateOfAsync(IDataModel entity);
+        public Guid Id { get; set; }
+
+        public string? Data { get; set; }
+
+        public string? Type { get; set; }
+
+        public Instant? ScheduledDate { get; set; }
+
+        public Instant? ProcessedDate { get; set; }
     }
 }

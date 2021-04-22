@@ -12,46 +12,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketData.Infrastructure.DataPersistence.MarketEvaluationPoints
+namespace Energinet.DataHub.MarketData.Infrastructure.DatabaseAccess.Write.MeteringPoints
 {
-    public class MarketEvaluationPointDataModel : IDataModel
+    public class MeteringPointDataModel
     {
-        public MarketEvaluationPointDataModel(int id, string gsrnNumber, int type, List<RelationshipDataModel> relationships, bool productionObligated, int physicalState, int rowVersion)
-        {
-            Id = id;
-            GsrnNumber = gsrnNumber;
-            Type = type;
-            Relationships = relationships;
-            ProductionObligated = productionObligated;
-            PhysicalState = physicalState;
-            RowVersion = rowVersion;
-        }
+#pragma warning disable 8618 //Empty constructor needed to satisfy EntityFramework
+        public MeteringPointDataModel()
+#pragma warning restore 8618
+        { }
 
-        public MarketEvaluationPointDataModel(int id, string gsrnNumber, bool productionObligated, int physicalState, int type, int rowVersion)
+        public MeteringPointDataModel(Guid id, string gsrnNumber, int type, bool productionObligated, int physicalState, ICollection<RelationshipDataModel> relationshipDataModels, int version)
         {
             Id = id;
             GsrnNumber = gsrnNumber;
             Type = type;
             ProductionObligated = productionObligated;
             PhysicalState = physicalState;
-            RowVersion = rowVersion;
-            Relationships = new List<RelationshipDataModel>();
+            RelationshipDataModels = relationshipDataModels;
+            RowVersion = version;
         }
 
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         public string GsrnNumber { get; set; }
 
         public int Type { get; set; }
-
-        public List<RelationshipDataModel> Relationships { get; }
 
         public bool ProductionObligated { get; set; }
 
         public int PhysicalState { get; set; }
 
         public int RowVersion { get; set; }
+
+        public ICollection<RelationshipDataModel> RelationshipDataModels { get; set; }
     }
 }

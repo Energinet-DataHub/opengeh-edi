@@ -12,26 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketData.Infrastructure.DataPersistence.EnergySuppliers
-{
-    public class EnergySupplierDataModel : IDataModel
-    {
-        public EnergySupplierDataModel(int rowVersion)
-        {
-            RowVersion = rowVersion;
-        }
+using System;
+using System.Collections.Generic;
+using Energinet.DataHub.MarketData.Infrastructure.DatabaseAccess.Write.MeteringPoints;
 
-        public EnergySupplierDataModel(int id, string mrid, int rowVersion)
+namespace Energinet.DataHub.MarketData.Infrastructure.DatabaseAccess.Write.EnergySuppliers
+{
+    public class EnergySupplierDataModel
+    {
+        public EnergySupplierDataModel()
+        { }
+
+        public EnergySupplierDataModel(Guid id, string mrid, int rowVersion)
         {
             Id = id;
-            Mrid = mrid;
+            MrId = mrid;
             RowVersion = rowVersion;
         }
 
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
-        public string? Mrid { get; set; }
+        public string? MrId { get; set; }
 
         public int RowVersion { get; set; }
+
+        public ICollection<RelationshipDataModel>? RelationshipDataModels { get; set; }
     }
 }

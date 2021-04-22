@@ -21,9 +21,9 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
     {
         public MarketParticipantMrid(string marketParticipantId)
         {
-            Mrid = marketParticipantId ?? throw new ArgumentNullException(nameof(marketParticipantId));
+            MrId = marketParticipantId ?? throw new ArgumentNullException(nameof(marketParticipantId));
         }
 
-        public string Mrid { get; }
+        public string MrId { get; }
     }
 }

@@ -12,18 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace Energinet.DataHub.MarketData.Domain.EnergySuppliers
 {
     public class EnergySupplierSnapshot
     {
-        public EnergySupplierSnapshot(int id, string glnNumber, int version)
+        public EnergySupplierSnapshot(Guid id, string glnNumber, int version)
         {
             Id = id;
             GlnNumber = glnNumber;
             Version = version;
         }
 
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         public string GlnNumber { get; set; }
 

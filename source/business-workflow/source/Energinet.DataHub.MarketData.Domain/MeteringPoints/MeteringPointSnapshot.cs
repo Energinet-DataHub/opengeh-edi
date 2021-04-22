@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
 {
     public class MeteringPointSnapshot
     {
-        public MeteringPointSnapshot(int id, string gsrnNumber, int meteringPointType, List<RelationshipSnapshot> relationships, bool isProductionObligated, int physicalState, int version)
+        public MeteringPointSnapshot(Guid id, string gsrnNumber, int meteringPointType, List<RelationshipSnapshot> relationships, bool isProductionObligated, int physicalState, int version)
         {
             Id = id;
             GsrnNumber = gsrnNumber;
@@ -29,7 +30,7 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
             Version = version;
         }
 
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         public string GsrnNumber { get; set; }
 

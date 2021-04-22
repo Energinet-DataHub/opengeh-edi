@@ -44,7 +44,7 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
             _isProductionObligated = isProductionObligated;
         }
 
-        private MeteringPoint(GsrnNumber gsrnNumber, MeteringPointType meteringPointType, bool isProductionObligated, List<Relationship> relationships, int id, int version, PhysicalState physicalState)
+        private MeteringPoint(GsrnNumber gsrnNumber, MeteringPointType meteringPointType, bool isProductionObligated, List<Relationship> relationships, Guid id, int version, PhysicalState physicalState)
         {
             GsrnNumber = gsrnNumber;
             _meteringPointType = meteringPointType;
@@ -73,17 +73,17 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
                 GsrnNumber.Create(snapshot.GsrnNumber),
                 MeteringPointType.FromValue<MeteringPointType>(snapshot.MeteringPointType),
                 snapshot.IsProductionObligated,
-                snapshot.Relationships.Select(r => Relationship.CreateFrom(r)).ToList(),
+                snapshot.Relationships.Select(Relationship.CreateFrom).ToList(),
                 snapshot.Id,
                 snapshot.Version,
                 PhysicalState.FromValue<PhysicalState>(snapshot.PhysicalState));
         }
 
-        public BusinessRulesValidationResult CanChangeSupplier(MarketParticipantMrid energySupplierMrid, Instant effectuationDate, ISystemDateTimeProvider systemDateTimeProvider)
+        public BusinessRulesValidationResult CanChangeSupplier(MarketParticipantMrid energySupplierMrId, Instant effectuationDate, ISystemDateTimeProvider systemDateTimeProvider)
         {
-            if (energySupplierMrid is null)
+            if (energySupplierMrId is null)
             {
-                throw new ArgumentNullException(nameof(energySupplierMrid));
+                throw new ArgumentNullException(nameof(energySupplierMrId));
             }
 
             if (systemDateTimeProvider == null)
@@ -156,11 +156,11 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
             }
 
             var customerRelation = _relationships.First(r =>
-                r.MarketParticipantMrid.Equals(customerMrid) && r.Type == RelationshipType.Customer1);
+                r.MarketParticipantMrId.Equals(customerMrid) && r.Type == RelationshipType.Customer1);
             customerRelation.Activate();
 
             var energySupplierRelation = _relationships.First(r =>
-                r.MarketParticipantMrid.Equals(energySupplierMrid) && r.Type == RelationshipType.EnergySupplier);
+                r.MarketParticipantMrId.Equals(energySupplierMrid) && r.Type == RelationshipType.EnergySupplier);
             energySupplierRelation.Activate();
         }
 
