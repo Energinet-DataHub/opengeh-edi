@@ -145,11 +145,8 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
             var businessProcess = GetBusinessProcessOrThrow(processId, BusinessProcessType.ChangeOfSupplier);
             businessProcess.EffectuateOrThrow(systemDateTimeProvider);
 
-            var currentSupplier = GetCurrentSupplier(systemDateTimeProvider) !;
-            currentSupplier.MarkEndOfSupply(businessProcess.EffectiveDate);
-
-            var futureSupplier = _supplierRegistrations.Find(s => s.ProcessId.Equals(processId)) !;
-            futureSupplier.StartOfSupply(businessProcess.EffectiveDate);
+            DiscontinueCurrentSupplier(businessProcess, systemDateTimeProvider);
+            StartOfSupplyForFutureSupplier(businessProcess, systemDateTimeProvider);
 
             AddDomainEvent(new EnergySupplierChanged(GsrnNumber.Value, processId.Value!, businessProcess.EffectiveDate));
         }
@@ -220,6 +217,29 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
             var businessProcess = GetBusinessProcessOrThrow(processId, BusinessProcessType.ChangeOfSupplier);
             businessProcess.CancelOrThrow();
             AddDomainEvent(new ChangeOfSupplierCancelled(processId));
+        }
+
+        private void StartOfSupplyForFutureSupplier(BusinessProcess businessProcess, ISystemDateTimeProvider systemDateTimeProvider)
+        {
+            var futureSupplier = _supplierRegistrations.Find(s => s.ProcessId.Equals(businessProcess.ProcessId));
+            if (futureSupplier == null)
+            {
+                throw new BusinessProcessException(
+                    $"Could find supplier registration of process id {businessProcess.ProcessId.Value}.");
+            }
+
+            futureSupplier.StartOfSupply(businessProcess.EffectiveDate);
+        }
+
+        private void DiscontinueCurrentSupplier(BusinessProcess businessProcess, ISystemDateTimeProvider systemDateTimeProvider)
+        {
+            var currentSupplier = GetCurrentSupplier(systemDateTimeProvider);
+            if (currentSupplier == null)
+            {
+                throw new BusinessProcessException($"Could not find current energy supplier.");
+            }
+
+            currentSupplier.MarkEndOfSupply(businessProcess.EffectiveDate);
         }
 
         private SupplierRegistration? GetCurrentSupplier(ISystemDateTimeProvider systemDateTimeProvider)
