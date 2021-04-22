@@ -20,9 +20,9 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process.Even
 {
     public class ConsumerDetailsDispatched : DomainEventBase
     {
-        public ConsumerDetailsDispatched(ProcessId? processId)
+        public ConsumerDetailsDispatched(ProcessId processId)
         {
-            ProcessId = processId ?? throw new ArgumentNullException(nameof(processId));
+            ProcessId = processId;
         }
 
         public ProcessId ProcessId { get; }
