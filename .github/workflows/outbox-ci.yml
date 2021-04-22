@@ -17,7 +17,6 @@ on:
   pull_request:
     branches:
       - main
-      - cmgrd/dotnet-playground
   workflow_dispatch: {}
 
 env:
