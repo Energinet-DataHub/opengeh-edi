@@ -222,7 +222,7 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
             AddDomainEvent(new ChangeOfSupplierCancelled(processId));
         }
 
-        internal SupplierRegistration? GetCurrentSupplier(ISystemDateTimeProvider systemDateTimeProvider)
+        private SupplierRegistration? GetCurrentSupplier(ISystemDateTimeProvider systemDateTimeProvider)
         {
             return _supplierRegistrations.Find(supplier =>
                 supplier.StartOfSupplyDate <= systemDateTimeProvider.Now() && supplier.EndOfSupplyDate == null);
