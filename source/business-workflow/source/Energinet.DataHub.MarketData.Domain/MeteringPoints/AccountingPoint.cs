@@ -131,7 +131,7 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
                     "Cannot accept change of supplier request due to violation of one or more business rules.");
             }
 
-            AddBusinessProcessOrThrow(processId, supplyStartDate, BusinessProcessType.ChangeOfSupplier);
+            AddBusinessProcess(processId, supplyStartDate, BusinessProcessType.ChangeOfSupplier);
             _supplierRegistrations.Add(new SupplierRegistration(energySupplierId, processId));
 
             AddDomainEvent(new EnergySupplierChangeRegistered(GsrnNumber, processId, supplyStartDate));
@@ -142,8 +142,8 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
             if (processId is null) throw new ArgumentNullException(nameof(processId));
             if (systemDateTimeProvider == null) throw new ArgumentNullException(nameof(systemDateTimeProvider));
 
-            var businessProcess = GetBusinessProcessOrThrow(processId, BusinessProcessType.ChangeOfSupplier);
-            businessProcess.EffectuateOrThrow(systemDateTimeProvider);
+            var businessProcess = GetBusinessProcess(processId, BusinessProcessType.ChangeOfSupplier);
+            businessProcess.Effectuate(systemDateTimeProvider);
 
             DiscontinueCurrentSupplier(businessProcess, systemDateTimeProvider);
             StartOfSupplyForFutureSupplier(businessProcess, systemDateTimeProvider);
@@ -196,16 +196,16 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
                     "Cannot accept move in request due to violation of one or more business rules.");
             }
 
-            AddBusinessProcessOrThrow(processId, moveInDate, BusinessProcessType.MoveIn);
+            AddBusinessProcess(processId, moveInDate, BusinessProcessType.MoveIn);
             _consumerRegistrations.Add(new ConsumerRegistration(consumerId, processId));
             _supplierRegistrations.Add(new SupplierRegistration(energySupplierId, processId));
         }
 
         public void EffectuateConsumerMoveIn(ProcessId processId, ISystemDateTimeProvider systemDateTimeProvider)
         {
-            var businessProcess = GetBusinessProcessOrThrow(processId, BusinessProcessType.MoveIn);
+            var businessProcess = GetBusinessProcess(processId, BusinessProcessType.MoveIn);
 
-            businessProcess.EffectuateOrThrow(systemDateTimeProvider);
+            businessProcess.Effectuate(systemDateTimeProvider);
             var newSupplier = _supplierRegistrations.Find(supplier => supplier.ProcessId.Equals(processId)) !;
             newSupplier.StartOfSupply(businessProcess.EffectiveDate);
         }
@@ -214,8 +214,8 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
         {
             if (processId is null) throw new ArgumentNullException(nameof(processId));
 
-            var businessProcess = GetBusinessProcessOrThrow(processId, BusinessProcessType.ChangeOfSupplier);
-            businessProcess.CancelOrThrow();
+            var businessProcess = GetBusinessProcess(processId, BusinessProcessType.ChangeOfSupplier);
+            businessProcess.Cancel();
             AddDomainEvent(new ChangeOfSupplierCancelled(processId));
         }
 
@@ -248,7 +248,7 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
                 supplier.StartOfSupplyDate <= systemDateTimeProvider.Now() && supplier.EndOfSupplyDate == null);
         }
 
-        private BusinessProcess GetBusinessProcessOrThrow(ProcessId processId, BusinessProcessType businessProcessType)
+        private BusinessProcess GetBusinessProcess(ProcessId processId, BusinessProcessType businessProcessType)
         {
             var businessProcess =
                 _businessProcesses.Find(p => p.ProcessId.Equals(processId) && p.ProcessType == businessProcessType);
@@ -260,7 +260,7 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
             return businessProcess;
         }
 
-        private void AddBusinessProcessOrThrow(ProcessId processId, Instant effectiveDate, BusinessProcessType businessProcessType)
+        private void AddBusinessProcess(ProcessId processId, Instant effectiveDate, BusinessProcessType businessProcessType)
         {
             if (_businessProcesses.Any(p => p.ProcessId.Equals(processId)))
             {

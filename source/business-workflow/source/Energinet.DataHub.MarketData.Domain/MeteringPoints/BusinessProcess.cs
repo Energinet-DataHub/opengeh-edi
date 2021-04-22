@@ -51,14 +51,14 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
             return new BusinessProcessSnapshot(ProcessId.Value !, EffectiveDate, ProcessType.Id, Status.Id);
         }
 
-        public void EffectuateOrThrow(ISystemDateTimeProvider systemDateTimeProvider)
+        public void Effectuate(ISystemDateTimeProvider systemDateTimeProvider)
         {
             EnsureNotTooEarly(systemDateTimeProvider);
             EnsureStatus();
             Status = BusinessProcessStatus.Completed;
         }
 
-        public void CancelOrThrow()
+        public void Cancel()
         {
             EnsureStatus();
             Status = BusinessProcessStatus.Cancelled;
