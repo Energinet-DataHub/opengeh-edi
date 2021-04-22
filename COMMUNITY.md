@@ -1,3 +1,3 @@
 # Community
 
-Read about the Green Energy Hub community [here](https://github.com/Energinet-DataHub/green-energy-hub/blob/main/COMMUNITY.md).
+Learn about community for Green Energy Hub [here](https://github.com/Energinet-DataHub/green-energy-hub/blob/main/COMMUNITY.md).

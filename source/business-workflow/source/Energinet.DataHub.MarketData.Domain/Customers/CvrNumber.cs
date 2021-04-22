@@ -50,7 +50,7 @@ namespace Energinet.DataHub.MarketData.Domain.Customers
         private static void ThrowIfInvalid(string cvrValue)
         {
             var result = CheckRules(cvrValue);
-            if (result.AreAnyBroken)
+            if (!result.Success)
             {
                 throw new InvalidCvrNumberRuleException("Invalid CVR number.");
             }

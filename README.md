@@ -8,19 +8,19 @@ and changes in consumers/producers (who is a consumer), on metering points.
 
 These are the processes maintained by this domain.
 
-| Process                                                                             |
-| ----------------------------------------------------------------------------------- |
-| [Change of Energy Supplier](.\docs\business-processes\change-of-energy-supplier.md) |
-| [End of Supply](.\docs\business-processes\end-of-supply.md)                         |
-| Forced Energy Supplier change                                                       |
-| Incorrect Energy Supplier change                                                    |
-| Consumer move in                                                                    |
-| Consumer move out                                                                   |
-| Incorrect move                                                                      |
-| Forward consumer master data by Energy Supplier                                     |
-| Forward contact address by Grid Access Provider                                            |
-| Change of BRP for Energy Supplier                                                   |
-| ....                                                                                |
+| Process                                                                                                                                                                                       |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Change of Energy Supplier](https://github.com/Energinet-DataHub/geh-market-roles/blob/main/docs/business-processes/change-of-energy-supplier.md)                                             |
+| [End of Supply](https://github.com/Energinet-DataHub/geh-market-roles/blob/main/docs/business-processes/end-of-supply.md)                                                                     |
+| [Forced Energy Supplier change](https://github.com/Energinet-DataHub/geh-market-roles/blob/main/docs/business-processes/forced-energy-supplier-change.md)                                     |
+| [Incorrect Energy Supplier change](https://github.com/Energinet-DataHub/geh-market-roles/blob/main/docs/business-processes/incorrect-energy-supplier-change.md)                               |
+| [Consumer move in](https://github.com/Energinet-DataHub/geh-market-roles/blob/main/docs/business-processes/consumer-move-in.md)                                                               |
+| [Consumer move out](https://github.com/Energinet-DataHub/geh-market-roles/blob/main/docs/business-processes/consumer-move-out.md)                                                             |
+| [Incorrect move](https://github.com/Energinet-DataHub/geh-market-roles/blob/main/docs/business-processes/incorrect-move.md)                                                                   |
+| [Forward consumer master data by Energy Supplier](https://github.com/Energinet-DataHub/geh-market-roles/blob/main/docs/business-processes/forward-consumer-master-data-by-energy-supplier.md) |
+| [Forward contact address by Grid Access Provider](https://github.com/Energinet-DataHub/geh-market-roles/blob/main/docs/business-processes/forward-contact-address-by-grid-access-provider)    |
+| [Change of BRP for Energy Supplier](https://github.com/Energinet-DataHub/geh-market-roles/blob/main/docs/business-processes/change-of-energy-supplier.md)                                     |
+| ....                                                                                                                                                                                          |
 
 ## Architecture
 
@@ -28,7 +28,7 @@ These are the processes maintained by this domain.
 
 ## Context Streams
 
-TBD
+<img width="405" alt="Market roles context streams" src="https://user-images.githubusercontent.com/25637982/114846333-e2e5a980-9ddc-11eb-9941-ac03cbcc8336.PNG">
 
 ## Market Participants
 
@@ -47,12 +47,17 @@ In the long term all these [roles](https://github.com/Energinet-DataHub/green-en
 
 ## Domain Roadmap
 
-TBD
+In this program increment we are working on finishing the happy flow MVP for Change of energy supplier. This includes:
+
+- Generation of all remaining messages to be generated in accordance to the sequence diagram in the [Change of energy supplier description](docs/business-processes/change-of-energy-supplier.md).
+- Allowing for process to be cancelled before expiration of cancellation period.
+- Notifying current energy supplier that his supply period is ending upon expiration of cancellation period.
+- Setting end date and on prior supplier once process is completed.
 
 ## Getting Started
 
-TBD
+[Read here how to get started](https://github.com/Energinet-DataHub/green-energy-hub/blob/main/docs/getting-started.md).
 
 ## Where can I get more help?
 
-Code owners? Gitter versus Slack? Referral to main repository?
+Please see the [community documentation](https://github.com/Energinet-DataHub/green-energy-hub/blob/main/COMMUNITY.md)

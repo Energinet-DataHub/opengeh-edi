@@ -1,0 +1,17 @@
+name: Dependabot Check CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch: {}
+
+jobs:
+  check-dependabot-projects:
+    name: Check Dependabot Projects
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@master
+      - name: Check Dependabot Projects
+        uses: ./.github/actions/dependabot-project-check

@@ -22,17 +22,17 @@ namespace Energinet.DataHub.MarketData.Tests.Domain.CvrNumbers
     public class CvrNumberTests
     {
         [Theory]
-        [InlineData("10000000", false)]
-        [InlineData("50000000", false)]
-        [InlineData("99999999", false)]
-        [InlineData("abcdefgh", true)]
-        [InlineData("4567895", true)]
-        [InlineData("842546194", true)]
-        public void Validate_Cvr_Number(string cvrNumber, bool expectedIsBroken)
+        [InlineData("10000000", true)]
+        [InlineData("50000000", true)]
+        [InlineData("99999999", true)]
+        [InlineData("abcdefgh", false)]
+        [InlineData("4567895", false)]
+        [InlineData("842546194", false)]
+        public void Validate_Cvr_Number(string cvrNumber, bool expectedIsSuccess)
         {
-            var actualIsBroken = CvrNumber.CheckRules(cvrNumber).AreAnyBroken;
+            var actualIsSuccess = CvrNumber.CheckRules(cvrNumber).Success;
 
-            actualIsBroken.Should().Be(expectedIsBroken);
+            actualIsSuccess.Should().Be(expectedIsSuccess);
         }
     }
 }

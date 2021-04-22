@@ -16,7 +16,7 @@ using Energinet.DataHub.MarketData.Domain.SeedWork;
 
 namespace Energinet.DataHub.MarketData.Domain.MeteringPoints.Rules.ChangeEnergySupplier
 {
-    public class CannotBeInStateOfClosedDownRule : IBusinessRule
+    internal class CannotBeInStateOfClosedDownRule : IBusinessRule
     {
         private readonly PhysicalState _physicalState;
 

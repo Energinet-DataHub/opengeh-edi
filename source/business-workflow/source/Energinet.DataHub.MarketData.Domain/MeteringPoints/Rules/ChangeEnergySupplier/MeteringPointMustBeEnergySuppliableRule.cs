@@ -16,7 +16,7 @@ using Energinet.DataHub.MarketData.Domain.SeedWork;
 
 namespace Energinet.DataHub.MarketData.Domain.MeteringPoints.Rules.ChangeEnergySupplier
 {
-    public class MeteringPointMustBeEnergySuppliableRule : IBusinessRule
+    internal class MeteringPointMustBeEnergySuppliableRule : IBusinessRule
     {
         private readonly MeteringPointType _meteringPointType;
 

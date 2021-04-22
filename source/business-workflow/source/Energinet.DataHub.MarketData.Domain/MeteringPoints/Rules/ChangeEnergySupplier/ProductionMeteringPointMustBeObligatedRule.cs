@@ -16,7 +16,7 @@ using Energinet.DataHub.MarketData.Domain.SeedWork;
 
 namespace Energinet.DataHub.MarketData.Domain.MeteringPoints.Rules.ChangeEnergySupplier
 {
-    public class ProductionMeteringPointMustBeObligatedRule : IBusinessRule
+    internal class ProductionMeteringPointMustBeObligatedRule : IBusinessRule
     {
         private readonly MeteringPointType _meteringPointType;
         private readonly bool _isProductionObligated;

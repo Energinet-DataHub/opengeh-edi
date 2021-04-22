@@ -32,7 +32,7 @@ namespace GreenEnergyHub.Messaging.MessageTypes.Common
         public string MRID { get; set; }
 
         public static Transaction NewTransaction()
-            => new Transaction(Guid.NewGuid().ToString("N"));
+            => new Transaction();
 
         public override bool Equals(object? obj)
         {

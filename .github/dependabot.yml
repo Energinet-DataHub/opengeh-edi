@@ -5,31 +5,202 @@
 version: 2
 updates:
   - package-ecosystem: "nuget"
-    directory: "/source/business-workflow"
+    directory: "/source/business-workflow/source/Energinet.DataHub.MarketData.Application"
     schedule:
       interval: "weekly"
 
   - package-ecosystem: "nuget"
-    directory: "/source/ingestion"
+    directory: "/source/business-workflow/source/Energinet.DataHub.MarketData.ApplyDBMigrationsApp"
     schedule:
       interval: "weekly"
 
   - package-ecosystem: "nuget"
-    directory: "/source/shared/GreenEnergyHub"
+    directory: "/source/business-workflow/source/Energinet.DataHub.MarketData.Domain"
     schedule:
       interval: "weekly"
 
   - package-ecosystem: "nuget"
-    directory: "/source/shared/messaging"
+    directory: "/source/business-workflow/source/Energinet.DataHub.MarketData.EntryPoint"
     schedule:
       interval: "weekly"
 
   - package-ecosystem: "nuget"
-    directory: "/source/queues"
+    directory: "/source/business-workflow/source/Energinet.DataHub.MarketData.Infrastructure"
     schedule:
       interval: "weekly"
 
   - package-ecosystem: "nuget"
-    directory: "/source/soap-to-json-adapter"
+    directory: "/source/business-workflow/source/Energinet.DataHub.MarketData.IntegrationTests"
     schedule:
       interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/business-workflow/source/Energinet.DataHub.MarketData.Tests"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.EntryPoints.Ingestion"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.EntryPoints.Outbox"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.EntryPoints.Processing"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/ingestion/source/Energinet.DataHub.Ingestion.Application"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/ingestion/source/Energinet.DataHub.Ingestion.Asynchronous.AzureFunction"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/ingestion/source/Energinet.DataHub.Ingestion.Domain"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/ingestion/source/Energinet.DataHub.Ingestion.Infrastructure"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/ingestion/source/Energinet.DataHub.Ingestion.Synchronous.AzureFunction"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/ingestion/source/Energinet.DataHub.Ingestion.Tests"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/shared/GreenEnergyHub/source/GreenEnergyHub.Json"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/shared/GreenEnergyHub/source/GreenEnergyHub.Json.Tests"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/shared/GreenEnergyHub/source/GreenEnergyHub.TestHelpers"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/shared/GreenEnergyHub/source/GreenEnergyHub.TestHelpers.Tests"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/shared/iso8601/GreenEnergyHub.Iso8601"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/shared/iso8601/GreenEnergyHub.Iso8601.Tests"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/shared/messaging/source/GreenEnergyHub.Messaging"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/shared/messaging/source/GreenEnergyHub.Messaging.Integration.ServiceCollection"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/shared/messaging/source/GreenEnergyHub.Messaging.Protobuf"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/shared/messaging/source/GreenEnergyHub.Messaging.Protobuf.Integration.ServiceCollection"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/shared/messaging/source/GreenEnergyHub.Messaging.Protobuf.Tests"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/shared/messaging/source/GreenEnergyHub.Messaging.Tests"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/shared/queues/source/GreenEnergyHub.Queues"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/shared/queues/source/GreenEnergyHub.Queues.AzureServiceBus"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/shared/queues/source/GreenEnergyHub.Queues.AzureServiceBus.Integration.ServiceCollection"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/shared/queues/source/GreenEnergyHub.Queues.Kafka"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/shared/queues/source/GreenEnergyHub.Queues.Kafka.Integration.ServiceCollection"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/shared/queues/source/GreenEnergyHub.Queues.Tests"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/shared/queues/source/GreenEnergyHub.Queues.ValidationReportDispatcher"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/soap-to-json-adapter/source/Energinet.DataHub.SoapAdapter.Application"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/soap-to-json-adapter/source/Energinet.DataHub.SoapAdapter.Domain"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/soap-to-json-adapter/source/Energinet.DataHub.SoapAdapter.EntryPoint"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/soap-to-json-adapter/source/Energinet.DataHub.SoapAdapter.Infrastructure"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/soap-to-json-adapter/source/Energinet.DataHub.SoapAdapter.Tests"
+    schedule:
+      interval: "weekly"
+

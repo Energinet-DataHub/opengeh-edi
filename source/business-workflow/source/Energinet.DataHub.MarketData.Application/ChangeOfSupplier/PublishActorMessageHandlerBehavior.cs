@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketData.Application.ChangeOfSupplier.ActorMessages;
@@ -69,7 +70,8 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier
         private Task PublishRejectionMessageAsync(RequestChangeOfSupplier command, RequestChangeOfSupplierResult result)
         {
             // TODO: <INSERT MESSAGE ID> will be replaced in another PR
-            var message = new RequestChangeOfSupplierRejected("<INSERT MESSAGE ID>", command.Transaction.MRID, command.MarketEvaluationPoint.MRid, result.Errors!);
+            var validationErrors = result.InputValidationErrors.Concat(result.BusinessRuleValidationErrors.Select(e => e.Rule.Name));
+            var message = new RequestChangeOfSupplierRejected("<INSERT MESSAGE ID>", command.Transaction.MRID, command.MarketEvaluationPoint.MRid, result.InputValidationErrors!);
             return SendMessageAsync(message, command.EnergySupplier.MRID!);
         }
 

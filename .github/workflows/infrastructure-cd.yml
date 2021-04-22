@@ -73,6 +73,7 @@ jobs:
         uses: hashicorp/setup-terraform@v1.2.1
         with:
           terraform_wrapper: false
+          terraform_version: 0.14.10
       
       - name: Setup Python
         uses: actions/setup-python@v2
@@ -134,13 +135,11 @@ jobs:
         working-directory: ./build/infrastructure
         run: |
           terraform apply -no-color -auto-approve
-          echo "::set-output name=kv-market-roles-db-connection-string-secret-name::$(terraform output kv_market_roles_db_connection_string_secret_name)"
-          echo "::set-output name=kv-market-roles-name::$(terraform output kv_market_roles_name)"
         continue-on-error: false
 
-      - name: Applying market data migrations
-        uses: ./.github/actions/apply-database-migrations
-        with:
-          kv_market_roles_db_connection_string_secret_name: ${{ steps.terraform-apply.outputs.kv-market-roles-db-connection-string-secret-name }}
-          kv_market_roles_name: ${{ steps.terraform-apply.outputs.kv-market-roles-name }}
-          csproj_file_path: ${{ env.MIGRATION_PROJECT_CSPROJ_FILE_PATH }}
+      # - name: Applying market data migrations
+      #   uses: ./.github/actions/apply-database-migrations
+      #   with:
+      #     kv_market_roles_db_connection_string_secret_name: ${{ steps.terraform-apply.outputs.kv-market-roles-db-connection-string-secret-name }}
+      #     kv_market_roles_name: ${{ steps.terraform-apply.outputs.kv-market-roles-name }}
+      #     csproj_file_path: ${{ env.MIGRATION_PROJECT_CSPROJ_FILE_PATH }}

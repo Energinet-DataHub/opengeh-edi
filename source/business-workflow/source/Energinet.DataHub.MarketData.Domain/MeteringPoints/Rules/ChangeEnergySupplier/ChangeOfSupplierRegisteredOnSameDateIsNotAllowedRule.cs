@@ -19,7 +19,7 @@ using NodaTime;
 
 namespace Energinet.DataHub.MarketData.Domain.MeteringPoints.Rules.ChangeEnergySupplier
 {
-    public class ChangeOfSupplierRegisteredOnSameDateIsNotAllowedRule : IBusinessRule
+    internal class ChangeOfSupplierRegisteredOnSameDateIsNotAllowedRule : IBusinessRule
     {
         private readonly IReadOnlyList<Relationship> _businessProcesses;
         private readonly Instant _effectuationDate;
