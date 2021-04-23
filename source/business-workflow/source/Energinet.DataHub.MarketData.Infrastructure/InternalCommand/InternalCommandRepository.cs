@@ -12,31 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
-using Dapper;
-using Energinet.DataHub.MarketData.Application.Common;
-using Energinet.DataHub.MarketData.Infrastructure.Outbox;
+using Energinet.DataHub.MarketData.Infrastructure.DatabaseAccess.Write;
+using Microsoft.EntityFrameworkCore;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketData.Infrastructure.InternalCommand
 {
     public class InternalCommandRepository : IInternalCommandRepository
     {
-        private readonly IDbConnectionFactory _connectionFactory;
+        private readonly IWriteDatabaseContext _writeDatabaseContext;
+        private readonly IClock _clock;
 
-        public InternalCommandRepository(IDbConnectionFactory connectionFactory)
+        public InternalCommandRepository(IWriteDatabaseContext writeDatabaseContext, IClock clock)
         {
-            _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
+            _writeDatabaseContext = writeDatabaseContext;
+            _clock = clock;
         }
-
-        private IDbConnection Connection => _connectionFactory.GetOpenConnection();
 
         public async Task<InternalCommand?> GetUnprocessedInternalCommandAsync()
         {
-            var query = "SELECT TOP (1) Id, Data, Type FROM [dbo].[InternalCommandQueue] I WHERE I.ProcessedDate IS NULL and (ScheduledDate <= GETUTCDATE() OR ScheduledDate IS NULL)";
-            return await Connection.QueryFirstOrDefaultAsync<InternalCommand>(query).ConfigureAwait(false);
+            return await _writeDatabaseContext.InternalCommandDataModels
+                .Where(x => !x.ProcessedDate.HasValue)
+                .Where(x => !x.ScheduledDate.HasValue || x.ScheduledDate.Value <= _clock.GetCurrentInstant())
+                .Select(x => new InternalCommand
+                {
+                    Id = x.Id,
+                    Data = x.Data,
+                    Type = x.Type,
+                })
+                .FirstOrDefaultAsync();
         }
     }
 }

@@ -12,26 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketData.Infrastructure.DataPersistence.EnergySuppliers
+namespace Energinet.DataHub.MarketData.Infrastructure.DatabaseAccess.Write
 {
-    public class EnergySupplierDataModel : IDataModel
+    /// <inheritdoc />
+    public interface IWriteDatabaseContext : IBaseDatabaseContext
     {
-        public EnergySupplierDataModel(int rowVersion)
-        {
-            RowVersion = rowVersion;
-        }
-
-        public EnergySupplierDataModel(int id, string mrid, int rowVersion)
-        {
-            Id = id;
-            Mrid = mrid;
-            RowVersion = rowVersion;
-        }
-
-        public int Id { get; set; }
-
-        public string? Mrid { get; set; }
-
-        public int RowVersion { get; set; }
     }
 }

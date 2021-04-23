@@ -13,16 +13,18 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketData.Infrastructure.DatabaseAccess.Write.EnergySuppliers;
 using NodaTime;
 
-namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
+namespace Energinet.DataHub.MarketData.Infrastructure.DatabaseAccess.Write.MeteringPoints
 {
-    public class RelationshipSnapshot
+    public class RelationshipDataModel
     {
-        public RelationshipSnapshot(Guid id, string marketParticipantMrId, int type, Instant effectuationDate, int state)
+        public RelationshipDataModel(Guid id, Guid marketEvaluationPointId, Guid marketParticipantId, int type, Instant effectuationDate, int state)
         {
             Id = id;
-            MarketParticipantMrId = marketParticipantMrId;
+            MarketEvaluationPointId = marketEvaluationPointId;
+            MarketParticipantId = marketParticipantId;
             Type = type;
             EffectuationDate = effectuationDate;
             State = state;
@@ -30,12 +32,18 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
 
         public Guid Id { get; set; }
 
-        public string MarketParticipantMrId { get; set; }
+        public Guid MarketEvaluationPointId { get; set; }
+
+        public Guid MarketParticipantId { get; set; }
 
         public int Type { get; set; }
 
         public Instant EffectuationDate { get; set; }
 
         public int State { get; set; }
+
+        public EnergySupplierDataModel? EnergySupplierDataModel { get; set; }
+
+        public MeteringPointDataModel? MarketEvaluationPointDataModel { get; set; }
     }
 }

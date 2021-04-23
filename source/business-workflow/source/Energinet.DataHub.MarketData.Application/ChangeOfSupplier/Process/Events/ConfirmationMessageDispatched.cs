@@ -12,17 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.MarketData.Domain.BusinessProcesses;
 using Energinet.DataHub.MarketData.Domain.SeedWork;
 
 namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process.Events
 {
     public class ConfirmationMessageDispatched : DomainEventBase
     {
-        public ConfirmationMessageDispatched(string processId)
+        public ConfirmationMessageDispatched(ProcessId processId)
         {
             ProcessId = processId;
         }
 
-        public string ProcessId { get; }
+        public ProcessId ProcessId { get; }
     }
 }

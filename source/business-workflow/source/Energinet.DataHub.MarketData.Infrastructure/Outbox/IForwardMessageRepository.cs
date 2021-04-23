@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using System;
 using System.Threading.Tasks;
 
 namespace Energinet.DataHub.MarketData.Infrastructure.Outbox
@@ -30,6 +30,6 @@ namespace Energinet.DataHub.MarketData.Infrastructure.Outbox
         /// <summary>
         /// Updates the message in the database to processed
         /// </summary>
-        Task MarkForwardedMessageAsProcessedAsync(int id);
+        Task MarkForwardedMessageAsProcessedAsync(Guid id);
     }
 }

@@ -24,18 +24,44 @@ using NodaTime;
 
 namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process
 {
-    public class ChangeOfSupplierProcessManager
+    /// <summary>
+    /// Interface for Process Manager
+    /// </summary>
+    public interface IProcessManager
     {
-        private ProcessId? _processId;
-        private Instant? _effectiveDate;
-        private State _state;
+        /// <summary>
+        /// Id for a Process Manager
+        /// </summary>
+        ProcessId? ProcessId { get; }
+
+        /// <summary>
+        /// Effective Date for a Process Manager
+        /// </summary>
+        Instant? EffectiveDate { get; }
+
+        /// <summary>
+        /// Current State for a Process Manager
+        /// </summary>
+        int State { get; }
+    }
+
+    public class ChangeOfSupplierProcessManager : IProcessManager
+    {
+        private StateEnum _state;
 
         public ChangeOfSupplierProcessManager()
         {
-            SetInternalState(State.NotStarted);
+            SetInternalState(StateEnum.NotStarted);
         }
 
-        private enum State
+        public ChangeOfSupplierProcessManager(string? processId, int state, Instant? effectiveDate)
+        {
+            _state = (StateEnum)state;
+            ProcessId = new ProcessId(processId ?? string.Empty);
+            EffectiveDate = effectiveDate;
+        }
+
+        private enum StateEnum
         {
             NotStarted,
             AwaitingConfirmationMessageDispatch,
@@ -47,17 +73,23 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process
             Completed,
         }
 
+        public ProcessId? ProcessId { get; private set; }
+
+        public Instant? EffectiveDate { get; private set; }
+
+        public int State => (int)_state;
+
         public List<EnqueuedCommand> CommandsToSend { get; } = new List<EnqueuedCommand>();
 
         public void When(EnergySupplierChangeRegistered @event)
         {
             switch (_state)
             {
-                case State.NotStarted:
-                    _processId = @event.ProcessId;
-                    _effectiveDate = @event.EffectiveDate;
-                    SetInternalState(State.AwaitingConfirmationMessageDispatch);
-                    SendCommand(new SendConfirmationMessage(_processId));
+                case StateEnum.NotStarted:
+                    ProcessId = @event.ProcessId;
+                    EffectiveDate = @event.EffectiveDate;
+                    SetInternalState(StateEnum.AwaitingConfirmationMessageDispatch);
+                    SendCommand(new SendConfirmationMessage(ProcessId));
                     break;
                 default:
                     ThrowIfStateDoesNotMatch(@event);
@@ -69,9 +101,9 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process
         {
             switch (_state)
             {
-                case State.AwaitingConfirmationMessageDispatch:
-                    SetInternalState(State.AwaitingMeteringPointDetailsDispatch);
-                    SendCommand(new SendMeteringPointDetails(_processId !));
+                case StateEnum.AwaitingConfirmationMessageDispatch:
+                    SetInternalState(StateEnum.AwaitingMeteringPointDetailsDispatch);
+                    SendCommand(new SendMeteringPointDetails(ProcessId !));
                     break;
                 default:
                     ThrowIfStateDoesNotMatch(@event);
@@ -83,9 +115,9 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process
         {
             switch (_state)
             {
-                case State.AwaitingMeteringPointDetailsDispatch:
-                    SetInternalState(State.AwaitingConsumerDetailsDispatch);
-                    SendCommand(new SendConsumerDetails(_processId!));
+                case StateEnum.AwaitingMeteringPointDetailsDispatch:
+                    SetInternalState(StateEnum.AwaitingConsumerDetailsDispatch);
+                    SendCommand(new SendConsumerDetails(ProcessId!));
                     break;
                 default:
                     ThrowIfStateDoesNotMatch(@event);
@@ -97,9 +129,9 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process
         {
             switch (_state)
             {
-                case State.AwaitingConsumerDetailsDispatch:
-                    SetInternalState(State.AwaitingGridOperatorNotification);
-                    SendCommand(new NotifyGridOperator(_processId!));
+                case StateEnum.AwaitingConsumerDetailsDispatch:
+                    SetInternalState(StateEnum.AwaitingGridOperatorNotification);
+                    SendCommand(new NotifyGridOperator(ProcessId!));
                     break;
                 default:
                     ThrowIfStateDoesNotMatch(@event);
@@ -111,8 +143,8 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process
         {
             switch (_state)
             {
-                case State.AwaitingGridOperatorNotification:
-                    SetInternalState(State.AwaitingCurrentSupplierNotificationDispatch);
+                case StateEnum.AwaitingGridOperatorNotification:
+                    SetInternalState(StateEnum.AwaitingCurrentSupplierNotificationDispatch);
                     ScheduleNotificationOfCurrentSupplier();
                     break;
                 default:
@@ -125,8 +157,8 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process
         {
             switch (_state)
             {
-                case State.AwaitingCurrentSupplierNotificationDispatch:
-                    SetInternalState(State.AwaitingSupplierChange);
+                case StateEnum.AwaitingCurrentSupplierNotificationDispatch:
+                    SetInternalState(StateEnum.AwaitingSupplierChange);
                     ScheduleSupplierChange();
                     break;
                 default:
@@ -139,8 +171,8 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process
         {
             switch (_state)
             {
-                case State.AwaitingSupplierChange:
-                    SetInternalState(State.Completed);
+                case StateEnum.AwaitingSupplierChange:
+                    SetInternalState(StateEnum.Completed);
                     break;
                 default:
                     ThrowIfStateDoesNotMatch(@event);
@@ -150,18 +182,18 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process
 
         public bool IsCompleted()
         {
-            return _state == State.Completed;
+            return _state == StateEnum.Completed;
         }
 
         private void ScheduleSupplierChange()
         {
-            SendCommand(new ChangeSupplier(_processId !), _effectiveDate);
+            SendCommand(new ChangeSupplier(ProcessId !), EffectiveDate);
         }
 
         private void ScheduleNotificationOfCurrentSupplier()
         {
-            var executionDate = _effectiveDate!.Value.Minus(Duration.FromHours(72));
-            SendCommand(new NotifyCurrentSupplier(_processId !), executionDate);
+            var executionDate = EffectiveDate!.Value.Minus(Duration.FromHours(72));
+            SendCommand(new NotifyCurrentSupplier(ProcessId !), executionDate);
         }
 
         private void ThrowIfStateDoesNotMatch(IDomainEvent @event)
@@ -169,7 +201,7 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process
             throw new InvalidProcessManagerStateException($"The event of {@event.GetType().Name} is not applicable when state is {_state.ToString()}.");
         }
 
-        private void SetInternalState(State state)
+        private void SetInternalState(StateEnum state)
         {
             _state = state;
         }

@@ -13,31 +13,33 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process;
+using Energinet.DataHub.MarketData.Domain.BusinessProcesses;
 
-namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
+namespace Energinet.DataHub.MarketData.Application
 {
     /// <summary>
-    /// Repository for market evaluation points
+    /// Repository of energy suppliers
     /// </summary>
-    public interface IMeteringPointRepository
+    public interface IProcessManagerRepository
     {
         /// <summary>
-        /// Fetches market evaluation point by mRID
+        /// Get an existing Process Manager
         /// </summary>
-        /// <param name="gsrnNumber"></param>
-        /// <returns><see cref="MeteringPoint"/></returns>
-        Task<MeteringPoint> GetByGsrnNumberAsync(GsrnNumber gsrnNumber);
+        /// <param name="processManagerId"></param>
+        /// <returns><see cref="ChangeOfSupplierProcessManager"/></returns>
+        Task<IProcessManager> GetAsync(ProcessId processManagerId);
 
         /// <summary>
-        /// Adds metering point to repository
+        /// Add a new Process Manager
         /// </summary>
-        /// <param name="meteringPoint"></param>
-        void Add(MeteringPoint meteringPoint);
+        /// <param name="processManager"></param>
+        void Add(IProcessManager processManager);
 
         /// <summary>
-        /// Saves changes
+        /// Save an existing Process Manager
         /// </summary>
-        /// <param name="meteringPoint"></param>
-        Task SaveAsync(MeteringPoint meteringPoint);
+        /// <param name="processManager"></param>
+        Task SaveAsync(IProcessManager processManager);
     }
 }

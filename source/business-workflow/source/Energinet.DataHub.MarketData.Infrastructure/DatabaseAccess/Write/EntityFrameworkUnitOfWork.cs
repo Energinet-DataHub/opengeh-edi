@@ -12,24 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Data;
+using System.Threading.Tasks;
 
-namespace Energinet.DataHub.MarketData.Application.Common
+namespace Energinet.DataHub.MarketData.Infrastructure.DatabaseAccess.Write
 {
-    /// <summary>
-    ///  Factory for creating database connection
-    /// </summary>
-    public interface IDbConnectionFactory
+    public class EntityFrameworkUnitOfWork : IUnitOfWork
     {
-        /// <summary>
-        /// Return the open connection. Creates new connection one does not exist.
-        /// </summary>
-        /// <returns><see cref="IDbConnection"/></returns>
-        IDbConnection GetOpenConnection();
+        private readonly WriteDatabaseContext _databaseContext;
 
-        /// <summary>
-        ///  Resets the existing connection
-        /// </summary>
-        void ResetConnection();
+        public EntityFrameworkUnitOfWork(WriteDatabaseContext databaseContext)
+        {
+            _databaseContext = databaseContext;
+        }
+
+        public async Task CommitAsync()
+        {
+            await _databaseContext.SaveChangesAsync();
+        }
     }
 }

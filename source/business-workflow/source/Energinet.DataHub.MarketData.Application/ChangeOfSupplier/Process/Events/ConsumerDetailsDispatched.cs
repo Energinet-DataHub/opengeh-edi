@@ -13,17 +13,18 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketData.Domain.BusinessProcesses;
 using Energinet.DataHub.MarketData.Domain.SeedWork;
 
 namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process.Events
 {
     public class ConsumerDetailsDispatched : DomainEventBase
     {
-        public ConsumerDetailsDispatched(string processId)
+        public ConsumerDetailsDispatched(ProcessId processId)
         {
-            ProcessId = processId ?? throw new ArgumentNullException(nameof(processId));
+            ProcessId = processId;
         }
 
-        public string ProcessId { get; }
+        public ProcessId ProcessId { get; }
     }
 }

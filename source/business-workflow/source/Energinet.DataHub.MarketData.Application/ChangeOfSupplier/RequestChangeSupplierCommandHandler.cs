@@ -76,7 +76,7 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier
             }
 
             meteringPoint.RegisterChangeOfEnergySupplier(new MarketParticipantMrid(command.EnergySupplier.MRID!), command.StartDate, _systemTimeProvider);
-            _meteringPointRepository.Save(meteringPoint);
+            await _meteringPointRepository.SaveAsync(meteringPoint);
 
             return RequestChangeOfSupplierResult.Success();
         }
@@ -125,8 +125,7 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier
         private Task<MeteringPoint> GetMeteringPointAsync(string gsrnNumber)
         {
             var meteringPointId = GsrnNumber.Create(gsrnNumber);
-            var meteringPoint =
-                _meteringPointRepository.GetByGsrnNumberAsync(meteringPointId);
+            var meteringPoint = _meteringPointRepository.GetByGsrnNumberAsync(meteringPointId);
             return meteringPoint;
         }
     }

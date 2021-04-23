@@ -24,7 +24,7 @@ namespace Energinet.DataHub.MarketData.Domain.SeedWork
         /// <summary>
         /// Identity used by persistence mechanism
         /// </summary>
-        public int Id { get; protected set; }
+        public Guid Id { get; protected set; }
 
         /// <summary>
         /// Domain events occurred.

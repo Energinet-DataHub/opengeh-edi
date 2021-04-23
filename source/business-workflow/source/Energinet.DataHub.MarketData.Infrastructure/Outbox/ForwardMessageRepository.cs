@@ -13,46 +13,45 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using Dapper;
-using Energinet.DataHub.MarketData.Application.Common;
-using Energinet.DataHub.MarketData.Infrastructure.DataPersistence;
-using Energinet.DataHub.MarketData.Infrastructure.Outbox;
+using Energinet.DataHub.MarketData.Domain.SeedWork;
+using Energinet.DataHub.MarketData.Infrastructure.DatabaseAccess.Write;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketData.Infrastructure.Outbox
 {
     public class ForwardMessageRepository : IForwardMessageRepository
     {
-        private readonly IDbConnectionFactory _connectionFactory;
+        private readonly IWriteDatabaseContext _writeDatabaseContext;
+        private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
-        public ForwardMessageRepository(IDbConnectionFactory connectionFactory)
+        public ForwardMessageRepository(IWriteDatabaseContext writeDatabaseContext, ISystemDateTimeProvider systemDateTimeProvider)
         {
-            _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
+            _writeDatabaseContext = writeDatabaseContext;
+            _systemDateTimeProvider = systemDateTimeProvider;
         }
-
-        private IDbConnection Connection => _connectionFactory.GetOpenConnection();
 
         public async Task<ForwardMessage?> GetUnprocessedForwardMessageAsync()
         {
-            var query = "SELECT TOP(1) * FROM [dbo].[OutgoingActorMessages] O WHERE O.State = @State";
-            return await Connection.QueryFirstOrDefaultAsync<ForwardMessage>(query, new
-            {
-                State = OutboxState.Pending.Id,
-            }).ConfigureAwait(false);
+            return await _writeDatabaseContext.OutgoingActorMessageDataModels
+                .Where(x => x.State == OutboxState.Pending.Id)
+                .Select(x => new ForwardMessage
+                {
+                    Id = x.Id,
+                    Data = x.Data,
+                    Recipient = x.Recipient,
+                    Type = x.Type,
+                    OccurredOn = x.OccurredOn,
+                }).FirstOrDefaultAsync();
         }
 
-        public async Task MarkForwardedMessageAsProcessedAsync(int id)
+        public async Task MarkForwardedMessageAsProcessedAsync(Guid id)
         {
-            await Connection.ExecuteAsync(
-                    $"UPDATE OutgoingActorMessages SET LastUpdatedOn = GETDATE(), State = @State WHERE Id = @Id", param: new
-                    {
-                        State = OutboxState.Processed.Id,
-                        Id = id,
-                    })
-                .ConfigureAwait(false);
+            var outgoingActorMessage = await _writeDatabaseContext.OutgoingActorMessageDataModels
+                .SingleAsync(x => x.Id == id);
+
+            outgoingActorMessage.LastUpdatedOn = _systemDateTimeProvider.Now();
         }
     }
 }

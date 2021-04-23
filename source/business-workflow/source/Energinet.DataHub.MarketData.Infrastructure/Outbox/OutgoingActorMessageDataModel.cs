@@ -12,14 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketData.Infrastructure.DataPersistence
+using System;
+using NodaTime;
+
+namespace Energinet.DataHub.MarketData.Infrastructure.Outbox
 {
-    /// <summary>
-    /// Marker interface for aggregate root data models
-    /// </summary>
-    #pragma warning disable CA1040
-    public interface IDataModel
+    public class OutgoingActorMessageDataModel
     {
+        public string? Recipient { get; set; }
+
+        public Guid Id { get; set; }
+
+        public Instant OccurredOn { get; set; }
+
+        public string? Type { get; set; }
+
+        public string? Data { get; set; }
+
+        public int State { get; set; }
+
+        public Instant? LastUpdatedOn { get; set; }
     }
-    #pragma warning restore CA1040
 }

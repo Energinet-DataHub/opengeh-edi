@@ -13,15 +13,29 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using Energinet.DataHub.MarketData.Infrastructure.DatabaseAccess.Write.MeteringPoints;
 
-namespace Energinet.DataHub.MarketData.Infrastructure.InternalCommand
+namespace Energinet.DataHub.MarketData.Infrastructure.DatabaseAccess.Write.EnergySuppliers
 {
-    public class InternalCommand
+    public class EnergySupplierDataModel
     {
-        public string? Data { get; set; }
+        public EnergySupplierDataModel()
+        { }
+
+        public EnergySupplierDataModel(Guid id, string mrid, int rowVersion)
+        {
+            Id = id;
+            MrId = mrid;
+            RowVersion = rowVersion;
+        }
 
         public Guid Id { get; set; }
 
-        public string? Type { get;  set; }
+        public string? MrId { get; set; }
+
+        public int RowVersion { get; set; }
+
+        public ICollection<RelationshipDataModel>? RelationshipDataModels { get; set; }
     }
 }

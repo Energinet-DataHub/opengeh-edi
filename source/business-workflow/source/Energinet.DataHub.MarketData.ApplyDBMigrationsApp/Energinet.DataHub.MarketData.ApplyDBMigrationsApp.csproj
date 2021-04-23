@@ -32,6 +32,8 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202103291100 Set up MarketEvaluationPoint and MarketParticipant tables.sql" />
     <EmbeddedResource Include="Scripts\Model\202103291104 Alter OutgoingActorMessages table.sql" />
     <EmbeddedResource Include="Scripts\Model\202103291105 Create InternalCommandQueue.sql" />
+    <EmbeddedResource Include="Scripts\Model\202104191233 Change Id to UNIQUEIDENTIFIER and add RecordId as IDENTITY.sql" />
+    <EmbeddedResource Include="Scripts\Model\202104210857 Create ProcessManagers table.sql" />
     <EmbeddedResource Include="Scripts\Test\202103291101 Add MarketData mock data.sql" />
     <EmbeddedResource Include="Scripts\Test\202103291103 Add OutgoingActorMessages mock data.sql" />
     <EmbeddedResource Include="Scripts\Model\202103291102 Create OutgoingActorMessages table.sql" />
