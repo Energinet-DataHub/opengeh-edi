@@ -61,7 +61,7 @@ namespace Energinet.DataHub.MarketData.Tests.Application.ChangeOfSupplier.Proces
             var (processId, gsrnNumber, effectiveDate) = CreateTestValues();
 
             processManager.When(new EnergySupplierChangeRegistered(gsrnNumber, processId, effectiveDate));
-            if (processId.Value != null) processManager.When(new ConfirmationMessageDispatched(processId.Value));
+            if (processId.Value != null) processManager.When(new ConfirmationMessageDispatched(processId));
 
             var command =
                 processManager.CommandsToSend.First(c => c.Command is SendMeteringPointDetails).Command as
@@ -78,7 +78,7 @@ namespace Energinet.DataHub.MarketData.Tests.Application.ChangeOfSupplier.Proces
 
             if (processId.Value != null)
             {
-                var @event = new ConfirmationMessageDispatched(processId.Value);
+                var @event = new ConfirmationMessageDispatched(processId);
 
                 Assert.Throws<InvalidProcessManagerStateException>(() => processManager.When(@event));
             }
@@ -93,8 +93,8 @@ namespace Energinet.DataHub.MarketData.Tests.Application.ChangeOfSupplier.Proces
             processManager.When(new EnergySupplierChangeRegistered(gsrnNumber, processId, effectiveDate));
             if (processId.Value != null)
             {
-                processManager.When(new ConfirmationMessageDispatched(processId.Value));
-                processManager.When(new MeteringPointDetailsDispatched(processId.Value));
+                processManager.When(new ConfirmationMessageDispatched(processId));
+                processManager.When(new MeteringPointDetailsDispatched(processId));
             }
 
             var command =
@@ -112,7 +112,7 @@ namespace Energinet.DataHub.MarketData.Tests.Application.ChangeOfSupplier.Proces
 
             Assert.Throws<InvalidProcessManagerStateException>(() =>
             {
-                if (processId.Value != null) processManager.When(new MeteringPointDetailsDispatched(processId.Value));
+                if (processId.Value != null) processManager.When(new MeteringPointDetailsDispatched(processId));
             });
         }
 
@@ -125,9 +125,9 @@ namespace Energinet.DataHub.MarketData.Tests.Application.ChangeOfSupplier.Proces
             processManager.When(new EnergySupplierChangeRegistered(gsrnNumber, processId, effectiveDate));
             if (processId.Value != null)
             {
-                processManager.When(new ConfirmationMessageDispatched(processId.Value));
-                processManager.When(new MeteringPointDetailsDispatched(processId.Value));
-                processManager.When(new ConsumerDetailsDispatched(processId.Value));
+                processManager.When(new ConfirmationMessageDispatched(processId));
+                processManager.When(new MeteringPointDetailsDispatched(processId));
+                processManager.When(new ConsumerDetailsDispatched(processId));
             }
 
             var command =
@@ -145,7 +145,7 @@ namespace Energinet.DataHub.MarketData.Tests.Application.ChangeOfSupplier.Proces
 
             Assert.Throws<InvalidProcessManagerStateException>(() =>
             {
-                if (processId.Value != null) processManager.When(new ConsumerDetailsDispatched(processId.Value));
+                if (processId.Value != null) processManager.When(new ConsumerDetailsDispatched(processId));
             });
         }
 
@@ -158,10 +158,10 @@ namespace Energinet.DataHub.MarketData.Tests.Application.ChangeOfSupplier.Proces
             processManager.When(new EnergySupplierChangeRegistered(gsrnNumber, processId, effectiveDate));
             if (processId.Value != null)
             {
-                processManager.When(new ConfirmationMessageDispatched(processId.Value));
-                processManager.When(new MeteringPointDetailsDispatched(processId.Value));
-                processManager.When(new ConsumerDetailsDispatched(processId.Value));
-                processManager.When(new GridOperatorNotified(processId.Value));
+                processManager.When(new ConfirmationMessageDispatched(processId));
+                processManager.When(new MeteringPointDetailsDispatched(processId));
+                processManager.When(new ConsumerDetailsDispatched(processId));
+                processManager.When(new GridOperatorNotified(processId));
             }
 
             var command =
@@ -179,7 +179,7 @@ namespace Energinet.DataHub.MarketData.Tests.Application.ChangeOfSupplier.Proces
 
             Assert.Throws<InvalidProcessManagerStateException>(() =>
             {
-                if (processId.Value != null) processManager.When(new GridOperatorNotified(processId.Value));
+                if (processId.Value != null) processManager.When(new GridOperatorNotified(processId));
             });
         }
 
@@ -192,11 +192,11 @@ namespace Energinet.DataHub.MarketData.Tests.Application.ChangeOfSupplier.Proces
             processManager.When(new EnergySupplierChangeRegistered(gsrnNumber, processId, effectiveDate));
             if (processId.Value != null)
             {
-                processManager.When(new ConfirmationMessageDispatched(processId.Value));
-                processManager.When(new MeteringPointDetailsDispatched(processId.Value));
-                processManager.When(new ConsumerDetailsDispatched(processId.Value));
-                processManager.When(new GridOperatorNotified(processId.Value));
-                processManager.When(new CurrentSupplierNotified(processId.Value));
+                processManager.When(new ConfirmationMessageDispatched(processId));
+                processManager.When(new MeteringPointDetailsDispatched(processId));
+                processManager.When(new ConsumerDetailsDispatched(processId));
+                processManager.When(new GridOperatorNotified(processId));
+                processManager.When(new CurrentSupplierNotified(processId));
             }
 
             var command =
@@ -214,7 +214,7 @@ namespace Energinet.DataHub.MarketData.Tests.Application.ChangeOfSupplier.Proces
 
             Assert.Throws<InvalidProcessManagerStateException>(() =>
             {
-                if (processId.Value != null) processManager.When(new CurrentSupplierNotified(processId.Value));
+                if (processId.Value != null) processManager.When(new CurrentSupplierNotified(processId));
             });
         }
 
@@ -227,12 +227,12 @@ namespace Energinet.DataHub.MarketData.Tests.Application.ChangeOfSupplier.Proces
             processManager.When(new EnergySupplierChangeRegistered(gsrnNumber, processId, effectiveDate));
             if (processId.Value != null)
             {
-                processManager.When(new ConfirmationMessageDispatched(processId.Value));
-                processManager.When(new MeteringPointDetailsDispatched(processId.Value));
-                processManager.When(new ConsumerDetailsDispatched(processId.Value));
-                processManager.When(new GridOperatorNotified(processId.Value));
-                processManager.When(new CurrentSupplierNotified(processId.Value));
-                processManager.When(new EnergySupplierChanged(gsrnNumber.Value, processId.Value, effectiveDate));
+                processManager.When(new ConfirmationMessageDispatched(processId));
+                processManager.When(new MeteringPointDetailsDispatched(processId));
+                processManager.When(new ConsumerDetailsDispatched(processId));
+                processManager.When(new GridOperatorNotified(processId));
+                processManager.When(new CurrentSupplierNotified(processId));
+                processManager.When(new EnergySupplierChanged(gsrnNumber.Value, processId, effectiveDate));
             }
 
             Assert.True(processManager.IsCompleted());

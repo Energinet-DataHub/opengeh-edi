@@ -12,13 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace Energinet.DataHub.MarketData.Infrastructure.InternalCommand
 {
     public class InternalCommand
     {
         public string? Data { get; set; }
 
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         public string? Type { get;  set; }
     }

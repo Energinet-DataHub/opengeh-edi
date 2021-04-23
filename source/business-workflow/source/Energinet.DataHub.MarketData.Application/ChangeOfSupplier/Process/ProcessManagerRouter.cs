@@ -29,39 +29,67 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process
             INotificationHandler<CurrentSupplierNotified>,
             INotificationHandler<EnergySupplierChanged>
     {
-        public Task Handle(EnergySupplierChangeRegistered notification, CancellationToken cancellationToken)
+        private readonly IProcessManagerRepository _processManagerRepository;
+
+        public ProcessManagerRouter(IProcessManagerRepository processManagerRepository)
         {
-            throw new System.NotImplementedException();
+            _processManagerRepository = processManagerRepository;
         }
 
-        public Task Handle(ConfirmationMessageDispatched notification, CancellationToken cancellationToken)
+        public async Task Handle(EnergySupplierChangeRegistered notification, CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            var processManager = (ChangeOfSupplierProcessManager)await _processManagerRepository.GetAsync(notification.ProcessId);
+            processManager.When(notification);
+
+            await _processManagerRepository.SaveAsync(processManager);
         }
 
-        public Task Handle(CurrentSupplierNotified notification, CancellationToken cancellationToken)
+        public async Task Handle(ConfirmationMessageDispatched notification, CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            var processManager = (ChangeOfSupplierProcessManager)await _processManagerRepository.GetAsync(notification.ProcessId);
+            processManager.When(notification);
+
+            await _processManagerRepository.SaveAsync(processManager);
         }
 
-        public Task Handle(EnergySupplierChanged notification, CancellationToken cancellationToken)
+        public async Task Handle(CurrentSupplierNotified notification, CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            var processManager = (ChangeOfSupplierProcessManager)await _processManagerRepository.GetAsync(notification.ProcessId);
+            processManager.When(notification);
+
+            await _processManagerRepository.SaveAsync(processManager);
         }
 
-        public Task Handle(MeteringPointDetailsDispatched notification, CancellationToken cancellationToken)
+        public async Task Handle(EnergySupplierChanged notification, CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            var processManager = (ChangeOfSupplierProcessManager)await _processManagerRepository.GetAsync(notification.ProcessId);
+            processManager.When(notification);
+
+            await _processManagerRepository.SaveAsync(processManager);
         }
 
-        public Task Handle(ConsumerDetailsDispatched notification, CancellationToken cancellationToken)
+        public async Task Handle(MeteringPointDetailsDispatched notification, CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            var processManager = (ChangeOfSupplierProcessManager)await _processManagerRepository.GetAsync(notification.ProcessId);
+            processManager.When(notification);
+
+            await _processManagerRepository.SaveAsync(processManager);
         }
 
-        public Task Handle(GridOperatorNotified notification, CancellationToken cancellationToken)
+        public async Task Handle(ConsumerDetailsDispatched notification, CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            var processManager = (ChangeOfSupplierProcessManager)await _processManagerRepository.GetAsync(notification.ProcessId);
+            processManager.When(notification);
+
+            await _processManagerRepository.SaveAsync(processManager);
+        }
+
+        public async Task Handle(GridOperatorNotified notification, CancellationToken cancellationToken)
+        {
+            var processManager = (ChangeOfSupplierProcessManager)await _processManagerRepository.GetAsync(notification.ProcessId);
+            processManager.When(notification);
+
+            await _processManagerRepository.SaveAsync(processManager);
         }
     }
 }

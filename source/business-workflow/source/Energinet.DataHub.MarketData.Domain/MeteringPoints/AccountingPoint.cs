@@ -51,7 +51,7 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
             GsrnNumber gsrnNumber,
             MeteringPointType meteringPointType,
             bool isProductionObligated,
-            int id,
+            Guid id,
             int version,
             PhysicalState physicalState,
             List<BusinessProcess> businessProcesses,

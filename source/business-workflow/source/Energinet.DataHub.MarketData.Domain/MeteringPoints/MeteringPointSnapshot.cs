@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
@@ -19,7 +20,7 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
     public class MeteringPointSnapshot
     {
         public MeteringPointSnapshot(
-            int id,
+            Guid id,
             string gsrnNumber,
             int meteringPointType,
             bool isProductionObligated,
@@ -40,7 +41,7 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
             SupplierRegistrations = supplierRegistrations;
         }
 
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         public string GsrnNumber { get; set; }
 
