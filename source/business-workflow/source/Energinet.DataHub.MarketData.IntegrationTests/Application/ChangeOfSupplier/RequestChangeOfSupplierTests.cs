@@ -18,8 +18,10 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketData.Application.ChangeOfSupplier;
 using Energinet.DataHub.MarketData.Application.ChangeOfSupplier.ActorMessages;
 using Energinet.DataHub.MarketData.Application.Common;
+using Energinet.DataHub.MarketData.Domain.BusinessProcesses;
 using Energinet.DataHub.MarketData.Domain.EnergySuppliers;
 using Energinet.DataHub.MarketData.Domain.MeteringPoints;
+using Energinet.DataHub.MarketData.Domain.MeteringPoints.Rules.ChangeEnergySupplier;
 using Energinet.DataHub.MarketData.Domain.SeedWork;
 using Energinet.DataHub.MarketData.Infrastructure.ActorMessages;
 using Energinet.DataHub.MarketData.Infrastructure.DatabaseAccess.Write;
@@ -213,12 +215,16 @@ namespace Energinet.DataHub.MarketData.IntegrationTests.Application.ChangeOfSupp
             await _unitOfWork.CommitAsync().ConfigureAwait(false);
 
             var meteringPoint =
-                MeteringPoint.CreateProduction(
+                AccountingPoint.CreateProduction(
                     GsrnNumber.Create(meteringPointGsrnNumber), true);
 
             var systemTimeProvider = _serviceProvider.GetRequiredService<ISystemDateTimeProvider>();
-            meteringPoint.RegisterMoveIn(new MarketParticipantMrid(customerId), new MarketParticipantMrid(energySupplierGlnNumber), systemTimeProvider.Now().Minus(Duration.FromDays(365)));
-            meteringPoint.ActivateMoveIn(new MarketParticipantMrid(customerId), new MarketParticipantMrid(energySupplierGlnNumber));
+
+            var consumerId = new ConsumerId(customerId);
+            var moveInDate = systemTimeProvider.Now().Minus(Duration.FromDays(365));
+            var processId = new ProcessId(Guid.NewGuid().ToString());
+            meteringPoint.AcceptConsumerMoveIn(consumerId, new EnergySupplierId(energySupplierGlnNumber), moveInDate, processId);
+            meteringPoint.EffectuateConsumerMoveIn(processId, systemTimeProvider);
             _meteringPointRepository.Add(meteringPoint);
             await _unitOfWork.CommitAsync().ConfigureAwait(false);
         }

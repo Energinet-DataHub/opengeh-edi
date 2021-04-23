@@ -19,15 +19,26 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
 {
     public class MeteringPointSnapshot
     {
-        public MeteringPointSnapshot(Guid id, string gsrnNumber, int meteringPointType, List<RelationshipSnapshot> relationships, bool isProductionObligated, int physicalState, int version)
+        public MeteringPointSnapshot(
+            Guid id,
+            string gsrnNumber,
+            int meteringPointType,
+            bool isProductionObligated,
+            int physicalState,
+            int version,
+            List<BusinessProcessSnapshot> businessProcesses,
+            List<ConsumerRegistrationSnapshot> consumerRegistrations,
+            List<SupplierRegistrationSnapshot> supplierRegistrations)
         {
             Id = id;
             GsrnNumber = gsrnNumber;
             MeteringPointType = meteringPointType;
-            Relationships = relationships;
             IsProductionObligated = isProductionObligated;
             PhysicalState = physicalState;
             Version = version;
+            BusinessProcesses = businessProcesses;
+            ConsumerRegistrations = consumerRegistrations;
+            SupplierRegistrations = supplierRegistrations;
         }
 
         public Guid Id { get; set; }
@@ -36,7 +47,11 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
 
         public int MeteringPointType { get; set; }
 
-        public List<RelationshipSnapshot> Relationships { get; }
+        public List<BusinessProcessSnapshot> BusinessProcesses { get; }
+
+        public List<ConsumerRegistrationSnapshot> ConsumerRegistrations { get; }
+
+        public List<SupplierRegistrationSnapshot> SupplierRegistrations { get; }
 
         public bool IsProductionObligated { get; set; }
 

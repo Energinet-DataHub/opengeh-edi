@@ -12,21 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.MarketData.Domain.SeedWork;
 
-namespace Energinet.DataHub.MarketData.Domain.MeteringPoints.Rules.ChangeEnergySupplier
+namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
 {
-    internal class MustHaveEnergySupplierAssociatedRule : IBusinessRule
+    public class ConsumerId : ValueObject
     {
-        private readonly SupplierRegistration? _supplierRegistration;
-
-        public MustHaveEnergySupplierAssociatedRule(SupplierRegistration? supplierRegistration)
+        public ConsumerId(string value)
         {
-            _supplierRegistration = supplierRegistration;
+            Value = !string.IsNullOrWhiteSpace(value) ? value : throw new ArgumentNullException(nameof(value));
         }
 
-        public bool IsBroken => _supplierRegistration is null;
-
-        public string Message => $"An energy supplier must be associated.";
+        public string Value { get; }
     }
 }

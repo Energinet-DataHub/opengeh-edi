@@ -19,26 +19,27 @@ using NodaTime;
 
 namespace Energinet.DataHub.MarketData.Domain.MeteringPoints.Rules.ChangeEnergySupplier
 {
-    public class MoveInRegisteredOnSameDateIsNotAllowedRule : IBusinessRule
+    internal class MoveInRegisteredOnSameDateIsNotAllowedRule : IBusinessRule
     {
-        private readonly IReadOnlyList<Relationship> _processes;
-        private readonly Instant _effectuationDate;
+        private readonly IReadOnlyList<BusinessProcess> _businessProcesses;
+        private readonly Instant _moveInDate;
 
-        internal MoveInRegisteredOnSameDateIsNotAllowedRule(IReadOnlyList<Relationship> processes, Instant effectuationDate)
+        internal MoveInRegisteredOnSameDateIsNotAllowedRule(IReadOnlyList<BusinessProcess> businessProcesses, Instant moveInDate)
         {
-            _processes = processes;
-            _effectuationDate = effectuationDate;
+            _businessProcesses = businessProcesses;
+            _moveInDate = moveInDate;
         }
 
-        public bool IsBroken => HasMoveInRegisteredOnDate();
+        public bool IsBroken => HasPendingMoveInProcess();
 
-        public string Message => "A move in process (BRS-009) is registered on same date.";
+        public string Message => "A move in business process is registered on same date.";
 
-        private bool HasMoveInRegisteredOnDate()
+        private bool HasPendingMoveInProcess()
         {
-            return _processes.Any(p => p.Type == RelationshipType.Customer1 &&
-                                       p.EffectuationDate.ToDateTimeUtc().Date
-                                           .Equals(_effectuationDate.ToDateTimeUtc().Date));
+            return _businessProcesses.Any(p =>
+                p.ProcessType == BusinessProcessType.MoveIn &&
+                p.EffectiveDate.ToDateTimeUtc().Date.Equals(_moveInDate.ToDateTimeUtc().Date) &&
+                p.Status == BusinessProcessStatus.Pending);
         }
     }
 }

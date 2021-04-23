@@ -12,21 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketData.Domain.SeedWork;
+using NodaTime;
 
-namespace Energinet.DataHub.MarketData.Domain.MeteringPoints.Rules.ChangeEnergySupplier
+namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
 {
-    internal class MustHaveEnergySupplierAssociatedRule : IBusinessRule
+    public class BusinessProcessSnapshot
     {
-        private readonly SupplierRegistration? _supplierRegistration;
-
-        public MustHaveEnergySupplierAssociatedRule(SupplierRegistration? supplierRegistration)
+        public BusinessProcessSnapshot(string processId, Instant effectiveDate, int processType, int status)
         {
-            _supplierRegistration = supplierRegistration;
+            ProcessId = processId;
+            EffectiveDate = effectiveDate;
+            ProcessType = processType;
+            Status = status;
         }
 
-        public bool IsBroken => _supplierRegistration is null;
+        public string ProcessId { get; }
 
-        public string Message => $"An energy supplier must be associated.";
+        public Instant EffectiveDate { get; }
+
+        public int ProcessType { get; }
+
+        public int Status { get; }
     }
 }

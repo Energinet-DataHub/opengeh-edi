@@ -14,19 +14,16 @@
 
 using Energinet.DataHub.MarketData.Domain.SeedWork;
 
-namespace Energinet.DataHub.MarketData.Domain.MeteringPoints.Rules.ChangeEnergySupplier
+namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
 {
-    internal class MustHaveEnergySupplierAssociatedRule : IBusinessRule
+    internal class BusinessProcessType : EnumerationType
     {
-        private readonly SupplierRegistration? _supplierRegistration;
+        internal static readonly BusinessProcessType MoveIn = new BusinessProcessType(0, nameof(MoveIn));
+        internal static readonly BusinessProcessType ChangeOfSupplier = new BusinessProcessType(1, nameof(ChangeOfSupplier));
 
-        public MustHaveEnergySupplierAssociatedRule(SupplierRegistration? supplierRegistration)
+        private BusinessProcessType(int id, string name)
+            : base(id, name)
         {
-            _supplierRegistration = supplierRegistration;
         }
-
-        public bool IsBroken => _supplierRegistration is null;
-
-        public string Message => $"An energy supplier must be associated.";
     }
 }
