@@ -27,11 +27,19 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
     {
         [Function("CommandApi")]
         public static async Task<HttpResponseData> RunAsync(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequestData request,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData request,
             FunctionContext executionContext)
         {
             var logger = executionContext.GetLogger("CommandApi");
             logger.LogInformation("C# HTTP trigger function processed a request.");
+
+            var content = await request.ReadAsStringAsync().ConfigureAwait(false);
+            if (string.IsNullOrEmpty(content))
+            {
+                var errorResponse = request.CreateResponse(HttpStatusCode.BadRequest);
+                await errorResponse.WriteStringAsync("Missing body").ConfigureAwait(false);
+                return errorResponse;
+            }
 
             var response = request.CreateResponse(HttpStatusCode.OK);
             response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
@@ -44,7 +52,6 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
             {
                 // create a sender for the topic
                 var sender = client.CreateSender(topicName);
-                var content = "Welcome to Azure Functions! " + DateTime.Now;
                 var bytes = Encoding.UTF8.GetBytes(content);
                 await sender.SendMessageAsync(new ServiceBusMessage(bytes)).ConfigureAwait(false);
                 Console.WriteLine($"Sent a single message to the topic: {topicName}");
