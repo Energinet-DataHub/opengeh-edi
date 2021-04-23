@@ -1,0 +1,9 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "MARKET_DATA_QUEUE_CONNECTION_STRING": "",
+    "MARKET_DATA_QUEUE_TOPIC_NAME": ""
+  }
+}
