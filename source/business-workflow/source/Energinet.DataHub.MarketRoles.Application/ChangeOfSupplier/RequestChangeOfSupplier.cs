@@ -12,14 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using MediatR;
 using NodaTime;
 
 namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
 {
     public record RequestChangeOfSupplier(
-        string Transaction,
-        string EnergySupplier,
-        string Consumer,
-        string MeteringPoint,
-        Instant StartDate);
+            string Transaction,
+            string EnergySupplier,
+            string Consumer,
+            string MeteringPoint,
+            Instant StartDate)
+        : IRequest<RequestChangeOfSupplierResult>;
 }

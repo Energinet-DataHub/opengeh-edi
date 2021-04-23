@@ -15,10 +15,8 @@
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier;
 using MediatR;
-using MediatR.SimpleInjector;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using SimpleInjector;
-using SimpleInjector.Lifestyles;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
 {
@@ -26,33 +24,18 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
     {
         public static async Task Main()
         {
-            var container = new Container();
-
             var host = new HostBuilder()
                 .ConfigureFunctionsWorkerDefaults()
                 .ConfigureServices(
                     serviceCollection =>
                     {
-                        serviceCollection.AddSimpleInjector(container, options =>
-                        {
-                            options.AddLogging();
-                        });
-
-                        // serviceCollection.AddScoped(_ => container.GetInstance<IService>());
+                        serviceCollection.AddMediatR(typeof(RequestChangeOfSupplier).Assembly);
+                        serviceCollection.AddScoped<IPipelineBehavior<RequestChangeOfSupplier, RequestChangeOfSupplierResult>, InputValidationBehavior>();
+                        serviceCollection.AddScoped<IPipelineBehavior<RequestChangeOfSupplier, RequestChangeOfSupplierResult>, AuthorizationBehavior>();
                     })
                 .Build();
 
-            host.Services.UseSimpleInjector(container);
-            container.BuildMediator(typeof(RequestChangeOfSupplier).Assembly);
-            container.Register(typeof(IPipelineBehavior<,>), typeof(InputValidationBehavior));
-            container.Verify();
-
-            using (AsyncScopedLifestyle.BeginScope(container))
-            {
-                await host.RunAsync().ConfigureAwait(false);
-            }
-
-            await container.DisposeAsync().ConfigureAwait(false);
+            await host.RunAsync().ConfigureAwait(false);
         }
     }
 }

@@ -20,30 +20,22 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
 {
-    public class InputValidationBehavior : IPipelineBehavior<RequestChangeOfSupplier, RequestChangeOfSupplierResult>
+    public class RequestChangeOfSupplierHandler : IRequestHandler<RequestChangeOfSupplier, RequestChangeOfSupplierResult>
     {
-        private readonly ILogger<InputValidationBehavior> _logger;
+        private readonly ILogger<RequestChangeOfSupplierHandler> _logger;
 
-        public InputValidationBehavior(
-            ILogger<InputValidationBehavior> logger)
+        public RequestChangeOfSupplierHandler(
+            ILogger<RequestChangeOfSupplierHandler> logger)
         {
             _logger = logger;
         }
 
-        public async Task<RequestChangeOfSupplierResult> Handle(RequestChangeOfSupplier request, CancellationToken cancellationToken, RequestHandlerDelegate<RequestChangeOfSupplierResult> next)
+        public Task<RequestChangeOfSupplierResult> Handle(RequestChangeOfSupplier request, CancellationToken cancellationToken)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
-            if (next == null) throw new ArgumentNullException(nameof(next));
 
-            _logger.LogInformation("Validated: {request}", request.Transaction);
-
-            var result = await next().ConfigureAwait(false);
-            if (result == null)
-            {
-                return new RequestChangeOfSupplierResult();
-            }
-
-            return result;
+            _logger.LogInformation("Handled: {request}", request.Transaction);
+            return Task.FromResult(new RequestChangeOfSupplierResult());
         }
     }
 }

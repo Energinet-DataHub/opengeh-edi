@@ -20,12 +20,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
 {
-    public class InputValidationBehavior : IPipelineBehavior<RequestChangeOfSupplier, RequestChangeOfSupplierResult>
+    public class AuthorizationBehavior : IPipelineBehavior<RequestChangeOfSupplier, RequestChangeOfSupplierResult>
     {
-        private readonly ILogger<InputValidationBehavior> _logger;
+        private readonly ILogger<AuthorizationBehavior> _logger;
 
-        public InputValidationBehavior(
-            ILogger<InputValidationBehavior> logger)
+        public AuthorizationBehavior(
+            ILogger<AuthorizationBehavior> logger)
         {
             _logger = logger;
         }
@@ -35,7 +35,7 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
             if (request == null) throw new ArgumentNullException(nameof(request));
             if (next == null) throw new ArgumentNullException(nameof(next));
 
-            _logger.LogInformation("Validated: {request}", request.Transaction);
+            _logger.LogInformation("Authorized: {request}", request.Transaction);
 
             var result = await next().ConfigureAwait(false);
             if (result == null)
