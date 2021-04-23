@@ -98,9 +98,9 @@ namespace Energinet.DataHub.MarketData.Infrastructure.DatabaseAccess.Write.Meter
                 .ToList();
         }
 
-        private static MeteringPointSnapshot CreateMarketEvaluationPointSnapshot(MeteringPointDataModel meteringPointDataModel)
+        private static AccountingPointSnapshot CreateMarketEvaluationPointSnapshot(MeteringPointDataModel meteringPointDataModel)
         {
-            var meteringPointSnapshot = new MeteringPointSnapshot(
+            var meteringPointSnapshot = new AccountingPointSnapshot(
                 meteringPointDataModel.Id,
                 meteringPointDataModel.GsrnNumber,
                 meteringPointDataModel.Type,
@@ -114,7 +114,7 @@ namespace Energinet.DataHub.MarketData.Infrastructure.DatabaseAccess.Write.Meter
             return meteringPointSnapshot;
         }
 
-        private static MeteringPointDataModel GetDataModelFrom(MeteringPointSnapshot snapshot)
+        private static MeteringPointDataModel GetDataModelFrom(AccountingPointSnapshot snapshot)
         {
             // TODO - relationships?
             return new MeteringPointDataModel(

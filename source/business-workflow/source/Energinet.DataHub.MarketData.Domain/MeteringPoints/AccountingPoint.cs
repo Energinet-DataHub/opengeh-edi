@@ -76,7 +76,7 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
             return new AccountingPoint(gsrnNumber, MeteringPointType.Production, isObligated);
         }
 
-        public static AccountingPoint CreateFrom(MeteringPointSnapshot snapshot)
+        public static AccountingPoint CreateFrom(AccountingPointSnapshot snapshot)
         {
             if (snapshot is null)
             {
@@ -160,13 +160,13 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
             }
         }
 
-        public MeteringPointSnapshot GetSnapshot()
+        public AccountingPointSnapshot GetSnapshot()
         {
             var businessProcesses = _businessProcesses.Select(p => p.GetSnapshot()).ToList();
             var consumerRegistrations = _consumerRegistrations.Select(c => c.GetSnapshot()).ToList();
             var supplierRegistrations = _supplierRegistrations.Select(s => s.GetSnapshot()).ToList();
 
-            return new MeteringPointSnapshot(
+            return new AccountingPointSnapshot(
                 Id,
                 GsrnNumber.Value,
                 _meteringPointType.Id,
