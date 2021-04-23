@@ -11,22 +11,48 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-using System;
-using Microsoft.Extensions.Hosting;
 
-[assembly: CLSCompliant(false)]
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier;
+using MediatR;
+using MediatR.SimpleInjector;
+using Microsoft.Extensions.Hosting;
+using SimpleInjector;
+using SimpleInjector.Lifestyles;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
 {
     public static class Program
     {
-        public static void Main()
+        public static async Task Main()
         {
+            var container = new Container();
+
             var host = new HostBuilder()
                 .ConfigureFunctionsWorkerDefaults()
+                .ConfigureServices(
+                    serviceCollection =>
+                    {
+                        serviceCollection.AddSimpleInjector(container, options =>
+                        {
+                            options.AddLogging();
+                        });
+
+                        // serviceCollection.AddScoped(_ => container.GetInstance<IService>());
+                    })
                 .Build();
 
-            host.Run();
+            host.Services.UseSimpleInjector(container);
+            container.BuildMediator(typeof(RequestChangeOfSupplier).Assembly);
+            container.Register(typeof(IPipelineBehavior<,>), typeof(InputValidationBehavior));
+            container.Verify();
+
+            using (AsyncScopedLifestyle.BeginScope(container))
+            {
+                await host.RunAsync().ConfigureAwait(false);
+            }
+
+            await container.DisposeAsync().ConfigureAwait(false);
         }
     }
 }
