@@ -35,7 +35,7 @@ namespace Energinet.DataHub.MarketData.Tests.Domain.MeteringPoints
         }
 
         [Fact]
-        public void Effectuate_WhenAheadOfEffectiveDate_IsNotPossible()
+        public void Effectuate_WhenBeforeOfEffectiveDate_IsNotPossible()
         {
             var accountingPoint = CreateTestObject();
 
