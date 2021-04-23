@@ -30,7 +30,7 @@ namespace Energinet.DataHub.MarketData.Infrastructure.DatabaseAccess.Write.Meter
             _writeDatabaseContext = writeDatabaseContext;
         }
 
-        public async Task<MeteringPoint> GetByGsrnNumberAsync(GsrnNumber gsrnNumber)
+        public async Task<AccountingPoint> GetByGsrnNumberAsync(GsrnNumber gsrnNumber)
         {
             if (gsrnNumber is null)
             {
@@ -41,10 +41,10 @@ namespace Energinet.DataHub.MarketData.Infrastructure.DatabaseAccess.Write.Meter
                 .Where(m => m.GsrnNumber == gsrnNumber.Value)
                 .FirstOrDefaultAsync();
 
-            return MeteringPoint.CreateFrom(CreateMarketEvaluationPointSnapshot(meteringPoint));
+            return AccountingPoint.CreateFrom(CreateMarketEvaluationPointSnapshot(meteringPoint));
         }
 
-        public void Add(MeteringPoint meteringPoint)
+        public void Add(AccountingPoint meteringPoint)
         {
             if (meteringPoint is null)
             {
@@ -55,7 +55,7 @@ namespace Energinet.DataHub.MarketData.Infrastructure.DatabaseAccess.Write.Meter
             _writeDatabaseContext.MarketEvaluationPointDataModels.Add(dataModel);
         }
 
-        public async Task SaveAsync(MeteringPoint meteringPoint)
+        public async Task SaveAsync(AccountingPoint meteringPoint)
         {
             if (meteringPoint is null)
             {
@@ -73,16 +73,15 @@ namespace Energinet.DataHub.MarketData.Infrastructure.DatabaseAccess.Write.Meter
             // TODO - Relationships?
         }
 
-        private static MeteringPointDataModel CreateDataModelFrom(MeteringPoint aggregate)
+        private static MeteringPointDataModel CreateDataModelFrom(AccountingPoint aggregate)
         {
             var snapshot = aggregate.GetSnapshot();
 
             // TODO - relationships?
-            var relationships = snapshot.Relationships
-                .Select(r => new RelationshipDataModel(r.Id, marketEvaluationPointId: Guid.Empty, marketParticipantId: snapshot.Id, r.Type, r.EffectuationDate, r.State))
-                .ToList();
-
-            return new MeteringPointDataModel(snapshot.Id, snapshot.GsrnNumber, snapshot.MeteringPointType, snapshot.IsProductionObligated,  snapshot.PhysicalState, relationships, snapshot.Version);
+            // var relationships = snapshot.Relationships
+            //     .Select(r => new RelationshipDataModel(r.Id, marketEvaluationPointId: Guid.Empty, marketParticipantId: snapshot.Id, r.Type, r.EffectuationDate, r.State))
+            //     .ToList();
+            return new MeteringPointDataModel(snapshot.Id, snapshot.GsrnNumber, snapshot.MeteringPointType, snapshot.IsProductionObligated,  snapshot.PhysicalState, new List<RelationshipDataModel>(), snapshot.Version);
         }
 
         private static List<RelationshipDataModel> GetAddedRelationships(MeteringPointDataModel meteringPoint)
@@ -105,11 +104,12 @@ namespace Energinet.DataHub.MarketData.Infrastructure.DatabaseAccess.Write.Meter
                 meteringPointDataModel.Id,
                 meteringPointDataModel.GsrnNumber,
                 meteringPointDataModel.Type,
-                // TODO - relationships?
-                new List<RelationshipSnapshot>(),
                 meteringPointDataModel.ProductionObligated,
                 meteringPointDataModel.PhysicalState,
-                meteringPointDataModel.RowVersion);
+                meteringPointDataModel.RowVersion,
+                new List<BusinessProcessSnapshot>(),
+                new List<ConsumerRegistrationSnapshot>(),
+                new List<SupplierRegistrationSnapshot>());
 
             return meteringPointSnapshot;
         }
@@ -117,7 +117,14 @@ namespace Energinet.DataHub.MarketData.Infrastructure.DatabaseAccess.Write.Meter
         private static MeteringPointDataModel GetDataModelFrom(MeteringPointSnapshot snapshot)
         {
             // TODO - relationships?
-            return new MeteringPointDataModel(snapshot.Id, snapshot.GsrnNumber, snapshot.MeteringPointType, snapshot.IsProductionObligated, snapshot.PhysicalState, snapshot.Relationships.Select(x => new RelationshipDataModel(x.Id, marketEvaluationPointId: Guid.Empty, marketParticipantId: snapshot.Id, x.Type, x.EffectuationDate, x.State)).ToList(), snapshot.Version);
+            return new MeteringPointDataModel(
+                snapshot.Id,
+                snapshot.GsrnNumber,
+                snapshot.MeteringPointType,
+                snapshot.IsProductionObligated,
+                snapshot.PhysicalState,
+                new List<RelationshipDataModel>(),
+                snapshot.Version);
         }
 
         // private async Task<List<RelationshipDataModel>> GetRelationshipsDataModelAsync(int marketEvaluationPointId)
