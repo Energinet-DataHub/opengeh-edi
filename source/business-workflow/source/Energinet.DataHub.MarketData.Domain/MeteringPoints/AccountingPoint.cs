@@ -148,7 +148,7 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
             DiscontinueCurrentSupplier(businessProcess, systemDateTimeProvider);
             StartOfSupplyForFutureSupplier(businessProcess, systemDateTimeProvider);
 
-            AddDomainEvent(new EnergySupplierChanged(GsrnNumber.Value, processId.Value!, businessProcess.EffectiveDate));
+            AddDomainEvent(new EnergySupplierChanged(GsrnNumber.Value, processId, businessProcess.EffectiveDate));
         }
 
         public void CloseDown()
