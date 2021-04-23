@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketData.Application.ChangeOfSupplier;
 using Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process.Commands;
 using Energinet.DataHub.MarketData.Infrastructure.InternalCommand;
 using GreenEnergyHub.Json;
@@ -45,7 +45,7 @@ namespace Energinet.DataHub.MarketData.Tests.InternalCommand
             _internalCommandRepository.SetupSequence(m => m.GetUnprocessedInternalCommandAsync())
                 .ReturnsAsync(new Infrastructure.InternalCommand.InternalCommand
                 {
-                    Data = "Testvalue", Id = 666, Type = fullyQualifiedPath,
+                    Data = "Testvalue", Id = Guid.NewGuid(), Type = fullyQualifiedPath,
                 })
                 .ReturnsAsync((Infrastructure.InternalCommand.InternalCommand?)null);
         }

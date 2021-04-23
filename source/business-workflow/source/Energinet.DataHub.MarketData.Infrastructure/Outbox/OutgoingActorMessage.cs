@@ -13,14 +13,13 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketData.Infrastructure.DataPersistence;
 using NodaTime;
 
 namespace Energinet.DataHub.MarketData.Infrastructure.Outbox
 {
-    public class OutgoingActorMessage : IDataModel
+    public class OutgoingActorMessage
     {
-        public OutgoingActorMessage(int id, Instant occurredOn, string type, string data, string? recipient, Instant? processedDate, int state)
+        public OutgoingActorMessage(Guid id, Instant occurredOn, string type, string data, string? recipient, Instant? processedDate, int state)
         {
             Id = id;
             OccurredOn = occurredOn;
@@ -48,7 +47,7 @@ namespace Energinet.DataHub.MarketData.Infrastructure.Outbox
 
         public string? Recipient { get; set; }
 
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         public Instant OccurredOn { get; set; }
 

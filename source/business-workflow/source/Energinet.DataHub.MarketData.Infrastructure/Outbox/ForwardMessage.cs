@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using NodaTime;
 
 namespace Energinet.DataHub.MarketData.Infrastructure.Outbox
 {
     public class ForwardMessage
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         public string? Data { get; set; }
 

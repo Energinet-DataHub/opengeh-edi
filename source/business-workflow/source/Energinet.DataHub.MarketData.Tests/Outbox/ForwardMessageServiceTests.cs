@@ -41,7 +41,7 @@ namespace Energinet.DataHub.MarketData.Tests.Outbox
             _forwardMessageRepositoryMock.SetupSequence(m => m.GetUnprocessedForwardMessageAsync())
                 .ReturnsAsync(new ForwardMessage
                 {
-                    Id = 1,
+                    Id = Guid.NewGuid(),
                     Type = "something",
                     OccurredOn = default(Instant),
                     Data = "{'Name':'Boom'}",
@@ -49,14 +49,14 @@ namespace Energinet.DataHub.MarketData.Tests.Outbox
                 })
                 .ReturnsAsync(new ForwardMessage
                 {
-                    Id = 2,
+                    Id = Guid.NewGuid(),
                     Type = "something twice",
                     OccurredOn = default(Instant),
                     Data = "{'Name':'Boomer'}",
                     Recipient = "1234567890",
                 })
                 .ReturnsAsync((ForwardMessage?)null);
-            _forwardMessageRepositoryMock.Setup(m => m.MarkForwardedMessageAsProcessedAsync(It.IsAny<int>()))
+            _forwardMessageRepositoryMock.Setup(m => m.MarkForwardedMessageAsProcessedAsync(It.IsAny<Guid>()))
                 .Returns(Task.FromResult(typeof(void)));
         }
 
@@ -68,7 +68,7 @@ namespace Energinet.DataHub.MarketData.Tests.Outbox
             await sut.ProcessMessagesAsync().ConfigureAwait(false);
 
             _forwardMessageRepositoryMock.Verify(m => m.GetUnprocessedForwardMessageAsync(), Times.Exactly(3));
-            _forwardMessageRepositoryMock.Verify(m => m.MarkForwardedMessageAsProcessedAsync(It.IsAny<int>()), Times.Exactly(2));
+            _forwardMessageRepositoryMock.Verify(m => m.MarkForwardedMessageAsProcessedAsync(It.IsAny<Guid>()), Times.Exactly(2));
             _postOfficeServiceMock.Verify(m => m.SendMessageAsync(It.IsAny<byte[]>()), Times.Exactly(2));
         }
     }

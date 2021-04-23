@@ -12,24 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using NodaTime;
 
 namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
 {
     public class RelationshipSnapshot
     {
-        public RelationshipSnapshot(int id, string marketParticipantMrid, int type, Instant effectuationDate, int state)
+        public RelationshipSnapshot(Guid id, string marketParticipantMrId, int type, Instant effectuationDate, int state)
         {
             Id = id;
-            MarketParticipantMrid = marketParticipantMrid;
+            MarketParticipantMrId = marketParticipantMrId;
             Type = type;
             EffectuationDate = effectuationDate;
             State = state;
         }
 
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
-        public string MarketParticipantMrid { get; set; }
+        public string MarketParticipantMrId { get; set; }
 
         public int Type { get; set; }
 

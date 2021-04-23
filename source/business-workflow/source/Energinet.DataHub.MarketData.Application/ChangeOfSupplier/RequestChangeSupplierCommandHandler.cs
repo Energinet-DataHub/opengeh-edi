@@ -77,7 +77,7 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier
             }
 
             meteringPoint.AcceptChangeOfSupplier(new EnergySupplierId(command.EnergySupplier.MRID!), command.StartDate, new ProcessId(command.Transaction.MRID), _systemTimeProvider);
-            _meteringPointRepository.Save(meteringPoint);
+            await _meteringPointRepository.SaveAsync(meteringPoint);
 
             return RequestChangeOfSupplierResult.Success();
         }
