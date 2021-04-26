@@ -39,7 +39,7 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
 
         public Instant? StartOfSupplyDate { get; private set; } = null;
 
-        public Instant? EndOfSupplyDate { get; } = null;
+        public Instant? EndOfSupplyDate { get; private set; } = null;
 
         public ProcessId ProcessId { get; }
 
@@ -60,6 +60,11 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
         public SupplierRegistrationSnapshot GetSnapshot()
         {
             return new SupplierRegistrationSnapshot(EnergySupplierId.Value, StartOfSupplyDate, EndOfSupplyDate, ProcessId.Value !);
+        }
+
+        public void MarkEndOfSupply(Instant endOfSupplyDate)
+        {
+            EndOfSupplyDate = endOfSupplyDate;
         }
     }
 }

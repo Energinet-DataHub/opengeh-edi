@@ -17,9 +17,9 @@ using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
 {
-    public class MeteringPointSnapshot
+    public class AccountingPointSnapshot
     {
-        public MeteringPointSnapshot(
+        public AccountingPointSnapshot(
             Guid id,
             string gsrnNumber,
             int meteringPointType,

@@ -12,19 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.MarketData.Domain.BusinessProcesses;
 using Energinet.DataHub.MarketData.Domain.SeedWork;
 
-namespace Energinet.DataHub.MarketData.Domain.MeteringPoints.Rules.ChangeEnergySupplier
+namespace Energinet.DataHub.MarketData.Domain.MeteringPoints.Events
 {
-    internal class BusinessProcessStatus : EnumerationType
+    public class ChangeOfSupplierCancelled : DomainEventBase
     {
-        internal static readonly BusinessProcessStatus Pending = new BusinessProcessStatus(0, nameof(Pending));
-        internal static readonly BusinessProcessStatus Cancelled = new BusinessProcessStatus(1, nameof(Cancelled));
-        internal static readonly BusinessProcessStatus Completed = new BusinessProcessStatus(2, nameof(Completed));
-
-        private BusinessProcessStatus(int id, string name)
-            : base(id, name)
+        public ChangeOfSupplierCancelled(ProcessId processId)
         {
+            ProcessId = processId;
         }
+
+        public ProcessId ProcessId { get; }
     }
 }
