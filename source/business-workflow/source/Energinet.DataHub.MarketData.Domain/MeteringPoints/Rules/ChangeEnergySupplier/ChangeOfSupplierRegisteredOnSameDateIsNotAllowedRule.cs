@@ -21,13 +21,13 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints.Rules.ChangeEnergyS
 {
     internal class ChangeOfSupplierRegisteredOnSameDateIsNotAllowedRule : IBusinessRule
     {
-        private readonly IReadOnlyList<Relationship> _businessProcesses;
-        private readonly Instant _effectuationDate;
+        private readonly IReadOnlyList<BusinessProcess> _businessProcesses;
+        private readonly Instant _supplyStartDate;
 
-        public ChangeOfSupplierRegisteredOnSameDateIsNotAllowedRule(IReadOnlyList<Relationship> businessProcesses, Instant effectuationDate)
+        public ChangeOfSupplierRegisteredOnSameDateIsNotAllowedRule(IReadOnlyList<BusinessProcess> businessProcesses, Instant supplyStartDate)
         {
             _businessProcesses = businessProcesses;
-            _effectuationDate = effectuationDate;
+            _supplyStartDate = supplyStartDate;
         }
 
         public bool IsBroken => ProcessAlreadyRegistered();
@@ -37,8 +37,8 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints.Rules.ChangeEnergyS
         private bool ProcessAlreadyRegistered()
         {
             return _businessProcesses.Any(process =>
-                process.EffectuationDate.ToDateTimeUtc().Date.Equals(_effectuationDate.ToDateTimeUtc().Date)
-                && process.Type == RelationshipType.EnergySupplier);
+                process.EffectiveDate.ToDateTimeUtc().Date.Equals(_supplyStartDate.ToDateTimeUtc().Date)
+                && process.ProcessType == BusinessProcessType.ChangeOfSupplier);
         }
     }
 }

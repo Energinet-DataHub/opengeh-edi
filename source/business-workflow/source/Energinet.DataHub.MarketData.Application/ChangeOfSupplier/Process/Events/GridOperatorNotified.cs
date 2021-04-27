@@ -12,17 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.MarketData.Domain.BusinessProcesses;
 using Energinet.DataHub.MarketData.Domain.SeedWork;
 
 namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier.Process.Events
 {
     public class GridOperatorNotified : DomainEventBase
     {
-        public GridOperatorNotified(string processId)
+        public GridOperatorNotified(ProcessId processId)
         {
             ProcessId = processId;
         }
 
-        public string ProcessId { get; }
+        public ProcessId ProcessId { get; }
     }
 }

@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketData.Domain.BusinessProcesses;
 using Energinet.DataHub.MarketData.Domain.EnergySuppliers;
 using Energinet.DataHub.MarketData.Domain.MeteringPoints;
 using Energinet.DataHub.MarketData.Domain.SeedWork;
@@ -75,8 +76,8 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier
                 return rulesCheckResult;
             }
 
-            meteringPoint.RegisterChangeOfEnergySupplier(new MarketParticipantMrid(command.EnergySupplier.MRID!), command.StartDate, _systemTimeProvider);
-            _meteringPointRepository.Save(meteringPoint);
+            meteringPoint.AcceptChangeOfSupplier(new EnergySupplierId(command.EnergySupplier.MRID!), command.StartDate, new ProcessId(command.Transaction.MRID), _systemTimeProvider);
+            await _meteringPointRepository.SaveAsync(meteringPoint);
 
             return RequestChangeOfSupplierResult.Success();
         }
@@ -107,10 +108,10 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier
                : RequestChangeOfSupplierResult.Success();
         }
 
-        private RequestChangeOfSupplierResult CheckBusinessRules(RequestChangeOfSupplier command, MeteringPoint meteringPoint)
+        private RequestChangeOfSupplierResult CheckBusinessRules(RequestChangeOfSupplier command, AccountingPoint accountingPoint)
         {
             var validationResult =
-                meteringPoint.CanChangeSupplier(new MarketParticipantMrid(command.EnergySupplier.MRID!), command.StartDate, _systemTimeProvider);
+                accountingPoint.ChangeSupplierAcceptable(new EnergySupplierId(command.EnergySupplier.MRID!), command.StartDate, _systemTimeProvider);
 
             return validationResult.Success
                 ? RequestChangeOfSupplierResult.Reject(validationResult.Errors)
@@ -122,7 +123,7 @@ namespace Energinet.DataHub.MarketData.Application.ChangeOfSupplier
             return !await _energySupplierRepository.ExistsAsync(new GlnNumber(energySupplierId)).ConfigureAwait(false);
         }
 
-        private Task<MeteringPoint> GetMeteringPointAsync(string gsrnNumber)
+        private Task<AccountingPoint> GetMeteringPointAsync(string gsrnNumber)
         {
             var meteringPointId = GsrnNumber.Create(gsrnNumber);
             var meteringPoint =

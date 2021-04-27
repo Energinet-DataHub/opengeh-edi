@@ -12,29 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Linq;
 using Energinet.DataHub.MarketData.Domain.SeedWork;
 
 namespace Energinet.DataHub.MarketData.Domain.MeteringPoints.Rules.ChangeEnergySupplier
 {
     internal class MustHaveEnergySupplierAssociatedRule : IBusinessRule
     {
-        private readonly IReadOnlyList<Relationship> _relationships;
+        private readonly SupplierRegistration? _supplierRegistration;
 
-        public MustHaveEnergySupplierAssociatedRule(IReadOnlyList<Relationship> relationships)
+        public MustHaveEnergySupplierAssociatedRule(SupplierRegistration? supplierRegistration)
         {
-            _relationships = relationships;
+            _supplierRegistration = supplierRegistration;
         }
 
-        public bool IsBroken => !HasActiveEnergySupplier();
+        public bool IsBroken => _supplierRegistration is null;
 
-        public string Message => $"Metering point must have an energy supplier associated.";
-
-        private bool HasActiveEnergySupplier()
-        {
-            return _relationships.Any(r =>
-                r.Type.Equals(RelationshipType.EnergySupplier) && r.State.Equals(RelationshipState.Active));
-        }
+        public string Message => $"An energy supplier must be associated.";
     }
 }

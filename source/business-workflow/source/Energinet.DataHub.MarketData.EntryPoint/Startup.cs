@@ -14,7 +14,7 @@
 
 using System;
 using Azure.Messaging.ServiceBus;
-using Dapper.NodaTime;
+using Energinet.DataHub.MarketData.Application;
 using Energinet.DataHub.MarketData.Application.ChangeOfSupplier;
 using Energinet.DataHub.MarketData.Application.Common;
 using Energinet.DataHub.MarketData.Domain.EnergySuppliers;
@@ -23,9 +23,10 @@ using Energinet.DataHub.MarketData.Domain.SeedWork;
 using Energinet.DataHub.MarketData.EntryPoint;
 using Energinet.DataHub.MarketData.Infrastructure;
 using Energinet.DataHub.MarketData.Infrastructure.ActorMessages;
-using Energinet.DataHub.MarketData.Infrastructure.DataPersistence;
-using Energinet.DataHub.MarketData.Infrastructure.DataPersistence.EnergySuppliers;
-using Energinet.DataHub.MarketData.Infrastructure.DataPersistence.MarketEvaluationPoints;
+using Energinet.DataHub.MarketData.Infrastructure.DatabaseAccess.Write;
+using Energinet.DataHub.MarketData.Infrastructure.DatabaseAccess.Write.EnergySuppliers;
+using Energinet.DataHub.MarketData.Infrastructure.DatabaseAccess.Write.MeteringPoints;
+using Energinet.DataHub.MarketData.Infrastructure.DatabaseAccess.Write.ProcessManagers;
 using Energinet.DataHub.MarketData.Infrastructure.IntegrationEvents;
 using Energinet.DataHub.MarketData.Infrastructure.InternalCommand;
 using Energinet.DataHub.MarketData.Infrastructure.Outbox;
@@ -34,7 +35,6 @@ using GreenEnergyHub.Json;
 using GreenEnergyHub.Messaging;
 using MediatR;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
-using Microsoft.Azure.WebJobs.ServiceBus;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -52,16 +52,8 @@ namespace Energinet.DataHub.MarketData.EntryPoint
             }
 
             builder.Services.AddGreenEnergyHub(typeof(RequestChangeOfSupplier).Assembly, typeof(RequestChangeSupplierCommandHandler).Assembly);
-            builder.Services.AddUnitOfWork("MARKET_DATA_DB_CONNECTION_STRING");
             builder.Services.AddSingleton<IJsonSerializer, JsonSerializer>();
             builder.Services.AddScoped<IHubRehydrator, JsonMessageDeserializer>();
-
-            builder.Services.AddScoped<IDbConnectionFactory>(serviceProvider =>
-            {
-                var configuration = serviceProvider.GetService<IConfiguration>();
-                var connectionString = configuration.GetValue<string>("MARKET_DATA_DB_CONNECTION_STRING");
-                return new SqlDbConnectionFactory(connectionString);
-            });
 
             builder.Services.AddScoped(serviceProvider =>
             {
@@ -72,9 +64,15 @@ namespace Energinet.DataHub.MarketData.EntryPoint
                 return client.CreateSender(topicName);
             });
 
-            DapperNodaTimeSetup.Register();
+            builder.Services.AddScoped<IWriteDatabaseContext>(s =>
+            {
+                var configuration = s.GetService<IConfiguration>();
+                var connectionString = configuration.GetValue<string>("MARKET_DATA_DB_CONNECTION_STRING");
 
-            builder.Services.AddScoped<IUnitOfWorkCallback, UnitOfWorkCallback>();
+                return new WriteDatabaseContext(connectionString);
+            });
+
+            builder.Services.AddScoped<IUnitOfWork, EntityFrameworkUnitOfWork>();
             builder.Services.AddScoped<ISystemDateTimeProvider, SystemDateTimeProvider>();
             builder.Services.AddScoped<IEventPublisher, EventPublisher>();
             builder.Services.AddScoped<IActorMessagePublisher, ActorMessagePublisher>();
@@ -85,6 +83,7 @@ namespace Energinet.DataHub.MarketData.EntryPoint
             builder.Services.AddScoped<IForwardMessageRepository, ForwardMessageRepository>();
             builder.Services.AddScoped<IForwardMessageService, ForwardMessageService>();
             builder.Services.AddScoped<IPostOfficeService, PostOfficeService>();
+            builder.Services.AddScoped<IProcessManagerRepository, ProcessManagerRepository>();
             builder.Services.AddScoped<DomainEventsContext>();
 
             builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(DomainEventPublisherBehavior<,>));

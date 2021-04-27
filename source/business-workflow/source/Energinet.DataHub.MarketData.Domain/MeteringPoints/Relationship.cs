@@ -22,22 +22,22 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
     {
         public Relationship(MarketParticipantMrid marketParticipantMrid, RelationshipType type, Instant effectuationDate)
         {
-            MarketParticipantMrid = marketParticipantMrid ?? throw new ArgumentNullException(nameof(marketParticipantMrid));
+            MarketParticipantMrId = marketParticipantMrid ?? throw new ArgumentNullException(nameof(marketParticipantMrid));
             Type = type ?? throw new ArgumentNullException(nameof(type));
             EffectuationDate = effectuationDate;
             State = RelationshipState.Pending;
         }
 
-        private Relationship(int id, MarketParticipantMrid marketParticipantMrid, RelationshipType type, RelationshipState state, Instant effectuationDate)
+        private Relationship(Guid id, MarketParticipantMrid marketParticipantMrid, RelationshipType type, RelationshipState state, Instant effectuationDate)
         {
             Id = id;
-            MarketParticipantMrid = marketParticipantMrid ?? throw new ArgumentNullException(nameof(marketParticipantMrid));
+            MarketParticipantMrId = marketParticipantMrid ?? throw new ArgumentNullException(nameof(marketParticipantMrid));
             Type = type ?? throw new ArgumentNullException(nameof(type));
             EffectuationDate = effectuationDate;
             State = state;
         }
 
-        public MarketParticipantMrid MarketParticipantMrid { get; }
+        public MarketParticipantMrid MarketParticipantMrId { get; }
 
         public RelationshipType Type { get; }
 
@@ -54,7 +54,7 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
 
             return new Relationship(
                 snapshot.Id,
-                new MarketParticipantMrid(snapshot.MarketParticipantMrid),
+                new MarketParticipantMrid(snapshot.MarketParticipantMrId),
                 RelationshipType.FromValue<RelationshipType>(snapshot.Type),
                 RelationshipState.FromValue<RelationshipState>(snapshot.State),
                 snapshot.EffectuationDate);
@@ -70,7 +70,7 @@ namespace Energinet.DataHub.MarketData.Domain.MeteringPoints
 
         public RelationshipSnapshot GetSnapshot()
         {
-            return new RelationshipSnapshot(Id, MarketParticipantMrid.Mrid, Type.Id, EffectuationDate, State.Id);
+            return new RelationshipSnapshot(Id, MarketParticipantMrId.MrId, Type.Id, EffectuationDate, State.Id);
         }
     }
 }
