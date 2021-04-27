@@ -29,11 +29,15 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Common.MediatR
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (assemblies == null) throw new ArgumentNullException(nameof(assemblies));
 
-            return BuildMediator(container, (IEnumerable<Assembly>)assemblies);
+            return BuildMediatorWithPipeline(container, assemblies, Array.Empty<Type>());
         }
 
-        private static Container BuildMediator(this Container container, IEnumerable<Assembly> assemblies)
+        public static Container BuildMediatorWithPipeline(this Container container, Assembly[] assemblies, Type[] pipelineBehaviors)
         {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            if (assemblies == null) throw new ArgumentNullException(nameof(assemblies));
+            if (pipelineBehaviors == null) throw new ArgumentNullException(nameof(pipelineBehaviors));
+
             var allAssemblies = GetAssemblies(assemblies);
 
             container.RegisterSingleton<IMediator, Mediator>();
@@ -43,24 +47,17 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Common.MediatR
             RegisterHandlers(container, typeof(IRequestExceptionAction<,>), allAssemblies);
             RegisterHandlers(container, typeof(IRequestExceptionHandler<,,>), allAssemblies);
 
-            // Custom pipeline behaviors
-            var pipelineBehaviors = container.GetTypesToRegister(typeof(IPipelineBehavior<,>), allAssemblies, new TypesToRegisterOptions
-            {
-                IncludeGenericTypeDefinitions = true,
-                IncludeComposites = false,
-            }).ToList();
-
             // Add built-in pipeline behaviors
-            pipelineBehaviors.AddRange(new[]
+            var builtInBehaviors = new[]
             {
                 typeof(RequestExceptionProcessorBehavior<,>),
                 typeof(RequestExceptionActionProcessorBehavior<,>),
                 typeof(RequestPreProcessorBehavior<,>),
                 typeof(RequestPostProcessorBehavior<,>),
-            });
+            };
 
             // Register pipeline
-            container.Collection.Register(typeof(IPipelineBehavior<,>), pipelineBehaviors);
+            container.Collection.Register(typeof(IPipelineBehavior<,>), pipelineBehaviors.Union(builtInBehaviors));
 
             container.Collection.Register(typeof(IRequestPreProcessor<>), new[] { typeof(EmptyRequestPreProcessor<>) });
             container.Collection.Register(typeof(IRequestPostProcessor<,>), new[] { typeof(EmptyRequestPostProcessor<,>) });

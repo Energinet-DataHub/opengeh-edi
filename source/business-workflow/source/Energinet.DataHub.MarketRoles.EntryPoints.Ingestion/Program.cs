@@ -52,8 +52,10 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
 
             // Register application components.
             container.Register<CommandApi>(Lifestyle.Scoped);
-            container.BuildMediator(typeof(RequestChangeOfSupplier).Assembly);
             container.Register<IProcessingClient, ServiceBusProcessingClient>(Lifestyle.Singleton);
+            container.BuildMediatorWithPipeline(
+                new[] { typeof(RequestChangeOfSupplier).Assembly },
+                new[] { typeof(InputValidationBehavior), typeof(AuthorizationBehavior) });
 
             var connectionString = Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_CONNECTION_STRING");
             var topicName = Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_TOPIC_NAME");
