@@ -22,20 +22,26 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
 {
     public class RequestChangeOfSupplierHandler : IRequestHandler<RequestChangeOfSupplier, RequestChangeOfSupplierResult>
     {
-        private readonly ILogger<RequestChangeOfSupplierHandler> _logger;
+        private readonly ILogger _logger;
+        private readonly IProcessingClient _processingClient;
 
         public RequestChangeOfSupplierHandler(
-            ILogger<RequestChangeOfSupplierHandler> logger)
+            ILogger logger,
+            IProcessingClient processingClient)
         {
             _logger = logger;
+            _processingClient = processingClient;
         }
 
-        public Task<RequestChangeOfSupplierResult> Handle(RequestChangeOfSupplier request, CancellationToken cancellationToken)
+        public async Task<RequestChangeOfSupplierResult> Handle(RequestChangeOfSupplier request, CancellationToken cancellationToken)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
             _logger.LogInformation("Handled: {request}", request.Transaction);
-            return Task.FromResult(new RequestChangeOfSupplierResult());
+
+            await _processingClient.SendAsync(request).ConfigureAwait(false);
+
+            return new RequestChangeOfSupplierResult();
         }
     }
 }

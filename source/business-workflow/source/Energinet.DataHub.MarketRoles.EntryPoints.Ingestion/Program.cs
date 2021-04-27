@@ -13,9 +13,11 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketRoles.Application;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common.MediatR;
+using Energinet.DataHub.MarketRoles.Infrastructure;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -49,6 +51,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
             // Register application components.
             container.Register<CommandApi>(Lifestyle.Scoped);
             container.BuildMediator(typeof(RequestChangeOfSupplier).Assembly);
+            container.Register<IProcessingClient, ServiceBusProcessingClient>(Lifestyle.Singleton);
             container.Verify();
 
             await host.RunAsync().ConfigureAwait(false);
