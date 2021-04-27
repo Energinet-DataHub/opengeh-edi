@@ -22,10 +22,10 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
 {
     public class InputValidationBehavior : IPipelineBehavior<RequestChangeOfSupplier, RequestChangeOfSupplierResult>
     {
-        private readonly ILogger<InputValidationBehavior> _logger;
+        private readonly ILogger _logger;
 
         public InputValidationBehavior(
-            ILogger<InputValidationBehavior> logger)
+            ILogger logger)
         {
             _logger = logger;
         }

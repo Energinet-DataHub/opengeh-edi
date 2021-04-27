@@ -22,10 +22,10 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
 {
     public class AuthorizationBehavior : IPipelineBehavior<RequestChangeOfSupplier, RequestChangeOfSupplierResult>
     {
-        private readonly ILogger<AuthorizationBehavior> _logger;
+        private readonly ILogger _logger;
 
         public AuthorizationBehavior(
-            ILogger<AuthorizationBehavior> logger)
+            ILogger logger)
         {
             _logger = logger;
         }

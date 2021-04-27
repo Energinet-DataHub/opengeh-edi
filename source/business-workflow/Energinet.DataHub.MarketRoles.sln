@@ -28,6 +28,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{1E0CD798
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energinet.DataHub.MarketRoles.Tests", "source\Energinet.DataHub.MarketRoles.Tests\Energinet.DataHub.MarketRoles.Tests.csproj", "{4D32E38C-3001-43F5-824E-C271685521F0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energinet.DataHub.MarketRoles.EntryPoints.Common", "source\Energinet.DataHub.MarketRoles.EntryPoints.Common\Energinet.DataHub.MarketRoles.EntryPoints.Common.csproj", "{CAD21241-8CA0-4E1E-BE4C-7C2F902B138F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,11 +56,16 @@ Global
 		{4D32E38C-3001-43F5-824E-C271685521F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D32E38C-3001-43F5-824E-C271685521F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D32E38C-3001-43F5-824E-C271685521F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CAD21241-8CA0-4E1E-BE4C-7C2F902B138F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CAD21241-8CA0-4E1E-BE4C-7C2F902B138F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CAD21241-8CA0-4E1E-BE4C-7C2F902B138F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CAD21241-8CA0-4E1E-BE4C-7C2F902B138F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{654DA496-60D8-47D8-923E-F24F71A31F84} = {FD29AEE1-CB22-41FD-A875-1E99C4D5D81C}
 		{883CEA94-E42C-44B9-83C1-104998502B74} = {FD29AEE1-CB22-41FD-A875-1E99C4D5D81C}
 		{1A274305-4886-43D0-8A1C-D249DAEEC028} = {FD29AEE1-CB22-41FD-A875-1E99C4D5D81C}
 		{4D32E38C-3001-43F5-824E-C271685521F0} = {1E0CD798-F373-475B-AF45-93D02A1D7D2C}
+		{CAD21241-8CA0-4E1E-BE4C-7C2F902B138F} = {FD29AEE1-CB22-41FD-A875-1E99C4D5D81C}
 	EndGlobalSection
 EndGlobal

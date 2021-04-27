@@ -21,6 +21,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Energinet.DataHub.MarketRoles.Application\Energinet.DataHub.MarketRoles.Application.csproj" />
+      <ProjectReference Include="..\Energinet.DataHub.MarketRoles.EntryPoints.Ingestion\Energinet.DataHub.MarketRoles.EntryPoints.Ingestion.csproj" />
     </ItemGroup>
 
 </Project>

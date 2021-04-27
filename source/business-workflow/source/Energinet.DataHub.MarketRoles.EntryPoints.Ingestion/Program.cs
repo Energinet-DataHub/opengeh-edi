@@ -14,9 +14,12 @@
 
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier;
-using MediatR;
+using Energinet.DataHub.MarketRoles.EntryPoints.Common;
+using Energinet.DataHub.MarketRoles.EntryPoints.Common.MediatR;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SimpleInjector;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
 {
@@ -24,18 +27,33 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
     {
         public static async Task Main()
         {
+            var container = new Container();
             var host = new HostBuilder()
-                .ConfigureFunctionsWorkerDefaults()
-                .ConfigureServices(
-                    serviceCollection =>
+                .ConfigureFunctionsWorkerDefaults(options =>
+                {
+                    options.UseMiddleware<SimpleInjectorScopedRequest>();
+                })
+                .ConfigureServices(services =>
+                {
+                    services.AddLogging();
+                    services.AddSingleton<IFunctionActivator, SimpleInjectorActivator>(); // Replace existing activator
+
+                    services.AddSimpleInjector(container, options =>
                     {
-                        serviceCollection.AddMediatR(typeof(RequestChangeOfSupplier).Assembly);
-                        serviceCollection.AddScoped<IPipelineBehavior<RequestChangeOfSupplier, RequestChangeOfSupplierResult>, InputValidationBehavior>();
-                        serviceCollection.AddScoped<IPipelineBehavior<RequestChangeOfSupplier, RequestChangeOfSupplierResult>, AuthorizationBehavior>();
-                    })
-                .Build();
+                        options.AddLogging();
+                    });
+                })
+                .Build()
+                .UseSimpleInjector(container);
+
+            // Register application components.
+            container.Register<CommandApi>(Lifestyle.Scoped);
+            container.BuildMediator(typeof(RequestChangeOfSupplier).Assembly);
+            container.Verify();
 
             await host.RunAsync().ConfigureAwait(false);
+
+            await container.DisposeAsync().ConfigureAwait(false);
         }
     }
 }
