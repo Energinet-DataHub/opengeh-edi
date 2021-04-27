@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Text;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
@@ -27,20 +26,18 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure
     /// </summary>
     public class ServiceBusProcessingClient : IProcessingClient
     {
+        private readonly ServiceBusSender _sender;
+
+        public ServiceBusProcessingClient(
+            ServiceBusSender sender)
+        {
+            _sender = sender;
+        }
+
         public async Task SendAsync(RequestChangeOfSupplier request)
         {
-            var connectionString = Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_CONNECTION_STRING");
-            var topicName = Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_TOPIC_NAME");
-
-            // create a Service Bus client
-            await using (ServiceBusClient client = new ServiceBusClient(connectionString))
-            {
-                // create a sender for the topic
-                var sender = client.CreateSender(topicName);
-                var bytes = Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(request));
-                await sender.SendMessageAsync(new ServiceBusMessage(bytes)).ConfigureAwait(false);
-                Console.WriteLine($"Sent a single message to the topic: {topicName}");
-            }
+            var bytes = Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(request));
+            await _sender.SendMessageAsync(new ServiceBusMessage(bytes)).ConfigureAwait(false);
         }
     }
 }

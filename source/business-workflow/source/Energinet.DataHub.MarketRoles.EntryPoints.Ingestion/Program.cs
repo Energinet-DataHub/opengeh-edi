@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
+using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketRoles.Application;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common;
@@ -52,6 +54,12 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
             container.Register<CommandApi>(Lifestyle.Scoped);
             container.BuildMediator(typeof(RequestChangeOfSupplier).Assembly);
             container.Register<IProcessingClient, ServiceBusProcessingClient>(Lifestyle.Singleton);
+
+            var connectionString = Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_CONNECTION_STRING");
+            var topicName = Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_TOPIC_NAME");
+
+            container.Register<ServiceBusSender>(() => new ServiceBusClient(connectionString).CreateSender(topicName), Lifestyle.Singleton);
+
             container.Verify();
 
             await host.RunAsync().ConfigureAwait(false);
