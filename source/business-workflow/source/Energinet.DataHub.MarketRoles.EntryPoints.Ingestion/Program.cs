@@ -11,22 +11,62 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-using System;
-using Microsoft.Extensions.Hosting;
 
-[assembly: CLSCompliant(false)]
+using System;
+using System.Threading.Tasks;
+using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.MarketRoles.Application;
+using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier;
+using Energinet.DataHub.MarketRoles.EntryPoints.Common;
+using Energinet.DataHub.MarketRoles.EntryPoints.Common.MediatR;
+using Energinet.DataHub.MarketRoles.Infrastructure;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using SimpleInjector;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
 {
     public static class Program
     {
-        public static void Main()
+        public static async Task Main()
         {
+            var container = new Container();
             var host = new HostBuilder()
-                .ConfigureFunctionsWorkerDefaults()
-                .Build();
+                .ConfigureFunctionsWorkerDefaults(options =>
+                {
+                    options.UseMiddleware<SimpleInjectorScopedRequest>();
+                })
+                .ConfigureServices(services =>
+                {
+                    services.AddLogging();
+                    services.AddSingleton<IFunctionActivator, SimpleInjectorActivator>(); // Replace existing activator
 
-            host.Run();
+                    services.AddSimpleInjector(container, options =>
+                    {
+                        options.AddLogging();
+                    });
+                })
+                .Build()
+                .UseSimpleInjector(container);
+
+            // Register application components.
+            container.Register<CommandApi>(Lifestyle.Scoped);
+            container.Register<IProcessingClient, ServiceBusProcessingClient>(Lifestyle.Singleton);
+            container.BuildMediatorWithPipeline(
+                new[] { typeof(RequestChangeOfSupplier).Assembly },
+                new[] { typeof(InputValidationBehavior), typeof(AuthorizationBehavior) });
+
+            var connectionString = Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_CONNECTION_STRING");
+            var topicName = Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_TOPIC_NAME");
+
+            container.Register<ServiceBusSender>(() => new ServiceBusClient(connectionString).CreateSender(topicName), Lifestyle.Singleton);
+
+            container.Verify();
+
+            await host.RunAsync().ConfigureAwait(false);
+
+            await container.DisposeAsync().ConfigureAwait(false);
         }
     }
 }
