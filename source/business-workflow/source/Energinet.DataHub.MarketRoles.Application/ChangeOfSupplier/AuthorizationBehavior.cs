@@ -35,7 +35,7 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
             if (request == null) throw new ArgumentNullException(nameof(request));
             if (next == null) throw new ArgumentNullException(nameof(next));
 
-            _logger.LogInformation("Authorized: {request}", request.Transaction);
+            _logger.LogInformation("Authorized: {request}", request.TransactionId);
 
             var result = await next().ConfigureAwait(false);
             if (result == null)

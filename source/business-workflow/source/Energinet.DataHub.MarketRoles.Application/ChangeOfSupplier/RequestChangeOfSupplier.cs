@@ -18,10 +18,10 @@ using NodaTime;
 namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
 {
     public record RequestChangeOfSupplier(
-            string Transaction,
-            string EnergySupplier,
-            string Consumer,
-            string MeteringPoint,
+            string TransactionId,
+            string EnergySupplierId,
+            string ConsumerId,
+            string MeteringPointId,
             Instant StartDate)
         : IRequest<RequestChangeOfSupplierResult>;
 }

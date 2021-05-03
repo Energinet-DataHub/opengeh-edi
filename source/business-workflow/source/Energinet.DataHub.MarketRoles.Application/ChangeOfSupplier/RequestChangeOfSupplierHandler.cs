@@ -37,7 +37,7 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            _logger.LogInformation("Handled: {request}", request.Transaction);
+            _logger.LogInformation("Handled: {request}", request.TransactionId);
 
             await _processingClient.SendAsync(request).ConfigureAwait(false);
 
