@@ -12,9 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
+using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+
+namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.RequestChangeOfSupplier.Validation
 {
-    public class RequestChangeOfSupplierResult
+    public class UnknownEnergySupplierRule : IBusinessRule
     {
+        private readonly string _glnNumber;
+
+        public UnknownEnergySupplierRule(bool isBroken, string glnNumber)
+        {
+            IsBroken = isBroken;
+            _glnNumber = glnNumber;
+        }
+
+        public bool IsBroken { get; }
+
+        public string Message => "Unknown energy supplier ({glnNumber}).";
     }
 }

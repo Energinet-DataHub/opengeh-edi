@@ -13,15 +13,15 @@
 // limitations under the License.
 
 using MediatR;
-using NodaTime;
 
-namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
+namespace Energinet.DataHub.MarketRoles.Application.Common
 {
-    public record RequestChangeOfSupplier(
-            string TransactionId,
-            string EnergySupplierId,
-            string ConsumerId,
-            string MeteringPointId,
-            Instant StartDate)
-        : IRequest<RequestChangeOfSupplierResult>;
+    /// <summary>
+    /// Handler for business process requests
+    /// </summary>
+    /// <typeparam name="TBusinessRequest"><see cref="IBusinessRequest"/></typeparam>
+    public interface IBusinessRequestHandler<in TBusinessRequest> : IRequestHandler<TBusinessRequest, BusinessProcessResult>
+        where TBusinessRequest : IBusinessRequest
+    {
+    }
 }
