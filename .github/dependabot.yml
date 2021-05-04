@@ -45,6 +45,11 @@ updates:
       interval: "weekly"
 
   - package-ecosystem: "nuget"
+    directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.Domain"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
     directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.EntryPoints.Common"
     schedule:
       interval: "weekly"
