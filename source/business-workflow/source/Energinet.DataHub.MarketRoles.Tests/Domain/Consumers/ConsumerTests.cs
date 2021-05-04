@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.MarketRoles.Domain.Consumers;
 using Xunit;
 using Xunit.Categories;
@@ -41,7 +42,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.Consumers
 
         private ConsumerId CreateConsumerId()
         {
-            return new ConsumerId(1);
+            return new ConsumerId(Guid.NewGuid());
         }
     }
 }
