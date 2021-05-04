@@ -22,17 +22,21 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
     {
         public SupplierRegistration(EnergySupplierId energySupplierId, BusinessProcessId businessProcessId)
         {
+            Id = ConsumerRegistrationId.New();
             EnergySupplierId = energySupplierId;
             BusinessProcessId = businessProcessId;
         }
 
         private SupplierRegistration(EnergySupplierId energySupplierId, Instant? startOfSupplyDate, Instant? endOfSupplyDate, BusinessProcessId businessProcessId)
+            : this(energySupplierId, businessProcessId)
         {
             EnergySupplierId = energySupplierId;
             StartOfSupplyDate = startOfSupplyDate;
             EndOfSupplyDate = endOfSupplyDate;
             BusinessProcessId = businessProcessId;
         }
+
+        public ConsumerRegistrationId Id { get; }
 
         public EnergySupplierId EnergySupplierId { get; }
 
