@@ -1,5 +1,7 @@
 # MarketRoles
 
+[![codecov](https://codecov.io/gh/Energinet-DataHub/geh-market-roles/branch/main/graph/badge.svg?token=R80X7DC6C0)](https://codecov.io/gh/Energinet-DataHub/geh-market-roles)
+
 ## Intro
 
 The market roles domain is in charge of supply and consumer relations.

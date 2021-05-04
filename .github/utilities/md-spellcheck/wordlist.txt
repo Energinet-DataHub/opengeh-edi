@@ -2,6 +2,7 @@
 ApplyDBMigrationsApp
 cacert
 ChangeOfSupplier
+codecov
 composable
 csproj
 DataHub

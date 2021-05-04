@@ -1,0 +1,28 @@
+flags:
+  unit:
+    paths:
+      - source/business-workflow/source/Energinet.DataHub.MarketRoles.Application/
+      - source/business-workflow/source/Energinet.DataHub.MarketRoles.Domain/
+      - source/business-workflow/source/Energinet.DataHub.MarketRoles.Tests/
+  integration:
+    paths:
+      - source/business-workflow/source/Energinet.DataHub.MarketRoles.EntryPoints.Common
+      - source/business-workflow/source/Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
+      - source/business-workflow/source/Energinet.DataHub.MarketRoles.EntryPoints.Outbox
+      - source/business-workflow/source/Energinet.DataHub.MarketRoles.EntryPoints.Processing
+      - source/business-workflow/source/Energinet.DataHub.MarketRoles.Infrastructure
+
+coverage:
+  status:
+    project:
+      default:
+        flags:
+          - unit
+          - integration
+      unit:
+        flags:
+          - unit
+      integration:
+        flags:
+          - integration
+
