@@ -19,25 +19,19 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
     /// <summary>
     /// Repository for market evaluation points
     /// </summary>
-    public interface IMeteringPointRepository
+    public interface IAccountingPointRepository
     {
         /// <summary>
-        /// Fetches market evaluation point by mRID
+        /// Fetches accounting point by GSRN number
         /// </summary>
         /// <param name="gsrnNumber"></param>
         /// <returns><see cref="AccountingPoint"/></returns>
         Task<AccountingPoint> GetByGsrnNumberAsync(GsrnNumber gsrnNumber);
 
         /// <summary>
-        /// Adds metering point to repository
+        /// Adds accounting point to repository
         /// </summary>
         /// <param name="accountingPoint"></param>
         void Add(AccountingPoint accountingPoint);
-
-        // /// <summary>
-        // /// Saves changes
-        // /// </summary>
-        // /// <param name="accountingPoint"></param>
-        // Task SaveAsync(AccountingPoint accountingPoint);
     }
 }
