@@ -17,18 +17,18 @@ using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
 namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
 {
-    public class ProcessId : ValueObject
+    public class BusinessProcessId : ValueObject
     {
-        public ProcessId(string value)
+        public BusinessProcessId(Guid value)
         {
-            Value = !string.IsNullOrWhiteSpace(value) ? value : throw new ArgumentNullException(nameof(value));
+            Value = value;
         }
 
-        public string Value { get; set; }
+        public Guid Value { get; }
 
-        public override string ToString()
+        public static BusinessProcessId New()
         {
-            return Value ?? string.Empty;
+            return new BusinessProcessId(Guid.NewGuid());
         }
     }
 }

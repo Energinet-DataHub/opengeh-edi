@@ -20,23 +20,23 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
 {
     internal class ConsumerRegistration : Entity
     {
-        public ConsumerRegistration(ConsumerId consumerId, ProcessId processId)
+        public ConsumerRegistration(ConsumerId consumerId, BusinessProcessId businessProcessId)
         {
             ConsumerId = consumerId;
-            ProcessId = processId;
+            BusinessProcessId = businessProcessId;
         }
 
-        private ConsumerRegistration(ConsumerId consumerId, Instant moveInDate, ProcessId processId)
+        private ConsumerRegistration(ConsumerId consumerId, Instant moveInDate, BusinessProcessId businessProcessId)
         {
             ConsumerId = consumerId;
             MoveInDate = moveInDate;
-            ProcessId = processId;
+            BusinessProcessId = businessProcessId;
         }
 
         public ConsumerId ConsumerId { get; }
 
         public Instant MoveInDate { get; }
 
-        public ProcessId ProcessId { get; }
+        public BusinessProcessId BusinessProcessId { get; }
     }
 }

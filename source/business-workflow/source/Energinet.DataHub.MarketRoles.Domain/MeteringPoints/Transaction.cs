@@ -12,24 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
-using NodaTime;
 
-namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events
+namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
 {
-    public class EnergySupplierChangeRegistered : DomainEventBase
+    public class Transaction : ValueObject
     {
-        public EnergySupplierChangeRegistered(GsrnNumber gsrnNumber, Transaction transaction, Instant effectiveDate)
+        public Transaction(string value)
         {
-            GsrnNumber = gsrnNumber;
-            Transaction = transaction;
-            EffectiveDate = effectiveDate;
+            Value = !string.IsNullOrWhiteSpace(value) ? value : throw new ArgumentNullException(nameof(value));
         }
 
-        public GsrnNumber GsrnNumber { get; }
+        public string Value { get; set; }
 
-        public Transaction Transaction { get; }
-
-        public Instant EffectiveDate { get; }
+        public override string ToString()
+        {
+            return Value ?? string.Empty;
+        }
     }
 }
