@@ -161,7 +161,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.MeteringPoints.ChangeOfSupp
 
         private static EnergySupplierId CreateSupplierId()
         {
-            return new EnergySupplierId(1);
+            return new EnergySupplierId(Guid.NewGuid());
         }
 
         private static AccountingPoint CreateMeteringPoint(MeteringPointType meteringPointType)

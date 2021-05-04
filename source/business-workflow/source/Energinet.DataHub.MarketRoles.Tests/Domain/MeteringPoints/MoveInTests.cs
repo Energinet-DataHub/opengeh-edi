@@ -59,7 +59,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.MeteringPoints
         {
             var meteringPoint = Create();
             var consumerId = new ConsumerId(2);
-            var energySupplierId = new EnergySupplierId(1);
+            var energySupplierId = new EnergySupplierId(Guid.NewGuid());
             var moveInDate = _systemDateTimeProvider.Now();
             var processId = new ProcessId(Guid.NewGuid().ToString());
 
@@ -81,7 +81,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.MeteringPoints
             return (
                 Create(),
                 new ConsumerId(1),
-                new EnergySupplierId(1),
+                new EnergySupplierId(Guid.NewGuid()),
                 new ProcessId(Guid.NewGuid().ToString()));
         }
     }

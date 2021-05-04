@@ -78,7 +78,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.MeteringPoints.ChangeOfSupp
 
         private EnergySupplierId CreateEnergySupplierId()
         {
-            return new EnergySupplierId(1);
+            return new EnergySupplierId(Guid.NewGuid());
         }
 
         private ConsumerId CreateConsumerId()
