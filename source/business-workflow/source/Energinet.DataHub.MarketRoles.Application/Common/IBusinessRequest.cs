@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Net.Http;
 using MediatR;
 
 namespace Energinet.DataHub.MarketRoles.Application.Common
@@ -20,9 +19,11 @@ namespace Energinet.DataHub.MarketRoles.Application.Common
     /// <summary>
     /// Request for starting a business process
     /// </summary>
-    #pragma warning disable CA1040
     public interface IBusinessRequest : IRequest<BusinessProcessResult>
     {
+        /// <summary>
+        /// Business process transaction id
+        /// </summary>
+        string TransactionId { get; }
     }
-    #pragma warning restore
 }
