@@ -26,6 +26,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.DataAccess
 {
     public class MarketRolesContext : DbContext
     {
+        #nullable disable
         public MarketRolesContext(DbContextOptions<MarketRolesContext> options)
             : base(options)
         {
@@ -35,13 +36,13 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.DataAccess
         {
         }
 
-        public DbSet<EnergySupplier> EnergySuppliers { get; set; } = null!;
+        public DbSet<EnergySupplier> EnergySuppliers { get; set; }
 
-        public DbSet<Consumer> Consumers { get; set; } = null!;
+        public DbSet<Consumer> Consumers { get; set; }
 
-        public DbSet<AccountingPoint> AccountingPoints { get; set; } = null!;
+        public DbSet<AccountingPoint> AccountingPoints { get; set; }
 
-        public DbSet<OutboxMessage> OutboxMessages { get; set; } = null!;
+        public DbSet<OutboxMessage> OutboxMessages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
