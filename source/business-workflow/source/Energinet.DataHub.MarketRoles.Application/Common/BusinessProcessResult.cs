@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
@@ -21,7 +22,7 @@ namespace Energinet.DataHub.MarketRoles.Application.Common
 {
     public class BusinessProcessResult
     {
-        public BusinessProcessResult(string transactionId, List<IBusinessRule> businessRules)
+        public BusinessProcessResult(string transactionId, IEnumerable<IBusinessRule> businessRules)
         {
             TransactionId = transactionId;
             SetValidationErrors(businessRules);
@@ -37,31 +38,36 @@ namespace Energinet.DataHub.MarketRoles.Application.Common
             Success = ValidationErrors.Count == 0;
         }
 
-        public BusinessProcessResult(string transactionId, List<ValidationError> validationErrors)
+        public BusinessProcessResult(string transactionId, ReadOnlyCollection<ValidationError> validationErrors)
         {
             TransactionId = transactionId;
             ValidationErrors = validationErrors ?? throw new ArgumentNullException(nameof(validationErrors));
             Success = ValidationErrors.Count == 0;
         }
 
-        private BusinessProcessResult(string transactionId)
+        private BusinessProcessResult(string transactionId, bool success)
         {
             TransactionId = transactionId;
-            Success = true;
+            Success = success;
         }
 
         public bool Success { get; }
 
         public string TransactionId { get; }
 
-        public List<ValidationError> ValidationErrors { get; private set; } = new List<ValidationError>();
+        public IReadOnlyCollection<ValidationError> ValidationErrors { get; private set; } = new List<ValidationError>();
 
         public static BusinessProcessResult Ok(string transactionId)
         {
-            return new BusinessProcessResult(transactionId);
+            return new BusinessProcessResult(transactionId, true);
         }
 
-        private void SetValidationErrors(List<IBusinessRule> rules)
+        public static BusinessProcessResult Fail(string transactionId)
+        {
+            return new BusinessProcessResult(transactionId, false);
+        }
+
+        private void SetValidationErrors(IEnumerable<IBusinessRule> rules)
         {
             ValidationErrors = rules
                 .Where(r => r.IsBroken)
