@@ -20,11 +20,6 @@ namespace Energinet.DataHub.MarketRoles.Domain.SeedWork
     {
         private List<IDomainEvent>? _domainEvents;
 
-        // /// <summary>
-        // /// Identity used by persistence mechanism
-        // /// </summary>
-        // public Guid Id { get; protected set; }
-
         /// <summary>
         /// Domain events occurred.
         /// </summary>

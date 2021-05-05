@@ -18,11 +18,11 @@ using NodaTime;
 
 namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
 {
-    internal class SupplierRegistration : Entity
+    public class SupplierRegistration : Entity
     {
         public SupplierRegistration(EnergySupplierId energySupplierId, BusinessProcessId businessProcessId)
         {
-            Id = ConsumerRegistrationId.New();
+            Id = SupplierRegistrationId.New();
             EnergySupplierId = energySupplierId;
             BusinessProcessId = businessProcessId;
         }
@@ -36,7 +36,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
             BusinessProcessId = businessProcessId;
         }
 
-        public ConsumerRegistrationId Id { get; }
+        public SupplierRegistrationId Id { get; }
 
         public EnergySupplierId EnergySupplierId { get; }
 

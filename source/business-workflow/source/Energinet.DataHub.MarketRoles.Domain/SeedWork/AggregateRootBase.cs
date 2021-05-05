@@ -16,9 +16,5 @@ namespace Energinet.DataHub.MarketRoles.Domain.SeedWork
 {
     public class AggregateRootBase : Entity
     {
-        // /// <summary>
-        // /// Used by persistence mechanism for concurrency control
-        // /// </summary>
-        public int Version { get; protected set; }
     }
 }

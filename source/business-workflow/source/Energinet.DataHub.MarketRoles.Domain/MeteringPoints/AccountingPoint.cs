@@ -35,7 +35,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
 
         public AccountingPoint(GsrnNumber gsrnNumber, MeteringPointType meteringPointType)
         {
-            AccountingPointId = new AccountingPointId();
+            Id = AccountingPointId.New();
             GsrnNumber = gsrnNumber;
             _meteringPointType = meteringPointType;
             _physicalState = PhysicalState.New;
@@ -48,14 +48,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
             _isProductionObligated = isProductionObligated;
         }
 
-#pragma warning disable 8618
-        private AccountingPoint()
-#pragma warning restore 8618
-        {
-            // EF Core only
-        }
-
-        public AccountingPointId AccountingPointId { get; }
+        public AccountingPointId Id { get; }
 
         public GsrnNumber GsrnNumber { get; private set; }
 

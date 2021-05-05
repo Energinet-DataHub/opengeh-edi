@@ -26,20 +26,8 @@ namespace Energinet.DataHub.MarketRoles.Domain.EnergySuppliers
             GlnNumber = glnNumber ?? throw new ArgumentNullException(nameof(glnNumber));
         }
 
-#pragma warning disable 8618
-        private EnergySupplier()
-#pragma warning restore 8618
-        {
-            // EF core
-        }
-
         public EnergySupplierId EnergySupplierId { get; }
 
         public GlnNumber GlnNumber { get; }
-
-        public EnergySupplierSnapshot GetSnapshot()
-        {
-            return new EnergySupplierSnapshot(Guid.Empty, GlnNumber.Value, Version);
-        }
     }
 }

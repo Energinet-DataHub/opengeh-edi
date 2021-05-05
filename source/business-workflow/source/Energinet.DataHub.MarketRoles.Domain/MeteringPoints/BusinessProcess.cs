@@ -29,13 +29,6 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
             Status = BusinessProcessStatus.Pending;
         }
 
-#pragma warning disable 8618
-        private BusinessProcess()
-#pragma warning restore 8618
-        {
-            // For EF core
-        }
-
         public BusinessProcessId BusinessProcessId { get; }
 
         public Transaction Transaction { get; }
