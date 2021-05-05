@@ -12,23 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using NodaTime;
 
-namespace Energinet.DataHub.MarketRoles.Domain.EnergySuppliers
+namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 {
-    public class EnergySupplierSnapshot
+    public class SystemDateTimeProviderStub : ISystemDateTimeProvider
     {
-        public EnergySupplierSnapshot(Guid id, string glnNumber, int version)
+        private Instant _now = SystemClock.Instance.GetCurrentInstant();
+
+        public void SetNow(Instant now)
         {
-            Id = id;
-            GlnNumber = glnNumber;
-            Version = version;
+            _now = now;
         }
 
-        public Guid Id { get; set; }
-
-        public string GlnNumber { get; set; }
-
-        public int Version { get; set; }
+        public Instant Now()
+        {
+            return _now;
+        }
     }
 }

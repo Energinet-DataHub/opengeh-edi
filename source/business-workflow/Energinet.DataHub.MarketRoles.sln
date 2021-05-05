@@ -32,7 +32,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energinet.DataHub.MarketRol
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energinet.DataHub.MarketRoles.Infrastructure", "source\Energinet.DataHub.MarketRoles.Infrastructure\Energinet.DataHub.MarketRoles.Infrastructure.csproj", "{79DE71D0-7AA6-4B96-AB44-85F4C621608E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energinet.DataHub.MarketRoles.IntegrationTests", "Energinet.DataHub.MarketRoles.IntegrationTests\Energinet.DataHub.MarketRoles.IntegrationTests.csproj", "{3801DF77-3A40-460C-9529-7AD9422037B0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energinet.DataHub.MarketRoles.IntegrationTests", "source\Energinet.DataHub.MarketRoles.IntegrationTests\Energinet.DataHub.MarketRoles.IntegrationTests.csproj", "{3801DF77-3A40-460C-9529-7AD9422037B0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energinet.DataHub.MarketRoles.Domain", "source\Energinet.DataHub.MarketRoles.Domain\Energinet.DataHub.MarketRoles.Domain.csproj", "{87D55C95-0790-42A1-B543-AF27BF2E0950}"
 EndProject
