@@ -36,13 +36,13 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.DataAccess
         {
         }
 
-        public DbSet<EnergySupplier> EnergySuppliers { get; set; }
+        public DbSet<EnergySupplier> EnergySuppliers { get; private set; }
 
-        public DbSet<Consumer> Consumers { get; set; }
+        public DbSet<Consumer> Consumers { get; private set; }
 
-        public DbSet<AccountingPoint> AccountingPoints { get; set; }
+        public DbSet<AccountingPoint> AccountingPoints { get; private set; }
 
-        public DbSet<OutboxMessage> OutboxMessages { get; set; }
+        public DbSet<OutboxMessage> OutboxMessages { get; private set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
