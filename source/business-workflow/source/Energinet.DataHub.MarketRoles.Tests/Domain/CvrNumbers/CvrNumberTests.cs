@@ -15,10 +15,11 @@
 using Energinet.DataHub.MarketRoles.Domain.Consumers;
 using FluentAssertions;
 using Xunit;
+using Xunit.Categories;
 
 namespace Energinet.DataHub.MarketRoles.Tests.Domain.CvrNumbers
 {
-    [Trait("Category", "Unit")]
+    [UnitTest]
     public class CvrNumberTests
     {
         [Theory]
