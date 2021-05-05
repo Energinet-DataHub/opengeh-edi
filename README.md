@@ -20,7 +20,7 @@ These are the processes maintained by this domain.
 | [Consumer move out](https://github.com/Energinet-DataHub/geh-market-roles/blob/main/docs/business-processes/consumer-move-out.md)                                                             |
 | [Incorrect move](https://github.com/Energinet-DataHub/geh-market-roles/blob/main/docs/business-processes/incorrect-move.md)                                                                   |
 | [Forward consumer master data by Energy Supplier](https://github.com/Energinet-DataHub/geh-market-roles/blob/main/docs/business-processes/forward-consumer-master-data-by-energy-supplier.md) |
-| [Forward contact address by Grid Access Provider](https://github.com/Energinet-DataHub/geh-market-roles/blob/main/docs/business-processes/forward-contact-address-by-grid-access-provider)    |
+| [Forward contact address by Grid Access Provider](https://github.com/Energinet-DataHub/geh-market-roles/blob/main/docs/business-processes/forward-contact-address-by-grid-access-provider.md)    |
 | [Change of BRP for Energy Supplier](https://github.com/Energinet-DataHub/geh-market-roles/blob/main/docs/business-processes/change-of-energy-supplier.md)                                     |
 | ....                                                                                                                                                                                          |
 
