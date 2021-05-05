@@ -15,7 +15,6 @@
 using System.Net;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier;
-using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.RequestChangeOfSupplier;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
