@@ -18,7 +18,7 @@ using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.Outbox
 {
-    public class OutboxMessageFactory
+    public class OutboxMessageFactory : IOutboxMessageFactory
     {
         private readonly IJsonSerializer _jsonSerializer;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
