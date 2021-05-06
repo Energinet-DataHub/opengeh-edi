@@ -19,16 +19,16 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events
 {
     public class EnergySupplierChangeRegistered : DomainEventBase
     {
-        public EnergySupplierChangeRegistered(GsrnNumber gsrnNumber, Transaction transaction, Instant effectiveDate)
+        public EnergySupplierChangeRegistered(GsrnNumber gsrnNumber, BusinessProcessId businessProcessId, Instant effectiveDate)
         {
             GsrnNumber = gsrnNumber;
-            Transaction = transaction;
+            BusinessProcessId = businessProcessId;
             EffectiveDate = effectiveDate;
         }
 
         public GsrnNumber GsrnNumber { get; }
 
-        public Transaction Transaction { get; }
+        public BusinessProcessId BusinessProcessId { get; }
 
         public Instant EffectiveDate { get; }
     }
