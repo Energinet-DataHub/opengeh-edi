@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSupplier
+namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 {
     public static class SampleData
     {

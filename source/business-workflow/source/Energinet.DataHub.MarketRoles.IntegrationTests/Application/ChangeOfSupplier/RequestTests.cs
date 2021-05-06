@@ -41,64 +41,14 @@ using Xunit.Categories;
 namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSupplier
 {
     [IntegrationTest]
-    public sealed class RequestTests : IDisposable
+    public sealed class RequestTests : TestHost, IDisposable
     {
-        private readonly IServiceProvider _serviceProvider;
-        private readonly IMediator _mediator;
-        private readonly IAccountingPointRepository _accountingPointRepository;
-        private readonly IEnergySupplierRepository _energySupplierRepository;
-        private readonly IConsumerRepository _consumerRepository;
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-        private readonly MarketRolesContext _context;
-        private readonly IJsonSerializer _serializer;
-
-        public RequestTests()
-        {
-            var services = new ServiceCollection();
-
-            var connectionString = Environment.GetEnvironmentVariable("MarketData_IntegrationTests_ConnectionString");
-            services.AddDbContext<MarketRolesContext>(x =>
-                x.UseSqlServer(connectionString, y => y.UseNodaTime()));
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddScoped<ISystemDateTimeProvider, SystemDateTimeProviderStub>();
-            services.AddScoped<IAccountingPointRepository, AccountingPointRepository>();
-            services.AddScoped<IEnergySupplierRepository, EnergySupplierRepository>();
-            services.AddScoped<IConsumerRepository, ConsumerRepository>();
-            services.AddScoped<IJsonSerializer, JsonSerializer>();
-            services.AddScoped<IOutbox, OutboxProvider>();
-            services.AddSingleton<IOutboxMessageFactory, OutboxMessageFactory>();
-
-            services.AddMediatR(new[]
-            {
-                typeof(RequestChangeOfSupplierHandler).Assembly,
-            });
-
-            // Busines process responders
-            services.AddScoped<IBusinessProcessResponder<RequestChangeOfSupplier>, RequestChangeOfSupplierResponder>();
-
-            // Business process pipeline
-            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehaviour<,>));
-            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(AuthorizationBehaviour<,>));
-            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(BusinessProcessResponderBehaviour<,>));
-
-            _serviceProvider = services.BuildServiceProvider();
-            _mediator = _serviceProvider.GetRequiredService<IMediator>();
-            _accountingPointRepository = _serviceProvider.GetRequiredService<IAccountingPointRepository>();
-            _energySupplierRepository = _serviceProvider.GetRequiredService<IEnergySupplierRepository>();
-            _consumerRepository = _serviceProvider.GetRequiredService<IConsumerRepository>();
-            _unitOfWork = _serviceProvider.GetRequiredService<IUnitOfWork>();
-            _context = _serviceProvider.GetRequiredService<MarketRolesContext>();
-            _systemDateTimeProvider = _serviceProvider.GetRequiredService<ISystemDateTimeProvider>();
-            _serializer = _serviceProvider.GetRequiredService<IJsonSerializer>();
-        }
-
         [Fact]
         public async Task Request_WhenMeteringPointDoesNotExist_IsRejected()
         {
             var request = CreateRequest();
 
-            var result = await _mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
+            var result = await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
 
             var publishedMessage = await GetLastMessageFromOutboxAsync<RequestChangeOfSupplierRejected>().ConfigureAwait(false);
             Assert.Equal(request.MeteringPointId, publishedMessage.MeteringPoint);
@@ -111,7 +61,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
 
             var request = CreateRequest();
 
-            await _mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
+            await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
 
             var publishedMessage = await GetLastMessageFromOutboxAsync<RequestChangeOfSupplierRejected>().ConfigureAwait(false);
             Assert.Equal(request.MeteringPointId, publishedMessage.MeteringPoint);
@@ -150,11 +100,11 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
             var consumer = CreateConsumer();
             var supplier = CreateEnergySupplier();
             SetConsumerMovedIn(accountingPoint, consumer.ConsumerId, supplier.EnergySupplierId);
-            await _context.SaveChangesAsync().ConfigureAwait(false);
+            await MarketRolesContext.SaveChangesAsync().ConfigureAwait(false);
 
             var request = CreateRequest();
 
-            await _mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
+            await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
 
             var publishedMessage = await GetLastMessageFromOutboxAsync<RequestChangeOfSupplierApproved>().ConfigureAwait(false);
             Assert.Equal(request.MeteringPointId, publishedMessage.MeteringPointId);
@@ -167,8 +117,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
 
         private async Task<TMessage> GetLastMessageFromOutboxAsync<TMessage>()
         {
-            var outboxMessage = await _context.OutboxMessages.FirstAsync().ConfigureAwait(false);
-            var @event = _serializer.Deserialize<TMessage>(outboxMessage.Data);
+            var outboxMessage = await MarketRolesContext.OutboxMessages.FirstAsync().ConfigureAwait(false);
+            var @event = Serializer.Deserialize<TMessage>(outboxMessage.Data);
             return @event;
         }
 
@@ -182,8 +132,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
                                    $"DELETE FROM [dbo].[AccountingPoints] " +
                                    $"DELETE FROM [dbo].[OutboxMessages]";
 
-            _context.Database.ExecuteSqlRaw(cleanupStatement);
-            _context.Dispose();
+            MarketRolesContext.Database.ExecuteSqlRaw(cleanupStatement);
+            MarketRolesContext.Dispose();
         }
 
         private RequestChangeOfSupplier CreateRequest()
@@ -193,7 +143,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
                 EnergySupplierId: SampleData.SampleGlnNumber,
                 ConsumerId: SampleData.SampleConsumerId,
                 MeteringPointId: SampleData.SampleGsrnNumber,
-                StartDate: _systemDateTimeProvider.Now());
+                StartDate: SystemDateTimeProvider.Now());
         }
 
         private Consumer CreateConsumer()
@@ -201,7 +151,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
             var consumerId = new ConsumerId(Guid.NewGuid());
             var consumer = new Consumer(consumerId, CprNumber.Create(SampleData.SampleConsumerId));
 
-            _consumerRepository.Add(consumer);
+            ConsumerRepository.Add(consumer);
 
             return consumer;
         }
@@ -211,7 +161,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
             var energySupplierId = new EnergySupplierId(Guid.NewGuid());
             var energySupplierGln = new GlnNumber(SampleData.SampleGlnNumber);
             var energySupplier = new EnergySupplier(energySupplierId, energySupplierGln);
-            _energySupplierRepository.Add(energySupplier);
+            EnergySupplierRepository.Add(energySupplier);
             return energySupplier;
         }
 
@@ -221,14 +171,14 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
                 AccountingPoint.CreateProduction(
                     GsrnNumber.Create(SampleData.SampleGsrnNumber), true);
 
-            _accountingPointRepository.Add(meteringPoint);
+            AccountingPointRepository.Add(meteringPoint);
 
             return meteringPoint;
         }
 
         private void SetConsumerMovedIn(AccountingPoint accountingPoint, ConsumerId consumerId, EnergySupplierId energySupplierId)
         {
-            var systemTimeProvider = _serviceProvider.GetRequiredService<ISystemDateTimeProvider>();
+            var systemTimeProvider = ServiceProvider.GetRequiredService<ISystemDateTimeProvider>();
             var moveInDate = systemTimeProvider.Now().Minus(Duration.FromDays(365));
             var transaction = new Transaction(Guid.NewGuid().ToString());
 
