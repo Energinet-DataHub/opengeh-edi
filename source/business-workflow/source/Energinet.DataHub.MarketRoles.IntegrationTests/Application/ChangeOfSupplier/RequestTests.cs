@@ -110,30 +110,11 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
             Assert.Equal(request.MeteringPointId, publishedMessage.MeteringPointId);
         }
 
-        public void Dispose()
-        {
-            CleanupDatabase();
-        }
-
         private async Task<TMessage> GetLastMessageFromOutboxAsync<TMessage>()
         {
             var outboxMessage = await MarketRolesContext.OutboxMessages.FirstAsync().ConfigureAwait(false);
             var @event = Serializer.Deserialize<TMessage>(outboxMessage.Data);
             return @event;
-        }
-
-        private void CleanupDatabase()
-        {
-            var cleanupStatement = $"DELETE FROM [dbo].[ConsumerRegistrations] " +
-                                   $"DELETE FROM [dbo].[SupplierRegistrations] " +
-                                   $"DELETE FROM [dbo].[BusinessProcesses] " +
-                                   $"DELETE FROM [dbo].[Consumers] " +
-                                   $"DELETE FROM [dbo].[EnergySuppliers] " +
-                                   $"DELETE FROM [dbo].[AccountingPoints] " +
-                                   $"DELETE FROM [dbo].[OutboxMessages]";
-
-            MarketRolesContext.Database.ExecuteSqlRaw(cleanupStatement);
-            MarketRolesContext.Dispose();
         }
 
         private RequestChangeOfSupplier CreateRequest()
@@ -144,46 +125,6 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
                 ConsumerId: SampleData.SampleConsumerId,
                 MeteringPointId: SampleData.SampleGsrnNumber,
                 StartDate: SystemDateTimeProvider.Now());
-        }
-
-        private Consumer CreateConsumer()
-        {
-            var consumerId = new ConsumerId(Guid.NewGuid());
-            var consumer = new Consumer(consumerId, CprNumber.Create(SampleData.SampleConsumerId));
-
-            ConsumerRepository.Add(consumer);
-
-            return consumer;
-        }
-
-        private EnergySupplier CreateEnergySupplier()
-        {
-            var energySupplierId = new EnergySupplierId(Guid.NewGuid());
-            var energySupplierGln = new GlnNumber(SampleData.SampleGlnNumber);
-            var energySupplier = new EnergySupplier(energySupplierId, energySupplierGln);
-            EnergySupplierRepository.Add(energySupplier);
-            return energySupplier;
-        }
-
-        private AccountingPoint CreateAccountingPoint()
-        {
-            var meteringPoint =
-                AccountingPoint.CreateProduction(
-                    GsrnNumber.Create(SampleData.SampleGsrnNumber), true);
-
-            AccountingPointRepository.Add(meteringPoint);
-
-            return meteringPoint;
-        }
-
-        private void SetConsumerMovedIn(AccountingPoint accountingPoint, ConsumerId consumerId, EnergySupplierId energySupplierId)
-        {
-            var systemTimeProvider = ServiceProvider.GetRequiredService<ISystemDateTimeProvider>();
-            var moveInDate = systemTimeProvider.Now().Minus(Duration.FromDays(365));
-            var transaction = new Transaction(Guid.NewGuid().ToString());
-
-            accountingPoint.AcceptConsumerMoveIn(consumerId, energySupplierId, moveInDate, transaction);
-            accountingPoint.EffectuateConsumerMoveIn(transaction, systemTimeProvider);
         }
     }
 }

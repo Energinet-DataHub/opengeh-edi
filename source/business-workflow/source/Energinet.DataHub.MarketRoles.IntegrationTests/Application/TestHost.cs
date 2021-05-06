@@ -34,10 +34,11 @@ using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 {
-    public class TestHost
+    public class TestHost : IDisposable
     {
         protected TestHost()
         {
@@ -103,5 +104,64 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
         protected IJsonSerializer Serializer { get; }
 
         protected ProcessManagerRouter Router { get; }
+
+        public void Dispose()
+        {
+            CleanupDatabase();
+        }
+
+        protected Consumer CreateConsumer()
+        {
+            var consumerId = new ConsumerId(Guid.NewGuid());
+            var consumer = new Consumer(consumerId, CprNumber.Create(SampleData.SampleConsumerId));
+
+            ConsumerRepository.Add(consumer);
+
+            return consumer;
+        }
+
+        protected EnergySupplier CreateEnergySupplier()
+        {
+            var energySupplierId = new EnergySupplierId(Guid.NewGuid());
+            var energySupplierGln = new GlnNumber(SampleData.SampleGlnNumber);
+            var energySupplier = new EnergySupplier(energySupplierId, energySupplierGln);
+            EnergySupplierRepository.Add(energySupplier);
+            return energySupplier;
+        }
+
+        protected AccountingPoint CreateAccountingPoint()
+        {
+            var meteringPoint =
+                AccountingPoint.CreateProduction(
+                    GsrnNumber.Create(SampleData.SampleGsrnNumber), true);
+
+            AccountingPointRepository.Add(meteringPoint);
+
+            return meteringPoint;
+        }
+
+        protected void SetConsumerMovedIn(AccountingPoint accountingPoint, ConsumerId consumerId, EnergySupplierId energySupplierId)
+        {
+            var systemTimeProvider = ServiceProvider.GetRequiredService<ISystemDateTimeProvider>();
+            var moveInDate = systemTimeProvider.Now().Minus(Duration.FromDays(365));
+            var transaction = new Transaction(Guid.NewGuid().ToString());
+
+            accountingPoint.AcceptConsumerMoveIn(consumerId, energySupplierId, moveInDate, transaction);
+            accountingPoint.EffectuateConsumerMoveIn(transaction, systemTimeProvider);
+        }
+
+        private void CleanupDatabase()
+        {
+            var cleanupStatement = $"DELETE FROM [dbo].[ConsumerRegistrations] " +
+                                   $"DELETE FROM [dbo].[SupplierRegistrations] " +
+                                   $"DELETE FROM [dbo].[BusinessProcesses] " +
+                                   $"DELETE FROM [dbo].[Consumers] " +
+                                   $"DELETE FROM [dbo].[EnergySuppliers] " +
+                                   $"DELETE FROM [dbo].[AccountingPoints] " +
+                                   $"DELETE FROM [dbo].[OutboxMessages]";
+
+            MarketRolesContext.Database.ExecuteSqlRaw(cleanupStatement);
+            MarketRolesContext.Dispose();
+        }
     }
 }
