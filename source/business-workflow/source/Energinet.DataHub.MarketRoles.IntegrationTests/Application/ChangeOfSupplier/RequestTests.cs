@@ -40,6 +40,7 @@ using Xunit.Categories;
 
 namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSupplier
 {
+    [Collection("IntegrationTest")]
     [IntegrationTest]
     public sealed class RequestTests : TestHost, IDisposable
     {
