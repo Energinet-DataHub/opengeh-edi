@@ -19,6 +19,8 @@ using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.AccountingPoints;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.Consumers;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.EnergySuppliers;
+using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.ProcessManagers;
+using Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 using Microsoft.EntityFrameworkCore;
 
@@ -44,6 +46,8 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.DataAccess
 
         public DbSet<OutboxMessage> OutboxMessages { get; private set; }
 
+        public DbSet<QueuedInternalCommand> QueuedInternalCommands { get; private set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
@@ -52,6 +56,9 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.DataAccess
             modelBuilder.ApplyConfiguration(new ConsumerEntityConfiguration());
             modelBuilder.ApplyConfiguration(new AccountingPointEntityConfiguration());
             modelBuilder.ApplyConfiguration(new OutboxMessageEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new ProcessManagerEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new ChangeOfSupplierProcessManagerEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new QueuedInternalCommandEntityConfiguration());
         }
     }
 }
