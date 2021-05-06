@@ -122,9 +122,9 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
         {
             return new RequestChangeOfSupplier(
                 TransactionId: Guid.NewGuid().ToString(),
-                EnergySupplierId: SampleData.SampleGlnNumber,
-                ConsumerId: SampleData.SampleConsumerId,
-                MeteringPointId: SampleData.SampleGsrnNumber,
+                EnergySupplierId: SampleData.GlnNumber,
+                ConsumerId: SampleData.ConsumerId,
+                MeteringPointId: SampleData.GsrnNumber,
                 StartDate: SystemDateTimeProvider.Now());
         }
     }

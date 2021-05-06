@@ -16,10 +16,10 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 {
     public static class SampleData
     {
-        public static string SampleGsrnNumber => "571234567891234568";
+        public static string GsrnNumber => "571234567891234568";
 
-        public static string SampleConsumerId => "2601211234";
+        public static string ConsumerId => "2601211234";
 
-        public static string SampleGlnNumber => "5790000555550";
+        public static string GlnNumber => "5790000555550";
     }
 }
