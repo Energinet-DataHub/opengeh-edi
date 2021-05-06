@@ -12,23 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using MediatR;
 
-namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
+namespace Energinet.DataHub.MarketRoles.Application.Common
 {
-    public class ProcessId : ValueObject
+    /// <summary>
+    /// Handler for business process requests
+    /// </summary>
+    /// <typeparam name="TBusinessRequest"><see cref="IBusinessRequest"/></typeparam>
+    public interface IBusinessRequestHandler<in TBusinessRequest> : IRequestHandler<TBusinessRequest, BusinessProcessResult>
+        where TBusinessRequest : IBusinessRequest
     {
-        public ProcessId(string value)
-        {
-            Value = !string.IsNullOrWhiteSpace(value) ? value : throw new ArgumentNullException(nameof(value));
-        }
-
-        public string Value { get; set; }
-
-        public override string ToString()
-        {
-            return Value ?? string.Empty;
-        }
     }
 }

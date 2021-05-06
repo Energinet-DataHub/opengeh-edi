@@ -35,7 +35,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
 
         public AccountingPoint(GsrnNumber gsrnNumber, MeteringPointType meteringPointType)
         {
-            AccountingPointId = new AccountingPointId();
+            Id = AccountingPointId.New();
             GsrnNumber = gsrnNumber;
             _meteringPointType = meteringPointType;
             _physicalState = PhysicalState.New;
@@ -48,14 +48,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
             _isProductionObligated = isProductionObligated;
         }
 
-#pragma warning disable 8618
-        private AccountingPoint()
-#pragma warning restore 8618
-        {
-            // EF Core only
-        }
-
-        public AccountingPointId AccountingPointId { get; }
+        public AccountingPointId Id { get; }
 
         public GsrnNumber GsrnNumber { get; private set; }
 
@@ -92,7 +85,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
             return new BusinessRulesValidationResult(rules);
         }
 
-        public void AcceptChangeOfSupplier(EnergySupplierId energySupplierId, Instant supplyStartDate, ProcessId processId, ISystemDateTimeProvider systemDateTimeProvider)
+        public void AcceptChangeOfSupplier(EnergySupplierId energySupplierId, Instant supplyStartDate, Transaction transaction, ISystemDateTimeProvider systemDateTimeProvider)
         {
             if (!ChangeSupplierAcceptable(energySupplierId, supplyStartDate, systemDateTimeProvider).Success)
             {
@@ -100,24 +93,25 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
                     "Cannot accept change of supplier request due to violation of one or more business rules.");
             }
 
-            AddBusinessProcess(processId, supplyStartDate, BusinessProcessType.ChangeOfSupplier);
-            _supplierRegistrations.Add(new SupplierRegistration(energySupplierId, processId));
+            var businessProcess = CreateBusinessProcess(transaction, supplyStartDate, BusinessProcessType.ChangeOfSupplier);
+            _businessProcesses.Add(businessProcess);
+            _supplierRegistrations.Add(new SupplierRegistration(energySupplierId, businessProcess.BusinessProcessId));
 
-            AddDomainEvent(new EnergySupplierChangeRegistered(GsrnNumber, processId, supplyStartDate));
+            AddDomainEvent(new EnergySupplierChangeRegistered(GsrnNumber, transaction, supplyStartDate));
         }
 
-        public void EffectuateChangeOfSupplier(ProcessId processId, ISystemDateTimeProvider systemDateTimeProvider)
+        public void EffectuateChangeOfSupplier(Transaction transaction, ISystemDateTimeProvider systemDateTimeProvider)
         {
-            if (processId is null) throw new ArgumentNullException(nameof(processId));
+            if (transaction is null) throw new ArgumentNullException(nameof(transaction));
             if (systemDateTimeProvider == null) throw new ArgumentNullException(nameof(systemDateTimeProvider));
 
-            var businessProcess = GetBusinessProcess(processId, BusinessProcessType.ChangeOfSupplier);
+            var businessProcess = GetBusinessProcess(transaction, BusinessProcessType.ChangeOfSupplier);
             businessProcess.Effectuate(systemDateTimeProvider);
 
             DiscontinueCurrentSupplier(businessProcess, systemDateTimeProvider);
             StartOfSupplyForFutureSupplier(businessProcess, systemDateTimeProvider);
 
-            AddDomainEvent(new EnergySupplierChanged(GsrnNumber.Value, processId, businessProcess.EffectiveDate));
+            AddDomainEvent(new EnergySupplierChanged(GsrnNumber.Value, transaction, businessProcess.EffectiveDate));
         }
 
         public void CloseDown()
@@ -129,7 +123,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
             }
         }
 
-        public BusinessRulesValidationResult ConsumerMoveInAcceptable(ConsumerId consumerId, EnergySupplierId energySupplierId, Instant moveInDate, ProcessId processId)
+        public BusinessRulesValidationResult ConsumerMoveInAcceptable(ConsumerId consumerId, EnergySupplierId energySupplierId, Instant moveInDate, Transaction transaction)
         {
             var rules = new List<IBusinessRule>()
             {
@@ -139,44 +133,45 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
             return new BusinessRulesValidationResult(rules);
         }
 
-        public void AcceptConsumerMoveIn(ConsumerId consumerId, EnergySupplierId energySupplierId, Instant moveInDate, ProcessId processId)
+        public void AcceptConsumerMoveIn(ConsumerId consumerId, EnergySupplierId energySupplierId, Instant moveInDate, Transaction transaction)
         {
-            if (!ConsumerMoveInAcceptable(consumerId, energySupplierId, moveInDate, processId).Success)
+            if (!ConsumerMoveInAcceptable(consumerId, energySupplierId, moveInDate, transaction).Success)
             {
                 throw new BusinessProcessException(
                     "Cannot accept move in request due to violation of one or more business rules.");
             }
 
-            AddBusinessProcess(processId, moveInDate, BusinessProcessType.MoveIn);
-            _consumerRegistrations.Add(new ConsumerRegistration(consumerId, processId));
-            _supplierRegistrations.Add(new SupplierRegistration(energySupplierId, processId));
+            var businessProcess = CreateBusinessProcess(transaction, moveInDate, BusinessProcessType.MoveIn);
+            _businessProcesses.Add(businessProcess);
+            _consumerRegistrations.Add(new ConsumerRegistration(consumerId, businessProcess.BusinessProcessId));
+            _supplierRegistrations.Add(new SupplierRegistration(energySupplierId, businessProcess.BusinessProcessId));
         }
 
-        public void EffectuateConsumerMoveIn(ProcessId processId, ISystemDateTimeProvider systemDateTimeProvider)
+        public void EffectuateConsumerMoveIn(Transaction transaction, ISystemDateTimeProvider systemDateTimeProvider)
         {
-            var businessProcess = GetBusinessProcess(processId, BusinessProcessType.MoveIn);
+            var businessProcess = GetBusinessProcess(transaction, BusinessProcessType.MoveIn);
 
             businessProcess.Effectuate(systemDateTimeProvider);
-            var newSupplier = _supplierRegistrations.Find(supplier => supplier.ProcessId.Equals(processId))!;
+            var newSupplier = _supplierRegistrations.Find(supplier => supplier.BusinessProcessId.Equals(businessProcess.BusinessProcessId))!;
             newSupplier.StartOfSupply(businessProcess.EffectiveDate);
         }
 
-        public void CancelChangeOfSupplier(ProcessId processId)
+        public void CancelChangeOfSupplier(Transaction transaction)
         {
-            if (processId is null) throw new ArgumentNullException(nameof(processId));
+            if (transaction is null) throw new ArgumentNullException(nameof(transaction));
 
-            var businessProcess = GetBusinessProcess(processId, BusinessProcessType.ChangeOfSupplier);
+            var businessProcess = GetBusinessProcess(transaction, BusinessProcessType.ChangeOfSupplier);
             businessProcess.Cancel();
-            AddDomainEvent(new ChangeOfSupplierCancelled(processId));
+            AddDomainEvent(new ChangeOfSupplierCancelled(transaction));
         }
 
         private void StartOfSupplyForFutureSupplier(BusinessProcess businessProcess, ISystemDateTimeProvider systemDateTimeProvider)
         {
-            var futureSupplier = _supplierRegistrations.Find(s => s.ProcessId.Equals(businessProcess.ProcessId));
+            var futureSupplier = _supplierRegistrations.Find(s => s.BusinessProcessId.Equals(businessProcess.BusinessProcessId));
             if (futureSupplier == null)
             {
                 throw new BusinessProcessException(
-                    $"Could find supplier registration of process id {businessProcess.ProcessId.Value}.");
+                    $"Could find supplier registration of process id {businessProcess.Transaction.Value}.");
             }
 
             futureSupplier.StartOfSupply(businessProcess.EffectiveDate);
@@ -199,26 +194,26 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
                 supplier.StartOfSupplyDate <= systemDateTimeProvider.Now() && supplier.EndOfSupplyDate == null);
         }
 
-        private BusinessProcess GetBusinessProcess(ProcessId processId, BusinessProcessType businessProcessType)
+        private BusinessProcess GetBusinessProcess(Transaction transaction, BusinessProcessType businessProcessType)
         {
             var businessProcess =
-                _businessProcesses.Find(p => p.ProcessId.Equals(processId) && p.ProcessType == businessProcessType);
+                _businessProcesses.Find(p => p.Transaction.Equals(transaction) && p.ProcessType == businessProcessType);
             if (businessProcess == null)
             {
-                throw new BusinessProcessException($"Business process ({businessProcessType.Name}) {processId.ToString()} does not exist.");
+                throw new BusinessProcessException($"Business process ({businessProcessType.Name}) {transaction.ToString()} does not exist.");
             }
 
             return businessProcess;
         }
 
-        private void AddBusinessProcess(ProcessId processId, Instant effectiveDate, BusinessProcessType businessProcessType)
+        private BusinessProcess CreateBusinessProcess(Transaction transaction, Instant effectiveDate, BusinessProcessType businessProcessType)
         {
-            if (_businessProcesses.Any(p => p.ProcessId.Equals(processId)))
+            if (_businessProcesses.Any(p => p.Transaction.Equals(transaction)))
             {
-                throw new BusinessProcessException($"Process id {processId.Value} does already exist.");
+                throw new BusinessProcessException($"Process id {transaction.Value} does already exist.");
             }
 
-            _businessProcesses.Add(new BusinessProcess(processId, effectiveDate, businessProcessType));
+            return new BusinessProcess(BusinessProcessId.New(), transaction, effectiveDate, businessProcessType);
         }
     }
 }

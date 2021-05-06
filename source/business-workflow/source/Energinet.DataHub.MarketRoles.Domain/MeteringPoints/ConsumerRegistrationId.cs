@@ -12,9 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
+using System;
+using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+
+namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
 {
-    public class RequestChangeOfSupplierResult
+    public class ConsumerRegistrationId : ValueObject
     {
+        public ConsumerRegistrationId(Guid value)
+        {
+            Value = value;
+        }
+
+        public Guid Value { get; }
+
+        public static ConsumerRegistrationId New()
+        {
+            return new ConsumerRegistrationId(Guid.NewGuid());
+        }
     }
 }

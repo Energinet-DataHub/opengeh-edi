@@ -37,10 +37,10 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.MeteringPoints.ChangeOfSupp
         public void Cancel_WhenProcessIsPending_Success()
         {
             var (meteringPoint, _) = CreateWithActiveMoveIn();
-            var processId = CreateProcessId();
-            meteringPoint.AcceptChangeOfSupplier(CreateEnergySupplierId(), _systemDateTimeProvider.Now().Plus(Duration.FromDays(5)), processId, _systemDateTimeProvider);
+            var transaction = CreateTransaction();
+            meteringPoint.AcceptChangeOfSupplier(CreateEnergySupplierId(), _systemDateTimeProvider.Now().Plus(Duration.FromDays(5)), transaction, _systemDateTimeProvider);
 
-            meteringPoint.CancelChangeOfSupplier(processId);
+            meteringPoint.CancelChangeOfSupplier(transaction);
 
             Assert.Contains(meteringPoint.DomainEvents !, e => e is ChangeOfSupplierCancelled);
         }
@@ -49,36 +49,36 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.MeteringPoints.ChangeOfSupp
         public void Cancel_WhenIsNotPending_IsNotPossible()
         {
             var (meteringPoint, _) = CreateWithActiveMoveIn();
-            var processId = CreateProcessId();
+            var transaction = CreateTransaction();
             var supplyStartDate = _systemDateTimeProvider.Now();
-            meteringPoint.AcceptChangeOfSupplier(CreateEnergySupplierId(), supplyStartDate, processId, _systemDateTimeProvider);
-            meteringPoint.EffectuateChangeOfSupplier(processId, _systemDateTimeProvider);
+            meteringPoint.AcceptChangeOfSupplier(CreateEnergySupplierId(), supplyStartDate, transaction, _systemDateTimeProvider);
+            meteringPoint.EffectuateChangeOfSupplier(transaction, _systemDateTimeProvider);
 
-            Assert.Throws<BusinessProcessException>(() => meteringPoint.CancelChangeOfSupplier(processId));
+            Assert.Throws<BusinessProcessException>(() => meteringPoint.CancelChangeOfSupplier(transaction));
         }
 
-        private (AccountingPoint, ProcessId) CreateWithActiveMoveIn()
+        private (AccountingPoint, Transaction) CreateWithActiveMoveIn()
         {
             var accountingPoint = new AccountingPoint(GsrnNumber.Create("571234567891234568"), MeteringPointType.Consumption);
-            var processId = CreateProcessId();
-            accountingPoint.AcceptConsumerMoveIn(CreateConsumerId(), CreateEnergySupplierId(), _systemDateTimeProvider.Now().Minus(Duration.FromDays(365)), processId);
-            accountingPoint.EffectuateConsumerMoveIn(processId, _systemDateTimeProvider);
-            return (accountingPoint, processId);
+            var transaction = CreateTransaction();
+            accountingPoint.AcceptConsumerMoveIn(CreateConsumerId(), CreateEnergySupplierId(), _systemDateTimeProvider.Now().Minus(Duration.FromDays(365)), transaction);
+            accountingPoint.EffectuateConsumerMoveIn(transaction, _systemDateTimeProvider);
+            return (accountingPoint, transaction);
         }
 
-        private ProcessId CreateProcessId()
+        private Transaction CreateTransaction()
         {
-            return new ProcessId(Guid.NewGuid().ToString());
+            return new Transaction(Guid.NewGuid().ToString());
         }
 
         private EnergySupplierId CreateEnergySupplierId()
         {
-            return new EnergySupplierId(1);
+            return new EnergySupplierId(Guid.NewGuid());
         }
 
         private ConsumerId CreateConsumerId()
         {
-            return new ConsumerId(1);
+            return new ConsumerId(Guid.NewGuid());
         }
     }
 }

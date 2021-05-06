@@ -12,22 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
 namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
 {
     public class AccountingPointId : ValueObject
     {
-        public AccountingPointId(int value)
+        public AccountingPointId(Guid value)
         {
             Value = value;
         }
 
-        public AccountingPointId()
-        {
-            Value = -1;
-        }
+        public Guid Value { get; }
 
-        public int Value { get; }
+        public static AccountingPointId New()
+        {
+            return new AccountingPointId(Guid.NewGuid());
+        }
     }
 }

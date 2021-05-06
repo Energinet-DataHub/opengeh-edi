@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using NodaTime;
 
@@ -19,22 +20,18 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
 {
     public class BusinessProcess : Entity
     {
-        internal BusinessProcess(ProcessId processId, Instant effectiveDate, BusinessProcessType processType)
+        internal BusinessProcess(BusinessProcessId businessProcessId, Transaction transaction, Instant effectiveDate, BusinessProcessType processType)
         {
-            ProcessId = processId;
+            BusinessProcessId = businessProcessId ?? throw new ArgumentNullException(nameof(businessProcessId));
+            Transaction = transaction ?? throw new ArgumentNullException(nameof(transaction));
             EffectiveDate = effectiveDate;
-            ProcessType = processType;
+            ProcessType = processType ?? throw new ArgumentNullException(nameof(processType));
             Status = BusinessProcessStatus.Pending;
         }
 
-#pragma warning disable 8618
-        private BusinessProcess()
-#pragma warning restore 8618
-        {
-            // For EF core
-        }
+        public BusinessProcessId BusinessProcessId { get; }
 
-        public ProcessId ProcessId { get; }
+        public Transaction Transaction { get; }
 
         public Instant EffectiveDate { get; }
 

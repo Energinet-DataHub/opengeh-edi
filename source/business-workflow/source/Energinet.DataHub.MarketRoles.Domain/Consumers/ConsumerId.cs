@@ -12,23 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
 namespace Energinet.DataHub.MarketRoles.Domain.Consumers
 {
     public class ConsumerId : ValueObject
     {
-        public ConsumerId(int value)
+        public ConsumerId(Guid value)
         {
             Value = value;
         }
 
-        public ConsumerId()
-        {
-            Value = -1;
-        }
-
-        public int Value { get; }
+        public Guid Value { get; }
 
         public override string ToString()
         {
