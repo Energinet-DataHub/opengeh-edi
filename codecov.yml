@@ -21,9 +21,11 @@ coverage:
           - unit
           - integration
       unit:
+        informational: true
         flags:
           - unit
       integration:
+        informational: true
         flags:
           - integration
 
