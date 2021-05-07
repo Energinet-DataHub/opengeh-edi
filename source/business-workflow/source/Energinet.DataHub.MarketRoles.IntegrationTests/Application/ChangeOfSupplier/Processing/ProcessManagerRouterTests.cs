@@ -12,18 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Events;
-using Energinet.DataHub.MarketRoles.Application.Common.Processing;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events;
 using Microsoft.EntityFrameworkCore;
-using NodaTime;
 using Xunit;
 using Xunit.Categories;
 
@@ -33,163 +29,105 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
     [IntegrationTest]
     public class ProcessManagerRouterTests : TestHost
     {
+        private ProcessManagerRouter _router;
+        private BusinessProcessId _businessProcessId;
+
         public ProcessManagerRouterTests()
         : base()
         {
-            Router = new ProcessManagerRouter(ProcessManagerRepository, CommandScheduler);
             var consumer = CreateConsumer();
             var energySupplier = CreateEnergySupplier();
             var accountingPoint = CreateAccountingPoint();
             SetConsumerMovedIn(accountingPoint, consumer.ConsumerId, energySupplier.EnergySupplierId);
             MarketRolesContext.SaveChanges();
 
-            BusinessProcessId = GetBusinessProcessId();
+            _businessProcessId = GetBusinessProcessId();
+            _router = new ProcessManagerRouter(ProcessManagerRepository, CommandScheduler);
         }
-
-        protected ProcessManagerRouter Router { get; }
-
-        private BusinessProcessId BusinessProcessId { get; }
 
         [Fact]
         public async Task EnergySupplierChangeIsRegistered_WhenStateIsNotStarted_ForwardMasterDataDetailsCommandIsEnqueued()
         {
-            await Router.Handle(new EnergySupplierChangeRegistered(GsrnNumber.Create(SampleData.SampleGsrnNumber),  BusinessProcessId, EffectiveDate), CancellationToken.None);
-            await MarketRolesContext.SaveChangesAsync();
+            await _router.Handle(new EnergySupplierChangeRegistered(GsrnNumber.Create(SampleData.GsrnNumber),  _businessProcessId, EffectiveDate), CancellationToken.None);
+            await UnitOfWork.CommitAsync();
 
             var command = await GetEnqueuedCommandAsync<SendMeteringPointDetails>();
 
             Assert.NotNull(command);
+            Assert.Equal(_businessProcessId, command.BusinessProcessId);
         }
 
         [Fact]
-        public void MeteringPointDetailsAreDispatched_WhenStateIsAwaitingMeteringPointDetailsDispatch_ConsumerDetailsAreSend()
+        public async Task MeteringPointDetailsAreDispatched_WhenStateIsAwaitingMeteringPointDetailsDispatch_ForwardConsumerDetailsCommandIsEnqueued()
         {
-            var processManager = Create();
-            var (processId, gsrnNumber, effectiveDate) = CreateTestValues();
+            await _router.Handle(new EnergySupplierChangeRegistered(GsrnNumber.Create(SampleData.GsrnNumber),  _businessProcessId, EffectiveDate), CancellationToken.None);
+            await UnitOfWork.CommitAsync();
 
-            processManager.When(new EnergySupplierChangeRegistered(gsrnNumber, processId, effectiveDate));
-            if (processId.Value != null)
-            {
-                processManager.When(new ConfirmationMessageDispatched(processId));
-                processManager.When(new MeteringPointDetailsDispatched(processId));
-            }
+            await _router.Handle(new MeteringPointDetailsDispatched(_businessProcessId), CancellationToken.None).ConfigureAwait(false);
+            await UnitOfWork.CommitAsync();
 
-            var command =
-                processManager.CommandsToSend.First(c => c.Command is SendConsumerDetails).Command as
-                    SendConsumerDetails;
-
+            var command = await GetEnqueuedCommandAsync<SendConsumerDetails>();
             Assert.NotNull(command);
+            Assert.Equal(_businessProcessId, command.BusinessProcessId);
         }
 
         [Fact]
-        public void MeteringPointDetailsAreDispatched_WhenStateIsNotAwaitingMeteringPointDetailsDispatch_ThrowException()
+        public async Task ConsumerDetailsAreDispatched_WhenStateIsAwaitingConsumerDetailsDispatch_NotifyCurrentSupplierCommandIsEnqueued()
         {
-            var processManager = Create();
-            var (processId, gsrnNumber, effectiveDate) = CreateTestValues();
+            await _router.Handle(new EnergySupplierChangeRegistered(GsrnNumber.Create(SampleData.GsrnNumber),  _businessProcessId, EffectiveDate), CancellationToken.None);
+            await UnitOfWork.CommitAsync();
 
-            Assert.Throws<InvalidProcessManagerStateException>(() =>
-            {
-                if (processId.Value != null) processManager.When(new MeteringPointDetailsDispatched(processId));
-            });
-        }
+            await _router.Handle(new MeteringPointDetailsDispatched(_businessProcessId), CancellationToken.None).ConfigureAwait(false);
+            await UnitOfWork.CommitAsync();
 
-        [Fact]
-        public void ConsumerDetailsAreDispatched_WhenStateIsAwaitingConsumerDetailsDispatch_GridOperatorIsNotified()
-        {
-            var processManager = Create();
-            var (processId, gsrnNumber, effectiveDate) = CreateTestValues();
+            await _router.Handle(new ConsumerDetailsDispatched(_businessProcessId), CancellationToken.None).ConfigureAwait(false);
+            await UnitOfWork.CommitAsync();
 
-            processManager.When(new EnergySupplierChangeRegistered(gsrnNumber, processId, effectiveDate));
-            if (processId.Value != null)
-            {
-                processManager.When(new ConfirmationMessageDispatched(processId));
-                processManager.When(new MeteringPointDetailsDispatched(processId));
-                processManager.When(new ConsumerDetailsDispatched(processId));
-            }
-
-            var command =
-                processManager.CommandsToSend.First(c => c.Command is NotifyCurrentSupplier).Command as
-                    NotifyCurrentSupplier;
-
+            var command = await GetEnqueuedCommandAsync<NotifyCurrentSupplier>();
             Assert.NotNull(command);
+            Assert.Equal(_businessProcessId, command.BusinessProcessId);
         }
 
         [Fact]
-        public void ConsumerDetailsAreDispatched_WhenStateIsNotAwaitingConsumerDetailsDispatch_ThrowException()
+        public async Task CurrentSupplierIsNotified_WhenStateIsAwaitingCurrentSupplierNotification_ChangeSupplierCommandIsScheduled()
         {
-            var processManager = Create();
-            var (processId, gsrnNumber, effectiveDate) = CreateTestValues();
+            await _router.Handle(new EnergySupplierChangeRegistered(GsrnNumber.Create(SampleData.GsrnNumber),  _businessProcessId, EffectiveDate), CancellationToken.None);
+            await UnitOfWork.CommitAsync();
 
-            Assert.Throws<InvalidProcessManagerStateException>(() =>
-            {
-                if (processId.Value != null) processManager.When(new ConsumerDetailsDispatched(processId));
-            });
-        }
+            await _router.Handle(new MeteringPointDetailsDispatched(_businessProcessId), CancellationToken.None).ConfigureAwait(false);
+            await UnitOfWork.CommitAsync();
 
-        [Fact]
-        public void CurrentSupplierIsNotified_WhenStateIsAwaitingCurrentSupplierNotification_ChangeSupplierIsScheduled()
-        {
-            var processManager = Create();
-            var (processId, gsrnNumber, effectiveDate) = CreateTestValues();
+            await _router.Handle(new ConsumerDetailsDispatched(_businessProcessId), CancellationToken.None).ConfigureAwait(false);
+            await UnitOfWork.CommitAsync();
 
-            processManager.When(new EnergySupplierChangeRegistered(gsrnNumber, processId, effectiveDate));
-            if (processId.Value != null)
-            {
-                processManager.When(new ConfirmationMessageDispatched(processId));
-                processManager.When(new MeteringPointDetailsDispatched(processId));
-                processManager.When(new ConsumerDetailsDispatched(processId));
-                processManager.When(new CurrentSupplierNotified(processId));
-            }
+            await _router.Handle(new CurrentSupplierNotified(_businessProcessId), CancellationToken.None).ConfigureAwait(false);
+            await UnitOfWork.CommitAsync();
 
-            var command =
-                processManager.CommandsToSend.First(c => c.Command is ChangeSupplier).Command as
-                    ChangeSupplier;
-
+            var command = await GetEnqueuedCommandAsync<ChangeSupplier>();
             Assert.NotNull(command);
+            Assert.Equal(_businessProcessId, command.BusinessProcessId);
         }
 
         [Fact]
-        public void CurrentSupplierIsNotified_WhenStateIsNotAwaitingCurrentSupplierNotification_ThrowException()
+        public async Task SupplierIsChanged_WhenStateIsAwaitingSupplierChange_ProcessIsCompleted()
         {
-            var processManager = Create();
-            var (processId, gsrnNumber, effectiveDate) = CreateTestValues();
+            await _router.Handle(new EnergySupplierChangeRegistered(GsrnNumber.Create(SampleData.GsrnNumber),  _businessProcessId, EffectiveDate), CancellationToken.None);
+            await UnitOfWork.CommitAsync();
 
-            Assert.Throws<InvalidProcessManagerStateException>(() =>
-            {
-                if (processId.Value != null) processManager.When(new CurrentSupplierNotified(processId));
-            });
-        }
+            await _router.Handle(new MeteringPointDetailsDispatched(_businessProcessId), CancellationToken.None).ConfigureAwait(false);
+            await UnitOfWork.CommitAsync();
 
-        [Fact]
-        public void SupplierIsChanged_WhenStateIsAwaitingSupplierChange_ProcessIsCompleted()
-        {
-            var processManager = Create();
-            var (processId, gsrnNumber, effectiveDate) = CreateTestValues();
+            await _router.Handle(new ConsumerDetailsDispatched(_businessProcessId), CancellationToken.None).ConfigureAwait(false);
+            await UnitOfWork.CommitAsync();
 
-            processManager.When(new EnergySupplierChangeRegistered(gsrnNumber, processId, effectiveDate));
-            if (processId.Value != null)
-            {
-                processManager.When(new ConfirmationMessageDispatched(processId));
-                processManager.When(new MeteringPointDetailsDispatched(processId));
-                processManager.When(new ConsumerDetailsDispatched(processId));
-                processManager.When(new CurrentSupplierNotified(processId));
-                processManager.When(new EnergySupplierChanged(gsrnNumber.Value, processId, effectiveDate));
-            }
+            await _router.Handle(new CurrentSupplierNotified(_businessProcessId), CancellationToken.None).ConfigureAwait(false);
+            await UnitOfWork.CommitAsync();
 
+            await _router.Handle(new EnergySupplierChanged(SampleData.GsrnNumber, _businessProcessId, EffectiveDate), CancellationToken.None).ConfigureAwait(false);
+            await UnitOfWork.CommitAsync();
+
+            var processManager = await ProcessManagerRepository.GetAsync<ChangeOfSupplierProcessManager>(_businessProcessId);
             Assert.True(processManager.IsCompleted());
-        }
-
-        private ChangeOfSupplierProcessManager Create()
-        {
-            return new ChangeOfSupplierProcessManager();
-        }
-
-        private (BusinessProcessId, GsrnNumber, Instant) CreateTestValues()
-        {
-            var processId = new BusinessProcessId(Guid.NewGuid());
-            var gsrnNumber = GsrnNumber.Create("571234567891234568");
-            var effectiveDate = SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(60));
-            return (processId, gsrnNumber, effectiveDate);
         }
 
         private async Task<TCommand> GetEnqueuedCommandAsync<TCommand>()
@@ -197,7 +135,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
             var type = typeof(TCommand).FullName;
             var queuedCommand = await MarketRolesContext.QueuedInternalCommands
                 .SingleOrDefaultAsync(command =>
-                command.Type.Equals(type) && command.BusinessProcessId.Equals(BusinessProcessId.Value));
+                command.Type.Equals(type) && command.BusinessProcessId.Equals(_businessProcessId.Value));
 
             return Serializer.Deserialize<TCommand>(queuedCommand.Data);
         }
