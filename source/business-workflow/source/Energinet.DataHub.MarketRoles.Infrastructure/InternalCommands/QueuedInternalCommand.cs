@@ -29,18 +29,18 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands
             BusinessProcessId = businessProcessId;
         }
 
-        public Guid Id { get; set; }
+        public Guid Id { get; }
 
-        public string Type { get; set; } = string.Empty;
+        public string Type { get; private set; } = string.Empty;
 
-        public string Data { get; set; } = string.Empty;
+        public string Data { get; private set; } = string.Empty;
 
-        public Instant CreationDate { get; set; }
+        public Instant CreationDate { get; private set; }
 
-        public Instant? ScheduleDate { get; set; }
+        public Instant? ScheduleDate { get; private set; }
 
         public Instant? ProcessedDate { get; set; }
 
-        public Guid BusinessProcessId { get; set; }
+        public Guid BusinessProcessId { get; private set; }
     }
 }
