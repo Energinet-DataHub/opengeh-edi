@@ -12,23 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
-namespace Energinet.DataHub.MarketRoles.Domain.EnergySuppliers
+namespace Energinet.DataHub.MarketRoles.Infrastructure.Outbox
 {
-    public class EnergySupplierSnapshot
+    public class OutboxMessageCategory : EnumerationType
     {
-        public EnergySupplierSnapshot(Guid id, string glnNumber, int version)
+        public static readonly OutboxMessageCategory IntegrationEvent = new OutboxMessageCategory(0, nameof(IntegrationEvent));
+        public static readonly OutboxMessageCategory ActorMessage = new OutboxMessageCategory(1, nameof(ActorMessage));
+
+        public OutboxMessageCategory(int id, string name)
+            : base(id, name)
         {
-            Id = id;
-            GlnNumber = glnNumber;
-            Version = version;
         }
-
-        public Guid Id { get; set; }
-
-        public string GlnNumber { get; set; }
-
-        public int Version { get; set; }
     }
 }

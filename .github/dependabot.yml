@@ -5,6 +5,11 @@
 version: 2
 updates:
   - package-ecosystem: "nuget"
+    directory: "/source/business-workflow/Energinet.DataHub.MarketRoles.IntegrationTests"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
     directory: "/source/business-workflow/source/Energinet.DataHub.MarketData.Application"
     schedule:
       interval: "weekly"

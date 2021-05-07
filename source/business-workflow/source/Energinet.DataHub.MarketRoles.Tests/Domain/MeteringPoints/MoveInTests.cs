@@ -36,19 +36,19 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.MeteringPoints
         [Fact]
         public void Effectuate_WhenAheadOfEffectiveDate_IsNotPossible()
         {
-            var (accountingPoint, consumerId, energySupplierId, processId) = CreateTestValues();
+            var (accountingPoint, consumerId, energySupplierId, transaction) = CreateTestValues();
             var moveInDate = _systemDateTimeProvider.Now().Plus(Duration.FromDays(1));
-            accountingPoint.AcceptConsumerMoveIn(consumerId, energySupplierId, moveInDate, processId);
+            accountingPoint.AcceptConsumerMoveIn(consumerId, energySupplierId, moveInDate, transaction);
 
             Assert.Throws<BusinessProcessException>(() =>
-                accountingPoint.EffectuateConsumerMoveIn(processId, _systemDateTimeProvider));
+                accountingPoint.EffectuateConsumerMoveIn(transaction, _systemDateTimeProvider));
         }
 
         [Fact]
         public void Effectuate_WhenProcessIdDoesNotExists_IsNotPossible()
         {
             var (accountingPoint, _, _, _) = CreateTestValues();
-            var nonExistingProcessId = new ProcessId("NonExisting");
+            var nonExistingProcessId = new Transaction("NonExisting");
 
             Assert.Throws<BusinessProcessException>(() =>
                 accountingPoint.EffectuateConsumerMoveIn(nonExistingProcessId, _systemDateTimeProvider));
@@ -58,14 +58,14 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.MeteringPoints
         public void Accept_WhenPendingMoveInOnSameEffectiveDate_IsNotPossible()
         {
             var meteringPoint = Create();
-            var consumerId = new ConsumerId(2);
-            var energySupplierId = new EnergySupplierId(1);
+            var consumerId = new ConsumerId(Guid.NewGuid());
+            var energySupplierId = new EnergySupplierId(Guid.NewGuid());
             var moveInDate = _systemDateTimeProvider.Now();
-            var processId = new ProcessId(Guid.NewGuid().ToString());
+            var transaction = new Transaction(Guid.NewGuid().ToString());
 
-            meteringPoint.AcceptConsumerMoveIn(consumerId, energySupplierId, moveInDate, processId);
+            meteringPoint.AcceptConsumerMoveIn(consumerId, energySupplierId, moveInDate, transaction);
 
-            var result = meteringPoint.ConsumerMoveInAcceptable(consumerId, energySupplierId, moveInDate, processId);
+            var result = meteringPoint.ConsumerMoveInAcceptable(consumerId, energySupplierId, moveInDate, transaction);
 
             Assert.Contains(result.Errors, x => x.Rule == typeof(MoveInRegisteredOnSameDateIsNotAllowedRule));
         }
@@ -76,13 +76,13 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.MeteringPoints
             return new AccountingPoint(gsrnNumber, MeteringPointType.Consumption);
         }
 
-        private (AccountingPoint, ConsumerId, EnergySupplierId, ProcessId) CreateTestValues()
+        private (AccountingPoint, ConsumerId, EnergySupplierId, Transaction) CreateTestValues()
         {
             return (
                 Create(),
-                new ConsumerId(1),
-                new EnergySupplierId(1),
-                new ProcessId(Guid.NewGuid().ToString()));
+                new ConsumerId(Guid.NewGuid()),
+                new EnergySupplierId(Guid.NewGuid()),
+                new Transaction(Guid.NewGuid().ToString()));
         }
     }
 }

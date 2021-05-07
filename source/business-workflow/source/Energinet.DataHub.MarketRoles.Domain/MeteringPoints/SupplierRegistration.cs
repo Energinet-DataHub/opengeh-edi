@@ -18,21 +18,25 @@ using NodaTime;
 
 namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
 {
-    internal class SupplierRegistration : Entity
+    public class SupplierRegistration : Entity
     {
-        public SupplierRegistration(EnergySupplierId energySupplierId, ProcessId processId)
+        public SupplierRegistration(EnergySupplierId energySupplierId, BusinessProcessId businessProcessId)
         {
+            Id = SupplierRegistrationId.New();
             EnergySupplierId = energySupplierId;
-            ProcessId = processId;
+            BusinessProcessId = businessProcessId;
         }
 
-        private SupplierRegistration(EnergySupplierId energySupplierId, Instant? startOfSupplyDate, Instant? endOfSupplyDate, ProcessId processId)
+        private SupplierRegistration(EnergySupplierId energySupplierId, Instant? startOfSupplyDate, Instant? endOfSupplyDate, BusinessProcessId businessProcessId)
+            : this(energySupplierId, businessProcessId)
         {
             EnergySupplierId = energySupplierId;
             StartOfSupplyDate = startOfSupplyDate;
             EndOfSupplyDate = endOfSupplyDate;
-            ProcessId = processId;
+            BusinessProcessId = businessProcessId;
         }
+
+        public SupplierRegistrationId Id { get; }
 
         public EnergySupplierId EnergySupplierId { get; }
 
@@ -40,7 +44,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
 
         public Instant? EndOfSupplyDate { get; private set; } = null;
 
-        public ProcessId ProcessId { get; }
+        public BusinessProcessId BusinessProcessId { get; }
 
         public void StartOfSupply(Instant supplyStartDate)
         {

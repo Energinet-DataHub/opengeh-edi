@@ -15,33 +15,28 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
+using JetBrains.Annotations;
 using MediatR;
-using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
+namespace Energinet.DataHub.MarketRoles.Infrastructure.BusinessRequestProcessing.Pipeline
 {
-    public class AuthorizationBehavior : IPipelineBehavior<RequestChangeOfSupplier, RequestChangeOfSupplierResult>
+    public class UnitOfWorkBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+        where TRequest : IRequest<TResponse>
     {
-        private readonly ILogger _logger;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public AuthorizationBehavior(
-            ILogger logger)
+        public UnitOfWorkBehaviour(IUnitOfWork unitOfWork)
         {
-            _logger = logger;
+            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
 
-        public async Task<RequestChangeOfSupplierResult> Handle(RequestChangeOfSupplier request, CancellationToken cancellationToken, RequestHandlerDelegate<RequestChangeOfSupplierResult> next)
+        public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
         {
-            if (request == null) throw new ArgumentNullException(nameof(request));
             if (next == null) throw new ArgumentNullException(nameof(next));
-
-            _logger.LogInformation("Authorized: {request}", request.Transaction);
-
             var result = await next().ConfigureAwait(false);
-            if (result == null)
-            {
-                return new RequestChangeOfSupplierResult();
-            }
+
+            await _unitOfWork.CommitAsync().ConfigureAwait(false);
 
             return result;
         }

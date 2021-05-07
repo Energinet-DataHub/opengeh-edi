@@ -15,33 +15,29 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketRoles.Application.Common;
 using MediatR;
-using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
+namespace Energinet.DataHub.MarketRoles.Infrastructure.BusinessRequestProcessing.Pipeline
 {
-    public class InputValidationBehavior : IPipelineBehavior<RequestChangeOfSupplier, RequestChangeOfSupplierResult>
+    public class BusinessProcessResponderBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+        where TRequest : IBusinessRequest
+        where TResponse : BusinessProcessResult
     {
-        private readonly ILogger _logger;
+        private readonly IBusinessProcessResponder<TRequest> _businessProcessResponder;
 
-        public InputValidationBehavior(
-            ILogger logger)
+        public BusinessProcessResponderBehaviour(IBusinessProcessResponder<TRequest> businessProcessResponder)
         {
-            _logger = logger;
+            _businessProcessResponder = businessProcessResponder;
         }
 
-        public async Task<RequestChangeOfSupplierResult> Handle(RequestChangeOfSupplier request, CancellationToken cancellationToken, RequestHandlerDelegate<RequestChangeOfSupplierResult> next)
+        public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
         {
-            if (request == null) throw new ArgumentNullException(nameof(request));
             if (next == null) throw new ArgumentNullException(nameof(next));
 
-            _logger.LogInformation("Validated: {request}", request.Transaction);
-
             var result = await next().ConfigureAwait(false);
-            if (result == null)
-            {
-                return new RequestChangeOfSupplierResult();
-            }
+
+            await _businessProcessResponder.RespondAsync(request, result).ConfigureAwait(false);
 
             return result;
         }

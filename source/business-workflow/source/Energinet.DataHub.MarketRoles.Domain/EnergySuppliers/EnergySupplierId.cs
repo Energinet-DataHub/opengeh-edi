@@ -19,22 +19,12 @@ namespace Energinet.DataHub.MarketRoles.Domain.EnergySuppliers
 {
     public class EnergySupplierId : ValueObject
     {
-        public EnergySupplierId(string value)
-        {
-            Value = !string.IsNullOrWhiteSpace(value) ? int.Parse(value) : throw new ArgumentNullException(nameof(value));
-        }
-
-        public EnergySupplierId(int value)
+        public EnergySupplierId(Guid value)
         {
             Value = value;
         }
 
-        public EnergySupplierId()
-        {
-            Value = -1;
-        }
-
-        public int Value { get; }
+        public Guid Value { get; }
 
         public override string ToString()
         {
