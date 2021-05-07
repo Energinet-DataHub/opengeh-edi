@@ -78,6 +78,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             // Business process pipeline
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehaviour<,>));
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(AuthorizationBehaviour<,>));
+            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(DomainEventsDispatcherBehaviour<,>));
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(BusinessProcessResponderBehaviour<,>));
 
             ServiceProvider = services.BuildServiceProvider();
