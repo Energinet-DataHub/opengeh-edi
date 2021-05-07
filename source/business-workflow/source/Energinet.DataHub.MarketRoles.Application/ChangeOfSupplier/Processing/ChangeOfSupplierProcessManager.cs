@@ -61,20 +61,6 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing
             }
         }
 
-        // public void When(ConfirmationMessageDispatched @event)
-        // {
-        //     if (@event == null) throw new ArgumentNullException(nameof(@event));
-        //     switch (_state)
-        //     {
-        //         case State.AwaitingConfirmationMessageDispatch:
-        //             SetInternalState(State.AwaitingMeteringPointDetailsDispatch);
-        //             SendCommand(new SendMeteringPointDetails(BusinessProcessId));
-        //             break;
-        //         default:
-        //             ThrowIfStateDoesNotMatch(@event);
-        //             break;
-        //     }
-        // }
         public void When(MeteringPointDetailsDispatched @event)
         {
             if (@event == null) throw new ArgumentNullException(nameof(@event));
