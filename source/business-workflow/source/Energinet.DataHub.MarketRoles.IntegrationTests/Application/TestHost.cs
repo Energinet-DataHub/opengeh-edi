@@ -30,6 +30,7 @@ using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.AccountingPoints;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.Consumers;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.EnergySuppliers;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.ProcessManagers;
+using Energinet.DataHub.MarketRoles.Infrastructure.DomainEventDispatching;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.ChangeOfSupplier;
 using Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
@@ -63,6 +64,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             services.AddScoped<IOutbox, OutboxProvider>();
             services.AddSingleton<IOutboxMessageFactory, OutboxMessageFactory>();
             services.AddScoped<ICommandScheduler, CommandScheduler>();
+            services.AddScoped<IDomainEventsAccessor, DomainEventsAccessor>();
 
             services.AddMediatR(new[]
             {
