@@ -18,19 +18,19 @@ namespace Energinet.DataHub.MarketRoles.Domain.SeedWork
 {
     public abstract class Entity
     {
-        private List<IDomainEvent>? _domainEvents;
+        private List<IDomainEvent> _domainEvents = new List<IDomainEvent>();
 
         /// <summary>
         /// Domain events occurred.
         /// </summary>
-        public IReadOnlyCollection<IDomainEvent>? DomainEvents => _domainEvents?.AsReadOnly();
+        public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
 
         /// <summary>
         /// Clears all recorded events
         /// </summary>
         public void ClearDomainEvents()
         {
-            _domainEvents?.Clear();
+            _domainEvents.Clear();
         }
 
         // /// <summary>
@@ -55,8 +55,6 @@ namespace Energinet.DataHub.MarketRoles.Domain.SeedWork
         /// <param name="domainEvent">Domain event.</param>
         protected void AddDomainEvent(IDomainEvent domainEvent)
         {
-            _domainEvents ??= new List<IDomainEvent>();
-
             _domainEvents.Add(domainEvent);
         }
     }
