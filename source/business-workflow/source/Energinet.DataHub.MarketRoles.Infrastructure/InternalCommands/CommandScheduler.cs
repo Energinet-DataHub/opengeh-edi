@@ -37,6 +37,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands
         }
 
         public async Task EnqueueAsync<TCommand>(TCommand command, BusinessProcessId businessProcessId, Instant? scheduleDate)
+            where TCommand : InternalCommand
         {
             if (command == null) throw new ArgumentNullException(nameof(command));
             if (businessProcessId == null) throw new ArgumentNullException(nameof(businessProcessId));

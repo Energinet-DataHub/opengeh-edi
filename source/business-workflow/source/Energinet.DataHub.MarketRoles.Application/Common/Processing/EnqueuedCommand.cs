@@ -13,28 +13,25 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
+using Energinet.DataHub.MarketRoles.Application.Common.Commands;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using NodaTime;
 
 namespace Energinet.DataHub.MarketRoles.Application.Common.Processing
 {
-    public abstract class ProcessManager
+    public class EnqueuedCommand
     {
-        protected ProcessManager()
+        public EnqueuedCommand(InternalCommand command, BusinessProcessId businessProcessId, Instant? executionDate = null)
         {
-            Id = Guid.NewGuid();
+            Command = command ?? throw new ArgumentNullException(nameof(command));
+            BusinessProcessId = businessProcessId ?? throw new ArgumentNullException(nameof(command));
+            ExecutionDate = executionDate;
         }
 
-        public Guid Id { get; }
+        public InternalCommand Command { get; }
 
-        public BusinessProcessId BusinessProcessId { get; protected set; } = null!;
+        public BusinessProcessId BusinessProcessId { get; }
 
-        public Instant EffectiveDate { get; protected set;  }
-
-        #pragma warning disable CA1002
-        public List<EnqueuedCommand> CommandsToSend { get; } = new List<EnqueuedCommand>();
-
-        public abstract bool IsCompleted();
+        public Instant? ExecutionDate { get; }
     }
 }

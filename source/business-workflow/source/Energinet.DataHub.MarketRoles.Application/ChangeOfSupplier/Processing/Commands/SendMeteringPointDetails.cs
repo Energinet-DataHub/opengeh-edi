@@ -13,28 +13,18 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
+using Energinet.DataHub.MarketRoles.Application.Common.Commands;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
-using NodaTime;
 
-namespace Energinet.DataHub.MarketRoles.Application.Common.Processing
+namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands
 {
-    public abstract class ProcessManager
+    public class SendMeteringPointDetails : InternalCommand
     {
-        protected ProcessManager()
+        public SendMeteringPointDetails(BusinessProcessId businessProcessId)
         {
-            Id = Guid.NewGuid();
+            BusinessProcessId = businessProcessId ?? throw new ArgumentNullException(nameof(businessProcessId));
         }
 
-        public Guid Id { get; }
-
-        public BusinessProcessId BusinessProcessId { get; protected set; } = null!;
-
-        public Instant EffectiveDate { get; protected set;  }
-
-        #pragma warning disable CA1002
-        public List<EnqueuedCommand> CommandsToSend { get; } = new List<EnqueuedCommand>();
-
-        public abstract bool IsCompleted();
+        public BusinessProcessId BusinessProcessId { get; }
     }
 }

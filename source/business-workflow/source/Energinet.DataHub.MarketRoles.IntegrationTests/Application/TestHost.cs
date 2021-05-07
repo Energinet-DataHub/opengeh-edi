@@ -13,8 +13,11 @@
 // limitations under the License.
 
 using System;
+using System.Data;
+using System.Linq;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing;
+using Energinet.DataHub.MarketRoles.Application.Common.Commands;
 using Energinet.DataHub.MarketRoles.Application.Common.Processing;
 using Energinet.DataHub.MarketRoles.Domain.Consumers;
 using Energinet.DataHub.MarketRoles.Domain.EnergySuppliers;
@@ -28,10 +31,12 @@ using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.Consumers;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.EnergySuppliers;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.ProcessManagers;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.ChangeOfSupplier;
+using Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
 using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using MediatR;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
@@ -40,13 +45,14 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 {
     public class TestHost : IDisposable
     {
+        private BusinessProcessId _businessProcessId = null;
+
         protected TestHost()
         {
             var services = new ServiceCollection();
 
-            var connectionString = Environment.GetEnvironmentVariable("MarketData_IntegrationTests_ConnectionString");
             services.AddDbContext<MarketRolesContext>(x =>
-                x.UseSqlServer(connectionString, y => y.UseNodaTime()));
+                x.UseSqlServer(ConnectionString, y => y.UseNodaTime()));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<ISystemDateTimeProvider, SystemDateTimeProviderStub>();
             services.AddScoped<IAccountingPointRepository, AccountingPointRepository>();
@@ -56,6 +62,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             services.AddScoped<IJsonSerializer, JsonSerializer>();
             services.AddScoped<IOutbox, OutboxProvider>();
             services.AddSingleton<IOutboxMessageFactory, OutboxMessageFactory>();
+            services.AddScoped<ICommandScheduler, CommandScheduler>();
 
             services.AddMediatR(new[]
             {
@@ -81,6 +88,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             SystemDateTimeProvider = ServiceProvider.GetRequiredService<ISystemDateTimeProvider>();
             Serializer = ServiceProvider.GetRequiredService<IJsonSerializer>();
             SystemDateTimeProvider = new SystemDateTimeProviderStub();
+            CommandScheduler = ServiceProvider.GetRequiredService<ICommandScheduler>();
+            Transaction = new Transaction(Guid.NewGuid().ToString());
         }
 
         protected IServiceProvider ServiceProvider { get; }
@@ -101,19 +110,31 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
         protected MarketRolesContext MarketRolesContext { get; }
 
+        protected ICommandScheduler CommandScheduler { get; }
+
         protected IJsonSerializer Serializer { get; }
 
-        protected ProcessManagerRouter Router { get; }
+        protected Transaction Transaction { get; }
+
+        protected Instant EffectiveDate => SystemDateTimeProvider.Now();
+
+        private string ConnectionString =>
+            Environment.GetEnvironmentVariable("MarketData_IntegrationTests_ConnectionString");
 
         public void Dispose()
         {
             CleanupDatabase();
         }
 
+        protected TService GetService<TService>()
+        {
+            return ServiceProvider.GetRequiredService<TService>();
+        }
+
         protected Consumer CreateConsumer()
         {
             var consumerId = new ConsumerId(Guid.NewGuid());
-            var consumer = new Consumer(consumerId, CprNumber.Create(SampleData.SampleConsumerId));
+            var consumer = new Consumer(consumerId, CprNumber.Create(SampleData.ConsumerId));
 
             ConsumerRepository.Add(consumer);
 
@@ -123,7 +144,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
         protected EnergySupplier CreateEnergySupplier()
         {
             var energySupplierId = new EnergySupplierId(Guid.NewGuid());
-            var energySupplierGln = new GlnNumber(SampleData.SampleGlnNumber);
+            var energySupplierGln = new GlnNumber(SampleData.GlnNumber);
             var energySupplier = new EnergySupplier(energySupplierId, energySupplierGln);
             EnergySupplierRepository.Add(energySupplier);
             return energySupplier;
@@ -133,7 +154,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
         {
             var meteringPoint =
                 AccountingPoint.CreateProduction(
-                    GsrnNumber.Create(SampleData.SampleGsrnNumber), true);
+                    GsrnNumber.Create(SampleData.GsrnNumber), true);
 
             AccountingPointRepository.Add(meteringPoint);
 
@@ -144,21 +165,38 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
         {
             var systemTimeProvider = ServiceProvider.GetRequiredService<ISystemDateTimeProvider>();
             var moveInDate = systemTimeProvider.Now().Minus(Duration.FromDays(365));
-            var transaction = new Transaction(Guid.NewGuid().ToString());
 
-            accountingPoint.AcceptConsumerMoveIn(consumerId, energySupplierId, moveInDate, transaction);
-            accountingPoint.EffectuateConsumerMoveIn(transaction, systemTimeProvider);
+            accountingPoint.AcceptConsumerMoveIn(consumerId, energySupplierId, moveInDate, Transaction);
+            accountingPoint.EffectuateConsumerMoveIn(Transaction, systemTimeProvider);
+        }
+
+        protected BusinessProcessId GetBusinessProcessId()
+        {
+            if (_businessProcessId == null)
+            {
+                var connection = new SqlConnection(ConnectionString);
+                if (connection.State == ConnectionState.Closed)
+                    connection.Open();
+
+                var command = new SqlCommand($"SELECT Id FROM [dbo].[BusinessProcesses] WHERE TransactionId = '{Transaction.Value}'", connection);
+                var id = command.ExecuteScalar();
+                _businessProcessId = new BusinessProcessId(Guid.Parse(id.ToString()));
+            }
+
+            return _businessProcessId;
         }
 
         private void CleanupDatabase()
         {
             var cleanupStatement = $"DELETE FROM [dbo].[ConsumerRegistrations] " +
                                    $"DELETE FROM [dbo].[SupplierRegistrations] " +
+                                   $"DELETE FROM [dbo].[ProcessManagers] " +
                                    $"DELETE FROM [dbo].[BusinessProcesses] " +
                                    $"DELETE FROM [dbo].[Consumers] " +
                                    $"DELETE FROM [dbo].[EnergySuppliers] " +
                                    $"DELETE FROM [dbo].[AccountingPoints] " +
-                                   $"DELETE FROM [dbo].[OutboxMessages]";
+                                   $"DELETE FROM [dbo].[OutboxMessages] " +
+                                   $"DELETE FROM [dbo].[QueuedInternalCommands]";
 
             MarketRolesContext.Database.ExecuteSqlRaw(cleanupStatement);
             MarketRolesContext.Dispose();

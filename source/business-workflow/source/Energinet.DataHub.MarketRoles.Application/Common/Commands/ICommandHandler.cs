@@ -12,25 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
-using NodaTime;
+using MediatR;
 
 namespace Energinet.DataHub.MarketRoles.Application.Common.Commands
 {
     /// <summary>
-    /// Service for scheduling and enqueueing internal commands for later processing
+    /// Handler for CQRS command
     /// </summary>
-    public interface ICommandScheduler
+    /// <typeparam name="TCommand"><see cref="ICommand{TResult}"/></typeparam>
+    public interface ICommandHandler<in TCommand> : IRequestHandler<TCommand>
+        where TCommand : ICommand
     {
-        /// <summary>
-        /// Schedules or enqueues a command
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="businessProcessId"></param>
-        /// <param name="scheduleDate"></param>
-        /// <typeparam name="TCommand"><see cref="InternalCommand"/></typeparam>
-        Task EnqueueAsync<TCommand>(TCommand command, BusinessProcessId businessProcessId, Instant? scheduleDate)
-            where TCommand : InternalCommand;
+    }
+
+    /// <summary>
+    /// Handler for CQRS command with result
+    /// </summary>
+    /// <typeparam name="TCommand"><see cref="ICommand{TResult}"/></typeparam>
+    /// <typeparam name="TResult">Type of result returned by handler</typeparam>
+    public interface ICommandHandler<in TCommand, TResult> : IRequestHandler<TCommand, TResult>
+        where TCommand : ICommand<TResult>
+    {
     }
 }

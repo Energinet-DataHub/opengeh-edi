@@ -13,28 +13,24 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
-using NodaTime;
 
 namespace Energinet.DataHub.MarketRoles.Application.Common.Processing
 {
-    public abstract class ProcessManager
+    public class InvalidProcessManagerStateException : BusinessProcessException
     {
-        protected ProcessManager()
+        public InvalidProcessManagerStateException()
         {
-            Id = Guid.NewGuid();
         }
 
-        public Guid Id { get; }
+        public InvalidProcessManagerStateException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+        }
 
-        public BusinessProcessId BusinessProcessId { get; protected set; } = null!;
-
-        public Instant EffectiveDate { get; protected set;  }
-
-        #pragma warning disable CA1002
-        public List<EnqueuedCommand> CommandsToSend { get; } = new List<EnqueuedCommand>();
-
-        public abstract bool IsCompleted();
+        public InvalidProcessManagerStateException(string message)
+            : base(message)
+        {
+        }
     }
 }

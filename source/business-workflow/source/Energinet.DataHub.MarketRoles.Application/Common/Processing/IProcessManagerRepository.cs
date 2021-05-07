@@ -14,23 +14,27 @@
 
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
-using NodaTime;
 
-namespace Energinet.DataHub.MarketRoles.Application.Common.Commands
+namespace Energinet.DataHub.MarketRoles.Application.Common.Processing
 {
     /// <summary>
-    /// Service for scheduling and enqueueing internal commands for later processing
+    /// Repository of energy suppliers
     /// </summary>
-    public interface ICommandScheduler
+    public interface IProcessManagerRepository
     {
         /// <summary>
-        /// Schedules or enqueues a command
+        /// Get an existing Process Manager
         /// </summary>
-        /// <param name="command"></param>
         /// <param name="businessProcessId"></param>
-        /// <param name="scheduleDate"></param>
-        /// <typeparam name="TCommand"><see cref="InternalCommand"/></typeparam>
-        Task EnqueueAsync<TCommand>(TCommand command, BusinessProcessId businessProcessId, Instant? scheduleDate)
-            where TCommand : InternalCommand;
+        /// <returns><see cref="ProcessManager"/></returns>
+        Task<TProcessManager?> GetAsync<TProcessManager>(BusinessProcessId businessProcessId)
+            where TProcessManager : ProcessManager;
+
+        /// <summary>
+        /// Add a new Process Manager
+        /// </summary>
+        /// <param name="processManager"></param>
+        void Add<TProcessManager>(TProcessManager processManager)
+            where TProcessManager : ProcessManager;
     }
 }

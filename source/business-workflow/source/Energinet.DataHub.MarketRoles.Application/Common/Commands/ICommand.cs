@@ -12,25 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
-using NodaTime;
+using MediatR;
 
 namespace Energinet.DataHub.MarketRoles.Application.Common.Commands
 {
+    #pragma warning disable CA1040
     /// <summary>
-    /// Service for scheduling and enqueueing internal commands for later processing
+    /// CQRS command object
     /// </summary>
-    public interface ICommandScheduler
+    public interface ICommand : IRequest
     {
-        /// <summary>
-        /// Schedules or enqueues a command
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="businessProcessId"></param>
-        /// <param name="scheduleDate"></param>
-        /// <typeparam name="TCommand"><see cref="InternalCommand"/></typeparam>
-        Task EnqueueAsync<TCommand>(TCommand command, BusinessProcessId businessProcessId, Instant? scheduleDate)
-            where TCommand : InternalCommand;
     }
+
+    /// <summary>
+    /// CQRS command with result
+    /// </summary>
+    /// <typeparam name="TResult"><see cref="IRequest"/></typeparam>
+    public interface ICommand<out TResult> : IRequest<TResult>
+    {
+    }
+    #pragma warning restore
 }
