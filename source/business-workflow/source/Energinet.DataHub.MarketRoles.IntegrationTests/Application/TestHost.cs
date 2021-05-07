@@ -65,6 +65,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             services.AddSingleton<IOutboxMessageFactory, OutboxMessageFactory>();
             services.AddScoped<ICommandScheduler, CommandScheduler>();
             services.AddScoped<IDomainEventsAccessor, DomainEventsAccessor>();
+            services.AddScoped<IDomainEventsDispatcher, DomainEventsDispatcher>();
 
             services.AddMediatR(new[]
             {
