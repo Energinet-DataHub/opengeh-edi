@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.MarketRoles.Application.Common.Commands;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 
@@ -19,11 +20,14 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.
 {
     public class ChangeSupplier : InternalCommand
     {
-        public ChangeSupplier(BusinessProcessId businessProcessId)
+        public ChangeSupplier(Guid accountingPointId, Guid businessProcessId)
         {
+            AccountingPointId = accountingPointId;
             BusinessProcessId = businessProcessId;
         }
 
-        public BusinessProcessId BusinessProcessId { get; }
+        public Guid AccountingPointId { get; }
+
+        public Guid BusinessProcessId { get; }
     }
 }

@@ -19,11 +19,17 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.
 {
     public class ConsumerDetailsDispatched : DomainEventBase
     {
-        public ConsumerDetailsDispatched(BusinessProcessId businessProcessId)
+        public ConsumerDetailsDispatched(AccountingPointId accountingPointId, BusinessProcessId businessProcessId, Transaction transaction)
         {
+            AccountingPointId = accountingPointId;
             BusinessProcessId = businessProcessId;
+            Transaction = transaction;
         }
 
+        public AccountingPointId AccountingPointId { get; }
+
         public BusinessProcessId BusinessProcessId { get; }
+
+        public Transaction Transaction { get; }
     }
 }

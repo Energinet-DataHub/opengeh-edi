@@ -46,10 +46,13 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 {
     public class TestHost : IDisposable
     {
+        private SqlConnection _sqlConnection = null;
         private BusinessProcessId _businessProcessId = null;
 
         protected TestHost()
         {
+            CleanupDatabase();
+
             var services = new ServiceCollection();
 
             services.AddDbContext<MarketRolesContext>(x =>
@@ -135,6 +138,16 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             return ServiceProvider.GetRequiredService<TService>();
         }
 
+        protected SqlConnection GetSqlDbConnection()
+        {
+            if (_sqlConnection is null)
+                _sqlConnection = new SqlConnection(ConnectionString);
+
+            if (_sqlConnection.State == ConnectionState.Closed)
+                _sqlConnection.Open();
+            return _sqlConnection;
+        }
+
         protected Consumer CreateConsumer()
         {
             var consumerId = new ConsumerId(Guid.NewGuid());
@@ -165,16 +178,50 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             return meteringPoint;
         }
 
+        protected Transaction CreateTransaction()
+        {
+            return new Transaction(Guid.NewGuid().ToString());
+        }
+
         protected void SetConsumerMovedIn(AccountingPoint accountingPoint, ConsumerId consumerId, EnergySupplierId energySupplierId)
         {
             var systemTimeProvider = ServiceProvider.GetRequiredService<ISystemDateTimeProvider>();
             var moveInDate = systemTimeProvider.Now().Minus(Duration.FromDays(365));
+            var transaction = CreateTransaction();
+            SetConsumerMovedIn(accountingPoint, consumerId, energySupplierId, moveInDate, transaction);
+        }
 
-            accountingPoint.AcceptConsumerMoveIn(consumerId, energySupplierId, moveInDate, Transaction);
-            accountingPoint.EffectuateConsumerMoveIn(Transaction, systemTimeProvider);
+        protected void SetConsumerMovedIn(AccountingPoint accountingPoint, ConsumerId consumerId, EnergySupplierId energySupplierId, Instant moveInDate, Transaction transaction)
+        {
+            var systemTimeProvider = ServiceProvider.GetRequiredService<ISystemDateTimeProvider>();
+            accountingPoint.AcceptConsumerMoveIn(consumerId, energySupplierId, moveInDate, transaction);
+            accountingPoint.EffectuateConsumerMoveIn(transaction, systemTimeProvider);
+        }
+
+        protected void RegisterChangeOfSupplier(AccountingPoint accountingPoint, ConsumerId consumerId, EnergySupplierId energySupplierId, Transaction transaction)
+        {
+            var systemTimeProvider = ServiceProvider.GetRequiredService<ISystemDateTimeProvider>();
+
+            var moveInDate = systemTimeProvider.Now().Minus(Duration.FromDays(365));
+            var changeSupplierDate = systemTimeProvider.Now();
+
+            SetConsumerMovedIn(accountingPoint, consumerId, energySupplierId);
+            accountingPoint.AcceptChangeOfSupplier(energySupplierId, changeSupplierDate, transaction, systemTimeProvider);
         }
 
         protected BusinessProcessId GetBusinessProcessId()
+        {
+            if (_businessProcessId == null)
+            {
+                var command = new SqlCommand($"SELECT Id FROM [dbo].[BusinessProcesses] WHERE TransactionId = '{Transaction.Value}'", GetSqlDbConnection());
+                var id = command.ExecuteScalar();
+                _businessProcessId = new BusinessProcessId(Guid.Parse(id.ToString()));
+            }
+
+            return _businessProcessId;
+        }
+
+        protected BusinessProcessId GetBusinessProcessId(Transaction transaction)
         {
             if (_businessProcessId == null)
             {
@@ -182,7 +229,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
                 if (connection.State == ConnectionState.Closed)
                     connection.Open();
 
-                var command = new SqlCommand($"SELECT Id FROM [dbo].[BusinessProcesses] WHERE TransactionId = '{Transaction.Value}'", connection);
+                var command = new SqlCommand($"SELECT Id FROM [dbo].[BusinessProcesses] WHERE TransactionId = '{transaction.Value}'", connection);
                 var id = command.ExecuteScalar();
                 _businessProcessId = new BusinessProcessId(Guid.Parse(id.ToString()));
             }
@@ -202,8 +249,9 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
                                    $"DELETE FROM [dbo].[OutboxMessages] " +
                                    $"DELETE FROM [dbo].[QueuedInternalCommands]";
 
-            MarketRolesContext.Database.ExecuteSqlRaw(cleanupStatement);
-            MarketRolesContext.Dispose();
+            new SqlCommand(cleanupStatement, GetSqlDbConnection()).ExecuteNonQuery();
+            //MarketRolesContext.Database.ExecuteSqlRaw(cleanupStatement);
+            //MarketRolesContext.Dispose();
         }
     }
 }

@@ -97,7 +97,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
             _businessProcesses.Add(businessProcess);
             _supplierRegistrations.Add(new SupplierRegistration(energySupplierId, businessProcess.BusinessProcessId));
 
-            AddDomainEvent(new EnergySupplierChangeRegistered(GsrnNumber, businessProcess.BusinessProcessId, supplyStartDate));
+            AddDomainEvent(new EnergySupplierChangeRegistered(Id, GsrnNumber, businessProcess.BusinessProcessId, transaction, supplyStartDate));
         }
 
         public void EffectuateChangeOfSupplier(Transaction transaction, ISystemDateTimeProvider systemDateTimeProvider)
@@ -111,7 +111,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
             DiscontinueCurrentSupplier(businessProcess, systemDateTimeProvider);
             StartOfSupplyForFutureSupplier(businessProcess, systemDateTimeProvider);
 
-            AddDomainEvent(new EnergySupplierChanged(GsrnNumber.Value, businessProcess.BusinessProcessId, businessProcess.EffectiveDate));
+            AddDomainEvent(new EnergySupplierChanged(Id, GsrnNumber, businessProcess.BusinessProcessId, transaction, businessProcess.EffectiveDate));
         }
 
         public void CloseDown()
@@ -162,7 +162,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
 
             var businessProcess = GetBusinessProcess(transaction, BusinessProcessType.ChangeOfSupplier);
             businessProcess.Cancel();
-            AddDomainEvent(new ChangeOfSupplierCancelled(transaction));
+            AddDomainEvent(new ChangeOfSupplierCancelled(Id, GsrnNumber, businessProcess.BusinessProcessId, transaction));
         }
 
         private void StartOfSupplyForFutureSupplier(BusinessProcess businessProcess, ISystemDateTimeProvider systemDateTimeProvider)

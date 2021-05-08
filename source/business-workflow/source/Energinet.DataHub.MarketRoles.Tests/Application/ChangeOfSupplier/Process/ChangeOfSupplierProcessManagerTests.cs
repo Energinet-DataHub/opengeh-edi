@@ -31,19 +31,28 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Proce
     public class ChangeOfSupplierProcessManagerTests
     {
         private readonly SystemDateTimeProviderStub _systemDateTimeProvider;
+        private readonly AccountingPointId _accountingPointId;
+        private readonly GsrnNumber _gsrnNumber;
+        private readonly BusinessProcessId _businessProcessId;
+        private readonly Transaction _transaction;
+        private readonly Instant _effectiveDate;
 
         public ChangeOfSupplierProcessManagerTests()
         {
             _systemDateTimeProvider = new SystemDateTimeProviderStub();
+            _accountingPointId = AccountingPointId.New();
+            _gsrnNumber = GsrnNumber.Create("571234567891234568");
+            _businessProcessId = new BusinessProcessId(Guid.NewGuid());
+            _transaction = new Transaction(Guid.NewGuid().ToString());
+            _effectiveDate = SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(60));
         }
 
         [Fact]
         public void EnergySupplierChangeIsRegistered_WhenStateIsNotStarted_MasterDataDetailsIsSend()
         {
             var processManager = Create();
-            var (processId, gsrnNumber, effectiveDate) = CreateTestValues();
 
-            processManager.When(new EnergySupplierChangeRegistered(gsrnNumber, processId, effectiveDate));
+            processManager.When(CreateSupplierChangeRegisteredEvent());
 
             var command =
                 processManager.CommandsToSend.First(c => c.Command is SendMeteringPointDetails).Command as
@@ -56,10 +65,9 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Proce
         public void MeteringPointDetailsAreDispatched_WhenStateIsAwaitingMeteringPointDetailsDispatch_ConsumerDetailsAreSend()
         {
             var processManager = Create();
-            var (processId, gsrnNumber, effectiveDate) = CreateTestValues();
 
-            processManager.When(new EnergySupplierChangeRegistered(gsrnNumber, processId, effectiveDate));
-            processManager.When(new MeteringPointDetailsDispatched(processId));
+            processManager.When(CreateSupplierChangeRegisteredEvent());
+            processManager.When(new MeteringPointDetailsDispatched(_accountingPointId, _businessProcessId, _transaction));
             var command =
                 processManager.CommandsToSend.First(c => c.Command is SendConsumerDetails).Command as
                     SendConsumerDetails;
@@ -71,11 +79,10 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Proce
         public void MeteringPointDetailsAreDispatched_WhenStateIsNotAwaitingMeteringPointDetailsDispatch_ThrowException()
         {
             var processManager = Create();
-            var (processId, gsrnNumber, effectiveDate) = CreateTestValues();
 
             Assert.Throws<InvalidProcessManagerStateException>(() =>
             {
-                if (processId.Value != null) processManager.When(new MeteringPointDetailsDispatched(processId));
+                processManager.When(new MeteringPointDetailsDispatched(_accountingPointId, _businessProcessId, _transaction));
             });
         }
 
@@ -83,11 +90,10 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Proce
         public void ConsumerDetailsAreDispatched_WhenStateIsAwaitingConsumerDetailsDispatch_CurrentSupplierIsNotified()
         {
             var processManager = Create();
-            var (processId, gsrnNumber, effectiveDate) = CreateTestValues();
 
-            processManager.When(new EnergySupplierChangeRegistered(gsrnNumber, processId, effectiveDate));
-            processManager.When(new MeteringPointDetailsDispatched(processId));
-            processManager.When(new ConsumerDetailsDispatched(processId));
+            processManager.When(CreateSupplierChangeRegisteredEvent());
+            processManager.When(new MeteringPointDetailsDispatched(_accountingPointId, _businessProcessId, _transaction));
+            processManager.When(new ConsumerDetailsDispatched(_accountingPointId, _businessProcessId, _transaction));
 
             var command =
                 processManager.CommandsToSend.First(c => c.Command is NotifyCurrentSupplier).Command as
@@ -100,11 +106,10 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Proce
         public void ConsumerDetailsAreDispatched_WhenStateIsNotAwaitingConsumerDetailsDispatch_ThrowException()
         {
             var processManager = Create();
-            var (processId, gsrnNumber, effectiveDate) = CreateTestValues();
 
             Assert.Throws<InvalidProcessManagerStateException>(() =>
             {
-                if (processId.Value != null) processManager.When(new ConsumerDetailsDispatched(processId));
+                processManager.When(new ConsumerDetailsDispatched(_accountingPointId, _businessProcessId, _transaction));
             });
         }
 
@@ -112,12 +117,11 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Proce
         public void CurrentSupplierIsNotified_WhenStateIsAwaitingCurrentSupplierNotification_ChangeSupplierIsScheduled()
         {
             var processManager = Create();
-            var (processId, gsrnNumber, effectiveDate) = CreateTestValues();
 
-            processManager.When(new EnergySupplierChangeRegistered(gsrnNumber, processId, effectiveDate));
-            processManager.When(new MeteringPointDetailsDispatched(processId));
-            processManager.When(new ConsumerDetailsDispatched(processId));
-            processManager.When(new CurrentSupplierNotified(processId));
+            processManager.When(CreateSupplierChangeRegisteredEvent());
+            processManager.When(new MeteringPointDetailsDispatched(_accountingPointId, _businessProcessId, _transaction));
+            processManager.When(new ConsumerDetailsDispatched(_accountingPointId, _businessProcessId, _transaction));
+            processManager.When(new CurrentSupplierNotified(_accountingPointId, _businessProcessId, _transaction));
 
             var command =
                 processManager.CommandsToSend.First(c => c.Command is ChangeSupplier).Command as
@@ -130,11 +134,10 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Proce
         public void CurrentSupplierIsNotified_WhenStateIsNotAwaitingCurrentSupplierNotification_ThrowException()
         {
             var processManager = Create();
-            var (processId, gsrnNumber, effectiveDate) = CreateTestValues();
 
             Assert.Throws<InvalidProcessManagerStateException>(() =>
             {
-                if (processId.Value != null) processManager.When(new CurrentSupplierNotified(processId));
+                processManager.When(new CurrentSupplierNotified(_accountingPointId, _businessProcessId, _transaction));
             });
         }
 
@@ -142,13 +145,12 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Proce
         public void SupplierIsChanged_WhenStateIsAwaitingSupplierChange_ProcessIsCompleted()
         {
             var processManager = Create();
-            var (processId, gsrnNumber, effectiveDate) = CreateTestValues();
 
-            processManager.When(new EnergySupplierChangeRegistered(gsrnNumber, processId, effectiveDate));
-            processManager.When(new MeteringPointDetailsDispatched(processId));
-            processManager.When(new ConsumerDetailsDispatched(processId));
-            processManager.When(new CurrentSupplierNotified(processId));
-            processManager.When(new EnergySupplierChanged(gsrnNumber.Value, processId, effectiveDate));
+            processManager.When(CreateSupplierChangeRegisteredEvent());
+            processManager.When(new MeteringPointDetailsDispatched(_accountingPointId, _businessProcessId, _transaction));
+            processManager.When(new ConsumerDetailsDispatched(_accountingPointId, _businessProcessId, _transaction));
+            processManager.When(new CurrentSupplierNotified(_accountingPointId, _businessProcessId, _transaction));
+            processManager.When(new EnergySupplierChanged(_accountingPointId, _gsrnNumber, _businessProcessId, _transaction, Instant.MaxValue));
 
             Assert.True(processManager.IsCompleted());
         }
@@ -164,6 +166,16 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Proce
             var gsrnNumber = GsrnNumber.Create("571234567891234568");
             var effectiveDate = SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(60));
             return (processId, gsrnNumber, effectiveDate);
+        }
+
+        private EnergySupplierChangeRegistered CreateSupplierChangeRegisteredEvent()
+        {
+            return new EnergySupplierChangeRegistered(
+                _accountingPointId,
+                _gsrnNumber,
+                _businessProcessId,
+                _transaction,
+                _effectiveDate);
         }
     }
 }

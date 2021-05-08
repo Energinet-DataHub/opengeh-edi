@@ -19,11 +19,17 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.
 {
     public class CurrentSupplierNotified : DomainEventBase
     {
-        public CurrentSupplierNotified(BusinessProcessId businessProcessId)
+        public CurrentSupplierNotified(AccountingPointId accountingPointId, BusinessProcessId businessProcessId, Transaction transaction)
         {
+            AccountingPointId = accountingPointId;
             BusinessProcessId = businessProcessId;
+            Transaction = transaction;
         }
 
+        public AccountingPointId AccountingPointId { get; }
+
         public BusinessProcessId BusinessProcessId { get; }
+
+        public Transaction Transaction { get; }
     }
 }

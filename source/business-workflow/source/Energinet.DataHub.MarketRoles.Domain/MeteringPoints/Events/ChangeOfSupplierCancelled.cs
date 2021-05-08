@@ -18,10 +18,19 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events
 {
     public class ChangeOfSupplierCancelled : DomainEventBase
     {
-        public ChangeOfSupplierCancelled(Transaction transaction)
+        public ChangeOfSupplierCancelled(AccountingPointId accountingPointId, GsrnNumber gsrnNumber, BusinessProcessId businessProcessId, Transaction transaction)
         {
+            AccountingPointId = accountingPointId;
+            GsrnNumber = gsrnNumber;
+            BusinessProcessId = businessProcessId;
             Transaction = transaction;
         }
+
+        public AccountingPointId AccountingPointId { get; }
+
+        public GsrnNumber GsrnNumber { get; }
+
+        public BusinessProcessId BusinessProcessId { get; }
 
         public Transaction Transaction { get; }
     }

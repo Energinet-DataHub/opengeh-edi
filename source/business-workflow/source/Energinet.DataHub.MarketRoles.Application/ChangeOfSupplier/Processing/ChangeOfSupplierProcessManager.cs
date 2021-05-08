@@ -17,6 +17,7 @@ using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Comm
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Events;
 using Energinet.DataHub.MarketRoles.Application.Common.Commands;
 using Energinet.DataHub.MarketRoles.Application.Common.Processing;
+using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using NodaTime;
@@ -98,7 +99,7 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing
             {
                 case State.AwaitingCurrentSupplierNotificationDispatch:
                     SetInternalState(State.AwaitingSupplierChange);
-                    ScheduleSupplierChange();
+                    ScheduleSupplierChange(@event.AccountingPointId);
                     break;
                 default:
                     ThrowIfStateDoesNotMatch(@event);
@@ -125,9 +126,9 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing
             return _state == State.Completed;
         }
 
-        private void ScheduleSupplierChange()
+        private void ScheduleSupplierChange(AccountingPointId accountingPointId)
         {
-            SendCommand(new ChangeSupplier(BusinessProcessId), EffectiveDate);
+            SendCommand(new ChangeSupplier(accountingPointId.Value, BusinessProcessId.Value), EffectiveDate);
         }
 
         private void ScheduleNotificationOfCurrentSupplier()
