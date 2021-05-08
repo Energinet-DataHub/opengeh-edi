@@ -27,7 +27,6 @@ using Xunit.Categories;
 
 namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSupplier.Processing
 {
-    [Collection("IntegrationTest")]
     [IntegrationTest]
     public class ProcessManagerRouterTests : TestHost
     {

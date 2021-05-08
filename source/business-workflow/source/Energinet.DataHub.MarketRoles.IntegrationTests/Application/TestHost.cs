@@ -43,9 +43,11 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
+using Xunit;
 
 namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 {
+    [Collection("IntegrationTest")]
     public class TestHost : IDisposable
     {
         private SqlConnection _sqlConnection = null;
@@ -253,8 +255,6 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
                                    $"DELETE FROM [dbo].[QueuedInternalCommands]";
 
             new SqlCommand(cleanupStatement, GetSqlDbConnection()).ExecuteNonQuery();
-            //MarketRolesContext.Database.ExecuteSqlRaw(cleanupStatement);
-            //MarketRolesContext.Dispose();
         }
     }
 }

@@ -30,7 +30,6 @@ using Xunit.Categories;
 namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSupplier.Processing.Commands
 {
     [IntegrationTest]
-    [Collection("IntegrationTest")]
     public class ChangeSupplierTests : TestHost
     {
         private readonly AccountingPoint _accountingPoint;
