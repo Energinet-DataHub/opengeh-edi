@@ -12,18 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.Common.Commands;
+using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
+using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using MediatR;
 
 namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands
 {
     public class ChangeSupplierHandler : ICommandHandler<ChangeSupplier>
     {
-        public Task<Unit> Handle(ChangeSupplier request, CancellationToken cancellationToken)
+        private readonly IAccountingPointRepository _accountingPointRepository;
+        private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+
+        public ChangeSupplierHandler(IAccountingPointRepository accountingPointRepository, ISystemDateTimeProvider systemDateTimeProvider)
         {
-            throw new System.NotImplementedException();
+            _accountingPointRepository = accountingPointRepository ?? throw new ArgumentNullException(nameof(accountingPointRepository));
+            _systemDateTimeProvider = systemDateTimeProvider ?? throw new ArgumentNullException(nameof(systemDateTimeProvider));
+        }
+
+        public async Task<Unit> Handle(ChangeSupplier request, CancellationToken cancellationToken)
+        {
+            if (request == null) throw new ArgumentNullException(nameof(request));
+
+            var accountingPoint = await _accountingPointRepository.GetByIdAsync(AccountingPointId.Create(request.AccountingPointId)).ConfigureAwait(false);
+            accountingPoint.EffectuateChangeOfSupplier(Transaction.Create(request.Transaction), _systemDateTimeProvider);
+            return Unit.Value;
         }
     }
 }

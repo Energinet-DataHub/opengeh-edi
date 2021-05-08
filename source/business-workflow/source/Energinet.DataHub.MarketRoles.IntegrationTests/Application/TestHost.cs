@@ -15,9 +15,11 @@
 using System;
 using System.Data;
 using System.Linq;
+using Energinet.DataHub.MarketRoles.Application;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing;
 using Energinet.DataHub.MarketRoles.Application.Common.Commands;
+using Energinet.DataHub.MarketRoles.Application.Common.DomainEvents;
 using Energinet.DataHub.MarketRoles.Application.Common.Processing;
 using Energinet.DataHub.MarketRoles.Domain.Consumers;
 using Energinet.DataHub.MarketRoles.Domain.EnergySuppliers;
@@ -69,6 +71,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             services.AddScoped<ICommandScheduler, CommandScheduler>();
             services.AddScoped<IDomainEventsAccessor, DomainEventsAccessor>();
             services.AddScoped<IDomainEventsDispatcher, DomainEventsDispatcher>();
+            services.AddScoped<IDomainEventPublisher, DomainEventPublisher>();
 
             services.AddMediatR(new[]
             {
