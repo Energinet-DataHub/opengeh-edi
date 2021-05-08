@@ -12,18 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Events;
 using Energinet.DataHub.MarketRoles.Application.Common.Commands;
+using Energinet.DataHub.MarketRoles.Application.Common.DomainEvents;
+using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using MediatR;
 
 namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands
 {
     public class NotifyCurrentSupplierHandler : ICommandHandler<NotifyCurrentSupplier>
     {
-        public Task<Unit> Handle(NotifyCurrentSupplier request, CancellationToken cancellationToken)
+        private readonly IDomainEventPublisher _domainEventPublisher;
+
+        public NotifyCurrentSupplierHandler(IDomainEventPublisher domainEventPublisher)
         {
-            throw new System.NotImplementedException();
+            _domainEventPublisher = domainEventPublisher ?? throw new ArgumentNullException(nameof(domainEventPublisher));
+        }
+
+        public async Task<Unit> Handle(NotifyCurrentSupplier request, CancellationToken cancellationToken)
+        {
+            //TODO: Implement application logic
+            if (request == null) throw new ArgumentNullException(nameof(request));
+            await _domainEventPublisher.PublishAsync(new CurrentSupplierNotified(
+                AccountingPointId.Create(request.AccountingPointId),
+                BusinessProcessId.Create(request.BusinessProcessId),
+                Transaction.Create(request.Transaction))).ConfigureAwait(false);
+
+            return Unit.Value;
         }
     }
 }
