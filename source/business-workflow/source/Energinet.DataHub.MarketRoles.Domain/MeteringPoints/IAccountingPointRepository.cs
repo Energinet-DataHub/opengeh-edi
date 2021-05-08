@@ -33,5 +33,12 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
         /// </summary>
         /// <param name="accountingPoint"></param>
         void Add(AccountingPoint accountingPoint);
+
+        /// <summary>
+        /// Fetches an accounting point by accounting point id
+        /// </summary>
+        /// <param name="accountingPointId"></param>
+        /// <returns><see cref="AccountingPoint"/></returns>
+        Task<AccountingPoint> GetByIdAsync(AccountingPointId accountingPointId);
     }
 }
