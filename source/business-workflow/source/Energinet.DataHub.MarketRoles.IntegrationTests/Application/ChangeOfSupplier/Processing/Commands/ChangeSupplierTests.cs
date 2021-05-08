@@ -35,40 +35,52 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
         private readonly AccountingPoint _accountingPoint;
         private readonly EnergySupplier _energySupplier;
         private readonly Consumer _consumer;
+        private readonly IMediator _mediator;
+
+        private Transaction _transaction = null;
 
         public ChangeSupplierTests()
         {
             _accountingPoint = CreateAccountingPoint();
             _energySupplier = CreateEnergySupplier();
             _consumer = CreateConsumer();
+            _mediator = GetService<IMediator>();
         }
 
         [Fact]
         public async Task ChangeSupplier_WhenEffectiveDateIsDue_IsSuccessful()
         {
+            await SimulateProcess();
+
+            var command = new ChangeSupplier(_accountingPoint.Id.Value, _transaction.Value);
+            await GetService<IMediator>().Send(command, CancellationToken.None);
+
+            var query =
+                $"SELECT Count(1) FROM SupplierRegistrations WHERE AccountingPointId = '{_accountingPoint.Id.Value}' AND EnergySupplierId = '{_energySupplier.EnergySupplierId.Value}' AND StartOfSupplyDate IS NOT NULL AND EndOfSupplyDate IS NULL";
+            var sqlCommand = new SqlCommand(query, GetSqlDbConnection());
+            var result = await sqlCommand.ExecuteScalarAsync();
+
+            Assert.Equal(1, result);
+        }
+
+        private async Task SimulateProcess()
+        {
             SetConsumerMovedIn(_accountingPoint, _consumer.ConsumerId, _energySupplier.EnergySupplierId);
             await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
-            var transaction = CreateTransaction();
+
+            _transaction = CreateTransaction();
             await Mediator.Send(new RequestChangeOfSupplier(
-                transaction.Value,
+                _transaction.Value,
                 _energySupplier.GlnNumber.Value,
                 _consumer.CprNumber.Value,
                 _accountingPoint.GsrnNumber.Value,
                 SystemDateTimeProvider.Now()));
 
-            var bususinessProcessId = GetBusinessProcessId(transaction);
+            var bususinessProcessId = GetBusinessProcessId(_transaction);
 
-            await Mediator.Send(new SendMeteringPointDetails(_accountingPoint.Id.Value, bususinessProcessId.Value, transaction.Value));
-            await Mediator.Send(new SendConsumerDetails(_accountingPoint.Id.Value, bususinessProcessId.Value, transaction.Value));
-            await Mediator.Send(new NotifyCurrentSupplier(_accountingPoint.Id.Value, bususinessProcessId.Value, transaction.Value));
-
-            var command = new ChangeSupplier(_accountingPoint.Id.Value, transaction.Value);
-            await GetService<IMediator>().Send(command, CancellationToken.None);
-
-            var sql =
-                $"SELECT Count(1) FROM SupplierRegistrations WHERE EnergySupplierId = '{_energySupplier.EnergySupplierId.Value}' AND StartOfSupplyDate IS NOT NULL AND EndOfSupplyDate IS NULL";
-            var sqlCommand = new SqlCommand(sql, GetSqlDbConnection());
-            var result = sqlCommand.ExecuteNonQuery();
+            await Mediator.Send(new SendMeteringPointDetails(_accountingPoint.Id.Value, bususinessProcessId.Value, _transaction.Value));
+            await Mediator.Send(new SendConsumerDetails(_accountingPoint.Id.Value, bususinessProcessId.Value, _transaction.Value));
+            await Mediator.Send(new NotifyCurrentSupplier(_accountingPoint.Id.Value, bususinessProcessId.Value, _transaction.Value));
         }
     }
 }
