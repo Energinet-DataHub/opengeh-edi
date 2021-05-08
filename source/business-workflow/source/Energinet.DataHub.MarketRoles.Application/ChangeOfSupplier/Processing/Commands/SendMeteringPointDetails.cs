@@ -20,11 +20,17 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.
 {
     public class SendMeteringPointDetails : InternalCommand
     {
-        public SendMeteringPointDetails(BusinessProcessId businessProcessId)
+        public SendMeteringPointDetails(Guid accountingPointId, Guid businessProcessId, string transaction)
         {
-            BusinessProcessId = businessProcessId ?? throw new ArgumentNullException(nameof(businessProcessId));
+            AccountingPointId = accountingPointId;
+            BusinessProcessId = businessProcessId;
+            Transaction = transaction;
         }
 
-        public BusinessProcessId BusinessProcessId { get; }
+        public Guid AccountingPointId { get; }
+
+        public Guid BusinessProcessId { get; }
+
+        public string Transaction { get; }
     }
 }

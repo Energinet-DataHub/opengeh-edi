@@ -20,14 +20,14 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.
 {
     public class ChangeSupplier : InternalCommand
     {
-        public ChangeSupplier(Guid accountingPointId, Guid businessProcessId)
+        public ChangeSupplier(Guid accountingPointId, string transaction)
         {
             AccountingPointId = accountingPointId;
-            BusinessProcessId = businessProcessId;
+            Transaction = transaction;
         }
 
         public Guid AccountingPointId { get; }
 
-        public Guid BusinessProcessId { get; }
+        public string Transaction { get; }
     }
 }

@@ -62,7 +62,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
             var command = await GetEnqueuedCommandAsync<SendMeteringPointDetails>();
 
             Assert.NotNull(command);
-            Assert.Equal(_businessProcessId, command.BusinessProcessId);
+            Assert.Equal(_businessProcessId.Value, command.BusinessProcessId);
         }
 
         [Fact]
@@ -76,7 +76,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
 
             var command = await GetEnqueuedCommandAsync<SendConsumerDetails>();
             Assert.NotNull(command);
-            Assert.Equal(_businessProcessId, command.BusinessProcessId);
+            Assert.Equal(_businessProcessId.Value, command.BusinessProcessId);
         }
 
         [Fact]
@@ -93,7 +93,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
 
             var command = await GetEnqueuedCommandAsync<NotifyCurrentSupplier>();
             Assert.NotNull(command);
-            Assert.Equal(_businessProcessId, command.BusinessProcessId);
+            Assert.Equal(_businessProcessId.Value, command.BusinessProcessId);
         }
 
         [Fact]
@@ -113,7 +113,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
 
             var command = await GetEnqueuedCommandAsync<ChangeSupplier>();
             Assert.NotNull(command);
-            Assert.Equal(_businessProcessId.Value, command.BusinessProcessId);
+            Assert.Equal(_accountingPoint.Id.Value, command.AccountingPointId);
         }
 
         [Fact]
