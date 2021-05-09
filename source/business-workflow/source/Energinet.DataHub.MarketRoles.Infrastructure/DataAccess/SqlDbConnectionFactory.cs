@@ -22,6 +22,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.DataAccess
     {
         private readonly string _connectionString;
         private IDbConnection _connection = null!;
+        private bool _disposed;
 
         public SqlDbConnectionFactory(string connectionString)
         {
@@ -45,10 +46,19 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.DataAccess
 
         public void Dispose()
         {
-            if (_connection != null && _connection.State == ConnectionState.Open)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
             {
-                _connection.Dispose();
+                return;
             }
+
+            _connection.Dispose();
+            _disposed = true;
         }
     }
 }
