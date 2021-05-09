@@ -19,6 +19,7 @@ using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Cons
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.EndOfSupplyNotification;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.MeteringPointDetails;
 using Energinet.DataHub.MarketRoles.Application.Common.Processing;
+using Energinet.DataHub.MarketRoles.Domain.EnergySuppliers;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events;
 using Energinet.DataHub.MarketRoles.Tests.Domain;
@@ -36,6 +37,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Proce
         private readonly GsrnNumber _gsrnNumber;
         private readonly BusinessProcessId _businessProcessId;
         private readonly Transaction _transaction;
+        private readonly EnergySupplierId _energySupplierId;
         private readonly Instant _effectiveDate;
 
         public ChangeOfSupplierProcessManagerTests()
@@ -45,6 +47,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Proce
             _gsrnNumber = GsrnNumber.Create("571234567891234568");
             _businessProcessId = new BusinessProcessId(Guid.NewGuid());
             _transaction = new Transaction(Guid.NewGuid().ToString());
+            _energySupplierId = new EnergySupplierId(Guid.NewGuid());
             _effectiveDate = SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(60));
         }
 
@@ -151,7 +154,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Proce
             processManager.When(new MeteringPointDetailsDispatched(_accountingPointId, _businessProcessId, _transaction));
             processManager.When(new ConsumerDetailsDispatched(_accountingPointId, _businessProcessId, _transaction));
             processManager.When(new CurrentSupplierNotified(_accountingPointId, _businessProcessId, _transaction));
-            processManager.When(new EnergySupplierChanged(_accountingPointId, _gsrnNumber, _businessProcessId, _transaction, Instant.MaxValue));
+            processManager.When(new EnergySupplierChanged(_accountingPointId, _gsrnNumber, _businessProcessId, _transaction, _energySupplierId, Instant.MaxValue));
 
             Assert.True(processManager.IsCompleted());
         }
@@ -159,14 +162,6 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Proce
         private ChangeOfSupplierProcessManager Create()
         {
             return new ChangeOfSupplierProcessManager();
-        }
-
-        private (BusinessProcessId, GsrnNumber, Instant) CreateTestValues()
-        {
-            var processId = new BusinessProcessId(Guid.NewGuid());
-            var gsrnNumber = GsrnNumber.Create("571234567891234568");
-            var effectiveDate = SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(60));
-            return (processId, gsrnNumber, effectiveDate);
         }
 
         private EnergySupplierChangeRegistered CreateSupplierChangeRegisteredEvent()
