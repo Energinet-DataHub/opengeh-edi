@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands;
+using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands.ConsumerDetails;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands.EndOfSupplyNotification;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Events;
 using Energinet.DataHub.MarketRoles.Application.Common.Processing;
@@ -70,8 +71,8 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Proce
             processManager.When(CreateSupplierChangeRegisteredEvent());
             processManager.When(new MeteringPointDetailsDispatched(_accountingPointId, _businessProcessId, _transaction));
             var command =
-                processManager.CommandsToSend.First(c => c.Command is SendConsumerDetails).Command as
-                    SendConsumerDetails;
+                processManager.CommandsToSend.First(c => c.Command is ForwardConsumerDetails).Command as
+                    ForwardConsumerDetails;
 
             Assert.NotNull(command);
         }

@@ -16,6 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands;
+using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands.ConsumerDetails;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands.EndOfSupplyNotification;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Events;
 using Energinet.DataHub.MarketRoles.Domain.Consumers;
@@ -74,7 +75,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
             await _router.Handle(new MeteringPointDetailsDispatched(_accountingPoint.Id, _businessProcessId, Transaction), CancellationToken.None).ConfigureAwait(false);
             await UnitOfWork.CommitAsync();
 
-            var command = await GetEnqueuedCommandAsync<SendConsumerDetails>();
+            var command = await GetEnqueuedCommandAsync<ForwardConsumerDetails>();
             Assert.NotNull(command);
             Assert.Equal(_businessProcessId.Value, command.BusinessProcessId);
         }

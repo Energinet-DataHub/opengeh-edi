@@ -14,6 +14,7 @@
 
 using System;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands;
+using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands.ConsumerDetails;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands.EndOfSupplyNotification;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Events;
 using Energinet.DataHub.MarketRoles.Application.Common.Commands;
@@ -70,7 +71,7 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing
             {
                 case State.AwaitingMeteringPointDetailsDispatch:
                     SetInternalState(State.AwaitingConsumerDetailsDispatch);
-                    SendCommand(new SendConsumerDetails(@event.AccountingPointId.Value, @event.BusinessProcessId.Value, @event.Transaction.Value));
+                    SendCommand(new ForwardConsumerDetails(@event.AccountingPointId.Value, @event.BusinessProcessId.Value, @event.Transaction.Value));
                     break;
                 default:
                     ThrowIfStateDoesNotMatch(@event);

@@ -12,24 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Energinet.DataHub.MarketRoles.Application.Common.Commands;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands.ConsumerDetails;
+using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 
-namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands
+namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.ChangeOfSupplier.ConsumerDetails
 {
-    public class SendConsumerDetails : InternalCommand
+    public class ConsumerDetailsForwarder : IConsumerDetailsForwarder
     {
-        public SendConsumerDetails(Guid accountingPointId, Guid businessProcessId, string transaction)
+        public Task ForwardAsync(AccountingPointId accountingPointId)
         {
-            AccountingPointId = accountingPointId;
-            BusinessProcessId = businessProcessId;
-            Transaction = transaction;
+            //TODO: Add logic for generating EDI messages containing consumer details
+            return Task.CompletedTask;
         }
-
-        public Guid AccountingPointId { get; }
-
-        public Guid BusinessProcessId { get; }
-
-        public string Transaction { get; }
     }
 }

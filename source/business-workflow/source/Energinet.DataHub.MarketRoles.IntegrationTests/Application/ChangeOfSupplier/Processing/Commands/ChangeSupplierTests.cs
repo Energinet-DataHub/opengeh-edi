@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands;
+using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands.ConsumerDetails;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands.EndOfSupplyNotification;
 using Energinet.DataHub.MarketRoles.Domain.Consumers;
 using Energinet.DataHub.MarketRoles.Domain.EnergySuppliers;
@@ -80,7 +81,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
             var bususinessProcessId = GetBusinessProcessId(_transaction);
 
             await Mediator.Send(new SendMeteringPointDetails(_accountingPoint.Id.Value, bususinessProcessId.Value, _transaction.Value));
-            await Mediator.Send(new SendConsumerDetails(_accountingPoint.Id.Value, bususinessProcessId.Value, _transaction.Value));
+            await Mediator.Send(new ForwardConsumerDetails(_accountingPoint.Id.Value, bususinessProcessId.Value, _transaction.Value));
             await Mediator.Send(new NotifyCurrentSupplier(_accountingPoint.Id.Value, bususinessProcessId.Value, _transaction.Value));
         }
     }

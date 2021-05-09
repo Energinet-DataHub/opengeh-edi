@@ -21,20 +21,21 @@ using Energinet.DataHub.MarketRoles.Application.Common.DomainEvents;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using MediatR;
 
-namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands
+namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands.ConsumerDetails
 {
-    public class SendConsumerDetailsHandler : ICommandHandler<SendConsumerDetails>
+    public class ForwardConsumerDetailsHandler : ICommandHandler<ForwardConsumerDetails>
     {
         private readonly IDomainEventPublisher _domainEventPublisher;
+        private readonly IConsumerDetailsForwarder _consumerDetailsForwarder;
 
-        public SendConsumerDetailsHandler(IDomainEventPublisher domainEventPublisher)
+        public ForwardConsumerDetailsHandler(IDomainEventPublisher domainEventPublisher, IConsumerDetailsForwarder consumerDetailsForwarder)
         {
             _domainEventPublisher = domainEventPublisher ?? throw new ArgumentNullException(nameof(domainEventPublisher));
+            _consumerDetailsForwarder = consumerDetailsForwarder ?? throw new ArgumentNullException(nameof(consumerDetailsForwarder));
         }
 
-        public async Task<Unit> Handle(SendConsumerDetails request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(ForwardConsumerDetails request, CancellationToken cancellationToken)
         {
-            //TODO: Implement application logic
             if (request == null) throw new ArgumentNullException(nameof(request));
 
             await _domainEventPublisher.PublishAsync(new ConsumerDetailsDispatched(
