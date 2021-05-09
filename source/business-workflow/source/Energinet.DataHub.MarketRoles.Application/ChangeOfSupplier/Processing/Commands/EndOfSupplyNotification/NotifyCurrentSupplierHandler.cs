@@ -21,21 +21,25 @@ using Energinet.DataHub.MarketRoles.Application.Common.DomainEvents;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using MediatR;
 
-namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands
+namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands.EndOfSupplyNotification
 {
     public class NotifyCurrentSupplierHandler : ICommandHandler<NotifyCurrentSupplier>
     {
         private readonly IDomainEventPublisher _domainEventPublisher;
+        private readonly IEndOfSupplyNotifier _endOfSupplyNotifier;
 
-        public NotifyCurrentSupplierHandler(IDomainEventPublisher domainEventPublisher)
+        public NotifyCurrentSupplierHandler(IDomainEventPublisher domainEventPublisher, IEndOfSupplyNotifier endOfSupplyNotifier)
         {
             _domainEventPublisher = domainEventPublisher ?? throw new ArgumentNullException(nameof(domainEventPublisher));
+            _endOfSupplyNotifier = endOfSupplyNotifier ?? throw new ArgumentNullException(nameof(endOfSupplyNotifier));
         }
 
         public async Task<Unit> Handle(NotifyCurrentSupplier request, CancellationToken cancellationToken)
         {
-            //TODO: Implement application logic
             if (request == null) throw new ArgumentNullException(nameof(request));
+
+            await _endOfSupplyNotifier.NotifyAsync(AccountingPointId.Create(request.AccountingPointId)).ConfigureAwait(false);
+
             await _domainEventPublisher.PublishAsync(new CurrentSupplierNotified(
                 AccountingPointId.Create(request.AccountingPointId),
                 BusinessProcessId.Create(request.BusinessProcessId),
