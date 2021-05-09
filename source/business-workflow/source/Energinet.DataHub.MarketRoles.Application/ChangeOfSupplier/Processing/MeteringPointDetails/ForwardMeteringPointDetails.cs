@@ -15,7 +15,7 @@
 using System;
 using Energinet.DataHub.MarketRoles.Application.Common.Commands;
 
-namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands.MeteringPointDetails
+namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.MeteringPointDetails
 {
     public class ForwardMeteringPointDetails : InternalCommand
     {

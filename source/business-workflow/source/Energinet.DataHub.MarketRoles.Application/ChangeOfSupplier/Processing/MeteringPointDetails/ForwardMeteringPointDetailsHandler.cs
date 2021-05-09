@@ -15,13 +15,12 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Events;
 using Energinet.DataHub.MarketRoles.Application.Common.Commands;
 using Energinet.DataHub.MarketRoles.Application.Common.DomainEvents;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using MediatR;
 
-namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands.MeteringPointDetails
+namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.MeteringPointDetails
 {
     public class ForwardMeteringPointDetailsHandler : ICommandHandler<ForwardMeteringPointDetails>
     {

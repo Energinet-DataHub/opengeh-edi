@@ -12,18 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
-namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Events
+namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.EndOfSupplyNotification
 {
-    public class MeteringPointDetailsDispatched : DomainEventBase
+    public class CurrentSupplierNotified : DomainEventBase
     {
-        public MeteringPointDetailsDispatched(AccountingPointId accountingPointId, BusinessProcessId businessProcessId, Transaction transaction)
+        public CurrentSupplierNotified(AccountingPointId accountingPointId, BusinessProcessId businessProcessId, Transaction transaction)
         {
             AccountingPointId = accountingPointId;
-            BusinessProcessId = businessProcessId ?? throw new ArgumentNullException(nameof(businessProcessId));
+            BusinessProcessId = businessProcessId;
             Transaction = transaction;
         }
 

@@ -15,20 +15,17 @@
 using System;
 using Energinet.DataHub.MarketRoles.Application.Common.Commands;
 
-namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands.EndOfSupplyNotification
+namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing
 {
-    public class NotifyCurrentSupplier : InternalCommand
+    public class ChangeSupplier : InternalCommand
     {
-        public NotifyCurrentSupplier(Guid accountingPointId, Guid businessProcessId, string transaction)
+        public ChangeSupplier(Guid accountingPointId, string transaction)
         {
             AccountingPointId = accountingPointId;
-            BusinessProcessId = businessProcessId;
             Transaction = transaction;
         }
 
         public Guid AccountingPointId { get; }
-
-        public Guid BusinessProcessId { get; }
 
         public string Transaction { get; }
     }

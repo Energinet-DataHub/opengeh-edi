@@ -13,23 +13,24 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketRoles.Application.Common.Commands;
+using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
+using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
-namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands.ConsumerDetails
+namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.MeteringPointDetails
 {
-    public class ForwardConsumerDetails : InternalCommand
+    public class MeteringPointDetailsDispatched : DomainEventBase
     {
-        public ForwardConsumerDetails(Guid accountingPointId, Guid businessProcessId, string transaction)
+        public MeteringPointDetailsDispatched(AccountingPointId accountingPointId, BusinessProcessId businessProcessId, Transaction transaction)
         {
             AccountingPointId = accountingPointId;
-            BusinessProcessId = businessProcessId;
+            BusinessProcessId = businessProcessId ?? throw new ArgumentNullException(nameof(businessProcessId));
             Transaction = transaction;
         }
 
-        public Guid AccountingPointId { get; }
+        public AccountingPointId AccountingPointId { get; }
 
-        public Guid BusinessProcessId { get; }
+        public BusinessProcessId BusinessProcessId { get; }
 
-        public string Transaction { get; }
+        public Transaction Transaction { get; }
     }
 }

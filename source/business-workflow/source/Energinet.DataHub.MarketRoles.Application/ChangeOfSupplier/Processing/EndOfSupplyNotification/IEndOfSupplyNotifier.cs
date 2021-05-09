@@ -15,19 +15,18 @@
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 
-namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands.ConsumerDetails
+namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.EndOfSupplyNotification
 {
     /// <summary>
-    /// Handler for forwarding accounting point consumer details to future energy supplier. This handler is used
-    /// as part of a change of supplier business process
+    /// Handler for notifying energy supplier about end of supply due to a change of supplier business process
     /// </summary>
-    public interface IConsumerDetailsForwarder
+    public interface IEndOfSupplyNotifier
     {
         /// <summary>
-        /// Generate and dispatch consumer details
+        /// Generates notification
         /// </summary>
         /// <param name="accountingPointId"></param>
         /// <returns><see cref="Task"/></returns>
-        Task ForwardAsync(AccountingPointId accountingPointId);
+        Task NotifyAsync(AccountingPointId accountingPointId);
     }
 }

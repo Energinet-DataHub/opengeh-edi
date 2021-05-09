@@ -15,32 +15,29 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Events;
 using Energinet.DataHub.MarketRoles.Application.Common.Commands;
 using Energinet.DataHub.MarketRoles.Application.Common.DomainEvents;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using MediatR;
 
-namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands.EndOfSupplyNotification
+namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.ConsumerDetails
 {
-    public class NotifyCurrentSupplierHandler : ICommandHandler<NotifyCurrentSupplier>
+    public class ForwardConsumerDetailsHandler : ICommandHandler<ForwardConsumerDetails>
     {
         private readonly IDomainEventPublisher _domainEventPublisher;
-        private readonly IEndOfSupplyNotifier _endOfSupplyNotifier;
+        private readonly IConsumerDetailsForwarder _consumerDetailsForwarder;
 
-        public NotifyCurrentSupplierHandler(IDomainEventPublisher domainEventPublisher, IEndOfSupplyNotifier endOfSupplyNotifier)
+        public ForwardConsumerDetailsHandler(IDomainEventPublisher domainEventPublisher, IConsumerDetailsForwarder consumerDetailsForwarder)
         {
             _domainEventPublisher = domainEventPublisher ?? throw new ArgumentNullException(nameof(domainEventPublisher));
-            _endOfSupplyNotifier = endOfSupplyNotifier ?? throw new ArgumentNullException(nameof(endOfSupplyNotifier));
+            _consumerDetailsForwarder = consumerDetailsForwarder ?? throw new ArgumentNullException(nameof(consumerDetailsForwarder));
         }
 
-        public async Task<Unit> Handle(NotifyCurrentSupplier request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(ForwardConsumerDetails request, CancellationToken cancellationToken)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            await _endOfSupplyNotifier.NotifyAsync(AccountingPointId.Create(request.AccountingPointId)).ConfigureAwait(false);
-
-            await _domainEventPublisher.PublishAsync(new CurrentSupplierNotified(
+            await _domainEventPublisher.PublishAsync(new ConsumerDetailsDispatched(
                 AccountingPointId.Create(request.AccountingPointId),
                 BusinessProcessId.Create(request.BusinessProcessId),
                 Transaction.Create(request.Transaction))).ConfigureAwait(false);

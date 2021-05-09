@@ -15,11 +15,9 @@
 using System;
 using System.Linq;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing;
-using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands;
-using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands.ConsumerDetails;
-using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands.EndOfSupplyNotification;
-using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands.MeteringPointDetails;
-using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Events;
+using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.ConsumerDetails;
+using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.EndOfSupplyNotification;
+using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.MeteringPointDetails;
 using Energinet.DataHub.MarketRoles.Application.Common.Processing;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events;

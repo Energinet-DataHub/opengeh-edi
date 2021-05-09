@@ -20,7 +20,7 @@ using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using MediatR;
 
-namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands
+namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing
 {
     public class ChangeSupplierHandler : ICommandHandler<ChangeSupplier>
     {

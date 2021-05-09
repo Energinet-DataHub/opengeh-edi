@@ -15,30 +15,31 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Events;
 using Energinet.DataHub.MarketRoles.Application.Common.Commands;
 using Energinet.DataHub.MarketRoles.Application.Common.DomainEvents;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using MediatR;
 
-namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands.ConsumerDetails
+namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.EndOfSupplyNotification
 {
-    public class ForwardConsumerDetailsHandler : ICommandHandler<ForwardConsumerDetails>
+    public class NotifyCurrentSupplierHandler : ICommandHandler<NotifyCurrentSupplier>
     {
         private readonly IDomainEventPublisher _domainEventPublisher;
-        private readonly IConsumerDetailsForwarder _consumerDetailsForwarder;
+        private readonly IEndOfSupplyNotifier _endOfSupplyNotifier;
 
-        public ForwardConsumerDetailsHandler(IDomainEventPublisher domainEventPublisher, IConsumerDetailsForwarder consumerDetailsForwarder)
+        public NotifyCurrentSupplierHandler(IDomainEventPublisher domainEventPublisher, IEndOfSupplyNotifier endOfSupplyNotifier)
         {
             _domainEventPublisher = domainEventPublisher ?? throw new ArgumentNullException(nameof(domainEventPublisher));
-            _consumerDetailsForwarder = consumerDetailsForwarder ?? throw new ArgumentNullException(nameof(consumerDetailsForwarder));
+            _endOfSupplyNotifier = endOfSupplyNotifier ?? throw new ArgumentNullException(nameof(endOfSupplyNotifier));
         }
 
-        public async Task<Unit> Handle(ForwardConsumerDetails request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(NotifyCurrentSupplier request, CancellationToken cancellationToken)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            await _domainEventPublisher.PublishAsync(new ConsumerDetailsDispatched(
+            await _endOfSupplyNotifier.NotifyAsync(AccountingPointId.Create(request.AccountingPointId)).ConfigureAwait(false);
+
+            await _domainEventPublisher.PublishAsync(new CurrentSupplierNotified(
                 AccountingPointId.Create(request.AccountingPointId),
                 BusinessProcessId.Create(request.BusinessProcessId),
                 Transaction.Create(request.Transaction))).ConfigureAwait(false);
