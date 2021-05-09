@@ -18,6 +18,7 @@ using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands.ConsumerDetails;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands.EndOfSupplyNotification;
+using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands.MeteringPointDetails;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Events;
 using Energinet.DataHub.MarketRoles.Application.Common.Processing;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
@@ -57,8 +58,8 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Proce
             processManager.When(CreateSupplierChangeRegisteredEvent());
 
             var command =
-                processManager.CommandsToSend.First(c => c.Command is SendMeteringPointDetails).Command as
-                    SendMeteringPointDetails;
+                processManager.CommandsToSend.First(c => c.Command is ForwardMeteringPointDetails).Command as
+                    ForwardMeteringPointDetails;
 
             Assert.NotNull(command);
         }

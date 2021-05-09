@@ -21,21 +21,25 @@ using Energinet.DataHub.MarketRoles.Application.Common.DomainEvents;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using MediatR;
 
-namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands
+namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands.MeteringPointDetails
 {
-    public class SendMeteringPointDetailsHandler : ICommandHandler<SendMeteringPointDetails>
+    public class ForwardMeteringPointDetailsHandler : ICommandHandler<ForwardMeteringPointDetails>
     {
         private readonly IDomainEventPublisher _domainEventPublisher;
+        private readonly IMeteringPointDetailsForwarder _meteringPointDetailsForwarder;
 
-        public SendMeteringPointDetailsHandler(IDomainEventPublisher domainEventPublisher)
+        public ForwardMeteringPointDetailsHandler(IDomainEventPublisher domainEventPublisher, IMeteringPointDetailsForwarder meteringPointDetailsForwarder)
         {
             _domainEventPublisher = domainEventPublisher ?? throw new ArgumentNullException(nameof(domainEventPublisher));
+            _meteringPointDetailsForwarder = meteringPointDetailsForwarder ?? throw new ArgumentNullException(nameof(meteringPointDetailsForwarder));
         }
 
-        public async Task<Unit> Handle(SendMeteringPointDetails request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(ForwardMeteringPointDetails request, CancellationToken cancellationToken)
         {
-            //TODO: Implement application logic
             if (request == null) throw new ArgumentNullException(nameof(request));
+
+            await _meteringPointDetailsForwarder.ForwardAsync(AccountingPointId.Create(request.AccountingPointId)).ConfigureAwait(false);
+
             await _domainEventPublisher.PublishAsync(new MeteringPointDetailsDispatched(
                 AccountingPointId.Create(request.AccountingPointId),
                 BusinessProcessId.Create(request.BusinessProcessId),

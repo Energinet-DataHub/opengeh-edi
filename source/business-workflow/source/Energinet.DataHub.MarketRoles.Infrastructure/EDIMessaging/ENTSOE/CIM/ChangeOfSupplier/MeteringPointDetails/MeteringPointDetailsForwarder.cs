@@ -12,25 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Energinet.DataHub.MarketRoles.Application.Common.Commands;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands.MeteringPointDetails;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 
-namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands
+namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.ChangeOfSupplier.MeteringPointDetails
 {
-    public class SendMeteringPointDetails : InternalCommand
+    public class MeteringPointDetailsForwarder : IMeteringPointDetailsForwarder
     {
-        public SendMeteringPointDetails(Guid accountingPointId, Guid businessProcessId, string transaction)
+        public Task ForwardAsync(AccountingPointId accountingPointId)
         {
-            AccountingPointId = accountingPointId;
-            BusinessProcessId = businessProcessId;
-            Transaction = transaction;
+            //TODO: Add logic for generating EDI messages containing metering point details
+            return Task.CompletedTask;
         }
-
-        public Guid AccountingPointId { get; }
-
-        public Guid BusinessProcessId { get; }
-
-        public string Transaction { get; }
     }
 }
