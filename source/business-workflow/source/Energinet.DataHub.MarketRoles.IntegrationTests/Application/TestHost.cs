@@ -80,6 +80,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             services.AddScoped<IDomainEventsAccessor, DomainEventsAccessor>();
             services.AddScoped<IDomainEventsDispatcher, DomainEventsDispatcher>();
             services.AddScoped<IDomainEventPublisher, DomainEventPublisher>();
+            services.AddScoped<IDbConnectionFactory>(sp => new SqlDbConnectionFactory(ConnectionString));
 
             services.AddMediatR(new[]
             {
