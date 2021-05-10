@@ -49,7 +49,7 @@ runs:
       # If the file doesn't contain the directory then throw an error telling the user to run the dependabot-generator.bat file.
     - name: Check for added csproj files
       run: |
-        errorMessage="The csproj file in %s has not been added to dependabot.yml. Please run dependabot-generator.bat and commit the updated dependabot.yml file."
+        errorMessage="The csproj file in %s has not been added to dependabot.yml. Please run dependabot-generator.bat (found in the ".github" directory locally) and commit the updated dependabot.yml file."
         dirs="$(echo '${{ steps.fetchCsprojDirs.outputs.csproj_dirs }}' | (grep 'added;' || true) | sed 's/.*;//')"
         [ -z "$dirs" ] && echo "No csproj files added. Proceeding to next step." && exit 0
         for dir in $dirs; do
