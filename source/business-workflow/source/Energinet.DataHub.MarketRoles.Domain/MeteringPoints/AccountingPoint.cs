@@ -109,9 +109,11 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
             businessProcess.Effectuate(systemDateTimeProvider);
 
             DiscontinueCurrentSupplier(businessProcess, systemDateTimeProvider);
-            StartOfSupplyForFutureSupplier(businessProcess, systemDateTimeProvider);
 
-            AddDomainEvent(new EnergySupplierChanged(Id, GsrnNumber, businessProcess.BusinessProcessId, transaction, businessProcess.EffectiveDate));
+            var futureSupplier = GetFutureSupplierRegistration(businessProcess);
+            StartOfSupplyForFutureSupplier(businessProcess, futureSupplier);
+
+            AddDomainEvent(new EnergySupplierChanged(Id, GsrnNumber, businessProcess.BusinessProcessId, transaction, futureSupplier.EnergySupplierId, businessProcess.EffectiveDate));
         }
 
         public void CloseDown()
@@ -165,7 +167,12 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
             AddDomainEvent(new ChangeOfSupplierCancelled(Id, GsrnNumber, businessProcess.BusinessProcessId, transaction));
         }
 
-        private void StartOfSupplyForFutureSupplier(BusinessProcess businessProcess, ISystemDateTimeProvider systemDateTimeProvider)
+        private void StartOfSupplyForFutureSupplier(BusinessProcess businessProcess, SupplierRegistration supplierRegistration)
+        {
+            supplierRegistration.StartOfSupply(businessProcess.EffectiveDate);
+        }
+
+        private SupplierRegistration GetFutureSupplierRegistration(BusinessProcess businessProcess)
         {
             var futureSupplier = _supplierRegistrations.Find(s => s.BusinessProcessId.Equals(businessProcess.BusinessProcessId));
             if (futureSupplier == null)
@@ -174,7 +181,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
                     $"Could find supplier registration of process id {businessProcess.Transaction.Value}.");
             }
 
-            futureSupplier.StartOfSupply(businessProcess.EffectiveDate);
+            return futureSupplier;
         }
 
         private void DiscontinueCurrentSupplier(BusinessProcess businessProcess, ISystemDateTimeProvider systemDateTimeProvider)

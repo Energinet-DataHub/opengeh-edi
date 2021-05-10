@@ -40,6 +40,7 @@ using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.Chang
 using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.ChangeOfSupplier.ConsumerDetails;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.ChangeOfSupplier.EndOfSupplyNotification;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.ChangeOfSupplier.MeteringPointDetails;
+using Energinet.DataHub.MarketRoles.Infrastructure.IntegrationEventDispatching.ChangeOfSupplier;
 using Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
@@ -80,10 +81,12 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             services.AddScoped<IDomainEventsAccessor, DomainEventsAccessor>();
             services.AddScoped<IDomainEventsDispatcher, DomainEventsDispatcher>();
             services.AddScoped<IDomainEventPublisher, DomainEventPublisher>();
+            services.AddScoped<IDbConnectionFactory>(sp => new SqlDbConnectionFactory(ConnectionString));
 
             services.AddMediatR(new[]
             {
                 typeof(RequestChangeOfSupplierHandler).Assembly,
+                typeof(PublishWhenEnergySupplierHasChanged).Assembly,
             });
 
             // Actor Notification handlers
