@@ -30,5 +30,10 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
         {
             return new AccountingPointId(Guid.NewGuid());
         }
+
+        public static AccountingPointId Create(Guid id)
+        {
+            return new AccountingPointId(id);
+        }
     }
 }

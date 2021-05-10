@@ -12,18 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading;
-using System.Threading.Tasks;
+using System;
 using Energinet.DataHub.MarketRoles.Application.Common.Commands;
-using MediatR;
 
-namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands
+namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.EndOfSupplyNotification
 {
-    public class SendConsumerDetailsHandler : ICommandHandler<SendConsumerDetails>
+    public class NotifyCurrentSupplier : InternalCommand
     {
-        public Task<Unit> Handle(SendConsumerDetails request, CancellationToken cancellationToken)
+        public NotifyCurrentSupplier(Guid accountingPointId, Guid businessProcessId, string transaction)
         {
-            throw new System.NotImplementedException();
+            AccountingPointId = accountingPointId;
+            BusinessProcessId = businessProcessId;
+            Transaction = transaction;
         }
+
+        public Guid AccountingPointId { get; }
+
+        public Guid BusinessProcessId { get; }
+
+        public string Transaction { get; }
     }
 }

@@ -13,10 +13,12 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands;
-using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Events;
+using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.ConsumerDetails;
+using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.EndOfSupplyNotification;
+using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.MeteringPointDetails;
 using Energinet.DataHub.MarketRoles.Application.Common.Commands;
 using Energinet.DataHub.MarketRoles.Application.Common.Processing;
+using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using NodaTime;
@@ -53,7 +55,7 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing
                     BusinessProcessId = @event.BusinessProcessId;
                     EffectiveDate = @event.EffectiveDate;
                     SetInternalState(State.AwaitingMeteringPointDetailsDispatch);
-                    SendCommand(new SendMeteringPointDetails(BusinessProcessId));
+                    SendCommand(new ForwardMeteringPointDetails(@event.AccountingPointId.Value, @event.BusinessProcessId.Value, @event.Transaction.Value));
                     break;
                 default:
                     ThrowIfStateDoesNotMatch(@event);
@@ -68,7 +70,7 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing
             {
                 case State.AwaitingMeteringPointDetailsDispatch:
                     SetInternalState(State.AwaitingConsumerDetailsDispatch);
-                    SendCommand(new SendConsumerDetails(BusinessProcessId));
+                    SendCommand(new ForwardConsumerDetails(@event.AccountingPointId.Value, @event.BusinessProcessId.Value, @event.Transaction.Value));
                     break;
                 default:
                     ThrowIfStateDoesNotMatch(@event);
@@ -83,7 +85,7 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing
             {
                 case State.AwaitingConsumerDetailsDispatch:
                     SetInternalState(State.AwaitingCurrentSupplierNotificationDispatch);
-                    ScheduleNotificationOfCurrentSupplier();
+                    ScheduleNotificationOfCurrentSupplier(@event.AccountingPointId, @event.Transaction);
                     break;
                 default:
                     ThrowIfStateDoesNotMatch(@event);
@@ -98,7 +100,7 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing
             {
                 case State.AwaitingCurrentSupplierNotificationDispatch:
                     SetInternalState(State.AwaitingSupplierChange);
-                    ScheduleSupplierChange();
+                    ScheduleSupplierChange(@event.AccountingPointId, @event.Transaction);
                     break;
                 default:
                     ThrowIfStateDoesNotMatch(@event);
@@ -125,15 +127,15 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing
             return _state == State.Completed;
         }
 
-        private void ScheduleSupplierChange()
+        private void ScheduleSupplierChange(AccountingPointId accountingPointId, Transaction transaction)
         {
-            SendCommand(new ChangeSupplier(BusinessProcessId), EffectiveDate);
+            SendCommand(new ChangeSupplier(accountingPointId.Value, transaction.Value), EffectiveDate);
         }
 
-        private void ScheduleNotificationOfCurrentSupplier()
+        private void ScheduleNotificationOfCurrentSupplier(AccountingPointId accountingPointId, Transaction transaction)
         {
             var executionDate = EffectiveDate.Minus(Duration.FromHours(72));
-            SendCommand(new NotifyCurrentSupplier(BusinessProcessId), executionDate);
+            SendCommand(new NotifyCurrentSupplier(accountingPointId.Value, BusinessProcessId.Value, transaction.Value), executionDate);
         }
 
         private void ThrowIfStateDoesNotMatch(IDomainEvent @event)

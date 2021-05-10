@@ -12,18 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Application.Common.Commands;
-using MediatR;
+using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.MeteringPointDetails;
+using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 
-namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands
+namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.ChangeOfSupplier.MeteringPointDetails
 {
-    public class ChangeSupplierHandler : ICommandHandler<ChangeSupplier>
+    public class MeteringPointDetailsForwarder : IMeteringPointDetailsForwarder
     {
-        public Task<Unit> Handle(ChangeSupplier request, CancellationToken cancellationToken)
+        public Task ForwardAsync(AccountingPointId accountingPointId)
         {
-            throw new System.NotImplementedException();
+            //TODO: Add logic for generating EDI messages containing metering point details
+            return Task.CompletedTask;
         }
     }
 }

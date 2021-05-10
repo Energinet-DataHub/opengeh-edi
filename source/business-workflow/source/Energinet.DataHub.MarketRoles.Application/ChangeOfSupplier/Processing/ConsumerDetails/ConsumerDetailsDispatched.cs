@@ -15,15 +15,21 @@
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
-namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Events
+namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.ConsumerDetails
 {
-    public class CurrentSupplierNotified : DomainEventBase
+    public class ConsumerDetailsDispatched : DomainEventBase
     {
-        public CurrentSupplierNotified(BusinessProcessId businessProcessId)
+        public ConsumerDetailsDispatched(AccountingPointId accountingPointId, BusinessProcessId businessProcessId, Transaction transaction)
         {
+            AccountingPointId = accountingPointId;
             BusinessProcessId = businessProcessId;
+            Transaction = transaction;
         }
 
+        public AccountingPointId AccountingPointId { get; }
+
         public BusinessProcessId BusinessProcessId { get; }
+
+        public Transaction Transaction { get; }
     }
 }

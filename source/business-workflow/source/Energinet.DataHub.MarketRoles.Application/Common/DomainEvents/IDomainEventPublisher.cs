@@ -12,18 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketRoles.Application.Common.Commands;
-using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
-namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands
+namespace Energinet.DataHub.MarketRoles.Application.Common.DomainEvents
 {
-    public class NotifyCurrentSupplier : InternalCommand
+    /// <summary>
+    /// Service for publishing domain events
+    /// </summary>
+    public interface IDomainEventPublisher
     {
-        public NotifyCurrentSupplier(BusinessProcessId businessProcessId)
-        {
-            BusinessProcessId = businessProcessId;
-        }
-
-        public BusinessProcessId BusinessProcessId { get; }
+        /// <summary>
+        /// Publishes a domain event
+        /// </summary>
+        /// <param name="domainEvent"></param>
+        /// <returns><see cref="Task"/></returns>
+        Task PublishAsync(IDomainEvent @domainEvent);
     }
 }

@@ -12,19 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.EndOfSupplyNotification;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
-namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Events
+namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.ChangeOfSupplier.EndOfSupplyNotification
 {
-    public class MeteringPointDetailsDispatched : DomainEventBase
+    public class EndOfSupplyNotifier : IEndOfSupplyNotifier
     {
-        public MeteringPointDetailsDispatched(BusinessProcessId businessProcessId)
+        public Task NotifyAsync(AccountingPointId accountingPointId)
         {
-            BusinessProcessId = businessProcessId ?? throw new ArgumentNullException(nameof(businessProcessId));
+            //TODO: Add logic for generating actor notification message
+            return Task.CompletedTask;
         }
-
-        public BusinessProcessId BusinessProcessId { get; }
     }
 }

@@ -30,5 +30,15 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
         {
             return new BusinessProcessId(Guid.NewGuid());
         }
+
+        public static BusinessProcessId Create(string value)
+        {
+            return new BusinessProcessId(Guid.Parse(value));
+        }
+
+        public static BusinessProcessId Create(Guid value)
+        {
+            return new BusinessProcessId(value);
+        }
     }
 }

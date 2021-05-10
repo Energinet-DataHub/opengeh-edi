@@ -12,26 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using System;
+using Energinet.DataHub.MarketRoles.Application.Common.Commands;
 
-namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events
+namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.ConsumerDetails
 {
-    public class ChangeOfSupplierCancelled : DomainEventBase
+    public class ForwardConsumerDetails : InternalCommand
     {
-        public ChangeOfSupplierCancelled(AccountingPointId accountingPointId, GsrnNumber gsrnNumber, BusinessProcessId businessProcessId, Transaction transaction)
+        public ForwardConsumerDetails(Guid accountingPointId, Guid businessProcessId, string transaction)
         {
             AccountingPointId = accountingPointId;
-            GsrnNumber = gsrnNumber;
             BusinessProcessId = businessProcessId;
             Transaction = transaction;
         }
 
-        public AccountingPointId AccountingPointId { get; }
+        public Guid AccountingPointId { get; }
 
-        public GsrnNumber GsrnNumber { get; }
+        public Guid BusinessProcessId { get; }
 
-        public BusinessProcessId BusinessProcessId { get; }
-
-        public Transaction Transaction { get; }
+        public string Transaction { get; }
     }
 }

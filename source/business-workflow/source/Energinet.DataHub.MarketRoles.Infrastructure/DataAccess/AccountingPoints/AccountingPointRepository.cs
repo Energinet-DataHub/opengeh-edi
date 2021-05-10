@@ -39,5 +39,11 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.AccountingPoin
             if (accountingPoint == null) throw new ArgumentNullException(nameof(accountingPoint));
             _context.AccountingPoints.Add(accountingPoint);
         }
+
+        public Task<AccountingPoint> GetByIdAsync(AccountingPointId accountingPointId)
+        {
+            if (accountingPointId == null) throw new ArgumentNullException(nameof(accountingPointId));
+            return _context.AccountingPoints.SingleOrDefaultAsync(x => x.Id.Equals(accountingPointId));
+        }
     }
 }

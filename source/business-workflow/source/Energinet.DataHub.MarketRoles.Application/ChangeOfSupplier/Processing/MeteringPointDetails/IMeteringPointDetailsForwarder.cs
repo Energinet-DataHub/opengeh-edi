@@ -12,18 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketRoles.Application.Common.Commands;
+using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 
-namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands
+namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.MeteringPointDetails
 {
-    public class ChangeSupplier : InternalCommand
+    /// <summary>
+    /// Handler for forwarding accounting point details to future energy supplier. This handler is used
+    /// as part of a change of supplier business process
+    /// </summary>
+    public interface IMeteringPointDetailsForwarder
     {
-        public ChangeSupplier(BusinessProcessId businessProcessId)
-        {
-            BusinessProcessId = businessProcessId;
-        }
-
-        public BusinessProcessId BusinessProcessId { get; }
+        /// <summary>
+        /// Generate and dispatch consumer details
+        /// </summary>
+        /// <param name="accountingPointId"></param>
+        /// <returns><see cref="Task"/></returns>
+        Task ForwardAsync(AccountingPointId accountingPointId);
     }
 }

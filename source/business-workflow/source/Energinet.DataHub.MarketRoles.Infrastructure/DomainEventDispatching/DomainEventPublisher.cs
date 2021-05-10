@@ -12,18 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading;
+using System;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Application.Common.Commands;
+using Energinet.DataHub.MarketRoles.Application;
+using Energinet.DataHub.MarketRoles.Application.Common.DomainEvents;
+using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using MediatR;
 
-namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands
+namespace Energinet.DataHub.MarketRoles.Infrastructure.DomainEventDispatching
 {
-    public class NotifyCurrentSupplierHandler : ICommandHandler<NotifyCurrentSupplier>
+    public class DomainEventPublisher : IDomainEventPublisher
     {
-        public Task<Unit> Handle(NotifyCurrentSupplier request, CancellationToken cancellationToken)
+        private readonly IMediator _mediator;
+
+        public DomainEventPublisher(IMediator mediator)
         {
-            throw new System.NotImplementedException();
+            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+        }
+
+        public Task PublishAsync(IDomainEvent domainEvent)
+        {
+            return _mediator.Publish(domainEvent);
         }
     }
 }

@@ -12,18 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
-namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Events
+namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.ConsumerDetails
 {
-    public class ConsumerDetailsDispatched : DomainEventBase
+    /// <summary>
+    /// Handler for forwarding accounting point consumer details to future energy supplier. This handler is used
+    /// as part of a change of supplier business process
+    /// </summary>
+    public interface IConsumerDetailsForwarder
     {
-        public ConsumerDetailsDispatched(BusinessProcessId businessProcessId)
-        {
-            BusinessProcessId = businessProcessId;
-        }
-
-        public BusinessProcessId BusinessProcessId { get; }
+        /// <summary>
+        /// Generate and dispatch consumer details
+        /// </summary>
+        /// <param name="accountingPointId"></param>
+        /// <returns><see cref="Task"/></returns>
+        Task ForwardAsync(AccountingPointId accountingPointId);
     }
 }

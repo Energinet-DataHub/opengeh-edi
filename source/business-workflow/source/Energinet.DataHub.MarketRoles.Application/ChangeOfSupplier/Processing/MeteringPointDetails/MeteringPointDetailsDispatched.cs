@@ -13,18 +13,24 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketRoles.Application.Common.Commands;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
+using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
-namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands
+namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.MeteringPointDetails
 {
-    public class SendMeteringPointDetails : InternalCommand
+    public class MeteringPointDetailsDispatched : DomainEventBase
     {
-        public SendMeteringPointDetails(BusinessProcessId businessProcessId)
+        public MeteringPointDetailsDispatched(AccountingPointId accountingPointId, BusinessProcessId businessProcessId, Transaction transaction)
         {
+            AccountingPointId = accountingPointId;
             BusinessProcessId = businessProcessId ?? throw new ArgumentNullException(nameof(businessProcessId));
+            Transaction = transaction;
         }
 
+        public AccountingPointId AccountingPointId { get; }
+
         public BusinessProcessId BusinessProcessId { get; }
+
+        public Transaction Transaction { get; }
     }
 }

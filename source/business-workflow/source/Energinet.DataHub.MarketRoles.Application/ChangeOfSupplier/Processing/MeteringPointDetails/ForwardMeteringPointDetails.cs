@@ -14,17 +14,22 @@
 
 using System;
 using Energinet.DataHub.MarketRoles.Application.Common.Commands;
-using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 
-namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands
+namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.MeteringPointDetails
 {
-    public class SendConsumerDetails : InternalCommand
+    public class ForwardMeteringPointDetails : InternalCommand
     {
-        public SendConsumerDetails(BusinessProcessId businessProcessId)
+        public ForwardMeteringPointDetails(Guid accountingPointId, Guid businessProcessId, string transaction)
         {
-            BusinessProcessId = businessProcessId ?? throw new ArgumentNullException(nameof(businessProcessId));
+            AccountingPointId = accountingPointId;
+            BusinessProcessId = businessProcessId;
+            Transaction = transaction;
         }
 
-        public BusinessProcessId BusinessProcessId { get; set; }
+        public Guid AccountingPointId { get; }
+
+        public Guid BusinessProcessId { get; }
+
+        public string Transaction { get; }
     }
 }
