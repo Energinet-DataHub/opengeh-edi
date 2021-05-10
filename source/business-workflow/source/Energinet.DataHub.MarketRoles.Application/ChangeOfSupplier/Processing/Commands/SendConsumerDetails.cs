@@ -12,24 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
-using NodaTime;
+using System;
+using Energinet.DataHub.MarketRoles.Application.Common.Commands;
+using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 
-namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events
+namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands
 {
-    public class EnergySupplierChanged : DomainEventBase
+    public class SendConsumerDetails : InternalCommand
     {
-        public EnergySupplierChanged(string gsrnNumber, BusinessProcessId businessProcessId, Instant effectiveDate)
+        public SendConsumerDetails(BusinessProcessId businessProcessId)
         {
-            GsrnNumber = gsrnNumber;
-            BusinessProcessId = businessProcessId;
-            EffectiveDate = effectiveDate;
+            BusinessProcessId = businessProcessId ?? throw new ArgumentNullException(nameof(businessProcessId));
         }
 
-        public string GsrnNumber { get; }
-
-        public BusinessProcessId BusinessProcessId { get; }
-
-        public Instant EffectiveDate { get; }
+        public BusinessProcessId BusinessProcessId { get; set; }
     }
 }

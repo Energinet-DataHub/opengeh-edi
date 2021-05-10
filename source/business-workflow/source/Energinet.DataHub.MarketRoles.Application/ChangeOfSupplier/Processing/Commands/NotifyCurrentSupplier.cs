@@ -12,14 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSupplier
+using Energinet.DataHub.MarketRoles.Application.Common.Commands;
+using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
+
+namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands
 {
-    public static class SampleData
+    public class NotifyCurrentSupplier : InternalCommand
     {
-        public static string SampleGsrnNumber => "571234567891234568";
+        public NotifyCurrentSupplier(BusinessProcessId businessProcessId)
+        {
+            BusinessProcessId = businessProcessId;
+        }
 
-        public static string SampleConsumerId => "2601211234";
-
-        public static string SampleGlnNumber => "5790000555550";
+        public BusinessProcessId BusinessProcessId { get; }
     }
 }

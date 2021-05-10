@@ -12,24 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
-using NodaTime;
+using System.Threading;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketRoles.Application.Common.Commands;
+using MediatR;
 
-namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events
+namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Commands
 {
-    public class EnergySupplierChanged : DomainEventBase
+    public class SendConsumerDetailsHandler : ICommandHandler<SendConsumerDetails>
     {
-        public EnergySupplierChanged(string gsrnNumber, BusinessProcessId businessProcessId, Instant effectiveDate)
+        public Task<Unit> Handle(SendConsumerDetails request, CancellationToken cancellationToken)
         {
-            GsrnNumber = gsrnNumber;
-            BusinessProcessId = businessProcessId;
-            EffectiveDate = effectiveDate;
+            throw new System.NotImplementedException();
         }
-
-        public string GsrnNumber { get; }
-
-        public BusinessProcessId BusinessProcessId { get; }
-
-        public Instant EffectiveDate { get; }
     }
 }

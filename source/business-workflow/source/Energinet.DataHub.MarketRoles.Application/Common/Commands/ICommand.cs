@@ -12,24 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
-using NodaTime;
+using MediatR;
 
-namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events
+namespace Energinet.DataHub.MarketRoles.Application.Common.Commands
 {
-    public class EnergySupplierChanged : DomainEventBase
+    #pragma warning disable CA1040
+    /// <summary>
+    /// CQRS command object
+    /// </summary>
+    public interface ICommand : IRequest
     {
-        public EnergySupplierChanged(string gsrnNumber, BusinessProcessId businessProcessId, Instant effectiveDate)
-        {
-            GsrnNumber = gsrnNumber;
-            BusinessProcessId = businessProcessId;
-            EffectiveDate = effectiveDate;
-        }
-
-        public string GsrnNumber { get; }
-
-        public BusinessProcessId BusinessProcessId { get; }
-
-        public Instant EffectiveDate { get; }
     }
+
+    /// <summary>
+    /// CQRS command with result
+    /// </summary>
+    /// <typeparam name="TResult"><see cref="IRequest"/></typeparam>
+    public interface ICommand<out TResult> : IRequest<TResult>
+    {
+    }
+    #pragma warning restore
 }

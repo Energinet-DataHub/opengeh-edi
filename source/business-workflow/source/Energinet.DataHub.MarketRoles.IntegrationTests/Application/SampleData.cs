@@ -12,24 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
-using NodaTime;
-
-namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events
+namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 {
-    public class EnergySupplierChanged : DomainEventBase
+    public static class SampleData
     {
-        public EnergySupplierChanged(string gsrnNumber, BusinessProcessId businessProcessId, Instant effectiveDate)
-        {
-            GsrnNumber = gsrnNumber;
-            BusinessProcessId = businessProcessId;
-            EffectiveDate = effectiveDate;
-        }
+        public static string GsrnNumber => "571234567891234568";
 
-        public string GsrnNumber { get; }
+        public static string ConsumerId => "2601211234";
 
-        public BusinessProcessId BusinessProcessId { get; }
-
-        public Instant EffectiveDate { get; }
+        public static string GlnNumber => "5790000555550";
     }
 }
