@@ -28,20 +28,22 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.BusinessRequestProcessing
         where TResponse : BusinessProcessResult
     {
         private readonly IValidator<TRequest> _validator;
+        private readonly IBusinessProcessResponder<TRequest> _businessProcessResponder;
 
-        public InputValidationBehaviour(IValidator<TRequest> validator)
+        public InputValidationBehaviour(IValidator<TRequest> validator, IBusinessProcessResponder<TRequest> businessProcessResponder)
         {
             _validator = validator;
+            _businessProcessResponder = businessProcessResponder ?? throw new ArgumentNullException(nameof(businessProcessResponder));
         }
 
-        public Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+        public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
             if (next == null) throw new ArgumentNullException(nameof(next));
 
             if (_validator is null)
             {
-                return next();
+                return await next().ConfigureAwait(false);
             }
 
             var validationResult = _validator.Validate(request);
@@ -53,10 +55,12 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.BusinessRequestProcessing
                     .ToList()
                     .AsReadOnly();
 
-                return Task.FromResult((TResponse)new BusinessProcessResult(request.TransactionId, validationErrors));
+                var result = new BusinessProcessResult(request.TransactionId, validationErrors);
+                await _businessProcessResponder.RespondAsync(request, result).ConfigureAwait(false);
+                return (TResponse)result;
             }
 
-            return next();
+            return await next().ConfigureAwait(false);
         }
     }
 }
