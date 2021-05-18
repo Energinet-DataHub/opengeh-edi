@@ -14,16 +14,16 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
+namespace Energinet.DataHub.MarketRoles.Tests
 {
-    public static class SampleData
+    internal static class SampleData
     {
-        public static string GsrnNumber => "571234567891234568";
+        internal static string GsrnNumber => "571234567891234568";
 
-        public static string ConsumerId => "2601211234";
+        internal static string ConsumerId => "2601211234";
 
-        public static string GlnNumber => "5790000555550";
+        internal static string GlnNumber => "5790000555550";
 
-        public static string Transaction => Guid.NewGuid().ToString();
+        internal static string TranactionId => Guid.NewGuid().ToString();
     }
 }

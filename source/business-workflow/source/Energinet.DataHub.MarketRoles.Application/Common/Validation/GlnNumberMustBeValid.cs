@@ -12,18 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
+namespace Energinet.DataHub.MarketRoles.Application.Common.Validation
 {
-    public static class SampleData
+    public class GlnNumberMustBeValid : AbstractValidator<string>
     {
-        public static string GsrnNumber => "571234567891234568";
-
-        public static string ConsumerId => "2601211234";
-
-        public static string GlnNumber => "5790000555550";
-
-        public static string Transaction => Guid.NewGuid().ToString();
+        public GlnNumberMustBeValid()
+        {
+            RuleFor(gln => gln)
+                .NotEmpty()
+                .WithState(x => new ValidationError("Invalid GLN number", typeof(GlnNumberMustBeValid)));
+        }
     }
 }

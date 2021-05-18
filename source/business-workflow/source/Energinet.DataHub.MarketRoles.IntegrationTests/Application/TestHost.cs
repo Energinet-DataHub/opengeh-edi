@@ -21,6 +21,7 @@ using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.ConsumerDetails;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.EndOfSupplyNotification;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.MeteringPointDetails;
+using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Validation;
 using Energinet.DataHub.MarketRoles.Application.Common.Commands;
 using Energinet.DataHub.MarketRoles.Application.Common.DomainEvents;
 using Energinet.DataHub.MarketRoles.Application.Common.Processing;
@@ -45,6 +46,7 @@ using Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
 using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
+using FluentValidation;
 using MediatR;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -97,9 +99,13 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             // Busines process responders
             services.AddScoped<IBusinessProcessResponder<RequestChangeOfSupplier>, RequestChangeOfSupplierResponder>();
 
+            // Input validation
+            services.AddScoped<IValidator<RequestChangeOfSupplier>, RequestChangeOfSupplierRuleSet>();
+
             // Business process pipeline
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehaviour<,>));
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(AuthorizationBehaviour<,>));
+            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(InputValidationBehaviour<,>));
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(DomainEventsDispatcherBehaviour<,>));
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(BusinessProcessResponderBehaviour<,>));
 

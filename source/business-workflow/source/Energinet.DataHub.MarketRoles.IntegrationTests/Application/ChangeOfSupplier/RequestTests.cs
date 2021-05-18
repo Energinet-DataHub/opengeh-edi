@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.ObjectModel;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier;
@@ -67,32 +68,22 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
             Assert.Equal(request.MeteringPointId, publishedMessage.MeteringPoint);
         }
 
-        //TODO: Fix in another PR.
-        // [Fact]
-        // public async Task Request_WhenInputValidationsAreBroken_IsRejected()
-        // {
-        //     // Arrange
-        //     var energySupplierGlnNumber = "5790000555550";
-        //     var meteringPointGsrnNumber = "571234567891234568";
-        //     await Seed(energySupplierGlnNumber, meteringPointGsrnNumber).ConfigureAwait(false);
-        //     var systemDateTimeProvider = _serviceProvider.GetRequiredService<ISystemDateTimeProvider>();
-        //
-        //     var command = new RequestChangeOfSupplier
-        //     {
-        //         MarketEvaluationPoint = new MarketEvaluationPoint(meteringPointGsrnNumber),
-        //         EnergySupplier = new MarketParticipant(energySupplierGlnNumber),
-        //         BalanceResponsibleParty = new MarketParticipant("2"),
-        //         Consumer = new MarketParticipant("0101210000", null, null, "OOPS"), // A correct qualifier would be ARR or VA
-        //         StartDate = systemDateTimeProvider.Now(),
-        //     };
-        //
-        //     // Act
-        //     await _mediator.Send(command, CancellationToken.None).ConfigureAwait(false);
-        //
-        //     // Assert (it's a rejected message)
-        //     var publishedMessage = await GetLastMessageFromOutboxAsync<RequestChangeOfSupplierRejected>().ConfigureAwait(false);
-        //     Assert.Equal(command.MarketEvaluationPoint.MRid, publishedMessage.MeteringPointId);
-        // }
+        [Fact]
+        public async Task Request_WhenInputValidationsAreBroken_IsRejected()
+        {
+            var request = CreateRequest(
+                SampleData.Transaction,
+                SampleData.GlnNumber,
+                SampleData.ConsumerId,
+                "THIS_IS_NOT_VALID_GSRN_NUMBER",
+                SystemDateTimeProvider.Now());
+
+            await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
+
+            var publishedMessage = await GetLastMessageFromOutboxAsync<RequestChangeOfSupplierRejected>().ConfigureAwait(false);
+            Assert.Equal(request.MeteringPointId, publishedMessage.MeteringPoint);
+        }
+
         [Fact]
         public async Task Request_WhenNoRulesAreBroken_IsSuccessful()
         {
@@ -119,12 +110,22 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
 
         private RequestChangeOfSupplier CreateRequest()
         {
+            return CreateRequest(
+                SampleData.Transaction,
+                SampleData.GlnNumber,
+                SampleData.ConsumerId,
+                SampleData.GsrnNumber,
+                SystemDateTimeProvider.Now());
+        }
+
+        private RequestChangeOfSupplier CreateRequest(string transaction, string energySupplierGln, string consumerId, string gsrnNumber, Instant startDate)
+        {
             return new RequestChangeOfSupplier(
-                TransactionId: Guid.NewGuid().ToString(),
-                EnergySupplierId: SampleData.GlnNumber,
-                ConsumerId: SampleData.ConsumerId,
-                MeteringPointId: SampleData.GsrnNumber,
-                StartDate: SystemDateTimeProvider.Now());
+                TransactionId: transaction,
+                EnergySupplierId: energySupplierGln,
+                ConsumerId: consumerId,
+                MeteringPointId: gsrnNumber,
+                StartDate: startDate);
         }
     }
 }
