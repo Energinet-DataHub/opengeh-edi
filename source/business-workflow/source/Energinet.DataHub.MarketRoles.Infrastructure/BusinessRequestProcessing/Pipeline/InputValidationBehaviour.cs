@@ -41,12 +41,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.BusinessRequestProcessing
             if (request == null) throw new ArgumentNullException(nameof(request));
             if (next == null) throw new ArgumentNullException(nameof(next));
 
-            if (_validator is null)
-            {
-                return await next().ConfigureAwait(false);
-            }
-
-            var validationResult = _validator.Validate(request);
+            var validationResult = await _validator.ValidateAsync(request).ConfigureAwait(false);
             if (!validationResult.IsValid)
             {
                 var validationErrors = validationResult
