@@ -12,20 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
+namespace Energinet.DataHub.MarketRoles.Application.MoveIn.Validation
 {
-    public static class SampleData
+    public class RequestMoveInRuleSet : AbstractValidator<RequestMoveIn>
     {
-        public static string GsrnNumber => "571234567891234568";
-
-        public static string ConsumerSSN => "2601211234";
-
-        public static string GlnNumber => "5790000555550";
-
-        public static string Transaction => Guid.NewGuid().ToString();
-
-        public static string ConsumerName => "Test Testesen";
     }
 }

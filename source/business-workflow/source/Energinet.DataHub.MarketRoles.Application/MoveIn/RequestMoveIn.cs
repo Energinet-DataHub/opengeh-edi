@@ -12,20 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Energinet.DataHub.MarketRoles.Application.Common;
+using NodaTime;
 
-namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
+namespace Energinet.DataHub.MarketRoles.Application.MoveIn
 {
-    public static class SampleData
-    {
-        public static string GsrnNumber => "571234567891234568";
-
-        public static string ConsumerSSN => "2601211234";
-
-        public static string GlnNumber => "5790000555550";
-
-        public static string Transaction => Guid.NewGuid().ToString();
-
-        public static string ConsumerName => "Test Testesen";
-    }
+    public record RequestMoveIn(
+        string TransactionId,
+        string EnergySupplierGlnNumber,
+        string SocialSecurityNumber,
+        string VATNumber,
+        string ConsumerName,
+        string AccountingPointGsrnNumber,
+        Instant MoveInDate) : IBusinessRequest;
 }
