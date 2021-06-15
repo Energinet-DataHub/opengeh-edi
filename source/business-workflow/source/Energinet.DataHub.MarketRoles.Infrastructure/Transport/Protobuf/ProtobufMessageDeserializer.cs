@@ -15,7 +15,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Application.Transport;
+using Energinet.DataHub.MarketRoles.Application.Common.Transport;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf
 {

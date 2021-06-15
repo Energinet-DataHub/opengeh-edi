@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketRoles.Application.Transport
+namespace Energinet.DataHub.MarketRoles.Application.Common.Transport
 {
     /// <summary>
-    /// Marker interface for incoming messages
+    /// Marker interface for outgoing messages
     /// </summary>
     #pragma warning disable CA1040 // Marker interface
-    public interface IInboundMessage
+    public interface IOutboundMessage
     {
     }
 }

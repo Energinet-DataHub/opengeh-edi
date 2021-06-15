@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketRoles.Application.Transport;
+using Energinet.DataHub.MarketRoles.Application.Common.Transport;
 using Energinet.DataHub.MarketRoles.Contracts;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
 
