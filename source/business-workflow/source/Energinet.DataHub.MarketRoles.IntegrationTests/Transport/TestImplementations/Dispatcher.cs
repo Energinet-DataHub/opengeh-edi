@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.MarketRoles.Application.Transport;
 
-namespace Energinet.DataHub.MarketRoles.IntegrationTests.Send
+namespace Energinet.DataHub.MarketRoles.IntegrationTests.Transport.TestImplementations
 {
     public class Dispatcher : MessageDispatcher
     {

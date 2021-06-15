@@ -12,18 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.Transport;
-using Energinet.DataHub.MarketRoles.Contracts;
-using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
-using Google.Protobuf;
 
-namespace Energinet.DataHub.MarketRoles.IntegrationTests.Send
+namespace Energinet.DataHub.MarketRoles.IntegrationTests.Transport.TestImplementations
 {
-    public class TransportTestOutboundMapper : ProtobufOutboundMapper<TransportTestRecord>
+    public class InProcessChannel : Channel
     {
-        protected override IMessage Convert(TransportTestRecord obj)
+        private byte[] _writtenBytes;
+
+        public byte[] GetWrittenBytes() => _writtenBytes ?? throw new InvalidOperationException("Write bytes before getting them.");
+
+        public override async Task WriteAsync(byte[] data, CancellationToken cancellationToken = default)
         {
-            return new TestMessage { TestProperty = obj.TestProperty };
+            _writtenBytes = data;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
     }
 }
