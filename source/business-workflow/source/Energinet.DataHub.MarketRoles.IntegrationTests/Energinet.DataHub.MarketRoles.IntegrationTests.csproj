@@ -22,9 +22,12 @@ limitations under the License.
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="FluentAssertions" Version="5.10.3" />
         <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
+      <PackageReference Include="Google.Protobuf" Version="3.15.8" />
+      <PackageReference Include="Grpc.Tools" Version="2.37.0" PrivateAssets="All" />
         <PackageReference Include="xunit" Version="2.4.1" />
         <PackageReference Include="xunit.categories" Version="2.0.4" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
@@ -41,5 +44,16 @@ limitations under the License.
       <ProjectReference Include="..\Energinet.DataHub.MarketRoles.Application\Energinet.DataHub.MarketRoles.Application.csproj" />
       <ProjectReference Include="..\Energinet.DataHub.MarketRoles.Infrastructure\Energinet.DataHub.MarketRoles.Infrastructure.csproj" />
     </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="**/*.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Public</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+      <OutputDir>obj\Debug\net5.0\</OutputDir>
+      <Generator>MSBuild:Compile</Generator>
+    </Protobuf>
+  </ItemGroup>
 
 </Project>
