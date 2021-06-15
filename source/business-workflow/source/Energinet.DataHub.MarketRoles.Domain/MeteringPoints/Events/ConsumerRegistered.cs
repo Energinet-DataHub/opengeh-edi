@@ -12,20 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events
 {
     public class ConsumerRegistered : DomainEventBase
     {
-        public ConsumerRegistered(AccountingPointId accountingPointId, bool customerMovedIn)
+        public ConsumerRegistered(Guid accountingPointId, string gsrnNumber, Guid businessProcessId, string transaction, Guid consumerId, Instant moveInDate, bool customerMovedIn)
         {
             AccountingPointId = accountingPointId;
+            GsrnNumber = gsrnNumber;
             CustomerMovedIn = customerMovedIn;
+            BusinessProcessId = businessProcessId;
+            Transaction = transaction;
+            ConsumerId = consumerId;
+            MoveInDate = moveInDate;
         }
 
-        private AccountingPointId AccountingPointId { get; }
+        public Guid AccountingPointId { get; }
 
-        private bool CustomerMovedIn { get; }
+        public string GsrnNumber { get; }
+
+        public Guid BusinessProcessId { get; }
+
+        public string Transaction { get; }
+
+        public Guid ConsumerId { get; }
+
+        public Instant MoveInDate { get; }
+
+        public bool CustomerMovedIn { get; }
     }
 }

@@ -14,7 +14,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Infrastructure.IntegrationEventDispatching.MoveIn;
+using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn;
 using MediatR;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox.RequestHandlers

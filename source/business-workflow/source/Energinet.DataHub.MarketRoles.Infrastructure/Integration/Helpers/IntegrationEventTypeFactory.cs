@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketRoles.Infrastructure.IntegrationEventDispatching.MoveIn;
+using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.Helpers
 {
