@@ -74,7 +74,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
             var request = CreateRequest(
                 SampleData.Transaction,
                 SampleData.GlnNumber,
-                SampleData.ConsumerId,
+                SampleData.ConsumerSSN,
                 "THIS_IS_NOT_VALID_GSRN_NUMBER",
                 SystemDateTimeProvider.Now());
 
@@ -101,19 +101,12 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
             Assert.Equal(request.MeteringPointId, publishedMessage.MeteringPointId);
         }
 
-        private async Task<TMessage> GetLastMessageFromOutboxAsync<TMessage>()
-        {
-            var outboxMessage = await MarketRolesContext.OutboxMessages.FirstAsync().ConfigureAwait(false);
-            var @event = Serializer.Deserialize<TMessage>(outboxMessage.Data);
-            return @event;
-        }
-
         private RequestChangeOfSupplier CreateRequest()
         {
             return CreateRequest(
                 SampleData.Transaction,
                 SampleData.GlnNumber,
-                SampleData.ConsumerId,
+                SampleData.ConsumerSSN,
                 SampleData.GsrnNumber,
                 SystemDateTimeProvider.Now());
         }

@@ -15,6 +15,8 @@
 using System;
 using System.Data;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing;
@@ -22,9 +24,12 @@ using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.Cons
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.EndOfSupplyNotification;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.MeteringPointDetails;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Validation;
+using Energinet.DataHub.MarketRoles.Application.Common;
 using Energinet.DataHub.MarketRoles.Application.Common.Commands;
 using Energinet.DataHub.MarketRoles.Application.Common.DomainEvents;
 using Energinet.DataHub.MarketRoles.Application.Common.Processing;
+using Energinet.DataHub.MarketRoles.Application.MoveIn;
+using Energinet.DataHub.MarketRoles.Application.MoveIn.Validation;
 using Energinet.DataHub.MarketRoles.Domain.Consumers;
 using Energinet.DataHub.MarketRoles.Domain.EnergySuppliers;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
@@ -41,6 +46,7 @@ using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.Chang
 using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.ChangeOfSupplier.ConsumerDetails;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.ChangeOfSupplier.EndOfSupplyNotification;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.ChangeOfSupplier.MeteringPointDetails;
+using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.MoveIn;
 using Energinet.DataHub.MarketRoles.Infrastructure.IntegrationEventDispatching.ChangeOfSupplier;
 using Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
@@ -98,9 +104,11 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
             // Busines process responders
             services.AddScoped<IBusinessProcessResponder<RequestChangeOfSupplier>, RequestChangeOfSupplierResponder>();
+            services.AddScoped<IBusinessProcessResponder<RequestMoveIn>, RequestMoveInResultHandler>();
 
-            // Input validation
+            // Input validation(
             services.AddScoped<IValidator<RequestChangeOfSupplier>, RequestChangeOfSupplierRuleSet>();
+            services.AddScoped<IValidator<RequestMoveIn>, RequestMoveInRuleSet>();
 
             // Business process pipeline
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehaviour<,>));
@@ -173,10 +181,28 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             return _sqlConnection;
         }
 
+        protected void SaveChanges()
+        {
+            GetService<MarketRolesContext>().SaveChanges();
+        }
+
+        protected async Task<TMessage> GetLastMessageFromOutboxAsync<TMessage>()
+        {
+            var outboxMessage = await MarketRolesContext.OutboxMessages.FirstAsync(m => m.Type.Equals(typeof(TMessage).FullName)).ConfigureAwait(false);
+            var @event = Serializer.Deserialize<TMessage>(outboxMessage.Data);
+            return @event;
+        }
+
+        protected async Task<BusinessProcessResult> SendRequest(IBusinessRequest request)
+        {
+            var result = await GetService<IMediator>().Send(request, CancellationToken.None);
+            return result;
+        }
+
         protected Consumer CreateConsumer()
         {
             var consumerId = new ConsumerId(Guid.NewGuid());
-            var consumer = new Consumer(consumerId, CprNumber.Create(SampleData.ConsumerId));
+            var consumer = new Consumer(consumerId, CprNumber.Create(SampleData.ConsumerSSN));
 
             ConsumerRepository.Add(consumer);
 
