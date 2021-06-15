@@ -12,21 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Infrastructure.IntegrationEventDispatching.MoveIn;
+using MediatR;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.Helpers
+namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox.RequestHandlers
 {
-    public static class IntegrationEventTypeFactory
+    public class ConsumerRegisteredDispatch : IRequestHandler<ConsumerRegisteredIntegrationEvent>
     {
-        public static Type GetType(string type)
+        public Task<Unit> Handle(ConsumerRegisteredIntegrationEvent request, CancellationToken cancellationToken)
         {
-            if (typeof(ConsumerRegisteredIntegrationEvent).FullName == type)
-            {
-                return typeof(ConsumerRegisteredIntegrationEvent);
-            }
-
-            throw new ArgumentException("Integration Event type is not implemented.");
+            throw new System.NotImplementedException();
         }
     }
 }

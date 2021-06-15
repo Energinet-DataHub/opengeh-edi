@@ -12,13 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketRoles.Application.Common.Transport;
-using Energinet.DataHub.MarketRoles.Infrastructure.IntegrationEventDispatching;
-using MediatR;
-using NodaTime;
+using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.Messages
+namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events
 {
-    public record EnergySupplierChangedEventMessage(string MeteringPointId, Instant Occurence) : IOutboundMessage, IRequest,
-        IIntegrationEvent;
+    public class ConsumerRegistered : DomainEventBase
+    {
+        public ConsumerRegistered(AccountingPointId accountingPointId, bool customerMovedIn)
+        {
+            AccountingPointId = accountingPointId;
+            CustomerMovedIn = customerMovedIn;
+        }
+
+        private AccountingPointId AccountingPointId { get; }
+
+        private bool CustomerMovedIn { get; }
+    }
 }

@@ -17,19 +17,13 @@ syntax = "proto3";
 
 option csharp_namespace = "Energinet.DataHub.MarketRoles.IntegrationEventContracts";
 
-message EnergySupplierChangeInitiated {
+message ConsumerRegisteredIntegrationEvent {
   string MeteringPointId = 1;
-  string Occurence = 2;
-}
-
-message EnergySupplierChanged {
-  string MeteringPointId = 1;
-  string Occurence = 2;
+  bool CustomerMovedIn = 2;
 }
 
 message MoveInIntegrationEventEnvelope {
   oneof MoveInIntegrationEventMessages {
-    EnergySupplierChangeInitiated energySupplierChangeInitiated = 1;
-    EnergySupplierChanged energySupplierChanged = 2;
+    ConsumerRegisteredIntegrationEvent consumerRegisteredIntegrationEvent = 1;
   }
 }

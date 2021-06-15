@@ -11,8 +11,25 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 using System;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketRoles.Application.Integration;
+using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events;
+using Energinet.DataHub.MarketRoles.EntryPoints.Common;
+using Energinet.DataHub.MarketRoles.EntryPoints.Common.MediatR;
+using Energinet.DataHub.MarketRoles.EntryPoints.Outbox.RequestHandlers;
+using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
+using Energinet.DataHub.MarketRoles.Infrastructure.Integration.Services;
+using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
+using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
+using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using SimpleInjector;
 
 [assembly: CLSCompliant(false)]
 
@@ -20,13 +37,64 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
 {
     public static class Program
     {
-        public static void Main()
+        public static async Task Main()
         {
+            var container = new Container();
             var host = new HostBuilder()
-                .ConfigureFunctionsWorkerDefaults()
-                .Build();
+                .ConfigureFunctionsWorkerDefaults(options =>
+                {
+                    options.UseMiddleware<SimpleInjectorScopedRequest>();
+                })
+                .ConfigureServices(services =>
+                {
+                    var descriptor = new ServiceDescriptor(
+                        typeof(IFunctionActivator),
+                        typeof(SimpleInjectorActivator),
+                        ServiceLifetime.Singleton);
+                    services.Replace(descriptor); // Replace existing activator
 
-            host.Run();
+                    services.AddLogging();
+
+                    services.AddDbContext<MarketRolesContext>(x =>
+                    {
+                        var connectionString = Environment.GetEnvironmentVariable("MARKETROLES_DB_CONNECTION_STRING")
+                                               ?? throw new InvalidOperationException(
+                                                   "Metering point db connection string not found.");
+
+                        x.UseSqlServer(connectionString, y => y.UseNodaTime());
+                    });
+
+                    services.AddSimpleInjector(container, options =>
+                    {
+                        options.AddLogging();
+                    });
+                })
+                .Build()
+                .UseSimpleInjector(container);
+
+            // Register application components.
+            container.Register<IJsonSerializer, JsonSerializer>(Lifestyle.Singleton);
+            container.Register<IOutbox, OutboxProvider>(Lifestyle.Scoped);
+            container.Register<IOutboxManager, OutboxManager>(Lifestyle.Scoped);
+            container.Register<IOutboxMessageFactory, OutboxMessageFactory>(Lifestyle.Scoped);
+            container.Register<IUnitOfWork, UnitOfWork>(Lifestyle.Scoped);
+            container.Register<EventMessageDispatcher>(Lifestyle.Transient);
+            container.Register<IIntegrationEventDispatchOrchestrator, IntegrationEventDispatchOrchestrator>(Lifestyle.Transient);
+            container.Register<ConsumerRegisteredDispatch>(Lifestyle.Transient);
+
+            container.BuildMediator(
+                new[]
+                {
+                    typeof(ConsumerRegistered).Assembly,
+                    typeof(ConsumerRegisteredDispatch).Assembly,
+                },
+                Array.Empty<Type>());
+
+            container.Verify();
+
+            await host.RunAsync().ConfigureAwait(false);
+
+            await container.DisposeAsync().ConfigureAwait(false);
         }
     }
 }

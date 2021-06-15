@@ -24,28 +24,16 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Common.MediatR
 {
     public static class SimpleInjectorMediatorContainerExtensions
     {
-        public static Container BuildMediator(this Container container, params Assembly[] assemblies)
+        public static void BuildMediator(this Container container, Assembly[] applicationAssemblies, Type[] pipelineBehaviors)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            if (assemblies == null) throw new ArgumentNullException(nameof(assemblies));
-
-            return BuildMediatorWithPipeline(container, assemblies, Array.Empty<Type>());
-        }
-
-        public static Container BuildMediatorWithPipeline(this Container container, Assembly[] assemblies, Type[] pipelineBehaviors)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (assemblies == null) throw new ArgumentNullException(nameof(assemblies));
-            if (pipelineBehaviors == null) throw new ArgumentNullException(nameof(pipelineBehaviors));
-
-            var allAssemblies = GetAssemblies(assemblies);
-
+            var assemblies = GetMediatorAssemblies().Union(applicationAssemblies).ToArray();
             container.RegisterSingleton<IMediator, Mediator>();
-            container.Register(typeof(IRequestHandler<,>), allAssemblies);
+            container.Register(typeof(IRequestHandler<,>), assemblies);
 
-            RegisterHandlers(container, typeof(INotificationHandler<>), allAssemblies);
-            RegisterHandlers(container, typeof(IRequestExceptionAction<,>), allAssemblies);
-            RegisterHandlers(container, typeof(IRequestExceptionHandler<,,>), allAssemblies);
+            RegisterHandlers(container, typeof(INotificationHandler<>), assemblies);
+            RegisterHandlers(container, typeof(IRequestExceptionAction<,>), assemblies);
+            RegisterHandlers(container, typeof(IRequestExceptionHandler<,,>), assemblies);
 
             // Add built-in pipeline behaviors
             var builtInBehaviors = new[]
@@ -56,15 +44,13 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Common.MediatR
                 typeof(RequestPostProcessorBehavior<,>),
             };
 
-            // Register pipeline
+            // Register built both-in and custom pipeline
             container.Collection.Register(typeof(IPipelineBehavior<,>), pipelineBehaviors.Union(builtInBehaviors));
 
             container.Collection.Register(typeof(IRequestPreProcessor<>), new[] { typeof(EmptyRequestPreProcessor<>) });
             container.Collection.Register(typeof(IRequestPostProcessor<,>), new[] { typeof(EmptyRequestPostProcessor<,>) });
 
             container.Register(() => new ServiceFactory(container.GetInstance), Lifestyle.Singleton);
-
-            return container;
         }
 
         private static void RegisterHandlers(Container container, Type collectionType, Assembly[] assemblies)
@@ -79,12 +65,9 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Common.MediatR
             container.Collection.Register(collectionType, handlerTypes);
         }
 
-        private static Assembly[] GetAssemblies(IEnumerable<Assembly> assemblies)
+        private static IEnumerable<Assembly> GetMediatorAssemblies()
         {
-            var allAssemblies = new List<Assembly> { typeof(IMediator).GetTypeInfo().Assembly };
-            allAssemblies.AddRange(assemblies);
-
-            return allAssemblies.ToArray();
+            yield return typeof(IMediator).GetTypeInfo().Assembly;
         }
     }
 }

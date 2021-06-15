@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketRoles.Application.Integration;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
@@ -21,15 +22,19 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
 {
     public class EventMessageDispatcher
     {
+        private readonly IIntegrationEventDispatchOrchestrator _integrationEventDispatchOrchestrator;
+
+        public EventMessageDispatcher(IIntegrationEventDispatchOrchestrator integrationEventDispatchOrchestrator)
+        {
+            _integrationEventDispatchOrchestrator = integrationEventDispatchOrchestrator;
+        }
+
         [Function("EventMessageDispatcher")]
-        public Task RunAsync(
-            [TimerTrigger("%EVENT_MESSAGE_DISPATCH_TRIGGER_TIMER%")] string timerInformation,
-            FunctionContext context)
+        public static void Run(
+            [TimerTrigger("%EVENT_MESSAGE_DISPATCH_TRIGGER_TIMER%")] FunctionContext context)
         {
             var logger = context.GetLogger("EventMessageDispatcher");
             logger.LogInformation($"C# Timer trigger function executed at: {DateTime.UtcNow}");
-
-            return Task.CompletedTask;
         }
     }
 }
