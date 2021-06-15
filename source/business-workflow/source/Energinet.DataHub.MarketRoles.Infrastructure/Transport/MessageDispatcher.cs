@@ -15,8 +15,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketRoles.Application.Common.Transport;
 
-namespace Energinet.DataHub.MarketRoles.Application.Transport
+namespace Energinet.DataHub.MarketRoles.Infrastructure.Transport
 {
     /// <summary>
     /// A class that combines the serialized format, and the means of transport

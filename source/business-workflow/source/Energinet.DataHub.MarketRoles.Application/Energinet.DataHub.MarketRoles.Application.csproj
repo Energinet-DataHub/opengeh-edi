@@ -34,8 +34,4 @@ limitations under the License.
     <ProjectReference Include="..\Energinet.DataHub.MarketRoles.Domain\Energinet.DataHub.MarketRoles.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Transport" />
-  </ItemGroup>
-
 </Project>

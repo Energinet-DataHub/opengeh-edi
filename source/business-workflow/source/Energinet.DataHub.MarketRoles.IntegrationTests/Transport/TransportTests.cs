@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Application.Transport;
 using Energinet.DataHub.MarketRoles.Contracts;
+using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integration;
 using Energinet.DataHub.MarketRoles.IntegrationTests.Transport.TestImplementations;
 using FluentAssertions;
@@ -47,7 +47,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Transport
             var receivingServiceCollection = new ServiceCollection();
             receivingServiceCollection.ReceiveProtobuf<TestEnvelope>(
                config => config
-                    .FromOneOf(envelope => envelope.TestMessagesCase)
+                   .FromOneOf(envelope => envelope.TestMessagesCase)
                    .WithParser(() => TestEnvelope.Parser));
 
             var receivingServiceProvider = receivingServiceCollection.BuildServiceProvider();
