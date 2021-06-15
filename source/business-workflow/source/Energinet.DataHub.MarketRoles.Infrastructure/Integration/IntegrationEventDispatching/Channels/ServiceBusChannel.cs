@@ -16,7 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.Channels
+namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.Channels
 {
     public class ServiceBusChannel : Channel
     {
