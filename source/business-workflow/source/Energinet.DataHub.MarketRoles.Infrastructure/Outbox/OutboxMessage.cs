@@ -38,6 +38,11 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Outbox
 
         public Instant CreationDate { get; }
 
-        public Instant? ProcessedDate { get; }
+        public Instant? ProcessedDate { get; private set; }
+
+        public void SetProcessed(Instant when)
+        {
+            ProcessedDate = when;
+        }
     }
 }
