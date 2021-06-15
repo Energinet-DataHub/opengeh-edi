@@ -20,11 +20,10 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events
 {
     public class ConsumerRegistered : DomainEventBase
     {
-        public ConsumerRegistered(Guid accountingPointId, string gsrnNumber, Guid businessProcessId, string transaction, Guid consumerId, Instant moveInDate, bool customerMovedIn)
+        public ConsumerRegistered(Guid accountingPointId, string gsrnNumber, Guid businessProcessId, string transaction, Guid consumerId, Instant moveInDate)
         {
             AccountingPointId = accountingPointId;
             GsrnNumber = gsrnNumber;
-            CustomerMovedIn = customerMovedIn;
             BusinessProcessId = businessProcessId;
             Transaction = transaction;
             ConsumerId = consumerId;
@@ -42,7 +41,5 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events
         public Guid ConsumerId { get; }
 
         public Instant MoveInDate { get; }
-
-        public bool CustomerMovedIn { get; }
     }
 }
