@@ -40,6 +40,13 @@ limitations under the License.
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Integration\Channels" />
+    <Folder Include="Integration\Dispatchers" />
+    <Folder Include="Integration\Handlers" />
+    <Folder Include="Integration\Helpers" />
+    <Folder Include="Integration\Mappers" />
+    <Folder Include="Integration\Messages" />
+    <Folder Include="Integration\Services" />
     <Folder Include="Transport" />
   </ItemGroup>
 
