@@ -16,12 +16,12 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.Transport;
 using Energinet.DataHub.MarketRoles.Contracts;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integration;
-using Energinet.DataHub.MarketRoles.IntegrationTests.Send;
+using Energinet.DataHub.MarketRoles.IntegrationTests.Transport.TestImplementations;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace Energinet.DataHub.MarketRoles.IntegrationTests
+namespace Energinet.DataHub.MarketRoles.IntegrationTests.Transport
 {
     public class TransportTests
     {
