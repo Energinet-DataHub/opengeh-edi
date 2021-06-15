@@ -36,6 +36,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energinet.DataHub.MarketRol
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energinet.DataHub.MarketRoles.Domain", "source\Energinet.DataHub.MarketRoles.Domain\Energinet.DataHub.MarketRoles.Domain.csproj", "{87D55C95-0790-42A1-B543-AF27BF2E0950}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp", "source\Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp\Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.csproj", "{2B806039-5BCF-4768-95FE-56778403E64D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -78,6 +80,10 @@ Global
 		{3801DF77-3A40-460C-9529-7AD9422037B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3801DF77-3A40-460C-9529-7AD9422037B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3801DF77-3A40-460C-9529-7AD9422037B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B806039-5BCF-4768-95FE-56778403E64D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B806039-5BCF-4768-95FE-56778403E64D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B806039-5BCF-4768-95FE-56778403E64D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B806039-5BCF-4768-95FE-56778403E64D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{654DA496-60D8-47D8-923E-F24F71A31F84} = {FD29AEE1-CB22-41FD-A875-1E99C4D5D81C}
