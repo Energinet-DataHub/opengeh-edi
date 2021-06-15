@@ -26,6 +26,11 @@ namespace Energinet.DataHub.MarketRoles.Domain.Consumers
 
         public Guid Value { get; }
 
+        public static ConsumerId New()
+        {
+            return new ConsumerId(Guid.NewGuid());
+        }
+
         public override string ToString()
         {
             return Value.ToString();
