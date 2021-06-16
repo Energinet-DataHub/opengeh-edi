@@ -40,6 +40,6 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules.ChangeEnergy
         // }
         public bool IsBroken => false;
 
-        public string Message => string.Empty;
+        public ValidationError Error => new MoveOutRegisteredOnSameDateIsNotAllowedRuleError();
     }
 }

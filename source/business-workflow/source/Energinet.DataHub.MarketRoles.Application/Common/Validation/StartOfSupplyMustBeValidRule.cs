@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using FluentValidation;
 using NodaTime;
 
@@ -24,7 +23,7 @@ namespace Energinet.DataHub.MarketRoles.Application.Common.Validation
         {
             RuleFor(x => x)
                 .Must(x => x != default)
-                .WithState(x => new ValidationError("Invalid start of supply date.", typeof(StartOfSupplyMustBeValidRule)));
+                .WithState(startOfSupplyDate => new StartOfSupplyMustBeValidRuleError(startOfSupplyDate));
         }
     }
 }

@@ -29,9 +29,12 @@ message RequestChangeOfSupplier {
 
 message RequestMoveIn {
   string TransactionId = 1;
-  string AccountingPointId = 2;
-  string GsrnNumber = 3;
-  google.protobuf.Timestamp MoveInDate = 4;
+  string EnergySupplierGlnNumber = 2;
+  string SocialSecurityNumber = 3;
+  string VATNumber = 4;
+  string ConsumerName = 5;
+  string AccountingPointGsrnNumber = 6;
+  google.protobuf.Timestamp MoveInDate = 7;
 }
 
 message MarketRolesEnvelope {

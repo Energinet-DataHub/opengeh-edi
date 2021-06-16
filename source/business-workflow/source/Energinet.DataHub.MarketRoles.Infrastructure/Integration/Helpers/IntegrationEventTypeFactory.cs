@@ -12,18 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading;
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
+using System;
+using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn;
 
-namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
+namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.Helpers
 {
-    #pragma warning disable CA1812 // Never instantiated
-    internal class NullChannel : Channel
+    public static class IntegrationEventTypeFactory
     {
-        public override Task WriteAsync(byte[] data, CancellationToken cancellationToken = default)
+        public static Type GetType(string type)
         {
-            return Task.CompletedTask;
+            if (typeof(ConsumerRegisteredIntegrationEvent).FullName == type)
+            {
+                return typeof(ConsumerRegisteredIntegrationEvent);
+            }
+
+            throw new ArgumentException("Integration Event type is not implemented.");
         }
     }
 }
