@@ -21,7 +21,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.BusinessRequestProcessing
     /// Generates a client response for completed a business process request
     /// </summary>
     /// <typeparam name="TBusinessProcessRequest"><see cref="IBusinessRequest"/></typeparam>
-    public interface IBusinessProcessResponder<in TBusinessProcessRequest>
+    public interface IBusinessProcessResultHandler<in TBusinessProcessRequest>
         where TBusinessProcessRequest : IBusinessRequest
     {
         /// <summary>
@@ -30,6 +30,6 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.BusinessRequestProcessing
         /// <param name="request"></param>
         /// <param name="result"></param>
         /// <returns><see cref="Task"/></returns>
-        Task RespondAsync(TBusinessProcessRequest request, BusinessProcessResult result);
+        Task HandleAsync(TBusinessProcessRequest request, BusinessProcessResult result);
     }
 }

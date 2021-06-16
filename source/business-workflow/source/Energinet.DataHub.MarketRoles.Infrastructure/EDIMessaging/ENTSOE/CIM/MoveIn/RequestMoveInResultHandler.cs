@@ -21,7 +21,7 @@ using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.MoveIn
 {
-    public class RequestMoveInResultHandler : IBusinessProcessResponder<RequestMoveIn>
+    public class RequestMoveInResultHandler : IBusinessProcessResultHandler<RequestMoveIn>
     {
         private readonly IOutbox _outbox;
         private readonly IOutboxMessageFactory _outboxMessageFactory;
@@ -32,7 +32,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.M
             _outboxMessageFactory = outboxMessageFactory ?? throw new ArgumentNullException(nameof(outboxMessageFactory));
         }
 
-        public Task RespondAsync(RequestMoveIn request, BusinessProcessResult result)
+        public Task HandleAsync(RequestMoveIn request, BusinessProcessResult result)
         {
             //TODO: Implement message logic
             _outbox.Add(_outboxMessageFactory.CreateFrom(new MoveInRequestAccepted(), OutboxMessageCategory.ActorMessage));
