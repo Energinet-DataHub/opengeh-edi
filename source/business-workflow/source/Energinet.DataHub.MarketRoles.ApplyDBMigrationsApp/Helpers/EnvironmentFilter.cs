@@ -13,24 +13,22 @@
 // limitations under the License.
 
 using System;
-using Microsoft.Azure.Functions.Worker;
-using SimpleInjector;
+using System.Linq;
 
-namespace Energinet.DataHub.MarketRoles.EntryPoints.Common
+namespace Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.Helpers
 {
-    public class SimpleInjectorActivator : IFunctionActivator
+    public static class EnvironmentFilter
     {
-        private readonly Container _container;
-
-        public SimpleInjectorActivator(Container container)
+        public static Func<string, bool> GetFilter(string[] args)
         {
-            _container = container;
-        }
-
-        public object? CreateInstance(Type instanceType, FunctionContext context)
-        {
-            if (instanceType == null) throw new ArgumentNullException(nameof(instanceType));
-            return _container.GetInstance(instanceType);
+#pragma warning disable CA1307
+#pragma warning disable CA1310
+            return file => file.EndsWith(".sql") &&
+                           ((file.Contains(".Scripts.Seed.") && args.Contains("includeSeedData")) ||
+                            (file.Contains(".Scripts.Test.") && args.Contains("includeTestData")) ||
+                            file.Contains(".Scripts.Model."));
         }
     }
+#pragma warning restore CA1307
+#pragma warning restore CA1310
 }
