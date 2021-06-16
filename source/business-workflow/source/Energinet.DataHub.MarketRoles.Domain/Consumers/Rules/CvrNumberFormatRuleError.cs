@@ -13,17 +13,10 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
-using FluentValidation;
 
-namespace Energinet.DataHub.MarketRoles.Application.Common.Validation
+namespace Energinet.DataHub.MarketRoles.Domain.Consumers.Rules
 {
-    public class GlnNumberMustBeValid : AbstractValidator<string>
+    public class CvrNumberFormatRuleError : ValidationError
     {
-        public GlnNumberMustBeValid()
-        {
-            RuleFor(gln => gln)
-                .NotEmpty()
-                .WithState(x => new ValidationError("Invalid GLN number", typeof(GlnNumberMustBeValid)));
-        }
     }
 }

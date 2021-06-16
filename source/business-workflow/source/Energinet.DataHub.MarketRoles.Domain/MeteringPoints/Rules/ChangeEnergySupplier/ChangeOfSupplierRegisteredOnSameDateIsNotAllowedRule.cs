@@ -32,7 +32,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules.ChangeEnergy
 
         public bool IsBroken => ProcessAlreadyRegistered();
 
-        public string Message => $"There is already a change of energy supplier registered on this date.";
+        public ValidationError Error => new ChangeOfSupplierRegisteredOnSameDateIsNotAllowedRuleError();
 
         private bool ProcessAlreadyRegistered()
         {
