@@ -13,16 +13,12 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Azure.Core;
 using Energinet.DataHub.MarketRoles.Application.Common;
 using Energinet.DataHub.MarketRoles.Application.MoveIn;
 using Energinet.DataHub.MarketRoles.Domain.EnergySuppliers;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.MoveIn;
-using Energinet.DataHub.MarketRoles.Infrastructure.IntegrationEventDispatching.MoveIn;
-using MediatR;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Xunit;
 
 namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
@@ -38,27 +34,6 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
             _accountingPoint = CreateAccountingPoint();
             _energySupplier = CreateEnergySupplier();
             SaveChanges();
-        }
-
-        [Fact]
-        public async Task Accept_WhenConsumerIsRegistered_IntegrationEventIsPublished()
-        {
-            var consumerSsn = SampleData.ConsumerSSN;
-            var moveInDate = GetService<ISystemDateTimeProvider>().Now();
-            var request = new RequestMoveIn(
-                SampleData.Transaction,
-                SampleData.GlnNumber,
-                consumerSsn,
-                string.Empty,
-                SampleData.ConsumerName,
-                SampleData.GsrnNumber,
-                moveInDate);
-
-            var result = await SendRequest(request) as BusinessProcessResult;
-            var publishedMessage = await GetLastMessageFromOutboxAsync<ConsumerRegisteredIntegrationEvent>().ConfigureAwait(false);
-
-            Assert.True(result.Success);
-            Assert.NotNull(publishedMessage);
         }
 
         [Fact]
