@@ -12,25 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Microsoft.Azure.Functions.Worker;
-using SimpleInjector;
-
-namespace Energinet.DataHub.MarketRoles.EntryPoints.Common
+namespace Energinet.DataHub.MarketRoles.Infrastructure.Correlation
 {
-    public class SimpleInjectorActivator : IFunctionActivator
+    /// <summary>
+    /// Context for the current scope identified by a correlation id.
+    /// </summary>
+    public interface ICorrelationContext
     {
-        private readonly Container _container;
+        /// <summary>
+        /// Get the current correlation id.
+        /// </summary>
+        string GetCorrelationId();
 
-        public SimpleInjectorActivator(Container container)
-        {
-            _container = container;
-        }
-
-        public object? CreateInstance(Type instanceType, FunctionContext context)
-        {
-            if (instanceType == null) throw new ArgumentNullException(nameof(instanceType));
-            return _container.GetInstance(instanceType);
-        }
+        /// <summary>
+        /// Set the current correlation id.
+        /// </summary>
+        void SetCorrelationId(string correlationId);
     }
 }

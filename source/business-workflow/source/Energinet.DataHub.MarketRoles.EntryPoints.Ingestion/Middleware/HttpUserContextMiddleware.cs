@@ -12,30 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketRoles.Application.Common.Users;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
-using SimpleInjector;
-using SimpleInjector.Lifestyles;
 
-namespace Energinet.DataHub.MarketRoles.EntryPoints.Common
+namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion.Middleware
 {
-    public sealed class SimpleInjectorScopedRequest : IFunctionsWorkerMiddleware
+    public sealed class HttpUserContextMiddleware : IFunctionsWorkerMiddleware
     {
-        private readonly Container _container;
+        private readonly IUserContext _userContext;
 
-        public SimpleInjectorScopedRequest(Container container)
+        public HttpUserContextMiddleware(
+            IUserContext userContext)
         {
-            _container = container;
+            _userContext = userContext;
         }
 
         public async Task Invoke(FunctionContext context, [NotNull] FunctionExecutionDelegate next)
         {
-            await using (AsyncScopedLifestyle.BeginScope(_container))
-            {
-                await next(context).ConfigureAwait(false);
-            }
+            if (context == null) throw new ArgumentNullException(nameof(context));
+
+            // TODO: Update with a proper identity once we know how/what/when.
+            _userContext.CurrentUser = new UserIdentity(Id: "Replace me with an identity of the current user");
+
+            await next(context).ConfigureAwait(false);
         }
     }
 }
