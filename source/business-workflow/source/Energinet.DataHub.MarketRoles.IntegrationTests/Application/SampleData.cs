@@ -20,10 +20,12 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
     {
         public static string GsrnNumber => "571234567891234568";
 
-        public static string ConsumerId => "2601211234";
+        public static string ConsumerSSN => "2601211234";
 
         public static string GlnNumber => "5790000555550";
 
         public static string Transaction => Guid.NewGuid().ToString();
+
+        public static string ConsumerName => "Test Testesen";
     }
 }

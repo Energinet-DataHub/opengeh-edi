@@ -12,28 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketRoles.Domain.Consumers
+namespace Energinet.DataHub.MarketRoles.Application.MoveIn.Validation
 {
-    public class ConsumerId : ValueObject
+    public class RequestMoveInRuleSet : AbstractValidator<RequestMoveIn>
     {
-        public ConsumerId(Guid value)
-        {
-            Value = value;
-        }
-
-        public Guid Value { get; }
-
-        public static ConsumerId New()
-        {
-            return new ConsumerId(Guid.NewGuid());
-        }
-
-        public override string ToString()
-        {
-            return Value.ToString();
-        }
     }
 }
