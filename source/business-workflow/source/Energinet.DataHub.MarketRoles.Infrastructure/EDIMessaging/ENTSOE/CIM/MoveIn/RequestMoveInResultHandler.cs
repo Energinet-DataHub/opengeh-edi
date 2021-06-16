@@ -13,52 +13,31 @@
 // limitations under the License.
 
 using System;
-using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.Common;
 using Energinet.DataHub.MarketRoles.Application.MoveIn;
-using Energinet.DataHub.MarketRoles.Infrastructure.BusinessRequestProcessing;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.MoveIn
 {
-    public class RequestMoveInResultHandler : IBusinessProcessResultHandler<RequestMoveIn>
+    public class RequestMoveInResultHandler : BusinessProcessResultHandler<RequestMoveIn>
     {
-        private readonly IOutbox _outbox;
-        private readonly IOutboxMessageFactory _outboxMessageFactory;
-
         public RequestMoveInResultHandler(IOutbox outbox, IOutboxMessageFactory outboxMessageFactory)
+        : base(outbox, outboxMessageFactory)
         {
-            _outbox = outbox ?? throw new ArgumentNullException(nameof(outbox));
-            _outboxMessageFactory = outboxMessageFactory ?? throw new ArgumentNullException(nameof(outboxMessageFactory));
         }
 
-        public Task HandleAsync(RequestMoveIn request, BusinessProcessResult result)
+        protected override object CreateRejectMessage(RequestMoveIn request, BusinessProcessResult result)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
             if (result == null) throw new ArgumentNullException(nameof(result));
-            return result.Success ? CreateAcceptResponseAsync(request, result) : CreateRejectResponseAsync(request, result);
+            return new MoveInRequestRejected(result.TransactionId, request.AccountingPointGsrnNumber);
         }
 
-        private Task CreateRejectResponseAsync(RequestMoveIn request, BusinessProcessResult result)
+        protected override object CreateAcceptMessage(RequestMoveIn request, BusinessProcessResult result)
         {
-            var ediMessage = new MoveInRequestRejected(result.TransactionId, request.AccountingPointGsrnNumber);
-            AddToOutbox(ediMessage);
-
-            return Task.CompletedTask;
-        }
-
-        private Task CreateAcceptResponseAsync(RequestMoveIn request, BusinessProcessResult result)
-        {
-            var ediMessage = new MoveInRequestAccepted(result.TransactionId, request.AccountingPointGsrnNumber);
-            AddToOutbox(ediMessage);
-
-            return Task.CompletedTask;
-        }
-
-        private void AddToOutbox<TEdiMessage>(TEdiMessage ediMessage)
-        {
-            var outboxMessage = _outboxMessageFactory.CreateFrom(ediMessage, OutboxMessageCategory.ActorMessage);
-            _outbox.Add(outboxMessage);
+            if (request == null) throw new ArgumentNullException(nameof(request));
+            if (result == null) throw new ArgumentNullException(nameof(result));
+            return new MoveInRequestAccepted(result.TransactionId, request.AccountingPointGsrnNumber);
         }
     }
 }
