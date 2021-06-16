@@ -30,6 +30,6 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules.ChangeEnergy
 
         public bool IsBroken => _effectuationDate < _currentDate;
 
-        public string Message => "Energy supplier cannot be changed in the past.";
+        public ValidationError Error => new EffectuationDateCannotBeInThePastRuleError();
     }
 }

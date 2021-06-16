@@ -44,7 +44,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.MeteringPoints.ChangeOfSupp
 
             var result = CanChangeSupplier(meteringPoint);
 
-            Assert.Contains(result.Errors, x => x.Rule == typeof(MeteringPointMustBeEnergySuppliableRule));
+            Assert.Contains(result.Errors, error => error is MeteringPointMustBeEnergySuppliableRuleError);
         }
 
         [Fact]
@@ -54,7 +54,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.MeteringPoints.ChangeOfSupp
 
             var result = CanChangeSupplier(meteringPoint);
 
-            Assert.Contains(result.Errors, x => x.Rule == typeof(ProductionMeteringPointMustBeObligatedRule));
+            Assert.Contains(result.Errors, error => error is ProductionMeteringPointMustBeObligatedRuleError);
         }
 
         [Fact]
@@ -65,7 +65,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.MeteringPoints.ChangeOfSupp
 
             var result = CanChangeSupplier(meteringPoint);
 
-            Assert.Contains(result.Errors, x => x.Rule == typeof(CannotBeInStateOfClosedDownRule));
+            Assert.Contains(result.Errors, error => error is CannotBeInStateOfClosedDownRuleError);
         }
 
         [Fact]
@@ -75,7 +75,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.MeteringPoints.ChangeOfSupp
 
             var result = CanChangeSupplier(meteringPoint);
 
-            Assert.Contains(result.Errors, x => x.Rule == typeof(MustHaveEnergySupplierAssociatedRule));
+            Assert.Contains(result.Errors, error => error is MustHaveEnergySupplierAssociatedRuleError);
         }
 
         [Fact]
@@ -93,7 +93,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.MeteringPoints.ChangeOfSupp
 
             var result = CanChangeSupplier(meteringPoint);
 
-            Assert.Contains(result.Errors, x => x.Rule == typeof(ChangeOfSupplierRegisteredOnSameDateIsNotAllowedRule));
+            Assert.Contains(result.Errors, error => error is ChangeOfSupplierRegisteredOnSameDateIsNotAllowedRuleError);
         }
 
         [Fact]
@@ -105,7 +105,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.MeteringPoints.ChangeOfSupp
 
             var result = CanChangeSupplier(meteringPoint);
 
-            Assert.Contains(result.Errors, x => x.Rule == typeof(MoveInRegisteredOnSameDateIsNotAllowedRule));
+            Assert.Contains(result.Errors, error => error is MoveInRegisteredOnSameDateIsNotAllowedRuleError);
         }
 
         // TODO: Ignore Move related rules until implementation is in scope
@@ -130,7 +130,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.MeteringPoints.ChangeOfSupp
 
             var result = CanChangeSupplier(meteringPoint, effectuationDate);
 
-            Assert.Contains(result.Errors, x => x.Rule == typeof(EffectuationDateCannotBeInThePastRule));
+            Assert.Contains(result.Errors, error => error is EffectuationDateCannotBeInThePastRuleError);
         }
 
         [Fact]

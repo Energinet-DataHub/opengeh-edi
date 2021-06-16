@@ -46,7 +46,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.C
                 MessageId: Guid.NewGuid().ToString(),
                 TransactionId: result.TransactionId,
                 MeteringPoint: request.MeteringPointId,
-                ReasonCodes: result.ValidationErrors.Select(e => e.Rule.FullName!).AsEnumerable());
+                ReasonCodes: result.ValidationErrors.Select(e => e.GetType().Name).AsEnumerable());
 
             AddToOutbox(ediMessage);
 

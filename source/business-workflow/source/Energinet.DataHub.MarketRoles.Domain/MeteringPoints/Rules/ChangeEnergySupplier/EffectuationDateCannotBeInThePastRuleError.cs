@@ -12,14 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.IntegrationEventDispatching
+using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+
+namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules.ChangeEnergySupplier
 {
-    /// <summary>
-    /// An event that published outside the domain and bounded context
-    /// </summary>
-    #pragma warning disable CA1040
-    public interface IIntegrationEvent
+    public class EffectuationDateCannotBeInThePastRuleError : ValidationError
     {
     }
-    #pragma warning restore
 }

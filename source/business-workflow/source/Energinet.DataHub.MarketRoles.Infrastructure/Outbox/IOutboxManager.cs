@@ -12,14 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using NodaTime;
-
-namespace Energinet.DataHub.MarketRoles.Infrastructure.IntegrationEventDispatching.ChangeOfSupplier
+namespace Energinet.DataHub.MarketRoles.Infrastructure.Outbox
 {
-    //TODO: Determine other attributes need in integration event
-    public record EnergySupplierChanged(
-            string GsrnNumber,
-            string EnergySupplierGln,
-            Instant StartOfSupplyDate)
-        : IIntegrationEvent;
+    /// <summary>
+    /// Transactional outbox manipulation
+    /// </summary>
+    public interface IOutboxManager
+    {
+        /// <summary>
+        /// Get next unprocessed message based on category
+        /// </summary>
+        OutboxMessage? GetNext(OutboxMessageCategory category);
+
+        /// <summary>
+        /// Mark message as processed
+        /// </summary>
+        /// <param name="outboxMessage"></param>
+        void MarkProcessed(OutboxMessage outboxMessage);
+    }
 }
