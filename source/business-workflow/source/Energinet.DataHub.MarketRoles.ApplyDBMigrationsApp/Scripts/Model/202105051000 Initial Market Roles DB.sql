@@ -1,9 +1,5 @@
 GO
 /****** Object: Table [dbo].[AccountingPoints] Script Date: 6/15/2021 1:51:00 PM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
 CREATE TABLE [dbo].[AccountingPoints](
     [Id] [uniqueidentifier] NOT NULL,
     [RecordId] [int] IDENTITY(1,1) NOT NULL,
@@ -19,10 +15,7 @@ CREATE TABLE [dbo].[AccountingPoints](
     ) ON [PRIMARY]
     GO
 /****** Object: Table [dbo].[BusinessProcesses] Script Date: 6/15/2021 1:51:00 PM ******/
-    SET ANSI_NULLS ON
-    GO
-    SET QUOTED_IDENTIFIER ON
-    GO
+
 CREATE TABLE [dbo].[BusinessProcesses](
     [Id] [uniqueidentifier] NOT NULL,
     [RecordId] [int] IDENTITY(1,1) NOT NULL,
@@ -38,10 +31,7 @@ CREATE TABLE [dbo].[BusinessProcesses](
     ) ON [PRIMARY]
     GO
 /****** Object: Table [dbo].[ConsumerRegistrations] Script Date: 6/15/2021 1:51:00 PM ******/
-    SET ANSI_NULLS ON
-    GO
-    SET QUOTED_IDENTIFIER ON
-    GO
+
 CREATE TABLE [dbo].[ConsumerRegistrations](
     [Id] [uniqueidentifier] NOT NULL,
     [RecordId] [int] IDENTITY(1,1) NOT NULL,
@@ -56,10 +46,7 @@ CREATE TABLE [dbo].[ConsumerRegistrations](
     ) ON [PRIMARY]
     GO
 /****** Object: Table [dbo].[Consumers] Script Date: 6/15/2021 1:51:00 PM ******/
-    SET ANSI_NULLS ON
-    GO
-    SET QUOTED_IDENTIFIER ON
-    GO
+
 CREATE TABLE [dbo].[Consumers](
     [Id] [uniqueidentifier] NOT NULL,
     [RecordId] [int] IDENTITY(1,1) NOT NULL,
@@ -73,10 +60,7 @@ CREATE TABLE [dbo].[Consumers](
     ) ON [PRIMARY]
     GO
 /****** Object: Table [dbo].[EnergySuppliers] Script Date: 6/15/2021 1:51:00 PM ******/
-    SET ANSI_NULLS ON
-    GO
-    SET QUOTED_IDENTIFIER ON
-    GO
+
 CREATE TABLE [dbo].[EnergySuppliers](
     [Id] [uniqueidentifier] NOT NULL,
     [RecordId] [int] IDENTITY(1,1) NOT NULL,
@@ -89,10 +73,7 @@ CREATE TABLE [dbo].[EnergySuppliers](
     ) ON [PRIMARY]
     GO
 /****** Object: Table [dbo].[OutboxMessages] Script Date: 6/15/2021 1:51:00 PM ******/
-    SET ANSI_NULLS ON
-    GO
-    SET QUOTED_IDENTIFIER ON
-    GO
+
 CREATE TABLE [dbo].[OutboxMessages](
     [Id] [uniqueidentifier] NOT NULL,
     [RecordId] [int] IDENTITY(1,1) NOT NULL,
@@ -108,10 +89,7 @@ CREATE TABLE [dbo].[OutboxMessages](
     ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
     GO
 /****** Object: Table [dbo].[ProcessManagers] Script Date: 6/15/2021 1:51:00 PM ******/
-    SET ANSI_NULLS ON
-    GO
-    SET QUOTED_IDENTIFIER ON
-    GO
+
 CREATE TABLE [dbo].[ProcessManagers](
     [Id] [uniqueidentifier] NOT NULL,
     [RecordId] [int] IDENTITY(1,1) NOT NULL,
@@ -130,10 +108,7 @@ CREATE TABLE [dbo].[ProcessManagers](
     ) ON [PRIMARY]
     GO
 /****** Object: Table [dbo].[QueuedInternalCommands] Script Date: 6/15/2021 1:51:00 PM ******/
-    SET ANSI_NULLS ON
-    GO
-    SET QUOTED_IDENTIFIER ON
-    GO
+
 CREATE TABLE [dbo].[QueuedInternalCommands](
     [Id] [uniqueidentifier] NOT NULL,
     [RecordId] [int] IDENTITY(1,1) NOT NULL,
@@ -154,10 +129,7 @@ CREATE TABLE [dbo].[QueuedInternalCommands](
     ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
     GO
 /****** Object: Table [dbo].[SupplierRegistrations] Script Date: 6/15/2021 1:51:00 PM ******/
-    SET ANSI_NULLS ON
-    GO
-    SET QUOTED_IDENTIFIER ON
-    GO
+
 CREATE TABLE [dbo].[SupplierRegistrations](
     [Id] [uniqueidentifier] NOT NULL,
     [RecordId] [int] IDENTITY(1,1) NOT NULL,
