@@ -27,6 +27,6 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules.ChangeEnergy
 
         public bool IsBroken => _supplierRegistration is null;
 
-        public string Message => $"An energy supplier must be associated.";
+        public ValidationError Error => new MustHaveEnergySupplierAssociatedRuleError();
     }
 }

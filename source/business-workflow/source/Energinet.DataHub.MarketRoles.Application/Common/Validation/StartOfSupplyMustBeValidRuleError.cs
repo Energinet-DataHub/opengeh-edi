@@ -12,23 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using NodaTime;
 
-namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Validation
+namespace Energinet.DataHub.MarketRoles.Application.Common.Validation
 {
-    public class MeteringPointMustBeKnownRule : IBusinessRule
+    public class StartOfSupplyMustBeValidRuleError : ValidationError
     {
-        private readonly string _gsrnNumber;
-
-        public MeteringPointMustBeKnownRule(AccountingPoint? accountingPoint, string gsrnNumber)
+        public StartOfSupplyMustBeValidRuleError(Instant startOfSupplyDate)
         {
-            _gsrnNumber = gsrnNumber;
-            IsBroken = accountingPoint == null;
+            StartOfSupplyDate = startOfSupplyDate;
         }
 
-        public bool IsBroken { get; }
-
-        public ValidationError Error => new MeteringPointMustBeKnownRuleError();
+        public Instant StartOfSupplyDate { get; }
     }
 }

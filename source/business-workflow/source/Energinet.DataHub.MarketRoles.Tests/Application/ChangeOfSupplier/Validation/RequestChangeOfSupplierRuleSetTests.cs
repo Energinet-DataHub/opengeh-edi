@@ -35,7 +35,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Valid
 
             var errors = GetValidationErrors(businessRequest);
 
-            Assert.Contains(errors, error => error.Rule == typeof(GlnNumberMustBeValid));
+            Assert.Contains(errors, error => error is GlnNumberMustBeValidRuleError);
         }
 
         [Fact]
@@ -45,7 +45,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Valid
 
             var errors = GetValidationErrors(businessRequest);
 
-            Assert.DoesNotContain(errors, error => error.Rule == typeof(GlnNumberMustBeValid));
+            Assert.DoesNotContain(errors, error => error is GlnNumberMustBeValidRuleError);
         }
 
         [Fact]
@@ -55,7 +55,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Valid
 
             var errors = GetValidationErrors(businessRequest);
 
-            Assert.Contains(errors, error => error.Rule == typeof(GsrnNumberMustBeValidRule));
+            Assert.Contains(errors, error => error is GsrnNumberMustBeValidRuleError);
         }
 
         [Fact]
@@ -65,7 +65,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Valid
 
             var errors = GetValidationErrors(businessRequest);
 
-            Assert.Contains(errors, error => error.Rule == typeof(GsrnNumberMustBeValidRule));
+            Assert.Contains(errors, error => error is GsrnNumberMustBeValidRuleError);
         }
 
         [Fact]
@@ -75,7 +75,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Valid
 
             var errors = GetValidationErrors(businessRequest);
 
-            Assert.DoesNotContain(errors, error => error.Rule == typeof(GsrnNumberMustBeValidRule));
+            Assert.DoesNotContain(errors, error => error is GsrnNumberMustBeValidRuleError);
         }
 
         [Fact]
@@ -85,7 +85,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Valid
 
             var errors = GetValidationErrors(businessRequest);
 
-            Assert.Contains(errors, error => error.Rule == typeof(TransactionMustBeValidRule));
+            Assert.Contains(errors, error => error is TransactionMustBeValidRuleError);
         }
 
         [Fact]
@@ -95,7 +95,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Valid
 
             var errors = GetValidationErrors(businessRequest);
 
-            Assert.DoesNotContain(errors, error => error.Rule == typeof(GsrnNumberMustBeValidRule));
+            Assert.DoesNotContain(errors, error => error is GsrnNumberMustBeValidRuleError);
         }
 
         [Fact]
@@ -105,7 +105,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Valid
 
             var errors = GetValidationErrors(businessRequest);
 
-            Assert.Contains(errors, error => error.Rule == typeof(StartOfSupplyMustBeValidRule));
+            Assert.Contains(errors, error => error is StartOfSupplyMustBeValidRuleError);
         }
 
         [Fact]
@@ -115,7 +115,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Valid
 
             var errors = GetValidationErrors(businessRequest);
 
-            Assert.DoesNotContain(errors, error => error.Rule == typeof(StartOfSupplyMustBeValidRule));
+            Assert.DoesNotContain(errors, error => error is StartOfSupplyMustBeValidRuleError);
         }
 
         private RequestChangeOfSupplier CreateRequest(string transaction = "", string glnNumber = "", string gsrnNumber = "")
