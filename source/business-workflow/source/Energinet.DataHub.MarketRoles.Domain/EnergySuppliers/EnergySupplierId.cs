@@ -26,6 +26,11 @@ namespace Energinet.DataHub.MarketRoles.Domain.EnergySuppliers
 
         public Guid Value { get; }
 
+        public static EnergySupplierId New()
+        {
+            return new EnergySupplierId(Guid.NewGuid());
+        }
+
         public override string ToString()
         {
             return Value.ToString();

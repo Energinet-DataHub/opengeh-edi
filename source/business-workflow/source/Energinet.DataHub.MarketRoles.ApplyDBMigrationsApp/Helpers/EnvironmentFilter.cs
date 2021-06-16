@@ -13,27 +13,22 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using System.Linq;
 
-namespace Energinet.DataHub.MarketRoles.Domain.Consumers
+namespace Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.Helpers
 {
-    public class ConsumerId : ValueObject
+    public static class EnvironmentFilter
     {
-        public ConsumerId(Guid value)
+        public static Func<string, bool> GetFilter(string[] args)
         {
-            Value = value;
-        }
-
-        public Guid Value { get; }
-
-        public static ConsumerId New()
-        {
-            return new ConsumerId(Guid.NewGuid());
-        }
-
-        public override string ToString()
-        {
-            return Value.ToString();
+#pragma warning disable CA1307
+#pragma warning disable CA1310
+            return file => file.EndsWith(".sql") &&
+                           ((file.Contains(".Scripts.Seed.") && args.Contains("includeSeedData")) ||
+                            (file.Contains(".Scripts.Test.") && args.Contains("includeTestData")) ||
+                            file.Contains(".Scripts.Model."));
         }
     }
+#pragma warning restore CA1307
+#pragma warning restore CA1310
 }

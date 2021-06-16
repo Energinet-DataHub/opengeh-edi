@@ -12,28 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using System.Linq;
+using Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.Helpers;
 
-namespace Energinet.DataHub.MarketRoles.Domain.Consumers
+namespace Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp
 {
-    public class ConsumerId : ValueObject
+    public static class Program
     {
-        public ConsumerId(Guid value)
+        public static int Main(string[] args)
         {
-            Value = value;
-        }
+            var connectionString = ConnectionStringFactory.GetConnectionString(args);
+            var filter = EnvironmentFilter.GetFilter(args);
+            var isDryRun = args.Contains("dryRun");
 
-        public Guid Value { get; }
+            var upgrader = UpgradeFactory.GetUpgradeEngine(connectionString, filter, isDryRun);
 
-        public static ConsumerId New()
-        {
-            return new ConsumerId(Guid.NewGuid());
-        }
+            var result = upgrader.PerformUpgrade();
 
-        public override string ToString()
-        {
-            return Value.ToString();
+            return ResultReporter.ReportResult(result);
         }
     }
 }

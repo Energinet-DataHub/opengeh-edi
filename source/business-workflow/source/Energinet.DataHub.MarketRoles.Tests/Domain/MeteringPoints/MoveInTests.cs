@@ -54,22 +54,6 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.MeteringPoints
                 accountingPoint.EffectuateConsumerMoveIn(nonExistingProcessId, _systemDateTimeProvider));
         }
 
-        [Fact]
-        public void Accept_WhenPendingMoveInOnSameEffectiveDate_IsNotPossible()
-        {
-            var meteringPoint = Create();
-            var consumerId = new ConsumerId(Guid.NewGuid());
-            var energySupplierId = new EnergySupplierId(Guid.NewGuid());
-            var moveInDate = _systemDateTimeProvider.Now();
-            var transaction = new Transaction(Guid.NewGuid().ToString());
-
-            meteringPoint.AcceptConsumerMoveIn(consumerId, energySupplierId, moveInDate, transaction);
-
-            var result = meteringPoint.ConsumerMoveInAcceptable(consumerId, energySupplierId, moveInDate, transaction);
-
-            Assert.Contains(result.Errors, x => x.Rule == typeof(MoveInRegisteredOnSameDateIsNotAllowedRule));
-        }
-
         private AccountingPoint Create()
         {
             var gsrnNumber = GsrnNumber.Create("571234567891234568");
