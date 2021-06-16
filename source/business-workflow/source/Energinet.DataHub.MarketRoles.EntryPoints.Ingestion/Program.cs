@@ -15,13 +15,16 @@
 using System;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.MarketRoles.Application;
-using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier;
-using Energinet.DataHub.MarketRoles.EntryPoints.Common;
-using Energinet.DataHub.MarketRoles.EntryPoints.Common.MediatR;
-using Energinet.DataHub.MarketRoles.Infrastructure;
+using Energinet.DataHub.MarketRoles.Application.Common.Users;
+using Energinet.DataHub.MarketRoles.Contracts;
+using Energinet.DataHub.MarketRoles.EntryPoints.Common.SimpleInjector;
+using Energinet.DataHub.MarketRoles.EntryPoints.Ingestion.Middleware;
+using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
+using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
+using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integration;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using SimpleInjector;
 
@@ -36,32 +39,45 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
                 .ConfigureFunctionsWorkerDefaults(options =>
                 {
                     options.UseMiddleware<SimpleInjectorScopedRequest>();
+                    options.UseMiddleware<HttpCorrelationIdMiddleware>();
+                    options.UseMiddleware<HttpUserContextMiddleware>();
                 })
                 .ConfigureServices(services =>
                 {
-                    services.AddLogging();
-                    services.AddSingleton<IFunctionActivator, SimpleInjectorActivator>(); // Replace existing activator
+                    var descriptor = new ServiceDescriptor(
+                        typeof(IFunctionActivator),
+                        typeof(SimpleInjectorActivator),
+                        ServiceLifetime.Singleton);
+                    services.Replace(descriptor); // Replace existing activator
 
+                    services.AddLogging();
                     services.AddSimpleInjector(container, options =>
                     {
                         options.AddLogging();
                     });
+
+                    services.SendProtobuf<MarketRolesEnvelope>();
                 })
                 .Build()
                 .UseSimpleInjector(container);
 
             // Register application components.
             container.Register<CommandApi>(Lifestyle.Scoped);
-            container.Register<IProcessingClient, ServiceBusProcessingClient>(Lifestyle.Singleton);
-            //TODO: Fix in another PR.
-            // container.BuildMediatorWithPipeline(
-            //     new[] { typeof(RequestChangeOfSupplier).Assembly },
-            //     new[] { typeof(InputValidationBehavior), typeof(AuthorizationBehavior) });
+            container.Register<HttpCorrelationIdMiddleware>(Lifestyle.Scoped);
+            container.Register<ICorrelationContext, CorrelationContext>(Lifestyle.Scoped);
+            container.Register<HttpUserContextMiddleware>(Lifestyle.Scoped);
+            container.Register<IUserContext, UserContext>(Lifestyle.Scoped);
+
+            container.Register<MessageDispatcher>(Lifestyle.Scoped);
+
+            // TODO: add service bus implementation
+            container.Register<Channel, NullChannel>(Lifestyle.Scoped);
+
             var connectionString = Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_CONNECTION_STRING");
             var topicName = Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_TOPIC_NAME");
-
-            container.Register<ServiceBusSender>(() => new ServiceBusClient(connectionString).CreateSender(topicName), Lifestyle.Singleton);
-
+            container.Register<ServiceBusSender>(
+                () => new ServiceBusClient(connectionString).CreateSender(topicName),
+                Lifestyle.Singleton);
             container.Verify();
 
             await host.RunAsync().ConfigureAwait(false);
