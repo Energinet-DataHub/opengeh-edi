@@ -27,21 +27,65 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
     public class MoveInTests : TestHost
     {
         private readonly AccountingPoint _accountingPoint;
-        private readonly EnergySupplier _energySupplier;
 
         public MoveInTests()
         {
-            _accountingPoint = CreateAccountingPoint();
-            _energySupplier = CreateEnergySupplier();
-            SaveChanges();
         }
 
         [Fact]
         public async Task Accept_WhenConsumerIsRegistered_AcceptMessageIsPublished()
         {
+            CreateEnergySupplier();
+            CreateAccountingPoint();
+            SaveChanges();
+
+            var request = CreateRequest();
+
+            var result = await SendRequest(request);
+
+            Assert.True(result.Success);
+            await AssertOutboxMessage<MoveInRequestAccepted>();
+        }
+
+        [Fact]
+        public async Task Accept_WhenEnergySupplierDoesNotExists_IsRejected()
+        {
+            CreateAccountingPoint();
+            SaveChanges();
+
+            var request = CreateRequest();
+
+            var result = await SendRequest(request);
+
+            Assert.False(result.Success);
+            await AssertOutboxMessage<MoveInRequestRejected>().ConfigureAwait(false);
+        }
+
+        [Fact]
+        public async Task Accept_WhenAccountingPointDoesNotExists_IsRejected()
+        {
+            CreateEnergySupplier();
+            SaveChanges();
+
+            var request = CreateRequest();
+
+            var result = await SendRequest(request);
+
+            Assert.False(result.Success);
+            await AssertOutboxMessage<MoveInRequestRejected>().ConfigureAwait(false);
+        }
+
+        private async Task AssertOutboxMessage<TMessage>()
+        {
+            var publishedMessage = await GetLastMessageFromOutboxAsync<TMessage>().ConfigureAwait(false);
+            Assert.NotNull(publishedMessage);
+        }
+
+        private RequestMoveIn CreateRequest()
+        {
             var consumerSsn = SampleData.ConsumerSSN;
             var moveInDate = GetService<ISystemDateTimeProvider>().Now();
-            var request = new RequestMoveIn(
+            return new RequestMoveIn(
                 SampleData.Transaction,
                 SampleData.GlnNumber,
                 consumerSsn,
@@ -49,31 +93,6 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
                 SampleData.ConsumerName,
                 SampleData.GsrnNumber,
                 moveInDate);
-
-            var result = await SendRequest(request) as BusinessProcessResult;
-            var publishedMessage = await GetLastMessageFromOutboxAsync<MoveInRequestAccepted>().ConfigureAwait(false);
-
-            Assert.True(result.Success);
-            Assert.NotNull(publishedMessage);
         }
-
-        // [Fact]
-        // public async Task Accept_WhenEnergySupplierDoesNotExists_IsRejected()
-        // {
-        //     var consumerSsn = SampleData.ConsumerSSN;
-        //     var moveInDate = GetService<ISystemDateTimeProvider>().Now();
-        //     var request = new RequestMoveIn(
-        //         SampleData.Transaction,
-        //         SampleData.GlnNumber,
-        //         consumerSsn,
-        //         string.Empty,
-        //         SampleData.ConsumerName,
-        //         SampleData.GsrnNumber,
-        //         moveInDate);
-        //
-        //     var result = await SendRequest(request) as BusinessProcessResult;
-        //
-        //     Assert.False(result.Success);
-        // }
     }
 }

@@ -103,8 +103,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             services.AddScoped<IMeteringPointDetailsForwarder, MeteringPointDetailsForwarder>();
 
             // Busines process responders
-            services.AddScoped<IBusinessProcessResponder<RequestChangeOfSupplier>, RequestChangeOfSupplierResponder>();
-            services.AddScoped<IBusinessProcessResponder<RequestMoveIn>, RequestMoveInResultHandler>();
+            services.AddScoped<IBusinessProcessResultHandler<RequestChangeOfSupplier>, RequestChangeOfSupplierResultHandler>();
+            services.AddScoped<IBusinessProcessResultHandler<RequestMoveIn>, RequestMoveInResultHandler>();
 
             // Input validation(
             services.AddScoped<IValidator<RequestChangeOfSupplier>, RequestChangeOfSupplierRuleSet>();

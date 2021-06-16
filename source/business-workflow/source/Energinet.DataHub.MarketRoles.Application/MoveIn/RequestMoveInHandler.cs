@@ -13,12 +13,15 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.Common;
+using Energinet.DataHub.MarketRoles.Application.Common.Validation;
 using Energinet.DataHub.MarketRoles.Domain.Consumers;
 using Energinet.DataHub.MarketRoles.Domain.EnergySuppliers;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
+using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
 namespace Energinet.DataHub.MarketRoles.Application.MoveIn
 {
@@ -38,8 +41,15 @@ namespace Energinet.DataHub.MarketRoles.Application.MoveIn
         public async Task<BusinessProcessResult> Handle(RequestMoveIn request, CancellationToken cancellationToken)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
+
             var energySupplier = await _energySupplierRepository.GetByGlnNumberAsync(new GlnNumber(request.EnergySupplierGlnNumber)).ConfigureAwait(false);
             var accountingPoint = await _accountingPointRepository.GetByGsrnNumberAsync(GsrnNumber.Create(request.AccountingPointGsrnNumber)).ConfigureAwait(false);
+
+            var validationResult = CheckRules(energySupplier, accountingPoint, request);
+            if (validationResult.Success == false)
+            {
+                return validationResult;
+            }
 
             //TODO: Add logic for creating correct type of consumer (SSN or VAT). Also check if consumer already exists
             var consumer = new Consumer(ConsumerId.New(), new CprNumber(request.VATNumber));
@@ -47,6 +57,17 @@ namespace Energinet.DataHub.MarketRoles.Application.MoveIn
 
             accountingPoint.AcceptConsumerMoveIn(consumer.ConsumerId, energySupplier.EnergySupplierId, request.MoveInDate, Transaction.Create(request.TransactionId));
             return BusinessProcessResult.Ok(request.TransactionId);
+        }
+
+        private static BusinessProcessResult CheckRules(EnergySupplier energySupplier, AccountingPoint accountingPoint, RequestMoveIn request)
+        {
+            var rules = new List<IBusinessRule>()
+            {
+                new EnergySupplierMustBeKnownRule(energySupplier, request.EnergySupplierGlnNumber),
+                new MeteringPointMustBeKnownRule(accountingPoint, request.AccountingPointGsrnNumber),
+            };
+
+            return new BusinessProcessResult(request.TransactionId, rules);
         }
     }
 }

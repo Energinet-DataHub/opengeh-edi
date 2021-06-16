@@ -22,18 +22,18 @@ using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.ChangeOfSupplier
 {
-    public class RequestChangeOfSupplierResponder : IBusinessProcessResponder<RequestChangeOfSupplier>
+    public class RequestChangeOfSupplierResultHandler : IBusinessProcessResultHandler<RequestChangeOfSupplier>
     {
         private readonly IOutbox _outbox;
         private readonly IOutboxMessageFactory _outboxMessageFactory;
 
-        public RequestChangeOfSupplierResponder(IOutbox outbox, IOutboxMessageFactory outboxMessageFactory)
+        public RequestChangeOfSupplierResultHandler(IOutbox outbox, IOutboxMessageFactory outboxMessageFactory)
         {
             _outbox = outbox ?? throw new ArgumentNullException(nameof(outbox));
             _outboxMessageFactory = outboxMessageFactory ?? throw new ArgumentNullException(nameof(outboxMessageFactory));
         }
 
-        public Task RespondAsync(RequestChangeOfSupplier request, BusinessProcessResult result)
+        public Task HandleAsync(RequestChangeOfSupplier request, BusinessProcessResult result)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
             if (result == null) throw new ArgumentNullException(nameof(result));

@@ -24,11 +24,11 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.BusinessRequestProcessing
         where TRequest : IBusinessRequest
         where TResponse : BusinessProcessResult
     {
-        private readonly IBusinessProcessResponder<TRequest> _businessProcessResponder;
+        private readonly IBusinessProcessResultHandler<TRequest> _businessProcessResultHandler;
 
-        public BusinessProcessResponderBehaviour(IBusinessProcessResponder<TRequest> businessProcessResponder)
+        public BusinessProcessResponderBehaviour(IBusinessProcessResultHandler<TRequest> businessProcessResultHandler)
         {
-            _businessProcessResponder = businessProcessResponder;
+            _businessProcessResultHandler = businessProcessResultHandler;
         }
 
         public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
@@ -37,7 +37,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.BusinessRequestProcessing
 
             var result = await next().ConfigureAwait(false);
 
-            await _businessProcessResponder.RespondAsync(request, result).ConfigureAwait(false);
+            await _businessProcessResultHandler.HandleAsync(request, result).ConfigureAwait(false);
 
             return result;
         }
