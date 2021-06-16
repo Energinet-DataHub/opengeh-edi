@@ -29,6 +29,6 @@ namespace Energinet.DataHub.MarketRoles.Application.Common.Validation
 
         public bool IsBroken { get; }
 
-        public string Message => "Unknown energy supplier ({glnNumber}).";
+        public ValidationError Error => new EnergySupplierMustBeKnownRuleError();
     }
 }

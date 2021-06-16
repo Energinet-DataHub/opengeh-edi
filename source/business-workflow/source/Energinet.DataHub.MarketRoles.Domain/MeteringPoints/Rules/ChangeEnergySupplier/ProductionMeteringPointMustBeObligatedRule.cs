@@ -29,6 +29,6 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules.ChangeEnergy
 
         public bool IsBroken => _meteringPointType == MeteringPointType.Production && _isProductionObligated == false;
 
-        public string Message => $"Metering point is not set for production obligation.";
+        public ValidationError Error => new ProductionMeteringPointMustBeObligatedRuleError();
     }
 }

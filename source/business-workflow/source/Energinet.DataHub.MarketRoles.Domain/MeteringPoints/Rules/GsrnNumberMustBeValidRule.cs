@@ -29,7 +29,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules
 
         public bool IsBroken => !IsValidGsrnNumber();
 
-        public string Message => $"Invalid GSRN number.";
+        public ValidationError Error => new GsrnNumberMustBeValidRuleError();
 
         private static int Parse(string input)
         {
