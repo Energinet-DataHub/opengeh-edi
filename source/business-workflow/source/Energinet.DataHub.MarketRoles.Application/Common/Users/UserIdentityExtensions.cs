@@ -12,21 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier;
-
-namespace Energinet.DataHub.MarketRoles.Application
+namespace Energinet.DataHub.MarketRoles.Application.Common.Users
 {
-    /// <summary>
-    /// Send a request for processing
-    /// </summary>
-    public interface IProcessingClient
+    public static class UserIdentityExtensions
     {
-        /// <summary>
-        /// Send a request for processing
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
-        Task SendAsync(RequestChangeOfSupplier request);
+        public static string AsString(this UserIdentity userIdentity)
+        {
+            return System.Text.Json.JsonSerializer.Serialize(userIdentity);
+        }
     }
 }

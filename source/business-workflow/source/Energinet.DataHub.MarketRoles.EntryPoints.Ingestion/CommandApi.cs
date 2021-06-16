@@ -24,12 +24,12 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
 {
     public class CommandApi
     {
-        private readonly IMediator _mediator;
+        private readonly ILogger _logger;
 
         public CommandApi(
-            IMediator mediator)
+            ILogger logger)
         {
-            _mediator = mediator;
+            _logger = logger;
         }
 
         [Function("CommandApi")]
@@ -48,7 +48,8 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
                 return errorResponse;
             }
 
-            await _mediator.Send(command).ConfigureAwait(false);
+            // TODO: Send to processing queue
+            _logger.LogInformation("Processing...");
 
             var response = request.CreateResponse(HttpStatusCode.OK);
             response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
