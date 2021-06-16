@@ -1,9 +1,0 @@
-{
-  "IsEncrypted": false,
-  "Values": {
-    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-    "APPINSIGHTS_INSTRUMENTATIONKEY": "<An instrumentation key for Application Insights>",
-    "SYNCHRONOUS_INGESTOR_BASE_URL":"http://localhost:3003/api"
-  }
-}
