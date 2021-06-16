@@ -20,6 +20,7 @@ using Energinet.DataHub.MarketRoles.Contracts;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common.SimpleInjector;
 using Energinet.DataHub.MarketRoles.EntryPoints.Ingestion.Middleware;
 using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
+using Energinet.DataHub.MarketRoles.Infrastructure.Ingestion;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integration;
 using Microsoft.Azure.Functions.Worker;
@@ -69,9 +70,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
             container.Register<IUserContext, UserContext>(Lifestyle.Scoped);
 
             container.Register<MessageDispatcher>(Lifestyle.Scoped);
-
-            // TODO: add service bus implementation
-            container.Register<Channel, NullChannel>(Lifestyle.Scoped);
+            container.Register<Channel, ProcessingServiceBusChannel>(Lifestyle.Scoped);
 
             var connectionString = Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_CONNECTION_STRING");
             var topicName = Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_TOPIC_NAME");
