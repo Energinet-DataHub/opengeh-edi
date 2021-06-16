@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Validation;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
