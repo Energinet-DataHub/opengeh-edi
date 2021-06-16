@@ -12,28 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using Energinet.DataHub.MarketRoles.Application.Common;
+using NodaTime;
 
-namespace Energinet.DataHub.MarketRoles.Domain.Consumers
+namespace Energinet.DataHub.MarketRoles.Application.MoveIn
 {
-    public class ConsumerId : ValueObject
-    {
-        public ConsumerId(Guid value)
-        {
-            Value = value;
-        }
-
-        public Guid Value { get; }
-
-        public static ConsumerId New()
-        {
-            return new ConsumerId(Guid.NewGuid());
-        }
-
-        public override string ToString()
-        {
-            return Value.ToString();
-        }
-    }
+    public record RequestMoveIn(
+        string TransactionId,
+        string EnergySupplierGlnNumber,
+        string SocialSecurityNumber,
+        string VATNumber,
+        string ConsumerName,
+        string AccountingPointGsrnNumber,
+        Instant MoveInDate) : IBusinessRequest;
 }
