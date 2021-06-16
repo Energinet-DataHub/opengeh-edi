@@ -12,23 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
+using Energinet.DataHub.MarketRoles.Domain.EnergySuppliers;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
-namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Validation
+namespace Energinet.DataHub.MarketRoles.Application.Common.Validation
 {
-    public class MeteringPointMustBeKnownRule : IBusinessRule
+    public class EnergySupplierMustBeKnownRule : IBusinessRule
     {
-        private readonly string _gsrnNumber;
+        private readonly string _glnNumber;
 
-        public MeteringPointMustBeKnownRule(AccountingPoint? accountingPoint, string gsrnNumber)
+        public EnergySupplierMustBeKnownRule(EnergySupplier? energySupplier, string glnNumber)
         {
-            _gsrnNumber = gsrnNumber;
-            IsBroken = accountingPoint == null;
+            _glnNumber = glnNumber;
+            IsBroken = energySupplier == null;
         }
 
         public bool IsBroken { get; }
 
-        public string Message => $"Unknown metering point ({_gsrnNumber}).";
+        public string Message => "Unknown energy supplier ({glnNumber}).";
     }
 }
