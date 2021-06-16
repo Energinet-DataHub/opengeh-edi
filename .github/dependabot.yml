@@ -10,42 +10,12 @@ updates:
       interval: "weekly"
 
   - package-ecosystem: "nuget"
-    directory: "/source/business-workflow/source/Energinet.DataHub.MarketData.Application"
-    schedule:
-      interval: "weekly"
-
-  - package-ecosystem: "nuget"
-    directory: "/source/business-workflow/source/Energinet.DataHub.MarketData.ApplyDBMigrationsApp"
-    schedule:
-      interval: "weekly"
-
-  - package-ecosystem: "nuget"
-    directory: "/source/business-workflow/source/Energinet.DataHub.MarketData.Domain"
-    schedule:
-      interval: "weekly"
-
-  - package-ecosystem: "nuget"
-    directory: "/source/business-workflow/source/Energinet.DataHub.MarketData.EntryPoint"
-    schedule:
-      interval: "weekly"
-
-  - package-ecosystem: "nuget"
-    directory: "/source/business-workflow/source/Energinet.DataHub.MarketData.Infrastructure"
-    schedule:
-      interval: "weekly"
-
-  - package-ecosystem: "nuget"
-    directory: "/source/business-workflow/source/Energinet.DataHub.MarketData.IntegrationTests"
-    schedule:
-      interval: "weekly"
-
-  - package-ecosystem: "nuget"
-    directory: "/source/business-workflow/source/Energinet.DataHub.MarketData.Tests"
-    schedule:
-      interval: "weekly"
-
-  - package-ecosystem: "nuget"
     directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.Application"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp"
     schedule:
       interval: "weekly"
 
