@@ -13,16 +13,18 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketRoles.Application.Common;
+using Energinet.DataHub.MarketRoles.Application.Common.Transport;
 using NodaTime;
 
 namespace Energinet.DataHub.MarketRoles.Application.MoveIn
 {
     public record RequestMoveIn(
-        string TransactionId,
-        string EnergySupplierGlnNumber,
-        string SocialSecurityNumber,
-        string VATNumber,
-        string ConsumerName,
-        string AccountingPointGsrnNumber,
-        Instant MoveInDate) : IBusinessRequest;
+        string TransactionId = "",
+        string EnergySupplierGlnNumber = "",
+        string SocialSecurityNumber = "",
+        string VATNumber = "",
+        string ConsumerName = "",
+        string AccountingPointGsrnNumber = "",
+        Instant MoveInDate = default)
+        : IBusinessRequest, IOutboundMessage, IInboundMessage;
 }
