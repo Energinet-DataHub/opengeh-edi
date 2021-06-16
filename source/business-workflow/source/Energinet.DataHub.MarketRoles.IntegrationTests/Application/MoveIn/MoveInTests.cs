@@ -64,6 +64,21 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
             Assert.NotNull(publishedMessage);
         }
 
+        [Fact]
+        public async Task Accept_WhenAccountingPointDoesNotExists_IsRejected()
+        {
+            CreateEnergySupplier();
+            SaveChanges();
+
+            var request = CreateRequest();
+
+            var result = await SendRequest(request);
+
+            var publishedMessage = await GetLastMessageFromOutboxAsync<MoveInRequestRejected>().ConfigureAwait(false);
+            Assert.False(result.Success);
+            Assert.NotNull(publishedMessage);
+        }
+
         private RequestMoveIn CreateRequest()
         {
             var consumerSsn = SampleData.ConsumerSSN;
