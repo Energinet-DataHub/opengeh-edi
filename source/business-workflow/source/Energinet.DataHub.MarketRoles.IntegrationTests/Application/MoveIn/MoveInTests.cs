@@ -42,10 +42,9 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
             var request = CreateRequest();
 
             var result = await SendRequest(request);
-            var publishedMessage = await GetLastMessageFromOutboxAsync<MoveInRequestAccepted>().ConfigureAwait(false);
 
             Assert.True(result.Success);
-            Assert.NotNull(publishedMessage);
+            await AssertOutboxMessage<MoveInRequestAccepted>();
         }
 
         [Fact]
@@ -58,10 +57,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
 
             var result = await SendRequest(request);
 
-            var publishedMessage = await GetLastMessageFromOutboxAsync<MoveInRequestRejected>().ConfigureAwait(false);
-
             Assert.False(result.Success);
-            Assert.NotNull(publishedMessage);
+            await AssertOutboxMessage<MoveInRequestRejected>().ConfigureAwait(false);
         }
 
         [Fact]
@@ -74,8 +71,13 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
 
             var result = await SendRequest(request);
 
-            var publishedMessage = await GetLastMessageFromOutboxAsync<MoveInRequestRejected>().ConfigureAwait(false);
             Assert.False(result.Success);
+            await AssertOutboxMessage<MoveInRequestRejected>().ConfigureAwait(false);
+        }
+
+        private async Task AssertOutboxMessage<TMessage>()
+        {
+            var publishedMessage = await GetLastMessageFromOutboxAsync<TMessage>().ConfigureAwait(false);
             Assert.NotNull(publishedMessage);
         }
 
