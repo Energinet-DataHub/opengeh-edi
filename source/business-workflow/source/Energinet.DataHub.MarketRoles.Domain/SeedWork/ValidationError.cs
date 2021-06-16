@@ -16,16 +16,7 @@ using System;
 
 namespace Energinet.DataHub.MarketRoles.Domain.SeedWork
 {
-    public class ValidationError
+    public abstract class ValidationError
     {
-        public ValidationError(string reason, Type rule)
-        {
-            Reason = reason;
-            Rule = rule;
-        }
-
-        public string Reason { get; }
-
-        public Type Rule { get; }
     }
 }

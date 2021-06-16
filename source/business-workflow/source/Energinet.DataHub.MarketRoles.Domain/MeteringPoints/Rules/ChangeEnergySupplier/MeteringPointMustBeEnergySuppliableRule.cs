@@ -28,6 +28,6 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules.ChangeEnergy
         public bool IsBroken => !(_meteringPointType == MeteringPointType.Production ||
                                   _meteringPointType == MeteringPointType.Consumption);
 
-        public string Message => $"Market evaluation point is eligible of having energy supplier associated.";
+        public ValidationError Error => new MeteringPointMustBeEnergySuppliableRuleError();
     }
 }

@@ -26,13 +26,13 @@ namespace Energinet.DataHub.MarketRoles.Domain.SeedWork
 
         public bool Success => Errors.Count == 0;
 
-        public List<ValidationError> Errors { get; private set; } = new List<ValidationError>();
+        public List<ValidationError> Errors { get; private set; } = new();
 
         private void SetValidationErrors(List<IBusinessRule> rules)
         {
             Errors = rules
                 .Where(r => r.IsBroken)
-                .Select(r => new ValidationError(r.Message, r.GetType()))
+                .Select(r => r.Error)
                 .ToList();
         }
     }

@@ -31,7 +31,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.Consumers.Rules
 
         public bool IsBroken => !IsValidCprNumber();
 
-        public string Message => $"Invalid CPR number.";
+        public ValidationError Error => new CprNumberFormatRuleError();
 
         private static bool LengthIsValid(string cprValue)
         {

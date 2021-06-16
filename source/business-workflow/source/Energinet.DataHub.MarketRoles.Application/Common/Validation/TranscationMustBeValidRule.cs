@@ -21,9 +21,9 @@ namespace Energinet.DataHub.MarketRoles.Application.Common.Validation
     {
         public TransactionMustBeValidRule()
         {
-            RuleFor(gln => gln)
+            RuleFor(transaction => transaction)
                 .NotEmpty()
-                .WithState(x => new ValidationError("Invalid transaction", typeof(TransactionMustBeValidRule)));
+                .WithState(transaction => new TransactionMustBeValidRuleError(transaction));
         }
     }
 }
