@@ -14,63 +14,42 @@
 
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier;
 using Energinet.DataHub.MarketRoles.Application.Common;
-using Energinet.DataHub.MarketRoles.Infrastructure.BusinessRequestProcessing;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.ChangeOfSupplier
 {
-    public class RequestChangeOfSupplierResultHandler : IBusinessProcessResultHandler<RequestChangeOfSupplier>
+    public class RequestChangeOfSupplierResultHandler : BusinessProcessResultHandler<RequestChangeOfSupplier>
     {
-        private readonly IOutbox _outbox;
-        private readonly IOutboxMessageFactory _outboxMessageFactory;
-
         public RequestChangeOfSupplierResultHandler(IOutbox outbox, IOutboxMessageFactory outboxMessageFactory)
+            : base(outbox, outboxMessageFactory)
         {
-            _outbox = outbox ?? throw new ArgumentNullException(nameof(outbox));
-            _outboxMessageFactory = outboxMessageFactory ?? throw new ArgumentNullException(nameof(outboxMessageFactory));
         }
 
-        public Task HandleAsync(RequestChangeOfSupplier request, BusinessProcessResult result)
+        protected override object CreateRejectMessage(RequestChangeOfSupplier request, BusinessProcessResult result)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
             if (result == null) throw new ArgumentNullException(nameof(result));
-            return result.Success ? CreateAcceptResponseAsync(request, result) : CreateRejectResponseAsync(request, result);
-        }
 
-        private Task CreateRejectResponseAsync(RequestChangeOfSupplier request, BusinessProcessResult result)
-        {
-            var ediMessage = new RequestChangeOfSupplierRejected(
+            return new RequestChangeOfSupplierRejected(
                 MessageId: Guid.NewGuid().ToString(),
                 TransactionId: result.TransactionId,
                 MeteringPoint: request.MeteringPointId,
                 ReasonCodes: result.ValidationErrors.Select(e => e.GetType().Name).AsEnumerable());
-
-            AddToOutbox(ediMessage);
-
-            return Task.CompletedTask;
         }
 
-        private Task CreateAcceptResponseAsync(RequestChangeOfSupplier request, BusinessProcessResult result)
+        protected override object CreateAcceptMessage(RequestChangeOfSupplier request, BusinessProcessResult result)
         {
-            var ediMessage = new RequestChangeOfSupplierApproved(
+            if (request == null) throw new ArgumentNullException(nameof(request));
+            if (result == null) throw new ArgumentNullException(nameof(result));
+
+            return new RequestChangeOfSupplierApproved(
                 MessageId: Guid.NewGuid().ToString(),
                 TransactionId: result.TransactionId,
                 MeteringPointId: request.MeteringPointId,
                 RequestingEnergySupplierId: request.EnergySupplierId,
                 StartDate: request.StartDate);
-
-            AddToOutbox(ediMessage);
-
-            return Task.CompletedTask;
-        }
-
-        private void AddToOutbox<TEdiMessage>(TEdiMessage ediMessage)
-        {
-            var outboxMessage = _outboxMessageFactory.CreateFrom(ediMessage, OutboxMessageCategory.ActorMessage);
-            _outbox.Add(outboxMessage);
         }
     }
 }
