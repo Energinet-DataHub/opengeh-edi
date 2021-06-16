@@ -14,8 +14,9 @@
 
 using System.Net;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier;
-using MediatR;
+using Energinet.DataHub.MarketRoles.Application.MoveIn;
+using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
+using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
@@ -25,43 +26,36 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
     public class CommandApi
     {
         private readonly ILogger _logger;
+        private readonly MessageDispatcher _messageDispatcher;
+        private readonly ICorrelationContext _correlationContext;
 
         public CommandApi(
-            ILogger logger)
+            ILogger logger,
+            MessageDispatcher messageDispatcher,
+            ICorrelationContext correlationContext)
         {
             _logger = logger;
+            _messageDispatcher = messageDispatcher;
+            _correlationContext = correlationContext;
         }
 
         [Function("CommandApi")]
         public async Task<HttpResponseData> RunAsync(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData request,
-            FunctionContext executionContext)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData request)
         {
-            var logger = executionContext.GetLogger("CommandApi");
-            logger.LogInformation("C# HTTP trigger function processed a request.");
-
-            var command = await RehydrateAsync(request).ConfigureAwait(false);
-            if (command == null)
-            {
-                var errorResponse = request.CreateResponse(HttpStatusCode.BadRequest);
-                await errorResponse.WriteStringAsync("Missing body").ConfigureAwait(false);
-                return errorResponse;
-            }
-
-            // TODO: Send to processing queue
+            _logger.LogInformation("C# HTTP trigger function processed a request.");
             _logger.LogInformation("Processing...");
 
+            var correlationId = _correlationContext.GetCorrelationId();
             var response = request.CreateResponse(HttpStatusCode.OK);
             response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
 
-            return response;
-        }
-
-        private static async Task<RequestChangeOfSupplier?> RehydrateAsync(HttpRequestData request)
-        {
-            return await request
-                .ReadFromJsonAsync<RequestChangeOfSupplier>()
+            await response.WriteStringAsync("Correlation id: " + _correlationContext.GetCorrelationId())
                 .ConfigureAwait(false);
+
+            await _messageDispatcher.DispatchAsync(new RequestMoveIn(correlationId)).ConfigureAwait(false);
+
+            return response;
         }
     }
 }
