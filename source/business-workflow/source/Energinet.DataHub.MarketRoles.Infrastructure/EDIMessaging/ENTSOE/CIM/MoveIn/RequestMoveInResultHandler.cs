@@ -34,9 +34,31 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.M
 
         public Task HandleAsync(RequestMoveIn request, BusinessProcessResult result)
         {
-            //TODO: Implement message logic
-            _outbox.Add(_outboxMessageFactory.CreateFrom(new MoveInRequestAccepted(), OutboxMessageCategory.ActorMessage));
+            if (request == null) throw new ArgumentNullException(nameof(request));
+            if (result == null) throw new ArgumentNullException(nameof(result));
+            return result.Success ? CreateAcceptResponseAsync(request, result) : CreateRejectResponseAsync(request, result);
+        }
+
+        private Task CreateRejectResponseAsync(RequestMoveIn request, BusinessProcessResult result)
+        {
+            var ediMessage = new MoveInRequestRejected(result.TransactionId, request.AccountingPointGsrnNumber);
+            AddToOutbox(ediMessage);
+
             return Task.CompletedTask;
+        }
+
+        private Task CreateAcceptResponseAsync(RequestMoveIn request, BusinessProcessResult result)
+        {
+            var ediMessage = new MoveInRequestAccepted(result.TransactionId, request.AccountingPointGsrnNumber);
+            AddToOutbox(ediMessage);
+
+            return Task.CompletedTask;
+        }
+
+        private void AddToOutbox<TEdiMessage>(TEdiMessage ediMessage)
+        {
+            var outboxMessage = _outboxMessageFactory.CreateFrom(ediMessage, OutboxMessageCategory.ActorMessage);
+            _outbox.Add(outboxMessage);
         }
     }
 }

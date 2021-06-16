@@ -15,5 +15,5 @@
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.MoveIn
 {
     //TODO: Define required properties
-    public record MoveInRequestAccepted(string Tranaction, string GsrnNumber);
+    public record MoveInRequestRejected(string Transaction, string GsrnNumber);
 }
