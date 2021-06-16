@@ -12,18 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.Common;
 using Energinet.DataHub.MarketRoles.Application.MoveIn;
 using Energinet.DataHub.MarketRoles.Infrastructure.BusinessRequestProcessing;
+using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.MoveIn
 {
     public class RequestMoveInResultHandler : IBusinessProcessResponder<RequestMoveIn>
     {
+        private readonly IOutbox _outbox;
+        private readonly IOutboxMessageFactory _outboxMessageFactory;
+
+        public RequestMoveInResultHandler(IOutbox outbox, IOutboxMessageFactory outboxMessageFactory)
+        {
+            _outbox = outbox ?? throw new ArgumentNullException(nameof(outbox));
+            _outboxMessageFactory = outboxMessageFactory ?? throw new ArgumentNullException(nameof(outboxMessageFactory));
+        }
+
         public Task RespondAsync(RequestMoveIn request, BusinessProcessResult result)
         {
             //TODO: Implement message logic
+            _outbox.Add(_outboxMessageFactory.CreateFrom(new MoveInRequestAccepted(), OutboxMessageCategory.ActorMessage));
             return Task.CompletedTask;
         }
     }
