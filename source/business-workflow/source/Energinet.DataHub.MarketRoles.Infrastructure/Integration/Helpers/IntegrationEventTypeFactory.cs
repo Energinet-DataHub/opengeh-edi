@@ -12,14 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.IntegrationEventDispatching
+using System;
+using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn;
+
+namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.Helpers
 {
-    /// <summary>
-    /// An event that published outside the domain and bounded context
-    /// </summary>
-    #pragma warning disable CA1040
-    public interface IIntegrationEvent
+    public static class IntegrationEventTypeFactory
     {
+        public static Type GetType(string type)
+        {
+            if (typeof(ConsumerRegisteredIntegrationEvent).FullName == type)
+            {
+                return typeof(ConsumerRegisteredIntegrationEvent);
+            }
+
+            throw new ArgumentException("Integration Event type is not implemented.");
+        }
     }
-    #pragma warning restore
 }
