@@ -14,13 +14,14 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
+using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn;
+using MediatR;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.Channels
+namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox.RequestHandlers
 {
-    public class ServiceBusChannel : Channel
+    public class ConsumerRegisteredDispatchHandler : IRequestHandler<ConsumerRegisteredIntegrationEvent>
     {
-        public override Task WriteAsync(byte[] data, CancellationToken cancellationToken = default)
+        public Task<Unit> Handle(ConsumerRegisteredIntegrationEvent request, CancellationToken cancellationToken)
         {
             throw new System.NotImplementedException();
         }

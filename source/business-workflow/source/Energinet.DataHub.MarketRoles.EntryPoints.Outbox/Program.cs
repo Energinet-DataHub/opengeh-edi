@@ -17,8 +17,8 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.Integration;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
-using Energinet.DataHub.MarketRoles.EntryPoints.Common;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common.MediatR;
+using Energinet.DataHub.MarketRoles.EntryPoints.Common.SimpleInjector;
 using Energinet.DataHub.MarketRoles.EntryPoints.Outbox.RequestHandlers;
 using Energinet.DataHub.MarketRoles.Infrastructure;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
@@ -83,13 +83,13 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
             container.Register<IUnitOfWork, UnitOfWork>(Lifestyle.Scoped);
             container.Register<EventMessageDispatcher>(Lifestyle.Transient);
             container.Register<IIntegrationEventDispatchOrchestrator, IntegrationEventDispatchOrchestrator>(Lifestyle.Transient);
-            container.Register<ConsumerRegisteredDispatch>(Lifestyle.Transient);
+            container.Register<ConsumerRegisteredDispatchHandler>(Lifestyle.Transient);
 
             container.BuildMediator(
                 new[]
                 {
                     typeof(ConsumerRegistered).Assembly,
-                    typeof(ConsumerRegisteredDispatch).Assembly,
+                    typeof(ConsumerRegisteredDispatchHandler).Assembly,
                 },
                 Array.Empty<Type>());
 

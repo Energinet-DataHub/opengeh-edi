@@ -44,7 +44,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Common.MediatR
                 typeof(RequestPostProcessorBehavior<,>),
             };
 
-            // Register built both-in and custom pipeline
+            // Register both build-in and custom pipeline
             container.Collection.Register(typeof(IPipelineBehavior<,>), pipelineBehaviors.Union(builtInBehaviors));
 
             container.Collection.Register(typeof(IRequestPreProcessor<>), new[] { typeof(EmptyRequestPreProcessor<>) });
