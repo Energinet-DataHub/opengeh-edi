@@ -18,34 +18,12 @@ using Azure.Messaging.ServiceBus;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration
 {
-    public abstract class Topic : IAsyncDisposable // singleton in DI
+    public abstract class Topic // singleton in DI
     {
-        private readonly ServiceBusClient _client;
-        private readonly Lazy<ServiceBusSender> _senderCreator;
-
-        protected Topic(ServiceBusClient client)
+        protected Topic()
         {
-            _client = client;
-            _senderCreator = new Lazy<ServiceBusSender>(() => _client.CreateSender(TopicName));
         }
 
-        protected abstract string TopicName { get; }
-
-        public ServiceBusSender CreateSender()
-        {
-            return _senderCreator.Value;
-        }
-
-        public async ValueTask DisposeAsync()
-        {
-            await _client.DisposeAsync().ConfigureAwait(false);
-
-            if (_senderCreator.IsValueCreated)
-            {
-                await _senderCreator.Value.DisposeAsync().ConfigureAwait(false);
-            }
-
-            GC.SuppressFinalize(this);
-        }
+        internal abstract string TopicName { get; }
     }
 }

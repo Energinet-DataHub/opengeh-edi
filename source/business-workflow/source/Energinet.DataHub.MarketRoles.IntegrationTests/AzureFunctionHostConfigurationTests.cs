@@ -12,18 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Azure.Messaging.ServiceBus;
-using Microsoft.Extensions.Configuration;
+using Energinet.DataHub.MarketRoles.EntryPoints.Outbox;
+using SimpleInjector;
+using Xunit;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn
+namespace Energinet.DataHub.MarketRoles.IntegrationTests
 {
-    public class ConsumerRegisteredTopic : Topic
+    public class AzureFunctionHostConfigurationTests
     {
-        public ConsumerRegisteredTopic(string topicName)
+        [Fact]
+        public void M1()
         {
-            TopicName = topicName;
-        }
+            var container = new Container();
+            var program = new Program(container);
 
-        internal override string TopicName { get; }
+            program.ConfigureApplication();
+
+            container.Verify();
+        }
     }
 }
