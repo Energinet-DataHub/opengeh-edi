@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketRoles.Application.Integration;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
@@ -21,6 +22,7 @@ using Energinet.DataHub.MarketRoles.EntryPoints.Common.MediatR;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common.SimpleInjector;
 using Energinet.DataHub.MarketRoles.Infrastructure;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
+using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.Services;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
@@ -82,6 +84,17 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
             container.Register<IUnitOfWork, UnitOfWork>(Lifestyle.Scoped);
             container.Register<EventMessageDispatcher>(Lifestyle.Transient);
             container.Register<IIntegrationEventDispatchOrchestrator, IntegrationEventDispatchOrchestrator>(Lifestyle.Transient);
+
+            var connectionString = Environment.GetEnvironmentVariable("SHARED_SERVICEBUS_INTEGRATION_EVENT_CONNECTIONSTRING_TODO");
+            container.Register<ServiceBusClient>(
+                () => new ServiceBusClient(connectionString),
+                Lifestyle.Singleton);
+
+            container.Register<ConsumerRegisteredTopic>(
+                () => new ConsumerRegisteredTopic(
+                container.GetInstance<ServiceBusClient>(),
+                Environment.GetEnvironmentVariable("CONSUMERREGISTERED_TODO") ?? throw new ApplicationException("Couln't find CONSUMERREGISTERED_TODO")),
+                Lifestyle.Singleton);
 
             container.BuildMediator(
                 new[]
