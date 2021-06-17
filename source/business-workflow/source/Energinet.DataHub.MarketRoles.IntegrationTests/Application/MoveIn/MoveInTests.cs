@@ -12,7 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.ComponentModel.Design;
+using System.Text;
 using System.Threading.Tasks;
+using Dapper;
 using Energinet.DataHub.MarketRoles.Application.Common;
 using Energinet.DataHub.MarketRoles.Application.MoveIn;
 using Energinet.DataHub.MarketRoles.Domain.Consumers;
@@ -77,7 +80,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
         }
 
         [Fact]
-        public async Task Accept_WhenConsumerIsRegisteredBySSN_ConsumerCanBeRetrievedBySSN()
+        public async Task Accept_WhenConsumerIsRegisteredBySSN_ConsumerIsRegistered()
         {
             CreateEnergySupplier();
             CreateAccountingPoint();
@@ -86,13 +89,11 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
             var request = CreateRequest();
             await SendRequest(request);
 
-            var consumer = await GetService<IConsumerRepository>().GetBySSNAsync(CprNumber.Create(request.SocialSecurityNumber));
-
-            Assert.NotNull(consumer);
+            await AssertConsumer().ConfigureAwait(false);
         }
 
         [Fact]
-        public async Task Accept_WhenConsumerIsRegisteredByVAT_ConsumerCanBeRetrievedByVAT()
+        public async Task Accept_WhenConsumerIsRegisteredByVAT_ConsumerIsRegistered()
         {
             CreateEnergySupplier();
             CreateAccountingPoint();
@@ -103,9 +104,37 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
 
             var consumer = await GetService<IConsumerRepository>().GetByVATNumberAsync(CvrNumber.Create(request.VATNumber));
 
-            Assert.NotNull(consumer);
+            await AssertConsumer(false).ConfigureAwait(false);
         }
 
+        private async Task AssertConsumer(bool assertSSN = true)
+        {
+            var connection = GetSqlDbConnection();
+            var queryBuilder = new StringBuilder();
+
+            queryBuilder.Append($"SELECT COUNT(*) FROM [dbo].[Consumers] WHERE ");
+            queryBuilder.Append("Name = @Name AND ");
+
+            if (assertSSN)
+            {
+                queryBuilder.Append("CvrNumber IS NULL AND ");
+                queryBuilder.Append("CprNumber = @CprNumber ");
+            }
+            else
+            {
+                queryBuilder.Append("CprNumber IS NULL AND ");
+                queryBuilder.Append("CvrNumber = @CvrNumber ");
+            }
+
+            var queryResult = await connection.ExecuteScalarAsync<int>(queryBuilder.ToString(), new
+            {
+                CprNumber = SampleData.ConsumerSSN,
+                CvrNumber = SampleData.ConsumerVAT,
+                Name = SampleData.ConsumerName,
+            }).ConfigureAwait(false);
+
+            Assert.Equal(1, queryResult);
+        }
         private async Task AssertOutboxMessage<TMessage>()
         {
             var publishedMessage = await GetLastMessageFromOutboxAsync<TMessage>().ConfigureAwait(false);

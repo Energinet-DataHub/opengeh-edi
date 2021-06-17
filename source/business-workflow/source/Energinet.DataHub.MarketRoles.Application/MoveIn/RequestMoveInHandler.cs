@@ -87,9 +87,10 @@ namespace Energinet.DataHub.MarketRoles.Application.MoveIn
 
         private Consumer CreateConsumer(RequestMoveIn request)
         {
+            var consumerName = ConsumerName.Create(request.ConsumerName);
             Consumer consumer = string.IsNullOrWhiteSpace(request.SocialSecurityNumber) == false
-                ? new Consumer(ConsumerId.New(), CprNumber.Create(request.SocialSecurityNumber))
-                : new Consumer(ConsumerId.New(), CvrNumber.Create(request.VATNumber));
+                ? new Consumer(ConsumerId.New(), CprNumber.Create(request.SocialSecurityNumber), consumerName)
+                : new Consumer(ConsumerId.New(), CvrNumber.Create(request.VATNumber), consumerName);
             _consumerRepository.Add(consumer);
             return consumer;
         }

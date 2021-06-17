@@ -13,22 +13,35 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketRoles.Domain.Consumers.Events;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
 namespace Energinet.DataHub.MarketRoles.Domain.Consumers
 {
     public class Consumer : AggregateRootBase
     {
-        public Consumer(ConsumerId consumerId, CprNumber cprNumber)
+        private readonly ConsumerName _name;
+
+        public Consumer(ConsumerId consumerId, CprNumber cprNumber, ConsumerName name)
+            : this(consumerId, name)
         {
             ConsumerId = consumerId ?? throw new ArgumentNullException(nameof(consumerId));
             CprNumber = cprNumber ?? throw new ArgumentNullException(nameof(cprNumber));
+            AddDomainEvent(new ConsumerCreated(ConsumerId.Value, CprNumber?.Value, CvrNumber?.Value, _name.FullName));
         }
 
-        public Consumer(ConsumerId consumerId, CvrNumber cvrNumber)
+        public Consumer(ConsumerId consumerId, CvrNumber cvrNumber, ConsumerName name)
+            : this(consumerId, name)
         {
             ConsumerId = consumerId ?? throw new ArgumentNullException(nameof(consumerId));
             CvrNumber = cvrNumber ?? throw new ArgumentNullException(nameof(cvrNumber));
+            AddDomainEvent(new ConsumerCreated(ConsumerId.Value, CprNumber?.Value, CvrNumber?.Value, _name.FullName));
+        }
+
+        private Consumer(ConsumerId consumerId, ConsumerName name)
+        {
+            ConsumerId = consumerId ?? throw new ArgumentNullException(nameof(consumerId));
+            _name = name ?? throw new ArgumentNullException(nameof(name));
         }
 
         private Consumer()
