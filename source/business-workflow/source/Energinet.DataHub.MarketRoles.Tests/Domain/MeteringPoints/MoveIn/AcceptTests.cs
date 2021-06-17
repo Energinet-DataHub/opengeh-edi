@@ -40,11 +40,11 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.MeteringPoints.MoveIn
         }
 
         [Fact]
-        public void Should_raise_event_when_consumer_is_registered()
+        public void Should_raise_event_when_consumer_move_in_is_accepted()
         {
             _accountingPoint.AcceptConsumerMoveIn(ConsumerId.New(), new EnergySupplierId(Guid.NewGuid()), _systemDateTimeProvider.Now(), Transaction.Create(Guid.NewGuid().ToString()));
 
-            Assert.Contains(_accountingPoint.DomainEvents, e => e is ConsumerRegistered);
+            Assert.Contains(_accountingPoint.DomainEvents, e => e is ConsumerMoveInAccepted);
         }
 
         [Fact]
