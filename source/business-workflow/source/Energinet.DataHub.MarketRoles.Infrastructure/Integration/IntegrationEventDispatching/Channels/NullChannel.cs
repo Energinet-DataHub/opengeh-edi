@@ -21,10 +21,6 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEv
 {
     public class NullChannel : Channel
     {
-        public NullChannel(ConsumerRegisteredTopic consumerRegisteredTopic)
-        {
-        }
-
         public override Task WriteAsync(byte[] data, CancellationToken cancellationToken = default)
         {
             throw new System.NotImplementedException();
