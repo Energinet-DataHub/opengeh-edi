@@ -14,12 +14,17 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.Channels
 {
     public class NullChannel : Channel
     {
+        public NullChannel(ConsumerRegisteredTopic consumerRegisteredTopic)
+        {
+        }
+
         public override Task WriteAsync(byte[] data, CancellationToken cancellationToken = default)
         {
             throw new System.NotImplementedException();

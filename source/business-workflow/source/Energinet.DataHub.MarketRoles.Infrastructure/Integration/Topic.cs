@@ -23,13 +23,13 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration
         private readonly ServiceBusClient _client;
         private readonly Lazy<ServiceBusSender> _senderCreator;
 
-        public Topic(ServiceBusClient client)
+        protected Topic(ServiceBusClient client)
         {
             _client = client;
             _senderCreator = new Lazy<ServiceBusSender>(() => _client.CreateSender(TopicName));
         }
 
-        public abstract string TopicName { get; }
+        protected abstract string TopicName { get; }
 
         public ServiceBusSender CreateSender()
         {
@@ -38,11 +38,11 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration
 
         public async ValueTask DisposeAsync()
         {
-            await _client.DisposeAsync();
+            await _client.DisposeAsync().ConfigureAwait(false);
 
             if (_senderCreator.IsValueCreated)
             {
-                await _senderCreator.Value.DisposeAsync();
+                await _senderCreator.Value.DisposeAsync().ConfigureAwait(false);
             }
 
             GC.SuppressFinalize(this);

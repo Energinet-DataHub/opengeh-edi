@@ -24,6 +24,6 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEv
             TopicName = topicName;
         }
 
-        public override string TopicName { get; }
+        protected override string TopicName { get; }
     }
 }

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Data;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketRoles.Application.Integration;
@@ -90,11 +91,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
                 () => new ServiceBusClient(connectionString),
                 Lifestyle.Singleton);
 
-            container.Register<ConsumerRegisteredTopic>(
-                () => new ConsumerRegisteredTopic(
-                container.GetInstance<ServiceBusClient>(),
-                Environment.GetEnvironmentVariable("CONSUMERREGISTERED_TODO") ?? throw new ApplicationException("Couln't find CONSUMERREGISTERED_TODO")),
-                Lifestyle.Singleton);
+            RegisterTopic<ConsumerRegisteredTopic>(container, Environment.GetEnvironmentVariable("CONSUMER_REGISTERED_TOPIC_TODO") ?? throw new DataException("Couldn't find CONSUMER_REGISTERED_TOPIC_TODO"));
 
             container.BuildMediator(
                 new[]
@@ -108,6 +105,17 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
             await host.RunAsync().ConfigureAwait(false);
 
             await container.DisposeAsync().ConfigureAwait(false);
+        }
+
+        private static void RegisterTopic<TTopic>(Container container, string topic)
+            where TTopic : class
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            if (topic == null) throw new ArgumentNullException(nameof(topic));
+
+            container.Register(
+                () => (TTopic)Activator.CreateInstance(typeof(TTopic), container.GetInstance<ServiceBusClient>(), topic)!,
+                Lifestyle.Singleton);
         }
     }
 }
