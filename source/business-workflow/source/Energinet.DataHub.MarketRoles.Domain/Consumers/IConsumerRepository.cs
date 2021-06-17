@@ -32,6 +32,13 @@ namespace Energinet.DataHub.MarketRoles.Domain.Consumers
         /// </summary>
         /// <param name="cprNumber"></param>
         /// <returns><see cref="Consumer"/></returns>
-        Task<Consumer> GetByCprNumberAsync(CprNumber cprNumber);
+        Task<Consumer> GetBySSNAsync(CprNumber cprNumber);
+
+        /// <summary>
+        /// Find consumer by VAT-number
+        /// </summary>
+        /// <param name="vatNumber"></param>
+        /// <returns><see cref="Consumer"/></returns>
+        Task<Consumer> GetByVATNumberAsync(CvrNumber vatNumber);
     }
 }

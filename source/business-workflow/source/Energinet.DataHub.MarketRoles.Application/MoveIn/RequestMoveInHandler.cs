@@ -51,9 +51,7 @@ namespace Energinet.DataHub.MarketRoles.Application.MoveIn
                 return validationResult;
             }
 
-            //TODO: Add logic for creating correct type of consumer (SSN or VAT). Also check if consumer already exists
-            var consumer = new Consumer(ConsumerId.New(), new CprNumber(request.VATNumber));
-            _consumerRepository.Add(consumer);
+            var consumer = await GetOrCreateConsumerAsync(request).ConfigureAwait(false);
 
             accountingPoint.AcceptConsumerMoveIn(consumer.ConsumerId, energySupplier.EnergySupplierId, request.MoveInDate, Transaction.Create(request.TransactionId));
             return BusinessProcessResult.Ok(request.TransactionId);
@@ -68,6 +66,32 @@ namespace Energinet.DataHub.MarketRoles.Application.MoveIn
             };
 
             return new BusinessProcessResult(request.TransactionId, rules);
+        }
+
+        private async Task<Consumer> GetOrCreateConsumerAsync(RequestMoveIn request)
+        {
+            Consumer consumer;
+            if (string.IsNullOrWhiteSpace(request.SocialSecurityNumber) == false)
+            {
+                consumer = await _consumerRepository.GetBySSNAsync(CprNumber.Create(request.SocialSecurityNumber))
+                    .ConfigureAwait(false);
+            }
+            else
+            {
+                consumer = await _consumerRepository.GetByVATNumberAsync(CvrNumber.Create(request.VATNumber))
+                    .ConfigureAwait(false);
+            }
+
+            return consumer ?? CreateConsumer(request);
+        }
+
+        private Consumer CreateConsumer(RequestMoveIn request)
+        {
+            Consumer consumer = string.IsNullOrWhiteSpace(request.SocialSecurityNumber) == false
+                ? new Consumer(ConsumerId.New(), CprNumber.Create(request.SocialSecurityNumber))
+                : new Consumer(ConsumerId.New(), CvrNumber.Create(request.VATNumber));
+            _consumerRepository.Add(consumer);
+            return consumer;
         }
     }
 }

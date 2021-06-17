@@ -22,6 +22,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
         public static string ConsumerSSN => "2601211234";
 
+        public static string ConsumerVAT => "10000000";
+
         public static string GlnNumber => "5790000555550";
 
         public static string Transaction => Guid.NewGuid().ToString();
