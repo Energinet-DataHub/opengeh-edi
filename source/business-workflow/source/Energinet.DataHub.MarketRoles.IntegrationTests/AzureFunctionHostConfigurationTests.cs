@@ -13,26 +13,38 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketRoles.EntryPoints.Outbox;
-using SimpleInjector;
 using Xunit;
 
 namespace Energinet.DataHub.MarketRoles.IntegrationTests
 {
     public class AzureFunctionHostConfigurationTests
     {
+        private const string ServiceBusConnectionString = "Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=sender;SharedAccessKey=0XLJDfVlg+CorvdniMfp5S+SKbAeB9Kkiee6ZVBJJ4c=";
+        private const string SomeString = "Foo";
+
         [Fact]
         public void OutboxHostConfigurationTest()
         {
-            Environment.SetEnvironmentVariable("SHARED_SERVICEBUS_INTEGRATION_EVENT_CONNECTIONSTRING_TODO", "Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=sender;SharedAccessKey=0XLJDfVlg+CorvdniMfp5S+SKbAeB9Kkiee6ZVBJJ4c=");
-            Environment.SetEnvironmentVariable("MARKETROLES_DB_CONNECTION_STRING", "test");
-            Environment.SetEnvironmentVariable("CONSUMER_REGISTERED_TOPIC_TODO", "test");
-            var container = new Container();
-            var program = new Program(container);
+            Environment.SetEnvironmentVariable("SHARED_SERVICEBUS_INTEGRATION_EVENT_CONNECTIONSTRING_TODO", ServiceBusConnectionString);
+            Environment.SetEnvironmentVariable("MARKETROLES_DB_CONNECTION_STRING", SomeString);
+            Environment.SetEnvironmentVariable("CONSUMER_REGISTERED_TOPIC_TODO", SomeString);
+            var program = new EntryPoints.Outbox.Program();
 
             program.ConfigureApplication();
 
-            container.Verify();
+            program.AssertConfiguration();
+        }
+
+        [Fact]
+        public void IngestionHostConfigurationTest()
+        {
+            Environment.SetEnvironmentVariable("MARKET_DATA_QUEUE_CONNECTION_STRING", ServiceBusConnectionString);
+            Environment.SetEnvironmentVariable("MARKET_DATA_QUEUE_TOPIC_NAME", SomeString);
+            var program = new EntryPoints.Ingestion.Program();
+
+            program.ConfigureApplication();
+
+            program.AssertConfiguration();
         }
     }
 }

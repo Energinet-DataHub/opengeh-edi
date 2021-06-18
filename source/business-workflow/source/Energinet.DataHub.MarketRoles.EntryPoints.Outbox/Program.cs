@@ -18,8 +18,8 @@ using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketRoles.Application.Integration;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using Energinet.DataHub.MarketRoles.EntryPoints.Common;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common.MediatR;
-using Energinet.DataHub.MarketRoles.EntryPoints.Common.SimpleInjector;
 using Energinet.DataHub.MarketRoles.Infrastructure;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration;
@@ -28,30 +28,16 @@ using Energinet.DataHub.MarketRoles.Infrastructure.Integration.Services;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
 using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
-using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Hosting;
 using SimpleInjector;
 
 [assembly: CLSCompliant(false)]
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
 {
-    public class Program
+    public class Program : EntryPoint
     {
-        private readonly Container _container;
-
-        public Program()
-            : this(new Container())
-        { }
-
-        public Program(Container container)
-        {
-            _container = container;
-        }
-
         public static async Task Main()
         {
             var program = new Program();
@@ -61,77 +47,53 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
             await program.ExecuteApplicationAsync(host).ConfigureAwait(false);
         }
 
-        public IHost ConfigureApplication()
+        protected override void ConfigureServiceCollection(IServiceCollection services)
         {
-            var host = new HostBuilder()
-                .ConfigureFunctionsWorkerDefaults(options =>
-                {
-                    options.UseMiddleware<SimpleInjectorScopedRequest>();
-                })
-                .ConfigureServices(services =>
-                {
-                    var descriptor = new ServiceDescriptor(
-                        typeof(IFunctionActivator),
-                        typeof(SimpleInjectorActivator),
-                        ServiceLifetime.Singleton);
-                    services.Replace(descriptor); // Replace existing activator
+            if (services == null) throw new ArgumentNullException(nameof(services));
+            base.ConfigureServiceCollection(services);
 
-                    services.AddLogging();
+            services.AddDbContext<MarketRolesContext>(x =>
+            {
+                var dbConnectionString = Environment.GetEnvironmentVariable("MARKETROLES_DB_CONNECTION_STRING")
+                                         ?? throw new InvalidOperationException(
+                                             "Metering point db connection string not found.");
 
-                    services.AddDbContext<MarketRolesContext>(x =>
-                    {
-                        var dbConnectionString = Environment.GetEnvironmentVariable("MARKETROLES_DB_CONNECTION_STRING")
-                                               ?? throw new InvalidOperationException(
-                                                   "Metering point db connection string not found.");
+                x.UseSqlServer(dbConnectionString, options => options.UseNodaTime());
+            });
+        }
 
-                        x.UseSqlServer(dbConnectionString, y => y.UseNodaTime());
-                    });
-
-                    services.AddSimpleInjector(_container, options =>
-                    {
-                        options.AddLogging();
-                    });
-                })
-                .Build()
-                .UseSimpleInjector(_container);
+        protected override void ConfigureContainer(Container container)
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            base.ConfigureContainer(container);
 
             // Register application components.
-            _container.Register<ISystemDateTimeProvider, SystemDateTimeProvider>(Lifestyle.Scoped);
-            _container.Register<IJsonSerializer, JsonSerializer>(Lifestyle.Singleton);
-            _container.Register<IOutbox, OutboxProvider>(Lifestyle.Scoped);
-            _container.Register<IOutboxManager, OutboxManager>(Lifestyle.Scoped);
-            _container.Register<IOutboxMessageFactory, OutboxMessageFactory>(Lifestyle.Scoped);
-            _container.Register<IUnitOfWork, UnitOfWork>(Lifestyle.Scoped);
-            _container.Register<EventMessageDispatcher>(Lifestyle.Transient);
-            _container.Register<IIntegrationEventDispatchOrchestrator, IntegrationEventDispatchOrchestrator>(Lifestyle.Transient);
+            container.Register<ISystemDateTimeProvider, SystemDateTimeProvider>(Lifestyle.Scoped);
+            container.Register<IJsonSerializer, JsonSerializer>(Lifestyle.Singleton);
+            container.Register<IOutbox, OutboxProvider>(Lifestyle.Scoped);
+            container.Register<IOutboxManager, OutboxManager>(Lifestyle.Scoped);
+            container.Register<IOutboxMessageFactory, OutboxMessageFactory>(Lifestyle.Scoped);
+            container.Register<IUnitOfWork, UnitOfWork>(Lifestyle.Scoped);
+            container.Register<EventMessageDispatcher>(Lifestyle.Transient);
+            container.Register<IIntegrationEventDispatchOrchestrator, IntegrationEventDispatchOrchestrator>(Lifestyle.Transient);
 
             var connectionString = Environment.GetEnvironmentVariable("SHARED_SERVICEBUS_INTEGRATION_EVENT_CONNECTIONSTRING_TODO");
-            _container.Register<ServiceBusClient>(
+            container.Register<ServiceBusClient>(
                 () => new ServiceBusClient(connectionString),
                 Lifestyle.Singleton);
 
-            _container.Register(
+            container.Register(
                 () => new ConsumerRegisteredTopic(Environment.GetEnvironmentVariable("CONSUMER_REGISTERED_TOPIC_TODO") ?? throw new InvalidOperationException(
-                "No Consumer Registered Topic found")),
+                    "No Consumer Registered Topic found")),
                 Lifestyle.Singleton);
-            _container.Register<TopicSender<ConsumerRegisteredTopic>>(Lifestyle.Singleton);
+            container.Register<TopicSender<ConsumerRegisteredTopic>>(Lifestyle.Singleton);
 
-            _container.BuildMediator(
+            container.BuildMediator(
                 new[]
                 {
                     typeof(ConsumerMoveInAccepted).Assembly,
                 },
                 Array.Empty<Type>());
-
-            return host;
-        }
-
-        public void AssertConfiguration() => _container.Verify();
-
-        public async Task ExecuteApplicationAsync(IHost host)
-        {
-            await host.RunAsync().ConfigureAwait(false);
-            await _container.DisposeAsync().ConfigureAwait(false);
         }
     }
 }
