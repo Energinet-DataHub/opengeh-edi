@@ -16,7 +16,9 @@
 syntax = "proto3";
 
 option csharp_namespace = "Energinet.DataHub.MarketRoles.IntegrationEventContracts";
-
+/**
+ * This message is sent out when an awaiting change of energy supplier has been cancelled.
+ */
 message EnergySupplierChangeCancelled {
   string MeteringPointId = 1;
   string TransactionId = 2;
