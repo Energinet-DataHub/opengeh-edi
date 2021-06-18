@@ -24,8 +24,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests
         [Fact]
         public void OutBoxHostConfigurationTest()
         {
-            Environment.SetEnvironmentVariable("SHARED_SERVICEBUS_INTEGRATION_EVENT_CONNECTIONSTRING_TODO", "Endpoint=sb://marketrolestestsb.servicebus.windows.net/;SharedAccessKeyName=sender;SharedAccessKey=0XLJDfVlg+CorvdniMfp2D+SKbAeB9Kkiee6ZVBJJ4c=");
-            Environment.SetEnvironmentVariable("MARKETROLES_DB_CONNECTION_STRING", "Server=localhost\\SQLEXPRESS;Database=MarketRolesTestDB;Trusted_Connection=True;");
+            Environment.SetEnvironmentVariable("SHARED_SERVICEBUS_INTEGRATION_EVENT_CONNECTIONSTRING_TODO", "Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=sender;SharedAccessKey=0XLJDfVlg+CorvdniMfp5S+SKbAeB9Kkiee6ZVBJJ4c=");
+            Environment.SetEnvironmentVariable("MARKETROLES_DB_CONNECTION_STRING", "test");
             Environment.SetEnvironmentVariable("CONSUMER_REGISTERED_TOPIC_TODO", "test");
             var container = new Container();
             var program = new Program(container);
