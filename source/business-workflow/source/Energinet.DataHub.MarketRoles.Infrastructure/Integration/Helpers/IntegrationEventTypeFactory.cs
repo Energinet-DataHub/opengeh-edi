@@ -21,9 +21,9 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.Helpers
     {
         public static Type GetType(string type)
         {
-            if (typeof(ConsumerRegisteredIntegrationEvent).FullName == type)
+            if (typeof(ConsumerMovedInIntegrationEvent).FullName == type)
             {
-                return typeof(ConsumerRegisteredIntegrationEvent);
+                return typeof(ConsumerMovedInIntegrationEvent);
             }
 
             throw new ArgumentException("Integration Event type is not implemented.");

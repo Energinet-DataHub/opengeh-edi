@@ -15,8 +15,9 @@
 using Energinet.DataHub.MarketRoles.Application.Common.Transport;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using MediatR;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn
 {
-    public record ConsumerRegisteredIntegrationEvent(AccountingPointId MeteringPointId, bool CustomerMovedIn) : IIntegrationEvent, IRequest, IOutboundMessage;
+    public record ConsumerMovedInIntegrationEvent(string GsrnNumber, Instant MoveInDate) : IIntegrationEvent, IRequest, IOutboundMessage;
 }
