@@ -110,7 +110,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
                 () => new ServiceBusClient(connectionString),
                 Lifestyle.Singleton);
 
-            _container.Register(() => new ConsumerRegisteredTopic("TOPICNAME"), Lifestyle.Singleton);
+            _container.Register(() => new ConsumerRegisteredTopic("CONSUMER_REGISTERED_TOPIC_TODO"), Lifestyle.Singleton);
             _container.Register<TopicSender<ConsumerRegisteredTopic>>(Lifestyle.Singleton);
 
             _container.BuildMediator(
