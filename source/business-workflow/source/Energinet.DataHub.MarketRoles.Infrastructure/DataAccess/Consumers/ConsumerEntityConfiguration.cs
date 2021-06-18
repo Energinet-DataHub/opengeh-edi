@@ -39,6 +39,10 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.Consumers
                 .HasColumnName("CvrNumber")
                 .HasConversion(toDbValue => toDbValue == null ? null : toDbValue.Value, fromDbValue => fromDbValue == null ? null : new CvrNumber(fromDbValue));
 
+            builder.Property<ConsumerName>("_name")
+                .HasColumnName("Name")
+                .HasConversion(toDbValue => toDbValue.FullName, fromDbValue => ConsumerName.Create(fromDbValue));
+
             builder.Property<DateTime>("RowVersion")
                 .HasColumnName("RowVersion")
                 .HasColumnType("timestamp")
