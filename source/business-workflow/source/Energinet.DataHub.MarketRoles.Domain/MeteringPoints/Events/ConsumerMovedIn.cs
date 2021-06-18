@@ -13,34 +13,31 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketRoles.Domain.EnergySuppliers;
+using Energinet.DataHub.MarketRoles.Domain.Consumers;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using NodaTime;
 
 namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events
 {
-    public class EnergySupplierChanged : DomainEventBase
+    public class ConsumerMovedIn : DomainEventBase
     {
-        public EnergySupplierChanged(Guid accountingPointId, string gsrnNumber, Guid businessProcessId, string transaction, Guid energySupplierId, Instant startOfSupplyDate)
+        public ConsumerMovedIn(Guid accountingPointId, string gsrnNumber, Guid businessProcessId, Guid consumerId, Instant moveInDate)
         {
             AccountingPointId = accountingPointId;
             GsrnNumber = gsrnNumber;
             BusinessProcessId = businessProcessId;
-            Transaction = transaction;
-            EnergySupplierId = energySupplierId;
-            StartOfSupplyDate = startOfSupplyDate;
+            ConsumerId = consumerId;
+            MoveInDate = moveInDate;
         }
-
-        public string GsrnNumber { get; }
 
         public Guid AccountingPointId { get; }
 
+        public string GsrnNumber { get; }
+
         public Guid BusinessProcessId { get; }
 
-        public string Transaction { get; }
+        public Guid ConsumerId { get; }
 
-        public Guid EnergySupplierId { get; }
-
-        public Instant StartOfSupplyDate { get; }
+        public Instant MoveInDate { get; }
     }
 }

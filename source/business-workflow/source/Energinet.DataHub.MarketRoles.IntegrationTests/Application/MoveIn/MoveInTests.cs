@@ -12,14 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.ComponentModel.Design;
-using System.Text;
 using System.Threading.Tasks;
-using Dapper;
-using Energinet.DataHub.MarketRoles.Application.Common;
 using Energinet.DataHub.MarketRoles.Application.MoveIn;
 using Energinet.DataHub.MarketRoles.Domain.Consumers;
-using Energinet.DataHub.MarketRoles.Domain.EnergySuppliers;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.MoveIn;
@@ -105,12 +100,6 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
 
             var consumer = await GetService<IConsumerRepository>().GetByVATNumberAsync(CvrNumber.Create(request.VATNumber));
             Assert.NotNull(consumer);
-        }
-
-        private async Task AssertOutboxMessage<TMessage>()
-        {
-            var publishedMessage = await GetLastMessageFromOutboxAsync<TMessage>().ConfigureAwait(false);
-            Assert.NotNull(publishedMessage);
         }
 
         private RequestMoveIn CreateRequest(bool registerConsumerBySSN = true)

@@ -12,11 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketRoles.Application.Common.Transport;
-using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
-using MediatR;
+using System;
+using Energinet.DataHub.MarketRoles.Application.Common.Commands;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn
+namespace Energinet.DataHub.MarketRoles.Application.MoveIn.Processing
 {
-    public record ConsumerRegisteredIntegrationEvent(AccountingPointId MeteringPointId, bool CustomerMovedIn) : IIntegrationEvent, IRequest, IOutboundMessage;
+    public class EffectuateConsumerMoveIn
+        : InternalCommand
+    {
+        public EffectuateConsumerMoveIn(Guid accountingPointId, string transaction)
+        {
+            AccountingPointId = accountingPointId;
+            Transaction = transaction;
+        }
+
+        public Guid AccountingPointId { get; }
+
+        public string Transaction { get; }
+    }
 }

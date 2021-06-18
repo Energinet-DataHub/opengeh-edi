@@ -12,21 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn;
+using NodaTime;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.Helpers
+namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.ChangeOfSupplier
 {
-    public static class IntegrationEventTypeFactory
-    {
-        public static Type GetType(string type)
-        {
-            if (typeof(ConsumerMovedInIntegrationEvent).FullName == type)
-            {
-                return typeof(ConsumerMovedInIntegrationEvent);
-            }
-
-            throw new ArgumentException("Integration Event type is not implemented.");
-        }
-    }
+    //TODO: Determine other attributes need in integration event
+    public record EnergySupplierChangedIntegrationEvent(
+            string GsrnNumber,
+            string EnergySupplierGln,
+            Instant StartOfSupplyDate)
+        : IIntegrationEvent;
 }
