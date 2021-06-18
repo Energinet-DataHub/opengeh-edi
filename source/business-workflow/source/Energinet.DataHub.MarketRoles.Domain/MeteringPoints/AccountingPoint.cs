@@ -148,7 +148,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
             _consumerRegistrations.Add(new ConsumerRegistration(consumerId, businessProcess.BusinessProcessId));
             _supplierRegistrations.Add(new SupplierRegistration(energySupplierId, businessProcess.BusinessProcessId));
 
-            AddDomainEvent(new ConsumerRegistered(Id.Value, GsrnNumber.Value, businessProcess.BusinessProcessId.Value, businessProcess.Transaction.Value, consumerId.Value, moveInDate));
+            AddDomainEvent(new ConsumerMoveInAccepted(Id.Value, GsrnNumber.Value, businessProcess.BusinessProcessId.Value, businessProcess.Transaction.Value, consumerId.Value, energySupplierId.Value, moveInDate));
         }
 
         public void EffectuateConsumerMoveIn(Transaction transaction, ISystemDateTimeProvider systemDateTimeProvider)

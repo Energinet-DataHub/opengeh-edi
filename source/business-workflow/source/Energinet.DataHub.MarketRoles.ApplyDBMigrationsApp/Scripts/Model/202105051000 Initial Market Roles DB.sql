@@ -52,6 +52,7 @@ CREATE TABLE [dbo].[Consumers](
     [RecordId] [int] IDENTITY(1,1) NOT NULL,
     [CvrNumber] [nvarchar](50) NULL,
     [CprNumber] [nvarchar](50) NULL,
+    [Name] [nvarchar](255) NOT NULL,
     [RowVersion] [timestamp] NOT NULL,
     CONSTRAINT [PK_Consumers] PRIMARY KEY NONCLUSTERED
 (

@@ -12,9 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.ComponentModel.Design;
+using System.Text;
 using System.Threading.Tasks;
+using Dapper;
 using Energinet.DataHub.MarketRoles.Application.Common;
 using Energinet.DataHub.MarketRoles.Application.MoveIn;
+using Energinet.DataHub.MarketRoles.Domain.Consumers;
 using Energinet.DataHub.MarketRoles.Domain.EnergySuppliers;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
@@ -75,21 +79,49 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
             await AssertOutboxMessage<MoveInRequestRejected>().ConfigureAwait(false);
         }
 
+        [Fact]
+        public async Task Accept_WhenConsumerIsRegisteredBySSN_ConsumerIsRegistered()
+        {
+            CreateEnergySupplier();
+            CreateAccountingPoint();
+            SaveChanges();
+
+            var request = CreateRequest();
+            await SendRequest(request);
+
+            var consumer = await GetService<IConsumerRepository>().GetBySSNAsync(CprNumber.Create(request.SocialSecurityNumber));
+            Assert.NotNull(consumer);
+        }
+
+        [Fact]
+        public async Task Accept_WhenConsumerIsRegisteredByVAT_ConsumerIsRegistered()
+        {
+            CreateEnergySupplier();
+            CreateAccountingPoint();
+            SaveChanges();
+
+            var request = CreateRequest(false);
+            await SendRequest(request);
+
+            var consumer = await GetService<IConsumerRepository>().GetByVATNumberAsync(CvrNumber.Create(request.VATNumber));
+            Assert.NotNull(consumer);
+        }
+
         private async Task AssertOutboxMessage<TMessage>()
         {
             var publishedMessage = await GetLastMessageFromOutboxAsync<TMessage>().ConfigureAwait(false);
             Assert.NotNull(publishedMessage);
         }
 
-        private RequestMoveIn CreateRequest()
+        private RequestMoveIn CreateRequest(bool registerConsumerBySSN = true)
         {
             var consumerSsn = SampleData.ConsumerSSN;
             var moveInDate = GetService<ISystemDateTimeProvider>().Now();
             return new RequestMoveIn(
                 SampleData.Transaction,
                 SampleData.GlnNumber,
-                consumerSsn,
-                string.Empty,
+                registerConsumerBySSN ? consumerSsn : string.Empty,
+                registerConsumerBySSN == false ? SampleData.ConsumerVAT : string.Empty,
                 SampleData.ConsumerName,
                 SampleData.GsrnNumber,
                 moveInDate);

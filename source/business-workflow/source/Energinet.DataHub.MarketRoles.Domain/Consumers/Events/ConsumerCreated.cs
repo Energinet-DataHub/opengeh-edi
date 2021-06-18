@@ -13,23 +13,26 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
-namespace Energinet.DataHub.MarketRoles.Tests
+namespace Energinet.DataHub.MarketRoles.Domain.Consumers.Events
 {
-    internal static class SampleData
+    public class ConsumerCreated : DomainEventBase
     {
-        internal static string GsrnNumber => "571234567891234568";
+        public ConsumerCreated(Guid consumerId, string cprNumber, string cvrNumber, string fullName)
+        {
+            ConsumerId = consumerId;
+            CprNumber = cprNumber;
+            CvrNumber = cvrNumber;
+            FullName = fullName;
+        }
 
-        internal static string ConsumerId => "2601211234";
+        public Guid ConsumerId { get; }
 
-        internal static string GlnNumber => "5790000555550";
+        public string CprNumber { get; }
 
-        internal static string TranactionId => Guid.NewGuid().ToString();
+        public string CvrNumber { get; }
 
-        internal static string ConsumerName => "John Doe";
-
-        internal static string ConsumerCprNumber => "2601211234";
-
-        internal static string ConsumerCvrNumber => "10000000";
+        public string FullName { get;  }
     }
 }
