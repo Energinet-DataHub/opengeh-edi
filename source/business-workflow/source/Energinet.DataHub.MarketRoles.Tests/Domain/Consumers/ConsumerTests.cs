@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using Energinet.DataHub.MarketRoles.Domain.Consumers;
+using Energinet.DataHub.MarketRoles.Domain.Consumers.Events;
 using Xunit;
 using Xunit.Categories;
 
@@ -25,8 +27,9 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.Consumers
         [Fact]
         public void Create_UsingCprNumber_IsSuccessful()
         {
-            var cprNumber = CprNumber.Create("2601211234");
-            var customer = new Consumer(CreateConsumerId(), cprNumber);
+            var cprNumber = CprNumber.Create(SampleData.ConsumerCprNumber);
+            var name = ConsumerName.Create(SampleData.ConsumerName);
+            var customer = new Consumer(CreateConsumerId(), cprNumber, name);
 
             Assert.Equal(cprNumber, customer.CprNumber);
         }
@@ -34,11 +37,30 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.Consumers
         [Fact]
         public void Create_UsingCvrNumber_IsSuccessful()
         {
-            var cvrNumber = CvrNumber.Create("10000000");
-            var customer = new Consumer(CreateConsumerId(), cvrNumber);
+            var cvrNumber = CvrNumber.Create(SampleData.ConsumerCvrNumber);
+            var name = ConsumerName.Create(SampleData.ConsumerName);
+            var customer = new Consumer(CreateConsumerId(), cvrNumber, name);
 
             Assert.Equal(cvrNumber, customer.CvrNumber);
         }
+
+        [Fact]
+        public void Create_IsSuccessful()
+        {
+            var consumer = new Consumer(CreateConsumerId(), CreateCprNumber(), CreateName());
+
+            var @event = consumer.DomainEvents.FirstOrDefault() as ConsumerCreated;
+
+            Assert.NotNull(@event);
+            Assert.Equal(consumer.ConsumerId.Value, @event.ConsumerId);
+            Assert.Equal(consumer.CprNumber?.Value, @event.CprNumber);
+            Assert.Equal(consumer.CvrNumber?.Value, @event.CvrNumber);
+            Assert.Equal(SampleData.ConsumerName, @event.FullName);
+        }
+
+        private ConsumerName CreateName() => ConsumerName.Create(SampleData.ConsumerName);
+
+        private CprNumber CreateCprNumber() => CprNumber.Create(SampleData.ConsumerCprNumber);
 
         private ConsumerId CreateConsumerId()
         {

@@ -13,23 +13,22 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
-namespace Energinet.DataHub.MarketRoles.Tests
+namespace Energinet.DataHub.MarketRoles.Domain.Consumers
 {
-    internal static class SampleData
+    public class ConsumerName : ValueObject
     {
-        internal static string GsrnNumber => "571234567891234568";
+        private ConsumerName(string fullName)
+        {
+            FullName = !string.IsNullOrWhiteSpace(fullName) ? fullName : throw new ArgumentNullException(nameof(fullName));
+        }
 
-        internal static string ConsumerId => "2601211234";
+        public string FullName { get; }
 
-        internal static string GlnNumber => "5790000555550";
-
-        internal static string TranactionId => Guid.NewGuid().ToString();
-
-        internal static string ConsumerName => "John Doe";
-
-        internal static string ConsumerCprNumber => "2601211234";
-
-        internal static string ConsumerCvrNumber => "10000000";
+        public static ConsumerName Create(string fullName)
+        {
+            return new ConsumerName(fullName);
+        }
     }
 }

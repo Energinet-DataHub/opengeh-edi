@@ -202,7 +202,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
         protected Consumer CreateConsumer()
         {
             var consumerId = new ConsumerId(Guid.NewGuid());
-            var consumer = new Consumer(consumerId, CprNumber.Create(SampleData.ConsumerSSN));
+            var consumer = new Consumer(consumerId, CprNumber.Create(SampleData.ConsumerSSN), ConsumerName.Create(SampleData.ConsumerName));
 
             ConsumerRepository.Add(consumer);
 

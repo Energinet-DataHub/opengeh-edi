@@ -119,7 +119,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
             _container.BuildMediator(
                 new[]
                 {
-                    typeof(ConsumerRegistered).Assembly,
+                    typeof(ConsumerMoveInAccepted).Assembly,
                 },
                 Array.Empty<Type>());
 

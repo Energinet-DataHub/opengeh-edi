@@ -18,15 +18,16 @@ using NodaTime;
 
 namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events
 {
-    public class ConsumerRegistered : DomainEventBase
+    public class ConsumerMoveInAccepted : DomainEventBase
     {
-        public ConsumerRegistered(Guid accountingPointId, string gsrnNumber, Guid businessProcessId, string transaction, Guid consumerId, Instant moveInDate)
+        public ConsumerMoveInAccepted(Guid accountingPointId, string gsrnNumber, Guid businessProcessId, string transaction, Guid consumerId, Guid energySupplierId, Instant moveInDate)
         {
             AccountingPointId = accountingPointId;
             GsrnNumber = gsrnNumber;
             BusinessProcessId = businessProcessId;
             Transaction = transaction;
             ConsumerId = consumerId;
+            EnergySupplierId = energySupplierId;
             MoveInDate = moveInDate;
         }
 
@@ -39,6 +40,8 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events
         public string Transaction { get; }
 
         public Guid ConsumerId { get; }
+
+        public Guid EnergySupplierId { get; }
 
         public Instant MoveInDate { get; }
     }
