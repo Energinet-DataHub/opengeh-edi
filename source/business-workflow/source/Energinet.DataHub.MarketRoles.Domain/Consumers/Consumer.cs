@@ -44,11 +44,6 @@ namespace Energinet.DataHub.MarketRoles.Domain.Consumers
             _name = name ?? throw new ArgumentNullException(nameof(name));
         }
 
-        private Consumer()
-        {
-            // EF Core only
-        }
-
         public ConsumerId ConsumerId { get; } = null!;
 
         public CprNumber? CprNumber { get; }
