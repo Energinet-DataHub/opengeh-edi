@@ -89,7 +89,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
             var request = CreateRequest();
             await SendRequest(request);
 
-            await AssertConsumer().ConfigureAwait(false);
+            var consumer = await GetService<IConsumerRepository>().GetBySSNAsync(CprNumber.Create(request.SocialSecurityNumber));
+            Assert.NotNull(consumer);
         }
 
         [Fact]
@@ -103,38 +104,9 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
             await SendRequest(request);
 
             var consumer = await GetService<IConsumerRepository>().GetByVATNumberAsync(CvrNumber.Create(request.VATNumber));
-
-            await AssertConsumer(false).ConfigureAwait(false);
+            Assert.NotNull(consumer);
         }
 
-        private async Task AssertConsumer(bool assertSSN = true)
-        {
-            var connection = GetSqlDbConnection();
-            var queryBuilder = new StringBuilder();
-
-            queryBuilder.Append($"SELECT COUNT(*) FROM [dbo].[Consumers] WHERE ");
-            queryBuilder.Append("Name = @Name AND ");
-
-            if (assertSSN)
-            {
-                queryBuilder.Append("CvrNumber IS NULL AND ");
-                queryBuilder.Append("CprNumber = @CprNumber ");
-            }
-            else
-            {
-                queryBuilder.Append("CprNumber IS NULL AND ");
-                queryBuilder.Append("CvrNumber = @CvrNumber ");
-            }
-
-            var queryResult = await connection.ExecuteScalarAsync<int>(queryBuilder.ToString(), new
-            {
-                CprNumber = SampleData.ConsumerSSN,
-                CvrNumber = SampleData.ConsumerVAT,
-                Name = SampleData.ConsumerName,
-            }).ConfigureAwait(false);
-
-            Assert.Equal(1, queryResult);
-        }
         private async Task AssertOutboxMessage<TMessage>()
         {
             var publishedMessage = await GetLastMessageFromOutboxAsync<TMessage>().ConfigureAwait(false);
