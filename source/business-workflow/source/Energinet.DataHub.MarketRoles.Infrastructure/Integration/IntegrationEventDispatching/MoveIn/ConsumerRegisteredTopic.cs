@@ -12,18 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Azure.Messaging.ServiceBus;
-using Microsoft.Extensions.Configuration;
-
 namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn
 {
-    public class ConsumerRegisteredTopic : Topic
-    {
-        public ConsumerRegisteredTopic(string topicName)
-        {
-            TopicName = topicName;
-        }
-
-        internal override string TopicName { get; }
-    }
+    public record ConsumerRegisteredTopic(string Name) : Topic;
 }

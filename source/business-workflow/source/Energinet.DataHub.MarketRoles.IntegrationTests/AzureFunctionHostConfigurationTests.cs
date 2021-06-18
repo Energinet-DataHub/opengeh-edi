@@ -22,7 +22,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests
     public class AzureFunctionHostConfigurationTests
     {
         [Fact]
-        public void OutBoxHostConfigurationTest()
+        public void OutboxHostConfigurationTest()
         {
             Environment.SetEnvironmentVariable("SHARED_SERVICEBUS_INTEGRATION_EVENT_CONNECTIONSTRING_TODO", "Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=sender;SharedAccessKey=0XLJDfVlg+CorvdniMfp5S+SKbAeB9Kkiee6ZVBJJ4c=");
             Environment.SetEnvironmentVariable("MARKETROLES_DB_CONNECTION_STRING", "test");

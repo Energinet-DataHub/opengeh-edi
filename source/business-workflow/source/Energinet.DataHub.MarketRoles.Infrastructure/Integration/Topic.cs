@@ -12,18 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading.Tasks;
-using Azure.Messaging.ServiceBus;
-
 namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration
 {
-    public abstract class Topic // singleton in DI
+    public abstract record Topic
     {
-        protected Topic()
-        {
-        }
-
-        internal abstract string TopicName { get; }
+        public abstract string Name { get; init; }
     }
 }

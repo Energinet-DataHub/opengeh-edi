@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Data;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketRoles.Application.Integration;
@@ -55,11 +54,11 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
 
         public static async Task Main()
         {
-            var prg = new Program();
+            var program = new Program();
 
-            var host = prg.ConfigureApplication();
-            prg.AssertConfiguration();
-            await prg.ExecuteApplicationAsync(host).ConfigureAwait(false);
+            var host = program.ConfigureApplication();
+            program.AssertConfiguration();
+            await program.ExecuteApplicationAsync(host).ConfigureAwait(false);
         }
 
         public IHost ConfigureApplication()
