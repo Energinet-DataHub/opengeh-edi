@@ -16,6 +16,7 @@ using System;
 using Energinet.DataHub.MarketRoles.Domain.Consumers;
 using Energinet.DataHub.MarketRoles.Domain.EnergySuppliers;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
+using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events;
 using NodaTime;
 using Xunit;
 using Xunit.Categories;
@@ -35,7 +36,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.MeteringPoints.MoveIn
         [Fact]
         public void Effectuate_WhenAheadOfEffectiveDate_IsNotPossible()
         {
-            var (accountingPoint, consumerId, energySupplierId, transaction) = CreateTestValues();
+            var (accountingPoint, consumerId, energySupplierId, transaction) = SetupScenario();
             var moveInDate = _systemDateTimeProvider.Now().Plus(Duration.FromDays(1));
             accountingPoint.AcceptConsumerMoveIn(consumerId, energySupplierId, moveInDate, transaction);
 
@@ -46,23 +47,30 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.MeteringPoints.MoveIn
         [Fact]
         public void Effectuate_WhenProcessIdDoesNotExists_IsNotPossible()
         {
-            var (accountingPoint, _, _, _) = CreateTestValues();
+            var (accountingPoint, _, _, _) = SetupScenario();
             var nonExistingProcessId = new Transaction("NonExisting");
 
             Assert.Throws<BusinessProcessException>(() =>
                 accountingPoint.EffectuateConsumerMoveIn(nonExistingProcessId, _systemDateTimeProvider));
         }
 
-        private AccountingPoint Create()
+        [Fact]
+        public void Effectuate_WhenEffectiveDateIsDue_IsSuccessful()
         {
-            var gsrnNumber = GsrnNumber.Create("571234567891234568");
-            return new AccountingPoint(gsrnNumber, MeteringPointType.Consumption);
+            var (accountingPoint, consumerId, energySupplierId, transaction) = SetupScenario();
+            var moveInDate = _systemDateTimeProvider.Now();
+            accountingPoint.AcceptConsumerMoveIn(consumerId, energySupplierId, moveInDate, transaction);
+
+            accountingPoint.EffectuateConsumerMoveIn(transaction, _systemDateTimeProvider);
+
+            Assert.Contains(accountingPoint.DomainEvents, @event => @event is EnergySupplierChanged);
+            Assert.Contains(accountingPoint.DomainEvents, @event => @event is ConsumerMovedIn);
         }
 
-        private (AccountingPoint, ConsumerId, EnergySupplierId, Transaction) CreateTestValues()
+        private (AccountingPoint, ConsumerId, EnergySupplierId, Transaction) SetupScenario()
         {
             return (
-                Create(),
+                new AccountingPoint(GsrnNumber.Create(SampleData.GsrnNumber), MeteringPointType.Consumption),
                 new ConsumerId(Guid.NewGuid()),
                 new EnergySupplierId(Guid.NewGuid()),
                 new Transaction(Guid.NewGuid().ToString()));

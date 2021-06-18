@@ -158,6 +158,11 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
             businessProcess.Effectuate(systemDateTimeProvider);
             var newSupplier = _supplierRegistrations.Find(supplier => supplier.BusinessProcessId.Equals(businessProcess.BusinessProcessId))!;
             newSupplier.StartOfSupply(businessProcess.EffectiveDate);
+
+            var consumer = _consumerRegistrations.Find(consumerRegistration => consumerRegistration.BusinessProcessId.Equals(businessProcess.BusinessProcessId))!;
+
+            AddDomainEvent(new ConsumerMovedIn(Id.Value, GsrnNumber.Value, businessProcess.BusinessProcessId.Value, consumer.ConsumerId.Value, consumer.MoveInDate));
+            AddDomainEvent(new EnergySupplierChanged(Id, GsrnNumber, businessProcess.BusinessProcessId, businessProcess.Transaction, newSupplier.EnergySupplierId, businessProcess.EffectiveDate));
         }
 
         public void CancelChangeOfSupplier(Transaction transaction)
