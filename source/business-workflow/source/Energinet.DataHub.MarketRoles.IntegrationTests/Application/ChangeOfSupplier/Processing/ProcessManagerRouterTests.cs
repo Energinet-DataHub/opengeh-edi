@@ -151,11 +151,11 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
         private EnergySupplierChanged CreateEnergySupplierChangedEvent()
         {
             return new EnergySupplierChanged(
-                _accountingPoint.Id,
-                _accountingPoint.GsrnNumber,
-                _businessProcessId,
-                _transaction,
-                _energySupplier.EnergySupplierId,
+                _accountingPoint.Id.Value,
+                _accountingPoint.GsrnNumber.Value,
+                _businessProcessId.Value,
+                _transaction.Value,
+                _energySupplier.EnergySupplierId.Value,
                 EffectiveDate);
         }
 

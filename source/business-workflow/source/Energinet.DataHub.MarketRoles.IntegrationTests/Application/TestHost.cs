@@ -199,6 +199,11 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             return result;
         }
 
+        protected Task InvokeCommandAsync(InternalCommand command)
+        {
+            return GetService<IMediator>().Send(command, CancellationToken.None);
+        }
+
         protected Consumer CreateConsumer()
         {
             var consumerId = new ConsumerId(Guid.NewGuid());
@@ -286,6 +291,12 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             }
 
             return _businessProcessId;
+        }
+
+        protected async Task AssertOutboxMessage<TMessage>()
+        {
+            var publishedMessage = await GetLastMessageFromOutboxAsync<TMessage>().ConfigureAwait(false);
+            Assert.NotNull(publishedMessage);
         }
 
         private void CleanupDatabase()
