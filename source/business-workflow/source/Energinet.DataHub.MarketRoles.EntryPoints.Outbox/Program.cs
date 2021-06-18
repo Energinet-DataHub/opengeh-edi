@@ -113,7 +113,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
 
             _container.Register(() => new ConsumerRegisteredTopic("TOPICNAME"), Lifestyle.Singleton);
             _container.Register<TopicSender<ConsumerRegisteredTopic>>(Lifestyle.Singleton);
-            // RegisterTopic<ConsumerRegisteredTopic>(container, Environment.GetEnvironmentVariable("CONSUMER_REGISTERED_TOPIC_TODO") ?? throw new DataException("Couldn't find CONSUMER_REGISTERED_TOPIC_TODO"));
+
             _container.BuildMediator(
                 new[]
                 {
