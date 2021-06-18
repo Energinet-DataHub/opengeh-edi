@@ -23,5 +23,5 @@ message EnergySupplierChangeAccepted {
   string MeteringPointId = 1; // Unique metering point identification
   string EnergySupplierGLN = 2; // Unique Energy Supplier identifcation
   string EffectiveDate = 3; // Date in which the supplier change will go into effect
-  string TransactionId = 4;
+  string TransactionId = 4; // Unique transaction ID of the process. Needed to effectuate the correct process at a later date.
 }
