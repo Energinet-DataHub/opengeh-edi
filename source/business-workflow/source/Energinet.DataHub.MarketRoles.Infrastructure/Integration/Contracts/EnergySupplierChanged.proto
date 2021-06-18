@@ -20,6 +20,6 @@ option csharp_namespace = "Energinet.DataHub.MarketRoles.IntegrationEventContrac
 message EnergySupplierChanged {
   string MeteringPointId = 1;
   string EnergySupplierGLN = 2; // Unique Energy Supplier identifcation.
-  string EffectiveDate = 3;
+  string EffectiveDate = 3; // Date which the change of supplier goes into effect.
   string TransactionId = 4; // Unique transaction ID of the process. Needed to effectuate the correct accepted process.
 }
