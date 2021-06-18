@@ -17,7 +17,7 @@ using NodaTime;
 namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.ChangeOfSupplier
 {
     //TODO: Determine other attributes need in integration event
-    public record EnergySupplierChanged(
+    public record EnergySupplierChangedIntegrationEvent(
             string GsrnNumber,
             string EnergySupplierGln,
             Instant StartOfSupplyDate)

@@ -35,7 +35,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
             await InvokeCommandAsync(command);
 
             await AssertOutboxMessage<ConsumerMovedInIntegrationEvent>();
-            await AssertOutboxMessage<EnergySupplierChanged>();
+            await AssertOutboxMessage<EnergySupplierChangedIntegrationEvent>();
         }
 
         private async Task<(AccountingPoint AccountingPoint, Transaction Transaction)> SetupScenarioAsync()
