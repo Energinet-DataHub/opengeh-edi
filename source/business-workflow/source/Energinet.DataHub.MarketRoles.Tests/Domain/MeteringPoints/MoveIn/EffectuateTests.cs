@@ -16,19 +16,18 @@ using System;
 using Energinet.DataHub.MarketRoles.Domain.Consumers;
 using Energinet.DataHub.MarketRoles.Domain.EnergySuppliers;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
-using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules.ChangeEnergySupplier;
 using NodaTime;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketRoles.Tests.Domain.MeteringPoints
+namespace Energinet.DataHub.MarketRoles.Tests.Domain.MeteringPoints.MoveIn
 {
     [UnitTest]
-    public class MoveInTests
+    public class EffectuateTests
     {
         private SystemDateTimeProviderStub _systemDateTimeProvider = new SystemDateTimeProviderStub();
 
-        public MoveInTests()
+        public EffectuateTests()
         {
             _systemDateTimeProvider.SetNow(Instant.FromUtc(2020, 1, 1, 0, 0));
         }
