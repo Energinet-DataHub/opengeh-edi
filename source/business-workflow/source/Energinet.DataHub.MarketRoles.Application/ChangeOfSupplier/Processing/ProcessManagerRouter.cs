@@ -47,7 +47,13 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing
         public async Task Handle(EnergySupplierChangeRegistered notification, CancellationToken cancellationToken)
         {
             if (notification == null) throw new ArgumentNullException(nameof(notification));
-            var processManager = await GetProcessManagerAsync(notification.BusinessProcessId).ConfigureAwait(false);
+            var processManager = await _processManagerRepository.GetAsync<ChangeOfSupplierProcessManager>(notification.BusinessProcessId).ConfigureAwait(false);
+            if (processManager is null)
+            {
+                processManager = new ChangeOfSupplierProcessManager();
+                _processManagerRepository.Add(processManager);
+            }
+
             processManager.When(notification);
             await EnqueueCommandsAsync(processManager).ConfigureAwait(false);
         }
@@ -56,44 +62,49 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing
         {
             if (notification == null) throw new ArgumentNullException(nameof(notification));
             var processManager = await GetProcessManagerAsync(notification.BusinessProcessId).ConfigureAwait(false);
-            processManager.When(notification);
-            await EnqueueCommandsAsync(processManager).ConfigureAwait(false);
+            if (processManager is not null)
+            {
+                processManager.When(notification);
+                await EnqueueCommandsAsync(processManager).ConfigureAwait(false);
+            }
         }
 
         public async Task Handle(EnergySupplierChanged notification, CancellationToken cancellationToken)
         {
             if (notification == null) throw new ArgumentNullException(nameof(notification));
             var processManager = await GetProcessManagerAsync(BusinessProcessId.Create(notification.BusinessProcessId)).ConfigureAwait(false);
-            processManager.When(notification);
-            await EnqueueCommandsAsync(processManager).ConfigureAwait(false);
+            if (processManager is not null)
+            {
+                processManager.When(notification);
+                await EnqueueCommandsAsync(processManager).ConfigureAwait(false);
+            }
         }
 
         public async Task Handle(MeteringPointDetailsDispatched notification, CancellationToken cancellationToken)
         {
             if (notification == null) throw new ArgumentNullException(nameof(notification));
             var processManager = await GetProcessManagerAsync(notification.BusinessProcessId).ConfigureAwait(false);
-            processManager.When(notification);
-            await EnqueueCommandsAsync(processManager).ConfigureAwait(false);
+            if (processManager is not null)
+            {
+                processManager.When(notification);
+                await EnqueueCommandsAsync(processManager).ConfigureAwait(false);
+            }
         }
 
         public async Task Handle(ConsumerDetailsDispatched notification, CancellationToken cancellationToken)
         {
             if (notification == null) throw new ArgumentNullException(nameof(notification));
             var processManager = await GetProcessManagerAsync(notification.BusinessProcessId).ConfigureAwait(false);
-            processManager.When(notification);
-            await EnqueueCommandsAsync(processManager).ConfigureAwait(false);
+            if (processManager is not null)
+            {
+                processManager.When(notification);
+                await EnqueueCommandsAsync(processManager).ConfigureAwait(false);
+            }
         }
 
-        private async Task<ChangeOfSupplierProcessManager> GetProcessManagerAsync(BusinessProcessId businessProcessId)
+        private Task<ChangeOfSupplierProcessManager?> GetProcessManagerAsync(BusinessProcessId businessProcessId)
         {
-            var processManager = await _processManagerRepository.GetAsync<ChangeOfSupplierProcessManager>(businessProcessId).ConfigureAwait(false);
-            if (processManager is null)
-            {
-                processManager = new ChangeOfSupplierProcessManager();
-                _processManagerRepository.Add(processManager);
-            }
-
-            return processManager;
+            return _processManagerRepository.GetAsync<ChangeOfSupplierProcessManager>(businessProcessId);
         }
 
         private async Task EnqueueCommandsAsync(ProcessManager processManager)
