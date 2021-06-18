@@ -40,9 +40,9 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEv
         {
             if (notification == null) throw new ArgumentNullException(nameof(notification));
 
-            var supplierGlnNumber = await GetSupplierGlnNumberAsync(notification.EnergySupplierId).ConfigureAwait(false);
+            var supplierGlnNumber = await GetSupplierGlnNumberAsync(new EnergySupplierId(notification.EnergySupplierId)).ConfigureAwait(false);
             var integrationEvent = new EnergySupplierChanged(
-                notification.GsrnNumber.Value,
+                notification.GsrnNumber,
                 supplierGlnNumber,
                 notification.StartOfSupplyDate);
 

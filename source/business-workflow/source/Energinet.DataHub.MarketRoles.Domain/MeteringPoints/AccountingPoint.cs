@@ -113,7 +113,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
             var futureSupplier = GetFutureSupplierRegistration(businessProcess);
             StartOfSupplyForFutureSupplier(businessProcess, futureSupplier);
 
-            AddDomainEvent(new EnergySupplierChanged(Id, GsrnNumber, businessProcess.BusinessProcessId, transaction, futureSupplier.EnergySupplierId, businessProcess.EffectiveDate));
+            AddDomainEvent(new EnergySupplierChanged(Id.Value, GsrnNumber.Value, businessProcess.BusinessProcessId.Value, transaction.Value, futureSupplier.EnergySupplierId.Value, businessProcess.EffectiveDate));
         }
 
         public void CloseDown()
@@ -162,7 +162,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
             var consumer = _consumerRegistrations.Find(consumerRegistration => consumerRegistration.BusinessProcessId.Equals(businessProcess.BusinessProcessId))!;
 
             AddDomainEvent(new ConsumerMovedIn(Id.Value, GsrnNumber.Value, businessProcess.BusinessProcessId.Value, consumer.ConsumerId.Value, consumer.MoveInDate));
-            AddDomainEvent(new EnergySupplierChanged(Id, GsrnNumber, businessProcess.BusinessProcessId, businessProcess.Transaction, newSupplier.EnergySupplierId, businessProcess.EffectiveDate));
+            AddDomainEvent(new EnergySupplierChanged(Id.Value, GsrnNumber.Value, businessProcess.BusinessProcessId.Value, businessProcess.Transaction.Value, newSupplier.EnergySupplierId.Value, businessProcess.EffectiveDate));
         }
 
         public void CancelChangeOfSupplier(Transaction transaction)

@@ -154,7 +154,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Proce
             processManager.When(new MeteringPointDetailsDispatched(_accountingPointId, _businessProcessId, _transaction));
             processManager.When(new ConsumerDetailsDispatched(_accountingPointId, _businessProcessId, _transaction));
             processManager.When(new CurrentSupplierNotified(_accountingPointId, _businessProcessId, _transaction));
-            processManager.When(new EnergySupplierChanged(_accountingPointId, _gsrnNumber, _businessProcessId, _transaction, _energySupplierId, Instant.MaxValue));
+            processManager.When(new EnergySupplierChanged(_accountingPointId.Value, _gsrnNumber.Value, _businessProcessId.Value, _transaction.Value, _energySupplierId.Value, Instant.MaxValue));
 
             Assert.True(processManager.IsCompleted());
         }

@@ -63,7 +63,7 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing
         public async Task Handle(EnergySupplierChanged notification, CancellationToken cancellationToken)
         {
             if (notification == null) throw new ArgumentNullException(nameof(notification));
-            var processManager = await GetProcessManagerAsync(notification.BusinessProcessId).ConfigureAwait(false);
+            var processManager = await GetProcessManagerAsync(BusinessProcessId.Create(notification.BusinessProcessId)).ConfigureAwait(false);
             processManager.When(notification);
             await EnqueueCommandsAsync(processManager).ConfigureAwait(false);
         }
