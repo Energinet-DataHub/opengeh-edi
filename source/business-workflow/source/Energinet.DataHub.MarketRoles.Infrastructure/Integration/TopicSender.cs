@@ -18,21 +18,25 @@ using Azure.Messaging.ServiceBus;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration
 {
-    public class TopicSender<TTopic> : IAsyncDisposable
-        where TTopic : Topic
+    #pragma warning disable
+
+    public class TopicSender<TTopic> : IAsyncDisposable, ITopicSender<TTopic> where TTopic : Topic
     {
         private readonly ServiceBusClient _client;
         private readonly Lazy<ServiceBusSender> _senderCreator;
+        private readonly string _topicName;
 
         public TopicSender(ServiceBusClient client, TTopic topic)
         {
             _client = client;
             _senderCreator = new Lazy<ServiceBusSender>(() => _client.CreateSender(topic.Name));
+            _topicName = topic.Name;
         }
 
-        public ServiceBusSender CreateSender()
+        public async Task SendMessageAsync(byte[] message)
         {
-            return _senderCreator.Value;
+            ServiceBusMessage serviceBusMessage = new (message) {Subject = _topicName};
+            await _senderCreator.Value.SendMessageAsync(serviceBusMessage).ConfigureAwait(false);
         }
 
         public async ValueTask DisposeAsync()
