@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketRoles.Application.Common.Users;
 using Energinet.DataHub.MarketRoles.Contracts;
-using Energinet.DataHub.MarketRoles.EntryPoints.Common.SimpleInjector;
+using Energinet.DataHub.MarketRoles.EntryPoints.Common;
 using Energinet.DataHub.MarketRoles.EntryPoints.Ingestion.Middleware;
 using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
 using Energinet.DataHub.MarketRoles.Infrastructure.Ingestion;
@@ -25,44 +25,44 @@ using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integration;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using SimpleInjector;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
 {
-    public static class Program
+    public class Program : EntryPoint
     {
         public static async Task Main()
         {
-            var container = new Container();
-            var host = new HostBuilder()
-                .ConfigureFunctionsWorkerDefaults(options =>
-                {
-                    options.UseMiddleware<SimpleInjectorScopedRequest>();
-                    options.UseMiddleware<HttpCorrelationIdMiddleware>();
-                    options.UseMiddleware<HttpUserContextMiddleware>();
-                })
-                .ConfigureServices(services =>
-                {
-                    var descriptor = new ServiceDescriptor(
-                        typeof(IFunctionActivator),
-                        typeof(SimpleInjectorActivator),
-                        ServiceLifetime.Singleton);
-                    services.Replace(descriptor); // Replace existing activator
+            var program = new Program();
 
-                    services.AddLogging();
-                    services.AddSimpleInjector(container, options =>
-                    {
-                        options.AddLogging();
-                    });
+            var host = program.ConfigureApplication();
+            program.AssertConfiguration();
+            await program.ExecuteApplicationAsync(host).ConfigureAwait(false);
+        }
 
-                    services.SendProtobuf<MarketRolesEnvelope>();
-                })
-                .Build()
-                .UseSimpleInjector(container);
+        protected override void ConfigureFunctionsWorkerDefaults(IFunctionsWorkerApplicationBuilder options)
+        {
+            if (options == null) throw new ArgumentNullException(nameof(options));
+            base.ConfigureFunctionsWorkerDefaults(options);
 
-            // Register application components.
+            options.UseMiddleware<HttpCorrelationIdMiddleware>();
+            options.UseMiddleware<HttpUserContextMiddleware>();
+        }
+
+        protected override void ConfigureServiceCollection(IServiceCollection services)
+        {
+            if (services == null) throw new ArgumentNullException(nameof(services));
+            base.ConfigureServiceCollection(services);
+
+            services.SendProtobuf<MarketRolesEnvelope>();
+        }
+
+        protected override void ConfigureContainer(Container container)
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            base.ConfigureContainer(container);
+
             container.Register<CommandApi>(Lifestyle.Scoped);
             container.Register<HttpCorrelationIdMiddleware>(Lifestyle.Scoped);
             container.Register<ICorrelationContext, CorrelationContext>(Lifestyle.Scoped);
@@ -78,10 +78,6 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
                 () => new ServiceBusClient(connectionString).CreateSender(topicName),
                 Lifestyle.Singleton);
             container.Verify();
-
-            await host.RunAsync().ConfigureAwait(false);
-
-            await container.DisposeAsync().ConfigureAwait(false);
         }
     }
 }
