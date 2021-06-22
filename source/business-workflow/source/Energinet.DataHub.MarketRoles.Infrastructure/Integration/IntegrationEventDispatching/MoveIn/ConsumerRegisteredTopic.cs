@@ -12,18 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading;
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn;
-using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
-
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.Channels
+namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn
 {
-    public class NullChannel : Channel
-    {
-        public override Task WriteAsync(byte[] data, CancellationToken cancellationToken = default)
-        {
-            throw new System.NotImplementedException();
-        }
-    }
+    public record ConsumerRegisteredTopic(string Name) : Topic;
 }
