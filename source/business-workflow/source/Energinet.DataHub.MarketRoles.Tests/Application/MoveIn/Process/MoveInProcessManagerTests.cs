@@ -14,8 +14,6 @@
 
 using System;
 using System.Linq;
-using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing;
-using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.EndOfSupplyNotification;
 using Energinet.DataHub.MarketRoles.Application.MoveIn.Processing;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events;
 using NodaTime;
@@ -23,7 +21,6 @@ using Xunit;
 
 namespace Energinet.DataHub.MarketRoles.Tests.Application.MoveIn.Process
 {
-    #pragma warning disable
     public class MoveInProcessManagerTests
     {
         private readonly Guid _accountingPointId = Guid.NewGuid();
