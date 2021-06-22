@@ -24,7 +24,7 @@ This message is sent out when an energy supplier has been changed.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | MeteringPointId | [string](#string) |  | Unique metering point identification |
-| EnergySupplierGLN | [string](#string) |  | Unique Energy Supplier identifcation. |
+| EnergySupplierGLN | [string](#string) |  | Unique Energy Supplier identification. |
 | EffectiveDate | [string](#string) |  | Date which the change of supplier goes into effect. |
 | TransactionId | [string](#string) |  | Unique transaction ID of the process. Needed to effectuate the correct accepted process. |
 
