@@ -1,5 +1,4 @@
 # Protocol Documentation
-<a name="top"></a>
 
 ## Table of Contents
 
@@ -39,11 +38,10 @@ This message is sent out when an energy supplier has been changed.
 
 This message is sent out when a future energy supplier change is accepted. It informs who will be the future energy supplier of the respective metering point
 
-
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | MeteringPointId | [string](#string) |  | Unique metering point identification |
-| EnergySupplierGLN | [string](#string) |  | Unique Energy Supplier identifcation |
+| EnergySupplierGLN | [string](#string) |  | Unique Energy Supplier identification |
 | EffectiveDate | [string](#string) |  | Date in which the supplier change will go into effect |
 | TransactionId | [string](#string) |  | Unique transaction ID of the process. Needed to effectuate the correct process at a later date. |
 
