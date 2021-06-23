@@ -58,6 +58,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.DataAccess
             modelBuilder.ApplyConfiguration(new OutboxMessageEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ProcessManagerEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ChangeOfSupplierProcessManagerEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new MoveInProcessManagerEntityConfiguration());
             modelBuilder.ApplyConfiguration(new QueuedInternalCommandEntityConfiguration());
         }
     }

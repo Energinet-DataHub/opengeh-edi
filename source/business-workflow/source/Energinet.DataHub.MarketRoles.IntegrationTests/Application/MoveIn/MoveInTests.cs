@@ -19,10 +19,11 @@ using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.MoveIn;
 using Xunit;
+using Xunit.Categories;
 
 namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
 {
-    #pragma warning disable
+    [IntegrationTest]
     public class MoveInTests : TestHost
     {
         private readonly AccountingPoint _accountingPoint;
