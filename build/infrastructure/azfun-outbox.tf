@@ -37,6 +37,8 @@ module "azfun_outbox" {
     ACTOR_MESSAGE_DISPATCH_TRIGGER_TIMER  = "*/10 * * * * *"
     # POST_OFFICE_QUEUE_CONNECTION_STRING   = data.azurerm_key_vault_secret.POST_OFFICE_QUEUE_CONNECTION_STRING.value
     # POST_OFFICE_QUEUE_TOPIC_NAME          = data.azurerm_key_vault_secret.POST_OFFICE_QUEUE_MARKETDATA_TOPIC_NAME.value
+    SHARED_INTEGRATION_EVENT_SERVICE_BUS_CONNECTION_STRING =""
+    CONSUMER_REGISTERED_TOPIC = "sbt-consumer-registered"
   }
   dependencies                              = [
     module.appi.dependent_on,
