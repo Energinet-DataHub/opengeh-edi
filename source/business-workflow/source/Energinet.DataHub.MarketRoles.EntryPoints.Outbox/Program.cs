@@ -77,13 +77,13 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
             container.Register<EventMessageDispatcher>(Lifestyle.Transient);
             container.Register<IIntegrationEventDispatchOrchestrator, IntegrationEventDispatchOrchestrator>(Lifestyle.Transient);
 
-            var connectionString = Environment.GetEnvironmentVariable("SHARED_SERVICEBUS_INTEGRATION_EVENT_CONNECTIONSTRING_TODO");
+            var connectionString = Environment.GetEnvironmentVariable("SHARED_INTEGRATION_EVENT_SERVICE_BUS_SENDER_CONNECTION_STRING");
             container.Register<ServiceBusClient>(
                 () => new ServiceBusClient(connectionString),
                 Lifestyle.Singleton);
 
             container.Register(
-                () => new ConsumerRegisteredTopic(Environment.GetEnvironmentVariable("CONSUMER_REGISTERED_TOPIC_TODO") ?? throw new InvalidOperationException(
+                () => new ConsumerRegisteredTopic(Environment.GetEnvironmentVariable("CONSUMER_REGISTERED_TOPIC") ?? throw new InvalidOperationException(
                     "No Consumer Registered Topic found")),
                 Lifestyle.Singleton);
 
