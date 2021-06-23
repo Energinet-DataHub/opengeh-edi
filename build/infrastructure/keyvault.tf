@@ -11,14 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-data "azurerm_servicebus_namespace" "integrationevents" {
-  name                = var.sharedresources_integrationevents_service_bus_namespace_name
-  resource_group_name = data.azurerm_resource_group.shared_resources.name
-}
-
-module "sbt_shared_sb" {
-  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//service-bus-topic?ref=1.2.0"
-  name                = "sbt-consumer-registered"
-  namespace_name      = data.azurerm_servicebus_namespace.integrationevents.name
-  resource_group_name = data.azurerm_resource_group.shared_resources.name
+data "azurerm_key_vault" "kv_sharedresources" {
+  name                = var.sharedresources_keyvault_name
+  resource_group_name = var.sharedresources_resource_group_name
 }
