@@ -18,9 +18,11 @@ using Energinet.DataHub.MarketRoles.Application.MoveIn.Processing;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events;
 using NodaTime;
 using Xunit;
+using Xunit.Categories;
 
 namespace Energinet.DataHub.MarketRoles.Tests.Application.MoveIn.Process
 {
+    [UnitTest]
     public class MoveInProcessManagerTests
     {
         private readonly Guid _accountingPointId = Guid.NewGuid();

@@ -27,9 +27,11 @@ using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Microsoft.EntityFrameworkCore;
 using NodaTime;
 using Xunit;
+using Xunit.Categories;
 
 namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn.Processing
 {
+    [IntegrationTest]
     public class MoveInProcessManagerTests : TestHost
     {
         private readonly MoveInProcessManagerRouter _router;
