@@ -39,3 +39,8 @@ variable "sharedresources_resource_group_name" {
   type          = string
   description   = "Resource group name of the Core keyvaults location"
 }
+
+variable "sharedresources_sql_server_name" {
+  type          = string
+  description   = "Name of the SQL server"
+}
