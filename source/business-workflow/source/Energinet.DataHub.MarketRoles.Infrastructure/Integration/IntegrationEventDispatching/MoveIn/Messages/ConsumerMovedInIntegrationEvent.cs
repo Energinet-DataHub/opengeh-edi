@@ -13,11 +13,10 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketRoles.Application.Common.Transport;
-using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using MediatR;
 using NodaTime;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn
+namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn.Messages
 {
     public record ConsumerMovedInIntegrationEvent(string GsrnNumber, Instant MoveInDate) : IIntegrationEvent, IRequest, IOutboundMessage;
 }

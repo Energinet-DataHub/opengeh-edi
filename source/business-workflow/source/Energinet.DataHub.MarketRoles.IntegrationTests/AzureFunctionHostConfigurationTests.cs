@@ -25,9 +25,9 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests
         [Fact]
         public void OutboxHostConfigurationTest()
         {
-            Environment.SetEnvironmentVariable("SHARED_SERVICEBUS_INTEGRATION_EVENT_CONNECTIONSTRING_TODO", ServiceBusConnectionString);
+            Environment.SetEnvironmentVariable("SHARED_INTEGRATION_EVENT_SERVICE_BUS_SENDER_CONNECTION_STRING", ServiceBusConnectionString);
             Environment.SetEnvironmentVariable("MARKETROLES_DB_CONNECTION_STRING", SomeString);
-            Environment.SetEnvironmentVariable("CONSUMER_REGISTERED_TOPIC_TODO", SomeString);
+            Environment.SetEnvironmentVariable("CONSUMER_REGISTERED_TOPIC", SomeString);
             var program = new EntryPoints.Outbox.Program();
 
             program.ConfigureApplication();

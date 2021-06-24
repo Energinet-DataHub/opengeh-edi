@@ -13,21 +13,23 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn.Messages;
+using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
+using Energinet.DataHub.MarketRoles.IntegrationEventContracts;
+using Google.Protobuf;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.Helpers
+namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn.Mappers
 {
-    public static class IntegrationEventTypeFactory
+    public class ConsumerMovedInMessageMapper : ProtobufOutboundMapper<ConsumerMovedInIntegrationEvent>
     {
-        public static Type GetType(string type)
+        protected override IMessage Convert(ConsumerMovedInIntegrationEvent obj)
         {
-            if (typeof(ConsumerMovedInIntegrationEvent).FullName == type)
+            if (obj == null) throw new ArgumentException(null, nameof(obj));
+            return new ConsumerRegisteredIntegrationEvent
             {
-                return typeof(ConsumerMovedInIntegrationEvent);
-            }
-
-            throw new ArgumentException("Integration Event type is not implemented.");
+                GsrnNr = obj.GsrnNumber,
+                MoveInDate = obj.MoveInDate.ToString(),
+            };
         }
     }
 }

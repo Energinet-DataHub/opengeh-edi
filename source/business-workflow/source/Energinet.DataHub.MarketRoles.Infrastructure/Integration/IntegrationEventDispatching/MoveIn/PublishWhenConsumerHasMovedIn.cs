@@ -16,6 +16,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events;
+using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn.Messages;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 using MediatR;
 

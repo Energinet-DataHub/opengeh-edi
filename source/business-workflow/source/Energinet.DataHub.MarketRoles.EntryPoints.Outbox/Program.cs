@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketRoles.Application.Integration;
@@ -20,16 +22,24 @@ using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common.MediatR;
+using Energinet.DataHub.MarketRoles.EntryPoints.Common.SimpleInjector;
+using Energinet.DataHub.MarketRoles.EntryPoints.Outbox.Handlers;
 using Energinet.DataHub.MarketRoles.Infrastructure;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn;
+using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn.Messages;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.Services;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
+using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
+using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
+using Energinet.DataHub.MarketRoles.IntegrationEventContracts;
 using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
+using Google.Protobuf;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using SimpleInjector;
 
 [assembly: CLSCompliant(false)]
@@ -60,6 +70,8 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
 
                 x.UseSqlServer(dbConnectionString, options => options.UseNodaTime());
             });
+
+            // services.RegisterProtoContracts<ConsumerRegisteredIntegrationEvent>();
         }
 
         protected override void ConfigureContainer(Container container)
@@ -77,13 +89,13 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
             container.Register<EventMessageDispatcher>(Lifestyle.Transient);
             container.Register<IIntegrationEventDispatchOrchestrator, IntegrationEventDispatchOrchestrator>(Lifestyle.Transient);
 
-            var connectionString = Environment.GetEnvironmentVariable("SHARED_SERVICEBUS_INTEGRATION_EVENT_CONNECTIONSTRING_TODO");
+            var connectionString = Environment.GetEnvironmentVariable("SHARED_INTEGRATION_EVENT_SERVICE_BUS_SENDER_CONNECTION_STRING");
             container.Register<ServiceBusClient>(
                 () => new ServiceBusClient(connectionString),
                 Lifestyle.Singleton);
 
             container.Register(
-                () => new ConsumerRegisteredTopic(Environment.GetEnvironmentVariable("CONSUMER_REGISTERED_TOPIC_TODO") ?? throw new InvalidOperationException(
+                () => new ConsumerRegisteredTopic(Environment.GetEnvironmentVariable("CONSUMER_REGISTERED_TOPIC") ?? throw new InvalidOperationException(
                     "No Consumer Registered Topic found")),
                 Lifestyle.Singleton);
 
@@ -93,8 +105,15 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
                 new[]
                 {
                     typeof(ConsumerMoveInAccepted).Assembly,
+                    typeof(ConsumerMovedInEvent).Assembly,
                 },
                 Array.Empty<Type>());
+
+            container.AddProtoBuffContracts(
+                new[]
+                {
+                    typeof(ConsumerRegisteredIntegrationEvent).Assembly,
+                });
         }
     }
 }
