@@ -34,7 +34,7 @@ module "azfun_processing" {
     # VALIDATION_REPORTS_CONNECTION_STRING  = data.azurerm_key_vault_secret.VALIDATION_REPORTS_CONNECTION_STRING.value
     MARKET_DATA_QUEUE_URL                 = "${module.sbn_marketroles.name}.servicebus.windows.net:9093"
     MARKET_DATA_QUEUE_CONNECTION_STRING   = module.sbnar_marketroles_listener.primary_connection_string
-    MARKET_DATA_DB_CONNECTION_STRING      = local.kvs_marketroles_db_connection_string.value
+    MARKET_DATA_DB_CONNECTION_STRING      = local.MARKETROLES_CONNECTION_STRING
     MARKET_DATA_QUEUE_TOPIC_NAME          = module.sbq_marketroles.name
     # POST_OFFICE_QUEUE_CONNECTION_STRING   = data.azurerm_key_vault_secret.POST_OFFICE_QUEUE_CONNECTION_STRING.value
     # POST_OFFICE_QUEUE_TOPIC_NAME          = data.azurerm_key_vault_secret.POST_OFFICE_QUEUE_MARKETDATA_TOPIC_NAME.value
