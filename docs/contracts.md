@@ -25,7 +25,7 @@ This message is sent out when an energy supplier has been changed.
 | ----- | ---- | ----- | ----------- |
 | MeteringPointId | [string](#string) |  | Unique metering point identification |
 | EnergySupplierGLN | [string](#string) |  | Unique Energy Supplier identification. |
-| EffectiveDate | [string](#string) |  | Date which the change of supplier goes into effect. |
+| EffectiveDate | [string](#string) |  | Date on which the change of supplier goes into effect. |
 | TransactionId | [string](#string) |  | Unique transaction ID of the process. Needed to effectuate the correct accepted process. |
 
 <a name="FutureEnergySupplierChangeAccepted.proto"></a>
@@ -42,7 +42,7 @@ This message is sent out when a future energy supplier change is accepted. It in
 | ----- | ---- | ----- | ----------- |
 | MeteringPointId | [string](#string) |  | Unique metering point identification |
 | EnergySupplierGLN | [string](#string) |  | Unique Energy Supplier identification |
-| EffectiveDate | [string](#string) |  | Date in which the supplier change will go into effect |
+| EffectiveDate | [string](#string) |  | Date on which the supplier change will go into effect |
 | TransactionId | [string](#string) |  | Unique transaction ID of the process. Needed to effectuate the correct process at a later date. |
 
 <a name="FutureEnergySupplierChangeCancelled.proto"></a>
