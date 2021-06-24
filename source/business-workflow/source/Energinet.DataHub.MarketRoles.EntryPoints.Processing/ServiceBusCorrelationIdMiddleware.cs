@@ -11,48 +11,49 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 using System;
-using System.Text;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
-using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
-using MediatR;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Processing
 {
-    public class QueueSubscriber
+    /// <summary>
+    /// Set <see cref="ICorrelationContext"/> via a ServiceBus function context
+    /// </summary>
+    public sealed class ServiceBusCorrelationIdMiddleware : IFunctionsWorkerMiddleware
     {
         private readonly ILogger _logger;
         private readonly ICorrelationContext _correlationContext;
-        private readonly MessageExtractor _messageExtractor;
-        private readonly IMediator _mediator;
 
-        public QueueSubscriber(
+        public ServiceBusCorrelationIdMiddleware(
             ILogger logger,
-            ICorrelationContext correlationContext,
-            MessageExtractor messageExtractor,
-            IMediator mediator)
+            ICorrelationContext correlationContext)
         {
             _logger = logger;
             _correlationContext = correlationContext;
-            _messageExtractor = messageExtractor;
-            _mediator = mediator;
         }
 
-        [Function("QueueSubscriber")]
-        public async Task RunAsync(
-            [ServiceBusTrigger("sbq-marketroles", Connection = "MARKET_DATA_QUEUE_CONNECTION_STRING")] byte[] data,
-            FunctionContext context)
+        public async Task Invoke(FunctionContext context, [NotNull] FunctionExecutionDelegate next)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
-            var message = await _messageExtractor.ExtractAsync(data).ConfigureAwait(false);
+            if (context.BindingContext.BindingData.TryGetValue("CorrelationId", out var correlationIdObject)
+                && correlationIdObject is string correlationId)
+            {
+                _correlationContext.SetCorrelationId(correlationId);
+            }
+            else
+            {
+                _logger.LogWarning("CorrelationId not found for invocation: {invocationId}", context.InvocationId);
+                throw new InvalidOperationException();
+            }
 
-            await _mediator.Send(message).ConfigureAwait(false);
-
-            _logger.LogInformation("Dequeued with correlation id: {correlationId}", _correlationContext.GetCorrelationId());
+            await next(context).ConfigureAwait(false);
         }
     }
 }
