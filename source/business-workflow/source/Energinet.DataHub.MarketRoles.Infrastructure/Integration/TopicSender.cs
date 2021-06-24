@@ -27,6 +27,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration
 
         public TopicSender(ServiceBusClient client, TTopic topic)
         {
+            if (topic == null) throw new ArgumentNullException(nameof(topic));
             _client = client;
             _senderCreator = new Lazy<ServiceBusSender>(() => _client.CreateSender(topic.Name));
             _topicName = topic.Name;
