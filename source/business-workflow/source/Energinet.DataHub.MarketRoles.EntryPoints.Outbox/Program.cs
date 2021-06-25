@@ -64,8 +64,6 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
 
                 x.UseSqlServer(dbConnectionString, options => options.UseNodaTime());
             });
-
-            // services.RegisterProtoContracts<ConsumerRegisteredIntegrationEvent>();
         }
 
         protected override void ConfigureContainer(Container container)
