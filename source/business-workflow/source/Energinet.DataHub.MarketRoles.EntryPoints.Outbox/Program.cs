@@ -23,6 +23,7 @@ using Energinet.DataHub.MarketRoles.EntryPoints.Common.MediatR;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common.SimpleInjector;
 using Energinet.DataHub.MarketRoles.EntryPoints.Outbox.Handlers;
 using Energinet.DataHub.MarketRoles.Infrastructure;
+using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn;
@@ -90,6 +91,11 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
             container.Register(
                 () => new ConsumerRegisteredTopic(Environment.GetEnvironmentVariable("CONSUMER_REGISTERED_TOPIC") ?? throw new InvalidOperationException(
                     "No Consumer Registered Topic found")),
+                Lifestyle.Singleton);
+
+            container.Register(
+                () => new EnergySupplierChangedTopic(Environment.GetEnvironmentVariable("ENERGY_SUPPLIER_CHANGED_TOPIC") ?? throw new InvalidOperationException(
+                    "No EnergySupplierChanged Topic found")),
                 Lifestyle.Singleton);
 
             container.Register(typeof(ITopicSender<>), typeof(TopicSender<>), Lifestyle.Singleton);

@@ -12,16 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketRoles.Application.Common.Transport;
-using MediatR;
-using NodaTime;
-
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.ChangeOfSupplier
+namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn
 {
-    //TODO: Determine other attributes need in integration event
-    public record EnergySupplierChangedIntegrationEvent(
-            string GsrnNumber,
-            string EnergySupplierGln,
-            Instant StartOfSupplyDate)
-        : IIntegrationEvent, IRequest, IOutboundMessage;
+    public record EnergySupplierChangedTopic(string Name) : Topic;
 }
