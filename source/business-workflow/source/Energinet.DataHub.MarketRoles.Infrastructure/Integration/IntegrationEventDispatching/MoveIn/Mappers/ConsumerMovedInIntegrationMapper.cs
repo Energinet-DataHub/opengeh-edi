@@ -20,7 +20,7 @@ using Google.Protobuf;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn.Mappers
 {
-    public class ConsumerMovedInMessageMapper : ProtobufOutboundMapper<ConsumerMovedInIntegrationEvent>
+    public class ConsumerMovedInIntegrationMapper : ProtobufOutboundMapper<ConsumerMovedInIntegrationEvent>
     {
         protected override IMessage Convert(ConsumerMovedInIntegrationEvent obj)
         {

@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Reflection;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketRoles.Application.Integration;
@@ -28,18 +26,13 @@ using Energinet.DataHub.MarketRoles.Infrastructure;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn;
-using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn.Messages;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.Services;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
-using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
-using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
 using Energinet.DataHub.MarketRoles.IntegrationEventContracts;
 using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
-using Google.Protobuf;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using SimpleInjector;
 
 [assembly: CLSCompliant(false)]

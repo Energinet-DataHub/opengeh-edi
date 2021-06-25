@@ -34,7 +34,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Common.SimpleInjector
             container.Register<ProtobufOutboundMapperFactory>(Lifestyle.Transient);
             container.Register<MessageSerializer, ProtobufMessageSerializer>(Lifestyle.Transient);
 
-            ScanForMappers(container, typeof(ProtobufOutboundMapper), assemblies);
+            ScanForMappers(container, typeof(ProtobufOutboundMapper<>), assemblies);
         }
 
         private static void ScanForMappers(Container container, Type collectionType, Assembly[] assemblies)
@@ -45,7 +45,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Common.SimpleInjector
                 IncludeComposites = false,
             });
 
-            container.Collection.Register(collectionType, types);
+            container.Register(collectionType, types);
         }
 
         private static IEnumerable<Assembly> GetAssemblies()
