@@ -137,6 +137,7 @@ jobs:
         working-directory: ./build/infrastructure
         run: |
           terraform apply -no-color -auto-approve
+          echo "::set-output name=sql-server-connectionstring::$(terraform output marketroles_connection_string)"
         continue-on-error: false
 
       - name: Applying market data migrations
