@@ -53,9 +53,6 @@ limitations under the License.
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Integration\Contracts\MoveIn" />
-    <Folder Include="Integration\IntegrationEventDispatching\MoveIn\Mappers" />
-    <Folder Include="Integration\IntegrationEventDispatching\MoveIn\Topics" />
     <Folder Include="Processing\Mappers" />
   </ItemGroup>
 
