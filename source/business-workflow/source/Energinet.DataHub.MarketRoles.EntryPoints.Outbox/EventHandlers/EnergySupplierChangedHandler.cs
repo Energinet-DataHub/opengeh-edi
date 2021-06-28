@@ -16,20 +16,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.ChangeOfSupplier;
-using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn;
-using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn.Messages;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
-using Google.Protobuf;
 using MediatR;
 
-namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox.Handlers
+namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox.EventHandlers
 {
-    public class EnergySupplierChangedEvent : IRequestHandler<EnergySupplierChangedIntegrationEvent>
+    public class EnergySupplierChangedHandler : EventHandlerBase, IRequestHandler<EnergySupplierChangedIntegrationEvent>
     {
         private readonly ITopicSender<EnergySupplierChangedTopic> _topicSender;
         private readonly ProtobufOutboundMapper<EnergySupplierChangedIntegrationEvent> _mapper;
 
-        public EnergySupplierChangedEvent(
+        public EnergySupplierChangedHandler(
             ITopicSender<EnergySupplierChangedTopic> topicSender,
             ProtobufOutboundMapper<EnergySupplierChangedIntegrationEvent> mapper)
         {
@@ -39,9 +36,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox.Handlers
 
         public async Task<Unit> Handle(EnergySupplierChangedIntegrationEvent request, CancellationToken cancellationToken)
         {
-            var message = _mapper.Convert(request);
-            var bytes = message.ToByteArray();
-            await _topicSender.SendMessageAsync(bytes).ConfigureAwait(false);
+            await DispatchMessageAsync(_mapper, _topicSender, request).ConfigureAwait(false);
             return Unit.Value;
         }
     }

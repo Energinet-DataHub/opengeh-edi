@@ -23,11 +23,6 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.Helpers
     {
         public static Type GetType(string type)
         {
-            if (typeof(ConsumerMovedInIntegrationEvent).FullName == type)
-            {
-                return typeof(ConsumerMovedInIntegrationEvent);
-            }
-
             if (typeof(EnergySupplierChangedIntegrationEvent).FullName == type)
             {
                 return typeof(EnergySupplierChangedIntegrationEvent);

@@ -16,13 +16,6 @@ data "azurerm_servicebus_namespace" "integrationevents" {
   resource_group_name = data.azurerm_resource_group.shared_resources.name
 }
 
-module "sbt_consumer_registered" {
-  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//service-bus-topic?ref=1.2.0"
-  name                = "sbt-consumer-registered"
-  namespace_name      = data.azurerm_servicebus_namespace.integrationevents.name
-  resource_group_name = data.azurerm_resource_group.shared_resources.name
-}
-
 module "sbt_energy_supplier_changed" {
   source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//service-bus-topic?ref=1.2.0"
   name                = "sbt-energy-supplier-changed"

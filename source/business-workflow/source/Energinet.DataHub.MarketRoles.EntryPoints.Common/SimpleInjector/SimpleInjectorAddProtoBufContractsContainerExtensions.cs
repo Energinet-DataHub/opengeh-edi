@@ -24,17 +24,22 @@ using SimpleInjector;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Common.SimpleInjector
 {
-    public static class SimpleInjectorAddProtoBufContractsContainerExtensions
+    public static class SimpleInjectorAddProtobufContractsContainerExtensions
     {
-        public static void AddProtoBuffContracts(this Container container, Assembly[] applicationAssemblies)
+        public static void AddProtobufOutBoundMappers(this Container container, Assembly[] applicationAssemblies)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             var assemblies = GetAssemblies().Union(applicationAssemblies).ToArray();
 
             container.Register<ProtobufOutboundMapperFactory>(Lifestyle.Transient);
-            container.Register<MessageSerializer, ProtobufMessageSerializer>(Lifestyle.Transient);
 
             ScanForMappers(container, typeof(ProtobufOutboundMapper<>), assemblies);
+        }
+
+        public static void AddProtobufMessageSerializer(this Container container)
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            container.Register<MessageSerializer, ProtobufMessageSerializer>(Lifestyle.Transient);
         }
 
         private static void ScanForMappers(Container container, Type collectionType, Assembly[] assemblies)
