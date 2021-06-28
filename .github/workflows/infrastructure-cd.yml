@@ -143,6 +143,5 @@ jobs:
       - name: Applying market data migrations
         uses: ./.github/actions/apply-database-migrations
         with:
-          kv_market_roles_db_connection_string_secret_name: ${{ steps.terraform-apply.outputs.kv-market-roles-db-connection-string-secret-name }}
-          kv_market_roles_name: ${{ steps.terraform-apply.outputs.kv-market-roles-name }}
-          csproj_file_path: ${{ env.MIGRATION_PROJECT_CSPROJ_FILE_PATH }}
+          sql-server-connectionstring: ${{ steps.terraform-apply.outputs.marketroles_connection_string }}
+          environment-name: ${{ matrix.environment.name }}
