@@ -37,6 +37,8 @@ module "azfun_outbox" {
     ACTOR_MESSAGE_DISPATCH_TRIGGER_TIMER  = "*/10 * * * * *"
     # POST_OFFICE_QUEUE_CONNECTION_STRING   = data.azurerm_key_vault_secret.POST_OFFICE_QUEUE_CONNECTION_STRING.value
     # POST_OFFICE_QUEUE_TOPIC_NAME          = data.azurerm_key_vault_secret.POST_OFFICE_QUEUE_MARKETDATA_TOPIC_NAME.value
+    SHARED_INTEGRATION_EVENT_SERVICE_BUS_SENDER_CONNECTION_STRING = data.azurerm_key_vault_secret.INTEGRATION_EVENTS_SENDER_CONNECTION_STRING.value
+    CONSUMER_REGISTERED_TOPIC = "sbt-consumer-registered"
   }
   dependencies                              = [
     module.appi.dependent_on,
@@ -75,4 +77,10 @@ resource "random_string" "outbox" {
   length  = 10
   special = false
   upper   = false
+}
+
+# Reference to get the sender connection string from the shared integration event service bus
+data "azurerm_key_vault_secret" "INTEGRATION_EVENTS_SENDER_CONNECTION_STRING" {
+  name         = "INTEGRATION-EVENTS-SENDER-CONNECTION-STRING"
+  key_vault_id = data.azurerm_key_vault.kv_sharedresources.id
 }
