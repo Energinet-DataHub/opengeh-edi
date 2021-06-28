@@ -18,9 +18,9 @@ using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox.EventHandlers
 {
-    public class EnergySupplierChangedHandler : IntegrationEventHandler<EnergySupplierChangedTopic, EnergySupplierChangedIntegrationEvent>
+    public class EnergySupplierChangedDispatcher : IntegrationEventDispatcher<EnergySupplierChangedTopic, EnergySupplierChangedIntegrationEvent>
     {
-        public EnergySupplierChangedHandler(
+        public EnergySupplierChangedDispatcher(
             ITopicSender<EnergySupplierChangedTopic> topicSender,
             ProtobufOutboundMapper<EnergySupplierChangedIntegrationEvent> mapper)
             : base(topicSender, mapper)

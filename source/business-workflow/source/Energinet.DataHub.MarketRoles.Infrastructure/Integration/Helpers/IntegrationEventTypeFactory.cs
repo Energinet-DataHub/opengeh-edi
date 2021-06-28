@@ -14,8 +14,6 @@
 
 using System;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.ChangeOfSupplier;
-using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn;
-using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn.Messages;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.Helpers
 {

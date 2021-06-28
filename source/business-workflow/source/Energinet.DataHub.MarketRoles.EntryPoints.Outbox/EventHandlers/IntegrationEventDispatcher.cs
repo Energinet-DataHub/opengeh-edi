@@ -12,26 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.Common.Transport;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration;
-using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.ChangeOfSupplier;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
 using Google.Protobuf;
 using MediatR;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox.EventHandlers
 {
-    public abstract class IntegrationEventHandler<TTopic, TEvent> : IRequestHandler<TEvent>
+    public abstract class IntegrationEventDispatcher<TTopic, TEvent> : IRequestHandler<TEvent>
         where TTopic : Topic
         where TEvent : IOutboundMessage, IRequest<Unit>
     {
         private readonly ITopicSender<TTopic> _topicSender;
         private readonly ProtobufOutboundMapper<TEvent> _mapper;
 
-        protected IntegrationEventHandler(ITopicSender<TTopic> topicSender, ProtobufOutboundMapper<TEvent> mapper)
+        protected IntegrationEventDispatcher(ITopicSender<TTopic> topicSender, ProtobufOutboundMapper<TEvent> mapper)
         {
             _topicSender = topicSender;
             _mapper = mapper;

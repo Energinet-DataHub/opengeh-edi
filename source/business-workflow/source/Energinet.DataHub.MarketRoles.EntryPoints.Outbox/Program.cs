@@ -96,7 +96,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
                 new[]
                 {
                     typeof(ConsumerMoveInAccepted).Assembly,
-                    typeof(EnergySupplierChangedHandler).Assembly,
+                    typeof(EnergySupplierChangedDispatcher).Assembly,
                 },
                 Array.Empty<Type>());
 
