@@ -12,32 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.ChangeOfSupplier;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
-using MediatR;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox.EventHandlers
 {
-    public class EnergySupplierChangedHandler : EventHandlerBase, IRequestHandler<EnergySupplierChangedIntegrationEvent>
+    public class EnergySupplierChangedHandler : IntegrationEventHandler<EnergySupplierChangedTopic, EnergySupplierChangedIntegrationEvent>
     {
-        private readonly ITopicSender<EnergySupplierChangedTopic> _topicSender;
-        private readonly ProtobufOutboundMapper<EnergySupplierChangedIntegrationEvent> _mapper;
-
         public EnergySupplierChangedHandler(
             ITopicSender<EnergySupplierChangedTopic> topicSender,
             ProtobufOutboundMapper<EnergySupplierChangedIntegrationEvent> mapper)
+            : base(topicSender, mapper)
         {
-            _topicSender = topicSender;
-            _mapper = mapper;
-        }
-
-        public async Task<Unit> Handle(EnergySupplierChangedIntegrationEvent request, CancellationToken cancellationToken)
-        {
-            await DispatchMessageAsync(_mapper, _topicSender, request).ConfigureAwait(false);
-            return Unit.Value;
         }
     }
 }
