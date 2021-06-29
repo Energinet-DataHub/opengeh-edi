@@ -163,23 +163,5 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
                 _energySupplier.EnergySupplierId.Value,
                 EffectiveDate);
         }
-
-        private async Task<TCommand> GetEnqueuedCommandAsync<TCommand>()
-        {
-            var type = typeof(TCommand).FullName;
-            var queuedCommand = MarketRolesContext.QueuedInternalCommands
-                .FirstOrDefault(queuedInternalCommand =>
-                    queuedInternalCommand.BusinessProcessId.Equals(_businessProcessId.Value) &&
-                    queuedInternalCommand.Type.Equals(type));
-
-            if (queuedCommand is null)
-            {
-                return default(TCommand);
-            }
-
-            var messageExtractor = GetService<MessageExtractor>();
-            var command = await messageExtractor.ExtractAsync(queuedCommand!.Data).ConfigureAwait(false);
-            return (TCommand)command;
-        }
     }
 }

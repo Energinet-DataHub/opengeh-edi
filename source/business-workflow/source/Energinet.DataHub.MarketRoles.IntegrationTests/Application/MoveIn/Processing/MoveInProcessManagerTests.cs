@@ -65,16 +65,6 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn.Proc
             Assert.True(processManager.IsCompleted());
         }
 
-        private async Task<TCommand> GetEnqueuedCommandAsync<TCommand>(BusinessProcessId businessProcessId)
-        {
-            var type = typeof(TCommand).FullName;
-            var queuedCommand = await MarketRolesContext.QueuedInternalCommands
-                .SingleOrDefaultAsync(command =>
-                    command.Type.Equals(type) && command.BusinessProcessId.Equals(businessProcessId.Value));
-
-            return Serializer.Deserialize<TCommand>(queuedCommand.Data);
-        }
-
         private async Task<(Transaction, BusinessProcessId)> SetupScenario()
         {
             _ = CreateAccountingPoint();

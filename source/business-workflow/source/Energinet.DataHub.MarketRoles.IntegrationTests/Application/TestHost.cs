@@ -50,6 +50,7 @@ using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventD
 using Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
+using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integration;
 using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using FluentValidation;
@@ -211,6 +212,42 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
         protected Task InvokeCommandAsync(InternalCommand command)
         {
             return GetService<IMediator>().Send(command, CancellationToken.None);
+        }
+
+        protected async Task<TCommand> GetEnqueuedCommandAsync<TCommand>()
+        {
+            var type = typeof(TCommand).FullName;
+            var queuedCommand = MarketRolesContext.QueuedInternalCommands
+                .FirstOrDefault(queuedInternalCommand =>
+                    queuedInternalCommand.BusinessProcessId.Equals(_businessProcessId.Value) &&
+                    queuedInternalCommand.Type.Equals(type));
+
+            if (queuedCommand is null)
+            {
+                return default(TCommand);
+            }
+
+            var messageExtractor = GetService<MessageExtractor>();
+            var command = await messageExtractor.ExtractAsync(queuedCommand!.Data).ConfigureAwait(false);
+            return (TCommand)command;
+        }
+
+        protected async Task<TCommand> GetEnqueuedCommandAsync<TCommand>(BusinessProcessId businessProcessId)
+        {
+            var type = typeof(TCommand).FullName;
+            var queuedCommand = MarketRolesContext.QueuedInternalCommands
+                .FirstOrDefault(queuedInternalCommand =>
+                    queuedInternalCommand.BusinessProcessId.Equals(businessProcessId.Value) &&
+                    queuedInternalCommand.Type.Equals(type));
+
+            if (queuedCommand is null)
+            {
+                return default(TCommand);
+            }
+
+            var messageExtractor = GetService<MessageExtractor>();
+            var command = await messageExtractor.ExtractAsync(queuedCommand!.Data).ConfigureAwait(false);
+            return (TCommand)command;
         }
 
         protected Consumer CreateConsumer()
