@@ -60,6 +60,11 @@ message ChangeSupplier {
   string Transaction = 2;
 }
 
+message EffectuateConsumerMoveIn {
+  string AccountingPointId = 1;
+  string Transaction = 2;
+}
+
 message MarketRolesEnvelope {
   oneof MarketRolesMessages {
     RequestChangeOfSupplier requestChangeOfSupplier = 1;
@@ -67,6 +72,7 @@ message MarketRolesEnvelope {
     ForwardConsumerDetails forwardConsumerDetails = 3;
     NotifyCurrentSupplier notifyCurrentSupplier = 4;
     ForwardMeteringPointDetails forwardMeteringPointDetails = 5;
-    ChangeSupplier changeSupplier = 6; 
+    ChangeSupplier changeSupplier = 6;
+    EffectuateConsumerMoveIn effectuateConsumerMoveIn = 7;
   }
 }
