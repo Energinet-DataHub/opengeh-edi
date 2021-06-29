@@ -12,21 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Energinet.DataHub.MarketRoles.Infrastructure.Integration;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.ChangeOfSupplier;
+using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.Helpers
+namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox.EventHandlers
 {
-    public static class IntegrationEventTypeFactory
+    public class EnergySupplierChangedDispatcher : IntegrationEventDispatcher<EnergySupplierChangedTopic, EnergySupplierChangedIntegrationEvent>
     {
-        public static Type GetType(string type)
+        public EnergySupplierChangedDispatcher(
+            ITopicSender<EnergySupplierChangedTopic> topicSender,
+            ProtobufOutboundMapper<EnergySupplierChangedIntegrationEvent> mapper)
+            : base(topicSender, mapper)
         {
-            if (typeof(EnergySupplierChangedIntegrationEvent).FullName == type)
-            {
-                return typeof(EnergySupplierChangedIntegrationEvent);
-            }
-
-            throw new ArgumentException("Integration Event type is not implemented.");
         }
     }
 }
