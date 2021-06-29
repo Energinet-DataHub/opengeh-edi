@@ -18,6 +18,7 @@ using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketRoles.Application.Common.Users;
 using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
+using Energinet.DataHub.MarketRoles.Infrastructure.Users;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.Ingestion
 {
