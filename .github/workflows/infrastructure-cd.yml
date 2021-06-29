@@ -140,9 +140,7 @@ jobs:
           echo "::set-output name=sql-server-connectionstring::$(terraform output marketroles_connection_string)"
         continue-on-error: false
 
-      # - name: Applying market data migrations
-      #   uses: ./.github/actions/apply-database-migrations
-      #   with:
-      #     sql-server-connectionstring: "${{ steps.terraform-apply.outputs.marketroles_connection_string }}"
-      #     # sql-server-connectionstring: ${{ steps.terraform-apply.outputs.marketroles_connection_string }}
-      #     # environment-name: ${{ matrix.environment.name }}
+      - name: Applying market data migrations
+        uses: ./.github/actions/apply-database-migrations
+        with:
+          sql-server-connectionstring: ${{ steps.terraform-apply.outputs.sql-server-connectionstring }}
