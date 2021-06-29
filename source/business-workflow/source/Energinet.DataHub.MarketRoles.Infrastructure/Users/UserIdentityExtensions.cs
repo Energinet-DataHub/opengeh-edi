@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketRoles.Application.Common.Users
+namespace Energinet.DataHub.MarketRoles.Infrastructure.Users
 {
     public static class UserIdentityExtensions
     {
-        public static string AsString(this UserIdentity userIdentity)
+        public static string AsString(this Application.Common.Users.UserIdentity userIdentity)
         {
             return System.Text.Json.JsonSerializer.Serialize(userIdentity);
         }

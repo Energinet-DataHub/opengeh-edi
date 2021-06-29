@@ -52,8 +52,4 @@ limitations under the License.
     <ProjectReference Include="..\Energinet.DataHub.MarketRoles.Application\Energinet.DataHub.MarketRoles.Application.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Processing\Mappers" />
-  </ItemGroup>
-
 </Project>
