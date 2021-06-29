@@ -116,6 +116,7 @@ CREATE TABLE [dbo].[QueuedInternalCommands](
     [Type] [nvarchar](255) NOT NULL,
     [Data] [varbinary](max) NOT NULL,
     [ScheduleDate] [datetime2](1) NULL,
+    [DispatchedDate] [datetime2](1) NULL,
     [ProcessedDate] [datetime2](1) NULL,
     [CreationDate] [datetime2](7) NOT NULL,
     [BusinessProcessId] [uniqueidentifier] NULL,

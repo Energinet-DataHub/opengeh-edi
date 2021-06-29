@@ -48,13 +48,9 @@ using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.Chang
 using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.MoveIn;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.ChangeOfSupplier;
 using Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands;
-using Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands.Protobuf;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
-using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
-using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integration;
-using Energinet.DataHub.MarketRoles.InternalCommandContracts;
 using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using FluentValidation;
 using MediatR;
@@ -65,7 +61,6 @@ using NodaTime;
 using Xunit;
 using RequestChangeOfSupplier = Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.RequestChangeOfSupplier;
 using RequestMoveIn = Energinet.DataHub.MarketRoles.Application.MoveIn.RequestMoveIn;
-using TestCommand = Energinet.DataHub.MarketRoles.Application.TestCommand;
 
 namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 {
@@ -109,7 +104,6 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             {
                 typeof(RequestChangeOfSupplierHandler).Assembly,
                 typeof(PublishWhenEnergySupplierHasChanged).Assembly,
-                typeof(TestCommand).Assembly,
             });
 
             // Actor Notification handlers

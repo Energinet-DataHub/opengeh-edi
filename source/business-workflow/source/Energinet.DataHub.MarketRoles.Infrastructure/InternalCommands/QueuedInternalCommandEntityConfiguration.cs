@@ -32,6 +32,8 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands
                 .HasColumnName("Type");
             builder.Property(x => x.CreationDate)
                 .HasColumnName("CreationDate");
+            builder.Property(x => x.DispatchedDate)
+                .HasColumnName("DispatchedDate");
             builder.Property(x => x.ProcessedDate)
                 .HasColumnName("ProcessedDate");
             builder.Property(x => x.ScheduleDate)
