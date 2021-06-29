@@ -57,7 +57,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.DataAccess
                 return;
             }
 
-            _connection.Dispose();
+            _connection?.Dispose();
             _disposed = true;
         }
     }

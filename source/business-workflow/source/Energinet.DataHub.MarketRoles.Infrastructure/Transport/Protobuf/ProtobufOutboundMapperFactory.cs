@@ -14,6 +14,7 @@
 
 using System;
 using Energinet.DataHub.MarketRoles.Application.Common.Transport;
+using SimpleInjector;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf
 {
@@ -23,15 +24,15 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf
     public sealed class ProtobufOutboundMapperFactory
     {
         private static readonly Type _protobufMapperType = typeof(ProtobufOutboundMapper<>);
-        private readonly IServiceProvider _serviceProvider;
+        private readonly Container _container;
 
         /// <summary>
         /// Create a mapper factory
         /// </summary>
-        /// <param name="serviceProvider">Current service provider</param>
-        public ProtobufOutboundMapperFactory(IServiceProvider serviceProvider)
+        /// <param name="container"></param>
+        public ProtobufOutboundMapperFactory(Container container)
         {
-            _serviceProvider = serviceProvider;
+            _container = container;
         }
 
         /// <summary>
@@ -45,7 +46,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
             var typeToLocate = _protobufMapperType.MakeGenericType(message.GetType());
-            var mapper = _serviceProvider.GetService(typeToLocate) as ProtobufOutboundMapper;
+            var mapper = _container.GetInstance(typeToLocate) as ProtobufOutboundMapper;
 
             return mapper ?? throw new InvalidOperationException("Mapper not found");
         }

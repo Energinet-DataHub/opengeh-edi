@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketRoles.Application.Common.Transport;
-using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
-using MediatR;
-using NodaTime;
-
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn
+namespace Energinet.DataHub.MarketRoles.Infrastructure.Users
 {
-    public record ConsumerMovedInIntegrationEvent(string GsrnNumber, Instant MoveInDate) : IIntegrationEvent, IRequest, IOutboundMessage;
+    public static class UserIdentityExtensions
+    {
+        public static string AsString(this Application.Common.Users.UserIdentity userIdentity)
+        {
+            return System.Text.Json.JsonSerializer.Serialize(userIdentity);
+        }
+    }
 }
