@@ -15,6 +15,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketRoles.Application.Common.Commands;
+using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
 using JetBrains.Annotations;
 using MediatR;
@@ -25,16 +27,26 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.BusinessRequestProcessing
         where TRequest : IRequest<TResponse>
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly MarketRolesContext _context;
+        private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
-        public UnitOfWorkBehaviour(IUnitOfWork unitOfWork)
+        public UnitOfWorkBehaviour(IUnitOfWork unitOfWork, MarketRolesContext context, ISystemDateTimeProvider systemDateTimeProvider)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _systemDateTimeProvider = systemDateTimeProvider ?? throw new ArgumentNullException(nameof(systemDateTimeProvider));
         }
 
         public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
         {
             if (next == null) throw new ArgumentNullException(nameof(next));
             var result = await next().ConfigureAwait(false);
+
+            if (request is InternalCommand command)
+            {
+                var queuedCommand = await _context.QueuedInternalCommands.FindAsync(command.Id).ConfigureAwait(false);
+                queuedCommand?.SetProcessed(_systemDateTimeProvider.Now());
+            }
 
             await _unitOfWork.CommitAsync().ConfigureAwait(false);
 
