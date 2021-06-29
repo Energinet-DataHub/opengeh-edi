@@ -37,9 +37,36 @@ message RequestMoveIn {
   google.protobuf.Timestamp MoveInDate = 7;
 }
 
+message ForwardConsumerDetails {
+  string AccountingPointId = 1;
+  string BusinessProcessId = 2;
+  string Transaction = 3;
+}
+
+message NotifyCurrentSupplier {
+  string AccountingPointId = 1;
+  string BusinessProcessId = 2;
+  string Transaction = 3;
+}
+
+message ForwardMeteringPointDetails {
+  string AccountingPointId = 1;
+  string BusinessProcessId = 2;
+  string Transaction = 3;
+}
+
+message ChangeSupplier {
+  string AccountingPointId = 1;
+  string Transaction = 2;
+}
+
 message MarketRolesEnvelope {
   oneof MarketRolesMessages {
     RequestChangeOfSupplier requestChangeOfSupplier = 1;
     RequestMoveIn requestMoveIn = 2;
+    ForwardConsumerDetails forwardConsumerDetails = 3;
+    NotifyCurrentSupplier notifyCurrentSupplier = 4;
+    ForwardMeteringPointDetails forwardMeteringPointDetails = 5;
+    ChangeSupplier changeSupplier = 6; 
   }
 }

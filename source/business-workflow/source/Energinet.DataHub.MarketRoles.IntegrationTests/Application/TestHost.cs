@@ -17,7 +17,6 @@ using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Application;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.ConsumerDetails;
@@ -28,8 +27,8 @@ using Energinet.DataHub.MarketRoles.Application.Common;
 using Energinet.DataHub.MarketRoles.Application.Common.Commands;
 using Energinet.DataHub.MarketRoles.Application.Common.DomainEvents;
 using Energinet.DataHub.MarketRoles.Application.Common.Processing;
-using Energinet.DataHub.MarketRoles.Application.MoveIn;
 using Energinet.DataHub.MarketRoles.Application.MoveIn.Validation;
+using Energinet.DataHub.MarketRoles.Contracts;
 using Energinet.DataHub.MarketRoles.Domain.Consumers;
 using Energinet.DataHub.MarketRoles.Domain.EnergySuppliers;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
@@ -49,8 +48,13 @@ using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.Chang
 using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.MoveIn;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.ChangeOfSupplier;
 using Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands;
+using Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands.Protobuf;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
+using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
+using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
+using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integration;
+using Energinet.DataHub.MarketRoles.InternalCommandContracts;
 using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using FluentValidation;
 using MediatR;
@@ -59,6 +63,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Xunit;
+using RequestChangeOfSupplier = Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.RequestChangeOfSupplier;
+using RequestMoveIn = Energinet.DataHub.MarketRoles.Application.MoveIn.RequestMoveIn;
+using TestCommand = Energinet.DataHub.MarketRoles.Application.TestCommand;
 
 namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 {
@@ -74,6 +81,12 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
             var services = new ServiceCollection();
 
+            services.SendProtobuf<MarketRolesEnvelope>();
+            services.ReceiveProtobuf<MarketRolesEnvelope>(
+                config => config
+                    .FromOneOf(envelope => envelope.MarketRolesMessagesCase)
+                    .WithParser(() => MarketRolesEnvelope.Parser));
+
             services.AddDbContext<MarketRolesContext>(x =>
                 x.UseSqlServer(ConnectionString, y => y.UseNodaTime()));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -84,6 +97,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             services.AddScoped<IConsumerRepository, ConsumerRepository>();
             services.AddScoped<IJsonSerializer, JsonSerializer>();
             services.AddScoped<IOutbox, OutboxProvider>();
+            services.AddScoped<IOutboxManager, OutboxManager>();
             services.AddSingleton<IOutboxMessageFactory, OutboxMessageFactory>();
             services.AddScoped<ICommandScheduler, CommandScheduler>();
             services.AddScoped<IDomainEventsAccessor, DomainEventsAccessor>();
@@ -95,6 +109,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             {
                 typeof(RequestChangeOfSupplierHandler).Assembly,
                 typeof(PublishWhenEnergySupplierHasChanged).Assembly,
+                typeof(TestCommand).Assembly,
             });
 
             // Actor Notification handlers
