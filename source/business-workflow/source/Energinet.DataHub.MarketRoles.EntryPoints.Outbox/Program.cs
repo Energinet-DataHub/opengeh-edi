@@ -20,13 +20,16 @@ using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common.MediatR;
+using Energinet.DataHub.MarketRoles.EntryPoints.Common.SimpleInjector;
+using Energinet.DataHub.MarketRoles.EntryPoints.Outbox.EventHandlers;
 using Energinet.DataHub.MarketRoles.Infrastructure;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration;
-using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.MoveIn;
+using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.ChangeOfSupplier;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.Services;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
+using Energinet.DataHub.MarketRoles.IntegrationEventContracts;
 using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -83,8 +86,8 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
                 Lifestyle.Singleton);
 
             container.Register(
-                () => new ConsumerRegisteredTopic(Environment.GetEnvironmentVariable("CONSUMER_REGISTERED_TOPIC") ?? throw new InvalidOperationException(
-                    "No Consumer Registered Topic found")),
+                () => new EnergySupplierChangedTopic(Environment.GetEnvironmentVariable("ENERGY_SUPPLIER_CHANGED_TOPIC") ?? throw new InvalidOperationException(
+                    "No EnergySupplierChanged Topic found")),
                 Lifestyle.Singleton);
 
             container.Register(typeof(ITopicSender<>), typeof(TopicSender<>), Lifestyle.Singleton);
@@ -93,8 +96,16 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
                 new[]
                 {
                     typeof(ConsumerMoveInAccepted).Assembly,
+                    typeof(EnergySupplierChangedDispatcher).Assembly,
                 },
                 Array.Empty<Type>());
+
+            container.AddProtobufMessageSerializer();
+            container.AddProtobufOutboundMappers(
+                new[]
+                {
+                    typeof(EnergySupplierChangedIntegrationEvent).Assembly,
+                });
         }
     }
 }
