@@ -114,7 +114,7 @@ CREATE TABLE [dbo].[QueuedInternalCommands](
     [Id] [uniqueidentifier] NOT NULL,
     [RecordId] [int] IDENTITY(1,1) NOT NULL,
     [Type] [nvarchar](255) NOT NULL,
-    [Data] [nvarchar](max) NOT NULL,
+    [Data] [varbinary](max) NOT NULL,
     [ScheduleDate] [datetime2](1) NULL,
     [ProcessedDate] [datetime2](1) NULL,
     [CreationDate] [datetime2](7) NOT NULL,
