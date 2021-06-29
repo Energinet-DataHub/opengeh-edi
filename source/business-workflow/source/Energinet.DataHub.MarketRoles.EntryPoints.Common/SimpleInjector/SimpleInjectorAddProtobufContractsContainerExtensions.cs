@@ -26,7 +26,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Common.SimpleInjector
 {
     public static class SimpleInjectorAddProtobufContractsContainerExtensions
     {
-        public static void AddProtobufOutBoundMappers(this Container container, Assembly[] applicationAssemblies)
+        public static void AddProtobufOutboundMappers(this Container container, Assembly[] applicationAssemblies)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             var assemblies = GetAssemblies().Union(applicationAssemblies).ToArray();

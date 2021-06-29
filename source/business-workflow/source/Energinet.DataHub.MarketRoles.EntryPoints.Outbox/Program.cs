@@ -101,7 +101,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
                 Array.Empty<Type>());
 
             container.AddProtobufMessageSerializer();
-            container.AddProtobufOutBoundMappers(
+            container.AddProtobufOutboundMappers(
                 new[]
                 {
                     typeof(EnergySupplierChangedIntegrationEvent).Assembly,
