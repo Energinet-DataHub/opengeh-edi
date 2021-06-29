@@ -46,6 +46,8 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands
 
         public Instant? DispatchedDate { get; private set; }
 
+        public long SequenceId { get; private set; }
+
         public void SetProcessed(Instant now)
         {
             ProcessedDate = now;
@@ -54,6 +56,11 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands
         public void SetDispatched(Instant now)
         {
             DispatchedDate = now;
+        }
+
+        public void SetSequenceId(long sequenceId)
+        {
+            SequenceId = sequenceId;
         }
     }
 }
