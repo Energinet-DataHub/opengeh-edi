@@ -105,3 +105,9 @@ dk
 energinet
 greenenergyhub
 thirdparty
+EnergySupplierChanged
+FutureEnergySupplierChangeAccepted
+FutureEnergySupplierChangeCancelled
+EffectiveDate
+EnergySupplierGLN
+TransactionId
