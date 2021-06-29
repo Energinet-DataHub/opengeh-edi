@@ -43,7 +43,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Processing
 
         [Function("QueueSubscriber")]
         public async Task RunAsync(
-            [ServiceBusTrigger("sbq-marketroles", Connection = "MARKET_DATA_QUEUE_CONNECTION_STRING")] byte[] data,
+            [ServiceBusTrigger("%MARKET_DATA_QUEUE_TOPIC_NAME%", Connection = "MARKET_DATA_QUEUE_CONNECTION_STRING")] byte[] data,
             FunctionContext context)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
