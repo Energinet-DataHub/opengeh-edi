@@ -143,6 +143,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Processing
                     typeof(AuthorizationBehaviour<,>),
                     typeof(InputValidationBehaviour<,>),
                     typeof(DomainEventsDispatcherBehaviour<,>),
+                    typeof(InternalCommandHandlingBehaviour<,>),
                     typeof(BusinessProcessResponderBehaviour<,>),
                 });
 

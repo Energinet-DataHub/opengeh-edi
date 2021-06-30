@@ -136,10 +136,9 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
                 {
                     typeof(UnitOfWorkBehaviour<,>),
                     typeof(InputValidationBehaviour<,>),
-                    // typeof(AuthorizationBehavior<,>),
                     typeof(BusinessProcessResponderBehaviour<,>),
                     typeof(DomainEventsDispatcherBehaviour<,>),
-                    // typeof(ValidationReportsBehavior<,>),
+                    typeof(InternalCommandHandlingBehaviour<,>),
                 });
 
             _container.Verify();

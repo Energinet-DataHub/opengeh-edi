@@ -18,33 +18,35 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.Common.Commands;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
-using JetBrains.Annotations;
 using MediatR;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.BusinessRequestProcessing.Pipeline
 {
-    public class UnitOfWorkBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-        where TRequest : IRequest<TResponse>
+    public class InternalCommandHandlingBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+     where TRequest : InternalCommand
     {
-        private readonly IUnitOfWork _unitOfWork;
         private readonly MarketRolesContext _context;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
-        public UnitOfWorkBehaviour(IUnitOfWork unitOfWork, MarketRolesContext context, ISystemDateTimeProvider systemDateTimeProvider)
+        public InternalCommandHandlingBehaviour(MarketRolesContext context, ISystemDateTimeProvider systemDateTimeProvider)
         {
-            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _systemDateTimeProvider = systemDateTimeProvider ?? throw new ArgumentNullException(nameof(systemDateTimeProvider));
         }
 
         public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
         {
+            if (request == null) throw new ArgumentNullException(nameof(request));
             if (next == null) throw new ArgumentNullException(nameof(next));
-            var result = await next().ConfigureAwait(false);
 
-            await _unitOfWork.CommitAsync().ConfigureAwait(false);
+            await MarkAsProcessedAsync(request).ConfigureAwait(false);
+            return await next().ConfigureAwait(false);
+        }
 
-            return result;
+        private async Task MarkAsProcessedAsync(TRequest request)
+        {
+            var queuedCommand = await _context.QueuedInternalCommands.FindAsync(request.Id).ConfigureAwait(false);
+            queuedCommand?.SetProcessed(_systemDateTimeProvider.Now());
         }
     }
 }
