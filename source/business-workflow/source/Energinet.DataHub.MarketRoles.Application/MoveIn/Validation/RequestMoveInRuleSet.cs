@@ -12,11 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Data;
+using Energinet.DataHub.MarketRoles.Application.Common.Validation;
+using Energinet.DataHub.MarketRoles.Application.Consumers.Validation;
 using FluentValidation;
 
 namespace Energinet.DataHub.MarketRoles.Application.MoveIn.Validation
 {
     public class RequestMoveInRuleSet : AbstractValidator<RequestMoveIn>
     {
+        public RequestMoveInRuleSet()
+        {
+            RuleFor(request => request.AccountingPointGsrnNumber).SetValidator(new GsrnNumberMustBeValidRule());
+            RuleFor(request => request.SocialSecurityNumber)
+                .SetValidator(new SocialSecurityNumberMustBeValid())
+                .When(x => !string.IsNullOrEmpty(x.SocialSecurityNumber));
+            RuleFor(request => request.VATNumber)
+                .SetValidator(new VATNumberMustBeValidRule())
+                .When(x => !string.IsNullOrEmpty(x.VATNumber));
+        }
     }
 }
