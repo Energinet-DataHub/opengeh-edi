@@ -29,7 +29,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.MoveIn.Validation
     public class RequestMoveInRuleSetTests
     {
         [Fact]
-        public void Validate_WhenSocialSecurityNumber_IsSuccess()
+        public void Validate_When_SocialSecurityNumber_Is_Valid()
         {
             var request = CreateRequest(SampleData.ConsumerSocialSecurityNumber, SampleData.ConsumerVATNumber);
 
@@ -39,7 +39,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.MoveIn.Validation
         }
 
         [Fact]
-        public void Validate_NotRun_WhenSocialSecurityNumberIsEmpty_IsFailure()
+        public void Validate_That_SocialSecurityNumber_Validation_Is_Not_Run_When_SocialSecurityNumber_Is_Empty()
         {
             var request = CreateRequest(string.Empty, SampleData.ConsumerVATNumber);
 
@@ -49,7 +49,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.MoveIn.Validation
         }
 
         [Fact]
-        public void Validate_WhenSocialSecurityNumber_IsFailure()
+        public void Validate_Fails_When_SocialSecurityNumber_Has_Invalid_Date()
         {
             var request = CreateRequest("2091202120", SampleData.ConsumerVATNumber);
 
@@ -59,7 +59,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.MoveIn.Validation
         }
 
         [Fact]
-        public void Validate_WhenSocialSecurityNumberIsWrongLength_IsFailure()
+        public void Validate_Fails_When_SocialSecurityNumber_Is_Wrong_Length()
         {
             var request = CreateRequest("209120", SampleData.ConsumerVATNumber);
 
@@ -69,7 +69,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.MoveIn.Validation
         }
 
         [Fact]
-        public void Validate_WhenVATNumber_IsSuccess()
+        public void Validate_When_VATNumber_Is_Valid()
         {
             var request = CreateRequest(SampleData.ConsumerSocialSecurityNumber, SampleData.ConsumerVATNumber);
 
@@ -79,7 +79,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.MoveIn.Validation
         }
 
         [Fact]
-        public void Validate_NotRun_WhenVATNumberIsEmpty_IsFailure()
+        public void Validate_That_SocialSecurityNumber_Validation_Is_Not_Run_When_VATNUmber_Is_Empty()
         {
             var request = CreateRequest(SampleData.ConsumerSocialSecurityNumber, string.Empty);
 
@@ -89,7 +89,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.MoveIn.Validation
         }
 
         [Fact]
-        public void Validate_WhenVATNumberIsWrongLength_IsFailure()
+        public void Validate_Fails_When_VATNumber_Is_Wrong_Length()
         {
             var request = CreateRequest(SampleData.ConsumerSocialSecurityNumber, "0998768");
 
@@ -99,7 +99,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.MoveIn.Validation
         }
 
         [Fact]
-        public void Validate_WhenVATNumberIsOutOfBound_IsFailure()
+        public void Validate_Fails_When_VATNumber_Is_OutOfBound()
         {
             var request = CreateRequest(SampleData.ConsumerSocialSecurityNumber, "09987680");
 
