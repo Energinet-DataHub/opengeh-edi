@@ -15,6 +15,7 @@
 using System;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration
 {
@@ -28,14 +29,19 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration
         public TopicSender(ServiceBusClient client, TTopic topic)
         {
             if (topic == null) throw new ArgumentNullException(nameof(topic));
-            _client = client;
+
+            _client = client ?? throw new ArgumentNullException(nameof(client));
             _senderCreator = new Lazy<ServiceBusSender>(() => _client.CreateSender(topic.Name));
             _topicName = topic.Name;
         }
 
         public async Task SendMessageAsync(byte[] message)
         {
-            ServiceBusMessage serviceBusMessage = new(message) { Subject = _topicName };
+            ServiceBusMessage serviceBusMessage = new(message)
+            {
+                Subject = _topicName,
+                ContentType = "application/octet-stream;charset=utf-8",
+            };
             await _senderCreator.Value.SendMessageAsync(serviceBusMessage).ConfigureAwait(false);
         }
 

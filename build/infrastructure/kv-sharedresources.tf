@@ -11,7 +11,27 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 data "azurerm_key_vault" "kv_sharedresources" {
   name                = var.sharedresources_keyvault_name
   resource_group_name = var.sharedresources_resource_group_name
+}
+
+data "azurerm_key_vault_secret" "POST_OFFICE_QUEUE_CONNECTION_STRING" {
+  name         = "POST-OFFICE-QUEUE-CONNECTION-STRING"
+  key_vault_id = data.azurerm_key_vault.kv_sharedresources.id
+}
+
+data "azurerm_key_vault_secret" "SHARED_RESOURCES_DB_ADMIN_NAME" {
+  name         = "SHARED-RESOURCES-DB-ADMIN-NAME"
+  key_vault_id = data.azurerm_key_vault.kv_sharedresources.id
+}
+
+data "azurerm_key_vault_secret" "SHARED_RESOURCES_DB_ADMIN_PASSWORD" {
+  name         = "SHARED-RESOURCES-DB-ADMIN-PASSWORD"
+  key_vault_id = data.azurerm_key_vault.kv_sharedresources.id
+}
+data "azurerm_key_vault_secret" "SHARED_RESOURCES_DB_URL" {
+  name         = "SHARED-RESOURCES-DB-URL"
+  key_vault_id = data.azurerm_key_vault.kv_sharedresources.id
 }

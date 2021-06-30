@@ -43,4 +43,9 @@ variable "sharedresources_resource_group_name" {
 variable "sharedresources_integrationevents_service_bus_namespace_name" {
   type          = string
   description   = "Namespace of the shared integration event service bus"
+}  
+  
+variable "sharedresources_sql_server_name" {
+  type          = string
+  description   = "Name of the SQL server"
 }

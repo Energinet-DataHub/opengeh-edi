@@ -115,6 +115,7 @@ jobs:
           echo "TF_VAR_sharedresources_keyvault_name=${{ secrets.SHAREDRESOURCES_KEYVAULT_NAME }}" >> $GITHUB_ENV
           echo "TF_VAR_sharedresources_resource_group_name=${{ secrets.SHAREDRESOURCES_RESOURCE_GROUP_NAME }}" >> $GITHUB_ENV
           echo "TF_VAR_sharedresources_integrationevents_service_bus_namespace_name=${{ secrets.SHAREDRESOURCES_INTEGRATIONEVENTS_SERVICE_BUS_NAMESPACE_NAME }}" >> $GITHUB_ENV
+          echo "TF_VAR_sharedresources_sql_server_name=${{ secrets.SHAREDRESOURCES_SQL_SERVER_NAME }}" >> $GITHUB_ENV
 
       - name: Configure Terraform Backend
         uses: ./.github/actions/configure-terraform-backend
@@ -136,11 +137,10 @@ jobs:
         working-directory: ./build/infrastructure
         run: |
           terraform apply -no-color -auto-approve
+          echo "::set-output name=sql-server-connectionstring::$(terraform output marketroles_connection_string)"
         continue-on-error: false
 
-      # - name: Applying market data migrations
-      #   uses: ./.github/actions/apply-database-migrations
-      #   with:
-      #     kv_market_roles_db_connection_string_secret_name: ${{ steps.terraform-apply.outputs.kv-market-roles-db-connection-string-secret-name }}
-      #     kv_market_roles_name: ${{ steps.terraform-apply.outputs.kv-market-roles-name }}
-      #     csproj_file_path: ${{ env.MIGRATION_PROJECT_CSPROJ_FILE_PATH }}
+      - name: Applying market data migrations
+        uses: ./.github/actions/apply-database-migrations
+        with:
+          sql-server-connectionstring: ${{ steps.terraform-apply.outputs.sql-server-connectionstring }}

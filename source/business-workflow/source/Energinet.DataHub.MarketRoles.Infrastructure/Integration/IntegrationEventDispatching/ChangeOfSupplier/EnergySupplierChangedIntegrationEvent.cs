@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.MarketRoles.Application.Common.Transport;
+using MediatR;
 using NodaTime;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.ChangeOfSupplier
@@ -21,5 +23,5 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEv
             string GsrnNumber,
             string EnergySupplierGln,
             Instant StartOfSupplyDate)
-        : IIntegrationEvent;
+        : IIntegrationEvent, IRequest, IOutboundMessage;
 }
