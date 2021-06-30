@@ -27,7 +27,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.Consumers
         {
             ConsumerId = consumerId ?? throw new ArgumentNullException(nameof(consumerId));
             CprNumber = cprNumber ?? throw new ArgumentNullException(nameof(cprNumber));
-            AddDomainEvent(new ConsumerCreated(ConsumerId.Value, CprNumber.Value, CvrNumber?.Value, _name.FullName));
+            AddDomainEvent(new ConsumerCreated(ConsumerId.Value, CprNumber.Value, null, _name.FullName));
         }
 
         public Consumer(ConsumerId consumerId, CvrNumber cvrNumber, ConsumerName name)
@@ -35,7 +35,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.Consumers
         {
             ConsumerId = consumerId ?? throw new ArgumentNullException(nameof(consumerId));
             CvrNumber = cvrNumber ?? throw new ArgumentNullException(nameof(cvrNumber));
-            AddDomainEvent(new ConsumerCreated(ConsumerId.Value, CprNumber?.Value, CvrNumber.Value, _name.FullName));
+            AddDomainEvent(new ConsumerCreated(ConsumerId.Value, null, CvrNumber.Value, _name.FullName));
         }
 
         private Consumer(ConsumerId consumerId, ConsumerName name)
