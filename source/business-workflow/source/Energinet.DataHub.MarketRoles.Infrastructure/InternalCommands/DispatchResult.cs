@@ -12,25 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketRoles.Application.Common.Transport;
-using MediatR;
-
-namespace Energinet.DataHub.MarketRoles.Application.Common.Commands
+namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands
 {
-    #pragma warning disable CA1040
-    /// <summary>
-    /// CQRS command object
-    /// </summary>
-    public interface ICommand : IRequest, IOutboundMessage, IInboundMessage
+    public class DispatchResult
     {
-    }
+        private DispatchResult(long sequenceId)
+        {
+            SequenceId = sequenceId;
+        }
 
-    /// <summary>
-    /// CQRS command with result
-    /// </summary>
-    /// <typeparam name="TResult"><see cref="IRequest"/></typeparam>
-    public interface ICommand<out TResult> : IRequest<TResult>, IOutboundMessage, IInboundMessage
-    {
+        public long SequenceId { get; }
+
+        public static DispatchResult Create(long sequenceNumber)
+        {
+            return new DispatchResult(sequenceNumber);
+        }
     }
-    #pragma warning restore
 }

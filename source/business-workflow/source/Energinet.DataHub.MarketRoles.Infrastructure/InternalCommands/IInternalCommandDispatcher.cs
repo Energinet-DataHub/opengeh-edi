@@ -12,25 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketRoles.Application.Common.Transport;
-using MediatR;
+using System.Threading.Tasks;
 
-namespace Energinet.DataHub.MarketRoles.Application.Common.Commands
+namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands
 {
-    #pragma warning disable CA1040
     /// <summary>
-    /// CQRS command object
+    /// Service dispatching internal commands to processing queue
     /// </summary>
-    public interface ICommand : IRequest, IOutboundMessage, IInboundMessage
+    public interface IInternalCommandDispatcher
     {
+        /// <summary>
+        /// Dispatch command to processing queue
+        /// </summary>
+        /// <param name="queuedInternalCommand"></param>
+        /// <returns><see cref="DispatchResult"/></returns>
+        Task<DispatchResult> DispatchAsync(QueuedInternalCommand queuedInternalCommand);
     }
-
-    /// <summary>
-    /// CQRS command with result
-    /// </summary>
-    /// <typeparam name="TResult"><see cref="IRequest"/></typeparam>
-    public interface ICommand<out TResult> : IRequest<TResult>, IOutboundMessage, IInboundMessage
-    {
-    }
-    #pragma warning restore
 }

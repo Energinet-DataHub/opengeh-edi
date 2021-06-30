@@ -12,25 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.MarketRoles.Application.Common.Transport;
-using MediatR;
+using Energinet.DataHub.MarketRoles.Contracts;
+using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
 
-namespace Energinet.DataHub.MarketRoles.Application.Common.Commands
+namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands.Protobuf.Mappers.ChangeOfSupplier
 {
-    #pragma warning disable CA1040
-    /// <summary>
-    /// CQRS command object
-    /// </summary>
-    public interface ICommand : IRequest, IOutboundMessage, IInboundMessage
+    public class ChangeSupplierInbound : ProtobufInboundMapper<MarketRoles.Contracts.ChangeSupplier>
     {
+        protected override IInboundMessage Convert(ChangeSupplier obj)
+        {
+            if (obj == null) throw new ArgumentNullException(nameof(obj));
+            return new Application.ChangeOfSupplier.Processing.ChangeSupplier(Guid.Parse(obj.AccountingPointId), obj.Transaction);
+        }
     }
-
-    /// <summary>
-    /// CQRS command with result
-    /// </summary>
-    /// <typeparam name="TResult"><see cref="IRequest"/></typeparam>
-    public interface ICommand<out TResult> : IRequest<TResult>, IOutboundMessage, IInboundMessage
-    {
-    }
-    #pragma warning restore
 }

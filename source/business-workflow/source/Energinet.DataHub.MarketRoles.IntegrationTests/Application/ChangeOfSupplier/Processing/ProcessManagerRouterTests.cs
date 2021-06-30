@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing;
@@ -22,6 +24,9 @@ using Energinet.DataHub.MarketRoles.Domain.Consumers;
 using Energinet.DataHub.MarketRoles.Domain.EnergySuppliers;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events;
+using Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands;
+using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
+using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Xunit.Categories;
@@ -157,16 +162,6 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
                 _transaction.Value,
                 _energySupplier.EnergySupplierId.Value,
                 EffectiveDate);
-        }
-
-        private async Task<TCommand> GetEnqueuedCommandAsync<TCommand>()
-        {
-            var type = typeof(TCommand).FullName;
-            var queuedCommand = await MarketRolesContext.QueuedInternalCommands
-                .SingleOrDefaultAsync(command =>
-                command.Type.Equals(type) && command.BusinessProcessId.Equals(_businessProcessId.Value));
-
-            return Serializer.Deserialize<TCommand>(queuedCommand.Data);
         }
     }
 }

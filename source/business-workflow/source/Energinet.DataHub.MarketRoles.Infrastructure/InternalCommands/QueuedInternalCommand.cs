@@ -19,9 +19,9 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands
 {
     public class QueuedInternalCommand
     {
-        public QueuedInternalCommand(string type, string data, Instant creationDate, Guid businessProcessId, Instant? scheduleDate)
+        public QueuedInternalCommand(Guid id, string type, byte[] data, Instant creationDate, Guid businessProcessId, Instant? scheduleDate)
         {
-            Id = Guid.NewGuid();
+            Id = id;
             Type = type;
             Data = data;
             CreationDate = creationDate;
@@ -31,9 +31,10 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands
 
         public Guid Id { get; }
 
-        public string Type { get; private set; } = string.Empty;
+        public string Type { get;  } = string.Empty;
 
-        public string Data { get; private set; } = string.Empty;
+        #pragma warning disable CA1819 // Properties should not return arrays
+        public byte[] Data { get; }
 
         public Instant CreationDate { get; private set; }
 
@@ -42,5 +43,24 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands
         public Instant? ProcessedDate { get; set; }
 
         public Guid BusinessProcessId { get; private set; }
+
+        public Instant? DispatchedDate { get; private set; }
+
+        public long SequenceId { get; private set; }
+
+        public void SetProcessed(Instant now)
+        {
+            ProcessedDate = now;
+        }
+
+        public void SetDispatched(Instant now)
+        {
+            DispatchedDate = now;
+        }
+
+        public void SetSequenceId(long sequenceId)
+        {
+            SequenceId = sequenceId;
+        }
     }
 }

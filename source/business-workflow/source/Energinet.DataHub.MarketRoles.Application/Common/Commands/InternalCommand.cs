@@ -13,21 +13,22 @@
 // limitations under the License.
 
 using System;
+using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.MarketRoles.Application.Common.Commands
 {
     public abstract class InternalCommand : ICommand
     {
-        protected InternalCommand(Guid id)
-        {
-            Id = id;
-        }
-
         protected InternalCommand()
         {
             Id = Guid.NewGuid();
         }
 
-        public Guid Id { get; }
+        protected InternalCommand(Guid id)
+        {
+            Id = id;
+        }
+
+        public Guid Id { get; protected set; }
     }
 }
