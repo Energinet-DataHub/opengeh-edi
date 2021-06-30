@@ -71,7 +71,7 @@ namespace Energinet.DataHub.MarketRoles.Application.Common
         {
             ValidationErrors = rules
                 .Where(r => r.IsBroken)
-                .Select(r => r.Error)
+                .Select(r => r.ValidationError)
                 .ToList();
         }
     }

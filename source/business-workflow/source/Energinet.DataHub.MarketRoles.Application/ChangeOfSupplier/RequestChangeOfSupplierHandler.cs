@@ -14,6 +14,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Validation;
@@ -85,7 +87,7 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
             var validationResult =
                 _accountingPoint!.ChangeSupplierAcceptable(_energySupplier!.EnergySupplierId, _request!.StartDate, _systemTimeProvider);
 
-            return new BusinessProcessResult(_request.TransactionId, validationResult.Errors.AsReadOnly());
+            return new BusinessProcessResult(_request.TransactionId, validationResult.Errors.ToList().AsReadOnly());
         }
 
         private Task<AccountingPoint> GetMeteringPointAsync(string gsrnNumber)

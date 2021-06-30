@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Energinet.DataHub.MarketRoles.Domain.Consumers.Rules;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
@@ -41,7 +41,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.Consumers
 
         public static BusinessRulesValidationResult CheckRules(string? cprValue)
         {
-            return new BusinessRulesValidationResult(new List<IBusinessRule>()
+            return new BusinessRulesValidationResult(new Collection<IBusinessRule>()
             {
                 new CprNumberFormatRule(cprValue),
             });

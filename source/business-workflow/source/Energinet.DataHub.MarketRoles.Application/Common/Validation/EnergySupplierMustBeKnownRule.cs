@@ -30,6 +30,6 @@ namespace Energinet.DataHub.MarketRoles.Application.Common.Validation
 
         public bool IsBroken { get; }
 
-        public ValidationError Error => new EnergySupplierMustBeKnownRuleError();
+        public ValidationError ValidationError => new EnergySupplierMustBeKnownRuleError();
     }
 }

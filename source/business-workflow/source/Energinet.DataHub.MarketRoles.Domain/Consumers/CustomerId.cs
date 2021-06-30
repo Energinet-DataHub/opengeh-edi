@@ -18,7 +18,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.Consumers
 {
     public abstract class CustomerId : ValueObject
     {
-        public CustomerId(string value)
+        protected CustomerId(string value)
         {
             Value = value;
         }
