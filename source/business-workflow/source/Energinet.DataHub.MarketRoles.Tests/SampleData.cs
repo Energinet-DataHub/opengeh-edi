@@ -28,8 +28,10 @@ namespace Energinet.DataHub.MarketRoles.Tests
 
         internal static string ConsumerName => "John Doe";
 
-        internal static string ConsumerCprNumber => "2601211234";
+        internal static string ConsumerSocialSecurityNumber => "2601211234";
 
-        internal static string ConsumerCvrNumber => "10000000";
+        internal static string ConsumerVATNumber => "10000000";
+
+        internal static string Transaction => Guid.NewGuid().ToString();
     }
 }

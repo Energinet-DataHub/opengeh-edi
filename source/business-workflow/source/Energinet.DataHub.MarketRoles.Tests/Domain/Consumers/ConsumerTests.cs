@@ -27,7 +27,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.Consumers
         [Fact]
         public void Create_UsingCprNumber_IsSuccessful()
         {
-            var cprNumber = CprNumber.Create(SampleData.ConsumerCprNumber);
+            var cprNumber = CprNumber.Create(SampleData.ConsumerSocialSecurityNumber);
             var name = ConsumerName.Create(SampleData.ConsumerName);
             var customer = new Consumer(CreateConsumerId(), cprNumber, name);
 
@@ -37,7 +37,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.Consumers
         [Fact]
         public void Create_UsingCvrNumber_IsSuccessful()
         {
-            var cvrNumber = CvrNumber.Create(SampleData.ConsumerCvrNumber);
+            var cvrNumber = CvrNumber.Create(SampleData.ConsumerVATNumber);
             var name = ConsumerName.Create(SampleData.ConsumerName);
             var customer = new Consumer(CreateConsumerId(), cvrNumber, name);
 
@@ -60,7 +60,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.Consumers
 
         private ConsumerName CreateName() => ConsumerName.Create(SampleData.ConsumerName);
 
-        private CprNumber CreateCprNumber() => CprNumber.Create(SampleData.ConsumerCprNumber);
+        private CprNumber CreateCprNumber() => CprNumber.Create(SampleData.ConsumerSocialSecurityNumber);
 
         private ConsumerId CreateConsumerId()
         {
