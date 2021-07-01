@@ -31,7 +31,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.XmlConverter
 
         public IEnumerable<IBusinessRequest> Map(XElement rootElement)
         {
-            XNamespace ns = rootElement.FirstAttribute?.Value ?? throw new ArgumentException("Found no namespace for XML Document");
+            XNamespace ns = rootElement.Attributes().FirstOrDefault(attr => attr.Name.LocalName == "cim")?.Value ?? throw new ArgumentException("Found no namespace for XML Document");
 
             var headerData = MapHeaderData(rootElement, ns);
 

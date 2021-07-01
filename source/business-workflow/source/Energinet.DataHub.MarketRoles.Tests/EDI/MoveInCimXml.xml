@@ -12,8 +12,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <cim:RequestChangeOfSupplier_MarketDocument
-        xmlns:cim="urn:ebix:org:ChangeOfSupplier:0:1"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:cim="urn:ebix:org:ChangeOfSupplier:0:1"
         xsi:schemaLocation="urn:ebix:org:ChangeOfSupplier:0:1 urn-ediel-org-RSM-001-ChangeOfSupplier-RequestChangeOfSupplier-0-1.xsd">
     <cim:mRID>String</cim:mRID>
     <cim:type>392</cim:type>
