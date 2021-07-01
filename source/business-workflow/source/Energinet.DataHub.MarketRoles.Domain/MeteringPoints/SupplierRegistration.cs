@@ -40,9 +40,9 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
 
         public EnergySupplierId EnergySupplierId { get; }
 
-        public Instant? StartOfSupplyDate { get; private set; } = null;
+        public Instant? StartOfSupplyDate { get; private set; }
 
-        public Instant? EndOfSupplyDate { get; private set; } = null;
+        public Instant? EndOfSupplyDate { get; private set; }
 
         public BusinessProcessId BusinessProcessId { get; }
 

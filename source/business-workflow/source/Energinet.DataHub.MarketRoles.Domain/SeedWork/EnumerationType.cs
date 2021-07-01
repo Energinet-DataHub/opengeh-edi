@@ -31,7 +31,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.SeedWork
 
         public int Id { get; private set; }
 
-        public static bool operator ==(EnumerationType left, EnumerationType right)
+        public static bool operator ==(EnumerationType left, EnumerationType? right)
         {
             if (ReferenceEquals(left, null))
             {
@@ -113,12 +113,12 @@ namespace Energinet.DataHub.MarketRoles.Domain.SeedWork
                 return false;
             }
 
-            if (!(obj is EnumerationType otherValue))
+            if (obj is not EnumerationType otherValue)
             {
                 return false;
             }
 
-            var typeMatches = GetType().Equals(obj.GetType());
+            var typeMatches = GetType() == obj.GetType();
             var valueMatches = Id.Equals(otherValue.Id);
 
             return typeMatches && valueMatches;
@@ -126,14 +126,14 @@ namespace Energinet.DataHub.MarketRoles.Domain.SeedWork
 
         public override int GetHashCode() => Id.GetHashCode();
 
-        public int CompareTo(object? other)
+        public int CompareTo(object? obj)
         {
-            if (other is null)
+            if (obj is null)
             {
-                throw new ArgumentNullException(nameof(other));
+                throw new ArgumentNullException(nameof(obj));
             }
 
-            return Id.CompareTo(((EnumerationType)other).Id);
+            return Id.CompareTo(((EnumerationType)obj).Id);
         }
 
         private static T Parse<T, TValue>(TValue value, string description, Func<T, bool> predicate)
