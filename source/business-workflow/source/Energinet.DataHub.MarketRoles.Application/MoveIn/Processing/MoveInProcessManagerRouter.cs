@@ -67,6 +67,7 @@ namespace Energinet.DataHub.MarketRoles.Application.MoveIn.Processing
             var enqueuedCommands = new List<Task>();
             processManager.CommandsToSend.ForEach(command => enqueuedCommands.Add(_commandScheduler.EnqueueAsync(command.Command, command.BusinessProcessId, command.ExecutionDate)));
             await Task.WhenAll(enqueuedCommands).ConfigureAwait(false);
+            processManager.CommandsToSend.Clear();
         }
 
         private Task<MoveInProcessManager?> GetProcessManagerAsync(Guid businessProcessId)
