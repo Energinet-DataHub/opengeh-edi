@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketRoles.Application.Common;
-using NodaTime;
 
 namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
 {

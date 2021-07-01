@@ -23,7 +23,6 @@ using Energinet.DataHub.MarketRoles.Application.MoveIn;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.XmlConverter;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.XmlConverter.Mappings;
 using FluentAssertions;
-using NodaTime;
 using Xunit;
 using Xunit.Categories;
 
@@ -79,6 +78,8 @@ namespace Energinet.DataHub.MarketRoles.Tests.EDI
             command.TransactionId.Should().Be("8B05EE11-DE70-4820-AF7F-F9F11D0A5614");
             command.EnergySupplierGlnNumber.Should().Be("3CC261B5-F4C5-4A12-9F94-E3050C63B38E");
             command.AccountingPointGsrnNumber.Should().Be("B6953F11-B3F5-48E9-8426-D3448F034614");
+            command.VATNumber.Should().BeNullOrEmpty();
+            command.SocialSecurityNumber.Should().Be("1234561234");
         }
 
         private static Stream GetResourceStream(string resourcePath)

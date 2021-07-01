@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using Energinet.DataHub.MarketRoles.Application.Common;
-using NodaTime;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.XmlConverter
 {
@@ -94,7 +93,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.XmlConverter
                     var xmlHierarchyQueue = new Queue<string>(property.Value.XmlHierarchy);
                     var correspondingXmlElement = GetXmlElement(element, xmlHierarchyQueue, ns);
 
-                    return Convert(correspondingXmlElement?.Value, property.Value.PropertyInfo.PropertyType, property.Value.TranslatorFunc);
+                    return Convert(correspondingXmlElement, property.Value.PropertyInfo.PropertyType, property.Value.TranslatorFunc);
                 }).ToArray();
 
                 if (configuration.CreateInstance(args) is not IBusinessRequest instance)
@@ -108,21 +107,23 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.XmlConverter
             return messages;
         }
 
-        private static object? Convert(string? source, Type dest, Func<string, object>? valueTranslatorFunc)
+        private static object? Convert(XElement? source, Type dest, Func<XmlElementInfo, object>? valueTranslatorFunc)
         {
-            if (dest == typeof(Nullable<>)) return default;
+            if (source is null) return default;
+
+            var xmlElementInfo = new XmlElementInfo(source.Value, source.Attributes());
 
             if (dest == typeof(string))
             {
-                return valueTranslatorFunc != null ? valueTranslatorFunc(source ?? string.Empty) : source;
+                return valueTranslatorFunc != null ? valueTranslatorFunc(xmlElementInfo) : source.Value;
             }
 
             if (dest == typeof(bool))
             {
-                return valueTranslatorFunc != null ? valueTranslatorFunc(source ?? string.Empty) : source;
+                return valueTranslatorFunc != null ? valueTranslatorFunc(xmlElementInfo) : source.Value;
             }
 
-            return System.Convert.ChangeType(source, dest);
+            return System.Convert.ChangeType(source.Value, dest);
         }
     }
 }

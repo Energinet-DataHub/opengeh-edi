@@ -38,12 +38,12 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.XmlConverter
             }
         }
 
-        public ConverterMapperConfigurationBuilder<T> AddProperty<TProperty>(Expression<Func<T, string>> selector, Func<string, TProperty> translatorFunc, params string[] xmlHierarchy)
+        public ConverterMapperConfigurationBuilder<T> AddProperty<TProperty>(Expression<Func<T, string>> selector, Func<XmlElementInfo, TProperty> translatorFunc, params string[] xmlHierarchy)
         {
             return AddPropertyInternal(selector, CastFunc(translatorFunc), xmlHierarchy);
         }
 
-        public ConverterMapperConfigurationBuilder<T> AddProperty<TProperty>(Expression<Func<T, TProperty>> selector, Func<string, TProperty> translatorFunc, params string[] xmlHierarchy)
+        public ConverterMapperConfigurationBuilder<T> AddProperty<TProperty>(Expression<Func<T, TProperty>> selector, Func<XmlElementInfo, TProperty> translatorFunc, params string[] xmlHierarchy)
             where TProperty : struct, IComparable, IComparable<TProperty>, IEquatable<TProperty>
         {
             return AddPropertyInternal(selector, CastFunc(translatorFunc), xmlHierarchy);
@@ -65,12 +65,12 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.XmlConverter
             return new(typeof(T), _xmlElementName, _properties);
         }
 
-        private static Func<string, object> CastFunc<TProperty>(Func<string, TProperty> translatorFunc)
+        private static Func<XmlElementInfo, object> CastFunc<TProperty>(Func<XmlElementInfo, TProperty> translatorFunc)
         {
             return p => translatorFunc(p) ?? throw new InvalidOperationException($"Type '{typeof(TProperty)}' could not be casted to object");
         }
 
-        private ConverterMapperConfigurationBuilder<T> AddPropertyInternal<TProperty>(Expression<Func<T, TProperty>> selector, Func<string, object> translatorFunc, params string[] xmlHierarchy)
+        private ConverterMapperConfigurationBuilder<T> AddPropertyInternal<TProperty>(Expression<Func<T, TProperty>> selector, Func<XmlElementInfo, object> translatorFunc, params string[] xmlHierarchy)
         {
             var propertyInfo = PropertyInfoHelper.GetPropertyInfo(selector);
             _properties[propertyInfo.Name] = new ExtendedPropertyInfo(xmlHierarchy, propertyInfo, translatorFunc);
