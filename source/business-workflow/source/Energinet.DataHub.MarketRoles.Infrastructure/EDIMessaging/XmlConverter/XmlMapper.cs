@@ -122,11 +122,6 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.XmlConverter
                 return valueTranslatorFunc != null ? valueTranslatorFunc(source ?? string.Empty) : source;
             }
 
-            if (dest == typeof(Instant))
-            {
-                return Instant.MinValue; // TODO .. How to properly parse string to Instant?! Shouldn't perform input validation to make sure date format is correct before parsing?
-            }
-
             return System.Convert.ChangeType(source, dest);
         }
     }

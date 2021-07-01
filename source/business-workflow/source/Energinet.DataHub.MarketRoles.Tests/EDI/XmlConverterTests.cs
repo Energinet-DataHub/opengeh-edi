@@ -58,8 +58,8 @@ namespace Energinet.DataHub.MarketRoles.Tests.EDI
             var command = commands.First();
 
             command.ConsumerId.Should().Be("C87157A9-EC3B-4B2D-B834-8147203EA0FC");
-            command.StartDate.Should().Be(Instant.MinValue);
-            command.TransactionId.Should().Be("String");
+            command.StartDate.Should().Be("1957-08-13");
+            command.TransactionId.Should().Be("D4CE11B8-C34B-4931-BD03-BFCEC3B462B9");
             command.EnergySupplierId.Should().Be("BAF8F2EA-B7B2-4851-90FD-C7609DE646F6");
             command.MeteringPointId.Should().Be("BD370B4E-28B5-4948-9056-732172CC4B5F");
         }
@@ -75,8 +75,8 @@ namespace Energinet.DataHub.MarketRoles.Tests.EDI
             var command = commands.First();
 
             command.ConsumerName.Should().Be("Test Name");
-            command.MoveInDate.Should().Be(Instant.MinValue);
-            command.TransactionId.Should().Be("String");
+            command.MoveInDate.Should().Be("1957-08-13");
+            command.TransactionId.Should().Be("8B05EE11-DE70-4820-AF7F-F9F11D0A5614");
             command.EnergySupplierGlnNumber.Should().Be("3CC261B5-F4C5-4A12-9F94-E3050C63B38E");
             command.AccountingPointGsrnNumber.Should().Be("B6953F11-B3F5-48E9-8426-D3448F034614");
         }
