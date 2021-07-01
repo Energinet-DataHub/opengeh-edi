@@ -27,6 +27,6 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules.ChangeEnergy
 
         public bool IsBroken => _physicalState == PhysicalState.ClosedDown;
 
-        public ValidationError Error => new CannotBeInStateOfClosedDownRuleError();
+        public ValidationError ValidationError => new CannotBeInStateOfClosedDownRuleError();
     }
 }

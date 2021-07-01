@@ -16,8 +16,8 @@ using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
 namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules.ChangeEnergySupplier
 {
-    internal class MoveOutRegisteredOnSameDateIsNotAllowedRule : IBusinessRule
-    {
+    // internal class MoveOutRegisteredOnSameDateIsNotAllowedRule : IBusinessRule
+    // {
         //TODO: Implement when Move in business process is implemented
         // private readonly IReadOnlyList<Relationship> _processes;
         // private readonly Instant _effectuationDate;
@@ -38,8 +38,8 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules.ChangeEnergy
         //                                p.EffectuationDate.ToDateTimeUtc().Date
         //                                    .Equals(_effectuationDate.ToDateTimeUtc().Date));
         // }
-        public bool IsBroken => false;
-
-        public ValidationError Error => new MoveOutRegisteredOnSameDateIsNotAllowedRuleError();
-    }
+    //     public bool IsBroken => false;
+    //
+    //     public ValidationError ValidationError => new MoveOutRegisteredOnSameDateIsNotAllowedRuleError();
+    // }
 }

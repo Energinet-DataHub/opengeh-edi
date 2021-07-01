@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Energinet.DataHub.MarketRoles.Domain.Consumers;
 using Energinet.DataHub.MarketRoles.Domain.EnergySuppliers;
@@ -69,7 +70,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
                 throw new ArgumentNullException(nameof(systemDateTimeProvider));
             }
 
-            var rules = new List<IBusinessRule>()
+            var rules = new Collection<IBusinessRule>()
             {
                 new MeteringPointMustBeEnergySuppliableRule(_meteringPointType),
                 new ProductionMeteringPointMustBeObligatedRule(_meteringPointType, _isProductionObligated),
@@ -87,6 +88,9 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
 
         public void AcceptChangeOfSupplier(EnergySupplierId energySupplierId, Instant supplyStartDate, Transaction transaction, ISystemDateTimeProvider systemDateTimeProvider)
         {
+            if (energySupplierId == null) throw new ArgumentNullException(nameof(energySupplierId));
+            if (transaction == null) throw new ArgumentNullException(nameof(transaction));
+            if (systemDateTimeProvider == null) throw new ArgumentNullException(nameof(systemDateTimeProvider));
             if (!ChangeSupplierAcceptable(energySupplierId, supplyStartDate, systemDateTimeProvider).Success)
             {
                 throw new BusinessProcessException(
@@ -125,9 +129,9 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
             }
         }
 
-        public BusinessRulesValidationResult ConsumerMoveInAcceptable(ConsumerId consumerId, EnergySupplierId energySupplierId, Instant moveInDate, Transaction transaction)
+        public BusinessRulesValidationResult ConsumerMoveInAcceptable(Instant moveInDate)
         {
-            var rules = new List<IBusinessRule>()
+            var rules = new Collection<IBusinessRule>()
             {
                 new MoveInRegisteredOnSameDateIsNotAllowedRule(_businessProcesses.AsReadOnly(), moveInDate),
             };
@@ -137,7 +141,10 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
 
         public void AcceptConsumerMoveIn(ConsumerId consumerId, EnergySupplierId energySupplierId, Instant moveInDate, Transaction transaction)
         {
-            if (!ConsumerMoveInAcceptable(consumerId, energySupplierId, moveInDate, transaction).Success)
+            if (consumerId == null) throw new ArgumentNullException(nameof(consumerId));
+            if (energySupplierId == null) throw new ArgumentNullException(nameof(energySupplierId));
+            if (transaction == null) throw new ArgumentNullException(nameof(transaction));
+            if (!ConsumerMoveInAcceptable(moveInDate).Success)
             {
                 throw new BusinessProcessException(
                     "Cannot accept move in request due to violation of one or more business rules.");
@@ -153,6 +160,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
 
         public void EffectuateConsumerMoveIn(Transaction transaction, ISystemDateTimeProvider systemDateTimeProvider)
         {
+            if (transaction == null) throw new ArgumentNullException(nameof(transaction));
             var businessProcess = GetBusinessProcess(transaction, BusinessProcessType.MoveIn);
 
             businessProcess.Effectuate(systemDateTimeProvider);
@@ -174,7 +182,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
             AddDomainEvent(new ChangeOfSupplierCancelled(Id, GsrnNumber, businessProcess.BusinessProcessId, transaction));
         }
 
-        private void StartOfSupplyForFutureSupplier(BusinessProcess businessProcess, SupplierRegistration supplierRegistration)
+        private static void StartOfSupplyForFutureSupplier(BusinessProcess businessProcess, SupplierRegistration supplierRegistration)
         {
             supplierRegistration.StartOfSupply(businessProcess.EffectiveDate);
         }
@@ -202,7 +210,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
             currentSupplier.MarkEndOfSupply(businessProcess.EffectiveDate);
         }
 
-        private SupplierRegistration GetCurrentSupplier(ISystemDateTimeProvider systemDateTimeProvider)
+        private SupplierRegistration? GetCurrentSupplier(ISystemDateTimeProvider systemDateTimeProvider)
         {
             return _supplierRegistrations.Find(supplier =>
                 supplier.StartOfSupplyDate <= systemDateTimeProvider.Now() && supplier.EndOfSupplyDate == null);

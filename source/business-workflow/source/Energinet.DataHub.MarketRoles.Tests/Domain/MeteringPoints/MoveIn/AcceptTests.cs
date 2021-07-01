@@ -53,7 +53,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.MeteringPoints.MoveIn
             var moveInDate = _systemDateTimeProvider.Now();
             _accountingPoint.AcceptConsumerMoveIn(_consumerId, _energySupplierId, moveInDate, _transaction);
 
-            var result = _accountingPoint.ConsumerMoveInAcceptable(_consumerId, _energySupplierId, moveInDate, _transaction);
+            var result = _accountingPoint.ConsumerMoveInAcceptable(moveInDate);
 
             Assert.Contains(result.Errors, error => error is MoveInRegisteredOnSameDateIsNotAllowedRuleError);
         }
