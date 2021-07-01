@@ -30,6 +30,6 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules.ChangeEnergy
 
         public bool IsBroken => _effectuationDate < _currentDate;
 
-        public ValidationError Error => new EffectuationDateCannotBeInThePastRuleError();
+        public ValidationError ValidationError => new EffectuationDateCannotBeInThePastRuleError();
     }
 }

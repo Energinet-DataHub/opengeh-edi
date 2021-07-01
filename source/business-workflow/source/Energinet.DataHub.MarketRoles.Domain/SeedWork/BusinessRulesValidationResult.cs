@@ -13,26 +13,28 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using Microsoft.VisualBasic;
 
 namespace Energinet.DataHub.MarketRoles.Domain.SeedWork
 {
     public class BusinessRulesValidationResult
     {
-        public BusinessRulesValidationResult(List<IBusinessRule> rules)
+        public BusinessRulesValidationResult(IEnumerable<IBusinessRule> rules)
         {
             SetValidationErrors(rules);
         }
 
         public bool Success => Errors.Count == 0;
 
-        public List<ValidationError> Errors { get; private set; } = new();
+        public ICollection<ValidationError> Errors { get; private set; } = new List<ValidationError>();
 
-        private void SetValidationErrors(List<IBusinessRule> rules)
+        private void SetValidationErrors(IEnumerable<IBusinessRule> rules)
         {
             Errors = rules
                 .Where(r => r.IsBroken)
-                .Select(r => r.Error)
+                .Select(r => r.ValidationError)
                 .ToList();
         }
     }

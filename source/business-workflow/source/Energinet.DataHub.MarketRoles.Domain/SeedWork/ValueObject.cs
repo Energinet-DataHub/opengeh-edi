@@ -24,11 +24,11 @@ namespace Energinet.DataHub.MarketRoles.Domain.SeedWork
         private List<PropertyInfo>? _properties;
         private List<FieldInfo>? _fields;
 
-        public static bool operator ==(ValueObject obj1, ValueObject obj2)
+        public static bool operator ==(ValueObject? obj1, ValueObject? obj2)
         {
-            if (object.Equals(obj1, null))
+            if (Equals(obj1, null))
             {
-                if (object.Equals(obj2, null))
+                if (Equals(obj2, null))
                 {
                     return true;
                 }
@@ -44,14 +44,9 @@ namespace Energinet.DataHub.MarketRoles.Domain.SeedWork
             return !(obj1 == obj2);
         }
 
-        public bool Equals(ValueObject? obj)
+        public bool Equals(ValueObject? other)
         {
-            if (obj is null)
-            {
-                return false;
-            }
-
-            return Equals(obj as object);
+            return other is not null && Equals(other as object);
         }
 
         public override bool Equals(object? obj)

@@ -27,6 +27,6 @@ namespace Energinet.DataHub.MarketRoles.Domain.SeedWork
         /// <summary>
         /// Validation details
         /// </summary>
-        ValidationError Error { get; }
+        ValidationError ValidationError { get; }
     }
 }
