@@ -121,6 +121,7 @@ CREATE TABLE [dbo].[QueuedInternalCommands](
     [ProcessedDate] [datetime2](1) NULL,
     [CreationDate] [datetime2](7) NOT NULL,
     [BusinessProcessId] [uniqueidentifier] NULL,
+    [CorrelationId] [nvarchar](50) NULL,
     CONSTRAINT [PK_InternalCommandQueue] PRIMARY KEY NONCLUSTERED
 (
 [Id] ASC
