@@ -76,7 +76,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
                 SampleData.GlnNumber,
                 SampleData.ConsumerSSN,
                 "THIS_IS_NOT_VALID_GSRN_NUMBER",
-                SystemDateTimeProvider.Now());
+                SampleData.MoveInDate);
 
             await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
 
@@ -108,10 +108,10 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
                 SampleData.GlnNumber,
                 SampleData.ConsumerSSN,
                 SampleData.GsrnNumber,
-                SystemDateTimeProvider.Now());
+                Instant.FromDateTimeUtc(DateTime.UtcNow.AddHours(1)).ToString());
         }
 
-        private RequestChangeOfSupplier CreateRequest(string transaction, string energySupplierGln, string consumerId, string gsrnNumber, Instant startDate)
+        private RequestChangeOfSupplier CreateRequest(string transaction, string energySupplierGln, string consumerId, string gsrnNumber, string startDate)
         {
             return new RequestChangeOfSupplier(
                 TransactionId: transaction,

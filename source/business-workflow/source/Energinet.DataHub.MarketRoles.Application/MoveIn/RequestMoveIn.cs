@@ -25,6 +25,6 @@ namespace Energinet.DataHub.MarketRoles.Application.MoveIn
         string VATNumber = "",
         string ConsumerName = "",
         string AccountingPointGsrnNumber = "",
-        Instant MoveInDate = default)
+        string MoveInDate = "")
         : IBusinessRequest, IOutboundMessage, IInboundMessage;
 }

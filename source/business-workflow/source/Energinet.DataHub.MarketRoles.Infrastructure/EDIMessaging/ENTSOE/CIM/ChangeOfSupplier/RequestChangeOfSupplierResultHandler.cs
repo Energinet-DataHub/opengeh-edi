@@ -13,10 +13,12 @@
 // limitations under the License.
 
 using System;
+using System.Globalization;
 using System.Linq;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier;
 using Energinet.DataHub.MarketRoles.Application.Common;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.ChangeOfSupplier
 {
@@ -44,12 +46,14 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.C
             if (request == null) throw new ArgumentNullException(nameof(request));
             if (result == null) throw new ArgumentNullException(nameof(result));
 
+            var startDate = Instant.FromDateTimeOffset(DateTimeOffset.Parse(request.StartDate, CultureInfo.InvariantCulture));
+
             return new RequestChangeOfSupplierApproved(
                 MessageId: Guid.NewGuid().ToString(),
                 TransactionId: result.TransactionId,
                 MeteringPointId: request.MeteringPointId,
                 RequestingEnergySupplierId: request.EnergySupplierId,
-                StartDate: request.StartDate);
+                StartDate: startDate);
         }
     }
 }

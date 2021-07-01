@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketRoles.Tests
 {
@@ -33,5 +34,7 @@ namespace Energinet.DataHub.MarketRoles.Tests
         internal static string ConsumerVATNumber => "10000000";
 
         internal static string Transaction => Guid.NewGuid().ToString();
+
+        internal static string StartDate => SystemClock.Instance.GetCurrentInstant().ToString();
     }
 }

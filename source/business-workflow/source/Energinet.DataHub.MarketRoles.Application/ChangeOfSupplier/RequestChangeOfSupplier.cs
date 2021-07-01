@@ -22,6 +22,6 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
             string EnergySupplierId,
             string ConsumerId,
             string MeteringPointId,
-            Instant StartDate)
+            string StartDate)
         : IBusinessRequest;
 }
