@@ -5,12 +5,6 @@
 version: 2
 updates:
   - package-ecosystem: "nuget"
-    directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.IntegrationTests"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 0
-
-  - package-ecosystem: "nuget"
     directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.Application"
     schedule:
       interval: "weekly"
@@ -41,6 +35,12 @@ updates:
     open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
+    directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.EntryPoints.InternalCommandDispatcher"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "nuget"
     directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.EntryPoints.Outbox"
     schedule:
       interval: "weekly"
@@ -59,7 +59,14 @@ updates:
     open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
+    directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.IntegrationTests"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "nuget"
     directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.Tests"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
+
