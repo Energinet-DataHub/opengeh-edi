@@ -12,18 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.Common;
-using Energinet.DataHub.MarketRoles.Application.Common.Transport;
 
-namespace Energinet.DataHub.MarketRoles.Application.MoveIn
+namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.XmlConverter
 {
-    public record RequestMoveIn(
-        string TransactionId = "",
-        string EnergySupplierGlnNumber = "",
-        string SocialSecurityNumber = "",
-        string VATNumber = "",
-        string ConsumerName = "",
-        string AccountingPointGsrnNumber = "",
-        string MoveInDate = "")
-        : IBusinessRequest, IOutboundMessage, IInboundMessage;
+    /// <summary>
+    /// XML converter
+    /// </summary>
+    public interface IXmlConverter
+    {
+        /// <summary>
+        /// Deserializes an EDI message in XML format to a generic collection
+        /// </summary>
+        /// <param name="body"></param>
+        /// <returns>A generic collection</returns>
+        public Task<IEnumerable<IBusinessRequest>> DeserializeAsync(Stream body);
+    }
 }

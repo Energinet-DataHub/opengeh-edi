@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Globalization;
 using Energinet.DataHub.MarketRoles.Contracts;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
 using Google.Protobuf;
@@ -36,7 +37,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Ingestion.Mappers
                     VATNumber = obj.VATNumber,
                     ConsumerName = obj.ConsumerName,
                     AccountingPointGsrnNumber = obj.AccountingPointGsrnNumber,
-                    MoveInDate = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTimeOffset(obj.MoveInDate.ToDateTimeOffset()),
+                    MoveInDate = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTimeOffset(DateTimeOffset.Parse(obj.MoveInDate, CultureInfo.InvariantCulture)),
                 },
             };
         }

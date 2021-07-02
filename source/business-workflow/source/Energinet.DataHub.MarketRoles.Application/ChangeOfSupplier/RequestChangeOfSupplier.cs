@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketRoles.Application.Common;
-using NodaTime;
 
 namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
 {
@@ -22,6 +21,6 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
             string EnergySupplierId,
             string ConsumerId,
             string MeteringPointId,
-            Instant StartDate)
+            string StartDate)
         : IBusinessRequest;
 }

@@ -38,7 +38,7 @@ namespace Energinet.DataHub.MarketRoles.Application.Common
             Success = ValidationErrors.Count == 0;
         }
 
-        public BusinessProcessResult(string transactionId, ReadOnlyCollection<ValidationError> validationErrors)
+        public BusinessProcessResult(string transactionId, IReadOnlyCollection<ValidationError> validationErrors)
         {
             TransactionId = transactionId;
             ValidationErrors = validationErrors ?? throw new ArgumentNullException(nameof(validationErrors));

@@ -12,18 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketRoles.Application.Common;
-using Energinet.DataHub.MarketRoles.Application.Common.Transport;
+using System.Collections.Generic;
+using System.Xml.Linq;
 
-namespace Energinet.DataHub.MarketRoles.Application.MoveIn
+namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.XmlConverter
 {
-    public record RequestMoveIn(
-        string TransactionId = "",
-        string EnergySupplierGlnNumber = "",
-        string SocialSecurityNumber = "",
-        string VATNumber = "",
-        string ConsumerName = "",
-        string AccountingPointGsrnNumber = "",
-        string MoveInDate = "")
-        : IBusinessRequest, IOutboundMessage, IInboundMessage;
+    public class XmlElementInfo
+    {
+        public XmlElementInfo(string sourceValue, IEnumerable<XAttribute> attributes)
+        {
+            SourceValue = sourceValue;
+            Attributes = attributes;
+        }
+
+        public string SourceValue { get; }
+
+        public IEnumerable<XAttribute> Attributes { get; }
+    }
 }

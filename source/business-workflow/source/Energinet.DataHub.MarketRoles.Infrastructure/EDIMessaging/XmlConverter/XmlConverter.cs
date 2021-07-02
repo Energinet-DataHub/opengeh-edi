@@ -13,27 +13,27 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Xml.Linq;
+using Energinet.DataHub.MarketRoles.Application.Common;
 
-namespace Energinet.DataHub.MarketRoles.Domain.SeedWork
+namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.XmlConverter
 {
-    public class BusinessRulesValidationResult
+    public class XmlConverter : IXmlConverter
     {
-        public BusinessRulesValidationResult(IEnumerable<IBusinessRule> rules)
+        private readonly XmlMapper _xmlMapper;
+
+        public XmlConverter(XmlMapper xmlMapper)
         {
-            SetValidationErrors(rules);
+            _xmlMapper = xmlMapper;
         }
 
-        public bool Success => !Errors.Any();
-
-        public IReadOnlyCollection<ValidationError> Errors { get; private set; } = new List<ValidationError>();
-
-        private void SetValidationErrors(IEnumerable<IBusinessRule> rules)
+        public async Task<IEnumerable<IBusinessRequest>> DeserializeAsync(Stream body)
         {
-            Errors = rules
-                .Where(r => r.IsBroken)
-                .Select(r => r.ValidationError)
-                .ToList();
+            XElement rootElement = await XElement.LoadAsync(body, LoadOptions.None, CancellationToken.None);
+            return _xmlMapper.Map(rootElement);
         }
     }
 }

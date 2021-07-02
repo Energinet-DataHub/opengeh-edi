@@ -19,11 +19,11 @@ namespace Energinet.DataHub.MarketRoles.Application.Common.Validation
 {
     public class StartOfSupplyMustBeValidRuleError : ValidationError
     {
-        public StartOfSupplyMustBeValidRuleError(Instant startOfSupplyDate)
+        public StartOfSupplyMustBeValidRuleError(string startOfSupplyDate)
         {
             StartOfSupplyDate = startOfSupplyDate;
         }
 
-        public Instant StartOfSupplyDate { get; }
+        public string StartOfSupplyDate { get; }
     }
 }
