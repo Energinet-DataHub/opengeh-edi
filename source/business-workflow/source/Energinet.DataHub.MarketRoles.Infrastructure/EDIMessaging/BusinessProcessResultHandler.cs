@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.IO;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using Energinet.DataHub.MarketRoles.Application.Common;
 using Energinet.DataHub.MarketRoles.Infrastructure.BusinessRequestProcessing;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;

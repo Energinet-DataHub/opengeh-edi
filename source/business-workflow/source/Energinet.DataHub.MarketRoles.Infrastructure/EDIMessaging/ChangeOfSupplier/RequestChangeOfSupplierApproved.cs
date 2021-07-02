@@ -12,18 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.EndOfSupplyNotification;
-using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
+using NodaTime;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.ChangeOfSupplier.EndOfSupplyNotification
+namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ChangeOfSupplier
 {
-    public class EndOfSupplyNotifier : IEndOfSupplyNotifier
-    {
-        public Task NotifyAsync(AccountingPointId accountingPointId)
-        {
-            //TODO: Add logic for generating actor notification message
-            return Task.CompletedTask;
-        }
-    }
+    public record RequestChangeOfSupplierApproved(
+        string MessageId,
+        string TransactionId,
+        string MeteringPointId,
+        string RequestingEnergySupplierId,
+        Instant StartDate);
 }

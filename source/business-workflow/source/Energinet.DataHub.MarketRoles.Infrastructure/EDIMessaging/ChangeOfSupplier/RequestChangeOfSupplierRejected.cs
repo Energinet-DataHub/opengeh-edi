@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using NodaTime;
+using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.ChangeOfSupplier
+namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ChangeOfSupplier
 {
-    public record RequestChangeOfSupplierApproved(
+    public record RequestChangeOfSupplierRejected(
         string MessageId,
         string TransactionId,
-        string MeteringPointId,
-        string RequestingEnergySupplierId,
-        Instant StartDate);
+        string MeteringPoint,
+        IEnumerable<string> ReasonCodes);
 }

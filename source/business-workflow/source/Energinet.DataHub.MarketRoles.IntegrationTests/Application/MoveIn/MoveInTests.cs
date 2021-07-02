@@ -17,7 +17,7 @@ using Energinet.DataHub.MarketRoles.Application.MoveIn;
 using Energinet.DataHub.MarketRoles.Domain.Consumers;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
-using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.MoveIn;
+using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging;
 using Xunit;
 using Xunit.Categories;
 
@@ -44,7 +44,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
             var result = await SendRequest(request);
 
             Assert.True(result.Success);
-            await AssertOutboxMessage<MoveInRequestAccepted>();
+            await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType.StartsWith("Confirm"))
+                .ConfigureAwait(false);
         }
 
         [Fact]
@@ -58,7 +59,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
             var result = await SendRequest(request);
 
             Assert.False(result.Success);
-            await AssertOutboxMessage<MoveInRequestRejected>().ConfigureAwait(false);
+            await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType.StartsWith("Reject"))
+                .ConfigureAwait(false);
         }
 
         [Fact]
@@ -72,7 +74,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
             var result = await SendRequest(request);
 
             Assert.False(result.Success);
-            await AssertOutboxMessage<MoveInRequestRejected>().ConfigureAwait(false);
+            await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType.StartsWith("Reject"))
+                .ConfigureAwait(false);
         }
 
         [Fact]

@@ -18,7 +18,7 @@ using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier;
 using Energinet.DataHub.MarketRoles.Application.Common;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.ChangeOfSupplier
+namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ChangeOfSupplier
 {
     public class RequestChangeOfSupplierResultHandler : BusinessProcessResultHandler<RequestChangeOfSupplier>
     {

@@ -12,8 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.MoveIn
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.MeteringPointDetails;
+using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
+
+namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ChangeOfSupplier.MeteringPointDetails
 {
-    //TODO: Define required properties
-    public record MoveInRequestRejected(string Transaction, string GsrnNumber);
+    public class MeteringPointDetailsForwarder : IMeteringPointDetailsForwarder
+    {
+        public Task ForwardAsync(AccountingPointId accountingPointId)
+        {
+            //TODO: Add logic for generating EDI messages containing metering point details
+            return Task.CompletedTask;
+        }
+    }
 }

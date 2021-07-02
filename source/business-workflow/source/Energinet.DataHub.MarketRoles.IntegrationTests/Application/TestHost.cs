@@ -42,11 +42,11 @@ using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.Consumers;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.EnergySuppliers;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.ProcessManagers;
 using Energinet.DataHub.MarketRoles.Infrastructure.DomainEventDispatching;
-using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.ChangeOfSupplier;
-using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.ChangeOfSupplier.ConsumerDetails;
-using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.ChangeOfSupplier.EndOfSupplyNotification;
-using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.ChangeOfSupplier.MeteringPointDetails;
-using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.MoveIn;
+using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ChangeOfSupplier;
+using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ChangeOfSupplier.ConsumerDetails;
+using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ChangeOfSupplier.EndOfSupplyNotification;
+using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ChangeOfSupplier.MeteringPointDetails;
+using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.MoveIn;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.ChangeOfSupplier;
 using Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
@@ -293,7 +293,16 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             return _businessProcessId;
         }
 
-        protected async Task AssertOutboxMessage<TMessage>()
+        protected async Task AssertOutboxMessageAsync<TMessage>(Func<TMessage, bool> funcAssert)
+        {
+            var publishedMessage = await GetLastMessageFromOutboxAsync<TMessage>().ConfigureAwait(false);
+            var assertion = funcAssert.Invoke(publishedMessage);
+
+            Assert.NotNull(publishedMessage);
+            Assert.True(assertion);
+        }
+
+        protected async Task AssertOutboxMessageAsync<TMessage>()
         {
             var publishedMessage = await GetLastMessageFromOutboxAsync<TMessage>().ConfigureAwait(false);
             Assert.NotNull(publishedMessage);

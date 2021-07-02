@@ -13,16 +13,16 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.ConsumerDetails;
+using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.EndOfSupplyNotification;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.ChangeOfSupplier.ConsumerDetails
+namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ChangeOfSupplier.EndOfSupplyNotification
 {
-    public class ConsumerDetailsForwarder : IConsumerDetailsForwarder
+    public class EndOfSupplyNotifier : IEndOfSupplyNotifier
     {
-        public Task ForwardAsync(AccountingPointId accountingPointId)
+        public Task NotifyAsync(AccountingPointId accountingPointId)
         {
-            //TODO: Add logic for generating EDI messages containing consumer details
+            //TODO: Add logic for generating actor notification message
             return Task.CompletedTask;
         }
     }
