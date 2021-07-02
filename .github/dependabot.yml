@@ -8,54 +8,65 @@ updates:
     directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.Application"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
     directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
     directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.Domain"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
     directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.EntryPoints.Common"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
     directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.EntryPoints.Ingestion"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
     directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.EntryPoints.InternalCommandDispatcher"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
     directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.EntryPoints.Outbox"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
     directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.EntryPoints.Processing"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
     directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.Infrastructure"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
     directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.IntegrationTests"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
     directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.Tests"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 0
 
