@@ -21,7 +21,6 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.InternalCommandDispatcher
 {
-    #pragma warning disable
     public class Dispatcher
     {
         private readonly IInternalCommandProcessor _internalCommandProcessor;
