@@ -17,7 +17,7 @@ using Energinet.DataHub.MarketRoles.Application.MoveIn;
 using Energinet.DataHub.MarketRoles.Domain.Consumers;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
-using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging;
+using Energinet.DataHub.MarketRoles.Infrastructure.EDI;
 using Xunit;
 using Xunit.Categories;
 
