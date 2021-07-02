@@ -11,14 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-module "azfun_outbox" {
+module "azfun_internalcommanddispatcher" {
   source                                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//function-app?ref=1.2.0"
   name                                      = "azfun-outbox-${var.project}-${var.organisation}-${var.environment}"
   resource_group_name                       = data.azurerm_resource_group.main.name
   location                                  = data.azurerm_resource_group.main.location
-  storage_account_access_key                = module.azfun_outbox_stor.primary_access_key
-  storage_account_name                      = module.azfun_outbox_stor.name
-  app_service_plan_id                       = module.azfun_outbox_plan.id
+  storage_account_access_key                = module.azfun_internalcommanddispatcher_stor.primary_access_key
+  storage_account_name                      = module.azfun_internalcommanddispatcher_stor.name
+  app_service_plan_id                       = module.azfun_internalcommanddispatcher_plan.id
   application_insights_instrumentation_key  = module.appi.instrumentation_key
   tags                                      = data.azurerm_resource_group.main.tags
   always_on                                 = true
