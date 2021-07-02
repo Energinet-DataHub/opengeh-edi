@@ -12,10 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Application.MoveIn;
+using Energinet.DataHub.MarketRoles.Application.Common;
+using Energinet.DataHub.MarketRoles.Application.Common.Transport;
 using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
+using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.XmlConverter;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -28,32 +33,51 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
         private readonly ILogger _logger;
         private readonly MessageDispatcher _messageDispatcher;
         private readonly ICorrelationContext _correlationContext;
+        private readonly IXmlConverter _xmlConverter;
 
         public CommandApi(
             ILogger logger,
             MessageDispatcher messageDispatcher,
-            ICorrelationContext correlationContext)
+            ICorrelationContext correlationContext,
+            IXmlConverter xmlConverter)
         {
             _logger = logger;
             _messageDispatcher = messageDispatcher;
             _correlationContext = correlationContext;
+            _xmlConverter = xmlConverter;
         }
 
         [Function("CommandApi")]
         public async Task<HttpResponseData> RunAsync(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData request)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
+            [NotNull] HttpRequestData request)
         {
-            _logger.LogInformation("C# HTTP trigger function processed a request.");
-            _logger.LogInformation("Processing...");
+            _logger.LogInformation("Received CommandApi request");
 
-            var correlationId = _correlationContext.GetCorrelationId();
+            IEnumerable<IBusinessRequest> commands;
+
+            try
+            {
+                commands = await _xmlConverter.DeserializeAsync(request.Body).ConfigureAwait(false);
+            }
+#pragma warning disable CA1031 // We need to return BadRequest in case of failure
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, "Unable to deserialize request");
+                return request.CreateResponse(HttpStatusCode.BadRequest);
+            }
+
             var response = request.CreateResponse(HttpStatusCode.OK);
+
             response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
 
             await response.WriteStringAsync("Correlation id: " + _correlationContext.GetCorrelationId())
                 .ConfigureAwait(false);
 
-            await _messageDispatcher.DispatchAsync(new RequestMoveIn(correlationId)).ConfigureAwait(false);
+            foreach (var command in commands)
+            {
+                await _messageDispatcher.DispatchAsync((IOutboundMessage)command).ConfigureAwait(false);
+            }
 
             return response;
         }
