@@ -12,21 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using System.Threading.Tasks;
 
-namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules.ChangeEnergySupplier
+namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands
 {
-    public class CannotBeInStateOfClosedDownRule : IBusinessRule
+    /// <summary>
+    /// Service for dispatching of queued internal commands
+    /// </summary>
+    public interface IInternalCommandProcessor
     {
-        private readonly PhysicalState _physicalState;
-
-        internal CannotBeInStateOfClosedDownRule(PhysicalState physicalState)
-        {
-            _physicalState = physicalState;
-        }
-
-        public bool IsBroken => _physicalState == PhysicalState.ClosedDown;
-
-        public ValidationError ValidationError => new CannotBeInStateOfClosedDownRuleError();
+        /// <summary>
+        /// Dispatch all undispatched internal commands
+        /// </summary>
+        /// <returns><see cref="Task"/></returns>
+        Task ProcessUndispatchedAsync();
     }
 }

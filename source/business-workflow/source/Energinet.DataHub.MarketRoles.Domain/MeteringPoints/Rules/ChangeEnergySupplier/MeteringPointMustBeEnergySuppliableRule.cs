@@ -28,6 +28,6 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules.ChangeEnergy
         public bool IsBroken => !(_meteringPointType == MeteringPointType.Production ||
                                   _meteringPointType == MeteringPointType.Consumption);
 
-        public ValidationError Error => new MeteringPointMustBeEnergySuppliableRuleError();
+        public ValidationError ValidationError => new MeteringPointMustBeEnergySuppliableRuleError();
     }
 }

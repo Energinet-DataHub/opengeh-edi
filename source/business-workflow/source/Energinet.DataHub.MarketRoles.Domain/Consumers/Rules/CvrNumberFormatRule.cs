@@ -31,7 +31,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.Consumers.Rules
 
         public bool IsBroken => !IsValidCvrNumber();
 
-        public ValidationError Error => new CvrNumberFormatRuleError();
+        public ValidationError ValidationError => new CvrNumberFormatRuleError();
 
         private static bool LengthIsValid(string cvrValue)
         {

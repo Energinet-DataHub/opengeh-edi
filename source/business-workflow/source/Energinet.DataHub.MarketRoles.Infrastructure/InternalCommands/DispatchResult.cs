@@ -12,21 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
-
-namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules.ChangeEnergySupplier
+namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands
 {
-    public class MustHaveEnergySupplierAssociatedRule : IBusinessRule
+    public class DispatchResult
     {
-        private readonly SupplierRegistration? _supplierRegistration;
-
-        internal MustHaveEnergySupplierAssociatedRule(SupplierRegistration? supplierRegistration)
+        private DispatchResult(long sequenceId)
         {
-            _supplierRegistration = supplierRegistration;
+            SequenceId = sequenceId;
         }
 
-        public bool IsBroken => _supplierRegistration is null;
+        public long SequenceId { get; }
 
-        public ValidationError ValidationError => new MustHaveEnergySupplierAssociatedRuleError();
+        public static DispatchResult Create(long sequenceNumber)
+        {
+            return new DispatchResult(sequenceNumber);
+        }
     }
 }

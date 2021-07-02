@@ -41,6 +41,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
 
         public void Effectuate(ISystemDateTimeProvider systemDateTimeProvider)
         {
+            if (systemDateTimeProvider == null) throw new ArgumentNullException(nameof(systemDateTimeProvider));
             EnsureNotTooEarly(systemDateTimeProvider);
             EnsureStatus();
             Status = BusinessProcessStatus.Completed;

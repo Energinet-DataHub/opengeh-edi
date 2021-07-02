@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Energinet.DataHub.MarketRoles.Domain.Consumers.Rules;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 

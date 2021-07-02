@@ -19,7 +19,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.Consumers.Events
 {
     public class ConsumerCreated : DomainEventBase
     {
-        public ConsumerCreated(Guid consumerId, string cprNumber, string cvrNumber, string fullName)
+        public ConsumerCreated(Guid consumerId, string? cprNumber, string? cvrNumber, string fullName)
         {
             ConsumerId = consumerId;
             CprNumber = cprNumber;
@@ -29,9 +29,9 @@ namespace Energinet.DataHub.MarketRoles.Domain.Consumers.Events
 
         public Guid ConsumerId { get; }
 
-        public string CprNumber { get; }
+        public string? CprNumber { get; }
 
-        public string CvrNumber { get; }
+        public string? CvrNumber { get; }
 
         public string FullName { get;  }
     }
