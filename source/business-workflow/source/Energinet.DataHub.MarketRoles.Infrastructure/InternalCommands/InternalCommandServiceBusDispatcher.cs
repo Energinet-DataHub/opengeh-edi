@@ -21,12 +21,10 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands
 {
     public class InternalCommandServiceBusDispatcher : IInternalCommandDispatcher
     {
-        private readonly ICorrelationContext _correlationContext;
         private readonly ServiceBusSender _serviceBusSender;
 
-        public InternalCommandServiceBusDispatcher(ICorrelationContext correlationContext, ServiceBusSender serviceBusSender)
+        public InternalCommandServiceBusDispatcher(ServiceBusSender serviceBusSender)
         {
-            _correlationContext = correlationContext ?? throw new ArgumentNullException(nameof(correlationContext));
             _serviceBusSender = serviceBusSender ?? throw new ArgumentNullException(nameof(serviceBusSender));
         }
 
@@ -45,12 +43,12 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands
             return DispatchResult.Create(default);
         }
 
-        private ServiceBusMessage CreateMessageFrom(QueuedInternalCommand queuedInternalCommand)
+        private static ServiceBusMessage CreateMessageFrom(QueuedInternalCommand queuedInternalCommand)
         {
             var message = new ServiceBusMessage(queuedInternalCommand.Data);
             message.ContentType = "application/octet-stream";
             message.MessageId = queuedInternalCommand.Id.ToString();
-            message.CorrelationId = _correlationContext.GetCorrelationId();
+            message.CorrelationId = queuedInternalCommand.CorrelationId;
 
             return message;
         }
