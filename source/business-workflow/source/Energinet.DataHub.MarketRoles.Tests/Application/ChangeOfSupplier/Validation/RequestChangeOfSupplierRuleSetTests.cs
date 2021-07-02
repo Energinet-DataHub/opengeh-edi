@@ -101,7 +101,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Valid
         [Fact]
         public void Validate_WhenStartOfSupplyDateNotValid_IsFailure()
         {
-            var businessRequest = CreateRequest(SampleData.TranactionId, SampleData.GlnNumber, SampleData.GsrnNumber, default);
+            var businessRequest = CreateRequest(SampleData.TranactionId, SampleData.GlnNumber, SampleData.GsrnNumber, startDate: string.Empty);
 
             var errors = GetValidationErrors(businessRequest);
 
@@ -125,10 +125,10 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Valid
                 glnNumber,
                 "FakeCVROrCPR",
                 gsrnNumber,
-                SystemClock.Instance.GetCurrentInstant());
+                SystemClock.Instance.GetCurrentInstant().ToString());
         }
 
-        private RequestChangeOfSupplier CreateRequest(string transaction = "", string glnNumber = "", string gsrnNumber = "", Instant startDate = default)
+        private RequestChangeOfSupplier CreateRequest(string transaction = "", string glnNumber = "", string gsrnNumber = "", string startDate = "")
         {
             return new RequestChangeOfSupplier(
                 transaction,

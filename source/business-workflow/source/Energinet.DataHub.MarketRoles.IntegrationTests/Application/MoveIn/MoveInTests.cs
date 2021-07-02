@@ -117,7 +117,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
                 registerConsumerBySSN == false ? SampleData.ConsumerVAT : string.Empty,
                 SampleData.ConsumerName,
                 SampleData.GsrnNumber,
-                moveInDate);
+                SampleData.MoveInDate);
         }
     }
 }

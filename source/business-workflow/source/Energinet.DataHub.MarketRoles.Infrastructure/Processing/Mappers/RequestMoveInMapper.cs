@@ -34,7 +34,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Processing.Mappers
                 VATNumber = obj.VATNumber,
                 ConsumerName = obj.ConsumerName,
                 AccountingPointGsrnNumber = obj.AccountingPointGsrnNumber,
-                MoveInDate = Instant.FromDateTimeOffset(obj.MoveInDate.ToDateTimeOffset()),
+                MoveInDate = Instant.FromDateTimeOffset(obj.MoveInDate.ToDateTimeOffset()).ToString(),
             };
         }
     }

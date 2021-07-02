@@ -51,7 +51,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
                 string.Empty,
                 SampleData.ConsumerName,
                 SampleData.GsrnNumber,
-                moveInDate);
+                SampleData.MoveInDate);
 
             var result = await SendRequest(requestMoveIn);
 

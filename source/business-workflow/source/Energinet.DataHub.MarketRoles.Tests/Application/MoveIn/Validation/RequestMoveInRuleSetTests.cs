@@ -117,7 +117,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.MoveIn.Validation
                 vatNumber,
                 SampleData.ConsumerName,
                 SampleData.GsrnNumber,
-                SystemClock.Instance.GetCurrentInstant());
+                SampleData.StartDate);
         }
 
         private List<ValidationError> GetValidationErrors(RequestMoveIn request)

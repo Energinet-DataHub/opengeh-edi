@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier;
@@ -77,13 +78,13 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
                 _energySupplier.GlnNumber.Value,
                 _consumer.CprNumber.Value,
                 _accountingPoint.GsrnNumber.Value,
-                SystemDateTimeProvider.Now()));
+                Instant.FromDateTimeUtc(DateTime.UtcNow.AddHours(1)).ToString()));
 
-            var bususinessProcessId = GetBusinessProcessId(_transaction);
+            var businessProcessId = GetBusinessProcessId(_transaction);
 
-            await Mediator.Send(new ForwardMeteringPointDetails(_accountingPoint.Id.Value, bususinessProcessId.Value, _transaction.Value));
-            await Mediator.Send(new ForwardConsumerDetails(_accountingPoint.Id.Value, bususinessProcessId.Value, _transaction.Value));
-            await Mediator.Send(new NotifyCurrentSupplier(_accountingPoint.Id.Value, bususinessProcessId.Value, _transaction.Value));
+            await Mediator.Send(new ForwardMeteringPointDetails(_accountingPoint.Id.Value, businessProcessId.Value, _transaction.Value));
+            await Mediator.Send(new ForwardConsumerDetails(_accountingPoint.Id.Value, businessProcessId.Value, _transaction.Value));
+            await Mediator.Send(new NotifyCurrentSupplier(_accountingPoint.Id.Value, businessProcessId.Value, _transaction.Value));
         }
     }
 }

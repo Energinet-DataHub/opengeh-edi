@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 {
@@ -29,5 +30,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
         public static string Transaction => Guid.NewGuid().ToString();
 
         public static string ConsumerName => "Test Testesen";
+
+        internal static string MoveInDate => Instant.FromDateTimeUtc(DateTime.UtcNow.AddHours(1)).ToString();
     }
 }

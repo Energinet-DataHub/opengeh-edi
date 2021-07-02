@@ -43,4 +43,11 @@ limitations under the License.
       <ProjectReference Include="..\Energinet.DataHub.MarketRoles.EntryPoints.Ingestion\Energinet.DataHub.MarketRoles.EntryPoints.Ingestion.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="EDI\ChangeOfSupplierCimXml.xml" />
+      <EmbeddedResource Include="EDI\ChangeOfSupplierCimXml.xml" />
+      <None Remove="EDI\MoveInCimXml.xml" />
+      <EmbeddedResource Include="EDI\MoveInCimXml.xml" />
+    </ItemGroup>
+
 </Project>
