@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Data;
 using Energinet.DataHub.MarketRoles.Application.Common.Validation;
 using Energinet.DataHub.MarketRoles.Application.Consumers.Validation;
 using FluentValidation;

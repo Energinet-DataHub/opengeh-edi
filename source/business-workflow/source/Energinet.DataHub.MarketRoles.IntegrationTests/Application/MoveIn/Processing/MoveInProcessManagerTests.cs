@@ -12,20 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing;
 using Energinet.DataHub.MarketRoles.Application.Common.Commands;
 using Energinet.DataHub.MarketRoles.Application.Common.Processing;
 using Energinet.DataHub.MarketRoles.Application.MoveIn;
 using Energinet.DataHub.MarketRoles.Application.MoveIn.Processing;
-using Energinet.DataHub.MarketRoles.Domain.Consumers;
-using Energinet.DataHub.MarketRoles.Domain.EnergySuppliers;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
-using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
-using Microsoft.EntityFrameworkCore;
-using NodaTime;
 using Xunit;
 using Xunit.Categories;
 
@@ -82,7 +75,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn.Proc
                 string.Empty,
                 SampleData.ConsumerName,
                 SampleData.GsrnNumber,
-                moveInDate));
+                SampleData.MoveInDate));
 
             return (transaction, GetBusinessProcessId(transaction));
         }

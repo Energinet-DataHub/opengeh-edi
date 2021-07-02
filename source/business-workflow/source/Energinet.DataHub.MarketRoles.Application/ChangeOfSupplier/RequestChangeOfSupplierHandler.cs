@@ -14,16 +14,14 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Validation;
 using Energinet.DataHub.MarketRoles.Application.Common;
 using Energinet.DataHub.MarketRoles.Application.Common.Validation;
 using Energinet.DataHub.MarketRoles.Domain.EnergySuppliers;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using NodaTime.Text;
 
 namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
 {
@@ -64,7 +62,9 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
                 return rulesCheckResult;
             }
 
-            _accountingPoint.AcceptChangeOfSupplier(_energySupplier.EnergySupplierId, request.StartDate, new Transaction(request.TransactionId), _systemTimeProvider);
+            var startDate = InstantPattern.General.Parse(request.StartDate).Value;
+
+            _accountingPoint.AcceptChangeOfSupplier(_energySupplier.EnergySupplierId, startDate, new Transaction(request.TransactionId), _systemTimeProvider);
 
             return BusinessProcessResult.Ok(request.TransactionId);
         }
@@ -84,10 +84,14 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
 
         private BusinessProcessResult CheckBusinessRules()
         {
-            var validationResult =
-                _accountingPoint!.ChangeSupplierAcceptable(_energySupplier!.EnergySupplierId, _request!.StartDate, _systemTimeProvider);
+            if (_request is null) throw new ArgumentNullException(nameof(_request));
 
-            return new BusinessProcessResult(_request.TransactionId, validationResult.Errors.ToList().AsReadOnly());
+            var startDate = InstantPattern.General.Parse(_request.StartDate).Value;
+
+            var validationResult =
+                _accountingPoint!.ChangeSupplierAcceptable(_energySupplier!.EnergySupplierId, startDate, _systemTimeProvider);
+
+            return new BusinessProcessResult(_request.TransactionId, validationResult.Errors);
         }
 
         private Task<AccountingPoint> GetMeteringPointAsync(string gsrnNumber)

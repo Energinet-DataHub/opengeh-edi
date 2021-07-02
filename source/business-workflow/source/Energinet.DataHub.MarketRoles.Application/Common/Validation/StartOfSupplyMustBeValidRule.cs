@@ -13,16 +13,15 @@
 // limitations under the License.
 
 using FluentValidation;
-using NodaTime;
 
 namespace Energinet.DataHub.MarketRoles.Application.Common.Validation
 {
-    public class StartOfSupplyMustBeValidRule : AbstractValidator<Instant>
+    public class StartOfSupplyMustBeValidRule : AbstractValidator<string>
     {
         public StartOfSupplyMustBeValidRule()
         {
-            RuleFor(x => x)
-                .Must(x => x != default)
+            RuleFor(startOfSupplyDate => startOfSupplyDate)
+                .NotEmpty()
                 .WithState(startOfSupplyDate => new StartOfSupplyMustBeValidRuleError(startOfSupplyDate));
         }
     }
