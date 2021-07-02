@@ -15,36 +15,28 @@
 #pragma warning disable // Auto-generated code
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.MoveIn
 {
-    public partial class ConfirmRequestChangeAccountingPointCharacteristics_MarketDocument
-    {
-        [System.Xml.Serialization.XmlAttributeAttribute("schemaLocation", Namespace="http://www.w3.org/2001/XMLSchema-instance")]
-        public string xsiSchemaLocation = "urn:ebix:org:ChangeAccountingPointCharacteristics:0:1 urn-ediel-org-RSM-021-ChangeOfAccountingPointCharacteristics-ConfirmChangeOfAccountingPointCharacteristics-0-1.xsd";
-    }
-
     // NOTE: Generated code may require at least .NET Framework 4.5 or .NET Core/Standard 2.0.
+    /// <remarks/>
     [System.SerializableAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true,
-        Namespace = "urn:ebix:org:ChangeAccountingPointCharacteristics:0:1")]
-    [System.Xml.Serialization.XmlRootAttribute(Namespace = "urn:ebix:org:ChangeAccountingPointCharacteristics:0:1",
-        IsNullable = false)]
-    public partial class ConfirmRequestChangeAccountingPointCharacteristics_MarketDocument
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "urn:ebix:org:ChangeOfSupplier:0:1")]
+    [System.Xml.Serialization.XmlRootAttribute(Namespace = "urn:ebix:org:ChangeOfSupplier:0:1", IsNullable = false)]
+    public partial class ConfirmRequestChangeOfSupplier_MarketDocument
     {
-
         private string mRIDField;
 
-        private string typeField;
+        private ushort typeField;
 
         private string processprocessTypeField;
 
         private string businessSectortypeField;
 
-        private ConfirmRequestChangeAccountingPointCharacteristics_MarketDocumentSender_MarketParticipantmRID
+        private ConfirmRequestChangeOfSupplier_MarketDocumentSender_MarketParticipantmRID
             sender_MarketParticipantmRIDField;
 
         private string sender_MarketParticipantmarketRoletypeField;
 
-        private ConfirmRequestChangeAccountingPointCharacteristics_MarketDocumentReceiver_MarketParticipantmRID
+        private ConfirmRequestChangeOfSupplier_MarketDocumentReceiver_MarketParticipantmRID
             receiver_MarketParticipantmRIDField;
 
         private string receiver_MarketParticipantmarketRoletypeField;
@@ -53,8 +45,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.MoveIn
 
         private string reasoncodeField;
 
-        private ConfirmRequestChangeAccountingPointCharacteristics_MarketDocumentMktActivityRecord
-            mktActivityRecordField;
+        private ConfirmRequestChangeOfSupplier_MarketDocumentMktActivityRecord mktActivityRecordField;
 
         /// <remarks/>
         public string mRID
@@ -70,7 +61,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.MoveIn
         }
 
         /// <remarks/>
-        public string type
+        public ushort type
         {
             get
             {
@@ -112,8 +103,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.MoveIn
 
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute("sender_MarketParticipant.mRID")]
-        public ConfirmRequestChangeAccountingPointCharacteristics_MarketDocumentSender_MarketParticipantmRID
-            sender_MarketParticipantmRID
+        public ConfirmRequestChangeOfSupplier_MarketDocumentSender_MarketParticipantmRID sender_MarketParticipantmRID
         {
             get
             {
@@ -141,7 +131,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.MoveIn
 
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute("receiver_MarketParticipant.mRID")]
-        public ConfirmRequestChangeAccountingPointCharacteristics_MarketDocumentReceiver_MarketParticipantmRID
+        public ConfirmRequestChangeOfSupplier_MarketDocumentReceiver_MarketParticipantmRID
             receiver_MarketParticipantmRID
         {
             get
@@ -196,7 +186,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.MoveIn
         }
 
         /// <remarks/>
-        public ConfirmRequestChangeAccountingPointCharacteristics_MarketDocumentMktActivityRecord MktActivityRecord
+        public ConfirmRequestChangeOfSupplier_MarketDocumentMktActivityRecord MktActivityRecord
         {
             get
             {
@@ -212,9 +202,8 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.MoveIn
     /// <remarks/>
     [System.SerializableAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true,
-        Namespace = "urn:ebix:org:ChangeAccountingPointCharacteristics:0:1")]
-    public partial class ConfirmRequestChangeAccountingPointCharacteristics_MarketDocumentSender_MarketParticipantmRID
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "urn:ebix:org:ChangeOfSupplier:0:1")]
+    public partial class ConfirmRequestChangeOfSupplier_MarketDocumentSender_MarketParticipantmRID
     {
 
         private string codingSchemeField;
@@ -253,9 +242,8 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.MoveIn
     /// <remarks/>
     [System.SerializableAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true,
-        Namespace = "urn:ebix:org:ChangeAccountingPointCharacteristics:0:1")]
-    public partial class ConfirmRequestChangeAccountingPointCharacteristics_MarketDocumentReceiver_MarketParticipantmRID
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "urn:ebix:org:ChangeOfSupplier:0:1")]
+    public partial class ConfirmRequestChangeOfSupplier_MarketDocumentReceiver_MarketParticipantmRID
     {
 
         private string codingSchemeField;
@@ -294,20 +282,31 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.MoveIn
     /// <remarks/>
     [System.SerializableAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true,
-        Namespace = "urn:ebix:org:ChangeAccountingPointCharacteristics:0:1")]
-    public partial class ConfirmRequestChangeAccountingPointCharacteristics_MarketDocumentMktActivityRecord
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "urn:ebix:org:ChangeOfSupplier:0:1")]
+    public partial class ConfirmRequestChangeOfSupplier_MarketDocumentMktActivityRecord
     {
 
         private string mRIDField;
 
-        private string businessProcessReference_MktActivityRecordmRIDField;
-
         private string marketEvaluationPointmRIDField;
 
-        private System.DateTime start_DateAndOrTimedateField;
+        private
+            ConfirmRequestChangeOfSupplier_MarketDocumentMktActivityRecordMarketEvaluationPointenergySupplier_MarketParticipantmRID
+            marketEvaluationPointenergySupplier_MarketParticipantmRIDField;
 
-        private string originalTransactionIDReference_MktActivityRecordmRIDField;
+        private
+            ConfirmRequestChangeOfSupplier_MarketDocumentMktActivityRecordMarketEvaluationPointbalanceResponsibleParty_MarketParticipantmRID
+            marketEvaluationPointbalanceResponsibleParty_MarketParticipantmRIDField;
+
+        private
+            ConfirmRequestChangeOfSupplier_MarketDocumentMktActivityRecordMarketEvaluationPointshipper_MarketParticipantmRID
+            marketEvaluationPointshipper_MarketParticipantmRIDField;
+
+        private string businessProcessReference_MktActivityRecordmRIDField;
+
+        private string originalTransactionReference_MktActivityRecordmRIDField;
+
+        private System.DateTime start_DateAndOrTimedateField;
 
         /// <remarks/>
         public string mRID
@@ -319,20 +318,6 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.MoveIn
             set
             {
                 mRIDField = value;
-            }
-        }
-
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("businessProcessReference_MktActivityRecord.mRID")]
-        public string businessProcessReference_MktActivityRecordmRID
-        {
-            get
-            {
-                return businessProcessReference_MktActivityRecordmRIDField;
-            }
-            set
-            {
-                businessProcessReference_MktActivityRecordmRIDField = value;
             }
         }
 
@@ -351,6 +336,83 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.MoveIn
         }
 
         /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("marketEvaluationPoint.energySupplier_MarketParticipant.mRID")]
+        public
+            ConfirmRequestChangeOfSupplier_MarketDocumentMktActivityRecordMarketEvaluationPointenergySupplier_MarketParticipantmRID
+            marketEvaluationPointenergySupplier_MarketParticipantmRID
+        {
+            get
+            {
+                return marketEvaluationPointenergySupplier_MarketParticipantmRIDField;
+            }
+            set
+            {
+                marketEvaluationPointenergySupplier_MarketParticipantmRIDField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(
+            "marketEvaluationPoint.balanceResponsibleParty_MarketParticipant.mRID")]
+        public
+            ConfirmRequestChangeOfSupplier_MarketDocumentMktActivityRecordMarketEvaluationPointbalanceResponsibleParty_MarketParticipantmRID
+            marketEvaluationPointbalanceResponsibleParty_MarketParticipantmRID
+        {
+            get
+            {
+                return marketEvaluationPointbalanceResponsibleParty_MarketParticipantmRIDField;
+            }
+            set
+            {
+                marketEvaluationPointbalanceResponsibleParty_MarketParticipantmRIDField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("marketEvaluationPoint.shipper_MarketParticipant.mRID")]
+        public
+            ConfirmRequestChangeOfSupplier_MarketDocumentMktActivityRecordMarketEvaluationPointshipper_MarketParticipantmRID
+            marketEvaluationPointshipper_MarketParticipantmRID
+        {
+            get
+            {
+                return marketEvaluationPointshipper_MarketParticipantmRIDField;
+            }
+            set
+            {
+                marketEvaluationPointshipper_MarketParticipantmRIDField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("businessProcessReference_MktActivityRecord.mRID")]
+        public string businessProcessReference_MktActivityRecordmRID
+        {
+            get
+            {
+                return businessProcessReference_MktActivityRecordmRIDField;
+            }
+            set
+            {
+                businessProcessReference_MktActivityRecordmRIDField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("originalTransactionReference_MktActivityRecord.mRID")]
+        public string originalTransactionReference_MktActivityRecordmRID
+        {
+            get
+            {
+                return originalTransactionReference_MktActivityRecordmRIDField;
+            }
+            set
+            {
+                originalTransactionReference_MktActivityRecordmRIDField = value;
+            }
+        }
+
+        /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute("start_DateAndOrTime.date", DataType = "date")]
         public System.DateTime start_DateAndOrTimedate
         {
@@ -363,18 +425,127 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.MoveIn
                 start_DateAndOrTimedateField = value;
             }
         }
+    }
+
+    /// <remarks/>
+    [System.SerializableAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "urn:ebix:org:ChangeOfSupplier:0:1")]
+    public partial class
+        ConfirmRequestChangeOfSupplier_MarketDocumentMktActivityRecordMarketEvaluationPointenergySupplier_MarketParticipantmRID
+    {
+
+        private string codingSchemeField;
+
+        private string valueField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("originalTransactionIDReference_MktActivityRecord.mRID")]
-        public string originalTransactionIDReference_MktActivityRecordmRID
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string codingScheme
         {
             get
             {
-                return originalTransactionIDReference_MktActivityRecordmRIDField;
+                return codingSchemeField;
             }
             set
             {
-                originalTransactionIDReference_MktActivityRecordmRIDField = value;
+                codingSchemeField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlTextAttribute()]
+        public string Value
+        {
+            get
+            {
+                return valueField;
+            }
+            set
+            {
+                valueField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.SerializableAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "urn:ebix:org:ChangeOfSupplier:0:1")]
+    public partial class
+        ConfirmRequestChangeOfSupplier_MarketDocumentMktActivityRecordMarketEvaluationPointbalanceResponsibleParty_MarketParticipantmRID
+    {
+
+        private string codingSchemeField;
+
+        private string valueField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string codingScheme
+        {
+            get
+            {
+                return codingSchemeField;
+            }
+            set
+            {
+                codingSchemeField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlTextAttribute()]
+        public string Value
+        {
+            get
+            {
+                return valueField;
+            }
+            set
+            {
+                valueField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.SerializableAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "urn:ebix:org:ChangeOfSupplier:0:1")]
+    public partial class
+        ConfirmRequestChangeOfSupplier_MarketDocumentMktActivityRecordMarketEvaluationPointshipper_MarketParticipantmRID
+    {
+
+        private string codingSchemeField;
+
+        private string valueField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string codingScheme
+        {
+            get
+            {
+                return codingSchemeField;
+            }
+            set
+            {
+                codingSchemeField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlTextAttribute()]
+        public string Value
+        {
+            get
+            {
+                return valueField;
+            }
+            set
+            {
+                valueField = value;
             }
         }
     }
