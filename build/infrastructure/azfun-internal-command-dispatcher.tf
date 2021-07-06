@@ -13,7 +13,7 @@
 # limitations under the License.
 module "azfun_internalcommanddispatcher" {
   source                                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//function-app?ref=1.2.0"
-  name                                      = "azfun-outbox-${var.project}-${var.organisation}-${var.environment}"
+  name                                      = "azfun-internalcommanddispatcher-${var.project}-${var.organisation}-${var.environment}"
   resource_group_name                       = data.azurerm_resource_group.main.name
   location                                  = data.azurerm_resource_group.main.location
   storage_account_access_key                = module.azfun_internalcommanddispatcher_stor.primary_access_key
@@ -29,9 +29,9 @@ module "azfun_internalcommanddispatcher" {
     WEBSITES_ENABLE_APP_SERVICE_STORAGE   = true
     FUNCTIONS_WORKER_RUNTIME              = "dotnet-isolated"
     # Endregion: Default Values
-    "MARKETROLES_QUEUE_CONNECTION_STRING": module.sbnar_marketroles_sender.primary_connection_string,
-    "MARKETROLES_QUEUE_TOPIC_NAME": module.sbq_marketroles.name,
-    "MARKETROLES_DB_CONNECTION_STRING": module.kvs_marketroles_db_connection_string.value,
+    "MARKETROLES_QUEUE_CONNECTION_STRING": module.sbnar_marketroles_sender.primary_connection_string
+    "MARKETROLES_QUEUE_TOPIC_NAME": module.sbq_marketroles.name
+    "MARKETROLES_DB_CONNECTION_STRING": local.MARKETROLES_CONNECTION_STRING
     "DISPATCH_TRIGGER_TIMER": "*/10 * * * * *"    
   }
   dependencies                              = [
