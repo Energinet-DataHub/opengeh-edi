@@ -13,12 +13,10 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
-using Energinet.DataHub.MarketRoles.IntegrationEventContracts;
 using Google.Protobuf;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.EnergySupplierChange
+namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChange
 {
     public class EnergySupplierChangedIntegrationMapper : ProtobufOutboundMapper<EnergySupplierChangedIntegrationEvent>
     {

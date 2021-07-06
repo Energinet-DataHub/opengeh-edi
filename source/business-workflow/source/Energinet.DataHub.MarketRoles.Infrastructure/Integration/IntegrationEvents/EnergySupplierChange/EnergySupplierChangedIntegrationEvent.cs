@@ -16,7 +16,7 @@ using Energinet.DataHub.MarketRoles.Application.Common.Transport;
 using MediatR;
 using NodaTime;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.EnergySupplierChange
+namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChange
 {
     public record EnergySupplierChangedIntegrationEvent(
             string GsrnNumber,
