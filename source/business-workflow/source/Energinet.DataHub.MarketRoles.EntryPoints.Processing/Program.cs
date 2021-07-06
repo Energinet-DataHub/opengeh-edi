@@ -30,6 +30,7 @@ using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common.MediatR;
+using Energinet.DataHub.MarketRoles.EntryPoints.Common.SimpleInjector;
 using Energinet.DataHub.MarketRoles.Infrastructure;
 using Energinet.DataHub.MarketRoles.Infrastructure.BusinessRequestProcessing;
 using Energinet.DataHub.MarketRoles.Infrastructure.BusinessRequestProcessing.Pipeline;
@@ -147,6 +148,13 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Processing
                     typeof(DomainEventsDispatcherBehaviour<,>),
                     typeof(InternalCommandHandlingBehaviour<,>),
                     typeof(BusinessProcessResponderBehaviour<,>),
+                });
+
+            container.AddProtobufMessageSerializer();
+            container.AddProtobufOutboundMappers(
+                new[]
+                {
+                    typeof(EnergySupplierChangedIntegrationEvent).Assembly,
                 });
 
             // Actor Notification handlers
