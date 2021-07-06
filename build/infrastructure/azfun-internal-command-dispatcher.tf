@@ -13,7 +13,7 @@
 # limitations under the License.
 module "azfun_internalcommanddispatcher" {
   source                                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//function-app?ref=1.2.0"
-  name                                      = "azfun-outbox-${var.project}-${var.organisation}-${var.environment}"
+  name                                      = "azfun-internalcommanddispatcher-${var.project}-${var.organisation}-${var.environment}"
   resource_group_name                       = data.azurerm_resource_group.main.name
   location                                  = data.azurerm_resource_group.main.location
   storage_account_access_key                = module.azfun_internalcommanddispatcher_stor.primary_access_key
