@@ -36,10 +36,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.XmlConverter
 
         private delegate object ConstructorDelegate(params object?[] args);
 
-        public Dictionary<string, ExtendedPropertyInfo?> GetProperties()
-        {
-            return _properties;
-        }
+        public Dictionary<string, ExtendedPropertyInfo?> GetProperties() => _properties;
 
         public string GetXmlElementName()
         {
@@ -59,7 +56,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.XmlConverter
         private ConstructorDelegate CreateConstructor()
         {
             var constructorInfo = GetType().GetConstructors().SingleOrDefault() ??
-                                  throw new Exception("No constructor found for type");
+                                  throw new InvalidOperationException("No constructor found for type");
             var parameters = constructorInfo.GetParameters().Select(x => x.ParameterType);
             var paramExpr = Expression.Parameter(typeof(object[]));
             var constructorParameters = parameters.Select((paramType, index) =>

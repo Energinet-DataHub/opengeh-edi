@@ -18,7 +18,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class VATNumberMustBeValidRuleErrorConverter : ErrorConverter<VATNumberMustBeValidRuleError>
     {
-        protected override Error Convert(VATNumberMustBeValidRuleError error)
+        protected override ErrorMessage Convert(VATNumberMustBeValidRuleError validationError)
         {
             return new("TODO", $"Description");
         }

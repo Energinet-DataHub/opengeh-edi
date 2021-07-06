@@ -18,7 +18,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class CannotBeInStateOfClosedDownRuleErrorConverter : ErrorConverter<CannotBeInStateOfClosedDownRuleError>
     {
-        protected override Error Convert(CannotBeInStateOfClosedDownRuleError error)
+        protected override ErrorMessage Convert(CannotBeInStateOfClosedDownRuleError validationError)
         {
             return new("TODO", $"Description");
         }

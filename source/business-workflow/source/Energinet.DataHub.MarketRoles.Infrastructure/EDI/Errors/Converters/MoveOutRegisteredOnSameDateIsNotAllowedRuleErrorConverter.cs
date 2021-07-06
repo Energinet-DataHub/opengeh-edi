@@ -18,7 +18,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class MoveOutRegisteredOnSameDateIsNotAllowedRuleErrorConverter : ErrorConverter<MoveOutRegisteredOnSameDateIsNotAllowedRuleError>
     {
-        protected override Error Convert(MoveOutRegisteredOnSameDateIsNotAllowedRuleError error)
+        protected override ErrorMessage Convert(MoveOutRegisteredOnSameDateIsNotAllowedRuleError validationError)
         {
             return new("TODO", $"Description");
         }

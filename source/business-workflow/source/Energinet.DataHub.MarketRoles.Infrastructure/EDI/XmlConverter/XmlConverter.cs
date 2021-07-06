@@ -32,7 +32,9 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.XmlConverter
 
         public async Task<IEnumerable<IBusinessRequest>> DeserializeAsync(Stream body)
         {
-            XElement rootElement = await XElement.LoadAsync(body, LoadOptions.None, CancellationToken.None);
+            XElement rootElement = await XElement
+                .LoadAsync(body, LoadOptions.None, CancellationToken.None)
+                .ConfigureAwait(false);
             return _xmlMapper.Map(rootElement);
         }
     }

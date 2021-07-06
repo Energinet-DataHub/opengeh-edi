@@ -18,7 +18,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class StartOfSupplyMustBeValidRuleErrorConverter : ErrorConverter<StartOfSupplyMustBeValidRuleError>
     {
-        protected override Error Convert(StartOfSupplyMustBeValidRuleError error)
+        protected override ErrorMessage Convert(StartOfSupplyMustBeValidRuleError validationError)
         {
             return new("TODO", $"Description");
         }

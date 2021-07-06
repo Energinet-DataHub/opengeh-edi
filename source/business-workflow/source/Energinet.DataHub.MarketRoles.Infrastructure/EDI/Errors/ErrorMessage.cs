@@ -14,5 +14,5 @@
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors
 {
-    public record Error(string Code, string Description);
+    public record ErrorMessage(string Code, string Description);
 }

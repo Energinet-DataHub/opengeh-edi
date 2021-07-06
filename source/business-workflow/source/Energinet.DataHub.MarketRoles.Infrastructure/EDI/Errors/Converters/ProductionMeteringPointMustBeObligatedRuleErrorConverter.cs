@@ -18,7 +18,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class ProductionMeteringPointMustBeObligatedRuleErrorConverter : ErrorConverter<ProductionMeteringPointMustBeObligatedRuleError>
     {
-        protected override Error Convert(ProductionMeteringPointMustBeObligatedRuleError error)
+        protected override ErrorMessage Convert(ProductionMeteringPointMustBeObligatedRuleError validationError)
         {
             return new("TODO", $"Description");
         }

@@ -32,7 +32,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.XmlConverter
             {
                 var configForType = configurations.SingleOrDefault(x => x.Configuration.GetType() == type);
 
-                if (configForType == null) throw new Exception($"Missing XmlMappingConfiguration for type: {type.Name}");
+                if (configForType == null) throw new InvalidOperationException($"Missing XmlMappingConfiguration for type: {type.Name}");
 
                 var propertiesInConfig = configForType.Configuration.GetProperties();
                 var propertiesInType = type.GetProperties();
@@ -41,11 +41,11 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.XmlConverter
                 {
                     if (!propertiesInConfig.TryGetValue(propertyInfo.Name, out var propertyInConfig) || propertyInConfig is null)
                     {
-                        throw new Exception($"Property {propertyInfo.Name} missing in XmlMappingConfiguration for type: {type.Name}");
+                        throw new InvalidOperationException($"Property {propertyInfo.Name} missing in XmlMappingConfiguration for type: {type.Name}");
                     }
                 }
 
-                if (propertiesInType.Length != propertiesInConfig.Count) throw new Exception($"Properties mismatch in XmlMappingConfiguration for type: {type.Name}");
+                if (propertiesInType.Length != propertiesInConfig.Count) throw new InvalidOperationException($"Properties mismatch in XmlMappingConfiguration for type: {type.Name}");
             }
         }
 

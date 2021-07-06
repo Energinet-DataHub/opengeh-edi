@@ -24,6 +24,8 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.XmlConverter
 
         protected void CreateMapping<T>(string xmlElementName, Func<ConverterMapperConfigurationBuilder<T>, ConverterMapperConfigurationBuilder<T>> createFunc)
         {
+            if (createFunc == null) throw new ArgumentNullException(nameof(createFunc));
+
             _configuration = createFunc(new ConverterMapperConfigurationBuilder<T>(xmlElementName)).Build();
         }
     }
