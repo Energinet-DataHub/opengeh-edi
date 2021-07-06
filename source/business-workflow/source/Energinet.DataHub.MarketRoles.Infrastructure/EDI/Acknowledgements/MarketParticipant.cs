@@ -14,5 +14,8 @@
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Acknowledgements
 {
-    public record MarketParticipant(string Id, string CodingScheme, string Role);
+    public record MarketParticipant(
+        string Id,
+        string CodingScheme,
+        string Role);
 }

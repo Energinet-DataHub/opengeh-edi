@@ -68,19 +68,19 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
                     Code: "41",
                     Text: "5"),
                 MarketActivityRecord: new MarketActivityRecordWithReasons(
-                    id: Guid.NewGuid().ToString(),
-                    businessProcessReference: _correlationContext.GetCorrelationId(),
-                    marketEvaluationPoint: request.AccountingPointGsrnNumber,
-                    startDateAndOrTime: request.MoveInDate,
-                    originalTransaction: request.TransactionId,
-                    new List<Reason> { new Reason("TODO", "TODO") })); // TODO: Use error conversion
+                    Id: Guid.NewGuid().ToString(),
+                    BusinessProcessReference: _correlationContext.GetCorrelationId(),
+                    MarketEvaluationPoint: request.AccountingPointGsrnNumber,
+                    StartDateAndOrTime: request.MoveInDate,
+                    OriginalTransaction: request.TransactionId,
+                    Reasons: new List<Reason> { new Reason("TODO", "TODO") })); // TODO: Use error conversion
 
             var document = _acknowledgementSerializer.Serialize(message, XmlNamespace);
 
             return CreatePostOfficeEnvelope(
-                request.EnergySupplierGlnNumber,
-                document,
-                "RejectRequestChangeOfSupplier");
+                recipient: request.EnergySupplierGlnNumber,
+                cimContent: document,
+                messageType: "RejectRequestChangeOfSupplier");
         }
 
         protected override object CreateAcceptMessage(RequestMoveIn request, BusinessProcessResult result)
@@ -114,9 +114,9 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
             var document = _acknowledgementSerializer.Serialize(message, XmlNamespace);
 
             return CreatePostOfficeEnvelope(
-                request.EnergySupplierGlnNumber,
-                document,
-                "ConfirmRequestChangeOfSupplier");
+                recipient: request.EnergySupplierGlnNumber,
+                cimContent: document,
+                messageType: "ConfirmRequestChangeOfSupplier");
         }
 
         private static PostOfficeEnvelope CreatePostOfficeEnvelope(string recipient, string cimContent, string messageType)

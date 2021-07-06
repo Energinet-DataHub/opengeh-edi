@@ -13,18 +13,20 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Acknowledgements
 {
-    public record MarketActivityRecordWithReasons : MarketActivityRecord
-    {
-        public MarketActivityRecordWithReasons(string id, string businessProcessReference, string marketEvaluationPoint, string startDateAndOrTime, string originalTransaction, IEnumerable<Reason> reasons)
-            : base(id, businessProcessReference, marketEvaluationPoint, startDateAndOrTime, originalTransaction)
-        {
-            Reasons = reasons.ToList();
-        }
-
-        public IReadOnlyCollection<Reason> Reasons { get; init; }
-    }
+    public record MarketActivityRecordWithReasons(
+            string Id,
+            string BusinessProcessReference,
+            string MarketEvaluationPoint,
+            string StartDateAndOrTime,
+            string OriginalTransaction,
+            IReadOnlyCollection<Reason> Reasons)
+        : MarketActivityRecord(
+            Id,
+            BusinessProcessReference,
+            MarketEvaluationPoint,
+            StartDateAndOrTime,
+            OriginalTransaction);
 }
