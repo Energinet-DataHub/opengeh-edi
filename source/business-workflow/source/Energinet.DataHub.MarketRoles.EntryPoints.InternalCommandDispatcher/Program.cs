@@ -20,7 +20,7 @@ using Energinet.DataHub.MarketRoles.EntryPoints.Common;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common.SimpleInjector;
 using Energinet.DataHub.MarketRoles.Infrastructure;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
-using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.ChangeOfSupplier;
+using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.EnergySupplierChange;
 using Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands;
 using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using Microsoft.EntityFrameworkCore;

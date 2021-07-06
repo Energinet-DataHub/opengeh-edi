@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.ChangeOfSupplier
+namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.EnergySupplierChange
 {
     public record EnergySupplierChangedTopic(string Name) : Topic;
 }

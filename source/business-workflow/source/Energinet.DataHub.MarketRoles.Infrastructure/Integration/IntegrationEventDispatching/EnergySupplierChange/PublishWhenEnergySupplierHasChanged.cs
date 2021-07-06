@@ -21,7 +21,7 @@ using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 using MediatR;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.ChangeOfSupplier
+namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.EnergySupplierChange
 {
     public class PublishWhenEnergySupplierHasChanged : INotificationHandler<Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events.EnergySupplierChanged>
     {

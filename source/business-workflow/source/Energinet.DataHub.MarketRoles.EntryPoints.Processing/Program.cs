@@ -45,7 +45,7 @@ using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.Chang
 using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.ChangeOfSupplier.EndOfSupplyNotification;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.ChangeOfSupplier.MeteringPointDetails;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.MoveIn;
-using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.ChangeOfSupplier;
+using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.EnergySupplierChange;
 using Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;

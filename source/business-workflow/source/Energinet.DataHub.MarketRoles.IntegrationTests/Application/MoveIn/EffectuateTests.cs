@@ -17,7 +17,7 @@ using Energinet.DataHub.MarketRoles.Application.MoveIn;
 using Energinet.DataHub.MarketRoles.Application.MoveIn.Processing;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
-using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.ChangeOfSupplier;
+using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.EnergySupplierChange;
 using Xunit;
 using Xunit.Categories;
 

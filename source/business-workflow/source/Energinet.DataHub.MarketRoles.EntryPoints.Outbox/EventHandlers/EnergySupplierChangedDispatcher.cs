@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration;
-using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.ChangeOfSupplier;
+using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.EnergySupplierChange;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox.EventHandlers
