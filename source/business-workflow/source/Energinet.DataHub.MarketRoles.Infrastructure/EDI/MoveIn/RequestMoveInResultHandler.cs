@@ -13,26 +13,33 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using Energinet.DataHub.MarketRoles.Application.Common;
 using Energinet.DataHub.MarketRoles.Application.MoveIn;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
+using Energinet.DataHub.MarketRoles.Infrastructure.EDI.Acknowledgements;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
 {
-    public sealed class RequestMoveInResultHandler : BusinessProcessResultPostOfficeCimHandler<RequestMoveIn>
+    public sealed class RequestMoveInResultHandler : BusinessProcessResultHandler<RequestMoveIn>
     {
+        private const string XmlNamespace = "urn:ebix:org:ChangeAccountingPointCharacteristics:0:1";
+
+        private readonly AcknowledgementXmlSerializer _acknowledgementSerializer;
         private readonly ICorrelationContext _correlationContext;
         private readonly ISystemDateTimeProvider _dateTimeProvider;
 
         public RequestMoveInResultHandler(
+            AcknowledgementXmlSerializer acknowledgementSerializer,
             ICorrelationContext correlationContext,
             ISystemDateTimeProvider dateTimeProvider,
             IOutbox outbox,
             IOutboxMessageFactory outboxMessageFactory)
         : base(outbox, outboxMessageFactory)
         {
+            _acknowledgementSerializer = acknowledgementSerializer;
             _correlationContext = correlationContext;
             _dateTimeProvider = dateTimeProvider;
         }
@@ -42,49 +49,35 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
             if (request == null) throw new ArgumentNullException(nameof(request));
             if (result == null) throw new ArgumentNullException(nameof(result));
 
-            var document = new RejectRequestChangeOfSupplier_MarketDocument
-            {
-                mRID = Guid.NewGuid().ToString(),
-                type = 414,
-                processprocessType = "E65",
-                sender_MarketParticipantmRID = new()
-                {
-                    Value = "DataHub GLN", // TODO: use correct GLN
-                    codingScheme = "9",
-                },
-                sender_MarketParticipantmarketRoletype = "EZ",
-                receiver_MarketParticipantmRID = new()
-                {
-                    Value = request.EnergySupplierGlnNumber,
-                    codingScheme = "9",
-                },
-                receiver_MarketParticipantmarketRoletype = "DDQ",
-                createdDateTime = _dateTimeProvider.Now().ToDateTimeUtc(),
-                Reason = new()
-                {
-                    code = "41",
-                },
-                MktActivityRecord = new()
-                {
-                    mRID = Guid.NewGuid().ToString(),
-                    businessProcessReference_MktActivityRecordmRID = _correlationContext.GetCorrelationId(),
-                    originalTransactionIDReference_MktActivityRecordmRID = request.TransactionId,
-                    marketEvaluationPointmRID = request.AccountingPointGsrnNumber,
-                    start_DateAndOrTimedate = DateTime.Parse(request.MoveInDate),
-                    Reason = new RejectRequestChangeOfSupplier_MarketDocumentMktActivityRecordReason[]
-                    {
-                        new()
-                        {
-                            code = "TODO", // TODO: Use error conversion.
-                        },
-                    },
-                },
-            };
-            var cimDocument = Serialize(document);
+            var message = new RejectMessage(
+                DocumentName: "RejectRequestChangeOfSupplier_MarketDocument",
+                Type: "414",
+                ProcessType: "E65",
+                Sender: new MarketParticipant(
+                    Id: "DataHub GLN", // TODO: Use correct GLN
+                    CodingScheme: "9",
+                    Role: "EZ"),
+                Receiver: new MarketParticipant(
+                    Id: request.EnergySupplierGlnNumber,
+                    CodingScheme: "9",
+                    Role: "DDQ"),
+                CreatedDateTime: _dateTimeProvider.Now(),
+                Reason: new Reason(
+                    Code: "41",
+                    Text: "5"),
+                MarketActivityRecord: new MarketActivityRecordWithReasons(
+                    id: Guid.NewGuid().ToString(),
+                    businessProcessReference: _correlationContext.GetCorrelationId(),
+                    marketEvaluationPoint: request.AccountingPointGsrnNumber,
+                    startDateAndOrTime: request.MoveInDate,
+                    originalTransaction: request.TransactionId,
+                    new List<Reason> { new Reason("TODO", "TODO") })); // TODO: Use error conversion
+
+            var document = _acknowledgementSerializer.Serialize(message, XmlNamespace);
 
             return CreatePostOfficeEnvelope(
                 request.EnergySupplierGlnNumber,
-                cimDocument,
+                document,
                 "RejectRequestChangeOfSupplier");
         }
 
@@ -93,45 +86,42 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
             if (request == null) throw new ArgumentNullException(nameof(request));
             if (result == null) throw new ArgumentNullException(nameof(result));
 
-            var document = new ConfirmRequestChangeOfSupplier_MarketDocument
-            {
-                mRID = Guid.NewGuid().ToString(),
-                type = 414,
-                processprocessType = "E65",
-                sender_MarketParticipantmRID = new()
-                {
-                    Value = "DataHub GLN", // TODO: use correct GLN
-                    codingScheme = "9",
-                },
-                sender_MarketParticipantmarketRoletype = "EZ",
-                receiver_MarketParticipantmRID = new()
-                {
-                    Value = request.EnergySupplierGlnNumber,
-                    codingScheme = "9",
-                },
-                receiver_MarketParticipantmarketRoletype = "DDQ",
-                createdDateTime = _dateTimeProvider.Now().ToDateTimeUtc(),
-                reasoncode = "39",
-                MktActivityRecord = new()
-                {
-                    mRID = Guid.NewGuid().ToString(),
-                    businessProcessReference_MktActivityRecordmRID = _correlationContext.GetCorrelationId(),
-                    originalTransactionReference_MktActivityRecordmRID = request.TransactionId,
-                    marketEvaluationPointmRID = request.AccountingPointGsrnNumber,
-                    start_DateAndOrTimedate = DateTime.Parse(request.MoveInDate),
-                },
-            };
-            var cimDocument = Serialize(document);
+            var message = new ConfirmMessage(
+                DocumentName: "ConfirmRequestChangeOfSupplier_MarketDocument",
+                Type: "414",
+                ProcessType: "E65",
+                Sender: new MarketParticipant(
+                    Id: "DataHub GLN", // TODO: Use correct GLN
+                    CodingScheme: "9",
+                    Role: "EZ"),
+                Receiver: new MarketParticipant(
+                    Id: request.EnergySupplierGlnNumber,
+                    CodingScheme: "9",
+                    Role: "DDQ"),
+                CreatedDateTime: _dateTimeProvider.Now(),
+                ReasonCode: "39",
+                MarketActivityRecord: new MarketActivityRecord(
+                    Id: Guid.NewGuid().ToString(),
+                    BusinessProcessReference: _correlationContext.GetCorrelationId(),
+                    MarketEvaluationPoint: request.AccountingPointGsrnNumber,
+                    StartDateAndOrTime: request.MoveInDate,
+                    OriginalTransaction: request.TransactionId));
+
+            var document = _acknowledgementSerializer.Serialize(message, XmlNamespace);
 
             return CreatePostOfficeEnvelope(
                 request.EnergySupplierGlnNumber,
-                cimDocument,
+                document,
                 "ConfirmRequestChangeOfSupplier");
         }
 
-        private static string Serialize<TObject>(TObject toSerialize)
+        private static PostOfficeEnvelope CreatePostOfficeEnvelope(string recipient, string cimContent, string messageType)
         {
-            return Serialize(toSerialize, "urn:ebix:org:ChangeOfSupplier:0:1");
+            return new(
+                Id: Guid.NewGuid().ToString(),
+                Recipient: recipient,
+                Content: cimContent,
+                MessageType: messageType);
         }
     }
 }
