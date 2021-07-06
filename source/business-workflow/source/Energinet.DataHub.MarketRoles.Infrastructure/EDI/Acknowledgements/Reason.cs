@@ -14,5 +14,7 @@
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Acknowledgements
 {
-    public record Reason(string Code, string Text);
+    public record Reason(
+        string Code,
+        string Text);
 }

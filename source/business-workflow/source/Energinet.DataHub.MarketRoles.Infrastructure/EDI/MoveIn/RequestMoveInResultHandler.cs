@@ -58,8 +58,10 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
 
             var message = new RejectMessage(
                 DocumentName: "RejectRequestChangeOfSupplier_MarketDocument",
+                Id: Guid.NewGuid().ToString(),
                 Type: "414",
                 ProcessType: "E65",
+                BusinessSectorType: "E21",
                 Sender: new MarketParticipant(
                     Id: "DataHub GLN", // TODO: Use correct GLN
                     CodingScheme: "9",
@@ -73,19 +75,19 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
                     Code: "41",
                     Text: string.Empty),
                 MarketActivityRecord: new MarketActivityRecordWithReasons(
-                    id: Guid.NewGuid().ToString(),
-                    businessProcessReference: _correlationContext.GetCorrelationId(),
-                    marketEvaluationPoint: request.AccountingPointGsrnNumber,
-                    startDateAndOrTime: request.MoveInDate,
-                    originalTransaction: request.TransactionId,
-                    reasons: errors.Select(error => new Reason(error.Code, error.Description))));
+                    Id: Guid.NewGuid().ToString(),
+                    BusinessProcessReference: _correlationContext.GetCorrelationId(),
+                    MarketEvaluationPoint: request.AccountingPointGsrnNumber,
+                    StartDateAndOrTime: request.MoveInDate,
+                    OriginalTransaction: request.TransactionId,
+                    Reasons: new List<Reason> { new Reason("TODO", "TODO") })); // TODO: Use error conversion
 
             var document = _acknowledgementSerializer.Serialize(message, XmlNamespace);
 
             return CreatePostOfficeEnvelope(
-                request.EnergySupplierGlnNumber,
-                document,
-                "RejectRequestChangeOfSupplier");
+                recipient: request.EnergySupplierGlnNumber,
+                cimContent: document,
+                messageType: "RejectRequestChangeOfSupplier");
         }
 
         protected override object CreateAcceptMessage(RequestMoveIn request, BusinessProcessResult result)
@@ -95,8 +97,10 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
 
             var message = new ConfirmMessage(
                 DocumentName: "ConfirmRequestChangeOfSupplier_MarketDocument",
+                Id: Guid.NewGuid().ToString(),
                 Type: "414",
                 ProcessType: "E65",
+                BusinessSectorType: "E21",
                 Sender: new MarketParticipant(
                     Id: "DataHub GLN", // TODO: Use correct GLN
                     CodingScheme: "9",
@@ -117,9 +121,9 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
             var document = _acknowledgementSerializer.Serialize(message, XmlNamespace);
 
             return CreatePostOfficeEnvelope(
-                request.EnergySupplierGlnNumber,
-                document,
-                "ConfirmRequestChangeOfSupplier");
+                recipient: request.EnergySupplierGlnNumber,
+                cimContent: document,
+                messageType: "ConfirmRequestChangeOfSupplier");
         }
 
         private static PostOfficeEnvelope CreatePostOfficeEnvelope(string recipient, string cimContent, string messageType)

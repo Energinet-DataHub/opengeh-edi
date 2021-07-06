@@ -18,8 +18,10 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Acknowledgements
 {
     public record ConfirmMessage(
         string DocumentName,
+        string Id,
         string Type,
         string ProcessType,
+        string BusinessSectorType,
         MarketParticipant Sender,
         MarketParticipant Receiver,
         Instant CreatedDateTime,

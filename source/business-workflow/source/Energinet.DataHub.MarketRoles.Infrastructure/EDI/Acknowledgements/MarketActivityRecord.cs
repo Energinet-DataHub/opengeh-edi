@@ -14,5 +14,10 @@
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Acknowledgements
 {
-    public record MarketActivityRecord(string Id, string BusinessProcessReference, string MarketEvaluationPoint, string StartDateAndOrTime, string OriginalTransaction);
+    public record MarketActivityRecord(
+        string Id,
+        string BusinessProcessReference,
+        string MarketEvaluationPoint,
+        string StartDateAndOrTime,
+        string OriginalTransaction);
 }
