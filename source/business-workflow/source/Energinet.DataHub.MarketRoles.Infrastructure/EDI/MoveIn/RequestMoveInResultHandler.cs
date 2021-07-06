@@ -51,8 +51,10 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
 
             var message = new RejectMessage(
                 DocumentName: "RejectRequestChangeOfSupplier_MarketDocument",
+                Id: Guid.NewGuid().ToString(),
                 Type: "414",
                 ProcessType: "E65",
+                BusinessSectorType: "E21",
                 Sender: new MarketParticipant(
                     Id: "DataHub GLN", // TODO: Use correct GLN
                     CodingScheme: "9",
@@ -88,8 +90,10 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
 
             var message = new ConfirmMessage(
                 DocumentName: "ConfirmRequestChangeOfSupplier_MarketDocument",
+                Id: Guid.NewGuid().ToString(),
                 Type: "414",
                 ProcessType: "E65",
+                BusinessSectorType: "E21",
                 Sender: new MarketParticipant(
                     Id: "DataHub GLN", // TODO: Use correct GLN
                     CodingScheme: "9",
