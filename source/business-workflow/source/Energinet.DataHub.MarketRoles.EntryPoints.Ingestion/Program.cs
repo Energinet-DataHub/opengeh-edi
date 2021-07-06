@@ -20,6 +20,8 @@ using Energinet.DataHub.MarketRoles.Contracts;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common;
 using Energinet.DataHub.MarketRoles.EntryPoints.Ingestion.Middleware;
 using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
+using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.XmlConverter;
+using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.XmlConverter.Mappings;
 using Energinet.DataHub.MarketRoles.Infrastructure.Ingestion;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integration;
@@ -69,6 +71,10 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
             container.Register<HttpUserContextMiddleware>(Lifestyle.Scoped);
             container.Register<IUserContext, UserContext>(Lifestyle.Scoped);
 
+            container.Register(XmlMapperFactory, Lifestyle.Singleton);
+            container.Register<XmlMapper>(Lifestyle.Singleton);
+            container.Register<IXmlConverter, XmlConverter>(Lifestyle.Singleton);
+
             container.Register<MessageDispatcher>(Lifestyle.Scoped);
             container.Register<Channel, ProcessingServiceBusChannel>(Lifestyle.Scoped);
 
@@ -78,6 +84,22 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
                 () => new ServiceBusClient(connectionString).CreateSender(topicName),
                 Lifestyle.Singleton);
             container.Verify();
+        }
+
+        private Func<string, string, XmlMappingConfigurationBase> XmlMapperFactory()
+        {
+            return (processType, type) =>
+            {
+                switch (processType)
+                {
+                    case "E03":
+                        return new ChangeOfSupplierXmlMappingConfiguration();
+                    case "E65":
+                        return new RequestMoveInXmlMappingConfiguration();
+                    default:
+                        throw new NotImplementedException($"Found no mapper for process type {processType} and type {type}");
+                }
+            };
         }
     }
 }
