@@ -45,7 +45,7 @@ module "azfun_outbox" {
     module.appi.dependent_on,
     module.azfun_outbox_plan.dependent_on,
     module.azfun_outbox_stor.dependent_on,
-    module.sbq_marketroles.dependent_on,
+    module.sbt_energy_supplier_changed.dependent_on,
   ]
 }
 
