@@ -19,6 +19,7 @@ using Energinet.DataHub.MarketRoles.Application.Common.Users;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.Users
 {
+#pragma warning disable CA1822 // Could be static, but we keep it non-static for now.
     public class UserIdentityFactory
     {
         public UserIdentity FromString(string userIdentity)
@@ -34,7 +35,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Users
             var inputJsonDocument = System.Text.Json.JsonDocument.Parse(inputText);
             var resultJsonProperty = inputJsonDocument.RootElement
                 .EnumerateObject()
-                .FirstOrDefault(e => e.Name.Equals(propertyKey));
+                .FirstOrDefault(e => e.Name.Equals(propertyKey, StringComparison.Ordinal));
             if (resultJsonProperty.Value.ValueKind == JsonValueKind.Undefined)
             {
                 return null;
