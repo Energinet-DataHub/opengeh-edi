@@ -32,7 +32,7 @@ module "azfun_outbox" {
     # VALIDATION_REPORTS_QUEUE_TOPIC        = data.azurerm_key_vault_secret.VALIDATION_REPORTS_QUEUE_TOPIC.value
     # VALIDATION_REPORTS_URL                = data.azurerm_key_vault_secret.VALIDATION_REPORTS_QUEUE_URL.value
     # VALIDATION_REPORTS_CONNECTION_STRING  = data.azurerm_key_vault_secret.VALIDATION_REPORTS_CONNECTION_STRING.value
-    # MARKET_DATA_DB_CONNECTION_STRING      = module.kvs_marketroles_db_connection_string.value
+    "MARKETROLES_DB_CONNECTION_STRING" = local.MARKETROLES_CONNECTION_STRING
     MARKET_DATA_QUEUE_TOPIC_NAME          = module.sbq_marketroles.name
     ACTOR_MESSAGE_DISPATCH_TRIGGER_TIMER  = "*/10 * * * * *"
     EVENT_MESSAGE_DISPATCH_TRIGGER_TIMER = "*/10 * * * * *"
