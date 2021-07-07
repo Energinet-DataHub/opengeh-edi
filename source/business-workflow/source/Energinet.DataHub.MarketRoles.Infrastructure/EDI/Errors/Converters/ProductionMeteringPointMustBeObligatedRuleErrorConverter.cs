@@ -20,7 +20,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
     {
         protected override Error Convert(ProductionMeteringPointMustBeObligatedRuleError error)
         {
-            return new("TODO", $"Description");
+            return new("E22", $"GLN code (TODO: insert GLN) not allowed: The specified production metering point (TODO: Insert GSRN) is blocked because it is subject to production obligation on the effectuation date (TODO: Insert date)");
         }
     }
 }
