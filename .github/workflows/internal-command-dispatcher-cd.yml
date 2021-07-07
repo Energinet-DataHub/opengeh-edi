@@ -28,7 +28,7 @@ env:
   SOLUTION_FILE_PATH: 'source/business-workflow/Energinet.DataHub.MarketRoles.sln'
   DOTNET_VERSION: '5.0.202'
   ORGANISATION_NAME: 'endk'
-  AZURE_FUNCTIONAPP_NAME: 'internal-command-dispatcher'
+  AZURE_FUNCTIONAPP_NAME: 'internalcommanddispatcher'
   PROJECT_NAME: marketroles
   REPOSITORY_NAME: Energinet-DataHub/geh-market-roles
 
