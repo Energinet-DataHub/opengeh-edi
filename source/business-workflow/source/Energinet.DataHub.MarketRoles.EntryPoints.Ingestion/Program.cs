@@ -73,7 +73,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
 
             container.Register(XmlMapperFactory, Lifestyle.Singleton);
             container.Register<XmlMapper>(Lifestyle.Singleton);
-            container.Register<IXmlConverter, XmlConverter>(Lifestyle.Singleton);
+            container.Register<IXmlDeserializer, XmlDeserializer>(Lifestyle.Singleton);
 
             container.Register<MessageDispatcher>(Lifestyle.Scoped);
             container.Register<Channel, ProcessingServiceBusChannel>(Lifestyle.Scoped);

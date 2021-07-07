@@ -31,12 +31,12 @@ namespace Energinet.DataHub.MarketRoles.Tests.EDI
     [UnitTest]
     public class XmlConverterTests
     {
-        private readonly XmlConverter _xmlConverter;
+        private readonly XmlDeserializer _xmlDeserializer;
 
         public XmlConverterTests()
         {
             var xmlMapper = new XmlMapper(XmlMapperFactory);
-            _xmlConverter = new XmlConverter(xmlMapper);
+            _xmlDeserializer = new XmlDeserializer(xmlMapper);
         }
 
         [Fact]
@@ -51,7 +51,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.EDI
         {
             var stream = GetResourceStream("ChangeOfSupplierCimXml.xml");
 
-            var commandsRaw = await _xmlConverter.DeserializeAsync(stream);
+            var commandsRaw = await _xmlDeserializer.DeserializeAsync(stream);
             var commands = commandsRaw.Cast<RequestChangeOfSupplier>();
 
             var command = commands.First();
@@ -68,7 +68,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.EDI
         {
             var stream = GetResourceStream("MoveInCimXml.xml");
 
-            var commandsRaw = await _xmlConverter.DeserializeAsync(stream);
+            var commandsRaw = await _xmlDeserializer.DeserializeAsync(stream);
             var commands = commandsRaw.Cast<RequestMoveIn>();
 
             var command = commands.First();
