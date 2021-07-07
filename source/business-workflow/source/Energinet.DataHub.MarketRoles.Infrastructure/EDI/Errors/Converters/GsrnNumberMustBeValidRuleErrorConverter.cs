@@ -12,23 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Application.Common;
+using Energinet.DataHub.MarketRoles.Application.Common.Validation;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.XmlConverter
+namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
-    /// <summary>
-    /// XML converter
-    /// </summary>
-    public interface IXmlConverter
+    public class GsrnNumberMustBeValidRuleErrorConverter : ErrorConverter<GsrnNumberMustBeValidRuleError>
     {
-        /// <summary>
-        /// Deserializes an EDI message in XML format to a generic collection
-        /// </summary>
-        /// <param name="body"></param>
-        /// <returns>A generic collection</returns>
-        public Task<IEnumerable<IBusinessRequest>> DeserializeAsync(Stream body);
+        protected override ErrorMessage Convert(GsrnNumberMustBeValidRuleError validationError)
+        {
+            return new("TODO", $"Description");
+        }
     }
 }

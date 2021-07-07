@@ -21,45 +21,33 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.XmlConverter
 {
     public class ConverterMapperConfiguration
     {
-        private readonly Type _type;
-        private readonly string _xmlElementName;
-        private readonly Dictionary<string, ExtendedPropertyInfo?> _properties;
         private readonly ConstructorDelegate _cachedConstructor;
 
         public ConverterMapperConfiguration(Type type, string xmlElementName, Dictionary<string, ExtendedPropertyInfo?> properties)
         {
-            _type = type;
-            _xmlElementName = xmlElementName;
-            _properties = properties;
+            Type = type;
+            XmlElementName = xmlElementName;
+            Properties = properties;
             _cachedConstructor = CreateConstructor();
         }
 
         private delegate object ConstructorDelegate(params object?[] args);
 
-        public Dictionary<string, ExtendedPropertyInfo?> GetProperties()
-        {
-            return _properties;
-        }
+        public Dictionary<string, ExtendedPropertyInfo?> Properties { get; }
 
-        public string GetXmlElementName()
-        {
-            return _xmlElementName;
-        }
+        public string XmlElementName { get; }
+
+        public Type Type { get; }
 
         public object CreateInstance(params object?[] parameters)
         {
             return _cachedConstructor(parameters);
         }
 
-        public new Type GetType()
-        {
-            return _type;
-        }
-
         private ConstructorDelegate CreateConstructor()
         {
-            var constructorInfo = GetType().GetConstructors().SingleOrDefault() ??
-                                  throw new Exception("No constructor found for type");
+            var constructorInfo = Type.GetConstructors().SingleOrDefault() ??
+                                  throw new InvalidOperationException("No constructor found for type");
             var parameters = constructorInfo.GetParameters().Select(x => x.ParameterType);
             var paramExpr = Expression.Parameter(typeof(object[]));
             var constructorParameters = parameters.Select((paramType, index) =>
