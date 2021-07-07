@@ -20,7 +20,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
     {
         protected override Error Convert(StartOfSupplyMustBeValidRuleError error)
         {
-            return new("TODO", $"Description");
+            return new("E17", $"Effectuation date (TODO: Insert date) incorrect: The information is not received within the correct time period (either too soon or too late)");
         }
     }
 }
