@@ -21,11 +21,11 @@ using Energinet.DataHub.MarketRoles.Application.Common;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.XmlConverter
 {
-    public class XmlConverter : IXmlConverter
+    public class XmlDeserializer : IXmlDeserializer
     {
         private readonly XmlMapper _xmlMapper;
 
-        public XmlConverter(XmlMapper xmlMapper)
+        public XmlDeserializer(XmlMapper xmlMapper)
         {
             _xmlMapper = xmlMapper;
         }

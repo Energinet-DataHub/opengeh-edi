@@ -30,11 +30,11 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.XmlConverter
 
             foreach (var type in businessRequests)
             {
-                var configForType = configurations.SingleOrDefault(x => x.Configuration.GetType() == type);
+                var configForType = configurations.SingleOrDefault(x => x.Configuration.Type == type);
 
                 if (configForType == null) throw new InvalidOperationException($"Missing XmlMappingConfiguration for type: {type.Name}");
 
-                var propertiesInConfig = configForType.Configuration.GetProperties();
+                var propertiesInConfig = configForType.Configuration.Properties;
                 var propertiesInType = type.GetProperties();
 
                 foreach (var propertyInfo in propertiesInType)

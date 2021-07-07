@@ -75,11 +75,11 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.XmlConverter
         {
             var configuration = xmlMappingConfigurationBase.Configuration;
 
-            var properties = configuration.GetProperties();
+            var properties = configuration.Properties;
 
             var messages = new List<IBusinessRequest>();
 
-            var elements = rootElement.Elements(ns + configuration.GetXmlElementName());
+            var elements = rootElement.Elements(ns + configuration.XmlElementName);
 
             foreach (var element in elements)
             {

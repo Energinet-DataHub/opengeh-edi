@@ -22,7 +22,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.XmlConverter
     /// <summary>
     /// XML converter
     /// </summary>
-    public interface IXmlConverter
+    public interface IXmlDeserializer
     {
         /// <summary>
         /// Deserializes an EDI message in XML format to a generic collection
