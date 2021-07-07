@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 using Energinet.DataHub.MarketRoles.Application.Common;
@@ -31,6 +32,8 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.XmlConverter
 
         public IEnumerable<IBusinessRequest> Map(XElement rootElement)
         {
+            if (rootElement == null) throw new ArgumentNullException(nameof(rootElement));
+
             XNamespace ns = rootElement.Attributes().FirstOrDefault(attr => attr.Name.LocalName == "cim")?.Value ?? throw new ArgumentException("Found no namespace for XML Document");
 
             var headerData = MapHeaderData(rootElement, ns);
@@ -60,10 +63,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.XmlConverter
 
         private static XElement? GetXmlElement(XContainer? container, Queue<string> hierarchyQueue, XNamespace ns)
         {
-            if (container is null)
-            {
-                throw new ArgumentNullException();
-            }
+            if (container == null) throw new ArgumentNullException(nameof(container));
 
             var elementName = hierarchyQueue.Dequeue();
             var element = container.Element(ns + elementName);
@@ -75,11 +75,11 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.XmlConverter
         {
             var configuration = xmlMappingConfigurationBase.Configuration;
 
-            var properties = configuration.GetProperties();
+            var properties = configuration.Properties;
 
             var messages = new List<IBusinessRequest>();
 
-            var elements = rootElement.Elements(ns + configuration.GetXmlElementName());
+            var elements = rootElement.Elements(ns + configuration.XmlElementName);
 
             foreach (var element in elements)
             {
@@ -123,7 +123,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.XmlConverter
                 return valueTranslatorFunc != null ? valueTranslatorFunc(xmlElementInfo) : source.Value;
             }
 
-            return System.Convert.ChangeType(source.Value, dest);
+            return System.Convert.ChangeType(source.Value, dest, CultureInfo.InvariantCulture);
         }
     }
 }

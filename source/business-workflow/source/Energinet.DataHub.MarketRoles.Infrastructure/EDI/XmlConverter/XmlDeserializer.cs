@@ -12,21 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Xml.Linq;
+using Energinet.DataHub.MarketRoles.Application.Common;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.XmlConverter
 {
-    public abstract class XmlMappingConfigurationBase
+    public class XmlDeserializer : IXmlDeserializer
     {
-        private ConverterMapperConfiguration? _configuration;
+        private readonly XmlMapper _xmlMapper;
 
-        public ConverterMapperConfiguration Configuration => _configuration ?? throw new InvalidOperationException("Found no configuration for this instance. You need to create an instance by calling CreateMapping first.")!;
-
-        protected void CreateMapping<T>(string xmlElementName, Func<ConverterMapperConfigurationBuilder<T>, ConverterMapperConfigurationBuilder<T>> createFunc)
+        public XmlDeserializer(XmlMapper xmlMapper)
         {
-            if (createFunc == null) throw new ArgumentNullException(nameof(createFunc));
+            _xmlMapper = xmlMapper;
+        }
 
-            _configuration = createFunc(new ConverterMapperConfigurationBuilder<T>(xmlElementName)).Build();
+        public async Task<IEnumerable<IBusinessRequest>> DeserializeAsync(Stream body)
+        {
+            XElement rootElement = await XElement
+                .LoadAsync(body, LoadOptions.None, CancellationToken.None)
+                .ConfigureAwait(false);
+            return _xmlMapper.Map(rootElement);
         }
     }
 }

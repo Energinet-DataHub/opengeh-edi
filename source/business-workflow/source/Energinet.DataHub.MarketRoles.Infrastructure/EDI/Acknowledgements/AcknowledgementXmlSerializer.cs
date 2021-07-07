@@ -19,10 +19,12 @@ using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Acknowledgements
 {
-    public class AcknowledgementXmlSerializer
+    public static class AcknowledgementXmlSerializer
     {
-        public string Serialize(ConfirmMessage message, XNamespace xmlNamespace)
+        public static string Serialize(ConfirmMessage message, XNamespace xmlNamespace)
         {
+            if (message == null) throw new ArgumentNullException(nameof(message));
+
             var document = new XDocument(
                 new XElement(
                     xmlNamespace + message.DocumentName,
@@ -48,8 +50,10 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Acknowledgements
             return Serialize(document);
         }
 
-        public string Serialize(RejectMessage message, XNamespace xmlNamespace)
+        public static string Serialize(RejectMessage message, XNamespace xmlNamespace)
         {
+            if (message == null) throw new ArgumentNullException(nameof(message));
+
             var document = new XDocument(
                 new XElement(
                     xmlNamespace + message.DocumentName,
@@ -78,11 +82,9 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Acknowledgements
 
         private static string Serialize(XDocument document)
         {
-            using (var writer = new Utf8StringWriter())
-            {
-                document.Save(writer);
-                return writer.ToString();
-            }
+            using var writer = new Utf8StringWriter();
+            document.Save(writer);
+            return writer.ToString();
         }
 
         private static XElement GetReasonElement(XNamespace xmlNamespace, string code, string text)

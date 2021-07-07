@@ -14,11 +14,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Energinet.DataHub.MarketRoles.Application.Common;
 using Energinet.DataHub.MarketRoles.Application.MoveIn;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI.Acknowledgements;
+using Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
@@ -27,19 +29,19 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
     {
         private const string XmlNamespace = "urn:ebix:org:ChangeAccountingPointCharacteristics:0:1";
 
-        private readonly AcknowledgementXmlSerializer _acknowledgementSerializer;
+        private readonly ErrorMessageFactory _errorMessageFactory;
         private readonly ICorrelationContext _correlationContext;
         private readonly ISystemDateTimeProvider _dateTimeProvider;
 
         public RequestMoveInResultHandler(
-            AcknowledgementXmlSerializer acknowledgementSerializer,
+            ErrorMessageFactory errorMessageFactory,
             ICorrelationContext correlationContext,
             ISystemDateTimeProvider dateTimeProvider,
             IOutbox outbox,
             IOutboxMessageFactory outboxMessageFactory)
         : base(outbox, outboxMessageFactory)
         {
-            _acknowledgementSerializer = acknowledgementSerializer;
+            _errorMessageFactory = errorMessageFactory;
             _correlationContext = correlationContext;
             _dateTimeProvider = dateTimeProvider;
         }
@@ -48,6 +50,9 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
             if (result == null) throw new ArgumentNullException(nameof(result));
+
+            var errors = result.ValidationErrors
+                .Select(error => _errorMessageFactory.GetErrorMessage(error));
 
             var message = new RejectMessage(
                 DocumentName: "RejectRequestChangeOfSupplier_MarketDocument",
@@ -66,7 +71,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
                 CreatedDateTime: _dateTimeProvider.Now(),
                 Reason: new Reason(
                     Code: "41",
-                    Text: "5"),
+                    Text: string.Empty),
                 MarketActivityRecord: new MarketActivityRecordWithReasons(
                     Id: Guid.NewGuid().ToString(),
                     BusinessProcessReference: _correlationContext.GetCorrelationId(),
@@ -75,7 +80,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
                     OriginalTransaction: request.TransactionId,
                     Reasons: new List<Reason> { new Reason("TODO", "TODO") })); // TODO: Use error conversion
 
-            var document = _acknowledgementSerializer.Serialize(message, XmlNamespace);
+            var document = AcknowledgementXmlSerializer.Serialize(message, XmlNamespace);
 
             return CreatePostOfficeEnvelope(
                 recipient: request.EnergySupplierGlnNumber,
@@ -111,7 +116,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
                     StartDateAndOrTime: request.MoveInDate,
                     OriginalTransaction: request.TransactionId));
 
-            var document = _acknowledgementSerializer.Serialize(message, XmlNamespace);
+            var document = AcknowledgementXmlSerializer.Serialize(message, XmlNamespace);
 
             return CreatePostOfficeEnvelope(
                 recipient: request.EnergySupplierGlnNumber,
