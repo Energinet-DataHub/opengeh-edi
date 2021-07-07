@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.Common;
 using Energinet.DataHub.MarketRoles.Application.Common.Transport;
 using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
-using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.XmlConverter;
+using Energinet.DataHub.MarketRoles.Infrastructure.EDI.XmlConverter;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
