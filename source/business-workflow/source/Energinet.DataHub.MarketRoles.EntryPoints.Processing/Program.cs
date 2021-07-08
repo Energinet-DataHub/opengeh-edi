@@ -130,7 +130,6 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Processing
             container.Register<IDomainEventsAccessor, DomainEventsAccessor>(Lifestyle.Scoped);
             container.Register<IDomainEventsDispatcher, DomainEventsDispatcher>(Lifestyle.Scoped);
             container.Register<IDomainEventPublisher, DomainEventPublisher>(Lifestyle.Scoped);
-            container.Register<AcknowledgementXmlSerializer>(Lifestyle.Scoped);
 
             var connectionString = Environment.GetEnvironmentVariable("MARKET_DATA_DB_CONNECTION_STRING")
                                    ?? throw new InvalidOperationException(

@@ -18,7 +18,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class TransactionMustBeValidRuleErrorConverter : ErrorConverter<TransactionMustBeValidRuleError>
     {
-        protected override Error Convert(TransactionMustBeValidRuleError error)
+        protected override ErrorMessage Convert(TransactionMustBeValidRuleError validationError)
         {
             return new("TODO", $"Description");
         }

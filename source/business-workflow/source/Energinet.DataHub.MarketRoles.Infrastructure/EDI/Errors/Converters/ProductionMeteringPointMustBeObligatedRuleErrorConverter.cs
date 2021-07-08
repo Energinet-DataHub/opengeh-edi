@@ -18,7 +18,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class ProductionMeteringPointMustBeObligatedRuleErrorConverter : ErrorConverter<ProductionMeteringPointMustBeObligatedRuleError>
     {
-        protected override Error Convert(ProductionMeteringPointMustBeObligatedRuleError error)
+        protected override ErrorMessage Convert(ProductionMeteringPointMustBeObligatedRuleError validationError)
         {
             return new("E22", $"GLN code (TODO: insert GLN) not allowed: The specified production metering point (TODO: Insert GSRN) is blocked because it is subject to production obligation on the effectuation date (TODO: Insert date)");
         }

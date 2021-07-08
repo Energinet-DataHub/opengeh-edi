@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.Integration;
 using Microsoft.Azure.Functions.Worker;
@@ -24,17 +23,21 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
     public class EventMessageDispatcher
     {
         private readonly IIntegrationEventDispatchOrchestrator _integrationEventDispatchOrchestrator;
+        private readonly ILogger _logger;
 
-        public EventMessageDispatcher(IIntegrationEventDispatchOrchestrator integrationEventDispatchOrchestrator)
+        public EventMessageDispatcher(IIntegrationEventDispatchOrchestrator integrationEventDispatchOrchestrator, ILogger logger)
         {
             _integrationEventDispatchOrchestrator = integrationEventDispatchOrchestrator;
+            _logger = logger;
         }
 
         [Function("EventMessageDispatcher")]
         public async Task RunAsync(
-            [TimerTrigger("%EVENT_MESSAGE_DISPATCH_TRIGGER_TIMER%")] FunctionContext context)
+            [TimerTrigger("%EVENT_MESSAGE_DISPATCH_TRIGGER_TIMER%")] TimerInfo timerInfo, FunctionContext context)
         {
-            var logger = context.GetLogger("EventMessageDispatcher");
+            if (context == null) throw new ArgumentNullException(nameof(context));
+            _logger.LogInformation($"C# Timer trigger function executed at: {DateTimeOffset.UtcNow} (UTC)");
+            _logger.LogInformation($"Next timer schedule at: {timerInfo?.ScheduleStatus?.Next}");
             await _integrationEventDispatchOrchestrator.ProcessEventsAsync().ConfigureAwait(false);
         }
     }

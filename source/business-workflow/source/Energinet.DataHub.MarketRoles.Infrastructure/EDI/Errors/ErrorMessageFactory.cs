@@ -31,7 +31,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors
             _converters = registrations.ToDictionary(x => x.Error, x => x.Func);
         }
 
-        public Error GetErrorMessage([NotNull] ValidationError error)
+        public ErrorMessage GetErrorMessage([NotNull] ValidationError error)
             => _converters[error.GetType()]().Convert(error);
     }
 }

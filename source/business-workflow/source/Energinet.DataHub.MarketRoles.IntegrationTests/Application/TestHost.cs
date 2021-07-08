@@ -116,7 +116,6 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             _container.Register<ICommandScheduler, CommandScheduler>(Lifestyle.Scoped);
             _container.Register<IDbConnectionFactory>(() => new SqlDbConnectionFactory(ConnectionString));
             _container.Register<ICorrelationContext, CorrelationContext>(Lifestyle.Scoped);
-            _container.Register<AcknowledgementXmlSerializer>(Lifestyle.Scoped);
 
             // Business process responders
             _container.Register<IBusinessProcessResultHandler<RequestChangeOfSupplier>, RequestChangeOfSupplierResultHandler>(Lifestyle.Scoped);

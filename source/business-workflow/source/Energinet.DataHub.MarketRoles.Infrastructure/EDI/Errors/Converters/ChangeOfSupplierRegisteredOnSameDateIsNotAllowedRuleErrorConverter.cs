@@ -18,7 +18,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class ChangeOfSupplierRegisteredOnSameDateIsNotAllowedRuleErrorConverter : ErrorConverter<ChangeOfSupplierRegisteredOnSameDateIsNotAllowedRuleError>
     {
-        protected override Error Convert(ChangeOfSupplierRegisteredOnSameDateIsNotAllowedRuleError error)
+        protected override ErrorMessage Convert(ChangeOfSupplierRegisteredOnSameDateIsNotAllowedRuleError validationError)
         {
             return new("D07", $"Effectuation date <1>(TODO: Insert effectuation date) incorrect: There is already another market transaction that takes precedence on date <2> (TODO: Insert effectuation date");
         }

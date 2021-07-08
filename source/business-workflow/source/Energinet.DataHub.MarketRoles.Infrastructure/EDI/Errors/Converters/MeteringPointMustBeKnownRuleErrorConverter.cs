@@ -18,7 +18,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class MeteringPointMustBeKnownRuleErrorConverter : ErrorConverter<MeteringPointMustBeKnownRuleError>
     {
-        protected override Error Convert(MeteringPointMustBeKnownRuleError error)
+        protected override ErrorMessage Convert(MeteringPointMustBeKnownRuleError validationError)
         {
             return new("TODO", $"Description");
         }

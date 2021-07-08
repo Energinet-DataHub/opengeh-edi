@@ -18,6 +18,7 @@ using System.Reflection;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors;
 using SimpleInjector;
+using ValidationError = Energinet.DataHub.MarketRoles.Domain.SeedWork.ValidationError;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.ContainerExtensions
 {
@@ -25,6 +26,8 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.ContainerExtensions
     {
         public static void AddValidationErrorConversion(this Container container, bool validateRegistrations, params Assembly[] assemblies)
         {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+
             var validationErrorTypes = container.GetTypesToRegister(typeof(ValidationError), assemblies).ToList();
             var errorConverterTypes = container.GetTypesToRegister(typeof(ErrorConverter<>), assemblies).ToList();
             container.Register(typeof(ErrorConverter<>), errorConverterTypes, Lifestyle.Singleton);

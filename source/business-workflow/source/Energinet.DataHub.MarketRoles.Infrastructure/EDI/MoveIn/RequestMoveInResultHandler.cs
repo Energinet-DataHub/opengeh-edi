@@ -30,13 +30,11 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
         private const string XmlNamespace = "urn:ebix:org:ChangeAccountingPointCharacteristics:0:1";
 
         private readonly ErrorMessageFactory _errorMessageFactory;
-        private readonly AcknowledgementXmlSerializer _acknowledgementSerializer;
         private readonly ICorrelationContext _correlationContext;
         private readonly ISystemDateTimeProvider _dateTimeProvider;
 
         public RequestMoveInResultHandler(
             ErrorMessageFactory errorMessageFactory,
-            AcknowledgementXmlSerializer acknowledgementSerializer,
             ICorrelationContext correlationContext,
             ISystemDateTimeProvider dateTimeProvider,
             IOutbox outbox,
@@ -44,7 +42,6 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
         : base(outbox, outboxMessageFactory)
         {
             _errorMessageFactory = errorMessageFactory;
-            _acknowledgementSerializer = acknowledgementSerializer;
             _correlationContext = correlationContext;
             _dateTimeProvider = dateTimeProvider;
         }
@@ -83,7 +80,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
                     OriginalTransaction: request.TransactionId,
                     Reasons: new List<Reason> { new Reason("TODO", "TODO") })); // TODO: Use error conversion
 
-            var document = _acknowledgementSerializer.Serialize(message, XmlNamespace);
+            var document = AcknowledgementXmlSerializer.Serialize(message, XmlNamespace);
 
             return CreatePostOfficeEnvelope(
                 recipient: request.EnergySupplierGlnNumber,
@@ -119,7 +116,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
                     StartDateAndOrTime: request.MoveInDate,
                     OriginalTransaction: request.TransactionId));
 
-            var document = _acknowledgementSerializer.Serialize(message, XmlNamespace);
+            var document = AcknowledgementXmlSerializer.Serialize(message, XmlNamespace);
 
             return CreatePostOfficeEnvelope(
                 recipient: request.EnergySupplierGlnNumber,

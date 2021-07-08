@@ -18,7 +18,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class GsrnNumberMustBeValidRuleErrorConverter : ErrorConverter<GsrnNumberMustBeValidRuleError>
     {
-        protected override Error Convert(GsrnNumberMustBeValidRuleError error)
+        protected override ErrorMessage Convert(GsrnNumberMustBeValidRuleError validationError)
         {
             return new("TODO", $"Description");
         }

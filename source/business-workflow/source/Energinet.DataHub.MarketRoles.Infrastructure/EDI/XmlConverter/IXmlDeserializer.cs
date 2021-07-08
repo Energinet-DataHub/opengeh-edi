@@ -14,26 +14,21 @@
 
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using Energinet.DataHub.MarketRoles.Application.Common;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.XmlConverter
 {
-    public class XmlConverter : IXmlConverter
+    /// <summary>
+    /// XML converter
+    /// </summary>
+    public interface IXmlDeserializer
     {
-        private readonly XmlMapper _xmlMapper;
-
-        public XmlConverter(XmlMapper xmlMapper)
-        {
-            _xmlMapper = xmlMapper;
-        }
-
-        public async Task<IEnumerable<IBusinessRequest>> DeserializeAsync(Stream body)
-        {
-            XElement rootElement = await XElement.LoadAsync(body, LoadOptions.None, CancellationToken.None);
-            return _xmlMapper.Map(rootElement);
-        }
+        /// <summary>
+        /// Deserializes an EDI message in XML format to a generic collection
+        /// </summary>
+        /// <param name="body"></param>
+        /// <returns>A generic collection</returns>
+        public Task<IEnumerable<IBusinessRequest>> DeserializeAsync(Stream body);
     }
 }

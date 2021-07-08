@@ -18,7 +18,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class CvrNumberFormatRuleErrorConverter : ErrorConverter<CvrNumberFormatRuleError>
     {
-        protected override Error Convert(CvrNumberFormatRuleError error)
+        protected override ErrorMessage Convert(CvrNumberFormatRuleError validationError)
         {
             return new("D17", $"Description");
         }

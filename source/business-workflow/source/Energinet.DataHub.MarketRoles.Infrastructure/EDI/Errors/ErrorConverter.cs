@@ -19,9 +19,9 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors
     #pragma warning disable SA1402 // These ErrorConverter types "overloaded" by type parameter are tightly coupled and it seems logical to have them in the same file.
     public abstract class ErrorConverter
     {
-        public abstract Error Convert(ValidationError error);
+        public abstract ErrorMessage Convert(ValidationError validationError);
 
-        protected Error Default()
+        protected static ErrorMessage Default()
         {
             return new(string.Empty, string.Empty);
         }
@@ -30,14 +30,14 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors
     public abstract class ErrorConverter<TError> : ErrorConverter
         where TError : ValidationError
     {
-        public override Error Convert(ValidationError error)
+        public override ErrorMessage Convert(ValidationError validationError)
         {
-            return error is TError specificError
+            return validationError is TError specificError
                 ? Convert(specificError)
                 : Default();
         }
 
-        protected abstract Error Convert(TError error);
+        protected abstract ErrorMessage Convert(TError validationError);
     }
     #pragma warning restore SA1402
 }

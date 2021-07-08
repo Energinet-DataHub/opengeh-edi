@@ -18,7 +18,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class MustHaveEnergySupplierAssociatedRuleErrorConverter : ErrorConverter<MustHaveEnergySupplierAssociatedRuleError>
     {
-        protected override Error Convert(MustHaveEnergySupplierAssociatedRuleError error)
+        protected override ErrorMessage Convert(MustHaveEnergySupplierAssociatedRuleError validationError)
         {
             return new("TODO", $"Description");
         }

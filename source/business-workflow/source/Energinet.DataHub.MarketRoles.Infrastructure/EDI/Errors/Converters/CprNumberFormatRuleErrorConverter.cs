@@ -18,7 +18,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class CprNumberFormatRuleErrorConverter : ErrorConverter<CprNumberFormatRuleError>
     {
-        protected override Error Convert(CprNumberFormatRuleError error)
+        protected override ErrorMessage Convert(CprNumberFormatRuleError validationError)
         {
             return new("D17", $"Description");
         }

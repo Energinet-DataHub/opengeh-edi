@@ -18,7 +18,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class SocialSecurityNumberMustBeValidRuleErrorConverter : ErrorConverter<SocialSecurityNumberMustBeValidRuleError>
     {
-        protected override Error Convert(SocialSecurityNumberMustBeValidRuleError error)
+        protected override ErrorMessage Convert(SocialSecurityNumberMustBeValidRuleError validationError)
         {
             return new("D17", $"Description");
         }

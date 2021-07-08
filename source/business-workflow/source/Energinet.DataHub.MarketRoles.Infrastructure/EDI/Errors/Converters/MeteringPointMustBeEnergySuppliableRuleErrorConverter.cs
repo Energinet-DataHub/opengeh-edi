@@ -18,7 +18,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class MeteringPointMustBeEnergySuppliableRuleErrorConverter : ErrorConverter<MeteringPointMustBeEnergySuppliableRuleError>
     {
-        protected override Error Convert(MeteringPointMustBeEnergySuppliableRuleError error)
+        protected override ErrorMessage Convert(MeteringPointMustBeEnergySuppliableRuleError validationError)
         {
             return new("TODO", $"Description");
         }

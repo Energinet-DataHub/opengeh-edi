@@ -18,7 +18,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class StartOfSupplyMustBeValidRuleErrorConverter : ErrorConverter<StartOfSupplyMustBeValidRuleError>
     {
-        protected override Error Convert(StartOfSupplyMustBeValidRuleError error)
+        protected override ErrorMessage Convert(StartOfSupplyMustBeValidRuleError validationError)
         {
             return new("E17", $"Effectuation date (TODO: Insert date) incorrect: The information is not received within the correct time period (either too soon or too late)");
         }

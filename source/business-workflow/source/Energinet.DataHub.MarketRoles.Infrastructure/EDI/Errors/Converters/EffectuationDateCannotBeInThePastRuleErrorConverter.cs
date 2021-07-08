@@ -18,7 +18,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class EffectuationDateCannotBeInThePastRuleErrorConverter : ErrorConverter<EffectuationDateCannotBeInThePastRuleError>
     {
-        protected override Error Convert(EffectuationDateCannotBeInThePastRuleError error)
+        protected override ErrorMessage Convert(EffectuationDateCannotBeInThePastRuleError validationError)
         {
             return new("TODO", $"Description");
         }
