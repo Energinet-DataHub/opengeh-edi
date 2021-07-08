@@ -20,7 +20,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
     {
         protected override ErrorMessage Convert(SocialSecurityNumberMustBeValidRuleError validationError)
         {
-            return new("TODO", $"Description");
+            return new("D17", $"Description");
         }
     }
 }

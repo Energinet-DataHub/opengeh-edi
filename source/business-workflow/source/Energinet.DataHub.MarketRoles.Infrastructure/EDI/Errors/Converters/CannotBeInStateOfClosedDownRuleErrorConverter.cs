@@ -20,7 +20,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
     {
         protected override ErrorMessage Convert(CannotBeInStateOfClosedDownRuleError validationError)
         {
-            return new("TODO", $"Description");
+            return new("D16", $"The specified metering point has been closed down");
         }
     }
 }
