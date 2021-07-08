@@ -79,9 +79,3 @@ resource "random_string" "outbox" {
   special = false
   upper   = false
 }
-
-# Reference to get the sender connection string from the shared integration event service bus
-data "azurerm_key_vault_secret" "INTEGRATION_EVENTS_SENDER_CONNECTION_STRING" {
-  name         = "INTEGRATION-EVENTS-SENDER-CONNECTION-STRING"
-  key_vault_id = data.azurerm_key_vault.kv_sharedresources.id
-}
