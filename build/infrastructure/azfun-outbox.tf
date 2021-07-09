@@ -45,7 +45,6 @@ module "azfun_outbox" {
     module.appi.dependent_on,
     module.azfun_outbox_plan.dependent_on,
     module.azfun_outbox_stor.dependent_on,
-    module.sbt_energy_supplier_changed.dependent_on,
   ]
 }
 
@@ -78,10 +77,4 @@ resource "random_string" "outbox" {
   length  = 10
   special = false
   upper   = false
-}
-
-# Reference to get the sender connection string from the shared integration event service bus
-data "azurerm_key_vault_secret" "INTEGRATION_EVENTS_SENDER_CONNECTION_STRING" {
-  name         = "INTEGRATION-EVENTS-SENDER-CONNECTION-STRING"
-  key_vault_id = data.azurerm_key_vault.kv_sharedresources.id
 }
