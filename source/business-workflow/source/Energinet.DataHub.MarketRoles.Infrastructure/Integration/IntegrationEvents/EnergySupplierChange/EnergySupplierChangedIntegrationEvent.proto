@@ -17,11 +17,12 @@ syntax = "proto3";
 
 option csharp_namespace = "Energinet.DataHub.MarketRoles.IntegrationEventContracts";
 /**
- * This message is sent out when a future energy supplier change is accepted. It informs who will be the future energy supplier of the respective metering point
+ * This message is sent out when an energy supplier has been changed.
  */
-message FutureEnergySupplierChangeAccepted {
-  string MeteringPointId = 1; // Unique metering point identification
-  string EnergySupplierGLN = 2; // Unique Energy Supplier identifcation
-  string EffectiveDate = 3; // Date in which the supplier change will go into effect
-  string TransactionId = 4; // Unique transaction ID of the process. Needed to effectuate the correct process at a later date.
+
+message EnergySupplierChanged {
+  string accountingpoint_id = 1;
+  string gsrn_number = 2; // Unique metering point identification
+  string energy_supplier_gln = 3; // Unique Energy Supplier identifcation.
+  string effective_date = 4; // Date which the change of supplier goes into effect.
 }

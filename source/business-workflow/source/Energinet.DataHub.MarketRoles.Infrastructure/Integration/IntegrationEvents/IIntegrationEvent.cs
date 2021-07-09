@@ -12,7 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.ChangeOfSupplier
+namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents
 {
-    public record EnergySupplierChangedTopic(string Name) : Topic;
+    /// <summary>
+    /// An event that published outside the domain and bounded context
+    /// </summary>
+    #pragma warning disable CA1040
+    public interface IIntegrationEvent
+    {
+    }
+    #pragma warning restore
 }
