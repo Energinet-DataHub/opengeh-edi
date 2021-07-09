@@ -28,7 +28,7 @@ using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.AccountingPoints;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.Consumers;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.EnergySuppliers;
-using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.ENTSOE.CIM.ChangeOfSupplier;
+using Energinet.DataHub.MarketRoles.Infrastructure.EDI.ChangeOfSupplier;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
 using EntityFrameworkCore.SqlServer.NodaTime.Extensions;

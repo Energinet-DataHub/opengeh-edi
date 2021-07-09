@@ -20,8 +20,8 @@ using Energinet.DataHub.MarketRoles.Contracts;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common;
 using Energinet.DataHub.MarketRoles.EntryPoints.Ingestion.Middleware;
 using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
-using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.XmlConverter;
-using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.XmlConverter.Mappings;
+using Energinet.DataHub.MarketRoles.Infrastructure.EDI.XmlConverter;
+using Energinet.DataHub.MarketRoles.Infrastructure.EDI.XmlConverter.Mappings;
 using Energinet.DataHub.MarketRoles.Infrastructure.Ingestion;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integration;
@@ -73,7 +73,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
 
             container.Register(XmlMapperFactory, Lifestyle.Singleton);
             container.Register<XmlMapper>(Lifestyle.Singleton);
-            container.Register<IXmlConverter, XmlConverter>(Lifestyle.Singleton);
+            container.Register<IXmlDeserializer, XmlDeserializer>(Lifestyle.Singleton);
 
             container.Register<MessageDispatcher>(Lifestyle.Scoped);
             container.Register<Channel, ProcessingServiceBusChannel>(Lifestyle.Scoped);

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketRoles.Application.Common.Validation;
-using Energinet.DataHub.MarketRoles.Application.Consumers.Validation;
+using Energinet.DataHub.MarketRoles.Application.Common.Validation.Consumers;
 using FluentValidation;
 
 namespace Energinet.DataHub.MarketRoles.Application.MoveIn.Validation

@@ -15,7 +15,6 @@
 using System;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.MarketRoles.Application.Integration;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common;
@@ -25,11 +24,11 @@ using Energinet.DataHub.MarketRoles.EntryPoints.Outbox.EventHandlers;
 using Energinet.DataHub.MarketRoles.Infrastructure;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration;
+using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChange;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.Services;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
-using Energinet.DataHub.MarketRoles.IntegrationEventContracts;
 using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -59,7 +58,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
             {
                 var dbConnectionString = Environment.GetEnvironmentVariable("MARKETROLES_DB_CONNECTION_STRING")
                                          ?? throw new InvalidOperationException(
-                                             "Metering point db connection string not found.");
+                                             "Market roles db connection string not found.");
 
                 x.UseSqlServer(dbConnectionString, options => options.UseNodaTime());
             });
@@ -71,13 +70,13 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
             base.ConfigureContainer(container);
 
             // Register application components.
+            container.Register<EventMessageDispatcher>(Lifestyle.Scoped);
             container.Register<ISystemDateTimeProvider, SystemDateTimeProvider>(Lifestyle.Scoped);
             container.Register<IJsonSerializer, JsonSerializer>(Lifestyle.Singleton);
             container.Register<IOutbox, OutboxProvider>(Lifestyle.Scoped);
             container.Register<IOutboxManager, OutboxManager>(Lifestyle.Scoped);
             container.Register<IOutboxMessageFactory, OutboxMessageFactory>(Lifestyle.Scoped);
             container.Register<IUnitOfWork, UnitOfWork>(Lifestyle.Scoped);
-            container.Register<EventMessageDispatcher>(Lifestyle.Transient);
             container.Register<IIntegrationEventDispatchOrchestrator, IntegrationEventDispatchOrchestrator>(Lifestyle.Transient);
 
             var connectionString = Environment.GetEnvironmentVariable("SHARED_INTEGRATION_EVENT_SERVICE_BUS_SENDER_CONNECTION_STRING");

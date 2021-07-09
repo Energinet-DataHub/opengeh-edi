@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.Common;
 using Energinet.DataHub.MarketRoles.Application.Common.Transport;
 using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
-using Energinet.DataHub.MarketRoles.Infrastructure.EDIMessaging.XmlConverter;
+using Energinet.DataHub.MarketRoles.Infrastructure.EDI.XmlConverter;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -33,18 +33,18 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
         private readonly ILogger _logger;
         private readonly MessageDispatcher _messageDispatcher;
         private readonly ICorrelationContext _correlationContext;
-        private readonly IXmlConverter _xmlConverter;
+        private readonly IXmlDeserializer _xmlDeserializer;
 
         public CommandApi(
             ILogger logger,
             MessageDispatcher messageDispatcher,
             ICorrelationContext correlationContext,
-            IXmlConverter xmlConverter)
+            IXmlDeserializer xmlDeserializer)
         {
             _logger = logger;
             _messageDispatcher = messageDispatcher;
             _correlationContext = correlationContext;
-            _xmlConverter = xmlConverter;
+            _xmlDeserializer = xmlDeserializer;
         }
 
         [Function("CommandApi")]
@@ -58,7 +58,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
 
             try
             {
-                commands = await _xmlConverter.DeserializeAsync(request.Body).ConfigureAwait(false);
+                commands = await _xmlDeserializer.DeserializeAsync(request.Body).ConfigureAwait(false);
             }
 #pragma warning disable CA1031 // We need to return BadRequest in case of failure
             catch (Exception exception)
