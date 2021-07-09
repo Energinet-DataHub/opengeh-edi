@@ -29,31 +29,3 @@ data "azurerm_key_vault_secret" "INTEGRATION_EVENTS_SENDER_CONNECTION_STRING" {
   name         = "INTEGRATION-EVENTS-SENDER-CONNECTION-STRING"
   key_vault_id = data.azurerm_key_vault.kv_sharedresources.id
 }
-
-#Topics
-module "sbt_energy_supplier_changed" {
-  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//service-bus-topic?ref=1.2.0"
-  name                = "sbt-energy-supplier-changed"
-  namespace_name      = data.azurerm_servicebus_namespace.integrationevents.name
-  resource_group_name = data.azurerm_servicebus_namespace.integrationevents.resource_group_name
-}
-
-#Subscriptions
-module "sbt_energy_supplier_changed_subscription" {
-  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//service-bus-subscription?ref=1.2.0"
-  name                = "sbt_energy_supplier_changed_subscription"
-  namespace_name      = data.azurerm_servicebus_namespace.integrationevents.name
-  resource_group_name = data.azurerm_servicebus_namespace.integrationevents.resource_group_name  
-  topic_name          = module.sbt_energy_supplier_changed.name
-  max_delivery_count  = 10
-  forward_to          = module.sbq_market_roles_forwarded_queue.name
-  dependencies        = [module.sbq_market_roles_forwarded_queue]
-}
-
-#Queue to forward subscriptions to
-module "sbq_market_roles_forwarded_queue" {
-  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//service-bus-queue?ref=1.2.0"
-  name                = "sbq-market_roles_forwarded_queue"
-  namespace_name      = data.azurerm_servicebus_namespace.integrationevents.name
-  resource_group_name = data.azurerm_servicebus_namespace.integrationevents.resource_group_name
-}
