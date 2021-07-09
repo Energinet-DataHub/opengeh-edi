@@ -25,6 +25,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEv
             if (obj == null) throw new ArgumentException(null, nameof(obj));
             return new IntegrationEventContracts.EnergySupplierChanged()
             {
+                AccountingpointId = obj.AccountingPointId.ToString(),
                 EffectiveDate = obj.StartOfSupplyDate.ToString(),
                 GsrnNumber = obj.GsrnNumber,
                 EnergySupplierGln = obj.EnergySupplierGln,
