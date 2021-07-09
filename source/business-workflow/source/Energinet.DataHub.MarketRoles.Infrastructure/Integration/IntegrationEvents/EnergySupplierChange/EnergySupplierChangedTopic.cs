@@ -12,17 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
-
-namespace Energinet.DataHub.MarketRoles.Application.Consumers.Validation
+namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChange
 {
-    public class SocialSecurityNumberMustBeValidRuleError : ValidationError
-    {
-        public SocialSecurityNumberMustBeValidRuleError(string socialSecurityNumber)
-        {
-            SocialSecurityNumber = socialSecurityNumber;
-        }
-
-        public string SocialSecurityNumber { get; }
-    }
+    public record EnergySupplierChangedTopic(string Name) : Topic;
 }

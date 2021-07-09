@@ -12,7 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.ChangeOfSupplier
+using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+
+namespace Energinet.DataHub.MarketRoles.Application.Common.Validation.Consumers
 {
-    public record EnergySupplierChangedTopic(string Name) : Topic;
+    public class VATNumberMustBeValidRuleError : ValidationError
+    {
+        public VATNumberMustBeValidRuleError(string vatNumber)
+        {
+            VATNumber = vatNumber;
+        }
+
+        public string VATNumber { get; }
+    }
 }

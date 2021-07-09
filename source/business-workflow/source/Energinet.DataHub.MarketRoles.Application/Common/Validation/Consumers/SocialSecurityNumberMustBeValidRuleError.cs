@@ -12,14 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching
+using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+
+namespace Energinet.DataHub.MarketRoles.Application.Common.Validation.Consumers
 {
-    /// <summary>
-    /// An event that published outside the domain and bounded context
-    /// </summary>
-    #pragma warning disable CA1040
-    public interface IIntegrationEvent
+    public class SocialSecurityNumberMustBeValidRuleError : ValidationError
     {
+        public SocialSecurityNumberMustBeValidRuleError(string socialSecurityNumber)
+        {
+            SocialSecurityNumber = socialSecurityNumber;
+        }
+
+        public string SocialSecurityNumber { get; }
     }
-    #pragma warning restore
 }

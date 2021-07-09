@@ -14,7 +14,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Energinet.DataHub.MarketRoles.Application.Consumers.Validation;
+using Energinet.DataHub.MarketRoles.Application.Common.Validation.Consumers;
 using Energinet.DataHub.MarketRoles.Application.MoveIn;
 using Energinet.DataHub.MarketRoles.Application.MoveIn.Validation;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;

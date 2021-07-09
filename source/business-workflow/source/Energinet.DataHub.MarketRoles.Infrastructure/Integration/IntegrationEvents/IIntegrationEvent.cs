@@ -12,19 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-
-namespace Energinet.DataHub.MarketRoles.Application.Integration
+namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents
 {
     /// <summary>
-    /// Interface for the integration event dispatch orchestrator
+    /// An event that published outside the domain and bounded context
     /// </summary>
-    public interface IIntegrationEventDispatchOrchestrator
+    #pragma warning disable CA1040
+    public interface IIntegrationEvent
     {
-        /// <summary>
-        /// Orchestrate the events to be dispatched
-        /// </summary>
-        /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
-        Task ProcessEventsAsync();
     }
+    #pragma warning restore
 }

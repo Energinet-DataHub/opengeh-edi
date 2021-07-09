@@ -14,21 +14,21 @@
 
 using System;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
-using Energinet.DataHub.MarketRoles.IntegrationEventContracts;
 using Google.Protobuf;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching.ChangeOfSupplier.Mappers
+namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChange
 {
     public class EnergySupplierChangedIntegrationMapper : ProtobufOutboundMapper<EnergySupplierChangedIntegrationEvent>
     {
         protected override IMessage Convert(EnergySupplierChangedIntegrationEvent obj)
         {
             if (obj == null) throw new ArgumentException(null, nameof(obj));
-            return new EnergySupplierChanged
+            return new IntegrationEventContracts.EnergySupplierChanged()
             {
-                MeteringPointId = obj.GsrnNumber,
-                EnergySupplierGLN = obj.EnergySupplierGln,
+                AccountingpointId = obj.AccountingPointId.ToString(),
                 EffectiveDate = obj.StartOfSupplyDate.ToString(),
+                GsrnNumber = obj.GsrnNumber,
+                EnergySupplierGln = obj.EnergySupplierGln,
             };
         }
     }
