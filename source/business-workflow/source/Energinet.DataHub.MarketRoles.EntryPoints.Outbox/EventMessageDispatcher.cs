@@ -14,7 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Application.Integration;
+using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
