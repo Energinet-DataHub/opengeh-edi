@@ -27,7 +27,6 @@ using Energinet.DataHub.MarketRoles.Application.Common;
 using Energinet.DataHub.MarketRoles.Application.Common.Commands;
 using Energinet.DataHub.MarketRoles.Application.Common.DomainEvents;
 using Energinet.DataHub.MarketRoles.Application.Common.Processing;
-using Energinet.DataHub.MarketRoles.Application.Integration;
 using Energinet.DataHub.MarketRoles.Application.MoveIn.Validation;
 using Energinet.DataHub.MarketRoles.Contracts;
 using Energinet.DataHub.MarketRoles.Domain.Consumers;
@@ -200,7 +199,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
         protected Instant EffectiveDate => SystemDateTimeProvider.Now();
 
         private string ConnectionString =>
-            Environment.GetEnvironmentVariable("MarketData_IntegrationTests_ConnectionString");
+            Environment.GetEnvironmentVariable("MarketRoles_IntegrationTests_ConnectionString");
 
         public void Dispose()
         {

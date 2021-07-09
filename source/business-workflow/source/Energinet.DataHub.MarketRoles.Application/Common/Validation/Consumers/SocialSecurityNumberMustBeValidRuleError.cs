@@ -14,15 +14,15 @@
 
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
-namespace Energinet.DataHub.MarketRoles.Application.Consumers.Validation
+namespace Energinet.DataHub.MarketRoles.Application.Common.Validation.Consumers
 {
-    public class VATNumberMustBeValidRuleError : ValidationError
+    public class SocialSecurityNumberMustBeValidRuleError : ValidationError
     {
-        public VATNumberMustBeValidRuleError(string vatNumber)
+        public SocialSecurityNumberMustBeValidRuleError(string socialSecurityNumber)
         {
-            VATNumber = vatNumber;
+            SocialSecurityNumber = socialSecurityNumber;
         }
 
-        public string VATNumber { get; }
+        public string SocialSecurityNumber { get; }
     }
 }

@@ -16,25 +16,26 @@ using Energinet.DataHub.MarketRoles.Domain.Consumers;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using FluentValidation;
 
-namespace Energinet.DataHub.MarketRoles.Application.Consumers.Validation
+namespace Energinet.DataHub.MarketRoles.Application.Common.Validation.Consumers
 {
-    public class SocialSecurityNumberMustBeValid : AbstractValidator<string>
+    public class VATNumberMustBeValidRule : AbstractValidator<string>
     {
-        public SocialSecurityNumberMustBeValid()
+        public VATNumberMustBeValidRule()
         {
             CascadeMode = CascadeMode.Stop;
-            RuleFor(socialSecurityNumber => socialSecurityNumber)
+
+            RuleFor(vatNumber => vatNumber)
                 .NotEmpty()
                 .WithState(CreateValidationError);
 
-            RuleFor(socialSecurityNumber => CprNumber.CheckRules(socialSecurityNumber))
+            RuleFor(vatNumber => CvrNumber.CheckRules(vatNumber))
                 .Must(x => x.Success)
                 .WithState(CreateValidationError);
         }
 
-        private static ValidationError CreateValidationError(string socialSecurityNumber)
+        private static ValidationError CreateValidationError(string vatNumber)
         {
-            return new Validation.SocialSecurityNumberMustBeValidRuleError(socialSecurityNumber);
+            return new VATNumberMustBeValidRuleError(vatNumber);
         }
     }
 }

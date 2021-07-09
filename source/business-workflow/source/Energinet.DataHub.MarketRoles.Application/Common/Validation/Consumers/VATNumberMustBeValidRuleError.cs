@@ -12,19 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
+using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
-namespace Energinet.DataHub.MarketRoles.Application.Integration
+namespace Energinet.DataHub.MarketRoles.Application.Common.Validation.Consumers
 {
-    /// <summary>
-    /// Interface for the integration event dispatch orchestrator
-    /// </summary>
-    public interface IIntegrationEventDispatchOrchestrator
+    public class VATNumberMustBeValidRuleError : ValidationError
     {
-        /// <summary>
-        /// Orchestrate the events to be dispatched
-        /// </summary>
-        /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
-        Task ProcessEventsAsync();
+        public VATNumberMustBeValidRuleError(string vatNumber)
+        {
+            VATNumber = vatNumber;
+        }
+
+        public string VATNumber { get; }
     }
 }
