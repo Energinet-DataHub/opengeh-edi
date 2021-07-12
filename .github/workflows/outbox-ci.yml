@@ -20,8 +20,8 @@ on:
   workflow_dispatch: {}
 
 env:
-  CSPROJ_FILE_PATH: 'source/business-workflow/source/Energinet.DataHub.MarketRoles.EntryPoints.Outbox/Energinet.DataHub.MarketRoles.EntryPoints.Outbox.csproj'
-  SOLUTION_FILE_PATH: 'source/business-workflow/Energinet.DataHub.MarketRoles.sln'
+  CSPROJ_FILE_PATH: 'source/Energinet.DataHub.MarketRoles.EntryPoints.Outbox/Energinet.DataHub.MarketRoles.EntryPoints.Outbox.csproj'
+  SOLUTION_FILE_PATH: 'source/Energinet.DataHub.MarketRoles.sln'
   DOTNET_VERSION: '5.0'
 
 jobs:
@@ -36,7 +36,7 @@ jobs:
         with:
           github_token: ${{ github.token }}
           paths: '[
-            "source/business-workflow/**",
+            "source/**",
             ".github/workflows/outbox-ci.yml",
             ".github/actions/dotnet-build-and-test/**"
           ]'
