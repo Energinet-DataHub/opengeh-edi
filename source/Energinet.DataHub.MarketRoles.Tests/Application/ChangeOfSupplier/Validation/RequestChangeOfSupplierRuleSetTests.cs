@@ -134,7 +134,8 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Valid
             return new RequestChangeOfSupplier(
                 transaction,
                 glnNumber,
-                "FakeCVROrCPR",
+                "1212120000",
+                "12345678",
                 gsrnNumber,
                 startDate);
         }
