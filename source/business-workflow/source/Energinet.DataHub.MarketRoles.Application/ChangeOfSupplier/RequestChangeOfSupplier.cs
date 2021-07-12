@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketRoles.Application.Common;
+using Energinet.DataHub.MarketRoles.Application.Common.Transport;
 
 namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
 {
@@ -22,5 +23,5 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
             string ConsumerId,
             string MeteringPointId,
             string StartDate)
-        : IBusinessRequest;
+        : IBusinessRequest, IOutboundMessage, IInboundMessage;
 }
