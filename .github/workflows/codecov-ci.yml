@@ -39,8 +39,8 @@ jobs:
           paths: '[
             "codecov.yml",
             ".github/workflows/codecov-ci.yml",
-            "source/business-workflow/source/Energinet.DataHub.MarketRoles*/**",
-            "source/business-workflow/Energinet.DataHub.MarketRoles.sln"
+            "source/Energinet.DataHub.MarketRoles*/**",
+            "source/Energinet.DataHub.MarketRoles.sln"
           ]'
           
   collect_coverage_dotnet:
@@ -51,7 +51,7 @@ jobs:
     strategy:
       matrix:
         project: [
-          source/business-workflow/source/Energinet.DataHub.MarketRoles.Tests/Energinet.DataHub.MarketRoles.Tests.csproj
+          source/Energinet.DataHub.MarketRoles.Tests/Energinet.DataHub.MarketRoles.Tests.csproj
         ]
         
     steps:

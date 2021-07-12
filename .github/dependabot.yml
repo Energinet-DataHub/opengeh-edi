@@ -5,67 +5,67 @@
 version: 2
 updates:
   - package-ecosystem: "nuget"
-    directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.Application"
+    directory: "/source/Energinet.DataHub.MarketRoles.Application"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
-    directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp"
+    directory: "/source/Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
-    directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.Domain"
+    directory: "/source/Energinet.DataHub.MarketRoles.Domain"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
-    directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.EntryPoints.Common"
+    directory: "/source/Energinet.DataHub.MarketRoles.EntryPoints.Common"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
-    directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.EntryPoints.Ingestion"
+    directory: "/source/Energinet.DataHub.MarketRoles.EntryPoints.Ingestion"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
-    directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.EntryPoints.InternalCommandDispatcher"
+    directory: "/source/Energinet.DataHub.MarketRoles.EntryPoints.InternalCommandDispatcher"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
-    directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.EntryPoints.Outbox"
+    directory: "/source/Energinet.DataHub.MarketRoles.EntryPoints.Outbox"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
-    directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.EntryPoints.Processing"
+    directory: "/source/Energinet.DataHub.MarketRoles.EntryPoints.Processing"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
-    directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.Infrastructure"
+    directory: "/source/Energinet.DataHub.MarketRoles.Infrastructure"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
-    directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.IntegrationTests"
+    directory: "/source/Energinet.DataHub.MarketRoles.IntegrationTests"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
-    directory: "/source/business-workflow/source/Energinet.DataHub.MarketRoles.Tests"
+    directory: "/source/Energinet.DataHub.MarketRoles.Tests"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0

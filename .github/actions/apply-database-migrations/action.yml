@@ -19,5 +19,5 @@ runs:
         fi
       shell: bash    
     - run: |
-        dotnet run --project source/business-workflow/source/Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp/ --configuration Release -- ${{ inputs.sql-server-connectionstring }} includeSeedData ${{ env.INCLUDE_TESTDATA }}
+        dotnet run --project source/Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp/ --configuration Release -- ${{ inputs.sql-server-connectionstring }} includeSeedData ${{ env.INCLUDE_TESTDATA }}
       shell: bash
