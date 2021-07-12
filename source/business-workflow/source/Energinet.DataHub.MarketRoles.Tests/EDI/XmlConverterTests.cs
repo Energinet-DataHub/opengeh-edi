@@ -56,11 +56,11 @@ namespace Energinet.DataHub.MarketRoles.Tests.EDI
 
             var command = commands.First();
 
-            command.ConsumerId.Should().Be("C87157A9-EC3B-4B2D-B834-8147203EA0FC");
+            command.SocialSecurityNumber.Should().Be("C87157A9-EC3B-4B2D-B834-8147203EA0FC");
             command.StartDate.Should().Be("1957-08-13");
             command.TransactionId.Should().Be("D4CE11B8-C34B-4931-BD03-BFCEC3B462B9");
-            command.EnergySupplierId.Should().Be("BAF8F2EA-B7B2-4851-90FD-C7609DE646F6");
-            command.MeteringPointId.Should().Be("BD370B4E-28B5-4948-9056-732172CC4B5F");
+            command.EnergySupplierGlnNumber.Should().Be("BAF8F2EA-B7B2-4851-90FD-C7609DE646F6");
+            command.AccountingPointGsrnNumber.Should().Be("BD370B4E-28B5-4948-9056-732172CC4B5F");
         }
 
         [Fact]

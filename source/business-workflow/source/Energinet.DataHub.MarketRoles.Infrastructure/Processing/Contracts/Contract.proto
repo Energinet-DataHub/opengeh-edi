@@ -21,10 +21,11 @@ option csharp_namespace = "Energinet.DataHub.MarketRoles.Contracts";
 
 message RequestChangeOfSupplier {
   string TransactionId = 1;
-  string EnergySupplierId = 2;
-  string ConsumerId = 3;
-  string MeteringPointId = 4;
-  google.protobuf.Timestamp StartDate = 5;
+  string EnergySupplierGlnNumber = 2;
+  string SocialSecurityNumber = 3;
+  string VATNumber = 4;
+  string AccountingPointGsrnNumber = 5;
+  google.protobuf.Timestamp StartDate = 6;
 }
 
 message RequestMoveIn {

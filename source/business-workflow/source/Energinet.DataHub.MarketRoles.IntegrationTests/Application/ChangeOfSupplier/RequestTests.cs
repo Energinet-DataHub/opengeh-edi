@@ -52,7 +52,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
             var result = await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
 
             var publishedMessage = await GetLastMessageFromOutboxAsync<RequestChangeOfSupplierRejected>().ConfigureAwait(false);
-            Assert.Equal(request.MeteringPointId, publishedMessage.MeteringPoint);
+            Assert.Equal(request.AccountingPointGsrnNumber, publishedMessage.MeteringPoint);
         }
 
         [Fact]
@@ -65,7 +65,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
             await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
 
             var publishedMessage = await GetLastMessageFromOutboxAsync<RequestChangeOfSupplierRejected>().ConfigureAwait(false);
-            Assert.Equal(request.MeteringPointId, publishedMessage.MeteringPoint);
+            Assert.Equal(request.AccountingPointGsrnNumber, publishedMessage.MeteringPoint);
         }
 
         [Fact]
@@ -81,7 +81,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
             await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
 
             var publishedMessage = await GetLastMessageFromOutboxAsync<RequestChangeOfSupplierRejected>().ConfigureAwait(false);
-            Assert.Equal(request.MeteringPointId, publishedMessage.MeteringPoint);
+            Assert.Equal(request.AccountingPointGsrnNumber, publishedMessage.MeteringPoint);
         }
 
         [Fact]
@@ -98,7 +98,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
             await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
 
             var publishedMessage = await GetLastMessageFromOutboxAsync<RequestChangeOfSupplierApproved>().ConfigureAwait(false);
-            Assert.Equal(request.MeteringPointId, publishedMessage.MeteringPointId);
+            Assert.Equal(request.AccountingPointGsrnNumber, publishedMessage.AccountingPointId);
         }
 
         private RequestChangeOfSupplier CreateRequest()
@@ -115,9 +115,9 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
         {
             return new RequestChangeOfSupplier(
                 TransactionId: transaction,
-                EnergySupplierId: energySupplierGln,
-                ConsumerId: consumerId,
-                MeteringPointId: gsrnNumber,
+                EnergySupplierGlnNumber: energySupplierGln,
+                SocialSecurityNumber: consumerId,
+                AccountingPointGsrnNumber: gsrnNumber,
                 StartDate: startDate);
         }
     }

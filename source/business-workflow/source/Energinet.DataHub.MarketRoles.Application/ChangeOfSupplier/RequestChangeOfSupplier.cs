@@ -19,9 +19,10 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
 {
     public record RequestChangeOfSupplier(
             string TransactionId,
-            string EnergySupplierId,
-            string ConsumerId,
-            string MeteringPointId,
-            string StartDate)
+            string EnergySupplierGlnNumber = "",
+            string SocialSecurityNumber = "",
+            string VATNumber = "",
+            string AccountingPointGsrnNumber = "",
+            string StartDate = "")
         : IBusinessRequest, IOutboundMessage, IInboundMessage;
 }
