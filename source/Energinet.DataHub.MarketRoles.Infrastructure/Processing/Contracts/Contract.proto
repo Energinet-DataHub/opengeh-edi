@@ -20,50 +20,50 @@ import "google/protobuf/timestamp.proto";
 option csharp_namespace = "Energinet.DataHub.MarketRoles.Contracts";
 
 message RequestChangeOfSupplier {
-  string TransactionId = 1;
-  string EnergySupplierGlnNumber = 2;
-  string SocialSecurityNumber = 3;
-  string VATNumber = 4;
-  string AccountingPointGsrnNumber = 5;
-  google.protobuf.Timestamp StartDate = 6;
+  string transaction_id = 1;
+  string energy_supplier_gln_number = 2;
+  string social_security_number = 3;
+  string vat_number = 4;
+  string accounting_point_gsrn_number = 5;
+  google.protobuf.Timestamp start_date = 6;
 }
 
 message RequestMoveIn {
-  string TransactionId = 1;
-  string EnergySupplierGlnNumber = 2;
-  string SocialSecurityNumber = 3;
-  string VATNumber = 4;
-  string ConsumerName = 5;
-  string AccountingPointGsrnNumber = 6;
-  google.protobuf.Timestamp MoveInDate = 7;
+  string transaction_id = 1;
+  string energy_supplier_gln_number = 2;
+  string social_security_number = 3;
+  string vat_number = 4;
+  string consumer_name = 5;
+  string accounting_point_gsrn_number = 6;
+  google.protobuf.Timestamp move_in_date = 7;
 }
 
 message ForwardConsumerDetails {
-  string AccountingPointId = 1;
-  string BusinessProcessId = 2;
-  string Transaction = 3;
+  string accounting_point_id = 1;
+  string business_process_id = 2;
+  string transaction = 3;
 }
 
 message NotifyCurrentSupplier {
-  string AccountingPointId = 1;
-  string BusinessProcessId = 2;
-  string Transaction = 3;
+  string accounting_point_id = 1;
+  string business_process_id = 2;
+  string transaction = 3;
 }
 
 message ForwardMeteringPointDetails {
-  string AccountingPointId = 1;
-  string BusinessProcessId = 2;
-  string Transaction = 3;
+  string accounting_point_id = 1;
+  string business_process_id = 2;
+  string transaction = 3;
 }
 
 message ChangeSupplier {
-  string AccountingPointId = 1;
-  string Transaction = 2;
+  string accounting_point_id = 1;
+  string transaction = 2;
 }
 
 message EffectuateConsumerMoveIn {
-  string AccountingPointId = 1;
-  string Transaction = 2;
+  string accounting_point_id = 1;
+  string transaction = 2;
 }
 
 message MarketRolesEnvelope {

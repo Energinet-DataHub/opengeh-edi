@@ -34,7 +34,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Ingestion.Mappers
                     TransactionId = obj.TransactionId,
                     EnergySupplierGlnNumber = obj.EnergySupplierGlnNumber,
                     SocialSecurityNumber = obj.SocialSecurityNumber,
-                    VATNumber = obj.VATNumber,
+                    VatNumber = obj.VATNumber,
                     AccountingPointGsrnNumber = obj.AccountingPointGsrnNumber,
                     StartDate = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTimeOffset(DateTimeOffset.Parse(obj.StartDate, CultureInfo.InvariantCulture)),
                 },
