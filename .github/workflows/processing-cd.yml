@@ -18,14 +18,14 @@ on:
     branches:
       - main
     paths:
-      - source/business-workflow/**
+      - source/**
       - .github/workflows/processing-cd.yml
       - .github/actions/dotnet-build-and-test/**
   workflow_dispatch: {}
 
 env:
-  CSPROJ_FILE_PATH: 'source/business-workflow/source/Energinet.DataHub.MarketRoles.EntryPoints.Processing/Energinet.DataHub.MarketRoles.EntryPoints.Processing.csproj'
-  SOLUTION_FILE_PATH: 'source/business-workflow/Energinet.DataHub.MarketRoles.sln'
+  CSPROJ_FILE_PATH: 'source/Energinet.DataHub.MarketRoles.EntryPoints.Processing/Energinet.DataHub.MarketRoles.EntryPoints.Processing.csproj'
+  SOLUTION_FILE_PATH: 'source/Energinet.DataHub.MarketRoles.sln'
   DOTNET_VERSION: '5.0.202'
   ORGANISATION_NAME: 'endk'
   AZURE_FUNCTIONAPP_NAME: 'processing'

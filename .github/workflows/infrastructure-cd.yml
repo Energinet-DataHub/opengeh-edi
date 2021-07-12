@@ -25,7 +25,7 @@ on:
 env:
   ORGANISATION_NAME: endk
   PROJECT_NAME: marketroles
-  MIGRATION_PROJECT_CSPROJ_FILE_PATH: 'source/business-workflow/source/Energinet.DataHub.MarketData.ApplyDBMigrationsApp/Energinet.DataHub.MarketData.ApplyDBMigrationsApp.csproj'
+  MIGRATION_PROJECT_CSPROJ_FILE_PATH: 'source/Energinet.DataHub.MarketData.ApplyDBMigrationsApp/Energinet.DataHub.MarketData.ApplyDBMigrationsApp.csproj'
 
 jobs:
   infra_deploy:
