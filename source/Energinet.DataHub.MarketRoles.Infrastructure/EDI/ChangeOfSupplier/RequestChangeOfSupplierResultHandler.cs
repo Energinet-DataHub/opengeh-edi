@@ -37,7 +37,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.ChangeOfSupplier
             return new RequestChangeOfSupplierRejected(
                 MessageId: Guid.NewGuid().ToString(),
                 TransactionId: result.TransactionId,
-                MeteringPoint: request.MeteringPointId,
+                MeteringPoint: request.AccountingPointGsrnNumber,
                 ReasonCodes: result.ValidationErrors.Select(e => e.GetType().Name).AsEnumerable());
         }
 
@@ -51,8 +51,8 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.ChangeOfSupplier
             return new RequestChangeOfSupplierApproved(
                 MessageId: Guid.NewGuid().ToString(),
                 TransactionId: result.TransactionId,
-                MeteringPointId: request.MeteringPointId,
-                RequestingEnergySupplierId: request.EnergySupplierId,
+                AccountingPointId: request.AccountingPointGsrnNumber,
+                RequestingEnergySupplierGln: request.EnergySupplierGlnNumber,
                 StartDate: startDate);
         }
     }

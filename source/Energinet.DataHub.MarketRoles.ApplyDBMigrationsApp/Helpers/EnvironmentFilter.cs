@@ -21,14 +21,10 @@ namespace Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.Helpers
     {
         public static Func<string, bool> GetFilter(string[] args)
         {
-#pragma warning disable CA1307
-#pragma warning disable CA1310
-            return file => file.EndsWith(".sql") &&
-                           ((file.Contains(".Scripts.Seed.") && args.Contains("includeSeedData")) ||
-                            (file.Contains(".Scripts.Test.") && args.Contains("includeTestData")) ||
-                            file.Contains(".Scripts.Model."));
+            return file => file.EndsWith(".sql", StringComparison.OrdinalIgnoreCase) &&
+                           ((file.Contains(".Scripts.Seed.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeSeedData")) ||
+                            (file.Contains(".Scripts.Test.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeTestData")) ||
+                            file.Contains(".Scripts.Model.", StringComparison.OrdinalIgnoreCase));
         }
     }
-#pragma warning restore CA1307
-#pragma warning restore CA1310
 }

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Linq;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.XmlConverter.Mappings
@@ -21,11 +22,30 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.XmlConverter.Mappings
         public ChangeOfSupplierXmlMappingConfiguration()
         {
             CreateMapping<RequestChangeOfSupplier>("MktActivityRecord", mapper => mapper
-                .AddProperty(x => x.MeteringPointId, "marketEvaluationPoint.mRID")
+                .AddProperty(x => x.AccountingPointGsrnNumber, "marketEvaluationPoint.mRID")
                 .AddProperty(x => x.StartDate, "start_DateAndOrTime.date")
-                .AddProperty(x => x.EnergySupplierId, "marketEvaluationPoint.energySupplier_MarketParticipant.mRID")
-                .AddProperty(x => x.ConsumerId, "marketEvaluationPoint.customer_MarketParticipant.mRID")
+                .AddProperty(x => x.EnergySupplierGlnNumber, "marketEvaluationPoint.energySupplier_MarketParticipant.mRID")
+                .AddProperty(x => x.SocialSecurityNumber, EvaluateSocialSecurityNumber, "marketEvaluationPoint.customer_MarketParticipant.mRID")
+                .AddProperty(x => x.VATNumber, EvaluateVatNumber, "marketEvaluationPoint.customer_MarketParticipant.mRID")
                 .AddProperty(x => x.TransactionId, "mRID"));
+        }
+
+        private static string EvaluateSocialSecurityNumber(XmlElementInfo xmlElementInfo)
+        {
+            var codingScheme = xmlElementInfo.Attributes.SingleOrDefault(x => x.Name == "codingScheme");
+
+            if (codingScheme is null) return xmlElementInfo.SourceValue;
+
+            return codingScheme.Value == "ARR" ? xmlElementInfo.SourceValue : string.Empty;
+        }
+
+        private static string EvaluateVatNumber(XmlElementInfo xmlElementInfo)
+        {
+            var codingScheme = xmlElementInfo.Attributes.SingleOrDefault(x => x.Name == "codingScheme");
+
+            if (codingScheme is null) return xmlElementInfo.SourceValue;
+
+            return codingScheme.Value == "VA" ? xmlElementInfo.SourceValue : string.Empty;
         }
     }
 }

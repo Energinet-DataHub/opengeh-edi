@@ -19,7 +19,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.ChangeOfSupplier
     public record RequestChangeOfSupplierApproved(
         string MessageId,
         string TransactionId,
-        string MeteringPointId,
-        string RequestingEnergySupplierId,
+        string AccountingPointId,
+        string RequestingEnergySupplierGln,
         Instant StartDate);
 }
