@@ -7,8 +7,8 @@
     See also: https://docs.microsoft.com/en-us/visualstudio/msbuild/customize-your-build?view=vs-2019#search-scope
     -->
     <ItemGroup>
-        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.9.60" />
-        <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.333" />
+        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.10.56" />
+        <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.354" />
         <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2" />
         <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="5.0.3">
 		      <PrivateAssets>All</PrivateAssets>
