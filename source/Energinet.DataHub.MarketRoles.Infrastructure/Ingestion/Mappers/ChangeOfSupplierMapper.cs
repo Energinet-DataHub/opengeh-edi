@@ -17,27 +17,26 @@ using System.Globalization;
 using Energinet.DataHub.MarketRoles.Contracts;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
 using Google.Protobuf;
-using RequestMoveIn = Energinet.DataHub.MarketRoles.Application.MoveIn.RequestMoveIn;
+using RequestChangeOfSupplier = Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.RequestChangeOfSupplier;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.Ingestion.Mappers
 {
-    public class RequestMoveInMapper : ProtobufOutboundMapper<RequestMoveIn>
+    public class ChangeOfSupplierMapper : ProtobufOutboundMapper<RequestChangeOfSupplier>
     {
-        protected override IMessage Convert(RequestMoveIn obj)
+        protected override IMessage Convert(RequestChangeOfSupplier obj)
         {
             if (obj == null) throw new ArgumentNullException(nameof(obj));
 
             return new MarketRolesEnvelope
             {
-                RequestMoveIn = new Contracts.RequestMoveIn
+                RequestChangeOfSupplier = new Contracts.RequestChangeOfSupplier
                 {
                     TransactionId = obj.TransactionId,
                     EnergySupplierGlnNumber = obj.EnergySupplierGlnNumber,
                     SocialSecurityNumber = obj.SocialSecurityNumber,
                     VatNumber = obj.VATNumber,
-                    ConsumerName = obj.ConsumerName,
                     AccountingPointGsrnNumber = obj.AccountingPointGsrnNumber,
-                    MoveInDate = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTimeOffset(DateTimeOffset.Parse(obj.MoveInDate, CultureInfo.InvariantCulture)),
+                    StartDate = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTimeOffset(DateTimeOffset.Parse(obj.StartDate, CultureInfo.InvariantCulture)),
                 },
             };
         }

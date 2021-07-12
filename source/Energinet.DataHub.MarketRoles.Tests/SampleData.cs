@@ -21,7 +21,7 @@ namespace Energinet.DataHub.MarketRoles.Tests
     {
         internal static string GsrnNumber => "571234567891234568";
 
-        internal static string ConsumerId => "2601211234";
+        internal static string ConsumerSsnNumber => "2601211234";
 
         internal static string GlnNumber => "5790000555550";
 

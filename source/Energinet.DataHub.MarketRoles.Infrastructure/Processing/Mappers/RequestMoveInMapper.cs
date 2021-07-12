@@ -31,7 +31,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Processing.Mappers
                 TransactionId = obj.TransactionId,
                 EnergySupplierGlnNumber = obj.EnergySupplierGlnNumber,
                 SocialSecurityNumber = obj.SocialSecurityNumber,
-                VATNumber = obj.VATNumber,
+                VATNumber = obj.VatNumber,
                 ConsumerName = obj.ConsumerName,
                 AccountingPointGsrnNumber = obj.AccountingPointGsrnNumber,
                 MoveInDate = Instant.FromDateTimeOffset(obj.MoveInDate.ToDateTimeOffset()).ToString(),

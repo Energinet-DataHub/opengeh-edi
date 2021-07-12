@@ -21,8 +21,8 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Validation
     {
         public RequestChangeOfSupplierRuleSet()
         {
-            RuleFor(request => request.MeteringPointId).SetValidator(new GsrnNumberMustBeValidRule());
-            RuleFor(request => request.EnergySupplierId).SetValidator(new GlnNumberMustBeValidRule());
+            RuleFor(request => request.AccountingPointGsrnNumber).SetValidator(new GsrnNumberMustBeValidRule());
+            RuleFor(request => request.EnergySupplierGlnNumber).SetValidator(new GlnNumberMustBeValidRule());
             RuleFor(request => request.StartDate).SetValidator(new StartOfSupplyMustBeValidRule());
             RuleFor(request => request.TransactionId).SetValidator(new TransactionMustBeValidRule());
         }

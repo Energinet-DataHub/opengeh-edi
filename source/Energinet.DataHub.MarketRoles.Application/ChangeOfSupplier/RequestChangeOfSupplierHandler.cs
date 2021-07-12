@@ -47,8 +47,8 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
         public async Task<BusinessProcessResult> Handle(RequestChangeOfSupplier request, CancellationToken cancellationToken)
         {
             _request = request ?? throw new ArgumentNullException(nameof(request));
-            _energySupplier = await _energySupplierRepository.GetByGlnNumberAsync(new GlnNumber(request.EnergySupplierId)).ConfigureAwait(false);
-            _accountingPoint = await GetMeteringPointAsync(request.MeteringPointId).ConfigureAwait(false);
+            _energySupplier = await _energySupplierRepository.GetByGlnNumberAsync(new GlnNumber(request.EnergySupplierGlnNumber)).ConfigureAwait(false);
+            _accountingPoint = await GetMeteringPointAsync(request.AccountingPointGsrnNumber).ConfigureAwait(false);
 
             var validationResult = Validate();
             if (!validationResult.Success)
@@ -75,8 +75,8 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
 
             var validationRules = new List<IBusinessRule>()
             {
-                new EnergySupplierMustBeKnownRule(_energySupplier, _request.EnergySupplierId),
-                new MeteringPointMustBeKnownRule(_accountingPoint, _request.MeteringPointId),
+                new EnergySupplierMustBeKnownRule(_energySupplier, _request.EnergySupplierGlnNumber),
+                new MeteringPointMustBeKnownRule(_accountingPoint, _request.AccountingPointGsrnNumber),
             };
 
             return new BusinessProcessResult(_request.TransactionId, validationRules);

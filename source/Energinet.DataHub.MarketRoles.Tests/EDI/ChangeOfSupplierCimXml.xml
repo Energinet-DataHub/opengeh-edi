@@ -30,7 +30,7 @@ limitations under the License.
         <cim:marketEvaluationPoint.energySupplier_MarketParticipant.mRID codingScheme="NMK">BAF8F2EA-B7B2-4851-90FD-C7609DE646F6</cim:marketEvaluationPoint.energySupplier_MarketParticipant.mRID>
         <cim:marketEvaluationPoint.balanceResponsibleParty_MarketParticipant.mRID codingScheme="NUA">C240D0F6-2C96-4385-B72B-CDC7924CEB98</cim:marketEvaluationPoint.balanceResponsibleParty_MarketParticipant.mRID>
         <cim:marketEvaluationPoint.shipper_MarketParticipant.mRID codingScheme="NLT">26F54285-64F4-4745-9582-3461C06F037E</cim:marketEvaluationPoint.shipper_MarketParticipant.mRID>
-        <cim:marketEvaluationPoint.customer_MarketParticipant.mRID codingScheme="A02">C87157A9-EC3B-4B2D-B834-8147203EA0FC</cim:marketEvaluationPoint.customer_MarketParticipant.mRID>
+        <cim:marketEvaluationPoint.customer_MarketParticipant.mRID codingScheme="ARR">C87157A9-EC3B-4B2D-B834-8147203EA0FC</cim:marketEvaluationPoint.customer_MarketParticipant.mRID>
         <cim:marketEvaluationPoint.customer_MarketParticipant.name>Customer Test Name</cim:marketEvaluationPoint.customer_MarketParticipant.name>
         <cim:start_DateAndOrTime.date>1957-08-13</cim:start_DateAndOrTime.date>
         <cim:businessProcessReference_MktActivityRecord.mRID>D49E31B3-8326-4266-B115-240DE95A404A</cim:businessProcessReference_MktActivityRecord.mRID>
