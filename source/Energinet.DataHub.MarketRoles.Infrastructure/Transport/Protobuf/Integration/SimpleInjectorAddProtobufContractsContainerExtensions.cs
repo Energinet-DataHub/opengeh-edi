@@ -23,23 +23,18 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integr
 {
     public static class SimpleInjectorAddProtobufContractsContainerExtensions
     {
-        public static void AddProtobufOutboundMappers(this Container container, Assembly[] applicationAssemblies)
+        public static void SendProtobuf(this Container container, Assembly[] applicationAssemblies)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             var assemblies = GetAssemblies().Union(applicationAssemblies).ToArray();
 
+            container.Register<MessageSerializer, ProtobufMessageSerializer>(Lifestyle.Transient);
             container.Register<ProtobufOutboundMapperFactory>(Lifestyle.Transient);
 
             ScanForMappers(container, typeof(ProtobufOutboundMapper<>), assemblies);
         }
 
-        public static void AddProtobufMessageSerializer(this Container container)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            container.Register<MessageSerializer, ProtobufMessageSerializer>(Lifestyle.Transient);
-        }
-
-        public static void ReceiveProtobufEnvelope<TProtoContract>(
+        public static void ReceiveProtobuf<TProtoContract>(
             this Container container,
             Action<OneOfConfiguration<TProtoContract>> configuration)
             where TProtoContract : class, IMessage

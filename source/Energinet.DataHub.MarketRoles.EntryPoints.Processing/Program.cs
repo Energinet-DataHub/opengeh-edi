@@ -148,13 +148,12 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Processing
                     typeof(BusinessProcessResponderBehaviour<,>),
                 });
 
-            container.ReceiveProtobufEnvelope<Contracts.MarketRolesEnvelope>(
+            container.ReceiveProtobuf<Contracts.MarketRolesEnvelope>(
                 config => config
                     .FromOneOf(envelope => envelope.MarketRolesMessagesCase)
                     .WithParser(() => Contracts.MarketRolesEnvelope.Parser));
 
-            container.AddProtobufMessageSerializer();
-            container.AddProtobufOutboundMappers(
+            container.SendProtobuf(
                 new[]
                 {
                     typeof(EnergySupplierChangedIntegrationEvent).Assembly,

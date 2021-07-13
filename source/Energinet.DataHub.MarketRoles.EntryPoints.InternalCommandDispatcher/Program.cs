@@ -74,8 +74,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.InternalCommandDispatcher
                 () => new ServiceBusClient(connectionString).CreateSender(topicName),
                 Lifestyle.Singleton);
 
-            container.AddProtobufMessageSerializer();
-            container.AddProtobufOutboundMappers(
+            container.SendProtobuf(
                 new[]
                 {
                     typeof(EnergySupplierChangedIntegrationEvent).Assembly,
