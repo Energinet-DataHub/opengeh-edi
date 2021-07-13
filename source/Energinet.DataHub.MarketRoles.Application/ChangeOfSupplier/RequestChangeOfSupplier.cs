@@ -18,7 +18,7 @@ using Energinet.DataHub.MarketRoles.Application.Common.Transport;
 namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
 {
     public record RequestChangeOfSupplier(
-            string TransactionId,
+            string TransactionId = "",
             string EnergySupplierGlnNumber = "",
             string SocialSecurityNumber = "",
             string VATNumber = "",
