@@ -18,6 +18,7 @@ using System.Linq;
 using System.Reflection;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
+using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integration;
 using Google.Protobuf;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleInjector;
@@ -40,6 +41,26 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Common.SimpleInjector
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             container.Register<MessageSerializer, ProtobufMessageSerializer>(Lifestyle.Transient);
+        }
+
+        public static void ReceiveProtobufEnvelope<TProtoContract>(
+            this Container container,
+            Action<OneOfConfiguration<TProtoContract>> configuration)
+            where TProtoContract : class, IMessage
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            if (configuration == null) throw new ArgumentNullException(nameof(configuration));
+            var config = new OneOfConfiguration<TProtoContract>();
+            configuration.Invoke(config);
+            container.Register<MessageExtractor>(Lifestyle.Transient);
+            container.Register<MessageDeserializer, ProtobufMessageDeserializer>(Lifestyle.Transient);
+            container.Register<ProtobufInboundMapperFactory>(Lifestyle.Transient);
+            container.Register(() => config.GetParser(), Lifestyle.Transient);
+
+            ScanForMappers(container, typeof(ProtobufInboundMapper<>), new[]
+            {
+                typeof(TProtoContract).Assembly,
+            });
         }
 
         private static void ScanForMappers(Container container, Type collectionType, Assembly[] assemblies)

@@ -14,11 +14,13 @@
 
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Contracts;
+using Energinet.DataHub.MarketRoles.EntryPoints.Common.SimpleInjector;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integration;
 using Energinet.DataHub.MarketRoles.IntegrationTests.Transport.TestImplementations;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
+using SimpleInjector;
 using Xunit;
 
 namespace Energinet.DataHub.MarketRoles.IntegrationTests.Transport
@@ -28,30 +30,33 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Transport
         [Fact]
         public async Task Send_and_receive_must_result_in_same_transmitted_values()
         {
-            // Send
-            var sendingServiceCollection = new ServiceCollection();
-            sendingServiceCollection.AddSingleton<InProcessChannel>();
-            sendingServiceCollection.AddScoped<Dispatcher>();
-            sendingServiceCollection.SendProtobuf<TestEnvelope>();
-            var sendingServiceProvider = sendingServiceCollection.BuildServiceProvider();
+            var container = new Container();
+            container.Register<InProcessChannel>(Lifestyle.Singleton);
+            container.Register<Dispatcher>(Lifestyle.Transient);
+            container.AddProtobufMessageSerializer();
+            container.ReceiveProtobufEnvelope<TestEnvelope>(
+                config => config
+                    .FromOneOf(envelope => envelope.TestMessagesCase)
+                    .WithParser(() => TestEnvelope.Parser));
 
-            var messageDispatcher = sendingServiceProvider.GetRequiredService<Dispatcher>();
+            // container.AddProtobufMessageDeSerializer();
+            container.AddProtobufOutboundMappers(
+                new[]
+                {
+                    typeof(TransportTestOutboundMapper).Assembly,
+                });
+
+            // Send
+            var messageDispatcher = container.GetInstance<Dispatcher>();
             var outboundMessage = new TransportTestRecord("test");
             await messageDispatcher.DispatchAsync(outboundMessage).ConfigureAwait(false);
-            var channel = sendingServiceProvider.GetRequiredService<InProcessChannel>();
+            var channel = container.GetInstance<InProcessChannel>();
 
             // The wire
             var bytes = channel.GetWrittenBytes();
 
             // Receive
-            var receivingServiceCollection = new ServiceCollection();
-            receivingServiceCollection.ReceiveProtobuf<TestEnvelope>(
-               config => config
-                   .FromOneOf(envelope => envelope.TestMessagesCase)
-                   .WithParser(() => TestEnvelope.Parser));
-
-            var receivingServiceProvider = receivingServiceCollection.BuildServiceProvider();
-            var messageExtractor = receivingServiceProvider.GetRequiredService<MessageExtractor>();
+            var messageExtractor = container.GetInstance<MessageExtractor>();
 
             var message = await messageExtractor.ExtractAsync(bytes).ConfigureAwait(false);
 

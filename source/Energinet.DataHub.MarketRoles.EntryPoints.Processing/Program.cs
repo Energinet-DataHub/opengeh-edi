@@ -53,6 +53,7 @@ using Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChange;
 using Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
+using Energinet.DataHub.MarketRoles.Infrastructure.Processing.Mappers;
 using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integration;
 using Energinet.DataHub.MarketRoles.Infrastructure.Users;
@@ -99,11 +100,6 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Processing
 
                 x.UseSqlServer(connectionString, y => y.UseNodaTime());
             });
-
-            services.ReceiveProtobuf<Contracts.MarketRolesEnvelope>(
-                config => config
-                    .FromOneOf(envelope => envelope.MarketRolesMessagesCase)
-                    .WithParser(() => Contracts.MarketRolesEnvelope.Parser));
         }
 
         protected override void ConfigureContainer(Container container)
@@ -151,6 +147,11 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Processing
                     typeof(InternalCommandHandlingBehaviour<,>),
                     typeof(BusinessProcessResponderBehaviour<,>),
                 });
+
+            container.ReceiveProtobufEnvelope<Contracts.MarketRolesEnvelope>(
+                config => config
+                    .FromOneOf(envelope => envelope.MarketRolesMessagesCase)
+                    .WithParser(() => Contracts.MarketRolesEnvelope.Parser));
 
             container.AddProtobufMessageSerializer();
             container.AddProtobufOutboundMappers(

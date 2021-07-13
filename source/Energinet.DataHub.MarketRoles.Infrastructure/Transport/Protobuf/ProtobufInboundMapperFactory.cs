@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using SimpleInjector;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf
 {
@@ -22,15 +23,15 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf
     public sealed class ProtobufInboundMapperFactory
     {
         private static readonly Type _protobufReverseMapperType = typeof(ProtobufInboundMapper<>);
-        private readonly IServiceProvider _serviceProvider;
+        private readonly Container _container;
 
         /// <summary>
         /// Create a Mapper factory
         /// </summary>
-        /// <param name="serviceProvider">The current service provider</param>
-        public ProtobufInboundMapperFactory(IServiceProvider serviceProvider)
+        /// <param name="container"></param>
+        public ProtobufInboundMapperFactory(Container container)
         {
-            _serviceProvider = serviceProvider;
+            _container = container;
         }
 
         /// <summary>
@@ -45,7 +46,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf
             if (typeOfMessage == null) throw new ArgumentNullException(nameof(typeOfMessage));
 
             var typeToLocate = _protobufReverseMapperType.MakeGenericType(typeOfMessage);
-            var mapper = _serviceProvider.GetService(typeToLocate) as ProtobufInboundMapper;
+            var mapper = _container.GetInstance(typeToLocate) as ProtobufInboundMapper;
 
             return mapper ?? throw new InvalidOperationException("Mapper not found");
         }

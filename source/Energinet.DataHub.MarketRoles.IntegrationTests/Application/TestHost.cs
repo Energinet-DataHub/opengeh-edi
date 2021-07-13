@@ -210,11 +210,13 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
         protected SqlConnection GetSqlDbConnection()
         {
-            if (_sqlConnection is null)
-                _sqlConnection = new SqlConnection(ConnectionString);
+            _sqlConnection ??= new SqlConnection(ConnectionString);
 
             if (_sqlConnection.State == ConnectionState.Closed)
+            {
                 _sqlConnection.Open();
+            }
+
             return _sqlConnection;
         }
 
@@ -356,7 +358,9 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             {
                 var connection = new SqlConnection(ConnectionString);
                 if (connection.State == ConnectionState.Closed)
+                {
                     connection.Open();
+                }
 
                 var command = new SqlCommand($"SELECT Id FROM [dbo].[BusinessProcesses] WHERE TransactionId = '{transaction.Value}'", connection);
                 var id = command.ExecuteScalar();
