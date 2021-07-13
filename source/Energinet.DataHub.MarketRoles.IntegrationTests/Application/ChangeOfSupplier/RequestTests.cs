@@ -27,8 +27,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
     [IntegrationTest]
     public sealed class RequestTests : TestHost, IDisposable
     {
-        public RequestTests(SqlServerResource sqlServerResource)
-            : base(sqlServerResource)
+        public RequestTests(DatabaseFixture databaseFixture)
+            : base(databaseFixture)
         {
         }
 

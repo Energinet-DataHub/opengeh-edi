@@ -27,8 +27,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
     [IntegrationTest]
     public class EffectuateTests : TestHost
     {
-        public EffectuateTests(SqlServerResource sqlServerResource)
-            : base(sqlServerResource)
+        public EffectuateTests(DatabaseFixture databaseFixture)
+            : base(databaseFixture)
         {
         }
 

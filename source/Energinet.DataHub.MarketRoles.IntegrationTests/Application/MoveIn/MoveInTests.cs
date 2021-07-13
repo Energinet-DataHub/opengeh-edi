@@ -29,8 +29,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
     {
         private readonly AccountingPoint _accountingPoint;
 
-        public MoveInTests(SqlServerResource sqlServerResource)
-            : base(sqlServerResource)
+        public MoveInTests(DatabaseFixture databaseFixture)
+            : base(databaseFixture)
         {
         }
 

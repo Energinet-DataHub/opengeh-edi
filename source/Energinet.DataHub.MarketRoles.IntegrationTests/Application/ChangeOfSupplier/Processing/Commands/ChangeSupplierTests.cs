@@ -44,8 +44,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
 
         private Transaction _transaction = null;
 
-        public ChangeSupplierTests(SqlServerResource sqlServerResource)
-            : base(sqlServerResource)
+        public ChangeSupplierTests(DatabaseFixture databaseFixture)
+            : base(databaseFixture)
         {
             _accountingPoint = CreateAccountingPoint();
             _energySupplier = CreateEnergySupplier();

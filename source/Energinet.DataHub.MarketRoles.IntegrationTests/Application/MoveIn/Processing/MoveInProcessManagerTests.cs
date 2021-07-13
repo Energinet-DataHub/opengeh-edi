@@ -30,8 +30,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn.Proc
     {
         private readonly MoveInProcessManagerRouter _router;
 
-        public MoveInProcessManagerTests(SqlServerResource sqlServerResource)
-            : base(sqlServerResource)
+        public MoveInProcessManagerTests(DatabaseFixture databaseFixture)
+            : base(databaseFixture)
         {
             _router = new MoveInProcessManagerRouter(GetService<IProcessManagerRepository>(), GetService<ICommandScheduler>());
         }

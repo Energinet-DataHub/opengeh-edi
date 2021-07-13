@@ -27,7 +27,6 @@ using Energinet.DataHub.MarketRoles.Application.Common.Commands;
 using Energinet.DataHub.MarketRoles.Application.Common.DomainEvents;
 using Energinet.DataHub.MarketRoles.Application.Common.Processing;
 using Energinet.DataHub.MarketRoles.Application.MoveIn.Validation;
-using Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.Helpers;
 using Energinet.DataHub.MarketRoles.Contracts;
 using Energinet.DataHub.MarketRoles.Domain.Consumers;
 using Energinet.DataHub.MarketRoles.Domain.EnergySuppliers;
@@ -66,7 +65,6 @@ using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using SimpleInjector;
 using SimpleInjector.Lifestyles;
-using Squadron;
 using Xunit;
 using RequestChangeOfSupplier = Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.RequestChangeOfSupplier;
 using RequestMoveIn = Energinet.DataHub.MarketRoles.Application.MoveIn.RequestMoveIn;
@@ -74,19 +72,18 @@ using RequestMoveIn = Energinet.DataHub.MarketRoles.Application.MoveIn.RequestMo
 namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 {
     [Collection("IntegrationTest")]
-    public class TestHost : IDisposable, IClassFixture<SqlServerResource>
+    public class TestHost : IDisposable
     {
         private readonly Scope _scope;
         private readonly Container _container;
         private readonly IServiceProvider _serviceProvider;
-        private SqlServerResource _sqlServerResource;
+        private readonly string _connectionString;
         private SqlConnection _sqlConnection = null;
         private BusinessProcessId _businessProcessId = null;
 
-        protected TestHost(SqlServerResource sqlServerResource)
+        protected TestHost(DatabaseFixture databaseFixture)
         {
-            _sqlServerResource = sqlServerResource;
-            ConnectionString = Task.Run(GetConnectionString).Result;
+            _connectionString = databaseFixture.GetConnectionString.Value;
 
             _container = new Container();
             var serviceCollection = new ServiceCollection();
@@ -201,7 +198,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
         protected Instant EffectiveDate => SystemDateTimeProvider.Now();
 
-        private string ConnectionString { get; set; }
+        private string ConnectionString => _connectionString;
 
         public void Dispose()
         {
@@ -211,21 +208,6 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
         protected TService GetService<TService>()
         {
             return _container.GetService<TService>();
-        }
-
-        protected async Task<string> GetConnectionString()
-        {
-            var connectionString = await _sqlServerResource.CreateDatabaseAsync().ConfigureAwait(false);
-            var upgrader = UpgradeFactory.GetUpgradeEngine(connectionString, x => true, false);
-            var result = upgrader.PerformUpgrade();
-            if (result.Successful)
-            {
-                return connectionString;
-            }
-            else
-            {
-                throw new InvalidOperationException("Couldn't start Squadron SQL server");
-            }
         }
 
         protected SqlConnection GetSqlDbConnection()
