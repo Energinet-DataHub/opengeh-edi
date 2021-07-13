@@ -77,6 +77,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
                 _transaction.Value,
                 _energySupplier.GlnNumber.Value,
                 _consumer.CprNumber.Value,
+                string.Empty,
                 _accountingPoint.GsrnNumber.Value,
                 Instant.FromDateTimeUtc(DateTime.UtcNow.AddHours(1)).ToString()));
 
