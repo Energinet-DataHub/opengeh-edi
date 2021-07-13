@@ -28,8 +28,8 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integr
             if (container == null) throw new ArgumentNullException(nameof(container));
             var assemblies = GetAssemblies().Union(applicationAssemblies).ToArray();
 
-            container.Register<MessageSerializer, ProtobufMessageSerializer>(Lifestyle.Transient);
-            container.Register<ProtobufOutboundMapperFactory>(Lifestyle.Transient);
+            container.Register<MessageSerializer, ProtobufMessageSerializer>(Lifestyle.Scoped);
+            container.Register<ProtobufOutboundMapperFactory>(Lifestyle.Scoped);
 
             ScanForMappers(container, typeof(ProtobufOutboundMapper<>), assemblies);
         }
@@ -41,12 +41,13 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integr
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
+
             var config = new OneOfConfiguration<TProtoContract>();
             configuration.Invoke(config);
-            container.Register<MessageExtractor>(Lifestyle.Transient);
-            container.Register<MessageDeserializer, ProtobufMessageDeserializer>(Lifestyle.Transient);
-            container.Register<ProtobufInboundMapperFactory>(Lifestyle.Transient);
-            container.Register(() => config.GetParser(), Lifestyle.Transient);
+            container.Register<MessageExtractor>(Lifestyle.Scoped);
+            container.Register<MessageDeserializer, ProtobufMessageDeserializer>(Lifestyle.Scoped);
+            container.Register<ProtobufInboundMapperFactory>(Lifestyle.Scoped);
+            container.Register(() => config.GetParser(), Lifestyle.Scoped);
 
             ScanForMappers(container, typeof(ProtobufInboundMapper<>), new[]
             {
@@ -62,7 +63,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integr
                 IncludeComposites = false,
             });
 
-            container.Register(collectionType, types);
+            container.Register(collectionType, types, Lifestyle.Scoped);
         }
 
         private static IEnumerable<Assembly> GetAssemblies()

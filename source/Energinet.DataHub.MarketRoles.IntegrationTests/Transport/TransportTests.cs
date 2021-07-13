@@ -21,6 +21,7 @@ using Energinet.DataHub.MarketRoles.IntegrationTests.Transport.TestImplementatio
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleInjector;
+using SimpleInjector.Lifestyles;
 using Xunit;
 
 namespace Energinet.DataHub.MarketRoles.IntegrationTests.Transport
@@ -31,6 +32,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Transport
         public async Task Send_and_receive_must_result_in_same_transmitted_values()
         {
             var container = new Container();
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
 
             // Send Registrations
             container.Register<InProcessChannel>(Lifestyle.Singleton);
@@ -47,21 +49,26 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Transport
                     .FromOneOf(envelope => envelope.TestMessagesCase)
                     .WithParser(() => TestEnvelope.Parser));
 
-            // Send
-            var messageDispatcher = container.GetInstance<Dispatcher>();
-            var outboundMessage = new TransportTestRecord("test");
-            await messageDispatcher.DispatchAsync(outboundMessage).ConfigureAwait(false);
-            var channel = container.GetInstance<InProcessChannel>();
+            // Verify configuration
+            container.Verify();
 
-            // The wire
-            var bytes = channel.GetWrittenBytes();
+            using (var scope = AsyncScopedLifestyle.BeginScope(container))
+            {
+                // Send
+                var messageDispatcher = container.GetInstance<Dispatcher>();
+                var outboundMessage = new TransportTestRecord("test");
+                await messageDispatcher.DispatchAsync(outboundMessage).ConfigureAwait(false);
+                var channel = container.GetInstance<InProcessChannel>();
 
-            // Receive
-            var messageExtractor = container.GetInstance<MessageExtractor>();
+                // The wire
+                var bytes = channel.GetWrittenBytes();
 
-            var message = await messageExtractor.ExtractAsync(bytes).ConfigureAwait(false);
+                // Receive
+                var messageExtractor = container.GetInstance<MessageExtractor>();
+                var message = await messageExtractor.ExtractAsync(bytes).ConfigureAwait(false);
 
-            message.Should().BeOfType<TransportTestRecord>();
+                message.Should().BeOfType<TransportTestRecord>();
+            }
         }
     }
 }
