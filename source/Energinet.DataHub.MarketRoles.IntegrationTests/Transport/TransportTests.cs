@@ -31,20 +31,22 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Transport
         public async Task Send_and_receive_must_result_in_same_transmitted_values()
         {
             var container = new Container();
+
+            // Send Registrations
             container.Register<InProcessChannel>(Lifestyle.Singleton);
             container.Register<Dispatcher>(Lifestyle.Transient);
             container.AddProtobufMessageSerializer();
-            container.ReceiveProtobufEnvelope<TestEnvelope>(
-                config => config
-                    .FromOneOf(envelope => envelope.TestMessagesCase)
-                    .WithParser(() => TestEnvelope.Parser));
-
-            // container.AddProtobufMessageDeSerializer();
             container.AddProtobufOutboundMappers(
                 new[]
                 {
                     typeof(TransportTestOutboundMapper).Assembly,
                 });
+
+            // Receive Registrations
+            container.ReceiveProtobufEnvelope<TestEnvelope>(
+                config => config
+                    .FromOneOf(envelope => envelope.TestMessagesCase)
+                    .WithParser(() => TestEnvelope.Parser));
 
             // Send
             var messageDispatcher = container.GetInstance<Dispatcher>();

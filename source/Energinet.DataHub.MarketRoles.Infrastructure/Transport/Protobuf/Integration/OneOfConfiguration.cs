@@ -28,7 +28,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integr
 
         private Func<TOneOf, Enum>? _getMessageType;
 
-        public OneOfConfiguration() { }
+        internal OneOfConfiguration() { }
 
         /// <summary>
         /// Assign a parser
@@ -57,7 +57,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integr
         /// Configure a proto buf parser
         /// </summary>
         /// <returns><see cref="ProtobufParser"/> from the configuration</returns>
-        public ProtobufParser GetParser()
+        internal ProtobufParser GetParser()
         {
             return new ConfigParser(_getParser.Invoke(), _getMessageType);
         }

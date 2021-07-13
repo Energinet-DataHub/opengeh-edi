@@ -16,14 +16,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
-using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
-using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integration;
 using Google.Protobuf;
-using Microsoft.Extensions.DependencyInjection;
 using SimpleInjector;
 
-namespace Energinet.DataHub.MarketRoles.EntryPoints.Common.SimpleInjector
+namespace Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integration
 {
     public static class SimpleInjectorAddProtobufContractsContainerExtensions
     {
