@@ -19,6 +19,7 @@ using Energinet.DataHub.MarketRoles.Application.MoveIn;
 using Energinet.DataHub.MarketRoles.Application.MoveIn.Processing;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using Squadron;
 using Xunit;
 using Xunit.Categories;
 
@@ -29,8 +30,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn.Proc
     {
         private readonly MoveInProcessManagerRouter _router;
 
-        public MoveInProcessManagerTests()
-            : base()
+        public MoveInProcessManagerTests(SqlServerResource sqlServerResource)
+            : base(sqlServerResource)
         {
             _router = new MoveInProcessManagerRouter(GetService<IProcessManagerRepository>(), GetService<ICommandScheduler>());
         }

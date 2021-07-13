@@ -28,6 +28,7 @@ using Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
 using Microsoft.EntityFrameworkCore;
+using Squadron;
 using Xunit;
 using Xunit.Categories;
 
@@ -43,8 +44,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
         private EnergySupplier _energySupplier;
         private Transaction _transaction;
 
-        public ProcessManagerRouterTests()
-        : base()
+        public ProcessManagerRouterTests(SqlServerResource sqlServerResource)
+            : base(sqlServerResource)
         {
             _consumer = CreateConsumer();
             _energySupplier = CreateEnergySupplier();

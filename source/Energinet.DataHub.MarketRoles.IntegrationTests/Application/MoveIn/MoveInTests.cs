@@ -18,6 +18,7 @@ using Energinet.DataHub.MarketRoles.Domain.Consumers;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI;
+using Squadron;
 using Xunit;
 using Xunit.Categories;
 
@@ -28,7 +29,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
     {
         private readonly AccountingPoint _accountingPoint;
 
-        public MoveInTests()
+        public MoveInTests(SqlServerResource sqlServerResource)
+            : base(sqlServerResource)
         {
         }
 

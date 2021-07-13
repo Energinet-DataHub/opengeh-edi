@@ -13,29 +13,12 @@
 // limitations under the License.
 
 using System;
-using System.Collections.ObjectModel;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier;
-using Energinet.DataHub.MarketRoles.Domain.Consumers;
-using Energinet.DataHub.MarketRoles.Domain.EnergySuppliers;
-using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
-using Energinet.DataHub.MarketRoles.Infrastructure.BusinessRequestProcessing;
-using Energinet.DataHub.MarketRoles.Infrastructure.BusinessRequestProcessing.Pipeline;
-using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
-using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.AccountingPoints;
-using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.Consumers;
-using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.EnergySuppliers;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI.ChangeOfSupplier;
-using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
-using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
-using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
+using Squadron;
 using Xunit;
 using Xunit.Categories;
 
@@ -44,6 +27,11 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
     [IntegrationTest]
     public sealed class RequestTests : TestHost, IDisposable
     {
+        public RequestTests(SqlServerResource sqlServerResource)
+            : base(sqlServerResource)
+        {
+        }
+
         [Fact]
         public async Task Request_WhenMeteringPointDoesNotExist_IsRejected()
         {

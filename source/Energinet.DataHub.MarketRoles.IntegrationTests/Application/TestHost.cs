@@ -27,6 +27,7 @@ using Energinet.DataHub.MarketRoles.Application.Common.Commands;
 using Energinet.DataHub.MarketRoles.Application.Common.DomainEvents;
 using Energinet.DataHub.MarketRoles.Application.Common.Processing;
 using Energinet.DataHub.MarketRoles.Application.MoveIn.Validation;
+using Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.Helpers;
 using Energinet.DataHub.MarketRoles.Contracts;
 using Energinet.DataHub.MarketRoles.Domain.Consumers;
 using Energinet.DataHub.MarketRoles.Domain.EnergySuppliers;
@@ -65,6 +66,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using SimpleInjector;
 using SimpleInjector.Lifestyles;
+using Squadron;
 using Xunit;
 using RequestChangeOfSupplier = Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.RequestChangeOfSupplier;
 using RequestMoveIn = Energinet.DataHub.MarketRoles.Application.MoveIn.RequestMoveIn;
@@ -72,16 +74,20 @@ using RequestMoveIn = Energinet.DataHub.MarketRoles.Application.MoveIn.RequestMo
 namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 {
     [Collection("IntegrationTest")]
-    public class TestHost : IDisposable
+    public class TestHost : IDisposable, IClassFixture<SqlServerResource>
     {
         private readonly Scope _scope;
         private readonly Container _container;
         private readonly IServiceProvider _serviceProvider;
+        private SqlServerResource _sqlServerResource;
         private SqlConnection _sqlConnection = null;
         private BusinessProcessId _businessProcessId = null;
 
-        protected TestHost()
+        protected TestHost(SqlServerResource sqlServerResource)
         {
+            _sqlServerResource = sqlServerResource;
+            ConnectionString = Task.Run(GetConnectionString).Result;
+
             _container = new Container();
             var serviceCollection = new ServiceCollection();
 
@@ -195,8 +201,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
         protected Instant EffectiveDate => SystemDateTimeProvider.Now();
 
-        private string ConnectionString =>
-            Environment.GetEnvironmentVariable("MarketRoles_IntegrationTests_ConnectionString");
+        private string ConnectionString { get; set; }
 
         public void Dispose()
         {
@@ -208,13 +213,25 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             return _container.GetService<TService>();
         }
 
+        protected async Task<string> GetConnectionString()
+        {
+            var connectionString = await _sqlServerResource.CreateDatabaseAsync().ConfigureAwait(false);
+            var upgrader = UpgradeFactory.GetUpgradeEngine(connectionString, x => true, false);
+            var result = upgrader.PerformUpgrade();
+            if (result.Successful)
+            {
+                return connectionString;
+            }
+            else
+            {
+                throw new InvalidOperationException("Couldn't start Squadron SQL server");
+            }
+        }
+
         protected SqlConnection GetSqlDbConnection()
         {
-            if (_sqlConnection is null)
-                _sqlConnection = new SqlConnection(ConnectionString);
-
-            if (_sqlConnection.State == ConnectionState.Closed)
-                _sqlConnection.Open();
+            if (_sqlConnection is null) _sqlConnection = new SqlConnection(ConnectionString);
+            if (_sqlConnection.State == ConnectionState.Closed) _sqlConnection.Open();
             return _sqlConnection;
         }
 
@@ -356,7 +373,9 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             {
                 var connection = new SqlConnection(ConnectionString);
                 if (connection.State == ConnectionState.Closed)
+                {
                     connection.Open();
+                }
 
                 var command = new SqlCommand($"SELECT Id FROM [dbo].[BusinessProcesses] WHERE TransactionId = '{transaction.Value}'", connection);
                 var id = command.ExecuteScalar();

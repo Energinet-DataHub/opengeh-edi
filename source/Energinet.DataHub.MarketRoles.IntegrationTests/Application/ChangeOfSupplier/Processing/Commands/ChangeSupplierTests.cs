@@ -28,6 +28,7 @@ using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
 using MediatR;
 using Microsoft.Data.SqlClient;
 using NodaTime;
+using Squadron;
 using Xunit;
 using Xunit.Categories;
 
@@ -43,7 +44,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
 
         private Transaction _transaction = null;
 
-        public ChangeSupplierTests()
+        public ChangeSupplierTests(SqlServerResource sqlServerResource)
+            : base(sqlServerResource)
         {
             _accountingPoint = CreateAccountingPoint();
             _energySupplier = CreateEnergySupplier();

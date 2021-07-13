@@ -18,6 +18,7 @@ using Energinet.DataHub.MarketRoles.Application.MoveIn.Processing;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChange;
+using Squadron;
 using Xunit;
 using Xunit.Categories;
 
@@ -26,6 +27,11 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
     [IntegrationTest]
     public class EffectuateTests : TestHost
     {
+        public EffectuateTests(SqlServerResource sqlServerResource)
+            : base(sqlServerResource)
+        {
+        }
+
         [Fact]
         public async Task Effectuate_WhenEffectiveDateIsDue_IntegrationEventsArePublished()
         {
