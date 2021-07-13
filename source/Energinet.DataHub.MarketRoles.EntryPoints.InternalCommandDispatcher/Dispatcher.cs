@@ -14,7 +14,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.EntryPoints.InternalCommandDispatcher.Infrastructure.TimerTriggers;
 using Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
@@ -31,11 +30,11 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.InternalCommandDispatcher
         }
 
         [Function("Dispatcher")]
-        public Task RunAsync([TimerTrigger("%DISPATCH_TRIGGER_TIMER%")] TimerInfo timerTimerInfo, FunctionContext context)
+        public Task RunAsync([TimerTrigger("%DISPATCH_TRIGGER_TIMER%")] TimerInfo timerInfo, FunctionContext context)
         {
             var logger = context.GetLogger("Dispatcher");
             logger.LogInformation($"Timer trigger function executed at: {DateTime.Now}");
-            logger.LogInformation($"Next timer schedule at: {timerTimerInfo?.ScheduleStatus?.Next}");
+            logger.LogInformation($"Next timer schedule at: {timerInfo.ScheduleStatus?.Next}");
 
             return _internalCommandProcessor.ProcessUndispatchedAsync();
         }
