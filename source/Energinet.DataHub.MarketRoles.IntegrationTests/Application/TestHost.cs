@@ -82,11 +82,13 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
         protected TestHost()
         {
-            _container = new Container();
             var serviceCollection = new ServiceCollection();
 
-            serviceCollection.SendProtobuf<MarketRolesEnvelope>();
-            serviceCollection.ReceiveProtobuf<MarketRolesEnvelope>(
+            _container = new Container();
+            _container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+
+            _container.SendProtobuf<MarketRolesEnvelope>();
+            _container.ReceiveProtobuf<MarketRolesEnvelope>(
                 config => config
                     .FromOneOf(envelope => envelope.MarketRolesMessagesCase)
                     .WithParser(() => MarketRolesEnvelope.Parser));

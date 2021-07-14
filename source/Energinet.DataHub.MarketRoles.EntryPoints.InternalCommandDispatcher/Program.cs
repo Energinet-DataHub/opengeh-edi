@@ -17,11 +17,12 @@ using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common;
-using Energinet.DataHub.MarketRoles.EntryPoints.Common.SimpleInjector;
 using Energinet.DataHub.MarketRoles.Infrastructure;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChange;
 using Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands;
+using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integration;
+using Energinet.DataHub.MarketRoles.IntegrationEventContracts;
 using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -74,12 +75,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.InternalCommandDispatcher
                 () => new ServiceBusClient(connectionString).CreateSender(topicName),
                 Lifestyle.Singleton);
 
-            container.AddProtobufMessageSerializer();
-            container.AddProtobufOutboundMappers(
-                new[]
-                {
-                    typeof(EnergySupplierChangedIntegrationEvent).Assembly,
-                });
+            container.SendProtobuf<EnergySupplierChanged>();
         }
     }
 }

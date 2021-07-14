@@ -56,8 +56,6 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
             base.ConfigureServiceCollection(services);
-
-            services.SendProtobuf<MarketRolesEnvelope>();
         }
 
         protected override void ConfigureContainer(Container container)
@@ -74,6 +72,8 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
             container.Register(XmlMapperFactory, Lifestyle.Singleton);
             container.Register<XmlMapper>(Lifestyle.Singleton);
             container.Register<IXmlDeserializer, XmlDeserializer>(Lifestyle.Singleton);
+
+            container.SendProtobuf<MarketRolesEnvelope>();
 
             container.Register<MessageDispatcher>(Lifestyle.Scoped);
             container.Register<Channel, ProcessingServiceBusChannel>(Lifestyle.Scoped);

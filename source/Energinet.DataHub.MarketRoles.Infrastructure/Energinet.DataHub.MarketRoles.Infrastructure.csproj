@@ -53,4 +53,9 @@ limitations under the License.
     <ProjectReference Include="..\Energinet.DataHub.MarketRoles.Application\Energinet.DataHub.MarketRoles.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Transport\Protobuf\Integration\ServiceCollectionReceiveProtobuf.cs" />
+    <Compile Remove="Transport\Protobuf\Integration\ServiceCollectionSendProtobuf.cs" />
+  </ItemGroup>
+
 </Project>
