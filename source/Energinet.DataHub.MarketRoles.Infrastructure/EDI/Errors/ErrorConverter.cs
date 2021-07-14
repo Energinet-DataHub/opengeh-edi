@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors
@@ -37,7 +38,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors
                 : Default();
         }
 
-        protected abstract ErrorMessage Convert(TError validationError);
+        protected abstract ErrorMessage Convert([NotNull] TError validationError);
     }
     #pragma warning restore SA1402
 }

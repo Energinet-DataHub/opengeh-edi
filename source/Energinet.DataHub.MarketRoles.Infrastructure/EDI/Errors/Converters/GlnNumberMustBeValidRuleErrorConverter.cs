@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.MarketRoles.Application.Common.Validation;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class GlnNumberMustBeValidRuleErrorConverter : ErrorConverter<GlnNumberMustBeValidRuleError>
     {
-        protected override ErrorMessage Convert(GlnNumberMustBeValidRuleError validationError)
+        protected override ErrorMessage Convert([NotNull] GlnNumberMustBeValidRuleError validationError)
         {
-            return new("TODO", $"Description");
+            return new("D02", $"GLN number must not be empty.");
         }
     }
 }

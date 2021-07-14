@@ -82,11 +82,13 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
         protected TestHost()
         {
-            _container = new Container();
             var serviceCollection = new ServiceCollection();
 
-            serviceCollection.SendProtobuf<MarketRolesEnvelope>();
-            serviceCollection.ReceiveProtobuf<MarketRolesEnvelope>(
+            _container = new Container();
+            _container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+
+            _container.SendProtobuf<MarketRolesEnvelope>();
+            _container.ReceiveProtobuf<MarketRolesEnvelope>(
                 config => config
                     .FromOneOf(envelope => envelope.MarketRolesMessagesCase)
                     .WithParser(() => MarketRolesEnvelope.Parser));
@@ -211,10 +213,15 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
         protected SqlConnection GetSqlDbConnection()
         {
             if (_sqlConnection is null)
+            {
                 _sqlConnection = new SqlConnection(ConnectionString);
+            }
 
             if (_sqlConnection.State == ConnectionState.Closed)
+            {
                 _sqlConnection.Open();
+            }
+
             return _sqlConnection;
         }
 
@@ -356,7 +363,9 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             {
                 var connection = new SqlConnection(ConnectionString);
                 if (connection.State == ConnectionState.Closed)
+                {
                     connection.Open();
+                }
 
                 var command = new SqlCommand($"SELECT Id FROM [dbo].[BusinessProcesses] WHERE TransactionId = '{transaction.Value}'", connection);
                 var id = command.ExecuteScalar();

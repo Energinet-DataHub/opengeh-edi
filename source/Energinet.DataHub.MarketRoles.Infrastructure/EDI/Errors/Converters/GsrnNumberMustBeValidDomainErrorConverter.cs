@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using GsrnNumberMustBeValidRuleError = Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules.GsrnNumberMustBeValidRuleError;
+using System.Diagnostics.CodeAnalysis;
+using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class GsrnNumberMustBeValidDomainErrorConverter : ErrorConverter<GsrnNumberMustBeValidRuleError>
     {
-        protected override ErrorMessage Convert(Domain.MeteringPoints.Rules.GsrnNumberMustBeValidRuleError validationError)
+        protected override ErrorMessage Convert([NotNull] GsrnNumberMustBeValidRuleError validationError)
         {
-            return new("E10", $"A metering point cannot be registered in GEH without a valid identification");
+            return new("E10", $"A metering point cannot be registered without a valid identification");
         }
     }
 }

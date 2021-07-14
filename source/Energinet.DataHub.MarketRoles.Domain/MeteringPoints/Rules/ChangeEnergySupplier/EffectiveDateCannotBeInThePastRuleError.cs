@@ -17,19 +17,13 @@ using NodaTime;
 
 namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules.ChangeEnergySupplier
 {
-    public class EffectuationDateCannotBeInThePastRule : IBusinessRule
+    public class EffectiveDateCannotBeInThePastRuleError : ValidationError
     {
-        private readonly Instant _effectuationDate;
-        private readonly Instant _currentDate;
-
-        internal EffectuationDateCannotBeInThePastRule(Instant effectuationDate, Instant currentDate)
+        public EffectiveDateCannotBeInThePastRuleError(Instant effectiveDate)
         {
-            _effectuationDate = effectuationDate;
-            _currentDate = currentDate;
+            EffectiveDate = effectiveDate;
         }
 
-        public bool IsBroken => _effectuationDate < _currentDate;
-
-        public ValidationError ValidationError => new EffectuationDateCannotBeInThePastRuleError();
+        public Instant EffectiveDate { get; }
     }
 }

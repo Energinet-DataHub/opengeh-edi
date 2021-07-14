@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules.ChangeEnergySupplier;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class ChangeOfSupplierRegisteredOnSameDateIsNotAllowedRuleErrorConverter : ErrorConverter<ChangeOfSupplierRegisteredOnSameDateIsNotAllowedRuleError>
     {
-        protected override ErrorMessage Convert(ChangeOfSupplierRegisteredOnSameDateIsNotAllowedRuleError validationError)
+        protected override ErrorMessage Convert([NotNull] ChangeOfSupplierRegisteredOnSameDateIsNotAllowedRuleError validationError)
         {
-            return new("D07", $"Effectuation date <1>(TODO: Insert effectuation date) incorrect: There is already another market transaction that takes precedence on date <2> (TODO: Insert effectuation date");
+            return new("D07", $"Effective date {validationError.SupplyStartDate.ToString()} incorrect: There is already another market transaction that takes precedence on date {validationError.SupplyStartDate.ToString()}");
         }
     }
 }
