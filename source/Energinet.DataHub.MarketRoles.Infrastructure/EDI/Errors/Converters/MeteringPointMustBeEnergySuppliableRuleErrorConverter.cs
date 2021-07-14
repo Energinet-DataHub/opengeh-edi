@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules.ChangeEnergySupplier;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class MeteringPointMustBeEnergySuppliableRuleErrorConverter : ErrorConverter<MeteringPointMustBeEnergySuppliableRuleError>
     {
-        protected override ErrorMessage Convert(MeteringPointMustBeEnergySuppliableRuleError validationError)
+        protected override ErrorMessage Convert([NotNull] MeteringPointMustBeEnergySuppliableRuleError validationError)
         {
-            return new("TODO", $"Description");
+            return new("E22", $"The specified production metering point is blocked because it is subject to production obligation.");
         }
     }
 }

@@ -32,7 +32,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules.ChangeEnergy
 
         public bool IsBroken => HasPendingMoveInProcess();
 
-        public ValidationError ValidationError => new MoveInRegisteredOnSameDateIsNotAllowedRuleError();
+        public ValidationError ValidationError => new MoveInRegisteredOnSameDateIsNotAllowedRuleError(_moveInDate);
 
         private bool HasPendingMoveInProcess()
         {

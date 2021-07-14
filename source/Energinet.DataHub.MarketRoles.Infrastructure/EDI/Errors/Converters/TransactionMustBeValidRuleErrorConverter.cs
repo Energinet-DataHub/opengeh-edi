@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.MarketRoles.Application.Common.Validation;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class TransactionMustBeValidRuleErrorConverter : ErrorConverter<TransactionMustBeValidRuleError>
     {
-        protected override ErrorMessage Convert(TransactionMustBeValidRuleError validationError)
+        protected override ErrorMessage Convert([NotNull] TransactionMustBeValidRuleError validationError)
         {
-            return new("TODO", $"Description");
+            return new("E0H", $"Identification is missing");
         }
     }
 }

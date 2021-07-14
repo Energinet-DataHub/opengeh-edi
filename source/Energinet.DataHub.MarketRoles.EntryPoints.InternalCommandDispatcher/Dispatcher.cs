@@ -35,7 +35,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.InternalCommandDispatcher
             if (timerInfo == null) throw new ArgumentNullException(nameof(timerInfo));
             var logger = context.GetLogger("Dispatcher");
             logger.LogInformation($"Timer trigger function executed at: {DateTime.Now}");
-            logger.LogInformation($"Next timer schedule at: {timerInfo.ScheduleStatus?.Next}");
+            logger.LogInformation($"Next timer schedule at: {timerInfo?.ScheduleStatus?.Next}");
 
             return _internalCommandProcessor.ProcessUndispatchedAsync();
         }

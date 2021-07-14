@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.MarketRoles.Application.Common.Validation.Consumers;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class SocialSecurityNumberMustBeValidRuleErrorConverter : ErrorConverter<SocialSecurityNumberMustBeValidRuleError>
     {
-        protected override ErrorMessage Convert(SocialSecurityNumberMustBeValidRuleError validationError)
+        protected override ErrorMessage Convert([NotNull] SocialSecurityNumberMustBeValidRuleError validationError)
         {
-            return new("D17", $"Description");
+            return new("D17", $"Invalid social security number: {validationError.SocialSecurityNumber}");
         }
     }
 }

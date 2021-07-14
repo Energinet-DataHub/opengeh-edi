@@ -212,7 +212,10 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
         protected SqlConnection GetSqlDbConnection()
         {
-            _sqlConnection ??= new SqlConnection(ConnectionString);
+            if (_sqlConnection is null)
+            {
+                _sqlConnection = new SqlConnection(ConnectionString);
+            }
 
             if (_sqlConnection.State == ConnectionState.Closed)
             {

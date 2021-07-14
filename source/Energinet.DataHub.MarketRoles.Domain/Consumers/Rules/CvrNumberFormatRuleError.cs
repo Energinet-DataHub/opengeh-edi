@@ -18,5 +18,11 @@ namespace Energinet.DataHub.MarketRoles.Domain.Consumers.Rules
 {
     public class CvrNumberFormatRuleError : ValidationError
     {
+        public CvrNumberFormatRuleError(string? cvrValue)
+        {
+            CvrNumber = cvrValue ?? string.Empty;
+        }
+
+        public string CvrNumber { get; }
     }
 }
