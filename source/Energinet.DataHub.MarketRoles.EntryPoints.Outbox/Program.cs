@@ -99,11 +99,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
                 },
                 Array.Empty<Type>());
 
-            container.SendProtobuf(
-                new[]
-                {
-                    typeof(EnergySupplierChangedIntegrationEvent).Assembly,
-                });
+            container.SendProtobuf<Energinet.DataHub.MarketRoles.IntegrationEventContracts.EnergySupplierChanged>();
         }
     }
 }

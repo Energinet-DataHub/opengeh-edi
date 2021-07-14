@@ -153,11 +153,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Processing
                     .FromOneOf(envelope => envelope.MarketRolesMessagesCase)
                     .WithParser(() => Contracts.MarketRolesEnvelope.Parser));
 
-            container.SendProtobuf(
-                new[]
-                {
-                    typeof(EnergySupplierChangedIntegrationEvent).Assembly,
-                });
+            container.SendProtobuf<Energinet.DataHub.MarketRoles.IntegrationEventContracts.EnergySupplierChanged>();
 
             // Actor Notification handlers
             container.Register<IEndOfSupplyNotifier, EndOfSupplyNotifier>(Lifestyle.Scoped);

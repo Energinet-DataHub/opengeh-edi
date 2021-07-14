@@ -37,11 +37,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Transport
             // Send Registrations
             container.Register<InProcessChannel>(Lifestyle.Singleton);
             container.Register<Dispatcher>(Lifestyle.Transient);
-            container.SendProtobuf(
-                new[]
-                {
-                    typeof(TransportTestOutboundMapper).Assembly,
-                });
+            container.SendProtobuf<TestEnvelope>();
 
             // Receive Registrations
             container.ReceiveProtobuf<TestEnvelope>(

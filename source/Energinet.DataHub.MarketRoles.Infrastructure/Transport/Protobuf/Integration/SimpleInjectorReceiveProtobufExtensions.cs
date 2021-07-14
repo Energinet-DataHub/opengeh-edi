@@ -21,26 +21,31 @@ using SimpleInjector;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integration
 {
-    public static class SimpleInjectorAddProtobufContractsContainerExtensions
+    public static class SimpleInjectorReceiveProtobufExtensions
     {
-        public static void SendProtobuf(this Container container, Assembly[] applicationAssemblies)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            var assemblies = GetAssemblies().Union(applicationAssemblies).ToArray();
+        private static readonly Type _mapperType = typeof(ProtobufInboundMapper<>);
 
-            container.Register<MessageSerializer, ProtobufMessageSerializer>(Lifestyle.Scoped);
-            container.Register<ProtobufOutboundMapperFactory>(Lifestyle.Scoped);
-
-            ScanForMappers(container, typeof(ProtobufOutboundMapper<>), assemblies);
-        }
-
+        /// <summary>
+        /// Configure the container to receive protobuf
+        /// </summary>
+        /// <param name="container">container</param>
+        /// <param name="configuration">Configuration of the parser</param>
+        /// <param name="additionalAssemblies">Scan additional assemblies for mappers</param>
+        /// <typeparam name="TProtoContract">Protobuf contract DTO</typeparam>
+        /// <exception cref="ArgumentNullException"><paramref name="container"/>, <paramref name="configuration"/> or the optional <paramref name="additionalAssemblies"/> is <c>null</c></exception>
         public static void ReceiveProtobuf<TProtoContract>(
             this Container container,
-            Action<OneOfConfiguration<TProtoContract>> configuration)
+            Action<OneOfConfiguration<TProtoContract>> configuration,
+            params Assembly[] additionalAssemblies)
             where TProtoContract : class, IMessage
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
+
+            var assemblies = additionalAssemblies.ToList();
+            assemblies.Add(typeof(TProtoContract).Assembly);
+
+            var mapperTypes = ScanForMappers(container, assemblies);
 
             var config = new OneOfConfiguration<TProtoContract>();
             configuration.Invoke(config);
@@ -48,27 +53,16 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integr
             container.Register<MessageDeserializer, ProtobufMessageDeserializer>(Lifestyle.Scoped);
             container.Register<ProtobufInboundMapperFactory>(Lifestyle.Scoped);
             container.Register(() => config.GetParser(), Lifestyle.Scoped);
-
-            ScanForMappers(container, typeof(ProtobufInboundMapper<>), new[]
-            {
-                typeof(TProtoContract).Assembly,
-            });
+            container.Register(_mapperType, mapperTypes, Lifestyle.Scoped);
         }
 
-        private static void ScanForMappers(Container container, Type collectionType, Assembly[] assemblies)
+        private static IEnumerable<Type> ScanForMappers(Container container, IEnumerable<Assembly> assemblies)
         {
-            var types = container.GetTypesToRegister(collectionType, assemblies, new TypesToRegisterOptions
+            return container.GetTypesToRegister(_mapperType, assemblies, new TypesToRegisterOptions
             {
                 IncludeGenericTypeDefinitions = true,
                 IncludeComposites = false,
             });
-
-            container.Register(collectionType, types, Lifestyle.Scoped);
-        }
-
-        private static IEnumerable<Assembly> GetAssemblies()
-        {
-            yield return typeof(ProtobufOutboundMapper).GetTypeInfo().Assembly;
         }
     }
 }
