@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.MarketRoles.Domain.Consumers.Rules;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class CprNumberFormatRuleErrorConverter : ErrorConverter<CprNumberFormatRuleError>
     {
-        protected override ErrorMessage Convert(CprNumberFormatRuleError validationError)
+        protected override ErrorMessage Convert([NotNull] CprNumberFormatRuleError validationError)
         {
-            return new("D17", $"Description");
+            return new("D17", $"Invalid CPR number: {validationError.CprNumber}");
         }
     }
 }

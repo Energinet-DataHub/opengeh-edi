@@ -80,7 +80,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
                 new MoveInRegisteredOnSameDateIsNotAllowedRule(_businessProcesses.AsReadOnly(), supplyStartDate),
                 // TODO: Ignore move out process until implementation is in scope
                 //new MoveOutRegisteredOnSameDateIsNotAllowedRule(_businessProcesses.AsReadOnly(), supplyStartDate),
-                new EffectuationDateCannotBeInThePastRule(supplyStartDate, systemDateTimeProvider.Now()),
+                new EffectiveDateCannotBeInThePastRule(supplyStartDate, systemDateTimeProvider.Now()),
             };
 
             return new BusinessRulesValidationResult(rules);

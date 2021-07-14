@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.MarketRoles.Application.Common.Validation;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class GsrnNumberMustBeValidRuleErrorConverter : ErrorConverter<GsrnNumberMustBeValidRuleError>
     {
-        protected override ErrorMessage Convert(GsrnNumberMustBeValidRuleError validationError)
+        protected override ErrorMessage Convert([NotNull] GsrnNumberMustBeValidRuleError validationError)
         {
-            return new("TODO", $"Description");
+            return new("E10", $"A metering point cannot be registered without a valid identification");
         }
     }
 }

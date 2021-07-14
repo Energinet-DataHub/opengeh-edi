@@ -18,5 +18,11 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Validation
 {
     public class MeteringPointMustBeKnownRuleError : ValidationError
     {
+        public MeteringPointMustBeKnownRuleError(string gsrnNumber)
+        {
+            GsrnNumber = gsrnNumber;
+        }
+
+        public string GsrnNumber { get; }
     }
 }

@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.MarketRoles.Application.Common.Validation.Consumers;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class VATNumberMustBeValidRuleErrorConverter : ErrorConverter<VATNumberMustBeValidRuleError>
     {
-        protected override ErrorMessage Convert(VATNumberMustBeValidRuleError validationError)
+        protected override ErrorMessage Convert([NotNull] VATNumberMustBeValidRuleError validationError)
         {
-            return new("D17", $"Description");
+            return new("D17", $"Invalid VAT number: {validationError.VATNumber}");
         }
     }
 }

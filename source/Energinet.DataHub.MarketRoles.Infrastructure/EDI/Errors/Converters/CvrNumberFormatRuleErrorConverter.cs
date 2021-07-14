@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.MarketRoles.Domain.Consumers.Rules;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class CvrNumberFormatRuleErrorConverter : ErrorConverter<CvrNumberFormatRuleError>
     {
-        protected override ErrorMessage Convert(CvrNumberFormatRuleError validationError)
+        protected override ErrorMessage Convert([NotNull] CvrNumberFormatRuleError validationError)
         {
-            return new("D17", $"Description");
+            return new("D17", $"Invalid VAT number: {validationError.CvrNumber}");
         }
     }
 }
