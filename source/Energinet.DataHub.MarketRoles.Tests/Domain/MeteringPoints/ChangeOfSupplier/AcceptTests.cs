@@ -130,7 +130,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.MeteringPoints.ChangeOfSupp
 
             var result = CanChangeSupplier(meteringPoint, effectuationDate);
 
-            Assert.Contains(result.Errors, error => error is EffectuationDateCannotBeInThePastRuleError);
+            Assert.Contains(result.Errors, error => error is EffectiveDateCannotBeInThePastRuleError);
         }
 
         [Fact]

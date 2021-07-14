@@ -18,5 +18,11 @@ namespace Energinet.DataHub.MarketRoles.Domain.Consumers.Rules
 {
     public class CprNumberFormatRuleError : ValidationError
     {
+        public CprNumberFormatRuleError(string? cprValue)
+        {
+            CprNumber = cprValue ?? string.Empty;
+        }
+
+        public string CprNumber { get; }
     }
 }

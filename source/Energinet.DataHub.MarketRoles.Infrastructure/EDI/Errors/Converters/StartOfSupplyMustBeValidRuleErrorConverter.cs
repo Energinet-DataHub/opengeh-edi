@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.MarketRoles.Application.Common.Validation;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class StartOfSupplyMustBeValidRuleErrorConverter : ErrorConverter<StartOfSupplyMustBeValidRuleError>
     {
-        protected override ErrorMessage Convert(StartOfSupplyMustBeValidRuleError validationError)
+        protected override ErrorMessage Convert([NotNull] StartOfSupplyMustBeValidRuleError validationError)
         {
-            return new("E17", $"Effectuation date (TODO: Insert date) incorrect: The information is not received within the correct time period (either too soon or too late)");
+            return new("E17", $"Effective date {validationError.StartOfSupplyDate} incorrect: The information is not received within the correct time period (either too soon or too late)");
         }
     }
 }

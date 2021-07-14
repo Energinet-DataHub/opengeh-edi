@@ -13,10 +13,17 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules.ChangeEnergySupplier
 {
     public class MoveOutRegisteredOnSameDateIsNotAllowedRuleError : ValidationError
     {
+        public MoveOutRegisteredOnSameDateIsNotAllowedRuleError(Instant moveOutDate)
+        {
+            MoveOutDate = moveOutDate;
+        }
+
+        public Instant MoveOutDate { get; }
     }
 }

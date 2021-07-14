@@ -13,10 +13,23 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules.ChangeEnergySupplier
 {
-    public class EffectuationDateCannotBeInThePastRuleError : ValidationError
+    public class EffectiveDateCannotBeInThePastRule : IBusinessRule
     {
+        private readonly Instant _effectiveDate;
+        private readonly Instant _currentDate;
+
+        internal EffectiveDateCannotBeInThePastRule(Instant effectiveDate, Instant currentDate)
+        {
+            _effectiveDate = effectiveDate;
+            _currentDate = currentDate;
+        }
+
+        public bool IsBroken => _effectiveDate < _currentDate;
+
+        public ValidationError ValidationError => new EffectiveDateCannotBeInThePastRuleError(_effectiveDate);
     }
 }

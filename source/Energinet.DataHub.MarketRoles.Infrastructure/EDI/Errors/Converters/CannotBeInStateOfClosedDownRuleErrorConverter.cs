@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules.ChangeEnergySupplier;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class CannotBeInStateOfClosedDownRuleErrorConverter : ErrorConverter<CannotBeInStateOfClosedDownRuleError>
     {
-        protected override ErrorMessage Convert(CannotBeInStateOfClosedDownRuleError validationError)
+        protected override ErrorMessage Convert([NotNull] CannotBeInStateOfClosedDownRuleError validationError)
         {
             return new("D16", $"The specified metering point has been closed down");
         }

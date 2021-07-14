@@ -18,7 +18,7 @@ namespace Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.Helpers
 {
     public static class ConnectionStringFactory
     {
-        private const string DefaultConnectionString = "Server=(local); Database=MarketRoleData; Trusted_connection=true";
+        private const string DefaultConnectionString = "Server=(local); Database=sqldb-marketroles-endk; Trusted_connection=true";
 
         public static string GetConnectionString(string[] args)
         {

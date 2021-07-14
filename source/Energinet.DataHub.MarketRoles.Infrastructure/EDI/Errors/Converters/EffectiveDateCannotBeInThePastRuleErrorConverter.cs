@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules.ChangeEnergySupplier;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
-    public class EffectuationDateCannotBeInThePastRuleErrorConverter : ErrorConverter<EffectuationDateCannotBeInThePastRuleError>
+    public class EffectiveDateCannotBeInThePastRuleErrorConverter : ErrorConverter<EffectiveDateCannotBeInThePastRuleError>
     {
-        protected override ErrorMessage Convert(EffectuationDateCannotBeInThePastRuleError validationError)
+        protected override ErrorMessage Convert([NotNull] EffectiveDateCannotBeInThePastRuleError validationError)
         {
-            return new("TODO", $"Description");
+            return new("E17", $"Effective date {validationError.EffectiveDate.ToString()} incorrect: The information is not received within the correct time period.");
         }
     }
 }

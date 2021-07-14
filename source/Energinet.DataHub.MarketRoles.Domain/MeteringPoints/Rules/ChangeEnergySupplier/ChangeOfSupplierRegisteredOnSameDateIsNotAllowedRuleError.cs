@@ -13,10 +13,17 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules.ChangeEnergySupplier
 {
     public class ChangeOfSupplierRegisteredOnSameDateIsNotAllowedRuleError : ValidationError
     {
+        public ChangeOfSupplierRegisteredOnSameDateIsNotAllowedRuleError(Instant supplyStartDate)
+        {
+            SupplyStartDate = supplyStartDate;
+        }
+
+        public Instant SupplyStartDate { get; }
     }
 }
