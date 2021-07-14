@@ -18,7 +18,7 @@ data "azurerm_sql_server" "sqlsrv" {
 }
 
 module "sqldb_marketroles" {
-  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//sql-database?ref=1.2.0"
+  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//sql-database?ref=1.7.0"
   name                = "sqldb-${var.project}-${var.organisation}"
   resource_group_name = data.azurerm_resource_group.shared_resources.name
   location            = data.azurerm_resource_group.shared_resources.location
