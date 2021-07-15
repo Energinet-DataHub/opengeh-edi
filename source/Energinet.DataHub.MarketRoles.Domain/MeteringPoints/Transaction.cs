@@ -26,9 +26,9 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
 
         public string Value { get; set; }
 
-        public static Transaction Create(string transction)
+        public static Transaction Create(string transaction)
         {
-            return new Transaction(transction);
+            return new Transaction(transaction);
         }
 
         public override string ToString()
