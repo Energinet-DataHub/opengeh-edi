@@ -62,6 +62,21 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.MeteringPoints.ChangeOfSupp
             Assert.NotNull(@event);
         }
 
+        private static Transaction CreateTransaction()
+        {
+            return new Transaction(Guid.NewGuid().ToString());
+        }
+
+        private static EnergySupplierId CreateEnergySupplierId()
+        {
+            return new EnergySupplierId(Guid.NewGuid());
+        }
+
+        private static ConsumerId CreateConsumerId()
+        {
+            return new ConsumerId(Guid.NewGuid());
+        }
+
         private AccountingPoint CreateTestObject()
         {
             var accountingPoint = new AccountingPoint(GsrnNumber.Create("571234567891234568"), MeteringPointType.Consumption);
@@ -69,21 +84,6 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.MeteringPoints.ChangeOfSupp
             accountingPoint.AcceptConsumerMoveIn(CreateConsumerId(), CreateEnergySupplierId(), _systemDateTimeProvider.Now().Minus(Duration.FromDays(365)), transaction);
             accountingPoint.EffectuateConsumerMoveIn(transaction, _systemDateTimeProvider);
             return accountingPoint;
-        }
-
-        private Transaction CreateTransaction()
-        {
-            return new Transaction(Guid.NewGuid().ToString());
-        }
-
-        private EnergySupplierId CreateEnergySupplierId()
-        {
-            return new EnergySupplierId(Guid.NewGuid());
-        }
-
-        private ConsumerId CreateConsumerId()
-        {
-            return new ConsumerId(Guid.NewGuid());
         }
     }
 }

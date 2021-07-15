@@ -57,28 +57,28 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.MeteringPoints.ChangeOfSupp
             Assert.Throws<BusinessProcessException>(() => meteringPoint.CancelChangeOfSupplier(transaction));
         }
 
-        private (AccountingPoint, Transaction) CreateWithActiveMoveIn()
+        private static Transaction CreateTransaction()
+        {
+            return new Transaction(Guid.NewGuid().ToString());
+        }
+
+        private static EnergySupplierId CreateEnergySupplierId()
+        {
+            return new EnergySupplierId(Guid.NewGuid());
+        }
+
+        private static ConsumerId CreateConsumerId()
+        {
+            return new ConsumerId(Guid.NewGuid());
+        }
+
+        private (AccountingPoint AccountingPoint, Transaction Transaction) CreateWithActiveMoveIn()
         {
             var accountingPoint = new AccountingPoint(GsrnNumber.Create("571234567891234568"), MeteringPointType.Consumption);
             var transaction = CreateTransaction();
             accountingPoint.AcceptConsumerMoveIn(CreateConsumerId(), CreateEnergySupplierId(), _systemDateTimeProvider.Now().Minus(Duration.FromDays(365)), transaction);
             accountingPoint.EffectuateConsumerMoveIn(transaction, _systemDateTimeProvider);
             return (accountingPoint, transaction);
-        }
-
-        private Transaction CreateTransaction()
-        {
-            return new Transaction(Guid.NewGuid().ToString());
-        }
-
-        private EnergySupplierId CreateEnergySupplierId()
-        {
-            return new EnergySupplierId(Guid.NewGuid());
-        }
-
-        private ConsumerId CreateConsumerId()
-        {
-            return new ConsumerId(Guid.NewGuid());
         }
     }
 }

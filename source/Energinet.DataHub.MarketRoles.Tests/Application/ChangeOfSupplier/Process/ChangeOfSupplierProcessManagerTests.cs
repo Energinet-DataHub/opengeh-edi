@@ -159,7 +159,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Proce
             Assert.True(processManager.IsCompleted());
         }
 
-        private ChangeOfSupplierProcessManager Create()
+        private static ChangeOfSupplierProcessManager Create()
         {
             return new ChangeOfSupplierProcessManager();
         }

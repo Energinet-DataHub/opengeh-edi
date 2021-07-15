@@ -72,13 +72,14 @@ using RequestMoveIn = Energinet.DataHub.MarketRoles.Application.MoveIn.RequestMo
 namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 {
     [Collection("IntegrationTest")]
+#pragma warning disable CA1724 // TODO: TestHost is reserved. Maybe refactor to base EntryPoint?
     public class TestHost : IDisposable
     {
         private readonly Scope _scope;
         private readonly Container _container;
-        private readonly IServiceProvider _serviceProvider;
-        private SqlConnection _sqlConnection = null;
-        private BusinessProcessId _businessProcessId = null;
+        private bool _disposed;
+        private SqlConnection? _sqlConnection;
+        private BusinessProcessId? _businessProcessId;
 
         protected TestHost()
         {
@@ -96,7 +97,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             serviceCollection.AddDbContext<MarketRolesContext>(x =>
                 x.UseSqlServer(ConnectionString, y => y.UseNodaTime()));
             serviceCollection.AddSimpleInjector(_container);
-            _serviceProvider = serviceCollection.BuildServiceProvider().UseSimpleInjector(_container);
+            IServiceProvider serviceProvider = serviceCollection.BuildServiceProvider().UseSimpleInjector(_container);
 
             _container.Register<IUnitOfWork, UnitOfWork>(Lifestyle.Scoped);
             _container.Register<IAccountingPointRepository, AccountingPointRepository>(Lifestyle.Scoped);
@@ -156,17 +157,17 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
             CleanupDatabase();
 
-            ServiceProvider = _serviceProvider;
-            Mediator = _container.GetService<IMediator>();
-            AccountingPointRepository = _container.GetService<IAccountingPointRepository>();
-            EnergySupplierRepository = _container.GetService<IEnergySupplierRepository>();
-            ProcessManagerRepository = _container.GetService<IProcessManagerRepository>();
-            ConsumerRepository = _container.GetService<IConsumerRepository>();
-            UnitOfWork = _container.GetService<IUnitOfWork>();
-            MarketRolesContext = _container.GetService<MarketRolesContext>();
-            SystemDateTimeProvider = _container.GetService<ISystemDateTimeProvider>();
-            Serializer = _container.GetService<IJsonSerializer>();
-            CommandScheduler = _container.GetService<ICommandScheduler>();
+            ServiceProvider = serviceProvider;
+            Mediator = _container.GetInstance<IMediator>();
+            AccountingPointRepository = _container.GetInstance<IAccountingPointRepository>();
+            EnergySupplierRepository = _container.GetInstance<IEnergySupplierRepository>();
+            ProcessManagerRepository = _container.GetInstance<IProcessManagerRepository>();
+            ConsumerRepository = _container.GetInstance<IConsumerRepository>();
+            UnitOfWork = _container.GetInstance<IUnitOfWork>();
+            MarketRolesContext = _container.GetInstance<MarketRolesContext>();
+            SystemDateTimeProvider = _container.GetInstance<ISystemDateTimeProvider>();
+            Serializer = _container.GetInstance<IJsonSerializer>();
+            CommandScheduler = _container.GetInstance<ICommandScheduler>();
             Transaction = new Transaction(Guid.NewGuid().ToString());
         }
 
@@ -197,17 +198,41 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
         protected Instant EffectiveDate => SystemDateTimeProvider.Now();
 
-        private string ConnectionString =>
-            Environment.GetEnvironmentVariable("MarketRoles_IntegrationTests_ConnectionString");
+        private static string ConnectionString =>
+            Environment.GetEnvironmentVariable("MarketRoles_IntegrationTests_ConnectionString")
+            ?? throw new InvalidOperationException("MarketRoles_IntegrationTests_ConnectionString config not set");
 
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected static Transaction CreateTransaction()
+        {
+            return new Transaction(Guid.NewGuid().ToString());
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
             CleanupDatabase();
+
+            _sqlConnection?.Dispose();
+            _scope.Dispose();
+            _container.Dispose();
+
+            _disposed = true;
         }
 
         protected TService GetService<TService>()
+            where TService : class
         {
-            return _container.GetService<TService>();
+            return _container.GetInstance<TService>();
         }
 
         protected SqlConnection GetSqlDbConnection()
@@ -232,14 +257,16 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
         protected async Task<TMessage> GetLastMessageFromOutboxAsync<TMessage>()
         {
+#pragma warning disable CA1309 // Warns about: "Use ordinal string comparison", but we want EF to take care of this.
             var outboxMessage = await MarketRolesContext.OutboxMessages.FirstAsync(m => m.Type.Equals(typeof(TMessage).FullName)).ConfigureAwait(false);
+            #pragma warning restore CA1309
             var @event = Serializer.Deserialize<TMessage>(outboxMessage.Data);
             return @event;
         }
 
-        protected async Task<BusinessProcessResult> SendRequest(IBusinessRequest request)
+        protected async Task<BusinessProcessResult> SendRequestAsync(IBusinessRequest request)
         {
-            var result = await GetService<IMediator>().Send(request, CancellationToken.None);
+            var result = await GetService<IMediator>().Send(request, CancellationToken.None).ConfigureAwait(false);
             return result;
         }
 
@@ -248,12 +275,14 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             return GetService<IMediator>().Send(command, CancellationToken.None);
         }
 
-        protected async Task<TCommand> GetEnqueuedCommandAsync<TCommand>()
+        protected async Task<TCommand?> GetEnqueuedCommandAsync<TCommand>()
         {
+            var businessProcessId = _businessProcessId?.Value ?? throw new InvalidOperationException("Unknown BusinessProcessId");
             var type = typeof(TCommand).FullName;
             var queuedCommand = MarketRolesContext.QueuedInternalCommands
                 .FirstOrDefault(queuedInternalCommand =>
-                    queuedInternalCommand.BusinessProcessId.Equals(_businessProcessId.Value) &&
+                    queuedInternalCommand.BusinessProcessId.Equals(businessProcessId) &&
+#pragma warning disable CA1309 // Warns about: "Use ordinal string comparison", but we want EF to take care of this.
                     queuedInternalCommand.Type.Equals(type));
 
             if (queuedCommand is null)
@@ -266,12 +295,13 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             return (TCommand)command;
         }
 
-        protected async Task<TCommand> GetEnqueuedCommandAsync<TCommand>(BusinessProcessId businessProcessId)
+        protected async Task<TCommand?> GetEnqueuedCommandAsync<TCommand>(BusinessProcessId businessProcessId)
         {
             var type = typeof(TCommand).FullName;
             var queuedCommand = MarketRolesContext.QueuedInternalCommands
                 .FirstOrDefault(queuedInternalCommand =>
                     queuedInternalCommand.BusinessProcessId.Equals(businessProcessId.Value) &&
+#pragma warning disable CA1309 // Warns about: "Use ordinal string comparison", but we want EF to take care of this.
                     queuedInternalCommand.Type.Equals(type));
 
             if (queuedCommand is null)
@@ -314,11 +344,6 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             return meteringPoint;
         }
 
-        protected Transaction CreateTransaction()
-        {
-            return new Transaction(Guid.NewGuid().ToString());
-        }
-
         protected void SetConsumerMovedIn(AccountingPoint accountingPoint, ConsumerId consumerId, EnergySupplierId energySupplierId)
         {
             var systemTimeProvider = GetService<ISystemDateTimeProvider>();
@@ -329,6 +354,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
         protected void SetConsumerMovedIn(AccountingPoint accountingPoint, ConsumerId consumerId, EnergySupplierId energySupplierId, Instant moveInDate, Transaction transaction)
         {
+            if (accountingPoint == null) throw new ArgumentNullException(nameof(accountingPoint));
+
             var systemTimeProvider = GetService<ISystemDateTimeProvider>();
             accountingPoint.AcceptConsumerMoveIn(consumerId, energySupplierId, moveInDate, transaction);
             accountingPoint.EffectuateConsumerMoveIn(transaction, systemTimeProvider);
@@ -336,6 +363,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
         protected void RegisterChangeOfSupplier(AccountingPoint accountingPoint, ConsumerId consumerId, EnergySupplierId energySupplierId, Transaction transaction)
         {
+            if (accountingPoint == null) throw new ArgumentNullException(nameof(accountingPoint));
+
             var systemTimeProvider = GetService<ISystemDateTimeProvider>();
 
             var moveInDate = systemTimeProvider.Now().Minus(Duration.FromDays(365));
@@ -349,9 +378,10 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
         {
             if (_businessProcessId == null)
             {
-                var command = new SqlCommand($"SELECT Id FROM [dbo].[BusinessProcesses] WHERE TransactionId = '{Transaction.Value}'", GetSqlDbConnection());
-                var id = command.ExecuteScalar();
-                _businessProcessId = new BusinessProcessId(Guid.Parse(id.ToString()));
+                using var command = new SqlCommand($"SELECT Id FROM [dbo].[BusinessProcesses] WHERE TransactionId = @transaction", GetSqlDbConnection());
+                command.Parameters.Add("@transaction", SqlDbType.NVarChar).Value = Transaction.Value;
+                var id = (Guid)command.ExecuteScalar();
+                _businessProcessId = BusinessProcessId.Create(id);
             }
 
             return _businessProcessId;
@@ -359,17 +389,20 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
         protected BusinessProcessId GetBusinessProcessId(Transaction transaction)
         {
+            if (transaction == null) throw new ArgumentNullException(nameof(transaction));
+
             if (_businessProcessId == null)
             {
-                var connection = new SqlConnection(ConnectionString);
+                using var connection = new SqlConnection(ConnectionString);
                 if (connection.State == ConnectionState.Closed)
                 {
                     connection.Open();
                 }
 
-                var command = new SqlCommand($"SELECT Id FROM [dbo].[BusinessProcesses] WHERE TransactionId = '{transaction.Value}'", connection);
-                var id = command.ExecuteScalar();
-                _businessProcessId = new BusinessProcessId(Guid.Parse(id.ToString()));
+                using var command = new SqlCommand($"SELECT Id FROM [dbo].[BusinessProcesses] WHERE TransactionId = @transaction", connection);
+                command.Parameters.Add("@transaction", SqlDbType.NVarChar).Value = transaction.Value;
+                var id = (Guid)command.ExecuteScalar();
+                _businessProcessId = BusinessProcessId.Create(id);
             }
 
             return _businessProcessId;
@@ -377,6 +410,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
         protected async Task AssertOutboxMessageAsync<TMessage>(Func<TMessage, bool> funcAssert)
         {
+            if (funcAssert == null) throw new ArgumentNullException(nameof(funcAssert));
+
             var publishedMessage = await GetLastMessageFromOutboxAsync<TMessage>().ConfigureAwait(false);
             var assertion = funcAssert.Invoke(publishedMessage);
 
@@ -402,7 +437,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
                                    $"DELETE FROM [dbo].[OutboxMessages] " +
                                    $"DELETE FROM [dbo].[QueuedInternalCommands]";
 
-            new SqlCommand(cleanupStatement, GetSqlDbConnection()).ExecuteNonQuery();
+            using var sqlCommand = new SqlCommand(cleanupStatement, GetSqlDbConnection());
+            sqlCommand.ExecuteNonQuery();
         }
     }
 }

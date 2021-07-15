@@ -42,7 +42,7 @@ using Xunit.Categories;
 namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSupplier
 {
     [IntegrationTest]
-    public sealed class RequestTests : TestHost, IDisposable
+    public sealed class RequestTests : TestHost
     {
         [Fact]
         public async Task Request_WhenMeteringPointDoesNotExist_IsRejected()
@@ -101,17 +101,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
             Assert.Equal(request.AccountingPointGsrnNumber, publishedMessage.AccountingPointId);
         }
 
-        private RequestChangeOfSupplier CreateRequest()
-        {
-            return CreateRequest(
-                SampleData.Transaction,
-                SampleData.GlnNumber,
-                SampleData.ConsumerSSN,
-                SampleData.GsrnNumber,
-                Instant.FromDateTimeUtc(DateTime.UtcNow.AddHours(1)).ToString());
-        }
-
-        private RequestChangeOfSupplier CreateRequest(string transaction, string energySupplierGln, string consumerId, string gsrnNumber, string startDate)
+        private static RequestChangeOfSupplier CreateRequest(string transaction, string energySupplierGln, string consumerId, string gsrnNumber, string startDate)
         {
             return new RequestChangeOfSupplier(
                 TransactionId: transaction,
@@ -119,6 +109,16 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
                 SocialSecurityNumber: consumerId,
                 AccountingPointGsrnNumber: gsrnNumber,
                 StartDate: startDate);
+        }
+
+        private static RequestChangeOfSupplier CreateRequest()
+        {
+            return CreateRequest(
+                SampleData.Transaction,
+                SampleData.GlnNumber,
+                SampleData.ConsumerSSN,
+                SampleData.GsrnNumber,
+                Instant.FromDateTimeUtc(DateTime.UtcNow.AddHours(1)).ToString());
         }
     }
 }

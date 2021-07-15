@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.MarketRoles.Contracts;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
 using Google.Protobuf;
@@ -22,6 +23,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Transport.TestImplement
     {
         protected override IMessage Convert(TransportTestRecord obj)
         {
+            if (obj == null) throw new ArgumentNullException(nameof(obj));
+
             return new TestEnvelope()
             {
                 TestMessage = new TestMessage
