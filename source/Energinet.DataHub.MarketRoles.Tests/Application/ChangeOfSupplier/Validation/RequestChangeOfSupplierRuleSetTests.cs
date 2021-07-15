@@ -118,7 +118,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Valid
             Assert.DoesNotContain(errors, error => error is StartOfSupplyMustBeValidRuleError);
         }
 
-        private RequestChangeOfSupplier CreateRequest(string transaction = "", string glnNumber = "", string gsrnNumber = "")
+        private static RequestChangeOfSupplier CreateRequest(string transaction = "", string glnNumber = "", string gsrnNumber = "")
         {
             return new RequestChangeOfSupplier(
                 transaction,
@@ -129,7 +129,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Valid
                 SystemClock.Instance.GetCurrentInstant().ToString());
         }
 
-        private RequestChangeOfSupplier CreateRequest(string transaction = "", string glnNumber = "", string gsrnNumber = "", string startDate = "")
+        private static RequestChangeOfSupplier CreateRequest(string transaction = "", string glnNumber = "", string gsrnNumber = "", string startDate = "")
         {
             return new RequestChangeOfSupplier(
                 transaction,
@@ -140,12 +140,12 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Valid
                 startDate);
         }
 
-        private List<ValidationError> GetValidationErrors(RequestChangeOfSupplier request)
+        private static List<ValidationError> GetValidationErrors(RequestChangeOfSupplier request)
         {
             var ruleSet = new RequestChangeOfSupplierRuleSet();
             var validationResult = ruleSet.Validate(request);
             return validationResult.Errors
-                .Select(error => error.CustomState as ValidationError)
+                .Select(error => (ValidationError)error.CustomState)
                 .ToList();
         }
     }

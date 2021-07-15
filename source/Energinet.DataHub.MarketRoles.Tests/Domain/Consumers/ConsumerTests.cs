@@ -49,20 +49,20 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.Consumers
         {
             var consumer = new Consumer(CreateConsumerId(), CreateCprNumber(), CreateName());
 
-            var @event = consumer.DomainEvents.FirstOrDefault() as ConsumerCreated;
+            ConsumerCreated? @event = consumer.DomainEvents.FirstOrDefault() as ConsumerCreated;
 
             Assert.NotNull(@event);
-            Assert.Equal(consumer.ConsumerId.Value, @event.ConsumerId);
+            Assert.Equal(consumer.ConsumerId.Value, @event!.ConsumerId);
             Assert.Equal(consumer.CprNumber?.Value, @event.CprNumber);
             Assert.Equal(consumer.CvrNumber?.Value, @event.CvrNumber);
             Assert.Equal(SampleData.ConsumerName, @event.FullName);
         }
 
-        private ConsumerName CreateName() => ConsumerName.Create(SampleData.ConsumerName);
+        private static ConsumerName CreateName() => ConsumerName.Create(SampleData.ConsumerName);
 
-        private CprNumber CreateCprNumber() => CprNumber.Create(SampleData.ConsumerSocialSecurityNumber);
+        private static CprNumber CreateCprNumber() => CprNumber.Create(SampleData.ConsumerSocialSecurityNumber);
 
-        private ConsumerId CreateConsumerId()
+        private static ConsumerId CreateConsumerId()
         {
             return new ConsumerId(Guid.NewGuid());
         }

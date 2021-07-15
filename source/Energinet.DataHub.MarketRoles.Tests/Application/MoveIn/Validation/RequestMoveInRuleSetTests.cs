@@ -108,7 +108,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.MoveIn.Validation
             Assert.Contains(errors, error => error is VATNumberMustBeValidRuleError);
         }
 
-        private RequestMoveIn CreateRequest(string socialSecurityNumber, string vatNumber)
+        private static RequestMoveIn CreateRequest(string socialSecurityNumber, string vatNumber)
         {
             return new(
                 SampleData.Transaction,
@@ -120,12 +120,12 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.MoveIn.Validation
                 SampleData.StartDate);
         }
 
-        private List<ValidationError> GetValidationErrors(RequestMoveIn request)
+        private static List<ValidationError> GetValidationErrors(RequestMoveIn request)
         {
             var ruleSet = new RequestMoveInRuleSet();
             var validationResult = ruleSet.Validate(request);
             return validationResult.Errors
-                .Select(error => error.CustomState as ValidationError)
+                .Select(error => (ValidationError)error.CustomState)
                 .ToList();
         }
     }

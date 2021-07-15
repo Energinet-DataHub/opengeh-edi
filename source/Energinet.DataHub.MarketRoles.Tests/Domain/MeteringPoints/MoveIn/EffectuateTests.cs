@@ -67,7 +67,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.MeteringPoints.MoveIn
             Assert.Contains(accountingPoint.DomainEvents, @event => @event is ConsumerMovedIn);
         }
 
-        private (AccountingPoint, ConsumerId, EnergySupplierId, Transaction) SetupScenario()
+        private static (AccountingPoint AccountingPoint, ConsumerId ConsumerId, EnergySupplierId EnergySupplierId, Transaction Transaction) SetupScenario()
         {
             return (
                 new AccountingPoint(GsrnNumber.Create(SampleData.GsrnNumber), MeteringPointType.Consumption),

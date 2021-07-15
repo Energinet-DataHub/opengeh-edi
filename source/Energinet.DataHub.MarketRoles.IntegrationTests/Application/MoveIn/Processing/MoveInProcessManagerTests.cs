@@ -38,27 +38,27 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn.Proc
         [Fact]
         public async Task ConsumerMoveInAccepted_WhenStateIsNotStarted_EffectuateCommandIsEnqueued()
         {
-            var (transaction, businessProcessId) = await SetupScenario();
+            var (transaction, businessProcessId) = await SetupScenario().ConfigureAwait(false);
 
-            var command = await GetEnqueuedCommandAsync<EffectuateConsumerMoveIn>(businessProcessId);
+            var command = await GetEnqueuedCommandAsync<EffectuateConsumerMoveIn>(businessProcessId).ConfigureAwait(false);
 
             Assert.NotNull(command);
-            Assert.Equal(transaction.Value, command.Transaction);
+            Assert.Equal(transaction.Value, command?.Transaction);
         }
 
         [Fact]
         public async Task ConsumerMoveIn_WhenStateIsAwaitingEffectuation_ProcessIsCompleted()
         {
-            var (_, businessProcessId) = await SetupScenario();
+            var (_, businessProcessId) = await SetupScenario().ConfigureAwait(false);
 
-            var effectuateConsumerMoveInCommand = await GetEnqueuedCommandAsync<EffectuateConsumerMoveIn>(businessProcessId);
-            await InvokeCommandAsync(effectuateConsumerMoveInCommand);
+            var effectuateConsumerMoveInCommand = await GetEnqueuedCommandAsync<EffectuateConsumerMoveIn>(businessProcessId).ConfigureAwait(false);
+            await InvokeCommandAsync(effectuateConsumerMoveInCommand!).ConfigureAwait(false);
 
-            var processManager = await ProcessManagerRepository.GetAsync<MoveInProcessManager>(businessProcessId);
-            Assert.True(processManager.IsCompleted());
+            var processManager = await ProcessManagerRepository.GetAsync<MoveInProcessManager>(businessProcessId).ConfigureAwait(false);
+            Assert.True(processManager?.IsCompleted());
         }
 
-        private async Task<(Transaction, BusinessProcessId)> SetupScenario()
+        private async Task<(Transaction Transaction, BusinessProcessId BusinessProcessId)> SetupScenario()
         {
             _ = CreateAccountingPoint();
             _ = CreateEnergySupplier();
@@ -66,16 +66,15 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn.Proc
             SaveChanges();
 
             var transaction = CreateTransaction();
-            var moveInDate = GetService<ISystemDateTimeProvider>().Now();
 
-            await SendRequest(new RequestMoveIn(
+            await SendRequestAsync(new RequestMoveIn(
                 transaction.Value,
                 SampleData.GlnNumber,
                 SampleData.ConsumerSSN,
                 string.Empty,
                 SampleData.ConsumerName,
                 SampleData.GsrnNumber,
-                SampleData.MoveInDate));
+                SampleData.MoveInDate)).ConfigureAwait(false);
 
             return (transaction, GetBusinessProcessId(transaction));
         }
