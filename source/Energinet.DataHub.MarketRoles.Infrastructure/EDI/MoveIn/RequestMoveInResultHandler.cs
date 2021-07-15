@@ -78,7 +78,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
                     MarketEvaluationPoint: request.AccountingPointGsrnNumber,
                     StartDateAndOrTime: request.MoveInDate,
                     OriginalTransaction: request.TransactionId,
-                    Reasons: new List<Reason> { new Reason("TODO", "TODO") })); // TODO: Use error conversion
+                    Reasons: errors.Select(error => new Reason(error.Code, error.Description)).ToList()));
 
             var document = AcknowledgementXmlSerializer.Serialize(message, XmlNamespace);
 
