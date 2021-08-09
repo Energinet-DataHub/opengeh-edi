@@ -39,7 +39,7 @@ module "azfun_outbox" {
     # POST_OFFICE_QUEUE_CONNECTION_STRING   = data.azurerm_key_vault_secret.POST_OFFICE_QUEUE_CONNECTION_STRING.value
     # POST_OFFICE_QUEUE_TOPIC_NAME          = data.azurerm_key_vault_secret.POST_OFFICE_QUEUE_MARKETDATA_TOPIC_NAME.value
     SHARED_INTEGRATION_EVENT_SERVICE_BUS_SENDER_CONNECTION_STRING = data.azurerm_key_vault_secret.INTEGRATION_EVENTS_SENDER_CONNECTION_STRING.value
-    ENERGY_SUPPLIER_CHANGED_TOPIC = "sbt-energy-supplier-changed"
+    ENERGY_SUPPLIER_CHANGED_TOPIC = "energy-supplier-changed"
   }
   dependencies                              = [
     module.appi.dependent_on,
