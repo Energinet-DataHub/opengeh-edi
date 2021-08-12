@@ -1,6 +1,10 @@
 {
   "IsEncrypted": false,
   "Values": {
-    "ACTOR_MESSAGE_DISPATCH_TRIGGER_TIMER": "*/10 * * * * *"
+    "ACTOR_MESSAGE_DISPATCH_TRIGGER_TIMER": "*/10 * * * * *",
+    "EVENT_MESSAGE_DISPATCH_TRIGGER_TIMER": "*/10 * * * * *",
+    "SHARED_INTEGRATION_EVENT_SERVICE_BUS_SENDER_CONNECTION_STRING": "",
+    "MARKETROLES_DB_CONNECTION_STRING": "",
+    "ENERGY_SUPPLIER_CHANGED_TOPIC": "energy-supplier-changed"
   }
 }
