@@ -13,20 +13,22 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing;
 using Energinet.DataHub.MarketRoles.Application.Common.Transport;
 using Energinet.DataHub.MarketRoles.Contracts;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands.Protobuf.Mappers.ChangeOfSupplier
 {
-    public class NotifyCurrentSupplierInbound : ProtobufInboundMapper<MarketRoles.Contracts.NotifyCurrentSupplier>
+    public class NotifyCurrentSupplierInbound : ProtobufInboundMapper<NotifyCurrentSupplier>
     {
         protected override IInboundMessage Convert(NotifyCurrentSupplier obj)
         {
             if (obj == null) throw new ArgumentNullException(nameof(obj));
             return new Application.ChangeOfSupplier.Processing.EndOfSupplyNotification.NotifyCurrentSupplier(
-                Guid.Parse(obj.AccountingPointId), Guid.Parse(obj.BusinessProcessId), obj.Transaction);
+                Guid.Parse(obj.Id),
+                Guid.Parse(obj.AccountingPointId),
+                Guid.Parse(obj.BusinessProcessId),
+                obj.Transaction);
         }
     }
 }

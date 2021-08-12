@@ -29,6 +29,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands.Protobuf
             {
                 ForwardMeteringPointDetails = new Contracts.ForwardMeteringPointDetails()
                 {
+                    Id = obj.Id.ToString(),
                     Transaction = obj.Transaction,
                     AccountingPointId = obj.AccountingPointId.ToString(),
                     BusinessProcessId = obj.BusinessProcessId.ToString(),

@@ -24,11 +24,6 @@ namespace Energinet.DataHub.MarketRoles.Application.Common.Commands
             Id = Guid.NewGuid();
         }
 
-        protected InternalCommand(Guid id)
-        {
-            Id = id;
-        }
-
-        public Guid Id { get; protected set; }
+        public Guid Id { get; protected init; }
     }
 }

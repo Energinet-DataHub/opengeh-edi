@@ -42,28 +42,33 @@ message ForwardConsumerDetails {
   string accounting_point_id = 1;
   string business_process_id = 2;
   string transaction = 3;
+  string id = 4;
 }
 
 message NotifyCurrentSupplier {
   string accounting_point_id = 1;
   string business_process_id = 2;
   string transaction = 3;
+  string id = 4;
 }
 
 message ForwardMeteringPointDetails {
   string accounting_point_id = 1;
   string business_process_id = 2;
   string transaction = 3;
+  string id = 4;
 }
 
 message ChangeSupplier {
   string accounting_point_id = 1;
   string transaction = 2;
+  string id = 3;
 }
 
 message EffectuateConsumerMoveIn {
   string accounting_point_id = 1;
   string transaction = 2;
+  string id = 3;
 }
 
 message MarketRolesEnvelope {

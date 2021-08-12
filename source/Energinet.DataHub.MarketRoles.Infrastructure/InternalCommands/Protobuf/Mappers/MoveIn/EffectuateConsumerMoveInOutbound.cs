@@ -29,7 +29,9 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands.Protobuf
             {
                 EffectuateConsumerMoveIn = new Contracts.EffectuateConsumerMoveIn()
                 {
-                    Transaction = obj.Transaction, AccountingPointId = obj.AccountingPointId.ToString(),
+                    Id = obj.Id.ToString(),
+                    Transaction = obj.Transaction,
+                    AccountingPointId = obj.AccountingPointId.ToString(),
                 },
             };
         }
