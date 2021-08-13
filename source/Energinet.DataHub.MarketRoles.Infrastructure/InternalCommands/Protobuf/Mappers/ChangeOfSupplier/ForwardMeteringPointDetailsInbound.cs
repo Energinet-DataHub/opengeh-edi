@@ -19,13 +19,16 @@ using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands.Protobuf.Mappers.ChangeOfSupplier
 {
-    public class ForwardMeteringPointDetailsInbound : ProtobufInboundMapper<MarketRoles.Contracts.ForwardMeteringPointDetails>
+    public class ForwardMeteringPointDetailsInbound : ProtobufInboundMapper<ForwardMeteringPointDetails>
     {
         protected override IInboundMessage Convert(ForwardMeteringPointDetails obj)
         {
             if (obj == null) throw new ArgumentNullException(nameof(obj));
             return new Application.ChangeOfSupplier.Processing.MeteringPointDetails.ForwardMeteringPointDetails(
-                Guid.Parse(obj.AccountingPointId), Guid.Parse(obj.BusinessProcessId), obj.Transaction);
+                Guid.Parse(obj.Id),
+                Guid.Parse(obj.AccountingPointId),
+                Guid.Parse(obj.BusinessProcessId),
+                obj.Transaction);
         }
     }
 }

@@ -43,7 +43,6 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
             CreateEnergySupplier();
             SaveChanges();
 
-            var moveInDate = GetService<ISystemDateTimeProvider>().Now();
             var requestMoveIn = new RequestMoveIn(
                 SampleData.Transaction,
                 SampleData.GlnNumber,
