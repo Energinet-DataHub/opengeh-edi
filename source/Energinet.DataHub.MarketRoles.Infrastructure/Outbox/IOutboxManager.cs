@@ -20,9 +20,19 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Outbox
     public interface IOutboxManager
     {
         /// <summary>
+        /// Get next unprocessed message
+        /// </summary>
+        OutboxMessage? GetNext();
+
+        /// <summary>
         /// Get next unprocessed message based on category
         /// </summary>
         OutboxMessage? GetNext(OutboxMessageCategory category);
+
+        /// <summary>
+        /// Get next unprocessed message based on category and type
+        /// </summary>
+        OutboxMessage? GetNext(OutboxMessageCategory category, string type);
 
         /// <summary>
         /// Mark message as processed

@@ -12,9 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketRoles.Infrastructure.EDI;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI
+namespace Energinet.DataHub.MarketRoles.Infrastructure.PostOffice
 {
-    public record PostOfficeEnvelope(string Id, string Recipient, string Content, string MessageType, string Correlation) : IRequest;
+    /// <summary>
+    /// Basic file management for PostOffice communication.
+    /// </summary>
+    public interface IPostOfficeStorageClient
+    {
+        /// <summary>
+        /// Write file.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
+        Task WriteAsync(PostOfficeEnvelope message);
+    }
 }

@@ -13,28 +13,11 @@
 // limitations under the License.
 
 using System;
-using System.Collections.ObjectModel;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier;
-using Energinet.DataHub.MarketRoles.Domain.Consumers;
-using Energinet.DataHub.MarketRoles.Domain.EnergySuppliers;
-using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
-using Energinet.DataHub.MarketRoles.Infrastructure.BusinessRequestProcessing;
-using Energinet.DataHub.MarketRoles.Infrastructure.BusinessRequestProcessing.Pipeline;
-using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
-using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.AccountingPoints;
-using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.Consumers;
-using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.EnergySuppliers;
+using Energinet.DataHub.MarketRoles.Infrastructure.EDI;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI.ChangeOfSupplier;
-using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
-using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
-using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Xunit;
 using Xunit.Categories;
@@ -49,10 +32,10 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
         {
             var request = CreateRequest();
 
-            var result = await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
+            await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
 
-            var publishedMessage = await GetLastMessageFromOutboxAsync<RequestChangeOfSupplierRejected>().ConfigureAwait(false);
-            Assert.Equal(request.AccountingPointGsrnNumber, publishedMessage.MeteringPoint);
+            await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType == nameof(RequestChangeOfSupplierRejected))
+                .ConfigureAwait(false);
         }
 
         [Fact]
@@ -64,8 +47,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
 
             await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
 
-            var publishedMessage = await GetLastMessageFromOutboxAsync<RequestChangeOfSupplierRejected>().ConfigureAwait(false);
-            Assert.Equal(request.AccountingPointGsrnNumber, publishedMessage.MeteringPoint);
+            await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType == nameof(RequestChangeOfSupplierRejected))
+                .ConfigureAwait(false);
         }
 
         [Fact]
@@ -80,8 +63,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
 
             await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
 
-            var publishedMessage = await GetLastMessageFromOutboxAsync<RequestChangeOfSupplierRejected>().ConfigureAwait(false);
-            Assert.Equal(request.AccountingPointGsrnNumber, publishedMessage.MeteringPoint);
+            await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType == nameof(RequestChangeOfSupplierRejected))
+                .ConfigureAwait(false);
         }
 
         [Fact]
@@ -96,9 +79,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
             var request = CreateRequest();
 
             await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
-
-            var publishedMessage = await GetLastMessageFromOutboxAsync<RequestChangeOfSupplierApproved>().ConfigureAwait(false);
-            Assert.Equal(request.AccountingPointGsrnNumber, publishedMessage.AccountingPointId);
+            await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType == nameof(RequestChangeOfSupplierApproved))
+                .ConfigureAwait(false);
         }
 
         private static RequestChangeOfSupplier CreateRequest(string transaction, string energySupplierGln, string consumerId, string gsrnNumber, string startDate)
