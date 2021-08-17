@@ -53,7 +53,6 @@ using Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChange;
 using Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
-using Energinet.DataHub.MarketRoles.Infrastructure.Processing.Mappers;
 using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integration;
 using Energinet.DataHub.MarketRoles.Infrastructure.Users;

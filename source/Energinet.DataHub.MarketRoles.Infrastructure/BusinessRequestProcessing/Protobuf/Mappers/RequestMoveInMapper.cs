@@ -18,22 +18,23 @@ using Energinet.DataHub.MarketRoles.Contracts;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
 using NodaTime;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Processing.Mappers
+namespace Energinet.DataHub.MarketRoles.Infrastructure.BusinessRequestProcessing.Protobuf.Mappers
 {
-    public class RequestChangeOfSupplierMapper : ProtobufInboundMapper<RequestChangeOfSupplier>
+    public class RequestMoveInMapper : ProtobufInboundMapper<RequestMoveIn>
     {
-        protected override IInboundMessage Convert(RequestChangeOfSupplier obj)
+        protected override IInboundMessage Convert(RequestMoveIn obj)
         {
             if (obj == null) throw new ArgumentNullException(nameof(obj));
 
-            return new Application.ChangeOfSupplier.RequestChangeOfSupplier
+            return new Application.MoveIn.RequestMoveIn
             {
                 TransactionId = obj.TransactionId,
                 EnergySupplierGlnNumber = obj.EnergySupplierGlnNumber,
                 SocialSecurityNumber = obj.SocialSecurityNumber,
                 VATNumber = obj.VatNumber,
+                ConsumerName = obj.ConsumerName,
                 AccountingPointGsrnNumber = obj.AccountingPointGsrnNumber,
-                StartDate = Instant.FromDateTimeOffset(obj.StartDate.ToDateTimeOffset()).ToString(),
+                MoveInDate = Instant.FromDateTimeOffset(obj.MoveInDate.ToDateTimeOffset()).ToString(),
             };
         }
     }
