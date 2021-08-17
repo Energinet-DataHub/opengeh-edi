@@ -21,6 +21,7 @@ using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.Consumers;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.EnergySuppliers;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.ProcessManagers;
 using Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands;
+using Energinet.DataHub.MarketRoles.Infrastructure.Messaging.Idempotency;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 using Microsoft.EntityFrameworkCore;
 
@@ -48,6 +49,8 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.DataAccess
 
         public DbSet<QueuedInternalCommand> QueuedInternalCommands { get; private set; }
 
+        public DbSet<IncomingMessage> IncomingMessages { get; private set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
@@ -60,6 +63,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.DataAccess
             modelBuilder.ApplyConfiguration(new ChangeOfSupplierProcessManagerEntityConfiguration());
             modelBuilder.ApplyConfiguration(new MoveInProcessManagerEntityConfiguration());
             modelBuilder.ApplyConfiguration(new QueuedInternalCommandEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new IncomingMessageEntityConfiguration());
         }
     }
 }
