@@ -33,6 +33,7 @@ limitations under the License.
 
   <ItemGroup>
     <EmbeddedResource Include="Scripts\Model\202105051000 Initial Market Roles DB.sql" />
+    <EmbeddedResource Include="Scripts\Model\202108171123 Add IncomingMessages.sql" />
   </ItemGroup>
 
 </Project>
