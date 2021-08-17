@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Data;
-using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier;
@@ -62,8 +60,9 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
 
             string query = @"SELECT Count(1) FROM SupplierRegistrations WHERE AccountingPointId = @AccountingPointId AND EnergySupplierId = @EnergySupplierId AND StartOfSupplyDate IS NOT NULL AND EndOfSupplyDate IS NULL";
             await using var sqlCommand = new SqlCommand(query, GetSqlDbConnection());
-            sqlCommand.Parameters.Add("@AccountingPointId", SqlDbType.NVarChar).Value = Transaction.Value;
-            sqlCommand.Parameters.Add("@EnergySupplierId", SqlDbType.NVarChar).Value = Transaction.Value;
+
+            sqlCommand.Parameters.Add(new SqlParameter("@AccountingPointId", _accountingPoint.Id.Value));
+            sqlCommand.Parameters.Add(new SqlParameter("@EnergySupplierId", _energySupplier.EnergySupplierId.Value));
 
             var result = await sqlCommand.ExecuteScalarAsync().ConfigureAwait(false);
 

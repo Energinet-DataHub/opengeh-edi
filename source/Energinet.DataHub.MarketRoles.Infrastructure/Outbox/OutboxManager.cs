@@ -36,11 +36,27 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Outbox
             _context.OutboxMessages.Add(message);
         }
 
+        public OutboxMessage? GetNext()
+        {
+            return _context.OutboxMessages
+                .OrderBy(message => message.CreationDate)
+                .FirstOrDefault(message => !message.ProcessedDate.HasValue);
+        }
+
         public OutboxMessage? GetNext(OutboxMessageCategory category)
         {
             return _context.OutboxMessages
                 .OrderBy(message => message.CreationDate)
                 .Where(message => !message.ProcessedDate.HasValue)
+                .FirstOrDefault(message => message.Category == category);
+        }
+
+        public OutboxMessage? GetNext(OutboxMessageCategory category, string type)
+        {
+            return _context.OutboxMessages
+                .OrderBy(message => message.CreationDate)
+                .Where(message => !message.ProcessedDate.HasValue)
+                .Where(message => message.Type == type)
                 .FirstOrDefault(message => message.Category == category);
         }
 
