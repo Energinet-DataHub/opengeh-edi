@@ -12,19 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketRoles.Infrastructure.Integration;
+using System;
+using System.Collections.Generic;
+using Energinet.DataHub.MarketRoles.Infrastructure.EDI;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChange;
-using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
 
-namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox.EventHandlers
+namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.Helpers
 {
-    public class EnergySupplierChangedDispatcher : IntegrationEventDispatcher<EnergySupplierChangedTopic, EnergySupplierChangedIntegrationEvent>
+    public static class OutboxTypeFactory
     {
-        public EnergySupplierChangedDispatcher(
-            ITopicSender<EnergySupplierChangedTopic> topicSender,
-            ProtobufOutboundMapper<EnergySupplierChangedIntegrationEvent> mapper)
-            : base(topicSender, mapper)
+        private static readonly Dictionary<string, Type> _types = new()
         {
+            { typeof(EnergySupplierChangedIntegrationEvent).FullName!, typeof(EnergySupplierChangedIntegrationEvent) },
+            { typeof(PostOfficeEnvelope).FullName!, typeof(PostOfficeEnvelope) },
+        };
+
+        public static Type GetType(string type)
+        {
+            return _types.TryGetValue(type, out var result)
+                ? result
+                : throw new ArgumentException("Outbox type is not implemented.");
         }
     }
 }

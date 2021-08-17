@@ -374,19 +374,6 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             accountingPoint.AcceptChangeOfSupplier(energySupplierId, changeSupplierDate, transaction, systemTimeProvider);
         }
 
-        protected BusinessProcessId GetBusinessProcessId()
-        {
-            if (_businessProcessId == null)
-            {
-                using var command = new SqlCommand($"SELECT Id FROM [dbo].[BusinessProcesses] WHERE TransactionId = @transaction", GetSqlDbConnection());
-                command.Parameters.Add("@transaction", SqlDbType.NVarChar).Value = Transaction.Value;
-                var id = (Guid)command.ExecuteScalar();
-                _businessProcessId = BusinessProcessId.Create(id);
-            }
-
-            return _businessProcessId;
-        }
-
         protected BusinessProcessId GetBusinessProcessId(Transaction transaction)
         {
             if (transaction == null) throw new ArgumentNullException(nameof(transaction));

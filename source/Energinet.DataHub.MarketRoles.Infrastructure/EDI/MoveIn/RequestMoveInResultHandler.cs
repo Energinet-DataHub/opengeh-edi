@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Energinet.DataHub.MarketRoles.Application.Common;
 using Energinet.DataHub.MarketRoles.Application.MoveIn;
@@ -130,7 +129,8 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
                 Id: Guid.NewGuid().ToString(),
                 Recipient: recipient,
                 Content: cimContent,
-                MessageType: messageType);
+                MessageType: messageType,
+                Correlation: string.Empty); // TODO: add correlation when Telemetry is added
         }
     }
 }
