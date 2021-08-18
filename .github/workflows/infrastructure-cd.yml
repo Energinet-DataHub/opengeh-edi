@@ -14,7 +14,7 @@
 name: Infrastructure CD
 
 on:
-  push:
+  pull_request:
     branches:
       - main      
     paths:
@@ -120,21 +120,21 @@ jobs:
       - name: Configure Terraform Backend
         uses: ./.github/actions/configure-terraform-backend
         with:
-          backend-file-path: "./build/infrastructure/backend.tf"
+          backend-file-path: "./build/infrastructure/main/backend.tf"
           resource-group-name: "${{ matrix.environment.long }}"
           storage-account-name: "tfstate${{ env.PROJECT_NAME }}${{ matrix.environment.short }}"
 
       - name: Terraform Init
-        working-directory: ./build/infrastructure
+        working-directory: ./build/infrastructure/main
         run: terraform init
 
       - name: Terraform Plan
-        working-directory: ./build/infrastructure
+        working-directory: ./build/infrastructure/main
         run: terraform plan
 
       - name: Terraform Apply
         id: terraform-apply
-        working-directory: ./build/infrastructure
+        working-directory: ./build/infrastructure/main
         run: |
           terraform apply -no-color -auto-approve
           echo "::set-output name=sql-server-connectionstring::$(terraform output marketroles_connection_string)"

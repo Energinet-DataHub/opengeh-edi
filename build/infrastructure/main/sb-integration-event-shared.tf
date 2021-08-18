@@ -12,12 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Reference to get the namespace for the shared service bus for integration events
-data "azurerm_servicebus_namespace" "integrationevents" {
-  name                = var.sharedresources_integrationevents_service_bus_namespace_name
-  resource_group_name = data.azurerm_resource_group.shared_resources.name
-}
-
 # Reference to get the listener connection string from the shared integration event service bus
 data "azurerm_key_vault_secret" "INTEGRATION_EVENTS_LISTENER_CONNECTION_STRING" {
   name         = "INTEGRATION-EVENTS-LISTENER-CONNECTION-STRING"
