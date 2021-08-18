@@ -125,16 +125,16 @@ jobs:
           storage-account-name: "tfstate${{ env.PROJECT_NAME }}${{ matrix.environment.short }}"
 
       - name: Terraform Init
-        working-directory: ./build/infrastructure
+        working-directory: ./build/infrastructure/main
         run: terraform init
 
       - name: Terraform Plan
-        working-directory: ./build/infrastructure
+        working-directory: ./build/infrastructure/main
         run: terraform plan
 
       - name: Terraform Apply
         id: terraform-apply
-        working-directory: ./build/infrastructure
+        working-directory: ./build/infrastructure/main
         run: |
           terraform apply -no-color -auto-approve
           echo "::set-output name=sql-server-connectionstring::$(terraform output marketroles_connection_string)"
