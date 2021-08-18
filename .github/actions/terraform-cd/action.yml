@@ -123,7 +123,7 @@ runs:
       working-directory: ./build/infrastructure/main
       run: | 
         terraform apply -no-color -auto-approve
-        echo "::set-output name=sql-server-connectionstring::$(terraform output metering_point_connection_string)"
+        echo "::set-output name=sql-server-connectionstring::$(terraform output market_roles_connection_string)"
 
     ## CUSTOM DOMAIN STEPS
     - name: Applying meteringpoint migrations
