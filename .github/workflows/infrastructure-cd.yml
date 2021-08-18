@@ -16,7 +16,7 @@ name: Infrastructure CD
 on:
   push:
     branches:
-      - main
+      - main      
     paths:
       - build/infrastructure/**
       - build/modules/**
@@ -99,7 +99,7 @@ jobs:
       - name: Create Terraform State Storage
         run: |
           storage_name="tfstate${{ env.PROJECT_NAME }}${{ matrix.environment.short }}"
-          az storage account create --resource-group ${{ matrix.environment.long }} --name $storage_name --sku Standard_LRS --encryption-services blob
+          az storage account create --resource-group ${{ matrix.environment.long }} --name $storage_name --sku Standard_LRS --min-tls-version TLS1_2 --encryption-services blob
           account_key=$(az storage account keys list --resource-group ${{ matrix.environment.long }} --account-name $storage_name --query '[0].value' -o tsv)
           az storage container create --name tfstate --account-name $storage_name --account-key $account_key
         if: steps.state-storage-exists.outputs.state-storage-exists == 'False'
