@@ -16,10 +16,6 @@ name: Infrastructure CD
 on:
   pull_request:
     branches:
-      - main
-      - dph/Add-infrastructure-CI-to-MR
-  push:
-    branches:
       - main      
     paths:
       - build/infrastructure/**
