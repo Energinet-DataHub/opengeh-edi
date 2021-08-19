@@ -68,6 +68,8 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.XmlConverter
             var elementName = hierarchyQueue.Dequeue();
             var element = container.Element(ns + elementName);
 
+            if (element is null) return null;
+
             return hierarchyQueue.Any() ? GetXmlElement(element, hierarchyQueue, ns) : element;
         }
 
