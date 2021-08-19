@@ -3,8 +3,11 @@
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-    "MARKET_DATA_QUEUE_CONNECTION_STRING": "",
-    "MARKET_DATA_QUEUE_TOPIC_NAME": "",
-    "MARKET_DATA_DB_CONNECTION_STRING": ""
+    "APPINSIGHTS_INSTRUMENTATIONKEY": "<Azure application insights instrumentation key>",
+    "MARKET_DATA_QUEUE_CONNECTION_STRING": "<Main SQL server database connection string>",
+    "MARKET_DATA_QUEUE_TOPIC_NAME": "<Name of Service Bus queue for receiving business requests and internal commands>",
+    "MARKET_DATA_DB_CONNECTION_STRING": "<Main SQL database connection string>",
+    "INTEGRATION_EVENT_QUEUE": "<Name of Service Bus queue for receiving integration/notification events>",
+    "INTEGRATION_EVENT_QUEUE_CONNECTION": "<Service Bus connection string where integration/notification events are received>"
   }
 }
