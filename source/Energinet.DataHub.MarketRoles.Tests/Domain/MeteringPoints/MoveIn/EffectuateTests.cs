@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using Energinet.DataHub.MarketRoles.Domain.Consumers;
 using Energinet.DataHub.MarketRoles.Domain.EnergySuppliers;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
@@ -65,6 +66,10 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.MeteringPoints.MoveIn
 
             Assert.Contains(accountingPoint.DomainEvents, @event => @event is EnergySupplierChanged);
             Assert.Contains(accountingPoint.DomainEvents, @event => @event is ConsumerMovedIn);
+
+            var consumerMovedIn = accountingPoint.DomainEvents.FirstOrDefault(de => de is ConsumerMovedIn) as ConsumerMovedIn;
+
+            if (consumerMovedIn != null) Assert.NotNull(consumerMovedIn.MoveInDate);
         }
 
         private static (AccountingPoint AccountingPoint, ConsumerId ConsumerId, EnergySupplierId EnergySupplierId, Transaction Transaction) SetupScenario()
