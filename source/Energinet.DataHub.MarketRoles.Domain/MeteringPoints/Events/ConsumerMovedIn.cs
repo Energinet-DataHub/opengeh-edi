@@ -21,7 +21,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events
 {
     public class ConsumerMovedIn : DomainEventBase
     {
-        public ConsumerMovedIn(Guid accountingPointId, string gsrnNumber, Guid businessProcessId, Guid consumerId, Instant moveInDate)
+        public ConsumerMovedIn(Guid accountingPointId, string gsrnNumber, Guid businessProcessId, Guid consumerId, Instant? moveInDate)
         {
             AccountingPointId = accountingPointId;
             GsrnNumber = gsrnNumber;
@@ -38,6 +38,6 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events
 
         public Guid ConsumerId { get; }
 
-        public Instant MoveInDate { get; }
+        public Instant? MoveInDate { get; }
     }
 }
