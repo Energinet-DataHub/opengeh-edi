@@ -67,7 +67,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
 
             var result = await sqlCommand.ExecuteScalarAsync().ConfigureAwait(false);
 
-            Assert.Equal(2, result);
+            Assert.Equal(1, result);
         }
 
         private async Task SimulateProcess()
