@@ -30,11 +30,11 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules.ChangeEnergy
             _moveInDate = moveInDate;
         }
 
-        public bool IsBroken => HasPendingMoveInProcess();
+        public bool IsBroken => HasPendingOrCompletedMoveInProcess();
 
         public ValidationError ValidationError => new MoveInRegisteredOnSameDateIsNotAllowedRuleError(_moveInDate);
 
-        private bool HasPendingMoveInProcess()
+        private bool HasPendingOrCompletedMoveInProcess()
         {
             return _businessProcesses.Any(p =>
                 p.ProcessType == BusinessProcessType.MoveIn &&
