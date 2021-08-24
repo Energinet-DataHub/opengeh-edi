@@ -80,7 +80,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
                 new MoveInRegisteredOnSameDateIsNotAllowedRule(_businessProcesses.AsReadOnly(), supplyStartDate),
                 // TODO: Ignore move out process until implementation is in scope
                 //new MoveOutRegisteredOnSameDateIsNotAllowedRule(_businessProcesses.AsReadOnly(), supplyStartDate),
-                new EffectuationDateCannotBeInThePastRule(supplyStartDate, systemDateTimeProvider.Now()),
+                new EffectiveDateCannotBeInThePastRule(supplyStartDate, systemDateTimeProvider.Now()),
             };
 
             return new BusinessRulesValidationResult(rules);
@@ -169,7 +169,13 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
 
             var consumer = _consumerRegistrations.Find(consumerRegistration => consumerRegistration.BusinessProcessId.Equals(businessProcess.BusinessProcessId))!;
 
-            AddDomainEvent(new ConsumerMovedIn(Id.Value, GsrnNumber.Value, businessProcess.BusinessProcessId.Value, consumer.ConsumerId.Value, consumer.MoveInDate));
+            AddDomainEvent(new ConsumerMovedIn(
+                Id.Value,
+                GsrnNumber.Value,
+                businessProcess.BusinessProcessId.Value,
+                consumer.ConsumerId.Value,
+                businessProcess.EffectiveDate));
+
             AddDomainEvent(new EnergySupplierChanged(Id.Value, GsrnNumber.Value, businessProcess.BusinessProcessId.Value, businessProcess.Transaction.Value, newSupplier.EnergySupplierId.Value, businessProcess.EffectiveDate));
         }
 

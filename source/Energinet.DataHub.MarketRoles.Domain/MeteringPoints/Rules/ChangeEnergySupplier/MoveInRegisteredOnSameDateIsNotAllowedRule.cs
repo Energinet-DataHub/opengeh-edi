@@ -32,14 +32,15 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules.ChangeEnergy
 
         public bool IsBroken => HasPendingMoveInProcess();
 
-        public ValidationError ValidationError => new MoveInRegisteredOnSameDateIsNotAllowedRuleError();
+        public ValidationError ValidationError => new MoveInRegisteredOnSameDateIsNotAllowedRuleError(_moveInDate);
 
         private bool HasPendingMoveInProcess()
         {
             return _businessProcesses.Any(p =>
                 p.ProcessType == BusinessProcessType.MoveIn &&
                 p.EffectiveDate.ToDateTimeUtc().Date.Equals(_moveInDate.ToDateTimeUtc().Date) &&
-                p.Status == BusinessProcessStatus.Pending);
+                (p.Status == BusinessProcessStatus.Pending ||
+                p.Status == BusinessProcessStatus.Completed));
         }
     }
 }

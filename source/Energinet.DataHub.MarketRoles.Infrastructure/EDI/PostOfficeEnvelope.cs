@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using MediatR;
+
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI
 {
-    public record PostOfficeEnvelope(string Id, string Recipient, string Content, string MessageType);
+    public record PostOfficeEnvelope(string Id, string Recipient, string Content, string MessageType, string Correlation) : IRequest;
 }

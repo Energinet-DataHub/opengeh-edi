@@ -21,7 +21,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Transport.TestImplement
 {
     public class InProcessChannel : Channel
     {
-        private byte[] _writtenBytes;
+        private byte[]? _writtenBytes;
 
         public byte[] GetWrittenBytes() => _writtenBytes ?? throw new InvalidOperationException("Write bytes before getting them.");
 

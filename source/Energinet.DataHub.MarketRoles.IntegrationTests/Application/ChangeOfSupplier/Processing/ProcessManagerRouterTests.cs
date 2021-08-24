@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing;
@@ -24,11 +22,6 @@ using Energinet.DataHub.MarketRoles.Domain.Consumers;
 using Energinet.DataHub.MarketRoles.Domain.EnergySuppliers;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events;
-using Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands;
-using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
-using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
-using Microsoft.EntityFrameworkCore;
-using Squadron;
 using Xunit;
 using Xunit.Categories;
 
@@ -62,86 +55,86 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
         [Fact]
         public async Task EnergySupplierChangeIsRegistered_WhenStateIsNotStarted_ForwardMasterDataDetailsCommandIsEnqueued()
         {
-            await _router.Handle(CreateSupplierChangeRegisteredEvent(), CancellationToken.None);
-            await UnitOfWork.CommitAsync();
+            await _router.Handle(CreateSupplierChangeRegisteredEvent(), CancellationToken.None).ConfigureAwait(false);
+            await UnitOfWork.CommitAsync().ConfigureAwait(false);
 
-            var command = await GetEnqueuedCommandAsync<ForwardMeteringPointDetails>();
+            var command = await GetEnqueuedCommandAsync<ForwardMeteringPointDetails>().ConfigureAwait(false);
 
             Assert.NotNull(command);
-            Assert.Equal(_businessProcessId.Value, command.BusinessProcessId);
+            Assert.Equal(_businessProcessId.Value, command?.BusinessProcessId);
         }
 
         [Fact]
         public async Task MeteringPointDetailsAreDispatched_WhenStateIsAwaitingMeteringPointDetailsDispatch_ForwardConsumerDetailsCommandIsEnqueued()
         {
-            await _router.Handle(CreateSupplierChangeRegisteredEvent(), CancellationToken.None);
-            await UnitOfWork.CommitAsync();
+            await _router.Handle(CreateSupplierChangeRegisteredEvent(), CancellationToken.None).ConfigureAwait(false);
+            await UnitOfWork.CommitAsync().ConfigureAwait(false);
 
             await _router.Handle(new MeteringPointDetailsDispatched(_accountingPoint.Id, _businessProcessId, Transaction), CancellationToken.None).ConfigureAwait(false);
-            await UnitOfWork.CommitAsync();
+            await UnitOfWork.CommitAsync().ConfigureAwait(false);
 
-            var command = await GetEnqueuedCommandAsync<ForwardConsumerDetails>();
+            var command = await GetEnqueuedCommandAsync<ForwardConsumerDetails>().ConfigureAwait(false);
             Assert.NotNull(command);
-            Assert.Equal(_businessProcessId.Value, command.BusinessProcessId);
+            Assert.Equal(_businessProcessId.Value, command?.BusinessProcessId);
         }
 
         [Fact]
         public async Task ConsumerDetailsAreDispatched_WhenStateIsAwaitingConsumerDetailsDispatch_NotifyCurrentSupplierCommandIsEnqueued()
         {
-            await _router.Handle(CreateSupplierChangeRegisteredEvent(), CancellationToken.None);
-            await UnitOfWork.CommitAsync();
+            await _router.Handle(CreateSupplierChangeRegisteredEvent(), CancellationToken.None).ConfigureAwait(false);
+            await UnitOfWork.CommitAsync().ConfigureAwait(false);
 
             await _router.Handle(new MeteringPointDetailsDispatched(_accountingPoint.Id, _businessProcessId, Transaction), CancellationToken.None).ConfigureAwait(false);
-            await UnitOfWork.CommitAsync();
+            await UnitOfWork.CommitAsync().ConfigureAwait(false);
 
             await _router.Handle(new ConsumerDetailsDispatched(_accountingPoint.Id, _businessProcessId, Transaction), CancellationToken.None).ConfigureAwait(false);
-            await UnitOfWork.CommitAsync();
+            await UnitOfWork.CommitAsync().ConfigureAwait(false);
 
-            var command = await GetEnqueuedCommandAsync<NotifyCurrentSupplier>();
+            var command = await GetEnqueuedCommandAsync<NotifyCurrentSupplier>().ConfigureAwait(false);
             Assert.NotNull(command);
-            Assert.Equal(_businessProcessId.Value, command.BusinessProcessId);
+            Assert.Equal(_businessProcessId.Value, command?.BusinessProcessId);
         }
 
         [Fact]
         public async Task CurrentSupplierIsNotified_WhenStateIsAwaitingCurrentSupplierNotification_ChangeSupplierCommandIsScheduled()
         {
-            await _router.Handle(CreateSupplierChangeRegisteredEvent(), CancellationToken.None);
-            await UnitOfWork.CommitAsync();
+            await _router.Handle(CreateSupplierChangeRegisteredEvent(), CancellationToken.None).ConfigureAwait(false);
+            await UnitOfWork.CommitAsync().ConfigureAwait(false);
 
             await _router.Handle(new MeteringPointDetailsDispatched(_accountingPoint.Id, _businessProcessId, Transaction), CancellationToken.None).ConfigureAwait(false);
-            await UnitOfWork.CommitAsync();
+            await UnitOfWork.CommitAsync().ConfigureAwait(false);
 
             await _router.Handle(new ConsumerDetailsDispatched(_accountingPoint.Id, _businessProcessId, Transaction), CancellationToken.None).ConfigureAwait(false);
-            await UnitOfWork.CommitAsync();
+            await UnitOfWork.CommitAsync().ConfigureAwait(false);
 
             await _router.Handle(new CurrentSupplierNotified(_accountingPoint.Id, _businessProcessId, Transaction), CancellationToken.None).ConfigureAwait(false);
-            await UnitOfWork.CommitAsync();
+            await UnitOfWork.CommitAsync().ConfigureAwait(false);
 
-            var command = await GetEnqueuedCommandAsync<ChangeSupplier>();
+            var command = await GetEnqueuedCommandAsync<ChangeSupplier>().ConfigureAwait(false);
             Assert.NotNull(command);
-            Assert.Equal(_accountingPoint.Id.Value, command.AccountingPointId);
+            Assert.Equal(_accountingPoint.Id.Value, command?.AccountingPointId);
         }
 
         [Fact]
         public async Task SupplierIsChanged_WhenStateIsAwaitingSupplierChange_ProcessIsCompleted()
         {
-            await _router.Handle(CreateSupplierChangeRegisteredEvent(), CancellationToken.None);
-            await UnitOfWork.CommitAsync();
+            await _router.Handle(CreateSupplierChangeRegisteredEvent(), CancellationToken.None).ConfigureAwait(false);
+            await UnitOfWork.CommitAsync().ConfigureAwait(false);
 
             await _router.Handle(new MeteringPointDetailsDispatched(_accountingPoint.Id, _businessProcessId, Transaction), CancellationToken.None).ConfigureAwait(false);
-            await UnitOfWork.CommitAsync();
+            await UnitOfWork.CommitAsync().ConfigureAwait(false);
 
             await _router.Handle(new ConsumerDetailsDispatched(_accountingPoint.Id, _businessProcessId, Transaction), CancellationToken.None).ConfigureAwait(false);
-            await UnitOfWork.CommitAsync();
+            await UnitOfWork.CommitAsync().ConfigureAwait(false);
 
             await _router.Handle(new CurrentSupplierNotified(_accountingPoint.Id, _businessProcessId, Transaction), CancellationToken.None).ConfigureAwait(false);
-            await UnitOfWork.CommitAsync();
+            await UnitOfWork.CommitAsync().ConfigureAwait(false);
 
             await _router.Handle(CreateEnergySupplierChangedEvent(), CancellationToken.None).ConfigureAwait(false);
-            await UnitOfWork.CommitAsync();
+            await UnitOfWork.CommitAsync().ConfigureAwait(false);
 
-            var processManager = await ProcessManagerRepository.GetAsync<ChangeOfSupplierProcessManager>(_businessProcessId);
-            Assert.True(processManager.IsCompleted());
+            var processManager = await ProcessManagerRepository.GetAsync<ChangeOfSupplierProcessManager>(_businessProcessId).ConfigureAwait(false);
+            Assert.True(processManager?.IsCompleted());
         }
 
         private EnergySupplierChangeRegistered CreateSupplierChangeRegisteredEvent()

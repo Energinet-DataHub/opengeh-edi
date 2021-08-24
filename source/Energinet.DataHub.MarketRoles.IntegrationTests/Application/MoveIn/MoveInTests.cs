@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.MoveIn;
 using Energinet.DataHub.MarketRoles.Domain.Consumers;
-using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI;
 using Squadron;
@@ -27,9 +27,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
     [IntegrationTest]
     public class MoveInTests : TestHost
     {
-        private readonly AccountingPoint _accountingPoint;
-
-        public MoveInTests(DatabaseFixture databaseFixture)
+        protected MoveInTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
         }
@@ -43,10 +41,10 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
 
             var request = CreateRequest();
 
-            var result = await SendRequest(request);
+            var result = await SendRequestAsync(request).ConfigureAwait(false);
 
             Assert.True(result.Success);
-            await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType.StartsWith("Confirm"))
+            await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType.StartsWith("Confirm", StringComparison.Ordinal))
                 .ConfigureAwait(false);
         }
 
@@ -58,10 +56,10 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
 
             var request = CreateRequest();
 
-            var result = await SendRequest(request);
+            var result = await SendRequestAsync(request).ConfigureAwait(false);
 
             Assert.False(result.Success);
-            await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType.StartsWith("Reject"))
+            await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType.StartsWith("Reject", StringComparison.Ordinal))
                 .ConfigureAwait(false);
         }
 
@@ -73,10 +71,10 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
 
             var request = CreateRequest();
 
-            var result = await SendRequest(request);
+            var result = await SendRequestAsync(request).ConfigureAwait(false);
 
             Assert.False(result.Success);
-            await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType.StartsWith("Reject"))
+            await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType.StartsWith("Reject", StringComparison.Ordinal))
                 .ConfigureAwait(false);
         }
 
@@ -88,9 +86,9 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
             SaveChanges();
 
             var request = CreateRequest();
-            await SendRequest(request);
+            await SendRequestAsync(request).ConfigureAwait(false);
 
-            var consumer = await GetService<IConsumerRepository>().GetBySSNAsync(CprNumber.Create(request.SocialSecurityNumber));
+            var consumer = await GetService<IConsumerRepository>().GetBySSNAsync(CprNumber.Create(request.SocialSecurityNumber)).ConfigureAwait(false);
             Assert.NotNull(consumer);
         }
 
@@ -102,9 +100,9 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
             SaveChanges();
 
             var request = CreateRequest(false);
-            await SendRequest(request);
+            await SendRequestAsync(request).ConfigureAwait(false);
 
-            var consumer = await GetService<IConsumerRepository>().GetByVATNumberAsync(CvrNumber.Create(request.VATNumber));
+            var consumer = await GetService<IConsumerRepository>().GetByVATNumberAsync(CvrNumber.Create(request.VATNumber)).ConfigureAwait(false);
             Assert.NotNull(consumer);
         }
 

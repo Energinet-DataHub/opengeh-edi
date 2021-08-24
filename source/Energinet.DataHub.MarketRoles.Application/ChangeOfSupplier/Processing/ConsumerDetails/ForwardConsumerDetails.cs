@@ -26,6 +26,14 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.
             Transaction = transaction;
         }
 
+        public ForwardConsumerDetails(Guid id, Guid accountingPointId, Guid businessProcessId, string transaction)
+        {
+            AccountingPointId = accountingPointId;
+            BusinessProcessId = businessProcessId;
+            Transaction = transaction;
+            Id = id;
+        }
+
         public Guid AccountingPointId { get; }
 
         public Guid BusinessProcessId { get; }

@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules.ChangeEnergySupplier;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class MustHaveEnergySupplierAssociatedRuleErrorConverter : ErrorConverter<MustHaveEnergySupplierAssociatedRuleError>
     {
-        protected override ErrorMessage Convert(MustHaveEnergySupplierAssociatedRuleError validationError)
+        protected override ErrorMessage Convert([NotNull] MustHaveEnergySupplierAssociatedRuleError validationError)
         {
-            return new("TODO", $"Description");
+            return new("TODO1", $"Can't change energy supplier if no energy supplier is already present on metering point.");
         }
     }
 }

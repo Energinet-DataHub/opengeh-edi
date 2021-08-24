@@ -19,12 +19,15 @@ using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands.Protobuf.Mappers.MoveIn
 {
-    public class EffectuateConsumerMoveInInbound : ProtobufInboundMapper<MarketRoles.Contracts.EffectuateConsumerMoveIn>
+    public class EffectuateConsumerMoveInInbound : ProtobufInboundMapper<EffectuateConsumerMoveIn>
     {
         protected override IInboundMessage Convert(EffectuateConsumerMoveIn obj)
         {
             if (obj == null) throw new ArgumentNullException(nameof(obj));
-            return new Application.MoveIn.Processing.EffectuateConsumerMoveIn(Guid.Parse(obj.AccountingPointId), obj.Transaction);
+            return new Application.MoveIn.Processing.EffectuateConsumerMoveIn(
+                Guid.Parse(obj.Id),
+                Guid.Parse(obj.AccountingPointId),
+                obj.Transaction);
         }
     }
 }

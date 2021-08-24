@@ -16,6 +16,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier;
+using Energinet.DataHub.MarketRoles.Infrastructure.EDI;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI.ChangeOfSupplier;
 using NodaTime;
 using Squadron;
@@ -25,7 +26,7 @@ using Xunit.Categories;
 namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSupplier
 {
     [IntegrationTest]
-    public sealed class RequestTests : TestHost, IDisposable
+    public sealed class RequestTests : TestHost
     {
         public RequestTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
@@ -37,10 +38,10 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
         {
             var request = CreateRequest();
 
-            var result = await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
+            await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
 
-            var publishedMessage = await GetLastMessageFromOutboxAsync<RequestChangeOfSupplierRejected>().ConfigureAwait(false);
-            Assert.Equal(request.AccountingPointGsrnNumber, publishedMessage.MeteringPoint);
+            await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType == nameof(RequestChangeOfSupplierRejected))
+                .ConfigureAwait(false);
         }
 
         [Fact]
@@ -52,8 +53,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
 
             await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
 
-            var publishedMessage = await GetLastMessageFromOutboxAsync<RequestChangeOfSupplierRejected>().ConfigureAwait(false);
-            Assert.Equal(request.AccountingPointGsrnNumber, publishedMessage.MeteringPoint);
+            await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType == nameof(RequestChangeOfSupplierRejected))
+                .ConfigureAwait(false);
         }
 
         [Fact]
@@ -68,8 +69,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
 
             await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
 
-            var publishedMessage = await GetLastMessageFromOutboxAsync<RequestChangeOfSupplierRejected>().ConfigureAwait(false);
-            Assert.Equal(request.AccountingPointGsrnNumber, publishedMessage.MeteringPoint);
+            await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType == nameof(RequestChangeOfSupplierRejected))
+                .ConfigureAwait(false);
         }
 
         [Fact]
@@ -84,22 +85,11 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
             var request = CreateRequest();
 
             await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
-
-            var publishedMessage = await GetLastMessageFromOutboxAsync<RequestChangeOfSupplierApproved>().ConfigureAwait(false);
-            Assert.Equal(request.AccountingPointGsrnNumber, publishedMessage.AccountingPointId);
+            await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType == nameof(RequestChangeOfSupplierApproved))
+                .ConfigureAwait(false);
         }
 
-        private RequestChangeOfSupplier CreateRequest()
-        {
-            return CreateRequest(
-                SampleData.Transaction,
-                SampleData.GlnNumber,
-                SampleData.ConsumerSSN,
-                SampleData.GsrnNumber,
-                Instant.FromDateTimeUtc(DateTime.UtcNow.AddHours(1)).ToString());
-        }
-
-        private RequestChangeOfSupplier CreateRequest(string transaction, string energySupplierGln, string consumerId, string gsrnNumber, string startDate)
+        private static RequestChangeOfSupplier CreateRequest(string transaction, string energySupplierGln, string consumerId, string gsrnNumber, string startDate)
         {
             return new RequestChangeOfSupplier(
                 TransactionId: transaction,
@@ -107,6 +97,16 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
                 SocialSecurityNumber: consumerId,
                 AccountingPointGsrnNumber: gsrnNumber,
                 StartDate: startDate);
+        }
+
+        private static RequestChangeOfSupplier CreateRequest()
+        {
+            return CreateRequest(
+                SampleData.Transaction,
+                SampleData.GlnNumber,
+                SampleData.ConsumerSSN,
+                SampleData.GsrnNumber,
+                Instant.FromDateTimeUtc(DateTime.UtcNow.AddHours(1)).ToString());
         }
     }
 }

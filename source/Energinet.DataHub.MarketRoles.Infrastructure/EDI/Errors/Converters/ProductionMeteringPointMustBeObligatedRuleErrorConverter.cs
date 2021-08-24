@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules.ChangeEnergySupplier;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class ProductionMeteringPointMustBeObligatedRuleErrorConverter : ErrorConverter<ProductionMeteringPointMustBeObligatedRuleError>
     {
-        protected override ErrorMessage Convert(ProductionMeteringPointMustBeObligatedRuleError validationError)
+        protected override ErrorMessage Convert([NotNull] ProductionMeteringPointMustBeObligatedRuleError validationError)
         {
-            return new("E22", $"GLN code (TODO: insert GLN) not allowed: The specified production metering point (TODO: Insert GSRN) is blocked because it is subject to production obligation on the effectuation date (TODO: Insert date)");
+            return new("E22", $"The specified production metering point is blocked because it is subject to production obligation.");
         }
     }
 }

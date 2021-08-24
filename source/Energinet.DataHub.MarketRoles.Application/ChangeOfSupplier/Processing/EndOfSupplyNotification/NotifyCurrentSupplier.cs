@@ -26,6 +26,12 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.
             Transaction = transaction;
         }
 
+        public NotifyCurrentSupplier(Guid id, Guid accountingPointId, Guid businessProcessId, string transaction)
+            : this(accountingPointId, businessProcessId, transaction)
+        {
+            Id = id;
+        }
+
         public Guid AccountingPointId { get; }
 
         public Guid BusinessProcessId { get; }

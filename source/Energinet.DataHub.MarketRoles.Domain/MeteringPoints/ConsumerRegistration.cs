@@ -39,7 +39,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
 
         public ConsumerId ConsumerId { get; }
 
-        public Instant MoveInDate { get; }
+        public Instant? MoveInDate { get; }
 
         public BusinessProcessId BusinessProcessId { get; }
     }

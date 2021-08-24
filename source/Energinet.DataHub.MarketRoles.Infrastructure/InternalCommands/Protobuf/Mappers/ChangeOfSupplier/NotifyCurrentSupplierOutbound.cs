@@ -27,8 +27,9 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands.Protobuf
             if (obj == null) throw new ArgumentNullException(nameof(obj));
             return new MarketRolesEnvelope()
             {
-                NotifyCurrentSupplier = new Contracts.NotifyCurrentSupplier()
+                NotifyCurrentSupplier = new Contracts.NotifyCurrentSupplier
                 {
+                    Id = obj.Id.ToString(),
                     AccountingPointId = obj.AccountingPointId.ToString(),
                     BusinessProcessId = obj.BusinessProcessId.ToString(),
                     Transaction = obj.Transaction,

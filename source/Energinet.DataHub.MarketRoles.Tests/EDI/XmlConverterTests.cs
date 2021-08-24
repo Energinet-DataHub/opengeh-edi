@@ -51,7 +51,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.EDI
         {
             var stream = GetResourceStream("ChangeOfSupplierCimXml.xml");
 
-            var commandsRaw = await _xmlDeserializer.DeserializeAsync(stream);
+            var commandsRaw = await _xmlDeserializer.DeserializeAsync(stream).ConfigureAwait(false);
             var commands = commandsRaw.Cast<RequestChangeOfSupplier>();
 
             var command = commands.First();
@@ -68,7 +68,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.EDI
         {
             var stream = GetResourceStream("MoveInCimXml.xml");
 
-            var commandsRaw = await _xmlDeserializer.DeserializeAsync(stream);
+            var commandsRaw = await _xmlDeserializer.DeserializeAsync(stream).ConfigureAwait(false);
             var commands = commandsRaw.Cast<RequestMoveIn>();
 
             var command = commands.First();
@@ -87,15 +87,12 @@ namespace Energinet.DataHub.MarketRoles.Tests.EDI
             var assembly = Assembly.GetExecutingAssembly();
             var resourceNames = new List<string>(assembly.GetManifestResourceNames());
 
-            resourcePath = resourcePath.Replace(@"/", ".");
-            resourcePath = resourceNames.FirstOrDefault(r => r.Contains(resourcePath));
+            var resourceName = resourcePath.Replace(@"/", ".", StringComparison.Ordinal);
+            var resource = resourceNames.FirstOrDefault(r => r.Contains(resourceName, StringComparison.Ordinal))
+                           ?? throw new FileNotFoundException("Resource not found");
 
-            if (resourcePath == null)
-            {
-                throw new FileNotFoundException("Resource not found");
-            }
-
-            return assembly.GetManifestResourceStream(resourcePath);
+            return assembly.GetManifestResourceStream(resource)
+                   ?? throw new InvalidOperationException($"Couldn't get requested resource: {resourcePath}");
         }
 
         private static XmlMappingConfigurationBase XmlMapperFactory(string processType, string type)

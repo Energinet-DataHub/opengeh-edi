@@ -1,11 +1,12 @@
 {
     "IsEncrypted": false,
     "Values": {
-        "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-        "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-        "MARKETROLES_QUEUE_CONNECTION_STRING": "<Azure Service Bus namespace connection>",
-        "MARKETROLES_QUEUE_TOPIC_NAME": "<Name of Azure Service Bus queue>",
-        "MARKETROLES_DB_CONNECTION_STRING": "<Database connection string>",
-        "DISPATCH_TRIGGER_TIMER": "*/10 * * * * *"
+      "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+      "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+      "APPINSIGHTS_INSTRUMENTATIONKEY": "<App insights instrumentation key>",
+      "MARKETROLES_QUEUE_CONNECTION_STRING": "<Azure Service Bus namespace connection>",
+      "MARKETROLES_QUEUE_NAME": "<Name of Azure Service Bus queue>",
+      "MARKETROLES_CONNECTION_STRING": "<Database connection string>",
+      "DISPATCH_TRIGGER_TIMER": "*/10 * * * * *"
     }
 }

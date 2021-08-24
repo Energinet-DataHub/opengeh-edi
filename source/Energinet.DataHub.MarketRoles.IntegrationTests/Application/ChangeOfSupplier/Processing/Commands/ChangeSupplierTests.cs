@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier;
@@ -42,7 +41,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
         private readonly Consumer _consumer;
         private readonly IMediator _mediator;
 
-        private Transaction _transaction = null;
+        private Transaction _transaction = CreateTransaction();
 
         public ChangeSupplierTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
@@ -56,15 +55,18 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
         [Fact]
         public async Task ChangeSupplier_WhenEffectiveDateIsDue_IsSuccessful()
         {
-            await SimulateProcess();
+            await SimulateProcess().ConfigureAwait(false);
 
             var command = new ChangeSupplier(_accountingPoint.Id.Value, _transaction.Value);
-            await GetService<IMediator>().Send(command, CancellationToken.None);
+            await GetService<IMediator>().Send(command, CancellationToken.None).ConfigureAwait(false);
 
-            var query =
-                $"SELECT Count(1) FROM SupplierRegistrations WHERE AccountingPointId = '{_accountingPoint.Id.Value}' AND EnergySupplierId = '{_energySupplier.EnergySupplierId.Value}' AND StartOfSupplyDate IS NOT NULL AND EndOfSupplyDate IS NULL";
-            var sqlCommand = new SqlCommand(query, GetSqlDbConnection());
-            var result = await sqlCommand.ExecuteScalarAsync();
+            string query = @"SELECT Count(1) FROM SupplierRegistrations WHERE AccountingPointId = @AccountingPointId AND EnergySupplierId = @EnergySupplierId AND StartOfSupplyDate IS NOT NULL AND EndOfSupplyDate IS NULL";
+            await using var sqlCommand = new SqlCommand(query, GetSqlDbConnection());
+
+            sqlCommand.Parameters.Add(new SqlParameter("@AccountingPointId", _accountingPoint.Id.Value));
+            sqlCommand.Parameters.Add(new SqlParameter("@EnergySupplierId", _energySupplier.EnergySupplierId.Value));
+
+            var result = await sqlCommand.ExecuteScalarAsync().ConfigureAwait(false);
 
             Assert.Equal(1, result);
         }
@@ -78,15 +80,16 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
             await Mediator.Send(new RequestChangeOfSupplier(
                 _transaction.Value,
                 _energySupplier.GlnNumber.Value,
-                _consumer.CprNumber.Value,
+                _consumer.CprNumber?.Value ?? throw new InvalidOperationException("CprNumber was supposed to have a value"),
+                string.Empty,
                 _accountingPoint.GsrnNumber.Value,
-                Instant.FromDateTimeUtc(DateTime.UtcNow.AddHours(1)).ToString()));
+                Instant.FromDateTimeUtc(DateTime.UtcNow.AddHours(1)).ToString())).ConfigureAwait(false);
 
             var businessProcessId = GetBusinessProcessId(_transaction);
 
-            await Mediator.Send(new ForwardMeteringPointDetails(_accountingPoint.Id.Value, businessProcessId.Value, _transaction.Value));
-            await Mediator.Send(new ForwardConsumerDetails(_accountingPoint.Id.Value, businessProcessId.Value, _transaction.Value));
-            await Mediator.Send(new NotifyCurrentSupplier(_accountingPoint.Id.Value, businessProcessId.Value, _transaction.Value));
+            await Mediator.Send(new ForwardMeteringPointDetails(_accountingPoint.Id.Value, businessProcessId.Value, _transaction.Value)).ConfigureAwait(false);
+            await Mediator.Send(new ForwardConsumerDetails(_accountingPoint.Id.Value, businessProcessId.Value, _transaction.Value)).ConfigureAwait(false);
+            await Mediator.Send(new NotifyCurrentSupplier(_accountingPoint.Id.Value, businessProcessId.Value, _transaction.Value)).ConfigureAwait(false);
         }
     }
 }

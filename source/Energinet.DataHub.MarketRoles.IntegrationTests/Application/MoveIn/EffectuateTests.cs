@@ -35,12 +35,12 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
         [Fact]
         public async Task Effectuate_WhenEffectiveDateIsDue_IntegrationEventsArePublished()
         {
-            var (accountingPoint, transaction) = await SetupScenarioAsync();
+            var (accountingPoint, transaction) = await SetupScenarioAsync().ConfigureAwait(false);
             var command = new EffectuateConsumerMoveIn(accountingPoint.Id.Value, transaction.Value);
 
-            await InvokeCommandAsync(command);
+            await InvokeCommandAsync(command).ConfigureAwait(false);
 
-            await AssertOutboxMessageAsync<EnergySupplierChangedIntegrationEvent>();
+            await AssertOutboxMessageAsync<EnergySupplierChangedIntegrationEvent>().ConfigureAwait(false);
         }
 
         private async Task<(AccountingPoint AccountingPoint, Transaction Transaction)> SetupScenarioAsync()
@@ -49,7 +49,6 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
             CreateEnergySupplier();
             SaveChanges();
 
-            var moveInDate = GetService<ISystemDateTimeProvider>().Now();
             var requestMoveIn = new RequestMoveIn(
                 SampleData.Transaction,
                 SampleData.GlnNumber,
@@ -59,7 +58,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
                 SampleData.GsrnNumber,
                 SampleData.MoveInDate);
 
-            var result = await SendRequest(requestMoveIn);
+            var result = await SendRequestAsync(requestMoveIn).ConfigureAwait(false);
 
             return (accountingPoint, Transaction.Create(result.TransactionId));
         }

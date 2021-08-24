@@ -27,8 +27,9 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands.Protobuf
             if (obj == null) throw new ArgumentNullException(nameof(obj));
             return new MarketRolesEnvelope()
             {
-                ForwardConsumerDetails = new Contracts.ForwardConsumerDetails()
+                ForwardConsumerDetails = new Contracts.ForwardConsumerDetails
                 {
+                    Id = obj.Id.ToString(),
                     Transaction = obj.Transaction,
                     AccountingPointId = obj.AccountingPointId.ToString(),
                     BusinessProcessId = obj.BusinessProcessId.ToString(),

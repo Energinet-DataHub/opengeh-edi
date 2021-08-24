@@ -15,20 +15,18 @@
 using System;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common.MediatR;
-using Energinet.DataHub.MarketRoles.EntryPoints.Common.SimpleInjector;
-using Energinet.DataHub.MarketRoles.EntryPoints.Outbox.EventHandlers;
+using Energinet.DataHub.MarketRoles.EntryPoints.Outbox.Common;
 using Energinet.DataHub.MarketRoles.Infrastructure;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration;
-using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChange;
-using Energinet.DataHub.MarketRoles.Infrastructure.Integration.Services;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
+using Energinet.DataHub.MarketRoles.Infrastructure.PostOffice;
 using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
+using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integration;
 using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -70,15 +68,19 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
             base.ConfigureContainer(container);
 
             // Register application components.
-            container.Register<EventMessageDispatcher>(Lifestyle.Scoped);
+            container.Register(
+                () => new PostOfficeStorageClientSettings(
+                    Environment.GetEnvironmentVariable("TEMP_POST_OFFICE_CONNECTION_STRING")!,
+                    Environment.GetEnvironmentVariable("TEMP_POST_OFFICE_SHARE")!));
             container.Register<ISystemDateTimeProvider, SystemDateTimeProvider>(Lifestyle.Scoped);
             container.Register<IJsonSerializer, JsonSerializer>(Lifestyle.Singleton);
-            container.Register<IOutbox, OutboxProvider>(Lifestyle.Scoped);
             container.Register<IOutboxManager, OutboxManager>(Lifestyle.Scoped);
             container.Register<IOutboxMessageFactory, OutboxMessageFactory>(Lifestyle.Scoped);
             container.Register<IUnitOfWork, UnitOfWork>(Lifestyle.Scoped);
-            container.Register<IIntegrationEventDispatchOrchestrator, IntegrationEventDispatchOrchestrator>(Lifestyle.Transient);
-
+            container.Register<IPostOfficeStorageClient, TempPostOfficeStorageClient>(Lifestyle.Scoped);
+            container.Register<OutboxWatcher>(Lifestyle.Scoped);
+            container.Register<OutboxOrchestrator>(Lifestyle.Scoped);
+            container.Register<IOutboxMessageDispatcher, OutboxMessageDispatcher>(Lifestyle.Scoped);
             var connectionString = Environment.GetEnvironmentVariable("SHARED_INTEGRATION_EVENT_SERVICE_BUS_SENDER_CONNECTION_STRING");
             container.Register<ServiceBusClient>(
                 () => new ServiceBusClient(connectionString),
@@ -94,17 +96,11 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
             container.BuildMediator(
                 new[]
                 {
-                    typeof(ConsumerMoveInAccepted).Assembly,
-                    typeof(EnergySupplierChangedDispatcher).Assembly,
+                    typeof(OutboxWatcher).Assembly,
                 },
                 Array.Empty<Type>());
 
-            container.AddProtobufMessageSerializer();
-            container.AddProtobufOutboundMappers(
-                new[]
-                {
-                    typeof(EnergySupplierChangedIntegrationEvent).Assembly,
-                });
+            container.SendProtobuf<Energinet.DataHub.MarketRoles.IntegrationEventContracts.EnergySupplierChanged>();
         }
     }
 }

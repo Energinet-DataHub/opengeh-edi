@@ -58,7 +58,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.MeteringPoints.MoveIn
             Assert.Contains(result.Errors, error => error is MoveInRegisteredOnSameDateIsNotAllowedRuleError);
         }
 
-        private AccountingPoint Create()
+        private static AccountingPoint Create()
         {
             var gsrnNumber = GsrnNumber.Create(SampleData.GsrnNumber);
             return new AccountingPoint(gsrnNumber, MeteringPointType.Consumption);

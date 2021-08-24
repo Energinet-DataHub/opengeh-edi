@@ -26,6 +26,12 @@ namespace Energinet.DataHub.MarketRoles.Application.MoveIn.Processing
             Transaction = transaction;
         }
 
+        public EffectuateConsumerMoveIn(Guid id, Guid accountingPointId, string transaction)
+            : this(accountingPointId, transaction)
+        {
+            Id = id;
+        }
+
         public Guid AccountingPointId { get; }
 
         public string Transaction { get; }

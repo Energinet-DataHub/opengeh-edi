@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Validation;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class MeteringPointMustBeKnownRuleErrorConverter : ErrorConverter<MeteringPointMustBeKnownRuleError>
     {
-        protected override ErrorMessage Convert(MeteringPointMustBeKnownRuleError validationError)
+        protected override ErrorMessage Convert([NotNull] MeteringPointMustBeKnownRuleError validationError)
         {
-            return new("TODO", $"Description");
+            return new("E10", $"GSRN-code {validationError.GsrnNumber} unknown: The specified metering point has not been registered in the system.");
         }
     }
 }
