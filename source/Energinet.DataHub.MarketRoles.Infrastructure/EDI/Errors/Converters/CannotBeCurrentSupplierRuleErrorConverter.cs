@@ -21,7 +21,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
     {
         protected override ErrorMessage Convert([NotNull] CannotBeCurrentSupplierRuleError validationError)
         {
-            return new("D02", $"It is not allowed to request change of supplier if supplier already active energy supplier.");
+            return new("D02", $"It is not allowed to request change of supplier if requesting supplier is already the active energy supplier.");
         }
     }
 }
