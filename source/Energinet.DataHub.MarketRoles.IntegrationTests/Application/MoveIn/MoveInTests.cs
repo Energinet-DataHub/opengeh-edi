@@ -27,7 +27,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
     [IntegrationTest]
     public class MoveInTests : TestHost
     {
-        protected MoveInTests(DatabaseFixture databaseFixture)
+        public MoveInTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
         }
