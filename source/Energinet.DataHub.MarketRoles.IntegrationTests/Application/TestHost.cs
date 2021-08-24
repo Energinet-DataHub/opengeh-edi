@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading;
@@ -57,6 +58,7 @@ using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integration;
 using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
+using FluentAssertions;
 using FluentValidation;
 using MediatR;
 using Microsoft.Data.SqlClient;
@@ -255,15 +257,6 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             GetService<MarketRolesContext>().SaveChanges();
         }
 
-        protected async Task<TMessage> GetLastMessageFromOutboxAsync<TMessage>()
-        {
-#pragma warning disable CA1309 // Warns about: "Use ordinal string comparison", but we want EF to take care of this.
-            var outboxMessage = await MarketRolesContext.OutboxMessages.FirstAsync(m => m.Type.Equals(typeof(TMessage).FullName)).ConfigureAwait(false);
-            #pragma warning restore CA1309
-            var @event = Serializer.Deserialize<TMessage>(outboxMessage.Data);
-            return @event;
-        }
-
         protected async Task<BusinessProcessResult> SendRequestAsync(IBusinessRequest request)
         {
             var result = await GetService<IMediator>().Send(request, CancellationToken.None).ConfigureAwait(false);
@@ -393,21 +386,32 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             return _businessProcessId;
         }
 
-        protected async Task AssertOutboxMessageAsync<TMessage>(Func<TMessage, bool> funcAssert)
+        protected IEnumerable<TMessage> GetOutboxMessages<TMessage>()
+        {
+            var jsonSerializer = GetService<IJsonSerializer>();
+            var context = GetService<MarketRolesContext>();
+            return context.OutboxMessages
+                .Where(message => message.Type == typeof(TMessage).FullName)
+                .Select(message => jsonSerializer.Deserialize<TMessage>(message.Data));
+        }
+
+        protected void AssertOutboxMessage<TMessage>(Func<TMessage, bool> funcAssert, int count = 1)
         {
             if (funcAssert == null) throw new ArgumentNullException(nameof(funcAssert));
 
-            var publishedMessage = await GetLastMessageFromOutboxAsync<TMessage>().ConfigureAwait(false);
-            var assertion = funcAssert.Invoke(publishedMessage);
+            var messages = GetOutboxMessages<TMessage>().Where(funcAssert.Invoke);
 
-            Assert.NotNull(publishedMessage);
-            Assert.True(assertion);
+            messages.Should().HaveCount(count);
+            messages.Should().NotContainNulls();
+            messages.Should().AllBeOfType<TMessage>();
         }
 
-        protected async Task AssertOutboxMessageAsync<TMessage>()
+        protected void AssertOutboxMessage<TMessage>()
         {
-            var publishedMessage = await GetLastMessageFromOutboxAsync<TMessage>().ConfigureAwait(false);
-            Assert.NotNull(publishedMessage);
+            var message = GetOutboxMessages<TMessage>().SingleOrDefault();
+
+            message.Should().NotBeNull();
+            message.Should().BeOfType<TMessage>();
         }
 
         private void CleanupDatabase()

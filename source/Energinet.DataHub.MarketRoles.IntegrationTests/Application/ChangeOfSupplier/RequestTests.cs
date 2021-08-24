@@ -34,8 +34,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
 
             await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
 
-            await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType == nameof(RequestChangeOfSupplierRejected))
-                .ConfigureAwait(false);
+            AssertOutboxMessage<PostOfficeEnvelope>(envelope => envelope.MessageType == nameof(RequestChangeOfSupplierRejected));
         }
 
         [Fact]
@@ -47,8 +46,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
 
             await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
 
-            await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType == nameof(RequestChangeOfSupplierRejected))
-                .ConfigureAwait(false);
+            AssertOutboxMessage<PostOfficeEnvelope>(envelope => envelope.MessageType == nameof(RequestChangeOfSupplierRejected));
         }
 
         [Fact]
@@ -63,8 +61,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
 
             await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
 
-            await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType == nameof(RequestChangeOfSupplierRejected))
-                .ConfigureAwait(false);
+            AssertOutboxMessage<PostOfficeEnvelope>(envelope => envelope.MessageType == nameof(RequestChangeOfSupplierRejected));
         }
 
         [Fact]
@@ -79,8 +76,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
             var request = CreateRequest();
 
             await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
-            await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType == nameof(RequestChangeOfSupplierApproved))
-                .ConfigureAwait(false);
+            AssertOutboxMessage<PostOfficeEnvelope>(envelope => envelope.MessageType == nameof(RequestChangeOfSupplierApproved));
         }
 
         private static RequestChangeOfSupplier CreateRequest(string transaction, string energySupplierGln, string consumerId, string gsrnNumber, string startDate)
