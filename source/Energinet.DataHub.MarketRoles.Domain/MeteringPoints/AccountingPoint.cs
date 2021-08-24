@@ -81,6 +81,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
                 // TODO: Ignore move out process until implementation is in scope
                 //new MoveOutRegisteredOnSameDateIsNotAllowedRule(_businessProcesses.AsReadOnly(), supplyStartDate),
                 new EffectiveDateCannotBeInThePastRule(supplyStartDate, systemDateTimeProvider.Now()),
+                new CannotBeCurrentSupplierRule(energySupplierId, GetCurrentSupplier(systemDateTimeProvider)),
             };
 
             return new BusinessRulesValidationResult(rules);
@@ -219,7 +220,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
         private SupplierRegistration? GetCurrentSupplier(ISystemDateTimeProvider systemDateTimeProvider)
         {
             return _supplierRegistrations.Find(supplier =>
-                supplier.StartOfSupplyDate <= systemDateTimeProvider.Now() && supplier.EndOfSupplyDate == null);
+                supplier.StartOfSupplyDate?.ToDateTimeUtc().Date <= systemDateTimeProvider.Now().ToDateTimeUtc().Date && supplier.EndOfSupplyDate == null);
         }
 
         private BusinessProcess GetBusinessProcess(Transaction transaction, BusinessProcessType businessProcessType)

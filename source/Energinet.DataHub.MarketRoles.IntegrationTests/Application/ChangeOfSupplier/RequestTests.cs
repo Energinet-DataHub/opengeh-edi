@@ -73,10 +73,15 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
             var accountingPoint = CreateAccountingPoint();
             var consumer = CreateConsumer();
             var supplier = CreateEnergySupplier();
+            CreateEnergySupplier(Guid.NewGuid(), "7495563456235");
             SetConsumerMovedIn(accountingPoint, consumer.ConsumerId, supplier.EnergySupplierId);
             await MarketRolesContext.SaveChangesAsync().ConfigureAwait(false);
 
-            var request = CreateRequest();
+            var request = CreateRequest()
+                with
+                {
+                    EnergySupplierGlnNumber = "7495563456235",
+                };
 
             await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
             await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType == nameof(RequestChangeOfSupplierApproved))

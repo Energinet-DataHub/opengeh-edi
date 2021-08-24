@@ -324,10 +324,10 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             return consumer;
         }
 
-        protected EnergySupplier CreateEnergySupplier()
+        protected EnergySupplier CreateEnergySupplier(Guid? id = null, string? glnNumber = null)
         {
-            var energySupplierId = new EnergySupplierId(Guid.NewGuid());
-            var energySupplierGln = new GlnNumber(SampleData.GlnNumber);
+            var energySupplierId = new EnergySupplierId(id ?? Guid.NewGuid());
+            var energySupplierGln = new GlnNumber(glnNumber ?? SampleData.GlnNumber);
             var energySupplier = new EnergySupplier(energySupplierId, energySupplierGln);
             EnergySupplierRepository.Add(energySupplier);
             return energySupplier;
