@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading;
@@ -57,6 +58,7 @@ using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integration;
 using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
+using FluentAssertions;
 using FluentValidation;
 using MediatR;
 using Microsoft.Data.SqlClient;
@@ -393,6 +395,34 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             }
 
             return _businessProcessId;
+        }
+
+        protected IEnumerable<TMessage> GetOutboxMessages<TMessage>()
+        {
+            var jsonSerializer = GetService<IJsonSerializer>();
+            var context = GetService<MarketRolesContext>();
+            return context.OutboxMessages
+                .Where(message => message.Type == typeof(TMessage).FullName)
+                .Select(message => jsonSerializer.Deserialize<TMessage>(message.Data));
+        }
+
+        protected void AssertOutboxMessage<TMessage>(Func<TMessage, bool> funcAssert, int count = 1)
+        {
+            if (funcAssert == null) throw new ArgumentNullException(nameof(funcAssert));
+
+            var messages = GetOutboxMessages<TMessage>().Where(funcAssert.Invoke);
+
+            messages.Should().HaveCount(count);
+            messages.Should().NotContainNulls();
+            messages.Should().AllBeOfType<TMessage>();
+        }
+
+        protected void AssertOutboxMessage<TMessage>()
+        {
+            var message = GetOutboxMessages<TMessage>().SingleOrDefault();
+
+            message.Should().NotBeNull();
+            message.Should().BeOfType<TMessage>();
         }
 
         protected async Task AssertOutboxMessageAsync<TMessage>(Func<TMessage, bool> funcAssert)
