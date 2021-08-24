@@ -27,7 +27,6 @@ using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
 using MediatR;
 using Microsoft.Data.SqlClient;
 using NodaTime;
-using Squadron;
 using Xunit;
 using Xunit.Categories;
 
@@ -68,7 +67,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
 
             var result = await sqlCommand.ExecuteScalarAsync().ConfigureAwait(false);
 
-            Assert.Equal(1, result);
+            Assert.Equal(2, result);
         }
 
         private async Task SimulateProcess()
