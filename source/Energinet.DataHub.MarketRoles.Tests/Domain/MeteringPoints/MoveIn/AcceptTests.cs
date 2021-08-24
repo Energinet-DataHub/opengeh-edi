@@ -58,6 +58,18 @@ namespace Energinet.DataHub.MarketRoles.Tests.Domain.MeteringPoints.MoveIn
             Assert.Contains(result.Errors, error => error is MoveInRegisteredOnSameDateIsNotAllowedRuleError);
         }
 
+        [Fact]
+        public void Should_return_error_when_a_completed_movein_with_the_same_movein_date_exists()
+        {
+            var moveInDate = _systemDateTimeProvider.Now();
+            _accountingPoint.AcceptConsumerMoveIn(_consumerId, _energySupplierId, moveInDate, _transaction);
+            _accountingPoint.EffectuateConsumerMoveIn(_transaction, _systemDateTimeProvider);
+
+            var result = _accountingPoint.ConsumerMoveInAcceptable(moveInDate);
+
+            Assert.Contains(result.Errors, error => error is MoveInRegisteredOnSameDateIsNotAllowedRuleError);
+        }
+
         private static AccountingPoint Create()
         {
             var gsrnNumber = GsrnNumber.Create(SampleData.GsrnNumber);
