@@ -38,8 +38,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
             var result = await SendRequestAsync(request).ConfigureAwait(false);
 
             Assert.True(result.Success);
-            await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType.StartsWith("Confirm", StringComparison.Ordinal))
-                .ConfigureAwait(false);
+            AssertOutboxMessage<PostOfficeEnvelope>(envelope => envelope.MessageType.StartsWith("Confirm", StringComparison.Ordinal));
         }
 
         [Fact]
@@ -53,8 +52,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
             var result = await SendRequestAsync(request).ConfigureAwait(false);
 
             Assert.False(result.Success);
-            await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType.StartsWith("Reject", StringComparison.Ordinal))
-                .ConfigureAwait(false);
+            AssertOutboxMessage<PostOfficeEnvelope>(envelope => envelope.MessageType.StartsWith("Reject", StringComparison.Ordinal));
         }
 
         [Fact]
@@ -68,8 +66,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
             var result = await SendRequestAsync(request).ConfigureAwait(false);
 
             Assert.False(result.Success);
-            await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType.StartsWith("Reject", StringComparison.Ordinal))
-                .ConfigureAwait(false);
+            AssertOutboxMessage<PostOfficeEnvelope>(envelope => envelope.MessageType.StartsWith("Reject", StringComparison.Ordinal));
         }
 
         [Fact]

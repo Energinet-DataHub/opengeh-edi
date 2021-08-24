@@ -257,15 +257,6 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             GetService<MarketRolesContext>().SaveChanges();
         }
 
-        protected async Task<TMessage> GetLastMessageFromOutboxAsync<TMessage>()
-        {
-#pragma warning disable CA1309 // Warns about: "Use ordinal string comparison", but we want EF to take care of this.
-            var outboxMessage = await MarketRolesContext.OutboxMessages.FirstAsync(m => m.Type.Equals(typeof(TMessage).FullName)).ConfigureAwait(false);
-            #pragma warning restore CA1309
-            var @event = Serializer.Deserialize<TMessage>(outboxMessage.Data);
-            return @event;
-        }
-
         protected async Task<BusinessProcessResult> SendRequestAsync(IBusinessRequest request)
         {
             var result = await GetService<IMediator>().Send(request, CancellationToken.None).ConfigureAwait(false);
@@ -423,23 +414,6 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
             message.Should().NotBeNull();
             message.Should().BeOfType<TMessage>();
-        }
-
-        protected async Task AssertOutboxMessageAsync<TMessage>(Func<TMessage, bool> funcAssert)
-        {
-            if (funcAssert == null) throw new ArgumentNullException(nameof(funcAssert));
-
-            var publishedMessage = await GetLastMessageFromOutboxAsync<TMessage>().ConfigureAwait(false);
-            var assertion = funcAssert.Invoke(publishedMessage);
-
-            Assert.NotNull(publishedMessage);
-            Assert.True(assertion);
-        }
-
-        protected async Task AssertOutboxMessageAsync<TMessage>()
-        {
-            var publishedMessage = await GetLastMessageFromOutboxAsync<TMessage>().ConfigureAwait(false);
-            Assert.NotNull(publishedMessage);
         }
 
         private void CleanupDatabase()
