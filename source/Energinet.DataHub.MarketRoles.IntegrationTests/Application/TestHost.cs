@@ -354,16 +354,14 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             accountingPoint.EffectuateConsumerMoveIn(transaction, systemTimeProvider);
         }
 
-        protected void RegisterChangeOfSupplier(AccountingPoint accountingPoint, ConsumerId consumerId, EnergySupplierId energySupplierId, Transaction transaction)
+        protected void RegisterChangeOfSupplier(AccountingPoint accountingPoint, EnergySupplierId energySupplierId, Transaction transaction)
         {
             if (accountingPoint == null) throw new ArgumentNullException(nameof(accountingPoint));
 
             var systemTimeProvider = GetService<ISystemDateTimeProvider>();
 
-            var moveInDate = systemTimeProvider.Now().Minus(Duration.FromDays(365));
             var changeSupplierDate = systemTimeProvider.Now();
 
-            SetConsumerMovedIn(accountingPoint, consumerId, energySupplierId);
             accountingPoint.AcceptChangeOfSupplier(energySupplierId, changeSupplierDate, transaction, systemTimeProvider);
         }
 
