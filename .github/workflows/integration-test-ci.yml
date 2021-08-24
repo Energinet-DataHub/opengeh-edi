@@ -17,6 +17,7 @@ on:
   push:
     branches:
       - main
+      - cmgrd/squadron-poc
     paths:
       - source/**
   workflow_dispatch: {}
