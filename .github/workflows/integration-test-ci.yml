@@ -1,0 +1,46 @@
+# Copyright 2020 Energinet DataHub A/S
+#
+# Licensed under the Apache License, Version 2.0 (the "License2");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+name: Integration test CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - source/**
+  workflow_dispatch: {}
+
+env:
+  CSPROJ_FILE_PATH: 'source/Energinet.DataHub.MarketRoles.IntegrationTests/Energinet.DataHub.MarketRoles.IntegrationTests.csproj'
+  SOLUTION_FILE_PATH: 'source/Energinet.DataHub.MarketRoles.sln'
+  DOTNET_VERSION: '5.0.x'
+
+jobs:
+  validate_integration_tests:
+    name: Validate integration tests
+    environment: PullRequestGate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@master
+
+      - name: Setup .NET ${{ env.DOTNET_VERSION }} environment
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+   
+      - name: Test
+        run: |
+          dotnet tool install --tool-path ./temp/reportgenerator dotnet-reportgenerator-globaltool
+          dotnet test ${{ env.SOLUTION_FILE_PATH }} --filter Category=IntegrationTest /p:CollectCoverage=true /p:CoverletOutput=${{ inputs.output_path }}/ /p:CoverletOutputFormat=cobertura /p:Threshold=0
