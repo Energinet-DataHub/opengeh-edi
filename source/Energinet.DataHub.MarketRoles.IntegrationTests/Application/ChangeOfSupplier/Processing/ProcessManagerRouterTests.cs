@@ -45,7 +45,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
             _accountingPoint = CreateAccountingPoint();
             _transaction = CreateTransaction();
             SetConsumerMovedIn(_accountingPoint, _consumer.ConsumerId, _energySupplier.EnergySupplierId);
-            RegisterChangeOfSupplier(_accountingPoint, _consumer.ConsumerId, _energySupplier.EnergySupplierId, _transaction);
+            RegisterChangeOfSupplier(_accountingPoint, _energySupplier.EnergySupplierId, _transaction);
             MarketRolesContext.SaveChanges();
 
             _businessProcessId = GetBusinessProcessId(_transaction);

@@ -16,7 +16,6 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.MoveIn;
 using Energinet.DataHub.MarketRoles.Application.MoveIn.Processing;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChange;
 using Squadron;
 using Xunit;
@@ -40,7 +39,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
 
             await InvokeCommandAsync(command).ConfigureAwait(false);
 
-            await AssertOutboxMessageAsync<EnergySupplierChangedIntegrationEvent>().ConfigureAwait(false);
+            AssertOutboxMessage<EnergySupplierChangedIntegrationEvent>();
         }
 
         private async Task<(AccountingPoint AccountingPoint, Transaction Transaction)> SetupScenarioAsync()
