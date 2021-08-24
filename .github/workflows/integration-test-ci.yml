@@ -19,6 +19,7 @@ on:
       - main
     paths:
       - source/**
+      - .github/workflows/integration-test-ci.yml
   workflow_dispatch: {}
 
 env:
