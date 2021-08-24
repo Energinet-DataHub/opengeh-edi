@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.ObjectModel;
+using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
+using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
 namespace Energinet.DataHub.MarketRoles.Domain.EnergySuppliers
@@ -24,5 +28,34 @@ namespace Energinet.DataHub.MarketRoles.Domain.EnergySuppliers
         }
 
         public string Value { get; }
+
+        public static GlnNumber Create(string gsrn)
+        {
+            if (string.IsNullOrWhiteSpace(gsrn)) throw new ArgumentException($"'{nameof(gsrn)}' cannot be null or whitespace", nameof(gsrn));
+
+            var formattedValue = gsrn.Trim();
+
+            ThrowIfInvalid(formattedValue);
+            return new GlnNumber(formattedValue);
+        }
+
+        public static BusinessRulesValidationResult CheckRules(string gsrnValue)
+        {
+            return new BusinessRulesValidationResult(new Collection<IBusinessRule>() { new GlnNumberMustBeValidRule(gsrnValue), });
+        }
+
+        public override string ToString()
+        {
+            return Value;
+        }
+
+        private static void ThrowIfInvalid(string gsrnValue)
+        {
+            var result = CheckRules(gsrnValue);
+            if (!result.Success)
+            {
+                throw new InvalidSupplierIdRuleException("Invalid supplier id.");
+            }
+        }
     }
 }
