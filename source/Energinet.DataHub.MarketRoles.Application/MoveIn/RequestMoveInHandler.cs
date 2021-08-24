@@ -24,6 +24,7 @@ using Energinet.DataHub.MarketRoles.Domain.EnergySuppliers;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using NodaTime;
+using NodaTime.Text;
 
 namespace Energinet.DataHub.MarketRoles.Application.MoveIn
 {
@@ -33,7 +34,10 @@ namespace Energinet.DataHub.MarketRoles.Application.MoveIn
         private readonly IEnergySupplierRepository _energySupplierRepository;
         private readonly IConsumerRepository _consumerRepository;
 
-        public RequestMoveInHandler(IAccountingPointRepository accountingPointRepository, IEnergySupplierRepository energySupplierRepository, IConsumerRepository consumerRepository)
+        public RequestMoveInHandler(
+            IAccountingPointRepository accountingPointRepository,
+            IEnergySupplierRepository energySupplierRepository,
+            IConsumerRepository consumerRepository)
         {
             _accountingPointRepository = accountingPointRepository ?? throw new ArgumentNullException(nameof(accountingPointRepository));
             _energySupplierRepository = energySupplierRepository ?? throw new ArgumentNullException(nameof(energySupplierRepository));
@@ -47,10 +51,16 @@ namespace Energinet.DataHub.MarketRoles.Application.MoveIn
             var energySupplier = await _energySupplierRepository.GetByGlnNumberAsync(new GlnNumber(request.EnergySupplierGlnNumber)).ConfigureAwait(false);
             var accountingPoint = await _accountingPointRepository.GetByGsrnNumberAsync(GsrnNumber.Create(request.AccountingPointGsrnNumber)).ConfigureAwait(false);
 
-            var validationResult = CheckRules(energySupplier, accountingPoint, request);
+            var validationResult = Validate(energySupplier, accountingPoint, request);
             if (validationResult.Success == false)
             {
                 return validationResult;
+            }
+
+            var businessRulesResult = CheckBusinessRules(accountingPoint, request);
+            if (!businessRulesResult.Success)
+            {
+                return businessRulesResult;
             }
 
             var consumer = await GetOrCreateConsumerAsync(request).ConfigureAwait(false);
@@ -61,7 +71,7 @@ namespace Energinet.DataHub.MarketRoles.Application.MoveIn
             return BusinessProcessResult.Ok(request.TransactionId);
         }
 
-        private static BusinessProcessResult CheckRules(EnergySupplier energySupplier, AccountingPoint accountingPoint, RequestMoveIn request)
+        private static BusinessProcessResult Validate(EnergySupplier energySupplier, AccountingPoint accountingPoint, RequestMoveIn request)
         {
             var rules = new List<IBusinessRule>()
             {
@@ -70,6 +80,17 @@ namespace Energinet.DataHub.MarketRoles.Application.MoveIn
             };
 
             return new BusinessProcessResult(request.TransactionId, rules);
+        }
+
+        private static BusinessProcessResult CheckBusinessRules(AccountingPoint accountingPoint, RequestMoveIn request)
+        {
+            if (request is null) throw new ArgumentNullException(nameof(request));
+
+            var moveInDate = InstantPattern.General.Parse(request.MoveInDate).Value;
+
+            var validationResult = accountingPoint.ConsumerMoveInAcceptable(moveInDate);
+
+            return new BusinessProcessResult(request.TransactionId, validationResult.Errors);
         }
 
         private async Task<Consumer> GetOrCreateConsumerAsync(RequestMoveIn request)
