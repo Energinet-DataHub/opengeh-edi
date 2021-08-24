@@ -43,4 +43,4 @@ jobs:
       - name: Test
         run: |
           dotnet tool install --tool-path ./temp/reportgenerator dotnet-reportgenerator-globaltool
-          dotnet test ${{ env.SOLUTION_FILE_PATH }} --filter Category=IntegrationTest /p:CollectCoverage=true /p:CoverletOutput=${{ inputs.output_path }}/ /p:CoverletOutputFormat=cobertura /p:Threshold=0
+          dotnet test ${{ env.SOLUTION_FILE_PATH }} --filter Category=IntegrationTest /p:CollectCoverage=false
