@@ -24,7 +24,9 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
         {
             GetConnectionString = new Lazy<string>(() =>
             {
-                var connectionString = CreateDatabaseAsync().Result; // Yeah, this is not ideal.
+#pragma warning disable VSTHRD002 // Yeah, this is not ideal.
+                var connectionString = CreateDatabaseAsync().Result;
+#pragma warning restore VSTHRD002
                 var upgrader = UpgradeFactory.GetUpgradeEngine(connectionString, x => true, false);
                 var result = upgrader.PerformUpgrade();
                 if (result.Successful)
