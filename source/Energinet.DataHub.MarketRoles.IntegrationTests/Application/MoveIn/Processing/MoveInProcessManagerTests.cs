@@ -18,7 +18,6 @@ using Energinet.DataHub.MarketRoles.Application.Common.Processing;
 using Energinet.DataHub.MarketRoles.Application.MoveIn;
 using Energinet.DataHub.MarketRoles.Application.MoveIn.Processing;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Xunit;
 using Xunit.Categories;
 
@@ -29,8 +28,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn.Proc
     {
         private readonly MoveInProcessManagerRouter _router;
 
-        public MoveInProcessManagerTests()
-            : base()
+        public MoveInProcessManagerTests(DatabaseFixture databaseFixture)
+            : base(databaseFixture)
         {
             _router = new MoveInProcessManagerRouter(GetService<IProcessManagerRepository>(), GetService<ICommandScheduler>());
         }

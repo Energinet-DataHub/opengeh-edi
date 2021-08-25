@@ -27,6 +27,11 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
     [IntegrationTest]
     public sealed class RequestTests : TestHost
     {
+        public RequestTests(DatabaseFixture databaseFixture)
+            : base(databaseFixture)
+        {
+        }
+
         [Fact]
         public async Task Request_WhenMeteringPointDoesNotExist_IsRejected()
         {

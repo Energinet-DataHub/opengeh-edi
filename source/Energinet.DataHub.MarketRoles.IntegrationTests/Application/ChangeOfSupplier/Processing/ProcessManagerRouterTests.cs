@@ -37,8 +37,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
         private EnergySupplier _energySupplier;
         private Transaction _transaction;
 
-        public ProcessManagerRouterTests()
-        : base()
+        public ProcessManagerRouterTests(DatabaseFixture databaseFixture)
+            : base(databaseFixture)
         {
             _consumer = CreateConsumer();
             _energySupplier = CreateEnergySupplier();
