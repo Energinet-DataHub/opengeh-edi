@@ -26,6 +26,11 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
     [IntegrationTest]
     public class MoveInTests : TestHost
     {
+        public MoveInTests(DatabaseFixture databaseFixture)
+            : base(databaseFixture)
+        {
+        }
+
         [Fact]
         public async Task Accept_WhenConsumerIsRegistered_AcceptMessageIsPublished()
         {

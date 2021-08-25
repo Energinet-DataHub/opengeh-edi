@@ -25,6 +25,11 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
     [IntegrationTest]
     public class EffectuateTests : TestHost
     {
+        public EffectuateTests(DatabaseFixture databaseFixture)
+            : base(databaseFixture)
+        {
+        }
+
         [Fact]
         public async Task Effectuate_WhenEffectiveDateIsDue_IntegrationEventsArePublished()
         {

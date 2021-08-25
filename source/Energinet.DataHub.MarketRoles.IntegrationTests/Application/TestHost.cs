@@ -82,9 +82,15 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
         private bool _disposed;
         private SqlConnection? _sqlConnection;
         private BusinessProcessId? _businessProcessId;
+        private string _connectionString;
 
-        protected TestHost()
+        protected TestHost(DatabaseFixture databaseFixture)
         {
+            if (databaseFixture == null) throw new ArgumentNullException(nameof(databaseFixture));
+
+            _connectionString = databaseFixture.GetConnectionString.Value;
+
+            _container = new Container();
             var serviceCollection = new ServiceCollection();
 
             _container = new Container();
@@ -97,7 +103,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
                     .WithParser(() => MarketRolesEnvelope.Parser));
 
             serviceCollection.AddDbContext<MarketRolesContext>(x =>
-                x.UseSqlServer(ConnectionString, y => y.UseNodaTime()));
+                x.UseSqlServer(_connectionString, y => y.UseNodaTime()));
             serviceCollection.AddSimpleInjector(_container);
             IServiceProvider serviceProvider = serviceCollection.BuildServiceProvider().UseSimpleInjector(_container);
 
@@ -115,7 +121,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             _container.Register<IDomainEventsDispatcher, DomainEventsDispatcher>();
             _container.Register<IDomainEventPublisher, DomainEventPublisher>();
             _container.Register<ICommandScheduler, CommandScheduler>(Lifestyle.Scoped);
-            _container.Register<IDbConnectionFactory>(() => new SqlDbConnectionFactory(ConnectionString));
+            _container.Register<IDbConnectionFactory>(() => new SqlDbConnectionFactory(_connectionString));
             _container.Register<ICorrelationContext, CorrelationContext>(Lifestyle.Scoped);
 
             // Business process responders
@@ -200,10 +206,6 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
         protected Instant EffectiveDate => SystemDateTimeProvider.Now();
 
-        private static string ConnectionString =>
-            Environment.GetEnvironmentVariable("MarketRoles_IntegrationTests_ConnectionString")
-            ?? throw new InvalidOperationException("MarketRoles_IntegrationTests_ConnectionString config not set");
-
         public void Dispose()
         {
             Dispose(true);
@@ -239,16 +241,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
         protected SqlConnection GetSqlDbConnection()
         {
-            if (_sqlConnection is null)
-            {
-                _sqlConnection = new SqlConnection(ConnectionString);
-            }
-
-            if (_sqlConnection.State == ConnectionState.Closed)
-            {
-                _sqlConnection.Open();
-            }
-
+            if (_sqlConnection is null) _sqlConnection = new SqlConnection(_connectionString);
+            if (_sqlConnection.State == ConnectionState.Closed) _sqlConnection.Open();
             return _sqlConnection;
         }
 
@@ -371,7 +365,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
             if (_businessProcessId == null)
             {
-                using var connection = new SqlConnection(ConnectionString);
+                using var connection = new SqlConnection(_connectionString);
                 if (connection.State == ConnectionState.Closed)
                 {
                     connection.Open();
