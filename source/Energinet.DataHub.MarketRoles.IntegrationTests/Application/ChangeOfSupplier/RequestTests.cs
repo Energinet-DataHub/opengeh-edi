@@ -19,7 +19,6 @@ using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI.ChangeOfSupplier;
 using NodaTime;
-using Squadron;
 using Xunit;
 using Xunit.Categories;
 
