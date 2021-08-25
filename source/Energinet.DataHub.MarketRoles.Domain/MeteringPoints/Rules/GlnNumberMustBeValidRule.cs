@@ -21,14 +21,14 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules
     internal class GlnNumberMustBeValidRule : IBusinessRule
     {
         private const int RequiredIdLength = 13;
-        private readonly string? _gsrnValue;
+        private readonly string? _glnNumber;
 
-        public GlnNumberMustBeValidRule(string gsrnValue)
+        public GlnNumberMustBeValidRule(string glnNumber)
         {
-            _gsrnValue = gsrnValue;
+            _glnNumber = glnNumber;
         }
 
-        public bool IsBroken => !IsValidGsrnNumber();
+        public bool IsBroken => !IsValidGlnNumber();
 
         public ValidationError ValidationError => new GsrnNumberMustBeValidRuleError();
 
@@ -42,24 +42,24 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules
             return int.Parse(input, System.Globalization.NumberStyles.Integer, System.Globalization.NumberFormatInfo.InvariantInfo);
         }
 
-        private bool IsValidGsrnNumber()
+        private bool IsValidGlnNumber()
         {
             return LengthIsValid() && AllCharsAreDigits() && CheckSumIsValid();
         }
 
         private bool LengthIsValid()
         {
-            return _gsrnValue?.Length == RequiredIdLength;
+            return _glnNumber?.Length == RequiredIdLength;
         }
 
         private bool AllCharsAreDigits()
         {
-            return _gsrnValue!.All(char.IsDigit);
+            return _glnNumber!.All(char.IsDigit);
         }
 
         private bool CheckSumIsValid()
         {
-            var definedChecksumDigit = Parse(_gsrnValue!.Substring(_gsrnValue.Length - 1));
+            var definedChecksumDigit = Parse(_glnNumber!.Substring(_glnNumber.Length - 1));
             var calculatedChecksum = CalculateChecksum();
             return calculatedChecksum == definedChecksumDigit;
         }
@@ -69,9 +69,9 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules
             var sumOfOddNumbers = 0;
             var sumOfEvenNumbers = 0;
 
-            for (var i = 1; i < _gsrnValue!.Length; i++)
+            for (var i = 1; i < _glnNumber!.Length; i++)
             {
-                var currentNumber = Parse(_gsrnValue.Substring(i - 1, 1));
+                var currentNumber = Parse(_glnNumber.Substring(i - 1, 1));
 
                 if (IsEvenNumber(i))
                 {
