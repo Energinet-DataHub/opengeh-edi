@@ -43,7 +43,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
         private Transaction _transaction = CreateTransaction();
         private string _glnNumber = "7495563456235";
 
-        public ChangeSupplierTests()
+        public ChangeSupplierTests(DatabaseFixture databaseFixture)
+            : base(databaseFixture)
         {
             _accountingPoint = CreateAccountingPoint();
             _energySupplier = CreateEnergySupplier();

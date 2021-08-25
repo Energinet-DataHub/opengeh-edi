@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.Common.Commands;
 using Energinet.DataHub.MarketRoles.Application.Common.Processing;
 using Energinet.DataHub.MarketRoles.Application.MoveIn;
 using Energinet.DataHub.MarketRoles.Application.MoveIn.Processing;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Xunit;
 using Xunit.Categories;
 
@@ -29,8 +29,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn.Proc
     {
         private readonly MoveInProcessManagerRouter _router;
 
-        public MoveInProcessManagerTests()
-            : base()
+        public MoveInProcessManagerTests(DatabaseFixture databaseFixture)
+            : base(databaseFixture)
         {
             _router = new MoveInProcessManagerRouter(GetService<IProcessManagerRepository>(), GetService<ICommandScheduler>());
         }
@@ -61,7 +61,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn.Proc
         private async Task<(Transaction Transaction, BusinessProcessId BusinessProcessId)> SetupScenario()
         {
             _ = CreateAccountingPoint();
-            _ = CreateEnergySupplier();
+            _ = CreateEnergySupplier(Guid.NewGuid(), SampleData.GlnNumber);
             _ = CreateConsumer();
             SaveChanges();
 

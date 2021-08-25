@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading;
@@ -57,6 +58,7 @@ using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integration;
 using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
+using FluentAssertions;
 using FluentValidation;
 using MediatR;
 using Microsoft.Data.SqlClient;
@@ -80,9 +82,15 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
         private bool _disposed;
         private SqlConnection? _sqlConnection;
         private BusinessProcessId? _businessProcessId;
+        private string _connectionString;
 
-        protected TestHost()
+        protected TestHost(DatabaseFixture databaseFixture)
         {
+            if (databaseFixture == null) throw new ArgumentNullException(nameof(databaseFixture));
+
+            _connectionString = databaseFixture.GetConnectionString.Value;
+
+            _container = new Container();
             var serviceCollection = new ServiceCollection();
 
             _container = new Container();
@@ -95,7 +103,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
                     .WithParser(() => MarketRolesEnvelope.Parser));
 
             serviceCollection.AddDbContext<MarketRolesContext>(x =>
-                x.UseSqlServer(ConnectionString, y => y.UseNodaTime()));
+                x.UseSqlServer(_connectionString, y => y.UseNodaTime()));
             serviceCollection.AddSimpleInjector(_container);
             IServiceProvider serviceProvider = serviceCollection.BuildServiceProvider().UseSimpleInjector(_container);
 
@@ -113,7 +121,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             _container.Register<IDomainEventsDispatcher, DomainEventsDispatcher>();
             _container.Register<IDomainEventPublisher, DomainEventPublisher>();
             _container.Register<ICommandScheduler, CommandScheduler>(Lifestyle.Scoped);
-            _container.Register<IDbConnectionFactory>(() => new SqlDbConnectionFactory(ConnectionString));
+            _container.Register<IDbConnectionFactory>(() => new SqlDbConnectionFactory(_connectionString));
             _container.Register<ICorrelationContext, CorrelationContext>(Lifestyle.Scoped);
 
             // Business process responders
@@ -198,10 +206,6 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
         protected Instant EffectiveDate => SystemDateTimeProvider.Now();
 
-        private static string ConnectionString =>
-            Environment.GetEnvironmentVariable("MarketRoles_IntegrationTests_ConnectionString")
-            ?? throw new InvalidOperationException("MarketRoles_IntegrationTests_ConnectionString config not set");
-
         public void Dispose()
         {
             Dispose(true);
@@ -237,31 +241,14 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
         protected SqlConnection GetSqlDbConnection()
         {
-            if (_sqlConnection is null)
-            {
-                _sqlConnection = new SqlConnection(ConnectionString);
-            }
-
-            if (_sqlConnection.State == ConnectionState.Closed)
-            {
-                _sqlConnection.Open();
-            }
-
+            if (_sqlConnection is null) _sqlConnection = new SqlConnection(_connectionString);
+            if (_sqlConnection.State == ConnectionState.Closed) _sqlConnection.Open();
             return _sqlConnection;
         }
 
         protected void SaveChanges()
         {
             GetService<MarketRolesContext>().SaveChanges();
-        }
-
-        protected async Task<TMessage> GetLastMessageFromOutboxAsync<TMessage>()
-        {
-#pragma warning disable CA1309 // Warns about: "Use ordinal string comparison", but we want EF to take care of this.
-            var outboxMessage = await MarketRolesContext.OutboxMessages.FirstAsync(m => m.Type.Equals(typeof(TMessage).FullName)).ConfigureAwait(false);
-            #pragma warning restore CA1309
-            var @event = Serializer.Deserialize<TMessage>(outboxMessage.Data);
-            return @event;
         }
 
         protected async Task<BusinessProcessResult> SendRequestAsync(IBusinessRequest request)
@@ -378,7 +365,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
             if (_businessProcessId == null)
             {
-                using var connection = new SqlConnection(ConnectionString);
+                using var connection = new SqlConnection(_connectionString);
                 if (connection.State == ConnectionState.Closed)
                 {
                     connection.Open();
@@ -393,21 +380,32 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             return _businessProcessId;
         }
 
-        protected async Task AssertOutboxMessageAsync<TMessage>(Func<TMessage, bool> funcAssert)
+        protected IEnumerable<TMessage> GetOutboxMessages<TMessage>()
+        {
+            var jsonSerializer = GetService<IJsonSerializer>();
+            var context = GetService<MarketRolesContext>();
+            return context.OutboxMessages
+                .Where(message => message.Type == typeof(TMessage).FullName)
+                .Select(message => jsonSerializer.Deserialize<TMessage>(message.Data));
+        }
+
+        protected void AssertOutboxMessage<TMessage>(Func<TMessage, bool> funcAssert, int count = 1)
         {
             if (funcAssert == null) throw new ArgumentNullException(nameof(funcAssert));
 
-            var publishedMessage = await GetLastMessageFromOutboxAsync<TMessage>().ConfigureAwait(false);
-            var assertion = funcAssert.Invoke(publishedMessage);
+            var messages = GetOutboxMessages<TMessage>().Where(funcAssert.Invoke);
 
-            Assert.NotNull(publishedMessage);
-            Assert.True(assertion);
+            messages.Should().HaveCount(count);
+            messages.Should().NotContainNulls();
+            messages.Should().AllBeOfType<TMessage>();
         }
 
-        protected async Task AssertOutboxMessageAsync<TMessage>()
+        protected void AssertOutboxMessage<TMessage>()
         {
-            var publishedMessage = await GetLastMessageFromOutboxAsync<TMessage>().ConfigureAwait(false);
-            Assert.NotNull(publishedMessage);
+            var message = GetOutboxMessages<TMessage>().SingleOrDefault();
+
+            message.Should().NotBeNull();
+            message.Should().BeOfType<TMessage>();
         }
 
         private void CleanupDatabase()

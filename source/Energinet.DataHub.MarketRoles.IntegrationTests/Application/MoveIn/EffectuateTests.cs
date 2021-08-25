@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.MoveIn;
 using Energinet.DataHub.MarketRoles.Application.MoveIn.Processing;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChange;
 using Xunit;
 using Xunit.Categories;
@@ -26,6 +26,11 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
     [IntegrationTest]
     public class EffectuateTests : TestHost
     {
+        public EffectuateTests(DatabaseFixture databaseFixture)
+            : base(databaseFixture)
+        {
+        }
+
         [Fact]
         public async Task Effectuate_WhenEffectiveDateIsDue_IntegrationEventsArePublished()
         {
@@ -34,13 +39,13 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
 
             await InvokeCommandAsync(command).ConfigureAwait(false);
 
-            await AssertOutboxMessageAsync<EnergySupplierChangedIntegrationEvent>().ConfigureAwait(false);
+            AssertOutboxMessage<EnergySupplierChangedIntegrationEvent>();
         }
 
         private async Task<(AccountingPoint AccountingPoint, Transaction Transaction)> SetupScenarioAsync()
         {
             var accountingPoint = CreateAccountingPoint();
-            CreateEnergySupplier();
+            CreateEnergySupplier(Guid.NewGuid(), SampleData.GlnNumber);
             SaveChanges();
 
             var requestMoveIn = new RequestMoveIn(

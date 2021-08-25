@@ -26,10 +26,15 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
     [IntegrationTest]
     public class MoveInTests : TestHost
     {
+        public MoveInTests(DatabaseFixture databaseFixture)
+            : base(databaseFixture)
+        {
+        }
+
         [Fact]
         public async Task Accept_WhenConsumerIsRegistered_AcceptMessageIsPublished()
         {
-            CreateEnergySupplier();
+            CreateEnergySupplier(Guid.NewGuid(), SampleData.GlnNumber);
             CreateAccountingPoint();
             SaveChanges();
 
@@ -38,8 +43,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
             var result = await SendRequestAsync(request).ConfigureAwait(false);
 
             Assert.True(result.Success);
-            await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType.StartsWith("Confirm", StringComparison.Ordinal))
-                .ConfigureAwait(false);
+            AssertOutboxMessage<PostOfficeEnvelope>(envelope => envelope.MessageType.StartsWith("Confirm", StringComparison.Ordinal));
         }
 
         [Fact]
@@ -53,14 +57,13 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
             var result = await SendRequestAsync(request).ConfigureAwait(false);
 
             Assert.False(result.Success);
-            await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType.StartsWith("Reject", StringComparison.Ordinal))
-                .ConfigureAwait(false);
+            AssertOutboxMessage<PostOfficeEnvelope>(envelope => envelope.MessageType.StartsWith("Reject", StringComparison.Ordinal));
         }
 
         [Fact]
         public async Task Accept_WhenAccountingPointDoesNotExists_IsRejected()
         {
-            CreateEnergySupplier();
+            CreateEnergySupplier(Guid.NewGuid(), SampleData.GlnNumber);
             SaveChanges();
 
             var request = CreateRequest();
@@ -68,14 +71,13 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
             var result = await SendRequestAsync(request).ConfigureAwait(false);
 
             Assert.False(result.Success);
-            await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType.StartsWith("Reject", StringComparison.Ordinal))
-                .ConfigureAwait(false);
+            AssertOutboxMessage<PostOfficeEnvelope>(envelope => envelope.MessageType.StartsWith("Reject", StringComparison.Ordinal));
         }
 
         [Fact]
         public async Task Accept_WhenConsumerIsRegisteredBySSN_ConsumerIsRegistered()
         {
-            CreateEnergySupplier();
+            CreateEnergySupplier(Guid.NewGuid(), SampleData.GlnNumber);
             CreateAccountingPoint();
             SaveChanges();
 
@@ -89,7 +91,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
         [Fact]
         public async Task Accept_WhenConsumerIsRegisteredByVAT_ConsumerIsRegistered()
         {
-            CreateEnergySupplier();
+            CreateEnergySupplier(Guid.NewGuid(), SampleData.GlnNumber);
             CreateAccountingPoint();
             SaveChanges();
 
@@ -98,6 +100,21 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
 
             var consumer = await GetService<IConsumerRepository>().GetByVATNumberAsync(CvrNumber.Create(request.VATNumber)).ConfigureAwait(false);
             Assert.NotNull(consumer);
+        }
+
+        [Fact]
+        public async Task Move_in_on_top_of_move_in_should_result_in_reject_message()
+        {
+            CreateEnergySupplier();
+            CreateAccountingPoint();
+            SaveChanges();
+
+            var request = CreateRequest(false);
+            await SendRequestAsync(request).ConfigureAwait(false);
+            await SendRequestAsync(request).ConfigureAwait(false);
+
+            AssertOutboxMessage<PostOfficeEnvelope>(envelope => envelope.MessageType.StartsWith("Confirm", StringComparison.Ordinal));
+            AssertOutboxMessage<PostOfficeEnvelope>(envelope => envelope.MessageType.StartsWith("Reject", StringComparison.Ordinal));
         }
 
         private RequestMoveIn CreateRequest(bool registerConsumerBySSN = true)

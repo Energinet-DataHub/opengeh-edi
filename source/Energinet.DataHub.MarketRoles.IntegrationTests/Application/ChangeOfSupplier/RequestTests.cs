@@ -27,6 +27,11 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
     [IntegrationTest]
     public sealed class RequestTests : TestHost
     {
+        public RequestTests(DatabaseFixture databaseFixture)
+            : base(databaseFixture)
+        {
+        }
+
         [Fact]
         public async Task Request_WhenMeteringPointDoesNotExist_IsRejected()
         {
@@ -34,8 +39,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
 
             await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
 
-            await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType == nameof(RequestChangeOfSupplierRejected))
-                .ConfigureAwait(false);
+            AssertOutboxMessage<PostOfficeEnvelope>(envelope => envelope.MessageType == nameof(RequestChangeOfSupplierRejected));
         }
 
         [Fact]
@@ -47,8 +51,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
 
             await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
 
-            await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType == nameof(RequestChangeOfSupplierRejected))
-                .ConfigureAwait(false);
+            AssertOutboxMessage<PostOfficeEnvelope>(envelope => envelope.MessageType == nameof(RequestChangeOfSupplierRejected));
         }
 
         [Fact]
@@ -63,8 +66,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
 
             await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
 
-            await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType == nameof(RequestChangeOfSupplierRejected))
-                .ConfigureAwait(false);
+            AssertOutboxMessage<PostOfficeEnvelope>(envelope => envelope.MessageType == nameof(RequestChangeOfSupplierRejected));
         }
 
         [Fact]
@@ -84,8 +86,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
                 };
 
             await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
-            await AssertOutboxMessageAsync<PostOfficeEnvelope>(envelope => envelope.MessageType == nameof(RequestChangeOfSupplierApproved))
-                .ConfigureAwait(false);
+            AssertOutboxMessage<PostOfficeEnvelope>(envelope => envelope.MessageType == nameof(RequestChangeOfSupplierApproved));
         }
 
         private static RequestChangeOfSupplier CreateRequest(string transaction, string energySupplierGln, string consumerId, string gsrnNumber, string startDate)
