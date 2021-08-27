@@ -20,13 +20,13 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 {
     public class DatabaseFixture : SqlServerResource
     {
+        private string _localConnectionStringName = "MarketRoles_IntegrationTests_ConnectionString";
+
         public DatabaseFixture()
         {
             GetConnectionString = new Lazy<string>(() =>
             {
-#pragma warning disable VSTHRD002 // Yeah, this is not ideal.
-                var connectionString = CreateDatabaseAsync().Result;
-#pragma warning restore VSTHRD002
+                var connectionString = GetLocalOrContainerConnectionString();
                 var upgrader = UpgradeFactory.GetUpgradeEngine(connectionString, x => true, false);
                 var result = upgrader.PerformUpgrade();
                 if (result.Successful)
@@ -41,5 +41,17 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
         }
 
         public Lazy<string> GetConnectionString { get; }
+
+        private string GetLocalOrContainerConnectionString()
+        {
+#if DEBUG
+            return Environment.GetEnvironmentVariable(_localConnectionStringName)
+                   ?? throw new InvalidOperationException($"{_localConnectionStringName} config not set");
+#else
+#pragma warning disable VSTHRD002 // Yeah, this is not ideal.
+            return CreateDatabaseAsync().Result;
+#pragma warning restore VSTHRD002
+#endif
+        }
     }
 }
