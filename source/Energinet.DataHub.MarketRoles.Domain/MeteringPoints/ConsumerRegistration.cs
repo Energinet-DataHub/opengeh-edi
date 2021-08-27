@@ -43,7 +43,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
 
         public BusinessProcessId BusinessProcessId { get; }
 
-        public void EffectuateMoveIn(Instant effectiveDate)
+        public void SetMoveInDate(Instant effectiveDate)
         {
             MoveInDate = effectiveDate;
         }
