@@ -168,6 +168,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
             newSupplier.StartOfSupply(businessProcess.EffectiveDate);
 
             var consumer = _consumerRegistrations.Find(consumerRegistration => consumerRegistration.BusinessProcessId.Equals(businessProcess.BusinessProcessId))!;
+            consumer.SetMoveInDate(businessProcess.EffectiveDate);
 
             AddDomainEvent(new ConsumerMovedIn(
                 Id.Value,
