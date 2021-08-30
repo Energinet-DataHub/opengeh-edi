@@ -35,7 +35,7 @@ namespace Energinet.DataHub.MarketRoles.Application.Common.Validation
 
         private static ValidationError CreateValidationError(string gsrnNumber)
         {
-            return new Validation.GsrnNumberMustBeValidRuleError(gsrnNumber);
+            return new GsrnNumberMustBeValidRuleError(gsrnNumber);
         }
     }
 }
