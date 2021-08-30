@@ -20,6 +20,9 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 {
     public class DatabaseFixture : SqlServerResource
     {
+        private const string LocalConnectionStringName = "MarketRoles_IntegrationTests_ConnectionString";
+        private const string UseLocalDatabaseSettingName = "MarketRoles_use_local_database";
+
         public DatabaseFixture()
         {
             GetConnectionString = new Lazy<string>(() =>
@@ -33,25 +36,27 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
                 }
                 else
                 {
-                    throw new InvalidOperationException("Couldn't start Squadron SQL server");
+                    throw new InvalidOperationException("Couldn't start test SQL server");
                 }
             });
         }
 
         public Lazy<string> GetConnectionString { get; }
 
-#pragma warning disable CA1822 // Non-static because of the call to `CreateDatabaseAsync`
+        private static bool UseLocalDatabase =>
+            Environment.GetEnvironmentVariable(UseLocalDatabaseSettingName) is "true";
+
+        private static string LocalConnectionString =>
+            Environment.GetEnvironmentVariable(LocalConnectionStringName)
+            ?? throw new InvalidOperationException($"{LocalConnectionStringName} config not set");
+
         private string GetLocalOrContainerConnectionString()
-#pragma warning restore CA1822
         {
-#if DEBUG
-            return Environment.GetEnvironmentVariable("MarketRoles_IntegrationTests_ConnectionString")
-                   ?? throw new InvalidOperationException($"MarketRoles_IntegrationTests_ConnectionString config not set");
-#else
-#pragma warning disable VSTHRD002 // Yeah, this is not ideal.
-            return CreateDatabaseAsync().Result;
+            return UseLocalDatabase
+                ? LocalConnectionString
+#pragma warning disable VSTHRD002 // Yeah, this is not ideal. Refactor to avoid instantiating this in the constructor.
+                : CreateDatabaseAsync().Result;
 #pragma warning restore VSTHRD002
-#endif
         }
     }
 }
