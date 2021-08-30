@@ -20,8 +20,6 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 {
     public class DatabaseFixture : SqlServerResource
     {
-        private string _localConnectionStringName = "MarketRoles_IntegrationTests_ConnectionString";
-
         public DatabaseFixture()
         {
             GetConnectionString = new Lazy<string>(() =>
@@ -42,11 +40,13 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
         public Lazy<string> GetConnectionString { get; }
 
+#pragma warning disable CA1822 // Non-static because of the call to `CreateDatabaseAsync`
         private string GetLocalOrContainerConnectionString()
+#pragma warning restore CA1822
         {
 #if DEBUG
-            return Environment.GetEnvironmentVariable(_localConnectionStringName)
-                   ?? throw new InvalidOperationException($"{_localConnectionStringName} config not set");
+            return Environment.GetEnvironmentVariable("MarketRoles_IntegrationTests_ConnectionString")
+                   ?? throw new InvalidOperationException($"MarketRoles_IntegrationTests_ConnectionString config not set");
 #else
 #pragma warning disable VSTHRD002 // Yeah, this is not ideal.
             return CreateDatabaseAsync().Result;
