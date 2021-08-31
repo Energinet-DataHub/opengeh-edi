@@ -49,7 +49,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands
 
             var data = await _serializer.ToBytesAsync(command, CancellationToken.None).ConfigureAwait(false);
             var type = command.GetType().FullName;
-            var queuedCommand = new QueuedInternalCommand(command.Id, type!, data, _systemDateTimeProvider.Now(), businessProcessId.Value, scheduleDate!, _correlationContext.GetCorrelationId());
+            var queuedCommand = new QueuedInternalCommand(command.Id, type!, data, _systemDateTimeProvider.Now(), businessProcessId.Value, scheduleDate!, _correlationContext.Id);
             await _context.QueuedInternalCommands.AddAsync(queuedCommand).ConfigureAwait(false);
         }
     }

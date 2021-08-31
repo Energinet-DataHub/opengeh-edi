@@ -84,7 +84,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Processing
         {
             base.ConfigureFunctionsWorkerDefaults(options);
 
-            options.UseMiddleware<ServiceBusCorrelationIdMiddleware>();
+            options.UseMiddleware<CorrelationIdMiddleware>();
             options.UseMiddleware<ServiceBusUserContextMiddleware>();
         }
 
@@ -108,7 +108,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Processing
             base.ConfigureContainer(container);
 
             container.Register<QueueSubscriber>(Lifestyle.Scoped);
-            container.Register<ServiceBusCorrelationIdMiddleware>(Lifestyle.Scoped);
+            container.Register<CorrelationIdMiddleware>(Lifestyle.Scoped);
             container.Register<ICorrelationContext, CorrelationContext>(Lifestyle.Scoped);
             container.Register<ServiceBusUserContextMiddleware>(Lifestyle.Scoped);
             container.Register<IUserContext, UserContext>(Lifestyle.Scoped);
