@@ -14,6 +14,7 @@
 
 using System;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
 using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.Outbox
@@ -22,11 +23,16 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Outbox
     {
         private readonly IJsonSerializer _jsonSerializer;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+        private readonly ICorrelationContext _correlationContext;
 
-        public OutboxMessageFactory(IJsonSerializer jsonSerializer, ISystemDateTimeProvider systemDateTimeProvider)
+        public OutboxMessageFactory(
+            IJsonSerializer jsonSerializer,
+            ISystemDateTimeProvider systemDateTimeProvider,
+            ICorrelationContext correlationContext)
         {
             _jsonSerializer = jsonSerializer ?? throw new ArgumentNullException(nameof(jsonSerializer));
             _systemDateTimeProvider = systemDateTimeProvider ?? throw new ArgumentNullException(nameof(systemDateTimeProvider));
+            _correlationContext = correlationContext;
         }
 
         public OutboxMessage CreateFrom<T>(T message, OutboxMessageCategory category)
@@ -42,7 +48,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Outbox
 
             var data = _jsonSerializer.Serialize(message);
 
-            return new OutboxMessage(type, data, category, _systemDateTimeProvider.Now());
+            return new OutboxMessage(type, data, _correlationContext.AsTraceContext(), category, _systemDateTimeProvider.Now());
         }
     }
 }
