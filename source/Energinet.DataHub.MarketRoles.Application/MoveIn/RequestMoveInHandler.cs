@@ -71,7 +71,7 @@ namespace Energinet.DataHub.MarketRoles.Application.MoveIn
             return BusinessProcessResult.Ok(request.TransactionId);
         }
 
-        private static BusinessProcessResult Validate(EnergySupplier energySupplier, AccountingPoint accountingPoint, RequestMoveIn request)
+        private static BusinessProcessResult Validate(EnergySupplier energySupplier, Domain.MeteringPoints.AccountingPoint accountingPoint, RequestMoveIn request)
         {
             var rules = new List<IBusinessRule>()
             {
@@ -82,7 +82,7 @@ namespace Energinet.DataHub.MarketRoles.Application.MoveIn
             return new BusinessProcessResult(request.TransactionId, rules);
         }
 
-        private static BusinessProcessResult CheckBusinessRules(AccountingPoint accountingPoint, RequestMoveIn request)
+        private static BusinessProcessResult CheckBusinessRules(Domain.MeteringPoints.AccountingPoint accountingPoint, RequestMoveIn request)
         {
             if (request is null) throw new ArgumentNullException(nameof(request));
 
