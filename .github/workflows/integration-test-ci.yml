@@ -48,4 +48,4 @@ jobs:
    
       - name: Test
         run: |
-          dotnet test ${{ env.SOLUTION_FILE_PATH }} --filter Category=IntegrationTest /p:CollectCoverage=false
+          dotnet test ${{ env.SOLUTION_FILE_PATH }} --configuration Release --filter Category=IntegrationTest /p:CollectCoverage=false
