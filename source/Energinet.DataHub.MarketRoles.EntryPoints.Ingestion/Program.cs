@@ -49,6 +49,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
             base.ConfigureFunctionsWorkerDefaults(options);
 
             options.UseMiddleware<CorrelationIdMiddleware>();
+            options.UseMiddleware<EntryPointTelemetryScopeMiddleware>();
             options.UseMiddleware<HttpUserContextMiddleware>();
         }
 
@@ -66,6 +67,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
             container.Register<CommandApi>(Lifestyle.Scoped);
             container.Register<CorrelationIdMiddleware>(Lifestyle.Scoped);
             container.Register<ICorrelationContext, CorrelationContext>(Lifestyle.Scoped);
+            container.Register<EntryPointTelemetryScopeMiddleware>(Lifestyle.Scoped);
             container.Register<HttpUserContextMiddleware>(Lifestyle.Scoped);
             container.Register<IUserContext, UserContext>(Lifestyle.Scoped);
 
