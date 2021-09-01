@@ -20,13 +20,14 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 {
     public class DatabaseFixture : SqlServerResource
     {
+        private const string LocalConnectionStringName = "MarketRoles_IntegrationTests_ConnectionString";
+        private const string UseLocalDatabaseSettingName = "MarketRoles_use_local_database";
+
         public DatabaseFixture()
         {
             GetConnectionString = new Lazy<string>(() =>
             {
-#pragma warning disable VSTHRD002 // Yeah, this is not ideal.
-                var connectionString = CreateDatabaseAsync().Result;
-#pragma warning restore VSTHRD002
+                var connectionString = GetLocalOrContainerConnectionString();
                 var upgrader = UpgradeFactory.GetUpgradeEngine(connectionString, x => true, false);
                 var result = upgrader.PerformUpgrade();
                 if (result.Successful)
@@ -35,11 +36,27 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
                 }
                 else
                 {
-                    throw new InvalidOperationException("Couldn't start Squadron SQL server");
+                    throw new InvalidOperationException("Couldn't start test SQL server");
                 }
             });
         }
 
         public Lazy<string> GetConnectionString { get; }
+
+        private static bool UseLocalDatabase =>
+            Environment.GetEnvironmentVariable(UseLocalDatabaseSettingName) is "true";
+
+        private static string LocalConnectionString =>
+            Environment.GetEnvironmentVariable(LocalConnectionStringName)
+            ?? throw new InvalidOperationException($"{LocalConnectionStringName} config not set");
+
+        private string GetLocalOrContainerConnectionString()
+        {
+            return UseLocalDatabase
+                ? LocalConnectionString
+#pragma warning disable VSTHRD002 // Yeah, this is not ideal. Refactor to avoid instantiating this in the constructor.
+                : CreateDatabaseAsync().Result;
+#pragma warning restore VSTHRD002
+        }
     }
 }

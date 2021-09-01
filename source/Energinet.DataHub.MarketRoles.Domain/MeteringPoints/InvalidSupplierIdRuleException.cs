@@ -12,28 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketRoles.Domain.EnergySuppliers;
+using System;
+using System.Runtime.Serialization;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
-using FluentValidation;
 
-namespace Energinet.DataHub.MarketRoles.Application.Common.Validation
+namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
 {
-    public class GlnNumberMustBeValidRule : AbstractValidator<string>
+    public class InvalidSupplierIdRuleException : BusinessRuleException
     {
-        public GlnNumberMustBeValidRule()
+        public InvalidSupplierIdRuleException()
         {
-            RuleFor(gln => gln)
-                .NotEmpty()
-                .WithState(gln => new GlnNumberMustBeValidRuleError(gln));
-
-            RuleFor(gsrn => GlnNumber.CheckRules(gsrn))
-                .Must(x => x.Success)
-                .WithState(CreateValidationError);
         }
 
-        private static ValidationError CreateValidationError(string gsrnNumber)
+        public InvalidSupplierIdRuleException(string? message)
+            : base(message)
         {
-            return new GlnNumberMustBeValidRuleError(gsrnNumber);
+        }
+
+        public InvalidSupplierIdRuleException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+        }
+
+        protected InvalidSupplierIdRuleException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
         }
     }
 }
