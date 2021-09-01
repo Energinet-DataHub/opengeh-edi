@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.MoveIn;
 using Energinet.DataHub.MarketRoles.Application.MoveIn.Processing;
@@ -44,7 +45,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
         private async Task<(AccountingPoint AccountingPoint, Transaction Transaction)> SetupScenarioAsync()
         {
             var accountingPoint = CreateAccountingPoint();
-            CreateEnergySupplier();
+            CreateEnergySupplier(Guid.NewGuid(), SampleData.GlnNumber);
             SaveChanges();
 
             var requestMoveIn = new RequestMoveIn(
