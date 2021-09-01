@@ -88,7 +88,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
         {
             if (databaseFixture == null) throw new ArgumentNullException(nameof(databaseFixture));
 
-            _connectionString = databaseFixture.GetConnectionString.Value;
+            _connectionString = databaseFixture.GetConnectionString();
 
             _container = new Container();
             var serviceCollection = new ServiceCollection();
