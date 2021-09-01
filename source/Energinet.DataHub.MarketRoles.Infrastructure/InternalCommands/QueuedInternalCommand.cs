@@ -19,14 +19,14 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands
 {
     public class QueuedInternalCommand
     {
-        public QueuedInternalCommand(Guid id, string type, byte[] data, Instant creationDate, Guid businessProcessId, Instant? scheduleDate, string correlationId)
+        public QueuedInternalCommand(Guid id, string type, byte[] data, Instant creationDate, Guid businessProcessId, Instant? scheduleDate, string correlation)
         {
             Id = id;
             Type = type;
             Data = data;
             CreationDate = creationDate;
             ScheduleDate = scheduleDate;
-            CorrelationId = correlationId;
+            Correlation = correlation;
             BusinessProcessId = businessProcessId;
         }
 
@@ -49,7 +49,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands
 
         public long SequenceId { get; private set; }
 
-        public string CorrelationId { get; }
+        public string Correlation { get; }
 
         public void SetProcessed(Instant now)
         {
