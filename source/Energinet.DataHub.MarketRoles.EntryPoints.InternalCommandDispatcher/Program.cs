@@ -68,6 +68,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.InternalCommandDispatcher
             container.Register<IInternalCommandAccessor, InternalCommandAccessor>(Lifestyle.Scoped);
             container.Register<IInternalCommandProcessor, InternalCommandProcessor>(Lifestyle.Scoped);
             container.Register<IInternalCommandDispatcher, InternalCommandServiceBusDispatcher>(Lifestyle.Scoped);
+            container.RegisterDecorator<IInternalCommandDispatcher, InternalCommandServiceBusDispatcher>(Lifestyle.Scoped);
 
             var connectionString = Environment.GetEnvironmentVariable("MARKETROLES_QUEUE_CONNECTION_STRING");
             var topicName = Environment.GetEnvironmentVariable("MARKETROLES_QUEUE_TOPIC_NAME");
