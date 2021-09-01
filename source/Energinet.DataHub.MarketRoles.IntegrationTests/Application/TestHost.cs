@@ -114,7 +114,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             _container.Register<IConsumerRepository, ConsumerRepository>(Lifestyle.Scoped);
             _container.Register<IOutbox, OutboxProvider>(Lifestyle.Scoped);
             _container.Register<IOutboxManager, OutboxManager>(Lifestyle.Scoped);
-            _container.Register<IOutboxMessageFactory, OutboxMessageFactory>(Lifestyle.Singleton);
+            _container.Register<IOutboxMessageFactory, OutboxMessageFactory>(Lifestyle.Scoped);
             _container.Register<IJsonSerializer, JsonSerializer>(Lifestyle.Singleton);
             _container.Register<ISystemDateTimeProvider, SystemDateTimeProviderStub>(Lifestyle.Singleton);
             _container.Register<IDomainEventsAccessor, DomainEventsAccessor>();

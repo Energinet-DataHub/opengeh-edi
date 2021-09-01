@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common.SimpleInjector;
 using Microsoft.Azure.Functions.Worker;
@@ -48,6 +49,10 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Common
 
                     // Configure IServiceCollection dependencies for specific entrypoint.
                     ConfigureServiceCollection(services);
+
+                    services.AddApplicationInsightsTelemetryWorkerService(
+                        Environment.GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY")
+                        ?? throw new InvalidOperationException("Missing APPINSIGHTS_INSTRUMENTATIONKEY"));
 
                     services.AddLogging();
                     services.AddSimpleInjector(_container, options =>
