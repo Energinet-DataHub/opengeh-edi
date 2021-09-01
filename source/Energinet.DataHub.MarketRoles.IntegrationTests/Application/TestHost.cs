@@ -161,7 +161,9 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
             _scope = AsyncScopedLifestyle.BeginScope(_container);
 
-            _container.GetInstance<ICorrelationContext>().SetId(Guid.NewGuid().ToString().Replace("-", string.Empty, StringComparison.Ordinal));
+            var correlationContext = _container.GetInstance<ICorrelationContext>();
+            correlationContext.SetId(Guid.NewGuid().ToString().Replace("-", string.Empty, StringComparison.Ordinal));
+            correlationContext.SetParentId(Guid.NewGuid().ToString().Replace("-", string.Empty, StringComparison.Ordinal)[..16]);
 
             CleanupDatabase();
 
