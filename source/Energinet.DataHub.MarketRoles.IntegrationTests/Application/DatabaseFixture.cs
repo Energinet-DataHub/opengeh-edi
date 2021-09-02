@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.Helpers;
 using Squadron;
 
@@ -20,26 +21,45 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 {
     public class DatabaseFixture : SqlServerResource
     {
-        public DatabaseFixture()
+        private const string LocalConnectionStringName = "IntegrationTests_ConnectionString";
+
+        private static bool UseLocalDatabase =>
+            Environment.GetEnvironmentVariable(LocalConnectionStringName) != null;
+
+        private static string LocalConnectionString =>
+            Environment.GetEnvironmentVariable(LocalConnectionStringName)
+            ?? throw new InvalidOperationException($"{LocalConnectionStringName} config not set");
+
+        public override Task InitializeAsync()
         {
-            GetConnectionString = new Lazy<string>(() =>
-            {
-#pragma warning disable VSTHRD002 // Yeah, this is not ideal.
-                var connectionString = CreateDatabaseAsync().Result;
-#pragma warning restore VSTHRD002
-                var upgrader = UpgradeFactory.GetUpgradeEngine(connectionString, x => true, false);
-                var result = upgrader.PerformUpgrade();
-                if (result.Successful)
-                {
-                    return connectionString;
-                }
-                else
-                {
-                    throw new InvalidOperationException("Couldn't start Squadron SQL server");
-                }
-            });
+            // If we're using a local database, skip the squadron initialization.
+            return UseLocalDatabase
+                ? Task.CompletedTask
+                : base.InitializeAsync();
         }
 
-        public Lazy<string> GetConnectionString { get; }
+        public string GetConnectionString()
+        {
+            var connectionString = CreateConnectionString();
+            UpdateDatabase(connectionString);
+            return connectionString;
+        }
+
+        private static void UpdateDatabase(string connectionString)
+        {
+            var upgrader = UpgradeFactory.GetUpgradeEngine(connectionString, x => true, false);
+            var result = upgrader.PerformUpgrade();
+            if (!result.Successful)
+            {
+                throw new InvalidOperationException("Couldn't start test SQL server");
+            }
+        }
+
+        private string CreateConnectionString()
+        {
+            return UseLocalDatabase
+                ? LocalConnectionString
+                : CreateConnectionString(UniqueNameGenerator.Create("db"));
+        }
     }
 }
