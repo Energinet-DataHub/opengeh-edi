@@ -15,20 +15,24 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Infrastructure;
 using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
 
-namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion.Middleware
+namespace Energinet.DataHub.MarketRoles.EntryPoints.Common
 {
-    public sealed class HttpCorrelationIdMiddleware : IFunctionsWorkerMiddleware
+    public class EntryPointTelemetryScopeMiddleware : IFunctionsWorkerMiddleware
     {
+        private readonly TelemetryClient _telemetryClient;
         private readonly ICorrelationContext _correlationContext;
 
-        public HttpCorrelationIdMiddleware(
+        public EntryPointTelemetryScopeMiddleware(
+            TelemetryClient telemetryClient,
             ICorrelationContext correlationContext)
         {
+            _telemetryClient = telemetryClient;
             _correlationContext = correlationContext;
         }
 
@@ -36,9 +40,23 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion.Middleware
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
-            _correlationContext.SetCorrelationId(context.InvocationId);
-
-            await next(context).ConfigureAwait(false);
+            var operation = _telemetryClient.StartOperation<DependencyTelemetry>(context.FunctionDefinition.Name, _correlationContext.Id, _correlationContext.ParentId);
+            operation.Telemetry.Type = "Function";
+            try
+            {
+                operation.Telemetry.Success = true;
+                await next(context).ConfigureAwait(false);
+            }
+            catch (Exception exception)
+            {
+                operation.Telemetry.Success = false;
+                _telemetryClient.TrackException(exception);
+                throw;
+            }
+            finally
+            {
+                _telemetryClient.StopOperation(operation);
+            }
         }
     }
 }

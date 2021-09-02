@@ -114,7 +114,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             _container.Register<IConsumerRepository, ConsumerRepository>(Lifestyle.Scoped);
             _container.Register<IOutbox, OutboxProvider>(Lifestyle.Scoped);
             _container.Register<IOutboxManager, OutboxManager>(Lifestyle.Scoped);
-            _container.Register<IOutboxMessageFactory, OutboxMessageFactory>(Lifestyle.Singleton);
+            _container.Register<IOutboxMessageFactory, OutboxMessageFactory>(Lifestyle.Scoped);
             _container.Register<IJsonSerializer, JsonSerializer>(Lifestyle.Singleton);
             _container.Register<ISystemDateTimeProvider, SystemDateTimeProviderStub>(Lifestyle.Singleton);
             _container.Register<IDomainEventsAccessor, DomainEventsAccessor>();
@@ -161,7 +161,9 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
             _scope = AsyncScopedLifestyle.BeginScope(_container);
 
-            _container.GetInstance<ICorrelationContext>().SetCorrelationId(Guid.NewGuid().ToString());
+            var correlationContext = _container.GetInstance<ICorrelationContext>();
+            correlationContext.SetId(Guid.NewGuid().ToString().Replace("-", string.Empty, StringComparison.Ordinal));
+            correlationContext.SetParentId(Guid.NewGuid().ToString().Replace("-", string.Empty, StringComparison.Ordinal)[..16]);
 
             CleanupDatabase();
 

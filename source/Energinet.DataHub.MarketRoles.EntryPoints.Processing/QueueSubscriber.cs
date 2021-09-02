@@ -52,7 +52,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Processing
 
             await _mediator.Send(message).ConfigureAwait(false);
 
-            _logger.LogInformation("Dequeued with correlation id: {correlationId}", _correlationContext.GetCorrelationId());
+            _logger.LogInformation("Dequeued with correlation id: {correlationId}", _correlationContext.Id);
         }
     }
 }

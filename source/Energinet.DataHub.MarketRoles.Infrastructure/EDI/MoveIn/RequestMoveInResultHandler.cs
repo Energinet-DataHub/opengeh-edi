@@ -73,7 +73,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
                     Text: string.Empty),
                 MarketActivityRecord: new MarketActivityRecordWithReasons(
                     Id: Guid.NewGuid().ToString(),
-                    BusinessProcessReference: _correlationContext.GetCorrelationId(),
+                    BusinessProcessReference: _correlationContext.Id,
                     MarketEvaluationPoint: request.AccountingPointGsrnNumber,
                     StartDateAndOrTime: request.MoveInDate,
                     OriginalTransaction: request.TransactionId,
@@ -110,7 +110,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
                 ReasonCode: "39",
                 MarketActivityRecord: new MarketActivityRecord(
                     Id: Guid.NewGuid().ToString(),
-                    BusinessProcessReference: _correlationContext.GetCorrelationId(),
+                    BusinessProcessReference: _correlationContext.Id,
                     MarketEvaluationPoint: request.AccountingPointGsrnNumber,
                     StartDateAndOrTime: request.MoveInDate,
                     OriginalTransaction: request.TransactionId));

@@ -40,8 +40,8 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands
                 .HasColumnName("ProcessedDate");
             builder.Property(x => x.ScheduleDate)
                 .HasColumnName("ScheduleDate");
-            builder.Property(x => x.CorrelationId)
-                .HasColumnName("CorrelationId");
+            builder.Property(x => x.Correlation)
+                .HasColumnName("Correlation");
         }
     }
 }

@@ -29,6 +29,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests
             Environment.SetEnvironmentVariable("MARKETROLES_DB_CONNECTION_STRING", SomeString);
             Environment.SetEnvironmentVariable("CONSUMER_REGISTERED_TOPIC", SomeString);
             Environment.SetEnvironmentVariable("ENERGY_SUPPLIER_CHANGED_TOPIC", SomeString);
+            Environment.SetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY", SomeString);
             var program = new EntryPoints.Outbox.Program();
 
             program.ConfigureApplication();
@@ -41,6 +42,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests
         {
             Environment.SetEnvironmentVariable("MARKET_DATA_QUEUE_CONNECTION_STRING", ServiceBusConnectionString);
             Environment.SetEnvironmentVariable("MARKET_DATA_QUEUE_TOPIC_NAME", SomeString);
+            Environment.SetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY", SomeString);
             var program = new EntryPoints.Ingestion.Program();
 
             program.ConfigureApplication();
