@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.Common.Commands;
 using Energinet.DataHub.MarketRoles.Application.Common.Processing;
@@ -60,7 +61,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn.Proc
         private async Task<(Transaction Transaction, BusinessProcessId BusinessProcessId)> SetupScenario()
         {
             _ = CreateAccountingPoint();
-            _ = CreateEnergySupplier();
+            _ = CreateEnergySupplier(Guid.NewGuid(), SampleData.GlnNumber);
             _ = CreateConsumer();
             SaveChanges();
 

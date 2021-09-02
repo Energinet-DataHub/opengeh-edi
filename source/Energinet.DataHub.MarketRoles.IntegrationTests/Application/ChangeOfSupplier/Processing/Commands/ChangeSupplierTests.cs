@@ -41,12 +41,14 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
         private readonly IMediator _mediator;
 
         private Transaction _transaction = CreateTransaction();
+        private string _glnNumber = "7495563456235";
 
         public ChangeSupplierTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
             _accountingPoint = CreateAccountingPoint();
             _energySupplier = CreateEnergySupplier();
+            CreateEnergySupplier(Guid.NewGuid(), _glnNumber);
             _consumer = CreateConsumer();
             _mediator = GetService<IMediator>();
         }
@@ -59,7 +61,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
             var command = new ChangeSupplier(_accountingPoint.Id.Value, _transaction.Value);
             await GetService<IMediator>().Send(command, CancellationToken.None).ConfigureAwait(false);
 
-            string query = @"SELECT Count(1) FROM SupplierRegistrations WHERE AccountingPointId = @AccountingPointId AND EnergySupplierId = @EnergySupplierId AND StartOfSupplyDate IS NOT NULL AND EndOfSupplyDate IS NULL";
+            string query = @"SELECT Count(1) FROM SupplierRegistrations WHERE AccountingPointId = @AccountingPointId AND StartOfSupplyDate IS NOT NULL AND EndOfSupplyDate IS NULL";
             await using var sqlCommand = new SqlCommand(query, GetSqlDbConnection());
 
             sqlCommand.Parameters.Add(new SqlParameter("@AccountingPointId", _accountingPoint.Id.Value));
@@ -78,7 +80,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
             _transaction = CreateTransaction();
             await Mediator.Send(new RequestChangeOfSupplier(
                 _transaction.Value,
-                _energySupplier.GlnNumber.Value,
+                _glnNumber,
                 _consumer.CprNumber?.Value ?? throw new InvalidOperationException("CprNumber was supposed to have a value"),
                 string.Empty,
                 _accountingPoint.GsrnNumber.Value,

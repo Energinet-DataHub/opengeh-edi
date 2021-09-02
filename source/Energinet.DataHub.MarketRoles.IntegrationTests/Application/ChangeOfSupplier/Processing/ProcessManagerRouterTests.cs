@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing;
@@ -30,22 +31,23 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
     [IntegrationTest]
     public class ProcessManagerRouterTests : TestHost
     {
-        private ProcessManagerRouter _router;
-        private BusinessProcessId _businessProcessId;
-        private AccountingPoint _accountingPoint;
-        private Consumer _consumer;
-        private EnergySupplier _energySupplier;
-        private Transaction _transaction;
+        private readonly ProcessManagerRouter _router;
+        private readonly BusinessProcessId _businessProcessId;
+        private readonly AccountingPoint _accountingPoint;
+        private readonly EnergySupplier _energySupplier;
+        private readonly Transaction _transaction;
 
         public ProcessManagerRouterTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
-            _consumer = CreateConsumer();
-            _energySupplier = CreateEnergySupplier();
+            Consumer consumer = CreateConsumer();
+            _energySupplier = CreateEnergySupplier(Guid.NewGuid(), SampleData.GlnNumber);
             _accountingPoint = CreateAccountingPoint();
             _transaction = CreateTransaction();
-            SetConsumerMovedIn(_accountingPoint, _consumer.ConsumerId, _energySupplier.EnergySupplierId);
-            RegisterChangeOfSupplier(_accountingPoint, _energySupplier.EnergySupplierId, _transaction);
+
+            EnergySupplier newEnergySupplier = CreateEnergySupplier(Guid.NewGuid(), "7495563456235");
+            SetConsumerMovedIn(_accountingPoint, consumer.ConsumerId, _energySupplier.EnergySupplierId);
+            RegisterChangeOfSupplier(_accountingPoint, newEnergySupplier.EnergySupplierId, _transaction);
             MarketRolesContext.SaveChanges();
 
             _businessProcessId = GetBusinessProcessId(_transaction);
