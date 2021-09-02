@@ -34,7 +34,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
         [Fact]
         public async Task Accept_WhenConsumerIsRegistered_AcceptMessageIsPublished()
         {
-            CreateEnergySupplier();
+            CreateEnergySupplier(Guid.NewGuid(), SampleData.GlnNumber);
             CreateAccountingPoint();
             SaveChanges();
 
@@ -63,7 +63,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
         [Fact]
         public async Task Accept_WhenAccountingPointDoesNotExists_IsRejected()
         {
-            CreateEnergySupplier();
+            CreateEnergySupplier(Guid.NewGuid(), SampleData.GlnNumber);
             SaveChanges();
 
             var request = CreateRequest();
@@ -77,7 +77,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
         [Fact]
         public async Task Accept_WhenConsumerIsRegisteredBySSN_ConsumerIsRegistered()
         {
-            CreateEnergySupplier();
+            CreateEnergySupplier(Guid.NewGuid(), SampleData.GlnNumber);
             CreateAccountingPoint();
             SaveChanges();
 
@@ -91,7 +91,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
         [Fact]
         public async Task Accept_WhenConsumerIsRegisteredByVAT_ConsumerIsRegistered()
         {
-            CreateEnergySupplier();
+            CreateEnergySupplier(Guid.NewGuid(), SampleData.GlnNumber);
             CreateAccountingPoint();
             SaveChanges();
 
