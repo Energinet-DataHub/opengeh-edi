@@ -30,6 +30,16 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands
             BusinessProcessId = businessProcessId;
         }
 
+        public QueuedInternalCommand(Guid id, string type, byte[] data, Instant creationDate, Instant? scheduleDate, string correlationId)
+        {
+            Id = id;
+            Type = type;
+            Data = data;
+            CreationDate = creationDate;
+            ScheduleDate = scheduleDate;
+            CorrelationId = correlationId;
+        }
+
         public Guid Id { get; }
 
         public string Type { get;  } = string.Empty;

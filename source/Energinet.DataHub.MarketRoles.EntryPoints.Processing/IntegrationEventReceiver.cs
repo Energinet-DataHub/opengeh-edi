@@ -1,4 +1,4 @@
-// Copyright 2020 Energinet DataHub A/S
+﻿// Copyright 2020 Energinet DataHub A/S
 //
 // Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
@@ -13,6 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.Notifications;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;

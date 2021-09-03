@@ -21,6 +21,18 @@ option csharp_namespace = "NotificationContracts";
  */
 
 message MeteringPointCreated {
-  string gsrn_number = 1; // Unique metering point identification
-  string meteringPointType = 2; // Type of metering point
+    string metering_point_id = 1; // Unique metering point identifier.
+    string metering_point_type = 2; // Defines the type of metering point created.
+    string metering_grid_area = 3; // Indicates the metering grid area in which the metering point is created.
+    string to_grid = 4;  // If an Exchange MP is created, this field indicates the outgoing grid.
+    string from_grid = 5; // If an Exchange MP is created, this field indicates the incoming grid.
+    string settlement_method = 6; // If a Consumption or Net loss correction metering point is created, this field indicates the settlement method.
+    string metering_method = 7; // This indicates if the metering point created is physical, virtual, or calculated.
+    string meter_reading_periodicity = 8; // This indicates the reading periodicity.
+    string connection_state = 9; // This indicates the connection state upon creation.
+    string net_settlement_group = 10; // This indicates the net settlement group.
+    string product = 11; // This indicates the energy product.
+    string quantity_unit = 12; // This indicates the quantity unit, eg. kWh.
+    string parent_metering_point_id = 13; // Unique identifier of associated parent metering point. This field is empty if no parent is set upon creation.
+    string effective_date = 14; // The date on which the metering point is created.
 }

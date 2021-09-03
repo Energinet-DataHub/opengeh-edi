@@ -13,10 +13,11 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketRoles.Application.Common.Transport;
+using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using MediatR;
 
 namespace Energinet.DataHub.MarketRoles.Application.AccountingPoint
 {
-    public record MeteringPointCreated(string GsrnNumber, string MeteringPointType)
+    public record MeteringPointCreated(string GsrnNumber, MeteringPointType MeteringPointType)
         : INotification, IInboundMessage;
 }

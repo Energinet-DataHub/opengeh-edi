@@ -132,6 +132,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Processing
             container.Register<IIncomingMessageRegistry, IncomingMessageRegistry>(Lifestyle.Transient);
             container.Register<IProtobufMessageFactory, ProtobufMessageFactory>(Lifestyle.Singleton);
             container.Register<INotificationReceiver, NotificationReceiver>(Lifestyle.Scoped);
+            container.Register<IntegrationEventReceiver>(Lifestyle.Scoped);
 
             var connectionString = Environment.GetEnvironmentVariable("MARKET_DATA_DB_CONNECTION_STRING")
                                    ?? throw new InvalidOperationException(
