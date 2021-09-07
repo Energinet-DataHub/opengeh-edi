@@ -21,7 +21,7 @@ on:
       - build/infrastructure/**
       - build/modules/**
       - .github/workflows/infrastructure-cd.yml
-      - source\Energinet.DataHub.MeteringPoints.ApplyDBMigrationsApp\Scripts
+      - source/Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp/Scripts
   workflow_dispatch: {}
 env:
   ORGANISATION_NAME: endk
