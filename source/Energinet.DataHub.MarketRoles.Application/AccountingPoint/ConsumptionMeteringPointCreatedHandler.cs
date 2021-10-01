@@ -21,19 +21,24 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketRoles.Application.AccountingPoint
 {
-    public class MeteringPointCreatedHandler : INotificationHandler<MeteringPointCreated>
+    public class ConsumptionMeteringPointCreatedHandler : INotificationHandler<ConsumptionMeteringPointCreated>
     {
         private readonly ICommandScheduler _commandScheduler;
 
-        public MeteringPointCreatedHandler(ICommandScheduler commandScheduler)
+        public ConsumptionMeteringPointCreatedHandler(ICommandScheduler commandScheduler)
         {
             _commandScheduler = commandScheduler ?? throw new ArgumentNullException(nameof(commandScheduler));
         }
 
-        public Task Handle(MeteringPointCreated notification, CancellationToken cancellationToken)
+        public Task Handle(ConsumptionMeteringPointCreated notification, CancellationToken cancellationToken)
         {
             if (notification == null) throw new ArgumentNullException(nameof(notification));
-            var command = new CreateAccountingPoint(notification.GsrnNumber, notification.MeteringPointType);
+            var command = new CreateAccountingPoint(
+                notification.MeteringPointId,
+                notification.GsrnNumber,
+                notification.MeteringPointType,
+                notification.ConnectionState);
+
             return _commandScheduler.EnqueueAsync(command);
         }
     }

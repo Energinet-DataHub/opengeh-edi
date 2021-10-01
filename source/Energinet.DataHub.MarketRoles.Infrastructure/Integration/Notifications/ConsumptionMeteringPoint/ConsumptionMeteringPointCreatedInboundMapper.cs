@@ -13,27 +13,25 @@
 // limitations under the License.
 
 using System;
-using System.Globalization;
 using Energinet.DataHub.MarketRoles.Application.AccountingPoint;
 using Energinet.DataHub.MarketRoles.Application.Common.Transport;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using Energinet.DataHub.MarketRoles.Infrastructure.Integration.Helpers;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.Notifications.Protobuf
+namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.Notifications.ConsumptionMeteringPoint
 {
-    public class MeteringPointCreatedInboundMapper : ProtobufInboundMapper<NotificationContracts.MeteringPointCreated>
+    public class ConsumptionMeteringPointCreatedInboundMapper : ProtobufInboundMapper<NotificationContracts.ConsumptionMeteringPointCreated>
     {
-        protected override IInboundMessage Convert(NotificationContracts.MeteringPointCreated obj)
+        protected override IInboundMessage Convert(NotificationContracts.ConsumptionMeteringPointCreated obj)
         {
             if (obj == null) throw new ArgumentNullException(nameof(obj));
 
-            return new MeteringPointCreated(
-                obj.MeteringPointId,
-                EnumerationType.FromValue<MeteringPointType>(
-                    int.Parse(
-                        obj.MeteringPointType,
-                        CultureInfo.InvariantCulture)));
+            return new ConsumptionMeteringPointCreated(
+            obj.MeteringPointId,
+            MeteringPointType.Consumption,
+            obj.GsrnNumber,
+            obj.ConnectionState.MapToEnumerationType<PhysicalState>());
         }
     }
 }

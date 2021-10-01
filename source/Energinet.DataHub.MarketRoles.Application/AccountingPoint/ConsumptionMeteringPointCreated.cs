@@ -18,6 +18,10 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketRoles.Application.AccountingPoint
 {
-    public record MeteringPointCreated(string GsrnNumber, MeteringPointType MeteringPointType)
+    public record ConsumptionMeteringPointCreated(
+    string MeteringPointId,
+    MeteringPointType MeteringPointType,
+    string GsrnNumber,
+    PhysicalState ConnectionState)
         : INotification, IInboundMessage;
 }

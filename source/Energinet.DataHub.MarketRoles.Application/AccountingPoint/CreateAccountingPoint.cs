@@ -23,14 +23,21 @@ namespace Energinet.DataHub.MarketRoles.Application.AccountingPoint
 {
     public class CreateAccountingPoint : InternalCommand, IOutboundMessage
     {
-        public CreateAccountingPoint(string gsrnNumber, MeteringPointType meteringPointType)
+        public CreateAccountingPoint(string meteringPointId, string gsrnNumber, MeteringPointType meteringPointType, PhysicalState physicalState)
         {
+            AccountingPointId = AccountingPointId.Create(Guid.Parse(meteringPointId));
             GsrnNumber = GsrnNumber.Create(gsrnNumber);
             MeteringPointType = meteringPointType;
+            PhysicalState = physicalState;
+            PhysicalState = physicalState;
         }
 
         public GsrnNumber GsrnNumber { get; }
 
         public MeteringPointType MeteringPointType { get; }
+
+        private AccountingPointId AccountingPointId { get; }
+
+        private PhysicalState PhysicalState { get; }
     }
 }
