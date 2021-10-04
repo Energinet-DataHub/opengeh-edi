@@ -29,15 +29,14 @@ namespace Energinet.DataHub.MarketRoles.Application.AccountingPoint
             GsrnNumber = GsrnNumber.Create(gsrnNumber);
             MeteringPointType = meteringPointType;
             PhysicalState = physicalState;
-            PhysicalState = physicalState;
         }
 
         public GsrnNumber GsrnNumber { get; }
 
         public MeteringPointType MeteringPointType { get; }
 
-        private AccountingPointId AccountingPointId { get; }
+        public AccountingPointId AccountingPointId { get; }
 
-        private PhysicalState PhysicalState { get; }
+        public PhysicalState PhysicalState { get; }
     }
 }
