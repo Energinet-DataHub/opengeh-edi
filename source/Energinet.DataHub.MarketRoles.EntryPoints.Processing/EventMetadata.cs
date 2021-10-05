@@ -16,8 +16,6 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Processing
 {
         public class EventMetadata
         {
-            public int? MessageVersion { get; set; }
-
-            public string? MessageType { get; set; }
+            public string? EventType { get; set; }
         }
 }

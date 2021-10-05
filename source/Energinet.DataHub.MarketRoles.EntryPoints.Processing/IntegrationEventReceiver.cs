@@ -72,7 +72,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Processing
             }
 
             var eventMetadata = _jsonSerializer.Deserialize<EventMetadata>(metadata.ToString() ?? throw new InvalidOperationException());
-            return eventMetadata.MessageType ?? throw new InvalidOperationException("Service bus metadata property MessageType is missing");
+            return eventMetadata.EventType ?? throw new InvalidOperationException("Service bus metadata property MessageType is missing");
         }
     }
 }
