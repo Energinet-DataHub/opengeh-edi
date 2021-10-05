@@ -13,9 +13,11 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketRoles.Application.AccountingPoint;
+using Energinet.DataHub.MarketRoles.Contracts;
+using Energinet.DataHub.MarketRoles.Infrastructure.Integration.Helpers;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
 using Google.Protobuf;
+using CreateAccountingPoint = Energinet.DataHub.MarketRoles.Application.AccountingPoint.CreateAccountingPoint;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands.Protobuf.Mappers.AccountingPoint
 {
@@ -24,11 +26,16 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands.Protobuf
         protected override IMessage Convert(CreateAccountingPoint obj)
         {
             if (obj == null) throw new ArgumentException(null, nameof(obj));
-            return new MeteringPoints.InternalCommandsContracts.CreateAccountingPoint()
+
+            return new MarketRolesEnvelope
             {
-               AccountingPointId = obj.Id.ToString(),
-               GsrnNumber = obj.GsrnNumber.ToString(),
-               MeteringPointType = obj.MeteringPointType.ToString(),
+                CreateAccountingPoint = new Contracts.CreateAccountingPoint()
+                {
+                    AccountingPointId = obj.Id.ToString(),
+                    GsrnNumber = obj.GsrnNumber.ToString(),
+                    MeteringPointType = obj.MeteringPointType.ToString(),
+                    ConnectionState = obj.PhysicalState.ToString(),
+                },
             };
         }
     }

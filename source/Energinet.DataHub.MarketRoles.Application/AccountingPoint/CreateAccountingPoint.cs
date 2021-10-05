@@ -13,15 +13,13 @@
 // limitations under the License.
 
 using System;
-using System.Threading;
 using Energinet.DataHub.MarketRoles.Application.Common.Commands;
 using Energinet.DataHub.MarketRoles.Application.Common.Transport;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
 namespace Energinet.DataHub.MarketRoles.Application.AccountingPoint
 {
-    public class CreateAccountingPoint : InternalCommand, IOutboundMessage
+    public class CreateAccountingPoint : InternalCommand, IOutboundMessage, IInboundMessage
     {
         public CreateAccountingPoint(string meteringPointId, string gsrnNumber, MeteringPointType meteringPointType, PhysicalState physicalState)
         {
