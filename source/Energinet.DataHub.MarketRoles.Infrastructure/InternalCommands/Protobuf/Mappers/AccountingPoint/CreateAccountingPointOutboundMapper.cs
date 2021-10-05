@@ -31,7 +31,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands.Protobuf
             {
                 CreateAccountingPoint = new Contracts.CreateAccountingPoint()
                 {
-                    AccountingPointId = obj.Id.ToString(),
+                    AccountingPointId = obj.AccountingPointId.Value.ToString(),
                     GsrnNumber = obj.GsrnNumber.ToString(),
                     MeteringPointType = obj.MeteringPointType.ToString(),
                     ConnectionState = obj.PhysicalState.ToString(),
