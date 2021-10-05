@@ -30,8 +30,8 @@ module "azfun_internalcommanddispatcher" {
     FUNCTIONS_WORKER_RUNTIME              = "dotnet-isolated"
     # Endregion: Default Values
     "MARKETROLES_QUEUE_CONNECTION_STRING": module.sbnar_marketroles_sender.primary_connection_string
-    "MARKETROLES_QUEUE_TOPIC_NAME": module.sbq_marketroles.name
-    "MARKETROLES_DB_CONNECTION_STRING": local.MARKETROLES_CONNECTION_STRING
+    "MARKETROLES_QUEUE_NAME": module.sbq_marketroles.name
+    "MARKETROLES_CONNECTION_STRING": local.MARKETROLES_CONNECTION_STRING
     "DISPATCH_TRIGGER_TIMER": "*/10 * * * * *"    
   }
   dependencies                              = [
