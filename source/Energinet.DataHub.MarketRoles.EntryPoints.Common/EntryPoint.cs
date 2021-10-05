@@ -51,7 +51,8 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Common
                     ConfigureServiceCollection(services);
 
                     services.AddApplicationInsightsTelemetryWorkerService(
-                        Environment.GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY"));
+                        Environment.GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY")
+                        ?? throw new InvalidOperationException("Missing APPINSIGHTS_INSTRUMENTATIONKEY"));
 
                     services.AddLogging();
                     services.AddSimpleInjector(_container, options =>

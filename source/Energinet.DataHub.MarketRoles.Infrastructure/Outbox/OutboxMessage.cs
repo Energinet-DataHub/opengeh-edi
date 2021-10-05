@@ -19,11 +19,12 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Outbox
 {
     public class OutboxMessage
     {
-        public OutboxMessage(string type, string data, OutboxMessageCategory category, Instant creationDate)
+        public OutboxMessage(string type, string data, string correlation, OutboxMessageCategory category, Instant creationDate)
         {
             Id = Guid.NewGuid();
             Type = type;
             Data = data;
+            Correlation = correlation;
             Category = category;
             CreationDate = creationDate;
         }
@@ -33,6 +34,8 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Outbox
         public string Type { get; }
 
         public string Data { get; }
+
+        public string Correlation { get; }
 
         public OutboxMessageCategory Category { get; }
 

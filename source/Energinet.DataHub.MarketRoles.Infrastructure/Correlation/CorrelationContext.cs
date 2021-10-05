@@ -18,21 +18,32 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Correlation
 {
     public sealed class CorrelationContext : ICorrelationContext
     {
-        private string? _correlationId;
+        private string? _id;
 
-        public string GetCorrelationId()
+        private string? _parentId;
+
+        public string Id => _id ?? throw new InvalidOperationException("Correlation id not set");
+
+        public string? ParentId => _parentId;
+
+        public void SetId(string id)
         {
-            if (string.IsNullOrWhiteSpace(_correlationId))
-            {
-                throw new InvalidOperationException("Correlation id not set");
-            }
-
-            return _correlationId;
+            _id = id;
         }
 
-        public void SetCorrelationId(string correlationId)
+        public void SetParentId(string parentId)
         {
-            _correlationId = correlationId;
+            _parentId = parentId;
+        }
+
+        public string AsTraceContext()
+        {
+            if (string.IsNullOrEmpty(_id) || string.IsNullOrEmpty(_parentId))
+            {
+                return string.Empty;
+            }
+
+            return $"00-{_id}-{_parentId}-00";
         }
     }
 }

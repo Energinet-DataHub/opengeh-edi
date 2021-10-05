@@ -38,7 +38,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
             ISystemDateTimeProvider dateTimeProvider,
             IOutbox outbox,
             IOutboxMessageFactory outboxMessageFactory)
-        : base(outbox, outboxMessageFactory)
+            : base(outbox, outboxMessageFactory)
         {
             _errorMessageFactory = errorMessageFactory;
             _correlationContext = correlationContext;
@@ -73,7 +73,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
                     Text: string.Empty),
                 MarketActivityRecord: new MarketActivityRecordWithReasons(
                     Id: Guid.NewGuid().ToString(),
-                    BusinessProcessReference: _correlationContext.GetCorrelationId(),
+                    BusinessProcessReference: _correlationContext.Id,
                     MarketEvaluationPoint: request.AccountingPointGsrnNumber,
                     StartDateAndOrTime: request.MoveInDate,
                     OriginalTransaction: request.TransactionId,
@@ -84,7 +84,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
             return CreatePostOfficeEnvelope(
                 recipient: request.EnergySupplierGlnNumber,
                 cimContent: document,
-                messageType: "RejectRequestChangeOfSupplier");
+                messageType: "RejectMoveInRequest");
         }
 
         protected override object CreateAcceptMessage(RequestMoveIn request, BusinessProcessResult result)
@@ -110,7 +110,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
                 ReasonCode: "39",
                 MarketActivityRecord: new MarketActivityRecord(
                     Id: Guid.NewGuid().ToString(),
-                    BusinessProcessReference: _correlationContext.GetCorrelationId(),
+                    BusinessProcessReference: _correlationContext.Id,
                     MarketEvaluationPoint: request.AccountingPointGsrnNumber,
                     StartDateAndOrTime: request.MoveInDate,
                     OriginalTransaction: request.TransactionId));
@@ -120,7 +120,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
             return CreatePostOfficeEnvelope(
                 recipient: request.EnergySupplierGlnNumber,
                 cimContent: document,
-                messageType: "ConfirmRequestChangeOfSupplier");
+                messageType: "ConfirmMoveInRequest");
         }
 
         private static PostOfficeEnvelope CreatePostOfficeEnvelope(string recipient, string cimContent, string messageType)

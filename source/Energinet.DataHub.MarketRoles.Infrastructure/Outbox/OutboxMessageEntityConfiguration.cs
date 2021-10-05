@@ -36,6 +36,8 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Outbox
                 .HasColumnName("Data");
             builder.Property(x => x.Type)
                 .HasColumnName("Type");
+            builder.Property(x => x.Correlation)
+                .HasColumnName("Correlation");
             builder.Property(x => x.CreationDate)
                 .HasColumnName("CreationDate");
             builder.Property(x => x.ProcessedDate)

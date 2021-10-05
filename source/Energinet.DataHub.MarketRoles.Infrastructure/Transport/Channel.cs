@@ -20,7 +20,9 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Transport
     /// <summary>
     /// Abstract class representing an out-of-process transport channel.
     /// </summary>
+#pragma warning disable CA1724 // Channel conflicts in whole or in part with the namespace name 'Microsoft.ApplicationInsights.Channel'.
     public abstract class Channel
+#pragma warning restore CA1724
     {
         /// <summary>
         /// Write the <paramref name="data"/> to the channel

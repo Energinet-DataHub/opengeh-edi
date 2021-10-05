@@ -71,7 +71,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
 
             response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
 
-            await response.WriteStringAsync("Correlation id: " + _correlationContext.GetCorrelationId())
+            await response.WriteStringAsync("Correlation id: " + _correlationContext.Id)
                 .ConfigureAwait(false);
 
             foreach (var command in commands)
