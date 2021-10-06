@@ -31,8 +31,8 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.BusinessRequestProcessing
             return new Application.AccountingPoint.CreateAccountingPoint(
                 obj.AccountingPointId,
                 obj.GsrnNumber,
-                EnumerationType.FromName<MeteringPointType>(obj.MeteringPointType),
-                EnumerationType.FromName<PhysicalState>(obj.ConnectionState));
+                obj.MeteringPointType,
+                obj.ConnectionState);
         }
     }
 }

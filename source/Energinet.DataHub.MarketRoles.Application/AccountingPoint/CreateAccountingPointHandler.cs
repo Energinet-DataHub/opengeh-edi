@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.Common.Commands;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
+using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using MediatR;
 
 namespace Energinet.DataHub.MarketRoles.Application.AccountingPoint
@@ -35,10 +36,10 @@ namespace Energinet.DataHub.MarketRoles.Application.AccountingPoint
             if (request == null) throw new ArgumentNullException(nameof(request));
 
             var accountingPoint = new Domain.MeteringPoints.AccountingPoint(
-                request.AccountingPointId,
-                request.GsrnNumber,
-                request.MeteringPointType,
-                request.PhysicalState);
+                AccountingPointId.Create(Guid.Parse(request.AccountingPointId)),
+                GsrnNumber.Create(request.GsrnNumber),
+                EnumerationType.FromName<MeteringPointType>(request.MeteringPointType),
+                EnumerationType.FromName<PhysicalState>(request.PhysicalState));
 
             _accountingPointRepository.Add(accountingPoint);
             return Task.FromResult(Unit.Value);

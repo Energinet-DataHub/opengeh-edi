@@ -29,9 +29,9 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.Notifications
 
             return new ConsumptionMeteringPointCreated(
             obj.MeteringPointId,
-            MeteringPointType.Consumption,
+            MeteringPointType.Consumption.ToString(),
             obj.GsrnNumber,
-            obj.ConnectionState.MapToEnumerationType<PhysicalState>());
+            obj.ConnectionState.MapToEnumerationType<PhysicalState>().ToString());
         }
     }
 }

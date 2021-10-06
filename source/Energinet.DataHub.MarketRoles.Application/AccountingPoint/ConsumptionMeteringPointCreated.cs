@@ -20,8 +20,8 @@ namespace Energinet.DataHub.MarketRoles.Application.AccountingPoint
 {
     public record ConsumptionMeteringPointCreated(
     string MeteringPointId,
-    MeteringPointType MeteringPointType,
+    string MeteringPointType,
     string GsrnNumber,
-    PhysicalState ConnectionState)
+    string ConnectionState)
         : INotification, IInboundMessage;
 }

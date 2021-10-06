@@ -14,7 +14,6 @@
 
 using System;
 using Energinet.DataHub.MarketRoles.Contracts;
-using Energinet.DataHub.MarketRoles.Infrastructure.Integration.Helpers;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
 using Google.Protobuf;
 using CreateAccountingPoint = Energinet.DataHub.MarketRoles.Application.AccountingPoint.CreateAccountingPoint;
@@ -31,10 +30,10 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands.Protobuf
             {
                 CreateAccountingPoint = new Contracts.CreateAccountingPoint()
                 {
-                    AccountingPointId = obj.AccountingPointId.Value.ToString(),
-                    GsrnNumber = obj.GsrnNumber.ToString(),
-                    MeteringPointType = obj.MeteringPointType.ToString(),
-                    ConnectionState = obj.PhysicalState.ToString(),
+                    AccountingPointId = obj.AccountingPointId,
+                    GsrnNumber = obj.GsrnNumber,
+                    MeteringPointType = obj.MeteringPointType,
+                    ConnectionState = obj.PhysicalState,
                 },
             };
         }

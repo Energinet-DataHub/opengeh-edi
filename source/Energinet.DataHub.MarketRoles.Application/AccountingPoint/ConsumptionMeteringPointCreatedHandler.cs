@@ -16,7 +16,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.Common.Commands;
-using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events;
 using MediatR;
 
 namespace Energinet.DataHub.MarketRoles.Application.AccountingPoint
