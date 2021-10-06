@@ -15,9 +15,6 @@
 using System;
 using Energinet.DataHub.MarketRoles.Application.Common.Transport;
 using Energinet.DataHub.MarketRoles.Contracts;
-using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
-using Energinet.DataHub.MarketRoles.Infrastructure.Integration.Helpers;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.BusinessRequestProcessing.Protobuf.Mappers
