@@ -37,6 +37,6 @@ data "azurerm_key_vault_secret" "SHARED_RESOURCES_DB_URL" {
 }
 
 data "azurerm_key_vault_secret" "SHARED_RESOURCES_EVENT_FORWARDED_QUEUE" {
-  name         = "METERING-POINT-FORWARDED-QUEUE-NAME"
+  name         = "MARKET-ROLES-FORWARDED-QUEUE-NAME"
   key_vault_id = data.azurerm_key_vault.kv_sharedresources.id
 }
