@@ -31,7 +31,7 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
         private readonly ISystemDateTimeProvider _systemTimeProvider;
         private readonly IEnergySupplierRepository _energySupplierRepository;
         private EnergySupplier? _energySupplier;
-        private AccountingPoint? _accountingPoint;
+        private Domain.MeteringPoints.AccountingPoint? _accountingPoint;
         private RequestChangeOfSupplier? _request;
 
         public RequestChangeOfSupplierHandler(
@@ -94,7 +94,7 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
             return new BusinessProcessResult(_request.TransactionId, validationResult.Errors);
         }
 
-        private Task<AccountingPoint> GetMeteringPointAsync(string gsrnNumber)
+        private Task<Domain.MeteringPoints.AccountingPoint> GetMeteringPointAsync(string gsrnNumber)
         {
             var meteringPointId = GsrnNumber.Create(gsrnNumber);
             var meteringPoint =

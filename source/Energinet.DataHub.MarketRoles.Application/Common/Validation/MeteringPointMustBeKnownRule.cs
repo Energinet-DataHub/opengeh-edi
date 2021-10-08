@@ -22,7 +22,7 @@ namespace Energinet.DataHub.MarketRoles.Application.Common.Validation
     {
         private readonly string _gsrnNumber;
 
-        public MeteringPointMustBeKnownRule(AccountingPoint? accountingPoint, string gsrnNumber)
+        public MeteringPointMustBeKnownRule(Domain.MeteringPoints.AccountingPoint? accountingPoint, string gsrnNumber)
         {
             _gsrnNumber = gsrnNumber;
             IsBroken = accountingPoint == null;

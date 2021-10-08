@@ -43,6 +43,15 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
             AddDomainEvent(new MeteringPointCreated(GsrnNumber, _meteringPointType));
         }
 
+        public AccountingPoint(AccountingPointId meteringPointId, GsrnNumber gsrnNumber, MeteringPointType meteringPointType, PhysicalState physicalState)
+        {
+            Id = meteringPointId;
+            GsrnNumber = gsrnNumber;
+            _meteringPointType = meteringPointType;
+            _physicalState = physicalState;
+            AddDomainEvent(new MeteringPointCreated(GsrnNumber, _meteringPointType));
+        }
+
         private AccountingPoint(GsrnNumber gsrnNumber, MeteringPointType meteringPointType, bool isProductionObligated)
             : this(gsrnNumber, meteringPointType)
         {

@@ -48,7 +48,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands
             var message = new ServiceBusMessage(queuedInternalCommand.Data);
             message.ContentType = "application/octet-stream";
             message.MessageId = queuedInternalCommand.Id.ToString();
-            message.CorrelationId = queuedInternalCommand.Correlation;
+            message.CorrelationId = queuedInternalCommand.CorrelationId;
 
             return message;
         }

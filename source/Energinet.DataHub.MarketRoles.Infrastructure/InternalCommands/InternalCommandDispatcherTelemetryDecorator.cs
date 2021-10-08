@@ -37,7 +37,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands
         {
             if (queuedInternalCommand == null) throw new ArgumentNullException(nameof(queuedInternalCommand));
 
-            var traceContext = TraceContext.Parse(queuedInternalCommand.Correlation);
+            var traceContext = TraceContext.Parse(queuedInternalCommand.CorrelationId);
             if (!traceContext.IsValid)
             {
                 return await _decoratee.DispatchAsync(queuedInternalCommand).ConfigureAwait(false);

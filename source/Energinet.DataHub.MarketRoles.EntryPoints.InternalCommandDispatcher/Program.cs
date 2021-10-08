@@ -48,7 +48,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.InternalCommandDispatcher
 
             services.AddDbContext<MarketRolesContext>(x =>
             {
-                var dbConnectionString = Environment.GetEnvironmentVariable("MARKETROLES_DB_CONNECTION_STRING")
+                var dbConnectionString = Environment.GetEnvironmentVariable("MARKETROLES_CONNECTION_STRING")
                                          ?? throw new InvalidOperationException(
                                              "Market roles point db connection string not found.");
 
@@ -71,7 +71,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.InternalCommandDispatcher
             container.RegisterDecorator<IInternalCommandDispatcher, InternalCommandDispatcherTelemetryDecorator>(Lifestyle.Scoped);
 
             var connectionString = Environment.GetEnvironmentVariable("MARKETROLES_QUEUE_CONNECTION_STRING");
-            var topicName = Environment.GetEnvironmentVariable("MARKETROLES_QUEUE_TOPIC_NAME");
+            var topicName = Environment.GetEnvironmentVariable("MARKETROLES_QUEUE_NAME");
             container.Register<ServiceBusSender>(
                 () => new ServiceBusClient(connectionString).CreateSender(topicName),
                 Lifestyle.Singleton);

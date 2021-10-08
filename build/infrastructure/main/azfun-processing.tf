@@ -36,6 +36,8 @@ module "azfun_processing" {
     MARKET_DATA_QUEUE_CONNECTION_STRING   = module.sbnar_marketroles_listener.primary_connection_string
     MARKET_DATA_DB_CONNECTION_STRING      = local.MARKETROLES_CONNECTION_STRING
     MARKET_DATA_QUEUE_TOPIC_NAME          = module.sbq_marketroles.name
+    INTEGRATION_EVENT_QUEUE               = data.azurerm_key_vault_secret.SHARED_RESOURCES_EVENT_FORWARDED_QUEUE.value
+    INTEGRATION_EVENT_QUEUE_CONNECTION    = data.azurerm_key_vault_secret.INTEGRATION_EVENTS_LISTENER_CONNECTION_STRING.value
     # POST_OFFICE_QUEUE_CONNECTION_STRING   = data.azurerm_key_vault_secret.POST_OFFICE_QUEUE_CONNECTION_STRING.value
     # POST_OFFICE_QUEUE_TOPIC_NAME          = data.azurerm_key_vault_secret.POST_OFFICE_QUEUE_MARKETDATA_TOPIC_NAME.value
   }

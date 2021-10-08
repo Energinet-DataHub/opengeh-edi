@@ -51,10 +51,12 @@ using Energinet.DataHub.MarketRoles.Infrastructure.EDI.ChangeOfSupplier.Metering
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChange;
+using Energinet.DataHub.MarketRoles.Infrastructure.Integration.Notifications;
 using Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands;
 using Energinet.DataHub.MarketRoles.Infrastructure.Messaging.Idempotency;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
+using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integration;
 using Energinet.DataHub.MarketRoles.Infrastructure.Users;
 using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
@@ -130,6 +132,9 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Processing
             container.Register<IDomainEventPublisher, DomainEventPublisher>(Lifestyle.Scoped);
             container.Register<ServiceBusMessageIdempotencyMiddleware>(Lifestyle.Scoped);
             container.Register<IIncomingMessageRegistry, IncomingMessageRegistry>(Lifestyle.Transient);
+            container.Register<IProtobufMessageFactory, ProtobufMessageFactory>(Lifestyle.Singleton);
+            container.Register<INotificationReceiver, NotificationReceiver>(Lifestyle.Scoped);
+            container.Register<IntegrationEventReceiver>(Lifestyle.Scoped);
 
             var connectionString = Environment.GetEnvironmentVariable("MARKET_DATA_DB_CONNECTION_STRING")
                                    ?? throw new InvalidOperationException(
