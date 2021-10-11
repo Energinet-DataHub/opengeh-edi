@@ -143,17 +143,10 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             _container.Register<IMeteringPointDetailsForwarder, MeteringPointDetailsForwarder>(Lifestyle.Scoped);
 
             _container.BuildMediator(
+                new[] { typeof(RequestChangeOfSupplierHandler).Assembly, typeof(PublishWhenEnergySupplierHasChanged).Assembly, },
                 new[]
                 {
-                    typeof(RequestChangeOfSupplierHandler).Assembly,
-                    typeof(PublishWhenEnergySupplierHasChanged).Assembly,
-                },
-                new[]
-                {
-                    typeof(UnitOfWorkBehaviour<,>),
-                    typeof(InputValidationBehaviour<,>),
-                    typeof(BusinessProcessResponderBehaviour<,>),
-                    typeof(DomainEventsDispatcherBehaviour<,>),
+                    typeof(UnitOfWorkBehaviour<,>), typeof(InputValidationBehaviour<,>), typeof(BusinessProcessResponderBehaviour<,>), typeof(DomainEventsDispatcherBehaviour<,>),
                     typeof(InternalCommandHandlingBehaviour<,>),
                 });
 

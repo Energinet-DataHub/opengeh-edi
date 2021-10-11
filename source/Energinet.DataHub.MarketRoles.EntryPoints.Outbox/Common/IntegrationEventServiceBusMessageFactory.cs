@@ -12,22 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration
+namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox.Common
 {
-    /// <summary>
-    /// Interface for Topic sender
-    /// </summary>
-    public interface ITopicSender<TTopic>
-        where TTopic : Topic
+    public class IntegrationEventServiceBusMessageFactory : IIntegrationEventMessageFactory
     {
-        /// <summary>
-        /// Sends a message async
-        /// </summary>
-        /// <param name="message"></param>
-        /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
-        Task SendMessageAsync(ServiceBusMessage message);
+        public ServiceBusMessage CreateMessage(byte[] bytes, IIntegrationMetadataContext integrationMetadataContext)
+        {
+            ServiceBusMessage serviceBusMessage = new(bytes)
+            {
+                ContentType = "application/octet-stream;charset=utf-8",
+            };
+
+            return serviceBusMessage;
+        }
     }
 }

@@ -26,12 +26,16 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox.Common
     {
         private readonly IMediator _mediator;
         private readonly IJsonSerializer _jsonSerializer;
+        private readonly IIntegrationMetadataContext _integrationMetadataContext;
 
         public OutboxMessageDispatcher(
-            IMediator mediator, IJsonSerializer jsonSerializer)
+            IMediator mediator,
+            IJsonSerializer jsonSerializer,
+            IIntegrationMetadataContext integrationMetadataContext)
         {
             _mediator = mediator;
             _jsonSerializer = jsonSerializer;
+            _integrationMetadataContext = integrationMetadataContext;
         }
 
         public async Task DispatchMessageAsync(OutboxMessage message)
@@ -42,6 +46,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox.Common
                 message.Data,
                 OutboxTypeFactory.GetType(message.Type));
 
+            _integrationMetadataContext.SetMetadata(message.CreationDate, message.Correlation, Guid.NewGuid());
             await _mediator.Send(parsedCommand, CancellationToken.None).ConfigureAwait(false);
         }
     }

@@ -12,22 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Azure.Messaging.ServiceBus;
+using System;
+using NodaTime;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration
+namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox.Common
 {
-    /// <summary>
-    /// Interface for Topic sender
-    /// </summary>
-    public interface ITopicSender<TTopic>
-        where TTopic : Topic
+    public class IntegrationMetadataContext : IIntegrationMetadataContext
     {
-        /// <summary>
-        /// Sends a message async
-        /// </summary>
-        /// <param name="message"></param>
-        /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
-        Task SendMessageAsync(ServiceBusMessage message);
+        public Instant Timestamp { get; private set; }
+
+        public string? CorrelationId { get; private set; }
+
+        public Guid EventId { get; private set; }
+
+        public void SetMetadata(Instant timestamp, string correlationId, Guid eventId)
+        {
+            Timestamp = timestamp;
+            CorrelationId = correlationId;
+            EventId = eventId;
+        }
     }
 }

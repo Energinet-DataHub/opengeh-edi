@@ -84,6 +84,9 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
             container.Register<IOutboxMessageDispatcher, OutboxMessageDispatcher>(Lifestyle.Scoped);
             container.RegisterDecorator<IOutboxMessageDispatcher, OutboxMessageDispatcherTelemetryDecorator>(Lifestyle.Scoped);
             container.Register<ICorrelationContext, CorrelationContext>(Lifestyle.Scoped);
+            container.Register<IIntegrationMetadataContext, IntegrationMetadataContext>(Lifestyle.Scoped);
+            container.Register<IIntegrationEventMessageFactory, IntegrationEventServiceBusMessageFactory>(Lifestyle.Scoped);
+
             var connectionString = Environment.GetEnvironmentVariable("SHARED_INTEGRATION_EVENT_SERVICE_BUS_SENDER_CONNECTION_STRING");
             container.Register<ServiceBusClient>(
                 () => new ServiceBusClient(connectionString),
@@ -97,10 +100,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
             container.Register(typeof(ITopicSender<>), typeof(TopicSender<>), Lifestyle.Singleton);
 
             container.BuildMediator(
-                new[]
-                {
-                    typeof(OutboxWatcher).Assembly,
-                },
+                new[] { typeof(OutboxWatcher).Assembly, },
                 Array.Empty<Type>());
 
             container.SendProtobuf<Energinet.DataHub.MarketRoles.IntegrationEventContracts.EnergySupplierChanged>();

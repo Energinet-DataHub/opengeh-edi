@@ -35,14 +35,9 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration
             _topicName = topic.Name;
         }
 
-        public async Task SendMessageAsync(byte[] message)
+        public async Task SendMessageAsync(ServiceBusMessage message)
         {
-            ServiceBusMessage serviceBusMessage = new(message)
-            {
-                Subject = _topicName,
-                ContentType = "application/octet-stream;charset=utf-8",
-            };
-            await _senderCreator.Value.SendMessageAsync(serviceBusMessage).ConfigureAwait(false);
+            await _senderCreator.Value.SendMessageAsync(message).ConfigureAwait(false);
         }
 
         public async ValueTask DisposeAsync()
