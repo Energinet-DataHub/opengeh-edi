@@ -171,7 +171,8 @@ namespace Energinet.DataHub.MarketRoles.Tests.Application.ChangeOfSupplier.Proce
                 _gsrnNumber,
                 _businessProcessId,
                 _transaction,
-                _effectiveDate);
+                _effectiveDate,
+                _energySupplierId);
         }
     }
 }
