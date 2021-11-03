@@ -17,15 +17,16 @@ using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events;
 using Energinet.DataHub.MarketRoles.EntryPoints.Outbox.Common;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChange;
+using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChangeRegistered;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox.IntegrationEventDispatchers
 {
-    public class EnergySupplierChangedDispatcher : IntegrationEventDispatcher<EnergySupplierChangedTopic, EnergySupplierChangedIntegrationEvent>
+    public class EnergySupplierChangeRegisteredDispatcher : IntegrationEventDispatcher<EnergySupplierChangeRegisteredTopic, EnergySupplierChangeRegisteredIntegrationEvent>
     {
-        public EnergySupplierChangedDispatcher(
-            ITopicSender<EnergySupplierChangedTopic> topicSender,
-            ProtobufOutboundMapper<EnergySupplierChangedIntegrationEvent> mapper,
+        public EnergySupplierChangeRegisteredDispatcher(
+            ITopicSender<EnergySupplierChangeRegisteredTopic> topicSender,
+            ProtobufOutboundMapper<EnergySupplierChangeRegisteredIntegrationEvent> mapper,
             IIntegrationEventMessageFactory integrationEventMessageFactory,
             IIntegrationMetadataContext integrationMetadataContext)
             : base(topicSender, mapper, integrationEventMessageFactory, integrationMetadataContext)

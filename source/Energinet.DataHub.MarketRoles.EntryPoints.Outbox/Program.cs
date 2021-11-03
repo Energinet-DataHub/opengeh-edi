@@ -97,6 +97,11 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
                     "No EnergySupplierChanged Topic found")),
                 Lifestyle.Singleton);
 
+            container.Register(
+                () => new EnergySupplierChangedTopic(Environment.GetEnvironmentVariable("ENERGY_SUPPLIER_CHANGE_REGISTERED_TOPIC") ?? throw new InvalidOperationException(
+                    "No EnergySupplierChangeRegistered Topic found")),
+                Lifestyle.Singleton);
+
             container.Register(typeof(ITopicSender<>), typeof(TopicSender<>), Lifestyle.Singleton);
 
             container.BuildMediator(
