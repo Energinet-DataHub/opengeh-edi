@@ -111,7 +111,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
             _businessProcesses.Add(businessProcess);
             _supplierRegistrations.Add(new SupplierRegistration(energySupplierId, businessProcess.BusinessProcessId));
 
-            AddDomainEvent(new EnergySupplierChangeRegistered(Id, GsrnNumber, businessProcess.BusinessProcessId, transaction, supplyStartDate));
+            AddDomainEvent(new EnergySupplierChangeRegistered(Id, GsrnNumber, businessProcess.BusinessProcessId, transaction, supplyStartDate, energySupplierId));
         }
 
         public void EffectuateChangeOfSupplier(Transaction transaction, ISystemDateTimeProvider systemDateTimeProvider)

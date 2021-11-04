@@ -24,6 +24,7 @@ using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChange;
+using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.FutureEnergySupplierChangeRegistered;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 using Energinet.DataHub.MarketRoles.Infrastructure.PostOffice;
 using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
@@ -95,6 +96,11 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
             container.Register(
                 () => new EnergySupplierChangedTopic(Environment.GetEnvironmentVariable("ENERGY_SUPPLIER_CHANGED_TOPIC") ?? throw new InvalidOperationException(
                     "No EnergySupplierChanged Topic found")),
+                Lifestyle.Singleton);
+
+            container.Register(
+                () => new FutureEnergySupplierChangeRegisteredTopic(Environment.GetEnvironmentVariable("ENERGY_SUPPLIER_CHANGE_REGISTERED_TOPIC") ?? throw new InvalidOperationException(
+                    "No EnergySupplierChangeRegistered Topic found")),
                 Lifestyle.Singleton);
 
             container.Register(typeof(ITopicSender<>), typeof(TopicSender<>), Lifestyle.Singleton);

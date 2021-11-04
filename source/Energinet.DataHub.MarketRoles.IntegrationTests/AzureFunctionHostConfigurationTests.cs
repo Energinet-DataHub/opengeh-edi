@@ -29,6 +29,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests
             Environment.SetEnvironmentVariable("MARKETROLES_DB_CONNECTION_STRING", SomeString);
             Environment.SetEnvironmentVariable("CONSUMER_REGISTERED_TOPIC", SomeString);
             Environment.SetEnvironmentVariable("ENERGY_SUPPLIER_CHANGED_TOPIC", SomeString);
+            Environment.SetEnvironmentVariable("ENERGY_SUPPLIER_CHANGE_REGISTERED_TOPIC", SomeString);
             Environment.SetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY", SomeString);
             var program = new EntryPoints.Outbox.Program();
 

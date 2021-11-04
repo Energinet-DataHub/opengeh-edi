@@ -146,7 +146,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
                 _accountingPoint.GsrnNumber,
                 _businessProcessId,
                 _transaction,
-                EffectiveDate);
+                EffectiveDate,
+                _energySupplier.EnergySupplierId);
         }
 
         private EnergySupplierChanged CreateEnergySupplierChangedEvent()
