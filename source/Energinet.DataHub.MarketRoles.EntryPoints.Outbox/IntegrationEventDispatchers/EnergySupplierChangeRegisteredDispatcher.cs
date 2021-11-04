@@ -36,7 +36,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox.IntegrationEventDispa
         protected override void EnrichMessage(ServiceBusMessage serviceBusMessage)
         {
             serviceBusMessage.EnrichMetadata(
-                nameof(EnergySupplierChanged),
+                nameof(EnergySupplierChangeRegistered),
                 1);
         }
     }
