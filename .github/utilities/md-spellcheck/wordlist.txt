@@ -111,3 +111,8 @@ FutureEnergySupplierChangeCancelled
 EffectiveDate
 EnergySupplierGLN
 TransactionId
+FutureEnergySupplierChangeRegistered
+effectuation
+MeteringPointDetails
+ChargeDetails
+dequeued
