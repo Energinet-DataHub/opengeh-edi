@@ -116,3 +116,4 @@ effectuation
 MeteringPointDetails
 ChargeDetails
 dequeued
+AwaitingChargeDetailsDispatch
