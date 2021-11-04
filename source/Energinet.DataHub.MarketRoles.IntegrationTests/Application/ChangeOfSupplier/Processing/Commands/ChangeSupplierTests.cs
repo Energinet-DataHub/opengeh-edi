@@ -24,6 +24,8 @@ using Energinet.DataHub.MarketRoles.Domain.Consumers;
 using Energinet.DataHub.MarketRoles.Domain.EnergySuppliers;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
+using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChange;
+using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChangeRegistered;
 using MediatR;
 using Microsoft.Data.SqlClient;
 using NodaTime;
@@ -72,25 +74,51 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
             Assert.Equal(1, result);
         }
 
+        [Fact]
+        public async Task RequestChangeOfSupplier_IsSuccessful_IntegrationEventsIsPublished()
+        {
+            _transaction = CreateTransaction();
+            await RequestChangeOfSupplierProcess().ConfigureAwait(false);
+
+            AssertOutboxMessage<EnergySupplierChangedIntegrationEvent>();
+            AssertOutboxMessage<EnergySupplierChangeRegisteredIntegrationEvent>();
+        }
+
         private async Task SimulateProcess()
         {
-            SetConsumerMovedIn(_accountingPoint, _consumer.ConsumerId, _energySupplier.EnergySupplierId);
-            await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
+            await SetConsumerMovedIn().ConfigureAwait(false);
 
             _transaction = CreateTransaction();
-            await Mediator.Send(new RequestChangeOfSupplier(
+            await RequestChangeOfSupplier().ConfigureAwait(false);
+
+            var businessProcessId = GetBusinessProcessId(_transaction);
+
+            await _mediator.Send(new ForwardMeteringPointDetails(_accountingPoint.Id.Value, businessProcessId.Value, _transaction.Value)).ConfigureAwait(false);
+            await _mediator.Send(new ForwardConsumerDetails(_accountingPoint.Id.Value, businessProcessId.Value, _transaction.Value)).ConfigureAwait(false);
+            await _mediator.Send(new NotifyCurrentSupplier(_accountingPoint.Id.Value, businessProcessId.Value, _transaction.Value)).ConfigureAwait(false);
+        }
+
+        private async Task RequestChangeOfSupplierProcess()
+        {
+            await SetConsumerMovedIn().ConfigureAwait(false);
+            await RequestChangeOfSupplier().ConfigureAwait(false);
+        }
+
+        private async Task RequestChangeOfSupplier()
+        {
+            await _mediator.Send(new RequestChangeOfSupplier(
                 _transaction.Value,
                 _glnNumber,
                 _consumer.CprNumber?.Value ?? throw new InvalidOperationException("CprNumber was supposed to have a value"),
                 string.Empty,
                 _accountingPoint.GsrnNumber.Value,
                 Instant.FromDateTimeUtc(DateTime.UtcNow.AddHours(1)).ToString())).ConfigureAwait(false);
+        }
 
-            var businessProcessId = GetBusinessProcessId(_transaction);
-
-            await Mediator.Send(new ForwardMeteringPointDetails(_accountingPoint.Id.Value, businessProcessId.Value, _transaction.Value)).ConfigureAwait(false);
-            await Mediator.Send(new ForwardConsumerDetails(_accountingPoint.Id.Value, businessProcessId.Value, _transaction.Value)).ConfigureAwait(false);
-            await Mediator.Send(new NotifyCurrentSupplier(_accountingPoint.Id.Value, businessProcessId.Value, _transaction.Value)).ConfigureAwait(false);
+        private async Task SetConsumerMovedIn()
+        {
+            SetConsumerMovedIn(_accountingPoint, _consumer.ConsumerId, _energySupplier.EnergySupplierId);
+            await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
         }
     }
 }
