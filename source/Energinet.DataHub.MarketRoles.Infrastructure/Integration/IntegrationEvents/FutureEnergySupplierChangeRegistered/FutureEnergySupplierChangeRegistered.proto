@@ -22,7 +22,7 @@ option csharp_namespace = "Energinet.DataHub.MarketRoles.IntegrationEventContrac
  * This message is sent out when an energy supplier has been changed.
  */
 
-message EnergySupplierChangeRegistered {
+message FutureEnergySupplierChangeRegistered {
   string accountingpoint_id = 1;
   string gsrn_number = 2; // Unique metering point identification
   string energy_supplier_gln = 3; // Unique Energy Supplier identifcation.

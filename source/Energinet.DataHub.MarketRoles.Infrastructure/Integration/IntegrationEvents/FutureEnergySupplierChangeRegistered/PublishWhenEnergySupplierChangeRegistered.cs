@@ -21,7 +21,7 @@ using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 using MediatR;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChangeRegistered
+namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.FutureEnergySupplierChangeRegistered
 {
     public class
         PublishWhenEnergySupplierChangeRegistered : INotificationHandler<
@@ -50,7 +50,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEv
 
             var supplierGlnNumber = await GetSupplierGlnNumberAsync(notification.EnergySupplierId)
                 .ConfigureAwait(false);
-            var integrationEvent = new EnergySupplierChangeRegisteredIntegrationEvent(
+            var integrationEvent = new FutureEnergySupplierChangeRegisteredIntegrationEvent(
                 notification.AccountingPointId.Value,
                 notification.GsrnNumber.Value,
                 supplierGlnNumber,

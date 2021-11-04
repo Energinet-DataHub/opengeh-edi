@@ -25,7 +25,7 @@ using Energinet.DataHub.MarketRoles.Domain.EnergySuppliers;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChange;
-using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChangeRegistered;
+using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.FutureEnergySupplierChangeRegistered;
 using MediatR;
 using Microsoft.Data.SqlClient;
 using NodaTime;
@@ -39,6 +39,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
     {
         private readonly AccountingPoint _accountingPoint;
         private readonly EnergySupplier _energySupplier;
+        private readonly EnergySupplier _newEnergySupplier;
         private readonly Consumer _consumer;
         private readonly IMediator _mediator;
 
@@ -49,8 +50,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
             : base(databaseFixture)
         {
             _accountingPoint = CreateAccountingPoint();
-            _energySupplier = CreateEnergySupplier();
-            CreateEnergySupplier(Guid.NewGuid(), _glnNumber);
+            _energySupplier = CreateEnergySupplier(Guid.NewGuid(), SampleData.GsrnNumber);
+            _newEnergySupplier = CreateEnergySupplier(Guid.NewGuid(), _glnNumber);
             _consumer = CreateConsumer();
             _mediator = GetService<IMediator>();
         }
@@ -75,13 +76,12 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
         }
 
         [Fact]
-        public async Task RequestChangeOfSupplier_IsSuccessful_IntegrationEventsIsPublished()
+        public async Task RequestChangeOfSupplier_IsSuccessful_FutureSupplier_IntegrationEventsIsPublished()
         {
             _transaction = CreateTransaction();
-            await RequestChangeOfSupplierProcess().ConfigureAwait(false);
+            await RequestFutureChangeOfSupplierProcess().ConfigureAwait(false);
 
-            AssertOutboxMessage<EnergySupplierChangedIntegrationEvent>();
-            AssertOutboxMessage<EnergySupplierChangeRegisteredIntegrationEvent>();
+            AssertOutboxMessage<FutureEnergySupplierChangeRegisteredIntegrationEvent>();
         }
 
         private async Task SimulateProcess()
@@ -98,10 +98,10 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
             await _mediator.Send(new NotifyCurrentSupplier(_accountingPoint.Id.Value, businessProcessId.Value, _transaction.Value)).ConfigureAwait(false);
         }
 
-        private async Task RequestChangeOfSupplierProcess()
+        private async Task RequestFutureChangeOfSupplierProcess()
         {
             await SetConsumerMovedIn().ConfigureAwait(false);
-            await RequestChangeOfSupplier().ConfigureAwait(false);
+            await RequestChangeOfSupplierInFuture().ConfigureAwait(false);
         }
 
         private async Task RequestChangeOfSupplier()
@@ -113,6 +113,17 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
                 string.Empty,
                 _accountingPoint.GsrnNumber.Value,
                 Instant.FromDateTimeUtc(DateTime.UtcNow.AddHours(1)).ToString())).ConfigureAwait(false);
+        }
+
+        private async Task RequestChangeOfSupplierInFuture()
+        {
+            await _mediator.Send(new RequestChangeOfSupplier(
+                _transaction.Value,
+                _newEnergySupplier.GlnNumber.Value,
+                _consumer.CprNumber?.Value ?? throw new InvalidOperationException("CprNumber was supposed to have a value"),
+                string.Empty,
+                _accountingPoint.GsrnNumber.Value,
+                Instant.FromDateTimeUtc(DateTime.UtcNow.AddHours(80)).ToString())).ConfigureAwait(false);
         }
 
         private async Task SetConsumerMovedIn()

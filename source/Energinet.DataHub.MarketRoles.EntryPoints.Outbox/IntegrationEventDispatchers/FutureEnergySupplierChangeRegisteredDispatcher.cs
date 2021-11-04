@@ -16,17 +16,16 @@ using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events;
 using Energinet.DataHub.MarketRoles.EntryPoints.Outbox.Common;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration;
-using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChange;
-using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChangeRegistered;
+using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.FutureEnergySupplierChangeRegistered;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox.IntegrationEventDispatchers
 {
-    public class EnergySupplierChangeRegisteredDispatcher : IntegrationEventDispatcher<EnergySupplierChangeRegisteredTopic, EnergySupplierChangeRegisteredIntegrationEvent>
+    public class FutureEnergySupplierChangeRegisteredDispatcher : IntegrationEventDispatcher<FutureEnergySupplierChangeRegisteredTopic, FutureEnergySupplierChangeRegisteredIntegrationEvent>
     {
-        public EnergySupplierChangeRegisteredDispatcher(
-            ITopicSender<EnergySupplierChangeRegisteredTopic> topicSender,
-            ProtobufOutboundMapper<EnergySupplierChangeRegisteredIntegrationEvent> mapper,
+        public FutureEnergySupplierChangeRegisteredDispatcher(
+            ITopicSender<FutureEnergySupplierChangeRegisteredTopic> topicSender,
+            ProtobufOutboundMapper<FutureEnergySupplierChangeRegisteredIntegrationEvent> mapper,
             IIntegrationEventMessageFactory integrationEventMessageFactory,
             IIntegrationMetadataContext integrationMetadataContext)
             : base(topicSender, mapper, integrationEventMessageFactory, integrationMetadataContext)

@@ -12,7 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChangeRegistered
+using System;
+using Energinet.DataHub.MarketRoles.Application.Common.Transport;
+using MediatR;
+using NodaTime;
+
+namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.FutureEnergySupplierChangeRegistered
 {
-    public record EnergySupplierChangeRegisteredTopic(string Name) : Topic;
+    public record FutureEnergySupplierChangeRegisteredIntegrationEvent(
+            Guid AccountingPointId,
+            string GsrnNumber,
+            string EnergySupplierGln,
+            Instant EffectiveDate)
+        : IIntegrationEvent, IRequest, IOutboundMessage;
 }

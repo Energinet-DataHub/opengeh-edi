@@ -17,14 +17,14 @@ using Energinet.DataHub.MarketRoles.Infrastructure.Integration.Helpers;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
 using Google.Protobuf;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChangeRegistered
+namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.FutureEnergySupplierChangeRegistered
 {
-    public class EnergySupplierChangeRegisteredOutBoundMapper : ProtobufOutboundMapper<EnergySupplierChangeRegisteredIntegrationEvent>
+    public class FutureEnergySupplierChangeRegisteredOutBoundMapper : ProtobufOutboundMapper<FutureEnergySupplierChangeRegisteredIntegrationEvent>
     {
-        protected override IMessage Convert(EnergySupplierChangeRegisteredIntegrationEvent obj)
+        protected override IMessage Convert(FutureEnergySupplierChangeRegisteredIntegrationEvent obj)
         {
             if (obj == null) throw new ArgumentException(null, nameof(obj));
-            return new IntegrationEventContracts.EnergySupplierChangeRegistered
+            return new IntegrationEventContracts.FutureEnergySupplierChangeRegistered
             {
                 AccountingpointId = obj.AccountingPointId.ToString(),
                 EnergySupplierGln = obj.EnergySupplierGln,
