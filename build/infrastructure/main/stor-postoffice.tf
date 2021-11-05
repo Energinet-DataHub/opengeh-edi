@@ -12,17 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 module "stor_postoffice" {
-    source = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//storage-account?ref=1.7.0"
-    name = "stor${var.project}tmp${var.environment}"
-    resource_group_name = data.azurerm_resource_group.main.name
-    location = data.azurerm_resource_group.main.location
-    account_replication_type = "LRS"
-    account_tier = "Standard"
-    tags = data.azurerm_resource_group.main.tags
+    source                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/storage-account?ref=5.1.0"
+
+    name                      = "tmp"
+    resource_group_name       = data.azurerm_resource_group.this.name
+    location                  = data.azurerm_resource_group.this.location
+    account_replication_type  = "LRS"
+    account_tier              = "Standard"
+    
+    tags = data.azurerm_resource_group.this.tags
 }
 
 resource "azurerm_storage_share" "postoffice" {
-  name                 = "temppostoffice"
-  storage_account_name = module.stor_postoffice.name
-  quota                = 50
+  name                        = "temppostoffice"
+  storage_account_name        = module.stor_postoffice.name
+  quota                       = 50
 }

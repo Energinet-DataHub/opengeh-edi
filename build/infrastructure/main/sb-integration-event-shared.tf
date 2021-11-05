@@ -13,13 +13,13 @@
 # limitations under the License.
 
 # Reference to get the listener connection string from the shared integration event service bus
-data "azurerm_key_vault_secret" "INTEGRATION_EVENTS_LISTENER_CONNECTION_STRING" {
+data "azurerm_key_vault_secret" "integration_events_listener_connection_string" {
   name         = "INTEGRATION-EVENTS-LISTENER-CONNECTION-STRING"
   key_vault_id = data.azurerm_key_vault.kv_sharedresources.id
 }
 
 # Reference to get the sender connection string from the shared integration event service bus
-data "azurerm_key_vault_secret" "INTEGRATION_EVENTS_SENDER_CONNECTION_STRING" {
+data "azurerm_key_vault_secret" "integration_events_sender_connection_string" {
   name         = "INTEGRATION-EVENTS-SENDER-CONNECTION-STRING"
   key_vault_id = data.azurerm_key_vault.kv_sharedresources.id
 }

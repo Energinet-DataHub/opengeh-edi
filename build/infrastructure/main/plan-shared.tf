@@ -11,22 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+module "plan_shared" {
+  source                = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/app-service-plan?ref=5.1.0"
 
-data "azurerm_sql_server" "sqlsrv" {
-  name                = var.sharedresources_sql_server_name
-  resource_group_name = data.azurerm_resource_group.shared_resources.name
-}
-
-module "sqldb_marketroles" {
-  source                = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/sql-database?ref=5.1.0"
-
-  name                  = "marketroles"
+  name                  = "shared"
   project_name          = var.project_name
   environment_short     = var.environment_short
   environment_instance  = var.environment_instance
-  resource_group_name   = data.azurerm_resource_group.shared_resources.name
-  location              = data.azurerm_resource_group.shared_resources.location  
-  server_name           = data.azurerm_sql_server.sqlsrv.name
-  
-  tags                  = data.azurerm_resource_group.shared_resources.tags
+  resource_group_name   = data.azurerm_resource_group.this.name
+  location              = data.azurerm_resource_group.this.location
+  kind                  = "FunctionApp"
+  sku                   = {
+    tier  = "Basic"
+    size  = "B1"
+  }
+
+  tags                  = data.azurerm_resource_group.this.tags
 }

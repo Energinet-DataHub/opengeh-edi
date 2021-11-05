@@ -17,26 +17,26 @@ data "azurerm_key_vault" "kv_sharedresources" {
   resource_group_name = var.sharedresources_resource_group_name
 }
 
-data "azurerm_key_vault_secret" "POST_OFFICE_QUEUE_CONNECTION_STRING" {
-  name         = "POST-OFFICE-QUEUE-CONNECTION-STRING"
+data "azurerm_key_vault_secret" "sql_admin_name" {
+  name         = "sql-data-admin-user-name"
   key_vault_id = data.azurerm_key_vault.kv_sharedresources.id
 }
 
-data "azurerm_key_vault_secret" "SHARED_RESOURCES_DB_ADMIN_NAME" {
-  name         = "SHARED-RESOURCES-DB-ADMIN-NAME"
+data "azurerm_key_vault_secret" "sql_admin_password" {
+  name         = "sql-data-admin-user-password"
+  key_vault_id = data.azurerm_key_vault.kv_sharedresources.id
+}
+data "azurerm_key_vault_secret" "sql_url" {
+  name         = "sql-data-url"
   key_vault_id = data.azurerm_key_vault.kv_sharedresources.id
 }
 
-data "azurerm_key_vault_secret" "SHARED_RESOURCES_DB_ADMIN_PASSWORD" {
-  name         = "SHARED-RESOURCES-DB-ADMIN-PASSWORD"
-  key_vault_id = data.azurerm_key_vault.kv_sharedresources.id
-}
-data "azurerm_key_vault_secret" "SHARED_RESOURCES_DB_URL" {
-  name         = "SHARED-RESOURCES-DB-URL"
+data "azurerm_key_vault_secret" "sbq-event_forwarded_queue" {
+  name         = "sbq-market-roles-forward-name"
   key_vault_id = data.azurerm_key_vault.kv_sharedresources.id
 }
 
-data "azurerm_key_vault_secret" "SHARED_RESOURCES_EVENT_FORWARDED_QUEUE" {
-  name         = "MARKET-ROLES-FORWARDED-QUEUE-NAME"
+data "azurerm_key_vault_secret" "appi_instrumentation_key" {
+  name         = "appi-shared-instrumentation-key"
   key_vault_id = data.azurerm_key_vault.kv_sharedresources.id
 }
