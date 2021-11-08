@@ -25,14 +25,14 @@ module "func_ingestion" {
   always_on                                 = true
   app_settings                              = {
     # Region: Default Values
-    WEBSITE_ENABLE_SYNC_UPDATE_SITE       = true
-    WEBSITE_RUN_FROM_PACKAGE              = 1
-    WEBSITES_ENABLE_APP_SERVICE_STORAGE   = true
-    FUNCTIONS_WORKER_RUNTIME              = "dotnet-isolated"
+    WEBSITE_ENABLE_SYNC_UPDATE_SITE         = true
+    WEBSITE_RUN_FROM_PACKAGE                = 1
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE     = true
+    FUNCTIONS_WORKER_RUNTIME                = "dotnet-isolated"
     # Endregion: Default Values
-    MARKET_DATA_QUEUE_URL                 = "${module.sb_marketroles.name}.servicebus.windows.net:9093"
-    MARKET_DATA_QUEUE_CONNECTION_STRING   = module.sb_marketroles.primary_connection_strings["send"]
-    MARKET_DATA_QUEUE_TOPIC_NAME          = module.sbq_marketroles.name
+    MARKET_DATA_QUEUE_URL                   = "${module.sb_marketroles.name}.servicebus.windows.net:9093"
+    MARKET_DATA_QUEUE_CONNECTION_STRING     = module.sb_marketroles.primary_connection_strings["send"]
+    MARKET_DATA_QUEUE_TOPIC_NAME            = module.sbq_marketroles.name
   }
   
   tags                                      = data.azurerm_resource_group.this.tags

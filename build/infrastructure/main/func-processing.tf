@@ -25,17 +25,17 @@ module "func_processing" {
   always_on                                 = true
   app_settings                              = {
     # Region: Default Values
-    WEBSITE_ENABLE_SYNC_UPDATE_SITE       = true
-    WEBSITE_RUN_FROM_PACKAGE              = 1
-    WEBSITES_ENABLE_APP_SERVICE_STORAGE   = true
-    FUNCTIONS_WORKER_RUNTIME              = "dotnet-isolated"
+    WEBSITE_ENABLE_SYNC_UPDATE_SITE         = true
+    WEBSITE_RUN_FROM_PACKAGE                = 1
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE     = true
+    FUNCTIONS_WORKER_RUNTIME                = "dotnet-isolated"
     # Endregion: Default Values
-    MARKET_DATA_QUEUE_URL                 = "${module.sb_marketroles.name}.servicebus.windows.net:9093"
-    MARKET_DATA_QUEUE_CONNECTION_STRING   = module.sb_marketroles.primary_connection_strings["listen"]
-    MARKET_DATA_DB_CONNECTION_STRING      = local.MARKETROLES_CONNECTION_STRING
-    MARKET_DATA_QUEUE_TOPIC_NAME          = module.sbq_marketroles.name
-    INTEGRATION_EVENT_QUEUE               = data.azurerm_key_vault_secret.sbq-event_forwarded_queue.value
-    INTEGRATION_EVENT_QUEUE_CONNECTION    = data.azurerm_key_vault_secret.integration_events_listener_connection_string.value
+    MARKET_DATA_QUEUE_URL                   = "${module.sb_marketroles.name}.servicebus.windows.net:9093"
+    MARKET_DATA_QUEUE_CONNECTION_STRING     = module.sb_marketroles.primary_connection_strings["listen"]
+    MARKET_DATA_DB_CONNECTION_STRING        = local.MARKETROLES_CONNECTION_STRING
+    MARKET_DATA_QUEUE_TOPIC_NAME            = module.sbq_marketroles.name
+    INTEGRATION_EVENT_QUEUE                 = data.azurerm_key_vault_secret.sbq-event_forwarded_queue.value
+    INTEGRATION_EVENT_QUEUE_CONNECTION      = data.azurerm_key_vault_secret.integration_events_listener_connection_string.value
   }
   
   tags                                      = data.azurerm_resource_group.this.tags
