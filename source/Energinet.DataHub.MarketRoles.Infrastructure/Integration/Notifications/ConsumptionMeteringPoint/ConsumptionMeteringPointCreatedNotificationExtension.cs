@@ -13,24 +13,21 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketRoles.Application.AccountingPoint;
-using Energinet.DataHub.MarketRoles.Application.Common.Transport;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
-using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
+using NotificationContracts;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.Notifications.ConsumptionMeteringPoint
 {
-    public class ConsumptionMeteringPointCreatedInboundMapper : ProtobufInboundMapper<NotificationContracts.ConsumptionMeteringPointCreated>
+    internal static class ConsumptionMeteringPointCreatedNotificationExtension
     {
-        protected override IInboundMessage Convert(NotificationContracts.ConsumptionMeteringPointCreated obj)
+        public static PhysicalState GetConnectionState(
+            this NotificationContracts.ConsumptionMeteringPointCreated @notification)
         {
-            if (obj == null) throw new ArgumentNullException(nameof(obj));
-
-            return new ConsumptionMeteringPointCreated(
-            obj.MeteringPointId,
-            MeteringPointType.Consumption.ToString(),
-            obj.GsrnNumber,
-            obj.GetConnectionState().ToString());
+            return @notification.ConnectionState switch
+            {
+                ConsumptionMeteringPointCreated.Types.ConnectionState.CsNew => PhysicalState.New,
+                _ => throw new ArgumentException("Connection state is not recognized."),
+            };
         }
     }
 }
