@@ -16,5 +16,5 @@ data "azurerm_resource_group" "this" {
 }
 
 data "azurerm_resource_group" "shared_resources" {
-  name = var.sharedresources_resource_group_name
+  name = var.shared_resources_resource_group_name
 }

@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-module "stor_postoffice" {
+module "st_postoffice" {
     source                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/storage-account?ref=5.1.0"
 
     name                      = "tmp"
@@ -28,6 +28,6 @@ module "stor_postoffice" {
 
 resource "azurerm_storage_share" "postoffice" {
   name                        = "temppostoffice"
-  storage_account_name        = module.stor_postoffice.name
+  storage_account_name        = module.st_postoffice.name
   quota                       = 50
 }

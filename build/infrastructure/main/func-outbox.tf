@@ -34,10 +34,10 @@ module "func_outbox" {
     MARKET_DATA_QUEUE_TOPIC_NAME                                  = module.sbq_marketroles.name
     ACTOR_MESSAGE_DISPATCH_TRIGGER_TIMER                          = "*/10 * * * * *"
     EVENT_MESSAGE_DISPATCH_TRIGGER_TIMER                          = "*/10 * * * * *"
-    SHARED_INTEGRATION_EVENT_SERVICE_BUS_SENDER_CONNECTION_STRING = data.azurerm_key_vault_secret.integration_events_sender_connection_string.value
+    SHARED_INTEGRATION_EVENT_SERVICE_BUS_SENDER_CONNECTION_STRING = data.azurerm_key_vault_secret.sb_domain_relay_sender_connection_string.value
     ENERGY_SUPPLIER_CHANGED_TOPIC                                 = "energy-supplier-changed"
     ENERGY_SUPPLIER_CHANGE_REGISTERED_TOPIC                       = "energy-supplier-change-registered"
-    TEMP_POST_OFFICE_CONNECTION_STRING                            = module.stor_postoffice.primary_connection_string
+    TEMP_POST_OFFICE_CONNECTION_STRING                            = module.st_postoffice.primary_connection_string
     TEMP_POST_OFFICE_SHARE                                        = azurerm_storage_share.postoffice.name
   }
   

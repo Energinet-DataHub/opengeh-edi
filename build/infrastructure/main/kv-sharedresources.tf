@@ -12,31 +12,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-data "azurerm_key_vault" "kv_sharedresources" {
-  name                = var.sharedresources_keyvault_name
-  resource_group_name = var.sharedresources_resource_group_name
+data "azurerm_key_vault" "kv_shared_resources" {
+  name                = var.shared_resources_keyvault_name
+  resource_group_name = var.shared_resources_resource_group_name
 }
 
 data "azurerm_key_vault_secret" "sql_admin_name" {
   name         = "sql-data-admin-user-name"
-  key_vault_id = data.azurerm_key_vault.kv_sharedresources.id
+  key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }
 
 data "azurerm_key_vault_secret" "sql_admin_password" {
   name         = "sql-data-admin-user-password"
-  key_vault_id = data.azurerm_key_vault.kv_sharedresources.id
+  key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }
 data "azurerm_key_vault_secret" "sql_url" {
   name         = "sql-data-url"
-  key_vault_id = data.azurerm_key_vault.kv_sharedresources.id
+  key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }
 
 data "azurerm_key_vault_secret" "sbq-event_forwarded_queue" {
   name         = "sbq-market-roles-forward-name"
-  key_vault_id = data.azurerm_key_vault.kv_sharedresources.id
+  key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }
 
 data "azurerm_key_vault_secret" "appi_instrumentation_key" {
   name         = "appi-shared-instrumentation-key"
-  key_vault_id = data.azurerm_key_vault.kv_sharedresources.id
+  key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }

@@ -34,17 +34,17 @@ variable project_name {
   description   = "Name of the project this infrastructure is a part of."
 }
 
-variable "sharedresources_keyvault_name" {
+variable "shared_resources_keyvault_name" {
   type          = string
   description   = "Name of the Core Key Vault, that contains shared secrets"
 }
 
-variable "sharedresources_resource_group_name" {
+variable "shared_resources_resource_group_name" {
   type          = string
   description   = "Resource group name of the Core Key Vaults location"
 }
   
-variable "sharedresources_sql_server_name" {
+variable "shared_resources_sql_server_name" {
   type          = string
   description   = "Name of the SQL server"
 }
