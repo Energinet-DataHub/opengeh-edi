@@ -15,6 +15,9 @@ module "stor_postoffice" {
     source                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/storage-account?ref=5.1.0"
 
     name                      = "tmp"
+    project_name              = var.project_name
+    environment_short         = var.environment_short
+    environment_instance      = var.environment_instance
     resource_group_name       = data.azurerm_resource_group.this.name
     location                  = data.azurerm_resource_group.this.location
     account_replication_type  = "LRS"

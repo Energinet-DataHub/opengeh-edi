@@ -30,10 +30,10 @@ module "func_internalcommanddispatcher" {
     WEBSITES_ENABLE_APP_SERVICE_STORAGE   = true
     FUNCTIONS_WORKER_RUNTIME              = "dotnet-isolated"
     # Endregion: Default Values
-    "MARKETROLES_QUEUE_CONNECTION_STRING": module.sbnar_marketroles_sender.primary_connection_string
-    "MARKETROLES_QUEUE_NAME": module.sbq_marketroles.name
-    "MARKETROLES_CONNECTION_STRING": local.MARKETROLES_CONNECTION_STRING
-    "DISPATCH_TRIGGER_TIMER": "*/10 * * * * *"    
+    "MARKETROLES_QUEUE_CONNECTION_STRING" = module.sb_marketroles.primary_connection_strings["send"]
+    "MARKETROLES_QUEUE_NAME"              = module.sbq_marketroles.name
+    "MARKETROLES_CONNECTION_STRING"       = local.MARKETROLES_CONNECTION_STRING
+    "DISPATCH_TRIGGER_TIMER"              = "*/10 * * * * *"    
   }
   
   tags                                      = data.azurerm_resource_group.this.tags

@@ -30,8 +30,8 @@ module "func_ingestion" {
     WEBSITES_ENABLE_APP_SERVICE_STORAGE   = true
     FUNCTIONS_WORKER_RUNTIME              = "dotnet-isolated"
     # Endregion: Default Values
-    MARKET_DATA_QUEUE_URL                 = "${module.sbn_marketroles.name}.servicebus.windows.net:9093"
-    MARKET_DATA_QUEUE_CONNECTION_STRING   = module.sbnar_marketroles_sender.primary_connection_string
+    MARKET_DATA_QUEUE_URL                 = "${module.sb_marketroles.name}.servicebus.windows.net:9093"
+    MARKET_DATA_QUEUE_CONNECTION_STRING   = module.sb_marketroles.primary_connection_strings["send"]
     MARKET_DATA_QUEUE_TOPIC_NAME          = module.sbq_marketroles.name
   }
   

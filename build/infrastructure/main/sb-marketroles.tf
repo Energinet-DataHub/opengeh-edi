@@ -11,37 +11,34 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-module "sbn_marketroles" {
-  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//service-bus-namespace?ref=1.7.0"
-  name                = "sbn-${var.project}-${var.organisation}-${var.environment}"
-  resource_group_name = data.azurerm_resource_group.this.name
-  location            = data.azurerm_resource_group.this.location
-  sku                 = "basic"
-  tags                = data.azurerm_resource_group.this.tags
+module "sb_marketroles" {
+  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/service-bus-namespace?ref=5.1.0"
+
+  name                  = "marketroles"
+  project_name          = var.project_name
+  environment_short     = var.environment_short
+  environment_instance  = var.environment_instance
+  resource_group_name   = data.azurerm_resource_group.this.name
+  location              = data.azurerm_resource_group.this.location
+  sku                   = "basic"
+  auth_rules            = [
+    {
+      name    = "listen",
+      listen  = true
+    },
+    {
+      name    = "send",
+      send    = true
+    },
+  ]
+
+  tags                  = data.azurerm_resource_group.this.tags
 }
 
 module "sbq_marketroles" {
-  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//service-bus-queue?ref=1.7.0"
-  name                = "sbq-marketroles"
-  namespace_name      = module.sbn_marketroles.name
+  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/service-bus-queue?ref=5.1.0"
+
+  name                = "marketroles"
+  namespace_name      = module.sb_marketroles.name
   resource_group_name = data.azurerm_resource_group.this.name
-  dependencies        = [module.sbn_marketroles]
-}
-
-module "sbnar_marketroles_listener" {
-  source                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//service-bus-namespace-auth-rule?ref=1.7.0"
-  name                      = "sbnar-marketroles-listener"
-  namespace_name            = module.sbn_marketroles.name
-  resource_group_name       = data.azurerm_resource_group.this.name
-  listen                    = true
-  dependencies              = [module.sbq_marketroles]
-}
-
-module "sbnar_marketroles_sender" {
-  source                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//service-bus-namespace-auth-rule?ref=1.7.0"
-  name                      = "sbnar-marketroles-sender"
-  namespace_name            = module.sbn_marketroles.name
-  resource_group_name       = data.azurerm_resource_group.this.name
-  send                      = true
-  dependencies              = [module.sbq_marketroles]
 }
