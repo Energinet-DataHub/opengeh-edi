@@ -18,8 +18,8 @@ module "func_outbox" {
   project_name                              = var.project_name
   environment_short                         = var.environment_short
   environment_instance                      = var.environment_instance
-  resource_group_name                       = data.azurerm_resource_group.this.name
-  location                                  = data.azurerm_resource_group.this.location
+  resource_group_name                       = azurerm_resource_group.this.name
+  location                                  = azurerm_resource_group.this.location
   app_service_plan_id                       = module.plan_shared.id
   application_insights_instrumentation_key  = data.azurerm_key_vault_secret.appi_instrumentation_key.value
   always_on                                 = true
@@ -41,5 +41,5 @@ module "func_outbox" {
     TEMP_POST_OFFICE_SHARE                                        = azurerm_storage_share.postoffice.name
   }
   
-  tags                                      = data.azurerm_resource_group.this.tags
+  tags                                      = azurerm_resource_group.this.tags
 }

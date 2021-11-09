@@ -18,13 +18,13 @@ module "plan_shared" {
   project_name          = var.project_name
   environment_short     = var.environment_short
   environment_instance  = var.environment_instance
-  resource_group_name   = data.azurerm_resource_group.this.name
-  location              = data.azurerm_resource_group.this.location
+  resource_group_name   = azurerm_resource_group.this.name
+  location              = azurerm_resource_group.this.location
   kind                  = "FunctionApp"
   sku                   = {
     tier  = "Basic"
     size  = "B1"
   }
 
-  tags                  = data.azurerm_resource_group.this.tags
+  tags                  = azurerm_resource_group.this.tags
 }

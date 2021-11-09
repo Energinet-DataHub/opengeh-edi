@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 module "sb_marketroles" {
-  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/service-bus-namespace?ref=5.1.0"
+  source                = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/service-bus-namespace?ref=5.1.0"
 
   name                  = "marketroles"
   project_name          = var.project_name
   environment_short     = var.environment_short
   environment_instance  = var.environment_instance
-  resource_group_name   = data.azurerm_resource_group.this.name
-  location              = data.azurerm_resource_group.this.location
+  resource_group_name   = azurerm_resource_group.this.name
+  location              = azurerm_resource_group.this.location
   sku                   = "basic"
   auth_rules            = [
     {
@@ -32,7 +32,7 @@ module "sb_marketroles" {
     },
   ]
 
-  tags                  = data.azurerm_resource_group.this.tags
+  tags                  = azurerm_resource_group.this.tags
 }
 
 module "sbq_marketroles" {
@@ -40,5 +40,5 @@ module "sbq_marketroles" {
 
   name                = "marketroles"
   namespace_name      = module.sb_marketroles.name
-  resource_group_name = data.azurerm_resource_group.this.name
+  resource_group_name = azurerm_resource_group.this.name
 }
