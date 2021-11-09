@@ -17,7 +17,6 @@ on:
   push:
     branches:
       - main
-      - djorgensen/new-sub
 
 jobs:
   publish_release:

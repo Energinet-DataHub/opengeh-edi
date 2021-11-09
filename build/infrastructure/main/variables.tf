@@ -21,6 +21,7 @@ variable resource_group_name {
   description = "Resource Group that the infrastructure code is deployed into."
 }
 
+
 variable environment_short {
   type          = string
   description   = "1 character name of the enviroment that the infrastructure code is deployed into."
@@ -44,9 +45,4 @@ variable "shared_resources_keyvault_name" {
 variable "shared_resources_resource_group_name" {
   type          = string
   description   = "Resource group name of the Core Key Vaults location"
-}
-  
-variable "shared_resources_sql_server_name" {
-  type          = string
-  description   = "Name of the SQL server"
 }
