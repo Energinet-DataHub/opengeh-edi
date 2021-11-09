@@ -11,36 +11,38 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-variable "resource_group_name" {
-  type = string
+variable subscription_id {
+  type        = string
+  description = "Subscription that the infrastructure code is deployed into."
 }
 
-variable "environment" {
-  type          = string
-  description   = "Enviroment that the infrastructure code is deployed into"
+variable resource_group_name {
+  type        = string
+  description = "Resource Group that the infrastructure code is deployed into."
 }
 
-variable "project" {
+
+variable environment_short {
   type          = string
-  description   = "Project that is running the infrastructure code"
+  description   = "1 character name of the enviroment that the infrastructure code is deployed into."
 }
 
-variable "organisation" {
+variable environment_instance {
   type          = string
-  description   = "Organisation that is running the infrastructure code"
+  description   = "Enviroment instance that the infrastructure code is deployed into."
 }
 
-variable "sharedresources_keyvault_name" {
+variable domain_name_short {
   type          = string
-  description   = "Name of the Core keyvault, that contains shared secrets"
+  description   = "Shortest possible edition of the domain name."
 }
 
-variable "sharedresources_resource_group_name" {
+variable "shared_resources_keyvault_name" {
   type          = string
-  description   = "Resource group name of the Core keyvaults location"
+  description   = "Name of the Core Key Vault, that contains shared secrets"
 }
-  
-variable "sharedresources_sql_server_name" {
+
+variable "shared_resources_resource_group_name" {
   type          = string
-  description   = "Name of the SQL server"
+  description   = "Resource group name of the Core Key Vaults location"
 }
