@@ -1,4 +1,4 @@
-// Copyright 2020 Energinet DataHub A/S
+﻿// Copyright 2020 Energinet DataHub A/S
 //
 // Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using Energinet.DataHub.MarketRoles.Application.Common.Transport;
+using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
+using NodaTime;
+
 namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.Notifications.MeteringPointConnected
 {
-    public class MeteringPointConnectedInboundMapper
+    public class MeteringPointConnectedInboundMapper : ProtobufInboundMapper<NotificationContracts.MeteringPointConnected>
     {
+        protected override IInboundMessage Convert(NotificationContracts.MeteringPointConnected obj)
+        {
+            if (obj == null) throw new ArgumentNullException(nameof(obj));
+
+            return new Application.Connected.MeteringPointConnected(
+                obj.MeteringpointId,
+                obj.GsrnNumber,
+                Instant.FromUnixTimeSeconds(obj.EffectiveDate.Seconds));
+        }
     }
 }
