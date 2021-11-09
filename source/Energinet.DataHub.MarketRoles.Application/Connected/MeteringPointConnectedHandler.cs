@@ -31,6 +31,7 @@ namespace Energinet.DataHub.MarketRoles.Application.Connected
 
         public async Task Handle(MeteringPointConnected notification, CancellationToken cancellationToken)
         {
+            if (notification == null) throw new ArgumentNullException(nameof(notification));
             var accountingPoint = await _accountingPointRepository.GetByIdAsync(
                 AccountingPointId.Create(Guid.Parse(notification.MeteringPointId))).ConfigureAwait(false);
             accountingPoint.Connect();
