@@ -11,34 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-module "sb_marketroles" {
-  source                = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/service-bus-namespace?ref=5.1.0"
+module "plan_shared" {
+  source                = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/app-service-plan?ref=5.1.0"
 
-  name                  = "marketroles"
+  name                  = "shared"
   project_name          = var.domain_name_short
   environment_short     = var.environment_short
   environment_instance  = var.environment_instance
   resource_group_name   = azurerm_resource_group.this.name
   location              = azurerm_resource_group.this.location
-  sku                   = "basic"
-  auth_rules            = [
-    {
-      name    = "listen",
-      listen  = true
-    },
-    {
-      name    = "send",
-      send    = true
-    },
-  ]
+  kind                  = "FunctionApp"
+  sku                   = {
+    tier  = "Basic"
+    size  = "B1"
+  }
 
   tags                  = azurerm_resource_group.this.tags
-}
-
-module "sbq_marketroles" {
-  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/service-bus-queue?ref=5.1.0"
-
-  name                = "marketroles"
-  namespace_name      = module.sb_marketroles.name
-  resource_group_name = azurerm_resource_group.this.name
 }

@@ -11,17 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 data "azurerm_sql_server" "sqlsrv" {
-  name                = var.sharedresources_sql_server_name
+  name                = data.azurerm_key_vault_secret.sql_data_name.value
   resource_group_name = data.azurerm_resource_group.shared_resources.name
 }
 
 module "sqldb_marketroles" {
-  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//sql-database?ref=1.7.0"
-  name                = "sqldb-${var.project}-${var.organisation}"
-  resource_group_name = data.azurerm_resource_group.shared_resources.name
-  location            = data.azurerm_resource_group.shared_resources.location
-  tags                = data.azurerm_resource_group.shared_resources.tags
-  server_name         = data.azurerm_sql_server.sqlsrv.name
+  source                = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/sql-database?ref=5.1.0"
+
+  name                  = "marketroles"
+  project_name          = var.domain_name_short
+  environment_short     = var.environment_short
+  environment_instance  = var.environment_instance
+  resource_group_name   = data.azurerm_resource_group.shared_resources.name
+  location              = data.azurerm_resource_group.shared_resources.location  
+  server_name           = data.azurerm_sql_server.sqlsrv.name
+  
+  tags                  = data.azurerm_resource_group.shared_resources.tags
 }

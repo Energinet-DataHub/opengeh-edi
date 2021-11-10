@@ -11,14 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-name: 'Azure Core Tools Install'
-description: 'Installs Azure Core Tools'
-runs:
-  using: "composite"
-  steps:
-    - run: |
-        wget -q https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb
-        sudo dpkg -i packages-microsoft-prod.deb
-        sudo apt-get update
-        sudo apt-get install azure-functions-core-tools-3
-      shell: bash
+resource "azurerm_resource_group" "this" {
+  name      = var.resource_group_name
+  location  = "West Europe"
+  tags      = data.azurerm_subscription.this.tags
+}
+
+data "azurerm_resource_group" "shared_resources" {
+  name = var.shared_resources_resource_group_name
+}
