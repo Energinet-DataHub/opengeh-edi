@@ -28,7 +28,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.Notifications
 
             return new Application.AccountingPoint.ProductionMeteringPointCreated(
                 obj.MeteringPointId,
-                MeteringPointType.Consumption.ToString(),
+                MeteringPointType.Production.ToString(),
                 obj.GsrnNumber,
                 obj.GetConnectionState().ToString());
         }
