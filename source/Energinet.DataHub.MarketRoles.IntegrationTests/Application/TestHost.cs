@@ -61,9 +61,13 @@ using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using FluentAssertions;
 using FluentValidation;
 using MediatR;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using NodaTime;
 using SimpleInjector;
 using SimpleInjector.Lifestyles;
@@ -149,6 +153,9 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
                     typeof(UnitOfWorkBehaviour<,>), typeof(InputValidationBehaviour<,>), typeof(BusinessProcessResponderBehaviour<,>), typeof(DomainEventsDispatcherBehaviour<,>),
                     typeof(InternalCommandHandlingBehaviour<,>),
                 });
+
+            _container.Register<ILogger>(() => NullLogger.Instance);
+            _container.Register(() => new TelemetryClient(new TelemetryConfiguration()), Lifestyle.Scoped);
 
             _container.Verify();
 
