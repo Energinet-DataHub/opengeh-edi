@@ -21,7 +21,7 @@ using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
 
-namespace Energinet.DataHub.MarketRoles.EntryPoints.Common
+namespace Energinet.DataHub.MarketRoles.EntryPoints.Common.Telemetry
 {
     public class EntryPointTelemetryScopeMiddleware : IFunctionsWorkerMiddleware
     {

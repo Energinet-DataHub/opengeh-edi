@@ -18,6 +18,7 @@ using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketRoles.Application.Common.Users;
 using Energinet.DataHub.MarketRoles.Contracts;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common;
+using Energinet.DataHub.MarketRoles.EntryPoints.Common.Telemetry;
 using Energinet.DataHub.MarketRoles.EntryPoints.Ingestion.Middleware;
 using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI.XmlConverter;
