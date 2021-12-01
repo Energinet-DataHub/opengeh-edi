@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChange;
+using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.FutureEnergySupplierChangeRegistered;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.Helpers
 {
@@ -24,6 +25,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.Helpers
         private static readonly Dictionary<string, Type> _types = new()
         {
             { typeof(EnergySupplierChangedIntegrationEvent).FullName!, typeof(EnergySupplierChangedIntegrationEvent) },
+            { typeof(FutureEnergySupplierChangeRegisteredIntegrationEvent).FullName!, typeof(FutureEnergySupplierChangeRegisteredIntegrationEvent) },
             { typeof(PostOfficeEnvelope).FullName!, typeof(PostOfficeEnvelope) },
         };
 
