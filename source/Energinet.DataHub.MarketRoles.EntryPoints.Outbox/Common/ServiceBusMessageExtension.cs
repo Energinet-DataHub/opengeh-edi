@@ -22,9 +22,9 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox.Common
     {
         private const string MessageTypeName = "MessageType";
         private const string MessageVersionName = "MessageVersion";
-        private const string TimeStampName = "Timestamp";
-        private const string CorrelationIdName = "CorrelationId";
-        private const string EventIdentifierName = "EventIdentifier";
+        private const string TimeStampName = "OperationTimestamp";
+        private const string CorrelationIdName = "OperationCorrelationId";
+        private const string EventIdentifierName = "EventIdentification";
 
         public static void EnrichMetadata(this ServiceBusMessage message, string messageType, int version)
         {
