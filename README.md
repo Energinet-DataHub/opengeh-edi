@@ -45,8 +45,6 @@ The market roles domain introduces the following roles into the Green Energy Hub
 - Metered data responsible
 - System Operator
 
-In the long term all these [roles](https://github.com/Energinet-DataHub/green-energy-hub/docs/dictionary-and-concepts/dictionary-market-participants.md) will be part of the Green Energy Hub
-
 ## Domain Roadmap
 
 In this program increment we are working on finishing the happy flow MVP for Change of energy supplier. This includes:
