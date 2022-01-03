@@ -21,7 +21,7 @@ on:
 
 jobs:
   ci_base:
-    uses: Energinet-DataHub/.github/.github/workflows/ci-base.yml@2.1.0
+    uses: Energinet-DataHub/.github/.github/workflows/ci-base.yml@2.6.1
   
   dotnet_solution_ci:
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@1.13.0
