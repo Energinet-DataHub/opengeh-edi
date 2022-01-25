@@ -16,3 +16,9 @@ output "marketroles_connection_string" {
   value = local.MARKETROLES_CONNECTION_STRING
   sensitive = true
 }
+
+output "ms_marketroles_connection_string" {
+  description = "Name of the database in the shared sql server"
+  value = local.MS_MARKETROLES_CONNECTION_STRING
+  sensitive = true
+}
