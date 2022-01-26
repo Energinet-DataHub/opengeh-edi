@@ -32,7 +32,7 @@ module "func_internalcommanddispatcher" {
     # Endregion: Default Values
     MARKETROLES_QUEUE_CONNECTION_STRING     = module.sb_marketroles.primary_connection_strings["send"]
     MARKETROLES_QUEUE_NAME                  = module.sbq_marketroles.name
-    MARKETROLES_CONNECTION_STRING           = local.MS_MARKETROLES_CONNECTION_STRING
+    MARKETROLES_CONNECTION_STRING           = local.MARKETROLES_CONNECTION_STRING
     DISPATCH_TRIGGER_TIMER                  = "*/10 * * * * *"    
   }
   

@@ -32,7 +32,7 @@ module "func_processing" {
     # Endregion: Default Values
     MARKET_DATA_QUEUE_URL                   = "${module.sb_marketroles.name}.servicebus.windows.net:9093"
     MARKET_DATA_QUEUE_CONNECTION_STRING     = module.sb_marketroles.primary_connection_strings["listen"]
-    MARKET_DATA_DB_CONNECTION_STRING        = local.MS_MARKETROLES_CONNECTION_STRING
+    MARKET_DATA_DB_CONNECTION_STRING        = local.MARKETROLES_CONNECTION_STRING
     MARKET_DATA_QUEUE_TOPIC_NAME            = module.sbq_marketroles.name
     INTEGRATION_EVENT_QUEUE                 = data.azurerm_key_vault_secret.sbq_event_forwarded_queue.value
     INTEGRATION_EVENT_QUEUE_CONNECTION      = data.azurerm_key_vault_secret.sb_domain_relay_listener_connection_string.value
