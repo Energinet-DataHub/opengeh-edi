@@ -12,15 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 module "sb_marketroles" {
-  source                = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/service-bus-namespace?ref=5.1.0"
+  source                          = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/service-bus-namespace?ref=6.0.0"
 
-  name                  = "marketroles"
-  project_name          = var.domain_name_short
-  environment_short     = var.environment_short
-  environment_instance  = var.environment_instance
-  resource_group_name   = azurerm_resource_group.this.name
-  location              = azurerm_resource_group.this.location
-  sku                   = "basic"
+  name                            = "marketroles"
+  project_name                    = var.domain_name_short
+  environment_short               = var.environment_short
+  environment_instance            = var.environment_instance
+  resource_group_name             = azurerm_resource_group.this.name
+  location                        = azurerm_resource_group.this.location
+  private_endpoint_subnet_id      = module.private_endpoints_subnet.id
+  private_dns_resource_group_name = data.azurerm_key_vault_secret.pdns_resouce_group_name
+
   auth_rules            = [
     {
       name    = "listen",
@@ -36,9 +38,8 @@ module "sb_marketroles" {
 }
 
 module "sbq_marketroles" {
-  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/service-bus-queue?ref=5.1.0"
+  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/service-bus-queue?ref=6.0.0"
 
   name                = "marketroles"
-  namespace_name      = module.sb_marketroles.name
-  resource_group_name = azurerm_resource_group.this.name
+  namespace_id        = module.sb_marketroles.id
 }
