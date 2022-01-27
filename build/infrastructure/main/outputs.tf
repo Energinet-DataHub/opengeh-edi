@@ -11,12 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-output "marketroles_connection_string" {
-  description = "Name of the database in the shared sql server"
-  value = local.MARKETROLES_CONNECTION_STRING
-  sensitive = true
-}
-
 output "ms_marketroles_connection_string" {
   description = "Name of the database in the shared sql server"
   value = local.MS_MARKETROLES_CONNECTION_STRING

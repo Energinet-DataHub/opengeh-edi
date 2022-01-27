@@ -30,7 +30,7 @@ module "func_outbox" {
     WEBSITES_ENABLE_APP_SERVICE_STORAGE                           = true
     FUNCTIONS_WORKER_RUNTIME                                      = "dotnet-isolated"
     # Endregion: Default Values
-    MARKETROLES_DB_CONNECTION_STRING                              = local.MARKETROLES_CONNECTION_STRING
+    MARKETROLES_DB_CONNECTION_STRING                              = local.MS_MARKETROLES_CONNECTION_STRING
     MARKET_DATA_QUEUE_TOPIC_NAME                                  = module.sbq_marketroles.name
     ACTOR_MESSAGE_DISPATCH_TRIGGER_TIMER                          = "*/10 * * * * *"
     EVENT_MESSAGE_DISPATCH_TRIGGER_TIMER                          = "*/10 * * * * *"
