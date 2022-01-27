@@ -21,7 +21,6 @@ variable resource_group_name {
   description = "Resource Group that the infrastructure code is deployed into."
 }
 
-
 variable environment_short {
   type          = string
   description   = "1 character name of the enviroment that the infrastructure code is deployed into."
