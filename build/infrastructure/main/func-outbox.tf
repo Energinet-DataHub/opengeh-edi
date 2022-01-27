@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 module "func_outbox" {
-  source                                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/function-app?ref=5.1.0"
+  source                                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/function-app?ref=6.0.0"
 
   name                                      = "outbox"
   project_name                              = var.domain_name_short
@@ -20,6 +20,9 @@ module "func_outbox" {
   environment_instance                      = var.environment_instance
   resource_group_name                       = azurerm_resource_group.this.name
   location                                  = azurerm_resource_group.this.location
+  vnet_integration_subnet_id                = module.vnet_integrations_functions.id
+  private_endpoint_subnet_id                = module.private_endpoints_subnet.id
+  private_dns_resource_group_name           = data.azurerm_key_vault_secret.pdns_resouce_group_name
   app_service_plan_id                       = module.plan_shared.id
   application_insights_instrumentation_key  = data.azurerm_key_vault_secret.appi_instrumentation_key.value
   always_on                                 = true
@@ -40,6 +43,6 @@ module "func_outbox" {
     TEMP_POST_OFFICE_CONNECTION_STRING                            = module.st_postoffice.primary_connection_string
     TEMP_POST_OFFICE_SHARE                                        = azurerm_storage_share.postoffice.name
   }
-  
+
   tags                                      = azurerm_resource_group.this.tags
 }

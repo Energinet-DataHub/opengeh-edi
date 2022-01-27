@@ -37,9 +37,9 @@ module "private_endpoints_subnet" {
   enforce_private_link_service_network_policies = true
 }
 
-module "vnet_integrations_functionhost" {
+module "vnet_integrations_functions" {
   source                                        = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/subnet?ref=6.0.0"
-  name                                          = "vnet-integrations-functionhost"
+  name                                          = "vnet-integrations-functions"
   project_name                                  = var.project_name
   environment_short                             = var.environment_short
   environment_instance                          = var.environment_instance
