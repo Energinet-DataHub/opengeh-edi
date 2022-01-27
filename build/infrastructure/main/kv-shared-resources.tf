@@ -37,25 +37,6 @@ data "azurerm_key_vault_secret" "mssql_data_url" {
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }
 
-data "azurerm_key_vault_secret" "sql_data_admin_name" {
-  name         = "sql-data-admin-user-name"
-  key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
-}
-
-data "azurerm_key_vault_secret" "sql_data_admin_password" {
-  name         = "sql-data-admin-user-password"
-  key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
-}
-data "azurerm_key_vault_secret" "sql_data_url" {
-  name         = "sql-data-url"
-  key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
-}
-
-data "azurerm_key_vault_secret" "sql_data_name" {
-  name         = "sql-data-name"
-  key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
-}
-
 data "azurerm_key_vault_secret" "sbq_event_forwarded_queue" {
   name         = "sbq-market-roles-forward-name"
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
