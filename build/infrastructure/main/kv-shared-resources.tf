@@ -58,16 +58,16 @@ data "azurerm_key_vault_secret" "sb_domain_relay_sender_connection_string" {
 }
 
 data "azurerm_key_vault_secret" "vnet_shared_name" {
-  name         = "vnet-shared-name"
+  name         = "vnet-shared-nameX"
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }
 
 data "azurerm_key_vault_secret" "vnet_shared_resouce_group_name" {
-  name         = "vnet-shared-resouce-group-name"
+  name         = "vnet-shared-resouce-group-nameX"
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }
 
 data "azurerm_key_vault_secret" "pdns_resouce_group_name" {
-  name         = "pdns-resouce-group-name"
+  name         = "pdns-resouce-group-nameX"
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }
