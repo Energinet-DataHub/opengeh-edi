@@ -17,7 +17,6 @@ on:
   pull_request:
     branches:
       - main
-      - djorgensen/new-sub
 
 jobs:
   ci_base:
