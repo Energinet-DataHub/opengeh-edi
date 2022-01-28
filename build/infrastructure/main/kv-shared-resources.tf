@@ -43,7 +43,7 @@ data "azurerm_key_vault_secret" "sbq_event_forwarded_queue" {
 }
 
 data "azurerm_key_vault_secret" "appi_instrumentation_key" {
-  name         = "appi-shared-instrumentation-key"
+  name         = "appi-shared-instrumentation-keyX"
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }
 
