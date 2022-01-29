@@ -24,7 +24,7 @@ module "st_postoffice" {
     account_tier                    = "Standard"
 
     private_endpoint_subnet_id      = module.snet_internal_private_endpoints.id
-    private_dns_resource_group_name = data.azurerm_key_vault_secret.pdns_resouce_group_name.value
+    private_dns_resource_group_name = data.azurerm_key_vault_secret.pdns_resource_group_name.value
     use_blob                        = false
     use_file                        = true
 

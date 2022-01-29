@@ -18,7 +18,7 @@ module "snet_external_private_endpoints" {
   project_name                                  = var.domain_name_short
   environment_short                             = var.environment_short
   environment_instance                          = var.environment_instance
-  resource_group_name                           = data.azurerm_key_vault_secret.vnet_shared_resouce_group_name.value
+  resource_group_name                           = data.azurerm_key_vault_secret.vnet_shared_resource_group_name.value
   virtual_network_name                          = data.azurerm_key_vault_secret.vnet_shared_name.value
   address_prefixes                              = ["10.42.0.96/28"]
   enforce_private_link_endpoint_network_policies  = true
@@ -30,7 +30,7 @@ module "snet_internal_private_endpoints" {
   project_name                                  = var.domain_name_short
   environment_short                             = var.environment_short
   environment_instance                          = var.environment_instance
-  resource_group_name                           = data.azurerm_key_vault_secret.vnet_shared_resouce_group_name.value
+  resource_group_name                           = data.azurerm_key_vault_secret.vnet_shared_resource_group_name.value
   virtual_network_name                          = data.azurerm_key_vault_secret.vnet_shared_name.value
   address_prefixes                              = ["10.42.0.112/28"]
   enforce_private_link_endpoint_network_policies  = true
@@ -43,7 +43,7 @@ module "vnet_integrations_functions" {
   project_name                                  = var.domain_name_short
   environment_short                             = var.environment_short
   environment_instance                          = var.environment_instance
-  resource_group_name                           = data.azurerm_key_vault_secret.vnet_shared_resouce_group_name.value
+  resource_group_name                           = data.azurerm_key_vault_secret.vnet_shared_resource_group_name.value
   virtual_network_name                          = data.azurerm_key_vault_secret.vnet_shared_name.value
   address_prefixes                              = ["10.42.0.128/28"]
   enforce_private_link_service_network_policies = true

@@ -43,7 +43,7 @@ data "azurerm_key_vault_secret" "sbq_event_forwarded_queue" {
 }
 
 data "azurerm_key_vault_secret" "appi_instrumentation_key" {
-  name         = "appi-shared-instrumentation-keyX"
+  name         = "appi-shared-instrumentation-key"
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }
 
@@ -58,16 +58,16 @@ data "azurerm_key_vault_secret" "sb_domain_relay_sender_connection_string" {
 }
 
 data "azurerm_key_vault_secret" "vnet_shared_name" {
-  name         = "vnet-shared-nameX"
+  name         = "vnet-shared-name"
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }
 
-data "azurerm_key_vault_secret" "vnet_shared_resouce_group_name" {
-  name         = "vnet-shared-resouce-group-nameX"
+data "azurerm_key_vault_secret" "vnet_shared_resource_group_name" {
+  name         = "vnet-shared-resource-group-name"
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }
 
-data "azurerm_key_vault_secret" "pdns_resouce_group_name" {
-  name         = "pdns-resouce-group-nameX"
+data "azurerm_key_vault_secret" "pdns_resource_group_name" {
+  name         = "pdns-resource-group-name"
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }
