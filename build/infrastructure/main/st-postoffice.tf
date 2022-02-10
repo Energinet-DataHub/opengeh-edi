@@ -25,7 +25,7 @@ module "st_postoffice" {
 
     private_endpoint_subnet_id      = module.snet_internal_private_endpoints.id
     private_dns_resource_group_name = data.azurerm_key_vault_secret.pdns_resource_group_name.value
-    use_blob                        = false
+    use_blob                        = true
     use_file                        = true
 
     tags                            = azurerm_resource_group.this.tags
