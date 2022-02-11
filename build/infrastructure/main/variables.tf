@@ -45,3 +45,18 @@ variable "shared_resources_resource_group_name" {
   type          = string
   description   = "Resource group name of the Core Key Vaults location"
 }
+
+variable "subnet_internal_private_endpoints_address_space" {
+  type          = string
+  description   = "Address space of the subnet for internal private endpoints"
+}
+
+variable "subnet_external_private_endpoints_address_space" {
+  type          = string
+  description   = "Address space of the subnet for external private endpoints"
+}
+
+variable "subnet_vnet_integrations_functions_address_space" {
+  type          = string
+  description   = "Address space of the subnet for Virtual Integrations of Azure Functions"
+}
