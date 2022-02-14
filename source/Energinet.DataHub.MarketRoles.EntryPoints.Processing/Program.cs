@@ -178,7 +178,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Processing
             container.Register<IValidator<RequestChangeOfSupplier>, RequestChangeOfSupplierRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<RequestMoveIn>, RequestMoveInRuleSet>(Lifestyle.Scoped);
             container.AddValidationErrorConversion(
-                validateRegistrations: true,
+                validateRegistrations: false,
                 typeof(RequestMoveIn).Assembly, // Application
                 typeof(ConsumerMovedIn).Assembly, // Domain
                 typeof(ErrorMessageFactory).Assembly); // Infrastructure

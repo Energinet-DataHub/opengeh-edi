@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Energinet.DataHub.MarketRoles.EntryPoints.Common.SimpleInjector;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common.Telemetry;
 using MediatR;
 using MediatR.Pipeline;
@@ -25,6 +26,11 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Common.MediatR
 {
     public static class SimpleInjectorMediatorContainerExtensions
     {
+        public static MediatorBuilder UseMediatR(this Container container)
+        {
+            return new MediatorBuilder(container);
+        }
+
         public static void BuildMediator(this Container container, Assembly[] applicationAssemblies, Type[] pipelineBehaviors)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));

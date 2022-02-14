@@ -15,24 +15,25 @@
 using System;
 using System.Linq;
 using Energinet.DataHub.MarketRoles.Application.Common;
+using Energinet.DataHub.MarketRoles.Application.EDI;
 using Energinet.DataHub.MarketRoles.Application.MoveIn;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI.Acknowledgements;
-using Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
+using ErrorMessageFactory = Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.ErrorMessageFactory;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
 {
     public sealed class RequestMoveInResultHandler : BusinessProcessResultHandler<RequestMoveIn>
     {
-        private const string XmlNamespace = "urn:ebix:org:ChangeAccountingPointCharacteristics:0:1";
-
+        private readonly IActorMessageService _actorMessageService;
         private readonly ErrorMessageFactory _errorMessageFactory;
         private readonly ICorrelationContext _correlationContext;
         private readonly ISystemDateTimeProvider _dateTimeProvider;
 
         public RequestMoveInResultHandler(
+            IActorMessageService actorMessageService,
             ErrorMessageFactory errorMessageFactory,
             ICorrelationContext correlationContext,
             ISystemDateTimeProvider dateTimeProvider,
@@ -40,6 +41,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
             IOutboxMessageFactory outboxMessageFactory)
             : base(outbox, outboxMessageFactory)
         {
+            _actorMessageService = actorMessageService;
             _errorMessageFactory = errorMessageFactory;
             _correlationContext = correlationContext;
             _dateTimeProvider = dateTimeProvider;
@@ -53,38 +55,8 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
             var errors = result.ValidationErrors
                 .Select(error => _errorMessageFactory.GetErrorMessage(error));
 
-            var message = new RejectMessage(
-                DocumentName: "RejectRequestChangeOfSupplier_MarketDocument",
-                Id: Guid.NewGuid().ToString(),
-                Type: "414",
-                ProcessType: "E65",
-                BusinessSectorType: "E21",
-                Sender: new MarketParticipant(
-                    Id: "DataHub GLN", // TODO: Use correct GLN
-                    CodingScheme: "9",
-                    Role: "EZ"),
-                Receiver: new MarketParticipant(
-                    Id: request.EnergySupplierGlnNumber,
-                    CodingScheme: "9",
-                    Role: "DDQ"),
-                CreatedDateTime: _dateTimeProvider.Now(),
-                Reason: new Reason(
-                    Code: "41",
-                    Text: string.Empty),
-                MarketActivityRecord: new MarketActivityRecordWithReasons(
-                    Id: Guid.NewGuid().ToString(),
-                    BusinessProcessReference: _correlationContext.Id,
-                    MarketEvaluationPoint: request.AccountingPointGsrnNumber,
-                    StartDateAndOrTime: request.MoveInDate,
-                    OriginalTransaction: request.TransactionId,
-                    Reasons: errors.Select(error => new Reason(error.Code, error.Description)).ToList()));
-
-            var document = AcknowledgementXmlSerializer.Serialize(message, XmlNamespace);
-
-            return CreatePostOfficeEnvelope(
-                recipient: request.EnergySupplierGlnNumber,
-                cimContent: document,
-                messageType: "RejectMoveInRequest");
+            // TODO: Send reject message
+            throw new NotImplementedException("Send reject message");
         }
 
         protected override object CreateAcceptMessage(RequestMoveIn request, BusinessProcessResult result)
@@ -92,45 +64,8 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
             if (request == null) throw new ArgumentNullException(nameof(request));
             if (result == null) throw new ArgumentNullException(nameof(result));
 
-            var message = new ConfirmMessage(
-                DocumentName: "ConfirmRequestChangeOfSupplier_MarketDocument",
-                Id: Guid.NewGuid().ToString(),
-                Type: "414",
-                ProcessType: "E65",
-                BusinessSectorType: "E21",
-                Sender: new MarketParticipant(
-                    Id: "DataHub GLN", // TODO: Use correct GLN
-                    CodingScheme: "9",
-                    Role: "EZ"),
-                Receiver: new MarketParticipant(
-                    Id: request.EnergySupplierGlnNumber,
-                    CodingScheme: "9",
-                    Role: "DDQ"),
-                CreatedDateTime: _dateTimeProvider.Now(),
-                ReasonCode: "39",
-                MarketActivityRecord: new MarketActivityRecord(
-                    Id: Guid.NewGuid().ToString(),
-                    BusinessProcessReference: _correlationContext.Id,
-                    MarketEvaluationPoint: request.AccountingPointGsrnNumber,
-                    StartDateAndOrTime: request.MoveInDate,
-                    OriginalTransaction: request.TransactionId));
-
-            var document = AcknowledgementXmlSerializer.Serialize(message, XmlNamespace);
-
-            return CreatePostOfficeEnvelope(
-                recipient: request.EnergySupplierGlnNumber,
-                cimContent: document,
-                messageType: "ConfirmMoveInRequest");
-        }
-
-        private static PostOfficeEnvelope CreatePostOfficeEnvelope(string recipient, string cimContent, string messageType)
-        {
-            return new(
-                Id: Guid.NewGuid().ToString(),
-                Recipient: recipient,
-                Content: cimContent,
-                MessageType: messageType,
-                Correlation: string.Empty); // TODO: add correlation when Telemetry is added
+            // TODO: Send confirm message
+            throw new NotImplementedException("Send confirm message");
         }
     }
 }

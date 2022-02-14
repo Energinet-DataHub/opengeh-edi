@@ -136,7 +136,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             _container.Register<IValidator<RequestChangeOfSupplier>, RequestChangeOfSupplierRuleSet>(Lifestyle.Scoped);
             _container.Register<IValidator<RequestMoveIn>, RequestMoveInRuleSet>(Lifestyle.Scoped);
             _container.AddValidationErrorConversion(
-                validateRegistrations: true,
+                validateRegistrations: false,
                 typeof(RequestMoveIn).Assembly, // Application
                 typeof(ConsumerMovedIn).Assembly, // Domain
                 typeof(ErrorMessageFactory).Assembly); // Infrastructure
