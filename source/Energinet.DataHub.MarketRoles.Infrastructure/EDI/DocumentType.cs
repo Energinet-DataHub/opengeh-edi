@@ -14,13 +14,18 @@
 
 using System;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using Energinet.DataHub.MarketRoles.Infrastructure.EDI.Acknowledgements;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI.GenericNotification;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI
 {
     public sealed class DocumentType : EnumerationType
     {
-        public static readonly DocumentType GenericNotification = new(8, nameof(GenericNotification), typeof(GenericNotificationMessage));
+        public static readonly DocumentType GenericNotification = new(1, nameof(GenericNotification), typeof(GenericNotificationMessage));
+        public static readonly DocumentType ConfirmChangeOfSupplier = new(2, nameof(ConfirmChangeOfSupplier), typeof(ConfirmMessage));
+        public static readonly DocumentType RejectChangeOfSupplier = new(3, nameof(RejectChangeOfSupplier), typeof(RejectMessage));
+        public static readonly DocumentType ConfirmMoveIn = new(3, nameof(ConfirmMoveIn), typeof(ConfirmMessage));
+        public static readonly DocumentType RejectMoveIn = new(3, nameof(RejectMoveIn), typeof(RejectMessage));
 
         public DocumentType(int id, string name)
             : base(id, name)

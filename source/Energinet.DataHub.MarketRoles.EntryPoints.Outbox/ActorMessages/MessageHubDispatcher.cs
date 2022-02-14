@@ -16,28 +16,27 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI;
-using Energinet.DataHub.MarketRoles.Infrastructure.PostOffice;
+using Energinet.DataHub.MarketRoles.Messaging;
 using MediatR;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox.ActorMessages
 {
-    public class PostOfficeDispatcher : IRequestHandler<PostOfficeEnvelope>
+    public class MessageHubDispatcher : IRequestHandler<MessageHubEnvelope>
     {
-        private readonly IPostOfficeStorageClient _postOfficeStorageClient;
+        private readonly ILocalMessageHubDataAvailableClient _localMessageHubDataAvailableClient;
 
-        public PostOfficeDispatcher(
-            IPostOfficeStorageClient postOfficeStorageClient)
+        public MessageHubDispatcher(ILocalMessageHubDataAvailableClient localMessageHubDataAvailableClient)
         {
-            _postOfficeStorageClient = postOfficeStorageClient;
+            _localMessageHubDataAvailableClient = localMessageHubDataAvailableClient;
         }
 
-        public async Task<Unit> Handle(PostOfficeEnvelope request, CancellationToken cancellationToken)
+        public Task<Unit> Handle(MessageHubEnvelope request, CancellationToken cancellationToken)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            await _postOfficeStorageClient.WriteAsync(request).ConfigureAwait(false);
+            _localMessageHubDataAvailableClient.DataAvailable(request);
 
-            return Unit.Value;
+            return Task.FromResult(Unit.Value);
         }
     }
 }

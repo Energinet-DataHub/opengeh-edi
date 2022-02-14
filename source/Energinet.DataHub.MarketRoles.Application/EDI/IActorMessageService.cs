@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using NodaTime;
 
@@ -30,5 +31,20 @@ namespace Energinet.DataHub.MarketRoles.Application.EDI
             string gsrn,
             Instant startDateAndOrTime,
             string receiverGln);
+
+        /// <summary>
+        /// Confirmation of change of supplier.
+        /// </summary>
+        Task SendChangeOfSupplierConfirmAsync(
+            string transactionId,
+            string gsrn);
+
+        /// <summary>
+        /// Rejection of change of supplier.
+        /// </summary>
+        Task SendChangeOfSupplierRejectAsync(
+            string transactionId,
+            string gsrn,
+            IEnumerable<ErrorMessage> errors);
     }
 }

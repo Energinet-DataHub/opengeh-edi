@@ -20,7 +20,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Acknowledgements
 {
     public static class ConfirmMessageFactory
     {
-        public static ConfirmMessage CreateMeteringPoint(
+        public static ConfirmMessage ChangeOfSupplier(
             MarketRoleParticipant sender,
             MarketRoleParticipant receiver,
             Instant createdDateTime,
@@ -29,75 +29,8 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Acknowledgements
             return Defaults()
                 with
                 {
-                    ProcessType = "E02",
-                    Sender = sender,
-                    Receiver = receiver,
-                    CreatedDateTime = createdDateTime,
-                    MarketActivityRecord = marketActivityRecord,
-                };
-        }
-
-        public static ConfirmMessage ConnectMeteringPoint(
-            MarketRoleParticipant sender,
-            MarketRoleParticipant receiver,
-            Instant createdDateTime,
-            MarketActivityRecord marketActivityRecord)
-        {
-            return Defaults()
-                with
-                {
-                    ProcessType = "D15",
-                    Sender = sender,
-                    Receiver = receiver,
-                    CreatedDateTime = createdDateTime,
-                    MarketActivityRecord = marketActivityRecord,
-                };
-        }
-
-        public static ConfirmMessage DisconnectMeteringPoint(
-            MarketRoleParticipant sender,
-            MarketRoleParticipant receiver,
-            Instant createdDateTime,
-            MarketActivityRecord marketActivityRecord)
-        {
-            return Defaults()
-                with
-                {
-                    ProcessType = "E79",
-                    Sender = sender,
-                    Receiver = receiver,
-                    CreatedDateTime = createdDateTime,
-                    MarketActivityRecord = marketActivityRecord,
-                };
-        }
-
-        public static ConfirmMessage ReconnectMeteringPoint(
-            MarketRoleParticipant sender,
-            MarketRoleParticipant receiver,
-            Instant createdDateTime,
-            MarketActivityRecord marketActivityRecord)
-        {
-            return Defaults()
-                with
-                {
-                    ProcessType = "E79",
-                    Sender = sender,
-                    Receiver = receiver,
-                    CreatedDateTime = createdDateTime,
-                    MarketActivityRecord = marketActivityRecord,
-                };
-        }
-
-        public static ConfirmMessage RequestCloseDown(
-            MarketRoleParticipant sender,
-            MarketRoleParticipant receiver,
-            Instant createdDateTime,
-            MarketActivityRecord marketActivityRecord)
-        {
-            return Defaults()
-                with
-                {
-                    ProcessType = "D14",
+                    DocumentName = "ConfirmRequestChangeOfSupplier_MarketDocument",
+                    ProcessType = "E03",
                     Sender = sender,
                     Receiver = receiver,
                     CreatedDateTime = createdDateTime,
@@ -108,7 +41,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Acknowledgements
         private static ConfirmMessage Defaults()
         {
             return new ConfirmMessage(
-                DocumentName: "ConfirmRequestChangeAccountingPointCharacteristics_MarketDocument",
+                DocumentName: string.Empty,
                 Id: Guid.NewGuid().ToString(),
                 Type: "E59", // Changes with the document type. eg E59 for ConfirmRequestChangeAccountingPointCharacteristics_MarketDocument
                 ProcessType: string.Empty, // Changes with BRS, eg D15 for connect

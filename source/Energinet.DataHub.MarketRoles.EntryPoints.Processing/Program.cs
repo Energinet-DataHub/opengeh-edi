@@ -22,6 +22,7 @@ using Energinet.DataHub.MarketRoles.Application.Common.Commands;
 using Energinet.DataHub.MarketRoles.Application.Common.DomainEvents;
 using Energinet.DataHub.MarketRoles.Application.Common.Processing;
 using Energinet.DataHub.MarketRoles.Application.Common.Users;
+using Energinet.DataHub.MarketRoles.Application.EDI;
 using Energinet.DataHub.MarketRoles.Application.MoveIn;
 using Energinet.DataHub.MarketRoles.Application.MoveIn.Validation;
 using Energinet.DataHub.MarketRoles.Domain.Consumers;
@@ -31,7 +32,6 @@ using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common.MediatR;
-using Energinet.DataHub.MarketRoles.EntryPoints.Common.SimpleInjector;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common.Telemetry;
 using Energinet.DataHub.MarketRoles.Infrastructure;
 using Energinet.DataHub.MarketRoles.Infrastructure.BusinessRequestProcessing;
@@ -44,12 +44,11 @@ using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.Consumers;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.EnergySuppliers;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.ProcessManagers;
 using Energinet.DataHub.MarketRoles.Infrastructure.DomainEventDispatching;
-using Energinet.DataHub.MarketRoles.Infrastructure.EDI.Acknowledgements;
+using Energinet.DataHub.MarketRoles.Infrastructure.EDI;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI.ChangeOfSupplier;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI.ChangeOfSupplier.ConsumerDetails;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI.ChangeOfSupplier.EndOfSupplyNotification;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI.ChangeOfSupplier.MeteringPointDetails;
-using Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChange;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.Notifications;
@@ -136,6 +135,8 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Processing
             container.Register<IProtobufMessageFactory, ProtobufMessageFactory>(Lifestyle.Singleton);
             container.Register<INotificationReceiver, NotificationReceiver>(Lifestyle.Scoped);
             container.Register<IntegrationEventReceiver>(Lifestyle.Scoped);
+            container.Register<IActorMessageService, ActorMessageService>(Lifestyle.Scoped);
+            container.Register<IMessageHubDispatcher, MessageHubDispatcher>(Lifestyle.Scoped);
 
             var connectionString = Environment.GetEnvironmentVariable("MARKET_DATA_DB_CONNECTION_STRING")
                                    ?? throw new InvalidOperationException(

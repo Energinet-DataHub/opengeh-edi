@@ -26,9 +26,11 @@ using Energinet.DataHub.MarketRoles.Infrastructure.Integration;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChange;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.FutureEnergySupplierChangeRegistered;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
-using Energinet.DataHub.MarketRoles.Infrastructure.PostOffice;
 using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integration;
+using Energinet.DataHub.MarketRoles.Messaging;
+using Energinet.DataHub.MessageHub.Client;
+using Energinet.DataHub.MessageHub.Client.SimpleInjector;
 using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -70,16 +72,11 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
             base.ConfigureContainer(container);
 
             // Register application components.
-            container.Register(
-                () => new PostOfficeStorageClientSettings(
-                    Environment.GetEnvironmentVariable("TEMP_POST_OFFICE_CONNECTION_STRING")!,
-                    Environment.GetEnvironmentVariable("TEMP_POST_OFFICE_SHARE")!));
             container.Register<ISystemDateTimeProvider, SystemDateTimeProvider>(Lifestyle.Scoped);
             container.Register<IJsonSerializer, JsonSerializer>(Lifestyle.Singleton);
             container.Register<IOutboxManager, OutboxManager>(Lifestyle.Scoped);
             container.Register<IOutboxMessageFactory, OutboxMessageFactory>(Lifestyle.Scoped);
             container.Register<IUnitOfWork, UnitOfWork>(Lifestyle.Scoped);
-            container.Register<IPostOfficeStorageClient, TempPostOfficeStorageClient>(Lifestyle.Scoped);
             container.Register<OutboxWatcher>(Lifestyle.Scoped);
             container.Register<OutboxOrchestrator>(Lifestyle.Scoped);
             container.Register<IOutboxMessageDispatcher, OutboxMessageDispatcher>(Lifestyle.Scoped);
@@ -104,6 +101,18 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
                 Lifestyle.Singleton);
 
             container.Register(typeof(ITopicSender<>), typeof(TopicSender<>), Lifestyle.Singleton);
+
+            container.Register<MessageHubMessageFactory>(Lifestyle.Scoped);
+            var messageHubStorageConnectionString = Environment.GetEnvironmentVariable("MESSAGEHUB_STORAGE_CONNECTION_STRING") ?? throw new InvalidOperationException("MessageHub storage connection string not found.");
+            var messageHubStorageContainerName = Environment.GetEnvironmentVariable("MESSAGEHUB_STORAGE_CONTAINER_NAME") ?? throw new InvalidOperationException("MessageHub storage container name not found.");
+            var messageHubServiceBusConnectionString = Environment.GetEnvironmentVariable("MESSAGEHUB_QUEUE_CONNECTION_STRING") ?? throw new InvalidOperationException("MessageHub queue connection string not found.");
+            var messageHubServiceBusDataAvailableQueue = Environment.GetEnvironmentVariable("MESSAGEHUB_DATA_AVAILABLE_QUEUE") ?? throw new InvalidOperationException("MessageHub data available queue not found.");
+            var messageHubServiceBusDomainReplyQueue = Environment.GetEnvironmentVariable("MESSAGEHUB_DOMAIN_REPLY_QUEUE") ?? throw new InvalidOperationException("MessageHub reply queue not found.");
+            container.AddMessageHubCommunication(
+                messageHubServiceBusConnectionString,
+                new MessageHubConfig(messageHubServiceBusDataAvailableQueue, messageHubServiceBusDomainReplyQueue),
+                messageHubStorageConnectionString,
+                new StorageConfig(messageHubStorageContainerName));
 
             container.BuildMediator(
                 new[] { typeof(OutboxWatcher).Assembly, },

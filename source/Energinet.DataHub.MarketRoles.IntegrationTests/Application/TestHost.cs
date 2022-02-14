@@ -18,6 +18,8 @@ using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common;
+using Energinet.DataHub.Core.App.Common.Abstractions.Actor;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.ConsumerDetails;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.EndOfSupplyNotification;
@@ -27,6 +29,7 @@ using Energinet.DataHub.MarketRoles.Application.Common;
 using Energinet.DataHub.MarketRoles.Application.Common.Commands;
 using Energinet.DataHub.MarketRoles.Application.Common.DomainEvents;
 using Energinet.DataHub.MarketRoles.Application.Common.Processing;
+using Energinet.DataHub.MarketRoles.Application.EDI;
 using Energinet.DataHub.MarketRoles.Application.MoveIn.Validation;
 using Energinet.DataHub.MarketRoles.Contracts;
 using Energinet.DataHub.MarketRoles.Domain.Consumers;
@@ -45,11 +48,11 @@ using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.Consumers;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.EnergySuppliers;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.ProcessManagers;
 using Energinet.DataHub.MarketRoles.Infrastructure.DomainEventDispatching;
+using Energinet.DataHub.MarketRoles.Infrastructure.EDI;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI.ChangeOfSupplier;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI.ChangeOfSupplier.ConsumerDetails;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI.ChangeOfSupplier.EndOfSupplyNotification;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI.ChangeOfSupplier.MeteringPointDetails;
-using Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChange;
 using Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands;
@@ -131,6 +134,9 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             // Business process responders
             _container.Register<IBusinessProcessResultHandler<RequestChangeOfSupplier>, RequestChangeOfSupplierResultHandler>(Lifestyle.Scoped);
             _container.Register<IBusinessProcessResultHandler<RequestMoveIn>, RequestMoveInResultHandler>(Lifestyle.Scoped);
+            _container.Register<IActorMessageService, ActorMessageService>(Lifestyle.Scoped);
+            _container.Register<IMessageHubDispatcher, MessageHubDispatcher>(Lifestyle.Scoped);
+            _container.Register<IActorContext>(() => new ActorContext { CurrentActor = new Actor(Guid.NewGuid(), "GLN", "8200000001409", "GridAccessProvider") }, Lifestyle.Singleton);
 
             // Input validation(
             _container.Register<IValidator<RequestChangeOfSupplier>, RequestChangeOfSupplierRuleSet>(Lifestyle.Scoped);
@@ -139,7 +145,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
                 validateRegistrations: false,
                 typeof(RequestMoveIn).Assembly, // Application
                 typeof(ConsumerMovedIn).Assembly, // Domain
-                typeof(ErrorMessageFactory).Assembly); // Infrastructure
+                typeof(DocumentType).Assembly); // Infrastructure
 
             // Actor Notification handlers
             _container.Register<IEndOfSupplyNotifier, EndOfSupplyNotifier>(Lifestyle.Scoped);

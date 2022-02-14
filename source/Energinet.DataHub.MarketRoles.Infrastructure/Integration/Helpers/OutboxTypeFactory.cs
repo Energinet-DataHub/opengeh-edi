@@ -26,7 +26,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.Helpers
         {
             { typeof(EnergySupplierChangedIntegrationEvent).FullName!, typeof(EnergySupplierChangedIntegrationEvent) },
             { typeof(FutureEnergySupplierChangeRegisteredIntegrationEvent).FullName!, typeof(FutureEnergySupplierChangeRegisteredIntegrationEvent) },
-            { typeof(PostOfficeEnvelope).FullName!, typeof(PostOfficeEnvelope) },
+            { typeof(MessageHubEnvelope).FullName!, typeof(MessageHubEnvelope) },
         };
 
         public static Type GetType(string type)

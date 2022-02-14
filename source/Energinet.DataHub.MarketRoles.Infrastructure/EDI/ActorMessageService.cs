@@ -20,6 +20,7 @@ using Energinet.DataHub.Core.App.Common.Abstractions.Actor;
 using Energinet.DataHub.MarketRoles.Application.EDI;
 using Energinet.DataHub.MarketRoles.Domain.Actors;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using Energinet.DataHub.MarketRoles.Infrastructure.EDI.Acknowledgements;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI.Common;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI.Extensions;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI.GenericNotification;
@@ -56,6 +57,39 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI
                 transactionId);
 
             await _messageHubDispatcher.DispatchAsync(message, DocumentType.GenericNotification, receiverGln, gsrn).ConfigureAwait(false);
+        }
+
+        public async Task SendChangeOfSupplierConfirmAsync(string transactionId, string gsrn)
+        {
+            if (_actorContext.CurrentActor is null) throw new InvalidOperationException("Can't create message when current actor is not set (null)");
+
+            var message = ConfirmMessageFactory.ChangeOfSupplier(
+                sender: Map(_actorContext.DataHub, Role.MeteringPointAdministrator), // TODO: verify roles
+                receiver: Map(_actorContext.CurrentActor, Role.GridAccessProvider),
+                createdDateTime: _dateTimeProvider.Now(),
+                marketActivityRecord: new Acknowledgements.MarketActivityRecord(
+                    Id: Guid.NewGuid().ToString(),
+                    MarketEvaluationPoint: gsrn,
+                    OriginalTransaction: transactionId));
+
+            await _messageHubDispatcher.DispatchAsync(message, DocumentType.ConfirmChangeOfSupplier, _actorContext.CurrentActor.Identifier, gsrn).ConfigureAwait(false);
+        }
+
+        public async Task SendChangeOfSupplierRejectAsync(string transactionId, string gsrn, IEnumerable<ErrorMessage> errors)
+        {
+            if (_actorContext.CurrentActor is null) throw new InvalidOperationException("Can't create message when current actor is not set (null)");
+
+            var message = RejectMessageFactory.ChangeOfSupplier(
+                sender: Map(_actorContext.DataHub, Role.MeteringPointAdministrator), // TODO: verify roles
+                receiver: Map(_actorContext.CurrentActor, Role.GridAccessProvider),
+                createdDateTime: _dateTimeProvider.Now(),
+                marketActivityRecord: new Acknowledgements.MarketActivityRecordWithReasons(
+                    Id: Guid.NewGuid().ToString(),
+                    MarketEvaluationPoint: gsrn,
+                    OriginalTransaction: transactionId,
+                    Reasons: errors.Select(error => new Reason(error.Code, error.Description)).ToList()));
+
+            await _messageHubDispatcher.DispatchAsync(message, DocumentType.RejectChangeOfSupplier, _actorContext.CurrentActor.Identifier, gsrn).ConfigureAwait(false);
         }
 
         private static MarketRoleParticipant Map(Actor actor, Role documentRole)

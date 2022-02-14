@@ -19,9 +19,7 @@ using Energinet.DataHub.MarketRoles.Application.EDI;
 using Energinet.DataHub.MarketRoles.Application.MoveIn;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
-using Energinet.DataHub.MarketRoles.Infrastructure.EDI.Acknowledgements;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
-using ErrorMessageFactory = Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.ErrorMessageFactory;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
 {

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
+using Energinet.DataHub.MarketRoles.Application.EDI;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
