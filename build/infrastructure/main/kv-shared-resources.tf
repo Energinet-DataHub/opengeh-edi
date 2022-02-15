@@ -76,3 +76,18 @@ data "azurerm_key_vault_secret" "sbq_data_available_name" {
   name         = "sbq-data-available-name"
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }
+
+data "azurerm_key_vault_secret" "sbq_marketroles_name" {
+  name         = "sbq-marketroles-name"
+  key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
+}
+
+data "azurerm_key_vault_secret" "sbq_marketroles_reply_name" {
+  name         = "sbq-marketroles-reply-name"
+  key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
+}
+
+data "azurerm_key_vault_secret" "sbq_marketroles_dequeue_name" {
+  name         = "sbq-marketroles-dequeue-name"
+  key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
+}
