@@ -15,12 +15,15 @@
 using System;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.Core.App.FunctionApp.Middleware;
+using Energinet.DataHub.Core.App.FunctionApp.SimpleInjector;
 using Energinet.DataHub.MarketRoles.Application.Common.Users;
 using Energinet.DataHub.MarketRoles.Contracts;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common.Telemetry;
-using Energinet.DataHub.MarketRoles.EntryPoints.Ingestion.Middleware;
+using Energinet.DataHub.MarketRoles.Infrastructure;
 using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
+using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI.XmlConverter;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI.XmlConverter.Mappings;
 using Energinet.DataHub.MarketRoles.Infrastructure.Ingestion;
@@ -49,9 +52,10 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
             if (options == null) throw new ArgumentNullException(nameof(options));
             base.ConfigureFunctionsWorkerDefaults(options);
 
+            options.UseMiddleware<JwtTokenMiddleware>();
+            options.UseMiddleware<ActorMiddleware>();
             options.UseMiddleware<CorrelationIdMiddleware>();
             options.UseMiddleware<EntryPointTelemetryScopeMiddleware>();
-            options.UseMiddleware<HttpUserContextMiddleware>();
         }
 
         protected override void ConfigureServiceCollection(IServiceCollection services)
@@ -69,8 +73,21 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
             container.Register<CorrelationIdMiddleware>(Lifestyle.Scoped);
             container.Register<ICorrelationContext, CorrelationContext>(Lifestyle.Scoped);
             container.Register<EntryPointTelemetryScopeMiddleware>(Lifestyle.Scoped);
-            container.Register<HttpUserContextMiddleware>(Lifestyle.Scoped);
             container.Register<IUserContext, UserContext>(Lifestyle.Scoped);
+
+            var tenantId = Environment.GetEnvironmentVariable("B2C_TENANT_ID") ?? throw new InvalidOperationException(
+                "B2C tenant id not found.");
+            var audience = Environment.GetEnvironmentVariable("BACKEND_SERVICE_APP_ID") ?? throw new InvalidOperationException(
+                "Backend service app id not found.");
+
+            container.AddJwtTokenSecurity($"https://login.microsoftonline.com/{tenantId}/v2.0/.well-known/openid-configuration", audience);
+            container.AddActorContext<ActorProvider>();
+
+            var dbConnectionString = Environment.GetEnvironmentVariable("MARKET_DATA_DB_CONNECTION_STRING")
+                                   ?? throw new InvalidOperationException(
+                                       "database connection string not found.");
+            container.Register<IDbConnectionFactory>(() => new SqlDbConnectionFactory(dbConnectionString), Lifestyle.Scoped);
+            Dapper.SqlMapper.AddTypeHandler(NodaTimeSqlMapper.Instance);
 
             container.Register(XmlMapperFactory, Lifestyle.Singleton);
             container.Register<XmlMapper>(Lifestyle.Singleton);

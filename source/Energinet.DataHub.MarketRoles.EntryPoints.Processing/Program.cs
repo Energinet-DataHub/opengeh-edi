@@ -13,6 +13,9 @@
 // limitations under the License.
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common;
+using Energinet.DataHub.Core.App.Common.Abstractions.Actor;
+using Energinet.DataHub.Core.App.FunctionApp.Middleware;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.ConsumerDetails;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.EndOfSupplyNotification;
@@ -21,7 +24,6 @@ using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Validation;
 using Energinet.DataHub.MarketRoles.Application.Common.Commands;
 using Energinet.DataHub.MarketRoles.Application.Common.DomainEvents;
 using Energinet.DataHub.MarketRoles.Application.Common.Processing;
-using Energinet.DataHub.MarketRoles.Application.Common.Users;
 using Energinet.DataHub.MarketRoles.Application.EDI;
 using Energinet.DataHub.MarketRoles.Application.MoveIn;
 using Energinet.DataHub.MarketRoles.Application.MoveIn.Validation;
@@ -88,7 +90,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Processing
 
             options.UseMiddleware<CorrelationIdMiddleware>();
             options.UseMiddleware<EntryPointTelemetryScopeMiddleware>();
-            options.UseMiddleware<ServiceBusUserContextMiddleware>();
+            options.UseMiddleware<ServiceBusActorContextMiddleware>();
         }
 
         protected override void ConfigureServiceCollection(IServiceCollection services)
@@ -114,8 +116,9 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Processing
             container.Register<CorrelationIdMiddleware>(Lifestyle.Scoped);
             container.Register<ICorrelationContext, CorrelationContext>(Lifestyle.Scoped);
             container.Register<EntryPointTelemetryScopeMiddleware>(Lifestyle.Scoped);
-            container.Register<ServiceBusUserContextMiddleware>(Lifestyle.Scoped);
-            container.Register<IUserContext, UserContext>(Lifestyle.Scoped);
+            container.Register<ServiceBusActorContextMiddleware>(Lifestyle.Scoped);
+            container.Register<IActorContext, ActorContext>(Lifestyle.Scoped);
+            container.Register<IActorProvider, ActorProvider>(Lifestyle.Scoped);
             container.Register<UserIdentityFactory>(Lifestyle.Singleton);
             container.Register<IUnitOfWork, UnitOfWork>(Lifestyle.Scoped);
             container.Register<ISystemDateTimeProvider, SystemDateTimeProvider>(Lifestyle.Scoped);

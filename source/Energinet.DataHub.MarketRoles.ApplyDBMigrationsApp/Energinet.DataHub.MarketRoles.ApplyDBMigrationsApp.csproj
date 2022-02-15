@@ -42,6 +42,8 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Seed\202109301258 Insert EnergySuppliers.sql" />
     <None Remove="Scripts\Model\202109270930 Add MessageHubMessages table.sql" />
     <EmbeddedResource Include="Scripts\Model\202109270930 Add MessageHubMessages table.sql" />
+    <None Remove="Scripts\Model\202112131115 Add Actor table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202112131115 Add Actor table.sql" />
   </ItemGroup>
 
 </Project>
