@@ -50,6 +50,9 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests
             Environment.SetEnvironmentVariable("MARKET_DATA_QUEUE_CONNECTION_STRING", ServiceBusConnectionString);
             Environment.SetEnvironmentVariable("MARKET_DATA_QUEUE_TOPIC_NAME", SomeString);
             Environment.SetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY", SomeString);
+            Environment.SetEnvironmentVariable("B2C_TENANT_ID", SomeString);
+            Environment.SetEnvironmentVariable("BACKEND_SERVICE_APP_ID", SomeString);
+            Environment.SetEnvironmentVariable("MARKET_DATA_DB_CONNECTION_STRING", SomeString);
             var program = new EntryPoints.Ingestion.Program();
 
             program.ConfigureApplication();
