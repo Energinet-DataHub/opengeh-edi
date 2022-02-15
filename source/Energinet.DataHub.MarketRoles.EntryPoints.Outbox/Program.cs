@@ -22,9 +22,11 @@ using Energinet.DataHub.MarketRoles.EntryPoints.Outbox.Common;
 using Energinet.DataHub.MarketRoles.Infrastructure;
 using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
+using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.MessageHub;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChange;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.FutureEnergySupplierChangeRegistered;
+using Energinet.DataHub.MarketRoles.Infrastructure.LocalMessageHub;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integration;
@@ -113,6 +115,10 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox
                 new MessageHubConfig(messageHubServiceBusDataAvailableQueue, messageHubServiceBusDomainReplyQueue),
                 messageHubStorageConnectionString,
                 new StorageConfig(messageHubStorageContainerName));
+            container.Register<ILocalMessageHubDataAvailableClient, LocalMessageHubDataAvailableClient>(Lifestyle.Scoped);
+            container.Register<IMessageHubMessageRepository, MessageHubMessageRepository>(Lifestyle.Scoped);
+            container.Register<IOutboxDispatcher<DataAvailableNotification>, DataAvailableNotificationOutboxDispatcher>();
+            container.Register<IOutbox, OutboxProvider>(Lifestyle.Scoped);
 
             container.BuildMediator(
                 new[] { typeof(OutboxWatcher).Assembly, },

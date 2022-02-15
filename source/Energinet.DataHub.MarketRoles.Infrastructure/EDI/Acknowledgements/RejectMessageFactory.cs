@@ -29,7 +29,27 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Acknowledgements
             return Defaults()
                 with
                 {
-                    DocumentName = "RejectRequestChangeOfSupplier_MarketDocument ",
+                    DocumentName = "RejectRequestChangeOfSupplier_MarketDocument",
+                    Type = "D16",
+                    ProcessType = "E03",
+                    Sender = sender,
+                    Receiver = receiver,
+                    CreatedDateTime = createdDateTime,
+                    MarketActivityRecord = marketActivityRecord,
+                };
+        }
+
+        public static RejectMessage MoveIn(
+            MarketRoleParticipant sender,
+            MarketRoleParticipant receiver,
+            Instant createdDateTime,
+            MarketActivityRecordWithReasons marketActivityRecord)
+        {
+            return Defaults()
+                with
+                {
+                    DocumentName = "RejectRequestChangeCustomerCharacteristics_MarketDocument",
+                    Type = "D16",
                     ProcessType = "E03",
                     Sender = sender,
                     Receiver = receiver,

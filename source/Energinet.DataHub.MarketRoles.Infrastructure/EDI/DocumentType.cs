@@ -24,8 +24,8 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI
         public static readonly DocumentType GenericNotification = new(1, nameof(GenericNotification), typeof(GenericNotificationMessage));
         public static readonly DocumentType ConfirmChangeOfSupplier = new(2, nameof(ConfirmChangeOfSupplier), typeof(ConfirmMessage));
         public static readonly DocumentType RejectChangeOfSupplier = new(3, nameof(RejectChangeOfSupplier), typeof(RejectMessage));
-        public static readonly DocumentType ConfirmMoveIn = new(3, nameof(ConfirmMoveIn), typeof(ConfirmMessage));
-        public static readonly DocumentType RejectMoveIn = new(3, nameof(RejectMoveIn), typeof(RejectMessage));
+        public static readonly DocumentType ConfirmMoveIn = new(4, nameof(ConfirmMoveIn), typeof(ConfirmMessage));
+        public static readonly DocumentType RejectMoveIn = new(5, nameof(RejectMoveIn), typeof(RejectMessage));
 
         public DocumentType(int id, string name)
             : base(id, name)

@@ -46,5 +46,20 @@ namespace Energinet.DataHub.MarketRoles.Application.EDI
             string transactionId,
             string gsrn,
             IEnumerable<ErrorMessage> errors);
+
+        /// <summary>
+        /// Confirmation of move in.
+        /// </summary>
+        Task SendMoveInConfirmAsync(
+            string transactionId,
+            string gsrn);
+
+        /// <summary>
+        /// Rejection of move in.
+        /// </summary>
+        Task SendMoveInRejectAsync(
+            string transactionId,
+            string gsrn,
+            IEnumerable<ErrorMessage> errors);
     }
 }

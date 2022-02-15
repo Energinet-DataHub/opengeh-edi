@@ -83,13 +83,46 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI
                 sender: Map(_actorContext.DataHub, Role.MeteringPointAdministrator), // TODO: verify roles
                 receiver: Map(_actorContext.CurrentActor, Role.GridAccessProvider),
                 createdDateTime: _dateTimeProvider.Now(),
-                marketActivityRecord: new Acknowledgements.MarketActivityRecordWithReasons(
+                marketActivityRecord: new MarketActivityRecordWithReasons(
                     Id: Guid.NewGuid().ToString(),
                     MarketEvaluationPoint: gsrn,
                     OriginalTransaction: transactionId,
                     Reasons: errors.Select(error => new Reason(error.Code, error.Description)).ToList()));
 
             await _messageHubDispatcher.DispatchAsync(message, DocumentType.RejectChangeOfSupplier, _actorContext.CurrentActor.Identifier, gsrn).ConfigureAwait(false);
+        }
+
+        public async Task SendMoveInConfirmAsync(string transactionId, string gsrn)
+        {
+            if (_actorContext.CurrentActor is null) throw new InvalidOperationException("Can't create message when current actor is not set (null)");
+
+            var message = ConfirmMessageFactory.MoveIn(
+                sender: Map(_actorContext.DataHub, Role.MeteringPointAdministrator), // TODO: verify roles
+                receiver: Map(_actorContext.CurrentActor, Role.GridAccessProvider),
+                createdDateTime: _dateTimeProvider.Now(),
+                marketActivityRecord: new Acknowledgements.MarketActivityRecord(
+                    Id: Guid.NewGuid().ToString(),
+                    MarketEvaluationPoint: gsrn,
+                    OriginalTransaction: transactionId));
+
+            await _messageHubDispatcher.DispatchAsync(message, DocumentType.ConfirmMoveIn, _actorContext.CurrentActor.Identifier, gsrn).ConfigureAwait(false);
+        }
+
+        public async Task SendMoveInRejectAsync(string transactionId, string gsrn, IEnumerable<ErrorMessage> errors)
+        {
+            if (_actorContext.CurrentActor is null) throw new InvalidOperationException("Can't create message when current actor is not set (null)");
+
+            var message = RejectMessageFactory.MoveIn(
+                sender: Map(_actorContext.DataHub, Role.MeteringPointAdministrator), // TODO: verify roles
+                receiver: Map(_actorContext.CurrentActor, Role.GridAccessProvider),
+                createdDateTime: _dateTimeProvider.Now(),
+                marketActivityRecord: new MarketActivityRecordWithReasons(
+                    Id: Guid.NewGuid().ToString(),
+                    MarketEvaluationPoint: gsrn,
+                    OriginalTransaction: transactionId,
+                    Reasons: errors.Select(error => new Reason(error.Code, error.Description)).ToList()));
+
+            await _messageHubDispatcher.DispatchAsync(message, DocumentType.RejectMoveIn, _actorContext.CurrentActor.Identifier, gsrn).ConfigureAwait(false);
         }
 
         private static MarketRoleParticipant Map(Actor actor, Role documentRole)

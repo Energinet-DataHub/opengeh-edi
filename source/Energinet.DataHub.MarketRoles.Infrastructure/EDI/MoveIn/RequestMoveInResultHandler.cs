@@ -14,16 +14,18 @@
 
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Application.Common;
 using Energinet.DataHub.MarketRoles.Application.EDI;
 using Energinet.DataHub.MarketRoles.Application.MoveIn;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using Energinet.DataHub.MarketRoles.Infrastructure.BusinessRequestProcessing;
 using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
 {
-    public sealed class RequestMoveInResultHandler : BusinessProcessResultHandler<RequestMoveIn>
+    public sealed class RequestMoveInResultHandler : IBusinessProcessResultHandler<RequestMoveIn>
     {
         private readonly IActorMessageService _actorMessageService;
         private readonly ErrorMessageFactory _errorMessageFactory;
@@ -34,10 +36,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
             IActorMessageService actorMessageService,
             ErrorMessageFactory errorMessageFactory,
             ICorrelationContext correlationContext,
-            ISystemDateTimeProvider dateTimeProvider,
-            IOutbox outbox,
-            IOutboxMessageFactory outboxMessageFactory)
-            : base(outbox, outboxMessageFactory)
+            ISystemDateTimeProvider dateTimeProvider)
         {
             _actorMessageService = actorMessageService;
             _errorMessageFactory = errorMessageFactory;
@@ -45,25 +44,36 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn
             _dateTimeProvider = dateTimeProvider;
         }
 
-        protected override object CreateRejectMessage(RequestMoveIn request, BusinessProcessResult result)
+        public Task HandleAsync(RequestMoveIn request, BusinessProcessResult result)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
             if (result == null) throw new ArgumentNullException(nameof(result));
 
-            var errors = result.ValidationErrors
-                .Select(error => _errorMessageFactory.GetErrorMessage(error));
-
-            // TODO: Send reject message
-            throw new NotImplementedException("Send reject message");
+            return result.Success
+                ? CreateAcceptResponseAsync(request)
+                : CreateRejectResponseAsync(request, result);
         }
 
-        protected override object CreateAcceptMessage(RequestMoveIn request, BusinessProcessResult result)
+        private async Task CreateAcceptResponseAsync(RequestMoveIn request)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
-            if (result == null) throw new ArgumentNullException(nameof(result));
 
-            // TODO: Send confirm message
-            throw new NotImplementedException("Send confirm message");
+            await _actorMessageService
+                .SendMoveInConfirmAsync(
+                    request.TransactionId,
+                    request.AccountingPointGsrnNumber)
+                .ConfigureAwait(false);
+        }
+
+        private async Task CreateRejectResponseAsync(RequestMoveIn request, BusinessProcessResult result)
+        {
+            var errors = result.ValidationErrors
+                .Select(error => _errorMessageFactory.GetErrorMessage(error))
+                .AsEnumerable();
+
+            await _actorMessageService
+                .SendMoveInRejectAsync(request.TransactionId, request.AccountingPointGsrnNumber, errors)
+                .ConfigureAwait(false);
         }
     }
 }

@@ -30,7 +30,27 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Acknowledgements
                 with
                 {
                     DocumentName = "ConfirmRequestChangeOfSupplier_MarketDocument",
+                    Type = "D16",
                     ProcessType = "E03",
+                    Sender = sender,
+                    Receiver = receiver,
+                    CreatedDateTime = createdDateTime,
+                    MarketActivityRecord = marketActivityRecord,
+                };
+        }
+
+        public static ConfirmMessage MoveIn(
+            MarketRoleParticipant sender,
+            MarketRoleParticipant receiver,
+            Instant createdDateTime,
+            MarketActivityRecord marketActivityRecord)
+        {
+            return Defaults()
+                with
+                {
+                    DocumentName = "ConfirmRequestChangeCustomerCharacteristics_MarketDocument",
+                    Type = "D16",
+                    ProcessType = "E65",
                     Sender = sender,
                     Receiver = receiver,
                     CreatedDateTime = createdDateTime,
