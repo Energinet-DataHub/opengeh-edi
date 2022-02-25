@@ -13,13 +13,14 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
+using Energinet.DataHub.MarketRoles.Application.EDI;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Rules.ChangeEnergySupplier;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors.Converters
 {
     public class CannotBeCurrentSupplierRuleErrorConverter : ErrorConverter<CannotBeCurrentSupplierRuleError>
     {
-        protected override ErrorMessage Convert([NotNull] CannotBeCurrentSupplierRuleError validationError)
+        protected override Application.EDI.ErrorMessage Convert([NotNull] CannotBeCurrentSupplierRuleError validationError)
         {
             return new("D02", $"It is not allowed to request change of supplier if requesting supplier is already the active energy supplier.");
         }

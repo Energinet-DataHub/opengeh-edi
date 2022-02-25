@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.MarketRoles.Infrastructure.EDI.Common;
 using NodaTime;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Acknowledgements
@@ -22,9 +23,9 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Acknowledgements
         string Type,
         string ProcessType,
         string BusinessSectorType,
-        MarketParticipant Sender,
-        MarketParticipant Receiver,
+        MarketRoleParticipant Sender,
+        MarketRoleParticipant Receiver,
         Instant CreatedDateTime,
-        Reason Reason,
+        string ReasonCode,
         MarketActivityRecordWithReasons MarketActivityRecord);
 }

@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
+using TraceContext = Energinet.DataHub.MarketRoles.Infrastructure.Correlation.TraceContext;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Common
 {
@@ -35,7 +36,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Common
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
-            var traceContext = Infrastructure.Correlation.TraceContext.Parse(context.TraceContext.TraceParent);
+            var traceContext = TraceContext.Parse(context.TraceContext.TraceParent);
 
             _correlationContext.SetId(traceContext.TraceId);
             _correlationContext.SetParentId(traceContext.ParentId);

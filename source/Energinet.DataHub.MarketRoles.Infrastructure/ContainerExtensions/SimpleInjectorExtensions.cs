@@ -15,10 +15,9 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using Energinet.DataHub.MarketRoles.Application.EDI;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
-using Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors;
 using SimpleInjector;
-using ValidationError = Energinet.DataHub.MarketRoles.Domain.SeedWork.ValidationError;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.ContainerExtensions
 {
@@ -72,7 +71,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.ContainerExtensions
             }
         }
 
-        private static ErrorConverterRegistration GetErrorConverterRegistration(this SimpleInjector.Container container, Type type)
+        private static ErrorConverterRegistration GetErrorConverterRegistration(this Container container, Type type)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
             if (type.BaseType?.GenericTypeArguments.SingleOrDefault() == null) throw new InvalidOperationException("ErrorConverterRegistration not found for type: " + type);

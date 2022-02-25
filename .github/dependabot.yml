@@ -41,6 +41,12 @@ updates:
     open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
+    directory: "/source/Energinet.DataHub.MarketRoles.EntryPoints.LocalMessageHub"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "nuget"
     directory: "/source/Energinet.DataHub.MarketRoles.EntryPoints.Outbox"
     schedule:
       interval: "weekly"
@@ -60,6 +66,12 @@ updates:
 
   - package-ecosystem: "nuget"
     directory: "/source/Energinet.DataHub.MarketRoles.IntegrationTests"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "nuget"
+    directory: "/source/Energinet.DataHub.MarketRoles.Messaging"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
