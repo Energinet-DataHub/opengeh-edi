@@ -39,7 +39,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
 
             await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
 
-            AssertOutboxMessage<PostOfficeEnvelope>(envelope => envelope.MessageType == nameof(RequestChangeOfSupplierRejected));
+            AssertOutboxMessage<MessageHubEnvelope>(envelope => envelope.MessageType == DocumentType.RejectChangeOfSupplier);
         }
 
         [Fact]
@@ -51,7 +51,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
 
             await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
 
-            AssertOutboxMessage<PostOfficeEnvelope>(envelope => envelope.MessageType == nameof(RequestChangeOfSupplierRejected));
+            AssertOutboxMessage<MessageHubEnvelope>(envelope => envelope.MessageType == DocumentType.RejectChangeOfSupplier);
         }
 
         [Fact]
@@ -66,7 +66,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
 
             await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
 
-            AssertOutboxMessage<PostOfficeEnvelope>(envelope => envelope.MessageType == nameof(RequestChangeOfSupplierRejected));
+            AssertOutboxMessage<MessageHubEnvelope>(envelope => envelope.MessageType == DocumentType.RejectChangeOfSupplier);
         }
 
         [Fact]
@@ -86,7 +86,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
                 };
 
             await Mediator.Send(request, CancellationToken.None).ConfigureAwait(false);
-            AssertOutboxMessage<PostOfficeEnvelope>(envelope => envelope.MessageType == nameof(RequestChangeOfSupplierApproved));
+            AssertOutboxMessage<MessageHubEnvelope>(envelope => envelope.MessageType == DocumentType.ConfirmChangeOfSupplier);
         }
 
         private static RequestChangeOfSupplier CreateRequest(string transaction, string energySupplierGln, string consumerId, string gsrnNumber, string startDate)

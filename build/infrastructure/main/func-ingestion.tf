@@ -23,7 +23,7 @@ module "func_ingestion" {
   vnet_integration_subnet_id                = module.vnet_integrations_functions.id
   private_endpoint_subnet_id                = module.snet_internal_private_endpoints.id
   private_dns_resource_group_name           = data.azurerm_key_vault_secret.pdns_resource_group_name.value
-  app_service_plan_id                       = module.plan_shared.id
+  app_service_plan_id                       = data.azurerm_key_vault_secret.plan_shared_id.value
   application_insights_instrumentation_key  = data.azurerm_key_vault_secret.appi_instrumentation_key.value
   always_on                                 = true
   app_settings                              = {

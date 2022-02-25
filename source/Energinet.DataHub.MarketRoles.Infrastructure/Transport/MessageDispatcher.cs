@@ -22,7 +22,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Transport
     /// <summary>
     /// A class that combines the serialized format, and the means of transport
     /// </summary>
-    public class MessageDispatcher
+    public class MessageDispatcher : IMessageDispatcher
     {
         private readonly MessageSerializer _serializer;
         private readonly Channel _channel;

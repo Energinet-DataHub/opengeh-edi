@@ -31,6 +31,12 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests
             Environment.SetEnvironmentVariable("ENERGY_SUPPLIER_CHANGED_TOPIC", SomeString);
             Environment.SetEnvironmentVariable("ENERGY_SUPPLIER_CHANGE_REGISTERED_TOPIC", SomeString);
             Environment.SetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY", SomeString);
+            Environment.SetEnvironmentVariable("MESSAGEHUB_STORAGE_CONNECTION_STRING", SomeString);
+            Environment.SetEnvironmentVariable("MESSAGEHUB_STORAGE_CONTAINER_NAME", SomeString);
+            Environment.SetEnvironmentVariable("MESSAGEHUB_QUEUE_CONNECTION_STRING", ServiceBusConnectionString);
+            Environment.SetEnvironmentVariable("MESSAGEHUB_DATA_AVAILABLE_QUEUE", SomeString);
+            Environment.SetEnvironmentVariable("MESSAGEHUB_DOMAIN_REPLY_QUEUE", SomeString);
+
             var program = new EntryPoints.Outbox.Program();
 
             program.ConfigureApplication();
@@ -44,6 +50,9 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests
             Environment.SetEnvironmentVariable("MARKET_DATA_QUEUE_CONNECTION_STRING", ServiceBusConnectionString);
             Environment.SetEnvironmentVariable("MARKET_DATA_QUEUE_TOPIC_NAME", SomeString);
             Environment.SetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY", SomeString);
+            Environment.SetEnvironmentVariable("B2C_TENANT_ID", SomeString);
+            Environment.SetEnvironmentVariable("BACKEND_SERVICE_APP_ID", SomeString);
+            Environment.SetEnvironmentVariable("MARKET_DATA_DB_CONNECTION_STRING", SomeString);
             var program = new EntryPoints.Ingestion.Program();
 
             program.ConfigureApplication();

@@ -5,7 +5,10 @@
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
     "APPINSIGHTS_INSTRUMENTATIONKEY": "<App insights instrumentation key>",
     "INTERNAL_SERVICEBUS_RETRY_COUNT": 3,
-    "MARKET_DATA_QUEUE_CONNECTION_STRING": "<Database connection string>",
-    "MARKET_DATA_QUEUE_TOPIC_NAME": "<Name of Azure Service Bus queue>"
+    "MARKET_DATA_QUEUE_CONNECTION_STRING": "<Service bus connection string>",
+    "MARKET_DATA_QUEUE_TOPIC_NAME": "<Name of Azure Service Bus queue>",
+    "MARKET_DATA_DB_CONNECTION_STRING": "<Database connection string>",
+    "B2C_TENANT_ID": "<Azure B2C tenant id>",
+    "BACKEND_SERVICE_APP_ID": "<Backend service application id>"
   }
 }
