@@ -23,7 +23,7 @@ module "st_postoffice" {
     account_replication_type        = "LRS"
     account_tier                    = "Standard"
 
-    private_endpoint_subnet_id      = data.azurerm_key_vault_secret.snet_private_endoints_id.value
+    private_endpoint_subnet_id      = data.azurerm_key_vault_secret.snet_private_endpoints_id.value
     private_dns_resource_group_name = data.azurerm_key_vault_secret.pdns_resource_group_name.value
     use_blob                        = false
     use_file                        = true
