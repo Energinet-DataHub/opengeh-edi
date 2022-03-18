@@ -35,7 +35,6 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "marketroles_alert" {
   data_source_id = data.azurerm_key_vault_secret.appi_shared_id.value
   description    = "Alert when total results cross threshold"
   enabled        = true
-  # Count all requests with server error result code grouped into 5-minute bins
   query       = <<-QUERY
     requests
 | where timestamp > ago(10m) and  success == false
