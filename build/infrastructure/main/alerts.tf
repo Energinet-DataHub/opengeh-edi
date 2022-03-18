@@ -42,10 +42,10 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "marketroles_alert" {
 | join kind= inner (
 exceptions
 | where timestamp > ago(10m)
-  and (cloud_RoleName == 'func-ingestion--${lower(var.domain_name_short)}-${lower(var.environment_short)}-${lower(var.environment_instance)}'
-  or cloud_RoleName == 'func-outbox--${lower(var.domain_name_short)}-${lower(var.environment_short)}-${lower(var.environment_instance)}'
-  or cloud_RoleName == 'func-localmessagehub--${lower(var.domain_name_short)}-${lower(var.environment_short)}-${lower(var.environment_instance)}'
-  or cloud_RoleName == 'func-processing--${lower(var.domain_name_short)}-${lower(var.environment_short)}-${lower(var.environment_instance)}')
+  and (cloud_RoleName == 'func-ingestion-${lower(var.domain_name_short)}-${lower(var.environment_short)}-${lower(var.environment_instance)}'
+  or cloud_RoleName == 'func-outbox-${lower(var.domain_name_short)}-${lower(var.environment_short)}-${lower(var.environment_instance)}'
+  or cloud_RoleName == 'func-localmessagehub-${lower(var.domain_name_short)}-${lower(var.environment_short)}-${lower(var.environment_instance)}'
+  or cloud_RoleName == 'func-processing-${lower(var.domain_name_short)}-${lower(var.environment_short)}-${lower(var.environment_instance)}')
 ) on operation_Id
 | project exceptionType = type, failedMethod = method, requestName = name, requestDuration = duration, function = cloud_RoleName
   QUERY
