@@ -51,9 +51,9 @@ exceptions
   QUERY
   severity    = 1
   frequency   = 5
-  time_window = 30
+  time_window = 10
   trigger {
     operator  = "GreaterThan"
-    threshold = 1
+    threshold = 0
   }
 }
