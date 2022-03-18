@@ -64,20 +64,25 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
             catch (Exception exception)
             {
                 _logger.LogError(exception, "Unable to deserialize request");
-                return request.CreateResponse(HttpStatusCode.BadRequest);
+                return CreateResponse(request, HttpStatusCode.BadRequest);
             }
 
-            var response = request.CreateResponse(HttpStatusCode.OK);
+            var response = CreateResponse(request, HttpStatusCode.OK);
 
             response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
-
-            await response.WriteStringAsync("Correlation id: " + _correlationContext.Id)
-                .ConfigureAwait(false);
 
             foreach (var command in commands)
             {
                 await _messageDispatcher.DispatchAsync((IOutboundMessage)command).ConfigureAwait(false);
             }
+
+            return response;
+        }
+
+        private HttpResponseData CreateResponse(HttpRequestData request, HttpStatusCode statusCode)
+        {
+            var response = request.CreateResponse(statusCode);
+            response.Headers.Add("CorrelationId", _correlationContext.Id);
 
             return response;
         }
