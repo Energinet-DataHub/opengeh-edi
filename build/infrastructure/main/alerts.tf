@@ -14,7 +14,7 @@
 resource "azurerm_monitor_action_group" "marketroles" {
   name                = "ag-marketroles-${lower(var.environment_short)}-${lower(var.environment_instance)}"
   resource_group_name = azurerm_resource_group.this.name
-  short_name          = "ag-mp-${lower(var.environment_short)}-${lower(var.environment_instance)}"
+  short_name          = "ag-mr-${lower(var.environment_short)}-${lower(var.environment_instance)}"
 
   email_receiver {
     name                    = "Alerts-MarketRoles-${lower(var.domain_name_short)}-${lower(var.environment_short)}-${lower(var.environment_instance)}"
