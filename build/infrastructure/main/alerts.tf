@@ -30,7 +30,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "marketroles_outbox" {
   resource_group_name = var.shared_resources_resource_group_name
 
   action {
-    action_group           = azurerm_monitor_action_group.marketroles.id
+    action_group           = [azurerm_monitor_action_group.marketroles.id]
   }
   data_source_id = data.azurerm_key_vault_secret.appi_shared_id.value
   description    = "Alert when total results cross threshold"
