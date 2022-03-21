@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -75,6 +76,7 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
 
                 Assert.False(result.Success);
                 Assert.Contains(result.Errors, error => error is DuplicateMessageIdDetected);
+                AssertContainsError(result, "B2B-003");
             }
         }
 
@@ -156,6 +158,11 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
             fileReader.CopyTo(messageStream);
             messageStream.Position = 0;
             return messageStream;
+        }
+
+        private static void AssertContainsError(Result result, string errorCode)
+        {
+            Assert.Contains(result.Errors, error => error.Code.Equals(errorCode, StringComparison.OrdinalIgnoreCase));
         }
 
         private Task<Result> ReceiveRequestChangeOfSupplierMessage(Stream message, string version = "1.0")

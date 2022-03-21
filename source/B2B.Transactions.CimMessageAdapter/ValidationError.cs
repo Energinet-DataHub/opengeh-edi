@@ -15,11 +15,20 @@ namespace B2B.CimMessageAdapter
 {
     public class ValidationError
     {
+        public ValidationError(string message, string code)
+        {
+            Message = message;
+            Code = code;
+        }
+
         public ValidationError(string message)
         {
             Message = message;
+            Code = "UnknownError";
         }
 
         public string Message { get; }
+
+        public string Code { get; }
     }
 }
