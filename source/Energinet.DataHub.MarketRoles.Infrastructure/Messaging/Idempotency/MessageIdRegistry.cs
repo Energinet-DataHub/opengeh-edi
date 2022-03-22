@@ -30,9 +30,18 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Messaging.Idempotency
 
         public async Task<bool> TryStoreAsync(string messageId)
         {
-           var result = await _context.MessageIds.AddAsync(new IncomingMessageId(messageId)).ConfigureAwait(false);
+            try
+            {
+                await _context.MessageIds.AddAsync(new IncomingMessageId(messageId)).ConfigureAwait(false);
+            }
+            catch (InvalidOperationException e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
 
-           return result != null;
+            // await _context.SaveChangesAsync().ConfigureAwait(false);
+            return true;
         }
     }
 }

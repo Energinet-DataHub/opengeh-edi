@@ -25,7 +25,6 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
     public class MessageReceiverTests : TestHost
     {
         private readonly TransactionIdsStub _transactionIdsStub = new();
-        private readonly MessageIdsStub _messageIdsStub = new();
         private readonly MarketActivityRecordForwarderStub _marketActivityRecordForwarderSpy = new();
 
         [Fact]
@@ -166,7 +165,7 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
 
         private MessageReceiver CreateMessageReceiver()
         {
-            var messageReceiver = new MessageReceiver(_messageIdsStub, _marketActivityRecordForwarderSpy, _transactionIdsStub, new SchemaProvider(new SchemaStore()));
+            var messageReceiver = new MessageReceiver(MessageIdRegistry, _marketActivityRecordForwarderSpy, _transactionIdsStub, new SchemaProvider(new SchemaStore()));
             return messageReceiver;
         }
     }

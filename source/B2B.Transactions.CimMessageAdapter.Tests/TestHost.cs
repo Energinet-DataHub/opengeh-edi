@@ -24,6 +24,7 @@ using SimpleInjector.Lifestyles;
 
 namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
 {
+#pragma warning disable CA1724 // TODO: TestHost is reserved. Maybe refactor to base EntryPoint?
     public class TestHost : IDisposable
     {
         private readonly Scope _scope;
@@ -49,9 +50,12 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
             _scope = AsyncScopedLifestyle.BeginScope(_container);
 
             MarketRolesContext = _container.GetInstance<MarketRolesContext>();
+            MessageIdRegistry = _container.GetInstance<IMessageIds>();
         }
 
         protected MarketRolesContext MarketRolesContext { get; }
+
+        protected IMessageIds MessageIdRegistry { get; }
 
         public void Dispose()
         {
