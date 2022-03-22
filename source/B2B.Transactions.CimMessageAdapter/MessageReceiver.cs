@@ -59,7 +59,7 @@ namespace B2B.CimMessageAdapter
             {
                 try
                 {
-                    var messageHeader = await HandleMessageHeaderValuesAsync(reader).ConfigureAwait(false);
+                    var messageHeader = await ExtractMessageHeaderAsync(reader).ConfigureAwait(false);
                     var messageIdIsUnique = await CheckMessageIdAsync(messageHeader.MessageId).ConfigureAwait(false);
                     if (messageIdIsUnique == false)
                     {
@@ -183,7 +183,7 @@ namespace B2B.CimMessageAdapter
             }
         }
 
-        private static async Task<MessageHeader> HandleMessageHeaderValuesAsync(XmlReader reader)
+        private static async Task<MessageHeader> ExtractMessageHeaderAsync(XmlReader reader)
         {
             var messageId = string.Empty;
 
