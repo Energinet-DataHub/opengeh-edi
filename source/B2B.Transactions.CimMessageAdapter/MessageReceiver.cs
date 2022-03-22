@@ -59,7 +59,14 @@ namespace B2B.CimMessageAdapter
             {
                 try
                 {
-                    await HandleMessageHeaderValuesAsync(reader).ConfigureAwait(false);
+                    var messageHeader = await HandleMessageHeaderValuesAsync(reader).ConfigureAwait(false);
+                    var messageIdIsUnique = await CheckMessageIdAsync(messageHeader.MessageId).ConfigureAwait(false);
+                    if (messageIdIsUnique == false)
+                    {
+                        _errors.Add(new DuplicateMessageIdDetected($"Message id '{messageHeader.MessageId}' is not unique"));
+                        _hasInvalidHeaderValues = true;
+                    }
+
                     await HandleMarketActivityRecordsAsync(reader).ConfigureAwait(false);
                 }
                 catch (XmlException exception)
@@ -176,6 +183,31 @@ namespace B2B.CimMessageAdapter
             }
         }
 
+        private static async Task<MessageHeader> HandleMessageHeaderValuesAsync(XmlReader reader)
+        {
+            var messageId = string.Empty;
+
+            while (await reader.ReadAsync().ConfigureAwait(false))
+            {
+                if (StartOfMessageHeader(reader))
+                {
+                    while (await reader.ReadAsync().ConfigureAwait(false))
+                    {
+                        if (reader.NodeType == XmlNodeType.Element &&
+                            reader.LocalName.Equals("mRID", StringComparison.OrdinalIgnoreCase))
+                        {
+                            TryExtractValueFrom("mRID", reader, value => messageId = value);
+                            break;
+                        }
+                    }
+
+                    break;
+                }
+            }
+
+            return new MessageHeader(messageId);
+        }
+
         private async Task HandleMarketActivityRecordsAsync(XmlReader reader)
         {
             while (await reader.ReadAsync().ConfigureAwait(false))
@@ -192,34 +224,6 @@ namespace B2B.CimMessageAdapter
                     {
                         await StoreActivityRecordAsync(marketActivityRecord).ConfigureAwait(false);
                     }
-                }
-            }
-        }
-
-        private async Task HandleMessageHeaderValuesAsync(XmlReader reader)
-        {
-            while (await reader.ReadAsync().ConfigureAwait(false))
-            {
-                if (StartOfMessageHeader(reader))
-                {
-                    while (await reader.ReadAsync().ConfigureAwait(false))
-                    {
-                        if (reader.NodeType == XmlNodeType.Element &&
-                            reader.LocalName.Equals("mRID", StringComparison.OrdinalIgnoreCase))
-                        {
-                            var messageId = reader.ReadElementString();
-                            var messageIdIsUnique = await CheckMessageIdAsync(messageId).ConfigureAwait(false);
-                            if (messageIdIsUnique == false)
-                            {
-                                _errors.Add(new DuplicateMessageIdDetected($"Message id '{messageId}' is not unique"));
-                                _hasInvalidHeaderValues = true;
-                            }
-
-                            break;
-                        }
-                    }
-
-                    break;
                 }
             }
         }
@@ -261,6 +265,17 @@ namespace B2B.CimMessageAdapter
             var message =
                 $"XML schema validation error at line {arguments.Exception.LineNumber}, position {arguments.Exception.LinePosition}: {arguments.Message}.";
             _errors.Add(InvalidMessageStructure.From(message));
+        }
+    }
+
+    #pragma warning disable
+    public class MessageHeader
+    {
+        public string MessageId { get; }
+
+        public MessageHeader(string messageId)
+        {
+            MessageId = messageId;
         }
     }
 }
