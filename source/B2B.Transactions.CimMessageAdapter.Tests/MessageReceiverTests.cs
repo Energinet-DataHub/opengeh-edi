@@ -24,8 +24,9 @@ using Xunit;
 
 namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
 {
-    public class MessageReceiverTests : TestHost
+    public class MessageReceiverTests
     {
+        private readonly MessageIdsStub _messageIdsStub = new();
         private readonly TransactionIdsStub _transactionIdsStub = new();
         private MarketActivityRecordForwarderStub _marketActivityRecordForwarderSpy = new();
 
@@ -64,23 +65,6 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
         }
 
         [Fact]
-        public async Task Return_failure_if_message_id_is_not_unique()
-        {
-            await using (var message = CreateMessage())
-            {
-                await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
-            }
-
-            await using (var message = CreateMessage())
-            {
-                var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
-
-                Assert.False(result.Success);
-                AssertContainsError(result, "B2B-003");
-            }
-        }
-
-        [Fact]
         public async Task Valid_activity_records_are_extracted_and_committed_to_queue()
         {
             await using var message = CreateMessageNotConformingToXmlSchema();
@@ -105,17 +89,6 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
             await SimulateDuplicationOfMessageIds(messageIds).ConfigureAwait(false);
 
             Assert.Empty(_marketActivityRecordForwarderSpy.CommittedItems);
-        }
-
-        [Fact]
-        public async Task Activity_records_must_have_unique_transaction_ids()
-        {
-            await using var message = CreateMessageWithDuplicateTransactionIds();
-            var result = await ReceiveRequestChangeOfSupplierMessage(message)
-                .ConfigureAwait(false);
-
-            AssertContainsError(result, "B2B-005");
-            Assert.False(result.Success);
         }
 
         private static Stream CreateMessageWithInvalidXmlStructure()
@@ -170,7 +143,7 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
         private MessageReceiver CreateMessageReceiver()
         {
             _marketActivityRecordForwarderSpy = new MarketActivityRecordForwarderStub();
-            var messageReceiver = new MessageReceiver(MessageIdRegistry, _marketActivityRecordForwarderSpy, TransactionIds, new SchemaProvider(new SchemaStore()));
+            var messageReceiver = new MessageReceiver(_messageIdsStub, _marketActivityRecordForwarderSpy, _transactionIdsStub, new SchemaProvider(new SchemaStore()));
             return messageReceiver;
         }
 
