@@ -67,7 +67,18 @@ namespace B2B.CimMessageAdapter
                         _hasInvalidHeaderValues = true;
                     }
 
-                    await HandleMarketActivityRecordsAsync(reader).ConfigureAwait(false);
+                    await foreach (var marketActivityRecord in MarketActivityRecordsFromAsync(reader))
+                    {
+                        if (await CheckTransactionIdAsync(marketActivityRecord.MrId).ConfigureAwait(false) == false)
+                        {
+                            _errors.Add(new DuplicateTransactionIdDetected(
+                                $"Transaction id '{marketActivityRecord.MrId}' is not unique and will not be processed."));
+                        }
+                        else
+                        {
+                            await StoreActivityRecordAsync(marketActivityRecord).ConfigureAwait(false);
+                        }
+                    }
                 }
                 catch (XmlException exception)
                 {
@@ -92,7 +103,7 @@ namespace B2B.CimMessageAdapter
             return Result.Failure(InvalidMessageStructure.From(exception));
         }
 
-        private static async IAsyncEnumerable<MarketActivityRecord> ExtractFromAsync(XmlReader reader)
+        private static async IAsyncEnumerable<MarketActivityRecord> MarketActivityRecordsFromAsync(XmlReader reader)
         {
             var mrid = string.Empty;
             var marketEvaluationPointmRID = string.Empty;
@@ -101,6 +112,14 @@ namespace B2B.CimMessageAdapter
             var customerMarketParticipantmRID = string.Empty;
             var customerMarketParticipantname = string.Empty;
             var startDateAndOrTimedateTime = string.Empty;
+
+            while (await reader.ReadAsync().ConfigureAwait(false))
+            {
+                if (StartOfMarketActivityRecord(reader))
+                {
+                    break;
+                }
+            }
 
             while (await reader.ReadAsync().ConfigureAwait(false))
             {
@@ -208,26 +227,25 @@ namespace B2B.CimMessageAdapter
             return new MessageHeader(messageId);
         }
 
-        private async Task HandleMarketActivityRecordsAsync(XmlReader reader)
-        {
-            while (await reader.ReadAsync().ConfigureAwait(false))
-            {
-                if (!StartOfMarketActivityRecord(reader)) continue;
-                await foreach (var marketActivityRecord in ExtractFromAsync(reader))
-                {
-                    if (await CheckTransactionIdAsync(marketActivityRecord.MrId).ConfigureAwait(false) == false)
-                    {
-                        _errors.Add(new DuplicateTransactionIdDetected(
-                            $"Transaction id '{marketActivityRecord.MrId}' is not unique and will not be processed."));
-                    }
-                    else
-                    {
-                        await StoreActivityRecordAsync(marketActivityRecord).ConfigureAwait(false);
-                    }
-                }
-            }
-        }
-
+        // private async Task HandleMarketActivityRecordsAsync(XmlReader reader)
+        // {
+        //     while (await reader.ReadAsync().ConfigureAwait(false))
+        //     {
+        //         if (!StartOfMarketActivityRecord(reader)) continue;
+        //         await foreach (var marketActivityRecord in ExtractFromAsync(reader))
+        //         {
+        //             if (await CheckTransactionIdAsync(marketActivityRecord.MrId).ConfigureAwait(false) == false)
+        //             {
+        //                 _errors.Add(new DuplicateTransactionIdDetected(
+        //                     $"Transaction id '{marketActivityRecord.MrId}' is not unique and will not be processed."));
+        //             }
+        //             else
+        //             {
+        //                 await StoreActivityRecordAsync(marketActivityRecord).ConfigureAwait(false);
+        //             }
+        //         }
+        //     }
+        // }
         private Task<bool> CheckTransactionIdAsync(string transactionId)
         {
             if (transactionId == null) throw new ArgumentNullException(nameof(transactionId));
