@@ -31,11 +31,14 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
 
             var response = ResponseFactory.From(result);
 
+            AssertHasValue(response, "Code", duplicateMessageIdError.Code);
+            AssertHasValue(response, "Message", duplicateMessageIdError.Message);
+        }
+
+        private static void AssertHasValue(Response response, string elementName, string expectedValue)
+        {
             var document = XDocument.Parse(response.MessageBody);
-            var code = document?.Element("Error")?.Element("Code")?.Value;
-            var message = document?.Element("Error")?.Element("Message")?.Value;
-            Assert.Equal(duplicateMessageIdError.Code, code);
-            Assert.Equal(duplicateMessageIdError.Message, message);
+            Assert.Equal(expectedValue, document?.Element("Error")?.Element(elementName)?.Value);
         }
     }
 
