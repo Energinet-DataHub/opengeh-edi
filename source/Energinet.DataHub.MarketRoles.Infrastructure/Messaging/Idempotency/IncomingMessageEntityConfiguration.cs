@@ -18,14 +18,14 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.Messaging.Idempotency
 {
-    public class IncomingMessageEntityConfiguration : IEntityTypeConfiguration<IncomingMessage>
+    public class IncomingMessageEntityConfiguration : IEntityTypeConfiguration<IncomingMessageId>
     {
-        public void Configure(EntityTypeBuilder<IncomingMessage> builder)
+        public void Configure(EntityTypeBuilder<IncomingMessageId> builder)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
             builder.ToTable("IncomingMessages", "dbo");
-            builder.HasKey(x => new { x.MessageId, x.MessageType });
+            builder.HasKey(x => new { x.MessageId });
         }
     }
 }

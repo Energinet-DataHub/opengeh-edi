@@ -14,16 +14,13 @@
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.Messaging.Idempotency
 {
-    public class IncomingMessage
+    public class IncomingMessageId
     {
-        public IncomingMessage(string messageId, string messageType)
+        public IncomingMessageId(string messageId)
         {
             MessageId = messageId;
-            MessageType = messageType;
         }
 
         public string MessageId { get; }
-
-        public string MessageType { get; }
     }
 }

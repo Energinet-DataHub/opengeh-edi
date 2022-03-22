@@ -14,23 +14,25 @@
 
 using System;
 using System.Threading.Tasks;
+using B2B.CimMessageAdapter;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.Messaging.Idempotency
 {
-    public class IncomingMessageRegistry : IIncomingMessageRegistry
+    public class MessageIdRegistry : IMessageIds
     {
         private readonly MarketRolesContext _context;
 
-        public IncomingMessageRegistry(MarketRolesContext context)
+        public MessageIdRegistry(MarketRolesContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public async Task RegisterMessageAsync(string messageId, string messageType)
+        public async Task<bool> TryStoreAsync(string messageId)
         {
-            if (messageType == null) throw new ArgumentNullException(nameof(messageType));
-            await _context.IncomingMessages.AddAsync(new IncomingMessage(messageId, messageType)).ConfigureAwait(false);
+           var result = await _context.IncomingMessages.AddAsync(new IncomingMessageId(messageId)).ConfigureAwait(false);
+
+           return result != null;
         }
     }
 }

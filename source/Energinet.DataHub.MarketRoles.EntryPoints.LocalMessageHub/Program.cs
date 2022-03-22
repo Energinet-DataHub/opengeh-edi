@@ -103,7 +103,6 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.LocalMessageHub
             container.Register<IUnitOfWork, UnitOfWork>();
             container.Register<IJsonSerializer, JsonSerializer>(Lifestyle.Singleton);
             container.Register<ISystemDateTimeProvider, SystemDateTimeProvider>(Lifestyle.Singleton);
-            container.Register<IIncomingMessageRegistry, IncomingMessageRegistry>(Lifestyle.Transient);
             container.SendProtobuf<MarketRolesEnvelope>();
             container.Register<IMessageDispatcher, InternalDispatcher>(Lifestyle.Scoped);
             container.Register<Channel, ProcessingServiceBusChannel>(Lifestyle.Scoped); // TODO: internal service bus from MP?
