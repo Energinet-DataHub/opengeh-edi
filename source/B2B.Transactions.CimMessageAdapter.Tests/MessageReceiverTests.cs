@@ -22,7 +22,7 @@ using Xunit;
 
 namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
 {
-    public class MessageReceiverTests
+    public class MessageReceiverTests : TestHost
     {
         private readonly TransactionIdsStub _transactionIdsStub = new();
         private readonly MessageIdsStub _messageIdsStub = new();
