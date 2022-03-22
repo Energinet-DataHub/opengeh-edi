@@ -48,8 +48,7 @@ namespace B2B.CimMessageAdapter
             var xmlSchema = await _schemaProvider.GetSchemaAsync(businessProcessType, version).ConfigureAwait(true);
             if (xmlSchema is null)
             {
-                return Result.Failure(new ValidationError(
-                    $"Schema version {version} for business process type {businessProcessType} does not exist."));
+                return Result.Failure(new UnknownBusinessProcessTypeOrVersion(businessProcessType, version));
             }
 
             _hasInvalidHeaderValues = false;

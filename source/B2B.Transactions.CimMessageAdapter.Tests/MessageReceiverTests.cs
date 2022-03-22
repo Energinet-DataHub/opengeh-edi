@@ -51,7 +51,7 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
         }
 
         [Fact]
-        public async Task Return_failure_if_xml_schema_does_not_exist()
+        public async Task Return_failure_if_xml_schema_for_business_process_type_does_not_exist()
         {
             await using var message = CreateMessage();
 
@@ -59,7 +59,7 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
                 .ConfigureAwait(false);
 
             Assert.False(result.Success);
-            Assert.Single(result.Errors);
+            AssertContainsError(result, "B2B-001");
         }
 
         [Fact]
