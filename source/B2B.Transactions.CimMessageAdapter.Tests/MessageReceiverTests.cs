@@ -16,18 +16,32 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Azure.Messaging.ServiceBus;
 using B2B.CimMessageAdapter;
+using B2B.CimMessageAdapter.MarketActivity;
 using B2B.CimMessageAdapter.Schema;
+using Energinet.DataHub.MarketRoles.Infrastructure.Integration;
 using MarketRoles.B2B.CimMessageAdapter.IntegrationTests.Stubs;
+using Moq;
 using Xunit;
 
 namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
 {
     public class MessageReceiverTests
     {
+        private readonly Mock<ITopicSender<MarketActivityRecordTopic>> _topicSenderMock = new Mock<ITopicSender<MarketActivityRecordTopic>>();
         private readonly TransactionIdsStub _transactionIdsStub = new();
         private readonly MessageIdsStub _messageIdsStub = new();
-        private MarketActivityRecordForwarderStub _marketActivityRecordForwarderSpy = new();
+        private MarketActivityRecordForwarder<MarketActivityRecord> _marketActivityRecordForwarder;
+
+        public MessageReceiverTests()
+        {
+            _topicSenderMock
+                .Setup(x => x.SendMessageAsync(It.IsAny<ServiceBusMessage>()))
+                .Returns<ServiceBusMessage>((message) => Task.CompletedTask);
+
+            _marketActivityRecordForwarder = new MarketActivityRecordForwarder<MarketActivityRecord>(_topicSenderMock.Object);
+        }
 
         [Fact]
         public async Task Message_must_be_valid_xml()
@@ -87,7 +101,7 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
             await ReceiveRequestChangeOfSupplierMessage(message)
                 .ConfigureAwait(false);
 
-            var activityRecord = _marketActivityRecordForwarderSpy.CommittedItems.FirstOrDefault();
+            var activityRecord = _marketActivityRecordForwarder.CommittedItems.FirstOrDefault();
             Assert.NotNull(activityRecord);
             Assert.Equal("12345699", activityRecord?.MrId);
             Assert.Equal("579999993331812345", activityRecord?.MarketEvaluationPointmRID);
@@ -104,7 +118,7 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
             var messageIds = new MessageIdsStub();
             await SimulateDuplicationOfMessageIds(messageIds).ConfigureAwait(false);
 
-            Assert.Empty(_marketActivityRecordForwarderSpy.CommittedItems);
+            Assert.Empty(_marketActivityRecordForwarder.CommittedItems);
         }
 
         [Fact]
@@ -115,7 +129,17 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
                 .ConfigureAwait(false);
 
             AssertContainsError(result, "B2B-005");
-            Assert.Single(_marketActivityRecordForwarderSpy.CommittedItems);
+            Assert.Single(_marketActivityRecordForwarder.CommittedItems);
+        }
+
+        [Fact]
+        public async Task Queue_was_send_to_servicebus()
+        {
+            await using var message = CreateMessageNotConformingToXmlSchema();
+            await ReceiveRequestChangeOfSupplierMessage(message)
+                .ConfigureAwait(false);
+
+            _topicSenderMock.Verify(mock => mock.SendMessageAsync(It.IsAny<ServiceBusMessage>()), Times.Once());
         }
 
         private static Stream CreateMessageWithInvalidXmlStructure()
@@ -169,15 +193,15 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
 
         private MessageReceiver CreateMessageReceiver()
         {
-            _marketActivityRecordForwarderSpy = new MarketActivityRecordForwarderStub();
-            var messageReceiver = new MessageReceiver(_messageIdsStub, _marketActivityRecordForwarderSpy, _transactionIdsStub, new SchemaProvider(new SchemaStore()));
+            _marketActivityRecordForwarder = new MarketActivityRecordForwarder<MarketActivityRecord>(_topicSenderMock.Object);
+            var messageReceiver = new MessageReceiver(_messageIdsStub, _marketActivityRecordForwarder, _transactionIdsStub, new SchemaProvider(new SchemaStore()));
             return messageReceiver;
         }
 
         private MessageReceiver CreateMessageReceiver(IMessageIds messageIds)
         {
-            _marketActivityRecordForwarderSpy = new MarketActivityRecordForwarderStub();
-            var messageReceiver = new MessageReceiver(messageIds, _marketActivityRecordForwarderSpy, _transactionIdsStub, new SchemaProvider(new SchemaStore()));
+            _marketActivityRecordForwarder = new MarketActivityRecordForwarder<MarketActivityRecord>(_topicSenderMock.Object);
+            var messageReceiver = new MessageReceiver(messageIds, _marketActivityRecordForwarder, _transactionIdsStub, new SchemaProvider(new SchemaStore()));
             return messageReceiver;
         }
 

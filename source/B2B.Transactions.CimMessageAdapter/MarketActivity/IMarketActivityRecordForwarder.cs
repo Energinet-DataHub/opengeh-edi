@@ -14,7 +14,7 @@
 
 using System.Threading.Tasks;
 
-namespace B2B.CimMessageAdapter
+namespace B2B.CimMessageAdapter.MarketActivity
 {
     /// <summary>
     /// Service for forwarding extracted market activity records to external sources

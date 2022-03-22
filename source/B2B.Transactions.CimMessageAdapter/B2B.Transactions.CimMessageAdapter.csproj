@@ -20,4 +20,12 @@ limitations under the License.
         <RootNamespace>B2B.CimMessageAdapter</RootNamespace>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.5.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Energinet.DataHub.MarketRoles.Infrastructure\Energinet.DataHub.MarketRoles.Infrastructure.csproj" />
+    </ItemGroup>
+
 </Project>
