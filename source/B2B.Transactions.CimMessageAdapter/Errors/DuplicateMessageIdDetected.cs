@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace B2B.CimMessageAdapter
+namespace B2B.CimMessageAdapter.Errors
 {
     public class DuplicateMessageIdDetected : ValidationError
     {
         public DuplicateMessageIdDetected(string message)
-            : base(message)
+            : base(message, "B2B-003")
         {
         }
     }

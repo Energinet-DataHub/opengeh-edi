@@ -11,15 +11,24 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-namespace B2B.CimMessageAdapter
+namespace B2B.CimMessageAdapter.Errors
 {
-    public class ValidationError
+    public abstract class ValidationError
     {
-        public ValidationError(string message)
+        protected ValidationError(string message, string code)
         {
             Message = message;
+            Code = code;
+        }
+
+        protected ValidationError(string message)
+        {
+            Message = message;
+            Code = "UnknownError";
         }
 
         public string Message { get; }
+
+        public string Code { get; }
     }
 }
