@@ -24,7 +24,7 @@ namespace B2B.CimMessageAdapter.Message.TransactionIds
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            builder.ToTable("MessageIds", "dbo");
+            builder.ToTable("TransactionIds", "dbo");
             builder.HasKey(x => new { x.TransactionId });
         }
     }
