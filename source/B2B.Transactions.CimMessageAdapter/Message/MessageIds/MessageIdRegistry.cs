@@ -31,7 +31,7 @@ namespace B2B.CimMessageAdapter.Message.MessageIds
         {
             var result = await _context.MessageIds.FindAsync(messageId).ConfigureAwait(false);
 
-            if (result == null) return false;
+            if (result != null) return false;
 
             await _context.MessageIds.AddAsync(new IncomingMessageId(messageId)).ConfigureAwait(false);
             return true;
