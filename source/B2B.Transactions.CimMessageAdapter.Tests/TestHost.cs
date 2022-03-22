@@ -55,11 +55,14 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
 
             MarketRolesContext = _container.GetInstance<MarketRolesContext>();
             MessageIdRegistry = _container.GetInstance<IMessageIds>();
+            TransactionIds = _container.GetInstance<ITransactionIds>();
         }
 
         protected MarketRolesContext MarketRolesContext { get; }
 
         protected IMessageIds MessageIdRegistry { get; }
+
+        protected ITransactionIds TransactionIds { get; }
 
         public void Dispose()
         {

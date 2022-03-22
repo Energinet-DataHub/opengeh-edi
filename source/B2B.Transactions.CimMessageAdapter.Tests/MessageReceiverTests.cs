@@ -115,7 +115,7 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
                 .ConfigureAwait(false);
 
             AssertContainsError(result, "B2B-005");
-            Assert.Single(_marketActivityRecordForwarderSpy.CommittedItems);
+            Assert.False(result.Success);
         }
 
         private static Stream CreateMessageWithInvalidXmlStructure()
@@ -170,7 +170,7 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
         private MessageReceiver CreateMessageReceiver()
         {
             _marketActivityRecordForwarderSpy = new MarketActivityRecordForwarderStub();
-            var messageReceiver = new MessageReceiver(MessageIdRegistry, _marketActivityRecordForwarderSpy, _transactionIdsStub, new SchemaProvider(new SchemaStore()));
+            var messageReceiver = new MessageReceiver(MessageIdRegistry, _marketActivityRecordForwarderSpy, TransactionIds, new SchemaProvider(new SchemaStore()));
             return messageReceiver;
         }
 

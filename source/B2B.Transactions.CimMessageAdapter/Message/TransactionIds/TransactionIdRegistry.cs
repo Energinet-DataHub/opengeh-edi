@@ -32,7 +32,7 @@ namespace B2B.CimMessageAdapter.Message.TransactionIds
         {
             var result = await _context.TransactionIds.FindAsync(transactionId).ConfigureAwait(false);
 
-            if (result == null) return false;
+            if (result != null) return false;
 
             await _context.TransactionIds.AddAsync(new IncomingTransactionId(transactionId)).ConfigureAwait(false);
             return true;
