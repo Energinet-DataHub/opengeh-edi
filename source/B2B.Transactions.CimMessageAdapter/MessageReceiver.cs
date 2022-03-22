@@ -35,7 +35,8 @@ namespace B2B.CimMessageAdapter
         public MessageReceiver(IMessageIds messageIds, IMarketActivityRecordForwarder marketActivityRecordForwarder, ITransactionIds transactionIds, ISchemaProvider schemaProvider)
         {
             _messageIds = messageIds ?? throw new ArgumentNullException(nameof(messageIds));
-            _marketActivityRecordForwarder = marketActivityRecordForwarder ?? throw new ArgumentNullException(nameof(marketActivityRecordForwarder));
+            _marketActivityRecordForwarder = marketActivityRecordForwarder ??
+                                             throw new ArgumentNullException(nameof(marketActivityRecordForwarder));
             _transactionIds = transactionIds;
             _schemaProvider = schemaProvider ?? throw new ArgumentNullException(nameof(schemaProvider));
         }
@@ -95,14 +96,9 @@ namespace B2B.CimMessageAdapter
 
             while (await reader.ReadAsync().ConfigureAwait(false))
             {
-                if (StartOfMarketActivityRecord(reader))
+                if (EndOfMarketActivityRecord(reader))
                 {
-                    if (reader.SchemaInfo?.Validity == XmlSchemaValidity.Invalid)
-                    {
-                        continue;
-                    }
-
-                    yield return new MarketActivityRecord()
+                    var marketActivityRecord = new MarketActivityRecord()
                     {
                         MrId = mrid,
                         CustomerMarketParticipantName = customerMarketParticipantname,
@@ -113,9 +109,23 @@ namespace B2B.CimMessageAdapter
                         BalanceResponsiblePartyMarketParticipantmRID =
                             balanceResponsiblePartyMarketParticipantmRID,
                     };
+
+                    mrid = string.Empty;
+                    marketEvaluationPointmRID = string.Empty;
+                    energySupplierMarketParticipantmRID = string.Empty;
+                    balanceResponsiblePartyMarketParticipantmRID = string.Empty;
+                    customerMarketParticipantmRID = string.Empty;
+                    customerMarketParticipantname = string.Empty;
+                    startDateAndOrTimedateTime = string.Empty;
+
+                    yield return marketActivityRecord;
                 }
 
-                if (reader.NodeType == XmlNodeType.Element)
+                if (reader.NodeType == XmlNodeType.Element && reader.SchemaInfo?.Validity == XmlSchemaValidity.Invalid)
+                {
+                    await MoveToEndOfMarketActivityRecordAsync(reader).ConfigureAwait(false);
+                }
+                else
                 {
                     TryExtractValueFrom("mRID", reader, (value) => mrid = value);
                     TryExtractValueFrom("marketEvaluationPoint.mRID", reader, (value) => marketEvaluationPointmRID = value);
@@ -128,6 +138,23 @@ namespace B2B.CimMessageAdapter
             }
         }
 
+        private static async Task MoveToEndOfMarketActivityRecordAsync(XmlReader reader)
+        {
+            while (await reader.ReadAsync().ConfigureAwait(false))
+            {
+                if (EndOfMarketActivityRecord(reader))
+                {
+                    break;
+                }
+            }
+        }
+
+        private static bool EndOfMarketActivityRecord(XmlReader reader)
+        {
+            return reader.NodeType == XmlNodeType.EndElement &&
+                   reader.LocalName.Equals(MarketActivityRecordElementName, StringComparison.OrdinalIgnoreCase);
+        }
+
         private static bool StartOfMessageHeader(XmlReader reader)
         {
             return reader.NodeType == XmlNodeType.Element &&
@@ -136,7 +163,7 @@ namespace B2B.CimMessageAdapter
 
         private static bool StartOfMarketActivityRecord(XmlReader reader)
         {
-            return reader.NodeType == XmlNodeType.EndElement &&
+            return reader.NodeType == XmlNodeType.Element &&
                    reader.LocalName.Equals(MarketActivityRecordElementName, StringComparison.OrdinalIgnoreCase);
         }
 
@@ -157,7 +184,7 @@ namespace B2B.CimMessageAdapter
                 {
                     if (await CheckTransactionIdAsync(marketActivityRecord.MrId).ConfigureAwait(false) == false)
                     {
-                        _errors.Add(new ValidationError(
+                        _errors.Add(new DuplicateTransactionIdDetected(
                             $"Transaction id '{marketActivityRecord.MrId}' is not unique and will not be processed."));
                     }
                     else
@@ -176,7 +203,8 @@ namespace B2B.CimMessageAdapter
                 {
                     while (await reader.ReadAsync().ConfigureAwait(false))
                     {
-                        if (reader.NodeType == XmlNodeType.Element && reader.LocalName.Equals("mRID", StringComparison.OrdinalIgnoreCase))
+                        if (reader.NodeType == XmlNodeType.Element &&
+                            reader.LocalName.Equals("mRID", StringComparison.OrdinalIgnoreCase))
                         {
                             var messageId = reader.ReadElementString();
                             var messageIdIsUnique = await CheckMessageIdAsync(messageId).ConfigureAwait(false);
