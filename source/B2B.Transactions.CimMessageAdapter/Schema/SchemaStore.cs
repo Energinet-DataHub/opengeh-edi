@@ -18,13 +18,15 @@ namespace B2B.CimMessageAdapter.Schema
 {
     public class SchemaStore
     {
+        public const string SchemaPath = "Schema\\Schemas\\";
+
         public SchemaStore()
         {
             Schemas = new Dictionary<KeyValuePair<string, string>, string>
             {
                 {
                     new KeyValuePair<string, string>("requestchangeofsupplier", "1.0"),
-                    "urn-ediel-org-structure-requestchangeofsupplier-0-1.xsd"
+                    SchemaPath + "urn-ediel-org-structure-requestchangeofsupplier-0-1.xsd"
                 },
             };
         }

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
@@ -40,7 +41,7 @@ namespace B2B.CimMessageAdapter
             return LoadSchemaWithDependentSchemasAsync(schemaName);
         }
 
-        private static async Task<XmlSchema?> LoadSchemaWithDependentSchemasAsync(string location)
+        private async Task<XmlSchema?> LoadSchemaWithDependentSchemasAsync(string location)
         {
             using var reader = new XmlTextReader(location);
             var xmlSchema = XmlSchema.Read(reader, null);
@@ -57,7 +58,7 @@ namespace B2B.CimMessageAdapter
                 }
 
                 external.Schema =
-                    await LoadSchemaWithDependentSchemasAsync(external.SchemaLocation).ConfigureAwait(false);
+                    await LoadSchemaWithDependentSchemasAsync(SchemaStore.SchemaPath + external.SchemaLocation).ConfigureAwait(false);
             }
 
             return xmlSchema;
