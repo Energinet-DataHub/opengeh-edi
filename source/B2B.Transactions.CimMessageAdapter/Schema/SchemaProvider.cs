@@ -12,27 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
-using B2B.CimMessageAdapter;
+using B2B.CimMessageAdapter.Schema;
 
-namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests.Stubs
+namespace B2B.CimMessageAdapter
 {
-    public class SchemaProviderStub : ISchemaProvider
+    public class SchemaProvider : ISchemaProvider
     {
+        private readonly SchemaStore _schemaStore;
+
+        public SchemaProvider(SchemaStore schemaStore)
+        {
+            _schemaStore = schemaStore;
+        }
+
         public Task<XmlSchema?> GetSchemaAsync(string businessProcessType, string version)
         {
-            var schemas = new Dictionary<KeyValuePair<string, string>, string>()
-            {
-                {
-                    new KeyValuePair<string, string>("requestchangeofsupplier", "1.0"),
-                    "urn-ediel-org-structure-requestchangeofsupplier-0-1.xsd"
-                },
-            };
+            var schemaName = _schemaStore.GetSchemaLocation(businessProcessType, version);
 
-            if (schemas.TryGetValue(new KeyValuePair<string, string>(businessProcessType, version), out var schemaName) == false)
+            if (schemaName == null)
             {
                 return Task.FromResult(default(XmlSchema));
             }
