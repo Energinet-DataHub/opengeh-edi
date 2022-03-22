@@ -14,7 +14,7 @@
 
 using System;
 
-namespace B2B.CimMessageAdapter
+namespace B2B.CimMessageAdapter.Errors
 {
     public class InvalidMessageStructure : ValidationError
     {
@@ -27,6 +27,12 @@ namespace B2B.CimMessageAdapter
         {
             if (exception == null) throw new ArgumentNullException(nameof(exception));
             return new InvalidMessageStructure(exception.Message);
+        }
+
+        public static InvalidMessageStructure From(string message)
+        {
+            if (message == null) throw new ArgumentNullException(nameof(message));
+            return new InvalidMessageStructure(message);
         }
     }
 }

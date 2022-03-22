@@ -18,6 +18,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
+using B2B.CimMessageAdapter.Errors;
 
 namespace B2B.CimMessageAdapter
 {
@@ -258,7 +259,7 @@ namespace B2B.CimMessageAdapter
         {
             var message =
                 $"XML schema validation error at line {arguments.Exception.LineNumber}, position {arguments.Exception.LinePosition}: {arguments.Message}.";
-            _errors.Add(new ValidationError(message));
+            _errors.Add(InvalidMessageStructure.From(message));
         }
     }
 }

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using B2B.CimMessageAdapter.Errors;
 
 namespace B2B.CimMessageAdapter
 {
