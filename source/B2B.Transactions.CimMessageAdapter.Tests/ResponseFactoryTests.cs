@@ -27,6 +27,17 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
         private readonly ResponseFactory _responseFactory = new();
 
         [Fact]
+        public void Generate_empty_response_when_no_validation_errors_has_occurred()
+        {
+            var result = Result.Succeeded();
+
+            var response = _responseFactory.From(result);
+
+            Assert.False(response.IsErrorResponse);
+            Assert.Null(response.MessageBody);
+        }
+
+        [Fact]
         public void Generates_single_error_response()
         {
             var duplicateMessageIdError = new DuplicateMessageIdDetected("Duplicate message id");
@@ -76,7 +87,7 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
     {
         public Response From(Result result)
         {
-            return new Response(true, CreateMessageBodyFrom(result));
+            return result.Success ? new Response() : new Response(true, CreateMessageBodyFrom(result));
         }
 
         private string CreateMessageBodyFrom(Result result)
@@ -113,6 +124,11 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
         {
             IsErrorResponse = isErrorResponse;
             MessageBody = messageBody;
+        }
+
+        internal Response()
+        {
+            IsErrorResponse = false;
         }
 
         public string MessageBody { get; }
