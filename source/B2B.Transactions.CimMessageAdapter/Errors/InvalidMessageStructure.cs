@@ -12,34 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using B2B.CimMessageAdapter.Errors;
+using System;
 
-namespace B2B.CimMessageAdapter
+namespace B2B.CimMessageAdapter.Errors
 {
-    public class Result
+    public class InvalidMessageStructure : ValidationError
     {
-        private Result()
+        private InvalidMessageStructure(string message)
+            : base(message, "B2B-005")
         {
         }
 
-        private Result(IReadOnlyCollection<ValidationError> errors)
+        public static InvalidMessageStructure From(Exception exception)
         {
-            Errors = errors;
+            if (exception == null) throw new ArgumentNullException(nameof(exception));
+            return new InvalidMessageStructure(exception.Message);
         }
 
-        public bool Success => Errors.Count == 0;
-
-        public IReadOnlyCollection<ValidationError> Errors { get; } = new List<ValidationError>();
-
-        public static Result Failure(params ValidationError[] errors)
+        public static InvalidMessageStructure From(string message)
         {
-            return new Result(errors);
-        }
-
-        public static Result Succeeded()
-        {
-            return new Result();
+            if (message == null) throw new ArgumentNullException(nameof(message));
+            return new InvalidMessageStructure(message);
         }
     }
 }

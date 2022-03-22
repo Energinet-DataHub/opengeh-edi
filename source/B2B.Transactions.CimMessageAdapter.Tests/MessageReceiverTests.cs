@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,7 +26,7 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
     public class MessageReceiverTests : TestHost
     {
         private readonly TransactionIdsStub _transactionIdsStub = new();
-        private readonly MarketActivityRecordForwarderStub _marketActivityRecordForwarderSpy = new();
+        private MarketActivityRecordForwarderStub _marketActivityRecordForwarderSpy = new();
 
         [Fact]
         public async Task Message_must_be_valid_xml()
@@ -35,7 +36,7 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
                 var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
 
                 Assert.False(result.Success);
-                Assert.Single(result.Errors);
+                AssertContainsError(result, "B2B-005");
             }
         }
 
@@ -50,7 +51,7 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
         }
 
         [Fact]
-        public async Task Return_failure_if_xml_schema_does_not_exist()
+        public async Task Return_failure_if_xml_schema_for_business_process_type_does_not_exist()
         {
             await using var message = CreateMessage();
 
@@ -58,7 +59,7 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
                 .ConfigureAwait(false);
 
             Assert.False(result.Success);
-            Assert.Single(result.Errors);
+            AssertContainsError(result, "B2B-001");
         }
 
         [Fact]
@@ -74,7 +75,7 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
                 var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
 
                 Assert.False(result.Success);
-                Assert.Contains(result.Errors, error => error is DuplicateMessageIdDetected);
+                AssertContainsError(result, "B2B-003");
             }
         }
 
@@ -99,17 +100,8 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
         [Fact]
         public async Task Activity_records_are_not_committed_to_queue_if_any_message_header_values_are_invalid()
         {
-            await using (var message = CreateMessage())
-            {
-                await ReceiveRequestChangeOfSupplierMessage(message)
-                    .ConfigureAwait(false);
-            }
-
-            await using (var message = CreateMessage())
-            {
-                await ReceiveRequestChangeOfSupplierMessage(message)
-                    .ConfigureAwait(false);
-            }
+            var messageIds = new MessageIdsStub();
+            await SimulateDuplicationOfMessageIds(messageIds).ConfigureAwait(false);
 
             Assert.Empty(_marketActivityRecordForwarderSpy.CommittedItems);
         }
@@ -118,9 +110,10 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
         public async Task Activity_records_must_have_unique_transaction_ids()
         {
             await using var message = CreateMessageWithDuplicateTransactionIds();
-            await ReceiveRequestChangeOfSupplierMessage(message)
+            var result = await ReceiveRequestChangeOfSupplierMessage(message)
                 .ConfigureAwait(false);
 
+            AssertContainsError(result, "B2B-005");
             Assert.Single(_marketActivityRecordForwarderSpy.CommittedItems);
         }
 
@@ -158,6 +151,16 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
             return messageStream;
         }
 
+        private static void AssertContainsError(Result result, string errorCode)
+        {
+            Assert.Contains(result.Errors, error => error.Code.Equals(errorCode, StringComparison.OrdinalIgnoreCase));
+        }
+
+        private static Task<Result> ReceiveRequestChangeOfSupplierMessage(Stream message, MessageReceiver receiver)
+        {
+            return receiver.ReceiveAsync(message, "requestchangeofsupplier", "1.0");
+        }
+
         private Task<Result> ReceiveRequestChangeOfSupplierMessage(Stream message, string version = "1.0")
         {
             return CreateMessageReceiver().ReceiveAsync(message, "requestchangeofsupplier", version);
@@ -165,8 +168,31 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
 
         private MessageReceiver CreateMessageReceiver()
         {
+            _marketActivityRecordForwarderSpy = new MarketActivityRecordForwarderStub();
             var messageReceiver = new MessageReceiver(MessageIdRegistry, _marketActivityRecordForwarderSpy, _transactionIdsStub, new SchemaProvider(new SchemaStore()));
             return messageReceiver;
+        }
+
+        private MessageReceiver CreateMessageReceiver(IMessageIds messageIds)
+        {
+            _marketActivityRecordForwarderSpy = new MarketActivityRecordForwarderStub();
+            var messageReceiver = new MessageReceiver(messageIds, _marketActivityRecordForwarderSpy, _transactionIdsStub, new SchemaProvider(new SchemaStore()));
+            return messageReceiver;
+        }
+
+        private async Task SimulateDuplicationOfMessageIds(IMessageIds messageIds)
+        {
+            await using (var message = CreateMessage())
+            {
+                await CreateMessageReceiver(messageIds).ReceiveAsync(message, "requestchangeofsupplier", "1.0")
+                    .ConfigureAwait(false);
+            }
+
+            await using (var message = CreateMessage())
+            {
+                await CreateMessageReceiver(messageIds).ReceiveAsync(message, "requestchangeofsupplier", "1.0")
+                    .ConfigureAwait(false);
+            }
         }
     }
 }
