@@ -12,15 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace B2B.CimMessageAdapter.Message.TransactionIds
-{
-    public class IncomingTransactionId
-    {
-        public IncomingTransactionId(string transactionId)
-        {
-            TransactionId = transactionId;
-        }
+using System.Data;
 
-        public string TransactionId { get; }
+namespace B2B.CimMessageAdapter.DataAccess
+{
+    /// <summary>
+    /// Factory for creating database connections
+    /// </summary>
+    public interface IDbConnectionFactory
+    {
+        /// <summary>
+        /// Returns and existing open connection if any, or creates a new open connection
+        /// </summary>
+        /// <returns><see cref="IDbConnection"/></returns>
+        IDbConnection GetOpenConnection();
     }
 }

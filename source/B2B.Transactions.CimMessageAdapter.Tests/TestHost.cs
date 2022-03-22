@@ -13,10 +13,9 @@
 // limitations under the License.
 
 using System;
-using B2B.CimMessageAdapter;
+using B2B.CimMessageAdapter.DataAccess;
 using B2B.CimMessageAdapter.Message.MessageIds;
-using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
-using Energinet.DataHub.MarketRoles.Infrastructure.Messaging.Idempotency;
+using B2B.CimMessageAdapter.Message.TransactionIds;
 using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,12 +38,16 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
             _container = new Container();
             _container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
 
+            var connectionString = "Server=localhost\\SQLEXPRESS;Database=MarketRolesTestDB;Trusted_Connection=True";
             serviceCollection.AddDbContext<MarketRolesContext>(x =>
-                x.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=MarketRolesTestDB;Trusted_Connection=True", y => y.UseNodaTime()));
+                x.UseSqlServer(connectionString, y => y.UseNodaTime()));
             serviceCollection.AddSimpleInjector(_container);
             IServiceProvider serviceProvider = serviceCollection.BuildServiceProvider().UseSimpleInjector(_container);
 
+            _container.Register<IDbConnectionFactory>(() => new SqlDbConnectionFactory(connectionString), Lifestyle.Scoped);
+
             _container.Register<IMessageIds, MessageIdRegistry>(Lifestyle.Scoped);
+            _container.Register<ITransactionIds, TransactionIdRegistry>(Lifestyle.Scoped);
 
             _container.Verify();
 
