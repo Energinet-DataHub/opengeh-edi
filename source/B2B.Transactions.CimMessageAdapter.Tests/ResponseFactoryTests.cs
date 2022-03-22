@@ -14,6 +14,7 @@
 
 using System.Linq;
 using System.Text;
+using System.Xml;
 using System.Xml.Linq;
 using B2B.CimMessageAdapter;
 using B2B.CimMessageAdapter.Errors;
@@ -23,13 +24,15 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
 {
     public class ResponseFactoryTests
     {
+        private readonly ResponseFactory _responseFactory = new();
+
         [Fact]
         public void Generates_single_error_response()
         {
             var duplicateMessageIdError = new DuplicateMessageIdDetected("Duplicate message id");
             var result = Result.Failure(duplicateMessageIdError);
 
-            var response = ResponseFactory.From(result);
+            var response = _responseFactory.From(result);
 
             Assert.True(response.IsErrorResponse);
             AssertHasValue(response, "Code", duplicateMessageIdError.Code);
@@ -43,7 +46,7 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
             var duplicateTransactionIdError = new DuplicateTransactionIdDetected("Fake transaction id");
             var result = Result.Failure(duplicateMessageIdError, duplicateTransactionIdError);
 
-            var response = ResponseFactory.From(result);
+            var response = _responseFactory.From(result);
 
             Assert.True(response.IsErrorResponse);
             AssertHasValue(response, "Code", "BadRequest");
@@ -68,43 +71,39 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
         }
     }
 
-    #pragma warning disable
+#pragma warning disable
     public class ResponseFactory
     {
-        public static Response From(Result result)
+        public Response From(Result result)
         {
+            return new Response(true, CreateMessageBodyFrom(result));
+        }
+
+        private string CreateMessageBodyFrom(Result result)
+        {
+            var messageBody = new StringBuilder();
+            var settings = new XmlWriterSettings() { OmitXmlDeclaration = true, };
+
+            using var writer = XmlWriter.Create(messageBody, settings);
+            writer.WriteStartElement("Error");
+            writer.WriteElementString("Code", result.Errors.Count == 1 ? result.Errors.First().Code : "BadRequest");
+            writer.WriteElementString("Message", result.Errors.Count == 1 ? result.Errors.First().Message : "Multiple errors in message");
             if (result.Errors.Count > 1)
             {
-                var detailsBuilder = new StringBuilder();
+                writer.WriteStartElement("Details");
                 foreach (var validationError in result.Errors)
                 {
-                    detailsBuilder.AppendLine("<Error>");
-                    detailsBuilder.AppendLine($"<Code>{validationError.Code}</Code>");
-                    detailsBuilder.AppendLine($"<Message>{validationError.Message}</Message>");
-                    detailsBuilder.AppendLine("</Error>");
+                    writer.WriteStartElement("Error");
+                    writer.WriteElementString("Code", validationError.Code);
+                    writer.WriteElementString("Message", validationError.Message);
+                    writer.WriteEndElement();
                 }
-
-                return new Response(true, $"<Error>" +
-                                    "<Code>BadRequest</Code>" +
-                                    "<Message>Multiple errors in message</Message>" +
-                                    $"<Details>{detailsBuilder}</Details>" +
-                                    "<InnerError>" +
-                                    "<Code>MessageIdPreviousUsed</Code>" +
-                                    "<Message-Id>gs8u033bqn</Message-Id>" +
-                                    "<Used-on>2018-05-16T15:32:12Z</Used-on>" +
-                                    "</InnerError>" +
-                                    "</Error>");
+                writer.WriteEndElement();
             }
+            writer.WriteEndElement();
+            writer.Close();
 
-            return new Response(true, $"<Error>" +
-                                      $"<Code>{result.Errors.First().Code}</Code>" +
-                                      $"<Message>{result.Errors.First().Message}</Message>" +
-                                      "<InnerError>" +
-                                      "<Code>MessageIdPreviousUsed</Code>" +
-                                      "<Message-Id>gs8u033bqn</Message-Id>" +
-                                      "<Used-on>2018-05-16T15:32:12Z</Used-on>" +
-                                      "</InnerError>" +
-                                      "</Error>");
+            return messageBody.ToString();
         }
     }
 
