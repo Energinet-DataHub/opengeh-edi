@@ -87,7 +87,7 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
     {
         public Response From(Result result)
         {
-            return result.Success ? new Response() : new Response(true, CreateMessageBodyFrom(result));
+            return result.Success ? new Response() : new Response(CreateMessageBodyFrom(result));
         }
 
         private string CreateMessageBodyFrom(Result result)
@@ -120,9 +120,9 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
 
     public class Response
     {
-        internal Response(bool isErrorResponse, string messageBody)
+        internal Response(string messageBody)
         {
-            IsErrorResponse = isErrorResponse;
+            IsErrorResponse = true;
             MessageBody = messageBody;
         }
 
