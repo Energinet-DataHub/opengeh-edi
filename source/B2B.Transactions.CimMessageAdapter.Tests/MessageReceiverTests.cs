@@ -177,7 +177,7 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
         private MessageReceiver CreateMessageReceiver(IMessageIds messageIds)
         {
             _marketActivityRecordForwarderSpy = new MarketActivityRecordForwarderStub();
-            var messageReceiver = new MessageReceiver(messageIds, _marketActivityRecordForwarderSpy, _transactionIdsStub, new SchemaProviderStub());
+            var messageReceiver = new MessageReceiver(messageIds, _marketActivityRecordForwarderSpy, _transactionIdsStub, new SchemaProvider(new SchemaStore()));
             return messageReceiver;
         }
 

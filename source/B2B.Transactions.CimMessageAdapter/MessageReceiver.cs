@@ -18,8 +18,8 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
-using B2B.CimMessageAdapter.Schema;
 using B2B.CimMessageAdapter.Errors;
+using B2B.CimMessageAdapter.Schema;
 
 namespace B2B.CimMessageAdapter
 {
