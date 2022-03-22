@@ -12,20 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
-namespace B2B.CimMessageAdapter.Message.MessageIds
+namespace B2B.CimMessageAdapter.Message.TransactionIds
 {
-    public class IncomingMessageEntityConfiguration : IEntityTypeConfiguration<IncomingMessageId>
+    public class IncomingTransactionId
     {
-        public void Configure(EntityTypeBuilder<IncomingMessageId> builder)
+        public IncomingTransactionId(string transactionIdId)
         {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-
-            builder.ToTable("MessageIds", "dbo");
-            builder.HasKey(x => new { x.MessageId });
+            TransactionId = transactionIdId;
         }
+
+        public string TransactionId { get; }
     }
 }

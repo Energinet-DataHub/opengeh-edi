@@ -14,7 +14,7 @@
 
 using System.Threading.Tasks;
 
-namespace B2B.CimMessageAdapter
+namespace B2B.CimMessageAdapter.Message.TransactionIds
 {
     /// <summary>
     /// Store containing transaction id for all received market activity records

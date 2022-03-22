@@ -16,16 +16,16 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace B2B.CimMessageAdapter.Message.MessageIds
+namespace B2B.CimMessageAdapter.Message.TransactionIds
 {
-    public class IncomingMessageEntityConfiguration : IEntityTypeConfiguration<IncomingMessageId>
+    public class IncomingTransactionIdsEntityConfiguration : IEntityTypeConfiguration<IncomingTransactionId>
     {
-        public void Configure(EntityTypeBuilder<IncomingMessageId> builder)
+        public void Configure(EntityTypeBuilder<IncomingTransactionId> builder)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
             builder.ToTable("MessageIds", "dbo");
-            builder.HasKey(x => new { x.MessageId });
+            builder.HasKey(x => new { x.TransactionId });
         }
     }
 }

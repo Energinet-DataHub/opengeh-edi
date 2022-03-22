@@ -13,7 +13,8 @@
 // limitations under the License.
 
 using System;
-using B2B.CimMessageAdapter.Message.MessageId;
+using B2B.CimMessageAdapter.Message.MessageIds;
+using B2B.CimMessageAdapter.Message.TransactionIds;
 using Microsoft.EntityFrameworkCore;
 
 namespace B2B.CimMessageAdapter.DataAccess
@@ -32,11 +33,14 @@ namespace B2B.CimMessageAdapter.DataAccess
 
         public DbSet<IncomingMessageId> MessageIds { get; private set; }
 
+        public DbSet<IncomingTransactionId> TransactionIds { get; private set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
 
             modelBuilder.ApplyConfiguration(new IncomingMessageEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new IncomingTransactionIdsEntityConfiguration());
         }
     }
 }

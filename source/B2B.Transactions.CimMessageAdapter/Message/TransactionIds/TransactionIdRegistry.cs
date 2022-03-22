@@ -15,26 +15,29 @@
 using System;
 using System.Threading.Tasks;
 using B2B.CimMessageAdapter.DataAccess;
+using B2B.CimMessageAdapter.Message.MessageIds;
 
-namespace B2B.CimMessageAdapter.Message.MessageIds
+namespace B2B.CimMessageAdapter.Message.TransactionIds
 {
-    public class MessageIdRegistry : IMessageIds
+    public class TransactionIdRegistry : ITransactionIds
     {
         private readonly MarketRolesContext _context;
 
-        public MessageIdRegistry(MarketRolesContext context)
+        public TransactionIdRegistry(MarketRolesContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public async Task<bool> TryStoreAsync(string messageId)
+        public async Task<bool> TryStoreAsync(string transactionId)
         {
-            var result = await _context.MessageIds.FindAsync(messageId).ConfigureAwait(false);
+            var result = await _context.TransactionIds.FindAsync(transactionId).ConfigureAwait(false);
 
             if (result == null) return false;
 
-            await _context.MessageIds.AddAsync(new IncomingMessageId(messageId)).ConfigureAwait(false);
+            await _context.TransactionIds.AddAsync(new IncomingTransactionId(transactionId)).ConfigureAwait(false);
             return true;
+
+            // await _context.SaveChangesAsync().ConfigureAwait(false);
         }
     }
 }
