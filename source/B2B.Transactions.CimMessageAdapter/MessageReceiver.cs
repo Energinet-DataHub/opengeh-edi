@@ -80,7 +80,7 @@ namespace B2B.CimMessageAdapter
 
         private static Result InvalidXmlFailure(Exception exception)
         {
-            return Result.Failure(new ValidationError(exception.Message));
+            return Result.Failure(InvalidMessageStructure.From(exception));
         }
 
         private static async IAsyncEnumerable<MarketActivityRecord> ExtractFromAsync(XmlReader reader)
