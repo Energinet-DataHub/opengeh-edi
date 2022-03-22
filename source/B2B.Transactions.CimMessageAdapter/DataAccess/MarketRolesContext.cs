@@ -14,21 +14,9 @@
 
 using System;
 using B2B.CimMessageAdapter.Message.MessageId;
-using Energinet.DataHub.MarketRoles.Domain.Consumers;
-using Energinet.DataHub.MarketRoles.Domain.EnergySuppliers;
-using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
-using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.AccountingPoints;
-using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.Consumers;
-using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.EnergySuppliers;
-using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.MessageHub;
-using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.ProcessManagers;
-using Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands;
-using Energinet.DataHub.MarketRoles.Infrastructure.LocalMessageHub;
-using Energinet.DataHub.MarketRoles.Infrastructure.Messaging.Idempotency;
-using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 using Microsoft.EntityFrameworkCore;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.DataAccess
+namespace B2B.CimMessageAdapter.DataAccess
 {
     public class MarketRolesContext : DbContext
     {
@@ -42,34 +30,13 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.DataAccess
         {
         }
 
-        public DbSet<EnergySupplier> EnergySuppliers { get; private set; }
-
-        public DbSet<Consumer> Consumers { get; private set; }
-
-        public DbSet<AccountingPoint> AccountingPoints { get; private set; }
-
-        public DbSet<OutboxMessage> OutboxMessages { get; private set; }
-
-        public DbSet<QueuedInternalCommand> QueuedInternalCommands { get; private set; }
-
         public DbSet<IncomingMessageId> MessageIds { get; private set; }
-
-        public DbSet<MessageHubMessage> MessageHubMessages { get; private set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
 
-            modelBuilder.ApplyConfiguration(new EnergySupplierEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new ConsumerEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new AccountingPointEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new OutboxMessageEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new ProcessManagerEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new ChangeOfSupplierProcessManagerEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new MoveInProcessManagerEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new QueuedInternalCommandEntityConfiguration());
             modelBuilder.ApplyConfiguration(new IncomingMessageEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new MessageHubMessageEntityConfiguration());
         }
     }
 }

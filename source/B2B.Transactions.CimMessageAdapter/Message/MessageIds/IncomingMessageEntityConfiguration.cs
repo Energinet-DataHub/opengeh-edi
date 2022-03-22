@@ -16,7 +16,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Messaging.Idempotency
+namespace B2B.CimMessageAdapter.Message.MessageId
 {
     public class IncomingMessageEntityConfiguration : IEntityTypeConfiguration<IncomingMessageId>
     {

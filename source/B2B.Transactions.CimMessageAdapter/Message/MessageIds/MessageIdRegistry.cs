@@ -14,10 +14,9 @@
 
 using System;
 using System.Threading.Tasks;
-using B2B.CimMessageAdapter;
-using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
+using B2B.CimMessageAdapter.DataAccess;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Messaging.Idempotency
+namespace B2B.CimMessageAdapter.Message.MessageId
 {
     public class MessageIdRegistry : IMessageIds
     {

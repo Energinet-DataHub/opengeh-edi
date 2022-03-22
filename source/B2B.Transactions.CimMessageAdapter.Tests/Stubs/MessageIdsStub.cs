@@ -15,6 +15,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using B2B.CimMessageAdapter;
+using B2B.CimMessageAdapter.Message.MessageId;
 
 namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests.Stubs
 {

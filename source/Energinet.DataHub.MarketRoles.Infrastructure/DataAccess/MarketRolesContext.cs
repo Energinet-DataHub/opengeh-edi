@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using B2B.CimMessageAdapter.Message.MessageId;
 using Energinet.DataHub.MarketRoles.Domain.Consumers;
 using Energinet.DataHub.MarketRoles.Domain.EnergySuppliers;
 using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;

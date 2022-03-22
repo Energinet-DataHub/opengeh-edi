@@ -14,6 +14,7 @@
 
 using System;
 using B2B.CimMessageAdapter;
+using B2B.CimMessageAdapter.Message.MessageId;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
 using Energinet.DataHub.MarketRoles.Infrastructure.Messaging.Idempotency;
 using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
