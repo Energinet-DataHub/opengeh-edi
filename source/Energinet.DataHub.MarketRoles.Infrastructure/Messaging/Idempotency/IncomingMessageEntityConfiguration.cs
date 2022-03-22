@@ -24,7 +24,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Messaging.Idempotency
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            builder.ToTable("IncomingMessages", "dbo");
+            builder.ToTable("MessageIds", "dbo");
             builder.HasKey(x => new { x.MessageId });
         }
     }

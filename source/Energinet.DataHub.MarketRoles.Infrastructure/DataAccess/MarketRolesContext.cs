@@ -51,7 +51,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.DataAccess
 
         public DbSet<QueuedInternalCommand> QueuedInternalCommands { get; private set; }
 
-        public DbSet<IncomingMessageId> IncomingMessages { get; private set; }
+        public DbSet<IncomingMessageId> MessageIds { get; private set; }
 
         public DbSet<MessageHubMessage> MessageHubMessages { get; private set; }
 
