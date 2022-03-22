@@ -31,6 +31,7 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
 
             var response = ResponseFactory.From(result);
 
+            Assert.True(response.IsErrorResponse);
             AssertHasValue(response, "Code", duplicateMessageIdError.Code);
             AssertHasValue(response, "Message", duplicateMessageIdError.Message);
         }
@@ -44,6 +45,7 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
 
             var response = ResponseFactory.From(result);
 
+            Assert.True(response.IsErrorResponse);
             AssertHasValue(response, "Code", "BadRequest");
             AssertHasValue(response, "Message", "Multiple errors in message");
             AssertContainsError(response, duplicateMessageIdError);
@@ -82,7 +84,7 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
                     detailsBuilder.AppendLine("</Error>");
                 }
 
-                return new Response($"<Error>" +
+                return new Response(true, $"<Error>" +
                                     "<Code>BadRequest</Code>" +
                                     "<Message>Multiple errors in message</Message>" +
                                     $"<Details>{detailsBuilder}</Details>" +
@@ -93,28 +95,28 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
                                     "</InnerError>" +
                                     "</Error>");
             }
-            else
-            {
-                return new Response($"<Error>" +
-                                    $"<Code>{result.Errors.First().Code}</Code>" +
-                                    $"<Message>{result.Errors.First().Message}</Message>" +
-                                    "<InnerError>" +
-                                    "<Code>MessageIdPreviousUsed</Code>" +
-                                    "<Message-Id>gs8u033bqn</Message-Id>" +
-                                    "<Used-on>2018-05-16T15:32:12Z</Used-on>" +
-                                    "</InnerError>" +
-                                    "</Error>");
-            }
+
+            return new Response(true, $"<Error>" +
+                                      $"<Code>{result.Errors.First().Code}</Code>" +
+                                      $"<Message>{result.Errors.First().Message}</Message>" +
+                                      "<InnerError>" +
+                                      "<Code>MessageIdPreviousUsed</Code>" +
+                                      "<Message-Id>gs8u033bqn</Message-Id>" +
+                                      "<Used-on>2018-05-16T15:32:12Z</Used-on>" +
+                                      "</InnerError>" +
+                                      "</Error>");
         }
     }
 
     public class Response
     {
-        public Response(string messageBody)
+        internal Response(bool isErrorResponse, string messageBody)
         {
+            IsErrorResponse = isErrorResponse;
             MessageBody = messageBody;
         }
 
         public string MessageBody { get; }
+        public bool IsErrorResponse { get; }
     }
 }
