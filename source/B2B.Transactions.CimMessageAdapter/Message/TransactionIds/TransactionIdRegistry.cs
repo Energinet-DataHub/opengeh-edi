@@ -14,30 +14,31 @@
 
 using System;
 using System.Threading.Tasks;
-using B2B.CimMessageAdapter.DataAccess;
-using B2B.CimMessageAdapter.Message.MessageIds;
+using Dapper;
+using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
 
 namespace B2B.CimMessageAdapter.Message.TransactionIds
 {
     public class TransactionIdRegistry : ITransactionIds
     {
-        private readonly MarketRolesContext _context;
+        private readonly IDbConnectionFactory _connectionFactory;
 
-        public TransactionIdRegistry(MarketRolesContext context)
+        public TransactionIdRegistry(IDbConnectionFactory connectionFactory)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
         }
 
         public async Task<bool> TryStoreAsync(string transactionId)
         {
-            var result = await _context.TransactionIds.FindAsync(transactionId).ConfigureAwait(false);
+            var connection = _connectionFactory.GetOpenConnection();
 
-            if (result != null) return false;
+            var result = await connection.ExecuteAsync(
+                    $"IF NOT EXISTS (SELECT * FROM dbo.TransactionIds WHERE TransactionId = @TransactionId)" +
+                    $"INSERT INTO dbo.TransactionIds(TransactionId) VALUES(@TransactionId)",
+                    new { TransactionId = transactionId })
+                .ConfigureAwait(false);
 
-            await _context.TransactionIds.AddAsync(new IncomingTransactionId(transactionId)).ConfigureAwait(false);
-            return true;
-
-            // await _context.SaveChangesAsync().ConfigureAwait(false);
+            return result == 1;
         }
     }
 }
