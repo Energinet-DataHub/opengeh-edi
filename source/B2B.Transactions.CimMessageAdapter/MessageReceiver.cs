@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using B2B.CimMessageAdapter.Errors;
+using B2B.CimMessageAdapter.Messages;
 using B2B.CimMessageAdapter.Schema;
 
 namespace B2B.CimMessageAdapter
@@ -284,33 +285,6 @@ namespace B2B.CimMessageAdapter
     }
 
 #pragma warning disable
-    public class MessageHeader
-    {
-        public MessageHeader(string messageId, string processType, string senderId, string senderRole, string receiverId, string receiverRole, string createdAt)
-        {
-            MessageId = messageId;
-            ProcessType = processType;
-            SenderId = senderId;
-            SenderRole = senderRole;
-            ReceiverId = receiverId;
-            ReceiverRole = receiverRole;
-            CreatedAt = createdAt;
-        }
-
-        public string MessageId { get; }
-
-        public string ProcessType { get; }
-
-        public string SenderId { get; }
-
-        public string SenderRole { get; }
-
-        public string ReceiverId { get; }
-
-        public string ReceiverRole { get; }
-
-        public string CreatedAt { get; }
-    }
 
     public class B2BTransaction
     {
