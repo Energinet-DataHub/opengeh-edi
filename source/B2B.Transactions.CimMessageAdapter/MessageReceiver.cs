@@ -16,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using System.Transactions;
 using System.Xml;
 using System.Xml.Schema;
 using B2B.CimMessageAdapter.Errors;
@@ -122,14 +121,6 @@ namespace B2B.CimMessageAdapter
 
             while (await reader.ReadAsync().ConfigureAwait(false))
             {
-                if (StartOfMarketActivityRecord(reader))
-                {
-                    break;
-                }
-            }
-
-            while (await reader.ReadAsync().ConfigureAwait(false))
-            {
                 if (EndOfMarketActivityRecord(reader))
                 {
                     var marketActivityRecord = new MarketActivityRecord()
@@ -195,6 +186,12 @@ namespace B2B.CimMessageAdapter
                    reader.LocalName.Equals(HeaderElementName, StringComparison.OrdinalIgnoreCase);
         }
 
+        private static bool EndOfMessageHeader(XmlReader reader)
+        {
+            return reader.NodeType == XmlNodeType.EndElement &&
+                   reader.LocalName.Equals(HeaderElementName, StringComparison.OrdinalIgnoreCase);
+        }
+
         private static bool StartOfMarketActivityRecord(XmlReader reader)
         {
             return reader.NodeType == XmlNodeType.Element &&
@@ -203,7 +200,7 @@ namespace B2B.CimMessageAdapter
 
         private static void TryExtractValueFrom(string elementName, XmlReader reader, Func<string, string> variable)
         {
-            if (reader.LocalName.Equals(elementName, StringComparison.OrdinalIgnoreCase))
+            if (reader.LocalName.Equals(elementName, StringComparison.OrdinalIgnoreCase) && reader.NodeType == XmlNodeType.Element)
             {
                 variable(reader.ReadElementString());
             }
@@ -212,6 +209,7 @@ namespace B2B.CimMessageAdapter
         private static async Task<MessageHeader> ExtractMessageHeaderAsync(XmlReader reader)
         {
             var messageId = string.Empty;
+            var processType = string.Empty;
 
             while (await reader.ReadAsync().ConfigureAwait(false))
             {
@@ -219,40 +217,22 @@ namespace B2B.CimMessageAdapter
                 {
                     while (await reader.ReadAsync().ConfigureAwait(false))
                     {
-                        if (reader.NodeType == XmlNodeType.Element &&
-                            reader.LocalName.Equals("mRID", StringComparison.OrdinalIgnoreCase))
+                        if (StartOfMarketActivityRecord(reader))
                         {
-                            TryExtractValueFrom("mRID", reader, value => messageId = value);
                             break;
                         }
+
+                        TryExtractValueFrom("mRID", reader, value => messageId = value);
+                        TryExtractValueFrom("process.processType", reader, value => processType = value);
                     }
 
                     break;
                 }
             }
 
-            return new MessageHeader(messageId);
+            return new MessageHeader(messageId, processType);
         }
 
-        // private async Task HandleMarketActivityRecordsAsync(XmlReader reader)
-        // {
-        //     while (await reader.ReadAsync().ConfigureAwait(false))
-        //     {
-        //         if (!StartOfMarketActivityRecord(reader)) continue;
-        //         await foreach (var marketActivityRecord in ExtractFromAsync(reader))
-        //         {
-        //             if (await CheckTransactionIdAsync(marketActivityRecord.MrId).ConfigureAwait(false) == false)
-        //             {
-        //                 _errors.Add(new DuplicateTransactionIdDetected(
-        //                     $"Transaction id '{marketActivityRecord.MrId}' is not unique and will not be processed."));
-        //             }
-        //             else
-        //             {
-        //                 await StoreActivityRecordAsync(marketActivityRecord).ConfigureAwait(false);
-        //             }
-        //         }
-        //     }
-        // }
         private Task<bool> CheckTransactionIdAsync(string transactionId)
         {
             if (transactionId == null) throw new ArgumentNullException(nameof(transactionId));
@@ -298,9 +278,12 @@ namespace B2B.CimMessageAdapter
     {
         public string MessageId { get; }
 
-        public MessageHeader(string messageId)
+        public string ProcessType { get; }
+
+        public MessageHeader(string messageId, string processType)
         {
             MessageId = messageId;
+            ProcessType = processType;
         }
     }
 
