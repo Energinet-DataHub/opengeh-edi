@@ -17,6 +17,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using B2B.CimMessageAdapter;
+using B2B.CimMessageAdapter.Message.MessageIds;
 using B2B.CimMessageAdapter.Schema;
 using MarketRoles.B2B.CimMessageAdapter.IntegrationTests.Stubs;
 using Xunit;
@@ -61,23 +62,6 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
 
             Assert.False(result.Success);
             AssertContainsError(result, "B2B-001");
-        }
-
-        [Fact]
-        public async Task Return_failure_if_message_id_is_not_unique()
-        {
-            await using (var message = CreateMessage())
-            {
-                await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
-            }
-
-            await using (var message = CreateMessage())
-            {
-                var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
-
-                Assert.False(result.Success);
-                AssertContainsError(result, "B2B-003");
-            }
         }
 
         [Fact]

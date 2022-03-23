@@ -134,7 +134,6 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Processing
             container.Register<IDomainEventsDispatcher, DomainEventsDispatcher>(Lifestyle.Scoped);
             container.Register<IDomainEventPublisher, DomainEventPublisher>(Lifestyle.Scoped);
             container.Register<ServiceBusMessageIdempotencyMiddleware>(Lifestyle.Scoped);
-            container.Register<IIncomingMessageRegistry, IncomingMessageRegistry>(Lifestyle.Transient);
             container.Register<IProtobufMessageFactory, ProtobufMessageFactory>(Lifestyle.Singleton);
             container.Register<INotificationReceiver, NotificationReceiver>(Lifestyle.Scoped);
             container.Register<IntegrationEventReceiver>(Lifestyle.Scoped);
