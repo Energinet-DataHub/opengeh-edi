@@ -14,10 +14,9 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using B2B.CimMessageAdapter;
 using B2B.CimMessageAdapter.Messages;
 
-namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests.Stubs
+namespace MarketRoles.B2B.CimMessageAdapter.Tests.Stubs
 {
     public class MessageIdsStub : IMessageIds
     {

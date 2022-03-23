@@ -19,7 +19,7 @@ using B2B.CimMessageAdapter.Errors;
 using B2B.CimMessageAdapter.Response;
 using Xunit;
 
-namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
+namespace MarketRoles.B2B.CimMessageAdapter.Tests
 {
     public class ResponseFactoryTests
     {
