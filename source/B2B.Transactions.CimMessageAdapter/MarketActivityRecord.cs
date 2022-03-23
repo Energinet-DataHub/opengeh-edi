@@ -16,18 +16,18 @@ namespace B2B.CimMessageAdapter
 {
     public class MarketActivityRecord
     {
+        public string Id { get; init; } = string.Empty;
+
         public string? ConsumerId { get; init; }
 
         public string? BalanceResponsibleId { get; init; }
 
         public string? EnergySupplierId { get; init; }
 
-        public string? MarketEvaluationPointId { get; init; }
-
-        public string Id { get; init; } = string.Empty;
+        public string MarketEvaluationPointId { get; init; } = string.Empty;
 
         public string? ConsumerName { get; init; }
 
-        public string? EffectiveDate { get; init; }
+        public string EffectiveDate { get; init; } = string.Empty;
     }
 }
