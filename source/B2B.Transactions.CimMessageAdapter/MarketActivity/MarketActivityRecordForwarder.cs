@@ -29,14 +29,12 @@ namespace B2B.CimMessageAdapter.MarketActivity
         private readonly string _queueName = "<Queue name";
         private bool _disposed;
         private TransactionScope? _transactionScope;
-        private ServiceBusClient? _client;
-        private ServiceBusSender? _serviceBusSender;
+        private ServiceBusSender _serviceBusSender;
 
-        public MarketActivityRecordForwarder(IJsonSerializer jsonSerializer)
+        public MarketActivityRecordForwarder(IJsonSerializer jsonSerializer, ServiceBusSender sender)
         {
             _transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-            _client = new ServiceBusClient(_connectionString);
-            _serviceBusSender = _client.CreateSender(_queueName);
+            _serviceBusSender = sender
             _jsonSerializer = jsonSerializer;
         }
 
