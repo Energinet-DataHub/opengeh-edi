@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using B2B.CimMessageAdapter.Errors;
+using B2B.CimMessageAdapter.MarketActivity;
 using B2B.CimMessageAdapter.Message.MessageIds;
 using B2B.CimMessageAdapter.Message.TransactionIds;
 using B2B.CimMessageAdapter.Schema;

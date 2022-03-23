@@ -12,24 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
+using Energinet.DataHub.MarketRoles.Infrastructure.Integration;
 
-namespace B2B.CimMessageAdapter
+namespace B2B.CimMessageAdapter.MarketActivity
 {
-    /// <summary>
-    /// Service for forwarding extracted market activity records to external sources
-    /// </summary>
-    public interface IMarketActivityRecordForwarder
-    {
-        /// <summary>
-        /// Adds a market activity record to collection
-        /// </summary>
-        /// <param name="marketActivityRecord"></param>
-        Task AddAsync(MarketActivityRecord marketActivityRecord);
-
-        /// <summary>
-        /// Commits added market activities to external source
-        /// </summary>
-        Task CommitAsync();
-    }
+    public record MarketActivityRecordTopic(string Name) : Topic;
 }
