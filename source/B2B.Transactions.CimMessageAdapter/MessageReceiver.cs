@@ -19,10 +19,9 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using B2B.CimMessageAdapter.Errors;
-using B2B.CimMessageAdapter.MarketActivity;
-using B2B.CimMessageAdapter.Message.MessageIds;
-using B2B.CimMessageAdapter.Message.TransactionIds;
+using B2B.CimMessageAdapter.Messages;
 using B2B.CimMessageAdapter.Schema;
+using B2B.CimMessageAdapter.Transactions;
 
 namespace B2B.CimMessageAdapter
 {
@@ -32,16 +31,16 @@ namespace B2B.CimMessageAdapter
         private const string HeaderElementName = "RequestChangeOfSupplier_MarketDocument";
         private readonly List<ValidationError> _errors = new();
         private readonly IMessageIds _messageIds;
-        private readonly IMarketActivityRecordForwarder _marketActivityRecordForwarder;
+        private readonly ITransactionQueueDispatcher _transactionQueueDispatcher;
         private readonly ITransactionIds _transactionIds;
         private readonly ISchemaProvider _schemaProvider;
         private bool _hasInvalidHeaderValues;
 
-        public MessageReceiver(IMessageIds messageIds, IMarketActivityRecordForwarder marketActivityRecordForwarder, ITransactionIds transactionIds, ISchemaProvider schemaProvider)
+        public MessageReceiver(IMessageIds messageIds, ITransactionQueueDispatcher transactionQueueDispatcher, ITransactionIds transactionIds, ISchemaProvider schemaProvider)
         {
             _messageIds = messageIds ?? throw new ArgumentNullException(nameof(messageIds));
-            _marketActivityRecordForwarder = marketActivityRecordForwarder ??
-                                             throw new ArgumentNullException(nameof(marketActivityRecordForwarder));
+            _transactionQueueDispatcher = transactionQueueDispatcher ??
+                                             throw new ArgumentNullException(nameof(transactionQueueDispatcher));
             _transactionIds = transactionIds;
             _schemaProvider = schemaProvider ?? throw new ArgumentNullException(nameof(schemaProvider));
         }
@@ -62,8 +61,27 @@ namespace B2B.CimMessageAdapter
             {
                 try
                 {
-                    await HandleMessageHeaderValuesAsync(reader).ConfigureAwait(false);
-                    await HandleMarketActivityRecordsAsync(reader).ConfigureAwait(false);
+                    var messageHeader = await ExtractMessageHeaderAsync(reader).ConfigureAwait(false);
+                    var messageIdIsUnique = await CheckMessageIdAsync(messageHeader.MessageId).ConfigureAwait(false);
+                    if (messageIdIsUnique == false)
+                    {
+                        _errors.Add(new DuplicateMessageIdDetected($"Message id '{messageHeader.MessageId}' is not unique"));
+                        _hasInvalidHeaderValues = true;
+                    }
+
+                    await foreach (var marketActivityRecord in MarketActivityRecordsFromAsync(reader))
+                    {
+                        if (await CheckTransactionIdAsync(marketActivityRecord.Id).ConfigureAwait(false) == false)
+                        {
+                            _errors.Add(new DuplicateTransactionIdDetected(
+                                $"Transaction id '{marketActivityRecord.Id}' is not unique and will not be processed."));
+                        }
+                        else
+                        {
+                            var transaction = CreateTransaction(messageHeader, marketActivityRecord);
+                            await AddToTransactionQueueAsync(transaction).ConfigureAwait(false);
+                        }
+                    }
                 }
                 catch (XmlException exception)
                 {
@@ -77,10 +95,15 @@ namespace B2B.CimMessageAdapter
 
             if (_hasInvalidHeaderValues == false)
             {
-                await _marketActivityRecordForwarder.CommitAsync().ConfigureAwait(false);
+                await _transactionQueueDispatcher.CommitAsync().ConfigureAwait(false);
             }
 
             return _errors.Count == 0 ? Result.Succeeded() : Result.Failure(_errors.ToArray());
+        }
+
+        private static B2BTransaction CreateTransaction(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
+        {
+            return B2BTransaction.Create(messageHeader, marketActivityRecord);
         }
 
         private static Result InvalidXmlFailure(Exception exception)
@@ -88,15 +111,15 @@ namespace B2B.CimMessageAdapter
             return Result.Failure(InvalidMessageStructure.From(exception));
         }
 
-        private static async IAsyncEnumerable<MarketActivityRecord> ExtractFromAsync(XmlReader reader)
+        private static async IAsyncEnumerable<MarketActivityRecord> MarketActivityRecordsFromAsync(XmlReader reader)
         {
-            var mrid = string.Empty;
-            var marketEvaluationPointmRID = string.Empty;
-            var energySupplierMarketParticipantmRID = string.Empty;
-            var balanceResponsiblePartyMarketParticipantmRID = string.Empty;
-            var customerMarketParticipantmRID = string.Empty;
-            var customerMarketParticipantname = string.Empty;
-            var startDateAndOrTimedateTime = string.Empty;
+            var id = string.Empty;
+            var marketEvaluationPointId = string.Empty;
+            var energySupplierId = string.Empty;
+            var balanceResponsibleId = string.Empty;
+            var consumerId = string.Empty;
+            var consumerName = string.Empty;
+            var effectiveDate = string.Empty;
 
             while (await reader.ReadAsync().ConfigureAwait(false))
             {
@@ -104,23 +127,23 @@ namespace B2B.CimMessageAdapter
                 {
                     var marketActivityRecord = new MarketActivityRecord()
                     {
-                        MrId = mrid,
-                        CustomerMarketParticipantName = customerMarketParticipantname,
-                        CustomerMarketParticipantmRID = customerMarketParticipantmRID,
-                        MarketEvaluationPointmRID = marketEvaluationPointmRID,
-                        EnergySupplierMarketParticipantmRID = energySupplierMarketParticipantmRID,
-                        StartDateAndOrTimeDateTime = startDateAndOrTimedateTime,
-                        BalanceResponsiblePartyMarketParticipantmRID =
-                            balanceResponsiblePartyMarketParticipantmRID,
+                        Id = id,
+                        ConsumerName = consumerName,
+                        ConsumerId = consumerId,
+                        MarketEvaluationPointId = marketEvaluationPointId,
+                        EnergySupplierId = energySupplierId,
+                        EffectiveDate = effectiveDate,
+                        BalanceResponsibleId =
+                            balanceResponsibleId,
                     };
 
-                    mrid = string.Empty;
-                    marketEvaluationPointmRID = string.Empty;
-                    energySupplierMarketParticipantmRID = string.Empty;
-                    balanceResponsiblePartyMarketParticipantmRID = string.Empty;
-                    customerMarketParticipantmRID = string.Empty;
-                    customerMarketParticipantname = string.Empty;
-                    startDateAndOrTimedateTime = string.Empty;
+                    id = string.Empty;
+                    marketEvaluationPointId = string.Empty;
+                    energySupplierId = string.Empty;
+                    balanceResponsibleId = string.Empty;
+                    consumerId = string.Empty;
+                    consumerName = string.Empty;
+                    effectiveDate = string.Empty;
 
                     yield return marketActivityRecord;
                 }
@@ -131,13 +154,13 @@ namespace B2B.CimMessageAdapter
                 }
                 else
                 {
-                    TryExtractValueFrom("mRID", reader, (value) => mrid = value);
-                    TryExtractValueFrom("marketEvaluationPoint.mRID", reader, (value) => marketEvaluationPointmRID = value);
-                    TryExtractValueFrom("marketEvaluationPoint.energySupplier_MarketParticipant.mRID", reader, (value) => energySupplierMarketParticipantmRID = value);
-                    TryExtractValueFrom("marketEvaluationPoint.balanceResponsibleParty_MarketParticipant.mRID", reader, (value) => balanceResponsiblePartyMarketParticipantmRID = value);
-                    TryExtractValueFrom("marketEvaluationPoint.customer_MarketParticipant.mRID", reader, (value) => customerMarketParticipantmRID = value);
-                    TryExtractValueFrom("marketEvaluationPoint.customer_MarketParticipant.name", reader, (value) => customerMarketParticipantname = value);
-                    TryExtractValueFrom("start_DateAndOrTime.dateTime", reader, (value) => startDateAndOrTimedateTime = value);
+                    TryExtractValueFrom("mRID", reader, (value) => id = value);
+                    TryExtractValueFrom("marketEvaluationPoint.mRID", reader, (value) => marketEvaluationPointId = value);
+                    TryExtractValueFrom("marketEvaluationPoint.energySupplier_MarketParticipant.mRID", reader, (value) => energySupplierId = value);
+                    TryExtractValueFrom("marketEvaluationPoint.balanceResponsibleParty_MarketParticipant.mRID", reader, (value) => balanceResponsibleId = value);
+                    TryExtractValueFrom("marketEvaluationPoint.customer_MarketParticipant.mRID", reader, (value) => consumerId = value);
+                    TryExtractValueFrom("marketEvaluationPoint.customer_MarketParticipant.name", reader, (value) => consumerName = value);
+                    TryExtractValueFrom("start_DateAndOrTime.dateTime", reader, (value) => effectiveDate = value);
                 }
             }
         }
@@ -165,6 +188,12 @@ namespace B2B.CimMessageAdapter
                    reader.LocalName.Equals(HeaderElementName, StringComparison.OrdinalIgnoreCase);
         }
 
+        private static bool EndOfMessageHeader(XmlReader reader)
+        {
+            return reader.NodeType == XmlNodeType.EndElement &&
+                   reader.LocalName.Equals(HeaderElementName, StringComparison.OrdinalIgnoreCase);
+        }
+
         private static bool StartOfMarketActivityRecord(XmlReader reader)
         {
             return reader.NodeType == XmlNodeType.Element &&
@@ -173,58 +202,47 @@ namespace B2B.CimMessageAdapter
 
         private static void TryExtractValueFrom(string elementName, XmlReader reader, Func<string, string> variable)
         {
-            if (reader.LocalName.Equals(elementName, StringComparison.OrdinalIgnoreCase))
+            if (reader.LocalName.Equals(elementName, StringComparison.OrdinalIgnoreCase) && reader.NodeType == XmlNodeType.Element)
             {
                 variable(reader.ReadElementString());
             }
         }
 
-        private async Task HandleMarketActivityRecordsAsync(XmlReader reader)
+        private static async Task<MessageHeader> ExtractMessageHeaderAsync(XmlReader reader)
         {
-            while (await reader.ReadAsync().ConfigureAwait(false))
-            {
-                if (!StartOfMarketActivityRecord(reader)) continue;
-                await foreach (var marketActivityRecord in ExtractFromAsync(reader))
-                {
-                    if (await CheckTransactionIdAsync(marketActivityRecord.MrId).ConfigureAwait(false) == false)
-                    {
-                        _errors.Add(new DuplicateTransactionIdDetected(
-                            $"Transaction id '{marketActivityRecord.MrId}' is not unique and will not be processed."));
-                    }
-                    else
-                    {
-                        await StoreActivityRecordAsync(marketActivityRecord).ConfigureAwait(false);
-                    }
-                }
-            }
-        }
+            var messageId = string.Empty;
+            var processType = string.Empty;
+            var senderId = string.Empty;
+            var senderRole = string.Empty;
+            var receiverId = string.Empty;
+            var receiverRole = string.Empty;
+            var createdAt = string.Empty;
 
-        private async Task HandleMessageHeaderValuesAsync(XmlReader reader)
-        {
             while (await reader.ReadAsync().ConfigureAwait(false))
             {
                 if (StartOfMessageHeader(reader))
                 {
                     while (await reader.ReadAsync().ConfigureAwait(false))
                     {
-                        if (reader.NodeType == XmlNodeType.Element &&
-                            reader.LocalName.Equals("mRID", StringComparison.OrdinalIgnoreCase))
+                        if (StartOfMarketActivityRecord(reader))
                         {
-                            var messageId = reader.ReadElementString();
-                            var messageIdIsUnique = await CheckMessageIdAsync(messageId).ConfigureAwait(false);
-                            if (messageIdIsUnique == false)
-                            {
-                                _errors.Add(new DuplicateMessageIdDetected($"Message id '{messageId}' is not unique"));
-                                _hasInvalidHeaderValues = true;
-                            }
-
                             break;
                         }
+
+                        TryExtractValueFrom("mRID", reader, value => messageId = value);
+                        TryExtractValueFrom("process.processType", reader, value => processType = value);
+                        TryExtractValueFrom("sender_MarketParticipant.mRID", reader, value => senderId = value);
+                        TryExtractValueFrom("sender_MarketParticipant.marketRole.type", reader, value => senderRole = value);
+                        TryExtractValueFrom("receiver_MarketParticipant.mRID", reader, value => receiverId = value);
+                        TryExtractValueFrom("receiver_MarketParticipant.marketRole.type", reader, value => receiverRole = value);
+                        TryExtractValueFrom("createdDateTime", reader, value => createdAt = value);
                     }
 
                     break;
                 }
             }
+
+            return new MessageHeader(messageId, processType, senderId, senderRole, receiverId, receiverRole, createdAt);
         }
 
         private Task<bool> CheckTransactionIdAsync(string transactionId)
@@ -233,9 +251,9 @@ namespace B2B.CimMessageAdapter
             return _transactionIds.TryStoreAsync(transactionId);
         }
 
-        private Task StoreActivityRecordAsync(MarketActivityRecord marketActivityRecord)
+        private Task AddToTransactionQueueAsync(B2BTransaction transaction)
         {
-            return _marketActivityRecordForwarder.AddAsync(marketActivityRecord);
+            return _transactionQueueDispatcher.AddAsync(transaction);
         }
 
         private Task<bool> CheckMessageIdAsync(string messageId)

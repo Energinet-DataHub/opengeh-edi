@@ -12,19 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using B2B.CimMessageAdapter.Messages;
 
-namespace B2B.CimMessageAdapter.Tests.Stubs
+namespace B2B.CimMessageAdapter.Transactions
 {
-    public class MessageIdsStub : IMessageIds
+    /// <summary>
+    /// Service for dispatching B2B transactions to transaction queue
+    /// </summary>
+    public interface ITransactionQueueDispatcher
     {
-        private readonly HashSet<string> _messageIds = new();
+        /// <summary>
+        /// Adds a transaction to collection
+        /// </summary>
+        /// <param name="transaction"></param>
+        Task AddAsync(B2BTransaction transaction);
 
-        public Task<bool> TryStoreAsync(string messageId)
-        {
-            return Task.FromResult(_messageIds.Add(messageId));
-        }
+        /// <summary>
+        /// Commits added transactions to queue
+        /// </summary>
+        Task CommitAsync();
     }
 }

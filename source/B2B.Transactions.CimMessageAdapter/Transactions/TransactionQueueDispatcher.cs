@@ -19,25 +19,25 @@ using System.Transactions;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
 
-namespace B2B.CimMessageAdapter.MarketActivity
+namespace B2B.CimMessageAdapter.Transactions
 {
-    public class MarketActivityRecordForwarder : IMarketActivityRecordForwarder, IDisposable, IAsyncDisposable
+    public class TransactionQueueDispatcher : ITransactionQueueDispatcher, IDisposable, IAsyncDisposable
     {
         private readonly IJsonSerializer _jsonSerializer;
         private bool _disposed;
         private TransactionScope? _transactionScope;
         private ServiceBusSender? _serviceBusSender;
 
-        public MarketActivityRecordForwarder(IJsonSerializer jsonSerializer, ServiceBusSender? sender)
+        public TransactionQueueDispatcher(IJsonSerializer jsonSerializer, ServiceBusSender? sender)
         {
             _transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
             _serviceBusSender = sender;
             _jsonSerializer = jsonSerializer;
         }
 
-        public async Task AddAsync(MarketActivityRecord marketActivityRecord)
+        public async Task AddAsync(B2BTransaction transaction)
         {
-            var message = CreateMessage(marketActivityRecord);
+            var message = CreateMessage(transaction);
             if (_serviceBusSender != null) await _serviceBusSender.SendMessageAsync(message).ConfigureAwait(false);
         }
 
@@ -82,9 +82,9 @@ namespace B2B.CimMessageAdapter.MarketActivity
             }
         }
 
-        private ServiceBusMessage CreateMessage(MarketActivityRecord item)
+        private ServiceBusMessage CreateMessage(B2BTransaction transaction)
         {
-            var json = _jsonSerializer.Serialize(item);
+            var json = _jsonSerializer.Serialize(transaction);
             var data = Encoding.UTF8.GetBytes(json);
             var message = new ServiceBusMessage(data);
             return message;

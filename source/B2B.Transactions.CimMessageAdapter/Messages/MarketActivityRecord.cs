@@ -12,24 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-
-namespace B2B.CimMessageAdapter.MarketActivity
+namespace B2B.CimMessageAdapter.Messages
 {
-    /// <summary>
-    /// Service for forwarding extracted market activity records to external sources
-    /// </summary>
-    public interface IMarketActivityRecordForwarder
+    public class MarketActivityRecord
     {
-        /// <summary>
-        /// Adds a market activity record to collection
-        /// </summary>
-        /// <param name="marketActivityRecord"></param>
-        Task AddAsync(MarketActivityRecord marketActivityRecord);
+        public string Id { get; init; } = string.Empty;
 
-        /// <summary>
-        /// Commits added market activities to external source
-        /// </summary>
-        Task CommitAsync();
+        public string? ConsumerId { get; init; }
+
+        public string? BalanceResponsibleId { get; init; }
+
+        public string? EnergySupplierId { get; init; }
+
+        public string MarketEvaluationPointId { get; init; } = string.Empty;
+
+        public string? ConsumerName { get; init; }
+
+        public string EffectiveDate { get; init; } = string.Empty;
     }
 }

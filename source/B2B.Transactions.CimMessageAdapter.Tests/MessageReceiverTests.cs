@@ -16,19 +16,18 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using B2B.CimMessageAdapter;
-using B2B.CimMessageAdapter.Message.MessageIds;
+using B2B.CimMessageAdapter.Messages;
 using B2B.CimMessageAdapter.Schema;
-using MarketRoles.B2B.CimMessageAdapter.IntegrationTests.Stubs;
+using B2B.CimMessageAdapter.Tests.Stubs;
 using Xunit;
 
-namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
+namespace B2B.CimMessageAdapter.Tests
 {
     public class MessageReceiverTests
     {
-        private readonly MessageIdsStub _messageIdsStub = new();
         private readonly TransactionIdsStub _transactionIdsStub = new();
-        private MarketActivityRecordForwarderStub _marketActivityRecordForwarderSpy = new();
+        private readonly MessageIdsStub _messageIdsStub = new();
+        private TransactionQueueDispatcherStub _transactionQueueDispatcherSpy = new();
 
         [Fact]
         public async Task Message_must_be_valid_xml()
@@ -71,15 +70,22 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
             await ReceiveRequestChangeOfSupplierMessage(message)
                 .ConfigureAwait(false);
 
-            var activityRecord = _marketActivityRecordForwarderSpy.CommittedItems.FirstOrDefault();
-            Assert.NotNull(activityRecord);
-            Assert.Equal("12345699", activityRecord?.MrId);
-            Assert.Equal("579999993331812345", activityRecord?.MarketEvaluationPointmRID);
-            Assert.Equal("5799999933318", activityRecord?.EnergySupplierMarketParticipantmRID);
-            Assert.Equal("5799999933340", activityRecord?.BalanceResponsiblePartyMarketParticipantmRID);
-            Assert.Equal("0801741527", activityRecord?.CustomerMarketParticipantmRID);
-            Assert.Equal("Jan Hansen", activityRecord?.CustomerMarketParticipantName);
-            Assert.Equal("2022-09-07T22:00:00Z", activityRecord?.StartDateAndOrTimeDateTime);
+            var transaction = _transactionQueueDispatcherSpy.CommittedItems.FirstOrDefault();
+            Assert.NotNull(transaction);
+            Assert.Equal("78954612", transaction?.Message.MessageId);
+            Assert.Equal("E65", transaction?.Message.ProcessType);
+            Assert.Equal("5799999933318", transaction?.Message.SenderId);
+            Assert.Equal("FakeMarketRole", transaction?.Message.SenderRole);
+            Assert.Equal("5790001330552", transaction?.Message.ReceiverId);
+            Assert.Equal("DDZ", transaction?.Message.ReceiverRole);
+            Assert.Equal("2022-09-07T09:30:47Z", transaction?.Message.CreatedAt);
+            Assert.Equal("12345699", transaction?.MarketActivityRecord.Id);
+            Assert.Equal("579999993331812345", transaction?.MarketActivityRecord.MarketEvaluationPointId);
+            Assert.Equal("5799999933318", transaction?.MarketActivityRecord.EnergySupplierId);
+            Assert.Equal("5799999933340", transaction?.MarketActivityRecord.BalanceResponsibleId);
+            Assert.Equal("0801741527", transaction?.MarketActivityRecord.ConsumerId);
+            Assert.Equal("Jan Hansen", transaction?.MarketActivityRecord.ConsumerName);
+            Assert.Equal("2022-09-07T22:00:00Z", transaction?.MarketActivityRecord.EffectiveDate);
         }
 
         [Fact]
@@ -88,7 +94,18 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
             var messageIds = new MessageIdsStub();
             await SimulateDuplicationOfMessageIds(messageIds).ConfigureAwait(false);
 
-            Assert.Empty(_marketActivityRecordForwarderSpy.CommittedItems);
+            Assert.Empty(_transactionQueueDispatcherSpy.CommittedItems);
+        }
+
+        [Fact]
+        public async Task Activity_records_must_have_unique_transaction_ids()
+        {
+            await using var message = CreateMessageWithDuplicateTransactionIds();
+            var result = await ReceiveRequestChangeOfSupplierMessage(message)
+                .ConfigureAwait(false);
+
+            AssertContainsError(result, "B2B-005");
+            Assert.Single(_transactionQueueDispatcherSpy.CommittedItems);
         }
 
         private static Stream CreateMessageWithInvalidXmlStructure()
@@ -142,15 +159,15 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
 
         private MessageReceiver CreateMessageReceiver()
         {
-            _marketActivityRecordForwarderSpy = new MarketActivityRecordForwarderStub();
-            var messageReceiver = new MessageReceiver(_messageIdsStub, _marketActivityRecordForwarderSpy, _transactionIdsStub, new SchemaProvider(new SchemaStore()));
+            _transactionQueueDispatcherSpy = new TransactionQueueDispatcherStub();
+            var messageReceiver = new MessageReceiver(_messageIdsStub, _transactionQueueDispatcherSpy, _transactionIdsStub, new SchemaProvider(new SchemaStore()));
             return messageReceiver;
         }
 
         private MessageReceiver CreateMessageReceiver(IMessageIds messageIds)
         {
-            _marketActivityRecordForwarderSpy = new MarketActivityRecordForwarderStub();
-            var messageReceiver = new MessageReceiver(messageIds, _marketActivityRecordForwarderSpy, _transactionIdsStub, new SchemaProvider(new SchemaStore()));
+            _transactionQueueDispatcherSpy = new TransactionQueueDispatcherStub();
+            var messageReceiver = new MessageReceiver(messageIds, _transactionQueueDispatcherSpy, _transactionIdsStub, new SchemaProvider(new SchemaStore()));
             return messageReceiver;
         }
 
