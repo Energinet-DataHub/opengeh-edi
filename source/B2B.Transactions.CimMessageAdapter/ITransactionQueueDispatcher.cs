@@ -17,18 +17,18 @@ using System.Threading.Tasks;
 namespace B2B.CimMessageAdapter
 {
     /// <summary>
-    /// Service for forwarding extracted market activity records to external sources
+    /// Service for dispatching B2B transactions to transaction queue
     /// </summary>
-    public interface IMarketActivityRecordForwarder
+    public interface ITransactionQueueDispatcher
     {
         /// <summary>
-        /// Adds a market activity record to collection
+        /// Adds a transaction to collection
         /// </summary>
-        /// <param name="marketActivityRecord"></param>
-        Task AddAsync(MarketActivityRecord marketActivityRecord);
+        /// <param name="transaction"></param>
+        Task AddAsync(B2BTransaction transaction);
 
         /// <summary>
-        /// Commits added market activities to external source
+        /// Commits added transactions to queue
         /// </summary>
         Task CommitAsync();
     }

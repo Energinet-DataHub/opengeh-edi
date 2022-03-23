@@ -12,23 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using B2B.CimMessageAdapter;
 
 namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests.Stubs
 {
-    public class MarketActivityRecordForwarderStub : IMarketActivityRecordForwarder
+    public class TransactionQueueDispatcherStub : ITransactionQueueDispatcher
     {
         private readonly List<MarketActivityRecord> _uncommittedItems = new();
         private readonly List<MarketActivityRecord> _committedItems = new();
 
         public IReadOnlyCollection<MarketActivityRecord> CommittedItems => _committedItems.AsReadOnly();
 
-        public Task AddAsync(MarketActivityRecord marketActivityRecord)
+        public Task AddAsync(B2BTransaction transaction)
         {
+            if (transaction == null) throw new ArgumentNullException(nameof(transaction));
             _committedItems.Clear();
-            _uncommittedItems.Add(marketActivityRecord);
+            _uncommittedItems.Add(transaction.MarketActivityRecord);
             return Task.CompletedTask;
         }
 

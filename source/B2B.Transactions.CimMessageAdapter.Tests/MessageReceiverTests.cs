@@ -27,7 +27,7 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
     {
         private readonly TransactionIdsStub _transactionIdsStub = new();
         private readonly MessageIdsStub _messageIdsStub = new();
-        private MarketActivityRecordForwarderStub _marketActivityRecordForwarderSpy = new();
+        private TransactionQueueDispatcherStub _transactionQueueDispatcherSpy = new();
 
         [Fact]
         public async Task Message_must_be_valid_xml()
@@ -87,15 +87,15 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
             await ReceiveRequestChangeOfSupplierMessage(message)
                 .ConfigureAwait(false);
 
-            var activityRecord = _marketActivityRecordForwarderSpy.CommittedItems.FirstOrDefault();
-            Assert.NotNull(activityRecord);
-            Assert.Equal("12345699", activityRecord?.MrId);
-            Assert.Equal("579999993331812345", activityRecord?.MarketEvaluationPointmRID);
-            Assert.Equal("5799999933318", activityRecord?.EnergySupplierMarketParticipantmRID);
-            Assert.Equal("5799999933340", activityRecord?.BalanceResponsiblePartyMarketParticipantmRID);
-            Assert.Equal("0801741527", activityRecord?.CustomerMarketParticipantmRID);
-            Assert.Equal("Jan Hansen", activityRecord?.CustomerMarketParticipantName);
-            Assert.Equal("2022-09-07T22:00:00Z", activityRecord?.StartDateAndOrTimeDateTime);
+            var transaction = _transactionQueueDispatcherSpy.CommittedItems.FirstOrDefault();
+            Assert.NotNull(transaction);
+            Assert.Equal("12345699", transaction?.MrId);
+            Assert.Equal("579999993331812345", transaction?.MarketEvaluationPointmRID);
+            Assert.Equal("5799999933318", transaction?.EnergySupplierMarketParticipantmRID);
+            Assert.Equal("5799999933340", transaction?.BalanceResponsiblePartyMarketParticipantmRID);
+            Assert.Equal("0801741527", transaction?.CustomerMarketParticipantmRID);
+            Assert.Equal("Jan Hansen", transaction?.CustomerMarketParticipantName);
+            Assert.Equal("2022-09-07T22:00:00Z", transaction?.StartDateAndOrTimeDateTime);
         }
 
         [Fact]
@@ -104,7 +104,7 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
             var messageIds = new MessageIdsStub();
             await SimulateDuplicationOfMessageIds(messageIds).ConfigureAwait(false);
 
-            Assert.Empty(_marketActivityRecordForwarderSpy.CommittedItems);
+            Assert.Empty(_transactionQueueDispatcherSpy.CommittedItems);
         }
 
         [Fact]
@@ -115,7 +115,7 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
                 .ConfigureAwait(false);
 
             AssertContainsError(result, "B2B-005");
-            Assert.Single(_marketActivityRecordForwarderSpy.CommittedItems);
+            Assert.Single(_transactionQueueDispatcherSpy.CommittedItems);
         }
 
         private static Stream CreateMessageWithInvalidXmlStructure()
@@ -169,15 +169,15 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
 
         private MessageReceiver CreateMessageReceiver()
         {
-            _marketActivityRecordForwarderSpy = new MarketActivityRecordForwarderStub();
-            var messageReceiver = new MessageReceiver(_messageIdsStub, _marketActivityRecordForwarderSpy, _transactionIdsStub, new SchemaProvider(new SchemaStore()));
+            _transactionQueueDispatcherSpy = new TransactionQueueDispatcherStub();
+            var messageReceiver = new MessageReceiver(_messageIdsStub, _transactionQueueDispatcherSpy, _transactionIdsStub, new SchemaProvider(new SchemaStore()));
             return messageReceiver;
         }
 
         private MessageReceiver CreateMessageReceiver(IMessageIds messageIds)
         {
-            _marketActivityRecordForwarderSpy = new MarketActivityRecordForwarderStub();
-            var messageReceiver = new MessageReceiver(messageIds, _marketActivityRecordForwarderSpy, _transactionIdsStub, new SchemaProvider(new SchemaStore()));
+            _transactionQueueDispatcherSpy = new TransactionQueueDispatcherStub();
+            var messageReceiver = new MessageReceiver(messageIds, _transactionQueueDispatcherSpy, _transactionIdsStub, new SchemaProvider(new SchemaStore()));
             return messageReceiver;
         }
 

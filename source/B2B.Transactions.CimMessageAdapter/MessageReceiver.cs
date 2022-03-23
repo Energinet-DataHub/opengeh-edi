@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using System.Transactions;
 using System.Xml;
 using System.Xml.Schema;
 using B2B.CimMessageAdapter.Errors;
@@ -29,16 +30,16 @@ namespace B2B.CimMessageAdapter
         private const string HeaderElementName = "RequestChangeOfSupplier_MarketDocument";
         private readonly List<ValidationError> _errors = new();
         private readonly IMessageIds _messageIds;
-        private readonly IMarketActivityRecordForwarder _marketActivityRecordForwarder;
+        private readonly ITransactionQueueDispatcher _transactionQueueDispatcher;
         private readonly ITransactionIds _transactionIds;
         private readonly ISchemaProvider _schemaProvider;
         private bool _hasInvalidHeaderValues;
 
-        public MessageReceiver(IMessageIds messageIds, IMarketActivityRecordForwarder marketActivityRecordForwarder, ITransactionIds transactionIds, ISchemaProvider schemaProvider)
+        public MessageReceiver(IMessageIds messageIds, ITransactionQueueDispatcher transactionQueueDispatcher, ITransactionIds transactionIds, ISchemaProvider schemaProvider)
         {
             _messageIds = messageIds ?? throw new ArgumentNullException(nameof(messageIds));
-            _marketActivityRecordForwarder = marketActivityRecordForwarder ??
-                                             throw new ArgumentNullException(nameof(marketActivityRecordForwarder));
+            _transactionQueueDispatcher = transactionQueueDispatcher ??
+                                             throw new ArgumentNullException(nameof(transactionQueueDispatcher));
             _transactionIds = transactionIds;
             _schemaProvider = schemaProvider ?? throw new ArgumentNullException(nameof(schemaProvider));
         }
@@ -76,7 +77,8 @@ namespace B2B.CimMessageAdapter
                         }
                         else
                         {
-                            await StoreActivityRecordAsync(marketActivityRecord).ConfigureAwait(false);
+                            var transaction = CreateTransaction(messageHeader, marketActivityRecord);
+                            await AddToTransactionQueueAsync(transaction).ConfigureAwait(false);
                         }
                     }
                 }
@@ -92,10 +94,15 @@ namespace B2B.CimMessageAdapter
 
             if (_hasInvalidHeaderValues == false)
             {
-                await _marketActivityRecordForwarder.CommitAsync().ConfigureAwait(false);
+                await _transactionQueueDispatcher.CommitAsync().ConfigureAwait(false);
             }
 
             return _errors.Count == 0 ? Result.Succeeded() : Result.Failure(_errors.ToArray());
+        }
+
+        private static B2BTransaction CreateTransaction(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
+        {
+            return B2BTransaction.Create(messageHeader, marketActivityRecord);
         }
 
         private static Result InvalidXmlFailure(Exception exception)
@@ -252,9 +259,9 @@ namespace B2B.CimMessageAdapter
             return _transactionIds.TryStoreAsync(transactionId);
         }
 
-        private Task StoreActivityRecordAsync(MarketActivityRecord marketActivityRecord)
+        private Task AddToTransactionQueueAsync(B2BTransaction transaction)
         {
-            return _marketActivityRecordForwarder.AddAsync(marketActivityRecord);
+            return _transactionQueueDispatcher.AddAsync(transaction);
         }
 
         private Task<bool> CheckMessageIdAsync(string messageId)
@@ -286,7 +293,7 @@ namespace B2B.CimMessageAdapter
         }
     }
 
-    #pragma warning disable
+#pragma warning disable
     public class MessageHeader
     {
         public string MessageId { get; }
@@ -295,5 +302,20 @@ namespace B2B.CimMessageAdapter
         {
             MessageId = messageId;
         }
+    }
+
+    public class B2BTransaction
+    {
+        private B2BTransaction(MarketActivityRecord marketActivityRecord)
+        {
+            MarketActivityRecord = marketActivityRecord;
+        }
+
+        public static B2BTransaction Create(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
+        {
+            return new B2BTransaction(marketActivityRecord);
+        }
+
+        public MarketActivityRecord MarketActivityRecord { get; }
     }
 }
