@@ -213,6 +213,7 @@ namespace B2B.CimMessageAdapter
             var senderId = string.Empty;
             var senderRole = string.Empty;
             var receiverId = string.Empty;
+            var receiverRole = string.Empty;
 
             while (await reader.ReadAsync().ConfigureAwait(false))
             {
@@ -230,13 +231,14 @@ namespace B2B.CimMessageAdapter
                         TryExtractValueFrom("sender_MarketParticipant.mRID", reader, value => senderId = value);
                         TryExtractValueFrom("sender_MarketParticipant.marketRole.type", reader, value => senderRole = value);
                         TryExtractValueFrom("receiver_MarketParticipant.mRID", reader, value => receiverId = value);
+                        TryExtractValueFrom("receiver_MarketParticipant.marketRole.type", reader, value => receiverRole = value);
                     }
 
                     break;
                 }
             }
 
-            return new MessageHeader(messageId, processType, senderId, senderRole, receiverId);
+            return new MessageHeader(messageId, processType, senderId, senderRole, receiverId, receiverRole);
         }
 
         private Task<bool> CheckTransactionIdAsync(string transactionId)
@@ -282,13 +284,14 @@ namespace B2B.CimMessageAdapter
 #pragma warning disable
     public class MessageHeader
     {
-        public MessageHeader(string messageId, string processType, string senderId, string senderRole, string receiverId)
+        public MessageHeader(string messageId, string processType, string senderId, string senderRole, string receiverId, string receiverRole)
         {
             MessageId = messageId;
             ProcessType = processType;
             SenderId = senderId;
             SenderRole = senderRole;
             ReceiverId = receiverId;
+            ReceiverRole = receiverRole;
         }
 
         public string MessageId { get; }
@@ -300,6 +303,8 @@ namespace B2B.CimMessageAdapter
         public string SenderRole { get; }
 
         public string ReceiverId { get; }
+
+        public string ReceiverRole { get; }
     }
 
     public class B2BTransaction
