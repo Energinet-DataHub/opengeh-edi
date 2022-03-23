@@ -214,6 +214,7 @@ namespace B2B.CimMessageAdapter
             var senderRole = string.Empty;
             var receiverId = string.Empty;
             var receiverRole = string.Empty;
+            var createdAt = string.Empty;
 
             while (await reader.ReadAsync().ConfigureAwait(false))
             {
@@ -232,13 +233,14 @@ namespace B2B.CimMessageAdapter
                         TryExtractValueFrom("sender_MarketParticipant.marketRole.type", reader, value => senderRole = value);
                         TryExtractValueFrom("receiver_MarketParticipant.mRID", reader, value => receiverId = value);
                         TryExtractValueFrom("receiver_MarketParticipant.marketRole.type", reader, value => receiverRole = value);
+                        TryExtractValueFrom("createdDateTime", reader, value => createdAt = value);
                     }
 
                     break;
                 }
             }
 
-            return new MessageHeader(messageId, processType, senderId, senderRole, receiverId, receiverRole);
+            return new MessageHeader(messageId, processType, senderId, senderRole, receiverId, receiverRole, createdAt);
         }
 
         private Task<bool> CheckTransactionIdAsync(string transactionId)
@@ -284,7 +286,7 @@ namespace B2B.CimMessageAdapter
 #pragma warning disable
     public class MessageHeader
     {
-        public MessageHeader(string messageId, string processType, string senderId, string senderRole, string receiverId, string receiverRole)
+        public MessageHeader(string messageId, string processType, string senderId, string senderRole, string receiverId, string receiverRole, string createdAt)
         {
             MessageId = messageId;
             ProcessType = processType;
@@ -292,6 +294,7 @@ namespace B2B.CimMessageAdapter
             SenderRole = senderRole;
             ReceiverId = receiverId;
             ReceiverRole = receiverRole;
+            CreatedAt = createdAt;
         }
 
         public string MessageId { get; }
@@ -305,6 +308,8 @@ namespace B2B.CimMessageAdapter
         public string ReceiverId { get; }
 
         public string ReceiverRole { get; }
+
+        public string CreatedAt { get; }
     }
 
     public class B2BTransaction
