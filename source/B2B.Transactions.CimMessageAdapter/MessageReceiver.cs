@@ -211,6 +211,7 @@ namespace B2B.CimMessageAdapter
             var messageId = string.Empty;
             var processType = string.Empty;
             var senderId = string.Empty;
+            var senderRole = string.Empty;
 
             while (await reader.ReadAsync().ConfigureAwait(false))
             {
@@ -226,13 +227,14 @@ namespace B2B.CimMessageAdapter
                         TryExtractValueFrom("mRID", reader, value => messageId = value);
                         TryExtractValueFrom("process.processType", reader, value => processType = value);
                         TryExtractValueFrom("sender_MarketParticipant.mRID", reader, value => senderId = value);
+                        TryExtractValueFrom("sender_MarketParticipant.marketRole.type", reader, value => senderRole = value);
                     }
 
                     break;
                 }
             }
 
-            return new MessageHeader(messageId, processType, senderId);
+            return new MessageHeader(messageId, processType, senderId, senderRole);
         }
 
         private Task<bool> CheckTransactionIdAsync(string transactionId)
@@ -278,11 +280,12 @@ namespace B2B.CimMessageAdapter
 #pragma warning disable
     public class MessageHeader
     {
-        public MessageHeader(string messageId, string processType, string senderId)
+        public MessageHeader(string messageId, string processType, string senderId, string senderRole)
         {
             MessageId = messageId;
             ProcessType = processType;
             SenderId = senderId;
+            SenderRole = senderRole;
         }
 
         public string MessageId { get; }
@@ -291,6 +294,7 @@ namespace B2B.CimMessageAdapter
 
         public string SenderId { get; }
 
+        public string SenderRole { get; }
     }
 
     public class B2BTransaction
