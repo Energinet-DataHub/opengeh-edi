@@ -20,7 +20,7 @@ limitations under the License.
 
         <IsPackable>false</IsPackable>
 
-        <RootNamespace>MarketRoles.B2B.CimMessageAdapter.Tests</RootNamespace>
+        <RootNamespace>B2B.CimMessageAdapter.Tests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

@@ -14,12 +14,11 @@
 
 using System.Linq;
 using System.Xml.Linq;
-using B2B.CimMessageAdapter;
 using B2B.CimMessageAdapter.Errors;
 using B2B.CimMessageAdapter.Response;
 using Xunit;
 
-namespace MarketRoles.B2B.CimMessageAdapter.Tests
+namespace B2B.CimMessageAdapter.Tests
 {
     public class ResponseFactoryTests
     {
