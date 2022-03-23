@@ -93,6 +93,7 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
             Assert.Equal("E65", transaction?.Message.ProcessType);
             Assert.Equal("5799999933318", transaction?.Message.SenderId);
             Assert.Equal("FakeMarketRole", transaction?.Message.SenderRole);
+            Assert.Equal("5790001330552", transaction?.Message.ReceiverId);
             Assert.Equal("12345699", transaction?.MarketActivityRecord.MrId);
             Assert.Equal("579999993331812345", transaction?.MarketActivityRecord.MarketEvaluationPointmRID);
             Assert.Equal("5799999933318", transaction?.MarketActivityRecord.EnergySupplierMarketParticipantmRID);
