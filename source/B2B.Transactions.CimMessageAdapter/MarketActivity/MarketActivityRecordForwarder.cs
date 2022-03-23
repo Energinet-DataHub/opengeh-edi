@@ -12,59 +12,89 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
 using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.MarketRoles.Application.Common.Transport;
-using Energinet.DataHub.MarketRoles.Infrastructure.Integration;
 using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
-using Newtonsoft.Json;
 
 namespace B2B.CimMessageAdapter.MarketActivity
 {
-    public class MarketActivityRecordForwarder : IMarketActivityRecordForwarder
+    public class MarketActivityRecordForwarder : IMarketActivityRecordForwarder, IDisposable, IAsyncDisposable
     {
-        private readonly ITopicSender<MarketActivityRecordTopic> _topicSender;
-        private readonly List<MarketActivityRecord> _uncommittedItems = new();
-        private readonly List<MarketActivityRecord> _committedItems = new();
-        private readonly List<ServiceBusMessage> _transactionItems = new();
         private readonly IJsonSerializer _jsonSerializer;
-
-        public IReadOnlyCollection<MarketActivityRecord> CommittedItems => _committedItems.AsReadOnly();
+        private readonly string _connectionString = "<Connection String>";
+        private readonly string _queueName = "<Queue name";
+        private bool _disposed;
+        private TransactionScope? _transactionScope;
+        private ServiceBusClient? _client;
+        private ServiceBusSender? _serviceBusSender;
 
         [SuppressMessage(
             "StyleCop.CSharp.OrderingRules",
             "SA1201:Elements should appear in the correct order",
             Justification = "Disallowing properties before a constructor is stupid")]
-        public MarketActivityRecordForwarder(ITopicSender<MarketActivityRecordTopic> topicSender, IJsonSerializer jsonSerializer)
+        public MarketActivityRecordForwarder(IJsonSerializer jsonSerializer)
         {
-            _topicSender = topicSender;
+            _transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+            _client = new ServiceBusClient(_connectionString);
+            _serviceBusSender = _client.CreateSender(_queueName);
             _jsonSerializer = jsonSerializer;
         }
 
-        public Task AddAsync(MarketActivityRecord marketActivityRecord)
+        public async Task AddAsync(MarketActivityRecord marketActivityRecord)
         {
-            _committedItems.Clear();
-            _uncommittedItems.Add(marketActivityRecord);
-            return Task.CompletedTask;
+            var message = CreateMessage(marketActivityRecord);
+            if (_serviceBusSender != null) await _serviceBusSender.SendMessageAsync(message).ConfigureAwait(false);
         }
 
         public async Task CommitAsync()
         {
-            _committedItems.Clear();
-            _committedItems.AddRange(_uncommittedItems);
-            _uncommittedItems.Clear();
+            await Task.Run(() => _transactionScope?.Complete()).ConfigureAwait(false);
+        }
 
-            foreach (var item in _committedItems)
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            if (_client is not null)
             {
-                var message = CreateMessage(item);
-                _transactionItems.Add(message);
+                await _client.DisposeAsync().ConfigureAwait(false);
             }
 
-            await HandleTransactionsAsync(_transactionItems).ConfigureAwait(false);
+            if (_serviceBusSender is not null)
+            {
+                await _serviceBusSender.DisposeAsync().ConfigureAwait(false);
+            }
+
+            _client = null;
+            _serviceBusSender = null;
+
+            Dispose(false);
+
+#pragma warning disable CA1816 // Dispose should call SurpressFinalize
+            GC.SuppressFinalize(this);
+#pragma warning restore CA1816
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    _transactionScope?.Dispose();
+                    _transactionScope = null;
+                }
+
+                _disposed = true;
+            }
         }
 
         private ServiceBusMessage CreateMessage(MarketActivityRecord item)
@@ -73,19 +103,6 @@ namespace B2B.CimMessageAdapter.MarketActivity
             var data = Encoding.UTF8.GetBytes(json);
             var message = new ServiceBusMessage(data);
             return message;
-        }
-
-        private async Task HandleTransactionsAsync(List<ServiceBusMessage> messages)
-        {
-            using (var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-            {
-                foreach (var message in messages)
-                {
-                    await _topicSender.SendMessageAsync(message).ConfigureAwait(false);
-                }
-
-                transactionScope.Complete();
-            }
         }
     }
 }

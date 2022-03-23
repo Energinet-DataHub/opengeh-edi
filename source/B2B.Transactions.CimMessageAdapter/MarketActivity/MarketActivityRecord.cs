@@ -16,7 +16,7 @@ using Energinet.DataHub.MarketRoles.Application.Common.Transport;
 
 namespace B2B.CimMessageAdapter.MarketActivity
 {
-    public class MarketActivityRecord : IOutboundMessage
+    public class MarketActivityRecord
     {
         public string? CustomerMarketParticipantmRID { get; init; }
 
