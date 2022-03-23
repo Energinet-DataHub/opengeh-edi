@@ -69,10 +69,10 @@ namespace B2B.CimMessageAdapter
 
                     await foreach (var marketActivityRecord in MarketActivityRecordsFromAsync(reader))
                     {
-                        if (await CheckTransactionIdAsync(marketActivityRecord.MrId).ConfigureAwait(false) == false)
+                        if (await CheckTransactionIdAsync(marketActivityRecord.Id).ConfigureAwait(false) == false)
                         {
                             _errors.Add(new DuplicateTransactionIdDetected(
-                                $"Transaction id '{marketActivityRecord.MrId}' is not unique and will not be processed."));
+                                $"Transaction id '{marketActivityRecord.Id}' is not unique and will not be processed."));
                         }
                         else
                         {
@@ -125,13 +125,13 @@ namespace B2B.CimMessageAdapter
                 {
                     var marketActivityRecord = new MarketActivityRecord()
                     {
-                        MrId = mrid,
-                        CustomerMarketParticipantName = customerMarketParticipantname,
-                        CustomerMarketParticipantmRID = customerMarketParticipantmRID,
-                        MarketEvaluationPointmRID = marketEvaluationPointmRID,
-                        EnergySupplierMarketParticipantmRID = energySupplierMarketParticipantmRID,
-                        StartDateAndOrTimeDateTime = startDateAndOrTimedateTime,
-                        BalanceResponsiblePartyMarketParticipantmRID =
+                        Id = mrid,
+                        ConsumerName = customerMarketParticipantname,
+                        ConsumerId = customerMarketParticipantmRID,
+                        MarketEvaluationPointId = marketEvaluationPointmRID,
+                        EnergySupplierId = energySupplierMarketParticipantmRID,
+                        EffectiveDate = startDateAndOrTimedateTime,
+                        BalanceResponsibleId =
                             balanceResponsiblePartyMarketParticipantmRID,
                     };
 

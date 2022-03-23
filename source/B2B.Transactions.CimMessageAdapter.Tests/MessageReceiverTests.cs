@@ -96,13 +96,13 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
             Assert.Equal("5790001330552", transaction?.Message.ReceiverId);
             Assert.Equal("DDZ", transaction?.Message.ReceiverRole);
             Assert.Equal("2022-09-07T09:30:47Z", transaction?.Message.CreatedAt);
-            Assert.Equal("12345699", transaction?.MarketActivityRecord.MrId);
-            Assert.Equal("579999993331812345", transaction?.MarketActivityRecord.MarketEvaluationPointmRID);
-            Assert.Equal("5799999933318", transaction?.MarketActivityRecord.EnergySupplierMarketParticipantmRID);
-            Assert.Equal("5799999933340", transaction?.MarketActivityRecord.BalanceResponsiblePartyMarketParticipantmRID);
-            Assert.Equal("0801741527", transaction?.MarketActivityRecord.CustomerMarketParticipantmRID);
-            Assert.Equal("Jan Hansen", transaction?.MarketActivityRecord.CustomerMarketParticipantName);
-            Assert.Equal("2022-09-07T22:00:00Z", transaction?.MarketActivityRecord.StartDateAndOrTimeDateTime);
+            Assert.Equal("12345699", transaction?.MarketActivityRecord.Id);
+            Assert.Equal("579999993331812345", transaction?.MarketActivityRecord.MarketEvaluationPointId);
+            Assert.Equal("5799999933318", transaction?.MarketActivityRecord.EnergySupplierId);
+            Assert.Equal("5799999933340", transaction?.MarketActivityRecord.BalanceResponsibleId);
+            Assert.Equal("0801741527", transaction?.MarketActivityRecord.ConsumerId);
+            Assert.Equal("Jan Hansen", transaction?.MarketActivityRecord.ConsumerName);
+            Assert.Equal("2022-09-07T22:00:00Z", transaction?.MarketActivityRecord.EffectiveDate);
         }
 
         [Fact]
