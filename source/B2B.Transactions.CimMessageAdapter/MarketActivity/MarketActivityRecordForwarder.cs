@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
@@ -25,16 +24,14 @@ namespace B2B.CimMessageAdapter.MarketActivity
     public class MarketActivityRecordForwarder : IMarketActivityRecordForwarder, IDisposable, IAsyncDisposable
     {
         private readonly IJsonSerializer _jsonSerializer;
-        private readonly string _connectionString = "<Connection String>";
-        private readonly string _queueName = "<Queue name";
         private bool _disposed;
         private TransactionScope? _transactionScope;
-        private ServiceBusSender _serviceBusSender;
+        private ServiceBusSender? _serviceBusSender;
 
-        public MarketActivityRecordForwarder(IJsonSerializer jsonSerializer, ServiceBusSender sender)
+        public MarketActivityRecordForwarder(IJsonSerializer jsonSerializer, ServiceBusSender? sender)
         {
             _transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-            _serviceBusSender = sender
+            _serviceBusSender = sender;
             _jsonSerializer = jsonSerializer;
         }
 
@@ -57,17 +54,11 @@ namespace B2B.CimMessageAdapter.MarketActivity
 
         public async ValueTask DisposeAsync()
         {
-            if (_client is not null)
-            {
-                await _client.DisposeAsync().ConfigureAwait(false);
-            }
-
             if (_serviceBusSender is not null)
             {
                 await _serviceBusSender.DisposeAsync().ConfigureAwait(false);
             }
 
-            _client = null;
             _serviceBusSender = null;
 
             Dispose(false);
