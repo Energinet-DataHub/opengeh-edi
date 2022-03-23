@@ -20,12 +20,6 @@ namespace B2B.CimMessageAdapter.Schema
 {
     public class SchemaStore
     {
-        public static string SchemaPath => $"Schema{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}";
-
-        [SuppressMessage(
-            "StyleCop.CSharp.OrderingRules",
-            "SA1201:Elements should appear in the correct order",
-            Justification = "Stupid rule that properties cant come before constructor")]
         public SchemaStore()
         {
             Schemas = new Dictionary<KeyValuePair<string, string>, string>
@@ -36,6 +30,8 @@ namespace B2B.CimMessageAdapter.Schema
                 },
             };
         }
+
+        public static string SchemaPath => $"Schema{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}";
 
         public Dictionary<KeyValuePair<string, string>, string> Schemas { get; }
 

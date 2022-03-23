@@ -32,10 +32,6 @@ namespace B2B.CimMessageAdapter.MarketActivity
         private ServiceBusClient? _client;
         private ServiceBusSender? _serviceBusSender;
 
-        [SuppressMessage(
-            "StyleCop.CSharp.OrderingRules",
-            "SA1201:Elements should appear in the correct order",
-            Justification = "Disallowing properties before a constructor is stupid")]
         public MarketActivityRecordForwarder(IJsonSerializer jsonSerializer)
         {
             _transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
