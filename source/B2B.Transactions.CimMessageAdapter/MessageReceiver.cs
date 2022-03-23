@@ -113,13 +113,13 @@ namespace B2B.CimMessageAdapter
 
         private static async IAsyncEnumerable<MarketActivityRecord> MarketActivityRecordsFromAsync(XmlReader reader)
         {
-            var mrid = string.Empty;
-            var marketEvaluationPointmRID = string.Empty;
-            var energySupplierMarketParticipantmRID = string.Empty;
-            var balanceResponsiblePartyMarketParticipantmRID = string.Empty;
-            var customerMarketParticipantmRID = string.Empty;
-            var customerMarketParticipantname = string.Empty;
-            var startDateAndOrTimedateTime = string.Empty;
+            var id = string.Empty;
+            var marketEvaluationPointId = string.Empty;
+            var energySupplierId = string.Empty;
+            var balanceResponsibleId = string.Empty;
+            var consumerId = string.Empty;
+            var consumerName = string.Empty;
+            var effectiveDate = string.Empty;
 
             while (await reader.ReadAsync().ConfigureAwait(false))
             {
@@ -127,23 +127,23 @@ namespace B2B.CimMessageAdapter
                 {
                     var marketActivityRecord = new MarketActivityRecord()
                     {
-                        Id = mrid,
-                        ConsumerName = customerMarketParticipantname,
-                        ConsumerId = customerMarketParticipantmRID,
-                        MarketEvaluationPointId = marketEvaluationPointmRID,
-                        EnergySupplierId = energySupplierMarketParticipantmRID,
-                        EffectiveDate = startDateAndOrTimedateTime,
+                        Id = id,
+                        ConsumerName = consumerName,
+                        ConsumerId = consumerId,
+                        MarketEvaluationPointId = marketEvaluationPointId,
+                        EnergySupplierId = energySupplierId,
+                        EffectiveDate = effectiveDate,
                         BalanceResponsibleId =
-                            balanceResponsiblePartyMarketParticipantmRID,
+                            balanceResponsibleId,
                     };
 
-                    mrid = string.Empty;
-                    marketEvaluationPointmRID = string.Empty;
-                    energySupplierMarketParticipantmRID = string.Empty;
-                    balanceResponsiblePartyMarketParticipantmRID = string.Empty;
-                    customerMarketParticipantmRID = string.Empty;
-                    customerMarketParticipantname = string.Empty;
-                    startDateAndOrTimedateTime = string.Empty;
+                    id = string.Empty;
+                    marketEvaluationPointId = string.Empty;
+                    energySupplierId = string.Empty;
+                    balanceResponsibleId = string.Empty;
+                    consumerId = string.Empty;
+                    consumerName = string.Empty;
+                    effectiveDate = string.Empty;
 
                     yield return marketActivityRecord;
                 }
@@ -154,13 +154,13 @@ namespace B2B.CimMessageAdapter
                 }
                 else
                 {
-                    TryExtractValueFrom("mRID", reader, (value) => mrid = value);
-                    TryExtractValueFrom("marketEvaluationPoint.mRID", reader, (value) => marketEvaluationPointmRID = value);
-                    TryExtractValueFrom("marketEvaluationPoint.energySupplier_MarketParticipant.mRID", reader, (value) => energySupplierMarketParticipantmRID = value);
-                    TryExtractValueFrom("marketEvaluationPoint.balanceResponsibleParty_MarketParticipant.mRID", reader, (value) => balanceResponsiblePartyMarketParticipantmRID = value);
-                    TryExtractValueFrom("marketEvaluationPoint.customer_MarketParticipant.mRID", reader, (value) => customerMarketParticipantmRID = value);
-                    TryExtractValueFrom("marketEvaluationPoint.customer_MarketParticipant.name", reader, (value) => customerMarketParticipantname = value);
-                    TryExtractValueFrom("start_DateAndOrTime.dateTime", reader, (value) => startDateAndOrTimedateTime = value);
+                    TryExtractValueFrom("mRID", reader, (value) => id = value);
+                    TryExtractValueFrom("marketEvaluationPoint.mRID", reader, (value) => marketEvaluationPointId = value);
+                    TryExtractValueFrom("marketEvaluationPoint.energySupplier_MarketParticipant.mRID", reader, (value) => energySupplierId = value);
+                    TryExtractValueFrom("marketEvaluationPoint.balanceResponsibleParty_MarketParticipant.mRID", reader, (value) => balanceResponsibleId = value);
+                    TryExtractValueFrom("marketEvaluationPoint.customer_MarketParticipant.mRID", reader, (value) => consumerId = value);
+                    TryExtractValueFrom("marketEvaluationPoint.customer_MarketParticipant.name", reader, (value) => consumerName = value);
+                    TryExtractValueFrom("start_DateAndOrTime.dateTime", reader, (value) => effectiveDate = value);
                 }
             }
         }
