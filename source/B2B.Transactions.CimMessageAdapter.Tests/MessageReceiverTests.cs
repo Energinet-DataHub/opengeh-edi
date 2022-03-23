@@ -89,13 +89,13 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests
 
             var transaction = _transactionQueueDispatcherSpy.CommittedItems.FirstOrDefault();
             Assert.NotNull(transaction);
-            Assert.Equal("12345699", transaction?.MrId);
-            Assert.Equal("579999993331812345", transaction?.MarketEvaluationPointmRID);
-            Assert.Equal("5799999933318", transaction?.EnergySupplierMarketParticipantmRID);
-            Assert.Equal("5799999933340", transaction?.BalanceResponsiblePartyMarketParticipantmRID);
-            Assert.Equal("0801741527", transaction?.CustomerMarketParticipantmRID);
-            Assert.Equal("Jan Hansen", transaction?.CustomerMarketParticipantName);
-            Assert.Equal("2022-09-07T22:00:00Z", transaction?.StartDateAndOrTimeDateTime);
+            Assert.Equal("12345699", transaction?.MarketActivityRecord.MrId);
+            Assert.Equal("579999993331812345", transaction?.MarketActivityRecord.MarketEvaluationPointmRID);
+            Assert.Equal("5799999933318", transaction?.MarketActivityRecord.EnergySupplierMarketParticipantmRID);
+            Assert.Equal("5799999933340", transaction?.MarketActivityRecord.BalanceResponsiblePartyMarketParticipantmRID);
+            Assert.Equal("0801741527", transaction?.MarketActivityRecord.CustomerMarketParticipantmRID);
+            Assert.Equal("Jan Hansen", transaction?.MarketActivityRecord.CustomerMarketParticipantName);
+            Assert.Equal("2022-09-07T22:00:00Z", transaction?.MarketActivityRecord.StartDateAndOrTimeDateTime);
         }
 
         [Fact]

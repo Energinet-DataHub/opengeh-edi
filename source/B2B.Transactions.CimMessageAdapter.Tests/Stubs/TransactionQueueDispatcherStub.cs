@@ -21,16 +21,16 @@ namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests.Stubs
 {
     public class TransactionQueueDispatcherStub : ITransactionQueueDispatcher
     {
-        private readonly List<MarketActivityRecord> _uncommittedItems = new();
-        private readonly List<MarketActivityRecord> _committedItems = new();
+        private readonly List<B2BTransaction> _uncommittedItems = new();
+        private readonly List<B2BTransaction> _committedItems = new();
 
-        public IReadOnlyCollection<MarketActivityRecord> CommittedItems => _committedItems.AsReadOnly();
+        public IReadOnlyCollection<B2BTransaction> CommittedItems => _committedItems.AsReadOnly();
 
         public Task AddAsync(B2BTransaction transaction)
         {
             if (transaction == null) throw new ArgumentNullException(nameof(transaction));
             _committedItems.Clear();
-            _uncommittedItems.Add(transaction.MarketActivityRecord);
+            _uncommittedItems.Add(transaction);
             return Task.CompletedTask;
         }
 
