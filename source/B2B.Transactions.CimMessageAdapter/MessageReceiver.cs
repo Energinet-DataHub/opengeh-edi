@@ -306,15 +306,18 @@ namespace B2B.CimMessageAdapter
 
     public class B2BTransaction
     {
-        private B2BTransaction(MarketActivityRecord marketActivityRecord)
+        private B2BTransaction(MessageHeader message, MarketActivityRecord marketActivityRecord)
         {
+            Message = message;
             MarketActivityRecord = marketActivityRecord;
         }
 
         public static B2BTransaction Create(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
         {
-            return new B2BTransaction(marketActivityRecord);
+            return new B2BTransaction(messageHeader, marketActivityRecord);
         }
+
+        public MessageHeader Message { get; }
 
         public MarketActivityRecord MarketActivityRecord { get; }
     }
