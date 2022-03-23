@@ -12,20 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using B2B.CimMessageAdapter;
-using B2B.CimMessageAdapter.Transactions;
+using B2B.CimMessageAdapter.Messages;
 
-namespace MarketRoles.B2B.CimMessageAdapter.IntegrationTests.Stubs
+namespace B2B.CimMessageAdapter.Transactions
 {
-    public class TransactionIdsStub : ITransactionIds
+    public class B2BTransaction
     {
-        private readonly HashSet<string> _transactionIds = new();
-
-        public Task<bool> TryStoreAsync(string transactionId)
+        private B2BTransaction(MessageHeader message, MarketActivityRecord marketActivityRecord)
         {
-            return Task.FromResult(_transactionIds.Add(transactionId));
+            Message = message;
+            MarketActivityRecord = marketActivityRecord;
+        }
+
+        public MessageHeader Message { get; }
+
+        public MarketActivityRecord MarketActivityRecord { get; }
+
+        public static B2BTransaction Create(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
+        {
+            return new B2BTransaction(messageHeader, marketActivityRecord);
         }
     }
 }

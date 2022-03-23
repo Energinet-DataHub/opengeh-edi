@@ -21,6 +21,7 @@ using System.Xml.Schema;
 using B2B.CimMessageAdapter.Errors;
 using B2B.CimMessageAdapter.Messages;
 using B2B.CimMessageAdapter.Schema;
+using B2B.CimMessageAdapter.Transactions;
 
 namespace B2B.CimMessageAdapter
 {
@@ -282,25 +283,5 @@ namespace B2B.CimMessageAdapter
                 $"XML schema validation error at line {arguments.Exception.LineNumber}, position {arguments.Exception.LinePosition}: {arguments.Message}.";
             _errors.Add(InvalidMessageStructure.From(message));
         }
-    }
-
-#pragma warning disable
-
-    public class B2BTransaction
-    {
-        private B2BTransaction(MessageHeader message, MarketActivityRecord marketActivityRecord)
-        {
-            Message = message;
-            MarketActivityRecord = marketActivityRecord;
-        }
-
-        public static B2BTransaction Create(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
-        {
-            return new B2BTransaction(messageHeader, marketActivityRecord);
-        }
-
-        public MessageHeader Message { get; }
-
-        public MarketActivityRecord MarketActivityRecord { get; }
     }
 }

@@ -14,7 +14,7 @@
 
 using System.Threading.Tasks;
 
-namespace B2B.CimMessageAdapter
+namespace B2B.CimMessageAdapter.Transactions
 {
     /// <summary>
     /// Service for dispatching B2B transactions to transaction queue
