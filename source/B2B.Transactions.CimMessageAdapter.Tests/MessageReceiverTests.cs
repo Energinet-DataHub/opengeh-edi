@@ -17,7 +17,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using B2B.CimMessageAdapter;
-using B2B.CimMessageAdapter.Message.MessageIds;
+using B2B.CimMessageAdapter.Messages;
 using B2B.CimMessageAdapter.Schema;
 using MarketRoles.B2B.CimMessageAdapter.IntegrationTests.Stubs;
 using Xunit;

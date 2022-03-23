@@ -14,7 +14,7 @@
 
 using System.Threading.Tasks;
 
-namespace B2B.CimMessageAdapter.Message.MessageIds
+namespace B2B.CimMessageAdapter.Messages
 {
     /// <summary>
     /// Store containing message id for all received market documents

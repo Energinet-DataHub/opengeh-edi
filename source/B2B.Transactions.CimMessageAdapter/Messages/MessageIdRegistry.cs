@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
 
-namespace B2B.CimMessageAdapter.Message.MessageIds
+namespace B2B.CimMessageAdapter.Messages
 {
     public class MessageIdRegistry : IMessageIds
     {
