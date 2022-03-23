@@ -42,3 +42,11 @@ module "sbq_marketroles" {
   namespace_name      = module.sb_marketroles.name
   resource_group_name = azurerm_resource_group.this.name
 }
+
+module "sbq_marketroles" {
+  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/service-bus-queue?ref=5.1.0"
+
+  name                = "marketActivity"
+  namespace_name      = module.sb_marketroles.name
+  resource_group_name = azurerm_resource_group.this.name
+}

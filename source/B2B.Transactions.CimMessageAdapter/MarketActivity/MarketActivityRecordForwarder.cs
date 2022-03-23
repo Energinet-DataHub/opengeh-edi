@@ -14,28 +14,24 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketRoles.Application.Common.Transport;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration;
-using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
+using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
 using Newtonsoft.Json;
 
 namespace B2B.CimMessageAdapter.MarketActivity
 {
-    public class MarketActivityRecordForwarder<TEntity> : IMarketActivityRecordForwarder
-        where TEntity : IOutboundMessage
+    public class MarketActivityRecordForwarder : IMarketActivityRecordForwarder
     {
         private readonly ITopicSender<MarketActivityRecordTopic> _topicSender;
         private readonly List<MarketActivityRecord> _uncommittedItems = new();
         private readonly List<MarketActivityRecord> _committedItems = new();
         private readonly List<ServiceBusMessage> _transactionItems = new();
+        private readonly IJsonSerializer _jsonSerializer;
 
         public IReadOnlyCollection<MarketActivityRecord> CommittedItems => _committedItems.AsReadOnly();
 
@@ -43,9 +39,10 @@ namespace B2B.CimMessageAdapter.MarketActivity
             "StyleCop.CSharp.OrderingRules",
             "SA1201:Elements should appear in the correct order",
             Justification = "Disallowing properties before a constructor is stupid")]
-        public MarketActivityRecordForwarder(ITopicSender<MarketActivityRecordTopic> topicSender)
+        public MarketActivityRecordForwarder(ITopicSender<MarketActivityRecordTopic> topicSender, IJsonSerializer jsonSerializer)
         {
             _topicSender = topicSender;
+            _jsonSerializer = jsonSerializer;
         }
 
         public Task AddAsync(MarketActivityRecord marketActivityRecord)
@@ -70,9 +67,9 @@ namespace B2B.CimMessageAdapter.MarketActivity
             await HandleTransactionsAsync(_transactionItems).ConfigureAwait(false);
         }
 
-        private static ServiceBusMessage CreateMessage(MarketActivityRecord item)
+        private ServiceBusMessage CreateMessage(MarketActivityRecord item)
         {
-            var json = JsonConvert.SerializeObject(item);
+            var json = _jsonSerializer.Serialize(item);
             var data = Encoding.UTF8.GetBytes(json);
             var message = new ServiceBusMessage(data);
             return message;
