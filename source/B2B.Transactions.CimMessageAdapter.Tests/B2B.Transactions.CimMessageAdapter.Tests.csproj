@@ -63,17 +63,8 @@ limitations under the License.
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
       <None Remove="urn-ediel-org-structure-requestchangeofsupplier-0-1.xsd" />
-      <EmbeddedResource Include="urn-ediel-org-structure-requestchangeofsupplier-0-1.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
       <None Remove="urn-entsoe-eu-local-extension-types.xsd" />
-      <EmbeddedResource Include="urn-entsoe-eu-local-extension-types.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
       <None Remove="urn-entsoe-eu-wgedi-codelists.xsd" />
-      <EmbeddedResource Include="urn-entsoe-eu-wgedi-codelists.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
       <None Remove="ValidRequestChangeOfSupplier.xml" />
       <EmbeddedResource Include="ValidRequestChangeOfSupplier.xml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>

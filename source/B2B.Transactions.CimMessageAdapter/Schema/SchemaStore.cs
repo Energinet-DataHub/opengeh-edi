@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
 
 namespace B2B.CimMessageAdapter.Schema
 {
@@ -24,10 +26,12 @@ namespace B2B.CimMessageAdapter.Schema
             {
                 {
                     new KeyValuePair<string, string>("requestchangeofsupplier", "1.0"),
-                    "urn-ediel-org-structure-requestchangeofsupplier-0-1.xsd"
+                    SchemaPath + "urn-ediel-org-structure-requestchangeofsupplier-0-1.xsd"
                 },
             };
         }
+
+        public static string SchemaPath => $"Schema{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}";
 
         public Dictionary<KeyValuePair<string, string>, string> Schemas { get; }
 
