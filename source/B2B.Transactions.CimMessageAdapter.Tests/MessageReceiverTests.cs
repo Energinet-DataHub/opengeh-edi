@@ -32,7 +32,7 @@ namespace B2B.CimMessageAdapter.Tests
         private TransactionQueueDispatcherStub _transactionQueueDispatcherSpy = new();
 
         [Fact]
-        public async Task Sender_id_must_match_current_authenticated_user()
+        public async Task Sender_id_must_match_the_organization_of_the_current_authenticated_user()
         {
             _actorContextStub.UseInvalidActor();
             await using var message = CreateMessage();
