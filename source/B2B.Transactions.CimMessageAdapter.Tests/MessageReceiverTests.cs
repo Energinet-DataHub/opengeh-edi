@@ -16,7 +16,6 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using B2B.CimMessageAdapter.Errors;
 using B2B.CimMessageAdapter.Messages;
 using B2B.CimMessageAdapter.Schema;
 using B2B.CimMessageAdapter.Tests.Stubs;
@@ -156,11 +155,6 @@ namespace B2B.CimMessageAdapter.Tests
         private static void AssertContainsError(Result result, string errorCode)
         {
             Assert.Contains(result.Errors, error => error.Code.Equals(errorCode, StringComparison.OrdinalIgnoreCase));
-        }
-
-        private static Task<Result> ReceiveRequestChangeOfSupplierMessage(Stream message, MessageReceiver receiver)
-        {
-            return receiver.ReceiveAsync(message, "requestchangeofsupplier", "1.0");
         }
 
         private Task<Result> ReceiveRequestChangeOfSupplierMessage(Stream message, string version = "1.0")
