@@ -200,12 +200,6 @@ namespace B2B.CimMessageAdapter
                    reader.LocalName.Equals(HeaderElementName, StringComparison.OrdinalIgnoreCase);
         }
 
-        private static bool EndOfMessageHeader(XmlReader reader)
-        {
-            return reader.NodeType == XmlNodeType.EndElement &&
-                   reader.LocalName.Equals(HeaderElementName, StringComparison.OrdinalIgnoreCase);
-        }
-
         private static bool StartOfMarketActivityRecord(XmlReader reader)
         {
             return reader.NodeType == XmlNodeType.Element &&
