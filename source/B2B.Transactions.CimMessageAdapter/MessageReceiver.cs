@@ -69,7 +69,7 @@ namespace B2B.CimMessageAdapter
                     var isAuthorized = await AuthorizeSenderAsync(messageHeader.SenderId).ConfigureAwait(false);
                     if (isAuthorized == false)
                     {
-                        _errors.Add(new SenderAuthorizationFailed());
+                        return Result.Failure(new SenderAuthorizationFailed());
                     }
 
                     var messageIdIsUnique = await CheckMessageIdAsync(messageHeader.MessageId).ConfigureAwait(false);
