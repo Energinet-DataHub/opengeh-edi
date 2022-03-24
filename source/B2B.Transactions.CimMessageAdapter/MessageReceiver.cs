@@ -36,7 +36,6 @@ namespace B2B.CimMessageAdapter
         private readonly ITransactionIds _transactionIds;
         private readonly ISchemaProvider _schemaProvider;
         private readonly IActorContext _actorContext;
-        private bool _hasInvalidHeaderValues;
 
         public MessageReceiver(IMessageIds messageIds, ITransactionQueueDispatcher transactionQueueDispatcher, ITransactionIds transactionIds, ISchemaProvider schemaProvider, IActorContext actorContext)
         {
@@ -58,13 +57,15 @@ namespace B2B.CimMessageAdapter
                 return Result.Failure(new UnknownBusinessProcessTypeOrVersion(businessProcessType, version));
             }
 
-            _hasInvalidHeaderValues = false;
-
             using (var reader = XmlReader.Create(message, CreateXmlReaderSettings(xmlSchema)))
             {
                 try
                 {
                     var messageHeader = await ExtractMessageHeaderAsync(reader).ConfigureAwait(false);
+                    if (_errors.Count > 0)
+                    {
+                        return Result.Failure(_errors.ToArray());
+                    }
 
                     var isAuthorized = await AuthorizeSenderAsync(messageHeader.SenderId).ConfigureAwait(false);
                     if (isAuthorized == false)
@@ -88,6 +89,9 @@ namespace B2B.CimMessageAdapter
 
                         await AddToTransactionQueueAsync(CreateTransaction(messageHeader, marketActivityRecord)).ConfigureAwait(false);
                     }
+
+                    await _transactionQueueDispatcher.CommitAsync().ConfigureAwait(false);
+                    return Result.Succeeded();
                 }
                 catch (XmlException exception)
                 {
@@ -98,13 +102,6 @@ namespace B2B.CimMessageAdapter
                     return InvalidXmlFailure(generalException);
                 }
             }
-
-            if (_hasInvalidHeaderValues == false)
-            {
-                await _transactionQueueDispatcher.CommitAsync().ConfigureAwait(false);
-            }
-
-            return _errors.Count == 0 ? Result.Succeeded() : Result.Failure(_errors.ToArray());
         }
 
         #pragma warning disable
