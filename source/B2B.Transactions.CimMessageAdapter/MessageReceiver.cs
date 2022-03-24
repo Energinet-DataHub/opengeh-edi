@@ -85,11 +85,8 @@ namespace B2B.CimMessageAdapter
                             return Result.Failure(new DuplicateTransactionIdDetected(
                                 $"Transaction id '{marketActivityRecord.Id}' is not unique and will not be processed."));
                         }
-                        else
-                        {
-                            var transaction = CreateTransaction(messageHeader, marketActivityRecord);
-                            await AddToTransactionQueueAsync(transaction).ConfigureAwait(false);
-                        }
+
+                        await AddToTransactionQueueAsync(CreateTransaction(messageHeader, marketActivityRecord)).ConfigureAwait(false);
                     }
                 }
                 catch (XmlException exception)
