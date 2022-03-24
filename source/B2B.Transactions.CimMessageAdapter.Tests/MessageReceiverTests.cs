@@ -118,7 +118,7 @@ namespace B2B.CimMessageAdapter.Tests
                 .ConfigureAwait(false);
 
             AssertContainsError(result, "B2B-005");
-            Assert.Single(_transactionQueueDispatcherSpy.CommittedItems);
+            Assert.Empty(_transactionQueueDispatcherSpy.CommittedItems);
         }
 
         private static Stream CreateMessageWithInvalidXmlStructure()

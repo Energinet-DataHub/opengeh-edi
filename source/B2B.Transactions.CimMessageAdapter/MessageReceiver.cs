@@ -82,7 +82,7 @@ namespace B2B.CimMessageAdapter
                     {
                         if (await CheckTransactionIdAsync(marketActivityRecord.Id).ConfigureAwait(false) == false)
                         {
-                            _errors.Add(new DuplicateTransactionIdDetected(
+                            return Result.Failure(new DuplicateTransactionIdDetected(
                                 $"Transaction id '{marketActivityRecord.Id}' is not unique and will not be processed."));
                         }
                         else
