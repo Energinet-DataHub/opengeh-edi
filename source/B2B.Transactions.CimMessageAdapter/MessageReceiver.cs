@@ -104,8 +104,6 @@ namespace B2B.CimMessageAdapter
             }
         }
 
-        #pragma warning disable
-
         private static B2BTransaction CreateTransaction(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
         {
             return B2BTransaction.Create(messageHeader, marketActivityRecord);
@@ -286,7 +284,7 @@ namespace B2B.CimMessageAdapter
         private Task<bool> AuthorizeSenderAsync(string senderId)
         {
             if (senderId == null) throw new ArgumentNullException(nameof(senderId));
-            return Task.FromResult(_actorContext.CurrentActor.Identifier.Equals(senderId, StringComparison.OrdinalIgnoreCase));
+            return Task.FromResult(_actorContext.CurrentActor!.Identifier.Equals(senderId, StringComparison.OrdinalIgnoreCase));
         }
     }
 }
