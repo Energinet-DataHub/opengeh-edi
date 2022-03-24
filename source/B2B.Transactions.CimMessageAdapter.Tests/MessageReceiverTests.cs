@@ -16,6 +16,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using B2B.CimMessageAdapter.Errors;
 using B2B.CimMessageAdapter.Messages;
 using B2B.CimMessageAdapter.Schema;
 using B2B.CimMessageAdapter.Tests.Stubs;
@@ -25,9 +26,20 @@ namespace B2B.CimMessageAdapter.Tests
 {
     public class MessageReceiverTests
     {
+        private readonly ActorContextStub _actorContextStub = new();
         private readonly TransactionIdsStub _transactionIdsStub = new();
         private readonly MessageIdsStub _messageIdsStub = new();
         private TransactionQueueDispatcherStub _transactionQueueDispatcherSpy = new();
+
+        [Fact]
+        public async Task Sender_id_must_match_the_organization_of_the_current_authenticated_user()
+        {
+            _actorContextStub.UseInvalidActor();
+            await using var message = CreateMessage();
+            var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
+
+            AssertContainsError(result, "B2B-008");
+        }
 
         [Fact]
         public async Task Message_must_be_valid_xml()
@@ -47,8 +59,9 @@ namespace B2B.CimMessageAdapter.Tests
             await using var message = CreateMessageNotConformingToXmlSchema();
             var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
 
+            var errors = result.Errors.Where(error => error is InvalidMessageStructure).ToList();
             Assert.False(result.Success);
-            Assert.Equal(2, result.Errors.Count);
+            Assert.Equal(2, errors.Count);
         }
 
         [Fact]
@@ -160,14 +173,14 @@ namespace B2B.CimMessageAdapter.Tests
         private MessageReceiver CreateMessageReceiver()
         {
             _transactionQueueDispatcherSpy = new TransactionQueueDispatcherStub();
-            var messageReceiver = new MessageReceiver(_messageIdsStub, _transactionQueueDispatcherSpy, _transactionIdsStub, new SchemaProvider(new SchemaStore()));
+            var messageReceiver = new MessageReceiver(_messageIdsStub, _transactionQueueDispatcherSpy, _transactionIdsStub, new SchemaProvider(new SchemaStore()), _actorContextStub);
             return messageReceiver;
         }
 
         private MessageReceiver CreateMessageReceiver(IMessageIds messageIds)
         {
             _transactionQueueDispatcherSpy = new TransactionQueueDispatcherStub();
-            var messageReceiver = new MessageReceiver(messageIds, _transactionQueueDispatcherSpy, _transactionIdsStub, new SchemaProvider(new SchemaStore()));
+            var messageReceiver = new MessageReceiver(messageIds, _transactionQueueDispatcherSpy, _transactionIdsStub, new SchemaProvider(new SchemaStore()), _actorContextStub);
             return messageReceiver;
         }
 

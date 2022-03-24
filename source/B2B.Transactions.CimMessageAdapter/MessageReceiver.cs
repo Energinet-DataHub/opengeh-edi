@@ -22,6 +22,7 @@ using B2B.CimMessageAdapter.Errors;
 using B2B.CimMessageAdapter.Messages;
 using B2B.CimMessageAdapter.Schema;
 using B2B.CimMessageAdapter.Transactions;
+using Energinet.DataHub.Core.App.Common.Abstractions.Actor;
 
 namespace B2B.CimMessageAdapter
 {
@@ -34,15 +35,17 @@ namespace B2B.CimMessageAdapter
         private readonly ITransactionQueueDispatcher _transactionQueueDispatcher;
         private readonly ITransactionIds _transactionIds;
         private readonly ISchemaProvider _schemaProvider;
+        private readonly IActorContext _actorContext;
         private bool _hasInvalidHeaderValues;
 
-        public MessageReceiver(IMessageIds messageIds, ITransactionQueueDispatcher transactionQueueDispatcher, ITransactionIds transactionIds, ISchemaProvider schemaProvider)
+        public MessageReceiver(IMessageIds messageIds, ITransactionQueueDispatcher transactionQueueDispatcher, ITransactionIds transactionIds, ISchemaProvider schemaProvider, IActorContext actorContext)
         {
             _messageIds = messageIds ?? throw new ArgumentNullException(nameof(messageIds));
             _transactionQueueDispatcher = transactionQueueDispatcher ??
                                              throw new ArgumentNullException(nameof(transactionQueueDispatcher));
             _transactionIds = transactionIds;
             _schemaProvider = schemaProvider ?? throw new ArgumentNullException(nameof(schemaProvider));
+            _actorContext = actorContext ?? throw new ArgumentNullException(nameof(actorContext));
         }
 
         public async Task<Result> ReceiveAsync(Stream message, string businessProcessType, string version)
@@ -62,6 +65,13 @@ namespace B2B.CimMessageAdapter
                 try
                 {
                     var messageHeader = await ExtractMessageHeaderAsync(reader).ConfigureAwait(false);
+
+                    var isAuthorized = await AuthorizeSenderAsync(messageHeader.SenderId).ConfigureAwait(false);
+                    if (isAuthorized == false)
+                    {
+                        _errors.Add(new SenderAuthorizationFailed());
+                    }
+
                     var messageIdIsUnique = await CheckMessageIdAsync(messageHeader.MessageId).ConfigureAwait(false);
                     if (messageIdIsUnique == false)
                     {
@@ -100,6 +110,8 @@ namespace B2B.CimMessageAdapter
 
             return _errors.Count == 0 ? Result.Succeeded() : Result.Failure(_errors.ToArray());
         }
+
+        #pragma warning disable
 
         private static B2BTransaction CreateTransaction(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
         {
@@ -185,12 +197,6 @@ namespace B2B.CimMessageAdapter
         private static bool StartOfMessageHeader(XmlReader reader)
         {
             return reader.NodeType == XmlNodeType.Element &&
-                   reader.LocalName.Equals(HeaderElementName, StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static bool EndOfMessageHeader(XmlReader reader)
-        {
-            return reader.NodeType == XmlNodeType.EndElement &&
                    reader.LocalName.Equals(HeaderElementName, StringComparison.OrdinalIgnoreCase);
         }
 
@@ -282,6 +288,12 @@ namespace B2B.CimMessageAdapter
             var message =
                 $"XML schema validation error at line {arguments.Exception.LineNumber}, position {arguments.Exception.LinePosition}: {arguments.Message}.";
             _errors.Add(InvalidMessageStructure.From(message));
+        }
+
+        private Task<bool> AuthorizeSenderAsync(string senderId)
+        {
+            if (senderId == null) throw new ArgumentNullException(nameof(senderId));
+            return Task.FromResult(_actorContext.CurrentActor.Identifier.Equals(senderId, StringComparison.OrdinalIgnoreCase));
         }
     }
 }
