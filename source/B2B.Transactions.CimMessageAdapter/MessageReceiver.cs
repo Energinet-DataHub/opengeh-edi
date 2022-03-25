@@ -36,7 +36,6 @@ namespace B2B.CimMessageAdapter
         private readonly ITransactionIds _transactionIds;
         private readonly ISchemaProvider _schemaProvider;
         private readonly IActorContext _actorContext;
-        private bool _hasInvalidHeaderValues;
 
         public MessageReceiver(IMessageIds messageIds, ITransactionQueueDispatcher transactionQueueDispatcher, ITransactionIds transactionIds, ISchemaProvider schemaProvider, IActorContext actorContext)
         {
@@ -58,40 +57,41 @@ namespace B2B.CimMessageAdapter
                 return Result.Failure(new UnknownBusinessProcessTypeOrVersion(businessProcessType, version));
             }
 
-            _hasInvalidHeaderValues = false;
-
             using (var reader = XmlReader.Create(message, CreateXmlReaderSettings(xmlSchema)))
             {
                 try
                 {
                     var messageHeader = await ExtractMessageHeaderAsync(reader).ConfigureAwait(false);
+                    if (_errors.Count > 0)
+                    {
+                        return Result.Failure(_errors.ToArray());
+                    }
 
                     var isAuthorized = await AuthorizeSenderAsync(messageHeader.SenderId).ConfigureAwait(false);
                     if (isAuthorized == false)
                     {
-                        _errors.Add(new SenderAuthorizationFailed());
+                        return Result.Failure(new SenderAuthorizationFailed());
                     }
 
                     var messageIdIsUnique = await CheckMessageIdAsync(messageHeader.MessageId).ConfigureAwait(false);
                     if (messageIdIsUnique == false)
                     {
-                        _errors.Add(new DuplicateMessageIdDetected($"Message id '{messageHeader.MessageId}' is not unique"));
-                        _hasInvalidHeaderValues = true;
+                        return Result.Failure(new DuplicateMessageIdDetected($"Message id '{messageHeader.MessageId}' is not unique"));
                     }
 
                     await foreach (var marketActivityRecord in MarketActivityRecordsFromAsync(reader))
                     {
                         if (await CheckTransactionIdAsync(marketActivityRecord.Id).ConfigureAwait(false) == false)
                         {
-                            _errors.Add(new DuplicateTransactionIdDetected(
+                            return Result.Failure(new DuplicateTransactionIdDetected(
                                 $"Transaction id '{marketActivityRecord.Id}' is not unique and will not be processed."));
                         }
-                        else
-                        {
-                            var transaction = CreateTransaction(messageHeader, marketActivityRecord);
-                            await AddToTransactionQueueAsync(transaction).ConfigureAwait(false);
-                        }
+
+                        await AddToTransactionQueueAsync(CreateTransaction(messageHeader, marketActivityRecord)).ConfigureAwait(false);
                     }
+
+                    await _transactionQueueDispatcher.CommitAsync().ConfigureAwait(false);
+                    return Result.Succeeded();
                 }
                 catch (XmlException exception)
                 {
@@ -102,16 +102,7 @@ namespace B2B.CimMessageAdapter
                     return InvalidXmlFailure(generalException);
                 }
             }
-
-            if (_hasInvalidHeaderValues == false)
-            {
-                await _transactionQueueDispatcher.CommitAsync().ConfigureAwait(false);
-            }
-
-            return _errors.Count == 0 ? Result.Succeeded() : Result.Failure(_errors.ToArray());
         }
-
-        #pragma warning disable
 
         private static B2BTransaction CreateTransaction(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
         {
@@ -293,7 +284,7 @@ namespace B2B.CimMessageAdapter
         private Task<bool> AuthorizeSenderAsync(string senderId)
         {
             if (senderId == null) throw new ArgumentNullException(nameof(senderId));
-            return Task.FromResult(_actorContext.CurrentActor.Identifier.Equals(senderId, StringComparison.OrdinalIgnoreCase));
+            return Task.FromResult(_actorContext.CurrentActor!.Identifier.Equals(senderId, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

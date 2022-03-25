@@ -16,7 +16,6 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using B2B.CimMessageAdapter.Errors;
 using B2B.CimMessageAdapter.Messages;
 using B2B.CimMessageAdapter.Schema;
 using B2B.CimMessageAdapter.Tests.Stubs;
@@ -59,9 +58,7 @@ namespace B2B.CimMessageAdapter.Tests
             await using var message = CreateMessageNotConformingToXmlSchema();
             var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
 
-            var errors = result.Errors.Where(error => error is InvalidMessageStructure).ToList();
-            Assert.False(result.Success);
-            Assert.Equal(2, errors.Count);
+            AssertContainsError(result, "B2B-005");
         }
 
         [Fact]
@@ -79,7 +76,7 @@ namespace B2B.CimMessageAdapter.Tests
         [Fact]
         public async Task Valid_activity_records_are_extracted_and_committed_to_queue()
         {
-            await using var message = CreateMessageNotConformingToXmlSchema();
+            await using var message = CreateMessage();
             await ReceiveRequestChangeOfSupplierMessage(message)
                 .ConfigureAwait(false);
 
@@ -88,11 +85,11 @@ namespace B2B.CimMessageAdapter.Tests
             Assert.Equal("78954612", transaction?.Message.MessageId);
             Assert.Equal("E65", transaction?.Message.ProcessType);
             Assert.Equal("5799999933318", transaction?.Message.SenderId);
-            Assert.Equal("FakeMarketRole", transaction?.Message.SenderRole);
+            Assert.Equal("DDQ", transaction?.Message.SenderRole);
             Assert.Equal("5790001330552", transaction?.Message.ReceiverId);
             Assert.Equal("DDZ", transaction?.Message.ReceiverRole);
             Assert.Equal("2022-09-07T09:30:47Z", transaction?.Message.CreatedAt);
-            Assert.Equal("12345699", transaction?.MarketActivityRecord.Id);
+            Assert.Equal("12345689", transaction?.MarketActivityRecord.Id);
             Assert.Equal("579999993331812345", transaction?.MarketActivityRecord.MarketEvaluationPointId);
             Assert.Equal("5799999933318", transaction?.MarketActivityRecord.EnergySupplierId);
             Assert.Equal("5799999933340", transaction?.MarketActivityRecord.BalanceResponsibleId);
@@ -118,7 +115,7 @@ namespace B2B.CimMessageAdapter.Tests
                 .ConfigureAwait(false);
 
             AssertContainsError(result, "B2B-005");
-            Assert.Single(_transactionQueueDispatcherSpy.CommittedItems);
+            Assert.Empty(_transactionQueueDispatcherSpy.CommittedItems);
         }
 
         private static Stream CreateMessageWithInvalidXmlStructure()
@@ -158,11 +155,6 @@ namespace B2B.CimMessageAdapter.Tests
         private static void AssertContainsError(Result result, string errorCode)
         {
             Assert.Contains(result.Errors, error => error.Code.Equals(errorCode, StringComparison.OrdinalIgnoreCase));
-        }
-
-        private static Task<Result> ReceiveRequestChangeOfSupplierMessage(Stream message, MessageReceiver receiver)
-        {
-            return receiver.ReceiveAsync(message, "requestchangeofsupplier", "1.0");
         }
 
         private Task<Result> ReceiveRequestChangeOfSupplierMessage(Stream message, string version = "1.0")
