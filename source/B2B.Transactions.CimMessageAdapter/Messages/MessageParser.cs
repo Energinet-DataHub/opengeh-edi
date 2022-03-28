@@ -233,6 +233,8 @@ namespace B2B.CimMessageAdapter.Messages
     {
         public IReadOnlyCollection<ValidationError> Errors { get; } = new List<ValidationError>();
 
+        public bool Success => Errors.Count == 0;
+
         public MessageHeader? MessageHeader { get; }
 
         public IReadOnlyCollection<MarketActivityRecord> MarketActivityRecords { get; } =

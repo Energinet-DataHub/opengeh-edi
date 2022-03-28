@@ -51,7 +51,7 @@ namespace B2B.CimMessageAdapter
             var messageParserResult =
                  await messageParser.ParseAsync(message, businessProcessType, version).ConfigureAwait(false);
 
-            if (messageParserResult.Errors.Count > 0)
+            if (messageParserResult.Success == false)
             {
                 return Result.Failure(messageParserResult.Errors.ToArray());
             }
