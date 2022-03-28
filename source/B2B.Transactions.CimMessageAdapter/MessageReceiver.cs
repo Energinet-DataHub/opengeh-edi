@@ -56,16 +56,18 @@ namespace B2B.CimMessageAdapter
                 return Result.Failure(messageParserResult.Errors.ToArray());
             }
 
-            var isAuthorized = await AuthorizeSenderAsync(messageParserResult.MessageHeader!.SenderId).ConfigureAwait(false);
+            var messageHeader = messageParserResult.MessageHeader;
+
+            var isAuthorized = await AuthorizeSenderAsync(messageHeader!.SenderId).ConfigureAwait(false);
             if (isAuthorized == false)
             {
                 return Result.Failure(new SenderAuthorizationFailed());
             }
 
-            var messageIdIsUnique = await CheckMessageIdAsync(messageParserResult.MessageHeader!.MessageId).ConfigureAwait(false);
+            var messageIdIsUnique = await CheckMessageIdAsync(messageHeader.MessageId).ConfigureAwait(false);
             if (messageIdIsUnique == false)
             {
-                return Result.Failure(new DuplicateMessageIdDetected($"Message id '{messageParserResult.MessageHeader!.MessageId}' is not unique"));
+                return Result.Failure(new DuplicateMessageIdDetected($"Message id '{messageHeader.MessageId}' is not unique"));
             }
 
             foreach (var marketActivityRecord in messageParserResult.MarketActivityRecords)
@@ -76,7 +78,7 @@ namespace B2B.CimMessageAdapter
                         $"Transaction id '{marketActivityRecord.Id}' is not unique and will not be processed."));
                 }
 
-                await AddToTransactionQueueAsync(CreateTransaction(messageParserResult.MessageHeader, marketActivityRecord)).ConfigureAwait(false);
+                await AddToTransactionQueueAsync(CreateTransaction(messageHeader, marketActivityRecord)).ConfigureAwait(false);
             }
 
             await _transactionQueueDispatcher.CommitAsync().ConfigureAwait(false);
