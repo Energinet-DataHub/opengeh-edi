@@ -27,6 +27,12 @@ runs:
         mkdir ${{ inputs.RELEASE_FOLDER_PATH }}
         cp -fR ${{ inputs.REPO_FOLDER_PATH }}/build/infrastructure ${{ inputs.RELEASE_FOLDER_PATH }} 2>/dev/null || :
 
+    - name: Publish CIM message receiver to release folder
+      uses: actions/download-artifact@v2
+      with:
+        name: cimmessagereceiver
+        path: ${{ inputs.RELEASE_FOLDER_PATH }}/functions/cimmessagereceiver
+
     - name: Publish Ingestion to release folder
       uses: actions/download-artifact@v2
       with:
