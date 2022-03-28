@@ -28,13 +28,9 @@ These are the processes maintained by this domain.
 
 ![MarketRole Architecture](https://user-images.githubusercontent.com/72008816/160091353-afb253c0-ba98-424d-9821-4e895da0a1cf.png)
 
-
-
 ## Context Streams
 
 ![MarketRole domain context](https://user-images.githubusercontent.com/72008816/160091489-023a18f5-9c78-4c10-99b8-7b32383c9858.png)
-
-
 
 ## Market Participants
 
