@@ -51,7 +51,7 @@ In this program increment we are working on the move-in process
 
 - A energy supplier is able to send in a move-in request and get their request schema validated
 - A energy supplier is able to receive an accept message for their move-in request
-- A energy supplier is able to get their message rejected if customer name is not present in their request, if cpr or cvr is not present in their request, if it is an accounting point and if the request is not received within the correct time frame.
+- A energy supplier is able to get their message rejected if customer name is not present in their request, if CPR or CVR is not present in their request, if it is an accounting point and if the request is not received within the correct time frame.
 - The move-in is performed and the old customer is removed and the old energy supplier is removed and replaced with the new energy supplier
 - A message is sent to the old energy supplier, informing them about the change.
 
