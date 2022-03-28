@@ -26,11 +26,11 @@ These are the processes maintained by this domain.
 
 ## Architecture
 
-![MarketRole Architecture](https://user-images.githubusercontent.com/72008816/160091353-afb253c0-ba98-424d-9821-4e895da0a1cf.png)
+![Market role Architecture](https://user-images.githubusercontent.com/72008816/160091353-afb253c0-ba98-424d-9821-4e895da0a1cf.png)
 
 ## Context Streams
 
-![MarketRole domain context](https://user-images.githubusercontent.com/72008816/160091489-023a18f5-9c78-4c10-99b8-7b32383c9858.png)
+![Market role domain context](https://user-images.githubusercontent.com/72008816/160091489-023a18f5-9c78-4c10-99b8-7b32383c9858.png)
 
 ## Market Participants
 
@@ -51,7 +51,7 @@ In this program increment we are working on the move-in process
 
 - A energy supplier is able to send in a move-in request and get their request schema validated
 - A energy supplier is able to receive an accept message for their move-in request
-- A energy supplier is able to get their message rejected if customer name is not present in their request, if CPR/CVR is not present in their request, if it is an accounting point and if the request is not received within the correct timeframe. 
+- A energy supplier is able to get their message rejected if customer name is not present in their request, if CPR / CVR is not present in their request, if it is an accounting point and if the request is not received within the correct timeframe. 
 - The move-in is performed and the old customer is removed and the old energy supplier is removed and replaced with the new energy supplier
 - A message is sent to the old energy supplier, informing them about the change.  
 
