@@ -228,37 +228,4 @@ namespace B2B.CimMessageAdapter.Messages
             _errors.Add(InvalidMessageStructure.From(message));
         }
     }
-
-    public class MessageParserResult
-    {
-        public IReadOnlyCollection<ValidationError> Errors { get; } = new List<ValidationError>();
-
-        public bool Success => Errors.Count == 0;
-
-        public MessageHeader? MessageHeader { get; }
-
-        public IReadOnlyCollection<MarketActivityRecord> MarketActivityRecords { get; } =
-            new List<MarketActivityRecord>();
-
-        private MessageParserResult(IReadOnlyCollection<ValidationError> errors)
-        {
-            Errors = errors;
-        }
-
-        private MessageParserResult(MessageHeader messageHeader, IReadOnlyCollection<MarketActivityRecord> marketActivityRecords)
-        {
-            MessageHeader = messageHeader;
-            MarketActivityRecords = marketActivityRecords;
-        }
-
-        public static MessageParserResult Failure(params ValidationError[] errors)
-        {
-            return new MessageParserResult(errors);
-        }
-
-        public static MessageParserResult Succeeded(MessageHeader messageHeader, List<MarketActivityRecord> marketActivityRecords)
-        {
-            return new MessageParserResult(messageHeader, marketActivityRecords);
-        }
-    }
 }
