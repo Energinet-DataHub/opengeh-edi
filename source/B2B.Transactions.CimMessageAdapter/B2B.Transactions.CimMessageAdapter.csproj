@@ -28,6 +28,7 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\B2B.Transactions\B2B.Transactions.csproj" />
       <ProjectReference Include="..\Energinet.DataHub.MarketRoles.Infrastructure\Energinet.DataHub.MarketRoles.Infrastructure.csproj" />
     </ItemGroup>
     <ItemGroup>

@@ -12,22 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace B2B.CimMessageAdapter.Messages
+using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using NodaTime;
+
+namespace B2B.Transactions.Tests
 {
-    public class MarketActivityRecord
+    public class SystemDateTimeProviderStub : ISystemDateTimeProvider
     {
-        public string Id { get; init; } = string.Empty;
+        private Instant _now = SystemClock.Instance.GetCurrentInstant();
 
-        public string? ConsumerId { get; init; }
+        public void SetNow(Instant now)
+        {
+            _now = now;
+        }
 
-        public string? BalanceResponsibleId { get; init; }
-
-        public string? EnergySupplierId { get; init; }
-
-        public string MarketEvaluationPointId { get; init; } = string.Empty;
-
-        public string? ConsumerName { get; init; }
-
-        public string EffectiveDate { get; init; } = string.Empty;
+        public Instant Now()
+        {
+            return _now;
+        }
     }
 }

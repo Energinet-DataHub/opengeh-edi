@@ -20,6 +20,8 @@ using B2B.CimMessageAdapter.Errors;
 using B2B.CimMessageAdapter.Messages;
 using B2B.CimMessageAdapter.Schema;
 using B2B.CimMessageAdapter.Transactions;
+using B2B.Transactions.Messages;
+using B2B.Transactions.Transactions;
 using Energinet.DataHub.Core.App.Common.Abstractions.Actor;
 
 namespace B2B.CimMessageAdapter

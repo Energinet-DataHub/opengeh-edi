@@ -11,26 +11,17 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-using System.Threading.Tasks;
-using B2B.Transactions.Transactions;
-
-namespace B2B.CimMessageAdapter.Transactions
+namespace B2B.Transactions.OutgoingMessages
 {
     /// <summary>
-    /// Service for dispatching B2B transactions to transaction queue
+    /// Store for outgoing actor messages
     /// </summary>
-    public interface ITransactionQueueDispatcher
+    public interface IOutgoingMessageStore
     {
         /// <summary>
-        /// Adds a transaction to collection
+        /// Add message to queue
         /// </summary>
-        /// <param name="transaction"></param>
-        Task AddAsync(B2BTransaction transaction);
-
-        /// <summary>
-        /// Commits added transactions to queue
-        /// </summary>
-        Task CommitAsync();
+        /// <param name="acceptMessage"></param>
+        void Add(AcceptMessage acceptMessage);
     }
 }

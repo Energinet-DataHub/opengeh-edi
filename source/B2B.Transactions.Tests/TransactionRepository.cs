@@ -12,25 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using B2B.CimMessageAdapter.Messages;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using B2B.Transactions.Transactions;
 
-namespace B2B.CimMessageAdapter.Transactions
+namespace B2B.Transactions.Tests
 {
-    public class B2BTransaction
+    public class TransactionRepository : ITransactionRepository
     {
-        private B2BTransaction(MessageHeader message, MarketActivityRecord marketActivityRecord)
+        private readonly List<AcceptedTransaction> _transactions = new();
+
+        public void Add(AcceptedTransaction acceptedTransaction)
         {
-            Message = message;
-            MarketActivityRecord = marketActivityRecord;
+            _transactions.Add(acceptedTransaction);
         }
 
-        public MessageHeader Message { get; }
-
-        public MarketActivityRecord MarketActivityRecord { get; }
-
-        public static B2BTransaction Create(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
+        public AcceptedTransaction? GetById(string transactionId)
         {
-            return new B2BTransaction(messageHeader, marketActivityRecord);
+            return _transactions.FirstOrDefault(transaction => transaction.TransactionId.Equals(transactionId, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

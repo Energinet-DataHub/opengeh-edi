@@ -12,25 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using B2B.Transactions.Transactions;
-
-namespace B2B.CimMessageAdapter.Transactions
+namespace B2B.Transactions.Transactions
 {
     /// <summary>
-    /// Service for dispatching B2B transactions to transaction queue
+    /// Storage for transactions
     /// </summary>
-    public interface ITransactionQueueDispatcher
+    public interface ITransactionRepository
     {
         /// <summary>
-        /// Adds a transaction to collection
+        /// Adds a transaction to store
         /// </summary>
-        /// <param name="transaction"></param>
-        Task AddAsync(B2BTransaction transaction);
+        /// <param name="acceptedTransaction"></param>
+        void Add(AcceptedTransaction acceptedTransaction);
 
         /// <summary>
-        /// Commits added transactions to queue
+        /// Find a transaction by transaction id
         /// </summary>
-        Task CommitAsync();
+        /// <param name="transactionId"></param>
+        /// <returns><see cref="AcceptedTransaction"/></returns>
+        AcceptedTransaction? GetById(string transactionId);
     }
 }

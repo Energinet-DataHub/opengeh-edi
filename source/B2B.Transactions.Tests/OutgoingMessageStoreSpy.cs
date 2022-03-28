@@ -12,25 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using B2B.Transactions.Transactions;
+using System.Collections.Generic;
+using B2B.Transactions.OutgoingMessages;
 
-namespace B2B.CimMessageAdapter.Transactions
+namespace B2B.Transactions.Tests
 {
-    /// <summary>
-    /// Service for dispatching B2B transactions to transaction queue
-    /// </summary>
-    public interface ITransactionQueueDispatcher
+    public class OutgoingMessageStoreSpy : IOutgoingMessageStore
     {
-        /// <summary>
-        /// Adds a transaction to collection
-        /// </summary>
-        /// <param name="transaction"></param>
-        Task AddAsync(B2BTransaction transaction);
+        private readonly List<AcceptMessage> _messages = new();
 
-        /// <summary>
-        /// Commits added transactions to queue
-        /// </summary>
-        Task CommitAsync();
+        public IReadOnlyCollection<AcceptMessage> Messages => _messages.AsReadOnly();
+
+        public void Add(AcceptMessage acceptMessage)
+        {
+            _messages.Add(acceptMessage);
+        }
     }
 }

@@ -5,6 +5,18 @@
 version: 2
 updates:
   - package-ecosystem: "nuget"
+    directory: "/source/B2B.Transactions.Tests"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+  
+  - package-ecosystem: "nuget"
+    directory: "/source/B2B.Transactions"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "nuget"
     directory: "/source/B2B.Transactions.CimMessageAdapter"
     schedule:
       interval: "weekly"

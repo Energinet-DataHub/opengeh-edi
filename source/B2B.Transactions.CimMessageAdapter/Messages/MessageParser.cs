@@ -20,6 +20,7 @@ using System.Xml;
 using System.Xml.Schema;
 using B2B.CimMessageAdapter.Errors;
 using B2B.CimMessageAdapter.Schema;
+using B2B.Transactions.Messages;
 
 namespace B2B.CimMessageAdapter.Messages
 {

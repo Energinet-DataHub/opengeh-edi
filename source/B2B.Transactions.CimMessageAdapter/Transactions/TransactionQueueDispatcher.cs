@@ -17,6 +17,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
 using Azure.Messaging.ServiceBus;
+using B2B.Transactions.Transactions;
 using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
 
 namespace B2B.CimMessageAdapter.Transactions
