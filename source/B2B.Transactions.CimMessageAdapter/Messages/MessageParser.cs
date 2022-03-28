@@ -23,13 +23,12 @@ using B2B.CimMessageAdapter.Schema;
 
 namespace B2B.CimMessageAdapter.Messages
 {
-#pragma warning disable
     public class MessageParser
     {
-        private readonly ISchemaProvider _schemaProvider;
         private const string MarketActivityRecordElementName = "MktActivityRecord";
         private const string HeaderElementName = "RequestChangeOfSupplier_MarketDocument";
         private readonly List<ValidationError> _errors = new();
+        private readonly ISchemaProvider _schemaProvider;
 
         public MessageParser(ISchemaProvider schemaProvider)
         {
@@ -71,21 +70,6 @@ namespace B2B.CimMessageAdapter.Messages
                     return InvalidXmlFailure(generalException);
                 }
             }
-        }
-
-        private XmlReaderSettings CreateXmlReaderSettings(XmlSchema xmlSchema)
-        {
-            var settings = new XmlReaderSettings
-            {
-                Async = true,
-                ValidationType = ValidationType.Schema,
-                ValidationFlags = XmlSchemaValidationFlags.ProcessInlineSchema |
-                                  XmlSchemaValidationFlags.ReportValidationWarnings,
-            };
-
-            settings.Schemas.Add(xmlSchema);
-            settings.ValidationEventHandler += OnValidationError;
-            return settings;
         }
 
         private static MessageParserResult InvalidXmlFailure(Exception exception)
@@ -226,6 +210,21 @@ namespace B2B.CimMessageAdapter.Messages
             var message =
                 $"XML schema validation error at line {arguments.Exception.LineNumber}, position {arguments.Exception.LinePosition}: {arguments.Message}.";
             _errors.Add(InvalidMessageStructure.From(message));
+        }
+
+        private XmlReaderSettings CreateXmlReaderSettings(XmlSchema xmlSchema)
+        {
+            var settings = new XmlReaderSettings
+            {
+                Async = true,
+                ValidationType = ValidationType.Schema,
+                ValidationFlags = XmlSchemaValidationFlags.ProcessInlineSchema |
+                                  XmlSchemaValidationFlags.ReportValidationWarnings,
+            };
+
+            settings.Schemas.Add(xmlSchema);
+            settings.ValidationEventHandler += OnValidationError;
+            return settings;
         }
     }
 }
