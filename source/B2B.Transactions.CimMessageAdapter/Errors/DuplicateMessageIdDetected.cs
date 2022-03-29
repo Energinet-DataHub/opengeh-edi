@@ -16,8 +16,8 @@ namespace B2B.CimMessageAdapter.Errors
 {
     public class DuplicateMessageIdDetected : ValidationError
     {
-        public DuplicateMessageIdDetected(string message)
-            : base(message, "B2B-003")
+        public DuplicateMessageIdDetected(string messageId)
+            : base($"Message id '{messageId}' is not unique", "B2B-003")
         {
         }
     }
