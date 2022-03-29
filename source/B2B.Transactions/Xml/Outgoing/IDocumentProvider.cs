@@ -11,15 +11,21 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-namespace B2B.Transactions.OutgoingMessages
-{
-    public class AcceptMessage : IMessage
-    {
-        public AcceptMessage(string messagePayload)
-        {
-            MessagePayload = messagePayload;
-        }
 
-        public string MessagePayload { get; init; }
+using B2B.Transactions.Transactions;
+
+namespace B2B.Transactions.Xml.Outgoing
+{
+    /// <summary>
+    /// Provides outgoing xml documents
+    /// </summary>
+    public interface IDocumentProvider<TMessage>
+    {
+        /// <summary>
+        /// Creates an outgoing AcceptMessage
+        /// </summary>
+        /// <param name="transaction"></param>
+        /// <returns><see cref="AcceptDocumentProvider"/></returns>
+        TMessage CreateMessage(B2BTransaction transaction);
     }
 }

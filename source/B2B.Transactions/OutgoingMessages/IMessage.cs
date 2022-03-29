@@ -11,15 +11,17 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 namespace B2B.Transactions.OutgoingMessages
 {
-    public class AcceptMessage : IMessage
+    /// <summary>
+    /// Interface for outgoing messages
+    /// </summary>
+    public interface IMessage
     {
-        public AcceptMessage(string messagePayload)
-        {
-            MessagePayload = messagePayload;
-        }
-
-        public string MessagePayload { get; init; }
+        /// <summary>
+        /// Payload of the outgoing message
+        /// </summary>
+        string MessagePayload { get; init; }
     }
 }
