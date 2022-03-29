@@ -32,6 +32,33 @@ namespace B2B.CimMessageAdapter.Tests
         private TransactionQueueDispatcherStub _transactionQueueDispatcherSpy = new();
 
         [Fact]
+        public async Task Receiver_id_must_be_known()
+        {
+            var unknownReceiverId = "5790001330550";
+            await using var message = BusinessMessageBuilder
+                .RequestChangeOfSupplier()
+                .WithReceiverId(unknownReceiverId)
+                .Message();
+
+            var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
+
+            AssertContainsError(result, "B2B-008");
+        }
+
+        [Fact]
+        public async Task Receiver_role_must_be_metering_point_administrator()
+        {
+            await using var message = BusinessMessageBuilder
+                .RequestChangeOfSupplier()
+                .WithReceiverRole("DDK")
+                .Message();
+
+            var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
+
+            AssertContainsError(result, "B2B-008");
+        }
+
+        [Fact]
         public async Task Sender_role_type_must_be_the_role_of_energy_supplier()
         {
             await using var message = BusinessMessageBuilder
