@@ -65,14 +65,10 @@ namespace B2B.CimMessageAdapter
                 return Result.Failure(authorizationResult.Errors.ToArray());
             }
 
-            if (messageHeader.ReceiverRole.Equals("DDZ", StringComparison.OrdinalIgnoreCase) == false)
+            var receiverVerification = await ReceiverVerification.VerifyAsync(messageHeader.ReceiverId, messageHeader.ReceiverRole).ConfigureAwait(false);
+            if (receiverVerification.Success == false)
             {
-                return Result.Failure(new InvalidReceiverRole());
-            }
-
-            if (messageHeader.ReceiverId.Equals("5790001330552", StringComparison.OrdinalIgnoreCase) == false)
-            {
-                return Result.Failure(new UnknownReceiver(messageHeader.ReceiverId));
+                return receiverVerification;
             }
 
             var messageIdIsUnique = await CheckMessageIdAsync(messageHeader.MessageId).ConfigureAwait(false);
