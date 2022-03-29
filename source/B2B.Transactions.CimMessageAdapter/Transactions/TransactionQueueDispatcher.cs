@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
@@ -22,64 +22,32 @@ using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
 
 namespace B2B.CimMessageAdapter.Transactions
 {
-    public class TransactionQueueDispatcher : ITransactionQueueDispatcher, IDisposable, IAsyncDisposable
+    public class TransactionQueueDispatcher : ITransactionQueueDispatcher
     {
         private readonly IJsonSerializer _jsonSerializer;
-        private bool _disposed;
-        private TransactionScope? _transactionScope;
-        private ServiceBusSender? _serviceBusSender;
+        private readonly List<ServiceBusMessage> _transactionQueue;
+        private readonly ServiceBusSender? _serviceBusSender;
 
         public TransactionQueueDispatcher(IJsonSerializer jsonSerializer, ServiceBusSender? sender)
         {
-            _transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
             _serviceBusSender = sender;
             _jsonSerializer = jsonSerializer;
+            _transactionQueue = new List<ServiceBusMessage>();
         }
 
-        public async Task AddAsync(B2BTransaction transaction)
+        public Task AddAsync(B2BTransaction transaction)
         {
             var message = CreateMessage(transaction);
-            if (_serviceBusSender != null) await _serviceBusSender.SendMessageAsync(message).ConfigureAwait(false);
+            _transactionQueue.Add(message);
+            return Task.CompletedTask;
         }
 
         public async Task CommitAsync()
         {
-            await Task.Run(() => _transactionScope?.Complete()).ConfigureAwait(false);
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        public async ValueTask DisposeAsync()
-        {
-            if (_serviceBusSender is not null)
+            using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                await _serviceBusSender.DisposeAsync().ConfigureAwait(false);
-            }
-
-            _serviceBusSender = null;
-
-            Dispose(false);
-
-#pragma warning disable CA1816 // Dispose should call SurpressFinalize
-            GC.SuppressFinalize(this);
-#pragma warning restore CA1816
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_disposed)
-            {
-                if (disposing)
-                {
-                    _transactionScope?.Dispose();
-                    _transactionScope = null;
-                }
-
-                _disposed = true;
+                if (_serviceBusSender != null) await _serviceBusSender.SendMessagesAsync(_transactionQueue).ConfigureAwait(false);
+                scope.Complete();
             }
         }
 
