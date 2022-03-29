@@ -125,6 +125,11 @@ namespace B2B.CimMessageAdapter
                 return Task.FromResult<Result>(Result.Failure(new SenderRoleTypeIsNotAuthorized()));
             }
 
+            if (_actorContext.CurrentActor.Roles.Contains(messageHeader.SenderRole, StringComparison.CurrentCultureIgnoreCase) == false)
+            {
+                return Task.FromResult<Result>(Result.Failure(new AuthenticatedUserDoesNotHoldRequiredRoleType()));
+            }
+
             return Task.FromResult(Result.Succeeded());
         }
     }

@@ -33,12 +33,26 @@ namespace B2B.CimMessageAdapter.Tests
         private TransactionQueueDispatcherStub _transactionQueueDispatcherSpy = new();
 
         [Fact]
-        public async Task Sender_must_have_the_role_of_energy_supplier()
+        public async Task Sender_role_type_must_be_the_role_of_energy_supplier()
         {
             await using var message = BusinessMessageBuilder
                 .RequestChangeOfSupplier()
                 .WithSenderRole("DDK")
                 .Message();
+
+            var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
+
+            AssertContainsError(result, "B2B-008");
+        }
+
+        [Fact]
+        public async Task Authenticated_user_must_hold_the_role_type_as_specified_in_message()
+        {
+            _actorContextStub.RemoveAllRolesFromCurrentActor();
+            await using var message = BusinessMessageBuilder
+                .RequestChangeOfSupplier()
+                .Message();
+
             var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
 
             AssertContainsError(result, "B2B-008");
