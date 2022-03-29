@@ -19,15 +19,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace B2B.Transactions.DataAccess
 {
-    public class MarketRolesContext : DbContext
+    public class B2BContext : DbContext
     {
         #nullable disable
-        public MarketRolesContext(DbContextOptions<MarketRolesContext> options)
+        public B2BContext(DbContextOptions<B2BContext> options)
             : base(options)
         {
         }
 
-        public MarketRolesContext()
+        public B2BContext()
         {
         }
 

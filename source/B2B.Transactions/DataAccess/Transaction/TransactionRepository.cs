@@ -21,21 +21,21 @@ namespace B2B.Transactions.DataAccess.Transaction
 {
     public class TransactionRepository : ITransactionRepository
     {
-        private readonly MarketRolesContext _marketRolesContext;
+        private readonly B2BContext _b2BContext;
 
-        public TransactionRepository(MarketRolesContext marketRolesContext)
+        public TransactionRepository(B2BContext b2BContext)
         {
-            _marketRolesContext = marketRolesContext;
+            _b2BContext = b2BContext;
         }
 
         public void Add(AcceptedTransaction acceptedTransaction)
         {
-            _marketRolesContext.Transactions.Add(acceptedTransaction);
+            _b2BContext.Transactions.Add(acceptedTransaction);
         }
 
         public AcceptedTransaction? GetById(string transactionId)
         {
-            return _marketRolesContext.Transactions.Find(transactionId);
+            return _b2BContext.Transactions.Find(transactionId);
         }
     }
 }
