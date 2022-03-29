@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -111,25 +110,7 @@ namespace B2B.CimMessageAdapter
         private Task<Result> AuthorizeSenderAsync(MessageHeader messageHeader)
         {
             if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
-            var senderIdMatchesAuthenticatedUserId =
-                _actorContext.CurrentActor!.Identifier.Equals(messageHeader.SenderId, StringComparison.OrdinalIgnoreCase);
-
-            if (senderIdMatchesAuthenticatedUserId == false)
-            {
-                return Task.FromResult(Result.Failure(new SenderIdDoesNotMatchAuthenticatedUser()));
-            }
-
-            if (messageHeader.SenderRole.Equals("DDQ", StringComparison.OrdinalIgnoreCase) == false)
-            {
-                return Task.FromResult<Result>(Result.Failure(new SenderRoleTypeIsNotAuthorized()));
-            }
-
-            if (_actorContext.CurrentActor.Roles.Contains(messageHeader.SenderRole, StringComparison.CurrentCultureIgnoreCase) == false)
-            {
-                return Task.FromResult<Result>(Result.Failure(new AuthenticatedUserDoesNotHoldRequiredRoleType()));
-            }
-
-            return Task.FromResult(Result.Succeeded());
+            return new SenderAuthorizer(_actorContext).AuthorizeAsync(messageHeader);
         }
     }
 }
