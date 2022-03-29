@@ -35,22 +35,19 @@ namespace B2B.CimMessageAdapter.Tests.Messages
 
         public BusinessMessageBuilder WithSenderRole(string roleType)
         {
-            _document.Root!
-                .Element(_xmlNamespace + "sender_MarketParticipant.marketRole.type")!.Value = roleType;
+            SetRootChildElementValue("sender_MarketParticipant.marketRole.type", roleType);
             return this;
         }
 
         public BusinessMessageBuilder WithReceiverRole(string roleType)
         {
-            _document.Root!
-                .Element(_xmlNamespace + "receiver_MarketParticipant.marketRole.type")!.Value = roleType;
+            SetRootChildElementValue("receiver_MarketParticipant.marketRole.type", roleType);
             return this;
         }
 
         public BusinessMessageBuilder WithReceiverId(string receiverId)
         {
-            _document.Root!
-                .Element(_xmlNamespace + "receiver_MarketParticipant.mRID")!.Value = receiverId;
+            SetRootChildElementValue("receiver_MarketParticipant.mRID", receiverId);
             return this;
         }
 
@@ -70,6 +67,12 @@ namespace B2B.CimMessageAdapter.Tests.Messages
 
             root.Add(marketActivityRecord);
             return this;
+        }
+
+        private void SetRootChildElementValue(string elementName, string value)
+        {
+            _document.Root!
+                .Element(_xmlNamespace + elementName)!.Value = value;
         }
     }
 }
