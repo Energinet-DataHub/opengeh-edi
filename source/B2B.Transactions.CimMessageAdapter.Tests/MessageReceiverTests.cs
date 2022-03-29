@@ -146,17 +146,6 @@ namespace B2B.CimMessageAdapter.Tests
             Assert.Empty(_transactionQueueDispatcherSpy.CommittedItems);
         }
 
-        [Fact]
-        public void Test_builder()
-        {
-            var sut = BusinessMessageBuilder
-                .RequestChangeOfSupplier()
-                .WithSenderRole("this_is_not_valid")
-                .Message();
-
-            sut.Dispose();
-        }
-
         private static Stream CreateMessageWithInvalidXmlStructure()
         {
             var messageStream = new MemoryStream();
