@@ -22,9 +22,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace B2B.Transactions.Tests.Tooling
 {
-    public class MarketRolesDatabaseManager : SqlServerDatabaseManager<B2BContext>
+    public class B2BContextDatabaseManager : SqlServerDatabaseManager<B2BContext>
     {
-        public MarketRolesDatabaseManager()
+        public B2BContextDatabaseManager()
             : base("MarketRoles")
         {
         }

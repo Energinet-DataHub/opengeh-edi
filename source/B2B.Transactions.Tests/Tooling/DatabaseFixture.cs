@@ -21,10 +21,10 @@ namespace B2B.Transactions.Tests.Tooling
     {
         public DatabaseFixture()
         {
-            DatabaseManager = new MarketRolesDatabaseManager();
+            DatabaseManager = new B2BContextDatabaseManager();
         }
 
-        public MarketRolesDatabaseManager DatabaseManager { get; }
+        public B2BContextDatabaseManager DatabaseManager { get; }
 
         public Task InitializeAsync()
         {
