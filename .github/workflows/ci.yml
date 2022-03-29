@@ -29,6 +29,7 @@ jobs:
       SOLUTION_FILE_PATH: 'source/Energinet.DataHub.MarketRoles.sln'
       DOTNET_VERSION: '5.0'
       OPERATING_SYSTEM: 'ubuntu-latest'
+      USE_AZURITE: true
       USE_SQLLOCALDB_2019: true
 
   terraform_validate:
