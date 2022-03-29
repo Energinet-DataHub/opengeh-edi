@@ -30,7 +30,7 @@ namespace B2B.CimMessageAdapter.Tests.Messages
 
         public static BusinessMessageBuilder RequestChangeOfSupplier()
         {
-            return new BusinessMessageBuilder("Messages\\ValidRequestChangeOfSupplier.xml", "urn:ediel.org:structure:requestchangeofsupplier:0:1");
+            return new BusinessMessageBuilder("Messages\\RequestChangeOfSupplier.xml", "urn:ediel.org:structure:requestchangeofsupplier:0:1");
         }
 
         public BusinessMessageBuilder WithSenderRole(string roleType)
@@ -46,6 +46,16 @@ namespace B2B.CimMessageAdapter.Tests.Messages
             _document.Save(message);
             message.Position = 0;
             return message;
+        }
+
+        public BusinessMessageBuilder DuplicateMarketActivityRecords()
+        {
+            var root = _document.Root;
+            var marketActivityRecord = root!
+                .Element(_xmlNamespace + "MktActivityRecord");
+
+            root.Add(marketActivityRecord);
+            return this;
         }
     }
 }

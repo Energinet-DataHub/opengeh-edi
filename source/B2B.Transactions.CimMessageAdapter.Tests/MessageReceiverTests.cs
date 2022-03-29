@@ -15,7 +15,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using B2B.CimMessageAdapter.Messages;
 using B2B.CimMessageAdapter.Schema;
@@ -62,7 +61,10 @@ namespace B2B.CimMessageAdapter.Tests
         public async Task Sender_id_must_match_the_organization_of_the_current_authenticated_user()
         {
             _actorContextStub.UseInvalidActor();
-            await using var message = CreateMessage();
+            await using var message = BusinessMessageBuilder
+                .RequestChangeOfSupplier()
+                .Message();
+
             var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
 
             AssertContainsError(result, "B2B-008");
@@ -83,7 +85,12 @@ namespace B2B.CimMessageAdapter.Tests
         [Fact]
         public async Task Message_must_conform_to_xml_schema()
         {
-            await using var message = CreateMessageNotConformingToXmlSchema();
+            await using var message =
+                BusinessMessageBuilder
+                    .RequestChangeOfSupplier()
+                    .WithSenderRole("FakeRoleType")
+                    .Message();
+
             var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
 
             AssertContainsError(result, "B2B-005");
@@ -92,7 +99,9 @@ namespace B2B.CimMessageAdapter.Tests
         [Fact]
         public async Task Return_failure_if_xml_schema_for_business_process_type_does_not_exist()
         {
-            await using var message = CreateMessage();
+            await using var message = BusinessMessageBuilder
+                .RequestChangeOfSupplier()
+                .Message();
 
             var result = await ReceiveRequestChangeOfSupplierMessage(message, "non_existing_version")
                 .ConfigureAwait(false);
@@ -104,7 +113,10 @@ namespace B2B.CimMessageAdapter.Tests
         [Fact]
         public async Task Valid_activity_records_are_extracted_and_committed_to_queue()
         {
-            await using var message = CreateMessage();
+            await using var message = BusinessMessageBuilder
+                .RequestChangeOfSupplier()
+                .Message();
+
             await ReceiveRequestChangeOfSupplierMessage(message)
                 .ConfigureAwait(false);
 
@@ -138,7 +150,10 @@ namespace B2B.CimMessageAdapter.Tests
         [Fact]
         public async Task Activity_records_must_have_unique_transaction_ids()
         {
-            await using var message = CreateMessageWithDuplicateTransactionIds();
+            await using var message = BusinessMessageBuilder
+                .RequestChangeOfSupplier()
+                .DuplicateMarketActivityRecords()
+                .Message();
             var result = await ReceiveRequestChangeOfSupplierMessage(message)
                 .ConfigureAwait(false);
 
@@ -152,30 +167,6 @@ namespace B2B.CimMessageAdapter.Tests
             using var writer = new StreamWriter(messageStream);
             writer.Write("This is not XML");
             writer.Flush();
-            messageStream.Position = 0;
-            return messageStream;
-        }
-
-        private static Stream CreateMessageNotConformingToXmlSchema()
-        {
-            return CreateMessageFrom("Messages\\InvalidRequestChangeOfSupplier.xml");
-        }
-
-        private static Stream CreateMessage()
-        {
-            return CreateMessageFrom("Messages\\ValidRequestChangeOfSupplier.xml");
-        }
-
-        private static Stream CreateMessageWithDuplicateTransactionIds()
-        {
-            return CreateMessageFrom("Messages\\RequestChangeOfSupplierWithDuplicateTransactionIds.xml");
-        }
-
-        private static Stream CreateMessageFrom(string xmlFile)
-        {
-            using var fileReader = new FileStream(xmlFile, FileMode.Open, FileAccess.Read);
-            var messageStream = new MemoryStream();
-            fileReader.CopyTo(messageStream);
             messageStream.Position = 0;
             return messageStream;
         }
@@ -206,13 +197,14 @@ namespace B2B.CimMessageAdapter.Tests
 
         private async Task SimulateDuplicationOfMessageIds(IMessageIds messageIds)
         {
-            await using (var message = CreateMessage())
+            var messageBuilder = BusinessMessageBuilder.RequestChangeOfSupplier();
+            await using (var message = messageBuilder.Message())
             {
                 await CreateMessageReceiver(messageIds).ReceiveAsync(message, "requestchangeofsupplier", "1.0")
                     .ConfigureAwait(false);
             }
 
-            await using (var message = CreateMessage())
+            await using (var message = messageBuilder.Message())
             {
                 await CreateMessageReceiver(messageIds).ReceiveAsync(message, "requestchangeofsupplier", "1.0")
                     .ConfigureAwait(false);
