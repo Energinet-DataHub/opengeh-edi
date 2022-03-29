@@ -130,17 +130,17 @@ namespace B2B.CimMessageAdapter.Tests
 
         private static Stream CreateMessageNotConformingToXmlSchema()
         {
-            return CreateMessageFrom("InvalidRequestChangeOfSupplier.xml");
+            return CreateMessageFrom("Messages\\InvalidRequestChangeOfSupplier.xml");
         }
 
         private static Stream CreateMessage()
         {
-            return CreateMessageFrom("ValidRequestChangeOfSupplier.xml");
+            return CreateMessageFrom("Messages\\ValidRequestChangeOfSupplier.xml");
         }
 
         private static Stream CreateMessageWithDuplicateTransactionIds()
         {
-            return CreateMessageFrom("RequestChangeOfSupplierWithDuplicateTransactionIds.xml");
+            return CreateMessageFrom("Messages\\RequestChangeOfSupplierWithDuplicateTransactionIds.xml");
         }
 
         private static Stream CreateMessageFrom(string xmlFile)
