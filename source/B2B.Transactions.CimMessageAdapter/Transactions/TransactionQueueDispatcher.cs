@@ -46,11 +46,7 @@ namespace B2B.CimMessageAdapter.Transactions
         {
             using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                foreach (var message in _transactionQueue)
-                {
-                    if (_serviceBusSender != null) await _serviceBusSender.SendMessageAsync(message).ConfigureAwait(false);
-                }
-
+                if (_serviceBusSender != null) await _serviceBusSender.SendMessagesAsync(_transactionQueue).ConfigureAwait(false);
                 scope.Complete();
             }
         }
