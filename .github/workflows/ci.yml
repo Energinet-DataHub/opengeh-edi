@@ -30,6 +30,7 @@ jobs:
       DOTNET_VERSION: '5.0'
       OPERATING_SYSTEM: 'ubuntu-latest'
       USE_AZURITE: true
+      USE_AZURE_FUNCTIONS_CORE_TOOLS: true
       USE_SQLLOCALDB_2019: true
     secrets:
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
