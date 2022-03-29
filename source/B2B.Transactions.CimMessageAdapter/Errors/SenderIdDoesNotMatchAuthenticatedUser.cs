@@ -14,10 +14,10 @@
 
 namespace B2B.CimMessageAdapter.Errors
 {
-    public class DuplicateTransactionIdDetected : ValidationError
+    public class SenderIdDoesNotMatchAuthenticatedUser : ValidationError
     {
-        public DuplicateTransactionIdDetected(string transactionId)
-            : base($"Transaction id '{transactionId}' is not unique and will not be processed.", "B2B-005")
+        public SenderIdDoesNotMatchAuthenticatedUser()
+            : base("Sender id does not match id of current authenticated user.", "B2B-008")
         {
         }
     }
