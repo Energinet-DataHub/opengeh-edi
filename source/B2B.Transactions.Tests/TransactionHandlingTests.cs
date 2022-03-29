@@ -15,7 +15,10 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using B2B.Transactions.DataAccess;
+using B2B.Transactions.DataAccess.Transaction;
 using B2B.Transactions.Messages;
+using B2B.Transactions.Tests.Tooling;
 using B2B.Transactions.Transactions;
 using Xunit;
 
@@ -23,10 +26,30 @@ namespace B2B.Transactions.Tests
 {
     public class TransactionHandlingTests
     {
-        private readonly TransactionRepositoryStub _transactionRepositoryStub = new();
+        private readonly DatabaseFixture _databaseFixture;
+        private readonly TransactionRepository _transactionRepository;
         private readonly SystemDateTimeProviderStub _dateTimeProvider = new();
         private readonly XNamespace _namespace = "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1";
         private OutgoingMessageStoreSpy _outgoingMessageStoreSpy = new();
+
+        public TransactionHandlingTests()
+        {
+            _databaseFixture = new DatabaseFixture();
+            _databaseFixture.DatabaseManager.UpgradeDatabase();
+            _transactionRepository = new TransactionRepository(_databaseFixture.DatabaseManager.CreateDbContext());
+        }
+
+        [Fact]
+        public async Task Transaction_is_registered()
+        {
+            var transaction = CreateTransaction();
+            await RegisterTransaction(transaction).ConfigureAwait(false);
+
+            var savedTransaction = _transactionRepository.GetById(transaction.Message.MessageId);
+            Assert.NotNull(savedTransaction);
+
+            await DisposeDatabaseAsync().ConfigureAwait(false);
+        }
 
         [Fact]
         public async Task Accept_message_is_sent_to_sender_when_transaction_is_accepted()
@@ -53,6 +76,8 @@ namespace B2B.Transactions.Tests
             Assert.NotNull(GetMarketActivityRecordValue(document, "mRID"));
             AssertMarketActivityRecordValue(document, "originalTransactionIDReference_MktActivityRecord.mRID", transaction.MarketActivityRecord.Id);
             AssertMarketActivityRecordValue(document, "marketEvaluationPoint.mRID", transaction.MarketActivityRecord.MarketEvaluationPointId);
+
+            await DisposeDatabaseAsync().ConfigureAwait(false);
         }
 
         private static B2BTransaction CreateTransaction()
@@ -78,7 +103,7 @@ namespace B2B.Transactions.Tests
 
         private Task RegisterTransaction(B2BTransaction transaction)
         {
-            var useCase = new RegisterTransaction(_outgoingMessageStoreSpy, _dateTimeProvider, _transactionRepositoryStub);
+            var useCase = new RegisterTransaction(_outgoingMessageStoreSpy, _dateTimeProvider, _transactionRepository);
             return useCase.HandleAsync(transaction);
         }
 
@@ -106,6 +131,11 @@ namespace B2B.Transactions.Tests
         private XElement? GetHeaderElement(XDocument document)
         {
             return document?.Element(_namespace + "ConfirmRequestChangeOfSupplier_MarketDocument");
+        }
+
+        private async Task DisposeDatabaseAsync()
+        {
+            await _databaseFixture.DisposeAsync().ConfigureAwait(false);
         }
     }
 }
