@@ -47,6 +47,13 @@ namespace B2B.CimMessageAdapter.Tests.Messages
             return this;
         }
 
+        public BusinessMessageBuilder WithReceiverId(string receiverId)
+        {
+            _document.Root!
+                .Element(_xmlNamespace + "receiver_MarketParticipant.mRID")!.Value = receiverId;
+            return this;
+        }
+
         public Stream Message()
         {
             var message = new MemoryStream();

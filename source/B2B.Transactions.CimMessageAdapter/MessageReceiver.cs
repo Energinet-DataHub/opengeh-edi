@@ -70,6 +70,11 @@ namespace B2B.CimMessageAdapter
                 return Result.Failure(new InvalidReceiverRole());
             }
 
+            if (messageHeader.ReceiverId.Equals("5790001330552", StringComparison.OrdinalIgnoreCase) == false)
+            {
+                return Result.Failure(new UnknownReceiver(messageHeader.ReceiverId));
+            }
+
             var messageIdIsUnique = await CheckMessageIdAsync(messageHeader.MessageId).ConfigureAwait(false);
             if (messageIdIsUnique == false)
             {
