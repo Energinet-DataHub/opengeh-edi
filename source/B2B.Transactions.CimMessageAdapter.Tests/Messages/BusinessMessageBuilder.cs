@@ -30,7 +30,7 @@ namespace B2B.CimMessageAdapter.Tests.Messages
 
         public static BusinessMessageBuilder RequestChangeOfSupplier()
         {
-            return new BusinessMessageBuilder("Messages\\RequestChangeOfSupplier.xml", "urn:ediel.org:structure:requestchangeofsupplier:0:1");
+            return new BusinessMessageBuilder("Messages//RequestChangeOfSupplier.xml", "urn:ediel.org:structure:requestchangeofsupplier:0:1");
         }
 
         public BusinessMessageBuilder WithSenderRole(string roleType)
