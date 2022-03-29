@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -52,17 +53,17 @@ namespace B2B.CimMessageAdapter
             var messageParserResult =
                  await messageParser.ParseAsync(message, businessProcessType, version).ConfigureAwait(false);
 
-            if (messageParserResult.Success == false)
+            if (messageParserResult.MessageHeader is null || messageParserResult.Success == false)
             {
                 return Result.Failure(messageParserResult.Errors.ToArray());
             }
 
             var messageHeader = messageParserResult.MessageHeader;
 
-            var isAuthorized = await AuthorizeSenderAsync(messageHeader!.SenderId).ConfigureAwait(false);
-            if (isAuthorized == false)
+            var authorizationResult = await AuthorizeSenderAsync(messageHeader).ConfigureAwait(false);
+            if (authorizationResult.Success == false)
             {
-                return Result.Failure(new SenderAuthorizationFailed());
+                return Result.Failure(authorizationResult.Errors.ToArray());
             }
 
             var messageIdIsUnique = await CheckMessageIdAsync(messageHeader.MessageId).ConfigureAwait(false);
@@ -108,10 +109,23 @@ namespace B2B.CimMessageAdapter
             return _messageIds.TryStoreAsync(messageId);
         }
 
-        private Task<bool> AuthorizeSenderAsync(string senderId)
+        private Task<Result> AuthorizeSenderAsync(MessageHeader messageHeader)
         {
-            if (senderId == null) throw new ArgumentNullException(nameof(senderId));
-            return Task.FromResult(_actorContext.CurrentActor!.Identifier.Equals(senderId, StringComparison.OrdinalIgnoreCase));
+            if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
+            var senderIdMatchesAuthenticatedUserId =
+                _actorContext.CurrentActor!.Identifier.Equals(messageHeader.SenderId, StringComparison.OrdinalIgnoreCase);
+
+            if (senderIdMatchesAuthenticatedUserId == false)
+            {
+                return Task.FromResult(Result.Failure(new SenderIdDoesNotMatchAuthenticatedUser()));
+            }
+
+            if (messageHeader.SenderRole.Equals("DDQ", StringComparison.OrdinalIgnoreCase) == false)
+            {
+                return Task.FromResult<Result>(Result.Failure(new SenderRoleTypeIsNotAuthorized()));
+            }
+
+            return Task.FromResult(Result.Succeeded());
         }
     }
 }

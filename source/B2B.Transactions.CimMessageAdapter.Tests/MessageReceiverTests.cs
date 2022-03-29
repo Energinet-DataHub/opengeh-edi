@@ -15,9 +15,11 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using B2B.CimMessageAdapter.Messages;
 using B2B.CimMessageAdapter.Schema;
+using B2B.CimMessageAdapter.Tests.Messages;
 using B2B.CimMessageAdapter.Tests.Stubs;
 using Xunit;
 
@@ -29,6 +31,18 @@ namespace B2B.CimMessageAdapter.Tests
         private readonly TransactionIdsStub _transactionIdsStub = new();
         private readonly MessageIdsStub _messageIdsStub = new();
         private TransactionQueueDispatcherStub _transactionQueueDispatcherSpy = new();
+
+        [Fact]
+        public async Task Sender_must_have_the_role_of_energy_supplier()
+        {
+            await using var message = BusinessMessageBuilder
+                .RequestChangeOfSupplier()
+                .WithSenderRole("DDK")
+                .Message();
+            var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
+
+            AssertContainsError(result, "B2B-008");
+        }
 
         [Fact]
         public async Task Sender_id_must_match_the_organization_of_the_current_authenticated_user()
@@ -116,6 +130,17 @@ namespace B2B.CimMessageAdapter.Tests
 
             AssertContainsError(result, "B2B-005");
             Assert.Empty(_transactionQueueDispatcherSpy.CommittedItems);
+        }
+
+        [Fact]
+        public void Test_builder()
+        {
+            var sut = BusinessMessageBuilder
+                .RequestChangeOfSupplier()
+                .WithSenderRole("this_is_not_valid")
+                .Message();
+
+            sut.Dispose();
         }
 
         private static Stream CreateMessageWithInvalidXmlStructure()
