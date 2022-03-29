@@ -54,21 +54,15 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
+      <EmbeddedResource Include="Messages\RequestChangeOfSupplier.xml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
       <None Remove="InvalidRequestChangeOfSupplier.xml" />
-      <EmbeddedResource Include="InvalidRequestChangeOfSupplier.xml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </EmbeddedResource>
       <None Remove="RequestChangeOfSupplierWithDuplicateTransactionIds.xml" />
-      <EmbeddedResource Include="RequestChangeOfSupplierWithDuplicateTransactionIds.xml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </EmbeddedResource>
       <None Remove="urn-ediel-org-structure-requestchangeofsupplier-0-1.xsd" />
       <None Remove="urn-entsoe-eu-local-extension-types.xsd" />
       <None Remove="urn-entsoe-eu-wgedi-codelists.xsd" />
       <None Remove="ValidRequestChangeOfSupplier.xml" />
-      <EmbeddedResource Include="ValidRequestChangeOfSupplier.xml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </EmbeddedResource>
     </ItemGroup>
 
 </Project>

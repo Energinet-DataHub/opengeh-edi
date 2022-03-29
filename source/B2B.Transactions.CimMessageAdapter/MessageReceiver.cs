@@ -52,31 +52,30 @@ namespace B2B.CimMessageAdapter
             var messageParserResult =
                  await messageParser.ParseAsync(message, businessProcessType, version).ConfigureAwait(false);
 
-            if (messageParserResult.Success == false)
+            if (messageParserResult.MessageHeader is null || messageParserResult.Success == false)
             {
                 return Result.Failure(messageParserResult.Errors.ToArray());
             }
 
             var messageHeader = messageParserResult.MessageHeader;
 
-            var isAuthorized = await AuthorizeSenderAsync(messageHeader!.SenderId).ConfigureAwait(false);
-            if (isAuthorized == false)
+            var authorizationResult = await AuthorizeSenderAsync(messageHeader).ConfigureAwait(false);
+            if (authorizationResult.Success == false)
             {
-                return Result.Failure(new SenderAuthorizationFailed());
+                return Result.Failure(authorizationResult.Errors.ToArray());
             }
 
             var messageIdIsUnique = await CheckMessageIdAsync(messageHeader.MessageId).ConfigureAwait(false);
             if (messageIdIsUnique == false)
             {
-                return Result.Failure(new DuplicateMessageIdDetected($"Message id '{messageHeader.MessageId}' is not unique"));
+                return Result.Failure(new DuplicateMessageIdDetected(messageHeader.MessageId));
             }
 
             foreach (var marketActivityRecord in messageParserResult.MarketActivityRecords)
             {
                 if (await CheckTransactionIdAsync(marketActivityRecord.Id).ConfigureAwait(false) == false)
                 {
-                    return Result.Failure(new DuplicateTransactionIdDetected(
-                        $"Transaction id '{marketActivityRecord.Id}' is not unique and will not be processed."));
+                    return Result.Failure(new DuplicateTransactionIdDetected(marketActivityRecord.Id));
                 }
 
                 await AddToTransactionQueueAsync(CreateTransaction(messageHeader, marketActivityRecord)).ConfigureAwait(false);
@@ -108,10 +107,10 @@ namespace B2B.CimMessageAdapter
             return _messageIds.TryStoreAsync(messageId);
         }
 
-        private Task<bool> AuthorizeSenderAsync(string senderId)
+        private Task<Result> AuthorizeSenderAsync(MessageHeader messageHeader)
         {
-            if (senderId == null) throw new ArgumentNullException(nameof(senderId));
-            return Task.FromResult(_actorContext.CurrentActor!.Identifier.Equals(senderId, StringComparison.OrdinalIgnoreCase));
+            if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
+            return new SenderAuthorizer(_actorContext).AuthorizeAsync(messageHeader);
         }
     }
 }
