@@ -69,7 +69,7 @@ namespace B2B.CimMessageAdapter
             var messageIdIsUnique = await CheckMessageIdAsync(messageHeader.MessageId).ConfigureAwait(false);
             if (messageIdIsUnique == false)
             {
-                return Result.Failure(new DuplicateMessageIdDetected($"Message id '{messageHeader.MessageId}' is not unique"));
+                return Result.Failure(new DuplicateMessageIdDetected(messageHeader.MessageId));
             }
 
             foreach (var marketActivityRecord in messageParserResult.MarketActivityRecords)
