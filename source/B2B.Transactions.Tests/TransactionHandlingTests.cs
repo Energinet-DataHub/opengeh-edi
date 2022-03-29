@@ -21,22 +21,12 @@ using Xunit;
 
 namespace B2B.Transactions.Tests
 {
-    public class TransactionHandlingTests : TestHost
+    public class TransactionHandlingTests
     {
-        // private readonly TransactionRepository _transactionRepository = new();
+        private readonly TransactionRepositoryStub _transactionRepositoryStub = new();
         private readonly SystemDateTimeProviderStub _dateTimeProvider = new();
         private readonly XNamespace _namespace = "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1";
         private OutgoingMessageStoreSpy _outgoingMessageStoreSpy = new();
-
-        [Fact]
-        public async Task Transaction_is_registered()
-        {
-            var transaction = CreateTransaction();
-            await RegisterTransaction(transaction).ConfigureAwait(false);
-
-            var savedTransaction = TransactionRepository.GetById(transaction.Message.MessageId);
-            Assert.NotNull(savedTransaction);
-        }
 
         [Fact]
         public async Task Accept_message_is_sent_to_sender_when_transaction_is_accepted()
@@ -88,7 +78,7 @@ namespace B2B.Transactions.Tests
 
         private Task RegisterTransaction(B2BTransaction transaction)
         {
-            var useCase = new RegisterTransaction(_outgoingMessageStoreSpy, _dateTimeProvider, TransactionRepository);
+            var useCase = new RegisterTransaction(_outgoingMessageStoreSpy, _dateTimeProvider, _transactionRepositoryStub);
             return useCase.HandleAsync(transaction);
         }
 
