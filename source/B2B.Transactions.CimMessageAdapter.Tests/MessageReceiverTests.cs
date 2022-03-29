@@ -32,7 +32,7 @@ namespace B2B.CimMessageAdapter.Tests
         private TransactionQueueDispatcherStub _transactionQueueDispatcherSpy = new();
 
         [Fact]
-        public async Task Receiver_must_be_a_valid_metering_point_administrator()
+        public async Task Receiver_role_must_be_metering_point_administrator()
         {
             await using var message = BusinessMessageBuilder
                 .RequestChangeOfSupplier()
