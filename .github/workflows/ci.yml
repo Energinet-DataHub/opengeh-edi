@@ -27,8 +27,7 @@ jobs:
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@3.0.2
     with:
       SOLUTION_FILE_PATH: 'source/Energinet.DataHub.MarketRoles.sln'
-      DOTNET_VERSION: '5.0'
-      OPERATING_SYSTEM: 'ubuntu-latest'
+      DOTNET_VERSION: '5.0'      
       USE_AZURITE: true
       USE_AZURE_FUNCTIONS_CORE_TOOLS: true
       USE_SQLLOCALDB_2019: true
