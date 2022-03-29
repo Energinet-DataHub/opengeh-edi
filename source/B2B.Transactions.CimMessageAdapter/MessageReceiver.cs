@@ -65,6 +65,11 @@ namespace B2B.CimMessageAdapter
                 return Result.Failure(authorizationResult.Errors.ToArray());
             }
 
+            if (messageHeader.ReceiverRole.Equals("DDZ", StringComparison.OrdinalIgnoreCase) == false)
+            {
+                return Result.Failure(new InvalidReceiverRole());
+            }
+
             var messageIdIsUnique = await CheckMessageIdAsync(messageHeader.MessageId).ConfigureAwait(false);
             if (messageIdIsUnique == false)
             {

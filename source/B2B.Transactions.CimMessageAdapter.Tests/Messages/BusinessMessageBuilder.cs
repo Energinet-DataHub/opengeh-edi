@@ -40,6 +40,13 @@ namespace B2B.CimMessageAdapter.Tests.Messages
             return this;
         }
 
+        public BusinessMessageBuilder WithReceiverRole(string roleType)
+        {
+            _document.Root!
+                .Element(_xmlNamespace + "receiver_MarketParticipant.marketRole.type")!.Value = roleType;
+            return this;
+        }
+
         public Stream Message()
         {
             var message = new MemoryStream();
