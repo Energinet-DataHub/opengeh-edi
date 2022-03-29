@@ -16,8 +16,8 @@ namespace B2B.CimMessageAdapter.Errors
 {
     public class DuplicateTransactionIdDetected : ValidationError
     {
-        public DuplicateTransactionIdDetected(string message)
-            : base(message, "B2B-005")
+        public DuplicateTransactionIdDetected(string transactionId)
+            : base($"Transaction id '{transactionId}' is not unique and will not be processed.", "B2B-005")
         {
         }
     }

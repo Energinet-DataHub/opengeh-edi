@@ -76,8 +76,7 @@ namespace B2B.CimMessageAdapter
             {
                 if (await CheckTransactionIdAsync(marketActivityRecord.Id).ConfigureAwait(false) == false)
                 {
-                    return Result.Failure(new DuplicateTransactionIdDetected(
-                        $"Transaction id '{marketActivityRecord.Id}' is not unique and will not be processed."));
+                    return Result.Failure(new DuplicateTransactionIdDetected(marketActivityRecord.Id));
                 }
 
                 await AddToTransactionQueueAsync(CreateTransaction(messageHeader, marketActivityRecord)).ConfigureAwait(false);
