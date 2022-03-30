@@ -47,6 +47,10 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202109270930 Add MessageHubMessages table.sql" />
     <None Remove="Scripts\Model\202112131115 Add Actor table.sql" />
     <EmbeddedResource Include="Scripts\Model\202112131115 Add Actor table.sql" />
+    <None Remove="Scripts\Seed\202202091335 Updates from actor registry.sql" />
+    <EmbeddedResource Include="Scripts\Seed\202202091335 Updates from actor registry.sql" />
+    <None Remove="Scripts\Seed\202203301046 Updates from actor registry.sql" />
+    <EmbeddedResource Include="Scripts\Seed\202203301046 Updates from actor registry.sql" />
   </ItemGroup>
 
 </Project>
