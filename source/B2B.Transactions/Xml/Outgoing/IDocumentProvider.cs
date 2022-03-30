@@ -19,10 +19,10 @@ namespace B2B.Transactions.Xml.Outgoing
     /// <summary>
     /// Provides outgoing xml documents
     /// </summary>
-    public interface IDocumentProvider<TMessage>
+    public interface IDocumentProvider<out TMessage>
     {
         /// <summary>
-        /// Creates an outgoing AcceptMessage
+        /// Creates an outgoing Messages
         /// </summary>
         /// <param name="transaction"></param>
         /// <returns><see cref="AcceptDocumentProvider"/></returns>

@@ -70,7 +70,7 @@ namespace B2B.Transactions.CimMessageAdapter.Receiver
                     services.AddScoped<ICorrelationContext, CorrelationContext>();
                     services.AddScoped<ITransactionIds, TransactionIdRegistry>();
                     services.AddScoped<IMessageIds, MessageIdRegistry>();
-                    services.AddScoped<IDocumentProvider<AcceptMessage>, AcceptDocumentProvider>();
+                    services.AddScoped<IDocumentProvider<IMessage>, AcceptDocumentProvider>();
                     services.AddSingleton<ServiceBusSender>(serviceProvider =>
                     {
                         var connectionString = Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_CONNECTION_STRING");

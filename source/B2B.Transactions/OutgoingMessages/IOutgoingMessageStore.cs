@@ -21,7 +21,7 @@ namespace B2B.Transactions.OutgoingMessages
         /// <summary>
         /// Add message to queue
         /// </summary>
-        /// <param name="acceptMessage"></param>
-        void Add(AcceptMessage acceptMessage);
+        /// <param name="message"></param>
+        void Add(IMessage message);
     }
 }

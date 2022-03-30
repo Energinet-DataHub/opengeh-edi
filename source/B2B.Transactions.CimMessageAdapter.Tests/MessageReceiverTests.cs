@@ -17,7 +17,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using B2B.CimMessageAdapter.Messages;
-using B2B.CimMessageAdapter.Schema;
 using B2B.CimMessageAdapter.Tests.Messages;
 using B2B.CimMessageAdapter.Tests.Stubs;
 using B2B.Transactions.Xml.Incoming;

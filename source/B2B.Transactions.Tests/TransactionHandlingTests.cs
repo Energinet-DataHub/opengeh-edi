@@ -30,7 +30,7 @@ namespace B2B.Transactions.Tests
         private readonly TransactionRepository _transactionRepository = new();
         private readonly XNamespace _namespace = "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1";
         private OutgoingMessageStoreSpy _outgoingMessageStoreSpy = new();
-        private IDocumentProvider<AcceptMessage> _documentProvider = new AcceptDocumentProvider(_dateTimeProvider);
+        private IDocumentProvider<IMessage> _documentProvider = new AcceptDocumentProvider(_dateTimeProvider);
 
         [Fact]
         public async Task Transaction_is_registered()

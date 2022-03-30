@@ -19,13 +19,13 @@ namespace B2B.Transactions.Tests
 {
     public class OutgoingMessageStoreSpy : IOutgoingMessageStore
     {
-        private readonly List<AcceptMessage> _messages = new();
+        private readonly List<IMessage> _messages = new();
 
-        public IReadOnlyCollection<AcceptMessage> Messages => _messages.AsReadOnly();
+        public IReadOnlyCollection<IMessage> Messages => _messages.AsReadOnly();
 
-        public void Add(AcceptMessage acceptMessage)
+        public void Add(IMessage message)
         {
-            _messages.Add(acceptMessage);
+            _messages.Add(message);
         }
     }
 }

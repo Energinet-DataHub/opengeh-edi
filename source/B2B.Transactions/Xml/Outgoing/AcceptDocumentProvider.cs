@@ -20,14 +20,14 @@ using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
 namespace B2B.Transactions.Xml.Outgoing
 {
-    public class AcceptDocumentProvider : DocumentProvider<AcceptMessage>
+    public class AcceptDocumentProvider : DocumentProvider<IMessage>
     {
         public AcceptDocumentProvider(ISystemDateTimeProvider systemDateTimeProvider)
             : base(systemDateTimeProvider)
         {
         }
 
-        public override AcceptMessage CreateMessage(B2BTransaction transaction)
+        public override IMessage CreateMessage(B2BTransaction transaction)
         {
             var settings = new XmlWriterSettings() { OmitXmlDeclaration = false, Encoding = Encoding.UTF8 };
             using var output = new Utf8StringWriter();
