@@ -19,7 +19,6 @@ using System.Text;
 using System.Threading.Tasks;
 using B2B.CimMessageAdapter;
 using B2B.CimMessageAdapter.Response;
-using B2B.CimMessageAdapter.Schema;
 using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;

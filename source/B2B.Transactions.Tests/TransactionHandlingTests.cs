@@ -18,8 +18,11 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using B2B.Transactions.DataAccess.Transaction;
 using B2B.Transactions.Messages;
+using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.Tests.Tooling;
 using B2B.Transactions.Transactions;
+using B2B.Transactions.Xml.Incoming;
+using B2B.Transactions.Xml.Outgoing;
 using Xunit;
 
 namespace B2B.Transactions.Tests
@@ -27,11 +30,12 @@ namespace B2B.Transactions.Tests
     [Collection("IntegrationTest")]
     public class TransactionHandlingTests : IDisposable
     {
+        private static readonly SystemDateTimeProviderStub _dateTimeProvider = new();
         private readonly DatabaseFixture _databaseFixture;
         private readonly TransactionRepository _transactionRepository;
-        private readonly SystemDateTimeProviderStub _dateTimeProvider = new();
         private readonly XNamespace _namespace = "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1";
         private OutgoingMessageStoreSpy _outgoingMessageStoreSpy = new();
+        private IDocumentProvider<IMessage> _documentProvider = new AcceptDocumentProvider(_dateTimeProvider);
         private bool _disposed;
 
         public TransactionHandlingTests()
@@ -118,7 +122,7 @@ namespace B2B.Transactions.Tests
 
         private Task RegisterTransaction(B2BTransaction transaction)
         {
-            var useCase = new RegisterTransaction(_outgoingMessageStoreSpy, _dateTimeProvider, _transactionRepository);
+            var useCase = new RegisterTransaction(_outgoingMessageStoreSpy, _transactionRepository, _documentProvider);
             return useCase.HandleAsync(transaction);
         }
 

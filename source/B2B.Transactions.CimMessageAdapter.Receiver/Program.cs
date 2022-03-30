@@ -17,8 +17,10 @@ using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using B2B.CimMessageAdapter;
 using B2B.CimMessageAdapter.Messages;
-using B2B.CimMessageAdapter.Schema;
 using B2B.CimMessageAdapter.Transactions;
+using B2B.Transactions.OutgoingMessages;
+using B2B.Transactions.Xml.Incoming;
+using B2B.Transactions.Xml.Outgoing;
 using Energinet.DataHub.Core.App.Common;
 using Energinet.DataHub.Core.App.Common.Abstractions.Actor;
 using Energinet.DataHub.Core.App.Common.Abstractions.Identity;
@@ -28,6 +30,7 @@ using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.Core.App.FunctionApp.Middleware;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
+using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common;
 using Energinet.DataHub.MarketRoles.Infrastructure;
 using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
@@ -59,6 +62,7 @@ namespace B2B.Transactions.CimMessageAdapter.Receiver
                 })
                 .ConfigureServices(services =>
                 {
+                    services.AddScoped<ISystemDateTimeProvider, SystemDateTimeProvider>();
                     services.AddSingleton<IJsonSerializer, JsonSerializer>();
                     services.AddScoped<SchemaStore>();
                     services.AddScoped<ISchemaProvider, SchemaProvider>();
@@ -66,6 +70,7 @@ namespace B2B.Transactions.CimMessageAdapter.Receiver
                     services.AddScoped<ICorrelationContext, CorrelationContext>();
                     services.AddScoped<ITransactionIds, TransactionIdRegistry>();
                     services.AddScoped<IMessageIds, MessageIdRegistry>();
+                    services.AddScoped<IDocumentProvider<IMessage>, AcceptDocumentProvider>();
                     services.AddSingleton<ServiceBusSender>(serviceProvider =>
                     {
                         var connectionString = Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_CONNECTION_STRING");

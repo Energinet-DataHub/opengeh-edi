@@ -32,27 +32,28 @@ namespace B2B.CimMessageAdapter.Messages
             _actorContext = actorContext ?? throw new ArgumentNullException(nameof(actorContext));
         }
 
-        public Task<Result> AuthorizeAsync(MessageHeader messageHeader)
+        public Task<Result> AuthorizeAsync(string senderId, string senderRole)
         {
-            if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
-            EnsureSenderIdMatches(messageHeader.SenderId);
-            EnsureSenderRole(messageHeader);
-            EnsureCurrentUserHasRequiredRole(messageHeader);
+            if (senderId == null) throw new ArgumentNullException(nameof(senderId));
+            if (senderRole == null) throw new ArgumentNullException(nameof(senderRole));
+            EnsureSenderIdMatches(senderId);
+            EnsureSenderRole(senderRole);
+            EnsureCurrentUserHasRequiredRole(senderRole);
 
             return Task.FromResult(_validationErrors.Count == 0 ? Result.Succeeded() : Result.Failure(_validationErrors.ToArray()));
         }
 
-        private void EnsureCurrentUserHasRequiredRole(MessageHeader messageHeader)
+        private void EnsureCurrentUserHasRequiredRole(string senderRole)
         {
-            if (_actorContext.CurrentActor!.Roles.Contains(messageHeader.SenderRole, StringComparison.CurrentCultureIgnoreCase) == false)
+            if (_actorContext.CurrentActor!.Roles.Contains(senderRole, StringComparison.CurrentCultureIgnoreCase) == false)
             {
                 _validationErrors.Add(new AuthenticatedUserDoesNotHoldRequiredRoleType());
             }
         }
 
-        private void EnsureSenderRole(MessageHeader messageHeader)
+        private void EnsureSenderRole(string senderRole)
         {
-            if (messageHeader.SenderRole.Equals(EnergySupplierRole, StringComparison.OrdinalIgnoreCase) == false)
+            if (senderRole.Equals(EnergySupplierRole, StringComparison.OrdinalIgnoreCase) == false)
             {
                 _validationErrors.Add(new SenderRoleTypeIsNotAuthorized());
             }

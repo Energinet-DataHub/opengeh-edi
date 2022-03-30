@@ -12,20 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using B2B.Transactions.OutgoingMessages;
-
-namespace B2B.Transactions.Tests
+namespace B2B.CimMessageAdapter.Errors
 {
-    public class OutgoingMessageStoreSpy : IOutgoingMessageStore
+    public class InvalidReceiverRole : ValidationError
     {
-        private readonly List<IMessage> _messages = new();
-
-        public IReadOnlyCollection<IMessage> Messages => _messages.AsReadOnly();
-
-        public void Add(IMessage message)
+        public InvalidReceiverRole()
+            : base("Invalid receiver role", "B2B-008")
         {
-            _messages.Add(message);
         }
     }
 }

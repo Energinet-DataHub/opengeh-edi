@@ -29,4 +29,16 @@ limitations under the License.
       <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.7" />
     </ItemGroup>
 
+    <ItemGroup>
+      <EmbeddedResource Include="Xml\Incoming\Schemas\urn-ediel-org-structure-requestchangeofsupplier-0-1.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Xml\Incoming\Schemas\urn-entsoe-eu-local-extension-types.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Xml\Incoming\Schemas\urn-entsoe-eu-wgedi-codelists.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+    </ItemGroup>
+
 </Project>
