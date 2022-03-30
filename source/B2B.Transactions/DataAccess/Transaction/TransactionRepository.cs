@@ -12,28 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Xunit;
+using B2B.Transactions.Transactions;
 
-namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
+namespace B2B.Transactions.DataAccess.Transaction
 {
-    public class DatabaseFixture : IAsyncLifetime
+    public class TransactionRepository : ITransactionRepository
     {
-        public DatabaseFixture()
+        private readonly B2BContext _b2BContext;
+
+        public TransactionRepository(B2BContext b2BContext)
         {
-            DatabaseManager = new MarketRolesDatabaseManager();
+            _b2BContext = b2BContext;
         }
 
-        public MarketRolesDatabaseManager DatabaseManager { get; }
-
-        public Task InitializeAsync()
+        public void Add(AcceptedTransaction acceptedTransaction)
         {
-            return DatabaseManager.CreateDatabaseAsync();
+            _b2BContext.Transactions.Add(acceptedTransaction);
         }
 
-        public Task DisposeAsync()
+        public AcceptedTransaction? GetById(string transactionId)
         {
-            return DatabaseManager.DeleteDatabaseAsync();
+            return _b2BContext.Transactions.Find(transactionId);
         }
     }
 }

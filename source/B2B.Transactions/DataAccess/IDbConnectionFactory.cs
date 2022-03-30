@@ -12,28 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Xunit;
+using System.Data;
 
-namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
+namespace B2B.Transactions.DataAccess
 {
-    public class DatabaseFixture : IAsyncLifetime
+    /// <summary>
+    /// Factory for creating database connections
+    /// </summary>
+    public interface IDbConnectionFactory
     {
-        public DatabaseFixture()
-        {
-            DatabaseManager = new MarketRolesDatabaseManager();
-        }
-
-        public MarketRolesDatabaseManager DatabaseManager { get; }
-
-        public Task InitializeAsync()
-        {
-            return DatabaseManager.CreateDatabaseAsync();
-        }
-
-        public Task DisposeAsync()
-        {
-            return DatabaseManager.DeleteDatabaseAsync();
-        }
+        /// <summary>
+        /// Returns and existing open connection if any, or creates a new open connection
+        /// </summary>
+        /// <returns><see cref="IDbConnection"/></returns>
+        IDbConnection GetOpenConnection();
     }
 }

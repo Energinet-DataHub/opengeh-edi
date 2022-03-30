@@ -22,7 +22,10 @@ limitations under the License.
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
+        <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="2.0.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
+        <PackageReference Include="SimpleInjector" Version="5.3.2" />
+        <PackageReference Include="SimpleInjector.Integration.GenericHost" Version="5.3.0" />
         <PackageReference Include="xunit" Version="2.4.1" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -36,6 +39,7 @@ limitations under the License.
 
     <ItemGroup>
       <ProjectReference Include="..\B2B.Transactions.CimMessageAdapter\B2B.Transactions.CimMessageAdapter.csproj" />
+      <ProjectReference Include="..\Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp\Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.csproj" />
     </ItemGroup>
 
 </Project>

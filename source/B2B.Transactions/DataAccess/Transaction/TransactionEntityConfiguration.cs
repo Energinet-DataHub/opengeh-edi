@@ -12,25 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using B2B.Transactions.Transactions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace B2B.Transactions.Tests
+namespace B2B.Transactions.DataAccess.Transaction
 {
-    public class TransactionRepository : ITransactionRepository
+    internal class TransactionEntityConfiguration : IEntityTypeConfiguration<AcceptedTransaction>
     {
-        private readonly List<AcceptedTransaction> _transactions = new();
-
-        public void Add(AcceptedTransaction acceptedTransaction)
+        public void Configure(EntityTypeBuilder<AcceptedTransaction> builder)
         {
-            _transactions.Add(acceptedTransaction);
-        }
-
-        public AcceptedTransaction? GetById(string transactionId)
-        {
-            return _transactions.FirstOrDefault(transaction => transaction.TransactionId.Equals(transactionId, StringComparison.OrdinalIgnoreCase));
+            builder.ToTable("Transactions", "dbo");
+            builder.HasKey(x => x.TransactionId);
         }
     }
 }
