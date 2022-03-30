@@ -13,8 +13,11 @@
 // limitations under the License.
 
 using System;
+using System.Text;
 using System.Threading.Tasks;
+using B2B.Transactions.Transactions;
 using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
+using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
@@ -24,24 +27,35 @@ public class B2BTransactionQueueTrigger
 {
     private readonly ILogger _logger;
     private readonly ICorrelationContext _correlationContext;
+    private readonly RegisterTransaction _registerTransaction;
+    private readonly IJsonSerializer _jsonSerializer;
 
     public B2BTransactionQueueTrigger(
         ILogger logger,
-        ICorrelationContext correlationContext)
+        ICorrelationContext correlationContext,
+        RegisterTransaction registerTransaction,
+        IJsonSerializer jsonSerializer)
     {
         _logger = logger;
         _correlationContext = correlationContext;
+        _registerTransaction = registerTransaction;
+        _jsonSerializer = jsonSerializer;
     }
 
     [Function("B2BTransactionQueueTrigger")]
-    public Task RunAsync(
-        [ServiceBusTrigger("%MARKET_DATA_QUEUE_TOPIC_NAME%", Connection = "MARKET_DATA_QUEUE_CONNECTION_STRING")] byte[] data,
+    public async Task RunAsync(
+        [ServiceBusTrigger("%MARKET_DATA_QUEUE_NAME%", Connection = "MARKET_DATA_QUEUE_CONNECTION_STRING")] byte[] data,
         FunctionContext context)
     {
         if (data == null) throw new ArgumentNullException(nameof(data));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        _logger.LogInformation("Dequeued with correlation id: {correlationId}", _correlationContext.Id);
-        return Task.CompletedTask;
+        var byteAsString = Encoding.UTF8.GetString(data);
+
+        await _registerTransaction.HandleAsync(
+            _jsonSerializer.Deserialize<B2BTransaction>(byteAsString))
+            .ConfigureAwait(false);
+
+        _logger.LogInformation("B2B transaction dequeued with correlation id: {correlationId}", _correlationContext.Id);
     }
 }
