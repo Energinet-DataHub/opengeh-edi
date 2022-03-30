@@ -12,33 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
 using Xunit;
 
 namespace B2B.Transactions.Tests.Tooling
 {
-    public class DatabaseFixture : IAsyncLifetime
+    [CollectionDefinition("IntegrationTest")]
+    public class TransactionTestDatabaseFixture : ICollectionFixture<DatabaseFixture>
     {
-        public DatabaseFixture()
-        {
-            DatabaseManager = new B2BContextDatabaseManager();
-        }
-
-        public B2BContextDatabaseManager DatabaseManager { get; }
-
-        public Task InitializeAsync()
-        {
-            return DatabaseManager.CreateDatabaseAsync();
-        }
-
-        public Task DisposeAsync()
-        {
-            return DatabaseManager.DeleteDatabaseAsync();
-        }
-
-        public bool Dispose()
-        {
-            return DatabaseManager.DeleteDatabase();
-        }
+        // This class has no code, and is never created. Its purpose is simply
+        // to be the place to apply [CollectionDefinition] and all the
+        // ICollectionFixture<> interfaces.
     }
 }

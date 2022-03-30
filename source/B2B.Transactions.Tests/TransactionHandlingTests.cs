@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using B2B.Transactions.DataAccess;
 using B2B.Transactions.DataAccess.Transaction;
 using B2B.Transactions.Messages;
 using B2B.Transactions.Tests.Tooling;
@@ -24,13 +24,15 @@ using Xunit;
 
 namespace B2B.Transactions.Tests
 {
-    public class TransactionHandlingTests
+    [Collection("IntegrationTest")]
+    public class TransactionHandlingTests : IDisposable
     {
         private readonly DatabaseFixture _databaseFixture;
         private readonly TransactionRepository _transactionRepository;
         private readonly SystemDateTimeProviderStub _dateTimeProvider = new();
         private readonly XNamespace _namespace = "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1";
         private OutgoingMessageStoreSpy _outgoingMessageStoreSpy = new();
+        private bool _disposed;
 
         public TransactionHandlingTests()
         {
@@ -47,8 +49,6 @@ namespace B2B.Transactions.Tests
 
             var savedTransaction = _transactionRepository.GetById(transaction.Message.MessageId);
             Assert.NotNull(savedTransaction);
-
-            await DisposeDatabaseAsync().ConfigureAwait(false);
         }
 
         [Fact]
@@ -76,8 +76,23 @@ namespace B2B.Transactions.Tests
             Assert.NotNull(GetMarketActivityRecordValue(document, "mRID"));
             AssertMarketActivityRecordValue(document, "originalTransactionIDReference_MktActivityRecord.mRID", transaction.MarketActivityRecord.Id);
             AssertMarketActivityRecordValue(document, "marketEvaluationPoint.mRID", transaction.MarketActivityRecord.MarketEvaluationPointId);
+        }
 
-            await DisposeDatabaseAsync().ConfigureAwait(false);
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _databaseFixture.Dispose();
+            _disposed = true;
         }
 
         private static B2BTransaction CreateTransaction()
@@ -131,11 +146,6 @@ namespace B2B.Transactions.Tests
         private XElement? GetHeaderElement(XDocument document)
         {
             return document?.Element(_namespace + "ConfirmRequestChangeOfSupplier_MarketDocument");
-        }
-
-        private async Task DisposeDatabaseAsync()
-        {
-            await _databaseFixture.DisposeAsync().ConfigureAwait(false);
         }
     }
 }
