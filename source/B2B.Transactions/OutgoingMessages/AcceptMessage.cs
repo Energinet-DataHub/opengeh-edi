@@ -13,7 +13,7 @@
 // limitations under the License.
 namespace B2B.Transactions.OutgoingMessages
 {
-    public class AcceptMessage
+    public class AcceptMessage : IMessage
     {
         public AcceptMessage(string messagePayload)
         {
