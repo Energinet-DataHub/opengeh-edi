@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,7 +23,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 
-namespace B2B.Transactions.CimMessageAdapter.Receiver
+namespace B2B.Transactions.Api
 {
     public class B2BCimHttpTrigger
     {

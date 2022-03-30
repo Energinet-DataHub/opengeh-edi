@@ -40,7 +40,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace B2B.Transactions.CimMessageAdapter.Receiver
+namespace B2B.Transactions.Api
 {
     public static class Program
     {
