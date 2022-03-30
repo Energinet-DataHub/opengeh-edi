@@ -13,10 +13,9 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
-namespace B2B.CimMessageAdapter.Schema
+namespace B2B.Transactions.Xml.Incoming
 {
     public class SchemaStore
     {
@@ -31,7 +30,7 @@ namespace B2B.CimMessageAdapter.Schema
             };
         }
 
-        public static string SchemaPath => $"Schema{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}";
+        public static string SchemaPath => $"Xml{Path.DirectorySeparatorChar}Incoming{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}";
 
         public Dictionary<KeyValuePair<string, string>, string> Schemas { get; }
 

@@ -15,7 +15,7 @@
 using System.Threading.Tasks;
 using System.Xml.Schema;
 
-namespace B2B.CimMessageAdapter.Schema
+namespace B2B.Transactions.Xml.Incoming
 {
     /// <summary>
     /// Provides XML schemas for CIM messages

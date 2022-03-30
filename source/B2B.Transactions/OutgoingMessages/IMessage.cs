@@ -12,20 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using B2B.Transactions.OutgoingMessages;
-
-namespace B2B.Transactions.Tests
+namespace B2B.Transactions.OutgoingMessages
 {
-    public class OutgoingMessageStoreSpy : IOutgoingMessageStore
+    /// <summary>
+    /// Interface for outgoing messages
+    /// </summary>
+    public interface IMessage
     {
-        private readonly List<IMessage> _messages = new();
-
-        public IReadOnlyCollection<IMessage> Messages => _messages.AsReadOnly();
-
-        public void Add(IMessage message)
-        {
-            _messages.Add(message);
-        }
+        /// <summary>
+        /// Payload of the outgoing message
+        /// </summary>
+        string MessagePayload { get; init; }
     }
 }

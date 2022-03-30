@@ -18,16 +18,19 @@ using System.Xml.Linq;
 using B2B.Transactions.Messages;
 using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.Transactions;
+using B2B.Transactions.Xml.Incoming;
+using B2B.Transactions.Xml.Outgoing;
 using Xunit;
 
 namespace B2B.Transactions.Tests
 {
     public class TransactionHandlingTests
     {
+        private static readonly SystemDateTimeProviderStub _dateTimeProvider = new();
         private readonly TransactionRepository _transactionRepository = new();
-        private readonly SystemDateTimeProviderStub _dateTimeProvider = new();
         private readonly XNamespace _namespace = "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1";
         private OutgoingMessageStoreSpy _outgoingMessageStoreSpy = new();
+        private IDocumentProvider<IMessage> _documentProvider = new AcceptDocumentProvider(_dateTimeProvider);
 
         [Fact]
         public async Task Transaction_is_registered()
@@ -89,7 +92,7 @@ namespace B2B.Transactions.Tests
 
         private Task RegisterTransaction(B2BTransaction transaction)
         {
-            var useCase = new RegisterTransaction(_outgoingMessageStoreSpy, _dateTimeProvider, _transactionRepository);
+            var useCase = new RegisterTransaction(_outgoingMessageStoreSpy, _transactionRepository, _documentProvider);
             return useCase.HandleAsync(transaction);
         }
 
