@@ -49,7 +49,7 @@ jobs:
     with:
       CSPROJ_FILE_PATH: 'source/B2B.Transactions.Api/B2B.Transactions.Api.csproj'
       DOTNET_VERSION: '5.0'
-      ARTIFACT_NAME: cimmessagereceiver
+      ARTIFACT_NAME: api
 
   ingestion_ci:
     needs: [ci_base, dotnet_solution_ci, terraform_validate]
