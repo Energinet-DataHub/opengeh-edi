@@ -15,16 +15,16 @@
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
+namespace B2B.Transactions.Tests.Tooling
 {
     public class DatabaseFixture : IAsyncLifetime
     {
         public DatabaseFixture()
         {
-            DatabaseManager = new MarketRolesDatabaseManager();
+            DatabaseManager = new B2BContextDatabaseManager();
         }
 
-        public MarketRolesDatabaseManager DatabaseManager { get; }
+        public B2BContextDatabaseManager DatabaseManager { get; }
 
         public Task InitializeAsync()
         {
@@ -34,6 +34,11 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
         public Task DisposeAsync()
         {
             return DatabaseManager.DeleteDatabaseAsync();
+        }
+
+        public bool Dispose()
+        {
+            return DatabaseManager.DeleteDatabase();
         }
     }
 }
