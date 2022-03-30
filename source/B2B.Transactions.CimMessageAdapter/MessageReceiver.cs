@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -28,6 +29,7 @@ namespace B2B.CimMessageAdapter
 {
     public class MessageReceiver
     {
+        private readonly List<ValidationError> _errors = new();
         private readonly IMessageIds _messageIds;
         private readonly ITransactionQueueDispatcher _transactionQueueDispatcher;
         private readonly ITransactionIds _transactionIds;
@@ -52,31 +54,26 @@ namespace B2B.CimMessageAdapter
             var messageParserResult =
                  await messageParser.ParseAsync(message, businessProcessType, version).ConfigureAwait(false);
 
-            if (messageParserResult.Success == false)
+            if (InvalidMessageHeader(messageParserResult))
             {
                 return Result.Failure(messageParserResult.Errors.ToArray());
             }
 
             var messageHeader = messageParserResult.MessageHeader;
 
-            var isAuthorized = await AuthorizeSenderAsync(messageHeader!.SenderId).ConfigureAwait(false);
-            if (isAuthorized == false)
+            await AuthorizeSenderAsync(messageHeader!).ConfigureAwait(false);
+            await VerifyReceiverAsync(messageHeader!).ConfigureAwait(false);
+            await CheckMessageIdAsync(messageHeader!.MessageId).ConfigureAwait(false);
+            if (_errors.Count > 0)
             {
-                return Result.Failure(new SenderAuthorizationFailed());
-            }
-
-            var messageIdIsUnique = await CheckMessageIdAsync(messageHeader.MessageId).ConfigureAwait(false);
-            if (messageIdIsUnique == false)
-            {
-                return Result.Failure(new DuplicateMessageIdDetected($"Message id '{messageHeader.MessageId}' is not unique"));
+                return Result.Failure(_errors.ToArray());
             }
 
             foreach (var marketActivityRecord in messageParserResult.MarketActivityRecords)
             {
                 if (await CheckTransactionIdAsync(marketActivityRecord.Id).ConfigureAwait(false) == false)
                 {
-                    return Result.Failure(new DuplicateTransactionIdDetected(
-                        $"Transaction id '{marketActivityRecord.Id}' is not unique and will not be processed."));
+                    return Result.Failure(new DuplicateTransactionIdDetected(marketActivityRecord.Id));
                 }
 
                 await AddToTransactionQueueAsync(CreateTransaction(messageHeader, marketActivityRecord)).ConfigureAwait(false);
@@ -84,6 +81,11 @@ namespace B2B.CimMessageAdapter
 
             await _transactionQueueDispatcher.CommitAsync().ConfigureAwait(false);
             return Result.Succeeded();
+        }
+
+        private static bool InvalidMessageHeader(MessageParserResult messageParserResult)
+        {
+            return messageParserResult.MessageHeader is null || messageParserResult.Success == false;
         }
 
         private static B2BTransaction CreateTransaction(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
@@ -102,16 +104,28 @@ namespace B2B.CimMessageAdapter
             return _transactionQueueDispatcher.AddAsync(transaction);
         }
 
-        private Task<bool> CheckMessageIdAsync(string messageId)
+        private async Task CheckMessageIdAsync(string messageId)
         {
             if (messageId == null) throw new ArgumentNullException(nameof(messageId));
-            return _messageIds.TryStoreAsync(messageId);
+            if (await _messageIds.TryStoreAsync(messageId).ConfigureAwait(false) == false)
+            {
+                _errors.Add(new DuplicateMessageIdDetected(messageId));
+            }
         }
 
-        private Task<bool> AuthorizeSenderAsync(string senderId)
+        private async Task AuthorizeSenderAsync(MessageHeader messageHeader)
         {
-            if (senderId == null) throw new ArgumentNullException(nameof(senderId));
-            return Task.FromResult(_actorContext.CurrentActor!.Identifier.Equals(senderId, StringComparison.OrdinalIgnoreCase));
+            if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
+            var authorizer = new SenderAuthorizer(_actorContext);
+            var result = await authorizer.AuthorizeAsync(messageHeader.SenderId, messageHeader.SenderRole).ConfigureAwait(false);
+            _errors.AddRange(result.Errors);
+        }
+
+        private async Task VerifyReceiverAsync(MessageHeader messageHeader)
+        {
+            if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
+            var receiverVerification = await ReceiverVerification.VerifyAsync(messageHeader!.ReceiverId, messageHeader.ReceiverRole).ConfigureAwait(false);
+            _errors.AddRange(receiverVerification.Errors);
         }
     }
 }

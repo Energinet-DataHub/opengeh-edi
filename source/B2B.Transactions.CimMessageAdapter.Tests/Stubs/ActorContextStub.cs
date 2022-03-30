@@ -19,7 +19,7 @@ namespace B2B.CimMessageAdapter.Tests.Stubs
 {
     public class ActorContextStub : IActorContext
     {
-        private readonly Actor _validActor = new Actor(Guid.NewGuid(), "GLN", "5799999933318", string.Empty);
+        private readonly Actor _validActor = new Actor(Guid.NewGuid(), "GLN", "5799999933318", "DDQ");
 
         public ActorContextStub()
         {
@@ -38,6 +38,11 @@ namespace B2B.CimMessageAdapter.Tests.Stubs
         public void UseInvalidActor()
         {
             CurrentActor = new Actor(Guid.Empty, "GLN", "Fake", string.Empty);
+        }
+
+        public void RemoveAllRolesFromCurrentActor()
+        {
+            CurrentActor = new Actor(Guid.NewGuid(), "GLN", "Fake", string.Empty);
         }
     }
 }

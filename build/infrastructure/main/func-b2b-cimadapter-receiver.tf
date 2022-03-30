@@ -38,6 +38,7 @@ module "func_receiver" {
     # Endregion: Default Values
     MARKET_DATA_QUEUE_URL                   = "${module.sb_marketroles.name}.servicebus.windows.net:9093"
     MARKET_DATA_QUEUE_CONNECTION_STRING     = module.sb_marketroles.primary_connection_strings["send"]
+    MARKET_DATA_DB_CONNECTION_STRING        = local.MS_MARKETROLES_CONNECTION_STRING
     MARKET_DATA_QUEUE_TOPIC_NAME            = module.sbq_marketroles.name
   }
   

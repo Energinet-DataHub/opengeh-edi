@@ -12,9 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketRoles.Infrastructure.Integration;
-
-namespace B2B.CimMessageAdapter.Transactions
+namespace B2B.CimMessageAdapter.Errors
 {
-    public record TransactionTopic(string Name) : Topic;
+    public class InvalidReceiverRole : ValidationError
+    {
+        public InvalidReceiverRole()
+            : base("Invalid receiver role", "B2B-008")
+        {
+        }
+    }
 }

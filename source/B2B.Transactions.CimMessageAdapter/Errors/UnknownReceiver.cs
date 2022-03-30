@@ -14,10 +14,10 @@
 
 namespace B2B.CimMessageAdapter.Errors
 {
-    public class DuplicateTransactionIdDetected : ValidationError
+    public class UnknownReceiver : ValidationError
     {
-        public DuplicateTransactionIdDetected(string transactionId)
-            : base($"Transaction id '{transactionId}' is not unique and will not be processed.", "B2B-005")
+        public UnknownReceiver(string receiverId)
+            : base($"Receiver id {receiverId} is not known receiver", "B2B-008")
         {
         }
     }
