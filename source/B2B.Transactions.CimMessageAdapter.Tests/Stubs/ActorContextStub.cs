@@ -19,7 +19,7 @@ namespace B2B.CimMessageAdapter.Tests.Stubs
 {
     public class ActorContextStub : IActorContext
     {
-        private readonly Actor _validActor = new Actor(Guid.NewGuid(), "GLN", "5799999933318", "DDQ");
+        private readonly Actor _validActor = new Actor(Guid.NewGuid(), "GLN", "5799999933318", "balanceresponsibleparty,electricalsupplier,gridoperator,meterdataresponsible");
 
         public ActorContextStub()
         {

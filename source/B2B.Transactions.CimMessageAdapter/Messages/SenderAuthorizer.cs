@@ -16,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using B2B.CimMessageAdapter.Errors;
-using B2B.Transactions.Messages;
 using Energinet.DataHub.Core.App.Common.Abstractions.Actor;
 
 namespace B2B.CimMessageAdapter.Messages
@@ -26,6 +25,10 @@ namespace B2B.CimMessageAdapter.Messages
         private const string EnergySupplierRole = "DDQ";
         private readonly IActorContext _actorContext;
         private readonly List<ValidationError> _validationErrors = new();
+        private readonly Dictionary<string, string> _rolesMap = new(StringComparer.OrdinalIgnoreCase)
+        {
+            { "DDQ", "electricalsupplier" },
+        };
 
         public SenderAuthorizer(IActorContext actorContext)
         {
@@ -45,7 +48,14 @@ namespace B2B.CimMessageAdapter.Messages
 
         private void EnsureCurrentUserHasRequiredRole(string senderRole)
         {
-            if (_actorContext.CurrentActor!.Roles.Contains(senderRole, StringComparison.CurrentCultureIgnoreCase) == false)
+            _rolesMap.TryGetValue(senderRole, out var nameOfRoleClaim);
+            if (nameOfRoleClaim is null)
+            {
+                _validationErrors.Add(new AuthenticatedUserDoesNotHoldRequiredRoleType());
+                return;
+            }
+
+            if (_actorContext.CurrentActor!.Roles.Contains(nameOfRoleClaim, StringComparison.CurrentCultureIgnoreCase) == false)
             {
                 _validationErrors.Add(new AuthenticatedUserDoesNotHoldRequiredRoleType());
             }
