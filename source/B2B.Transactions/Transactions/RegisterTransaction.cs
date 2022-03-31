@@ -33,14 +33,13 @@ namespace B2B.Transactions.Transactions
             _documentProvider = documentProvider ?? throw new ArgumentNullException(nameof(documentProvider));
         }
 
-        public Task HandleAsync(B2BTransaction transaction)
+        public async Task HandleAsync(B2BTransaction transaction)
         {
             if (transaction == null) throw new ArgumentNullException(nameof(transaction));
             var acceptedTransaction = new AcceptedTransaction(transaction.MarketActivityRecord.Id);
-            _transactionRepository.Add(acceptedTransaction);
+            await _transactionRepository.AddAsync(acceptedTransaction).ConfigureAwait(false);
 
             _outgoingMessageStore.Add(_documentProvider.CreateMessage(transaction));
-            return Task.CompletedTask;
         }
     }
 }
