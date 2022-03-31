@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading.Tasks;
 using B2B.Transactions.Transactions;
 
 namespace B2B.Transactions.DataAccess.Transaction
@@ -25,9 +26,10 @@ namespace B2B.Transactions.DataAccess.Transaction
             _b2BContext = b2BContext;
         }
 
-        public void Add(AcceptedTransaction acceptedTransaction)
+        public async Task AddAsync(AcceptedTransaction acceptedTransaction)
         {
             _b2BContext.Transactions.Add(acceptedTransaction);
+            await _b2BContext.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public AcceptedTransaction? GetById(string transactionId)

@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading.Tasks;
+
 namespace B2B.Transactions.Transactions
 {
     /// <summary>
@@ -23,7 +25,7 @@ namespace B2B.Transactions.Transactions
         /// Adds a transaction to store
         /// </summary>
         /// <param name="acceptedTransaction"></param>
-        void Add(AcceptedTransaction acceptedTransaction);
+        Task AddAsync(AcceptedTransaction acceptedTransaction);
 
         /// <summary>
         /// Find a transaction by transaction id
