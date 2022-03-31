@@ -14,7 +14,7 @@
 module "func_receiver" {
   source                                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/function-app?ref=5.1.0"
 
-  name                                      = "cimmessagereceiver"
+  name                                      = "api"
   project_name                              = var.domain_name_short
   environment_short                         = var.environment_short
   environment_instance                      = var.environment_instance
@@ -39,7 +39,7 @@ module "func_receiver" {
     MARKET_DATA_QUEUE_URL                   = "${module.sb_marketroles.name}.servicebus.windows.net:9093"
     MARKET_DATA_QUEUE_CONNECTION_STRING     = module.sb_marketroles.primary_connection_strings["send"]
     MARKET_DATA_DB_CONNECTION_STRING        = local.MS_MARKETROLES_CONNECTION_STRING
-    MARKET_DATA_QUEUE_TOPIC_NAME            = module.sbq_marketroles.name
+    MARKET_DATA_QUEUE_NAME                  = module.sbq_marketactivity.name
   }
   
   tags                                      = azurerm_resource_group.this.tags

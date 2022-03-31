@@ -6,6 +6,9 @@
     "B2C_TENANT_ID": "<Azure B2C tenant id>",
     "BACKEND_SERVICE_APP_ID": "<Backend service application id>",
     "REQUEST_RESPONSE_LOGGING_CONTAINER_NAME": "<Name of storage container>",
-    "REQUEST_RESPONSE_LOGGING_CONNECTION_STRING": "<connection string for logging request and response to storage>"
+    "REQUEST_RESPONSE_LOGGING_CONNECTION_STRING": "<connection string for logging request and response to storage>",
+    "MARKET_DATA_QUEUE_CONNECTION_STRING": "<connection string for service bus with sender permissions>",
+    "MARKET_DATA_QUEUE_NAME": "<Name of market activity service bus queue>"
+    
   }
 }

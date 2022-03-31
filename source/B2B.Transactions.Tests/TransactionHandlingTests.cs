@@ -41,7 +41,7 @@ namespace B2B.Transactions.Tests
         public TransactionHandlingTests()
         {
             _databaseFixture = new DatabaseFixture();
-            _databaseFixture.DatabaseManager.UpgradeDatabase();
+            _databaseFixture.DatabaseManager.CreateDatabase();
             _transactionRepository = new TransactionRepository(_databaseFixture.DatabaseManager.CreateDbContext());
         }
 

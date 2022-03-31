@@ -40,7 +40,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace B2B.Transactions.CimMessageAdapter.Receiver
+namespace B2B.Transactions.Api
 {
     public static class Program
     {
@@ -74,12 +74,11 @@ namespace B2B.Transactions.CimMessageAdapter.Receiver
                     services.AddSingleton<ServiceBusSender>(serviceProvider =>
                     {
                         var connectionString = Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_CONNECTION_STRING");
-                        var topicName = Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_TOPIC_NAME");
+                        var topicName = Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_NAME");
                         return new ServiceBusClient(connectionString).CreateSender(topicName);
                     });
                     services.AddScoped<ITransactionQueueDispatcher, TransactionQueueDispatcher>();
                     services.AddLogging();
-                    services.AddSingleton(typeof(ILogger), typeof(Logger<B2BCimHttpTrigger>));
 
                     services.AddSingleton<IRequestResponseLogging>(s =>
                         {
