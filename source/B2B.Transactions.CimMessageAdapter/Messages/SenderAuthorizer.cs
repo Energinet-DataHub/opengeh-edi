@@ -16,23 +16,23 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using B2B.CimMessageAdapter.Errors;
-using Energinet.DataHub.Core.App.Common.Abstractions.Actor;
+using B2B.Transactions.Infrastructure.Authentication.MarketActors;
 
 namespace B2B.CimMessageAdapter.Messages
 {
     public class SenderAuthorizer
     {
         private const string EnergySupplierRole = "DDQ";
-        private readonly IActorContext _actorContext;
+        private readonly MarketActorAuthenticator _marketActorAuthenticator;
         private readonly List<ValidationError> _validationErrors = new();
         private readonly Dictionary<string, string> _rolesMap = new(StringComparer.OrdinalIgnoreCase)
         {
             { "DDQ", "electricalsupplier" },
         };
 
-        public SenderAuthorizer(IActorContext actorContext)
+        public SenderAuthorizer(MarketActorAuthenticator marketActorAuthenticator)
         {
-            _actorContext = actorContext ?? throw new ArgumentNullException(nameof(actorContext));
+            _marketActorAuthenticator = marketActorAuthenticator ?? throw new ArgumentNullException(nameof(marketActorAuthenticator));
         }
 
         public Task<Result> AuthorizeAsync(string senderId, string senderRole)
@@ -55,7 +55,7 @@ namespace B2B.CimMessageAdapter.Messages
                 return;
             }
 
-            if (_actorContext.CurrentActor!.Roles.Contains(nameOfRoleClaim, StringComparison.CurrentCultureIgnoreCase) == false)
+            if (_marketActorAuthenticator.CurrentIdentity.HasRole(nameOfRoleClaim) == false)
             {
                 _validationErrors.Add(new AuthenticatedUserDoesNotHoldRequiredRoleType());
             }
@@ -71,7 +71,7 @@ namespace B2B.CimMessageAdapter.Messages
 
         private void EnsureSenderIdMatches(string senderId)
         {
-            if (_actorContext.CurrentActor!.Identifier.Equals(senderId, StringComparison.OrdinalIgnoreCase) == false)
+            if (_marketActorAuthenticator.CurrentIdentity.ActorIdentifier.Equals(senderId, StringComparison.OrdinalIgnoreCase) == false)
             {
                 _validationErrors.Add(new SenderIdDoesNotMatchAuthenticatedUser());
             }

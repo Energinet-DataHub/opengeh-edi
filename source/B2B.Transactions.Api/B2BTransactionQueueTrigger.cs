@@ -21,41 +21,42 @@ using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace B2B.Transactions.Api;
-
-public class B2BTransactionQueueTrigger
+namespace B2B.Transactions.Api
 {
-    private readonly ILogger _logger;
-    private readonly ICorrelationContext _correlationContext;
-    private readonly RegisterTransaction _registerTransaction;
-    private readonly IJsonSerializer _jsonSerializer;
-
-    public B2BTransactionQueueTrigger(
-        ILogger logger,
-        ICorrelationContext correlationContext,
-        RegisterTransaction registerTransaction,
-        IJsonSerializer jsonSerializer)
+    public class B2BTransactionQueueTrigger
     {
-        _logger = logger;
-        _correlationContext = correlationContext;
-        _registerTransaction = registerTransaction;
-        _jsonSerializer = jsonSerializer;
-    }
+        private readonly ILogger _logger;
+        private readonly ICorrelationContext _correlationContext;
+        private readonly RegisterTransaction _registerTransaction;
+        private readonly IJsonSerializer _jsonSerializer;
 
-    [Function("B2BTransactionQueueTrigger")]
-    public async Task RunAsync(
-        [ServiceBusTrigger("%MARKET_DATA_QUEUE_NAME%", Connection = "MARKET_DATA_QUEUE_CONNECTION_STRING")] byte[] data,
-        FunctionContext context)
-    {
-        if (data == null) throw new ArgumentNullException(nameof(data));
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        public B2BTransactionQueueTrigger(
+            ILogger logger,
+            ICorrelationContext correlationContext,
+            RegisterTransaction registerTransaction,
+            IJsonSerializer jsonSerializer)
+        {
+            _logger = logger;
+            _correlationContext = correlationContext;
+            _registerTransaction = registerTransaction;
+            _jsonSerializer = jsonSerializer;
+        }
 
-        var byteAsString = Encoding.UTF8.GetString(data);
+        [Function("B2BTransactionQueueTrigger")]
+        public async Task RunAsync(
+            [ServiceBusTrigger("%MARKET_DATA_QUEUE_NAME%", Connection = "MARKET_DATA_QUEUE_CONNECTION_STRING")] byte[] data,
+            FunctionContext context)
+        {
+            if (data == null) throw new ArgumentNullException(nameof(data));
+            if (context == null) throw new ArgumentNullException(nameof(context));
 
-        await _registerTransaction.HandleAsync(
-            _jsonSerializer.Deserialize<B2BTransaction>(byteAsString))
-            .ConfigureAwait(false);
+            var byteAsString = Encoding.UTF8.GetString(data);
 
-        _logger.LogInformation("B2B transaction dequeued with correlation id: {correlationId}", _correlationContext.Id);
+            await _registerTransaction.HandleAsync(
+                    _jsonSerializer.Deserialize<B2BTransaction>(byteAsString))
+                .ConfigureAwait(false);
+
+            _logger.LogInformation("B2B transaction dequeued with correlation id: {correlationId}", _correlationContext.Id);
+        }
     }
 }

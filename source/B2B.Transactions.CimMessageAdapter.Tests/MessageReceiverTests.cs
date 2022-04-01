@@ -13,12 +13,15 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using B2B.CimMessageAdapter.Messages;
 using B2B.CimMessageAdapter.Tests.Messages;
 using B2B.CimMessageAdapter.Tests.Stubs;
+using B2B.Transactions.Infrastructure.Authentication.MarketActors;
 using B2B.Transactions.Xml.Incoming;
 using Xunit;
 
@@ -26,10 +29,24 @@ namespace B2B.CimMessageAdapter.Tests
 {
     public class MessageReceiverTests
     {
-        private readonly ActorContextStub _actorContextStub = new();
+        private readonly List<Claim> _claims = new List<Claim>()
+        {
+            new("azp", Guid.NewGuid().ToString()),
+            new("actorid", "5799999933318"),
+            new("actoridtype", "GLN"),
+            new("role", "balanceresponsibleparty"),
+            new("role", "electricalsupplier"),
+        };
+
+        private readonly MarketActorAuthenticator _marketActorAuthenticator = new();
         private readonly TransactionIdsStub _transactionIdsStub = new();
         private readonly MessageIdsStub _messageIdsStub = new();
         private TransactionQueueDispatcherStub _transactionQueueDispatcherSpy = new();
+
+        public MessageReceiverTests()
+        {
+            _marketActorAuthenticator.Authenticate(CreateIdentity());
+        }
 
         [Fact]
         public async Task Receiver_id_must_be_known()
@@ -74,7 +91,7 @@ namespace B2B.CimMessageAdapter.Tests
         [Fact]
         public async Task Authenticated_user_must_hold_the_role_type_as_specified_in_message()
         {
-            _actorContextStub.RemoveAllRolesFromCurrentActor();
+            _marketActorAuthenticator.Authenticate(CreateIdentityWithoutRoles());
             await using var message = BusinessMessageBuilder
                 .RequestChangeOfSupplier()
                 .Message();
@@ -87,7 +104,7 @@ namespace B2B.CimMessageAdapter.Tests
         [Fact]
         public async Task Sender_id_must_match_the_organization_of_the_current_authenticated_user()
         {
-            _actorContextStub.UseInvalidActor();
+            _marketActorAuthenticator.Authenticate(CreateIdentity("Unknown_actor_identifier"));
             await using var message = BusinessMessageBuilder
                 .RequestChangeOfSupplier()
                 .Message();
@@ -188,6 +205,11 @@ namespace B2B.CimMessageAdapter.Tests
             Assert.Empty(_transactionQueueDispatcherSpy.CommittedItems);
         }
 
+        private static ClaimsPrincipal CreateClaimsPrincipal(IEnumerable<Claim> claims)
+        {
+            return new ClaimsPrincipal(new ClaimsIdentity(claims));
+        }
+
         private static Stream CreateMessageWithInvalidXmlStructure()
         {
             var messageStream = new MemoryStream();
@@ -211,14 +233,14 @@ namespace B2B.CimMessageAdapter.Tests
         private MessageReceiver CreateMessageReceiver()
         {
             _transactionQueueDispatcherSpy = new TransactionQueueDispatcherStub();
-            var messageReceiver = new MessageReceiver(_messageIdsStub, _transactionQueueDispatcherSpy, _transactionIdsStub, new SchemaProvider(new SchemaStore()), _actorContextStub);
+            var messageReceiver = new MessageReceiver(_messageIdsStub, _transactionQueueDispatcherSpy, _transactionIdsStub, new SchemaProvider(new SchemaStore()), _marketActorAuthenticator);
             return messageReceiver;
         }
 
         private MessageReceiver CreateMessageReceiver(IMessageIds messageIds)
         {
             _transactionQueueDispatcherSpy = new TransactionQueueDispatcherStub();
-            var messageReceiver = new MessageReceiver(messageIds, _transactionQueueDispatcherSpy, _transactionIdsStub, new SchemaProvider(new SchemaStore()), _actorContextStub);
+            var messageReceiver = new MessageReceiver(messageIds, _transactionQueueDispatcherSpy, _transactionIdsStub, new SchemaProvider(new SchemaStore()), _marketActorAuthenticator);
             return messageReceiver;
         }
 
@@ -236,6 +258,26 @@ namespace B2B.CimMessageAdapter.Tests
                 await CreateMessageReceiver(messageIds).ReceiveAsync(message, "requestchangeofsupplier", "1.0")
                     .ConfigureAwait(false);
             }
+        }
+
+        private ClaimsPrincipal CreateIdentity()
+        {
+            return new ClaimsPrincipal(new ClaimsIdentity(_claims));
+        }
+
+        private ClaimsPrincipal CreateIdentity(string actorIdentifier)
+        {
+            var claims = _claims.ToList();
+            claims.Remove(claims.Find(claim => claim.Type.Equals("actorid", StringComparison.OrdinalIgnoreCase))!);
+            claims.Add(new Claim("actorid", actorIdentifier));
+            return new ClaimsPrincipal(new ClaimsIdentity(claims));
+        }
+
+        private ClaimsPrincipal CreateIdentityWithoutRoles()
+        {
+            var claims = _claims.ToList();
+            claims.RemoveAll(claim => claim.Type.Equals("role", StringComparison.OrdinalIgnoreCase));
+            return CreateClaimsPrincipal(claims);
         }
     }
 }

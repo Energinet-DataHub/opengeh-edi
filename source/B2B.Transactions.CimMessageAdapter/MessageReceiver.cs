@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using B2B.CimMessageAdapter.Errors;
 using B2B.CimMessageAdapter.Messages;
 using B2B.CimMessageAdapter.Transactions;
+using B2B.Transactions.Infrastructure.Authentication.MarketActors;
 using B2B.Transactions.Messages;
 using B2B.Transactions.Transactions;
 using B2B.Transactions.Xml.Incoming;
@@ -34,16 +35,16 @@ namespace B2B.CimMessageAdapter
         private readonly ITransactionQueueDispatcher _transactionQueueDispatcher;
         private readonly ITransactionIds _transactionIds;
         private readonly ISchemaProvider _schemaProvider;
-        private readonly IActorContext _actorContext;
+        private readonly MarketActorAuthenticator _marketActorAuthenticator;
 
-        public MessageReceiver(IMessageIds messageIds, ITransactionQueueDispatcher transactionQueueDispatcher, ITransactionIds transactionIds, ISchemaProvider schemaProvider, IActorContext actorContext)
+        public MessageReceiver(IMessageIds messageIds, ITransactionQueueDispatcher transactionQueueDispatcher, ITransactionIds transactionIds, ISchemaProvider schemaProvider, MarketActorAuthenticator marketActorAuthenticator)
         {
             _messageIds = messageIds ?? throw new ArgumentNullException(nameof(messageIds));
             _transactionQueueDispatcher = transactionQueueDispatcher ??
                                              throw new ArgumentNullException(nameof(transactionQueueDispatcher));
             _transactionIds = transactionIds;
             _schemaProvider = schemaProvider ?? throw new ArgumentNullException(nameof(schemaProvider));
-            _actorContext = actorContext ?? throw new ArgumentNullException(nameof(actorContext));
+            _marketActorAuthenticator = marketActorAuthenticator ?? throw new ArgumentNullException(nameof(marketActorAuthenticator));
         }
 
         public async Task<Result> ReceiveAsync(Stream message, string businessProcessType, string version)
@@ -116,7 +117,7 @@ namespace B2B.CimMessageAdapter
         private async Task AuthorizeSenderAsync(MessageHeader messageHeader)
         {
             if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
-            var authorizer = new SenderAuthorizer(_actorContext);
+            var authorizer = new SenderAuthorizer(_marketActorAuthenticator);
             var result = await authorizer.AuthorizeAsync(messageHeader.SenderId, messageHeader.SenderRole).ConfigureAwait(false);
             _errors.AddRange(result.Errors);
         }
