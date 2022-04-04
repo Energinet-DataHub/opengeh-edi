@@ -42,7 +42,6 @@ namespace B2B.Transactions.Infrastructure
         {
             _services = services;
             services.AddSingleton<IJsonSerializer, JsonSerializer>();
-            UseCorrelationContext(services);
             services.AddScoped<ITransactionIds, TransactionIdRegistry>();
             services.AddScoped<IMessageIds, MessageIdRegistry>();
             services.AddScoped<IDocumentProvider<IMessage>, AcceptDocumentProvider>();
@@ -80,6 +79,12 @@ namespace B2B.Transactions.Infrastructure
             return this;
         }
 
+        public CompositionRoot AddCorrelationContext(Func<IServiceProvider, ICorrelationContext> action)
+        {
+            _services.AddScoped(action);
+            return this;
+        }
+
         private static void AddXmlSchema(IServiceCollection services)
         {
             services.AddScoped<SchemaStore>();
@@ -105,21 +110,6 @@ namespace B2B.Transactions.Infrastructure
                 var connectionString = Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_CONNECTION_STRING");
                 var topicName = Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_NAME");
                 return new ServiceBusClient(connectionString).CreateSender(topicName);
-            });
-        }
-
-        private static void UseCorrelationContext(IServiceCollection services)
-        {
-            services.AddScoped<ICorrelationContext, CorrelationContext>(sp =>
-            {
-                var correlationContext = new CorrelationContext();
-                if (IsRunningLocally())
-                {
-                    correlationContext.SetId(Guid.NewGuid().ToString());
-                    correlationContext.SetParentId(Guid.NewGuid().ToString());
-                }
-
-                return correlationContext;
             });
         }
 

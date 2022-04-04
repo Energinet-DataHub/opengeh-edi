@@ -20,6 +20,7 @@ using B2B.Transactions.Infrastructure.Authentication.Bearer;
 using B2B.Transactions.Infrastructure.Authentication.MarketActors;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common;
+using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -48,7 +49,16 @@ namespace B2B.Transactions.Api
                         .AddBearerAuthentication(tokenValidationParameters)
                         .AddDatabaseConnectionFactory(
                             Environment.GetEnvironmentVariable("MARKET_DATA_DB_CONNECTION_STRING")!)
-                        .AddSystemClock(new SystemDateTimeProvider());
+                        .AddSystemClock(new SystemDateTimeProvider())
+                        .AddCorrelationContext(sp =>
+                        {
+                            var correlationContext = new CorrelationContext();
+                            if (!IsRunningLocally()) return correlationContext;
+                            correlationContext.SetId(Guid.NewGuid().ToString());
+                            correlationContext.SetParentId(Guid.NewGuid().ToString());
+
+                            return correlationContext;
+                        });
                 })
                 .Build();
 
