@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Runtime.CompilerServices;
 using Azure.Messaging.ServiceBus;
 using B2B.CimMessageAdapter;
 using B2B.CimMessageAdapter.Messages;
@@ -47,7 +46,6 @@ namespace B2B.Transactions.Infrastructure
             services.AddScoped<IDocumentProvider<IMessage>, AcceptDocumentProvider>();
             services.AddScoped<ITransactionQueueDispatcher, TransactionQueueDispatcher>();
             services.AddLogging();
-            ConfigureRequestLogging(services);
             AddXmlSchema(services);
         }
 
@@ -90,22 +88,24 @@ namespace B2B.Transactions.Infrastructure
             return this;
         }
 
+        public CompositionRoot AddRequestLogging(string blobStorageConnectionString, string storageContainerName)
+        {
+            if (blobStorageConnectionString == null) throw new ArgumentNullException(nameof(blobStorageConnectionString));
+            if (storageContainerName == null) throw new ArgumentNullException(nameof(storageContainerName));
+            _services.AddSingleton<IRequestResponseLogging>(s =>
+            {
+                var factory = s.GetService<ILoggerFactory>();
+                var logger = factory.CreateLogger<RequestResponseLoggingBlobStorage>();
+                return new RequestResponseLoggingBlobStorage(blobStorageConnectionString, storageContainerName, logger);
+            });
+            return this;
+        }
+
         private static void AddXmlSchema(IServiceCollection services)
         {
             services.AddScoped<SchemaStore>();
             services.AddScoped<ISchemaProvider, SchemaProvider>();
             services.AddScoped<MessageReceiver>();
-        }
-
-        private static void ConfigureRequestLogging(IServiceCollection services)
-        {
-            services.AddSingleton<IRequestResponseLogging>(s =>
-            {
-                var logger = services.BuildServiceProvider().GetService<ILogger<RequestResponseLoggingBlobStorage>>();
-                var storage = new RequestResponseLoggingBlobStorage(
-                    Environment.GetEnvironmentVariable("REQUEST_RESPONSE_LOGGING_CONNECTION_STRING") ?? throw new InvalidOperationException(), Environment.GetEnvironmentVariable("REQUEST_RESPONSE_LOGGING_CONTAINER_NAME") ?? throw new InvalidOperationException(), logger ?? throw new InvalidOperationException());
-                return storage;
-            });
         }
 
         private static bool IsRunningLocally()
