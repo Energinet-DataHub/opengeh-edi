@@ -82,7 +82,11 @@ namespace B2B.Transactions.Api
             services.AddLogging();
 
             ConfigureRequestLogging(services);
-            services.AddScoped<RequestResponseLoggingMiddleware>();
+            ConfigureDatabaseConnectionFactory(services);
+        }
+
+        private static void ConfigureDatabaseConnectionFactory(IServiceCollection services)
+        {
             services.AddScoped<IDbConnectionFactory>(_ =>
             {
                 var connectionString = Environment.GetEnvironmentVariable("MARKET_DATA_DB_CONNECTION_STRING");
