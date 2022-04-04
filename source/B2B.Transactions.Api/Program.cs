@@ -46,7 +46,9 @@ namespace B2B.Transactions.Api
                 {
                     CompositionRoot.Initialize(services)
                         .AddBearerAuthentication(tokenValidationParameters)
-                        .AddDatabaseConnectionFactory(Environment.GetEnvironmentVariable("MARKET_DATA_DB_CONNECTION_STRING")!);
+                        .AddDatabaseConnectionFactory(
+                            Environment.GetEnvironmentVariable("MARKET_DATA_DB_CONNECTION_STRING")!)
+                        .AddSystemClock(new SystemDateTimeProvider());
                 })
                 .Build();
 

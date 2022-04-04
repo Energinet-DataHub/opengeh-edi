@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Runtime.CompilerServices;
 using Azure.Messaging.ServiceBus;
 using B2B.CimMessageAdapter;
 using B2B.CimMessageAdapter.Messages;
@@ -40,7 +41,6 @@ namespace B2B.Transactions.Infrastructure
         private CompositionRoot(IServiceCollection services)
         {
             _services = services;
-            services.AddScoped<ISystemDateTimeProvider, SystemDateTimeProvider>();
             services.AddSingleton<IJsonSerializer, JsonSerializer>();
             UseCorrelationContext(services);
             services.AddScoped<ITransactionIds, TransactionIdRegistry>();
@@ -56,6 +56,13 @@ namespace B2B.Transactions.Infrastructure
         public static CompositionRoot Initialize(IServiceCollection services)
         {
             return new CompositionRoot(services);
+        }
+
+        public CompositionRoot AddSystemClock(ISystemDateTimeProvider provider)
+        {
+            if (provider == null) throw new ArgumentNullException(nameof(provider));
+            _services.AddScoped(sp => provider);
+            return this;
         }
 
         public CompositionRoot AddBearerAuthentication(TokenValidationParameters tokenValidationParameters)
