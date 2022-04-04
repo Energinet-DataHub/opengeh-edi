@@ -31,7 +31,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
-namespace B2B.Transactions.Infrastructure
+namespace B2B.Transactions.Infrastructure.Configuration
 {
     public class CompositionRoot
     {

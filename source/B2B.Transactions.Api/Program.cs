@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using B2B.Transactions.Infrastructure;
 using B2B.Transactions.Infrastructure.Authentication.Bearer;
 using B2B.Transactions.Infrastructure.Authentication.MarketActors;
+using B2B.Transactions.Infrastructure.Configuration;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common;
 using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
