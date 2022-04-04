@@ -81,16 +81,7 @@ namespace B2B.Transactions.Api
             services.AddScoped<ITransactionQueueDispatcher, TransactionQueueDispatcher>();
             services.AddLogging();
 
-            services.AddSingleton<IRequestResponseLogging>(s =>
-            {
-                var logger = services.BuildServiceProvider().GetService<ILogger<RequestResponseLoggingBlobStorage>>();
-                var storage = new RequestResponseLoggingBlobStorage(
-                    Environment.GetEnvironmentVariable("REQUEST_RESPONSE_LOGGING_CONNECTION_STRING") ??
-                    throw new InvalidOperationException(),
-                    Environment.GetEnvironmentVariable("REQUEST_RESPONSE_LOGGING_CONTAINER_NAME") ?? throw new InvalidOperationException(),
-                    logger ?? throw new InvalidOperationException());
-                return storage;
-            });
+            ConfigureRequestLogging(services);
             services.AddScoped<RequestResponseLoggingMiddleware>();
             services.AddScoped<IDbConnectionFactory>(_ =>
             {
@@ -101,6 +92,17 @@ namespace B2B.Transactions.Api
                 }
 
                 return new SqlDbConnectionFactory(connectionString);
+            });
+        }
+
+        private static void ConfigureRequestLogging(IServiceCollection services)
+        {
+            services.AddSingleton<IRequestResponseLogging>(s =>
+            {
+                var logger = services.BuildServiceProvider().GetService<ILogger<RequestResponseLoggingBlobStorage>>();
+                var storage = new RequestResponseLoggingBlobStorage(
+                    Environment.GetEnvironmentVariable("REQUEST_RESPONSE_LOGGING_CONNECTION_STRING") ?? throw new InvalidOperationException(), Environment.GetEnvironmentVariable("REQUEST_RESPONSE_LOGGING_CONTAINER_NAME") ?? throw new InvalidOperationException(), logger ?? throw new InvalidOperationException());
+                return storage;
             });
         }
 
