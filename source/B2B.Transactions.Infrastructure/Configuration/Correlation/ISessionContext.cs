@@ -12,15 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-
-namespace B2B.Transactions.Infrastructure.Authentication.MarketActors
+namespace B2B.Transactions.Infrastructure.Configuration.Correlation
 {
-    public class Authenticated : MarketActorIdentity
+    /// <summary>
+    /// Context for the session.
+    /// </summary>
+    public interface ISessionContext
     {
-        public Authenticated(string id, string actorIdentifier, IdentifierType actorIdentifierType, IEnumerable<string> roles)
-            : base(id, actorIdentifier, actorIdentifierType, roles)
-        {
-        }
+        /// <summary>
+        /// Get the current session id.
+        /// </summary>
+        string Id { get; }
+
+        /// <summary>
+        /// Set the current session id.
+        /// </summary>
+        void SetId(string id);
     }
 }

@@ -14,28 +14,29 @@
 
 using System;
 using System.Threading.Tasks;
+using B2B.CimMessageAdapter.Messages;
+using B2B.Transactions.DataAccess;
 using Dapper;
-using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
 
-namespace B2B.CimMessageAdapter.Messages
+namespace B2B.Transactions.Infrastructure.Messages
 {
-    public class TransactionIdRegistry : ITransactionIds
+    public class MessageIdRegistry : IMessageIds
     {
         private readonly IDbConnectionFactory _connectionFactory;
 
-        public TransactionIdRegistry(IDbConnectionFactory connectionFactory)
+        public MessageIdRegistry(IDbConnectionFactory connectionFactory)
         {
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
         }
 
-        public async Task<bool> TryStoreAsync(string transactionId)
+        public async Task<bool> TryStoreAsync(string messageId)
         {
             var connection = _connectionFactory.GetOpenConnection();
 
             var result = await connection.ExecuteAsync(
-                    $"IF NOT EXISTS (SELECT * FROM dbo.TransactionIds WHERE TransactionId = @TransactionId)" +
-                    $"INSERT INTO dbo.TransactionIds(TransactionId) VALUES(@TransactionId)",
-                    new { TransactionId = transactionId })
+                    $"IF NOT EXISTS (SELECT * FROM dbo.MessageIds WHERE MessageId = @MessageId)" +
+                    $"INSERT INTO dbo.MessageIds(MessageId) VALUES(@MessageId)",
+                    new { MessageId = messageId })
                 .ConfigureAwait(false);
 
             return result == 1;

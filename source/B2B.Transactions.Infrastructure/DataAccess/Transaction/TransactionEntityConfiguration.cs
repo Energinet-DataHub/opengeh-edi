@@ -12,32 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using B2B.Transactions.DataAccess.Transaction;
 using B2B.Transactions.Transactions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace B2B.Transactions.DataAccess
+namespace B2B.Transactions.Infrastructure.DataAccess.Transaction
 {
-    public class B2BContext : DbContext
+    internal class TransactionEntityConfiguration : IEntityTypeConfiguration<AcceptedTransaction>
     {
-        #nullable disable
-        public B2BContext(DbContextOptions<B2BContext> options)
-            : base(options)
+        public void Configure(EntityTypeBuilder<AcceptedTransaction> builder)
         {
-        }
-
-        public B2BContext()
-        {
-        }
-
-        public DbSet<AcceptedTransaction> Transactions { get; private set; }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
-
-            modelBuilder.ApplyConfiguration(new TransactionEntityConfiguration());
+            builder.ToTable("Transactions", "dbo");
+            builder.HasKey(x => x.TransactionId);
         }
     }
 }
