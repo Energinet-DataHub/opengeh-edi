@@ -17,6 +17,7 @@ using Azure.Messaging.ServiceBus;
 using B2B.CimMessageAdapter;
 using B2B.CimMessageAdapter.Messages;
 using B2B.CimMessageAdapter.Transactions;
+using B2B.Transactions.Authentication;
 using B2B.Transactions.DataAccess;
 using B2B.Transactions.Infrastructure.Authentication.Bearer;
 using B2B.Transactions.Infrastructure.Authentication.MarketActors;
@@ -68,7 +69,7 @@ namespace B2B.Transactions.Infrastructure.Configuration
         {
             _services.AddScoped<CurrentClaimsPrincipal>();
             _services.AddScoped(sp => new JwtTokenParser(tokenValidationParameters));
-            _services.AddScoped<MarketActorAuthenticator>();
+            _services.AddScoped<IMarketActorAuthenticator, MarketActorAuthenticator>();
             return this;
         }
 
