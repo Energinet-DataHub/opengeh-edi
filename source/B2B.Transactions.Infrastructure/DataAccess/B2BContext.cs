@@ -13,11 +13,11 @@
 // limitations under the License.
 
 using System;
-using B2B.Transactions.DataAccess.Transaction;
-using B2B.Transactions.Transactions;
+using B2B.Transactions.Infrastructure.DataAccess.Transaction;
+using B2B.Transactions.UseCases;
 using Microsoft.EntityFrameworkCore;
 
-namespace B2B.Transactions.DataAccess
+namespace B2B.Transactions.Infrastructure.DataAccess
 {
     public class B2BContext : DbContext
     {

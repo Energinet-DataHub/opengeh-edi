@@ -12,16 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.IO;
-using System.Text;
-
-namespace B2B.Transactions.Transactions
+namespace B2B.Transactions.UseCases
 {
-    public class Utf8StringWriter : StringWriter
+    public class AcceptedTransaction
     {
-        public override Encoding Encoding
+        public AcceptedTransaction(string transactionId)
         {
-            get { return Encoding.UTF8; }
+            TransactionId = transactionId;
         }
+
+        public string TransactionId { get; }
     }
 }

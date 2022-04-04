@@ -12,20 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using B2B.Transactions.UseCases;
+using System;
 
-namespace B2B.Transactions.Xml.Outgoing
+namespace B2B.Transactions.Authentication
 {
-    /// <summary>
-    /// Provides outgoing xml documents
-    /// </summary>
-    public interface IDocumentProvider<out TMessage>
+    public class NotAuthenticated : MarketActorIdentity
     {
-        /// <summary>
-        /// Creates an outgoing Messages
-        /// </summary>
-        /// <param name="transaction"></param>
-        /// <returns><see cref="AcceptDocumentProvider"/></returns>
-        TMessage CreateMessage(B2BTransaction transaction);
+        public NotAuthenticated()
+            : base("NotSet", "NotSet", IdentifierType.Eic, Array.Empty<string>())
+        {
+        }
     }
 }

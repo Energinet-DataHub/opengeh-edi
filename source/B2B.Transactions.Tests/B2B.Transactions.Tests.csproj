@@ -23,6 +23,7 @@ limitations under the License.
 
     <ItemGroup>
         <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="2.0.0" />
+        <PackageReference Include="EntityFrameworkCore.SqlServer.NodaTime" Version="5.0.1" />
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Core" Version="1.4.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
         <PackageReference Include="SimpleInjector" Version="5.3.2" />
@@ -39,8 +40,10 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\B2B.Transactions.CimMessageAdapter\B2B.Transactions.CimMessageAdapter.csproj" />
+      <ProjectReference Include="..\B2B.Transactions.Infrastructure\B2B.Transactions.Infrastructure.csproj" />
+      <ProjectReference Include="..\B2B.Transactions\B2B.Transactions.csproj" />
       <ProjectReference Include="..\Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp\Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.csproj" />
+      <ProjectReference Include="..\Energinet.DataHub.MarketRoles.Domain\Energinet.DataHub.MarketRoles.Domain.csproj" />
     </ItemGroup>
 
 </Project>

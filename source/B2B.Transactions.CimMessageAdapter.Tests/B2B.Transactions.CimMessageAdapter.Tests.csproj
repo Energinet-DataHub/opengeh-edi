@@ -50,10 +50,6 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\B2B.Transactions.CimMessageAdapter\B2B.Transactions.CimMessageAdapter.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
       <EmbeddedResource Include="Messages\RequestChangeOfSupplier.xml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
@@ -63,6 +59,11 @@ limitations under the License.
       <None Remove="urn-entsoe-eu-local-extension-types.xsd" />
       <None Remove="urn-entsoe-eu-wgedi-codelists.xsd" />
       <None Remove="ValidRequestChangeOfSupplier.xml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\B2B.Transactions.CimMessageAdapter\B2B.Transactions.CimMessageAdapter.csproj" />
+      <ProjectReference Include="..\B2B.Transactions.Infrastructure\B2B.Transactions.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

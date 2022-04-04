@@ -13,12 +13,10 @@
 // limitations under the License.
 
 using System;
-using System.Net;
 using System.Threading.Tasks;
+using B2B.Transactions.Authentication;
 using B2B.Transactions.Infrastructure.Authentication.Bearer;
-using Energinet.DataHub.Core.App.Common;
 using Microsoft.Azure.Functions.Worker;
-using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;
 

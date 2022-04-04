@@ -15,7 +15,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace B2B.Transactions.Infrastructure.Authentication.MarketActors
+namespace B2B.Transactions.Authentication
 {
     public abstract class MarketActorIdentity
     {

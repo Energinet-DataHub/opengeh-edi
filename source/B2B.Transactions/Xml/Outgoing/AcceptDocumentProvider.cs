@@ -15,7 +15,7 @@
 using System.Text;
 using System.Xml;
 using B2B.Transactions.OutgoingMessages;
-using B2B.Transactions.Transactions;
+using B2B.Transactions.UseCases;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
 namespace B2B.Transactions.Xml.Outgoing

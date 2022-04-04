@@ -17,16 +17,17 @@ using Azure.Messaging.ServiceBus;
 using B2B.CimMessageAdapter;
 using B2B.CimMessageAdapter.Messages;
 using B2B.CimMessageAdapter.Transactions;
+using B2B.Transactions.DataAccess;
 using B2B.Transactions.Infrastructure.Authentication.Bearer;
 using B2B.Transactions.Infrastructure.Authentication.MarketActors;
+using B2B.Transactions.Infrastructure.Configuration.Correlation;
+using B2B.Transactions.Infrastructure.DataAccess;
 using B2B.Transactions.Infrastructure.Serialization;
 using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.Xml.Incoming;
 using B2B.Transactions.Xml.Outgoing;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
-using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
-using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -40,7 +41,7 @@ namespace B2B.Transactions.Infrastructure.Configuration
         private CompositionRoot(IServiceCollection services)
         {
             _services = services;
-            services.AddSingleton<ISerializer, JsonSerializer>();
+            services.AddSingleton<ISerializer, Serializer>();
             services.AddScoped<ITransactionIds, TransactionIdRegistry>();
             services.AddScoped<IMessageIds, MessageIdRegistry>();
             services.AddScoped<IDocumentProvider<IMessage>, AcceptDocumentProvider>();

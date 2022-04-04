@@ -12,25 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using B2B.Transactions.UseCases;
-
-namespace B2B.CimMessageAdapter.Transactions
+namespace B2B.Transactions.Infrastructure.Configuration.Correlation
 {
     /// <summary>
-    /// Service for dispatching B2B transactions to transaction queue
+    /// Context for the current scope identified by a correlation id.
     /// </summary>
-    public interface ITransactionQueueDispatcher
+    public interface ICorrelationContext
     {
         /// <summary>
-        /// Adds a transaction to collection
+        /// Get the current correlation id.
         /// </summary>
-        /// <param name="transaction"></param>
-        Task AddAsync(B2BTransaction transaction);
+        string Id { get; }
 
         /// <summary>
-        /// Commits added transactions to queue
+        /// Get the parent's id.
         /// </summary>
-        Task CommitAsync();
+        string? ParentId { get; }
+
+        /// <summary>
+        /// Set the current correlation/operation id.
+        /// </summary>
+        void SetId(string id);
+
+        /// <summary>
+        /// Set the id of the parent operation.
+        /// </summary>
+        void SetParentId(string parentId);
+
+        /// <summary>
+        /// Return the id and parent in trace context format.
+        /// </summary>
+        string AsTraceContext();
     }
 }

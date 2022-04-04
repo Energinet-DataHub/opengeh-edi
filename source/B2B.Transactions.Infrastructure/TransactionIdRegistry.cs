@@ -14,10 +14,11 @@
 
 using System;
 using System.Threading.Tasks;
+using B2B.CimMessageAdapter.Messages;
+using B2B.Transactions.DataAccess;
 using Dapper;
-using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
 
-namespace B2B.CimMessageAdapter.Messages
+namespace B2B.Transactions.Infrastructure
 {
     public class TransactionIdRegistry : ITransactionIds
     {

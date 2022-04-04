@@ -15,10 +15,9 @@
 using System;
 using System.Threading.Tasks;
 using B2B.Transactions.OutgoingMessages;
-using B2B.Transactions.Xml.Incoming;
 using B2B.Transactions.Xml.Outgoing;
 
-namespace B2B.Transactions.Transactions
+namespace B2B.Transactions.UseCases
 {
     public class RegisterTransaction
     {

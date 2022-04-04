@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using B2B.Transactions.Transactions;
+using B2B.Transactions.UseCases;
 
-namespace B2B.Transactions.DataAccess.Transaction
+namespace B2B.Transactions.Infrastructure.DataAccess.Transaction
 {
     public class TransactionRepository : ITransactionRepository
     {

@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using B2B.Transactions.Transactions;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.IO;
+using System.Text;
 
-namespace B2B.Transactions.DataAccess.Transaction
+namespace B2B.Transactions.UseCases
 {
-    internal class TransactionEntityConfiguration : IEntityTypeConfiguration<AcceptedTransaction>
+    public class Utf8StringWriter : StringWriter
     {
-        public void Configure(EntityTypeBuilder<AcceptedTransaction> builder)
+        public override Encoding Encoding
         {
-            builder.ToTable("Transactions", "dbo");
-            builder.HasKey(x => x.TransactionId);
+            get { return Encoding.UTF8; }
         }
     }
 }

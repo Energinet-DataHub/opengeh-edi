@@ -12,15 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace B2B.Transactions.Transactions
-{
-    public class AcceptedTransaction
-    {
-        public AcceptedTransaction(string transactionId)
-        {
-            TransactionId = transactionId;
-        }
+using System.Security.Claims;
 
-        public string TransactionId { get; }
+namespace B2B.Transactions.Authentication
+{
+    /// <summary>
+    /// Service for authenticating an market actor
+    /// </summary>
+    public interface IMarketActorAuthenticator
+    {
+        /// <summary>
+        /// Current identity
+        /// </summary>
+        MarketActorIdentity CurrentIdentity { get; }
+
+        /// <summary>
+        /// Authenticates a claims principal
+        /// </summary>
+        /// <param name="claimsPrincipal"></param>
+        void Authenticate(ClaimsPrincipal claimsPrincipal);
     }
 }

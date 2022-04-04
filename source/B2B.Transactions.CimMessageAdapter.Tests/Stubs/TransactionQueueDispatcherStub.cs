@@ -16,7 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using B2B.CimMessageAdapter.Transactions;
-using B2B.Transactions.Transactions;
+using B2B.Transactions.UseCases;
 
 namespace B2B.CimMessageAdapter.Tests.Stubs
 {

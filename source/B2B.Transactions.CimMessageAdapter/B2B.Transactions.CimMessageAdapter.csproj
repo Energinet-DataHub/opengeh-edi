@@ -22,13 +22,10 @@ limitations under the License.
 
     <ItemGroup>
       <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.5.0" />
-      <PackageReference Include="Dapper" Version="2.0.90" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.7" />
-      <PackageReference Include="NodaTime" Version="3.0.5" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\B2B.Transactions\B2B.Transactions.csproj" />
-      <ProjectReference Include="..\Energinet.DataHub.MarketRoles.Infrastructure\Energinet.DataHub.MarketRoles.Infrastructure.csproj" />
     </ItemGroup>
 </Project>

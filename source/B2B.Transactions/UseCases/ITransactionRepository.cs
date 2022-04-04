@@ -14,7 +14,7 @@
 
 using System.Threading.Tasks;
 
-namespace B2B.Transactions.Transactions
+namespace B2B.Transactions.UseCases
 {
     /// <summary>
     /// Storage for transactions

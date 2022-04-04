@@ -12,25 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using B2B.Transactions.Messages;
+using B2B.Transactions.UseCases;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace B2B.Transactions.Transactions
+namespace B2B.Transactions.Infrastructure.DataAccess.Transaction
 {
-    public class B2BTransaction
+    internal class TransactionEntityConfiguration : IEntityTypeConfiguration<AcceptedTransaction>
     {
-        private B2BTransaction(MessageHeader message, MarketActivityRecord marketActivityRecord)
+        public void Configure(EntityTypeBuilder<AcceptedTransaction> builder)
         {
-            Message = message;
-            MarketActivityRecord = marketActivityRecord;
-        }
-
-        public MessageHeader Message { get; }
-
-        public MarketActivityRecord MarketActivityRecord { get; }
-
-        public static B2BTransaction Create(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
-        {
-            return new B2BTransaction(messageHeader, marketActivityRecord);
+            builder.ToTable("Transactions", "dbo");
+            builder.HasKey(x => x.TransactionId);
         }
     }
 }

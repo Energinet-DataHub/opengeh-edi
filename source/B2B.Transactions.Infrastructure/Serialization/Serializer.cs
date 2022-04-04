@@ -24,11 +24,11 @@ namespace B2B.Transactions.Infrastructure.Serialization
     /// <summary>
     /// JSON serializer that specifically support NodaTime's <see cref="NodaTime.Instant"/>.
     /// </summary>
-    public class JsonSerializer : ISerializer
+    public class Serializer : ISerializer
     {
         private readonly JsonSerializerOptions _options;
 
-        public JsonSerializer()
+        public Serializer()
         {
             _options = new JsonSerializerOptions();
             _options.Converters.Add(NodaConverters.InstantConverter);

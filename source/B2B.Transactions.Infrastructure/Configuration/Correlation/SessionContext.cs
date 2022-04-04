@@ -12,20 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using B2B.Transactions.UseCases;
+using System;
 
-namespace B2B.Transactions.Xml.Outgoing
+namespace B2B.Transactions.Infrastructure.Configuration.Correlation
 {
-    /// <summary>
-    /// Provides outgoing xml documents
-    /// </summary>
-    public interface IDocumentProvider<out TMessage>
+    public sealed class SessionContext : ISessionContext
     {
-        /// <summary>
-        /// Creates an outgoing Messages
-        /// </summary>
-        /// <param name="transaction"></param>
-        /// <returns><see cref="AcceptDocumentProvider"/></returns>
-        TMessage CreateMessage(B2BTransaction transaction);
+        private string? _id;
+
+        public string Id => _id ?? throw new InvalidOperationException("Session id not set");
+
+        public void SetId(string id)
+        {
+            _id = id;
+        }
     }
 }

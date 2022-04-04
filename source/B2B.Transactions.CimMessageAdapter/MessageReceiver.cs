@@ -20,11 +20,11 @@ using System.Threading.Tasks;
 using B2B.CimMessageAdapter.Errors;
 using B2B.CimMessageAdapter.Messages;
 using B2B.CimMessageAdapter.Transactions;
-using B2B.Transactions.Infrastructure.Authentication.MarketActors;
+using B2B.Transactions;
+using B2B.Transactions.Authentication;
 using B2B.Transactions.Messages;
-using B2B.Transactions.Transactions;
+using B2B.Transactions.UseCases;
 using B2B.Transactions.Xml.Incoming;
-using Energinet.DataHub.Core.App.Common.Abstractions.Actor;
 
 namespace B2B.CimMessageAdapter
 {
@@ -35,9 +35,9 @@ namespace B2B.CimMessageAdapter
         private readonly ITransactionQueueDispatcher _transactionQueueDispatcher;
         private readonly ITransactionIds _transactionIds;
         private readonly ISchemaProvider _schemaProvider;
-        private readonly MarketActorAuthenticator _marketActorAuthenticator;
+        private readonly IMarketActorAuthenticator _marketActorAuthenticator;
 
-        public MessageReceiver(IMessageIds messageIds, ITransactionQueueDispatcher transactionQueueDispatcher, ITransactionIds transactionIds, ISchemaProvider schemaProvider, MarketActorAuthenticator marketActorAuthenticator)
+        public MessageReceiver(IMessageIds messageIds, ITransactionQueueDispatcher transactionQueueDispatcher, ITransactionIds transactionIds, ISchemaProvider schemaProvider, IMarketActorAuthenticator marketActorAuthenticator)
         {
             _messageIds = messageIds ?? throw new ArgumentNullException(nameof(messageIds));
             _transactionQueueDispatcher = transactionQueueDispatcher ??

@@ -17,18 +17,19 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
 using Azure.Messaging.ServiceBus;
-using B2B.Transactions.Transactions;
-using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
+using B2B.CimMessageAdapter.Transactions;
+using B2B.Transactions.Infrastructure.Serialization;
+using B2B.Transactions.UseCases;
 
-namespace B2B.CimMessageAdapter.Transactions
+namespace B2B.Transactions.Infrastructure
 {
     public class TransactionQueueDispatcher : ITransactionQueueDispatcher
     {
-        private readonly IJsonSerializer _jsonSerializer;
+        private readonly ISerializer _jsonSerializer;
         private readonly List<ServiceBusMessage> _transactionQueue;
         private readonly ServiceBusSender? _serviceBusSender;
 
-        public TransactionQueueDispatcher(IJsonSerializer jsonSerializer, ServiceBusSender? sender)
+        public TransactionQueueDispatcher(ISerializer jsonSerializer, ServiceBusSender? sender)
         {
             _serviceBusSender = sender;
             _jsonSerializer = jsonSerializer;
