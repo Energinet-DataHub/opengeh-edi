@@ -22,8 +22,9 @@ limitations under the License.
         <_FunctionsSkipCleanOutput>true</_FunctionsSkipCleanOutput>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Energinet.DataHub.Core.App.Common.Security" Version="2.0.0" />
-        <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="2.0.0" />
+        <PackageReference Include="AspNetCore.HealthChecks.AzureServiceBus" Version="6.0.3" />
+        <PackageReference Include="Energinet.DataHub.Core.App.Common.Security" Version="2.3.1" />
+        <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="2.3.1" />
         <PackageReference Include="Energinet.DataHub.Core.Logging" Version="1.1.0" />
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Abstractions" Version="1.0.0" />
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.0.13" />
@@ -40,6 +41,10 @@ limitations under the License.
             <CopyToPublishDirectory>Never</CopyToPublishDirectory>
         </None>
         <None Update="local.settings.sample.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+          <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+        </None>
+        <None Update="local.settings.json">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
           <CopyToPublishDirectory>Never</CopyToPublishDirectory>
         </None>
