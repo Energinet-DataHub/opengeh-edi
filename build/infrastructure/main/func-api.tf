@@ -23,6 +23,7 @@ module "func_receiver" {
   app_service_plan_id                       = data.azurerm_key_vault_secret.plan_shared_id.value
   application_insights_instrumentation_key  = data.azurerm_key_vault_secret.appi_instrumentation_key.value
   always_on                                 = true
+  health_check_path                         = "/api/monitor/ready"
   app_settings                              = {
     # Region: Default Values
     WEBSITE_ENABLE_SYNC_UPDATE_SITE                               = true
