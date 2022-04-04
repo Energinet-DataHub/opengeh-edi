@@ -45,7 +45,6 @@ namespace B2B.Transactions.Infrastructure
             services.AddScoped<ITransactionIds, TransactionIdRegistry>();
             services.AddScoped<IMessageIds, MessageIdRegistry>();
             services.AddScoped<IDocumentProvider<IMessage>, AcceptDocumentProvider>();
-            ConfigureTransactionQueue(services);
             services.AddScoped<ITransactionQueueDispatcher, TransactionQueueDispatcher>();
             services.AddLogging();
             ConfigureRequestLogging(services);
@@ -85,6 +84,12 @@ namespace B2B.Transactions.Infrastructure
             return this;
         }
 
+        public CompositionRoot AddTransactionQueue(string connectionString, string queueName)
+        {
+            _services.AddSingleton<ServiceBusSender>(serviceProvider => new ServiceBusClient(connectionString).CreateSender(queueName));
+            return this;
+        }
+
         private static void AddXmlSchema(IServiceCollection services)
         {
             services.AddScoped<SchemaStore>();
@@ -100,16 +105,6 @@ namespace B2B.Transactions.Infrastructure
                 var storage = new RequestResponseLoggingBlobStorage(
                     Environment.GetEnvironmentVariable("REQUEST_RESPONSE_LOGGING_CONNECTION_STRING") ?? throw new InvalidOperationException(), Environment.GetEnvironmentVariable("REQUEST_RESPONSE_LOGGING_CONTAINER_NAME") ?? throw new InvalidOperationException(), logger ?? throw new InvalidOperationException());
                 return storage;
-            });
-        }
-
-        private static void ConfigureTransactionQueue(IServiceCollection services)
-        {
-            services.AddSingleton<ServiceBusSender>(serviceProvider =>
-            {
-                var connectionString = Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_CONNECTION_STRING");
-                var topicName = Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_NAME");
-                return new ServiceBusClient(connectionString).CreateSender(topicName);
             });
         }
 

@@ -58,7 +58,10 @@ namespace B2B.Transactions.Api
                             correlationContext.SetParentId(Guid.NewGuid().ToString());
 
                             return correlationContext;
-                        });
+                        })
+                        .AddTransactionQueue(
+                            Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_CONNECTION_STRING")!,
+                            Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_NAME")!);
                 })
                 .Build();
 
