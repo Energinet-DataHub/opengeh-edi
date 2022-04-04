@@ -22,6 +22,7 @@ using B2B.Transactions.Infrastructure.Authentication.Bearer;
 using B2B.Transactions.Infrastructure.Authentication.MarketActors;
 using B2B.Transactions.Infrastructure.Configuration.Correlation;
 using B2B.Transactions.Infrastructure.DataAccess;
+using B2B.Transactions.Infrastructure.Messages;
 using B2B.Transactions.Infrastructure.Serialization;
 using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.Xml.Incoming;
