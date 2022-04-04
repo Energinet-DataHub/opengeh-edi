@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace B2B.Transactions.UseCases
+namespace B2B.Transactions.Transactions
 {
     public class AcceptedTransaction
     {

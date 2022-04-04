@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using B2B.Transactions.UseCases;
+using B2B.Transactions.Transactions;
 
 namespace B2B.Transactions.Infrastructure.DataAccess.Transaction
 {

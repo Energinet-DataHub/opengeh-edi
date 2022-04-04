@@ -15,7 +15,7 @@
 using System.IO;
 using System.Text;
 
-namespace B2B.Transactions.UseCases
+namespace B2B.Transactions.Transactions
 {
     public class Utf8StringWriter : StringWriter
     {

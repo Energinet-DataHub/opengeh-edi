@@ -20,7 +20,7 @@ using B2B.Transactions.Infrastructure.DataAccess.Transaction;
 using B2B.Transactions.Messages;
 using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.Tests.Tooling;
-using B2B.Transactions.UseCases;
+using B2B.Transactions.Transactions;
 using B2B.Transactions.Xml.Outgoing;
 using Xunit;
 

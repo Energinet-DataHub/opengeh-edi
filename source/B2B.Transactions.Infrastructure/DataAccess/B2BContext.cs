@@ -14,7 +14,7 @@
 
 using System;
 using B2B.Transactions.Infrastructure.DataAccess.Transaction;
-using B2B.Transactions.UseCases;
+using B2B.Transactions.Transactions;
 using Microsoft.EntityFrameworkCore;
 
 namespace B2B.Transactions.Infrastructure.DataAccess

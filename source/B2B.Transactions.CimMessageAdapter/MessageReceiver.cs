@@ -23,7 +23,7 @@ using B2B.CimMessageAdapter.Transactions;
 using B2B.Transactions;
 using B2B.Transactions.Authentication;
 using B2B.Transactions.Messages;
-using B2B.Transactions.UseCases;
+using B2B.Transactions.Transactions;
 using B2B.Transactions.Xml.Incoming;
 
 namespace B2B.CimMessageAdapter

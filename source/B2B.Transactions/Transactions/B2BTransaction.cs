@@ -14,7 +14,7 @@
 
 using B2B.Transactions.Messages;
 
-namespace B2B.Transactions.UseCases
+namespace B2B.Transactions.Transactions
 {
     public class B2BTransaction
     {
