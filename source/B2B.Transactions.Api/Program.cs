@@ -15,26 +15,12 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Threading.Tasks;
-using Azure.Messaging.ServiceBus;
-using B2B.CimMessageAdapter;
-using B2B.CimMessageAdapter.Messages;
-using B2B.CimMessageAdapter.Transactions;
+using B2B.Transactions.Infrastructure;
 using B2B.Transactions.Infrastructure.Authentication.Bearer;
 using B2B.Transactions.Infrastructure.Authentication.MarketActors;
-using B2B.Transactions.OutgoingMessages;
-using B2B.Transactions.Xml.Incoming;
-using B2B.Transactions.Xml.Outgoing;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware;
-using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common;
-using Energinet.DataHub.MarketRoles.Infrastructure;
-using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
-using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
-using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
@@ -58,88 +44,11 @@ namespace B2B.Transactions.Api
                 })
                 .ConfigureServices(services =>
                 {
-                    BuildCompositionRoot(services, tokenValidationParameters);
+                    CompositionRoot.BuildCompositionRoot(services, tokenValidationParameters);
                 })
                 .Build();
 
             await host.RunAsync().ConfigureAwait(false);
-        }
-
-        private static void BuildCompositionRoot(IServiceCollection services, TokenValidationParameters tokenValidationParameters)
-        {
-            ConfigureAuthentication(services, tokenValidationParameters);
-            services.AddScoped<ISystemDateTimeProvider, SystemDateTimeProvider>();
-            services.AddSingleton<IJsonSerializer, JsonSerializer>();
-            services.AddScoped<SchemaStore>();
-            services.AddScoped<ISchemaProvider, SchemaProvider>();
-            services.AddScoped<MessageReceiver>();
-            UseCorrelationContext(services);
-            services.AddScoped<ITransactionIds, TransactionIdRegistry>();
-            services.AddScoped<IMessageIds, MessageIdRegistry>();
-            services.AddScoped<IDocumentProvider<IMessage>, AcceptDocumentProvider>();
-            ConfigureTransactionQueue(services);
-            services.AddScoped<ITransactionQueueDispatcher, TransactionQueueDispatcher>();
-            services.AddLogging();
-
-            ConfigureRequestLogging(services);
-            ConfigureDatabaseConnectionFactory(services);
-        }
-
-        private static void ConfigureDatabaseConnectionFactory(IServiceCollection services)
-        {
-            services.AddScoped<IDbConnectionFactory>(_ =>
-            {
-                var connectionString = Environment.GetEnvironmentVariable("MARKET_DATA_DB_CONNECTION_STRING");
-                if (connectionString is null)
-                {
-                    throw new ArgumentNullException(connectionString);
-                }
-
-                return new SqlDbConnectionFactory(connectionString);
-            });
-        }
-
-        private static void ConfigureRequestLogging(IServiceCollection services)
-        {
-            services.AddSingleton<IRequestResponseLogging>(s =>
-            {
-                var logger = services.BuildServiceProvider().GetService<ILogger<RequestResponseLoggingBlobStorage>>();
-                var storage = new RequestResponseLoggingBlobStorage(
-                    Environment.GetEnvironmentVariable("REQUEST_RESPONSE_LOGGING_CONNECTION_STRING") ?? throw new InvalidOperationException(), Environment.GetEnvironmentVariable("REQUEST_RESPONSE_LOGGING_CONTAINER_NAME") ?? throw new InvalidOperationException(), logger ?? throw new InvalidOperationException());
-                return storage;
-            });
-        }
-
-        private static void ConfigureTransactionQueue(IServiceCollection services)
-        {
-            services.AddSingleton<ServiceBusSender>(serviceProvider =>
-            {
-                var connectionString = Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_CONNECTION_STRING");
-                var topicName = Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_NAME");
-                return new ServiceBusClient(connectionString).CreateSender(topicName);
-            });
-        }
-
-        private static void UseCorrelationContext(IServiceCollection services)
-        {
-            services.AddScoped<ICorrelationContext, CorrelationContext>(sp =>
-            {
-                var correlationContext = new CorrelationContext();
-                if (IsRunningLocally())
-                {
-                    correlationContext.SetId(Guid.NewGuid().ToString());
-                    correlationContext.SetParentId(Guid.NewGuid().ToString());
-                }
-
-                return correlationContext;
-            });
-        }
-
-        private static void ConfigureAuthentication(IServiceCollection services, TokenValidationParameters tokenValidationParameters)
-        {
-            services.AddScoped<CurrentClaimsPrincipal>();
-            services.AddScoped<JwtTokenParser>(sp => new JwtTokenParser(tokenValidationParameters));
-            services.AddScoped<MarketActorAuthenticator>();
         }
 
         private static bool IsRunningLocally()

@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Energinet.DataHub.Core.Logging" Version="1.1.0" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Microsoft.IdentityModel.Tokens, Version=6.10.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+        <HintPath>..\..\..\..\Users\KristianFaurskovThom\AppData\Roaming\JetBrains\Rider2021.2\azure-functions-coretools\4.0.3971\Microsoft.IdentityModel.Tokens.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\B2B.Transactions.CimMessageAdapter\B2B.Transactions.CimMessageAdapter.csproj" />
+      <ProjectReference Include="..\B2B.Transactions\B2B.Transactions.csproj" />
+      <ProjectReference Include="..\Energinet.DataHub.MarketRoles.Domain\Energinet.DataHub.MarketRoles.Domain.csproj" />
+      <ProjectReference Include="..\Energinet.DataHub.MarketRoles.Infrastructure\Energinet.DataHub.MarketRoles.Infrastructure.csproj" />
+    </ItemGroup>
+
+</Project>
