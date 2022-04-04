@@ -50,7 +50,6 @@ namespace B2B.Transactions.Infrastructure
             services.AddScoped<ITransactionQueueDispatcher, TransactionQueueDispatcher>();
             services.AddLogging();
             ConfigureRequestLogging(services);
-            ConfigureDatabaseConnectionFactory(services);
             AddXmlSchema(services);
         }
 
@@ -59,11 +58,18 @@ namespace B2B.Transactions.Infrastructure
             return new CompositionRoot(services);
         }
 
-        public CompositionRoot ConfigureAuthentication(TokenValidationParameters tokenValidationParameters)
+        public CompositionRoot AddBearerAuthentication(TokenValidationParameters tokenValidationParameters)
         {
             _services.AddScoped<CurrentClaimsPrincipal>();
-            _services.AddScoped<JwtTokenParser>(sp => new JwtTokenParser(tokenValidationParameters));
+            _services.AddScoped(sp => new JwtTokenParser(tokenValidationParameters));
             _services.AddScoped<MarketActorAuthenticator>();
+            return this;
+        }
+
+        public CompositionRoot AddDatabaseConnectionFactory(string connectionString)
+        {
+            if (connectionString == null) throw new ArgumentNullException(nameof(connectionString));
+            _services.AddScoped<IDbConnectionFactory>(_ => new SqlDbConnectionFactory(connectionString));
             return this;
         }
 
@@ -72,20 +78,6 @@ namespace B2B.Transactions.Infrastructure
             services.AddScoped<SchemaStore>();
             services.AddScoped<ISchemaProvider, SchemaProvider>();
             services.AddScoped<MessageReceiver>();
-        }
-
-        private static void ConfigureDatabaseConnectionFactory(IServiceCollection services)
-        {
-            services.AddScoped<IDbConnectionFactory>(_ =>
-            {
-                var connectionString = Environment.GetEnvironmentVariable("MARKET_DATA_DB_CONNECTION_STRING");
-                if (connectionString is null)
-                {
-                    throw new ArgumentNullException(connectionString);
-                }
-
-                return new SqlDbConnectionFactory(connectionString);
-            });
         }
 
         private static void ConfigureRequestLogging(IServiceCollection services)
