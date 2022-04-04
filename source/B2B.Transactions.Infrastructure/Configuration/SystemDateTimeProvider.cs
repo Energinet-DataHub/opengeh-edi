@@ -15,7 +15,7 @@
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using NodaTime;
 
-namespace B2B.Transactions.Infrastructure
+namespace B2B.Transactions.Infrastructure.Configuration
 {
     public class SystemDateTimeProvider : ISystemDateTimeProvider
     {

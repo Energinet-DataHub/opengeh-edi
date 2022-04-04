@@ -21,7 +21,7 @@ using B2B.CimMessageAdapter.Transactions;
 using B2B.Transactions.Infrastructure.Serialization;
 using B2B.Transactions.UseCases;
 
-namespace B2B.Transactions.Infrastructure
+namespace B2B.Transactions.Infrastructure.Transactions
 {
     public class TransactionQueueDispatcher : ITransactionQueueDispatcher
     {
