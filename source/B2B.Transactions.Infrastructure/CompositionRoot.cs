@@ -107,10 +107,5 @@ namespace B2B.Transactions.Infrastructure
             services.AddScoped<ISchemaProvider, SchemaProvider>();
             services.AddScoped<MessageReceiver>();
         }
-
-        private static bool IsRunningLocally()
-        {
-            return Environment.GetEnvironmentVariable("AZURE_FUNCTIONS_ENVIRONMENT") == "Development";
-        }
     }
 }
