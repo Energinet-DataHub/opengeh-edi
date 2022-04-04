@@ -77,12 +77,7 @@ namespace B2B.Transactions.Api
             services.AddScoped<ITransactionIds, TransactionIdRegistry>();
             services.AddScoped<IMessageIds, MessageIdRegistry>();
             services.AddScoped<IDocumentProvider<IMessage>, AcceptDocumentProvider>();
-            services.AddSingleton<ServiceBusSender>(serviceProvider =>
-            {
-                var connectionString = Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_CONNECTION_STRING");
-                var topicName = Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_NAME");
-                return new ServiceBusClient(connectionString).CreateSender(topicName);
-            });
+            ConfigureTransactionQueue(services);
             services.AddScoped<ITransactionQueueDispatcher, TransactionQueueDispatcher>();
             services.AddLogging();
 
@@ -106,6 +101,16 @@ namespace B2B.Transactions.Api
                 }
 
                 return new SqlDbConnectionFactory(connectionString);
+            });
+        }
+
+        private static void ConfigureTransactionQueue(IServiceCollection services)
+        {
+            services.AddSingleton<ServiceBusSender>(serviceProvider =>
+            {
+                var connectionString = Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_CONNECTION_STRING");
+                var topicName = Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_NAME");
+                return new ServiceBusClient(connectionString).CreateSender(topicName);
             });
         }
 
