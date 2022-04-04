@@ -32,7 +32,7 @@ namespace B2B.Transactions.Api
         private readonly MessageReceiver _messageReceiver;
 
         public B2BCimHttpTrigger(
-            ILogger logger,
+            ILogger<B2BCimHttpTrigger> logger,
             ICorrelationContext correlationContext,
             MessageReceiver messageReceiver)
         {

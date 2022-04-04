@@ -82,10 +82,9 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
 
             container.AddJwtTokenSecurity($"https://login.microsoftonline.com/{tenantId}/v2.0/.well-known/openid-configuration", audience);
             container.AddActorContext<ActorProvider>();
-
             var dbConnectionString = Environment.GetEnvironmentVariable("MARKET_DATA_DB_CONNECTION_STRING")
-                                   ?? throw new InvalidOperationException(
-                                       "database connection string not found.");
+                                     ?? throw new InvalidOperationException(
+                                         "database connection string not found.");
             container.Register<IDbConnectionFactory>(() => new SqlDbConnectionFactory(dbConnectionString), Lifestyle.Scoped);
             Dapper.SqlMapper.AddTypeHandler(NodaTimeSqlMapper.Instance);
 
