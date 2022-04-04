@@ -67,25 +67,13 @@ namespace B2B.Transactions.Api
 
         private static void BuildCompositionRoot(IServiceCollection services, TokenValidationParameters tokenValidationParameters)
         {
-            services.AddScoped<CurrentClaimsPrincipal>();
-            services.AddScoped<JwtTokenParser>(sp => new JwtTokenParser(tokenValidationParameters));
-            services.AddScoped<MarketActorAuthenticator>();
+            ConfigureAuthentication(services, tokenValidationParameters);
             services.AddScoped<ISystemDateTimeProvider, SystemDateTimeProvider>();
             services.AddSingleton<IJsonSerializer, JsonSerializer>();
             services.AddScoped<SchemaStore>();
             services.AddScoped<ISchemaProvider, SchemaProvider>();
             services.AddScoped<MessageReceiver>();
-            services.AddScoped<ICorrelationContext, CorrelationContext>(sp =>
-            {
-                var correlationContext = new CorrelationContext();
-                if (IsRunningLocally())
-                {
-                    correlationContext.SetId(Guid.NewGuid().ToString());
-                    correlationContext.SetParentId(Guid.NewGuid().ToString());
-                }
-
-                return correlationContext;
-            });
+            UseCorrelationContext(services);
             services.AddScoped<ITransactionIds, TransactionIdRegistry>();
             services.AddScoped<IMessageIds, MessageIdRegistry>();
             services.AddScoped<IDocumentProvider<IMessage>, AcceptDocumentProvider>();
@@ -119,6 +107,28 @@ namespace B2B.Transactions.Api
 
                 return new SqlDbConnectionFactory(connectionString);
             });
+        }
+
+        private static void UseCorrelationContext(IServiceCollection services)
+        {
+            services.AddScoped<ICorrelationContext, CorrelationContext>(sp =>
+            {
+                var correlationContext = new CorrelationContext();
+                if (IsRunningLocally())
+                {
+                    correlationContext.SetId(Guid.NewGuid().ToString());
+                    correlationContext.SetParentId(Guid.NewGuid().ToString());
+                }
+
+                return correlationContext;
+            });
+        }
+
+        private static void ConfigureAuthentication(IServiceCollection services, TokenValidationParameters tokenValidationParameters)
+        {
+            services.AddScoped<CurrentClaimsPrincipal>();
+            services.AddScoped<JwtTokenParser>(sp => new JwtTokenParser(tokenValidationParameters));
+            services.AddScoped<MarketActorAuthenticator>();
         }
 
         private static bool IsRunningLocally()
