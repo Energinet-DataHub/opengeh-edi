@@ -40,20 +40,8 @@ namespace B2B.Transactions.Infrastructure
         private CompositionRoot(IServiceCollection services)
         {
             _services = services;
-        }
-
-        public static CompositionRoot Initialize(IServiceCollection services)
-        {
-            return new CompositionRoot(services);
-        }
-
-        public static void BuildCompositionRoot(IServiceCollection services)
-        {
             services.AddScoped<ISystemDateTimeProvider, SystemDateTimeProvider>();
             services.AddSingleton<IJsonSerializer, JsonSerializer>();
-            services.AddScoped<SchemaStore>();
-            services.AddScoped<ISchemaProvider, SchemaProvider>();
-            services.AddScoped<MessageReceiver>();
             UseCorrelationContext(services);
             services.AddScoped<ITransactionIds, TransactionIdRegistry>();
             services.AddScoped<IMessageIds, MessageIdRegistry>();
@@ -61,9 +49,14 @@ namespace B2B.Transactions.Infrastructure
             ConfigureTransactionQueue(services);
             services.AddScoped<ITransactionQueueDispatcher, TransactionQueueDispatcher>();
             services.AddLogging();
-
             ConfigureRequestLogging(services);
             ConfigureDatabaseConnectionFactory(services);
+            AddXmlSchema(services);
+        }
+
+        public static CompositionRoot Initialize(IServiceCollection services)
+        {
+            return new CompositionRoot(services);
         }
 
         public CompositionRoot ConfigureAuthentication(TokenValidationParameters tokenValidationParameters)
@@ -72,6 +65,13 @@ namespace B2B.Transactions.Infrastructure
             _services.AddScoped<JwtTokenParser>(sp => new JwtTokenParser(tokenValidationParameters));
             _services.AddScoped<MarketActorAuthenticator>();
             return this;
+        }
+
+        private static void AddXmlSchema(IServiceCollection services)
+        {
+            services.AddScoped<SchemaStore>();
+            services.AddScoped<ISchemaProvider, SchemaProvider>();
+            services.AddScoped<MessageReceiver>();
         }
 
         private static void ConfigureDatabaseConnectionFactory(IServiceCollection services)
