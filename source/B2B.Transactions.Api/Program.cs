@@ -44,7 +44,9 @@ namespace B2B.Transactions.Api
                 })
                 .ConfigureServices(services =>
                 {
-                    CompositionRoot.BuildCompositionRoot(services, tokenValidationParameters);
+                    CompositionRoot.Initialize(services)
+                        .ConfigureAuthentication(tokenValidationParameters);
+                    CompositionRoot.BuildCompositionRoot(services);
                 })
                 .Build();
 

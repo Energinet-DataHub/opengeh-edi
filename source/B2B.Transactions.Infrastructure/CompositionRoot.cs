@@ -33,11 +33,22 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace B2B.Transactions.Infrastructure
 {
-    public static class CompositionRoot
+    public class CompositionRoot
     {
-        public static void BuildCompositionRoot(IServiceCollection services, TokenValidationParameters tokenValidationParameters)
+        private readonly IServiceCollection _services;
+
+        private CompositionRoot(IServiceCollection services)
         {
-            ConfigureAuthentication(services, tokenValidationParameters);
+            _services = services;
+        }
+
+        public static CompositionRoot Initialize(IServiceCollection services)
+        {
+            return new CompositionRoot(services);
+        }
+
+        public static void BuildCompositionRoot(IServiceCollection services)
+        {
             services.AddScoped<ISystemDateTimeProvider, SystemDateTimeProvider>();
             services.AddSingleton<IJsonSerializer, JsonSerializer>();
             services.AddScoped<SchemaStore>();
@@ -53,6 +64,14 @@ namespace B2B.Transactions.Infrastructure
 
             ConfigureRequestLogging(services);
             ConfigureDatabaseConnectionFactory(services);
+        }
+
+        public CompositionRoot ConfigureAuthentication(TokenValidationParameters tokenValidationParameters)
+        {
+            _services.AddScoped<CurrentClaimsPrincipal>();
+            _services.AddScoped<JwtTokenParser>(sp => new JwtTokenParser(tokenValidationParameters));
+            _services.AddScoped<MarketActorAuthenticator>();
+            return this;
         }
 
         private static void ConfigureDatabaseConnectionFactory(IServiceCollection services)
@@ -103,13 +122,6 @@ namespace B2B.Transactions.Infrastructure
 
                 return correlationContext;
             });
-        }
-
-        private static void ConfigureAuthentication(IServiceCollection services, TokenValidationParameters tokenValidationParameters)
-        {
-            services.AddScoped<CurrentClaimsPrincipal>();
-            services.AddScoped<JwtTokenParser>(sp => new JwtTokenParser(tokenValidationParameters));
-            services.AddScoped<MarketActorAuthenticator>();
         }
 
         private static bool IsRunningLocally()
