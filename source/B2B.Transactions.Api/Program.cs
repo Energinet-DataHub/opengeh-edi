@@ -24,6 +24,8 @@ using B2B.Transactions.Infrastructure.Authentication.MarketActors;
 using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.Xml.Incoming;
 using B2B.Transactions.Xml.Outgoing;
+using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
+using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
@@ -109,6 +111,15 @@ namespace B2B.Transactions.Api
 
                         return new SqlDbConnectionFactory(connectionString);
                     });
+
+                    // HealthChecks
+                    services.AddScoped<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>();
+                    services.AddHealthChecks()
+                        .AddLiveCheck()
+                        .AddAzureServiceBusQueue(
+                            Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_CONNECTION_STRING") ?? throw new InvalidOperationException(),
+                            Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_NAME") ?? throw new InvalidOperationException(),
+                            "MarketActivityQueueExists");
                 })
                 .Build();
 
