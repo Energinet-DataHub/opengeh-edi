@@ -46,7 +46,6 @@ namespace B2B.Transactions.Api
                 })
                 .ConfigureServices(services =>
                 {
-                    services.AddScoped<ICorrelationContext, CorrelationContext>();
                     CompositionRoot.Initialize(services)
                         .AddBearerAuthentication(tokenValidationParameters)
                         .AddDatabaseConnectionFactory(
