@@ -50,9 +50,6 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="Messages\RequestChangeOfSupplier.xml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </EmbeddedResource>
       <None Remove="InvalidRequestChangeOfSupplier.xml" />
       <None Remove="RequestChangeOfSupplierWithDuplicateTransactionIds.xml" />
       <None Remove="urn-ediel-org-structure-requestchangeofsupplier-0-1.xsd" />
