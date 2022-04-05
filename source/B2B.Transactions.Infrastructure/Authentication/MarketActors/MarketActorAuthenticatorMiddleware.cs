@@ -18,26 +18,27 @@ using B2B.Transactions.Authentication;
 using B2B.Transactions.Infrastructure.Authentication.Bearer;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace B2B.Transactions.Infrastructure.Authentication.MarketActors
 {
     public class MarketActorAuthenticatorMiddleware : IFunctionsWorkerMiddleware
     {
-        private readonly CurrentClaimsPrincipal _currentClaimsPrincipal;
-        private readonly IMarketActorAuthenticator _marketActorAuthenticator;
         private readonly ILogger<MarketActorAuthenticatorMiddleware> _logger;
 
-        public MarketActorAuthenticatorMiddleware(CurrentClaimsPrincipal currentClaimsPrincipal, IMarketActorAuthenticator marketActorAuthenticator, ILogger<MarketActorAuthenticatorMiddleware> logger)
+        public MarketActorAuthenticatorMiddleware(ILogger<MarketActorAuthenticatorMiddleware> logger)
         {
-            _currentClaimsPrincipal = currentClaimsPrincipal ?? throw new ArgumentNullException(nameof(currentClaimsPrincipal));
-            _marketActorAuthenticator = marketActorAuthenticator ?? throw new ArgumentNullException(nameof(marketActorAuthenticator));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
         {
+            if (context == null) throw new ArgumentNullException(nameof(context));
             if (next == null) throw new ArgumentNullException(nameof(next));
+            var marketActorAuthenticator = context.GetService<IMarketActorAuthenticator>();
+            var currentClaimsPrincipal = context.GetService<CurrentClaimsPrincipal>();
+
             if (!context.Is(FunctionContextExtensions.TriggerType.HttpTrigger))
             {
                 _logger.LogInformation("Functions is not triggered by HTTP. Call next middleware.");
@@ -53,15 +54,15 @@ namespace B2B.Transactions.Infrastructure.Authentication.MarketActors
                 return;
             }
 
-            if (_currentClaimsPrincipal.ClaimsPrincipal is null)
+            if (currentClaimsPrincipal.ClaimsPrincipal is null)
             {
                 _logger.LogError("Current claims principal is null. Cannot continue.");
                 context.RespondWithUnauthorized(httpRequestData);
                 return;
             }
 
-            _marketActorAuthenticator.Authenticate(_currentClaimsPrincipal.ClaimsPrincipal!);
-            if (_marketActorAuthenticator.CurrentIdentity is NotAuthenticated)
+            marketActorAuthenticator.Authenticate(currentClaimsPrincipal.ClaimsPrincipal!);
+            if (marketActorAuthenticator.CurrentIdentity is NotAuthenticated)
             {
                 _logger.LogError("Could not authenticate market actor identity. This is due to the current claims identity does hold the required claims.");
                 context.RespondWithUnauthorized(httpRequestData);

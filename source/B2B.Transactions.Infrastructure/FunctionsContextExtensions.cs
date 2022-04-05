@@ -18,6 +18,7 @@ using System.Linq;
 using System.Net;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace B2B.Transactions.Infrastructure
 {
@@ -71,6 +72,12 @@ namespace B2B.Transactions.Infrastructure
         {
             var httpResponseData = httpRequestData.CreateResponse(HttpStatusCode.Unauthorized);
             context.SetHttpResponseData(httpResponseData);
+        }
+
+        internal static T GetService<T>(this FunctionContext functionContext)
+            where T : notnull
+        {
+            return functionContext.InstanceServices.GetRequiredService<T>();
         }
 
         /// <summary>
