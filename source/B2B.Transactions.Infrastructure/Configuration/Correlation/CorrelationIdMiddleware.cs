@@ -40,7 +40,7 @@ namespace B2B.Transactions.Infrastructure.Configuration.Correlation
             _logger.LogInformation("Parsed TraceContext: " + context.TraceContext.TraceParent ?? string.Empty);
             var traceContext = TraceContext.Parse(context.TraceContext.TraceParent);
 
-            var correlationContext = context.GetService<CorrelationContext>();
+            var correlationContext = context.GetService<ICorrelationContext>();
             correlationContext.SetId(traceContext.TraceId);
             correlationContext.SetParentId(traceContext.ParentId);
 
