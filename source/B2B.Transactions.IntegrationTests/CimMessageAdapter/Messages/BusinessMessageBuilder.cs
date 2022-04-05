@@ -15,7 +15,7 @@
 using System.IO;
 using System.Xml.Linq;
 
-namespace B2B.CimMessageAdapter.Tests.Messages
+namespace B2B.Transactions.IntegrationTests.CimMessageAdapter.Messages
 {
     public class BusinessMessageBuilder
     {
