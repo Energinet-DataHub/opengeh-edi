@@ -22,6 +22,7 @@ limitations under the License.
     <ItemGroup>
       <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.5.0" />
       <PackageReference Include="Energinet.DataHub.Core.Logging" Version="1.1.0" />
+      <PackageReference Include="EntityFrameworkCore.SqlServer.NodaTime" Version="5.0.1" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
       <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.0.0" />
     </ItemGroup>
