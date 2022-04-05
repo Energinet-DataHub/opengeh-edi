@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
+using Microsoft.Extensions.Logging;
 using TraceContext = Energinet.DataHub.MarketRoles.Infrastructure.Correlation.TraceContext;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Common
@@ -25,17 +26,20 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Common
     public class CorrelationIdMiddleware : IFunctionsWorkerMiddleware
     {
         private readonly ICorrelationContext _correlationContext;
+        private readonly ILogger<CorrelationIdMiddleware> _logger;
 
         public CorrelationIdMiddleware(
-            ICorrelationContext correlationContext)
+            ICorrelationContext correlationContext, ILogger<CorrelationIdMiddleware> logger)
         {
             _correlationContext = correlationContext;
+            _logger = logger;
         }
 
         public async Task Invoke(FunctionContext context, [NotNull] FunctionExecutionDelegate next)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
+            _logger.LogInformation("Parsed TraceContext: " + context.TraceContext.TraceParent ?? string.Empty);
             var traceContext = TraceContext.Parse(context.TraceContext.TraceParent);
 
             _correlationContext.SetId(traceContext.TraceId);
