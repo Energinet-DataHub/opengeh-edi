@@ -1,4 +1,4 @@
-<!--
+﻿<!--
 Copyright 2020 Energinet DataHub A/S
 
 Licensed under the Apache License, Version 2.0 (the "License2");
@@ -17,7 +17,7 @@ limitations under the License.
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <LangVersion>9.0</LangVersion>
     <RootNamespace>Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp</RootNamespace>
   </PropertyGroup>
