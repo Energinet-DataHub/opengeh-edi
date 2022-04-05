@@ -23,14 +23,14 @@ using Microsoft.Extensions.Logging;
 
 namespace B2B.Transactions.Api
 {
-    public class B2BTransactionQueueTrigger
+    public class TransactionQueueListener
     {
         private readonly ILogger _logger;
         private readonly ICorrelationContext _correlationContext;
         private readonly RegisterTransaction _registerTransaction;
         private readonly ISerializer _jsonSerializer;
 
-        public B2BTransactionQueueTrigger(
+        public TransactionQueueListener(
             ILogger logger,
             ICorrelationContext correlationContext,
             RegisterTransaction registerTransaction,
@@ -42,7 +42,7 @@ namespace B2B.Transactions.Api
             _jsonSerializer = jsonSerializer;
         }
 
-        [Function("B2BTransactionQueueTrigger")]
+        [Function(nameof(TransactionQueueListener))]
         public async Task RunAsync(
             [ServiceBusTrigger("%TRANSACTIONS_QUEUE_NAME%", Connection = "TRANSACTIONS_QUEUE_LISTENER_CONNECTION_STRING")] byte[] data,
             FunctionContext context)
