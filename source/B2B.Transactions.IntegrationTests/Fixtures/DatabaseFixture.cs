@@ -13,33 +13,52 @@
 // limitations under the License.
 
 using System;
+using System.Threading.Tasks;
 using B2B.Transactions.Infrastructure.DataAccess;
 using Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.Helpers;
 using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Xunit;
 
 namespace B2B.Transactions.IntegrationTests.Fixtures
 {
-    public class DatabaseFixture : IDisposable
+    public class DatabaseFixture : IDisposable, IAsyncLifetime
     {
         private readonly B2BContext _context;
         private bool _disposed;
 
-        public DatabaseFixture(string connectionString)
+        public DatabaseFixture()
         {
-            ConnectionString = connectionString;
             var optionsBuilder = new DbContextOptionsBuilder<B2BContext>();
             optionsBuilder
-                .UseSqlServer(connectionString, options => options.UseNodaTime());
+                .UseSqlServer(ConnectionString, options => options.UseNodaTime());
 
             _context = new B2BContext(optionsBuilder.Options);
         }
 
-        protected string ConnectionString { get; }
+        public string ConnectionString { get; } = Environment.GetEnvironmentVariable("DatabaseConnectionString") ?? string.Empty;
 
-        public void Initialize()
+        public Task InitializeAsync()
         {
-            InitializeDatabase();
+            CreateSchema();
+            CleanupDatabase();
+            return Task.CompletedTask;
+        }
+
+        public Task DisposeAsync()
+        {
+            Dispose();
+            return Task.CompletedTask;
+        }
+
+        public void CleanupDatabase()
+        {
+            var cleanupStatement =
+                $"DELETE FROM [dbo].[Transactions] " +
+                $"DELETE FROM [dbo].[MessageIds] " +
+                $"DELETE FROM [dbo].[TransactionIds]";
+
+            _context.Database.ExecuteSqlRaw(cleanupStatement);
         }
 
         public void Dispose()
@@ -60,31 +79,9 @@ namespace B2B.Transactions.IntegrationTests.Fixtures
             _disposed = true;
         }
 
-        private void InitializeDatabase()
-        {
-            CreateDatabase();
-            CreateSchema();
-            CleanupDatabase();
-        }
-
         private void CreateSchema()
         {
             DefaultUpgrader.Upgrade(ConnectionString);
-        }
-
-        private void CreateDatabase()
-        {
-            _context.Database.EnsureCreated();
-        }
-
-        private void CleanupDatabase()
-        {
-            var cleanupStatement =
-                $"DELETE FROM [dbo].[Transactions] " +
-                $"DELETE FROM [dbo].[MessageIds] " +
-                $"DELETE FROM [dbo].[TransactionIds]";
-
-            _context.Database.ExecuteSqlRaw(cleanupStatement);
         }
     }
 }

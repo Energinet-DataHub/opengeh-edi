@@ -23,20 +23,19 @@ namespace B2B.Transactions.IntegrationTests
     [Collection("IntegrationTest")]
     public class TestBase : IDisposable
     {
-        private const string _connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;Initial Catalog=B2BTransactions;Integrated Security=True;";
         private readonly DatabaseFixture _databaseFixture;
         private readonly IServiceProvider _serviceProvider;
         private bool _disposed;
 
-        protected TestBase()
+        protected TestBase(DatabaseFixture databaseFixture)
         {
-            _databaseFixture = new DatabaseFixture(_connectionString);
-            _databaseFixture.Initialize();
+            _databaseFixture = databaseFixture;
+            _databaseFixture.CleanupDatabase();
 
             var services = new ServiceCollection();
             CompositionRoot.Initialize(services)
-                .AddDatabaseConnectionFactory(_connectionString)
-                .AddDatabaseContext(_connectionString);
+                .AddDatabaseConnectionFactory(_databaseFixture.ConnectionString)
+                .AddDatabaseContext(_databaseFixture.ConnectionString);
             _serviceProvider = services.BuildServiceProvider();
         }
 
@@ -59,7 +58,6 @@ namespace B2B.Transactions.IntegrationTests
                 return;
             }
 
-            _databaseFixture.Dispose();
             ((ServiceProvider)_serviceProvider).Dispose();
             _disposed = true;
         }

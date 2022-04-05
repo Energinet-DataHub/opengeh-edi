@@ -15,6 +15,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using B2B.Transactions.IntegrationTests.Fixtures;
 using B2B.Transactions.IntegrationTests.TestDoubles;
 using B2B.Transactions.Messages;
 using B2B.Transactions.OutgoingMessages;
@@ -32,7 +33,8 @@ namespace B2B.Transactions.IntegrationTests
         private OutgoingMessageStoreSpy _outgoingMessageStoreSpy = new();
         private IDocumentProvider<IMessage> _documentProvider = new AcceptDocumentProvider(_dateTimeProvider);
 
-        public TransactionHandlingTests()
+        public TransactionHandlingTests(DatabaseFixture databaseFixture)
+            : base(databaseFixture)
         {
             _transactionRepository =
                 GetService<ITransactionRepository>();
