@@ -9,7 +9,7 @@
     "REQUEST_RESPONSE_LOGGING_CONNECTION_STRING": "<connection string for logging request and response to storage>",
     "DB_CONNECTION_STRING": "<SQL database connection string>",
     "TRANSACTIONS_QUEUE_CONNECTION_STRING": "<connection string for service bus with sender permissions>",
-    "MARKET_DATA_QUEUE_CONNECTION_STRING_LISTENER": "<connection string for service bus with listener permissions>",
+    "TRANSACTIONS_QUEUE_LISTENER_CONNECTION_STRING": "<connection string for service bus with listener permissions>",
     "TRANSACTIONS_QUEUE_NAME": "<Name of transactions service bus queue>"
     
   }

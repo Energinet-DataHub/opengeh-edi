@@ -44,7 +44,7 @@ namespace B2B.Transactions.Api
 
         [Function("B2BTransactionQueueTrigger")]
         public async Task RunAsync(
-            [ServiceBusTrigger("%MARKET_DATA_QUEUE_NAME%", Connection = "MARKET_DATA_QUEUE_CONNECTION_STRING_LISTENER")] byte[] data,
+            [ServiceBusTrigger("%TRANSACTIONS_QUEUE_NAME%", Connection = "TRANSACTIONS_QUEUE_LISTENER_CONNECTION_STRING")] byte[] data,
             FunctionContext context)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
