@@ -54,6 +54,7 @@ namespace B2B.Transactions.Infrastructure.Configuration
             services.AddScoped<IDocumentProvider<IMessage>, AcceptDocumentProvider>();
             services.AddScoped<ITransactionQueueDispatcher, TransactionQueueDispatcher>();
             services.AddScoped<ITransactionRepository, TransactionRepository>();
+            services.AddScoped<IMarketActorAuthenticator, MarketActorAuthenticator>();
             services.AddLogging();
             AddXmlSchema(services);
         }
@@ -83,7 +84,6 @@ namespace B2B.Transactions.Infrastructure.Configuration
         {
             _services.AddScoped<CurrentClaimsPrincipal>();
             _services.AddScoped(sp => new JwtTokenParser(tokenValidationParameters));
-            _services.AddScoped<IMarketActorAuthenticator, MarketActorAuthenticator>();
             return this;
         }
 

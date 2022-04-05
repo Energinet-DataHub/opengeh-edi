@@ -20,6 +20,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using B2B.CimMessageAdapter;
 using B2B.CimMessageAdapter.Messages;
+using B2B.Transactions.Authentication;
 using B2B.Transactions.Infrastructure.Authentication.MarketActors;
 using B2B.Transactions.IntegrationTests.CimMessageAdapter.Messages;
 using B2B.Transactions.IntegrationTests.CimMessageAdapter.Stubs;
@@ -39,7 +40,7 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
             new("role", "electricalsupplier"),
         };
 
-        private readonly MarketActorAuthenticator _marketActorAuthenticator = new();
+        private readonly IMarketActorAuthenticator _marketActorAuthenticator;
         private readonly ITransactionIds _transactionIds;
         private readonly IMessageIds _messageIds;
         private TransactionQueueDispatcherStub _transactionQueueDispatcherSpy = new();
@@ -48,6 +49,7 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
         {
             _transactionIds = GetService<ITransactionIds>();
             _messageIds = GetService<IMessageIds>();
+            _marketActorAuthenticator = GetService<IMarketActorAuthenticator>();
             _marketActorAuthenticator.Authenticate(CreateIdentity());
         }
 
