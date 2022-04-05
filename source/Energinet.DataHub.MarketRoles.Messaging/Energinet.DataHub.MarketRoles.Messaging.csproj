@@ -22,7 +22,7 @@ limitations under the License.
 
   <ItemGroup>
     <PackageReference Include="Energinet.DataHub.MessageHub.Client" Version="1.9.1" />
-    <PackageReference Include="MediatR" Version="9.0.0" />
+    <PackageReference Include="MediatR" Version="10.0.1" />
   </ItemGroup>
 
   <ItemGroup>
