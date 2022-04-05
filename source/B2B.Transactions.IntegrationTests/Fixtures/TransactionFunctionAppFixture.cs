@@ -12,11 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.Core.FunctionApp.TestCommon;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 
 namespace B2B.Transactions.IntegrationTests.Fixtures
 {
     public class TransactionFunctionAppFixture : FunctionAppFixture
     {
+        protected override void OnConfigureEnvironment()
+        {
+            // Environment.SetEnvironmentVariable("AppInsightsInstrumentationKey", IntegrationTestConfiguration.ApplicationInsightsInstrumentationKey);
+            Environment.SetEnvironmentVariable("AzureWebJobsStorage", "UseDevelopmentStorage=true");
+        }
     }
 }

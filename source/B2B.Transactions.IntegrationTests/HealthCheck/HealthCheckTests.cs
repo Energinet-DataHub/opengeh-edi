@@ -27,6 +27,7 @@ using Xunit.Categories;
 namespace B2B.Transactions.IntegrationTests.HealthCheck
 {
     [IntegrationTest]
+    [Collection(nameof(TransactionFunctionAppCollectionFixture))]
     public class HealthCheckTests : FunctionAppTestBase<TransactionFunctionAppFixture>
     {
         public HealthCheckTests(TransactionFunctionAppFixture fixture, ITestOutputHelper testOutputHelper)
@@ -38,15 +39,17 @@ namespace B2B.Transactions.IntegrationTests.HealthCheck
         public async Task When_RequestLivenessStatus_Then_ResponseIsOkAndHealthy()
         {
             // Arrange
+#pragma warning disable CA2000
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, "api/monitor/live");
+#pragma warning restore CA2000
 
             // Act
-            var actualResponse = await Fixture.HostManager.HttpClient.SendAsync(requestMessage.Request).ConfigureAwait(false);
+            var actualResponse = await Fixture.HostManager.HttpClient.SendAsync(requestMessage).ConfigureAwait(false);
 
             // Assert
             actualResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var actualContent = await actualResponse.Content.ReadAsStringAsync();
+            var actualContent = await actualResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
             actualContent.Should().Be(Enum.GetName(typeof(HealthStatus), HealthStatus.Healthy));
         }
     }
