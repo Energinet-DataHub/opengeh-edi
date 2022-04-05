@@ -19,7 +19,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 
-namespace B2B.Transactions.IntegrationTests.Infrastructure
+namespace B2B.Transactions.IntegrationTests.Infrastructure.Authentication.MarketActors
 {
     public class JwtBuilder
     {
