@@ -19,7 +19,7 @@ using B2B.Transactions.Authentication;
 using B2B.Transactions.Infrastructure.Authentication.MarketActors;
 using Xunit;
 
-namespace B2B.Transactions.Tests.Infrastructure
+namespace B2B.Transactions.IntegrationTests.Infrastructure
 {
     #pragma warning disable
     public class MarketActorAuthenticatorTests

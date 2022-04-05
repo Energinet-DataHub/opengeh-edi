@@ -15,7 +15,7 @@
 using System.Collections.Generic;
 using B2B.Transactions.OutgoingMessages;
 
-namespace B2B.Transactions.Tests
+namespace B2B.Transactions.IntegrationTests
 {
     public class OutgoingMessageStoreSpy : IOutgoingMessageStore
     {

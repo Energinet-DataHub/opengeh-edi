@@ -18,7 +18,7 @@ using Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.Helpers;
 using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using Microsoft.EntityFrameworkCore;
 
-namespace B2B.Transactions.Tests.Fixtures
+namespace B2B.Transactions.IntegrationTests.Fixtures
 {
     public class DatabaseFixture : IDisposable
     {
