@@ -28,7 +28,7 @@ using Xunit;
 
 namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
 {
-    public class MessageReceiverTests
+    public class MessageReceiverTests : TestBase
     {
         private readonly List<Claim> _claims = new List<Claim>()
         {
@@ -40,12 +40,13 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
         };
 
         private readonly MarketActorAuthenticator _marketActorAuthenticator = new();
-        private readonly TransactionIdsStub _transactionIdsStub = new();
+        private readonly ITransactionIds _transactionIds;
         private readonly MessageIdsStub _messageIdsStub = new();
         private TransactionQueueDispatcherStub _transactionQueueDispatcherSpy = new();
 
         public MessageReceiverTests()
         {
+            _transactionIds = GetService<ITransactionIds>();
             _marketActorAuthenticator.Authenticate(CreateIdentity());
         }
 
@@ -234,14 +235,14 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
         private MessageReceiver CreateMessageReceiver()
         {
             _transactionQueueDispatcherSpy = new TransactionQueueDispatcherStub();
-            var messageReceiver = new MessageReceiver(_messageIdsStub, _transactionQueueDispatcherSpy, _transactionIdsStub, new SchemaProvider(new SchemaStore()), _marketActorAuthenticator);
+            var messageReceiver = new MessageReceiver(_messageIdsStub, _transactionQueueDispatcherSpy, _transactionIds, new SchemaProvider(new SchemaStore()), _marketActorAuthenticator);
             return messageReceiver;
         }
 
         private MessageReceiver CreateMessageReceiver(IMessageIds messageIds)
         {
             _transactionQueueDispatcherSpy = new TransactionQueueDispatcherStub();
-            var messageReceiver = new MessageReceiver(messageIds, _transactionQueueDispatcherSpy, _transactionIdsStub, new SchemaProvider(new SchemaStore()), _marketActorAuthenticator);
+            var messageReceiver = new MessageReceiver(messageIds, _transactionQueueDispatcherSpy, _transactionIds, new SchemaProvider(new SchemaStore()), _marketActorAuthenticator);
             return messageReceiver;
         }
 
