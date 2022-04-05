@@ -43,6 +43,7 @@ namespace B2B.Transactions.Infrastructure.Configuration.Correlation
 
             _logger.LogInformation("Setting TraceId: " + traceContext.TraceId ?? "null");
             _correlationContext.SetId(traceContext.TraceId);
+            _logger.LogInformation("Actual correlation Id: " + _correlationContext.Id ?? "null");
             _logger.LogInformation("Setting ParentId: " + traceContext.ParentId ?? "null");
             _correlationContext.SetParentId(traceContext.ParentId);
 
