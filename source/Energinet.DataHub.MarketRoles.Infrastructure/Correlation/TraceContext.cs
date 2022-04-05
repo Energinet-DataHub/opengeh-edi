@@ -27,15 +27,12 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Correlation
     /// </remarks>
     public class TraceContext
     {
-        private static ILogger<TraceContext>? _logger;
-
         // TODO: Use ActivityContext.Parse()?
-        private TraceContext(string traceId, string parentId, bool isValid, ILogger<TraceContext> logger)
+        private TraceContext(string traceId, string parentId, bool isValid)
         {
             TraceId = traceId;
             ParentId = parentId;
             IsValid = isValid;
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public string TraceId { get; }
@@ -47,7 +44,6 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Correlation
         public static TraceContext Parse([NotNull] string traceContext)
         {
             if (string.IsNullOrWhiteSpace(traceContext)) return Invalid();
-            _logger.LogInformation($"Parse TraceContext: {traceContext}");
             if (traceContext.Length != 55) return Invalid();
 
             var parts = traceContext.Split('-');
@@ -65,8 +61,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Correlation
             return new(
                 traceId,
                 parentId,
-                true,
-                _logger!);
+                true);
         }
 
         private static TraceContext Invalid()
@@ -74,8 +69,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.Correlation
             return new(
                 string.Empty,
                 string.Empty,
-                false,
-                _logger!);
+                false);
         }
     }
 }
