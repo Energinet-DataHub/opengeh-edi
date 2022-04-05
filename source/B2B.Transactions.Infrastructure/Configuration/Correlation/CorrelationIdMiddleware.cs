@@ -17,6 +17,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TraceContext = B2B.Transactions.Infrastructure.Configuration.Correlation;
 
@@ -24,13 +25,11 @@ namespace B2B.Transactions.Infrastructure.Configuration.Correlation
 {
     public class CorrelationIdMiddleware : IFunctionsWorkerMiddleware
     {
-        private readonly ICorrelationContext _correlationContext;
         private readonly ILogger<CorrelationIdMiddleware> _logger;
 
         public CorrelationIdMiddleware(
-            ICorrelationContext correlationContext, ILogger<CorrelationIdMiddleware> logger)
+            ILogger<CorrelationIdMiddleware> logger)
         {
-            _correlationContext = correlationContext;
             _logger = logger;
         }
 
@@ -41,11 +40,9 @@ namespace B2B.Transactions.Infrastructure.Configuration.Correlation
             _logger.LogInformation("Parsed TraceContext: " + context.TraceContext.TraceParent ?? string.Empty);
             var traceContext = TraceContext.Parse(context.TraceContext.TraceParent);
 
-            _logger.LogInformation("Setting TraceId: " + traceContext.TraceId ?? "null");
-            _correlationContext.SetId(traceContext.TraceId);
-            _logger.LogInformation("Actual correlation Id: " + _correlationContext.Id ?? "null");
-            _logger.LogInformation("Setting ParentId: " + traceContext.ParentId ?? "null");
-            _correlationContext.SetParentId(traceContext.ParentId);
+            var correlationContext = context.InstanceServices.GetRequiredService<CorrelationContext>();
+            correlationContext.SetId(traceContext.TraceId);
+            correlationContext.SetParentId(traceContext.ParentId);
 
             await next(context).ConfigureAwait(false);
         }
