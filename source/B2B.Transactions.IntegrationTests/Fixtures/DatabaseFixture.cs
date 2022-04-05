@@ -36,7 +36,7 @@ namespace B2B.Transactions.IntegrationTests.Fixtures
             _context = new B2BContext(optionsBuilder.Options);
         }
 
-        public string ConnectionString { get; } = Environment.GetEnvironmentVariable("DatabaseConnectionString") ?? string.Empty;
+        public string ConnectionString { get; } = @"Data Source=(LocalDB)\MSSQLLocalDB;Initial Catalog=B2BTransactions;Integrated Security=True;";
 
         public Task InitializeAsync()
         {
