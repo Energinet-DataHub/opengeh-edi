@@ -35,6 +35,7 @@ namespace B2B.Transactions.IntegrationTests
 
             var services = new ServiceCollection();
             CompositionRoot.Initialize(services)
+                .AddDatabaseConnectionFactory(_connectionString)
                 .AddDatabaseContext(_connectionString);
             _serviceProvider = services.BuildServiceProvider();
         }

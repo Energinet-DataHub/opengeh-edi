@@ -13,18 +13,19 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using B2B.CimMessageAdapter.Messages;
+using B2B.Transactions.OutgoingMessages;
 
-namespace B2B.CimMessageAdapter.Tests.Stubs
+namespace B2B.Transactions.IntegrationTests.TestDoubles
 {
-    public class MessageIdsStub : IMessageIds
+    public class OutgoingMessageStoreSpy : IOutgoingMessageStore
     {
-        private readonly HashSet<string> _messageIds = new();
+        private readonly List<IMessage> _messages = new();
 
-        public Task<bool> TryStoreAsync(string messageId)
+        public IReadOnlyCollection<IMessage> Messages => _messages.AsReadOnly();
+
+        public void Add(IMessage message)
         {
-            return Task.FromResult(_messageIds.Add(messageId));
+            _messages.Add(message);
         }
     }
 }

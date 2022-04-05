@@ -46,4 +46,10 @@ limitations under the License.
       <ProjectReference Include="..\Energinet.DataHub.MarketRoles.Domain\Energinet.DataHub.MarketRoles.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\RequestChangeOfSupplier.xml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+    </ItemGroup>
+
 </Project>

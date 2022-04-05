@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 using B2B.CimMessageAdapter.Transactions;
 using B2B.Transactions.Transactions;
 
-namespace B2B.CimMessageAdapter.Tests.Stubs
+namespace B2B.Transactions.IntegrationTests.CimMessageAdapter.Stubs
 {
     public class TransactionQueueDispatcherStub : ITransactionQueueDispatcher
     {

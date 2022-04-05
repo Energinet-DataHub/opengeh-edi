@@ -18,16 +18,18 @@ using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using B2B.CimMessageAdapter;
 using B2B.CimMessageAdapter.Messages;
-using B2B.CimMessageAdapter.Tests.Messages;
-using B2B.CimMessageAdapter.Tests.Stubs;
+using B2B.Transactions.Authentication;
 using B2B.Transactions.Infrastructure.Authentication.MarketActors;
+using B2B.Transactions.IntegrationTests.CimMessageAdapter.Messages;
+using B2B.Transactions.IntegrationTests.CimMessageAdapter.Stubs;
 using B2B.Transactions.Xml.Incoming;
 using Xunit;
 
-namespace B2B.CimMessageAdapter.Tests
+namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
 {
-    public class MessageReceiverTests
+    public class MessageReceiverTests : TestBase
     {
         private readonly List<Claim> _claims = new List<Claim>()
         {
@@ -38,13 +40,16 @@ namespace B2B.CimMessageAdapter.Tests
             new("role", "electricalsupplier"),
         };
 
-        private readonly MarketActorAuthenticator _marketActorAuthenticator = new();
-        private readonly TransactionIdsStub _transactionIdsStub = new();
-        private readonly MessageIdsStub _messageIdsStub = new();
+        private readonly IMarketActorAuthenticator _marketActorAuthenticator;
+        private readonly ITransactionIds _transactionIds;
+        private readonly IMessageIds _messageIds;
         private TransactionQueueDispatcherStub _transactionQueueDispatcherSpy = new();
 
         public MessageReceiverTests()
         {
+            _transactionIds = GetService<ITransactionIds>();
+            _messageIds = GetService<IMessageIds>();
+            _marketActorAuthenticator = GetService<IMarketActorAuthenticator>();
             _marketActorAuthenticator.Authenticate(CreateIdentity());
         }
 
@@ -185,8 +190,7 @@ namespace B2B.CimMessageAdapter.Tests
         [Fact]
         public async Task Activity_records_are_not_committed_to_queue_if_any_message_header_values_are_invalid()
         {
-            var messageIds = new MessageIdsStub();
-            await SimulateDuplicationOfMessageIds(messageIds).ConfigureAwait(false);
+            await SimulateDuplicationOfMessageIds(_messageIds).ConfigureAwait(false);
 
             Assert.Empty(_transactionQueueDispatcherSpy.CommittedItems);
         }
@@ -233,14 +237,14 @@ namespace B2B.CimMessageAdapter.Tests
         private MessageReceiver CreateMessageReceiver()
         {
             _transactionQueueDispatcherSpy = new TransactionQueueDispatcherStub();
-            var messageReceiver = new MessageReceiver(_messageIdsStub, _transactionQueueDispatcherSpy, _transactionIdsStub, new SchemaProvider(new SchemaStore()), _marketActorAuthenticator);
+            var messageReceiver = new MessageReceiver(_messageIds, _transactionQueueDispatcherSpy, _transactionIds, new SchemaProvider(new SchemaStore()), _marketActorAuthenticator);
             return messageReceiver;
         }
 
         private MessageReceiver CreateMessageReceiver(IMessageIds messageIds)
         {
             _transactionQueueDispatcherSpy = new TransactionQueueDispatcherStub();
-            var messageReceiver = new MessageReceiver(messageIds, _transactionQueueDispatcherSpy, _transactionIdsStub, new SchemaProvider(new SchemaStore()), _marketActorAuthenticator);
+            var messageReceiver = new MessageReceiver(messageIds, _transactionQueueDispatcherSpy, _transactionIds, new SchemaProvider(new SchemaStore()), _marketActorAuthenticator);
             return messageReceiver;
         }
 
