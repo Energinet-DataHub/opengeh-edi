@@ -17,6 +17,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
+using Microsoft.Extensions.Logging;
 using TraceContext = B2B.Transactions.Infrastructure.Configuration.Correlation;
 
 namespace B2B.Transactions.Infrastructure.Configuration.Correlation
@@ -24,17 +25,20 @@ namespace B2B.Transactions.Infrastructure.Configuration.Correlation
     public class CorrelationIdMiddleware : IFunctionsWorkerMiddleware
     {
         private readonly ICorrelationContext _correlationContext;
+        private readonly ILogger<CorrelationIdMiddleware> _logger;
 
         public CorrelationIdMiddleware(
-            ICorrelationContext correlationContext)
+            ICorrelationContext correlationContext, ILogger<CorrelationIdMiddleware> logger)
         {
             _correlationContext = correlationContext;
+            _logger = logger;
         }
 
         public async Task Invoke(FunctionContext context, [NotNull] FunctionExecutionDelegate next)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
+            _logger.LogInformation("Parsed TraceContext: " + context.TraceContext.TraceParent ?? string.Empty);
             var traceContext = TraceContext.Parse(context.TraceContext.TraceParent);
 
             _correlationContext.SetId(traceContext.TraceId);
