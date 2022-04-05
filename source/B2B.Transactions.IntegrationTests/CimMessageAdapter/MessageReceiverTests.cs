@@ -41,12 +41,13 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
 
         private readonly MarketActorAuthenticator _marketActorAuthenticator = new();
         private readonly ITransactionIds _transactionIds;
-        private readonly MessageIdsStub _messageIdsStub = new();
+        private readonly IMessageIds _messageIds;
         private TransactionQueueDispatcherStub _transactionQueueDispatcherSpy = new();
 
         public MessageReceiverTests()
         {
             _transactionIds = GetService<ITransactionIds>();
+            _messageIds = GetService<IMessageIds>();
             _marketActorAuthenticator.Authenticate(CreateIdentity());
         }
 
@@ -187,8 +188,7 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
         [Fact]
         public async Task Activity_records_are_not_committed_to_queue_if_any_message_header_values_are_invalid()
         {
-            var messageIds = new MessageIdsStub();
-            await SimulateDuplicationOfMessageIds(messageIds).ConfigureAwait(false);
+            await SimulateDuplicationOfMessageIds(_messageIds).ConfigureAwait(false);
 
             Assert.Empty(_transactionQueueDispatcherSpy.CommittedItems);
         }
@@ -235,7 +235,7 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
         private MessageReceiver CreateMessageReceiver()
         {
             _transactionQueueDispatcherSpy = new TransactionQueueDispatcherStub();
-            var messageReceiver = new MessageReceiver(_messageIdsStub, _transactionQueueDispatcherSpy, _transactionIds, new SchemaProvider(new SchemaStore()), _marketActorAuthenticator);
+            var messageReceiver = new MessageReceiver(_messageIds, _transactionQueueDispatcherSpy, _transactionIds, new SchemaProvider(new SchemaStore()), _marketActorAuthenticator);
             return messageReceiver;
         }
 
