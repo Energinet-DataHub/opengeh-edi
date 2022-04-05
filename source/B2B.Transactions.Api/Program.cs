@@ -21,6 +21,7 @@ using B2B.Transactions.Infrastructure.Authentication.MarketActors;
 using B2B.Transactions.Infrastructure.Configuration;
 using B2B.Transactions.Infrastructure.Configuration.Correlation;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -45,6 +46,7 @@ namespace B2B.Transactions.Api
                 })
                 .ConfigureServices(services =>
                 {
+                    services.AddScoped<ICorrelationContext, CorrelationContext>();
                     CompositionRoot.Initialize(services)
                         .AddBearerAuthentication(tokenValidationParameters)
                         .AddDatabaseConnectionFactory(
