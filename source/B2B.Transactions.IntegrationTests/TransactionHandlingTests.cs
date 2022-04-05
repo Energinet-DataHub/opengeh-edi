@@ -15,6 +15,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using B2B.Transactions.IntegrationTests.TestDoubles;
 using B2B.Transactions.Messages;
 using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.Transactions;

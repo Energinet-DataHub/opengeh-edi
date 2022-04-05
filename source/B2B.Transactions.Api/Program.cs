@@ -15,13 +15,11 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Threading.Tasks;
-using B2B.Transactions.Infrastructure;
 using B2B.Transactions.Infrastructure.Authentication.Bearer;
 using B2B.Transactions.Infrastructure.Authentication.MarketActors;
 using B2B.Transactions.Infrastructure.Configuration;
 using B2B.Transactions.Infrastructure.Configuration.Correlation;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -46,11 +44,13 @@ namespace B2B.Transactions.Api
                 })
                 .ConfigureServices(services =>
                 {
+                    var databaseConnectionString =
+                        Environment.GetEnvironmentVariable("MARKET_DATA_DB_CONNECTION_STRING");
                     CompositionRoot.Initialize(services)
                         .AddBearerAuthentication(tokenValidationParameters)
-                        .AddDatabaseConnectionFactory(
-                            Environment.GetEnvironmentVariable("MARKET_DATA_DB_CONNECTION_STRING")!)
+                        .AddDatabaseConnectionFactory(databaseConnectionString!)
                         .AddSystemClock(new SystemDateTimeProvider())
+                        .AddDatabaseContext(databaseConnectionString!)
                         .AddCorrelationContext(sp =>
                         {
                             var correlationContext = new CorrelationContext();

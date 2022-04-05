@@ -15,7 +15,7 @@
 using System.IO;
 using System.Xml.Linq;
 
-namespace B2B.CimMessageAdapter.Tests.Messages
+namespace B2B.Transactions.IntegrationTests.CimMessageAdapter.Messages
 {
     public class BusinessMessageBuilder
     {
@@ -30,7 +30,7 @@ namespace B2B.CimMessageAdapter.Tests.Messages
 
         public static BusinessMessageBuilder RequestChangeOfSupplier()
         {
-            return new BusinessMessageBuilder("Messages//RequestChangeOfSupplier.xml", "urn:ediel.org:structure:requestchangeofsupplier:0:1");
+            return new BusinessMessageBuilder("CimMessageAdapter//Messages//RequestChangeOfSupplier.xml", "urn:ediel.org:structure:requestchangeofsupplier:0:1");
         }
 
         public BusinessMessageBuilder WithSenderRole(string roleType)
