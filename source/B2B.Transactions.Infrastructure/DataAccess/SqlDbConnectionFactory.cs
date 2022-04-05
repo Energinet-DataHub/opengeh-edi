@@ -14,9 +14,10 @@
 
 using System;
 using System.Data;
+using B2B.Transactions.DataAccess;
 using Microsoft.Data.SqlClient;
 
-namespace B2B.Transactions.DataAccess
+namespace B2B.Transactions.Infrastructure.DataAccess
 {
     public class SqlDbConnectionFactory : IDbConnectionFactory, IDisposable
     {

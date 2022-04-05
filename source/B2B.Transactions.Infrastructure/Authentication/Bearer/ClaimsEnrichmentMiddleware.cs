@@ -14,12 +14,10 @@
 
 using System;
 using System.Linq;
-using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using B2B.Transactions.DataAccess;
 using Dapper;
-using Energinet.DataHub.Core.App.Common.Abstractions.Actor;
-using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;
@@ -118,4 +116,6 @@ namespace B2B.Transactions.Infrastructure.Authentication.Bearer
             return result;
         }
     }
+
+    public record Actor(Guid ActorId, string IdentificationType, string Identifier, string Roles);
 }

@@ -15,10 +15,11 @@
 using System;
 using System.Linq;
 using System.Security.Claims;
+using B2B.Transactions.Authentication;
 
 namespace B2B.Transactions.Infrastructure.Authentication.MarketActors
 {
-    public class MarketActorAuthenticator
+    public class MarketActorAuthenticator : IMarketActorAuthenticator
     {
         public MarketActorIdentity CurrentIdentity { get; private set; } = new NotAuthenticated();
 

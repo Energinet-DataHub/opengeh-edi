@@ -15,9 +15,9 @@
 using System;
 using System.Text;
 using System.Threading.Tasks;
+using B2B.Transactions.Infrastructure.Configuration.Correlation;
+using B2B.Transactions.Infrastructure.Serialization;
 using B2B.Transactions.Transactions;
-using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
-using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
@@ -28,13 +28,13 @@ namespace B2B.Transactions.Api
         private readonly ILogger _logger;
         private readonly ICorrelationContext _correlationContext;
         private readonly RegisterTransaction _registerTransaction;
-        private readonly IJsonSerializer _jsonSerializer;
+        private readonly ISerializer _jsonSerializer;
 
         public B2BTransactionQueueTrigger(
             ILogger logger,
             ICorrelationContext correlationContext,
             RegisterTransaction registerTransaction,
-            IJsonSerializer jsonSerializer)
+            ISerializer jsonSerializer)
         {
             _logger = logger;
             _correlationContext = correlationContext;
@@ -44,7 +44,7 @@ namespace B2B.Transactions.Api
 
         [Function("B2BTransactionQueueTrigger")]
         public async Task RunAsync(
-            [ServiceBusTrigger("%MARKET_DATA_QUEUE_NAME%", Connection = "MARKET_DATA_QUEUE_CONNECTION_STRING")] byte[] data,
+            [ServiceBusTrigger("%MARKET_DATA_QUEUE_NAME%", Connection = "MARKET_DATA_QUEUE_CONNECTION_STRING_LISTENER")] byte[] data,
             FunctionContext context)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));

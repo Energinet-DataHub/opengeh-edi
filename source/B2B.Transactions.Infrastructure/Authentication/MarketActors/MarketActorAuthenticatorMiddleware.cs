@@ -13,12 +13,10 @@
 // limitations under the License.
 
 using System;
-using System.Net;
 using System.Threading.Tasks;
+using B2B.Transactions.Authentication;
 using B2B.Transactions.Infrastructure.Authentication.Bearer;
-using Energinet.DataHub.Core.App.Common;
 using Microsoft.Azure.Functions.Worker;
-using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;
 
@@ -27,10 +25,10 @@ namespace B2B.Transactions.Infrastructure.Authentication.MarketActors
     public class MarketActorAuthenticatorMiddleware : IFunctionsWorkerMiddleware
     {
         private readonly CurrentClaimsPrincipal _currentClaimsPrincipal;
-        private readonly MarketActorAuthenticator _marketActorAuthenticator;
+        private readonly IMarketActorAuthenticator _marketActorAuthenticator;
         private readonly ILogger<MarketActorAuthenticatorMiddleware> _logger;
 
-        public MarketActorAuthenticatorMiddleware(CurrentClaimsPrincipal currentClaimsPrincipal, MarketActorAuthenticator marketActorAuthenticator, ILogger<MarketActorAuthenticatorMiddleware> logger)
+        public MarketActorAuthenticatorMiddleware(CurrentClaimsPrincipal currentClaimsPrincipal, IMarketActorAuthenticator marketActorAuthenticator, ILogger<MarketActorAuthenticatorMiddleware> logger)
         {
             _currentClaimsPrincipal = currentClaimsPrincipal ?? throw new ArgumentNullException(nameof(currentClaimsPrincipal));
             _marketActorAuthenticator = marketActorAuthenticator ?? throw new ArgumentNullException(nameof(marketActorAuthenticator));

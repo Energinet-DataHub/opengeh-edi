@@ -15,31 +15,26 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
-using Microsoft.Extensions.Logging;
-using TraceContext = Energinet.DataHub.MarketRoles.Infrastructure.Correlation.TraceContext;
+using TraceContext = B2B.Transactions.Infrastructure.Configuration.Correlation;
 
-namespace Energinet.DataHub.MarketRoles.EntryPoints.Common
+namespace B2B.Transactions.Infrastructure.Configuration.Correlation
 {
     public class CorrelationIdMiddleware : IFunctionsWorkerMiddleware
     {
         private readonly ICorrelationContext _correlationContext;
-        private readonly ILogger<CorrelationIdMiddleware> _logger;
 
         public CorrelationIdMiddleware(
-            ICorrelationContext correlationContext, ILogger<CorrelationIdMiddleware> logger)
+            ICorrelationContext correlationContext)
         {
             _correlationContext = correlationContext;
-            _logger = logger;
         }
 
         public async Task Invoke(FunctionContext context, [NotNull] FunctionExecutionDelegate next)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
-            _logger.LogInformation("Parsed TraceContext: " + context.TraceContext.TraceParent ?? string.Empty);
             var traceContext = TraceContext.Parse(context.TraceContext.TraceParent);
 
             _correlationContext.SetId(traceContext.TraceId);

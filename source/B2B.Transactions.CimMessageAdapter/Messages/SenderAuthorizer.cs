@@ -16,21 +16,22 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using B2B.CimMessageAdapter.Errors;
-using B2B.Transactions.Infrastructure.Authentication.MarketActors;
+using B2B.Transactions;
+using B2B.Transactions.Authentication;
 
 namespace B2B.CimMessageAdapter.Messages
 {
     public class SenderAuthorizer
     {
         private const string EnergySupplierRole = "DDQ";
-        private readonly MarketActorAuthenticator _marketActorAuthenticator;
+        private readonly IMarketActorAuthenticator _marketActorAuthenticator;
         private readonly List<ValidationError> _validationErrors = new();
         private readonly Dictionary<string, string> _rolesMap = new(StringComparer.OrdinalIgnoreCase)
         {
             { "DDQ", "electricalsupplier" },
         };
 
-        public SenderAuthorizer(MarketActorAuthenticator marketActorAuthenticator)
+        public SenderAuthorizer(IMarketActorAuthenticator marketActorAuthenticator)
         {
             _marketActorAuthenticator = marketActorAuthenticator ?? throw new ArgumentNullException(nameof(marketActorAuthenticator));
         }

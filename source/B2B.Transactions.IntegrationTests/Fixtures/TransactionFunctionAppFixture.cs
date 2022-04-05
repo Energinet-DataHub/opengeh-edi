@@ -12,15 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using Energinet.DataHub.Core.FunctionApp.TestCommon;
 
-namespace B2B.Transactions.Infrastructure.Authentication.MarketActors
+namespace B2B.Transactions.IntegrationTests.Fixtures
 {
-    public class Authenticated : MarketActorIdentity
+    public class TransactionFunctionAppFixture : FunctionAppFixture
     {
-        public Authenticated(string id, string actorIdentifier, IdentifierType actorIdentifierType, IEnumerable<string> roles)
-            : base(id, actorIdentifier, actorIdentifierType, roles)
-        {
-        }
     }
 }

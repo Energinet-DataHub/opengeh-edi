@@ -20,11 +20,7 @@ limitations under the License.
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Energinet.DataHub.MarketRoles.Domain\Energinet.DataHub.MarketRoles.Domain.csproj" />
-      <ProjectReference Include="..\Energinet.DataHub.MarketRoles.Infrastructure\Energinet.DataHub.MarketRoles.Infrastructure.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
+      <PackageReference Include="Dapper" Version="2.0.90" />
       <PackageReference Include="Microsoft.Azure.Functions.Worker.Core" Version="1.4.0" />
       <PackageReference Include="Microsoft.Data.SqlClient" Version="2.0.1" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.7" />
@@ -47,6 +43,14 @@ limitations under the License.
       <Reference Include="Microsoft.Azure.DocumentDB.Core, Version=2.11.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
         <HintPath>..\..\..\..\Users\KristianFaurskovThom\AppData\Roaming\JetBrains\Rider2021.2\azure-functions-coretools\4.0.3971\Microsoft.Azure.DocumentDB.Core.dll</HintPath>
       </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Infrastructure\CompositionRoot.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Energinet.DataHub.MarketRoles.Domain\Energinet.DataHub.MarketRoles.Domain.csproj" />
     </ItemGroup>
 
 </Project>
