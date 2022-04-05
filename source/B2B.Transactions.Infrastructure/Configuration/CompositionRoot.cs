@@ -23,14 +23,18 @@ using B2B.Transactions.Infrastructure.Authentication.Bearer;
 using B2B.Transactions.Infrastructure.Authentication.MarketActors;
 using B2B.Transactions.Infrastructure.Configuration.Correlation;
 using B2B.Transactions.Infrastructure.DataAccess;
+using B2B.Transactions.Infrastructure.DataAccess.Transaction;
 using B2B.Transactions.Infrastructure.Messages;
 using B2B.Transactions.Infrastructure.Serialization;
 using B2B.Transactions.Infrastructure.Transactions;
 using B2B.Transactions.OutgoingMessages;
+using B2B.Transactions.Transactions;
 using B2B.Transactions.Xml.Incoming;
 using B2B.Transactions.Xml.Outgoing;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -49,6 +53,7 @@ namespace B2B.Transactions.Infrastructure.Configuration
             services.AddScoped<IMessageIds, MessageIdRegistry>();
             services.AddScoped<IDocumentProvider<IMessage>, AcceptDocumentProvider>();
             services.AddScoped<ITransactionQueueDispatcher, TransactionQueueDispatcher>();
+            services.AddScoped<ITransactionRepository, TransactionRepository>();
             services.AddLogging();
             AddXmlSchema(services);
         }
@@ -56,6 +61,15 @@ namespace B2B.Transactions.Infrastructure.Configuration
         public static CompositionRoot Initialize(IServiceCollection services)
         {
             return new CompositionRoot(services);
+        }
+
+        public CompositionRoot AddDatabaseContext(string connectionString)
+        {
+            _services.AddDbContext<B2BContext>(x =>
+            {
+                x.UseSqlServer(connectionString, y => y.UseNodaTime());
+            });
+            return this;
         }
 
         public CompositionRoot AddSystemClock(ISystemDateTimeProvider provider)
