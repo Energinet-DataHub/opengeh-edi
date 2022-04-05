@@ -12,20 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using B2B.Transactions.OutgoingMessages;
+using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using NodaTime;
 
-namespace B2B.Transactions.Tests
+namespace B2B.Transactions.IntegrationTests
 {
-    public class OutgoingMessageStoreSpy : IOutgoingMessageStore
+    public class SystemDateTimeProviderStub : ISystemDateTimeProvider
     {
-        private readonly List<IMessage> _messages = new();
+        private Instant _now = SystemClock.Instance.GetCurrentInstant();
 
-        public IReadOnlyCollection<IMessage> Messages => _messages.AsReadOnly();
-
-        public void Add(IMessage message)
+        public void SetNow(Instant now)
         {
-            _messages.Add(message);
+            _now = now;
+        }
+
+        public Instant Now()
+        {
+            return _now;
         }
     }
 }

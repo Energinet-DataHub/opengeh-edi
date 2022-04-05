@@ -12,33 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Xunit;
+using System.Collections.Generic;
+using B2B.Transactions.OutgoingMessages;
 
-namespace B2B.Transactions.Tests.Tooling
+namespace B2B.Transactions.IntegrationTests
 {
-    public class DatabaseFixture : IAsyncLifetime
+    public class OutgoingMessageStoreSpy : IOutgoingMessageStore
     {
-        public DatabaseFixture()
-        {
-            DatabaseManager = new B2BContextDatabaseManager();
-        }
+        private readonly List<IMessage> _messages = new();
 
-        public B2BContextDatabaseManager DatabaseManager { get; }
+        public IReadOnlyCollection<IMessage> Messages => _messages.AsReadOnly();
 
-        public Task InitializeAsync()
+        public void Add(IMessage message)
         {
-            return DatabaseManager.CreateDatabaseAsync();
-        }
-
-        public Task DisposeAsync()
-        {
-            return DatabaseManager.DeleteDatabaseAsync();
-        }
-
-        public bool Dispose()
-        {
-            return DatabaseManager.DeleteDatabase();
+            _messages.Add(message);
         }
     }
 }

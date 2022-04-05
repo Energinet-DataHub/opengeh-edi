@@ -52,7 +52,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "B2B", "B2B", "{1C877C68-8E3
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "B2B.Transactions.Api", "B2B.Transactions.Api\B2B.Transactions.Api.csproj", "{B14EBA74-CCAF-4677-8AE5-A0F6302ED54C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "B2B.Transactions.Tests", "B2B.Transactions.Tests\B2B.Transactions.Tests.csproj", "{76FA7684-27E1-4022-9FB3-F72811E45C60}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "B2B.Transactions.IntegrationTests", "B2B.Transactions.IntegrationTests\B2B.Transactions.IntegrationTests.csproj", "{76FA7684-27E1-4022-9FB3-F72811E45C60}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "B2B.Transactions", "B2B.Transactions\B2B.Transactions.csproj", "{FB4D9AE5-FCF2-442D-97EC-8AED1F9DDD2E}"
 EndProject
