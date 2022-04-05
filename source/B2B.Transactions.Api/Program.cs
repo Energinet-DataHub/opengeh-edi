@@ -45,7 +45,7 @@ namespace B2B.Transactions.Api
                 .ConfigureServices(services =>
                 {
                     var databaseConnectionString =
-                        Environment.GetEnvironmentVariable("MARKET_DATA_DB_CONNECTION_STRING");
+                        Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
                     CompositionRoot.Initialize(services)
                         .AddBearerAuthentication(tokenValidationParameters)
                         .AddDatabaseConnectionFactory(databaseConnectionString!)
