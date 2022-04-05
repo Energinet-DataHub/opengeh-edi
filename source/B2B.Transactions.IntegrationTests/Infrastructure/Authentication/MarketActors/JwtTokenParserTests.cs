@@ -21,7 +21,7 @@ using B2B.Transactions.Infrastructure.Authentication.Bearer.Errors;
 using Microsoft.IdentityModel.Tokens;
 using Xunit;
 
-namespace B2B.Transactions.Tests.Infrastructure
+namespace B2B.Transactions.IntegrationTests.Infrastructure.Authentication.MarketActors
 {
     public class JwtTokenParserTests
     {

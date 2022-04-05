@@ -47,11 +47,13 @@ namespace B2B.Transactions.Api
                 })
                 .ConfigureServices(services =>
                 {
+                    var databaseConnectionString =
+                        Environment.GetEnvironmentVariable("MARKET_DATA_DB_CONNECTION_STRING");
                     CompositionRoot.Initialize(services)
                         .AddBearerAuthentication(tokenValidationParameters)
-                        .AddDatabaseConnectionFactory(
-                            Environment.GetEnvironmentVariable("MARKET_DATA_DB_CONNECTION_STRING")!)
+                        .AddDatabaseConnectionFactory(databaseConnectionString!)
                         .AddSystemClock(new SystemDateTimeProvider())
+                        .AddDatabaseContext(databaseConnectionString!)
                         .AddCorrelationContext(sp =>
                         {
                             var correlationContext = new CorrelationContext();
@@ -62,7 +64,7 @@ namespace B2B.Transactions.Api
                             return correlationContext;
                         })
                         .AddTransactionQueue(
-                            Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_CONNECTION_STRING")!,
+                            Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_CONNECTION_STRING_LISTENER")!,
                             Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_NAME")!)
                         .AddRequestLogging(
                             Environment.GetEnvironmentVariable("REQUEST_RESPONSE_LOGGING_CONNECTION_STRING")!,

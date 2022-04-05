@@ -12,36 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using B2B.Transactions.Infrastructure.DataAccess.Transaction;
+using B2B.Transactions.IntegrationTests.TestDoubles;
 using B2B.Transactions.Messages;
 using B2B.Transactions.OutgoingMessages;
-using B2B.Transactions.Tests.Tooling;
 using B2B.Transactions.Transactions;
 using B2B.Transactions.Xml.Outgoing;
 using Xunit;
 
-namespace B2B.Transactions.Tests
+namespace B2B.Transactions.IntegrationTests
 {
-    [Collection("IntegrationTest")]
-    public class TransactionHandlingTests : IDisposable
+    public class TransactionHandlingTests : TestBase
     {
         private static readonly SystemDateTimeProviderStub _dateTimeProvider = new();
-        private readonly DatabaseFixture _databaseFixture;
         private readonly ITransactionRepository _transactionRepository;
         private readonly XNamespace _namespace = "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1";
         private OutgoingMessageStoreSpy _outgoingMessageStoreSpy = new();
         private IDocumentProvider<IMessage> _documentProvider = new AcceptDocumentProvider(_dateTimeProvider);
-        private bool _disposed;
 
         public TransactionHandlingTests()
         {
-            _databaseFixture = new DatabaseFixture();
-            _databaseFixture.DatabaseManager.CreateDatabase();
-            _transactionRepository = new TransactionRepository(_databaseFixture.DatabaseManager.CreateDbContext());
+            _transactionRepository =
+                GetService<ITransactionRepository>();
         }
 
         [Fact]
@@ -79,23 +73,6 @@ namespace B2B.Transactions.Tests
             Assert.NotNull(GetMarketActivityRecordValue(document, "mRID"));
             AssertMarketActivityRecordValue(document, "originalTransactionIDReference_MktActivityRecord.mRID", transaction.MarketActivityRecord.Id);
             AssertMarketActivityRecordValue(document, "marketEvaluationPoint.mRID", transaction.MarketActivityRecord.MarketEvaluationPointId);
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposed)
-            {
-                return;
-            }
-
-            _databaseFixture.Dispose();
-            _disposed = true;
         }
 
         private static B2BTransaction CreateTransaction()

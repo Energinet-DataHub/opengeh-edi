@@ -12,19 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using B2B.CimMessageAdapter.Messages;
+using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using NodaTime;
 
-namespace B2B.CimMessageAdapter.Tests.Stubs
+namespace B2B.Transactions.IntegrationTests.TestDoubles
 {
-    public class MessageIdsStub : IMessageIds
+    public class SystemDateTimeProviderStub : ISystemDateTimeProvider
     {
-        private readonly HashSet<string> _messageIds = new();
+        private Instant _now = SystemClock.Instance.GetCurrentInstant();
 
-        public Task<bool> TryStoreAsync(string messageId)
+        public void SetNow(Instant now)
         {
-            return Task.FromResult(_messageIds.Add(messageId));
+            _now = now;
+        }
+
+        public Instant Now()
+        {
+            return _now;
         }
     }
 }

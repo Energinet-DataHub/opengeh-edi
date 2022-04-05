@@ -17,21 +17,18 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace B2B.Transactions.Infrastructure.Authentication.Bearer
 {
     public class BearerAuthenticationMiddleware : IFunctionsWorkerMiddleware
     {
-        private readonly JwtTokenParser _jwtTokenParser;
         private readonly ILogger<BearerAuthenticationMiddleware> _logger;
-        private readonly CurrentClaimsPrincipal _currentClaimsPrincipal;
 
-        public BearerAuthenticationMiddleware(JwtTokenParser jwtTokenParser, ILogger<BearerAuthenticationMiddleware> logger, CurrentClaimsPrincipal currentClaimsPrincipal)
+        public BearerAuthenticationMiddleware(ILogger<BearerAuthenticationMiddleware> logger)
         {
-            _jwtTokenParser = jwtTokenParser ?? throw new ArgumentNullException(nameof(jwtTokenParser));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _currentClaimsPrincipal = currentClaimsPrincipal ?? throw new ArgumentNullException(nameof(currentClaimsPrincipal));
         }
 
         public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
@@ -52,7 +49,8 @@ namespace B2B.Transactions.Infrastructure.Authentication.Bearer
                 return;
             }
 
-            var result = _jwtTokenParser.ParseFrom(httpRequestData.Headers);
+            var jwtTokenParser = context.GetService<JwtTokenParser>();
+            var result = jwtTokenParser.ParseFrom(httpRequestData.Headers);
             if (result.Success == false)
             {
                 LogParseResult(result);
@@ -60,7 +58,8 @@ namespace B2B.Transactions.Infrastructure.Authentication.Bearer
                 return;
             }
 
-            _currentClaimsPrincipal.SetCurrentUser(result.ClaimsPrincipal!);
+            var currentClaimsPrincipal = context.GetService<CurrentClaimsPrincipal>();
+            currentClaimsPrincipal.SetCurrentUser(result.ClaimsPrincipal!);
             _logger.LogInformation("Bearer token authentication succeeded.");
             await next(context).ConfigureAwait(false);
         }

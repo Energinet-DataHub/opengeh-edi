@@ -20,26 +20,26 @@ using B2B.Transactions.DataAccess;
 using Dapper;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace B2B.Transactions.Infrastructure.Authentication.Bearer
 {
     public class ClaimsEnrichmentMiddleware : IFunctionsWorkerMiddleware
     {
-        private readonly CurrentClaimsPrincipal _currentClaimsPrincipal;
         private readonly ILogger<ClaimsEnrichmentMiddleware> _logger;
-        private readonly IDbConnectionFactory _connectionFactory;
 
-        public ClaimsEnrichmentMiddleware(CurrentClaimsPrincipal currentClaimsPrincipal, ILogger<ClaimsEnrichmentMiddleware> logger, IDbConnectionFactory connectionFactory)
+        public ClaimsEnrichmentMiddleware(ILogger<ClaimsEnrichmentMiddleware> logger)
         {
-            _currentClaimsPrincipal = currentClaimsPrincipal ?? throw new ArgumentNullException(nameof(currentClaimsPrincipal));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _connectionFactory = connectionFactory;
         }
 
         public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
         {
+            if (context == null) throw new ArgumentNullException(nameof(context));
             if (next == null) throw new ArgumentNullException(nameof(next));
+            var currentClaimsPrincipal = context.GetService<CurrentClaimsPrincipal>();
+
             if (!context.Is(FunctionContextExtensions.TriggerType.HttpTrigger))
             {
                 _logger.LogInformation("Functions is not triggered by HTTP. Call next middleware.");
@@ -55,14 +55,14 @@ namespace B2B.Transactions.Infrastructure.Authentication.Bearer
                 return;
             }
 
-            if (_currentClaimsPrincipal.ClaimsPrincipal is null)
+            if (currentClaimsPrincipal.ClaimsPrincipal is null)
             {
                 _logger.LogError("No current authenticated user");
                 context.RespondWithUnauthorized(httpRequestData);
                 return;
             }
 
-            var marketActorId = GetMarketActorId(_currentClaimsPrincipal.ClaimsPrincipal);
+            var marketActorId = GetMarketActorId(currentClaimsPrincipal.ClaimsPrincipal);
             if (string.IsNullOrEmpty(marketActorId))
             {
                 _logger.LogError("Could not read market actor id from claims principal.");
@@ -70,7 +70,8 @@ namespace B2B.Transactions.Infrastructure.Authentication.Bearer
                 return;
             }
 
-            var actor = await GetActorAsync(Guid.Parse(marketActorId)).ConfigureAwait(false);
+            var connectionFactory = context.GetService<IDbConnectionFactory>();
+            var actor = await GetActorAsync(Guid.Parse(marketActorId), connectionFactory).ConfigureAwait(false);
             if (actor is null)
             {
                 _logger.LogError($"Could not find an actor in the database with id {marketActorId}");
@@ -78,8 +79,8 @@ namespace B2B.Transactions.Infrastructure.Authentication.Bearer
                 return;
             }
 
-            var identity = CreateClaimsIdentityFrom(actor);
-            _currentClaimsPrincipal.SetCurrentUser(new ClaimsPrincipal(identity));
+            var identity = CreateClaimsIdentityFrom(actor, currentClaimsPrincipal);
+            currentClaimsPrincipal.SetCurrentUser(new ClaimsPrincipal(identity));
 
             await next(context).ConfigureAwait(false);
         }
@@ -89,13 +90,13 @@ namespace B2B.Transactions.Infrastructure.Authentication.Bearer
             return claimsPrincipal.FindFirst(claim => claim.Type.Equals("azp", StringComparison.OrdinalIgnoreCase))?.Value;
         }
 
-        private ClaimsIdentity CreateClaimsIdentityFrom(Actor actor)
+        private static ClaimsIdentity CreateClaimsIdentityFrom(Actor actor, CurrentClaimsPrincipal currentClaimsPrincipal)
         {
-            var claims = _currentClaimsPrincipal.ClaimsPrincipal!.Claims.ToList();
+            var claims = currentClaimsPrincipal.ClaimsPrincipal!.Claims.ToList();
             claims.Add(new Claim("actorid", actor.Identifier));
             claims.Add(new Claim("actoridtype", actor.IdentificationType));
 
-            var currentIdentity = _currentClaimsPrincipal.ClaimsPrincipal?.Identity as ClaimsIdentity;
+            var currentIdentity = currentClaimsPrincipal.ClaimsPrincipal?.Identity as ClaimsIdentity;
             var identity = new ClaimsIdentity(
                 claims,
                 currentIdentity!.AuthenticationType,
@@ -104,11 +105,11 @@ namespace B2B.Transactions.Infrastructure.Authentication.Bearer
             return identity;
         }
 
-        private async Task<Actor?> GetActorAsync(Guid actorId)
+        private static async Task<Actor?> GetActorAsync(Guid actorId, IDbConnectionFactory connectionFactory)
         {
             var sql = "SELECT TOP 1 [Id] AS ActorId,[IdentificationType],[IdentificationNumber] AS Identifier,[Roles] FROM [dbo].[Actor] WHERE Id = @ActorId";
 
-            var result = await _connectionFactory
+            var result = await connectionFactory
                 .GetOpenConnection()
                 .QuerySingleOrDefaultAsync<Actor>(sql, new { ActorId = actorId })
                 .ConfigureAwait(false);
