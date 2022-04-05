@@ -21,7 +21,6 @@ using Xunit;
 
 namespace B2B.Transactions.IntegrationTests.Infrastructure.Authentication.MarketActors
 {
-    #pragma warning disable
     public class MarketActorAuthenticatorTests
     {
         [Fact]
@@ -38,8 +37,8 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.Authentication.Market
             var authenticator = new MarketActorAuthenticator();
             var claims = new List<Claim>()
             {
-                new ("role", "balanceresponsibleparty"),
-                new ("role", "electricalsupplier"),
+                new(ClaimTypes.Role, "balanceresponsibleparty"),
+                new(ClaimTypes.Role, "electricalsupplier"),
             };
             var claimsPrincipal = CreateIdentity(claims);
 
@@ -57,27 +56,27 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.Authentication.Market
             authenticator.Authenticate(claimsPrincipal);
 
             Assert.IsType<Authenticated>(authenticator.CurrentIdentity);
-            Assert.Equal(GetClaimValue(claimsPrincipal,"azp"), authenticator.CurrentIdentity.Id);
+            Assert.Equal(GetClaimValue(claimsPrincipal, "azp"), authenticator.CurrentIdentity.Id);
             Assert.Equal(GetClaimValue(claimsPrincipal, "actorid"), authenticator.CurrentIdentity.ActorIdentifier);
-            Assert.Equal(Enum.Parse<MarketActorIdentity.IdentifierType>(GetClaimValue(claimsPrincipal, "actoridtype"), true), authenticator.CurrentIdentity.ActorIdentifierType);
+            Assert.Equal(Enum.Parse<MarketActorIdentity.IdentifierType>(GetClaimValue(claimsPrincipal, "actoridtype")!, true), authenticator.CurrentIdentity.ActorIdentifierType);
             Assert.True(authenticator.CurrentIdentity.HasRole("balanceresponsibleparty"));
             Assert.True(authenticator.CurrentIdentity.HasRole("electricalsupplier"));
         }
 
-        private string? GetClaimValue(ClaimsPrincipal claimsPrincipal, string claimName)
+        private static string? GetClaimValue(ClaimsPrincipal claimsPrincipal, string claimName)
         {
             return claimsPrincipal.FindFirst(claim => claim.Type.Equals(claimName, StringComparison.OrdinalIgnoreCase))?.Value;
         }
 
-        private ClaimsPrincipal CreateIdentity(List<Claim>? claims = null)
+        private static ClaimsPrincipal CreateIdentity(List<Claim>? claims = null)
         {
             var validClaims = new List<Claim>()
             {
-                new ("azp", Guid.NewGuid().ToString()),
-                new ("actorid", Guid.NewGuid().ToString()),
-                new ("actoridtype", "GLN"),
-                new ("role", "balanceresponsibleparty"),
-                new ("role", "electricalsupplier"),
+                new("azp", Guid.NewGuid().ToString()),
+                new("actorid", Guid.NewGuid().ToString()),
+                new("actoridtype", "GLN"),
+                new(ClaimTypes.Role, "balanceresponsibleparty"),
+                new(ClaimTypes.Role, "electricalsupplier"),
             };
 
             var identity = new ClaimsIdentity(claims ?? validClaims);
