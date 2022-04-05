@@ -39,8 +39,8 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Common
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
+            _logger.LogInformation("Parsed TraceContext: " + context.TraceContext.TraceParent ?? string.Empty);
             var traceContext = TraceContext.Parse(context.TraceContext.TraceParent);
-            _logger.LogInformation($"Parsed TraceContext:  TraceId={traceContext.TraceId}, TraceParent={traceContext.ParentId}");
 
             _correlationContext.SetId(traceContext.TraceId);
             _correlationContext.SetParentId(traceContext.ParentId);
