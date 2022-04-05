@@ -16,9 +16,9 @@ using System;
 using System.Threading.Tasks;
 using B2B.Transactions.Authentication;
 using B2B.Transactions.Infrastructure.Authentication.Bearer;
+using B2B.Transactions.Infrastructure.Serialization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace B2B.Transactions.Infrastructure.Authentication.MarketActors
@@ -69,8 +69,15 @@ namespace B2B.Transactions.Infrastructure.Authentication.MarketActors
                 return;
             }
 
-            _logger.LogInformation("Successfully authenticated market actor identity.");
+            var serializer = context.GetService<ISerializer>();
+            WriteAuthenticatedIdentityToLog(marketActorAuthenticator, serializer);
             await next(context).ConfigureAwait(false);
+        }
+
+        private void WriteAuthenticatedIdentityToLog(IMarketActorAuthenticator marketActorAuthenticator, ISerializer serializer)
+        {
+            _logger.LogInformation("Successfully authenticated market actor identity.");
+            _logger.LogInformation(serializer.Serialize(marketActorAuthenticator.CurrentIdentity));
         }
     }
 }

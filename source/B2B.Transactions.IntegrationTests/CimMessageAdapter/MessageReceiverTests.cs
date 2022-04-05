@@ -36,8 +36,8 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
             new("azp", Guid.NewGuid().ToString()),
             new("actorid", "5799999933318"),
             new("actoridtype", "GLN"),
-            new("role", "balanceresponsibleparty"),
-            new("role", "electricalsupplier"),
+            new(ClaimTypes.Role, "balanceresponsibleparty"),
+            new(ClaimTypes.Role, "electricalsupplier"),
         };
 
         private readonly IMarketActorAuthenticator _marketActorAuthenticator;
@@ -280,7 +280,7 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
         private ClaimsPrincipal CreateIdentityWithoutRoles()
         {
             var claims = _claims.ToList();
-            claims.RemoveAll(claim => claim.Type.Equals("role", StringComparison.OrdinalIgnoreCase));
+            claims.RemoveAll(claim => claim.Type.Equals(ClaimTypes.Role, StringComparison.OrdinalIgnoreCase));
             return CreateClaimsPrincipal(claims);
         }
     }
