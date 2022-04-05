@@ -41,7 +41,9 @@ namespace B2B.Transactions.Infrastructure.Configuration.Correlation
             _logger.LogInformation("Parsed TraceContext: " + context.TraceContext.TraceParent ?? string.Empty);
             var traceContext = TraceContext.Parse(context.TraceContext.TraceParent);
 
+            _logger.LogInformation("Setting TraceId: " + traceContext.TraceId ?? "null");
             _correlationContext.SetId(traceContext.TraceId);
+            _logger.LogInformation("Setting ParentId: " + traceContext.ParentId ?? "null");
             _correlationContext.SetParentId(traceContext.ParentId);
 
             await next(context).ConfigureAwait(false);

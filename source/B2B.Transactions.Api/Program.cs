@@ -52,7 +52,7 @@ namespace B2B.Transactions.Api
                         .AddDatabaseConnectionFactory(
                             Environment.GetEnvironmentVariable("MARKET_DATA_DB_CONNECTION_STRING")!)
                         .AddSystemClock(new SystemDateTimeProvider())
-                        /*.AddCorrelationContext(sp =>
+                        .AddCorrelationContext(sp =>
                         {
                             var correlationContext = new CorrelationContext();
                             if (!IsRunningLocally()) return correlationContext;
@@ -60,7 +60,7 @@ namespace B2B.Transactions.Api
                             correlationContext.SetParentId(Guid.NewGuid().ToString());
 
                             return correlationContext;
-                        })*/
+                        })
                         .AddTransactionQueue(
                             Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_CONNECTION_STRING")!,
                             Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_NAME")!)
