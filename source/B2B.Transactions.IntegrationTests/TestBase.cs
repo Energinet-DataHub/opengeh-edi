@@ -14,11 +14,11 @@
 
 using System;
 using B2B.Transactions.Infrastructure.Configuration;
-using B2B.Transactions.Tests.Fixtures;
+using B2B.Transactions.IntegrationTests.Fixtures;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace B2B.Transactions.Tests
+namespace B2B.Transactions.IntegrationTests
 {
     [Collection("IntegrationTest")]
     public class TestBase : IDisposable
