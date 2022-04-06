@@ -42,7 +42,9 @@ namespace Energinet.DataHub.MarketRoles.Tests.LocalMessageHub
         [Fact]
         public async Task Bundles_should_be_created_for_multiple_documents()
         {
+#pragma warning disable CA2007 // Consider calling ConfigureAwait on the awaited task
             await using var container = new Container();
+#pragma warning restore CA2007 // Consider calling ConfigureAwait on the awaited task
 
             container.UseMediatR()
                 .WithPipeline()

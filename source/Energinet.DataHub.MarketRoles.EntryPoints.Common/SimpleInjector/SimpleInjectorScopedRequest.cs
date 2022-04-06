@@ -35,7 +35,9 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Common.SimpleInjector
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
+#pragma warning disable CA2007 // Consider calling ConfigureAwait on the awaited task
             await using var scope = AsyncScopedLifestyle.BeginScope(_container);
+#pragma warning restore CA2007 // Consider calling ConfigureAwait on the awaited task
             if (scope.Container == null) throw new InvalidOperationException("Scope doesn't contain a container.");
             context.InstanceServices = new SimpleInjectorServiceProviderAdapter(scope.Container);
             await next(context).ConfigureAwait(false);
