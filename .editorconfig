@@ -261,7 +261,7 @@ csharp_space_between_square_brackets = false
 csharp_preserve_single_line_statements = false
 csharp_preserve_single_line_blocks = true
 
-# Analyzers/StyleCop rules
+# C# .NET Analyzers rules
 dotnet_diagnostic.CA1303.severity = suggestion
 dotnet_diagnostic.CA1715.severity = error
 dotnet_diagnostic.CA1001.severity = warning
@@ -329,7 +329,10 @@ dotnet_diagnostic.CA2238.severity = warning
 dotnet_diagnostic.CA2240.severity = warning
 dotnet_diagnostic.CA2241.severity = warning
 dotnet_diagnostic.CA2242.severity = warning
+dotnet_diagnostic.CA2254.severity = suggestion
 dotnet_diagnostic.CS1591.severity = none
+
+# StyleCop Analyzer rules
 dotnet_diagnostic.SA0001.severity = none
 dotnet_diagnostic.SA1000.severity = error
 dotnet_diagnostic.SA1001.severity = error
