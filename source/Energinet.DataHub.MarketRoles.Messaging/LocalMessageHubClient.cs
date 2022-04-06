@@ -70,9 +70,7 @@ namespace Energinet.DataHub.MarketRoles.Messaging
                 message.AddToBundle(bundleRequestDto.IdempotencyId);
             }
 
-#pragma warning disable CA2007 // Consider calling ConfigureAwait on the awaited task
-            await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(bundle));
-#pragma warning restore CA2007 // Consider calling ConfigureAwait on the awaited task
+            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(bundle));
 
             var uri = await _storageHandler.AddStreamToStorageAsync(stream, bundleRequestDto).ConfigureAwait(false);
 
