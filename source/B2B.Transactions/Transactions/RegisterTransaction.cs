@@ -46,14 +46,15 @@ namespace B2B.Transactions.Transactions
             _outgoingMessageStore.Add(_documentProvider.CreateMessage(transaction));
 
             //TODO: Insert correct values or fetch them later?
+            //TODO: Get MessageType and documentType based on transaction.Message.ProcessType?
             var dataAvailableNotificationTheSecond = new MessageHubMessageAvailable(
                 transaction.Message.MessageId,
                 transaction.Message.ReceiverId,
-                "IncludeDocumentTypeHere",
+                "ConfirmChangeOfSupplier",
                 "MarketRoles",
                 true,
                 1,
-                "DocumentTypeCorrectName");
+                "ConfirmRequestChangeOfSupplier");
 
             _outbox.Add(dataAvailableNotificationTheSecond);
 
