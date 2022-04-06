@@ -81,6 +81,7 @@ namespace B2B.Transactions.Api
         {
             if (IsRunningLocally())
             {
+#pragma warning disable CA5404 // Do not disable token validation checks
                 return new TokenValidationParameters()
                 {
                     ValidateAudience = false,
@@ -88,6 +89,7 @@ namespace B2B.Transactions.Api
                     ValidateLifetime = false,
                     SignatureValidator = (token, parameters) => new JwtSecurityToken(token),
                 };
+#pragma warning restore CA5404 // Do not disable token validation checks
             }
 
             var tenantId = Environment.GetEnvironmentVariable("B2C_TENANT_ID") ?? throw new InvalidOperationException("B2C tenant id not found.");
