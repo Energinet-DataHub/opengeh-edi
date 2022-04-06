@@ -21,9 +21,9 @@ using System.Threading.Tasks;
 using B2B.CimMessageAdapter;
 using B2B.CimMessageAdapter.Messages;
 using B2B.Transactions.Authentication;
-using B2B.Transactions.Infrastructure.Authentication.MarketActors;
 using B2B.Transactions.IntegrationTests.CimMessageAdapter.Messages;
 using B2B.Transactions.IntegrationTests.CimMessageAdapter.Stubs;
+using B2B.Transactions.IntegrationTests.Fixtures;
 using B2B.Transactions.Xml.Incoming;
 using Xunit;
 
@@ -45,7 +45,8 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
         private readonly IMessageIds _messageIds;
         private TransactionQueueDispatcherStub _transactionQueueDispatcherSpy = new();
 
-        public MessageReceiverTests()
+        public MessageReceiverTests(DatabaseFixture databaseFixture)
+            : base(databaseFixture)
         {
             _transactionIds = GetService<ITransactionIds>();
             _messageIds = GetService<IMessageIds>();
