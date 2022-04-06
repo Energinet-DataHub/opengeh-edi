@@ -42,7 +42,15 @@ namespace B2B.Transactions.Transactions
 
             _outgoingMessageStore.Add(_documentProvider.CreateMessage(transaction));
 
-            var dataAvailableNotificationTheSecond = new DataAvailableNotificationTheSecond();
+            //TODO: Insert correct values or fetch them later?
+            var dataAvailableNotificationTheSecond = new MessageHubMessageAvailable(
+                transaction.Message.MessageId,
+                transaction.Message.ReceiverId,
+                "IncludeDocumentTypeHere",
+                "MarketRoles",
+                true,
+                1,
+                "DocumentTypeCorrectName");
 
             _outbox.Add(dataAvailableNotificationTheSecond);
         }

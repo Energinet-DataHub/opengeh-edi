@@ -71,7 +71,7 @@ namespace B2B.Transactions.IntegrationTests
             AssertHeader(document, transaction);
             AssertMarketActivityRecord(document, transaction);
 
-            FindAndAssertOutboxMessage<DataAvailableNotificationTheSecond>();
+            FindAndAssertOutboxMessage<MessageHubMessageAvailable>();
         }
 
         private static B2BTransaction CreateTransaction()
@@ -107,7 +107,7 @@ namespace B2B.Transactions.IntegrationTests
             var outboxMessage = GetOutboxMessage<T>();
 
             // TODO: Assert on data when data object has properties
-            // var data = GetService<ISerializer>().Deserialize<T>(outboxMessage.Data);
+            var data = GetService<ISerializer>().Deserialize<T>(outboxMessage.Data);
             Assert.NotNull(outboxMessage);
         }
 
