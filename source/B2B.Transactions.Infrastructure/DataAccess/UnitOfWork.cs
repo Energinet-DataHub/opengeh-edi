@@ -12,25 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using B2B.Transactions.Infrastructure.DataAccess;
-
-namespace B2B.Transactions.Infrastructure.Outbox
+namespace B2B.Transactions.Infrastructure.DataAccess
 {
-    public class OutboxProvider : IOutbox
+    public class UnitOfWork : IUnitOfWork
     {
         private readonly B2BContext _context;
-        private readonly OutboxMessageFactory _outboxMessageFactory;
 
-        public OutboxProvider(B2BContext context, OutboxMessageFactory outboxMessageFactory)
+        public UnitOfWork(B2BContext context)
         {
             _context = context;
-            _outboxMessageFactory = outboxMessageFactory;
         }
 
-        public void Add<T>(T message)
+        public void SaveTransaction()
         {
-            var outboxMessage = _outboxMessageFactory.CreateFrom(message);
-            _context.OutboxMessages.Add(outboxMessage);
+            _context.SaveChanges();
         }
     }
 }

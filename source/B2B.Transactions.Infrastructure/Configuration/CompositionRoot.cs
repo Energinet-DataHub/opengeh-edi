@@ -58,6 +58,7 @@ namespace B2B.Transactions.Infrastructure.Configuration
             services.AddScoped<IMarketActorAuthenticator, MarketActorAuthenticator>();
             services.AddScoped<IOutbox, OutboxProvider>();
             services.AddScoped<OutboxMessageFactory>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddLogging();
             AddXmlSchema(services);
         }

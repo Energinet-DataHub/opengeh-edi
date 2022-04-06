@@ -26,10 +26,9 @@ namespace B2B.Transactions.Infrastructure.DataAccess.Transaction
             _b2BContext = b2BContext;
         }
 
-        public async Task AddAsync(AcceptedTransaction acceptedTransaction)
+        public void Add(AcceptedTransaction acceptedTransaction)
         {
             _b2BContext.Transactions.Add(acceptedTransaction);
-            await _b2BContext.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public AcceptedTransaction? GetById(string transactionId)

@@ -12,26 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-
-namespace B2B.Transactions.Transactions
+namespace B2B.Transactions
 {
     /// <summary>
-    /// Storage for transactions
+    /// Unit of work
     /// </summary>
-    public interface ITransactionRepository
+    public interface IUnitOfWork
     {
         /// <summary>
-        /// Adds a transaction to store
+        /// Save transaction
         /// </summary>
-        /// <param name="acceptedTransaction"></param>
-        void Add(AcceptedTransaction acceptedTransaction);
-
-        /// <summary>
-        /// Find a transaction by transaction id
-        /// </summary>
-        /// <param name="transactionId"></param>
-        /// <returns><see cref="AcceptedTransaction"/></returns>
-        AcceptedTransaction? GetById(string transactionId);
+        void SaveTransaction();
     }
 }

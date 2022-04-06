@@ -33,6 +33,7 @@ namespace B2B.Transactions.IntegrationTests
     {
         private static readonly SystemDateTimeProviderStub _dateTimeProvider = new();
         private readonly ITransactionRepository _transactionRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IOutbox _outbox;
         private readonly XNamespace _namespace = "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1";
         private OutgoingMessageStoreSpy _outgoingMessageStoreSpy = new();
@@ -44,6 +45,7 @@ namespace B2B.Transactions.IntegrationTests
             _transactionRepository =
                 GetService<ITransactionRepository>();
             _outbox = GetService<IOutbox>();
+            _unitOfWork = GetService<IUnitOfWork>();
         }
 
         [Fact]
@@ -97,7 +99,7 @@ namespace B2B.Transactions.IntegrationTests
 
         private Task RegisterTransaction(B2BTransaction transaction)
         {
-            var useCase = new RegisterTransaction(_outgoingMessageStoreSpy, _transactionRepository, _documentProvider, _outbox);
+            var useCase = new RegisterTransaction(_outgoingMessageStoreSpy, _transactionRepository, _documentProvider, _outbox, _unitOfWork);
             return useCase.HandleAsync(transaction);
         }
 
@@ -106,8 +108,6 @@ namespace B2B.Transactions.IntegrationTests
         {
             var outboxMessage = GetOutboxMessage<T>();
 
-            // TODO: Assert on data when data object has properties
-            var data = GetService<ISerializer>().Deserialize<T>(outboxMessage.Data);
             Assert.NotNull(outboxMessage);
         }
 
