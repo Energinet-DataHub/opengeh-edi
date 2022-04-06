@@ -105,7 +105,9 @@ namespace B2B.Transactions.IntegrationTests
             where T : notnull
         {
             var outboxMessage = GetOutboxMessage<T>();
-            var data = GetService<ISerializer>().Deserialize<T>(outboxMessage.Data);
+
+            // TODO: Assert on data when data object has properties
+            // var data = GetService<ISerializer>().Deserialize<T>(outboxMessage.Data);
             Assert.NotNull(outboxMessage);
         }
 
