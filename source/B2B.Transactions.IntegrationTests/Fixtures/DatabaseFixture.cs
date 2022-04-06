@@ -16,7 +16,6 @@ using System;
 using System.Threading.Tasks;
 using B2B.Transactions.Infrastructure.DataAccess;
 using Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.Helpers;
-using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 

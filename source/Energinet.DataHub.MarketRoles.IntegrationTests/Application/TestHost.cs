@@ -60,7 +60,6 @@ using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integration;
-using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using FluentAssertions;
 using FluentValidation;
 using MediatR;
@@ -86,14 +85,15 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
     {
         private readonly Scope _scope;
         private readonly Container _container;
+        private readonly string _connectionString;
         private bool _disposed;
         private SqlConnection? _sqlConnection;
         private BusinessProcessId? _businessProcessId;
-        private string _connectionString;
 
         protected TestHost(DatabaseFixture databaseFixture)
         {
-            if (databaseFixture == null) throw new ArgumentNullException(nameof(databaseFixture));
+            if (databaseFixture == null)
+                throw new ArgumentNullException(nameof(databaseFixture));
 
             databaseFixture.DatabaseManager.UpgradeDatabase();
             _connectionString = databaseFixture.DatabaseManager.ConnectionString;
@@ -113,7 +113,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
             serviceCollection.AddDbContext<MarketRolesContext>(x =>
                 x.UseSqlServer(_connectionString, y => y.UseNodaTime()));
             serviceCollection.AddSimpleInjector(_container);
-            IServiceProvider serviceProvider = serviceCollection.BuildServiceProvider().UseSimpleInjector(_container);
+            var serviceProvider = serviceCollection.BuildServiceProvider().UseSimpleInjector(_container);
 
             _container.Register<IUnitOfWork, UnitOfWork>(Lifestyle.Scoped);
             _container.Register<IAccountingPointRepository, AccountingPointRepository>(Lifestyle.Scoped);
@@ -250,8 +250,10 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
         protected SqlConnection GetSqlDbConnection()
         {
-            if (_sqlConnection is null) _sqlConnection = new SqlConnection(_connectionString);
-            if (_sqlConnection.State == ConnectionState.Closed) _sqlConnection.Open();
+            if (_sqlConnection is null)
+                _sqlConnection = new SqlConnection(_connectionString);
+            if (_sqlConnection.State == ConnectionState.Closed)
+                _sqlConnection.Open();
             return _sqlConnection;
         }
 
@@ -283,7 +285,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
             if (queuedCommand is null)
             {
-                return default(TCommand);
+                return default;
             }
 
             var messageExtractor = GetService<MessageExtractor>();
@@ -302,7 +304,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
             if (queuedCommand is null)
             {
-                return default(TCommand);
+                return default;
             }
 
             var messageExtractor = GetService<MessageExtractor>();
@@ -350,7 +352,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
         protected void SetConsumerMovedIn(AccountingPoint accountingPoint, ConsumerId consumerId, EnergySupplierId energySupplierId, Instant moveInDate, Transaction transaction)
         {
-            if (accountingPoint == null) throw new ArgumentNullException(nameof(accountingPoint));
+            if (accountingPoint == null)
+                throw new ArgumentNullException(nameof(accountingPoint));
 
             var systemTimeProvider = GetService<ISystemDateTimeProvider>();
             accountingPoint.AcceptConsumerMoveIn(consumerId, energySupplierId, moveInDate, transaction);
@@ -359,7 +362,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
         protected void RegisterChangeOfSupplier(AccountingPoint accountingPoint, EnergySupplierId energySupplierId, Transaction transaction)
         {
-            if (accountingPoint == null) throw new ArgumentNullException(nameof(accountingPoint));
+            if (accountingPoint == null)
+                throw new ArgumentNullException(nameof(accountingPoint));
 
             var systemTimeProvider = GetService<ISystemDateTimeProvider>();
 
@@ -370,7 +374,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
         protected BusinessProcessId GetBusinessProcessId(Transaction transaction)
         {
-            if (transaction == null) throw new ArgumentNullException(nameof(transaction));
+            if (transaction == null)
+                throw new ArgumentNullException(nameof(transaction));
 
             if (_businessProcessId == null)
             {
@@ -400,7 +405,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application
 
         protected void AssertOutboxMessage<TMessage>(Func<TMessage, bool> funcAssert, int count = 1)
         {
-            if (funcAssert == null) throw new ArgumentNullException(nameof(funcAssert));
+            if (funcAssert == null)
+                throw new ArgumentNullException(nameof(funcAssert));
 
             var messages = GetOutboxMessages<TMessage>().Where(funcAssert.Invoke);
 

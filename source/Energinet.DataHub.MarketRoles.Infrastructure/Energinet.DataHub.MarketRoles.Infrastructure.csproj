@@ -25,7 +25,6 @@ limitations under the License.
     <PackageReference Include="Azure.Storage.Files.Shares" Version="12.9.0" />
     <PackageReference Include="Dapper" Version="2.0.123" />
     <PackageReference Include="Energinet.DataHub.MessageHub.Model" Version="1.3.0" />
-    <PackageReference Include="EntityFrameworkCore.SqlServer.NodaTime" Version="5.0.1" />
     <PackageReference Include="Google.Protobuf" Version="3.20.0" />
     <PackageReference Include="Grpc.Tools" Version="2.45.0" PrivateAssets="All" />
     <PackageReference Include="MediatR" Version="10.0.1" />
@@ -35,6 +34,7 @@ limitations under the License.
     <PackageReference Include="NodaTime" Version="3.0.10" />
     <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.0.0" />
     <PackageReference Include="SimpleInjector" Version="5.3.3" />
+    <PackageReference Include="SimplerSoftware.EntityFrameworkCore.SqlServer.NodaTime" Version="6.0.1" />
   </ItemGroup>
 
   <ItemGroup>

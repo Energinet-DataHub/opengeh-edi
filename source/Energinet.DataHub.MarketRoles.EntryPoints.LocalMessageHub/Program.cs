@@ -44,7 +44,6 @@ using Energinet.DataHub.MarketRoles.Messaging.Bundling.Generic;
 using Energinet.DataHub.MarketRoles.Messaging.Bundling.Reject;
 using Energinet.DataHub.MessageHub.Client;
 using Energinet.DataHub.MessageHub.Client.SimpleInjector;
-using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
