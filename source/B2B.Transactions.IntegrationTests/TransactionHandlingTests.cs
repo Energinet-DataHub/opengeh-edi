@@ -15,12 +15,14 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using B2B.Transactions.DataAccess;
 using B2B.Transactions.IntegrationTests.Fixtures;
 using B2B.Transactions.IntegrationTests.TestDoubles;
 using B2B.Transactions.Messages;
 using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.Transactions;
 using B2B.Transactions.Xml.Outgoing;
+using Dapper;
 using Xunit;
 
 namespace B2B.Transactions.IntegrationTests
@@ -75,6 +77,12 @@ namespace B2B.Transactions.IntegrationTests
             Assert.NotNull(GetMarketActivityRecordValue(document, "mRID"));
             AssertMarketActivityRecordValue(document, "originalTransactionIDReference_MktActivityRecord.mRID", transaction.MarketActivityRecord.Id);
             AssertMarketActivityRecordValue(document, "marketEvaluationPoint.mRID", transaction.MarketActivityRecord.MarketEvaluationPointId);
+
+            //Assert on dataavailable notification with direct sql
+            var sql = "SELECT * FROM OutBoxMessages WHERE Type = 'DataAvailableNotificationTheSecond'";
+            var result = await GetService<IDbConnectionFactory>().GetOpenConnection().ExecuteAsync(sql).ConfigureAwait(false);
+
+            Assert.Equal(1, result);
         }
 
         private static B2BTransaction CreateTransaction()

@@ -24,12 +24,14 @@ namespace B2B.Transactions.Transactions
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly ITransactionRepository _transactionRepository;
         private readonly IDocumentProvider<IMessage> _documentProvider;
+        private readonly IOutbox _outbox;
 
-        public RegisterTransaction(IOutgoingMessageStore outgoingMessageStore, ITransactionRepository transactionRepository, IDocumentProvider<IMessage> documentProvider)
+        public RegisterTransaction(IOutgoingMessageStore outgoingMessageStore, ITransactionRepository transactionRepository, IDocumentProvider<IMessage> documentProvider, IOutbox outbox)
         {
             _outgoingMessageStore = outgoingMessageStore ?? throw new ArgumentNullException(nameof(outgoingMessageStore));
             _transactionRepository = transactionRepository ?? throw new ArgumentNullException(nameof(transactionRepository));
             _documentProvider = documentProvider ?? throw new ArgumentNullException(nameof(documentProvider));
+            _outbox = outbox;
         }
 
         public async Task HandleAsync(B2BTransaction transaction)
@@ -39,6 +41,10 @@ namespace B2B.Transactions.Transactions
             await _transactionRepository.AddAsync(acceptedTransaction).ConfigureAwait(false);
 
             _outgoingMessageStore.Add(_documentProvider.CreateMessage(transaction));
+
+            var dataAvailableNotificationTheSecond = new DataAvailableNotificationTheSecond();
+
+            _outbox.Add(dataAvailableNotificationTheSecond);
         }
     }
 }
