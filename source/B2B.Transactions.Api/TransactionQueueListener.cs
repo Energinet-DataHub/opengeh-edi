@@ -56,7 +56,7 @@ namespace B2B.Transactions.Api
                     _jsonSerializer.Deserialize<B2BTransaction>(byteAsString))
                 .ConfigureAwait(false);
 
-            _logger.LogInformation("B2B transaction dequeued with correlation id: {correlationId}", _correlationContext.Id);
+            _logger.LogInformation("B2B transaction dequeued with correlation id: {CorrelationId}", _correlationContext.Id);
         }
     }
 }

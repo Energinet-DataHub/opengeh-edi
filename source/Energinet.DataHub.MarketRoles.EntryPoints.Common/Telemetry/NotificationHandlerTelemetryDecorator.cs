@@ -42,7 +42,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Common.Telemetry
         public async Task Handle(TNotification notification, CancellationToken cancellationToken)
         {
             var operationName = notification.GetType().Name;
-            _logger.LogInformation("Handle {notification}", operationName);
+            _logger.LogInformation("Handle {Notification}", operationName);
 
             var operation = _telemetryClient.StartOperation<DependencyTelemetry>(operationName);
             operation.Telemetry.Type = "Handler";
