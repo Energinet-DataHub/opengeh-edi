@@ -64,7 +64,7 @@ namespace B2B.Transactions.Api
                             return correlationContext;
                         })
                         .AddTransactionQueue(
-                            Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_CONNECTION_STRING_LISTENER")!,
+                            Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_CONNECTION_STRING")!,
                             Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_NAME")!)
                         .AddRequestLogging(
                             Environment.GetEnvironmentVariable("REQUEST_RESPONSE_LOGGING_CONNECTION_STRING")!,
