@@ -62,7 +62,9 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.DataAccess
 
                 if (conv?.CanConvertFrom(typeof(string)) == true)
                 {
+#pragma warning disable CS8605 // Unboxing a possibly null value.
                     return (Instant)conv.ConvertFromString(s);
+#pragma warning restore CS8605 // Unboxing a possibly null value.
                 }
             }
 
