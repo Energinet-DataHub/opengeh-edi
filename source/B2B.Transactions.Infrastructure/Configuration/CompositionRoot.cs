@@ -116,7 +116,7 @@ namespace B2B.Transactions.Infrastructure.Configuration
             if (storageContainerName == null) throw new ArgumentNullException(nameof(storageContainerName));
             _services.AddSingleton<IRequestResponseLogging>(s =>
             {
-                var factory = s.GetService<ILoggerFactory>();
+                var factory = s.GetRequiredService<ILoggerFactory>();
                 var logger = factory.CreateLogger<RequestResponseLoggingBlobStorage>();
                 return new RequestResponseLoggingBlobStorage(blobStorageConnectionString, storageContainerName, logger);
             });
