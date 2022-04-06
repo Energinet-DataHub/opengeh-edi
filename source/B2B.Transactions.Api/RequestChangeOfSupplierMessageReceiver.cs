@@ -25,14 +25,14 @@ using Microsoft.Extensions.Logging;
 
 namespace B2B.Transactions.Api
 {
-    public class B2BCimHttpTrigger
+    public class RequestChangeOfSupplier
     {
         private readonly ILogger _logger;
         private readonly ICorrelationContext _correlationContext;
         private readonly MessageReceiver _messageReceiver;
 
-        public B2BCimHttpTrigger(
-            ILogger<B2BCimHttpTrigger> logger,
+        public RequestChangeOfSupplier(
+            ILogger<RequestChangeOfSupplier> logger,
             ICorrelationContext correlationContext,
             MessageReceiver messageReceiver)
         {
@@ -41,12 +41,12 @@ namespace B2B.Transactions.Api
             _messageReceiver = messageReceiver ?? throw new ArgumentNullException(nameof(messageReceiver));
         }
 
-        [Function("MarketRoles")]
+        [Function(nameof(RequestChangeOfSupplier))]
         public async Task<HttpResponseData> RunAsync(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
             HttpRequestData request)
         {
-            _logger.LogInformation("Received MarketRoles request");
+            _logger.LogInformation($"Received {nameof(RequestChangeOfSupplier)} request");
 
             if (request == null) throw new ArgumentNullException(nameof(request));
 
