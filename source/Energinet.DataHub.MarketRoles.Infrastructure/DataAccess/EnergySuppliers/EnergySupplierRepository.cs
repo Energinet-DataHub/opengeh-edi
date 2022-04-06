@@ -46,7 +46,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.EnergySupplier
             if (glnNumber == null) throw new ArgumentNullException(nameof(glnNumber));
             return _context.EnergySuppliers
                 .Where(x => x.GlnNumber.Equals(glnNumber))
-                .SingleOrDefaultAsync();
+                .SingleAsync();
         }
     }
 }

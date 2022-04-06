@@ -37,13 +37,13 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.Consumers
         public Task<Consumer> GetBySSNAsync(CprNumber cprNumber)
         {
             if (cprNumber == null) throw new ArgumentNullException(nameof(cprNumber));
-            return _context.Consumers.SingleOrDefaultAsync(x => x.CprNumber!.Equals(cprNumber));
+            return _context.Consumers.SingleAsync(x => x.CprNumber!.Equals(cprNumber));
         }
 
         public Task<Consumer> GetByVATNumberAsync(CvrNumber vatNumber)
         {
             if (vatNumber == null) throw new ArgumentNullException(nameof(vatNumber));
-            return _context.Consumers.SingleOrDefaultAsync(consumer => consumer.CvrNumber!.Equals(vatNumber));
+            return _context.Consumers.SingleAsync(consumer => consumer.CvrNumber!.Equals(vatNumber));
         }
     }
 }

@@ -31,7 +31,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.AccountingPoin
         public Task<AccountingPoint> GetByGsrnNumberAsync(GsrnNumber gsrnNumber)
         {
             if (gsrnNumber == null) throw new ArgumentNullException(nameof(gsrnNumber));
-            return _context.AccountingPoints.SingleOrDefaultAsync(x => x.GsrnNumber.Equals(gsrnNumber));
+            return _context.AccountingPoints.SingleAsync(x => x.GsrnNumber.Equals(gsrnNumber));
         }
 
         public void Add(AccountingPoint accountingPoint)
@@ -43,7 +43,7 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.AccountingPoin
         public Task<AccountingPoint> GetByIdAsync(AccountingPointId accountingPointId)
         {
             if (accountingPointId == null) throw new ArgumentNullException(nameof(accountingPointId));
-            return _context.AccountingPoints.SingleOrDefaultAsync(x => x.Id.Equals(accountingPointId));
+            return _context.AccountingPoints.SingleAsync(x => x.Id.Equals(accountingPointId));
         }
     }
 }
