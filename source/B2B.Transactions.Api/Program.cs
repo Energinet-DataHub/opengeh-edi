@@ -75,9 +75,13 @@ namespace B2B.Transactions.Api
                     services.AddHealthChecks()
                         .AddLiveCheck()
                         .AddAzureServiceBusQueue(
-                            Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_CONNECTION_STRING") ?? throw new InvalidOperationException(),
+                            Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_CONNECTION_STRING") ??
+                            throw new InvalidOperationException(),
                             Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_NAME") ?? throw new InvalidOperationException(),
-                            "MarketActivityQueueExists");
+                            "MarketActivityQueueExists")
+                        .AddSqlServer(
+                            name: "MarketRolesDB",
+                            connectionString: Environment.GetEnvironmentVariable("MARKET_DATA_DB_CONNECTION_STRING") ?? throw new InvalidOperationException());
                 })
                 .Build();
 
