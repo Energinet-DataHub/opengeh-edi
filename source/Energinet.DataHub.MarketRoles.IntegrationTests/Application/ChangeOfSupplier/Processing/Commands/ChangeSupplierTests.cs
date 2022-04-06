@@ -64,10 +64,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
             var command = new ChangeSupplier(_accountingPoint.Id.Value, _transaction.Value);
             await GetService<IMediator>().Send(command, CancellationToken.None).ConfigureAwait(false);
 
-            string query = @"SELECT Count(1) FROM SupplierRegistrations WHERE AccountingPointId = @AccountingPointId AND StartOfSupplyDate IS NOT NULL AND EndOfSupplyDate IS NULL";
-#pragma warning disable CA2007 // Consider calling ConfigureAwait on the awaited task
-            await using var sqlCommand = new SqlCommand(query, GetSqlDbConnection());
-#pragma warning restore CA2007 // Consider calling ConfigureAwait on the awaited task
+            var query = @"SELECT Count(1) FROM SupplierRegistrations WHERE AccountingPointId = @AccountingPointId AND StartOfSupplyDate IS NOT NULL AND EndOfSupplyDate IS NULL";
+            using var sqlCommand = new SqlCommand(query, GetSqlDbConnection());
 
             sqlCommand.Parameters.Add(new SqlParameter("@AccountingPointId", _accountingPoint.Id.Value));
             sqlCommand.Parameters.Add(new SqlParameter("@EnergySupplierId", _energySupplier.EnergySupplierId.Value));
