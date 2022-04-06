@@ -41,12 +41,6 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
-      <Reference Include="Microsoft.Azure.DocumentDB.Core, Version=2.11.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-        <HintPath>..\..\..\..\Users\KristianFaurskovThom\AppData\Roaming\JetBrains\Rider2021.2\azure-functions-coretools\4.0.3971\Microsoft.Azure.DocumentDB.Core.dll</HintPath>
-      </Reference>
-    </ItemGroup>
-
-    <ItemGroup>
       <Compile Remove="Infrastructure\CompositionRoot.cs" />
     </ItemGroup>
 
