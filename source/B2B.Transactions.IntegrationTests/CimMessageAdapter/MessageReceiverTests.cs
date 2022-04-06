@@ -58,12 +58,10 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
         public async Task Receiver_id_must_be_known()
         {
             var unknownReceiverId = "5790001330550";
-#pragma warning disable CA2007 // Consider calling ConfigureAwait on the awaited task
-            await using var message = BusinessMessageBuilder
+            using var message = BusinessMessageBuilder
                 .RequestChangeOfSupplier()
                 .WithReceiverId(unknownReceiverId)
                 .Message();
-#pragma warning restore CA2007 // Consider calling ConfigureAwait on the awaited task
 
             var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
 
@@ -73,12 +71,10 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
         [Fact]
         public async Task Receiver_role_must_be_metering_point_administrator()
         {
-#pragma warning disable CA2007 // Consider calling ConfigureAwait on the awaited task
-            await using var message = BusinessMessageBuilder
+            using var message = BusinessMessageBuilder
                 .RequestChangeOfSupplier()
                 .WithReceiverRole("DDK")
                 .Message();
-#pragma warning restore CA2007 // Consider calling ConfigureAwait on the awaited task
 
             var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
 
@@ -88,12 +84,10 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
         [Fact]
         public async Task Sender_role_type_must_be_the_role_of_energy_supplier()
         {
-#pragma warning disable CA2007 // Consider calling ConfigureAwait on the awaited task
-            await using var message = BusinessMessageBuilder
+            using var message = BusinessMessageBuilder
                 .RequestChangeOfSupplier()
                 .WithSenderRole("DDK")
                 .Message();
-#pragma warning restore CA2007 // Consider calling ConfigureAwait on the awaited task
 
             var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
 
@@ -104,11 +98,9 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
         public async Task Authenticated_user_must_hold_the_role_type_as_specified_in_message()
         {
             _marketActorAuthenticator.Authenticate(CreateIdentityWithoutRoles());
-#pragma warning disable CA2007 // Consider calling ConfigureAwait on the awaited task
-            await using var message = BusinessMessageBuilder
+            using var message = BusinessMessageBuilder
                 .RequestChangeOfSupplier()
                 .Message();
-#pragma warning restore CA2007 // Consider calling ConfigureAwait on the awaited task
 
             var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
 
@@ -119,11 +111,9 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
         public async Task Sender_id_must_match_the_organization_of_the_current_authenticated_user()
         {
             _marketActorAuthenticator.Authenticate(CreateIdentity("Unknown_actor_identifier"));
-#pragma warning disable CA2007 // Consider calling ConfigureAwait on the awaited task
-            await using var message = BusinessMessageBuilder
+            using var message = BusinessMessageBuilder
                 .RequestChangeOfSupplier()
                 .Message();
-#pragma warning restore CA2007 // Consider calling ConfigureAwait on the awaited task
 
             var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
 
@@ -133,27 +123,21 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
         [Fact]
         public async Task Message_must_be_valid_xml()
         {
-#pragma warning disable CA2007 // Consider calling ConfigureAwait on the awaited task
-            await using var message = CreateMessageWithInvalidXmlStructure();
-#pragma warning restore CA2007 // Consider calling ConfigureAwait on the awaited task
-            {
-                var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
+            using var message = CreateMessageWithInvalidXmlStructure();
 
-                Assert.False(result.Success);
-                AssertContainsError(result, "B2B-005");
-            }
+            var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
+
+            Assert.False(result.Success);
+            AssertContainsError(result, "B2B-005");
         }
 
         [Fact]
         public async Task Message_must_conform_to_xml_schema()
         {
-#pragma warning disable CA2007 // Consider calling ConfigureAwait on the awaited task
-            await using var message =
-                BusinessMessageBuilder
-                    .RequestChangeOfSupplier()
-                    .WithSenderRole("FakeRoleType")
-                    .Message();
-#pragma warning restore CA2007 // Consider calling ConfigureAwait on the awaited task
+            using var message = BusinessMessageBuilder
+                .RequestChangeOfSupplier()
+                .WithSenderRole("FakeRoleType")
+                .Message();
 
             var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
 
@@ -163,11 +147,9 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
         [Fact]
         public async Task Return_failure_if_xml_schema_for_business_process_type_does_not_exist()
         {
-#pragma warning disable CA2007 // Consider calling ConfigureAwait on the awaited task
-            await using var message = BusinessMessageBuilder
+            using var message = BusinessMessageBuilder
                 .RequestChangeOfSupplier()
                 .Message();
-#pragma warning restore CA2007 // Consider calling ConfigureAwait on the awaited task
 
             var result = await ReceiveRequestChangeOfSupplierMessage(message, "non_existing_version")
                 .ConfigureAwait(false);
@@ -179,11 +161,9 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
         [Fact]
         public async Task Valid_activity_records_are_extracted_and_committed_to_queue()
         {
-#pragma warning disable CA2007 // Consider calling ConfigureAwait on the awaited task
-            await using var message = BusinessMessageBuilder
+            using var message = BusinessMessageBuilder
                 .RequestChangeOfSupplier()
                 .Message();
-#pragma warning restore CA2007 // Consider calling ConfigureAwait on the awaited task
 
             await ReceiveRequestChangeOfSupplierMessage(message)
                 .ConfigureAwait(false);
@@ -217,12 +197,11 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
         [Fact]
         public async Task Activity_records_must_have_unique_transaction_ids()
         {
-#pragma warning disable CA2007 // Consider calling ConfigureAwait on the awaited task
-            await using var message = BusinessMessageBuilder
+            using var message = BusinessMessageBuilder
                 .RequestChangeOfSupplier()
                 .DuplicateMarketActivityRecords()
                 .Message();
-#pragma warning restore CA2007 // Consider calling ConfigureAwait on the awaited task
+
             var result = await ReceiveRequestChangeOfSupplierMessage(message)
                 .ConfigureAwait(false);
 
@@ -272,21 +251,14 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
         private async Task SimulateDuplicationOfMessageIds(IMessageIds messageIds)
         {
             var messageBuilder = BusinessMessageBuilder.RequestChangeOfSupplier();
-#pragma warning disable CA2007 // Consider calling ConfigureAwait on the awaited task
-            await using (var message = messageBuilder.Message())
-            {
-                await CreateMessageReceiver(messageIds).ReceiveAsync(message, "requestchangeofsupplier", "1.0")
-                    .ConfigureAwait(false);
-            }
-#pragma warning restore CA2007 // Consider calling ConfigureAwait on the awaited task
 
-#pragma warning disable CA2007 // Consider calling ConfigureAwait on the awaited task
-            await using (var message = messageBuilder.Message())
-            {
-                await CreateMessageReceiver(messageIds).ReceiveAsync(message, "requestchangeofsupplier", "1.0")
-                    .ConfigureAwait(false);
-            }
-#pragma warning restore CA2007 // Consider calling ConfigureAwait on the awaited task
+            using var originalMessage = messageBuilder.Message();
+            await CreateMessageReceiver(messageIds).ReceiveAsync(originalMessage, "requestchangeofsupplier", "1.0")
+                .ConfigureAwait(false);
+
+            using var duplicateMessage = messageBuilder.Message();
+            await CreateMessageReceiver(messageIds).ReceiveAsync(duplicateMessage, "requestchangeofsupplier", "1.0")
+                .ConfigureAwait(false);
         }
 
         private ClaimsPrincipal CreateIdentity()
