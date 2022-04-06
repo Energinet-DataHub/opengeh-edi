@@ -42,9 +42,9 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
         private readonly EnergySupplier _newEnergySupplier;
         private readonly Consumer _consumer;
         private readonly IMediator _mediator;
+        private readonly string _glnNumber = "7495563456235";
 
         private Transaction _transaction = CreateTransaction();
-        private readonly string _glnNumber = "7495563456235";
 
         public ChangeSupplierTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
