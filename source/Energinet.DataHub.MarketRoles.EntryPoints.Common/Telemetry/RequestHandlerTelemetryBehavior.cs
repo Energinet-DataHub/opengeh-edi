@@ -23,7 +23,7 @@ using Microsoft.Extensions.Logging;
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Common.Telemetry
 {
     public class RequestHandlerTelemetryBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-        where TRequest : notnull
+        where TRequest : notnull, IRequest<TResponse>
     {
         private readonly TelemetryClient _telemetryClient;
         private readonly ILogger _logger;
