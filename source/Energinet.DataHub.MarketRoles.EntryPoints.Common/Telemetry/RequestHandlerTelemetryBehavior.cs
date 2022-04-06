@@ -41,7 +41,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Common.Telemetry
             if (next == null) throw new ArgumentNullException(nameof(next));
 
             var operationName = request.GetType().Name;
-            _logger.LogInformation("Handle {request}", operationName);
+            _logger.LogInformation("Handle {Request}", operationName);
             var operation = _telemetryClient.StartOperation<DependencyTelemetry>(operationName);
             operation.Telemetry.Type = "Handler";
 
