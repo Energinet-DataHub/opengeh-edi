@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using B2B.Transactions.Authentication;
@@ -27,7 +28,7 @@ namespace B2B.Transactions.Infrastructure.Authentication.MarketActors
         {
             if (claimsPrincipal == null) throw new ArgumentNullException(nameof(claimsPrincipal));
             var roles = claimsPrincipal.FindAll(claim =>
-                    claim.Type.Equals("role", StringComparison.OrdinalIgnoreCase))
+                    claim.Type.Equals(ClaimTypes.Role, StringComparison.OrdinalIgnoreCase))
                 .Select(claim => claim.Value)
                 .ToArray();
 
