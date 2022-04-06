@@ -16,6 +16,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using B2B.Transactions.DataAccess;
+using B2B.Transactions.Infrastructure.DataAccess;
+using B2B.Transactions.Infrastructure.Serialization;
 using B2B.Transactions.IntegrationTests.Fixtures;
 using B2B.Transactions.IntegrationTests.TestDoubles;
 using B2B.Transactions.Messages;
@@ -65,26 +67,11 @@ namespace B2B.Transactions.IntegrationTests
             var acceptMessage = _outgoingMessageStoreSpy.Messages.FirstOrDefault();
             Assert.NotNull(acceptMessage);
             var document = CreateDocument(acceptMessage!.MessagePayload);
-            Assert.NotNull(GetMessageHeaderValue(document, "mRID"));
-            AssertHasHeaderValue(document, "type", "414");
-            AssertHasHeaderValue(document, "process.processType", transaction.Message.ProcessType);
-            AssertHasHeaderValue(document, "businessSector.type", "23");
-            AssertHasHeaderValue(document, "sender_MarketParticipant.mRID", "5790001330552");
-            AssertHasHeaderValue(document, "sender_MarketParticipant.marketRole.type", "DDZ");
-            AssertHasHeaderValue(document, "receiver_MarketParticipant.mRID", transaction.Message.SenderId);
-            AssertHasHeaderValue(document, "receiver_MarketParticipant.marketRole.type", transaction.Message.SenderRole);
-            AssertHasHeaderValue(document, "createdDateTime", now.ToString());
-            AssertHasHeaderValue(document, "reason.code", "A01");
 
-            Assert.NotNull(GetMarketActivityRecordValue(document, "mRID"));
-            AssertMarketActivityRecordValue(document, "originalTransactionIDReference_MktActivityRecord.mRID", transaction.MarketActivityRecord.Id);
-            AssertMarketActivityRecordValue(document, "marketEvaluationPoint.mRID", transaction.MarketActivityRecord.MarketEvaluationPointId);
+            AssertHeader(document, transaction);
+            AssertMarketActivityRecord(document, transaction);
 
-            //Assert on dataavailable notification with direct sql
-            var sql = $"SELECT * FROM [b2b].[OutboxMessages] WHERE Type = '{typeof(DataAvailableNotificationTheSecond).FullName}'";
-            var result = GetService<IDbConnectionFactory>().GetOpenConnection().QuerySingleOrDefault<OutboxMessage>(sql);
-
-            Assert.NotNull(result);
+            FindAndAssertOutboxMessage<DataAvailableNotificationTheSecond>();
         }
 
         private static B2BTransaction CreateTransaction()
@@ -112,6 +99,35 @@ namespace B2B.Transactions.IntegrationTests
         {
             var useCase = new RegisterTransaction(_outgoingMessageStoreSpy, _transactionRepository, _documentProvider, _outbox);
             return useCase.HandleAsync(transaction);
+        }
+
+        private void FindAndAssertOutboxMessage<T>()
+            where T : notnull
+        {
+            var outboxMessage = GetOutboxMessage<T>();
+            var data = GetService<ISerializer>().Deserialize<T>(outboxMessage.Data);
+            Assert.NotNull(outboxMessage);
+        }
+
+        private void AssertMarketActivityRecord(XDocument document, B2BTransaction transaction)
+        {
+            Assert.NotNull(GetMarketActivityRecordValue(document, "mRID"));
+            AssertMarketActivityRecordValue(document, "originalTransactionIDReference_MktActivityRecord.mRID", transaction.MarketActivityRecord.Id);
+            AssertMarketActivityRecordValue(document, "marketEvaluationPoint.mRID", transaction.MarketActivityRecord.MarketEvaluationPointId);
+        }
+
+        private void AssertHeader(XDocument document, B2BTransaction transaction)
+        {
+            Assert.NotNull(GetMessageHeaderValue(document, "mRID"));
+            AssertHasHeaderValue(document, "type", "414");
+            AssertHasHeaderValue(document, "process.processType", transaction.Message.ProcessType);
+            AssertHasHeaderValue(document, "businessSector.type", "23");
+            AssertHasHeaderValue(document, "sender_MarketParticipant.mRID", "5790001330552");
+            AssertHasHeaderValue(document, "sender_MarketParticipant.marketRole.type", "DDZ");
+            AssertHasHeaderValue(document, "receiver_MarketParticipant.mRID", transaction.Message.SenderId);
+            AssertHasHeaderValue(document, "receiver_MarketParticipant.marketRole.type", transaction.Message.SenderRole);
+            AssertHasHeaderValue(document, "createdDateTime", _dateTimeProvider.Now().ToString());
+            AssertHasHeaderValue(document, "reason.code", "A01");
         }
 
         private void AssertHasHeaderValue(XDocument document, string elementName, string expectedValue)
