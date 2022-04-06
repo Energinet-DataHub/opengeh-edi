@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using B2B.Transactions.DataAccess;
+
 namespace B2B.Transactions.Infrastructure.DataAccess
 {
     public class UnitOfWork : IUnitOfWork
