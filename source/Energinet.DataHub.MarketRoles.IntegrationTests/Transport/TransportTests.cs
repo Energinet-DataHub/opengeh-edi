@@ -31,7 +31,9 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Transport
         [Fact]
         public async Task Send_and_receive_must_result_in_same_transmitted_values()
         {
+#pragma warning disable CA2007 // Consider calling ConfigureAwait on the awaited task
             await using var container = new Container();
+#pragma warning restore CA2007 // Consider calling ConfigureAwait on the awaited task
             container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
 
             // Send Registrations

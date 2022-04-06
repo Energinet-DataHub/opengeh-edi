@@ -44,7 +44,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
         private readonly IMediator _mediator;
 
         private Transaction _transaction = CreateTransaction();
-        private string _glnNumber = "7495563456235";
+        private readonly string _glnNumber = "7495563456235";
 
         public ChangeSupplierTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
@@ -65,7 +65,9 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
             await GetService<IMediator>().Send(command, CancellationToken.None).ConfigureAwait(false);
 
             string query = @"SELECT Count(1) FROM SupplierRegistrations WHERE AccountingPointId = @AccountingPointId AND StartOfSupplyDate IS NOT NULL AND EndOfSupplyDate IS NULL";
+#pragma warning disable CA2007 // Consider calling ConfigureAwait on the awaited task
             await using var sqlCommand = new SqlCommand(query, GetSqlDbConnection());
+#pragma warning restore CA2007 // Consider calling ConfigureAwait on the awaited task
 
             sqlCommand.Parameters.Add(new SqlParameter("@AccountingPointId", _accountingPoint.Id.Value));
             sqlCommand.Parameters.Add(new SqlParameter("@EnergySupplierId", _energySupplier.EnergySupplierId.Value));
