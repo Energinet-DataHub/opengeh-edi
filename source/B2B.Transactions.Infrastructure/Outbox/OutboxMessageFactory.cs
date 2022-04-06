@@ -23,16 +23,13 @@ namespace B2B.Transactions.Infrastructure.Outbox
     {
         private readonly ISerializer _jsonSerializer;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-        private readonly ICorrelationContext _correlationContext;
 
         public OutboxMessageFactory(
             ISerializer jsonSerializer,
-            ISystemDateTimeProvider systemDateTimeProvider,
-            ICorrelationContext correlationContext)
+            ISystemDateTimeProvider systemDateTimeProvider)
         {
             _jsonSerializer = jsonSerializer ?? throw new ArgumentNullException(nameof(jsonSerializer));
             _systemDateTimeProvider = systemDateTimeProvider ?? throw new ArgumentNullException(nameof(systemDateTimeProvider));
-            _correlationContext = correlationContext;
         }
 
         public OutboxMessage CreateFrom<T>(T message)
@@ -47,7 +44,7 @@ namespace B2B.Transactions.Infrastructure.Outbox
 
             var data = _jsonSerializer.Serialize(message);
 
-            return new OutboxMessage(type, data, _systemDateTimeProvider.Now());
+            return new OutboxMessage(type, data, _systemDateTimeProvider.Now().ToDateTimeUtc());
         }
     }
 }

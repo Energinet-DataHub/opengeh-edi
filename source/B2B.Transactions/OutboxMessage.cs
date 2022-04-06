@@ -19,7 +19,7 @@ namespace B2B.Transactions
 {
     public class OutboxMessage
     {
-        public OutboxMessage(string type, string data, Instant creationDate)
+        public OutboxMessage(string type, string data, DateTime creationDate)
         {
             Id = Guid.NewGuid();
             Type = type;
@@ -27,7 +27,7 @@ namespace B2B.Transactions
             CreationDate = creationDate;
         }
 
-        public OutboxMessage(string type, string data, Instant creationDate, Guid id)
+        public OutboxMessage(string type, string data, DateTime creationDate, Guid id)
         {
             Id = id;
             Type = type;
@@ -35,17 +35,23 @@ namespace B2B.Transactions
             CreationDate = creationDate;
         }
 
+        #pragma warning disable
+        private OutboxMessage()
+        {
+        }
+        #pragma warning restore
+
         public Guid Id { get; }
 
         public string Type { get; }
 
         public string Data { get; }
 
-        public Instant CreationDate { get; }
+        public DateTime CreationDate { get; }
 
-        public Instant? ProcessedDate { get; private set; }
+        public DateTime? ProcessedDate { get; private set; }
 
-        public void SetProcessed(Instant when)
+        public void SetProcessed(DateTime when)
         {
             ProcessedDate = when;
         }

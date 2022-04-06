@@ -31,6 +31,7 @@ namespace B2B.Transactions.IntegrationTests
     {
         private static readonly SystemDateTimeProviderStub _dateTimeProvider = new();
         private readonly ITransactionRepository _transactionRepository;
+        private readonly IOutbox _outbox;
         private readonly XNamespace _namespace = "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1";
         private OutgoingMessageStoreSpy _outgoingMessageStoreSpy = new();
         private IDocumentProvider<IMessage> _documentProvider = new AcceptDocumentProvider(_dateTimeProvider);
@@ -40,6 +41,7 @@ namespace B2B.Transactions.IntegrationTests
         {
             _transactionRepository =
                 GetService<ITransactionRepository>();
+            _outbox = GetService<IOutbox>();
         }
 
         [Fact]
@@ -79,10 +81,10 @@ namespace B2B.Transactions.IntegrationTests
             AssertMarketActivityRecordValue(document, "marketEvaluationPoint.mRID", transaction.MarketActivityRecord.MarketEvaluationPointId);
 
             //Assert on dataavailable notification with direct sql
-            var sql = "SELECT * FROM OutBoxMessages WHERE Type = 'DataAvailableNotificationTheSecond'";
-            var result = await GetService<IDbConnectionFactory>().GetOpenConnection().ExecuteAsync(sql).ConfigureAwait(false);
+            var sql = $"SELECT * FROM [b2b].[OutboxMessages] WHERE Type = '{typeof(DataAvailableNotificationTheSecond).FullName}'";
+            var result = GetService<IDbConnectionFactory>().GetOpenConnection().QuerySingleOrDefault<OutboxMessage>(sql);
 
-            Assert.Equal(1, result);
+            Assert.NotNull(result);
         }
 
         private static B2BTransaction CreateTransaction()
@@ -108,7 +110,7 @@ namespace B2B.Transactions.IntegrationTests
 
         private Task RegisterTransaction(B2BTransaction transaction)
         {
-            var useCase = new RegisterTransaction(_outgoingMessageStoreSpy, _transactionRepository, _documentProvider);
+            var useCase = new RegisterTransaction(_outgoingMessageStoreSpy, _transactionRepository, _documentProvider, _outbox);
             return useCase.HandleAsync(transaction);
         }
 

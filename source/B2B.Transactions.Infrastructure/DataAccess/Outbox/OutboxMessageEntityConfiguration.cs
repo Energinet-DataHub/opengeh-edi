@@ -24,8 +24,12 @@ namespace B2B.Transactions.Infrastructure.DataAccess.Outbox
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            builder.ToTable("OutboxMessages", "dbo");
+            builder.ToTable("OutboxMessages", "b2b");
             builder.HasKey(x => x.Id);
+            builder.Property(x => x.Data);
+            builder.Property(x => x.Type);
+            builder.Property(x => x.CreationDate);
+            builder.Property(x => x.ProcessedDate);
         }
     }
 }

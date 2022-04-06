@@ -15,6 +15,7 @@
 using System;
 using B2B.Transactions.Infrastructure.Configuration;
 using B2B.Transactions.IntegrationTests.Fixtures;
+using B2B.Transactions.IntegrationTests.TestDoubles;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -35,7 +36,8 @@ namespace B2B.Transactions.IntegrationTests
             var services = new ServiceCollection();
             CompositionRoot.Initialize(services)
                 .AddDatabaseConnectionFactory(_databaseFixture.ConnectionString)
-                .AddDatabaseContext(_databaseFixture.ConnectionString);
+                .AddDatabaseContext(_databaseFixture.ConnectionString)
+                .AddSystemClock(new SystemDateTimeProviderStub());
             _serviceProvider = services.BuildServiceProvider();
         }
 
