@@ -31,16 +31,16 @@ module "func_receiver" {
     FUNCTIONS_WORKER_RUNTIME                                      = "dotnet-isolated"
     # Endregion: Default Values
     # Shared resources logging
-    REQUEST_RESPONSE_LOGGING_CONNECTION_STRING   = data.azurerm_key_vault_secret.st_market_operator_logs_primary_connection_string.value
-    REQUEST_RESPONSE_LOGGING_CONTAINER_NAME      = data.azurerm_key_vault_secret.st_market_operator_logs_container_name.value
-    B2C_TENANT_ID                                = data.azurerm_key_vault_secret.b2c_tenant_id.value
-    BACKEND_SERVICE_APP_ID                       = data.azurerm_key_vault_secret.backend_service_app_id.value
+    REQUEST_RESPONSE_LOGGING_CONNECTION_STRING    = data.azurerm_key_vault_secret.st_market_operator_logs_primary_connection_string.value
+    REQUEST_RESPONSE_LOGGING_CONTAINER_NAME       = data.azurerm_key_vault_secret.st_market_operator_logs_container_name.value
+    B2C_TENANT_ID                                 = data.azurerm_key_vault_secret.b2c_tenant_id.value
+    BACKEND_SERVICE_APP_ID                        = data.azurerm_key_vault_secret.backend_service_app_id.value
     # Endregion: Default Values
-    MARKET_DATA_QUEUE_URL                        = "${module.sb_marketroles.name}.servicebus.windows.net:9093"
-    MARKET_DATA_QUEUE_CONNECTION_STRING          = module.sb_marketroles.primary_connection_strings["send"]
-    MARKET_DATA_QUEUE_CONNECTION_STRING_LISTENER = module.sb_marketroles.primary_connection_strings["listen"]
-    MARKET_DATA_DB_CONNECTION_STRING             = local.MS_MARKETROLES_CONNECTION_STRING
-    MARKET_DATA_QUEUE_NAME                       = module.sbq_marketactivity.name
+    MARKET_DATA_QUEUE_URL                         = "${module.sb_marketroles.name}.servicebus.windows.net:9093"
+    TRANSACTIONS_QUEUE_SENDER_CONNECTION_STRING   = module.sb_marketroles.primary_connection_strings["send"]
+    TRANSACTIONS_QUEUE_LISTENER_CONNECTION_STRING = module.sb_marketroles.primary_connection_strings["listen"]
+    DB_CONNECTION_STRING             		  = local.MS_MARKETROLES_CONNECTION_STRING
+    TRANSACTIONS_QUEUE_NAME                       = module.sbq_marketactivity.name
   }
   
   tags                                      = azurerm_resource_group.this.tags
