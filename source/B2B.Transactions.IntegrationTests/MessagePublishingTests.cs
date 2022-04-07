@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using B2B.Transactions.IntegrationTests.Fixtures;
 using B2B.Transactions.IntegrationTests.TestDoubles;
@@ -45,17 +47,16 @@ namespace B2B.Transactions.IntegrationTests
         [Fact]
         public async Task Outgoing_messages_are_published()
         {
-           _outgoingMessageStore.Add(_documentProvider.CreateMessage(CreateTransaction()));
+            var dataAvailableNotificationSenderSpy = new DataAvailableNotificationSenderSpy();
+            var messagePublisher = new MessagePublisher(dataAvailableNotificationSenderSpy);
+            _outgoingMessageStore.Add(_documentProvider.CreateMessage(CreateTransaction()));
 
-           var unpublishedMessages = await _outgoingMessageStore.GetUnpublishedAsync().ConfigureAwait(false);
+            await messagePublisher.PublishAsync(await _outgoingMessageStore.GetUnpublishedAsync().ConfigureAwait(false)).ConfigureAwait(false);
+            var unpublishedMessages = await _outgoingMessageStore.GetUnpublishedAsync().ConfigureAwait(false);
+            var publishedMessage = dataAvailableNotificationSenderSpy.PublishedMessages.FirstOrDefault();
 
-           var messagePublisher = new MessagePublisher(new DataAvailableNotificationSenderSpy());
-
-           await messagePublisher.PublishAsync(unpublishedMessages).ConfigureAwait(false);
-
-           unpublishedMessages = await _outgoingMessageStore.GetUnpublishedAsync().ConfigureAwait(false);
-
-           Assert.Empty(unpublishedMessages);
+            Assert.Empty(unpublishedMessages);
+            Assert.NotNull(publishedMessage);
         }
 
         private static B2BTransaction CreateTransaction()
@@ -84,6 +85,8 @@ namespace B2B.Transactions.IntegrationTests
         {
             _dataAvailableNotificationSender = dataAvailableNotificationSender ?? throw new ArgumentNullException(nameof(dataAvailableNotificationSender));
         }
+
+
         public async Task PublishAsync(ReadOnlyCollection<IMessage> unpublishedMessages)
         {
             foreach (var message in unpublishedMessages)
@@ -106,9 +109,13 @@ namespace B2B.Transactions.IntegrationTests
 
     public class DataAvailableNotificationSenderSpy : IDataAvailableNotificationSender
     {
+        public ReadOnlyCollection<DataAvailableNotificationDto> PublishedMessages => _publishedMessages.AsReadOnly();
+
+        private List<DataAvailableNotificationDto> _publishedMessages = new();
         public Task SendAsync(string correlationId, DataAvailableNotificationDto dataAvailableNotificationDto)
         {
-            throw new NotImplementedException();
+            _publishedMessages.Add(dataAvailableNotificationDto);
+            return Task.CompletedTask;
         }
     }
 }
