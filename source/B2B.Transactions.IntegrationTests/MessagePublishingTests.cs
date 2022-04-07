@@ -61,6 +61,7 @@ namespace B2B.Transactions.IntegrationTests
             Assert.NotNull(publishedMessage);
             Assert.Equal(outgoingMessage.RecipientId, publishedMessage?.Recipient.Value);
             Assert.Equal(DomainOrigin.MarketRoles, publishedMessage?.Origin);
+            Assert.Equal(outgoingMessage.MessageType, publishedMessage?.DocumentType);
         }
 
         private static B2BTransaction CreateTransaction()
@@ -100,11 +101,11 @@ namespace B2B.Transactions.IntegrationTests
                     new DataAvailableNotificationDto(
                         Guid.NewGuid(),
                         new GlobalLocationNumberDto(message.RecipientId),
-                        new MessageTypeDto("MessageType"),
+                        new MessageTypeDto("Kristian"),
                         DomainOrigin.MarketRoles,
                         true,
                         1,
-                        "DocumentType")).ConfigureAwait(false);
+                        message.MessageType)).ConfigureAwait(false);
 
                 message.Published();
             }

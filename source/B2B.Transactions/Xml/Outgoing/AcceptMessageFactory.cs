@@ -22,6 +22,8 @@ namespace B2B.Transactions.Xml.Outgoing
 {
     public class AcceptMessageFactory : MessageFactory<IMessage>
     {
+        private const string MessageType = "ConfirmRequestChangeOfSupplier";
+
         public AcceptMessageFactory(ISystemDateTimeProvider systemDateTimeProvider)
             : base(systemDateTimeProvider)
         {
@@ -71,7 +73,7 @@ namespace B2B.Transactions.Xml.Outgoing
             writer.Close();
             output.Flush();
 
-            return new AcceptMessage(output.ToString());
+            return new AcceptMessage(output.ToString(), MessageType);
         }
     }
 }

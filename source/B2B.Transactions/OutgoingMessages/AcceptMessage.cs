@@ -15,11 +15,14 @@ namespace B2B.Transactions.OutgoingMessages
 {
     public class AcceptMessage : IMessage
     {
-        public AcceptMessage(string messagePayload)
+        public AcceptMessage(string messagePayload, string messageType)
         {
             MessagePayload = messagePayload;
+            MessageType = messageType;
         }
 
         public string MessagePayload { get; init; }
+
+        public string MessageType { get; init; }
     }
 }
