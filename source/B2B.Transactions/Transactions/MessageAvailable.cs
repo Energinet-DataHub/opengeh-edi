@@ -16,9 +16,9 @@ using System;
 
 namespace B2B.Transactions.Transactions
 {
-    public class MessageHubMessageAvailable
+    public class MessageAvailable
     {
-        public MessageHubMessageAvailable(string id, string recipient, string messageType, string domainOrigin, bool supportsBundling, int relativeWeight, string documentType)
+        public MessageAvailable(string id, string recipient, string messageType, string domainOrigin, bool supportsBundling, int relativeWeight, string documentType)
         {
             Id = id;
             Recipient = recipient;

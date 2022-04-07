@@ -59,7 +59,7 @@ namespace B2B.Transactions.IntegrationTests
         }
 
         [Fact]
-        public async Task Accept_message_is_sent_to_sender_when_transaction_is_accepted()
+        public async Task Message_is_generated_when_transaction_is_accepted()
         {
             var now = _dateTimeProvider.Now();
             _dateTimeProvider.SetNow(now);
@@ -72,8 +72,6 @@ namespace B2B.Transactions.IntegrationTests
 
             AssertHeader(document, transaction);
             AssertMarketActivityRecord(document, transaction);
-
-            FindAndAssertOutboxMessage<MessageHubMessageAvailable>();
         }
 
         private static B2BTransaction CreateTransaction()
@@ -101,14 +99,6 @@ namespace B2B.Transactions.IntegrationTests
         {
             var useCase = new RegisterTransaction(_outgoingMessageStoreSpy, _transactionRepository, _documentProvider, _outbox, _unitOfWork);
             return useCase.HandleAsync(transaction);
-        }
-
-        private void FindAndAssertOutboxMessage<T>()
-            where T : notnull
-        {
-            var outboxMessage = GetOutboxMessage<T>();
-
-            Assert.NotNull(outboxMessage);
         }
 
         private void AssertMarketActivityRecord(XDocument document, B2BTransaction transaction)

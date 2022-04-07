@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using B2B.Transactions.OutgoingMessages;
 
 namespace B2B.Transactions.IntegrationTests.TestDoubles
@@ -22,6 +24,13 @@ namespace B2B.Transactions.IntegrationTests.TestDoubles
         private readonly List<IMessage> _messages = new();
 
         public IReadOnlyCollection<IMessage> Messages => _messages.AsReadOnly();
+
+        #pragma warning disable
+        public Task<ReadOnlyCollection<IMessage>> GetUnpublishedAsync()
+        {
+            return Task.FromResult(_messages.AsReadOnly());
+        }
+        #pragma warning restore
 
         public void Add(IMessage message)
         {

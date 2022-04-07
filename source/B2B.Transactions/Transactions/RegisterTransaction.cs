@@ -47,7 +47,7 @@ namespace B2B.Transactions.Transactions
 
             //TODO: Insert correct values or fetch them later?
             //TODO: Get MessageType and documentType based on transaction.Message.ProcessType?
-            var dataAvailableNotificationTheSecond = new MessageHubMessageAvailable(
+            var messageAvailable = new MessageAvailable(
                 transaction.Message.MessageId,
                 transaction.Message.ReceiverId,
                 "ConfirmChangeOfSupplier",
@@ -56,7 +56,7 @@ namespace B2B.Transactions.Transactions
                 1,
                 "ConfirmRequestChangeOfSupplier");
 
-            _outbox.Add(dataAvailableNotificationTheSecond);
+            _outbox.Add(messageAvailable);
 
             _unitOfWork.SaveTransaction();
             return Task.CompletedTask;
