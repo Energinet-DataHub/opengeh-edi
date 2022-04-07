@@ -34,14 +34,13 @@ namespace B2B.Transactions.IntegrationTests
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly IMessageFactory<IMessage> _messageFactory;
-        private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
         public MessagePublishingTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
-            _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
+            var systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
             _outgoingMessageStore = new OutgoingMessageStoreSpy();
-            _messageFactory = new AcceptMessageFactory(_systemDateTimeProvider);
+            _messageFactory = new AcceptMessageFactory(systemDateTimeProvider);
         }
 
         [Fact]
@@ -62,8 +61,8 @@ namespace B2B.Transactions.IntegrationTests
             Assert.Equal(outgoingMessage.RecipientId, publishedMessage?.Recipient.Value);
             Assert.Equal(DomainOrigin.MarketRoles, publishedMessage?.Origin);
             Assert.Equal(outgoingMessage.DocumentType, publishedMessage?.DocumentType);
-            Assert.Equal(true, publishedMessage?.SupportsBundling);
-            Assert.Equal(outgoingMessage.DocumentType, publishedMessage?.MessageType.Value);
+            Assert.Equal(false, publishedMessage?.SupportsBundling);
+            Assert.Equal(string.Empty, publishedMessage?.MessageType.Value);
         }
 
         private static B2BTransaction CreateTransaction()
@@ -103,9 +102,9 @@ namespace B2B.Transactions.IntegrationTests
                     new DataAvailableNotificationDto(
                         Guid.NewGuid(),
                         new GlobalLocationNumberDto(message.RecipientId),
-                        new MessageTypeDto(message.DocumentType),
+                        new MessageTypeDto(string.Empty),
                         DomainOrigin.MarketRoles,
-                        true,
+                        false,
                         1,
                         message.DocumentType)).ConfigureAwait(false);
 
