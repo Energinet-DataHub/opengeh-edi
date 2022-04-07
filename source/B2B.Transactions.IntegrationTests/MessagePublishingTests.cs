@@ -49,7 +49,8 @@ namespace B2B.Transactions.IntegrationTests
         {
             var dataAvailableNotificationSenderSpy = new DataAvailableNotificationSenderSpy();
             var messagePublisher = new MessagePublisher(dataAvailableNotificationSenderSpy);
-            var outgoingMessage = new OutgoingMessage(_messageFactory.CreateMessage(CreateTransaction()));
+            var transaction = CreateTransaction();
+            var outgoingMessage = new OutgoingMessage(_messageFactory.CreateMessage(transaction), transaction.Message.ReceiverId);
             _outgoingMessageStore.Add(outgoingMessage);
 
             await messagePublisher.PublishAsync(await _outgoingMessageStore.GetUnpublishedAsync().ConfigureAwait(false)).ConfigureAwait(false);
@@ -58,6 +59,7 @@ namespace B2B.Transactions.IntegrationTests
 
             Assert.Empty(unpublishedMessages);
             Assert.NotNull(publishedMessage);
+            Assert.Equal(outgoingMessage.RecipientId, publishedMessage?.Recipient.Value);
         }
 
         private static B2BTransaction CreateTransaction()
@@ -96,7 +98,7 @@ namespace B2B.Transactions.IntegrationTests
                     "CorrelationId",
                     new DataAvailableNotificationDto(
                         Guid.NewGuid(),
-                        new GlobalLocationNumberDto("RecipientId"),
+                        new GlobalLocationNumberDto(message.RecipientId),
                         new MessageTypeDto("MessageType"),
                         DomainOrigin.MarketRoles,
                         true,

@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using B2B.Transactions.DataAccess;
 using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.Xml.Outgoing;
+using Energinet.DataHub.MessageHub.Model.Model;
 
 namespace B2B.Transactions.Transactions
 {
@@ -42,7 +43,7 @@ namespace B2B.Transactions.Transactions
             if (transaction == null) throw new ArgumentNullException(nameof(transaction));
             var acceptedTransaction = new AcceptedTransaction(transaction.MarketActivityRecord.Id);
             _transactionRepository.Add(acceptedTransaction);
-            var outgoingMessage = new OutgoingMessage(_messageFactory.CreateMessage(transaction));
+            var outgoingMessage = new OutgoingMessage(_messageFactory.CreateMessage(transaction), transaction.Message.ReceiverId);
 
             _outgoingMessageStore.Add(outgoingMessage);
 
@@ -67,13 +68,15 @@ namespace B2B.Transactions.Transactions
     #pragma warning disable
     public class OutgoingMessage
     {
-        public OutgoingMessage(IMessage message)
+        public OutgoingMessage(IMessage message, string recipientId)
         {
             Message = message ?? throw new ArgumentNullException(nameof(message));
+            RecipientId = recipientId;
         }
 
         public IMessage Message { get; }
         public bool IsPublished { get; private set; }
+        public string RecipientId { get; }
 
         public void Published()
         {

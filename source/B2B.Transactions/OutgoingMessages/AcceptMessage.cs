@@ -20,13 +20,6 @@ namespace B2B.Transactions.OutgoingMessages
             MessagePayload = messagePayload;
         }
 
-        public bool IsPublished { get; private set; }
-
         public string MessagePayload { get; init; }
-
-        public void Published()
-        {
-            IsPublished = true;
-        }
     }
 }

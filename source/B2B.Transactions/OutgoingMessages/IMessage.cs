@@ -23,15 +23,5 @@ namespace B2B.Transactions.OutgoingMessages
         /// Payload of the outgoing message
         /// </summary>
         string MessagePayload { get; init; }
-
-        /// <summary>
-        /// Is message published
-        /// </summary>
-        bool IsPublished { get; }
-
-        /// <summary>
-        ///  Mark message as published
-        /// </summary>
-        void Published();
     }
 }
