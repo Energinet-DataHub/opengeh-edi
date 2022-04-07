@@ -48,9 +48,33 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.Consumers
                 .HasColumnType("timestamp")
                 .IsRowVersion();
 
-            builder.HasMany<ConsumerRegistration>()
-                .WithOne();
+            // builder.HasMany<ConsumerRegistration>()
+            //     .WithOne();
+            builder.OwnsMany<ConsumerRegistration>("_consumerRegistrations", y =>
+            {
+                y.Property("ConsumerId")
+                    .HasColumnName("ConsumerId")
+                    .HasColumnType("uniqueidentifier");
+                y.WithOwner()
+                    .HasForeignKey("ConsumerId")
+                    .HasPrincipalKey(z => z.ConsumerId);
 
+                y.ToTable("ConsumerRegistrations", "dbo");
+                y.HasKey(z => z.Id);
+                y.Property(z => z.Id)
+                    .HasColumnName("Id")
+                    .HasConversion(toDbValue => toDbValue.Value, fromDbValue => new ConsumerRegistrationId(fromDbValue));
+                // y.Property(z => z.AccountPointId)
+                //      .HasColumnName("AccountingPointId")
+                //      .HasConversion(toDbValue => toDbValue!.Value, fromDbValue => new AccountingPointId(fromDbValue));
+                y.Property(z => z.BusinessProcessId)
+                    .HasColumnName("BusinessProcessId")
+                    .HasConversion(toDbValue => toDbValue.Value, fromDbValue => new BusinessProcessId(fromDbValue));
+                y.Property(z => z.MoveInDate)
+                    .HasColumnName("MoveInDate");
+
+                y.Ignore(z => z.DomainEvents);
+            });
             builder.Ignore(x => x.DomainEvents);
         }
     }

@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using Energinet.DataHub.MarketRoles.Domain.Consumers.Events;
+using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
 namespace Energinet.DataHub.MarketRoles.Domain.Consumers
@@ -21,6 +23,10 @@ namespace Energinet.DataHub.MarketRoles.Domain.Consumers
     public class Consumer : AggregateRootBase
     {
         private readonly ConsumerName _name;
+
+        #pragma warning disable
+        private readonly List<ConsumerRegistration> _consumerRegistrations = new List<ConsumerRegistration>();
+        #pragma warning restore
 
         public Consumer(ConsumerId consumerId, CprNumber cprNumber, ConsumerName name)
             : this(consumerId, name)
