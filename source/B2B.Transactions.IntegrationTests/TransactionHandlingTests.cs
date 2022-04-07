@@ -68,7 +68,7 @@ namespace B2B.Transactions.IntegrationTests
 
             var acceptMessage = _outgoingMessageStoreSpy.Messages.FirstOrDefault();
             Assert.NotNull(acceptMessage);
-            var document = CreateDocument(acceptMessage!.MessagePayload);
+            var document = CreateDocument(acceptMessage!.Message.MessagePayload);
 
             AssertHeader(document, transaction);
             AssertMarketActivityRecord(document, transaction);

@@ -17,23 +17,24 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using B2B.Transactions.OutgoingMessages;
+using B2B.Transactions.Transactions;
 
 namespace B2B.Transactions.IntegrationTests.TestDoubles
 {
     public class OutgoingMessageStoreSpy : IOutgoingMessageStore
     {
-        private readonly List<IMessage> _messages = new();
+        private readonly List<OutgoingMessage> _messages = new();
 
-        public IReadOnlyCollection<IMessage> Messages => _messages.AsReadOnly();
+        public IReadOnlyCollection<OutgoingMessage> Messages => _messages.AsReadOnly();
 
         #pragma warning disable
-        public Task<ReadOnlyCollection<IMessage>> GetUnpublishedAsync()
+        public Task<ReadOnlyCollection<OutgoingMessage>> GetUnpublishedAsync()
         {
             return Task.FromResult(_messages.Where(message => message.IsPublished == false).ToList().AsReadOnly());
         }
         #pragma warning restore
 
-        public void Add(IMessage message)
+        public void Add(OutgoingMessage message)
         {
             _messages.Add(message);
         }

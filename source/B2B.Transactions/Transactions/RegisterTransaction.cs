@@ -42,8 +42,9 @@ namespace B2B.Transactions.Transactions
             if (transaction == null) throw new ArgumentNullException(nameof(transaction));
             var acceptedTransaction = new AcceptedTransaction(transaction.MarketActivityRecord.Id);
             _transactionRepository.Add(acceptedTransaction);
+            var outgoingMessage = new OutgoingMessage(_messageFactory.CreateMessage(transaction));
 
-            _outgoingMessageStore.Add(_messageFactory.CreateMessage(transaction));
+            _outgoingMessageStore.Add(outgoingMessage);
 
             //TODO: Insert correct values or fetch them later?
             //TODO: Get MessageType and documentType based on transaction.Message.ProcessType?
@@ -62,4 +63,22 @@ namespace B2B.Transactions.Transactions
             return Task.CompletedTask;
         }
     }
+
+    #pragma warning disable
+    public class OutgoingMessage
+    {
+        public OutgoingMessage(IMessage message)
+        {
+            Message = message ?? throw new ArgumentNullException(nameof(message));
+        }
+
+        public IMessage Message { get; }
+        public bool IsPublished { get; private set; }
+
+        public void Published()
+        {
+            IsPublished = true;
+        }
+    }
+    #pragma warning restore
 }

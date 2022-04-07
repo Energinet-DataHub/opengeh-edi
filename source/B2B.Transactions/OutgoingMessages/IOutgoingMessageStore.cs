@@ -15,6 +15,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using B2B.Transactions.Transactions;
 
 namespace B2B.Transactions.OutgoingMessages
 {
@@ -27,12 +28,12 @@ namespace B2B.Transactions.OutgoingMessages
         /// Add message to queue
         /// </summary>
         /// <param name="message"></param>
-        void Add(IMessage message);
+        void Add(OutgoingMessage message);
 
         /// <summary>
         /// Get unpublished messages
         /// </summary>
         /// <returns> A read only collection of unpublished messages</returns>
-        Task<ReadOnlyCollection<IMessage>> GetUnpublishedAsync();
+        Task<ReadOnlyCollection<OutgoingMessage>> GetUnpublishedAsync();
     }
 }

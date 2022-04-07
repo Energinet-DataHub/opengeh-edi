@@ -49,7 +49,8 @@ namespace B2B.Transactions.IntegrationTests
         {
             var dataAvailableNotificationSenderSpy = new DataAvailableNotificationSenderSpy();
             var messagePublisher = new MessagePublisher(dataAvailableNotificationSenderSpy);
-            _outgoingMessageStore.Add(_messageFactory.CreateMessage(CreateTransaction()));
+            var outgoingMessage = new OutgoingMessage(_messageFactory.CreateMessage(CreateTransaction()));
+            _outgoingMessageStore.Add(outgoingMessage);
 
             await messagePublisher.PublishAsync(await _outgoingMessageStore.GetUnpublishedAsync().ConfigureAwait(false)).ConfigureAwait(false);
             var unpublishedMessages = await _outgoingMessageStore.GetUnpublishedAsync().ConfigureAwait(false);
@@ -87,7 +88,7 @@ namespace B2B.Transactions.IntegrationTests
         }
 
 
-        public async Task PublishAsync(ReadOnlyCollection<IMessage> unpublishedMessages)
+        public async Task PublishAsync(ReadOnlyCollection<OutgoingMessage> unpublishedMessages)
         {
             foreach (var message in unpublishedMessages)
             {
