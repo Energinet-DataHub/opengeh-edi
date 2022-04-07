@@ -1,5 +1,3 @@
-CREATE SCHEMA b2b
-
 CREATE TABLE [b2b].[OutboxMessages](
     [Id] [uniqueidentifier] NOT NULL,
     [RecordId] [int] IDENTITY(1,1) NOT NULL,
