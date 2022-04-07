@@ -12,28 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using B2B.Transactions.Transactions;
+using System;
 
-namespace B2B.Transactions.Infrastructure.DataAccess.Transaction
+namespace B2B.Transactions.Infrastructure.Outbox
 {
-    public class TransactionRepository : ITransactionRepository
+    public class OutboxMessageException : Exception
     {
-        private readonly B2BContext _b2BContext;
-
-        public TransactionRepository(B2BContext b2BContext)
+        public OutboxMessageException()
         {
-            _b2BContext = b2BContext;
         }
 
-        public void Add(AcceptedTransaction acceptedTransaction)
+        public OutboxMessageException(string? message)
+            : base(message)
         {
-            _b2BContext.Transactions.Add(acceptedTransaction);
         }
 
-        public AcceptedTransaction? GetById(string transactionId)
+        public OutboxMessageException(string message, Exception innerException)
+            : base(message, innerException)
         {
-            return _b2BContext.Transactions.Find(transactionId);
         }
     }
 }

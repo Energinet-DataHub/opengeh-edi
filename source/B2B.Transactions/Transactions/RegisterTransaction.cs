@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
+using B2B.Transactions.DataAccess;
 using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.Xml.Outgoing;
 
@@ -24,21 +25,41 @@ namespace B2B.Transactions.Transactions
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly ITransactionRepository _transactionRepository;
         private readonly IDocumentProvider<IMessage> _documentProvider;
+        private readonly IOutbox _outbox;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public RegisterTransaction(IOutgoingMessageStore outgoingMessageStore, ITransactionRepository transactionRepository, IDocumentProvider<IMessage> documentProvider)
+        public RegisterTransaction(IOutgoingMessageStore outgoingMessageStore, ITransactionRepository transactionRepository, IDocumentProvider<IMessage> documentProvider, IOutbox outbox, IUnitOfWork unitOfWork)
         {
             _outgoingMessageStore = outgoingMessageStore ?? throw new ArgumentNullException(nameof(outgoingMessageStore));
             _transactionRepository = transactionRepository ?? throw new ArgumentNullException(nameof(transactionRepository));
             _documentProvider = documentProvider ?? throw new ArgumentNullException(nameof(documentProvider));
+            _outbox = outbox;
+            _unitOfWork = unitOfWork;
         }
 
-        public async Task HandleAsync(B2BTransaction transaction)
+        public Task HandleAsync(B2BTransaction transaction)
         {
             if (transaction == null) throw new ArgumentNullException(nameof(transaction));
             var acceptedTransaction = new AcceptedTransaction(transaction.MarketActivityRecord.Id);
-            await _transactionRepository.AddAsync(acceptedTransaction).ConfigureAwait(false);
+            _transactionRepository.Add(acceptedTransaction);
 
             _outgoingMessageStore.Add(_documentProvider.CreateMessage(transaction));
+
+            //TODO: Insert correct values or fetch them later?
+            //TODO: Get MessageType and documentType based on transaction.Message.ProcessType?
+            var dataAvailableNotificationTheSecond = new MessageHubMessageAvailable(
+                transaction.Message.MessageId,
+                transaction.Message.ReceiverId,
+                "ConfirmChangeOfSupplier",
+                "MarketRoles",
+                true,
+                1,
+                "ConfirmRequestChangeOfSupplier");
+
+            _outbox.Add(dataAvailableNotificationTheSecond);
+
+            _unitOfWork.SaveTransaction();
+            return Task.CompletedTask;
         }
     }
 }

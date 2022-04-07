@@ -25,6 +25,7 @@ using B2B.Transactions.Infrastructure.Configuration.Correlation;
 using B2B.Transactions.Infrastructure.DataAccess;
 using B2B.Transactions.Infrastructure.DataAccess.Transaction;
 using B2B.Transactions.Infrastructure.Messages;
+using B2B.Transactions.Infrastructure.Outbox;
 using B2B.Transactions.Infrastructure.Serialization;
 using B2B.Transactions.Infrastructure.Transactions;
 using B2B.Transactions.OutgoingMessages;
@@ -55,6 +56,9 @@ namespace B2B.Transactions.Infrastructure.Configuration
             services.AddScoped<ITransactionQueueDispatcher, TransactionQueueDispatcher>();
             services.AddScoped<ITransactionRepository, TransactionRepository>();
             services.AddScoped<IMarketActorAuthenticator, MarketActorAuthenticator>();
+            services.AddScoped<IOutbox, OutboxProvider>();
+            services.AddScoped<OutboxMessageFactory>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddLogging();
             AddXmlSchema(services);
         }

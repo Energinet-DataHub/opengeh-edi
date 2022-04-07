@@ -12,28 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using B2B.Transactions.Transactions;
+using B2B.Transactions.DataAccess;
 
-namespace B2B.Transactions.Infrastructure.DataAccess.Transaction
+namespace B2B.Transactions.Infrastructure.DataAccess
 {
-    public class TransactionRepository : ITransactionRepository
+    public class UnitOfWork : IUnitOfWork
     {
-        private readonly B2BContext _b2BContext;
+        private readonly B2BContext _context;
 
-        public TransactionRepository(B2BContext b2BContext)
+        public UnitOfWork(B2BContext context)
         {
-            _b2BContext = b2BContext;
+            _context = context;
         }
 
-        public void Add(AcceptedTransaction acceptedTransaction)
+        public void SaveTransaction()
         {
-            _b2BContext.Transactions.Add(acceptedTransaction);
-        }
-
-        public AcceptedTransaction? GetById(string transactionId)
-        {
-            return _b2BContext.Transactions.Find(transactionId);
+            _context.SaveChanges();
         }
     }
 }
