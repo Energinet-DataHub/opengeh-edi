@@ -60,6 +60,7 @@ namespace B2B.Transactions.IntegrationTests
             Assert.Empty(unpublishedMessages);
             Assert.NotNull(publishedMessage);
             Assert.Equal(outgoingMessage.RecipientId, publishedMessage?.Recipient.Value);
+            Assert.Equal(DomainOrigin.MarketRoles, publishedMessage?.Origin);
         }
 
         private static B2BTransaction CreateTransaction()
