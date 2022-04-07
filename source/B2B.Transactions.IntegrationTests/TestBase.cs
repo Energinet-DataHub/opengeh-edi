@@ -15,6 +15,7 @@
 using System;
 using B2B.Transactions.DataAccess;
 using B2B.Transactions.Infrastructure.Configuration;
+using B2B.Transactions.Infrastructure.Configuration.Correlation;
 using B2B.Transactions.IntegrationTests.Fixtures;
 using B2B.Transactions.IntegrationTests.TestDoubles;
 using Dapper;
@@ -39,7 +40,13 @@ namespace B2B.Transactions.IntegrationTests
             CompositionRoot.Initialize(services)
                 .AddDatabaseConnectionFactory(_databaseFixture.ConnectionString)
                 .AddDatabaseContext(_databaseFixture.ConnectionString)
-                .AddSystemClock(new SystemDateTimeProviderStub());
+                .AddSystemClock(new SystemDateTimeProviderStub())
+                .AddCorrelationContext(_ =>
+                {
+                    var correlation = new CorrelationContext();
+                    correlation.SetId(Guid.NewGuid().ToString());
+                    return correlation;
+                });
             _serviceProvider = services.BuildServiceProvider();
         }
 

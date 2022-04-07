@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using B2B.Transactions.Infrastructure.Configuration.Correlation;
 using B2B.Transactions.IntegrationTests.Fixtures;
 using B2B.Transactions.IntegrationTests.TestDoubles;
 using B2B.Transactions.Messages;
@@ -47,7 +48,7 @@ namespace B2B.Transactions.IntegrationTests
         public async Task Outgoing_messages_are_published()
         {
             var dataAvailableNotificationSenderSpy = new DataAvailableNotificationSenderSpy();
-            var messagePublisher = new MessagePublisher(dataAvailableNotificationSenderSpy);
+            var messagePublisher = new MessagePublisher(dataAvailableNotificationSenderSpy, GetService<ICorrelationContext>());
             var transaction = CreateTransaction();
             var outgoingMessage = new OutgoingMessage(_messageFactory.CreateMessage(transaction), transaction.Message.ReceiverId);
             _outgoingMessageStore.Add(outgoingMessage);
@@ -86,10 +87,12 @@ namespace B2B.Transactions.IntegrationTests
     public class MessagePublisher
     {
         private readonly IDataAvailableNotificationSender _dataAvailableNotificationSender;
+        private readonly ICorrelationContext _correlationContext;
 
-        public MessagePublisher(IDataAvailableNotificationSender dataAvailableNotificationSender)
+        public MessagePublisher(IDataAvailableNotificationSender dataAvailableNotificationSender, ICorrelationContext correlationContext)
         {
             _dataAvailableNotificationSender = dataAvailableNotificationSender ?? throw new ArgumentNullException(nameof(dataAvailableNotificationSender));
+            _correlationContext = correlationContext;
         }
 
 
@@ -98,7 +101,7 @@ namespace B2B.Transactions.IntegrationTests
             foreach (var message in unpublishedMessages)
             {
                 await _dataAvailableNotificationSender.SendAsync(
-                    "CorrelationId",
+                    _correlationContext.Id,
                     new DataAvailableNotificationDto(
                         Guid.NewGuid(),
                         new GlobalLocationNumberDto(message.RecipientId),
