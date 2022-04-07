@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using B2B.Transactions.IntegrationTests.Fixtures;
@@ -21,6 +22,8 @@ using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.Transactions;
 using B2B.Transactions.Xml.Outgoing;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using Energinet.DataHub.MessageHub.Client.DataAvailable;
+using Energinet.DataHub.MessageHub.Model.Model;
 using Xunit;
 
 namespace B2B.Transactions.IntegrationTests
@@ -46,9 +49,9 @@ namespace B2B.Transactions.IntegrationTests
 
            var unpublishedMessages = await _outgoingMessageStore.GetUnpublishedAsync().ConfigureAwait(false);
 
-           var messagePublisher = new MessagePublisher();
+           var messagePublisher = new MessagePublisher(new DataAvailableNotificationSenderSpy());
 
-           messagePublisher.PublishAsync(unpublishedMessages);
+           await messagePublisher.PublishAsync(unpublishedMessages).ConfigureAwait(false);
 
            unpublishedMessages = await _outgoingMessageStore.GetUnpublishedAsync().ConfigureAwait(false);
 
@@ -75,8 +78,37 @@ namespace B2B.Transactions.IntegrationTests
     #pragma warning disable
     public class MessagePublisher
     {
-        public void PublishAsync(ReadOnlyCollection<IMessage> unpublishedMessages)
+        private readonly IDataAvailableNotificationSender _dataAvailableNotificationSender;
+
+        public MessagePublisher(IDataAvailableNotificationSender dataAvailableNotificationSender)
         {
+            _dataAvailableNotificationSender = dataAvailableNotificationSender ?? throw new ArgumentNullException(nameof(dataAvailableNotificationSender));
+        }
+        public async Task PublishAsync(ReadOnlyCollection<IMessage> unpublishedMessages)
+        {
+            foreach (var message in unpublishedMessages)
+            {
+                await _dataAvailableNotificationSender.SendAsync(
+                    "CorrelationId",
+                    new DataAvailableNotificationDto(
+                        Guid.NewGuid(),
+                        new GlobalLocationNumberDto("RecipientId"),
+                        new MessageTypeDto("MessageType"),
+                        DomainOrigin.MarketRoles,
+                        true,
+                        1,
+                        "DocumentType")).ConfigureAwait(false);
+
+                message.Published();
+            }
+        }
+    }
+
+    public class DataAvailableNotificationSenderSpy : IDataAvailableNotificationSender
+    {
+        public Task SendAsync(string correlationId, DataAvailableNotificationDto dataAvailableNotificationDto)
+        {
+            throw new NotImplementedException();
         }
     }
 }

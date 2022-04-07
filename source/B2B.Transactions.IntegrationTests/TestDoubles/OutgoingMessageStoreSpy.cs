@@ -14,6 +14,7 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using B2B.Transactions.OutgoingMessages;
 
@@ -28,7 +29,7 @@ namespace B2B.Transactions.IntegrationTests.TestDoubles
         #pragma warning disable
         public Task<ReadOnlyCollection<IMessage>> GetUnpublishedAsync()
         {
-            return Task.FromResult(_messages.AsReadOnly());
+            return Task.FromResult(_messages.Where(message => message.IsPublished).ToList().AsReadOnly());
         }
         #pragma warning restore
 
