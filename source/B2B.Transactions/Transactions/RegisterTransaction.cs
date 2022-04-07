@@ -24,15 +24,15 @@ namespace B2B.Transactions.Transactions
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly ITransactionRepository _transactionRepository;
-        private readonly IDocumentProvider<IMessage> _documentProvider;
+        private readonly IMessageFactory<IMessage> _messageFactory;
         private readonly IOutbox _outbox;
         private readonly IUnitOfWork _unitOfWork;
 
-        public RegisterTransaction(IOutgoingMessageStore outgoingMessageStore, ITransactionRepository transactionRepository, IDocumentProvider<IMessage> documentProvider, IOutbox outbox, IUnitOfWork unitOfWork)
+        public RegisterTransaction(IOutgoingMessageStore outgoingMessageStore, ITransactionRepository transactionRepository, IMessageFactory<IMessage> messageFactory, IOutbox outbox, IUnitOfWork unitOfWork)
         {
             _outgoingMessageStore = outgoingMessageStore ?? throw new ArgumentNullException(nameof(outgoingMessageStore));
             _transactionRepository = transactionRepository ?? throw new ArgumentNullException(nameof(transactionRepository));
-            _documentProvider = documentProvider ?? throw new ArgumentNullException(nameof(documentProvider));
+            _messageFactory = messageFactory ?? throw new ArgumentNullException(nameof(messageFactory));
             _outbox = outbox;
             _unitOfWork = unitOfWork;
         }
@@ -43,7 +43,7 @@ namespace B2B.Transactions.Transactions
             var acceptedTransaction = new AcceptedTransaction(transaction.MarketActivityRecord.Id);
             _transactionRepository.Add(acceptedTransaction);
 
-            _outgoingMessageStore.Add(_documentProvider.CreateMessage(transaction));
+            _outgoingMessageStore.Add(_messageFactory.CreateMessage(transaction));
 
             //TODO: Insert correct values or fetch them later?
             //TODO: Get MessageType and documentType based on transaction.Message.ProcessType?

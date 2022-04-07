@@ -52,7 +52,7 @@ namespace B2B.Transactions.Infrastructure.Configuration
             services.AddSingleton<ISerializer, Serializer>();
             services.AddScoped<ITransactionIds, TransactionIdRegistry>();
             services.AddScoped<IMessageIds, MessageIdRegistry>();
-            services.AddScoped<IDocumentProvider<IMessage>, AcceptDocumentProvider>();
+            services.AddScoped<IMessageFactory<IMessage>, AcceptMessageFactory>();
             services.AddScoped<ITransactionQueueDispatcher, TransactionQueueDispatcher>();
             services.AddScoped<ITransactionRepository, TransactionRepository>();
             services.AddScoped<IMarketActorAuthenticator, MarketActorAuthenticator>();

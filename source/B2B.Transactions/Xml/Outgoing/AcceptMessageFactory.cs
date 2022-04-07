@@ -20,9 +20,9 @@ using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
 namespace B2B.Transactions.Xml.Outgoing
 {
-    public class AcceptDocumentProvider : DocumentProvider<IMessage>
+    public class AcceptMessageFactory : MessageFactory<IMessage>
     {
-        public AcceptDocumentProvider(ISystemDateTimeProvider systemDateTimeProvider)
+        public AcceptMessageFactory(ISystemDateTimeProvider systemDateTimeProvider)
             : base(systemDateTimeProvider)
         {
         }

@@ -33,7 +33,7 @@ namespace B2B.Transactions.IntegrationTests
     public class MessagePublishingTests : TestBase
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
-        private readonly IDocumentProvider<IMessage> _documentProvider;
+        private readonly IMessageFactory<IMessage> _messageFactory;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
         public MessagePublishingTests(DatabaseFixture databaseFixture)
@@ -41,7 +41,7 @@ namespace B2B.Transactions.IntegrationTests
         {
             _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
             _outgoingMessageStore = new OutgoingMessageStoreSpy();
-            _documentProvider = new AcceptDocumentProvider(_systemDateTimeProvider);
+            _messageFactory = new AcceptMessageFactory(_systemDateTimeProvider);
         }
 
         [Fact]
@@ -49,7 +49,7 @@ namespace B2B.Transactions.IntegrationTests
         {
             var dataAvailableNotificationSenderSpy = new DataAvailableNotificationSenderSpy();
             var messagePublisher = new MessagePublisher(dataAvailableNotificationSenderSpy);
-            _outgoingMessageStore.Add(_documentProvider.CreateMessage(CreateTransaction()));
+            _outgoingMessageStore.Add(_messageFactory.CreateMessage(CreateTransaction()));
 
             await messagePublisher.PublishAsync(await _outgoingMessageStore.GetUnpublishedAsync().ConfigureAwait(false)).ConfigureAwait(false);
             var unpublishedMessages = await _outgoingMessageStore.GetUnpublishedAsync().ConfigureAwait(false);

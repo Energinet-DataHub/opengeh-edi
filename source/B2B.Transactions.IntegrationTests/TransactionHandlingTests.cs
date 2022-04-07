@@ -37,7 +37,7 @@ namespace B2B.Transactions.IntegrationTests
         private readonly IOutbox _outbox;
         private readonly XNamespace _namespace = "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1";
         private OutgoingMessageStoreSpy _outgoingMessageStoreSpy = new();
-        private IDocumentProvider<IMessage> _documentProvider = new AcceptDocumentProvider(_dateTimeProvider);
+        private IMessageFactory<IMessage> _messageFactory = new AcceptMessageFactory(_dateTimeProvider);
 
         public TransactionHandlingTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
@@ -97,7 +97,7 @@ namespace B2B.Transactions.IntegrationTests
 
         private Task RegisterTransaction(B2BTransaction transaction)
         {
-            var useCase = new RegisterTransaction(_outgoingMessageStoreSpy, _transactionRepository, _documentProvider, _outbox, _unitOfWork);
+            var useCase = new RegisterTransaction(_outgoingMessageStoreSpy, _transactionRepository, _messageFactory, _outbox, _unitOfWork);
             return useCase.HandleAsync(transaction);
         }
 
