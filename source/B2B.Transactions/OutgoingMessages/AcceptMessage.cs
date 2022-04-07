@@ -18,11 +18,11 @@ namespace B2B.Transactions.OutgoingMessages
         public AcceptMessage(string messagePayload, string messageType)
         {
             MessagePayload = messagePayload;
-            MessageType = messageType;
+            DocumentType = messageType;
         }
 
         public string MessagePayload { get; init; }
 
-        public string MessageType { get; init; }
+        public string DocumentType { get; init; }
     }
 }

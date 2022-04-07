@@ -27,6 +27,6 @@ namespace B2B.Transactions.OutgoingMessages
         /// <summary>
         /// The type of the message
         /// </summary>
-        string MessageType { get; init; }
+        string DocumentType { get; init; }
     }
 }

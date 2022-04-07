@@ -78,7 +78,7 @@ namespace B2B.Transactions.Transactions
         public IMessage Message { get; }
         public bool IsPublished { get; private set; }
         public string RecipientId { get; }
-        public string MessageType => Message.MessageType;
+        public string DocumentType => Message.DocumentType;
 
         public void Published()
         {
