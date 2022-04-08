@@ -20,14 +20,16 @@ using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
 namespace B2B.Transactions.Xml.Outgoing
 {
-    public class AcceptDocumentProvider : DocumentProvider<IMessage>
+    public class AcceptMessageFactory : MessageFactory<IDocument>
     {
-        public AcceptDocumentProvider(ISystemDateTimeProvider systemDateTimeProvider)
+        private const string MessageType = "ConfirmRequestChangeOfSupplier";
+
+        public AcceptMessageFactory(ISystemDateTimeProvider systemDateTimeProvider)
             : base(systemDateTimeProvider)
         {
         }
 
-        public override IMessage CreateMessage(B2BTransaction transaction)
+        public override IDocument CreateMessage(B2BTransaction transaction)
         {
             var settings = new XmlWriterSettings() { OmitXmlDeclaration = false, Encoding = Encoding.UTF8 };
             using var output = new Utf8StringWriter();
@@ -71,7 +73,7 @@ namespace B2B.Transactions.Xml.Outgoing
             writer.Close();
             output.Flush();
 
-            return new AcceptMessage(output.ToString());
+            return new AcceptMessage(output.ToString(), MessageType);
         }
     }
 }
