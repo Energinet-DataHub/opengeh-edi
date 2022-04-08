@@ -12,17 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace B2B.Transactions
+namespace B2B.Transactions.OutgoingMessages
 {
     /// <summary>
-    /// Transactional outbox
+    /// Interface for outgoing messages
     /// </summary>
-    public interface IOutbox
+    public interface IDocument
     {
         /// <summary>
-        /// Add message to outbox
+        /// Payload of the outgoing message
         /// </summary>
-        /// <param name="message"></param>
-        void Add<T>(T message);
+        string MessagePayload { get; init; }
+
+        /// <summary>
+        /// The type of the message
+        /// </summary>
+        string DocumentType { get; init; }
     }
 }

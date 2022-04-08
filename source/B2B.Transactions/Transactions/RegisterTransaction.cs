@@ -24,16 +24,14 @@ namespace B2B.Transactions.Transactions
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly ITransactionRepository _transactionRepository;
-        private readonly IDocumentProvider<IMessage> _documentProvider;
-        private readonly IOutbox _outbox;
+        private readonly IMessageFactory<IDocument> _messageFactory;
         private readonly IUnitOfWork _unitOfWork;
 
-        public RegisterTransaction(IOutgoingMessageStore outgoingMessageStore, ITransactionRepository transactionRepository, IDocumentProvider<IMessage> documentProvider, IOutbox outbox, IUnitOfWork unitOfWork)
+        public RegisterTransaction(IOutgoingMessageStore outgoingMessageStore, ITransactionRepository transactionRepository, IMessageFactory<IDocument> messageFactory, IUnitOfWork unitOfWork)
         {
             _outgoingMessageStore = outgoingMessageStore ?? throw new ArgumentNullException(nameof(outgoingMessageStore));
             _transactionRepository = transactionRepository ?? throw new ArgumentNullException(nameof(transactionRepository));
-            _documentProvider = documentProvider ?? throw new ArgumentNullException(nameof(documentProvider));
-            _outbox = outbox;
+            _messageFactory = messageFactory ?? throw new ArgumentNullException(nameof(messageFactory));
             _unitOfWork = unitOfWork;
         }
 
@@ -42,24 +40,11 @@ namespace B2B.Transactions.Transactions
             if (transaction == null) throw new ArgumentNullException(nameof(transaction));
             var acceptedTransaction = new AcceptedTransaction(transaction.MarketActivityRecord.Id);
             _transactionRepository.Add(acceptedTransaction);
+            var outgoingMessage = new OutgoingMessage(_messageFactory.CreateMessage(transaction), transaction.Message.ReceiverId);
 
-            _outgoingMessageStore.Add(_documentProvider.CreateMessage(transaction));
+            _outgoingMessageStore.Add(outgoingMessage);
 
-            //TODO: Insert correct values or fetch them later?
-            //TODO: Get MessageType and documentType based on transaction.Message.ProcessType?
-            var dataAvailableNotificationTheSecond = new MessageHubMessageAvailable(
-                transaction.Message.MessageId,
-                transaction.Message.ReceiverId,
-                "ConfirmChangeOfSupplier",
-                "MarketRoles",
-                true,
-                1,
-                "ConfirmRequestChangeOfSupplier");
-
-            _outbox.Add(dataAvailableNotificationTheSecond);
-
-            _unitOfWork.SaveTransaction();
-            return Task.CompletedTask;
+            return _unitOfWork.CommitAsync();
         }
     }
 }
