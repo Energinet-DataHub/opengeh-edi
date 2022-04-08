@@ -1,3 +1,5 @@
+DROP TABLE [dbo].[IncomingMessages]
+
 CREATE TABLE [dbo].[MessageIds]
 (
     [RecordId] [int] IDENTITY(1,1) NOT NULL,
