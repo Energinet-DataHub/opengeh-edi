@@ -19,11 +19,11 @@ using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
 namespace B2B.Transactions.Xml.Outgoing
 {
-    public abstract class DocumentProvider<TMessage> : IDocumentProvider<TMessage>
+    public abstract class MessageFactory<TMessage> : IMessageFactory<TMessage>
     {
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
-        protected DocumentProvider(ISystemDateTimeProvider systemDateTimeProvider)
+        protected MessageFactory(ISystemDateTimeProvider systemDateTimeProvider)
         {
             _systemDateTimeProvider = systemDateTimeProvider ?? throw new ArgumentNullException(nameof(systemDateTimeProvider));
         }

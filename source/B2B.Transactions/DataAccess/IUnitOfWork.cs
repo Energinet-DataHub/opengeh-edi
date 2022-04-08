@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading.Tasks;
+
 namespace B2B.Transactions.DataAccess
 {
     /// <summary>
@@ -20,8 +22,8 @@ namespace B2B.Transactions.DataAccess
     public interface IUnitOfWork
     {
         /// <summary>
-        /// Save transaction
+        /// Commits current transaction
         /// </summary>
-        void SaveTransaction();
+        Task CommitAsync();
     }
 }

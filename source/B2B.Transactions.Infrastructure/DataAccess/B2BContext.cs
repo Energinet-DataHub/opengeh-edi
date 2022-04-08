@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Reflection.PortableExecutable;
-using B2B.Transactions.Infrastructure.DataAccess.Outbox;
 using B2B.Transactions.Infrastructure.DataAccess.Transaction;
 using B2B.Transactions.Transactions;
 using Microsoft.EntityFrameworkCore;
@@ -35,14 +33,11 @@ namespace B2B.Transactions.Infrastructure.DataAccess
 
         public DbSet<AcceptedTransaction> Transactions { get; private set; }
 
-        public DbSet<OutboxMessage> OutboxMessages { get; private set; }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
 
             modelBuilder.ApplyConfiguration(new TransactionEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new OutboxEntityConfiguration());
         }
     }
 }
