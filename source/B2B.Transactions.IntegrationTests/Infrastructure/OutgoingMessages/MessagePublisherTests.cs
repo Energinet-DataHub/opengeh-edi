@@ -25,17 +25,17 @@ using Energinet.DataHub.MessageHub.Model.Model;
 using Xunit;
 using Xunit.Categories;
 
-namespace B2B.Transactions.IntegrationTests.OutgoingMessages
+namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
 {
     [IntegrationTest]
-    public class MessagePublishingTests : TestBase
+    public class MessagePublisherTests : TestBase
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly IMessageFactory<IDocument> _messageFactory;
         private readonly MessagePublisher _messagePublisher;
         private readonly DataAvailableNotificationSenderSpy _dataAvailableNotificationSenderSpy;
 
-        public MessagePublishingTests(DatabaseFixture databaseFixture)
+        public MessagePublisherTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
             var systemDateTimeProvider = GetService<ISystemDateTimeProvider>();

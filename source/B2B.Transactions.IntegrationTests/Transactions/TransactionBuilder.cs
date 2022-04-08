@@ -15,7 +15,7 @@
 using B2B.Transactions.Messages;
 using B2B.Transactions.Transactions;
 
-namespace B2B.Transactions.IntegrationTests
+namespace B2B.Transactions.IntegrationTests.Transactions
 {
     internal static class TransactionBuilder
     {
