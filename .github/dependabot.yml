@@ -5,6 +5,42 @@
 version: 2
 updates:
   - package-ecosystem: "nuget"
+    directory: "/source/B2B.Transactions.Infrastructure"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+  
+  - package-ecosystem: "nuget"
+    directory: "/source/B2B.Transactions.IntegrationTests"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+  
+  - package-ecosystem: "nuget"
+    directory: "/source/B2B.Transactions"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "nuget"
+    directory: "/source/B2B.Transactions.CimMessageAdapter"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "nuget"
+    directory: "/source/B2B.Transactions.CimMessageAdapter.Receiver"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "nuget"
+    directory: "/source/B2B.Transactions.CimMessageAdapter.Tests"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "nuget"
     directory: "/source/Energinet.DataHub.MarketRoles.Application"
     schedule:
       interval: "weekly"
@@ -41,6 +77,12 @@ updates:
     open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
+    directory: "/source/Energinet.DataHub.MarketRoles.EntryPoints.LocalMessageHub"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "nuget"
     directory: "/source/Energinet.DataHub.MarketRoles.EntryPoints.Outbox"
     schedule:
       interval: "weekly"
@@ -65,8 +107,13 @@ updates:
     open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
-    directory: "/source/Energinet.DataHub.MarketRoles.Tests"
+    directory: "/source/Energinet.DataHub.MarketRoles.Messaging"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
 
+  - package-ecosystem: "nuget"
+    directory: "/source/Energinet.DataHub.MarketRoles.Tests"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0

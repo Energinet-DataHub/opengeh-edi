@@ -18,15 +18,11 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.EDI.Acknowledgements
 {
     public record MarketActivityRecordWithReasons(
             string Id,
-            string BusinessProcessReference,
-            string MarketEvaluationPoint,
-            string StartDateAndOrTime,
             string OriginalTransaction,
+            string MarketEvaluationPoint,
             IReadOnlyCollection<Reason> Reasons)
         : MarketActivityRecord(
             Id,
-            BusinessProcessReference,
             MarketEvaluationPoint,
-            StartDateAndOrTime,
             OriginalTransaction);
 }

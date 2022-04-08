@@ -20,7 +20,7 @@ module "func_processing" {
   environment_instance                      = var.environment_instance
   resource_group_name                       = azurerm_resource_group.this.name
   location                                  = azurerm_resource_group.this.location
-  app_service_plan_id                       = module.plan_shared.id
+  app_service_plan_id                       = data.azurerm_key_vault_secret.plan_shared_id.value
   application_insights_instrumentation_key  = data.azurerm_key_vault_secret.appi_instrumentation_key.value
   always_on                                 = true
   app_settings                              = {
@@ -32,7 +32,7 @@ module "func_processing" {
     # Endregion: Default Values
     MARKET_DATA_QUEUE_URL                   = "${module.sb_marketroles.name}.servicebus.windows.net:9093"
     MARKET_DATA_QUEUE_CONNECTION_STRING     = module.sb_marketroles.primary_connection_strings["listen"]
-    MARKET_DATA_DB_CONNECTION_STRING        = local.MARKETROLES_CONNECTION_STRING
+    MARKET_DATA_DB_CONNECTION_STRING        = local.MS_MARKETROLES_CONNECTION_STRING
     MARKET_DATA_QUEUE_TOPIC_NAME            = module.sbq_marketroles.name
     INTEGRATION_EVENT_QUEUE                 = data.azurerm_key_vault_secret.sbq_event_forwarded_queue.value
     INTEGRATION_EVENT_QUEUE_CONNECTION      = data.azurerm_key_vault_secret.sb_domain_relay_listener_connection_string.value

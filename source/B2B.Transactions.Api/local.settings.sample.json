@@ -1,0 +1,16 @@
+﻿{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "B2C_TENANT_ID": "<Azure B2C tenant id>",
+    "BACKEND_SERVICE_APP_ID": "<Backend service application id>",
+    "REQUEST_RESPONSE_LOGGING_CONTAINER_NAME": "<Name of storage container>",
+    "REQUEST_RESPONSE_LOGGING_CONNECTION_STRING": "<connection string for logging request and response to storage>",
+    "DB_CONNECTION_STRING": "<SQL database connection string>",
+    "TRANSACTIONS_QUEUE_CONNECTION_STRING": "<connection string for service bus with sender permissions>",
+    "TRANSACTIONS_QUEUE_LISTENER_CONNECTION_STRING": "<connection string for service bus with listener permissions>",
+    "TRANSACTIONS_QUEUE_NAME": "<Name of transactions service bus queue>"
+    
+  }
+}

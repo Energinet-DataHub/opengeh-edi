@@ -22,11 +22,12 @@ limitations under the License.
     <_FunctionsSkipCleanOutput>true</_FunctionsSkipCleanOutput>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Energinet.DataHub.MessageHub.Client.SimpleInjector" Version="1.6.1" />
     <PackageReference Include="MediatR" Version="9.0.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.18.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Timer" Version="4.1.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.0.3" OutputItemType="Analyzer" />
-    <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.3.0" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.6.0" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
@@ -40,5 +41,6 @@ limitations under the License.
   <ItemGroup>
     <ProjectReference Include="..\Energinet.DataHub.MarketRoles.EntryPoints.Common\Energinet.DataHub.MarketRoles.EntryPoints.Common.csproj" />
     <ProjectReference Include="..\Energinet.DataHub.MarketRoles.Infrastructure\Energinet.DataHub.MarketRoles.Infrastructure.csproj" />
+    <ProjectReference Include="..\Energinet.DataHub.MarketRoles.Messaging\Energinet.DataHub.MarketRoles.Messaging.csproj" />
   </ItemGroup>
 </Project>

@@ -43,7 +43,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
             var result = await SendRequestAsync(request).ConfigureAwait(false);
 
             Assert.True(result.Success);
-            AssertOutboxMessage<PostOfficeEnvelope>(envelope => envelope.MessageType.StartsWith("Confirm", StringComparison.Ordinal));
+            AssertOutboxMessage<MessageHubEnvelope>(envelope => envelope.MessageType == DocumentType.ConfirmMoveIn);
         }
 
         [Fact]
@@ -57,7 +57,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
             var result = await SendRequestAsync(request).ConfigureAwait(false);
 
             Assert.False(result.Success);
-            AssertOutboxMessage<PostOfficeEnvelope>(envelope => envelope.MessageType.StartsWith("Reject", StringComparison.Ordinal));
+            AssertOutboxMessage<MessageHubEnvelope>(envelope => envelope.MessageType == DocumentType.RejectMoveIn);
         }
 
         [Fact]
@@ -71,7 +71,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
             var result = await SendRequestAsync(request).ConfigureAwait(false);
 
             Assert.False(result.Success);
-            AssertOutboxMessage<PostOfficeEnvelope>(envelope => envelope.MessageType.StartsWith("Reject", StringComparison.Ordinal));
+            AssertOutboxMessage<MessageHubEnvelope>(envelope => envelope.MessageType == DocumentType.RejectMoveIn);
         }
 
         [Fact]
@@ -113,8 +113,8 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.MoveIn
             await SendRequestAsync(request).ConfigureAwait(false);
             await SendRequestAsync(request).ConfigureAwait(false);
 
-            AssertOutboxMessage<PostOfficeEnvelope>(envelope => envelope.MessageType.StartsWith("Confirm", StringComparison.Ordinal));
-            AssertOutboxMessage<PostOfficeEnvelope>(envelope => envelope.MessageType.StartsWith("Reject", StringComparison.Ordinal));
+            AssertOutboxMessage<MessageHubEnvelope>(envelope => envelope.MessageType == DocumentType.ConfirmMoveIn);
+            AssertOutboxMessage<MessageHubEnvelope>(envelope => envelope.MessageType == DocumentType.RejectMoveIn);
         }
 
         private RequestMoveIn CreateRequest(bool registerConsumerBySSN = true)

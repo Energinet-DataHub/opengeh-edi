@@ -26,11 +26,11 @@ These are the processes maintained by this domain.
 
 ## Architecture
 
-![design](ARCHITECTURE.png)
+![Market role Architecture](https://user-images.githubusercontent.com/72008816/160091353-afb253c0-ba98-424d-9821-4e895da0a1cf.png)
 
 ## Context Streams
 
-<img width="405" alt="Market roles context streams" src="https://user-images.githubusercontent.com/25637982/114846333-e2e5a980-9ddc-11eb-9941-ac03cbcc8336.PNG">
+![Market role domain context](https://user-images.githubusercontent.com/72008816/160091489-023a18f5-9c78-4c10-99b8-7b32383c9858.png)
 
 ## Market Participants
 
@@ -47,12 +47,13 @@ The market roles domain introduces the following roles into the Green Energy Hub
 
 ## Domain Roadmap
 
-In this program increment we are working on finishing the happy flow MVP for Change of energy supplier. This includes:
+In this program increment we are working on the move-in process
 
-- Generation of all remaining messages to be generated in accordance to the sequence diagram in the [Change of energy supplier description](docs/business-processes/change-of-energy-supplier.md).
-- Allowing for process to be cancelled before expiration of cancellation period.
-- Notifying current energy supplier that his supply period is ending upon expiration of cancellation period.
-- Setting end date and on prior supplier once process is completed.
+- A energy supplier is able to send in a move-in request and get their request schema validated
+- A energy supplier is able to receive an accept message for their move-in request
+- A energy supplier is able to get their message rejected if customer name is not present in their request, if CPR or CVR is not present in their request, if it is an accounting point and if the request is not received within the correct time frame.
+- The move-in is performed and the old customer is removed and the old energy supplier is removed and replaced with the new energy supplier
+- A message is sent to the old energy supplier, informing them about the change.
 
 ## Getting Started
 

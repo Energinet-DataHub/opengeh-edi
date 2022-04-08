@@ -37,9 +37,22 @@ limitations under the License.
     <None Remove="Scripts\Model\202109010720 Add Correlation to OutboxMessages.sql" />
     <EmbeddedResource Include="Scripts\Model\202109010720 Add Correlation to OutboxMessages.sql" />
     <None Remove="Scripts\Seed\202109301255 Insert AccountPoints.sql" />
+    <EmbeddedResource Include="Scripts\Model\202203221100 Re add IncomingMessagesId.sql" />
+    <EmbeddedResource Include="Scripts\Model\202203221130 Add IncomingTransactionIds.sql" />
+    <EmbeddedResource Include="Scripts\Model\202203291130 Add Transactions.sql" />
+    <EmbeddedResource Include="Scripts\Model\202204011130 Add OutboxMessages BTwoB Schema.sql" />
+    <EmbeddedResource Include="Scripts\Model\202204071500 Remove OutboxMessages from transactions schema.sql" />
     <EmbeddedResource Include="Scripts\Seed\202109301255 Insert AccountPoints.sql" />
     <None Remove="Scripts\Seed\202109301258 Insert EnergySuppliers.sql" />
     <EmbeddedResource Include="Scripts\Seed\202109301258 Insert EnergySuppliers.sql" />
+    <None Remove="Scripts\Model\202109270930 Add MessageHubMessages table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202109270930 Add MessageHubMessages table.sql" />
+    <None Remove="Scripts\Model\202112131115 Add Actor table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202112131115 Add Actor table.sql" />
+    <None Remove="Scripts\Seed\202202091335 Updates from actor registry.sql" />
+    <EmbeddedResource Include="Scripts\Seed\202202091335 Updates from actor registry.sql" />
+    <None Remove="Scripts\Seed\202203301046 Updates from actor registry.sql" />
+    <EmbeddedResource Include="Scripts\Seed\202203301046 Updates from actor registry.sql" />
   </ItemGroup>
 
 </Project>

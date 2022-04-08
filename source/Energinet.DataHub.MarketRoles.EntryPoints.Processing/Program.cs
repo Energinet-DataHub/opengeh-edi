@@ -13,6 +13,9 @@
 // limitations under the License.
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common;
+using Energinet.DataHub.Core.App.Common.Abstractions.Actor;
+using Energinet.DataHub.Core.App.FunctionApp.Middleware;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.ConsumerDetails;
 using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Processing.EndOfSupplyNotification;
@@ -21,7 +24,7 @@ using Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier.Validation;
 using Energinet.DataHub.MarketRoles.Application.Common.Commands;
 using Energinet.DataHub.MarketRoles.Application.Common.DomainEvents;
 using Energinet.DataHub.MarketRoles.Application.Common.Processing;
-using Energinet.DataHub.MarketRoles.Application.Common.Users;
+using Energinet.DataHub.MarketRoles.Application.EDI;
 using Energinet.DataHub.MarketRoles.Application.MoveIn;
 using Energinet.DataHub.MarketRoles.Application.MoveIn.Validation;
 using Energinet.DataHub.MarketRoles.Domain.Consumers;
@@ -31,7 +34,6 @@ using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common.MediatR;
-using Energinet.DataHub.MarketRoles.EntryPoints.Common.SimpleInjector;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common.Telemetry;
 using Energinet.DataHub.MarketRoles.Infrastructure;
 using Energinet.DataHub.MarketRoles.Infrastructure.BusinessRequestProcessing;
@@ -44,12 +46,11 @@ using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.Consumers;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.EnergySuppliers;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.ProcessManagers;
 using Energinet.DataHub.MarketRoles.Infrastructure.DomainEventDispatching;
-using Energinet.DataHub.MarketRoles.Infrastructure.EDI.Acknowledgements;
+using Energinet.DataHub.MarketRoles.Infrastructure.EDI;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI.ChangeOfSupplier;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI.ChangeOfSupplier.ConsumerDetails;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI.ChangeOfSupplier.EndOfSupplyNotification;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI.ChangeOfSupplier.MeteringPointDetails;
-using Energinet.DataHub.MarketRoles.Infrastructure.EDI.Errors;
 using Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChange;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.Notifications;
@@ -89,7 +90,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Processing
 
             options.UseMiddleware<CorrelationIdMiddleware>();
             options.UseMiddleware<EntryPointTelemetryScopeMiddleware>();
-            options.UseMiddleware<ServiceBusUserContextMiddleware>();
+            options.UseMiddleware<ServiceBusActorContextMiddleware>();
         }
 
         protected override void ConfigureServiceCollection(IServiceCollection services)
@@ -115,8 +116,9 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Processing
             container.Register<CorrelationIdMiddleware>(Lifestyle.Scoped);
             container.Register<ICorrelationContext, CorrelationContext>(Lifestyle.Scoped);
             container.Register<EntryPointTelemetryScopeMiddleware>(Lifestyle.Scoped);
-            container.Register<ServiceBusUserContextMiddleware>(Lifestyle.Scoped);
-            container.Register<IUserContext, UserContext>(Lifestyle.Scoped);
+            container.Register<ServiceBusActorContextMiddleware>(Lifestyle.Scoped);
+            container.Register<IActorContext, ActorContext>(Lifestyle.Scoped);
+            container.Register<IActorProvider, ActorProvider>(Lifestyle.Scoped);
             container.Register<UserIdentityFactory>(Lifestyle.Singleton);
             container.Register<IUnitOfWork, UnitOfWork>(Lifestyle.Scoped);
             container.Register<ISystemDateTimeProvider, SystemDateTimeProvider>(Lifestyle.Scoped);
@@ -132,10 +134,11 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Processing
             container.Register<IDomainEventsDispatcher, DomainEventsDispatcher>(Lifestyle.Scoped);
             container.Register<IDomainEventPublisher, DomainEventPublisher>(Lifestyle.Scoped);
             container.Register<ServiceBusMessageIdempotencyMiddleware>(Lifestyle.Scoped);
-            container.Register<IIncomingMessageRegistry, IncomingMessageRegistry>(Lifestyle.Transient);
             container.Register<IProtobufMessageFactory, ProtobufMessageFactory>(Lifestyle.Singleton);
             container.Register<INotificationReceiver, NotificationReceiver>(Lifestyle.Scoped);
             container.Register<IntegrationEventReceiver>(Lifestyle.Scoped);
+            container.Register<IActorMessageService, ActorMessageService>(Lifestyle.Scoped);
+            container.Register<IMessageHubDispatcher, MessageHubDispatcher>(Lifestyle.Scoped);
 
             var connectionString = Environment.GetEnvironmentVariable("MARKET_DATA_DB_CONNECTION_STRING")
                                    ?? throw new InvalidOperationException(
@@ -178,7 +181,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Processing
             container.Register<IValidator<RequestChangeOfSupplier>, RequestChangeOfSupplierRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<RequestMoveIn>, RequestMoveInRuleSet>(Lifestyle.Scoped);
             container.AddValidationErrorConversion(
-                validateRegistrations: true,
+                validateRegistrations: false,
                 typeof(RequestMoveIn).Assembly, // Application
                 typeof(ConsumerMovedIn).Assembly, // Domain
                 typeof(ErrorMessageFactory).Assembly); // Infrastructure
