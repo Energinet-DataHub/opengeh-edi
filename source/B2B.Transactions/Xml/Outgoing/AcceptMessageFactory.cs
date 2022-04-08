@@ -20,7 +20,7 @@ using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
 namespace B2B.Transactions.Xml.Outgoing
 {
-    public class AcceptMessageFactory : MessageFactory<IMessage>
+    public class AcceptMessageFactory : MessageFactory<IDocument>
     {
         private const string MessageType = "ConfirmRequestChangeOfSupplier";
 
@@ -29,7 +29,7 @@ namespace B2B.Transactions.Xml.Outgoing
         {
         }
 
-        public override IMessage CreateMessage(B2BTransaction transaction)
+        public override IDocument CreateMessage(B2BTransaction transaction)
         {
             var settings = new XmlWriterSettings() { OmitXmlDeclaration = false, Encoding = Encoding.UTF8 };
             using var output = new Utf8StringWriter();

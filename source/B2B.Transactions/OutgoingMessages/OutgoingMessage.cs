@@ -12,17 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace B2B.Transactions
+using System;
+
+namespace B2B.Transactions.OutgoingMessages
 {
-    /// <summary>
-    /// Transactional outbox
-    /// </summary>
-    public interface IOutbox
+    public class OutgoingMessage
     {
-        /// <summary>
-        /// Add message to outbox
-        /// </summary>
-        /// <param name="message"></param>
-        void Add<T>(T message);
+        public OutgoingMessage(IDocument document, string recipientId)
+        {
+            Document = document ?? throw new ArgumentNullException(nameof(document));
+            RecipientId = recipientId;
+        }
+
+        public IDocument Document { get; }
+
+        public bool IsPublished { get; private set; }
+
+        public string RecipientId { get; }
+
+        public string DocumentType => Document.DocumentType;
+
+        public void Published()
+        {
+            IsPublished = true;
+        }
     }
 }

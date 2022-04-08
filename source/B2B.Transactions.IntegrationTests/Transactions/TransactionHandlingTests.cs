@@ -18,37 +18,34 @@ using System.Xml.Linq;
 using B2B.Transactions.DataAccess;
 using B2B.Transactions.IntegrationTests.Fixtures;
 using B2B.Transactions.IntegrationTests.TestDoubles;
-using B2B.Transactions.Messages;
 using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.Transactions;
 using B2B.Transactions.Xml.Outgoing;
 using Xunit;
 
-namespace B2B.Transactions.IntegrationTests
+namespace B2B.Transactions.IntegrationTests.Transactions
 {
     public class TransactionHandlingTests : TestBase
     {
         private static readonly SystemDateTimeProviderStub _dateTimeProvider = new();
         private readonly ITransactionRepository _transactionRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IOutbox _outbox;
         private readonly XNamespace _namespace = "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1";
         private OutgoingMessageStoreSpy _outgoingMessageStoreSpy = new();
-        private IMessageFactory<IMessage> _messageFactory = new AcceptMessageFactory(_dateTimeProvider);
+        private IMessageFactory<IDocument> _messageFactory = new AcceptMessageFactory(_dateTimeProvider);
 
         public TransactionHandlingTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
             _transactionRepository =
                 GetService<ITransactionRepository>();
-            _outbox = GetService<IOutbox>();
             _unitOfWork = GetService<IUnitOfWork>();
         }
 
         [Fact]
         public async Task Transaction_is_registered()
         {
-            var transaction = CreateTransaction();
+            var transaction = TransactionBuilder.CreateTransaction();
             await RegisterTransaction(transaction).ConfigureAwait(false);
 
             var savedTransaction = _transactionRepository.GetById(transaction.Message.MessageId);
@@ -60,31 +57,15 @@ namespace B2B.Transactions.IntegrationTests
         {
             var now = _dateTimeProvider.Now();
             _dateTimeProvider.SetNow(now);
-            var transaction = CreateTransaction();
+            var transaction = TransactionBuilder.CreateTransaction();
             await RegisterTransaction(transaction).ConfigureAwait(false);
 
             var acceptMessage = _outgoingMessageStoreSpy.Messages.FirstOrDefault();
             Assert.NotNull(acceptMessage);
-            var document = CreateDocument(acceptMessage!.MessagePayload);
+            var document = CreateDocument(acceptMessage!.Document.MessagePayload);
 
             AssertHeader(document, transaction);
             AssertMarketActivityRecord(document, transaction);
-        }
-
-        private static B2BTransaction CreateTransaction()
-        {
-            return B2BTransaction.Create(
-                new MessageHeader("fake", "fake", "fake", "fake", "fake", "somedate", "fake"),
-                new MarketActivityRecord()
-                {
-                    BalanceResponsibleId = "fake",
-                    Id = "fake",
-                    ConsumerId = "fake",
-                    ConsumerName = "fake",
-                    EffectiveDate = "fake",
-                    EnergySupplierId = "fake",
-                    MarketEvaluationPointId = "fake",
-                });
         }
 
         private static XDocument CreateDocument(string payload)
@@ -94,7 +75,7 @@ namespace B2B.Transactions.IntegrationTests
 
         private Task RegisterTransaction(B2BTransaction transaction)
         {
-            var useCase = new RegisterTransaction(_outgoingMessageStoreSpy, _transactionRepository, _messageFactory, _outbox, _unitOfWork);
+            var useCase = new RegisterTransaction(_outgoingMessageStoreSpy, _transactionRepository, _messageFactory, _unitOfWork);
             return useCase.HandleAsync(transaction);
         }
 

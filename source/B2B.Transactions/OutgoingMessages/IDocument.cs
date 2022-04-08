@@ -17,7 +17,7 @@ namespace B2B.Transactions.OutgoingMessages
     /// <summary>
     /// Interface for outgoing messages
     /// </summary>
-    public interface IMessage
+    public interface IDocument
     {
         /// <summary>
         /// Payload of the outgoing message
