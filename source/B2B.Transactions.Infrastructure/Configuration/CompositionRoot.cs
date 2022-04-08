@@ -59,6 +59,8 @@ namespace B2B.Transactions.Infrastructure.Configuration
             services.AddScoped<IOutbox, OutboxProvider>();
             services.AddScoped<OutboxMessageFactory>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
+            services.AddScoped<IMessageFactory<IMessage>, AcceptMessageFactory>();
             services.AddLogging();
             AddXmlSchema(services);
         }

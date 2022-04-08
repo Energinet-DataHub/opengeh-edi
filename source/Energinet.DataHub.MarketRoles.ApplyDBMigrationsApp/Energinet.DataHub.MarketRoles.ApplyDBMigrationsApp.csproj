@@ -52,6 +52,8 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Seed\202202091335 Updates from actor registry.sql" />
     <None Remove="Scripts\Seed\202203301046 Updates from actor registry.sql" />
     <EmbeddedResource Include="Scripts\Seed\202203301046 Updates from actor registry.sql" />
+    <None Remove="Scripts\Model\202208042310 Create BTwoB Schema And Tables.sql" />
+    <EmbeddedResource Include="Scripts\Model\202208042310 Create BTwoB Schema And Tables.sql" />
   </ItemGroup>
 
 </Project>

@@ -44,7 +44,8 @@ namespace B2B.Transactions.Transactions
             if (transaction == null) throw new ArgumentNullException(nameof(transaction));
             var acceptedTransaction = new AcceptedTransaction(transaction.MarketActivityRecord.Id);
             _transactionRepository.Add(acceptedTransaction);
-            var outgoingMessage = new OutgoingMessage(_messageFactory.CreateMessage(transaction), transaction.Message.ReceiverId);
+            var message = _messageFactory.CreateMessage(transaction);
+            var outgoingMessage = new OutgoingMessage(message.MessagePayload, message.DocumentType, transaction.Message.ReceiverId);
 
             _outgoingMessageStore.Add(outgoingMessage);
 
@@ -69,16 +70,22 @@ namespace B2B.Transactions.Transactions
     #pragma warning disable
     public class OutgoingMessage
     {
-        public OutgoingMessage(IMessage message, string recipientId)
+        public OutgoingMessage(string messageMessagePayload, string messageDocumentType, string messageRecipientId)
         {
-            Message = message ?? throw new ArgumentNullException(nameof(message));
-            RecipientId = recipientId;
+            Id = Guid.NewGuid();
+            MessagePayload = messageMessagePayload;
+            DocumentType = messageDocumentType;
+            RecipientId = messageRecipientId;
         }
 
-        public IMessage Message { get; }
+        private OutgoingMessage()
+        {}
+
+        public Guid Id { get; }
+        public string MessagePayload { get; }
         public bool IsPublished { get; private set; }
         public string RecipientId { get; }
-        public string DocumentType => Message.DocumentType;
+        public string DocumentType { get; }
 
         public void Published()
         {

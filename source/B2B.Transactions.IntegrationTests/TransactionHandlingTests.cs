@@ -16,15 +16,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using B2B.Transactions.DataAccess;
-using B2B.Transactions.Infrastructure.DataAccess;
-using B2B.Transactions.Infrastructure.Serialization;
 using B2B.Transactions.IntegrationTests.Fixtures;
 using B2B.Transactions.IntegrationTests.TestDoubles;
 using B2B.Transactions.Messages;
 using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.Transactions;
 using B2B.Transactions.Xml.Outgoing;
-using Dapper;
 using Xunit;
 
 namespace B2B.Transactions.IntegrationTests
@@ -68,7 +65,7 @@ namespace B2B.Transactions.IntegrationTests
 
             var acceptMessage = _outgoingMessageStoreSpy.Messages.FirstOrDefault();
             Assert.NotNull(acceptMessage);
-            var document = CreateDocument(acceptMessage!.Message.MessagePayload);
+            var document = CreateDocument(acceptMessage!.MessagePayload);
 
             AssertHeader(document, transaction);
             AssertMarketActivityRecord(document, transaction);

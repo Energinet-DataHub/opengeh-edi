@@ -33,14 +33,14 @@ namespace B2B.Transactions.IntegrationTests
 {
     public class MessagePublishingTests : TestBase
     {
-        private readonly IOutgoingMessageStore _outgoingMessageStore;
+        private readonly IOutgoingMessageStore _outgoingMessageStoreSpy;
         private readonly IMessageFactory<IMessage> _messageFactory;
 
         public MessagePublishingTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
             var systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
-            _outgoingMessageStore = new OutgoingMessageStoreSpy();
+            _outgoingMessageStoreSpy = new OutgoingMessageStoreSpy();
             _messageFactory = new AcceptMessageFactory(systemDateTimeProvider);
         }
 
@@ -50,11 +50,12 @@ namespace B2B.Transactions.IntegrationTests
             var dataAvailableNotificationSenderSpy = new DataAvailableNotificationSenderSpy();
             var messagePublisher = new MessagePublisher(dataAvailableNotificationSenderSpy, GetService<ICorrelationContext>());
             var transaction = CreateTransaction();
-            var outgoingMessage = new OutgoingMessage(_messageFactory.CreateMessage(transaction), transaction.Message.ReceiverId);
-            _outgoingMessageStore.Add(outgoingMessage);
+            var message = _messageFactory.CreateMessage(transaction);
+            var outgoingMessage = new OutgoingMessage(message.MessagePayload, message.DocumentType, transaction.Message.ReceiverId);
+            _outgoingMessageStoreSpy.Add(outgoingMessage);
 
-            await messagePublisher.PublishAsync(await _outgoingMessageStore.GetUnpublishedAsync().ConfigureAwait(false)).ConfigureAwait(false);
-            var unpublishedMessages = await _outgoingMessageStore.GetUnpublishedAsync().ConfigureAwait(false);
+            await messagePublisher.PublishAsync(await _outgoingMessageStoreSpy.GetUnpublishedAsync().ConfigureAwait(false)).ConfigureAwait(false);
+            var unpublishedMessages = await _outgoingMessageStoreSpy.GetUnpublishedAsync().ConfigureAwait(false);
             var publishedMessage = dataAvailableNotificationSenderSpy.PublishedMessages.FirstOrDefault();
 
             Assert.Empty(unpublishedMessages);
