@@ -22,7 +22,7 @@ namespace B2B.Transactions.Infrastructure.DataAccess.Transaction
     {
         public void Configure(EntityTypeBuilder<AcceptedTransaction> builder)
         {
-            builder.ToTable("Transactions", "dbo");
+            builder.ToTable("Transactions", "b2b");
             builder.HasKey(x => x.TransactionId);
         }
     }
