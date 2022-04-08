@@ -20,7 +20,7 @@ module "sb_marketroles" {
   environment_instance  = var.environment_instance
   resource_group_name   = azurerm_resource_group.this.name
   location              = azurerm_resource_group.this.location
-  sku                   = "basic"
+  sku                   = "Standard"
   auth_rules            = [
     {
       name    = "listen",
