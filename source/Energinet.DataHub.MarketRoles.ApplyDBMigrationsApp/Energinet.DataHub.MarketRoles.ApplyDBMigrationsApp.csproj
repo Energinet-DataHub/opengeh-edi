@@ -53,6 +53,12 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Seed\202202091335 Updates from actor registry.sql" />
     <None Remove="Scripts\Seed\202203301046 Updates from actor registry.sql" />
     <EmbeddedResource Include="Scripts\Seed\202203301046 Updates from actor registry.sql" />
+    <None Remove="Scripts\Model\202204081035 Add Transactions to BtoB schema.sql" />
+    <EmbeddedResource Include="Scripts\Model\202204081035 Add Transactions to BtoB schema.sql" />
+    <None Remove="Scripts\Model\20224081038 Add TransactionIds to BtoB schema.sql" />
+    <EmbeddedResource Include="Scripts\Model\202240081038 Add TransactionIds to BtoB schema.sql" />
+    <None Remove="Scripts\Model\202204081040 Add MessageIds to BtoB schema.sql" />
+    <EmbeddedResource Include="Scripts\Model\202204081040 Add MessageIds to BtoB schema.sql" />
   </ItemGroup>
 
 </Project>
