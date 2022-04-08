@@ -16,7 +16,7 @@ namespace B2B.CimMessageAdapter.Errors
 {
     public class UnknownReceiver : ValidationError
     {
-        public UnknownReceiver(string receiverId)
+        public UnknownReceiver(string? receiverId)
             : base($"Receiver id {receiverId} is not known receiver", "B2B-008")
         {
         }

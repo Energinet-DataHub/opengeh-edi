@@ -32,6 +32,6 @@ namespace B2B.Transactions.Transactions
         /// </summary>
         /// <param name="transactionId"></param>
         /// <returns><see cref="AcceptedTransaction"/></returns>
-        AcceptedTransaction? GetById(string transactionId);
+        AcceptedTransaction? GetById(string? transactionId);
     }
 }

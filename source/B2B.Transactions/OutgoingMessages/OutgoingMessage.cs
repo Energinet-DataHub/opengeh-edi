@@ -18,19 +18,40 @@ namespace B2B.Transactions.OutgoingMessages
 {
     public class OutgoingMessage
     {
-        public OutgoingMessage(IDocument document, string recipientId)
+        public OutgoingMessage(IDocument? document, string? recipientId)
         {
             Document = document ?? throw new ArgumentNullException(nameof(document));
             RecipientId = recipientId;
         }
 
-        public IDocument Document { get; }
+        public OutgoingMessage()
+        { }
+
+        public Guid Id { get; }
+
+        public IDocument? Document { get; }
 
         public bool IsPublished { get; private set; }
 
-        public string RecipientId { get; }
+        public string? RecipientId { get; }
 
-        public string DocumentType => Document.DocumentType;
+        public string DocumentType
+        {
+            get => Document?.DocumentType ?? string.Empty;
+            set
+            {
+                if (Document != null) Document.DocumentType = value;
+            }
+        }
+
+        public string MessagePayload
+        {
+            get => Document?.MessagePayload ?? string.Empty;
+            set
+            {
+                if (Document != null) Document.MessagePayload = value;
+            }
+        }
 
         public void Published()
         {

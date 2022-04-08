@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System;
-using B2B.Transactions.Transactions;
+using B2B.Transactions.OutgoingMessages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

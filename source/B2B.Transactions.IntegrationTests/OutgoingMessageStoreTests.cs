@@ -34,9 +34,8 @@ namespace B2B.Transactions.IntegrationTests
             _testHelper = new TestHelper(
                 GetService<ITransactionRepository>(),
                 GetService<IUnitOfWork>(),
-                GetService<IOutbox>(),
                 GetService<IOutgoingMessageStore>(),
-                GetService<IMessageFactory<IMessage>>());
+                GetService<IMessageFactory<IDocument>>());
         }
 
         [Fact]

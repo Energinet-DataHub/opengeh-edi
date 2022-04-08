@@ -18,6 +18,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using B2B.Transactions.Infrastructure.Configuration.Correlation;
+using B2B.Transactions.Infrastructure.OutgoingMessages;
 using B2B.Transactions.IntegrationTests.Fixtures;
 using B2B.Transactions.IntegrationTests.TestDoubles;
 using B2B.Transactions.Messages;
@@ -34,7 +35,7 @@ namespace B2B.Transactions.IntegrationTests
     public class MessagePublishingTests : TestBase
     {
         private readonly IOutgoingMessageStore _outgoingMessageStoreSpy;
-        private readonly IMessageFactory<IMessage> _messageFactory;
+        private readonly IMessageFactory<IDocument?> _messageFactory;
 
         public MessagePublishingTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
@@ -50,8 +51,7 @@ namespace B2B.Transactions.IntegrationTests
             var dataAvailableNotificationSenderSpy = new DataAvailableNotificationSenderSpy();
             var messagePublisher = new MessagePublisher(dataAvailableNotificationSenderSpy, GetService<ICorrelationContext>());
             var transaction = CreateTransaction();
-            var message = _messageFactory.CreateMessage(transaction);
-            var outgoingMessage = new OutgoingMessage(message.MessagePayload, message.DocumentType, transaction.Message.ReceiverId);
+            var outgoingMessage = new OutgoingMessage(_messageFactory.CreateMessage(transaction), transaction.Message.ReceiverId);
             _outgoingMessageStoreSpy.Add(outgoingMessage);
 
             await messagePublisher.PublishAsync(await _outgoingMessageStoreSpy.GetUnpublishedAsync().ConfigureAwait(false)).ConfigureAwait(false);
@@ -81,51 +81,6 @@ namespace B2B.Transactions.IntegrationTests
                     EnergySupplierId = "fake",
                     MarketEvaluationPointId = "fake",
                 });
-        }
-    }
-
-    #pragma warning disable
-    public class MessagePublisher
-    {
-        private readonly IDataAvailableNotificationSender _dataAvailableNotificationSender;
-        private readonly ICorrelationContext _correlationContext;
-
-        public MessagePublisher(IDataAvailableNotificationSender dataAvailableNotificationSender, ICorrelationContext correlationContext)
-        {
-            _dataAvailableNotificationSender = dataAvailableNotificationSender ?? throw new ArgumentNullException(nameof(dataAvailableNotificationSender));
-            _correlationContext = correlationContext;
-        }
-
-
-        public async Task PublishAsync(ReadOnlyCollection<OutgoingMessage> unpublishedMessages)
-        {
-            foreach (var message in unpublishedMessages)
-            {
-                await _dataAvailableNotificationSender.SendAsync(
-                    _correlationContext.Id,
-                    new DataAvailableNotificationDto(
-                        Guid.NewGuid(),
-                        new GlobalLocationNumberDto(message.RecipientId),
-                        new MessageTypeDto(string.Empty),
-                        DomainOrigin.MarketRoles,
-                        false,
-                        1,
-                        message.DocumentType)).ConfigureAwait(false);
-
-                message.Published();
-            }
-        }
-    }
-
-    public class DataAvailableNotificationSenderSpy : IDataAvailableNotificationSender
-    {
-        public ReadOnlyCollection<DataAvailableNotificationDto> PublishedMessages => _publishedMessages.AsReadOnly();
-
-        private List<DataAvailableNotificationDto> _publishedMessages = new();
-        public Task SendAsync(string correlationId, DataAvailableNotificationDto dataAvailableNotificationDto)
-        {
-            _publishedMessages.Add(dataAvailableNotificationDto);
-            return Task.CompletedTask;
         }
     }
 }

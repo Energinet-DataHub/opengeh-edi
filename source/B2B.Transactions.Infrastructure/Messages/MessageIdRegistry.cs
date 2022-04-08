@@ -29,7 +29,7 @@ namespace B2B.Transactions.Infrastructure.Messages
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
         }
 
-        public async Task<bool> TryStoreAsync(string messageId)
+        public async Task<bool> TryStoreAsync(string? messageId)
         {
             var connection = _connectionFactory.GetOpenConnection();
 

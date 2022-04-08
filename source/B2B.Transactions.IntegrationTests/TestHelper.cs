@@ -25,19 +25,16 @@ namespace B2B.Transactions.IntegrationTests
     public class TestHelper
     {
         private readonly ITransactionRepository _transactionRepository;
-        private readonly IOutbox _outbox;
-        private readonly IMessageFactory<IMessage> _messageFactory;
+        private readonly IMessageFactory<IDocument?> _messageFactory;
 
         public TestHelper(
             ITransactionRepository transactionRepository,
             IUnitOfWork unitOfWork,
-            IOutbox outbox,
             IOutgoingMessageStore messageStore,
-            IMessageFactory<IMessage> messageFactory)
+            IMessageFactory<IDocument?> messageFactory)
         {
             _transactionRepository = transactionRepository;
             UnitOfWork = unitOfWork;
-            _outbox = outbox;
             MessageStore = messageStore;
             _messageFactory = messageFactory;
         }
@@ -69,7 +66,7 @@ namespace B2B.Transactions.IntegrationTests
 
         public Task RegisterTransactionAsync(B2BTransaction transaction)
         {
-            var useCase = new RegisterTransaction(MessageStore, _transactionRepository, _messageFactory, _outbox, UnitOfWork);
+            var useCase = new RegisterTransaction(MessageStore, _transactionRepository, _messageFactory, UnitOfWork);
             return useCase.HandleAsync(transaction);
         }
     }

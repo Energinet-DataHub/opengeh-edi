@@ -18,7 +18,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using B2B.Transactions.Infrastructure.DataAccess;
 using B2B.Transactions.OutgoingMessages;
-using B2B.Transactions.Transactions;
 
 namespace B2B.Transactions.Infrastructure
 {

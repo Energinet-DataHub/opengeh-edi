@@ -25,6 +25,6 @@ namespace B2B.CimMessageAdapter.Messages
         /// Store message id
         /// </summary>
         /// <param name="messageId"></param>
-        Task<bool> TryStoreAsync(string messageId);
+        Task<bool> TryStoreAsync(string? messageId);
     }
 }
