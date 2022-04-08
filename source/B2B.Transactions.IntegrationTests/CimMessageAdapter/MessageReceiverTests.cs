@@ -26,9 +26,11 @@ using B2B.Transactions.IntegrationTests.CimMessageAdapter.Stubs;
 using B2B.Transactions.IntegrationTests.Fixtures;
 using B2B.Transactions.Xml.Incoming;
 using Xunit;
+using Xunit.Categories;
 
 namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
 {
+    [IntegrationTest]
     public class MessageReceiverTests : TestBase
     {
         private readonly List<Claim> _claims = new List<Claim>()

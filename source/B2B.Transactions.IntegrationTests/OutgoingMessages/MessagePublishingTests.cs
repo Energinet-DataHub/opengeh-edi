@@ -18,15 +18,16 @@ using B2B.Transactions.Infrastructure.OutgoingMessages;
 using B2B.Transactions.IntegrationTests.Fixtures;
 using B2B.Transactions.IntegrationTests.TestDoubles;
 using B2B.Transactions.OutgoingMessages;
-using B2B.Transactions.Transactions;
 using B2B.Transactions.Xml.Outgoing;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MessageHub.Client.DataAvailable;
 using Energinet.DataHub.MessageHub.Model.Model;
 using Xunit;
+using Xunit.Categories;
 
 namespace B2B.Transactions.IntegrationTests.OutgoingMessages
 {
+    [IntegrationTest]
     public class MessagePublishingTests : TestBase
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;

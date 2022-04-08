@@ -22,9 +22,11 @@ using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.Transactions;
 using B2B.Transactions.Xml.Outgoing;
 using Xunit;
+using Xunit.Categories;
 
 namespace B2B.Transactions.IntegrationTests.Transactions
 {
+    [IntegrationTest]
     public class TransactionHandlingTests : TestBase
     {
         private static readonly SystemDateTimeProviderStub _dateTimeProvider = new();
