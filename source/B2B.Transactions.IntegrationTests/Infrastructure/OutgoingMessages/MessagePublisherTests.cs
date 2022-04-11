@@ -24,9 +24,11 @@ using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MessageHub.Client.DataAvailable;
 using Energinet.DataHub.MessageHub.Model.Model;
 using Xunit;
+using Xunit.Categories;
 
 namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
 {
+    [IntegrationTest]
     public class MessagePublisherTests : TestBase
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
