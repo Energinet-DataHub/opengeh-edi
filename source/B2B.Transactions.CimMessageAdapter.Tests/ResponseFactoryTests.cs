@@ -17,9 +17,11 @@ using System.Xml.Linq;
 using B2B.CimMessageAdapter.Errors;
 using B2B.CimMessageAdapter.Response;
 using Xunit;
+using Xunit.Categories;
 
 namespace B2B.CimMessageAdapter.Tests
 {
+    [UnitTest]
     public class ResponseFactoryTests
     {
         [Fact]
