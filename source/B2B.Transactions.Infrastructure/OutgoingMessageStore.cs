@@ -35,20 +35,15 @@ namespace B2B.Transactions.Infrastructure
             _context.OutgoingMessages.Add(message);
         }
 
-        public async Task<ReadOnlyCollection<OutgoingMessage>> GetUnpublishedAsync()
+        public ReadOnlyCollection<OutgoingMessage> GetUnpublished()
         {
-            var retVal = await Task.Run(() =>
-            {
-                var unpublished = _context
+            var unpublished = _context
                     .OutgoingMessages
                     .Where(x => x.IsPublished == false)
                     .ToList();
 
-                return unpublished;
-            }).ConfigureAwait(false);
-
-            return retVal.Count == 0 ? new ReadOnlyCollection<OutgoingMessage>(new List<OutgoingMessage>())
-                : new ReadOnlyCollection<OutgoingMessage>(retVal);
+            return unpublished.Count == 0 ? new ReadOnlyCollection<OutgoingMessage>(new List<OutgoingMessage>())
+                : new ReadOnlyCollection<OutgoingMessage>(unpublished);
         }
     }
 }

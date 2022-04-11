@@ -30,7 +30,7 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
     public class MessagePublisherTests : TestBase
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
-        private readonly IMessageFactory<IDocument?> _messageFactory;
+        private readonly IMessageFactory<IDocument> _messageFactory;
         private readonly MessagePublisher _messagePublisher;
         private readonly DataAvailableNotificationSenderSpy _dataAvailableNotificationSenderSpy;
 
@@ -49,9 +49,9 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
         {
             var outgoingMessage = CreateOutgoingMessage();
 
-            await _messagePublisher.PublishAsync(await _outgoingMessageStore.GetUnpublishedAsync().ConfigureAwait(false)).ConfigureAwait(false);
+            await _messagePublisher.PublishAsync(_outgoingMessageStore.GetUnpublished()).ConfigureAwait(false);
 
-            var unpublishedMessages = await _outgoingMessageStore.GetUnpublishedAsync().ConfigureAwait(false);
+            var unpublishedMessages = _outgoingMessageStore.GetUnpublished();
             var publishedMessage = _dataAvailableNotificationSenderSpy.PublishedMessages.FirstOrDefault();
             Assert.Empty(unpublishedMessages);
             Assert.NotNull(publishedMessage);
@@ -65,8 +65,9 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
         private OutgoingMessage CreateOutgoingMessage()
         {
             var transaction = TransactionBuilder.CreateTransaction();
+            var document = _messageFactory.CreateMessage(transaction);
             var outgoingMessage =
-                new OutgoingMessage(_messageFactory.CreateMessage(transaction), transaction.Message.ReceiverId);
+                new OutgoingMessage(document.DocumentType, document.MessagePayload, transaction.Message.ReceiverId);
             _outgoingMessageStore.Add(outgoingMessage);
             return outgoingMessage;
         }

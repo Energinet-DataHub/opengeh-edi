@@ -22,11 +22,11 @@ namespace B2B.Transactions.OutgoingMessages
         /// <summary>
         /// Payload of the outgoing message
         /// </summary>
-        string MessagePayload { get; set; }
+        string MessagePayload { get; init; }
 
         /// <summary>
         /// The type of the message
         /// </summary>
-        string DocumentType { get; set; }
+        string DocumentType { get; init; }
     }
 }

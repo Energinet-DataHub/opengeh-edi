@@ -35,7 +35,7 @@ namespace B2B.Transactions.IntegrationTests
     public class MessagePublishingTests : TestBase
     {
         private readonly IOutgoingMessageStore _outgoingMessageStoreSpy;
-        private readonly IMessageFactory<IDocument?> _messageFactory;
+        private readonly IMessageFactory<IDocument> _messageFactory;
 
         public MessagePublishingTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
@@ -51,11 +51,12 @@ namespace B2B.Transactions.IntegrationTests
             var dataAvailableNotificationSenderSpy = new DataAvailableNotificationSenderSpy();
             var messagePublisher = new MessagePublisher(dataAvailableNotificationSenderSpy, GetService<ICorrelationContext>());
             var transaction = CreateTransaction();
-            var outgoingMessage = new OutgoingMessage(_messageFactory.CreateMessage(transaction), transaction.Message.ReceiverId);
+            var document = _messageFactory.CreateMessage(transaction);
+            var outgoingMessage = new OutgoingMessage(document.DocumentType, document.MessagePayload, transaction.Message.ReceiverId);
             _outgoingMessageStoreSpy.Add(outgoingMessage);
 
-            await messagePublisher.PublishAsync(await _outgoingMessageStoreSpy.GetUnpublishedAsync().ConfigureAwait(false)).ConfigureAwait(false);
-            var unpublishedMessages = await _outgoingMessageStoreSpy.GetUnpublishedAsync().ConfigureAwait(false);
+            await messagePublisher.PublishAsync(_outgoingMessageStoreSpy.GetUnpublished()).ConfigureAwait(false);
+            var unpublishedMessages = _outgoingMessageStoreSpy.GetUnpublished();
             var publishedMessage = dataAvailableNotificationSenderSpy.PublishedMessages.FirstOrDefault();
 
             Assert.Empty(unpublishedMessages);

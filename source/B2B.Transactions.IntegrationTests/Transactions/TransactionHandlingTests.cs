@@ -32,7 +32,7 @@ namespace B2B.Transactions.IntegrationTests.Transactions
         private readonly IUnitOfWork _unitOfWork;
         private readonly XNamespace _namespace = "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1";
         private OutgoingMessageStoreSpy _outgoingMessageStoreSpy = new();
-        private IMessageFactory<IDocument?> _messageFactory = new AcceptMessageFactory(_dateTimeProvider);
+        private IMessageFactory<IDocument> _messageFactory = new AcceptMessageFactory(_dateTimeProvider);
 
         public TransactionHandlingTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
@@ -62,7 +62,7 @@ namespace B2B.Transactions.IntegrationTests.Transactions
 
             var acceptMessage = _outgoingMessageStoreSpy.Messages.FirstOrDefault();
             Assert.NotNull(acceptMessage);
-            var document = CreateDocument(acceptMessage!.Document?.MessagePayload ?? string.Empty);
+            var document = CreateDocument(acceptMessage!.MessagePayload ?? string.Empty);
 
             AssertHeader(document, transaction);
             AssertMarketActivityRecord(document, transaction);

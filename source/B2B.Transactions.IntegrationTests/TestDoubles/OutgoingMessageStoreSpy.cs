@@ -28,9 +28,9 @@ namespace B2B.Transactions.IntegrationTests.TestDoubles
         public IReadOnlyCollection<OutgoingMessage> Messages => _messages.AsReadOnly();
 
         #pragma warning disable
-        public Task<ReadOnlyCollection<OutgoingMessage>> GetUnpublishedAsync()
+        public ReadOnlyCollection<OutgoingMessage> GetUnpublished()
         {
-            return Task.FromResult(_messages.Where(message => message.IsPublished == false).ToList().AsReadOnly());
+            return _messages.Where(message => message.IsPublished == false).ToList().AsReadOnly();
         }
         #pragma warning restore
 

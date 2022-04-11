@@ -21,8 +21,8 @@ namespace B2B.Transactions.OutgoingMessages
             DocumentType = messageType;
         }
 
-        public string MessagePayload { get; set; }
+        public string MessagePayload { get; init; }
 
-        public string DocumentType { get; set; }
+        public string DocumentType { get; init; }
     }
 }

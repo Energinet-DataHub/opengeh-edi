@@ -16,11 +16,11 @@ namespace B2B.Transactions.Transactions
 {
     public class AcceptedTransaction
     {
-        public AcceptedTransaction(string? transactionId)
+        public AcceptedTransaction(string transactionId)
         {
             TransactionId = transactionId;
         }
 
-        public string? TransactionId { get; }
+        public string TransactionId { get; }
     }
 }

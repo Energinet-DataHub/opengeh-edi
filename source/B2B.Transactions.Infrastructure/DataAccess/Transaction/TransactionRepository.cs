@@ -31,7 +31,7 @@ namespace B2B.Transactions.Infrastructure.DataAccess.Transaction
             _b2BContext.Transactions.Add(acceptedTransaction);
         }
 
-        public AcceptedTransaction? GetById(string? transactionId)
+        public AcceptedTransaction? GetById(string transactionId)
         {
             return _b2BContext.Transactions.Find(transactionId);
         }

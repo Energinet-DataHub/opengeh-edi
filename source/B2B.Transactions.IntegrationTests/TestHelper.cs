@@ -25,13 +25,13 @@ namespace B2B.Transactions.IntegrationTests
     public class TestHelper
     {
         private readonly ITransactionRepository _transactionRepository;
-        private readonly IMessageFactory<IDocument?> _messageFactory;
+        private readonly IMessageFactory<IDocument> _messageFactory;
 
         public TestHelper(
             ITransactionRepository transactionRepository,
             IUnitOfWork unitOfWork,
             IOutgoingMessageStore messageStore,
-            IMessageFactory<IDocument?> messageFactory)
+            IMessageFactory<IDocument> messageFactory)
         {
             _transactionRepository = transactionRepository;
             UnitOfWork = unitOfWork;

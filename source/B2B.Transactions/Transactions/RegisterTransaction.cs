@@ -24,10 +24,10 @@ namespace B2B.Transactions.Transactions
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly ITransactionRepository _transactionRepository;
-        private readonly IMessageFactory<IDocument?> _messageFactory;
+        private readonly IMessageFactory<IDocument> _messageFactory;
         private readonly IUnitOfWork _unitOfWork;
 
-        public RegisterTransaction(IOutgoingMessageStore outgoingMessageStore, ITransactionRepository transactionRepository, IMessageFactory<IDocument?> messageFactory, IUnitOfWork unitOfWork)
+        public RegisterTransaction(IOutgoingMessageStore outgoingMessageStore, ITransactionRepository transactionRepository, IMessageFactory<IDocument> messageFactory, IUnitOfWork unitOfWork)
         {
             _outgoingMessageStore = outgoingMessageStore ?? throw new ArgumentNullException(nameof(outgoingMessageStore));
             _transactionRepository = transactionRepository ?? throw new ArgumentNullException(nameof(transactionRepository));
@@ -40,9 +40,8 @@ namespace B2B.Transactions.Transactions
             if (transaction == null) throw new ArgumentNullException(nameof(transaction));
             var acceptedTransaction = new AcceptedTransaction(transaction.MarketActivityRecord.Id);
             _transactionRepository.Add(acceptedTransaction);
-            var outgoingMessage = new OutgoingMessage(
-                _messageFactory.CreateMessage(transaction),
-                transaction.Message.ReceiverId);
+            var document = _messageFactory.CreateMessage(transaction);
+            var outgoingMessage = new OutgoingMessage(document.DocumentType, document.MessagePayload, transaction.Message.ReceiverId);
 
             _outgoingMessageStore.Add(outgoingMessage);
 

@@ -46,10 +46,9 @@ namespace B2B.Transactions.IntegrationTests
             var transaction = TestHelper.CreateTransaction();
             await _testHelper.RegisterTransactionAsync(transaction).ConfigureAwait(false);
 
-            var unpublished = await _testHelper
+            var unpublished = _testHelper
                 .MessageStore
-                .GetUnpublishedAsync()
-                .ConfigureAwait(false);
+                .GetUnpublished();
 
             Assert.Single(unpublished);
         }
