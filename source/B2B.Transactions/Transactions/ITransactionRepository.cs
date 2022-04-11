@@ -25,7 +25,7 @@ namespace B2B.Transactions.Transactions
         /// Adds a transaction to store
         /// </summary>
         /// <param name="acceptedTransaction"></param>
-        Task AddAsync(AcceptedTransaction acceptedTransaction);
+        void Add(AcceptedTransaction acceptedTransaction);
 
         /// <summary>
         /// Find a transaction by transaction id

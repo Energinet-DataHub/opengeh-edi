@@ -12,18 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using B2B.Transactions.Transactions;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Threading.Tasks;
+using B2B.Transactions.DataAccess;
 
-namespace B2B.Transactions.Infrastructure.DataAccess.Transaction
+namespace B2B.Transactions.Infrastructure.DataAccess
 {
-    internal class TransactionEntityConfiguration : IEntityTypeConfiguration<AcceptedTransaction>
+    public class UnitOfWork : IUnitOfWork
     {
-        public void Configure(EntityTypeBuilder<AcceptedTransaction> builder)
+        private readonly B2BContext _context;
+
+        public UnitOfWork(B2BContext context)
         {
-            builder.ToTable("Transactions", "b2b");
-            builder.HasKey(x => x.TransactionId);
+            _context = context;
+        }
+
+        public Task CommitAsync()
+        {
+            return _context.SaveChangesAsync();
         }
     }
 }

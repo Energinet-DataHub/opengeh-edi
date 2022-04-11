@@ -14,29 +14,22 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading.Tasks;
-using B2B.Transactions.OutgoingMessages;
-using B2B.Transactions.Transactions;
+using Energinet.DataHub.MessageHub.Client.DataAvailable;
+using Energinet.DataHub.MessageHub.Model.Model;
 
 namespace B2B.Transactions.IntegrationTests.TestDoubles
 {
-    public class OutgoingMessageStoreSpy : IOutgoingMessageStore
+    public class DataAvailableNotificationSenderSpy : IDataAvailableNotificationSender
     {
-        private readonly List<OutgoingMessage> _messages = new();
+        private readonly List<DataAvailableNotificationDto> _publishedMessages = new();
 
-        public IReadOnlyCollection<OutgoingMessage> Messages => _messages.AsReadOnly();
+        public ReadOnlyCollection<DataAvailableNotificationDto> PublishedMessages => _publishedMessages.AsReadOnly();
 
-        #pragma warning disable
-        public Task<ReadOnlyCollection<OutgoingMessage>> GetUnpublishedAsync()
+        public Task SendAsync(string correlationId, DataAvailableNotificationDto dataAvailableNotificationDto)
         {
-            return Task.FromResult(_messages.Where(message => message.IsPublished == false).ToList().AsReadOnly());
-        }
-        #pragma warning restore
-
-        public void Add(OutgoingMessage message)
-        {
-            _messages.Add(message);
+            _publishedMessages.Add(dataAvailableNotificationDto);
+            return Task.CompletedTask;
         }
     }
 }

@@ -12,18 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using B2B.Transactions.Transactions;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System;
 
-namespace B2B.Transactions.Infrastructure.DataAccess.Transaction
+namespace B2B.Transactions.OutgoingMessages
 {
-    internal class TransactionEntityConfiguration : IEntityTypeConfiguration<AcceptedTransaction>
+    public class OutgoingMessage
     {
-        public void Configure(EntityTypeBuilder<AcceptedTransaction> builder)
+        public OutgoingMessage(IDocument document, string recipientId)
         {
-            builder.ToTable("Transactions", "b2b");
-            builder.HasKey(x => x.TransactionId);
+            Document = document ?? throw new ArgumentNullException(nameof(document));
+            RecipientId = recipientId;
+        }
+
+        public IDocument Document { get; }
+
+        public bool IsPublished { get; private set; }
+
+        public string RecipientId { get; }
+
+        public string DocumentType => Document.DocumentType;
+
+        public void Published()
+        {
+            IsPublished = true;
         }
     }
 }

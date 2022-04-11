@@ -12,20 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using B2B.Transactions.Transactions;
+using System.Threading.Tasks;
 
-namespace B2B.Transactions.Xml.Outgoing
+namespace B2B.Transactions.DataAccess
 {
     /// <summary>
-    /// Provides outgoing xml documents
+    /// Unit of work
     /// </summary>
-    public interface IDocumentProvider<out TMessage>
+    public interface IUnitOfWork
     {
         /// <summary>
-        /// Creates an outgoing Messages
+        /// Commits current transaction
         /// </summary>
-        /// <param name="transaction"></param>
-        /// <returns><see cref="AcceptDocumentProvider"/></returns>
-        TMessage CreateMessage(B2BTransaction transaction);
+        Task CommitAsync();
     }
 }

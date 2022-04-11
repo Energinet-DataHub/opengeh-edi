@@ -14,7 +14,9 @@
 
 using System;
 using B2B.Transactions.Infrastructure.Configuration;
+using B2B.Transactions.Infrastructure.Configuration.Correlation;
 using B2B.Transactions.IntegrationTests.Fixtures;
+using B2B.Transactions.IntegrationTests.TestDoubles;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -35,7 +37,15 @@ namespace B2B.Transactions.IntegrationTests
             var services = new ServiceCollection();
             CompositionRoot.Initialize(services)
                 .AddDatabaseConnectionFactory(_databaseFixture.ConnectionString)
-                .AddDatabaseContext(_databaseFixture.ConnectionString);
+                .AddDatabaseContext(_databaseFixture.ConnectionString)
+                .AddSystemClock(new SystemDateTimeProviderStub())
+                .AddCorrelationContext(_ =>
+                {
+                    var correlation = new CorrelationContext();
+                    correlation.SetId(Guid.NewGuid().ToString());
+                    return correlation;
+                })
+                .AddMessagePublishing(new OutgoingMessageStoreSpy(), new DataAvailableNotificationSenderSpy());
             _serviceProvider = services.BuildServiceProvider();
         }
 

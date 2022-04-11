@@ -15,35 +15,39 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using B2B.Transactions.DataAccess;
 using B2B.Transactions.IntegrationTests.Fixtures;
 using B2B.Transactions.IntegrationTests.TestDoubles;
-using B2B.Transactions.Messages;
 using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.Transactions;
 using B2B.Transactions.Xml.Outgoing;
 using Xunit;
+using Xunit.Categories;
 
-namespace B2B.Transactions.IntegrationTests
+namespace B2B.Transactions.IntegrationTests.Transactions
 {
+    [IntegrationTest]
     public class TransactionHandlingTests : TestBase
     {
         private static readonly SystemDateTimeProviderStub _dateTimeProvider = new();
         private readonly ITransactionRepository _transactionRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly XNamespace _namespace = "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1";
         private OutgoingMessageStoreSpy _outgoingMessageStoreSpy = new();
-        private IDocumentProvider<IMessage> _documentProvider = new AcceptDocumentProvider(_dateTimeProvider);
+        private IMessageFactory<IDocument> _messageFactory = new AcceptMessageFactory(_dateTimeProvider);
 
         public TransactionHandlingTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
             _transactionRepository =
                 GetService<ITransactionRepository>();
+            _unitOfWork = GetService<IUnitOfWork>();
         }
 
         [Fact]
         public async Task Transaction_is_registered()
         {
-            var transaction = CreateTransaction();
+            var transaction = TransactionBuilder.CreateTransaction();
             await RegisterTransaction(transaction).ConfigureAwait(false);
 
             var savedTransaction = _transactionRepository.GetById(transaction.Message.MessageId);
@@ -51,46 +55,19 @@ namespace B2B.Transactions.IntegrationTests
         }
 
         [Fact]
-        public async Task Accept_message_is_sent_to_sender_when_transaction_is_accepted()
+        public async Task Message_is_generated_when_transaction_is_accepted()
         {
             var now = _dateTimeProvider.Now();
             _dateTimeProvider.SetNow(now);
-            var transaction = CreateTransaction();
+            var transaction = TransactionBuilder.CreateTransaction();
             await RegisterTransaction(transaction).ConfigureAwait(false);
 
             var acceptMessage = _outgoingMessageStoreSpy.Messages.FirstOrDefault();
             Assert.NotNull(acceptMessage);
-            var document = CreateDocument(acceptMessage!.MessagePayload);
-            Assert.NotNull(GetMessageHeaderValue(document, "mRID"));
-            AssertHasHeaderValue(document, "type", "414");
-            AssertHasHeaderValue(document, "process.processType", transaction.Message.ProcessType);
-            AssertHasHeaderValue(document, "businessSector.type", "23");
-            AssertHasHeaderValue(document, "sender_MarketParticipant.mRID", "5790001330552");
-            AssertHasHeaderValue(document, "sender_MarketParticipant.marketRole.type", "DDZ");
-            AssertHasHeaderValue(document, "receiver_MarketParticipant.mRID", transaction.Message.SenderId);
-            AssertHasHeaderValue(document, "receiver_MarketParticipant.marketRole.type", transaction.Message.SenderRole);
-            AssertHasHeaderValue(document, "createdDateTime", now.ToString());
-            AssertHasHeaderValue(document, "reason.code", "A01");
+            var document = CreateDocument(acceptMessage!.Document.MessagePayload);
 
-            Assert.NotNull(GetMarketActivityRecordValue(document, "mRID"));
-            AssertMarketActivityRecordValue(document, "originalTransactionIDReference_MktActivityRecord.mRID", transaction.MarketActivityRecord.Id);
-            AssertMarketActivityRecordValue(document, "marketEvaluationPoint.mRID", transaction.MarketActivityRecord.MarketEvaluationPointId);
-        }
-
-        private static B2BTransaction CreateTransaction()
-        {
-            return B2BTransaction.Create(
-                new MessageHeader("fake", "fake", "fake", "fake", "fake", "somedate", "fake"),
-                new MarketActivityRecord()
-                {
-                    BalanceResponsibleId = "fake",
-                    Id = "fake",
-                    ConsumerId = "fake",
-                    ConsumerName = "fake",
-                    EffectiveDate = "fake",
-                    EnergySupplierId = "fake",
-                    MarketEvaluationPointId = "fake",
-                });
+            AssertHeader(document, transaction);
+            AssertMarketActivityRecord(document, transaction);
         }
 
         private static XDocument CreateDocument(string payload)
@@ -100,8 +77,29 @@ namespace B2B.Transactions.IntegrationTests
 
         private Task RegisterTransaction(B2BTransaction transaction)
         {
-            var useCase = new RegisterTransaction(_outgoingMessageStoreSpy, _transactionRepository, _documentProvider);
+            var useCase = new RegisterTransaction(_outgoingMessageStoreSpy, _transactionRepository, _messageFactory, _unitOfWork);
             return useCase.HandleAsync(transaction);
+        }
+
+        private void AssertMarketActivityRecord(XDocument document, B2BTransaction transaction)
+        {
+            Assert.NotNull(GetMarketActivityRecordValue(document, "mRID"));
+            AssertMarketActivityRecordValue(document, "originalTransactionIDReference_MktActivityRecord.mRID", transaction.MarketActivityRecord.Id);
+            AssertMarketActivityRecordValue(document, "marketEvaluationPoint.mRID", transaction.MarketActivityRecord.MarketEvaluationPointId);
+        }
+
+        private void AssertHeader(XDocument document, B2BTransaction transaction)
+        {
+            Assert.NotNull(GetMessageHeaderValue(document, "mRID"));
+            AssertHasHeaderValue(document, "type", "414");
+            AssertHasHeaderValue(document, "process.processType", transaction.Message.ProcessType);
+            AssertHasHeaderValue(document, "businessSector.type", "23");
+            AssertHasHeaderValue(document, "sender_MarketParticipant.mRID", "5790001330552");
+            AssertHasHeaderValue(document, "sender_MarketParticipant.marketRole.type", "DDZ");
+            AssertHasHeaderValue(document, "receiver_MarketParticipant.mRID", transaction.Message.SenderId);
+            AssertHasHeaderValue(document, "receiver_MarketParticipant.marketRole.type", transaction.Message.SenderRole);
+            AssertHasHeaderValue(document, "createdDateTime", _dateTimeProvider.Now().ToString());
+            AssertHasHeaderValue(document, "reason.code", "A01");
         }
 
         private void AssertHasHeaderValue(XDocument document, string elementName, string expectedValue)

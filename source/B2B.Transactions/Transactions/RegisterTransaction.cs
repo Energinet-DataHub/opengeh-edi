@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
+using B2B.Transactions.DataAccess;
 using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.Xml.Outgoing;
 
@@ -23,22 +24,27 @@ namespace B2B.Transactions.Transactions
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly ITransactionRepository _transactionRepository;
-        private readonly IDocumentProvider<IMessage> _documentProvider;
+        private readonly IMessageFactory<IDocument> _messageFactory;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public RegisterTransaction(IOutgoingMessageStore outgoingMessageStore, ITransactionRepository transactionRepository, IDocumentProvider<IMessage> documentProvider)
+        public RegisterTransaction(IOutgoingMessageStore outgoingMessageStore, ITransactionRepository transactionRepository, IMessageFactory<IDocument> messageFactory, IUnitOfWork unitOfWork)
         {
             _outgoingMessageStore = outgoingMessageStore ?? throw new ArgumentNullException(nameof(outgoingMessageStore));
             _transactionRepository = transactionRepository ?? throw new ArgumentNullException(nameof(transactionRepository));
-            _documentProvider = documentProvider ?? throw new ArgumentNullException(nameof(documentProvider));
+            _messageFactory = messageFactory ?? throw new ArgumentNullException(nameof(messageFactory));
+            _unitOfWork = unitOfWork;
         }
 
-        public async Task HandleAsync(B2BTransaction transaction)
+        public Task HandleAsync(B2BTransaction transaction)
         {
             if (transaction == null) throw new ArgumentNullException(nameof(transaction));
             var acceptedTransaction = new AcceptedTransaction(transaction.MarketActivityRecord.Id);
-            await _transactionRepository.AddAsync(acceptedTransaction).ConfigureAwait(false);
+            _transactionRepository.Add(acceptedTransaction);
+            var outgoingMessage = new OutgoingMessage(_messageFactory.CreateMessage(transaction), transaction.Message.ReceiverId);
 
-            _outgoingMessageStore.Add(_documentProvider.CreateMessage(transaction));
+            _outgoingMessageStore.Add(outgoingMessage);
+
+            return _unitOfWork.CommitAsync();
         }
     }
 }

@@ -25,6 +25,7 @@ using B2B.Transactions.Infrastructure.Configuration.Correlation;
 using B2B.Transactions.Infrastructure.DataAccess;
 using B2B.Transactions.Infrastructure.DataAccess.Transaction;
 using B2B.Transactions.Infrastructure.Messages;
+using B2B.Transactions.Infrastructure.OutgoingMessages;
 using B2B.Transactions.Infrastructure.Serialization;
 using B2B.Transactions.Infrastructure.Transactions;
 using B2B.Transactions.OutgoingMessages;
@@ -33,6 +34,7 @@ using B2B.Transactions.Xml.Incoming;
 using B2B.Transactions.Xml.Outgoing;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using Energinet.DataHub.MessageHub.Client.DataAvailable;
 using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -51,10 +53,11 @@ namespace B2B.Transactions.Infrastructure.Configuration
             services.AddSingleton<ISerializer, Serializer>();
             services.AddScoped<ITransactionIds, TransactionIdRegistry>();
             services.AddScoped<IMessageIds, MessageIdRegistry>();
-            services.AddScoped<IDocumentProvider<IMessage>, AcceptDocumentProvider>();
+            services.AddScoped<IMessageFactory<IDocument>, AcceptMessageFactory>();
             services.AddScoped<ITransactionQueueDispatcher, TransactionQueueDispatcher>();
             services.AddScoped<ITransactionRepository, TransactionRepository>();
             services.AddScoped<IMarketActorAuthenticator, MarketActorAuthenticator>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddLogging();
             AddXmlSchema(services);
         }
@@ -116,6 +119,14 @@ namespace B2B.Transactions.Infrastructure.Configuration
                 var logger = factory.CreateLogger<RequestResponseLoggingBlobStorage>();
                 return new RequestResponseLoggingBlobStorage(blobStorageConnectionString, storageContainerName, logger);
             });
+            return this;
+        }
+
+        public CompositionRoot AddMessagePublishing(IOutgoingMessageStore outgoingMessageStore, IDataAvailableNotificationSender dataAvailableNotificationSender)
+        {
+            _services.AddScoped<IDataAvailableNotificationSender>(_ => dataAvailableNotificationSender);
+            _services.AddScoped<MessagePublisher>();
+            _services.AddScoped<IOutgoingMessageStore>(_ => outgoingMessageStore);
             return this;
         }
 

@@ -12,16 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace B2B.Transactions.OutgoingMessages
+using B2B.Transactions.Transactions;
+
+namespace B2B.Transactions.Xml.Outgoing
 {
     /// <summary>
-    /// Interface for outgoing messages
+    /// Provides outgoing xml documents
     /// </summary>
-    public interface IMessage
+    public interface IMessageFactory<out TMessage>
     {
         /// <summary>
-        /// Payload of the outgoing message
+        /// Creates an outgoing Messages
         /// </summary>
-        string MessagePayload { get; init; }
+        /// <param name="transaction"></param>
+        /// <returns><see cref="AcceptMessageFactory"/></returns>
+        TMessage CreateMessage(B2BTransaction transaction);
     }
 }
