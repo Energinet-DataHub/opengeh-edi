@@ -41,7 +41,7 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
             _outgoingMessageStore = GetService<IOutgoingMessageStore>();
             _messageFactory = new AcceptMessageFactory(systemDateTimeProvider);
             _messagePublisher = GetService<MessagePublisher>();
-            _dataAvailableNotificationSenderSpy = (DataAvailableNotificationSenderSpy)GetService<IDataAvailableNotificationSender>();
+            _dataAvailableNotificationSenderSpy = (DataAvailableNotificationSenderSpy)GetService<IDataAvailableNotification>();
         }
 
         [Fact]

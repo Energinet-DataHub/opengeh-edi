@@ -25,10 +25,10 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
 {
     public class MessagePublisher
     {
-        private readonly IDataAvailableNotificationSender _dataAvailableNotificationSender;
+        private readonly IDataAvailableNotification _dataAvailableNotificationSender;
         private readonly ICorrelationContext _correlationContext;
 
-        public MessagePublisher(IDataAvailableNotificationSender dataAvailableNotificationSender, ICorrelationContext correlationContext)
+        public MessagePublisher(IDataAvailableNotification dataAvailableNotificationSender, ICorrelationContext correlationContext)
         {
             _dataAvailableNotificationSender = dataAvailableNotificationSender ?? throw new ArgumentNullException(nameof(dataAvailableNotificationSender));
             _correlationContext = correlationContext;
