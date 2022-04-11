@@ -30,20 +30,17 @@ namespace B2B.Transactions.Api
         private readonly ICorrelationContext _correlationContext;
         private readonly RegisterTransaction _registerTransaction;
         private readonly ISerializer _jsonSerializer;
-        private readonly ServiceBusMessageMetadataExtractor _serviceBusMessageMetadataExtractor;
 
         public TransactionQueueListener(
             ILogger logger,
             ICorrelationContext correlationContext,
             RegisterTransaction registerTransaction,
-            ISerializer jsonSerializer,
-            ServiceBusMessageMetadataExtractor serviceBusMessageMetadataExtractor)
+            ISerializer jsonSerializer)
         {
             _logger = logger;
             _correlationContext = correlationContext;
             _registerTransaction = registerTransaction;
             _jsonSerializer = jsonSerializer;
-            _serviceBusMessageMetadataExtractor = serviceBusMessageMetadataExtractor;
         }
 
         [Function(nameof(TransactionQueueListener))]
@@ -53,8 +50,6 @@ namespace B2B.Transactions.Api
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
             if (context == null) throw new ArgumentNullException(nameof(context));
-
-            _serviceBusMessageMetadataExtractor.SetCorrelationId(context);
 
             var byteAsString = Encoding.UTF8.GetString(data);
 
