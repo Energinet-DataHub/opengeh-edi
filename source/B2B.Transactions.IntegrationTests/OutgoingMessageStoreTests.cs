@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using B2B.Transactions.DataAccess;
 using B2B.Transactions.IntegrationTests.Fixtures;
 using B2B.Transactions.IntegrationTests.TestDoubles;
+using B2B.Transactions.IntegrationTests.Transactions;
 using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.Transactions;
 using B2B.Transactions.Xml.Outgoing;
@@ -26,12 +27,12 @@ namespace B2B.Transactions.IntegrationTests
     public class OutgoingMessageStoreTests : TestBase
     {
         private SystemDateTimeProviderStub _dateTimeProvider = new();
-        private TestHelper _testHelper;
+        private TransactionBuilder _transactionBuilder;
 
         public OutgoingMessageStoreTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
-            _testHelper = new TestHelper(
+            _transactionBuilder = new TransactionBuilder(
                 GetService<ITransactionRepository>(),
                 GetService<IUnitOfWork>(),
                 GetService<IOutgoingMessageStore>(),
@@ -43,10 +44,10 @@ namespace B2B.Transactions.IntegrationTests
         {
             var now = _dateTimeProvider.Now();
             _dateTimeProvider.SetNow(now);
-            var transaction = TestHelper.CreateTransaction();
-            await _testHelper.RegisterTransactionAsync(transaction).ConfigureAwait(false);
+            var transaction = TransactionBuilder.CreateTransaction();
+            await _transactionBuilder.RegisterTransactionAsync(transaction).ConfigureAwait(false);
 
-            var unpublished = _testHelper
+            var unpublished = _transactionBuilder
                 .MessageStore
                 .GetUnpublished();
 
