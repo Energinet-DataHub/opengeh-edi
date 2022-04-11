@@ -19,6 +19,7 @@ using B2B.Transactions.Infrastructure.Authentication.Bearer;
 using B2B.Transactions.Infrastructure.Authentication.MarketActors;
 using B2B.Transactions.Infrastructure.Configuration;
 using B2B.Transactions.Infrastructure.Configuration.Correlation;
+using B2B.Transactions.Infrastructure.Configuration.Servicebus;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Protocols;
@@ -41,6 +42,7 @@ namespace B2B.Transactions.Api
                     worker.UseMiddleware<BearerAuthenticationMiddleware>();
                     worker.UseMiddleware<ClaimsEnrichmentMiddleware>();
                     worker.UseMiddleware<MarketActorAuthenticatorMiddleware>();
+                    worker.UseMiddleware<ServiceBusMessageMetadataMiddleWare>();
                 })
                 .ConfigureServices(services =>
                 {
