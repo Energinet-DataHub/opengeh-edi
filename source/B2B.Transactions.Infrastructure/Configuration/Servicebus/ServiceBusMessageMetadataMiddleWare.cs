@@ -38,7 +38,6 @@ public class ServiceBusMessageMetadataMiddleWare : IFunctionsWorkerMiddleware
         if (context == null) throw new ArgumentNullException(nameof(context));
         if (next == null) throw new ArgumentNullException(nameof(next));
 
-        // _logger.LogInformation("Parsed TraceContext: " + context.TraceContext.TraceParent ?? string.Empty);
         var correlationContext = context.GetService<ICorrelationContext>();
         var serializer = context.GetService<ISerializer>();
 
@@ -51,6 +50,8 @@ public class ServiceBusMessageMetadataMiddleWare : IFunctionsWorkerMiddleware
 
         var metadata = serializer.Deserialize<ServiceBusMessageMetadata>(serviceBusMessageMetadata.ToString() ?? throw new InvalidOperationException());
         correlationContext.SetId(metadata.CorrelationID ?? throw new InvalidOperationException("Service bus metadata property Correlation-ID is missing"));
+
+        _logger.LogInformation("Dequeued service bus message with correlation id: " + correlationContext.Id ?? string.Empty);
 
         await next(context).ConfigureAwait(false);
     }
