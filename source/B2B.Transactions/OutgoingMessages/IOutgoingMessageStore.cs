@@ -34,6 +34,6 @@ namespace B2B.Transactions.OutgoingMessages
         /// Get unpublished messages
         /// </summary>
         /// <returns> A read only collection of unpublished messages</returns>
-        Task<ReadOnlyCollection<OutgoingMessage>> GetUnpublishedAsync();
+        ReadOnlyCollection<OutgoingMessage> GetUnpublished();
     }
 }
