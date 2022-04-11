@@ -15,6 +15,7 @@
 using System;
 using System.Text;
 using System.Threading.Tasks;
+using B2B.Transactions.Api.Servicebus;
 using B2B.Transactions.Infrastructure.Configuration.Correlation;
 using B2B.Transactions.Infrastructure.Serialization;
 using B2B.Transactions.Transactions;
@@ -29,17 +30,20 @@ namespace B2B.Transactions.Api
         private readonly ICorrelationContext _correlationContext;
         private readonly RegisterTransaction _registerTransaction;
         private readonly ISerializer _jsonSerializer;
+        private readonly ServiceBusMessageMetadataExtractor _serviceBusMessageMetadataExtractor;
 
         public TransactionQueueListener(
             ILogger logger,
             ICorrelationContext correlationContext,
             RegisterTransaction registerTransaction,
-            ISerializer jsonSerializer)
+            ISerializer jsonSerializer,
+            ServiceBusMessageMetadataExtractor serviceBusMessageMetadataExtractor)
         {
             _logger = logger;
             _correlationContext = correlationContext;
             _registerTransaction = registerTransaction;
             _jsonSerializer = jsonSerializer;
+            _serviceBusMessageMetadataExtractor = serviceBusMessageMetadataExtractor;
         }
 
         [Function(nameof(TransactionQueueListener))]
@@ -49,6 +53,8 @@ namespace B2B.Transactions.Api
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
             if (context == null) throw new ArgumentNullException(nameof(context));
+
+            _serviceBusMessageMetadataExtractor.SetCorrelationId(context);
 
             var byteAsString = Encoding.UTF8.GetString(data);
 
