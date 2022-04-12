@@ -59,6 +59,7 @@ namespace B2B.Transactions.Infrastructure.Configuration
             services.AddScoped<IMarketActorAuthenticator, MarketActorAuthenticator>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
+            services.AddScoped<IDataAvailableNotificationPublisher, DataAvailableNotificationPublisherPublisher>();
             services.AddScoped<IMessageFactory<IDocument>, AcceptMessageFactory>();
             services.AddLogging();
             AddXmlSchema(services);
@@ -124,9 +125,9 @@ namespace B2B.Transactions.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddMessagePublishing(IOutgoingMessageStore outgoingMessageStore, IDataAvailableNotification dataAvailableNotification)
+        public CompositionRoot AddMessagePublishing(IOutgoingMessageStore outgoingMessageStore, IDataAvailableNotificationPublisher dataAvailableNotificationPublisher)
         {
-            _services.AddScoped<IDataAvailableNotification>(_ => dataAvailableNotification);
+            _services.AddScoped<IDataAvailableNotificationPublisher>(_ => dataAvailableNotificationPublisher);
             _services.AddScoped<MessagePublisher>();
             _services.AddScoped<IOutgoingMessageStore>(_ => outgoingMessageStore);
             return this;

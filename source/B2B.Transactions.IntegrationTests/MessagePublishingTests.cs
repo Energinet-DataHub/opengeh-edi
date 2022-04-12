@@ -48,7 +48,7 @@ namespace B2B.Transactions.IntegrationTests
         [Fact]
         public async Task Outgoing_messages_are_published()
         {
-            var dataAvailableNotificationSenderSpy = new DataAvailableNotificationSenderSpy();
+            var dataAvailableNotificationSenderSpy = new DataAvailableNotificationPublisherSpy();
             var messagePublisher = new MessagePublisher(dataAvailableNotificationSenderSpy, GetService<ICorrelationContext>());
             var transaction = CreateTransaction();
             var document = _messageFactory.CreateMessage(transaction);

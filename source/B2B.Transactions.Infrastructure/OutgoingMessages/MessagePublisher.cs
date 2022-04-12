@@ -25,12 +25,12 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
 {
     public class MessagePublisher
     {
-        private readonly IDataAvailableNotification _dataAvailableNotificationSender;
+        private readonly IDataAvailableNotificationPublisher _dataAvailableNotificationPublisherSender;
         private readonly ICorrelationContext _correlationContext;
 
-        public MessagePublisher(IDataAvailableNotification dataAvailableNotificationSender, ICorrelationContext correlationContext)
+        public MessagePublisher(IDataAvailableNotificationPublisher dataAvailableNotificationPublisherSender, ICorrelationContext correlationContext)
         {
-            _dataAvailableNotificationSender = dataAvailableNotificationSender ?? throw new ArgumentNullException(nameof(dataAvailableNotificationSender));
+            _dataAvailableNotificationPublisherSender = dataAvailableNotificationPublisherSender ?? throw new ArgumentNullException(nameof(dataAvailableNotificationPublisherSender));
             _correlationContext = correlationContext;
         }
 
@@ -39,7 +39,7 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
             if (unpublishedMessages == null) throw new ArgumentNullException(nameof(unpublishedMessages));
             foreach (var message in unpublishedMessages)
             {
-                await _dataAvailableNotificationSender.SendAsync(
+                await _dataAvailableNotificationPublisherSender.SendAsync(
                     _correlationContext.Id,
                     CreateDataAvailableNotificationFrom(message)).ConfigureAwait(false);
 

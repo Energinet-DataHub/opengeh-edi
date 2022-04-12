@@ -12,24 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using B2B.Transactions.OutgoingMessages;
 using Energinet.DataHub.MessageHub.Model.Model;
 
-namespace B2B.Transactions.IntegrationTests.TestDoubles
+namespace B2B.Transactions.OutgoingMessages
 {
-    public class DataAvailableNotificationSenderSpy : IDataAvailableNotification
+    /// <summary>
+    /// Interface for data available notifications
+    /// </summary>
+    public interface IDataAvailableNotificationPublisher
     {
-        private readonly List<DataAvailableNotificationDto> _publishedMessages = new();
-
-        public ReadOnlyCollection<DataAvailableNotificationDto> PublishedMessages => _publishedMessages.AsReadOnly();
-
-        public Task SendAsync(string correlationId, DataAvailableNotificationDto dataAvailableNotificationDto)
-        {
-            _publishedMessages.Add(dataAvailableNotificationDto);
-            return Task.CompletedTask;
-        }
+        /// <summary>
+        /// send the specified DataAvailableNotification to the post office DataAvailable queue.
+        /// </summary>
+        /// <param name="correlationId">The correlation id that can be used to track the data represented by the notification.</param>
+        /// <param name="dataAvailableNotificationDto">The notification to send to the post office.</param>
+        Task SendAsync(string correlationId, DataAvailableNotificationDto dataAvailableNotificationDto);
     }
 }

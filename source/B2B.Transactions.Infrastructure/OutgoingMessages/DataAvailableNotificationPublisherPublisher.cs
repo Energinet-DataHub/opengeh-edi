@@ -20,12 +20,12 @@ using Energinet.DataHub.MessageHub.Model.Model;
 
 namespace B2B.Transactions.Infrastructure.OutgoingMessages
 {
-    public class DataAvailableNotificationSender : IDataAvailableNotification
+    public class DataAvailableNotificationPublisherPublisher : IDataAvailableNotificationPublisher
     {
         private readonly IDataAvailableNotificationSender _dataAvailableNotificationSender;
         private readonly ICorrelationContext _correlationContext;
 
-        public DataAvailableNotificationSender(
+        public DataAvailableNotificationPublisherPublisher(
             IDataAvailableNotificationSender dataAvailableNotificationSender,
             ICorrelationContext correlationContext)
         {
