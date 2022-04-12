@@ -20,9 +20,11 @@ using B2B.Transactions.Infrastructure.Authentication.Bearer;
 using B2B.Transactions.Infrastructure.Authentication.Bearer.Errors;
 using Microsoft.IdentityModel.Tokens;
 using Xunit;
+using Xunit.Categories;
 
 namespace B2B.Transactions.IntegrationTests.Infrastructure.Authentication.MarketActors
 {
+    [IntegrationTest]
     public class JwtTokenParserTests
     {
         private static TokenValidationParameters DisableAllTokenValidations => new()
