@@ -12,49 +12,53 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using B2B.Transactions.Infrastructure.Configuration.Correlation;
 using B2B.Transactions.Infrastructure.OutgoingMessages;
 using B2B.Transactions.IntegrationTests.Fixtures;
 using B2B.Transactions.IntegrationTests.TestDoubles;
-using B2B.Transactions.IntegrationTests.Transactions;
+using B2B.Transactions.Messages;
 using B2B.Transactions.OutgoingMessages;
+using B2B.Transactions.Transactions;
 using B2B.Transactions.Xml.Outgoing;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MessageHub.Client.DataAvailable;
 using Energinet.DataHub.MessageHub.Model.Model;
 using Xunit;
-using Xunit.Categories;
 
-namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
+namespace B2B.Transactions.IntegrationTests
 {
-    [IntegrationTest]
-    public class MessagePublisherTests : TestBase
+    public class MessagePublishingTests : TestBase
     {
-        private readonly IOutgoingMessageStore _outgoingMessageStore;
+        private readonly IOutgoingMessageStore _outgoingMessageStoreSpy;
         private readonly IMessageFactory<IDocument> _messageFactory;
-        private readonly MessagePublisher _messagePublisher;
-        private readonly DataAvailableNotificationSenderSpy _dataAvailableNotificationSenderSpy;
 
-        public MessagePublisherTests(DatabaseFixture databaseFixture)
+        public MessagePublishingTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
             var systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
-            _outgoingMessageStore = GetService<IOutgoingMessageStore>();
+            _outgoingMessageStoreSpy = new OutgoingMessageStoreSpy();
             _messageFactory = new AcceptMessageFactory(systemDateTimeProvider);
-            _messagePublisher = GetService<MessagePublisher>();
-            _dataAvailableNotificationSenderSpy = (DataAvailableNotificationSenderSpy)GetService<IDataAvailableNotification>();
         }
 
         [Fact]
         public async Task Outgoing_messages_are_published()
         {
-            var outgoingMessage = CreateOutgoingMessage();
+            var dataAvailableNotificationSenderSpy = new DataAvailableNotificationSenderSpy();
+            var messagePublisher = new MessagePublisher(dataAvailableNotificationSenderSpy, GetService<ICorrelationContext>());
+            var transaction = CreateTransaction();
+            var document = _messageFactory.CreateMessage(transaction);
+            var outgoingMessage = new OutgoingMessage(document.DocumentType, document.MessagePayload, transaction.Message.ReceiverId);
+            _outgoingMessageStoreSpy.Add(outgoingMessage);
 
-            await _messagePublisher.PublishAsync(_outgoingMessageStore.GetUnpublished()).ConfigureAwait(false);
+            await messagePublisher.PublishAsync(_outgoingMessageStoreSpy.GetUnpublished()).ConfigureAwait(false);
+            var unpublishedMessages = _outgoingMessageStoreSpy.GetUnpublished();
+            var publishedMessage = dataAvailableNotificationSenderSpy.PublishedMessages.FirstOrDefault();
 
-            var unpublishedMessages = _outgoingMessageStore.GetUnpublished();
-            var publishedMessage = _dataAvailableNotificationSenderSpy.PublishedMessages.FirstOrDefault();
             Assert.Empty(unpublishedMessages);
             Assert.NotNull(publishedMessage);
             Assert.Equal(outgoingMessage.RecipientId, publishedMessage?.Recipient.Value);
@@ -64,14 +68,20 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
             Assert.Equal(string.Empty, publishedMessage?.MessageType.Value);
         }
 
-        private OutgoingMessage CreateOutgoingMessage()
+        private static B2BTransaction CreateTransaction()
         {
-            var transaction = TransactionBuilder.CreateTransaction();
-            var document = _messageFactory.CreateMessage(transaction);
-            var outgoingMessage =
-                new OutgoingMessage(document.DocumentType, document.MessagePayload, transaction.Message.ReceiverId);
-            _outgoingMessageStore.Add(outgoingMessage);
-            return outgoingMessage;
+            return B2BTransaction.Create(
+                new MessageHeader("fake", "fake", "fake", "fake", "fake", "somedate", "fake"),
+                new MarketActivityRecord()
+                {
+                    BalanceResponsibleId = "fake",
+                    Id = "fake",
+                    ConsumerId = "fake",
+                    ConsumerName = "fake",
+                    EffectiveDate = "fake",
+                    EnergySupplierId = "fake",
+                    MarketEvaluationPointId = "fake",
+                });
         }
     }
 }

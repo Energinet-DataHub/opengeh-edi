@@ -16,27 +16,34 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using B2B.Transactions.Infrastructure.DataAccess;
 using B2B.Transactions.OutgoingMessages;
-using B2B.Transactions.Transactions;
 
-namespace B2B.Transactions.IntegrationTests.TestDoubles
+namespace B2B.Transactions.Infrastructure
 {
-    public class OutgoingMessageStoreSpy : IOutgoingMessageStore
+    public class OutgoingMessageStore : IOutgoingMessageStore
     {
-        private readonly List<OutgoingMessage> _messages = new();
+        private readonly B2BContext _context;
 
-        public IReadOnlyCollection<OutgoingMessage> Messages => _messages.AsReadOnly();
-
-        #pragma warning disable
-        public ReadOnlyCollection<OutgoingMessage> GetUnpublished()
+        public OutgoingMessageStore(B2BContext context)
         {
-            return _messages.Where(message => message.IsPublished == false).ToList().AsReadOnly();
+            _context = context;
         }
-        #pragma warning restore
 
         public void Add(OutgoingMessage message)
         {
-            _messages.Add(message);
+            _context.OutgoingMessages.Add(message);
+        }
+
+        public ReadOnlyCollection<OutgoingMessage> GetUnpublished()
+        {
+            var unpublished = _context
+                    .OutgoingMessages
+                    .Where(x => x.IsPublished == false)
+                    .ToList();
+
+            return unpublished.Count == 0 ? new ReadOnlyCollection<OutgoingMessage>(new List<OutgoingMessage>())
+                : new ReadOnlyCollection<OutgoingMessage>(unpublished);
         }
     }
 }

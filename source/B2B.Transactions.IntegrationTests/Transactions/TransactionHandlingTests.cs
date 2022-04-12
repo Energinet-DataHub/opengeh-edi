@@ -22,9 +22,11 @@ using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.Transactions;
 using B2B.Transactions.Xml.Outgoing;
 using Xunit;
+using Xunit.Categories;
 
 namespace B2B.Transactions.IntegrationTests.Transactions
 {
+    [IntegrationTest]
     public class TransactionHandlingTests : TestBase
     {
         private static readonly SystemDateTimeProviderStub _dateTimeProvider = new();
@@ -62,7 +64,7 @@ namespace B2B.Transactions.IntegrationTests.Transactions
 
             var acceptMessage = _outgoingMessageStoreSpy.Messages.FirstOrDefault();
             Assert.NotNull(acceptMessage);
-            var document = CreateDocument(acceptMessage!.Document.MessagePayload);
+            var document = CreateDocument(acceptMessage!.MessagePayload ?? string.Empty);
 
             AssertHeader(document, transaction);
             AssertMarketActivityRecord(document, transaction);
@@ -100,12 +102,12 @@ namespace B2B.Transactions.IntegrationTests.Transactions
             AssertHasHeaderValue(document, "reason.code", "A01");
         }
 
-        private void AssertHasHeaderValue(XDocument document, string elementName, string expectedValue)
+        private void AssertHasHeaderValue(XDocument document, string elementName, string? expectedValue)
         {
             Assert.Equal(expectedValue, GetMessageHeaderValue(document, elementName));
         }
 
-        private void AssertMarketActivityRecordValue(XDocument document, string elementName, string expectedValue)
+        private void AssertMarketActivityRecordValue(XDocument document, string elementName, string? expectedValue)
         {
             Assert.Equal(expectedValue, GetMarketActivityRecordValue(document, elementName));
         }

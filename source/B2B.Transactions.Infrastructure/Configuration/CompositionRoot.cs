@@ -58,6 +58,8 @@ namespace B2B.Transactions.Infrastructure.Configuration
             services.AddScoped<ITransactionRepository, TransactionRepository>();
             services.AddScoped<IMarketActorAuthenticator, MarketActorAuthenticator>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
+            services.AddScoped<IMessageFactory<IDocument>, AcceptMessageFactory>();
             services.AddLogging();
             AddXmlSchema(services);
         }
