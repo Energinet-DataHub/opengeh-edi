@@ -38,20 +38,23 @@ public class ServiceBusMessageMetadataMiddleWare : IFunctionsWorkerMiddleware
         if (context == null) throw new ArgumentNullException(nameof(context));
         if (next == null) throw new ArgumentNullException(nameof(next));
 
-        var correlationContext = context.GetService<ICorrelationContext>();
-        var serializer = context.GetService<ISerializer>();
-
-        context.BindingContext.BindingData.TryGetValue("UserProperties", out var serviceBusMessageMetadata);
-
-        if (serviceBusMessageMetadata is null)
+        if (context.Is(FunctionContextExtensions.TriggerType.ServiceBusTrigger))
         {
-            throw new InvalidOperationException($"Service bus metadata must be specified as User Properties attributes");
+            var correlationContext = context.GetService<ICorrelationContext>();
+            var serializer = context.GetService<ISerializer>();
+
+            context.BindingContext.BindingData.TryGetValue("UserProperties", out var serviceBusMessageMetadata);
+
+            if (serviceBusMessageMetadata is null)
+            {
+                throw new InvalidOperationException($"Service bus metadata must be specified as User Properties attributes");
+            }
+
+            var metadata = serializer.Deserialize<ServiceBusMessageMetadata>(serviceBusMessageMetadata.ToString() ?? throw new InvalidOperationException());
+            correlationContext.SetId(metadata.CorrelationID ?? throw new InvalidOperationException("Service bus metadata property Correlation-ID is missing"));
+
+            _logger.LogInformation("Dequeued service bus message with correlation id: " + correlationContext.Id ?? string.Empty);
         }
-
-        var metadata = serializer.Deserialize<ServiceBusMessageMetadata>(serviceBusMessageMetadata.ToString() ?? throw new InvalidOperationException());
-        correlationContext.SetId(metadata.CorrelationID ?? throw new InvalidOperationException("Service bus metadata property Correlation-ID is missing"));
-
-        _logger.LogInformation("Dequeued service bus message with correlation id: " + correlationContext.Id ?? string.Empty);
 
         await next(context).ConfigureAwait(false);
     }
