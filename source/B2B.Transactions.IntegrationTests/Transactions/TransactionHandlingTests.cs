@@ -33,6 +33,7 @@ namespace B2B.Transactions.IntegrationTests.Transactions
         private readonly ITransactionRepository _transactionRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly XNamespace _namespace = "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1";
+        // private readonly string prefix = "cim:";
         private OutgoingMessageStoreSpy _outgoingMessageStoreSpy = new();
         private IMessageFactory<IDocument> _messageFactory = new AcceptMessageFactory(_dateTimeProvider);
 
@@ -114,13 +115,13 @@ namespace B2B.Transactions.IntegrationTests.Transactions
 
         private string GetMarketActivityRecordValue(XDocument document, string elementName)
         {
-            var element = GetHeaderElement(document)?.Element(_namespace + "MktActivityRecord")?.Element(elementName);
+            var element = GetHeaderElement(document)?.Element(_namespace + "MktActivityRecord")?.Element(_namespace + elementName);
             return element?.Value ?? string.Empty;
         }
 
         private string? GetMessageHeaderValue(XDocument document, string elementName)
         {
-            return GetHeaderElement(document)?.Element(elementName)?.Value;
+            return GetHeaderElement(document)?.Element(_namespace + elementName)?.Value;
         }
 
         private XElement? GetHeaderElement(XDocument document)
