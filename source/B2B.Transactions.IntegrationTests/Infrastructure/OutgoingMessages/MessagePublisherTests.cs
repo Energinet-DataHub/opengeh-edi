@@ -12,13 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using B2B.Transactions.Infrastructure.OutgoingMessages;
 using B2B.Transactions.IntegrationTests.Fixtures;
 using B2B.Transactions.IntegrationTests.TestDoubles;
 using B2B.Transactions.IntegrationTests.Transactions;
 using B2B.Transactions.OutgoingMessages;
+using B2B.Transactions.Xml.Incoming;
 using B2B.Transactions.Xml.Outgoing;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MessageHub.Client.DataAvailable;
@@ -35,6 +38,7 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
         private readonly IMessageFactory<IDocument> _messageFactory;
         private readonly MessagePublisher _messagePublisher;
         private readonly DataAvailableNotificationSenderSpy _dataAvailableNotificationSenderSpy;
+        private readonly OutgoingMessageParser _outgoingMessageParser;
 
         public MessagePublisherTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
@@ -44,6 +48,7 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
             _messageFactory = new AcceptMessageFactory(systemDateTimeProvider);
             _messagePublisher = GetService<MessagePublisher>();
             _dataAvailableNotificationSenderSpy = (DataAvailableNotificationSenderSpy)GetService<IDataAvailableNotificationSender>();
+            _outgoingMessageParser = new OutgoingMessageParser(new SchemaProvider(new SchemaStore()));
         }
 
         [Fact]
@@ -55,6 +60,7 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
 
             var unpublishedMessages = _outgoingMessageStore.GetUnpublished();
             var publishedMessage = _dataAvailableNotificationSenderSpy.PublishedMessages.FirstOrDefault();
+
             Assert.Empty(unpublishedMessages);
             Assert.NotNull(publishedMessage);
             Assert.Equal(outgoingMessage.RecipientId, publishedMessage?.Recipient.Value);
@@ -62,6 +68,23 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
             Assert.Equal(outgoingMessage.DocumentType, publishedMessage?.DocumentType);
             Assert.Equal(false, publishedMessage?.SupportsBundling);
             Assert.Equal(string.Empty, publishedMessage?.MessageType.Value);
+        }
+
+        [Fact]
+        public async Task Outgoing_messages_must_conform_to_schema()
+        {
+            var outgoingMessage = CreateOutgoingMessage();
+
+            var stream = CreateStreamFromString(outgoingMessage.MessagePayload);
+            var validationResult = await _outgoingMessageParser.ParseAsync(stream, "confirmrequestchangeofsupplier", "1.0").ConfigureAwait(false);
+            await stream.DisposeAsync().ConfigureAwait(false);
+
+            Assert.Empty(validationResult);
+        }
+
+        private static Stream CreateStreamFromString(string input)
+        {
+            return new MemoryStream(Encoding.UTF8.GetBytes(input));
         }
 
         private OutgoingMessage CreateOutgoingMessage()

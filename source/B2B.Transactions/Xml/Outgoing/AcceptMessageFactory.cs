@@ -23,6 +23,7 @@ namespace B2B.Transactions.Xml.Outgoing
     public class AcceptMessageFactory : MessageFactory<IDocument>
     {
         private const string MessageType = "ConfirmRequestChangeOfSupplier";
+        private const string Prefix = "cim";
 
         public AcceptMessageFactory(ISystemDateTimeProvider systemDateTimeProvider)
             : base(systemDateTimeProvider)
@@ -36,34 +37,35 @@ namespace B2B.Transactions.Xml.Outgoing
             using var writer = XmlWriter.Create(output, settings);
 
             writer.WriteStartDocument();
-            writer.WriteStartElement("cim", "ConfirmRequestChangeOfSupplier_MarketDocument", "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1");
+            writer.WriteStartElement(Prefix, "ConfirmRequestChangeOfSupplier_MarketDocument", "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1");
             writer.WriteAttributeString("xmlns", "xsi", null, "http://www.w3.org/2001/XMLSchema-instance");
             writer.WriteAttributeString("xsi", "schemaLocation", null, "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1 urn-ediel-org-structure-confirmrequestchangeofsupplier-0-1.xsd");
-            writer.WriteElementString("mRID", null, GenerateMessageId());
-            writer.WriteElementString("type", null, "414");
-            writer.WriteElementString("process.processType", null, transaction?.Message.ProcessType);
-            writer.WriteElementString("businessSector.type", null, "23");
+            writer.WriteElementString(Prefix, "mRID", null, GenerateMessageId());
+            writer.WriteElementString(Prefix, "type", null, "414");
+            writer.WriteElementString(Prefix, "process.processType", null, transaction?.Message.ProcessType);
+            writer.WriteElementString(Prefix, "businessSector.type", null, "23");
 
-            writer.WriteStartElement("sender_MarketParticipant.mRID");
+            writer.WriteStartElement(Prefix, "sender_MarketParticipant.mRID", null);
             writer.WriteAttributeString(null, "codingScheme", null, "A10");
             writer.WriteValue("5790001330552");
             writer.WriteEndElement();
 
-            writer.WriteElementString("sender_MarketParticipant.marketRole.type", null, "DDZ");
+            writer.WriteElementString(Prefix, "sender_MarketParticipant.marketRole.type", null, "DDZ");
 
-            writer.WriteStartElement("receiver_MarketParticipant.mRID");
+            writer.WriteStartElement(Prefix, "receiver_MarketParticipant.mRID", null);
             writer.WriteAttributeString(null, "codingScheme", null, "A10");
             writer.WriteValue(transaction?.Message.SenderId);
             writer.WriteEndElement();
-            writer.WriteElementString("receiver_MarketParticipant.marketRole.type", null, transaction?.Message.SenderRole);
-            writer.WriteElementString("createdDateTime", null, GetCurrentDateTime());
-            writer.WriteElementString("reason.code", null, "A01");
 
-            writer.WriteStartElement("cim", "MktActivityRecord", null);
-            writer.WriteElementString("mRID", null, GenerateTransactionId());
-            writer.WriteElementString("originalTransactionIDReference_MktActivityRecord.mRID", null, transaction?.MarketActivityRecord.Id);
+            writer.WriteElementString(Prefix, "receiver_MarketParticipant.marketRole.type", null, transaction?.Message.SenderRole);
+            writer.WriteElementString(Prefix, "createdDateTime", null, GetCurrentDateTime());
+            writer.WriteElementString(Prefix, "reason.code", null, "A01");
 
-            writer.WriteStartElement("marketEvaluationPoint.mRID");
+            writer.WriteStartElement(Prefix, "MktActivityRecord", null);
+            writer.WriteElementString(Prefix, "mRID", null, GenerateTransactionId());
+            writer.WriteElementString(Prefix, "originalTransactionIDReference_MktActivityRecord.mRID", null, transaction?.MarketActivityRecord.Id);
+
+            writer.WriteStartElement(Prefix, "marketEvaluationPoint.mRID", null);
             writer.WriteAttributeString(null, "codingScheme", null, "A10");
             writer.WriteValue(transaction?.MarketActivityRecord.EnergySupplierId);
             writer.WriteEndElement();
