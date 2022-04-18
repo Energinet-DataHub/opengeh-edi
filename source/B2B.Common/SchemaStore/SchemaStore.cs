@@ -34,7 +34,7 @@ namespace B2B.Transactions.Xml.Incoming
             };
         }
 
-        public static string SchemaPath => $"Xml{Path.DirectorySeparatorChar}SchemaStore{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}";
+        public static string SchemaPath => $"SchemaStore{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}";
 
         public Dictionary<KeyValuePair<string, string>, string> Schemas { get; }
 
