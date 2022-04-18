@@ -15,12 +15,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using B2B.Transactions.Xml.Incoming;
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
 namespace B2B.Transactions.Xml.Outgoing
 {
@@ -39,7 +37,7 @@ namespace B2B.Transactions.Xml.Outgoing
             var xmlSchema = await _schemaProvider.GetSchemaAsync(businessProcessType, version).ConfigureAwait(true);
             if (xmlSchema is null)
             {
-                return new List<string>();
+                return SchemaNotFoundError(businessProcessType, version);
             }
 
             using (var reader = XmlReader.Create(message, CreateXmlReaderSettings(xmlSchema)))
@@ -50,6 +48,11 @@ namespace B2B.Transactions.Xml.Outgoing
             }
 
             return _errors;
+        }
+
+        private static List<string> SchemaNotFoundError(string businessProcessType, string version)
+        {
+            return new List<string>() { $"{businessProcessType} version {version} could not be found in internal schema store" };
         }
 
         private void OnValidationError(object? sender, ValidationEventArgs arguments)
