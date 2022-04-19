@@ -93,7 +93,7 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
         private async Task SendNotificationAsync(OutgoingMessage message)
         {
             await _dataAvailableNotificationSender.SendAsync(
-                _correlationContext.Id,
+                message.CorrelationId,
                 CreateDataAvailableNotificationFrom(message)).ConfigureAwait(false);
         }
     }

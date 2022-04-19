@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Linq;
 using System.Threading.Tasks;
+using B2B.Transactions.Configuration;
 using B2B.Transactions.DataAccess;
 using B2B.Transactions.Infrastructure.OutgoingMessages;
 using B2B.Transactions.IntegrationTests.Fixtures;
@@ -32,6 +32,7 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
     [IntegrationTest]
     public class MessagePublisherTests : TestBase
     {
+        private readonly ICorrelationContext _correlationContext;
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly IMessageFactory<IDocument> _messageFactory;
         private readonly MessagePublisher _messagePublisher;
@@ -41,6 +42,7 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
             : base(databaseFixture)
         {
             var systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
+            _correlationContext = GetService<ICorrelationContext>();
             _outgoingMessageStore = GetService<IOutgoingMessageStore>();
             _messageFactory = new AcceptMessageFactory(systemDateTimeProvider);
             _messagePublisher = GetService<MessagePublisher>();
@@ -56,7 +58,7 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
             await _messagePublisher.PublishAsync().ConfigureAwait(false);
 
             var unpublishedMessages = _outgoingMessageStore.GetUnpublished();
-            var publishedMessage = _dataAvailableNotificationSenderSpy.PublishedMessages.FirstOrDefault();
+            var publishedMessage = _dataAvailableNotificationSenderSpy.GetMessageFrom(outgoingMessage.CorrelationId);
             Assert.Empty(unpublishedMessages);
             Assert.NotNull(publishedMessage);
             Assert.Equal(outgoingMessage.Id, publishedMessage?.Uuid);
@@ -77,7 +79,7 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
         {
             var transaction = TransactionBuilder.CreateTransaction();
             var document = _messageFactory.CreateMessage(transaction);
-            return new OutgoingMessage(document.DocumentType, document.MessagePayload, transaction.Message.ReceiverId);
+            return new OutgoingMessage(document.DocumentType, document.MessagePayload, transaction.Message.ReceiverId, _correlationContext.Id);
         }
     }
 }

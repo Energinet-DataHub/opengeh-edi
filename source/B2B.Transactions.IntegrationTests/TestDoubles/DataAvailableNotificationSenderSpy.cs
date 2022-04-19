@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Energinet.DataHub.MessageHub.Client.DataAvailable;
 using Energinet.DataHub.MessageHub.Model.Model;
@@ -22,14 +21,18 @@ namespace B2B.Transactions.IntegrationTests.TestDoubles
 {
     public class DataAvailableNotificationSenderSpy : IDataAvailableNotificationSender
     {
-        private readonly List<DataAvailableNotificationDto> _publishedMessages = new();
-
-        public ReadOnlyCollection<DataAvailableNotificationDto> PublishedMessages => _publishedMessages.AsReadOnly();
+        private readonly Dictionary<string, DataAvailableNotificationDto> _publishedNotifications = new();
 
         public Task SendAsync(string correlationId, DataAvailableNotificationDto dataAvailableNotificationDto)
         {
-            _publishedMessages.Add(dataAvailableNotificationDto);
+            _publishedNotifications.Add(correlationId, dataAvailableNotificationDto);
             return Task.CompletedTask;
+        }
+
+        public DataAvailableNotificationDto? GetMessageFrom(string correlationId)
+        {
+            _publishedNotifications.TryGetValue(correlationId, out var notification);
+            return notification;
         }
     }
 }
