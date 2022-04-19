@@ -46,12 +46,16 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
             {
                 using var scope = _serviceScopeFactory.CreateScope();
                 await SendNotificationAsync(message).ConfigureAwait(false);
-
-                var context = scope.ServiceProvider.GetService<B2BContext>();
-                var storedMessage = await context!.OutgoingMessages.FindAsync(message.Id).ConfigureAwait(false);
-                storedMessage.Published();
-                await scope.ServiceProvider.GetRequiredService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
+                await MarkMessageAsPublishedAsync(scope, message.Id).ConfigureAwait(false);
             }
+        }
+
+        private static async Task MarkMessageAsPublishedAsync(IServiceScope scope, Guid messageId)
+        {
+            var context = scope.ServiceProvider.GetService<B2BContext>();
+            var storedMessage = await context!.OutgoingMessages.FindAsync(messageId).ConfigureAwait(false);
+            storedMessage.Published();
+            await scope.ServiceProvider.GetRequiredService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
         }
 
         private static DataAvailableNotificationDto CreateDataAvailableNotificationFrom(OutgoingMessage message)
