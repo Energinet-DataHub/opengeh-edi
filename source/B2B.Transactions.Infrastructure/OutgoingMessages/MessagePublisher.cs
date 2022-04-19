@@ -45,9 +45,7 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
             foreach (var message in unpublishedMessages)
             {
                 using var scope = _serviceScopeFactory.CreateScope();
-                await _dataAvailableNotificationSender.SendAsync(
-                    _correlationContext.Id,
-                    CreateDataAvailableNotificationFrom(message)).ConfigureAwait(false);
+                await SendNotificationAsync(message).ConfigureAwait(false);
 
                 var context = scope.ServiceProvider.GetService<B2BContext>();
                 var storedMessage = await context!.OutgoingMessages.FindAsync(message.Id).ConfigureAwait(false);
@@ -66,6 +64,13 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
                 false,
                 1,
                 message.DocumentType);
+        }
+
+        private async Task SendNotificationAsync(OutgoingMessage message)
+        {
+            await _dataAvailableNotificationSender.SendAsync(
+                _correlationContext.Id,
+                CreateDataAvailableNotificationFrom(message)).ConfigureAwait(false);
         }
     }
 }
