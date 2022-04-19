@@ -51,8 +51,7 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
         public async Task Outgoing_messages_are_published()
         {
             var outgoingMessage = CreateOutgoingMessage();
-            _outgoingMessageStore.Add(outgoingMessage);
-            await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
+            await StoreOutgoingMessage(outgoingMessage).ConfigureAwait(false);
 
             await _messagePublisher.PublishAsync().ConfigureAwait(false);
 
@@ -65,6 +64,12 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
             Assert.Equal(outgoingMessage.DocumentType, publishedMessage?.DocumentType);
             Assert.Equal(false, publishedMessage?.SupportsBundling);
             Assert.Equal(string.Empty, publishedMessage?.MessageType.Value);
+        }
+
+        private async Task StoreOutgoingMessage(OutgoingMessage outgoingMessage)
+        {
+            _outgoingMessageStore.Add(outgoingMessage);
+            await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
         }
 
         private OutgoingMessage CreateOutgoingMessage()
