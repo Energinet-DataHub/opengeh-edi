@@ -17,7 +17,7 @@ using System.Linq;
 using B2B.Transactions.Infrastructure.DataAccess;
 using B2B.Transactions.OutgoingMessages;
 
-namespace B2B.Transactions.Infrastructure
+namespace B2B.Transactions.Infrastructure.OutgoingMessages
 {
     public class OutgoingMessageStore : IOutgoingMessageStore
     {
