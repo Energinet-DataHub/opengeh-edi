@@ -18,6 +18,7 @@ using System.Text;
 using System.Threading.Tasks;
 using B2B.CimMessageAdapter;
 using B2B.CimMessageAdapter.Response;
+using B2B.Transactions.Configuration;
 using B2B.Transactions.Infrastructure.Configuration.Correlation;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using B2B.Transactions.Configuration;
 
 namespace B2B.Transactions.Infrastructure.Configuration.Correlation
 {
