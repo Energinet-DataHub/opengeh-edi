@@ -15,7 +15,6 @@
 using System;
 using System.Text;
 using System.Threading.Tasks;
-using B2B.Transactions.Api.Servicebus;
 using B2B.Transactions.Infrastructure.Configuration.Correlation;
 using B2B.Transactions.Infrastructure.Serialization;
 using B2B.Transactions.Transactions;
