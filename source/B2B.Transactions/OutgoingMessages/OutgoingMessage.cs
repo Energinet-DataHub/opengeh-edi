@@ -23,6 +23,15 @@ namespace B2B.Transactions.OutgoingMessages
             DocumentType = documentType;
             MessagePayload = messagePayload;
             RecipientId = recipientId;
+            Id = Guid.NewGuid();
+        }
+
+        private OutgoingMessage(Guid id, string documentType, string messagePayload, string recipientId)
+        {
+            DocumentType = documentType;
+            MessagePayload = messagePayload;
+            RecipientId = recipientId;
+            Id = id;
         }
 
         public Guid Id { get; }
