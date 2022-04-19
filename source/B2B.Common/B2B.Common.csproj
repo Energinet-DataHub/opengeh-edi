@@ -4,19 +4,4 @@
         <TargetFramework>net5.0</TargetFramework>
     </PropertyGroup>
 
-    <ItemGroup>
-      <EmbeddedResource Include="SchemaStore\Schemas\urn-ediel-org-structure-confirmrequestchangeofsupplier-0-1.xsd">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="SchemaStore\Schemas\urn-ediel-org-structure-requestchangeofsupplier-0-1.xsd">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="SchemaStore\Schemas\urn-entsoe-eu-local-extension-types.xsd">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="SchemaStore\Schemas\urn-entsoe-eu-wgedi-codelists.xsd">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </EmbeddedResource>
-    </ItemGroup>
-
 </Project>

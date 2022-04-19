@@ -43,8 +43,22 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\B2B.Common\B2B.Common.csproj" />
       <ProjectReference Include="..\Energinet.DataHub.MarketRoles.Domain\Energinet.DataHub.MarketRoles.Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="Xml\SchemaStore\Schemas\urn-ediel-org-structure-confirmrequestchangeofsupplier-0-1.xsd">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Xml\SchemaStore\Schemas\urn-ediel-org-structure-requestchangeofsupplier-0-1.xsd">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Xml\SchemaStore\Schemas\urn-entsoe-eu-local-extension-types.xsd">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Xml\SchemaStore\Schemas\urn-entsoe-eu-wgedi-codelists.xsd">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
     </ItemGroup>
 
 </Project>
