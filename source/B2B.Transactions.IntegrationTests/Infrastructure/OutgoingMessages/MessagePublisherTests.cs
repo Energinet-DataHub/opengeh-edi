@@ -59,6 +59,7 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
             var publishedMessage = _dataAvailableNotificationSenderSpy.PublishedMessages.FirstOrDefault();
             Assert.Empty(unpublishedMessages);
             Assert.NotNull(publishedMessage);
+            Assert.Equal(outgoingMessage.Id, publishedMessage?.Uuid);
             Assert.Equal(outgoingMessage.RecipientId, publishedMessage?.Recipient.Value);
             Assert.Equal(DomainOrigin.MarketRoles, publishedMessage?.Origin);
             Assert.Equal(outgoingMessage.DocumentType, publishedMessage?.DocumentType);
