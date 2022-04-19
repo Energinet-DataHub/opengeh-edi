@@ -13,30 +13,26 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using B2B.Transactions.Infrastructure.Configuration.Correlation;
 using B2B.Transactions.OutgoingMessages;
 using Energinet.DataHub.MessageHub.Client.DataAvailable;
 using Energinet.DataHub.MessageHub.Model.Model;
 
 namespace B2B.Transactions.Infrastructure.OutgoingMessages
 {
-    public class DataAvailableNotificationPublisherPublisher : IDataAvailableNotificationPublisher
+    public class DataAvailableNotificationPublisher : IDataAvailableNotificationPublisher
     {
         private readonly IDataAvailableNotificationSender _dataAvailableNotificationSender;
-        private readonly ICorrelationContext _correlationContext;
 
-        public DataAvailableNotificationPublisherPublisher(
-            IDataAvailableNotificationSender dataAvailableNotificationSender,
-            ICorrelationContext correlationContext)
+        public DataAvailableNotificationPublisher(
+            IDataAvailableNotificationSender dataAvailableNotificationSender)
         {
             _dataAvailableNotificationSender = dataAvailableNotificationSender;
-            _correlationContext = correlationContext;
         }
 
         public async Task SendAsync(string correlationId, DataAvailableNotificationDto dataAvailableNotificationDto)
         {
             await _dataAvailableNotificationSender.SendAsync(
-                _correlationContext.Id,
+                correlationId,
                 dataAvailableNotificationDto).ConfigureAwait(false);
         }
     }
