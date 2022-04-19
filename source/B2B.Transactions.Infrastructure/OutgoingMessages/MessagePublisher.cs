@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics.Eventing.Reader;
 using System.Threading.Tasks;
 using B2B.Transactions.Infrastructure.Configuration.Correlation;
 using B2B.Transactions.Infrastructure.DataAccess;
@@ -20,6 +21,7 @@ using B2B.Transactions.OutgoingMessages;
 using Energinet.DataHub.MessageHub.Client.DataAvailable;
 using Energinet.DataHub.MessageHub.Model.Model;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace B2B.Transactions.Infrastructure.OutgoingMessages
 {
@@ -29,13 +31,15 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
         private readonly ICorrelationContext _correlationContext;
         private readonly IOutgoingMessageStore _messageStore;
         private readonly IServiceScopeFactory _serviceScopeFactory;
+        private readonly ILogger<MessagePublisher> _logger;
 
-        public MessagePublisher(IDataAvailableNotificationSender dataAvailableNotificationSender, ICorrelationContext correlationContext, IOutgoingMessageStore messageStore, IServiceScopeFactory serviceScopeFactory)
+        public MessagePublisher(IDataAvailableNotificationSender dataAvailableNotificationSender, ICorrelationContext correlationContext, IOutgoingMessageStore messageStore, IServiceScopeFactory serviceScopeFactory, ILogger<MessagePublisher> logger)
         {
             _dataAvailableNotificationSender = dataAvailableNotificationSender ?? throw new ArgumentNullException(nameof(dataAvailableNotificationSender));
             _correlationContext = correlationContext ?? throw new ArgumentNullException(nameof(correlationContext));
             _messageStore = messageStore ?? throw new ArgumentNullException(nameof(messageStore));
             _serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task PublishAsync()
@@ -43,9 +47,18 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
             var unpublishedMessages = _messageStore.GetUnpublished();
             foreach (var message in unpublishedMessages)
             {
-                using var scope = _serviceScopeFactory.CreateScope();
-                await SendNotificationAsync(message).ConfigureAwait(false);
-                await MarkMessageAsPublishedAsync(scope, message.Id).ConfigureAwait(false);
+                try
+                {
+                    using var scope = _serviceScopeFactory.CreateScope();
+                    await SendNotificationAsync(message).ConfigureAwait(false);
+                    await MarkMessageAsPublishedAsync(scope, message.Id).ConfigureAwait(false);
+                }
+#pragma warning disable CA1031 // Exception could be anything
+                catch (Exception exception)
+#pragma warning restore CA1031
+                {
+                    _logger.LogError(exception, $"Failed to publish message {message.Id}.");
+                }
             }
         }
 
