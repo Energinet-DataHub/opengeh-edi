@@ -20,6 +20,7 @@ using B2B.Transactions.Infrastructure.Authentication.Bearer;
 using B2B.Transactions.Infrastructure.Authentication.MarketActors;
 using B2B.Transactions.Infrastructure.Configuration;
 using B2B.Transactions.Infrastructure.Configuration.Correlation;
+using B2B.Transactions.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Protocols;

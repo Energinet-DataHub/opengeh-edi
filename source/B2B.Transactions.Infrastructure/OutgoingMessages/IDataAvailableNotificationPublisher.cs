@@ -13,9 +13,10 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
+using B2B.Transactions.OutgoingMessages;
 using Energinet.DataHub.MessageHub.Model.Model;
 
-namespace B2B.Transactions.OutgoingMessages
+namespace B2B.Transactions.Infrastructure.OutgoingMessages
 {
     /// <summary>
     /// Interface for data available notifications
@@ -26,7 +27,7 @@ namespace B2B.Transactions.OutgoingMessages
         /// send the specified DataAvailableNotification to the post office DataAvailable queue.
         /// </summary>
         /// <param name="correlationId">The correlation id that can be used to track the data represented by the notification.</param>
-        /// <param name="dataAvailableNotificationDto">The notification to send to the post office.</param>
-        Task SendAsync(string correlationId, DataAvailableNotificationDto dataAvailableNotificationDto);
+        /// <param name="message">The notification to send to the post office.</param>
+        Task SendAsync(string correlationId, OutgoingMessage message);
     }
 }

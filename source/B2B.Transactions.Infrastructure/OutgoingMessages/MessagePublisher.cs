@@ -41,22 +41,10 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
             {
                 await _dataAvailableNotificationPublisher.SendAsync(
                     _correlationContext.Id,
-                    CreateDataAvailableNotificationFrom(message)).ConfigureAwait(false);
+                    message).ConfigureAwait(false);
 
                 message.Published();
             }
-        }
-
-        private static DataAvailableNotificationDto CreateDataAvailableNotificationFrom(OutgoingMessage message)
-        {
-            return new DataAvailableNotificationDto(
-                Guid.NewGuid(),
-                new GlobalLocationNumberDto(message.RecipientId),
-                new MessageTypeDto(string.Empty),
-                DomainOrigin.MarketRoles,
-                false,
-                1,
-                message.DocumentType);
         }
     }
 }

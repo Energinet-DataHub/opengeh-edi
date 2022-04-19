@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using B2B.Transactions.OutgoingMessages;
 using Energinet.DataHub.MessageHub.Client.DataAvailable;
@@ -29,11 +30,26 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
             _dataAvailableNotificationSender = dataAvailableNotificationSender;
         }
 
-        public async Task SendAsync(string correlationId, DataAvailableNotificationDto dataAvailableNotificationDto)
+        public async Task SendAsync(string correlationId, OutgoingMessage message)
         {
+            if (correlationId == null) throw new ArgumentNullException(nameof(correlationId));
+            if (message == null) throw new ArgumentNullException(nameof(message));
+
             await _dataAvailableNotificationSender.SendAsync(
                 correlationId,
-                dataAvailableNotificationDto).ConfigureAwait(false);
+                CreateDataAvailableNotificationFrom(message)).ConfigureAwait(false);
+        }
+
+        private static DataAvailableNotificationDto CreateDataAvailableNotificationFrom(OutgoingMessage message)
+        {
+            return new DataAvailableNotificationDto(
+                Guid.NewGuid(),
+                new GlobalLocationNumberDto(message.RecipientId),
+                new MessageTypeDto(string.Empty),
+                DomainOrigin.MarketRoles,
+                false,
+                1,
+                message.DocumentType);
         }
     }
 }
