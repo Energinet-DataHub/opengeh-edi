@@ -41,6 +41,7 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\B2B.Transactions.Api\B2B.Transactions.Api.csproj" />
       <ProjectReference Include="..\B2B.Transactions.Infrastructure\B2B.Transactions.Infrastructure.csproj" />
       <ProjectReference Include="..\B2B.Transactions\B2B.Transactions.csproj" />
       <ProjectReference Include="..\Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp\Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.csproj" />
