@@ -27,11 +27,13 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
     {
         private readonly IDataAvailableNotificationSender _dataAvailableNotificationSender;
         private readonly ICorrelationContext _correlationContext;
+        private readonly IOutgoingMessageStore _messageStore;
 
-        public MessagePublisher(IDataAvailableNotificationSender dataAvailableNotificationSender, ICorrelationContext correlationContext)
+        public MessagePublisher(IDataAvailableNotificationSender dataAvailableNotificationSender, ICorrelationContext correlationContext, IOutgoingMessageStore messageStore)
         {
             _dataAvailableNotificationSender = dataAvailableNotificationSender ?? throw new ArgumentNullException(nameof(dataAvailableNotificationSender));
-            _correlationContext = correlationContext;
+            _correlationContext = correlationContext ?? throw new ArgumentNullException(nameof(correlationContext));
+            _messageStore = messageStore ?? throw new ArgumentNullException(nameof(messageStore));
         }
 
         public async Task PublishAsync(ReadOnlyCollection<OutgoingMessage> unpublishedMessages)
