@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace B2B.Transactions.Api.Servicebus;
-
-public class ServiceBusMessageMetadata
+namespace B2B.Transactions.Infrastructure.Configuration.ServiceBus
 {
-    public string? CorrelationID { get; set; }
+    public class ServiceBusMessageMetadata
+    {
+        public string? CorrelationID { get; set; }
+    }
 }
