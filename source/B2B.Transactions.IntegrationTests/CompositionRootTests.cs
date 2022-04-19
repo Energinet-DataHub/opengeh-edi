@@ -23,6 +23,26 @@ namespace B2B.Transactions.IntegrationTests
 {
     public class CompositionRootTests
     {
+        [Fact]
+        public void CompositionRoot_WithConfiguredDependencies_AllFunctionDependenciesCanBeResolved()
+        {
+            var host = Program.ConfigureHost(Program.DevelopmentTokenValidationParameters(), new TestEnvironment());
+
+            var allTypes = FunctionsReflectionHelper.FindAllTypes();
+            var functionTypes = FunctionsReflectionHelper.FindAllFunctionTypes();
+            var constructorDependencies = FunctionsReflectionHelper.FindAllConstructorDependencies();
+
+            var dependencies = constructorDependencies(functionTypes(allTypes(typeof(Program))));
+
+            using var scope = host.Services.CreateScope();
+
+            foreach (var dependency in dependencies)
+            {
+                var resolvedInstance = scope.ServiceProvider.GetService(dependency);
+                Assert.True(resolvedInstance != null, $"Can resolve {dependency.Name}");
+            }
+        }
+
         private class TestEnvironment : RuntimeEnvironment
         {
             public override string? TRANSACTIONS_QUEUE_SENDER_CONNECTION_STRING =>
