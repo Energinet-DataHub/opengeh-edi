@@ -14,6 +14,7 @@
 
 using System.Linq;
 using System.Threading.Tasks;
+using B2B.Transactions.DataAccess;
 using B2B.Transactions.Infrastructure.OutgoingMessages;
 using B2B.Transactions.IntegrationTests.Fixtures;
 using B2B.Transactions.IntegrationTests.TestDoubles;
@@ -50,6 +51,8 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
         public async Task Outgoing_messages_are_published()
         {
             var outgoingMessage = CreateOutgoingMessage();
+            _outgoingMessageStore.Add(outgoingMessage);
+            await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
 
             await _messagePublisher.PublishAsync().ConfigureAwait(false);
 
@@ -68,10 +71,7 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
         {
             var transaction = TransactionBuilder.CreateTransaction();
             var document = _messageFactory.CreateMessage(transaction);
-            var outgoingMessage =
-                new OutgoingMessage(document.DocumentType, document.MessagePayload, transaction.Message.ReceiverId);
-            _outgoingMessageStore.Add(outgoingMessage);
-            return outgoingMessage;
+            return new OutgoingMessage(document.DocumentType, document.MessagePayload, transaction.Message.ReceiverId);
         }
     }
 }

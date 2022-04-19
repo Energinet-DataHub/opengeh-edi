@@ -124,11 +124,11 @@ namespace B2B.Transactions.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddMessagePublishing(IOutgoingMessageStore outgoingMessageStore, IDataAvailableNotificationSender dataAvailableNotificationSender)
+        public CompositionRoot AddMessagePublishing(IDataAvailableNotificationSender dataAvailableNotificationSender)
         {
             _services.AddScoped<IDataAvailableNotificationSender>(_ => dataAvailableNotificationSender);
             _services.AddScoped<MessagePublisher>();
-            _services.AddScoped<IOutgoingMessageStore>(_ => outgoingMessageStore);
+            _services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
             return this;
         }
 

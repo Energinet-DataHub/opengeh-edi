@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
+using B2B.Transactions.DataAccess;
 using B2B.Transactions.Infrastructure.Configuration.Correlation;
 using B2B.Transactions.OutgoingMessages;
 using Energinet.DataHub.MessageHub.Client.DataAvailable;
@@ -26,12 +27,14 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
         private readonly IDataAvailableNotificationSender _dataAvailableNotificationSender;
         private readonly ICorrelationContext _correlationContext;
         private readonly IOutgoingMessageStore _messageStore;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public MessagePublisher(IDataAvailableNotificationSender dataAvailableNotificationSender, ICorrelationContext correlationContext, IOutgoingMessageStore messageStore)
+        public MessagePublisher(IDataAvailableNotificationSender dataAvailableNotificationSender, ICorrelationContext correlationContext, IOutgoingMessageStore messageStore, IUnitOfWork unitOfWork)
         {
             _dataAvailableNotificationSender = dataAvailableNotificationSender ?? throw new ArgumentNullException(nameof(dataAvailableNotificationSender));
             _correlationContext = correlationContext ?? throw new ArgumentNullException(nameof(correlationContext));
             _messageStore = messageStore ?? throw new ArgumentNullException(nameof(messageStore));
+            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
 
         public async Task PublishAsync()
@@ -44,6 +47,7 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
                     CreateDataAvailableNotificationFrom(message)).ConfigureAwait(false);
 
                 message.Published();
+                await _unitOfWork.CommitAsync().ConfigureAwait(false);
             }
         }
 

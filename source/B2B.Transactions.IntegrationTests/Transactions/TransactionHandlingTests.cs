@@ -33,12 +33,13 @@ namespace B2B.Transactions.IntegrationTests.Transactions
         private readonly ITransactionRepository _transactionRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly XNamespace _namespace = "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1";
-        private OutgoingMessageStoreSpy _outgoingMessageStoreSpy = new();
+        private readonly IOutgoingMessageStore _outgoingMessageStore;
         private IMessageFactory<IDocument> _messageFactory = new AcceptMessageFactory(_dateTimeProvider);
 
         public TransactionHandlingTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
+            _outgoingMessageStore = GetService<IOutgoingMessageStore>();
             _transactionRepository =
                 GetService<ITransactionRepository>();
             _unitOfWork = GetService<IUnitOfWork>();
@@ -62,7 +63,7 @@ namespace B2B.Transactions.IntegrationTests.Transactions
             var transaction = TransactionBuilder.CreateTransaction();
             await RegisterTransaction(transaction).ConfigureAwait(false);
 
-            var acceptMessage = _outgoingMessageStoreSpy.Messages.FirstOrDefault();
+            var acceptMessage = _outgoingMessageStore.GetUnpublished().FirstOrDefault();
             Assert.NotNull(acceptMessage);
             var document = CreateDocument(acceptMessage!.MessagePayload ?? string.Empty);
 
@@ -77,7 +78,7 @@ namespace B2B.Transactions.IntegrationTests.Transactions
 
         private Task RegisterTransaction(B2BTransaction transaction)
         {
-            var useCase = new RegisterTransaction(_outgoingMessageStoreSpy, _transactionRepository, _messageFactory, _unitOfWork);
+            var useCase = new RegisterTransaction(_outgoingMessageStore, _transactionRepository, _messageFactory, _unitOfWork);
             return useCase.HandleAsync(transaction);
         }
 
