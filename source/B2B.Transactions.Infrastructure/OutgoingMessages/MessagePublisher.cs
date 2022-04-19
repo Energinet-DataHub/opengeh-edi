@@ -14,7 +14,6 @@
 
 using System;
 using System.Threading.Tasks;
-using B2B.Transactions.DataAccess;
 using B2B.Transactions.Infrastructure.Configuration.Correlation;
 using B2B.Transactions.Infrastructure.DataAccess;
 using B2B.Transactions.OutgoingMessages;
@@ -52,10 +51,18 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
 
         private static async Task MarkMessageAsPublishedAsync(IServiceScope scope, Guid messageId)
         {
-            var context = scope.ServiceProvider.GetService<B2BContext>();
-            var storedMessage = await context!.OutgoingMessages.FindAsync(messageId).ConfigureAwait(false);
+            var context = GetService<B2BContext>(scope);
+
+            var storedMessage = await context.OutgoingMessages.FindAsync(messageId).ConfigureAwait(false);
             storedMessage.Published();
-            await scope.ServiceProvider.GetRequiredService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
+
+            await context.SaveChangesAsync().ConfigureAwait(false);
+        }
+
+        private static TService GetService<TService>(IServiceScope scope)
+            where TService : notnull
+        {
+            return scope.ServiceProvider.GetRequiredService<TService>();
         }
 
         private static DataAvailableNotificationDto CreateDataAvailableNotificationFrom(OutgoingMessage message)
