@@ -51,7 +51,7 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
         {
             var outgoingMessage = CreateOutgoingMessage();
 
-            await _messagePublisher.PublishAsync(_outgoingMessageStore.GetUnpublished()).ConfigureAwait(false);
+            await _messagePublisher.PublishAsync().ConfigureAwait(false);
 
             var unpublishedMessages = _outgoingMessageStore.GetUnpublished();
             var publishedMessage = _dataAvailableNotificationSenderSpy.PublishedMessages.FirstOrDefault();

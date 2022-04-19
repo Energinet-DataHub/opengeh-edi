@@ -13,11 +13,9 @@
 // limitations under the License.
 
 using System;
-using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using B2B.Transactions.Infrastructure.Configuration.Correlation;
 using B2B.Transactions.OutgoingMessages;
-using B2B.Transactions.Transactions;
 using Energinet.DataHub.MessageHub.Client.DataAvailable;
 using Energinet.DataHub.MessageHub.Model.Model;
 
@@ -36,9 +34,9 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
             _messageStore = messageStore ?? throw new ArgumentNullException(nameof(messageStore));
         }
 
-        public async Task PublishAsync(ReadOnlyCollection<OutgoingMessage> unpublishedMessages)
+        public async Task PublishAsync()
         {
-            if (unpublishedMessages == null) throw new ArgumentNullException(nameof(unpublishedMessages));
+            var unpublishedMessages = _messageStore.GetUnpublished();
             foreach (var message in unpublishedMessages)
             {
                 await _dataAvailableNotificationSender.SendAsync(
