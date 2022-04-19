@@ -12,10 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading.Tasks;
 using B2B.Transactions.Infrastructure.DataAccess;
 using B2B.Transactions.OutgoingMessages;
 
@@ -37,13 +35,11 @@ namespace B2B.Transactions.Infrastructure
 
         public ReadOnlyCollection<OutgoingMessage> GetUnpublished()
         {
-            var unpublished = _context
+            return _context
                     .OutgoingMessages
                     .Where(x => x.IsPublished == false)
-                    .ToList();
-
-            return unpublished.Count == 0 ? new ReadOnlyCollection<OutgoingMessage>(new List<OutgoingMessage>())
-                : new ReadOnlyCollection<OutgoingMessage>(unpublished);
+                    .ToList()
+                    .AsReadOnly();
         }
     }
 }
