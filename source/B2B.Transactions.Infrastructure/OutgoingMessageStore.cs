@@ -18,6 +18,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using B2B.Transactions.Infrastructure.DataAccess;
 using B2B.Transactions.OutgoingMessages;
+using Microsoft.EntityFrameworkCore;
 
 namespace B2B.Transactions.Infrastructure
 {

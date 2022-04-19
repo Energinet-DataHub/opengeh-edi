@@ -16,9 +16,11 @@ using System;
 using System.Threading.Tasks;
 using B2B.Transactions.DataAccess;
 using B2B.Transactions.Infrastructure.Configuration.Correlation;
+using B2B.Transactions.Infrastructure.DataAccess;
 using B2B.Transactions.OutgoingMessages;
 using Energinet.DataHub.MessageHub.Client.DataAvailable;
 using Energinet.DataHub.MessageHub.Model.Model;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace B2B.Transactions.Infrastructure.OutgoingMessages
 {
@@ -27,14 +29,14 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
         private readonly IDataAvailableNotificationSender _dataAvailableNotificationSender;
         private readonly ICorrelationContext _correlationContext;
         private readonly IOutgoingMessageStore _messageStore;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
 
-        public MessagePublisher(IDataAvailableNotificationSender dataAvailableNotificationSender, ICorrelationContext correlationContext, IOutgoingMessageStore messageStore, IUnitOfWork unitOfWork)
+        public MessagePublisher(IDataAvailableNotificationSender dataAvailableNotificationSender, ICorrelationContext correlationContext, IOutgoingMessageStore messageStore, IServiceScopeFactory serviceScopeFactory)
         {
             _dataAvailableNotificationSender = dataAvailableNotificationSender ?? throw new ArgumentNullException(nameof(dataAvailableNotificationSender));
             _correlationContext = correlationContext ?? throw new ArgumentNullException(nameof(correlationContext));
             _messageStore = messageStore ?? throw new ArgumentNullException(nameof(messageStore));
-            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+            _serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
         }
 
         public async Task PublishAsync()
@@ -42,12 +44,15 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
             var unpublishedMessages = _messageStore.GetUnpublished();
             foreach (var message in unpublishedMessages)
             {
+                using var scope = _serviceScopeFactory.CreateScope();
                 await _dataAvailableNotificationSender.SendAsync(
                     _correlationContext.Id,
                     CreateDataAvailableNotificationFrom(message)).ConfigureAwait(false);
 
-                message.Published();
-                await _unitOfWork.CommitAsync().ConfigureAwait(false);
+                var context = scope.ServiceProvider.GetService<B2BContext>();
+                var storedMessage = await context!.OutgoingMessages.FindAsync(message.Id).ConfigureAwait(false);
+                storedMessage.Published();
+                await scope.ServiceProvider.GetRequiredService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
             }
         }
 
