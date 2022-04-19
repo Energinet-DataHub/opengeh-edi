@@ -38,17 +38,17 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
         private readonly IMessageFactory<IDocument> _messageFactory;
         private readonly MessagePublisher _messagePublisher;
         private readonly DataAvailableNotificationSenderSpy _dataAvailableNotificationSenderSpy;
-        private readonly OutgoingMessageParser _outgoingMessageParser;
+        private readonly MessageValidator _messageValidator;
 
         public MessagePublisherTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
             var systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
             _outgoingMessageStore = GetService<IOutgoingMessageStore>();
-            _messageFactory = new AcceptMessageFactory(systemDateTimeProvider);
+            _messageFactory = new AcceptMessageFactory(systemDateTimeProvider, new MessageValidator(new SchemaProvider(new SchemaStore())));
             _messagePublisher = GetService<MessagePublisher>();
             _dataAvailableNotificationSenderSpy = (DataAvailableNotificationSenderSpy)GetService<IDataAvailableNotificationSender>();
-            _outgoingMessageParser = new OutgoingMessageParser(new SchemaProvider(new SchemaStore()));
+            _messageValidator = new MessageValidator(new SchemaProvider(new SchemaStore()));
         }
 
         [Fact]
@@ -68,23 +68,6 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
             Assert.Equal(outgoingMessage.DocumentType, publishedMessage?.DocumentType);
             Assert.Equal(false, publishedMessage?.SupportsBundling);
             Assert.Equal(string.Empty, publishedMessage?.MessageType.Value);
-        }
-
-        [Fact]
-        public async Task Outgoing_messages_must_conform_to_schema()
-        {
-            var outgoingMessage = CreateOutgoingMessage();
-
-            var stream = CreateStreamFromString(outgoingMessage.MessagePayload);
-            var validationResult = await _outgoingMessageParser.ParseAsync(stream, "confirmrequestchangeofsupplier", "1.0").ConfigureAwait(false);
-            await stream.DisposeAsync().ConfigureAwait(false);
-
-            Assert.Empty(validationResult);
-        }
-
-        private static Stream CreateStreamFromString(string input)
-        {
-            return new MemoryStream(Encoding.UTF8.GetBytes(input));
         }
 
         private OutgoingMessage CreateOutgoingMessage()

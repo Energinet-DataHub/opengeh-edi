@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
@@ -22,44 +23,47 @@ using B2B.Transactions.Xml.Incoming;
 
 namespace B2B.Transactions.Xml.Outgoing
 {
-    public class OutgoingMessageParser
+    public class MessageValidator
     {
-        private readonly List<string> _errors = new();
         private readonly ISchemaProvider _schemaProvider;
+        private readonly List<string> _errors = new();
 
-        public OutgoingMessageParser(ISchemaProvider schemaProvider)
+        public MessageValidator(ISchemaProvider schemaProvider)
         {
             _schemaProvider = schemaProvider ?? throw new ArgumentNullException(nameof(schemaProvider));
         }
 
-        public async Task<List<string>> ParseAsync(Stream message, string businessProcessType, string version)
+        public bool Success => _errors.Count == 0;
+
+        public async Task ParseAsync(string message, string businessProcessType, string version)
         {
             var xmlSchema = await _schemaProvider.GetSchemaAsync(businessProcessType, version).ConfigureAwait(true);
             if (xmlSchema is null)
             {
-                return SchemaNotFoundError(businessProcessType, version);
+                _errors.Add(
+                    $"{businessProcessType} version {version} could not be found in internal schema store");
+                return;
             }
 
-            using (var reader = XmlReader.Create(message, CreateXmlReaderSettings(xmlSchema)))
+            var messageStream = CreateStreamFromString(message);
+            using (var reader = XmlReader.Create(messageStream, CreateXmlReaderSettings(xmlSchema)))
             {
                 while (await reader.ReadAsync().ConfigureAwait(false))
                 {
                 }
             }
 
-            return _errors;
+            await messageStream.DisposeAsync().ConfigureAwait(false);
         }
 
-        private static List<string> SchemaNotFoundError(string businessProcessType, string version)
+        private static Stream CreateStreamFromString(string input)
         {
-            return new List<string>() { $"{businessProcessType} version {version} could not be found in internal schema store" };
+            return new MemoryStream(Encoding.UTF8.GetBytes(input));
         }
 
         private void OnValidationError(object? sender, ValidationEventArgs arguments)
         {
-            var message =
-                $"XML schema validation error at line {arguments.Exception.LineNumber}, position {arguments.Exception.LinePosition}: {arguments.Message}.";
-            _errors.Add(message);
+            _errors.Add($"XML schema validation error at line {arguments.Exception.LineNumber}, position {arguments.Exception.LinePosition}: {arguments.Message}");
         }
 
         private XmlReaderSettings CreateXmlReaderSettings(XmlSchema xmlSchema)

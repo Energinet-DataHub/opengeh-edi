@@ -20,6 +20,7 @@ using B2B.Transactions.IntegrationTests.Fixtures;
 using B2B.Transactions.IntegrationTests.TestDoubles;
 using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.Transactions;
+using B2B.Transactions.Xml.Incoming;
 using B2B.Transactions.Xml.Outgoing;
 using Xunit;
 using Xunit.Categories;
@@ -35,7 +36,7 @@ namespace B2B.Transactions.IntegrationTests.Transactions
         private readonly XNamespace _namespace = "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1";
         // private readonly string prefix = "cim:";
         private OutgoingMessageStoreSpy _outgoingMessageStoreSpy = new();
-        private IMessageFactory<IDocument> _messageFactory = new AcceptMessageFactory(_dateTimeProvider);
+        private IMessageFactory<IDocument> _messageFactory = new AcceptMessageFactory(_dateTimeProvider, new MessageValidator(new SchemaProvider(new SchemaStore())));
 
         public TransactionHandlingTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)

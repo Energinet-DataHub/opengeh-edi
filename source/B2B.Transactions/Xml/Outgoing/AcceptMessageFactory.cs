@@ -12,10 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Linq;
+using System.Xml.Schema;
 using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.Transactions;
+using B2B.Transactions.Xml.Incoming;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
 namespace B2B.Transactions.Xml.Outgoing
@@ -24,10 +29,12 @@ namespace B2B.Transactions.Xml.Outgoing
     {
         private const string MessageType = "ConfirmRequestChangeOfSupplier";
         private const string Prefix = "cim";
+        private readonly MessageValidator _messageValidator;
 
-        public AcceptMessageFactory(ISystemDateTimeProvider systemDateTimeProvider)
+        public AcceptMessageFactory(ISystemDateTimeProvider systemDateTimeProvider, MessageValidator messageValidator)
             : base(systemDateTimeProvider)
         {
+            _messageValidator = messageValidator;
         }
 
         public override IDocument CreateMessage(B2BTransaction transaction)
@@ -74,6 +81,12 @@ namespace B2B.Transactions.Xml.Outgoing
             writer.WriteEndElement();
             writer.Close();
             output.Flush();
+
+            Task parseResult = _messageValidator.ParseAsync(output.ToString(), "confirmrequestchangeofsupplier", "1.0");
+            if (!_messageValidator.Success)
+            {
+                throw new InvalidOperationException($"Generated accept message does not conform with XSD schema definition:");
+            }
 
             return new AcceptMessage(output.ToString(), MessageType);
         }
