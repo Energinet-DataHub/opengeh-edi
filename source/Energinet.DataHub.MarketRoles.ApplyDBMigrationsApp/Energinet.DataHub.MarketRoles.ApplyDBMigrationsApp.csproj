@@ -42,7 +42,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202203291130 Add Transactions.sql" />
     <EmbeddedResource Include="Scripts\Model\202204011130 Add OutboxMessages BTwoB Schema.sql" />
     <EmbeddedResource Include="Scripts\Model\202204071500 Remove OutboxMessages from transactions schema.sql" />
-    <EmbeddedResource Include="Scripts\Model\202204191630 Add correlation id.sql" />
+    <EmbeddedResource Include="Scripts\Model\202240191630 Add correlation id.sql" />
     <EmbeddedResource Include="Scripts\Seed\202109301255 Insert AccountPoints.sql" />
     <None Remove="Scripts\Seed\202109301258 Insert EnergySuppliers.sql" />
     <EmbeddedResource Include="Scripts\Seed\202109301258 Insert EnergySuppliers.sql" />
