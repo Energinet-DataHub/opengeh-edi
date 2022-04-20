@@ -16,6 +16,11 @@ namespace B2B.Transactions.Infrastructure.Configuration.ServiceBus
 {
     public class ServiceBusMessageMetadata
     {
-        public string? CorrelationID { get; set; }
+        public ServiceBusMessageMetadata(string correlationId)
+        {
+            CorrelationID = correlationId;
+        }
+
+        public string CorrelationID { get; }
     }
 }
