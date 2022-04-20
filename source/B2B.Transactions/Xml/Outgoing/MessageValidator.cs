@@ -35,6 +35,8 @@ namespace B2B.Transactions.Xml.Outgoing
 
         public bool Success => _errors.Count == 0;
 
+        public string Errors() => string.Join(",", _errors);
+
         public async Task ParseAsync(string message, string businessProcessType, string version)
         {
             var xmlSchema = await _schemaProvider.GetSchemaAsync(businessProcessType, version).ConfigureAwait(true);
