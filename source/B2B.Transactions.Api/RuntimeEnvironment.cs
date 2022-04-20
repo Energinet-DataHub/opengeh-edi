@@ -35,9 +35,12 @@ namespace B2B.Transactions.Api
         public virtual string? REQUEST_RESPONSE_LOGGING_CONTAINER_NAME =>
             GetEnvironmentVariable(nameof(REQUEST_RESPONSE_LOGGING_CONTAINER_NAME));
 
+        public virtual string? AZURE_FUNCTIONS_ENVIRONMENT =>
+            GetEnvironmentVariable(nameof(AZURE_FUNCTIONS_ENVIRONMENT));
+
         public virtual bool IsRunningLocally()
         {
-            return Environment.GetEnvironmentVariable("AZURE_FUNCTIONS_ENVIRONMENT") == "Development";
+            return AZURE_FUNCTIONS_ENVIRONMENT == "Development";
         }
 
         protected virtual string? GetEnvironmentVariable(string variable)
