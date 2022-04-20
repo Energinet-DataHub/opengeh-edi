@@ -37,7 +37,7 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly IMessageFactory<IDocument> _messageFactory;
         private readonly MessagePublisher _messagePublisher;
-        private readonly DataAvailableNotificationSenderSpy _dataAvailableNotificationSenderSpy;
+        private readonly DataAvailableNotificationPublisherSpy _dataAvailableNotificationPublisherSpy;
         private readonly MessageValidator _messageValidator;
 
         public MessagePublisherTests(DatabaseFixture databaseFixture)
@@ -47,7 +47,7 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
             _outgoingMessageStore = GetService<IOutgoingMessageStore>();
             _messageFactory = new AcceptMessageFactory(systemDateTimeProvider, new MessageValidator(new SchemaProvider(new SchemaStore())));
             _messagePublisher = GetService<MessagePublisher>();
-            _dataAvailableNotificationSenderSpy = (DataAvailableNotificationSenderSpy)GetService<IDataAvailableNotificationSender>();
+            _dataAvailableNotificationPublisherSpy = (DataAvailableNotificationPublisherSpy)GetService<IDataAvailableNotificationPublisher>();
             _messageValidator = new MessageValidator(new SchemaProvider(new SchemaStore()));
         }
 
@@ -59,8 +59,7 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
             await _messagePublisher.PublishAsync(_outgoingMessageStore.GetUnpublished()).ConfigureAwait(false);
 
             var unpublishedMessages = _outgoingMessageStore.GetUnpublished();
-            var publishedMessage = _dataAvailableNotificationSenderSpy.PublishedMessages.FirstOrDefault();
-
+            var publishedMessage = _dataAvailableNotificationPublisherSpy.PublishedMessages.FirstOrDefault();
             Assert.Empty(unpublishedMessages);
             Assert.NotNull(publishedMessage);
             Assert.Equal(outgoingMessage.RecipientId, publishedMessage?.Recipient.Value);

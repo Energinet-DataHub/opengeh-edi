@@ -12,24 +12,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using Energinet.DataHub.MessageHub.Client.DataAvailable;
+using B2B.Transactions.Infrastructure.OutgoingMessages;
+using B2B.Transactions.OutgoingMessages;
 using Energinet.DataHub.MessageHub.Model.Model;
 
 namespace B2B.Transactions.IntegrationTests.TestDoubles
 {
-    public class DataAvailableNotificationSenderSpy : IDataAvailableNotificationSender
+    public class DataAvailableNotificationPublisherSpy : IDataAvailableNotificationPublisher
     {
         private readonly List<DataAvailableNotificationDto> _publishedMessages = new();
 
         public ReadOnlyCollection<DataAvailableNotificationDto> PublishedMessages => _publishedMessages.AsReadOnly();
 
-        public Task SendAsync(string correlationId, DataAvailableNotificationDto dataAvailableNotificationDto)
+        public Task SendAsync(string correlationId, OutgoingMessage message)
         {
-            _publishedMessages.Add(dataAvailableNotificationDto);
+            if (correlationId == null) throw new ArgumentNullException(nameof(correlationId));
+            if (message == null) throw new ArgumentNullException(nameof(message));
+
+            _publishedMessages.Add(CreateDataAvailableNotificationFrom(message));
             return Task.CompletedTask;
+        }
+
+        private static DataAvailableNotificationDto CreateDataAvailableNotificationFrom(OutgoingMessage message)
+        {
+            return new DataAvailableNotificationDto(
+                Guid.NewGuid(),
+                new GlobalLocationNumberDto(message.RecipientId),
+                new MessageTypeDto(string.Empty),
+                DomainOrigin.MarketRoles,
+                false,
+                1,
+                message.DocumentType);
         }
     }
 }

@@ -25,12 +25,12 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
 {
     public class MessagePublisher
     {
-        private readonly IDataAvailableNotificationSender _dataAvailableNotificationSender;
+        private readonly IDataAvailableNotificationPublisher _dataAvailableNotificationPublisher;
         private readonly ICorrelationContext _correlationContext;
 
-        public MessagePublisher(IDataAvailableNotificationSender dataAvailableNotificationSender, ICorrelationContext correlationContext)
+        public MessagePublisher(IDataAvailableNotificationPublisher dataAvailableNotificationPublisher, ICorrelationContext correlationContext)
         {
-            _dataAvailableNotificationSender = dataAvailableNotificationSender ?? throw new ArgumentNullException(nameof(dataAvailableNotificationSender));
+            _dataAvailableNotificationPublisher = dataAvailableNotificationPublisher ?? throw new ArgumentNullException(nameof(dataAvailableNotificationPublisher));
             _correlationContext = correlationContext;
         }
 
@@ -39,24 +39,12 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
             if (unpublishedMessages == null) throw new ArgumentNullException(nameof(unpublishedMessages));
             foreach (var message in unpublishedMessages)
             {
-                await _dataAvailableNotificationSender.SendAsync(
+                await _dataAvailableNotificationPublisher.SendAsync(
                     _correlationContext.Id,
-                    CreateDataAvailableNotificationFrom(message)).ConfigureAwait(false);
+                    message).ConfigureAwait(false);
 
                 message.Published();
             }
-        }
-
-        private static DataAvailableNotificationDto CreateDataAvailableNotificationFrom(OutgoingMessage message)
-        {
-            return new DataAvailableNotificationDto(
-                Guid.NewGuid(),
-                new GlobalLocationNumberDto(message.RecipientId),
-                new MessageTypeDto(string.Empty),
-                DomainOrigin.MarketRoles,
-                false,
-                1,
-                message.DocumentType);
         }
     }
 }
