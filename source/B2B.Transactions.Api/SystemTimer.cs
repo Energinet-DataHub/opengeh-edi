@@ -14,23 +14,21 @@
 
 using System;
 using System.Threading.Tasks;
-using B2B.Transactions.Infrastructure.SystemTime;
-using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using NodaTime;
 
-namespace B2B.Transactions.Api;
-
-public static class SystemTimer
+namespace B2B.Transactions.Api
 {
-    [Function("RaiseTimeHasPassedEvent")]
-    public static Task RunAsync([TimerTrigger("%RAISE_TIME_HAS_PASSED_EVENT_SCHEDULE%")] TimerInfo timerTimerInfo, FunctionContext context)
+    public static class SystemTimer
     {
-        var logger = context.GetLogger("System timer");
-        logger.LogInformation($"System timer trigger at: {DateTime.Now}");
-        logger.LogInformation($"Next timer schedule at: {timerTimerInfo?.ScheduleStatus?.Next}");
+        [Function("RaiseTimeHasPassedEvent")]
+        public static Task RunAsync([TimerTrigger("%RAISE_TIME_HAS_PASSED_EVENT_SCHEDULE%")] TimerInfo timerTimerInfo, FunctionContext context)
+        {
+            var logger = context.GetLogger("System timer");
+            logger.LogInformation($"System timer trigger at: {DateTime.Now}");
+            logger.LogInformation($"Next timer schedule at: {timerTimerInfo?.ScheduleStatus?.Next}");
 
-        return Task.CompletedTask;
+            return Task.CompletedTask;
+        }
     }
 }
