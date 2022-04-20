@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using B2B.Transactions.DataAccess;
@@ -57,7 +58,7 @@ namespace B2B.Transactions.IntegrationTests.Transactions
         internal static B2BTransaction CreateTransaction()
         {
             return B2BTransaction.Create(
-                new MessageHeader("fake", "fake", "fake", "fake", "fake", "somedate", "fake"),
+                new MessageHeader("fake", "E03", "fake", "DDZ", "fake", "DDQ", "fake"),
                 new MarketActivityRecord()
                 {
                     BalanceResponsibleId = "fake",
