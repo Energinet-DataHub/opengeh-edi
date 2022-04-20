@@ -82,7 +82,7 @@ namespace B2B.Transactions.Xml.Outgoing
             writer.Close();
             output.Flush();
 
-            Task parseResult = _messageValidator.ParseAsync(output.ToString(), "confirmrequestchangeofsupplier", "1.0");
+            var parseResult = _messageValidator.ParseAsync(output.ToString(), "confirmrequestchangeofsupplier", "1.0");
             if (!_messageValidator.Success)
             {
                 throw new InvalidOperationException($"Generated accept message does not conform with XSD schema definition: {_messageValidator.Errors()}");
