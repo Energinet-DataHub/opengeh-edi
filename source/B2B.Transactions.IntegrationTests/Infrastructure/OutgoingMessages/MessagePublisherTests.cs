@@ -63,12 +63,6 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
             var publishedMessage = _dataAvailableNotificationPublisherSpy.GetMessageFrom(outgoingMessage.CorrelationId);
             Assert.Empty(unpublishedMessages);
             Assert.NotNull(publishedMessage);
-            Assert.Equal(outgoingMessage.Id, publishedMessage?.Uuid);
-            Assert.Equal(outgoingMessage.RecipientId, publishedMessage?.Recipient.Value);
-            Assert.Equal(DomainOrigin.MarketRoles, publishedMessage?.Origin);
-            Assert.Equal(outgoingMessage.DocumentType, publishedMessage?.DocumentType);
-            Assert.Equal(false, publishedMessage?.SupportsBundling);
-            Assert.Equal(string.Empty, publishedMessage?.MessageType.Value);
         }
 
         private async Task StoreOutgoingMessage(OutgoingMessage outgoingMessage)
