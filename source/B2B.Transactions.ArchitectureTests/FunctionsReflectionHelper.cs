@@ -18,7 +18,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.Azure.Functions.Worker;
 
-namespace B2B.Transactions.IntegrationTests
+namespace B2B.Transactions.ArchitectureTests
 {
     public static class FunctionsReflectionHelper
     {

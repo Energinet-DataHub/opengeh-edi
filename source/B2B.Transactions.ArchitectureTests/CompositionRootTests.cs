@@ -13,18 +13,17 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Text;
 using B2B.Transactions.Api;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace B2B.Transactions.IntegrationTests
+namespace B2B.Transactions.ArchitectureTests
 {
     public class CompositionRootTests
     {
         [Fact]
-        public void CompositionRoot_WithConfiguredDependencies_AllFunctionDependenciesCanBeResolved()
+        public void All_dependencies_can_be_resolved()
         {
             var host = Program.ConfigureHost(Program.DevelopmentTokenValidationParameters(), new TestEnvironment());
 
@@ -39,7 +38,7 @@ namespace B2B.Transactions.IntegrationTests
             foreach (var dependency in dependencies)
             {
                 var resolvedInstance = scope.ServiceProvider.GetService(dependency);
-                Assert.True(resolvedInstance != null, $"Can resolve {dependency.Name}");
+                Assert.True((bool)(resolvedInstance != null), $"Can resolve {dependency.Name}");
             }
         }
 
