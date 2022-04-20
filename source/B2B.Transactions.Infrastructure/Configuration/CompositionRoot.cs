@@ -22,7 +22,6 @@ using B2B.Transactions.Configuration;
 using B2B.Transactions.DataAccess;
 using B2B.Transactions.Infrastructure.Authentication.Bearer;
 using B2B.Transactions.Infrastructure.Authentication.MarketActors;
-using B2B.Transactions.Infrastructure.Configuration.Correlation;
 using B2B.Transactions.Infrastructure.DataAccess;
 using B2B.Transactions.Infrastructure.DataAccess.Transaction;
 using B2B.Transactions.Infrastructure.Messages;
@@ -35,7 +34,6 @@ using B2B.Transactions.Xml.Incoming;
 using B2B.Transactions.Xml.Outgoing;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
-using Energinet.DataHub.MessageHub.Client.DataAvailable;
 using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -125,9 +123,9 @@ namespace B2B.Transactions.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddMessagePublishing(IDataAvailableNotificationSender dataAvailableNotificationSender)
+        public CompositionRoot AddMessagePublishing(IDataAvailableNotificationPublisher dataAvailableNotificationPublisher)
         {
-            _services.AddScoped<IDataAvailableNotificationSender>(_ => dataAvailableNotificationSender);
+            _services.AddScoped<IDataAvailableNotificationPublisher>(_ => dataAvailableNotificationPublisher);
             _services.AddScoped<MessagePublisher>();
             _services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
             return this;

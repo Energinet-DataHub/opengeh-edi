@@ -15,11 +15,8 @@
 using System;
 using System.Threading.Tasks;
 using B2B.Transactions.Configuration;
-using B2B.Transactions.Infrastructure.Configuration.Correlation;
 using B2B.Transactions.Infrastructure.DataAccess;
 using B2B.Transactions.OutgoingMessages;
-using Energinet.DataHub.MessageHub.Client.DataAvailable;
-using Energinet.DataHub.MessageHub.Model.Model;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -27,15 +24,16 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
 {
     public class MessagePublisher
     {
-        private readonly IDataAvailableNotificationSender _dataAvailableNotificationSender;
+        private readonly IDataAvailableNotificationPublisher _dataAvailableNotificationPublisher;
         private readonly ICorrelationContext _correlationContext;
         private readonly IOutgoingMessageStore _messageStore;
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly ILogger<MessagePublisher> _logger;
 
-        public MessagePublisher(IDataAvailableNotificationSender dataAvailableNotificationSender, ICorrelationContext correlationContext, IOutgoingMessageStore messageStore, IServiceScopeFactory serviceScopeFactory, ILogger<MessagePublisher> logger)
+        public MessagePublisher(IDataAvailableNotificationPublisher dataAvailableNotificationPublisher, ICorrelationContext correlationContext, IOutgoingMessageStore messageStore, IServiceScopeFactory serviceScopeFactory, ILogger<MessagePublisher> logger)
         {
-            _dataAvailableNotificationSender = dataAvailableNotificationSender ?? throw new ArgumentNullException(nameof(dataAvailableNotificationSender));
+            _dataAvailableNotificationPublisher = dataAvailableNotificationPublisher ?? throw new ArgumentNullException(nameof(dataAvailableNotificationPublisher));
+            _correlationContext = correlationContext;
             _correlationContext = correlationContext ?? throw new ArgumentNullException(nameof(correlationContext));
             _messageStore = messageStore ?? throw new ArgumentNullException(nameof(messageStore));
             _serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
@@ -78,23 +76,11 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
             return scope.ServiceProvider.GetRequiredService<TService>();
         }
 
-        private static DataAvailableNotificationDto CreateDataAvailableNotificationFrom(OutgoingMessage message)
-        {
-            return new DataAvailableNotificationDto(
-                message.Id,
-                new GlobalLocationNumberDto(message.RecipientId),
-                new MessageTypeDto(string.Empty),
-                DomainOrigin.MarketRoles,
-                false,
-                1,
-                message.DocumentType);
-        }
-
         private async Task SendNotificationAsync(OutgoingMessage message)
         {
-            await _dataAvailableNotificationSender.SendAsync(
+            await _dataAvailableNotificationPublisher.SendAsync(
                 message.CorrelationId,
-                CreateDataAvailableNotificationFrom(message)).ConfigureAwait(false);
+                message).ConfigureAwait(false);
         }
     }
 }

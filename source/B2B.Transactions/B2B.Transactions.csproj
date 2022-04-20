@@ -29,15 +29,7 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="Xml\Incoming\Schemas\urn-ediel-org-structure-requestchangeofsupplier-0-1.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="Xml\Incoming\Schemas\urn-entsoe-eu-local-extension-types.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="Xml\Incoming\Schemas\urn-entsoe-eu-wgedi-codelists.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
+      <None Remove="Xml\SchemaStore\Schemas\urn-ediel-org-structure-confirmrequestchangeofsupplier-0-1.xsd" />
     </ItemGroup>
 
     <ItemGroup>
@@ -52,6 +44,21 @@ limitations under the License.
 
     <ItemGroup>
       <ProjectReference Include="..\Energinet.DataHub.MarketRoles.Domain\Energinet.DataHub.MarketRoles.Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="Xml\SchemaStore\Schemas\urn-ediel-org-structure-confirmrequestchangeofsupplier-0-1.xsd">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Xml\SchemaStore\Schemas\urn-ediel-org-structure-requestchangeofsupplier-0-1.xsd">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Xml\SchemaStore\Schemas\urn-entsoe-eu-local-extension-types.xsd">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Xml\SchemaStore\Schemas\urn-entsoe-eu-wgedi-codelists.xsd">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
     </ItemGroup>
 
 </Project>

@@ -26,7 +26,7 @@ namespace B2B.Transactions.IntegrationTests.Transactions
         internal static B2BTransaction CreateTransaction()
         {
             return B2BTransaction.Create(
-                new MessageHeader("fake", "fake", "fake", "fake", "fake", "somedate", "fake"),
+                new MessageHeader("fake", "E03", "fake", "DDZ", "fake", "DDQ", "fake"),
                 new MarketActivityRecord()
                 {
                     BalanceResponsibleId = "fake",
