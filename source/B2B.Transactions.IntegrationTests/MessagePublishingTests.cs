@@ -24,6 +24,7 @@ using B2B.Transactions.IntegrationTests.TestDoubles;
 using B2B.Transactions.Messages;
 using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.Transactions;
+using B2B.Transactions.Xml.Incoming;
 using B2B.Transactions.Xml.Outgoing;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MessageHub.Client.DataAvailable;
@@ -42,7 +43,7 @@ namespace B2B.Transactions.IntegrationTests
         {
             var systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
             _outgoingMessageStoreSpy = new OutgoingMessageStoreSpy();
-            _messageFactory = new AcceptMessageFactory(systemDateTimeProvider);
+            _messageFactory = new AcceptMessageFactory(systemDateTimeProvider, new MessageValidator(new SchemaProvider(new SchemaStore())));
         }
 
         [Fact]
@@ -71,7 +72,7 @@ namespace B2B.Transactions.IntegrationTests
         private static B2BTransaction CreateTransaction()
         {
             return B2BTransaction.Create(
-                new MessageHeader("fake", "fake", "fake", "fake", "fake", "somedate", "fake"),
+                new MessageHeader("fake", "E03", "fake", "DDQ", "fake", "fake", "fake"),
                 new MarketActivityRecord()
                 {
                     BalanceResponsibleId = "fake",

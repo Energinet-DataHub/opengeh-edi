@@ -12,13 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using B2B.Transactions.Infrastructure.OutgoingMessages;
 using B2B.Transactions.IntegrationTests.Fixtures;
 using B2B.Transactions.IntegrationTests.TestDoubles;
 using B2B.Transactions.IntegrationTests.Transactions;
 using B2B.Transactions.OutgoingMessages;
+using B2B.Transactions.Xml.Incoming;
 using B2B.Transactions.Xml.Outgoing;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MessageHub.Client.DataAvailable;
@@ -35,15 +38,17 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
         private readonly IMessageFactory<IDocument> _messageFactory;
         private readonly MessagePublisher _messagePublisher;
         private readonly DataAvailableNotificationPublisherSpy _dataAvailableNotificationPublisherSpy;
+        private readonly MessageValidator _messageValidator;
 
         public MessagePublisherTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
             var systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
             _outgoingMessageStore = GetService<IOutgoingMessageStore>();
-            _messageFactory = new AcceptMessageFactory(systemDateTimeProvider);
+            _messageFactory = new AcceptMessageFactory(systemDateTimeProvider, new MessageValidator(new SchemaProvider(new SchemaStore())));
             _messagePublisher = GetService<MessagePublisher>();
             _dataAvailableNotificationPublisherSpy = (DataAvailableNotificationPublisherSpy)GetService<IDataAvailableNotificationPublisher>();
+            _messageValidator = new MessageValidator(new SchemaProvider(new SchemaStore()));
         }
 
         [Fact]
