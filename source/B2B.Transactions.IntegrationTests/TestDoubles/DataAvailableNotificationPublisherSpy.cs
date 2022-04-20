@@ -14,39 +14,27 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using B2B.Transactions.Infrastructure.OutgoingMessages;
 using B2B.Transactions.OutgoingMessages;
-using Energinet.DataHub.MessageHub.Model.Model;
 
 namespace B2B.Transactions.IntegrationTests.TestDoubles
 {
     public class DataAvailableNotificationPublisherSpy : IDataAvailableNotificationPublisher
     {
-        private readonly List<DataAvailableNotificationDto> _publishedMessages = new();
-
-        public ReadOnlyCollection<DataAvailableNotificationDto> PublishedMessages => _publishedMessages.AsReadOnly();
+        private readonly Dictionary<string, OutgoingMessage> _publishedNotifications = new();
 
         public Task SendAsync(string correlationId, OutgoingMessage message)
         {
-            if (correlationId == null) throw new ArgumentNullException(nameof(correlationId));
             if (message == null) throw new ArgumentNullException(nameof(message));
-
-            _publishedMessages.Add(CreateDataAvailableNotificationFrom(message));
+            _publishedNotifications.Add(correlationId, message);
             return Task.CompletedTask;
         }
 
-        private static DataAvailableNotificationDto CreateDataAvailableNotificationFrom(OutgoingMessage message)
+        public OutgoingMessage? GetMessageFrom(string correlationId)
         {
-            return new DataAvailableNotificationDto(
-                Guid.NewGuid(),
-                new GlobalLocationNumberDto(message.RecipientId),
-                new MessageTypeDto(string.Empty),
-                DomainOrigin.MarketRoles,
-                false,
-                1,
-                message.DocumentType);
+            _publishedNotifications.TryGetValue(correlationId, out var notification);
+            return notification;
         }
     }
 }

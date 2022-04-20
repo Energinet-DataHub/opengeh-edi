@@ -12,47 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using B2B.Transactions.DataAccess;
 using B2B.Transactions.Messages;
-using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.Transactions;
-using B2B.Transactions.Xml.Outgoing;
 
 namespace B2B.Transactions.IntegrationTests.Transactions
 {
     internal class TransactionBuilder
     {
-        private readonly ITransactionRepository _transactionRepository;
-        private readonly IMessageFactory<IDocument> _messageFactory;
-
-        public TransactionBuilder(
-            ITransactionRepository transactionRepository,
-            IUnitOfWork unitOfWork,
-            IOutgoingMessageStore messageStore,
-            IMessageFactory<IDocument> messageFactory)
+        public TransactionBuilder()
         {
-            _transactionRepository = transactionRepository;
-            UnitOfWork = unitOfWork;
-            MessageStore = messageStore;
-            _messageFactory = messageFactory;
-        }
-
-        public IOutgoingMessageStore MessageStore { get; }
-
-        public IUnitOfWork UnitOfWork { get; }
-
-        public static XDocument CreateDocument(string payload)
-        {
-            return XDocument.Parse(payload);
-        }
-
-        public Task RegisterTransactionAsync(B2BTransaction transaction)
-        {
-            var useCase = new RegisterTransaction(MessageStore, _transactionRepository, _messageFactory, UnitOfWork);
-            return useCase.HandleAsync(transaction);
         }
 
         internal static B2BTransaction CreateTransaction()

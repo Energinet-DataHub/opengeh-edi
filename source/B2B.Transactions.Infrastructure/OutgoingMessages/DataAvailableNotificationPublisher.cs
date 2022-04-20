@@ -43,7 +43,7 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
         private static DataAvailableNotificationDto CreateDataAvailableNotificationFrom(OutgoingMessage message)
         {
             return new DataAvailableNotificationDto(
-                Guid.NewGuid(),
+                message.Id,
                 new GlobalLocationNumberDto(message.RecipientId),
                 new MessageTypeDto(string.Empty),
                 DomainOrigin.MarketRoles,

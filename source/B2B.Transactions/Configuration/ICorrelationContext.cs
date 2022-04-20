@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace B2B.Transactions.Infrastructure.Configuration.Correlation
+namespace B2B.Transactions.Configuration
 {
     /// <summary>
     /// Context for the current scope identified by a correlation id.

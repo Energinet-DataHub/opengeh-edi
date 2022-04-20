@@ -13,13 +13,12 @@
 // limitations under the License.
 
 using System;
-using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using B2B.Transactions.Infrastructure.Configuration.Correlation;
+using B2B.Transactions.Configuration;
+using B2B.Transactions.Infrastructure.DataAccess;
 using B2B.Transactions.OutgoingMessages;
-using B2B.Transactions.Transactions;
-using Energinet.DataHub.MessageHub.Client.DataAvailable;
-using Energinet.DataHub.MessageHub.Model.Model;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace B2B.Transactions.Infrastructure.OutgoingMessages
 {
@@ -27,24 +26,61 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
     {
         private readonly IDataAvailableNotificationPublisher _dataAvailableNotificationPublisher;
         private readonly ICorrelationContext _correlationContext;
+        private readonly IOutgoingMessageStore _messageStore;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
+        private readonly ILogger<MessagePublisher> _logger;
 
-        public MessagePublisher(IDataAvailableNotificationPublisher dataAvailableNotificationPublisher, ICorrelationContext correlationContext)
+        public MessagePublisher(IDataAvailableNotificationPublisher dataAvailableNotificationPublisher, ICorrelationContext correlationContext, IOutgoingMessageStore messageStore, IServiceScopeFactory serviceScopeFactory, ILogger<MessagePublisher> logger)
         {
             _dataAvailableNotificationPublisher = dataAvailableNotificationPublisher ?? throw new ArgumentNullException(nameof(dataAvailableNotificationPublisher));
             _correlationContext = correlationContext;
+            _correlationContext = correlationContext ?? throw new ArgumentNullException(nameof(correlationContext));
+            _messageStore = messageStore ?? throw new ArgumentNullException(nameof(messageStore));
+            _serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task PublishAsync(ReadOnlyCollection<OutgoingMessage> unpublishedMessages)
+        public async Task PublishAsync()
         {
-            if (unpublishedMessages == null) throw new ArgumentNullException(nameof(unpublishedMessages));
+            var unpublishedMessages = _messageStore.GetUnpublished();
             foreach (var message in unpublishedMessages)
             {
-                await _dataAvailableNotificationPublisher.SendAsync(
-                    _correlationContext.Id,
-                    message).ConfigureAwait(false);
-
-                message.Published();
+                try
+                {
+                    using var scope = _serviceScopeFactory.CreateScope();
+                    await SendNotificationAsync(message).ConfigureAwait(false);
+                    await MarkMessageAsPublishedAsync(scope, message.Id).ConfigureAwait(false);
+                }
+#pragma warning disable CA1031 // Exception could be anything
+                catch (Exception exception)
+#pragma warning restore CA1031
+                {
+                    _logger.LogError(exception, $"Failed to publish message {message.Id}.");
+                }
             }
+        }
+
+        private static async Task MarkMessageAsPublishedAsync(IServiceScope scope, Guid messageId)
+        {
+            var context = GetService<B2BContext>(scope);
+
+            var storedMessage = await context.OutgoingMessages.FindAsync(messageId).ConfigureAwait(false);
+            storedMessage.Published();
+
+            await context.SaveChangesAsync().ConfigureAwait(false);
+        }
+
+        private static TService GetService<TService>(IServiceScope scope)
+            where TService : notnull
+        {
+            return scope.ServiceProvider.GetRequiredService<TService>();
+        }
+
+        private async Task SendNotificationAsync(OutgoingMessage message)
+        {
+            await _dataAvailableNotificationPublisher.SendAsync(
+                message.CorrelationId,
+                message).ConfigureAwait(false);
         }
     }
 }
