@@ -58,6 +58,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "B2B.Transactions", "B2B.Tra
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "B2B.Transactions.Infrastructure", "B2B.Transactions.Infrastructure\B2B.Transactions.Infrastructure.csproj", "{8B1DCD6E-013F-4B45-B9EB-167F1D874793}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "B2B.Transactions.ArchitectureTests", "B2B.Transactions.ArchitectureTests\B2B.Transactions.ArchitectureTests.csproj", "{D0C39286-C7BE-4714-8CA1-5654B68A9529}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -140,6 +142,10 @@ Global
 		{8B1DCD6E-013F-4B45-B9EB-167F1D874793}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8B1DCD6E-013F-4B45-B9EB-167F1D874793}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8B1DCD6E-013F-4B45-B9EB-167F1D874793}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0C39286-C7BE-4714-8CA1-5654B68A9529}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0C39286-C7BE-4714-8CA1-5654B68A9529}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0C39286-C7BE-4714-8CA1-5654B68A9529}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0C39286-C7BE-4714-8CA1-5654B68A9529}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{654DA496-60D8-47D8-923E-F24F71A31F84} = {FD29AEE1-CB22-41FD-A875-1E99C4D5D81C}
@@ -156,5 +162,6 @@ Global
 		{76FA7684-27E1-4022-9FB3-F72811E45C60} = {1C877C68-8E3D-4371-B96A-7360850A538E}
 		{FB4D9AE5-FCF2-442D-97EC-8AED1F9DDD2E} = {1C877C68-8E3D-4371-B96A-7360850A538E}
 		{8B1DCD6E-013F-4B45-B9EB-167F1D874793} = {1C877C68-8E3D-4371-B96A-7360850A538E}
+		{D0C39286-C7BE-4714-8CA1-5654B68A9529} = {1C877C68-8E3D-4371-B96A-7360850A538E}
 	EndGlobalSection
 EndGlobal

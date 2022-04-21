@@ -16,7 +16,6 @@ using System;
 using System.Text;
 using System.Threading.Tasks;
 using B2B.Transactions.Configuration;
-using B2B.Transactions.Infrastructure.Configuration.Correlation;
 using B2B.Transactions.Infrastructure.Serialization;
 using B2B.Transactions.Transactions;
 using Microsoft.Azure.Functions.Worker;
@@ -26,13 +25,13 @@ namespace B2B.Transactions.Api
 {
     public class TransactionQueueListener
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<TransactionQueueListener> _logger;
         private readonly ICorrelationContext _correlationContext;
         private readonly RegisterTransaction _registerTransaction;
         private readonly ISerializer _jsonSerializer;
 
         public TransactionQueueListener(
-            ILogger logger,
+            ILogger<TransactionQueueListener> logger,
             ICorrelationContext correlationContext,
             RegisterTransaction registerTransaction,
             ISerializer jsonSerializer)

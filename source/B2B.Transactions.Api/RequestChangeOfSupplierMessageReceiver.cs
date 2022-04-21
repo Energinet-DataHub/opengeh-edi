@@ -28,7 +28,7 @@ namespace B2B.Transactions.Api
 {
     public class RequestChangeOfSupplier
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<RequestChangeOfSupplier> _logger;
         private readonly ICorrelationContext _correlationContext;
         private readonly MessageReceiver _messageReceiver;
 
