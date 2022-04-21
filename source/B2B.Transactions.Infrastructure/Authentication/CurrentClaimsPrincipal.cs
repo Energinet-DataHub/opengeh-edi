@@ -14,7 +14,7 @@
 
 using System.Security.Claims;
 
-namespace B2B.Transactions.Infrastructure.Authentication.Bearer
+namespace B2B.Transactions.Infrastructure.Authentication
 {
     public class CurrentClaimsPrincipal
     {

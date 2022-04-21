@@ -20,7 +20,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace B2B.Transactions.Infrastructure
+namespace B2B.Transactions.Api.Middleware
 {
     public static class FunctionContextExtensions
     {

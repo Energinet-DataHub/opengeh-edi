@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System;
+using B2B.Transactions.Api.Middleware.Correlation;
 using B2B.Transactions.Infrastructure.Configuration;
-using B2B.Transactions.Infrastructure.Configuration.Correlation;
 using B2B.Transactions.IntegrationTests.Fixtures;
 using B2B.Transactions.IntegrationTests.TestDoubles;
 using Microsoft.Extensions.DependencyInjection;

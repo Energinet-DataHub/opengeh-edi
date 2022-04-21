@@ -12,13 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace B2B.Transactions.Infrastructure.Authentication.Bearer.Errors
+namespace B2B.Transactions.Api.Middleware.Correlation
 {
-    public class AuthenticationHeaderIsNotBearerToken : AuthenticationError
+    /// <summary>
+    /// Context for the session.
+    /// </summary>
+    public interface ISessionContext
     {
-        public AuthenticationHeaderIsNotBearerToken()
-        : base("The value defined in authorization header is not start with 'bearer'.")
-        {
-        }
+        /// <summary>
+        /// Get the current session id.
+        /// </summary>
+        string Id { get; }
+
+        /// <summary>
+        /// Set the current session id.
+        /// </summary>
+        void SetId(string id);
     }
 }

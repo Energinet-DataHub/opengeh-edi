@@ -18,11 +18,9 @@ using System.Threading.Tasks;
 using B2B.Transactions.Configuration;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using TraceContext = B2B.Transactions.Infrastructure.Configuration.Correlation;
 
-namespace B2B.Transactions.Infrastructure.Configuration.Correlation
+namespace B2B.Transactions.Api.Middleware.Correlation
 {
     public class CorrelationIdMiddleware : IFunctionsWorkerMiddleware
     {

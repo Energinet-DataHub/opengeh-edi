@@ -16,10 +16,11 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http.Headers;
-using B2B.Transactions.Infrastructure.Authentication.Bearer.Errors;
+using B2B.CimMessageAdapter;
+using B2B.Transactions.Infrastructure.Authentication.Errors;
 using Microsoft.IdentityModel.Tokens;
 
-namespace B2B.Transactions.Infrastructure.Authentication.Bearer
+namespace B2B.Transactions.Infrastructure.Authentication
 {
     public class JwtTokenParser
     {

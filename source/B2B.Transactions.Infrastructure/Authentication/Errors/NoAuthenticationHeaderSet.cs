@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace B2B.Transactions.Infrastructure.Authentication.Bearer.Errors
+namespace B2B.Transactions.Infrastructure.Authentication.Errors
 {
-    public class TokenValidationFailed : AuthenticationError
+    public class NoAuthenticationHeaderSet : AuthenticationError
     {
-        public TokenValidationFailed(string message)
-         : base(message)
+        public NoAuthenticationHeaderSet()
+        : base("No authorization header is set.")
         {
         }
     }

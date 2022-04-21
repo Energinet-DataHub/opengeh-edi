@@ -13,12 +13,11 @@
 // limitations under the License.
 
 using System;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using B2B.Transactions.Authentication;
 
-namespace B2B.Transactions.Infrastructure.Authentication.MarketActors
+namespace B2B.Transactions.Infrastructure.Authentication
 {
     public class MarketActorAuthenticator : IMarketActorAuthenticator
     {

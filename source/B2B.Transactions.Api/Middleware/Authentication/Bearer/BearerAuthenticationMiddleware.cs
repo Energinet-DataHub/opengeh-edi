@@ -13,32 +13,28 @@
 // limitations under the License.
 
 using System;
+using System.Text;
 using System.Threading.Tasks;
-using B2B.Transactions.Authentication;
-using B2B.Transactions.Infrastructure.Authentication.Bearer;
-using B2B.Transactions.Infrastructure.Serialization;
+using B2B.Transactions.Infrastructure;
+using B2B.Transactions.Infrastructure.Authentication;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;
 
-namespace B2B.Transactions.Infrastructure.Authentication.MarketActors
+namespace B2B.Transactions.Api.Middleware.Authentication.Bearer
 {
-    public class MarketActorAuthenticatorMiddleware : IFunctionsWorkerMiddleware
+    public class BearerAuthenticationMiddleware : IFunctionsWorkerMiddleware
     {
-        private readonly ILogger<MarketActorAuthenticatorMiddleware> _logger;
+        private readonly ILogger<BearerAuthenticationMiddleware> _logger;
 
-        public MarketActorAuthenticatorMiddleware(ILogger<MarketActorAuthenticatorMiddleware> logger)
+        public BearerAuthenticationMiddleware(ILogger<BearerAuthenticationMiddleware> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
         {
-            if (context == null) throw new ArgumentNullException(nameof(context));
             if (next == null) throw new ArgumentNullException(nameof(next));
-            var marketActorAuthenticator = context.GetService<IMarketActorAuthenticator>();
-            var currentClaimsPrincipal = context.GetService<CurrentClaimsPrincipal>();
-
             if (!context.Is(FunctionContextExtensions.TriggerType.HttpTrigger))
             {
                 _logger.LogInformation("Functions is not triggered by HTTP. Call next middleware.");
@@ -54,30 +50,29 @@ namespace B2B.Transactions.Infrastructure.Authentication.MarketActors
                 return;
             }
 
-            if (currentClaimsPrincipal.ClaimsPrincipal is null)
+            var jwtTokenParser = context.GetService<JwtTokenParser>();
+            var result = jwtTokenParser.ParseFrom(httpRequestData.Headers);
+            if (result.Success == false)
             {
-                _logger.LogError("Current claims principal is null. Cannot continue.");
+                LogParseResult(result);
                 context.RespondWithUnauthorized(httpRequestData);
                 return;
             }
 
-            marketActorAuthenticator.Authenticate(currentClaimsPrincipal.ClaimsPrincipal!);
-            if (marketActorAuthenticator.CurrentIdentity is NotAuthenticated)
-            {
-                _logger.LogError("Could not authenticate market actor identity. This is due to the current claims identity does hold the required claims.");
-                context.RespondWithUnauthorized(httpRequestData);
-                return;
-            }
-
-            var serializer = context.GetService<ISerializer>();
-            WriteAuthenticatedIdentityToLog(marketActorAuthenticator, serializer);
+            var currentClaimsPrincipal = context.GetService<CurrentClaimsPrincipal>();
+            currentClaimsPrincipal.SetCurrentUser(result.ClaimsPrincipal!);
+            _logger.LogInformation("Bearer token authentication succeeded.");
             await next(context).ConfigureAwait(false);
         }
 
-        private void WriteAuthenticatedIdentityToLog(IMarketActorAuthenticator marketActorAuthenticator, ISerializer serializer)
+        private void LogParseResult(Result result)
         {
-            _logger.LogInformation("Successfully authenticated market actor identity.");
-            _logger.LogInformation(serializer.Serialize(marketActorAuthenticator.CurrentIdentity));
+            var message = new StringBuilder();
+            message.AppendLine("Failed to parse claims principal from JWT:");
+            message.AppendLine(result.Error?.Message);
+            message.AppendLine("Token from HTTP request header:");
+            message.AppendLine(result.Token);
+            _logger.LogError(message.ToString());
         }
     }
 }

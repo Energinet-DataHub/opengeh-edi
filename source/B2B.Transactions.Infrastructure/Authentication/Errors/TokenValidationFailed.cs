@@ -12,19 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-
-namespace B2B.Transactions.Infrastructure.Configuration.Correlation
+namespace B2B.Transactions.Infrastructure.Authentication.Errors
 {
-    public sealed class SessionContext : ISessionContext
+    public class TokenValidationFailed : AuthenticationError
     {
-        private string? _id;
-
-        public string Id => _id ?? throw new InvalidOperationException("Session id not set");
-
-        public void SetId(string id)
+        public TokenValidationFailed(string message)
+         : base(message)
         {
-            _id = id;
         }
     }
 }

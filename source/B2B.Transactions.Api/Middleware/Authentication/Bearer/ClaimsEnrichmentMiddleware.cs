@@ -17,13 +17,14 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using B2B.Transactions.DataAccess;
+using B2B.Transactions.Infrastructure;
+using B2B.Transactions.Infrastructure.Authentication;
 using Dapper;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace B2B.Transactions.Infrastructure.Authentication.Bearer
+namespace B2B.Transactions.Api.Middleware.Authentication.Bearer
 {
     public class ClaimsEnrichmentMiddleware : IFunctionsWorkerMiddleware
     {

@@ -12,21 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace B2B.Transactions.Infrastructure.Configuration.Correlation
-{
-    /// <summary>
-    /// Context for the session.
-    /// </summary>
-    public interface ISessionContext
-    {
-        /// <summary>
-        /// Get the current session id.
-        /// </summary>
-        string Id { get; }
+using System;
 
-        /// <summary>
-        /// Set the current session id.
-        /// </summary>
-        void SetId(string id);
+namespace B2B.Transactions.Api.Middleware.Correlation
+{
+    public sealed class SessionContext : ISessionContext
+    {
+        private string? _id;
+
+        public string Id => _id ?? throw new InvalidOperationException("Session id not set");
+
+        public void SetId(string id)
+        {
+            _id = id;
+        }
     }
 }

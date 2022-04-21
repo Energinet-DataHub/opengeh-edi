@@ -15,7 +15,7 @@
 using System;
 using B2B.Transactions.Configuration;
 
-namespace B2B.Transactions.Infrastructure.Configuration.Correlation
+namespace B2B.Transactions.Api.Middleware.Correlation
 {
     public sealed class CorrelationContext : ICorrelationContext
     {
