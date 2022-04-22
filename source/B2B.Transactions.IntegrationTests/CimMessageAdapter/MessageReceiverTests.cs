@@ -60,7 +60,7 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
         public async Task Receiver_id_must_be_known()
         {
             var unknownReceiverId = "5790001330550";
-            using var message = BusinessMessageBuilder
+            await using var message = BusinessMessageBuilder
                 .RequestChangeOfSupplier()
                 .WithReceiverId(unknownReceiverId)
                 .Message();
@@ -73,7 +73,7 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
         [Fact]
         public async Task Receiver_role_must_be_metering_point_administrator()
         {
-            using var message = BusinessMessageBuilder
+            await using var message = BusinessMessageBuilder
                 .RequestChangeOfSupplier()
                 .WithReceiverRole("DDK")
                 .Message();
@@ -86,7 +86,7 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
         [Fact]
         public async Task Sender_role_type_must_be_the_role_of_energy_supplier()
         {
-            using var message = BusinessMessageBuilder
+            await using var message = BusinessMessageBuilder
                 .RequestChangeOfSupplier()
                 .WithSenderRole("DDK")
                 .Message();
@@ -100,7 +100,7 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
         public async Task Authenticated_user_must_hold_the_role_type_as_specified_in_message()
         {
             _marketActorAuthenticator.Authenticate(CreateIdentityWithoutRoles());
-            using var message = BusinessMessageBuilder
+            await using var message = BusinessMessageBuilder
                 .RequestChangeOfSupplier()
                 .Message();
 
@@ -113,7 +113,7 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
         public async Task Sender_id_must_match_the_organization_of_the_current_authenticated_user()
         {
             _marketActorAuthenticator.Authenticate(CreateIdentity("Unknown_actor_identifier"));
-            using var message = BusinessMessageBuilder
+            await using var message = BusinessMessageBuilder
                 .RequestChangeOfSupplier()
                 .Message();
 
@@ -136,7 +136,7 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
         [Fact]
         public async Task Message_must_conform_to_xml_schema()
         {
-            using var message = BusinessMessageBuilder
+            await using var message = BusinessMessageBuilder
                 .RequestChangeOfSupplier()
                 .WithSenderRole("FakeRoleType")
                 .Message();
@@ -149,7 +149,7 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
         [Fact]
         public async Task Return_failure_if_xml_schema_for_business_process_type_does_not_exist()
         {
-            using var message = BusinessMessageBuilder
+            await using var message = BusinessMessageBuilder
                 .RequestChangeOfSupplier()
                 .Message();
 
@@ -163,7 +163,7 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
         [Fact]
         public async Task Valid_activity_records_are_extracted_and_committed_to_queue()
         {
-            using var message = BusinessMessageBuilder
+            await using var message = BusinessMessageBuilder
                 .RequestChangeOfSupplier()
                 .Message();
 
@@ -199,7 +199,7 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
         [Fact]
         public async Task Activity_records_must_have_unique_transaction_ids()
         {
-            using var message = BusinessMessageBuilder
+            await using var message = BusinessMessageBuilder
                 .RequestChangeOfSupplier()
                 .DuplicateMarketActivityRecords()
                 .Message();

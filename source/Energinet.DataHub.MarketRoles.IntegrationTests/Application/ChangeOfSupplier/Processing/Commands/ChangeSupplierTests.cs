@@ -65,7 +65,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
             await GetService<IMediator>().Send(command, CancellationToken.None).ConfigureAwait(false);
 
             var query = @"SELECT Count(1) FROM SupplierRegistrations WHERE AccountingPointId = @AccountingPointId AND StartOfSupplyDate IS NOT NULL AND EndOfSupplyDate IS NULL";
-            using var sqlCommand = new SqlCommand(query, GetSqlDbConnection());
+            await using var sqlCommand = new SqlCommand(query, GetSqlDbConnection());
 
             sqlCommand.Parameters.Add(new SqlParameter("@AccountingPointId", _accountingPoint.Id.Value));
             sqlCommand.Parameters.Add(new SqlParameter("@EnergySupplierId", _energySupplier.EnergySupplierId.Value));

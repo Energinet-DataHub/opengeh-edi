@@ -31,7 +31,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Transport
         [Fact]
         public async Task Send_and_receive_must_result_in_same_transmitted_values()
         {
-            using var container = new Container();
+            await using var container = new Container();
             container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
 
             // Send Registrations

@@ -42,7 +42,7 @@ namespace Energinet.DataHub.MarketRoles.Tests.LocalMessageHub
         [Fact]
         public async Task Bundles_should_be_created_for_multiple_documents()
         {
-            using var container = new Container();
+            await using var container = new Container();
 
             container.UseMediatR()
                 .WithPipeline()
