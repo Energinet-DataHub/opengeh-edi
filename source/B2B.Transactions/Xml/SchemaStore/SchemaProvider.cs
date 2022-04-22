@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 
-namespace B2B.Transactions.Xml.Incoming
+namespace B2B.Transactions.Xml.SchemaStore
 {
     public class SchemaProvider : ISchemaProvider
     {

@@ -19,7 +19,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
-using B2B.Transactions.Xml.Incoming;
+using B2B.Transactions.Xml.SchemaStore;
 
 namespace B2B.Transactions.Xml.Outgoing
 {

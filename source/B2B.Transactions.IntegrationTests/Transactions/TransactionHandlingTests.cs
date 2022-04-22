@@ -21,8 +21,8 @@ using B2B.Transactions.IntegrationTests.Fixtures;
 using B2B.Transactions.IntegrationTests.TestDoubles;
 using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.Transactions;
-using B2B.Transactions.Xml.Incoming;
 using B2B.Transactions.Xml.Outgoing;
+using B2B.Transactions.Xml.SchemaStore;
 using Xunit;
 using Xunit.Categories;
 
