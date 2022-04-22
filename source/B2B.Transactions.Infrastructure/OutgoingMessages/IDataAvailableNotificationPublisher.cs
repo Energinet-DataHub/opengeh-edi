@@ -13,18 +13,21 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
+using B2B.Transactions.OutgoingMessages;
+using Energinet.DataHub.MessageHub.Model.Model;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents
+namespace B2B.Transactions.Infrastructure.OutgoingMessages
 {
     /// <summary>
-    /// Interface for the integration event dispatch orchestrator
+    /// Interface for data available notifications
     /// </summary>
-    public interface IIntegrationEventDispatchOrchestrator
+    public interface IDataAvailableNotificationPublisher
     {
         /// <summary>
-        /// Orchestrate the events to be dispatched
+        /// send the specified DataAvailableNotification to the post office DataAvailable queue.
         /// </summary>
-        /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
-        Task ProcessEventsAsync();
+        /// <param name="correlationId">The correlation id that can be used to track the data represented by the notification.</param>
+        /// <param name="message">The notification to send to the post office.</param>
+        Task SendAsync(string correlationId, OutgoingMessage message);
     }
 }

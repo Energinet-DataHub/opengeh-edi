@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System;
+using B2B.Transactions.Api.Middleware.Correlation;
 using B2B.Transactions.Infrastructure.Configuration;
-using B2B.Transactions.Infrastructure.Configuration.Correlation;
 using B2B.Transactions.IntegrationTests.Fixtures;
 using B2B.Transactions.IntegrationTests.TestDoubles;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,7 +45,7 @@ namespace B2B.Transactions.IntegrationTests
                     correlation.SetId(Guid.NewGuid().ToString());
                     return correlation;
                 })
-                .AddMessagePublishing(new OutgoingMessageStoreSpy(), new DataAvailableNotificationSenderSpy());
+                .AddMessagePublishing(new DataAvailableNotificationPublisherSpy());
             _serviceProvider = services.BuildServiceProvider();
         }
 

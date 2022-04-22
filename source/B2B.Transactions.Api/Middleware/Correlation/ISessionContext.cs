@@ -12,19 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents
+namespace B2B.Transactions.Api.Middleware.Correlation
 {
     /// <summary>
-    /// Interface for the integration event dispatch orchestrator
+    /// Context for the session.
     /// </summary>
-    public interface IIntegrationEventDispatchOrchestrator
+    public interface ISessionContext
     {
         /// <summary>
-        /// Orchestrate the events to be dispatched
+        /// Get the current session id.
         /// </summary>
-        /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
-        Task ProcessEventsAsync();
+        string Id { get; }
+
+        /// <summary>
+        /// Set the current session id.
+        /// </summary>
+        void SetId(string id);
     }
 }

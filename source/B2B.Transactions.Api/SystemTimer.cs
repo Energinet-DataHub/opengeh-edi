@@ -14,30 +14,21 @@
 
 using System;
 using System.Threading.Tasks;
-using B2B.Transactions.Infrastructure.SystemTime;
-using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using NodaTime;
 
-namespace B2B.Transactions.Api;
-
-public class SystemTimer
+namespace B2B.Transactions.Api
 {
-    private readonly IMediator _mediator;
-
-    public SystemTimer(IMediator mediator)
+    public static class SystemTimer
     {
-        _mediator = mediator;
-    }
+        [Function("RaiseTimeHasPassedEvent")]
+        public static Task RunAsync([TimerTrigger("%RAISE_TIME_HAS_PASSED_EVENT_SCHEDULE%")] TimerInfo timerTimerInfo, FunctionContext context)
+        {
+            var logger = context.GetLogger("System timer");
+            logger.LogInformation($"System timer trigger at: {DateTime.Now}");
+            logger.LogInformation($"Next timer schedule at: {timerTimerInfo?.ScheduleStatus?.Next}");
 
-    [Function("RaiseTimeHasPassedEvent")]
-    public Task RunAsync([TimerTrigger("%RAISE_TIME_HAS_PASSED_EVENT_SCHEDULE%")] TimerInfo timerTimerInfo, FunctionContext context)
-    {
-        var logger = context.GetLogger("System timer");
-        logger.LogInformation($"System timer trigger at: {DateTime.Now}");
-        logger.LogInformation($"Next timer schedule at: {timerTimerInfo?.ScheduleStatus?.Next}");
-
-        return _mediator.Publish(new TimeHasPassed(Instant.FromDateTimeUtc(DateTime.UtcNow)));
+            return Task.CompletedTask;
+        }
     }
 }

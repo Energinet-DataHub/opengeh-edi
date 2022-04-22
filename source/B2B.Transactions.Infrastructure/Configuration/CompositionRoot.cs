@@ -18,10 +18,9 @@ using B2B.CimMessageAdapter;
 using B2B.CimMessageAdapter.Messages;
 using B2B.CimMessageAdapter.Transactions;
 using B2B.Transactions.Authentication;
+using B2B.Transactions.Configuration;
 using B2B.Transactions.DataAccess;
-using B2B.Transactions.Infrastructure.Authentication.Bearer;
-using B2B.Transactions.Infrastructure.Authentication.MarketActors;
-using B2B.Transactions.Infrastructure.Configuration.Correlation;
+using B2B.Transactions.Infrastructure.Authentication;
 using B2B.Transactions.Infrastructure.DataAccess;
 using B2B.Transactions.Infrastructure.DataAccess.Transaction;
 using B2B.Transactions.Infrastructure.Messages;
@@ -34,7 +33,6 @@ using B2B.Transactions.Xml.Incoming;
 using B2B.Transactions.Xml.Outgoing;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
-using Energinet.DataHub.MessageHub.Client.DataAvailable;
 using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -60,6 +58,8 @@ namespace B2B.Transactions.Infrastructure.Configuration
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
             services.AddScoped<IMessageFactory<IDocument>, AcceptMessageFactory>();
+            services.AddScoped<RegisterTransaction>();
+            services.AddScoped<MessageValidator>();
             services.AddLogging();
             AddXmlSchema(services);
         }
@@ -124,11 +124,11 @@ namespace B2B.Transactions.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddMessagePublishing(IOutgoingMessageStore outgoingMessageStore, IDataAvailableNotificationSender dataAvailableNotificationSender)
+        public CompositionRoot AddMessagePublishing(IDataAvailableNotificationPublisher dataAvailableNotificationPublisher)
         {
-            _services.AddScoped<IDataAvailableNotificationSender>(_ => dataAvailableNotificationSender);
+            _services.AddScoped<IDataAvailableNotificationPublisher>(_ => dataAvailableNotificationPublisher);
             _services.AddScoped<MessagePublisher>();
-            _services.AddScoped<IOutgoingMessageStore>(_ => outgoingMessageStore);
+            _services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
             return this;
         }
 

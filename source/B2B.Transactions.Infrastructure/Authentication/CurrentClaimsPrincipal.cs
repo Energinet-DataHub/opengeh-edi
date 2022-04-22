@@ -12,19 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
+using System.Security.Claims;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents
+namespace B2B.Transactions.Infrastructure.Authentication
 {
-    /// <summary>
-    /// Interface for the integration event dispatch orchestrator
-    /// </summary>
-    public interface IIntegrationEventDispatchOrchestrator
+    public class CurrentClaimsPrincipal
     {
-        /// <summary>
-        /// Orchestrate the events to be dispatched
-        /// </summary>
-        /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
-        Task ProcessEventsAsync();
+        private ClaimsPrincipal? _currentUser;
+
+        public ClaimsPrincipal? ClaimsPrincipal => _currentUser;
+
+        public void SetCurrentUser(ClaimsPrincipal currentUser)
+        {
+            _currentUser = currentUser;
+        }
     }
 }

@@ -12,19 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents
+namespace B2B.Transactions.Infrastructure.Authentication.Errors
 {
-    /// <summary>
-    /// Interface for the integration event dispatch orchestrator
-    /// </summary>
-    public interface IIntegrationEventDispatchOrchestrator
+    public class AuthenticationHeaderIsNotBearerToken : AuthenticationError
     {
-        /// <summary>
-        /// Orchestrate the events to be dispatched
-        /// </summary>
-        /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
-        Task ProcessEventsAsync();
+        public AuthenticationHeaderIsNotBearerToken()
+        : base("The value defined in authorization header is not start with 'bearer'.")
+        {
+        }
     }
 }
