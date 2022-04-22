@@ -15,13 +15,13 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
-using B2B.Transactions.Infrastructure.Configuration.Correlation;
+using B2B.Transactions.Configuration;
 using B2B.Transactions.Infrastructure.Serialization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;
 
-namespace B2B.Transactions.Infrastructure.Configuration.ServiceBus
+namespace B2B.Transactions.Api.Middleware.ServiceBus
 {
     public class ServiceBusMessageMetadataMiddleWare : IFunctionsWorkerMiddleware
     {
