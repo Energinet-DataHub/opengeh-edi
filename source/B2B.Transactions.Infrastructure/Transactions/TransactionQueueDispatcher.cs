@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 using System.Transactions;
 using Azure.Messaging.ServiceBus;
 using B2B.CimMessageAdapter.Transactions;
-using B2B.Transactions.Infrastructure.Configuration.Correlation;
+using B2B.Transactions.Configuration;
 using B2B.Transactions.Infrastructure.Serialization;
 using B2B.Transactions.Transactions;
 
