@@ -24,7 +24,7 @@ using B2B.Transactions.Authentication;
 using B2B.Transactions.IntegrationTests.CimMessageAdapter.Messages;
 using B2B.Transactions.IntegrationTests.CimMessageAdapter.Stubs;
 using B2B.Transactions.IntegrationTests.Fixtures;
-using B2B.Transactions.Xml.SchemaStore;
+using B2B.Transactions.Xml.Incoming;
 using Xunit;
 using Xunit.Categories;
 

@@ -15,7 +15,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace B2B.Transactions.Xml.SchemaStore
+namespace B2B.Transactions.Xml.Incoming
 {
     public class SchemaStore
     {
