@@ -62,11 +62,13 @@ namespace B2B.Transactions.ArchitectureTests
 
             private static string CreateFakeServiceBusConnectionString()
             {
+#pragma warning disable
                 var sb = new StringBuilder();
                 sb.Append($"Endpoint=sb://sb-{Guid.NewGuid():N}.servicebus.windows.net/;");
                 sb.Append("SharedAccessKeyName=send;");
                 sb.Append($"SharedAccessKey={Guid.NewGuid():N}");
                 return sb.ToString();
+#pragma warning restore
             }
         }
     }

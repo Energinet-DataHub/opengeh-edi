@@ -41,6 +41,7 @@ namespace B2B.Transactions.Api
 
         public static TokenValidationParameters DevelopmentTokenValidationParameters()
         {
+#pragma warning disable CA5404 // Do not disable token validation checks
             return new TokenValidationParameters()
             {
                 ValidateAudience = false,
@@ -48,6 +49,7 @@ namespace B2B.Transactions.Api
                 ValidateLifetime = false,
                 SignatureValidator = (token, parameters) => new JwtSecurityToken(token),
             };
+#pragma warning restore CA5404 // Do not disable token validation checks
         }
 
         public static IHost ConfigureHost(TokenValidationParameters tokenValidationParameters, RuntimeEnvironment runtime)

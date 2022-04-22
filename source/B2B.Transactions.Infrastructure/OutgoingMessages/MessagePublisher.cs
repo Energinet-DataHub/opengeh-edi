@@ -65,7 +65,7 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
             var context = GetService<B2BContext>(scope);
 
             var storedMessage = await context.OutgoingMessages.FindAsync(messageId).ConfigureAwait(false);
-            storedMessage.Published();
+            storedMessage?.Published();
 
             await context.SaveChangesAsync().ConfigureAwait(false);
         }
