@@ -1,0 +1,1 @@
+DROP TABLE [b2b].[OutboxMessages]

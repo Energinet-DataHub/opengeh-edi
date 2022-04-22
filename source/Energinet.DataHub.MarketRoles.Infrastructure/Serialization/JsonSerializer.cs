@@ -16,7 +16,7 @@ using System;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Energinet.DataHub.MeteringPoints.Infrastructure.Serialization.Converters;
+using Energinet.DataHub.MarketRoles.Infrastructure.Serialization.Converters;
 using NodaTime.Serialization.SystemTextJson;
 
 namespace Energinet.DataHub.MarketRoles.Infrastructure.Serialization

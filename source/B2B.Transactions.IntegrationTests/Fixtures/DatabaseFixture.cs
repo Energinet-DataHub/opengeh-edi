@@ -53,10 +53,10 @@ namespace B2B.Transactions.IntegrationTests.Fixtures
         public void CleanupDatabase()
         {
             var cleanupStatement =
-                $"DELETE FROM [dbo].[Transactions] " +
-                $"DELETE FROM [dbo].[MessageIds] " +
-                $"DELETE FROM [dbo].[TransactionIds]" +
-                $"DELETE FROM [b2b].[OutboxMessages]";
+                $"DELETE FROM [b2b].[Transactions] " +
+                $"DELETE FROM [b2b].[MessageIds] " +
+                $"DELETE FROM [b2b].[TransactionIds]" +
+                $"DELETE FROM [b2b].[OutgoingMessages]";
 
             _context.Database.ExecuteSqlRaw(cleanupStatement);
         }

@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
+using B2B.Transactions.Configuration;
 using B2B.Transactions.DataAccess;
 using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.Xml.Outgoing;
@@ -22,19 +23,19 @@ namespace B2B.Transactions.Transactions
 {
     public class RegisterTransaction
     {
+        private readonly ICorrelationContext _correlationContext;
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly ITransactionRepository _transactionRepository;
-        private readonly IDocumentProvider<IMessage> _documentProvider;
-        private readonly IOutbox _outbox;
+        private readonly IMessageFactory<IDocument> _messageFactory;
         private readonly IUnitOfWork _unitOfWork;
 
-        public RegisterTransaction(IOutgoingMessageStore outgoingMessageStore, ITransactionRepository transactionRepository, IDocumentProvider<IMessage> documentProvider, IOutbox outbox, IUnitOfWork unitOfWork)
+        public RegisterTransaction(IOutgoingMessageStore outgoingMessageStore, ITransactionRepository transactionRepository, IMessageFactory<IDocument> messageFactory, IUnitOfWork unitOfWork, ICorrelationContext correlationContext)
         {
             _outgoingMessageStore = outgoingMessageStore ?? throw new ArgumentNullException(nameof(outgoingMessageStore));
             _transactionRepository = transactionRepository ?? throw new ArgumentNullException(nameof(transactionRepository));
-            _documentProvider = documentProvider ?? throw new ArgumentNullException(nameof(documentProvider));
-            _outbox = outbox;
-            _unitOfWork = unitOfWork;
+            _messageFactory = messageFactory ?? throw new ArgumentNullException(nameof(messageFactory));
+            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+            _correlationContext = correlationContext ?? throw new ArgumentNullException(nameof(correlationContext));
         }
 
         public Task HandleAsync(B2BTransaction transaction)
@@ -42,24 +43,12 @@ namespace B2B.Transactions.Transactions
             if (transaction == null) throw new ArgumentNullException(nameof(transaction));
             var acceptedTransaction = new AcceptedTransaction(transaction.MarketActivityRecord.Id);
             _transactionRepository.Add(acceptedTransaction);
+            var document = _messageFactory.CreateMessage(transaction);
+            var outgoingMessage = new OutgoingMessage(document.DocumentType, document.MessagePayload, transaction.Message.ReceiverId, _correlationContext.Id);
 
-            _outgoingMessageStore.Add(_documentProvider.CreateMessage(transaction));
+            _outgoingMessageStore.Add(outgoingMessage);
 
-            //TODO: Insert correct values or fetch them later?
-            //TODO: Get MessageType and documentType based on transaction.Message.ProcessType?
-            var dataAvailableNotificationTheSecond = new MessageHubMessageAvailable(
-                transaction.Message.MessageId,
-                transaction.Message.ReceiverId,
-                "ConfirmChangeOfSupplier",
-                "MarketRoles",
-                true,
-                1,
-                "ConfirmRequestChangeOfSupplier");
-
-            _outbox.Add(dataAvailableNotificationTheSecond);
-
-            _unitOfWork.SaveTransaction();
-            return Task.CompletedTask;
+            return _unitOfWork.CommitAsync();
         }
     }
 }

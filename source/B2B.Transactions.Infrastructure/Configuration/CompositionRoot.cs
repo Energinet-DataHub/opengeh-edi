@@ -18,14 +18,13 @@ using B2B.CimMessageAdapter;
 using B2B.CimMessageAdapter.Messages;
 using B2B.CimMessageAdapter.Transactions;
 using B2B.Transactions.Authentication;
+using B2B.Transactions.Configuration;
 using B2B.Transactions.DataAccess;
-using B2B.Transactions.Infrastructure.Authentication.Bearer;
-using B2B.Transactions.Infrastructure.Authentication.MarketActors;
-using B2B.Transactions.Infrastructure.Configuration.Correlation;
+using B2B.Transactions.Infrastructure.Authentication;
 using B2B.Transactions.Infrastructure.DataAccess;
 using B2B.Transactions.Infrastructure.DataAccess.Transaction;
 using B2B.Transactions.Infrastructure.Messages;
-using B2B.Transactions.Infrastructure.Outbox;
+using B2B.Transactions.Infrastructure.OutgoingMessages;
 using B2B.Transactions.Infrastructure.Serialization;
 using B2B.Transactions.Infrastructure.Transactions;
 using B2B.Transactions.OutgoingMessages;
@@ -51,13 +50,15 @@ namespace B2B.Transactions.Infrastructure.Configuration
             services.AddSingleton<ISerializer, Serializer>();
             services.AddScoped<ITransactionIds, TransactionIdRegistry>();
             services.AddScoped<IMessageIds, MessageIdRegistry>();
-            services.AddScoped<IDocumentProvider<IMessage>, AcceptDocumentProvider>();
+            services.AddScoped<IMessageFactory<IDocument>, AcceptMessageFactory>();
             services.AddScoped<ITransactionQueueDispatcher, TransactionQueueDispatcher>();
             services.AddScoped<ITransactionRepository, TransactionRepository>();
             services.AddScoped<IMarketActorAuthenticator, MarketActorAuthenticator>();
-            services.AddScoped<IOutbox, OutboxProvider>();
-            services.AddScoped<OutboxMessageFactory>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
+            services.AddScoped<IMessageFactory<IDocument>, AcceptMessageFactory>();
+            services.AddScoped<RegisterTransaction>();
+            services.AddScoped<MessageValidator>();
             services.AddLogging();
             AddXmlSchema(services);
         }
@@ -119,6 +120,14 @@ namespace B2B.Transactions.Infrastructure.Configuration
                 var logger = factory.CreateLogger<RequestResponseLoggingBlobStorage>();
                 return new RequestResponseLoggingBlobStorage(blobStorageConnectionString, storageContainerName, logger);
             });
+            return this;
+        }
+
+        public CompositionRoot AddMessagePublishing(IDataAvailableNotificationPublisher dataAvailableNotificationPublisher)
+        {
+            _services.AddScoped<IDataAvailableNotificationPublisher>(_ => dataAvailableNotificationPublisher);
+            _services.AddScoped<MessagePublisher>();
+            _services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
             return this;
         }
 

@@ -13,11 +13,10 @@
 // limitations under the License.
 
 using System;
-using B2B.Transactions.DataAccess;
+using B2B.Transactions.Api.Middleware.Correlation;
 using B2B.Transactions.Infrastructure.Configuration;
 using B2B.Transactions.IntegrationTests.Fixtures;
 using B2B.Transactions.IntegrationTests.TestDoubles;
-using Dapper;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -39,7 +38,14 @@ namespace B2B.Transactions.IntegrationTests
             CompositionRoot.Initialize(services)
                 .AddDatabaseConnectionFactory(_databaseFixture.ConnectionString)
                 .AddDatabaseContext(_databaseFixture.ConnectionString)
-                .AddSystemClock(new SystemDateTimeProviderStub());
+                .AddSystemClock(new SystemDateTimeProviderStub())
+                .AddCorrelationContext(_ =>
+                {
+                    var correlation = new CorrelationContext();
+                    correlation.SetId(Guid.NewGuid().ToString());
+                    return correlation;
+                })
+                .AddMessagePublishing(new DataAvailableNotificationPublisherSpy());
             _serviceProvider = services.BuildServiceProvider();
         }
 
@@ -53,13 +59,6 @@ namespace B2B.Transactions.IntegrationTests
             where T : notnull
         {
             return _serviceProvider.GetRequiredService<T>();
-        }
-
-        protected OutboxMessage GetOutboxMessage<T>()
-            where T : notnull
-        {
-            var sql = $"SELECT * FROM [b2b].[OutboxMessages] WHERE Type = '{typeof(T).FullName}'";
-            return GetService<IDbConnectionFactory>().GetOpenConnection().QuerySingleOrDefault<OutboxMessage>(sql);
         }
 
         protected virtual void Dispose(bool disposing)

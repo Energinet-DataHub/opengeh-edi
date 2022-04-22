@@ -16,11 +16,13 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using B2B.Transactions.Authentication;
-using B2B.Transactions.Infrastructure.Authentication.MarketActors;
+using B2B.Transactions.Infrastructure.Authentication;
 using Xunit;
+using Xunit.Categories;
 
 namespace B2B.Transactions.IntegrationTests.Infrastructure.Authentication.MarketActors
 {
+    [IntegrationTest]
     public class MarketActorAuthenticatorTests
     {
         [Fact]

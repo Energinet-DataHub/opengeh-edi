@@ -18,7 +18,7 @@ using System.Text;
 using System.Threading.Tasks;
 using B2B.CimMessageAdapter;
 using B2B.CimMessageAdapter.Response;
-using B2B.Transactions.Infrastructure.Configuration.Correlation;
+using B2B.Transactions.Configuration;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
@@ -27,7 +27,7 @@ namespace B2B.Transactions.Api
 {
     public class RequestChangeOfSupplier
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<RequestChangeOfSupplier> _logger;
         private readonly ICorrelationContext _correlationContext;
         private readonly MessageReceiver _messageReceiver;
 

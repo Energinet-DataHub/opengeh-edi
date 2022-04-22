@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading.Tasks;
 using B2B.Transactions.DataAccess;
 
 namespace B2B.Transactions.Infrastructure.DataAccess
@@ -25,9 +26,9 @@ namespace B2B.Transactions.Infrastructure.DataAccess
             _context = context;
         }
 
-        public void SaveTransaction()
+        public Task CommitAsync()
         {
-            _context.SaveChanges();
+            return _context.SaveChangesAsync();
         }
     }
 }

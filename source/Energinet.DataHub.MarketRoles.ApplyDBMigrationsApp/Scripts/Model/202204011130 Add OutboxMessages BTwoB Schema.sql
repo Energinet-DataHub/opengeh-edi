@@ -1,4 +1,7 @@
-CREATE SCHEMA b2b
+IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'b2b')
+BEGIN
+EXEC('CREATE SCHEMA [b2b] AUTHORIZATION [dbo];')
+END
 
 CREATE TABLE [b2b].[OutboxMessages](
     [Id] [uniqueidentifier] NOT NULL,

@@ -16,13 +16,16 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using B2B.Transactions.Infrastructure.Authentication.Bearer;
-using B2B.Transactions.Infrastructure.Authentication.Bearer.Errors;
+using B2B.Transactions.Api.Middleware.Authentication.Bearer;
+using B2B.Transactions.Infrastructure.Authentication;
+using B2B.Transactions.Infrastructure.Authentication.Errors;
 using Microsoft.IdentityModel.Tokens;
 using Xunit;
+using Xunit.Categories;
 
 namespace B2B.Transactions.IntegrationTests.Infrastructure.Authentication.MarketActors
 {
+    [IntegrationTest]
     public class JwtTokenParserTests
     {
 #pragma warning disable CA5404 // Do not disable token validation checks
