@@ -31,11 +31,12 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Common.SimpleInjector
             _container = container;
         }
 
+        [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Issue: https://github.com/dotnet/roslyn-analyzers/issues/5712")]
         public async Task Invoke(FunctionContext context, [NotNull] FunctionExecutionDelegate next)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
-            using var scope = AsyncScopedLifestyle.BeginScope(_container);
+            await using var scope = AsyncScopedLifestyle.BeginScope(_container);
             if (scope.Container == null) throw new InvalidOperationException("Scope doesn't contain a container.");
 
             context.InstanceServices = new SimpleInjectorServiceProviderAdapter(scope.Container);
