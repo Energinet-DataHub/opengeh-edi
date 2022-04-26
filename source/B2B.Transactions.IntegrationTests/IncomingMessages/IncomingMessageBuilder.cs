@@ -27,7 +27,7 @@ namespace B2B.Transactions.IntegrationTests.Transactions
         internal static IncomingMessage CreateMessage()
         {
             return IncomingMessage.Create(
-                new MessageHeader(Guid.NewGuid().ToString(), "E03", "fake", "DDZ", "fake", "DDQ", "fake"),
+                new MessageHeader(Guid.NewGuid().ToString(), "E03", "senderIdfake", "DDZ", "5790001330552", "DDQ", "fake"),
                 new MarketActivityRecord()
                 {
                     BalanceResponsibleId = "fake",

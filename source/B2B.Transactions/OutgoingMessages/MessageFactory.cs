@@ -66,14 +66,14 @@ namespace B2B.Transactions.OutgoingMessages
 
             await writer.WriteStartElementAsync(Prefix, "sender_MarketParticipant.mRID", null).ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "codingScheme", null, "A10").ConfigureAwait(false);
-            writer.WriteValue("5790001330552");
+            writer.WriteValue(messageHeader.SenderId);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
 
             await writer.WriteElementStringAsync(Prefix, "sender_MarketParticipant.marketRole.type", null, "DDZ").ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(Prefix, "receiver_MarketParticipant.mRID", null).ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "codingScheme", null, "A10").ConfigureAwait(false);
-            writer.WriteValue(messageHeader.SenderId);
+            writer.WriteValue(messageHeader.ReceiverId);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
 
             await writer.WriteElementStringAsync(Prefix, "receiver_MarketParticipant.marketRole.type", null, messageHeader.ReceiverRole).ConfigureAwait(false);
