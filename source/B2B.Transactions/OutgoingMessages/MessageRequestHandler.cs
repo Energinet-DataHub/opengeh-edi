@@ -16,23 +16,31 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using B2B.Transactions.IncomingMessages;
+using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
 namespace B2B.Transactions.OutgoingMessages
 {
     public class MessageRequestHandler
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
+        private readonly IncomingMessageStore _incomingMessageStore;
+        private readonly ISystemDateTimeProvider _systemDateTimeProvider;
         private readonly MessageDispatcher _messageDispatcher;
         private readonly MessageFactory _messageFactory;
 
         public MessageRequestHandler(
             IOutgoingMessageStore outgoingMessageStore,
             MessageDispatcher messageDispatcher,
-            MessageFactory messageFactory)
+            MessageFactory messageFactory,
+            IncomingMessageStore incomingMessageStore,
+            ISystemDateTimeProvider systemDateTimeProvider)
         {
             _outgoingMessageStore = outgoingMessageStore;
             _messageDispatcher = messageDispatcher;
             _messageFactory = messageFactory;
+            _incomingMessageStore = incomingMessageStore;
+            _systemDateTimeProvider = systemDateTimeProvider;
         }
 
         public async Task<Result> HandleAsync(ReadOnlyCollection<string> messageIdsToForward)
@@ -45,7 +53,9 @@ namespace B2B.Transactions.OutgoingMessages
                 return Result.Failure(exceptions);
             }
 
-            var message = await _messageFactory.CreateFromAsync(messages).ConfigureAwait(false);
+            var incomingMessage = _incomingMessageStore.GetById(messages[0].OriginalMessageId);
+            var messageHeader = new MessageHeader(incomingMessage!.Message.ProcessType, incomingMessage.Message.ReceiverId, incomingMessage.Message.ReceiverRole, incomingMessage.Message.SenderId, incomingMessage.Message.SenderRole);
+            var message = await _messageFactory.CreateFromAsync(messages, messageHeader).ConfigureAwait(false);
             await _messageDispatcher.DispatchAsync(message).ConfigureAwait(false);
 
             return Result.Succeeded();

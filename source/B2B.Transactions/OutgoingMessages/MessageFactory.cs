@@ -38,18 +38,13 @@ namespace B2B.Transactions.OutgoingMessages
             _messageValidator = messageValidator;
         }
 
-        public async Task<Stream> CreateFromAsync(ReadOnlyCollection<OutgoingMessage> messages)
+        #pragma warning disable
+        public async Task<Stream> CreateFromAsync(ReadOnlyCollection<OutgoingMessage> messages, MessageHeader messageHeader)
         {
             if (messages == null) throw new ArgumentNullException(nameof(messages));
+            if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
 
             const string Prefix = "cim";
-
-            var incomingMessage = _incomingMessageStore.GetById(messages[0].OriginalMessageId);
-
-            if (incomingMessage is null)
-            {
-                throw new InvalidOperationException();
-            }
 
             var settings = new XmlWriterSettings { OmitXmlDeclaration = false, Encoding = Encoding.UTF8, Async = true };
             using var stream = new MemoryStream();
@@ -66,7 +61,7 @@ namespace B2B.Transactions.OutgoingMessages
                 "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1 urn-ediel-org-structure-confirmrequestchangeofsupplier-0-1.xsd").ConfigureAwait(false);
             await writer.WriteElementStringAsync(Prefix, "mRID", null, GenerateMessageId()).ConfigureAwait(false);
             await writer.WriteElementStringAsync(Prefix, "type", null, "414").ConfigureAwait(false);
-            await writer.WriteElementStringAsync(Prefix, "process.processType", null, incomingMessage.Message.ProcessType).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(Prefix, "process.processType", null, messageHeader.ProcessType).ConfigureAwait(false);
             await writer.WriteElementStringAsync(Prefix, "businessSector.type", null, "23").ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(Prefix, "sender_MarketParticipant.mRID", null).ConfigureAwait(false);
@@ -78,10 +73,10 @@ namespace B2B.Transactions.OutgoingMessages
 
             await writer.WriteStartElementAsync(Prefix, "receiver_MarketParticipant.mRID", null).ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "codingScheme", null, "A10").ConfigureAwait(false);
-            writer.WriteValue(incomingMessage.Message.SenderId);
+            writer.WriteValue(messageHeader.SenderId);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
 
-            await writer.WriteElementStringAsync(Prefix, "receiver_MarketParticipant.marketRole.type", null, incomingMessage.Message.SenderRole).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(Prefix, "receiver_MarketParticipant.marketRole.type", null, messageHeader.ReceiverRole).ConfigureAwait(false);
             await writer.WriteElementStringAsync(Prefix, "createdDateTime", null, GetCurrentDateTime()).ConfigureAwait(false);
             await writer.WriteElementStringAsync(Prefix, "reason.code", null, "A01").ConfigureAwait(false);
 
