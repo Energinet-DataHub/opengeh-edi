@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System;
+using B2B.Transactions.Configuration;
 using B2B.Transactions.IncomingMessages;
-using B2B.Transactions.Transactions;
 
 namespace B2B.Transactions.IntegrationTests.Transactions
 {
@@ -27,7 +27,7 @@ namespace B2B.Transactions.IntegrationTests.Transactions
         internal static IncomingMessage CreateMessage()
         {
             return IncomingMessage.Create(
-                new MessageHeader(Guid.NewGuid().ToString(), "E03", "senderIdfake", "DDZ", "5790001330552", "DDQ", "fake"),
+                new MessageHeader(Guid.NewGuid().ToString(), "E03", "senderIdfake", "DDZ", DataHubDetails.IdentificationNumber, "DDQ", "fake"),
                 new MarketActivityRecord()
                 {
                     BalanceResponsibleId = "fake",
