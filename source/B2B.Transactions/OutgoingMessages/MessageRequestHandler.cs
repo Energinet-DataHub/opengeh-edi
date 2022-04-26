@@ -17,7 +17,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using B2B.Transactions.IncomingMessages;
+using B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using MarketActivityRecord = B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier.MarketActivityRecord;
 
 namespace B2B.Transactions.OutgoingMessages
 {
@@ -25,7 +27,6 @@ namespace B2B.Transactions.OutgoingMessages
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly IncomingMessageStore _incomingMessageStore;
-        private readonly ISystemDateTimeProvider _systemDateTimeProvider;
         private readonly MessageDispatcher _messageDispatcher;
         private readonly MessageFactory _messageFactory;
 
@@ -33,14 +34,12 @@ namespace B2B.Transactions.OutgoingMessages
             IOutgoingMessageStore outgoingMessageStore,
             MessageDispatcher messageDispatcher,
             MessageFactory messageFactory,
-            IncomingMessageStore incomingMessageStore,
-            ISystemDateTimeProvider systemDateTimeProvider)
+            IncomingMessageStore incomingMessageStore)
         {
             _outgoingMessageStore = outgoingMessageStore;
             _messageDispatcher = messageDispatcher;
             _messageFactory = messageFactory;
             _incomingMessageStore = incomingMessageStore;
-            _systemDateTimeProvider = systemDateTimeProvider;
         }
 
         public async Task<Result> HandleAsync(ReadOnlyCollection<string> messageIdsToForward)
@@ -55,7 +54,15 @@ namespace B2B.Transactions.OutgoingMessages
 
             var incomingMessage = _incomingMessageStore.GetById(messages[0].OriginalMessageId);
             var messageHeader = new MessageHeader(incomingMessage!.Message.ProcessType, incomingMessage.Message.ReceiverId, incomingMessage.Message.ReceiverRole, incomingMessage.Message.SenderId, incomingMessage.Message.SenderRole);
-            var message = await _messageFactory.CreateFromAsync(messages, messageHeader).ConfigureAwait(false);
+
+            var marketActivityRecords = new List<MarketActivityRecord>();
+            foreach (var outgoingMessage in messages)
+            {
+                marketActivityRecords.Add(
+                    new MarketActivityRecord(outgoingMessage.Id.ToString(), incomingMessage.MarketActivityRecord.Id, incomingMessage.MarketActivityRecord.MarketEvaluationPointId));
+            }
+
+            var message = await _messageFactory.CreateFromAsync(messageHeader, marketActivityRecords.AsReadOnly()).ConfigureAwait(false);
             await _messageDispatcher.DispatchAsync(message).ConfigureAwait(false);
 
             return Result.Succeeded();

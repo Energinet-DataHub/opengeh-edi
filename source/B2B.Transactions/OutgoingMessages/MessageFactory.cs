@@ -18,7 +18,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using B2B.Transactions.IncomingMessages;
+using B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using B2B.Transactions.Transactions;
 using B2B.Transactions.Xml;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
@@ -27,22 +27,20 @@ namespace B2B.Transactions.OutgoingMessages
 {
     public class MessageFactory
     {
-        private readonly IncomingMessageStore _incomingMessageStore;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
         private readonly MessageValidator _messageValidator;
 
-        public MessageFactory(IncomingMessageStore incomingMessageStore, ISystemDateTimeProvider systemDateTimeProvider, MessageValidator messageValidator)
+        public MessageFactory(ISystemDateTimeProvider systemDateTimeProvider, MessageValidator messageValidator)
         {
-            _incomingMessageStore = incomingMessageStore;
             _systemDateTimeProvider = systemDateTimeProvider;
             _messageValidator = messageValidator;
         }
 
         #pragma warning disable
-        public async Task<Stream> CreateFromAsync(ReadOnlyCollection<OutgoingMessage> messages, MessageHeader messageHeader)
+        public async Task<Stream> CreateFromAsync(MessageHeader messageHeader, ReadOnlyCollection<MarketActivityRecord> marketActivityRecords)
         {
-            if (messages == null) throw new ArgumentNullException(nameof(messages));
             if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
+            if (marketActivityRecords == null) throw new ArgumentNullException(nameof(marketActivityRecords));
 
             const string Prefix = "cim";
 
@@ -80,21 +78,14 @@ namespace B2B.Transactions.OutgoingMessages
             await writer.WriteElementStringAsync(Prefix, "createdDateTime", null, GetCurrentDateTime()).ConfigureAwait(false);
             await writer.WriteElementStringAsync(Prefix, "reason.code", null, "A01").ConfigureAwait(false);
 
-            foreach (var message in messages)
+            foreach (var marketActivityRecord in marketActivityRecords)
             {
-                var originalMessage = _incomingMessageStore.GetById(message.OriginalMessageId);
-
-                if (originalMessage is null)
-                {
-                    throw new InvalidOperationException();
-                }
-
                 await writer.WriteStartElementAsync(Prefix, "MktActivityRecord", null).ConfigureAwait(false);
-                await writer.WriteElementStringAsync(Prefix, "mRID", null, message.Id.ToString()).ConfigureAwait(false);
-                await writer.WriteElementStringAsync(Prefix, "originalTransactionIDReference_MktActivityRecord.mRID", null, originalMessage.MarketActivityRecord.Id).ConfigureAwait(false);
+                await writer.WriteElementStringAsync(Prefix, "mRID", null, marketActivityRecord.Id.ToString()).ConfigureAwait(false);
+                await writer.WriteElementStringAsync(Prefix, "originalTransactionIDReference_MktActivityRecord.mRID", null, marketActivityRecord.OriginalTransactionId).ConfigureAwait(false);
                 await writer.WriteStartElementAsync(Prefix, "marketEvaluationPoint.mRID", null).ConfigureAwait(false);
                 await writer.WriteAttributeStringAsync(null, "codingScheme", null, "A10").ConfigureAwait(false);
-                writer.WriteValue(originalMessage.MarketActivityRecord.MarketEvaluationPointId);
+                writer.WriteValue(marketActivityRecord.MarketEvaluationPointId);
                 await writer.WriteEndElementAsync().ConfigureAwait(false);
                 await writer.WriteEndElementAsync().ConfigureAwait(false);
             }
