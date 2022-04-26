@@ -48,18 +48,7 @@ namespace B2B.Transactions.OutgoingMessages
             await using var writer = XmlWriter.Create(output, settings);
 
             await WriteMessageHeaderAsync(messageHeader, writer).ConfigureAwait(false);
-
-            foreach (var marketActivityRecord in marketActivityRecords)
-            {
-                await writer.WriteStartElementAsync(Prefix, "MktActivityRecord", null).ConfigureAwait(false);
-                await writer.WriteElementStringAsync(Prefix, "mRID", null, marketActivityRecord.Id.ToString()).ConfigureAwait(false);
-                await writer.WriteElementStringAsync(Prefix, "originalTransactionIDReference_MktActivityRecord.mRID", null, marketActivityRecord.OriginalTransactionId).ConfigureAwait(false);
-                await writer.WriteStartElementAsync(Prefix, "marketEvaluationPoint.mRID", null).ConfigureAwait(false);
-                await writer.WriteAttributeStringAsync(null, "codingScheme", null, "A10").ConfigureAwait(false);
-                writer.WriteValue(marketActivityRecord.MarketEvaluationPointId);
-                await writer.WriteEndElementAsync().ConfigureAwait(false);
-                await writer.WriteEndElementAsync().ConfigureAwait(false);
-            }
+            await WriteMarketActivityRecordsAsync(marketActivityRecords, writer).ConfigureAwait(false);
 
             await writer.WriteEndElementAsync().ConfigureAwait(false);
             writer.Close();
@@ -70,6 +59,26 @@ namespace B2B.Transactions.OutgoingMessages
             var data = Encoding.UTF8.GetBytes(output.ToString());
 
             return new MemoryStream(data);
+        }
+
+        private static async Task WriteMarketActivityRecordsAsync(ReadOnlyCollection<MarketActivityRecord> marketActivityRecords, XmlWriter writer)
+        {
+            foreach (var marketActivityRecord in marketActivityRecords)
+            {
+                await writer.WriteStartElementAsync(Prefix, "MktActivityRecord", null).ConfigureAwait(false);
+                await writer.WriteElementStringAsync(Prefix, "mRID", null, marketActivityRecord.Id.ToString())
+                    .ConfigureAwait(false);
+                await writer.WriteElementStringAsync(
+                    Prefix,
+                    "originalTransactionIDReference_MktActivityRecord.mRID",
+                    null,
+                    marketActivityRecord.OriginalTransactionId).ConfigureAwait(false);
+                await writer.WriteStartElementAsync(Prefix, "marketEvaluationPoint.mRID", null).ConfigureAwait(false);
+                await writer.WriteAttributeStringAsync(null, "codingScheme", null, "A10").ConfigureAwait(false);
+                writer.WriteValue(marketActivityRecord.MarketEvaluationPointId);
+                await writer.WriteEndElementAsync().ConfigureAwait(false);
+                await writer.WriteEndElementAsync().ConfigureAwait(false);
+            }
         }
 
         private static string GenerateMessageId()
