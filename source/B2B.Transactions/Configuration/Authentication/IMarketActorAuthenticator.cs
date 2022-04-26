@@ -14,7 +14,7 @@
 
 using System.Security.Claims;
 
-namespace B2B.Transactions.Authentication
+namespace B2B.Transactions.Configuration.Authentication
 {
     /// <summary>
     /// Service for authenticating an market actor

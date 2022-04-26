@@ -12,20 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using B2B.Transactions.Transactions;
 
-namespace B2B.Transactions.Xml.Outgoing
+namespace B2B.Transactions.IncomingMessages
 {
-    /// <summary>
-    /// Provides outgoing xml documents
-    /// </summary>
-    public interface IMessageFactory<out TMessage>
+    public class IncomingMessageStore
     {
-        /// <summary>
-        /// Creates an outgoing Messages
-        /// </summary>
-        /// <param name="transaction"></param>
-        /// <returns><see cref="AcceptMessageFactory"/></returns>
-        TMessage CreateMessage(B2BTransaction transaction);
+        private readonly List<IncomingMessage> _messages = new();
+
+        public IncomingMessage? GetById(string incomingMessageId)
+        {
+            return _messages.Find(x => x.Id == incomingMessageId);
+        }
+
+        public void Add(IncomingMessage incomingMessage)
+        {
+            _messages.Add(incomingMessage);
+        }
     }
 }

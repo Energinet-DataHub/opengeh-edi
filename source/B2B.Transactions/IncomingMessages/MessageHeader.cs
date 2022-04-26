@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace B2B.Transactions.Messages
+namespace B2B.Transactions.IncomingMessages
 {
     public class MessageHeader
     {

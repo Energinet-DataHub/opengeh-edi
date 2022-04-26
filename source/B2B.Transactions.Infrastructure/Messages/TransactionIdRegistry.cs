@@ -15,7 +15,7 @@
 using System;
 using System.Threading.Tasks;
 using B2B.CimMessageAdapter.Messages;
-using B2B.Transactions.DataAccess;
+using B2B.Transactions.Configuration.DataAccess;
 using Dapper;
 
 namespace B2B.Transactions.Infrastructure.Messages

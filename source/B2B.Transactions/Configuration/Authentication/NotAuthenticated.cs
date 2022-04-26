@@ -12,22 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace B2B.Transactions.Messages
+using System;
+
+namespace B2B.Transactions.Configuration.Authentication
 {
-    public class MarketActivityRecord
+    public class NotAuthenticated : MarketActorIdentity
     {
-        public string Id { get; init; } = string.Empty;
-
-        public string? ConsumerId { get; init; }
-
-        public string? BalanceResponsibleId { get; init; }
-
-        public string? EnergySupplierId { get; init; }
-
-        public string MarketEvaluationPointId { get; init; } = string.Empty;
-
-        public string? ConsumerName { get; init; }
-
-        public string EffectiveDate { get; init; } = string.Empty;
+        public NotAuthenticated()
+            : base("NotSet", "NotSet", IdentifierType.Eic, Array.Empty<string>())
+        {
+        }
     }
 }

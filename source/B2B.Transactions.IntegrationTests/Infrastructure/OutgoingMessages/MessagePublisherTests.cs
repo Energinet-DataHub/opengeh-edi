@@ -14,14 +14,13 @@
 
 using System.Threading.Tasks;
 using B2B.Transactions.Configuration;
-using B2B.Transactions.DataAccess;
+using B2B.Transactions.Configuration.DataAccess;
 using B2B.Transactions.Infrastructure.OutgoingMessages;
 using B2B.Transactions.IntegrationTests.Fixtures;
 using B2B.Transactions.IntegrationTests.TestDoubles;
 using B2B.Transactions.IntegrationTests.Transactions;
 using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.Xml.Incoming;
-using B2B.Transactions.Xml.Outgoing;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MessageHub.Model.Model;
 using Xunit;
@@ -34,21 +33,16 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
     {
         private readonly ICorrelationContext _correlationContext;
         private readonly IOutgoingMessageStore _outgoingMessageStore;
-        private readonly IMessageFactory<IDocument> _messageFactory;
         private readonly MessagePublisher _messagePublisher;
         private readonly DataAvailableNotificationPublisherSpy _dataAvailableNotificationPublisherSpy;
-        private readonly MessageValidator _messageValidator;
 
         public MessagePublisherTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
-            var systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
             _correlationContext = GetService<ICorrelationContext>();
             _outgoingMessageStore = GetService<IOutgoingMessageStore>();
-            _messageFactory = new AcceptMessageFactory(systemDateTimeProvider, new MessageValidator(new SchemaProvider(new SchemaStore())));
             _messagePublisher = GetService<MessagePublisher>();
             _dataAvailableNotificationPublisherSpy = (DataAvailableNotificationPublisherSpy)GetService<IDataAvailableNotificationPublisher>();
-            _messageValidator = new MessageValidator(new SchemaProvider(new SchemaStore()));
         }
 
         [Fact]
@@ -73,9 +67,8 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
 
         private OutgoingMessage CreateOutgoingMessage()
         {
-            var transaction = TransactionBuilder.CreateTransaction();
-            var document = _messageFactory.CreateMessage(transaction);
-            return new OutgoingMessage(document.DocumentType, document.MessagePayload, transaction.Message.ReceiverId, _correlationContext.Id);
+            var transaction = IncomingMessageBuilder.CreateMessage();
+            return new OutgoingMessage("FakeDocumentType", transaction.Message.ReceiverId, _correlationContext.Id, transaction.MarketActivityRecord.Id, transaction.MarketActivityRecord.MarketEvaluationPointId);
         }
     }
 }

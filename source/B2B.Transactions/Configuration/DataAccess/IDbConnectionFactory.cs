@@ -12,18 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
+using System.Data;
 
-namespace B2B.Transactions.DataAccess
+namespace B2B.Transactions.Configuration.DataAccess
 {
     /// <summary>
-    /// Unit of work
+    /// Factory for creating database connections
     /// </summary>
-    public interface IUnitOfWork
+    public interface IDbConnectionFactory
     {
         /// <summary>
-        /// Commits current transaction
+        /// Returns and existing open connection if any, or creates a new open connection
         /// </summary>
-        Task CommitAsync();
+        /// <returns><see cref="IDbConnection"/></returns>
+        IDbConnection GetOpenConnection();
     }
 }

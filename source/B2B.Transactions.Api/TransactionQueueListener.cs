@@ -16,6 +16,7 @@ using System;
 using System.Text;
 using System.Threading.Tasks;
 using B2B.Transactions.Configuration;
+using B2B.Transactions.IncomingMessages;
 using B2B.Transactions.Infrastructure.Serialization;
 using B2B.Transactions.Transactions;
 using Microsoft.Azure.Functions.Worker;
@@ -27,19 +28,19 @@ namespace B2B.Transactions.Api
     {
         private readonly ILogger<TransactionQueueListener> _logger;
         private readonly ICorrelationContext _correlationContext;
-        private readonly RegisterTransaction _registerTransaction;
         private readonly ISerializer _jsonSerializer;
+        private readonly IncomingMessageHandler _incomingMessageHandler;
 
         public TransactionQueueListener(
             ILogger<TransactionQueueListener> logger,
             ICorrelationContext correlationContext,
-            RegisterTransaction registerTransaction,
-            ISerializer jsonSerializer)
+            ISerializer jsonSerializer,
+            IncomingMessageHandler incomingMessageHandler)
         {
             _logger = logger;
             _correlationContext = correlationContext;
-            _registerTransaction = registerTransaction;
             _jsonSerializer = jsonSerializer;
+            _incomingMessageHandler = incomingMessageHandler;
         }
 
         [Function(nameof(TransactionQueueListener))]
@@ -52,8 +53,8 @@ namespace B2B.Transactions.Api
 
             var byteAsString = Encoding.UTF8.GetString(data);
 
-            await _registerTransaction.HandleAsync(
-                    _jsonSerializer.Deserialize<B2BTransaction>(byteAsString))
+            await _incomingMessageHandler.HandleAsync(
+                    _jsonSerializer.Deserialize<IncomingMessage>(byteAsString))
                 .ConfigureAwait(false);
 
             _logger.LogInformation("B2B transaction dequeued with correlation id: {correlationId}", _correlationContext.Id);

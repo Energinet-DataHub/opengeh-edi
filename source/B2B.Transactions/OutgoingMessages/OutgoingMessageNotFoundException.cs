@@ -12,14 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using System;
 
-namespace B2B.Transactions.Authentication
+namespace B2B.Transactions.OutgoingMessages
 {
-    public class Authenticated : MarketActorIdentity
+    public class OutgoingMessageNotFoundException : Exception
     {
-        public Authenticated(string id, string actorIdentifier, IdentifierType actorIdentifierType, IEnumerable<string> roles)
-            : base(id, actorIdentifier, actorIdentifierType, roles)
+        public OutgoingMessageNotFoundException(string messageId)
+            : base($"Message with id:{messageId} does not exist")
+        {
+        }
+
+        public OutgoingMessageNotFoundException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+        }
+
+        public OutgoingMessageNotFoundException()
         {
         }
     }

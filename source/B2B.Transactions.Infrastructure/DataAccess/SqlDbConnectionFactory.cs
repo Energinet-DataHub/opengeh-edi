@@ -14,7 +14,7 @@
 
 using System;
 using System.Data;
-using B2B.Transactions.DataAccess;
+using B2B.Transactions.Configuration.DataAccess;
 using Microsoft.Data.SqlClient;
 
 namespace B2B.Transactions.Infrastructure.DataAccess

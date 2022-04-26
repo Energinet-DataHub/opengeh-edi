@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using System.Transactions;
 using Azure.Messaging.ServiceBus;
 using B2B.CimMessageAdapter.Transactions;
+using B2B.Transactions.IncomingMessages;
 using B2B.Transactions.Infrastructure.Serialization;
 using B2B.Transactions.Transactions;
 
@@ -36,7 +37,7 @@ namespace B2B.Transactions.Infrastructure.Transactions
             _transactionQueue = new List<ServiceBusMessage>();
         }
 
-        public Task AddAsync(B2BTransaction transaction)
+        public Task AddAsync(IncomingMessage transaction)
         {
             var message = CreateMessage(transaction);
             _transactionQueue.Add(message);
@@ -52,7 +53,7 @@ namespace B2B.Transactions.Infrastructure.Transactions
             }
         }
 
-        private ServiceBusMessage CreateMessage(B2BTransaction transaction)
+        private ServiceBusMessage CreateMessage(IncomingMessage transaction)
         {
             var json = _jsonSerializer.Serialize(transaction);
             var data = Encoding.UTF8.GetBytes(json);

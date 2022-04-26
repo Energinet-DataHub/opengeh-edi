@@ -20,7 +20,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using B2B.CimMessageAdapter;
 using B2B.CimMessageAdapter.Messages;
-using B2B.Transactions.Authentication;
+using B2B.Transactions.Configuration.Authentication;
 using B2B.Transactions.IntegrationTests.CimMessageAdapter.Messages;
 using B2B.Transactions.IntegrationTests.CimMessageAdapter.Stubs;
 using B2B.Transactions.IntegrationTests.Fixtures;

@@ -45,7 +45,8 @@ namespace B2B.Transactions.IntegrationTests
                     correlation.SetId(Guid.NewGuid().ToString());
                     return correlation;
                 })
-                .AddMessagePublishing(new DataAvailableNotificationPublisherSpy());
+                .AddMessagePublishing(new DataAvailableNotificationPublisherSpy())
+                .AddOutgoingMessageDispatcher();
             _serviceProvider = services.BuildServiceProvider();
         }
 

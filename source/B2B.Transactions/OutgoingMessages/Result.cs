@@ -12,23 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using B2B.Transactions.Configuration.DataAccess;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace B2B.Transactions.Infrastructure.DataAccess
+namespace B2B.Transactions.OutgoingMessages
 {
-    public class UnitOfWork : IUnitOfWork
+    public class Result
     {
-        private readonly B2BContext _context;
-
-        public UnitOfWork(B2BContext context)
+        private Result(IEnumerable<Exception> exceptions)
         {
-            _context = context;
+            Errors = exceptions.ToList();
         }
 
-        public Task CommitAsync()
+        private Result()
         {
-            return _context.SaveChangesAsync();
+        }
+
+        public IReadOnlyCollection<Exception> Errors { get; } = new List<Exception>();
+
+        public bool Success => Errors.Count == 0;
+
+        public static Result Failure(IReadOnlyCollection<Exception> exceptions)
+        {
+            return new Result(exceptions);
+        }
+
+        public static Result Succeeded()
+        {
+            return new Result();
         }
     }
 }
