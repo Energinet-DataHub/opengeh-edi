@@ -27,6 +27,7 @@ namespace B2B.Transactions.OutgoingMessages
 {
     public class MessageFactory
     {
+        private const string Prefix = "cim";
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
         private readonly MessageValidator _messageValidator;
 
@@ -36,13 +37,10 @@ namespace B2B.Transactions.OutgoingMessages
             _messageValidator = messageValidator;
         }
 
-        #pragma warning disable
         public async Task<Stream> CreateFromAsync(MessageHeader messageHeader, ReadOnlyCollection<MarketActivityRecord> marketActivityRecords)
         {
             if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
             if (marketActivityRecords == null) throw new ArgumentNullException(nameof(marketActivityRecords));
-
-            const string Prefix = "cim";
 
             var settings = new XmlWriterSettings { OmitXmlDeclaration = false, Encoding = Encoding.UTF8, Async = true };
             using var stream = new MemoryStream();
