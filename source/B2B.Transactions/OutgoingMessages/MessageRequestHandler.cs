@@ -14,11 +14,10 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using B2B.Transactions.IncomingMessages;
-using B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier;
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using MarketActivityRecord = B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier.MarketActivityRecord;
 
 namespace B2B.Transactions.OutgoingMessages
@@ -52,17 +51,7 @@ namespace B2B.Transactions.OutgoingMessages
                 return Result.Failure(exceptions);
             }
 
-            var incomingMessage = _incomingMessageStore.GetById(messages[0].OriginalMessageId);
-            var messageHeader = new MessageHeader(incomingMessage!.Message.ProcessType, incomingMessage.Message.ReceiverId, incomingMessage.Message.ReceiverRole, incomingMessage.Message.SenderId, incomingMessage.Message.SenderRole);
-
-            var marketActivityRecords = new List<MarketActivityRecord>();
-            foreach (var outgoingMessage in messages)
-            {
-                marketActivityRecords.Add(
-                    new MarketActivityRecord(outgoingMessage.Id.ToString(), incomingMessage.MarketActivityRecord.Id, incomingMessage.MarketActivityRecord.MarketEvaluationPointId));
-            }
-
-            var message = await _messageFactory.CreateFromAsync(messageHeader, marketActivityRecords.AsReadOnly()).ConfigureAwait(false);
+            var message = await CreateMessageFromAsync(messages).ConfigureAwait(false);
             await _messageDispatcher.DispatchAsync(message).ConfigureAwait(false);
 
             return Result.Succeeded();
@@ -74,6 +63,20 @@ namespace B2B.Transactions.OutgoingMessages
                 .Except(messages.Select(message => message.Id.ToString()))
                 .Select(messageId => new OutgoingMessageNotFoundException(messageId))
                 .ToList();
+        }
+
+        private Task<Stream> CreateMessageFromAsync(ReadOnlyCollection<OutgoingMessage> outgoingMessages)
+        {
+            var incomingMessage = _incomingMessageStore.GetById(outgoingMessages[0].OriginalMessageId);
+            var messageHeader = new MessageHeader(incomingMessage!.Message.ProcessType, incomingMessage.Message.ReceiverId, incomingMessage.Message.ReceiverRole, incomingMessage.Message.SenderId, incomingMessage.Message.SenderRole);
+            var marketActivityRecords = new List<MarketActivityRecord>();
+            foreach (var outgoingMessage in outgoingMessages)
+            {
+                marketActivityRecords.Add(
+                    new MarketActivityRecord(outgoingMessage.Id.ToString(), incomingMessage.MarketActivityRecord.Id, incomingMessage.MarketActivityRecord.MarketEvaluationPointId));
+            }
+
+            return _messageFactory.CreateFromAsync(messageHeader, marketActivityRecords.AsReadOnly());
         }
     }
 }
