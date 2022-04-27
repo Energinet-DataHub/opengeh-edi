@@ -20,7 +20,8 @@ namespace B2B.Transactions.IntegrationTests.Transactions
 {
     internal class IncomingMessageBuilder
     {
-        private string _processType = string.Empty;
+        private string _processType = "NotSet";
+        private string _senderId = "NotSet";
 
         internal static IncomingMessage CreateMessage()
         {
@@ -44,10 +45,23 @@ namespace B2B.Transactions.IntegrationTests.Transactions
             return this;
         }
 
+        internal IncomingMessageBuilder WithSenderId(string senderId)
+        {
+            _senderId = senderId;
+            return this;
+        }
+
         internal IncomingMessage Build()
         {
             return IncomingMessage.Create(
-                new MessageHeader(Guid.NewGuid().ToString(), _processType, "senderIdfake", "DDZ", DataHubDetails.IdentificationNumber, "DDQ", "fake"),
+                new MessageHeader(
+                    Guid.NewGuid().ToString(),
+                    _processType,
+                    _senderId,
+                    "DDZ",
+                    DataHubDetails.IdentificationNumber,
+                    "DDQ",
+                    "fake"),
                 new MarketActivityRecord()
                 {
                     BalanceResponsibleId = "fake",
