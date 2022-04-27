@@ -12,26 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using B2B.Transactions.IncomingMessages;
-using B2B.Transactions.Transactions;
+using System.Collections.Generic;
 
-namespace B2B.CimMessageAdapter.Transactions
+namespace B2B.Transactions.Configuration.Authentication
 {
-    /// <summary>
-    /// Service for dispatching B2B transactions to transaction queue
-    /// </summary>
-    public interface ITransactionQueueDispatcher
+    public class Authenticated : MarketActorIdentity
     {
-        /// <summary>
-        /// Adds a transaction to collection
-        /// </summary>
-        /// <param name="transaction"></param>
-        Task AddAsync(IncomingMessage transaction);
-
-        /// <summary>
-        /// Commits added transactions to queue
-        /// </summary>
-        Task CommitAsync();
+        public Authenticated(string id, string actorIdentifier, IdentifierType actorIdentifierType, IEnumerable<string> roles)
+            : base(id, actorIdentifier, actorIdentifierType, roles)
+        {
+        }
     }
 }

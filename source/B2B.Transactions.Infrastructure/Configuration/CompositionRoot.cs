@@ -17,9 +17,10 @@ using Azure.Messaging.ServiceBus;
 using B2B.CimMessageAdapter;
 using B2B.CimMessageAdapter.Messages;
 using B2B.CimMessageAdapter.Transactions;
-using B2B.Transactions.Authentication;
 using B2B.Transactions.Configuration;
-using B2B.Transactions.DataAccess;
+using B2B.Transactions.Configuration.Authentication;
+using B2B.Transactions.Configuration.DataAccess;
+using B2B.Transactions.IncomingMessages;
 using B2B.Transactions.Infrastructure.Authentication;
 using B2B.Transactions.Infrastructure.DataAccess;
 using B2B.Transactions.Infrastructure.DataAccess.Transaction;
@@ -29,8 +30,8 @@ using B2B.Transactions.Infrastructure.Serialization;
 using B2B.Transactions.Infrastructure.Transactions;
 using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.Transactions;
+using B2B.Transactions.Xml;
 using B2B.Transactions.Xml.Incoming;
-using B2B.Transactions.Xml.Outgoing;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
@@ -51,15 +52,15 @@ namespace B2B.Transactions.Infrastructure.Configuration
             services.AddSingleton<ISerializer, Serializer>();
             services.AddScoped<ITransactionIds, TransactionIdRegistry>();
             services.AddScoped<IMessageIds, MessageIdRegistry>();
-            services.AddScoped<IMessageFactory<IDocument>, AcceptMessageFactory>();
             services.AddScoped<ITransactionQueueDispatcher, TransactionQueueDispatcher>();
             services.AddScoped<ITransactionRepository, TransactionRepository>();
             services.AddScoped<IMarketActorAuthenticator, MarketActorAuthenticator>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
-            services.AddScoped<IMessageFactory<IDocument>, AcceptMessageFactory>();
-            services.AddScoped<RegisterTransaction>();
             services.AddScoped<MessageValidator>();
+            services.AddScoped<IncomingMessageHandler>();
+            services.AddScoped<IncomingMessageStore>();
+
             services.AddLogging();
             AddXmlSchema(services);
         }
@@ -129,6 +130,15 @@ namespace B2B.Transactions.Infrastructure.Configuration
             _services.AddScoped<IDataAvailableNotificationPublisher>(_ => dataAvailableNotificationPublisher);
             _services.AddScoped<MessagePublisher>();
             _services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
+            return this;
+        }
+
+        public CompositionRoot AddOutgoingMessageDispatcher()
+        {
+            _services.AddScoped<MessageFactory>();
+            _services.AddScoped<MessageDispatcher>();
+            _services.AddScoped<MessageRequestHandler>();
+
             return this;
         }
 

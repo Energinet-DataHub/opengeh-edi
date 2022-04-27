@@ -12,25 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using B2B.Transactions.Messages;
+using System.IO;
+using System.Threading.Tasks;
 
-namespace B2B.Transactions.Transactions
+namespace B2B.Transactions.OutgoingMessages
 {
-    public class B2BTransaction
+    public class MessageDispatcher
     {
-        private B2BTransaction(MessageHeader message, MarketActivityRecord marketActivityRecord)
+        public Stream? DispatchedMessage { get; private set; }
+
+        public async Task DispatchAsync(Stream message)
         {
-            Message = message;
-            MarketActivityRecord = marketActivityRecord;
-        }
-
-        public MessageHeader Message { get; }
-
-        public MarketActivityRecord MarketActivityRecord { get; }
-
-        public static B2BTransaction Create(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
-        {
-            return new B2BTransaction(messageHeader, marketActivityRecord);
+            DispatchedMessage = message;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
     }
 }
