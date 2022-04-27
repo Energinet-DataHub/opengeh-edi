@@ -57,6 +57,11 @@ namespace B2B.Transactions.IntegrationTests
             Assert.Equal(expectedValue, marketActivityRecord.Element(marketActivityRecord.Name.Namespace + elementName)?.Value);
         }
 
+        internal static void AssertMarketActivityRecordCount(XDocument document, int expectedCount)
+        {
+            Assert.Equal(expectedCount, GetMarketActivityRecords(document).Count);
+        }
+
         private static XElement? GetHeaderElement(XDocument document)
         {
             return document.Root;
