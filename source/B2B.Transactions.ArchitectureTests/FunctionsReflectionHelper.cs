@@ -39,14 +39,20 @@ namespace B2B.Transactions.ArchitectureTests
                 .SelectMany(GetConstructorParameters);
         }
 
+        public static Func<Type, IEnumerable<Type>, IEnumerable<Type>> FindAllTypesThatImplementType()
+        {
+            return (targetType, types) =>
+                types.Where(targetType.IsAssignableFrom);
+        }
+
+        private static ConstructorInfo? GetOnePublicConstructor(Type? type)
+        {
+            return type?.GetConstructors().SingleOrDefault(ci => ci.IsPublic && ci.IsStatic == false);
+        }
+
         private static bool MethodIsAnnotatedWithFunctionAttribute(MethodInfo methodInfo)
         {
             return methodInfo.GetCustomAttributes(_functionAttribute).Any();
-        }
-
-        private static ConstructorInfo? GetOnePublicConstructor(Type type)
-        {
-            return type.GetConstructors().SingleOrDefault(ci => ci.IsPublic && ci.IsStatic == false);
         }
 
         private static IEnumerable<Type> GetConstructorParameters(ConstructorInfo? ci)

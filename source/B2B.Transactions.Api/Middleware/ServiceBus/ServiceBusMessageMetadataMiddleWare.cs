@@ -25,9 +25,9 @@ namespace B2B.Transactions.Api.Middleware.ServiceBus
 {
     public class ServiceBusMessageMetadataMiddleWare : IFunctionsWorkerMiddleware
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<ServiceBusMessageMetadataMiddleWare> _logger;
 
-        public ServiceBusMessageMetadataMiddleWare(ILogger logger)
+        public ServiceBusMessageMetadataMiddleWare(ILogger<ServiceBusMessageMetadataMiddleWare> logger)
         {
             _logger = logger;
         }
