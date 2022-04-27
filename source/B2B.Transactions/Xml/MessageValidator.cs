@@ -15,60 +15,49 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
-using B2B.Transactions.Xml.Incoming;
 
 namespace B2B.Transactions.Xml
 {
-    public class MessageValidator
+    public static class MessageValidator
     {
-        private readonly ISchemaProvider _schemaProvider;
-        private readonly List<string> _errors = new();
-
-        public MessageValidator(ISchemaProvider schemaProvider)
+        public static async Task<ValidationResult> ValidateAsync(Stream message, XmlSchema schema)
         {
-            _schemaProvider = schemaProvider ?? throw new ArgumentNullException(nameof(schemaProvider));
-        }
+            if (message == null) throw new ArgumentNullException(nameof(message));
+            if (schema == null) throw new ArgumentNullException(nameof(schema));
 
-        public bool Success => _errors.Count == 0;
-
-        public string Errors() => string.Join(",", _errors);
-
-        public async Task ParseAsync(string message, string businessProcessType, string version)
-        {
-            var xmlSchema = await _schemaProvider.GetSchemaAsync(businessProcessType, version).ConfigureAwait(true);
-            if (xmlSchema is null)
+            var validationErrors = new List<string>();
+            var settings = CreateXmlReaderSettings(schema);
+            settings.ValidationEventHandler += (sender, arguments) =>
             {
-                _errors.Add(
-                    $"{businessProcessType} version {version} could not be found in internal schema store");
-                return;
+                validationErrors.Add($"{arguments.Exception.LineNumber}, position {arguments.Exception.LinePosition}: {arguments.Message}");
+            };
+
+            using (var reader = XmlReader.Create(message, settings))
+            {
+                MoveToStartPosition(message);
+                await ReadEntireMessageAsync(reader).ConfigureAwait(false);
+                MoveToStartPosition(message);
             }
 
-            var messageStream = CreateStreamFromString(message);
-            using (var reader = XmlReader.Create(messageStream, CreateXmlReaderSettings(xmlSchema)))
+            return validationErrors.Count == 0 ? ValidationResult.Valid() : ValidationResult.Invalid(validationErrors);
+        }
+
+        private static async Task ReadEntireMessageAsync(XmlReader reader)
+        {
+            while (await reader.ReadAsync().ConfigureAwait(false))
             {
-                while (await reader.ReadAsync().ConfigureAwait(false))
-                {
-                }
             }
-
-            await messageStream.DisposeAsync().ConfigureAwait(false);
         }
 
-        private static Stream CreateStreamFromString(string input)
+        private static void MoveToStartPosition(Stream message)
         {
-            return new MemoryStream(Encoding.UTF8.GetBytes(input));
+            message.Position = 0;
         }
 
-        private void OnValidationError(object? sender, ValidationEventArgs arguments)
-        {
-            _errors.Add($"XML schema validation error at line {arguments.Exception.LineNumber}, position {arguments.Exception.LinePosition}: {arguments.Message}");
-        }
-
-        private XmlReaderSettings CreateXmlReaderSettings(XmlSchema xmlSchema)
+        private static XmlReaderSettings CreateXmlReaderSettings(XmlSchema xmlSchema)
         {
             var settings = new XmlReaderSettings
             {
@@ -79,7 +68,6 @@ namespace B2B.Transactions.Xml
             };
 
             settings.Schemas.Add(xmlSchema);
-            settings.ValidationEventHandler += OnValidationError;
             return settings;
         }
     }

@@ -14,12 +14,16 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using B2B.Transactions.Configuration;
 using B2B.Transactions.IncomingMessages;
 using B2B.Transactions.IntegrationTests.Fixtures;
 using B2B.Transactions.IntegrationTests.Transactions;
 using B2B.Transactions.OutgoingMessages;
+using B2B.Transactions.Xml;
+using B2B.Transactions.Xml.Incoming;
 using Xunit;
 
 namespace B2B.Transactions.IntegrationTests.OutgoingMessages
@@ -51,13 +55,14 @@ namespace B2B.Transactions.IntegrationTests.OutgoingMessages
             var requestedMessageIds = new List<string> { outgoingMessage1.Id.ToString(), outgoingMessage2.Id.ToString(), };
             var result = await _messageRequestHandler.HandleAsync(requestedMessageIds.AsReadOnly()).ConfigureAwait(false);
 
-            var dispatchedMessage = _messageDispatcher.DispatchedMessage;
-            var document = XDocument.Load(dispatchedMessage!);
-            var marketActivityRecords = AssertXmlMessage.GetMarketActivityRecords(document);
-            Assert.Equal(2, marketActivityRecords.Count);
             Assert.True(result.Success);
-            AssertMarketActivityRecord(document, incomingMessage1, outgoingMessage1);
-            AssertMessageHeader(document, incomingMessage1);
+
+            var dispatchedMessage = _messageDispatcher.DispatchedMessage;
+            var message = XDocument.Load(dispatchedMessage!);
+            AssertXmlMessage.AssertMarketActivityRecordCount(message, 2);
+            AssertMarketActivityRecord(message, incomingMessage1, outgoingMessage1);
+            AssertMessageHeader(message, incomingMessage1);
+            await AssertMessageConformsToSchema(dispatchedMessage).ConfigureAwait(false);
         }
 
         [Fact]
@@ -77,7 +82,7 @@ namespace B2B.Transactions.IntegrationTests.OutgoingMessages
             AssertXmlMessage.AssertHasHeaderValue(document, "type", "414");
             AssertXmlMessage.AssertHasHeaderValue(document, "process.processType", "E03");
             AssertXmlMessage.AssertHasHeaderValue(document, "businessSector.type", "23");
-            AssertXmlMessage.AssertHasHeaderValue(document, "sender_MarketParticipant.mRID", "5790001330552");
+            AssertXmlMessage.AssertHasHeaderValue(document, "sender_MarketParticipant.mRID", DataHubDetails.IdentificationNumber);
             AssertXmlMessage.AssertHasHeaderValue(document, "sender_MarketParticipant.marketRole.type", "DDZ");
             AssertXmlMessage.AssertHasHeaderValue(document, "receiver_MarketParticipant.mRID", incomingMessage.Message.SenderId);
             AssertXmlMessage.AssertHasHeaderValue(document, "receiver_MarketParticipant.marketRole.type", incomingMessage.Message.SenderRole);
@@ -91,6 +96,14 @@ namespace B2B.Transactions.IntegrationTests.OutgoingMessages
             Assert.NotNull(marketActivityRecord);
             AssertXmlMessage.AssertMarketActivityRecordValue(marketActivityRecord, "originalTransactionIDReference_MktActivityRecord.mRID", incomingMessage.MarketActivityRecord.Id);
             AssertXmlMessage.AssertMarketActivityRecordValue(marketActivityRecord, "marketEvaluationPoint.mRID", incomingMessage.MarketActivityRecord.MarketEvaluationPointId);
+        }
+
+        private async Task AssertMessageConformsToSchema(Stream? dispatchedMessage)
+        {
+            var schema = await GetService<ISchemaProvider>().GetSchemaAsync("confirmrequestchangeofsupplier", "1.0")
+                .ConfigureAwait(false);
+            var validationResult = await MessageValidator.ValidateAsync(dispatchedMessage!, schema!).ConfigureAwait(false);
+            Assert.True(validationResult.IsValid);
         }
 
         private async Task<IncomingMessage> MessageArrived()

@@ -11,18 +11,28 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 namespace B2B.Transactions.OutgoingMessages
 {
-    public class AcceptMessage : IDocument
+    public class MessageHeader
     {
-        public AcceptMessage(string messagePayload, string messageType)
+        public MessageHeader(string processType, string senderId, string senderRole, string receiverId, string receiverRole)
         {
-            MessagePayload = messagePayload;
-            DocumentType = messageType;
+            ProcessType = processType;
+            SenderId = senderId;
+            SenderRole = senderRole;
+            ReceiverId = receiverId;
+            ReceiverRole = receiverRole;
         }
 
-        public string MessagePayload { get; init; }
+        public string ProcessType { get; }
 
-        public string DocumentType { get; init; }
+        public string SenderId { get; }
+
+        public string SenderRole { get; }
+
+        public string ReceiverId { get; }
+
+        public string ReceiverRole { get; }
     }
 }

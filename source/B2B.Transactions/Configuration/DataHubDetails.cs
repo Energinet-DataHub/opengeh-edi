@@ -12,21 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace B2B.Transactions.OutgoingMessages
+namespace B2B.Transactions.Configuration
 {
-    /// <summary>
-    /// Interface for outgoing messages
-    /// </summary>
-    public interface IDocument
+    public static class DataHubDetails
     {
-        /// <summary>
-        /// Payload of the outgoing message
-        /// </summary>
-        string MessagePayload { get; init; }
-
-        /// <summary>
-        /// The type of the message
-        /// </summary>
-        string DocumentType { get; init; }
+        public static string IdentificationNumber => "5790001330552";
     }
 }

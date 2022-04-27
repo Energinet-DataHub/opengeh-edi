@@ -18,101 +18,56 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using B2B.Transactions.IncomingMessages;
-using B2B.Transactions.Transactions;
-using B2B.Transactions.Xml;
+using B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
 namespace B2B.Transactions.OutgoingMessages
 {
     public class MessageFactory
     {
-        private readonly IncomingMessageStore _incomingMessageStore;
+        private const string Prefix = "cim";
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-        private readonly MessageValidator _messageValidator;
 
-        public MessageFactory(IncomingMessageStore incomingMessageStore, ISystemDateTimeProvider systemDateTimeProvider, MessageValidator messageValidator)
+        public MessageFactory(ISystemDateTimeProvider systemDateTimeProvider)
         {
-            _incomingMessageStore = incomingMessageStore;
             _systemDateTimeProvider = systemDateTimeProvider;
-            _messageValidator = messageValidator;
         }
 
-        public async Task<Stream> CreateFromAsync(ReadOnlyCollection<OutgoingMessage> messages)
+        public async Task<Stream> CreateFromAsync(MessageHeader messageHeader, ReadOnlyCollection<MarketActivityRecord> marketActivityRecords)
         {
-            if (messages == null) throw new ArgumentNullException(nameof(messages));
-
-            const string Prefix = "cim";
-
-            var incomingMessage = _incomingMessageStore.GetById(messages[0].OriginalMessageId);
-
-            if (incomingMessage is null)
-            {
-                throw new InvalidOperationException();
-            }
+            if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
+            if (marketActivityRecords == null) throw new ArgumentNullException(nameof(marketActivityRecords));
 
             var settings = new XmlWriterSettings { OmitXmlDeclaration = false, Encoding = Encoding.UTF8, Async = true };
-            using var stream = new MemoryStream();
-            using var output = new Utf8StringWriter();
-            using var writer = XmlWriter.Create(output, settings);
-
-            await writer.WriteStartDocumentAsync().ConfigureAwait(false);
-            await writer.WriteStartElementAsync(Prefix, "ConfirmRequestChangeOfSupplier_MarketDocument", "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1").ConfigureAwait(false);
-            await writer.WriteAttributeStringAsync("xmlns", "xsi", null, "http://www.w3.org/2001/XMLSchema-instance").ConfigureAwait(false);
-            await writer.WriteAttributeStringAsync(
-                "xsi",
-                "schemaLocation",
-                null,
-                "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1 urn-ediel-org-structure-confirmrequestchangeofsupplier-0-1.xsd").ConfigureAwait(false);
-            await writer.WriteElementStringAsync(Prefix, "mRID", null, GenerateMessageId()).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(Prefix, "type", null, "414").ConfigureAwait(false);
-            await writer.WriteElementStringAsync(Prefix, "process.processType", null, incomingMessage.Message.ProcessType).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(Prefix, "businessSector.type", null, "23").ConfigureAwait(false);
-
-            await writer.WriteStartElementAsync(Prefix, "sender_MarketParticipant.mRID", null).ConfigureAwait(false);
-            await writer.WriteAttributeStringAsync(null, "codingScheme", null, "A10").ConfigureAwait(false);
-            writer.WriteValue("5790001330552");
+            var stream = new MemoryStream();
+            await using var writer = XmlWriter.Create(stream, settings);
+            await WriteMessageHeaderAsync(messageHeader, writer).ConfigureAwait(false);
+            await WriteMarketActivityRecordsAsync(marketActivityRecords, writer).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
+            writer.Close();
+            stream.Position = 0;
 
-            await writer.WriteElementStringAsync(Prefix, "sender_MarketParticipant.marketRole.type", null, "DDZ").ConfigureAwait(false);
+            return stream;
+        }
 
-            await writer.WriteStartElementAsync(Prefix, "receiver_MarketParticipant.mRID", null).ConfigureAwait(false);
-            await writer.WriteAttributeStringAsync(null, "codingScheme", null, "A10").ConfigureAwait(false);
-            writer.WriteValue(incomingMessage.Message.SenderId);
-            await writer.WriteEndElementAsync().ConfigureAwait(false);
-
-            await writer.WriteElementStringAsync(Prefix, "receiver_MarketParticipant.marketRole.type", null, incomingMessage.Message.SenderRole).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(Prefix, "createdDateTime", null, GetCurrentDateTime()).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(Prefix, "reason.code", null, "A01").ConfigureAwait(false);
-
-            foreach (var message in messages)
+        private static async Task WriteMarketActivityRecordsAsync(ReadOnlyCollection<MarketActivityRecord> marketActivityRecords, XmlWriter writer)
+        {
+            foreach (var marketActivityRecord in marketActivityRecords)
             {
-                var originalMessage = _incomingMessageStore.GetById(message.OriginalMessageId);
-
-                if (originalMessage is null)
-                {
-                    throw new InvalidOperationException();
-                }
-
                 await writer.WriteStartElementAsync(Prefix, "MktActivityRecord", null).ConfigureAwait(false);
-                await writer.WriteElementStringAsync(Prefix, "mRID", null, message.Id.ToString()).ConfigureAwait(false);
-                await writer.WriteElementStringAsync(Prefix, "originalTransactionIDReference_MktActivityRecord.mRID", null, originalMessage.MarketActivityRecord.Id).ConfigureAwait(false);
+                await writer.WriteElementStringAsync(Prefix, "mRID", null, marketActivityRecord.Id.ToString())
+                    .ConfigureAwait(false);
+                await writer.WriteElementStringAsync(
+                    Prefix,
+                    "originalTransactionIDReference_MktActivityRecord.mRID",
+                    null,
+                    marketActivityRecord.OriginalTransactionId).ConfigureAwait(false);
                 await writer.WriteStartElementAsync(Prefix, "marketEvaluationPoint.mRID", null).ConfigureAwait(false);
                 await writer.WriteAttributeStringAsync(null, "codingScheme", null, "A10").ConfigureAwait(false);
-                writer.WriteValue(originalMessage.MarketActivityRecord.MarketEvaluationPointId);
+                writer.WriteValue(marketActivityRecord.MarketEvaluationPointId);
                 await writer.WriteEndElementAsync().ConfigureAwait(false);
                 await writer.WriteEndElementAsync().ConfigureAwait(false);
             }
-
-            await writer.WriteEndElementAsync().ConfigureAwait(false);
-            writer.Close();
-            await output.FlushAsync().ConfigureAwait(false);
-
-            await ValidateXmlAgainstSchemaAsync(output).ConfigureAwait(false);
-
-            var data = Encoding.UTF8.GetBytes(output.ToString());
-
-            return new MemoryStream(data);
         }
 
         private static string GenerateMessageId()
@@ -120,19 +75,50 @@ namespace B2B.Transactions.OutgoingMessages
             return MessageIdGenerator.Generate();
         }
 
+        private async Task WriteMessageHeaderAsync(MessageHeader messageHeader, XmlWriter writer)
+        {
+            await writer.WriteStartDocumentAsync().ConfigureAwait(false);
+            await writer.WriteStartElementAsync(
+                Prefix,
+                "ConfirmRequestChangeOfSupplier_MarketDocument",
+                "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1").ConfigureAwait(false);
+            await writer.WriteAttributeStringAsync("xmlns", "xsi", null, "http://www.w3.org/2001/XMLSchema-instance")
+                .ConfigureAwait(false);
+            await writer.WriteAttributeStringAsync(
+                    "xsi",
+                    "schemaLocation",
+                    null,
+                    "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1 urn-ediel-org-structure-confirmrequestchangeofsupplier-0-1.xsd")
+                .ConfigureAwait(false);
+            await writer.WriteElementStringAsync(Prefix, "mRID", null, GenerateMessageId()).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(Prefix, "type", null, "414").ConfigureAwait(false);
+            await writer.WriteElementStringAsync(Prefix, "process.processType", null, messageHeader.ProcessType)
+                .ConfigureAwait(false);
+            await writer.WriteElementStringAsync(Prefix, "businessSector.type", null, "23").ConfigureAwait(false);
+
+            await writer.WriteStartElementAsync(Prefix, "sender_MarketParticipant.mRID", null).ConfigureAwait(false);
+            await writer.WriteAttributeStringAsync(null, "codingScheme", null, "A10").ConfigureAwait(false);
+            writer.WriteValue(messageHeader.SenderId);
+            await writer.WriteEndElementAsync().ConfigureAwait(false);
+
+            await writer.WriteElementStringAsync(Prefix, "sender_MarketParticipant.marketRole.type", null, "DDZ")
+                .ConfigureAwait(false);
+
+            await writer.WriteStartElementAsync(Prefix, "receiver_MarketParticipant.mRID", null).ConfigureAwait(false);
+            await writer.WriteAttributeStringAsync(null, "codingScheme", null, "A10").ConfigureAwait(false);
+            writer.WriteValue(messageHeader.ReceiverId);
+            await writer.WriteEndElementAsync().ConfigureAwait(false);
+
+            await writer
+                .WriteElementStringAsync(Prefix, "receiver_MarketParticipant.marketRole.type", null, messageHeader.ReceiverRole)
+                .ConfigureAwait(false);
+            await writer.WriteElementStringAsync(Prefix, "createdDateTime", null, GetCurrentDateTime()).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(Prefix, "reason.code", null, "A01").ConfigureAwait(false);
+        }
+
         private string GetCurrentDateTime()
         {
             return _systemDateTimeProvider.Now().ToString();
-        }
-
-        private async Task ValidateXmlAgainstSchemaAsync(Utf8StringWriter output)
-        {
-            await _messageValidator.ParseAsync(output.ToString(), "confirmrequestchangeofsupplier", "1.0").ConfigureAwait(false);
-            if (!_messageValidator.Success)
-            {
-                throw new InvalidOperationException(
-                    $"Generated accept message does not conform with XSD schema definition: {_messageValidator.Errors()}");
-            }
         }
     }
 }
