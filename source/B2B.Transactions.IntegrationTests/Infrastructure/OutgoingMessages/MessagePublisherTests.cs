@@ -20,9 +20,6 @@ using B2B.Transactions.IntegrationTests.Fixtures;
 using B2B.Transactions.IntegrationTests.TestDoubles;
 using B2B.Transactions.IntegrationTests.Transactions;
 using B2B.Transactions.OutgoingMessages;
-using B2B.Transactions.Xml.Incoming;
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
-using Energinet.DataHub.MessageHub.Model.Model;
 using Xunit;
 using Xunit.Categories;
 
