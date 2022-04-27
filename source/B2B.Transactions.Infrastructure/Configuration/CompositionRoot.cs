@@ -29,6 +29,7 @@ using B2B.Transactions.Infrastructure.OutgoingMessages;
 using B2B.Transactions.Infrastructure.Serialization;
 using B2B.Transactions.Infrastructure.Transactions;
 using B2B.Transactions.OutgoingMessages;
+using B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using B2B.Transactions.Transactions;
 using B2B.Transactions.Xml;
 using B2B.Transactions.Xml.Incoming;

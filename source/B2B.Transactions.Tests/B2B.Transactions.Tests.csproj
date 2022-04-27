@@ -34,4 +34,8 @@ limitations under the License.
         </PackageReference>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\B2B.Transactions\B2B.Transactions.csproj" />
+    </ItemGroup>
+
 </Project>
