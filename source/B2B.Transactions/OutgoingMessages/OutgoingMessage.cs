@@ -18,19 +18,43 @@ namespace B2B.Transactions.OutgoingMessages
 {
     public class OutgoingMessage
     {
-        public OutgoingMessage(IDocument document, string recipientId)
+        public OutgoingMessage(string documentType, string recipientId, string correlationId, string originalMessageId, string marketEvaluationPointId, string processType)
         {
-            Document = document ?? throw new ArgumentNullException(nameof(document));
+            DocumentType = documentType;
             RecipientId = recipientId;
+            CorrelationId = correlationId;
+            OriginalMessageId = originalMessageId;
+            MarketEvaluationPointId = marketEvaluationPointId;
+            ProcessType = processType;
+            Id = Guid.NewGuid();
         }
 
-        public IDocument Document { get; }
+        private OutgoingMessage(Guid id, string documentType, string recipientId, string correlationId, string originalMessageId, string marketEvaluationPointId, string processType)
+        {
+            DocumentType = documentType;
+            RecipientId = recipientId;
+            CorrelationId = correlationId;
+            OriginalMessageId = originalMessageId;
+            MarketEvaluationPointId = marketEvaluationPointId;
+            ProcessType = processType;
+            Id = id;
+        }
+
+        public Guid Id { get; }
 
         public bool IsPublished { get; private set; }
 
         public string RecipientId { get; }
 
-        public string DocumentType => Document.DocumentType;
+        public string DocumentType { get; }
+
+        public string CorrelationId { get; }
+
+        public string OriginalMessageId { get; }
+
+        public string MarketEvaluationPointId { get; }
+
+        public string ProcessType { get; }
 
         public void Published()
         {

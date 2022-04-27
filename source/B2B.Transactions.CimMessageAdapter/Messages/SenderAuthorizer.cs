@@ -17,7 +17,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using B2B.CimMessageAdapter.Errors;
 using B2B.Transactions;
-using B2B.Transactions.Authentication;
+using B2B.Transactions.Configuration.Authentication;
 
 namespace B2B.CimMessageAdapter.Messages
 {

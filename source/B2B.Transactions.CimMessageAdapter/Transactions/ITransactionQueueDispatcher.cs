@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
+using B2B.Transactions.IncomingMessages;
 using B2B.Transactions.Transactions;
 
 namespace B2B.CimMessageAdapter.Transactions
@@ -26,7 +27,7 @@ namespace B2B.CimMessageAdapter.Transactions
         /// Adds a transaction to collection
         /// </summary>
         /// <param name="transaction"></param>
-        Task AddAsync(B2BTransaction transaction);
+        Task AddAsync(IncomingMessage transaction);
 
         /// <summary>
         /// Commits added transactions to queue

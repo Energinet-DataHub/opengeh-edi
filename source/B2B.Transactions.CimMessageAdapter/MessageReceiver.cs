@@ -21,8 +21,8 @@ using B2B.CimMessageAdapter.Errors;
 using B2B.CimMessageAdapter.Messages;
 using B2B.CimMessageAdapter.Transactions;
 using B2B.Transactions;
-using B2B.Transactions.Authentication;
-using B2B.Transactions.Messages;
+using B2B.Transactions.Configuration.Authentication;
+using B2B.Transactions.IncomingMessages;
 using B2B.Transactions.Transactions;
 using B2B.Transactions.Xml.Incoming;
 
@@ -89,9 +89,9 @@ namespace B2B.CimMessageAdapter
             return messageParserResult.MessageHeader is null || messageParserResult.Success == false;
         }
 
-        private static B2BTransaction CreateTransaction(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
+        private static IncomingMessage CreateTransaction(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
         {
-            return B2BTransaction.Create(messageHeader, marketActivityRecord);
+            return IncomingMessage.Create(messageHeader, marketActivityRecord);
         }
 
         private Task<bool> CheckTransactionIdAsync(string transactionId)
@@ -100,7 +100,7 @@ namespace B2B.CimMessageAdapter
             return _transactionIds.TryStoreAsync(transactionId);
         }
 
-        private Task AddToTransactionQueueAsync(B2BTransaction transaction)
+        private Task AddToTransactionQueueAsync(IncomingMessage transaction)
         {
             return _transactionQueueDispatcher.AddAsync(transaction);
         }

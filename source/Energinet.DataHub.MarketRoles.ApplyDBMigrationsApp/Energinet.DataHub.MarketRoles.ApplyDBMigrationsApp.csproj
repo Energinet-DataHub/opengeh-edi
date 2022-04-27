@@ -42,6 +42,12 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202203291130 Add Transactions.sql" />
     <EmbeddedResource Include="Scripts\Model\202204011130 Add OutboxMessages BTwoB Schema.sql" />
     <EmbeddedResource Include="Scripts\Model\202204071500 Remove OutboxMessages from transactions schema.sql" />
+    <EmbeddedResource Include="Scripts\Model\202240211330 Add market evaluation point.sql" />
+    <EmbeddedResource Include="Scripts\Model\202240211330 Add original transaction id.sql" />
+    <EmbeddedResource Include="Scripts\Model\202240191630 Add correlation id.sql" />
+    <EmbeddedResource Include="Scripts\Model\202240221330 Remove MessagePayload.sql" />
+    <EmbeddedResource Include="Scripts\Model\202240221415 Rename original transaction id.sql" />
+    <EmbeddedResource Include="Scripts\Model\202240271047 Add process type.sql" />
     <EmbeddedResource Include="Scripts\Seed\202109301255 Insert AccountPoints.sql" />
     <None Remove="Scripts\Seed\202109301258 Insert EnergySuppliers.sql" />
     <EmbeddedResource Include="Scripts\Seed\202109301258 Insert EnergySuppliers.sql" />
@@ -59,6 +65,9 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202240081038 Add TransactionIds to BtoB schema.sql" />
     <None Remove="Scripts\Model\202204081040 Add MessageIds to BtoB schema.sql" />
     <EmbeddedResource Include="Scripts\Model\202204081040 Add MessageIds to BtoB schema.sql" />
+    <None Remove="Scripts\Model\202208042310 Create BTwoB Schema And Tables.sql" />
+    <None Remove="Scripts\Model\202208042310 Create BToB Schema And Tables.sql" />
+    <EmbeddedResource Include="Scripts\Model\202208042310 Create BToB Schema And Tables.sql" />
   </ItemGroup>
 
 </Project>

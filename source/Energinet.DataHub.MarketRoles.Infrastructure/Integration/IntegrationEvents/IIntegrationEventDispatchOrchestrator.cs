@@ -14,7 +14,7 @@
 
 using System.Threading.Tasks;
 
-namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEventDispatching
+namespace Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents
 {
     /// <summary>
     /// Interface for the integration event dispatch orchestrator

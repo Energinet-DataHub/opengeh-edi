@@ -40,8 +40,9 @@ module "func_receiver" {
     MARKET_DATA_QUEUE_URL                         = "${module.sb_marketroles.name}.servicebus.windows.net:9093"
     TRANSACTIONS_QUEUE_SENDER_CONNECTION_STRING   = module.sb_marketroles.primary_connection_strings["send"]
     TRANSACTIONS_QUEUE_LISTENER_CONNECTION_STRING = module.sb_marketroles.primary_connection_strings["listen"]
-    DB_CONNECTION_STRING             		  = local.MS_MARKETROLES_CONNECTION_STRING
+    DB_CONNECTION_STRING             		          = local.MS_MARKETROLES_CONNECTION_STRING
     TRANSACTIONS_QUEUE_NAME                       = module.sbq_marketactivity.name
+    RAISE_TIME_HAS_PASSED_EVENT_SCHEDULE          = "*/10 * * * * *"
   }
   
   tags                                      = azurerm_resource_group.this.tags

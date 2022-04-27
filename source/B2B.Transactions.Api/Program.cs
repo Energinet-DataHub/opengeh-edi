@@ -15,14 +15,12 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Threading.Tasks;
-using B2B.Transactions.Infrastructure.Authentication.Bearer;
-using B2B.Transactions.Infrastructure.Authentication.MarketActors;
+using B2B.Transactions.Api.Middleware.Authentication.Bearer;
+using B2B.Transactions.Api.Middleware.Authentication.MarketActors;
+using B2B.Transactions.Api.Middleware.Correlation;
+using B2B.Transactions.Api.Middleware.ServiceBus;
 using B2B.Transactions.Infrastructure.Configuration;
-using B2B.Transactions.Infrastructure.Configuration.Correlation;
-using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
-using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -34,9 +32,28 @@ namespace B2B.Transactions.Api
     {
         public static async Task Main()
         {
-            var tokenValidationParameters = await GetTokenValidationParametersAsync().ConfigureAwait(false);
+            var runtime = RuntimeEnvironment.Default;
+            var tokenValidationParameters = await GetTokenValidationParametersAsync(runtime).ConfigureAwait(false);
 
-            var host = new HostBuilder()
+            var host = ConfigureHost(tokenValidationParameters, runtime);
+
+            await host.RunAsync().ConfigureAwait(false);
+        }
+
+        public static TokenValidationParameters DevelopmentTokenValidationParameters()
+        {
+            return new TokenValidationParameters()
+            {
+                ValidateAudience = false,
+                ValidateIssuer = false,
+                ValidateLifetime = false,
+                SignatureValidator = (token, parameters) => new JwtSecurityToken(token),
+            };
+        }
+
+        public static IHost ConfigureHost(TokenValidationParameters tokenValidationParameters, RuntimeEnvironment runtime)
+        {
+            return new HostBuilder()
                 .ConfigureFunctionsWorkerDefaults(worker =>
                 {
                     worker.UseMiddleware<CorrelationIdMiddleware>();
@@ -44,11 +61,11 @@ namespace B2B.Transactions.Api
                     worker.UseMiddleware<BearerAuthenticationMiddleware>();
                     worker.UseMiddleware<ClaimsEnrichmentMiddleware>();
                     worker.UseMiddleware<MarketActorAuthenticatorMiddleware>();
+                    worker.UseMiddleware<ServiceBusMessageMetadataMiddleWare>();
                 })
                 .ConfigureServices(services =>
                 {
-                    var databaseConnectionString =
-                        Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+                    var databaseConnectionString = runtime.DB_CONNECTION_STRING;
                     CompositionRoot.Initialize(services)
                         .AddBearerAuthentication(tokenValidationParameters)
                         .AddDatabaseConnectionFactory(databaseConnectionString!)
@@ -57,53 +74,27 @@ namespace B2B.Transactions.Api
                         .AddCorrelationContext(sp =>
                         {
                             var correlationContext = new CorrelationContext();
-                            if (!IsRunningLocally()) return correlationContext;
+                            if (!runtime.IsRunningLocally()) return correlationContext;
                             correlationContext.SetId(Guid.NewGuid().ToString());
                             correlationContext.SetParentId(Guid.NewGuid().ToString());
 
                             return correlationContext;
                         })
                         .AddTransactionQueue(
-                            Environment.GetEnvironmentVariable("TRANSACTIONS_QUEUE_SENDER_CONNECTION_STRING")!,
-                            Environment.GetEnvironmentVariable("TRANSACTIONS_QUEUE_NAME")!)
+                            runtime.TRANSACTIONS_QUEUE_SENDER_CONNECTION_STRING!,
+                            runtime.TRANSACTIONS_QUEUE_NAME!)
                         .AddRequestLogging(
                             Environment.GetEnvironmentVariable("REQUEST_RESPONSE_LOGGING_CONNECTION_STRING")!,
                             Environment.GetEnvironmentVariable("REQUEST_RESPONSE_LOGGING_CONTAINER_NAME")!);
-
-                    // HealthChecks
-                    services.AddScoped<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>();
-                    services.AddHealthChecks()
-                        .AddLiveCheck()
-                        .AddAzureServiceBusQueue(
-                            Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_CONNECTION_STRING") ??
-                            throw new InvalidOperationException(),
-                            Environment.GetEnvironmentVariable("MARKET_DATA_QUEUE_NAME") ?? throw new InvalidOperationException(),
-                            "MarketActivityQueueExists")
-                        .AddSqlServer(
-                            name: "MarketRolesDB",
-                            connectionString: Environment.GetEnvironmentVariable("MARKET_DATA_DB_CONNECTION_STRING") ?? throw new InvalidOperationException());
                 })
                 .Build();
-
-            await host.RunAsync().ConfigureAwait(false);
         }
 
-        private static bool IsRunningLocally()
+        private static async Task<TokenValidationParameters> GetTokenValidationParametersAsync(RuntimeEnvironment runtime)
         {
-            return Environment.GetEnvironmentVariable("AZURE_FUNCTIONS_ENVIRONMENT") == "Development";
-        }
-
-        private static async Task<TokenValidationParameters> GetTokenValidationParametersAsync()
-        {
-            if (IsRunningLocally())
+            if (runtime.IsRunningLocally())
             {
-                return new TokenValidationParameters()
-                {
-                    ValidateAudience = false,
-                    ValidateIssuer = false,
-                    ValidateLifetime = false,
-                    SignatureValidator = (token, parameters) => new JwtSecurityToken(token),
-                };
+                return DevelopmentTokenValidationParameters();
             }
 
             var tenantId = Environment.GetEnvironmentVariable("B2C_TENANT_ID") ?? throw new InvalidOperationException("B2C tenant id not found.");
