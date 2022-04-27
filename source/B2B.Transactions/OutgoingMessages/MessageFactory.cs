@@ -19,8 +19,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier;
-using B2B.Transactions.Transactions;
-using B2B.Transactions.Xml;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
 namespace B2B.Transactions.OutgoingMessages
@@ -29,12 +27,10 @@ namespace B2B.Transactions.OutgoingMessages
     {
         private const string Prefix = "cim";
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-        private readonly MessageValidator _messageValidator;
 
-        public MessageFactory(ISystemDateTimeProvider systemDateTimeProvider, MessageValidator messageValidator)
+        public MessageFactory(ISystemDateTimeProvider systemDateTimeProvider)
         {
             _systemDateTimeProvider = systemDateTimeProvider;
-            _messageValidator = messageValidator;
         }
 
         public async Task<Stream> CreateFromAsync(MessageHeader messageHeader, ReadOnlyCollection<MarketActivityRecord> marketActivityRecords)
@@ -43,22 +39,15 @@ namespace B2B.Transactions.OutgoingMessages
             if (marketActivityRecords == null) throw new ArgumentNullException(nameof(marketActivityRecords));
 
             var settings = new XmlWriterSettings { OmitXmlDeclaration = false, Encoding = Encoding.UTF8, Async = true };
-            await using var stream = new MemoryStream();
-            await using var output = new Utf8StringWriter();
-            await using var writer = XmlWriter.Create(output, settings);
-
+            var stream = new MemoryStream();
+            await using var writer = XmlWriter.Create(stream, settings);
             await WriteMessageHeaderAsync(messageHeader, writer).ConfigureAwait(false);
             await WriteMarketActivityRecordsAsync(marketActivityRecords, writer).ConfigureAwait(false);
-
             await writer.WriteEndElementAsync().ConfigureAwait(false);
             writer.Close();
-            await output.FlushAsync().ConfigureAwait(false);
+            stream.Position = 0;
 
-            await ValidateXmlAgainstSchemaAsync(output).ConfigureAwait(false);
-
-            var data = Encoding.UTF8.GetBytes(output.ToString());
-
-            return new MemoryStream(data);
+            return stream;
         }
 
         private static async Task WriteMarketActivityRecordsAsync(ReadOnlyCollection<MarketActivityRecord> marketActivityRecords, XmlWriter writer)
@@ -130,16 +119,6 @@ namespace B2B.Transactions.OutgoingMessages
         private string GetCurrentDateTime()
         {
             return _systemDateTimeProvider.Now().ToString();
-        }
-
-        private async Task ValidateXmlAgainstSchemaAsync(Utf8StringWriter output)
-        {
-            await _messageValidator.ParseAsync(output.ToString(), "confirmrequestchangeofsupplier", "1.0").ConfigureAwait(false);
-            if (!_messageValidator.Success)
-            {
-                throw new InvalidOperationException(
-                    $"Generated accept message does not conform with XSD schema definition: {_messageValidator.Errors()}");
-            }
         }
     }
 }

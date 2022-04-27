@@ -21,6 +21,8 @@ using B2B.Transactions.IncomingMessages;
 using B2B.Transactions.IntegrationTests.Fixtures;
 using B2B.Transactions.IntegrationTests.Transactions;
 using B2B.Transactions.OutgoingMessages;
+using B2B.Transactions.Xml;
+using B2B.Transactions.Xml.Incoming;
 using Xunit;
 
 namespace B2B.Transactions.IntegrationTests.OutgoingMessages
@@ -59,6 +61,10 @@ namespace B2B.Transactions.IntegrationTests.OutgoingMessages
             Assert.True(result.Success);
             AssertMarketActivityRecord(document, incomingMessage1, outgoingMessage1);
             AssertMessageHeader(document, incomingMessage1);
+            var schema = await GetService<ISchemaProvider>().GetSchemaAsync("confirmrequestchangeofsupplier", "1.0")
+                .ConfigureAwait(false);
+            var validationResult = await MessageValidator.ValidateAsync(dispatchedMessage!, schema!).ConfigureAwait(false);
+            Assert.True(validationResult.IsValid);
         }
 
         [Fact]
