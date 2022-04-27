@@ -54,6 +54,6 @@ namespace B2B.Transactions.OutgoingMessages
         /// </summary>
         /// <param name="messageIds"></param>
         /// <returns><see cref="ReadOnlyCollection{OutgoingMessage}"/></returns>
-        ReadOnlyCollection<OutgoingMessage> GetByIds(ReadOnlyCollection<string> messageIds);
+        ReadOnlyCollection<OutgoingMessage> GetByIds(IReadOnlyCollection<string> messageIds);
     }
 }

@@ -18,23 +18,25 @@ namespace B2B.Transactions.OutgoingMessages
 {
     public class OutgoingMessage
     {
-        public OutgoingMessage(string documentType, string recipientId, string correlationId, string originalMessageId, string marketEvaluationPointId)
+        public OutgoingMessage(string documentType, string recipientId, string correlationId, string originalMessageId, string marketEvaluationPointId, string processType)
         {
             DocumentType = documentType;
             RecipientId = recipientId;
             CorrelationId = correlationId;
             OriginalMessageId = originalMessageId;
             MarketEvaluationPointId = marketEvaluationPointId;
+            ProcessType = processType;
             Id = Guid.NewGuid();
         }
 
-        private OutgoingMessage(Guid id, string documentType, string recipientId, string correlationId, string originalMessageId, string marketEvaluationPointId)
+        private OutgoingMessage(Guid id, string documentType, string recipientId, string correlationId, string originalMessageId, string marketEvaluationPointId, string processType)
         {
             DocumentType = documentType;
             RecipientId = recipientId;
             CorrelationId = correlationId;
             OriginalMessageId = originalMessageId;
             MarketEvaluationPointId = marketEvaluationPointId;
+            ProcessType = processType;
             Id = id;
         }
 
@@ -51,6 +53,8 @@ namespace B2B.Transactions.OutgoingMessages
         public string OriginalMessageId { get; }
 
         public string MarketEvaluationPointId { get; }
+
+        public string ProcessType { get; }
 
         public void Published()
         {

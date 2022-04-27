@@ -45,6 +45,30 @@ namespace B2B.Transactions.IntegrationTests.OutgoingMessages
         }
 
         [Fact]
+        public async Task Messages_must_originate_from_the_same_type_of_business_process()
+        {
+            var builder = new IncomingMessageBuilder();
+            var message1 = await MessageArrived(
+                builder
+                    .WithProcessType("ProcessType1")
+                    .Build()).ConfigureAwait(false);
+            var message2 = await MessageArrived(
+                builder
+                .WithProcessType("ProcessType2")
+                .Build()).ConfigureAwait(false);
+            var outgoingMessage1 = _outgoingMessageStore.GetByOriginalMessageId(message1.Id)!;
+            var outgoingMessage2 = _outgoingMessageStore.GetByOriginalMessageId(message2.Id)!;
+
+            var result = await _messageRequestHandler.HandleAsync(new List<string>()
+            {
+                outgoingMessage1.Id.ToString(),
+                outgoingMessage2.Id.ToString(),
+            }).ConfigureAwait(false);
+
+            Assert.False(result.Success);
+        }
+
+        [Fact]
         public async Task Message_is_dispatched_on_request()
         {
             var incomingMessage1 = await MessageArrived().ConfigureAwait(false);
@@ -111,6 +135,12 @@ namespace B2B.Transactions.IntegrationTests.OutgoingMessages
             var incomingMessage = IncomingMessageBuilder.CreateMessage();
             await _incomingMessageHandler.HandleAsync(incomingMessage).ConfigureAwait(false);
             return incomingMessage;
+        }
+
+        private async Task<IncomingMessage> MessageArrived(IncomingMessage arrivedMessage)
+        {
+            await _incomingMessageHandler.HandleAsync(arrivedMessage).ConfigureAwait(false);
+            return arrivedMessage;
         }
     }
 }

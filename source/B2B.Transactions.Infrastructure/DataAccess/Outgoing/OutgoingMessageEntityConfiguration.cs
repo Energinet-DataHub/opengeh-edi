@@ -33,6 +33,7 @@ namespace B2B.Transactions.Infrastructure.DataAccess.Outgoing
             builder.Property(x => x.CorrelationId);
             builder.Property(x => x.OriginalMessageId);
             builder.Property(x => x.MarketEvaluationPointId);
+            builder.Property(x => x.ProcessType);
         }
     }
 }

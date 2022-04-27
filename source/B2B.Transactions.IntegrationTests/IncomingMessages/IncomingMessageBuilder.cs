@@ -20,14 +20,34 @@ namespace B2B.Transactions.IntegrationTests.Transactions
 {
     internal class IncomingMessageBuilder
     {
-        public IncomingMessageBuilder()
-        {
-        }
+        private string _processType = string.Empty;
 
         internal static IncomingMessage CreateMessage()
         {
             return IncomingMessage.Create(
                 new MessageHeader(Guid.NewGuid().ToString(), "E03", "senderIdfake", "DDZ", DataHubDetails.IdentificationNumber, "DDQ", "fake"),
+                new MarketActivityRecord()
+                {
+                    BalanceResponsibleId = "fake",
+                    Id = Guid.NewGuid().ToString(),
+                    ConsumerId = "fake",
+                    ConsumerName = "fake",
+                    EffectiveDate = "fake",
+                    EnergySupplierId = "fake",
+                    MarketEvaluationPointId = "fake",
+                });
+        }
+
+        internal IncomingMessageBuilder WithProcessType(string processType)
+        {
+            _processType = processType;
+            return this;
+        }
+
+        internal IncomingMessage Build()
+        {
+            return IncomingMessage.Create(
+                new MessageHeader(Guid.NewGuid().ToString(), _processType, "senderIdfake", "DDZ", DataHubDetails.IdentificationNumber, "DDQ", "fake"),
                 new MarketActivityRecord()
                 {
                     BalanceResponsibleId = "fake",

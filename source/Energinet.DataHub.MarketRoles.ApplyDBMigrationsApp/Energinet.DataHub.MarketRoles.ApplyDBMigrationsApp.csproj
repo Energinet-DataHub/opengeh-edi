@@ -47,6 +47,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202240191630 Add correlation id.sql" />
     <EmbeddedResource Include="Scripts\Model\202240221330 Remove MessagePayload.sql" />
     <EmbeddedResource Include="Scripts\Model\202240221415 Rename original transaction id.sql" />
+    <EmbeddedResource Include="Scripts\Model\202240271047 Add process type.sql" />
     <EmbeddedResource Include="Scripts\Seed\202109301255 Insert AccountPoints.sql" />
     <None Remove="Scripts\Seed\202109301258 Insert EnergySuppliers.sql" />
     <EmbeddedResource Include="Scripts\Seed\202109301258 Insert EnergySuppliers.sql" />

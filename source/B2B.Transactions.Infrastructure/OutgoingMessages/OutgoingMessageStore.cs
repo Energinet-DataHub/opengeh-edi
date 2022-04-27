@@ -55,7 +55,7 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
                 .FirstOrDefault(message => message.OriginalMessageId == incomingMessageId);
         }
 
-        public ReadOnlyCollection<OutgoingMessage> GetByIds(ReadOnlyCollection<string> messageIds)
+        public ReadOnlyCollection<OutgoingMessage> GetByIds(IReadOnlyCollection<string> messageIds)
         {
             return _context.OutgoingMessages.Where(message => messageIds.Contains(message.Id.ToString())).ToList().AsReadOnly();
         }
