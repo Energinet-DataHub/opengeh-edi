@@ -42,23 +42,13 @@ namespace B2B.Transactions.OutgoingMessages
             _incomingMessageStore = incomingMessageStore;
         }
 
-        public async Task<Result> HandleAsync(IReadOnlyCollection<string> messageIdsToForward)
+        public async Task<Result> HandleAsync(IReadOnlyCollection<string> requestedMessageIds)
         {
-            var exceptions = new List<Exception>();
-            var messages = _outgoingMessageStore.GetByIds(messageIdsToForward);
-
-            var messageIdsNotFound = MessageIdsNotFound(messageIdsToForward, messages);
-            if (messageIdsNotFound.Any())
+            var messages = _outgoingMessageStore.GetByIds(requestedMessageIds);
+            var exceptions = CheckBundleApplicability(requestedMessageIds, messages);
+            if (exceptions.Count > 0)
             {
-                exceptions.AddRange(messageIdsNotFound
-                    .Select(messageId => new OutgoingMessageNotFoundException(messageId))
-                    .ToArray());
                 return Result.Failure(exceptions.ToArray());
-            }
-
-            if (HasMatchingProcessTypes(messages) == false)
-            {
-                return Result.Failure(new ProcessTypesDoesNotMatchException(messageIdsToForward.ToArray()));
             }
 
             var message = await CreateMessageFromAsync(messages).ConfigureAwait(false);
@@ -67,9 +57,41 @@ namespace B2B.Transactions.OutgoingMessages
             return Result.Succeeded();
         }
 
-        private static List<string> MessageIdsNotFound(IReadOnlyCollection<string> messageIdsToForward, ReadOnlyCollection<OutgoingMessage> messages)
+        private static IReadOnlyList<Exception> CheckBundleApplicability(IReadOnlyCollection<string> requestedMessageIds, ReadOnlyCollection<OutgoingMessage> messages)
         {
-            return messageIdsToForward
+            var exceptions = new List<Exception>();
+
+            var messageIdsNotFound = MessageIdsNotFound(requestedMessageIds, messages);
+            if (messageIdsNotFound.Any())
+            {
+                exceptions.AddRange(messageIdsNotFound
+                    .Select(messageId => new OutgoingMessageNotFoundException(messageId))
+                    .ToArray());
+                return exceptions;
+            }
+
+            if (HasMatchingProcessTypes(messages) == false)
+            {
+                exceptions.Add(new ProcessTypesDoesNotMatchException(requestedMessageIds.ToArray()));
+            }
+
+            if (HasMatchingReceiver(messages) == false)
+            {
+                exceptions.Add(new ReceiverIdsDoesNotMatchException(requestedMessageIds.ToArray()));
+            }
+
+            return exceptions;
+        }
+
+        private static bool HasMatchingReceiver(IReadOnlyCollection<OutgoingMessage> messages)
+        {
+            var expectedReceiver = messages.First().RecipientId;
+            return messages.All(message => message.RecipientId.Equals(expectedReceiver, StringComparison.OrdinalIgnoreCase));
+        }
+
+        private static List<string> MessageIdsNotFound(IReadOnlyCollection<string> requestedMessageIds, ReadOnlyCollection<OutgoingMessage> messages)
+        {
+            return requestedMessageIds
                 .Except(messages.Select(message => message.Id.ToString()))
                 .ToList();
         }
