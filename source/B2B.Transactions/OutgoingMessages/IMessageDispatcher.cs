@@ -17,14 +17,15 @@ using System.Threading.Tasks;
 
 namespace B2B.Transactions.OutgoingMessages
 {
-    public class MessageDispatcher
+    /// <summary>
+    /// Interface for dispatching messages
+    /// </summary>
+    public interface IMessageDispatcher
     {
-        public Stream? DispatchedMessage { get; private set; }
-
-        public async Task DispatchAsync(Stream message)
-        {
-            DispatchedMessage = message;
-            await Task.CompletedTask.ConfigureAwait(false);
-        }
+        /// <summary>
+        /// Dispatches the message
+        /// </summary>
+        /// <param name="message"></param>
+        Task DispatchAsync(Stream message);
     }
 }

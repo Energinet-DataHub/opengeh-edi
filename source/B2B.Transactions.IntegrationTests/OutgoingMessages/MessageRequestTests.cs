@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using B2B.Transactions.IncomingMessages;
 using B2B.Transactions.IntegrationTests.Fixtures;
+using B2B.Transactions.IntegrationTests.TestDoubles;
 using B2B.Transactions.IntegrationTests.Transactions;
 using B2B.Transactions.OutgoingMessages;
 using Xunit;
@@ -28,7 +29,7 @@ namespace B2B.Transactions.IntegrationTests.OutgoingMessages
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly MessageRequestHandler _messageRequestHandler;
         private readonly IncomingMessageHandler _incomingMessageHandler;
-        private readonly MessageDispatcher _messageDispatcher;
+        private readonly MessageDispatcherSpy _messageDispatcherSpy;
 
         public MessageRequestTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
@@ -36,7 +37,7 @@ namespace B2B.Transactions.IntegrationTests.OutgoingMessages
             _outgoingMessageStore = GetService<IOutgoingMessageStore>();
             _incomingMessageHandler = GetService<IncomingMessageHandler>();
             _messageRequestHandler = GetService<MessageRequestHandler>();
-            _messageDispatcher = GetService<MessageDispatcher>();
+            _messageDispatcherSpy = (MessageDispatcherSpy)GetService<IMessageDispatcher>();
         }
 
         [Fact]
@@ -99,7 +100,7 @@ namespace B2B.Transactions.IntegrationTests.OutgoingMessages
             var result = await _messageRequestHandler.HandleAsync(requestedMessageIds.AsReadOnly()).ConfigureAwait(false);
 
             Assert.True(result.Success);
-            Assert.NotNull(_messageDispatcher.DispatchedMessage);
+            Assert.NotNull(_messageDispatcherSpy.DispatchedMessage);
         }
 
         [Fact]

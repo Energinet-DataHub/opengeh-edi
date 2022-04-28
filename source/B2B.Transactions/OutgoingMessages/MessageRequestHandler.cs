@@ -28,17 +28,17 @@ namespace B2B.Transactions.OutgoingMessages
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly IncomingMessageStore _incomingMessageStore;
-        private readonly MessageDispatcher _messageDispatcher;
+        private readonly IMessageDispatcher _messageDispatcherSpy;
         private readonly MessageFactory _messageFactory;
 
         public MessageRequestHandler(
             IOutgoingMessageStore outgoingMessageStore,
-            MessageDispatcher messageDispatcher,
+            IMessageDispatcher messageDispatcherSpy,
             MessageFactory messageFactory,
             IncomingMessageStore incomingMessageStore)
         {
             _outgoingMessageStore = outgoingMessageStore;
-            _messageDispatcher = messageDispatcher;
+            _messageDispatcherSpy = messageDispatcherSpy;
             _messageFactory = messageFactory;
             _incomingMessageStore = incomingMessageStore;
         }
@@ -53,7 +53,7 @@ namespace B2B.Transactions.OutgoingMessages
             }
 
             var message = await CreateMessageFromAsync(messages).ConfigureAwait(false);
-            await _messageDispatcher.DispatchAsync(message).ConfigureAwait(false);
+            await _messageDispatcherSpy.DispatchAsync(message).ConfigureAwait(false);
 
             return Result.Succeeded();
         }

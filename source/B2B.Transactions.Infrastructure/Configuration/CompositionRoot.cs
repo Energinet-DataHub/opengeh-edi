@@ -133,10 +133,10 @@ namespace B2B.Transactions.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddOutgoingMessageDispatcher()
+        public CompositionRoot AddOutgoingMessageDispatcher(IMessageDispatcher messageDispatcher)
         {
             _services.AddScoped<MessageFactory>();
-            _services.AddScoped<MessageDispatcher>();
+            _services.AddScoped<IMessageDispatcher>(_ => messageDispatcher);
             _services.AddScoped<MessageRequestHandler>();
 
             return this;
