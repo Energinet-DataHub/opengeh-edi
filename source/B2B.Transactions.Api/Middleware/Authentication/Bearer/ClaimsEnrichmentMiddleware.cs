@@ -17,7 +17,6 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using B2B.Transactions.Configuration.DataAccess;
-using B2B.Transactions.Infrastructure;
 using B2B.Transactions.Infrastructure.Authentication;
 using Dapper;
 using Microsoft.Azure.Functions.Worker;

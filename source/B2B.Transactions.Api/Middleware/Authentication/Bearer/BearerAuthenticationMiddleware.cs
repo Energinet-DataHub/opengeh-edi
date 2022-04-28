@@ -15,7 +15,6 @@
 using System;
 using System.Text;
 using System.Threading.Tasks;
-using B2B.Transactions.Infrastructure;
 using B2B.Transactions.Infrastructure.Authentication;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
