@@ -13,15 +13,14 @@
 // limitations under the License.
 
 using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
-namespace B2B.Transactions.OutgoingMessages
+namespace B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier
 {
     public class MessageFactory
     {
@@ -33,7 +32,7 @@ namespace B2B.Transactions.OutgoingMessages
             _systemDateTimeProvider = systemDateTimeProvider;
         }
 
-        public async Task<Stream> CreateFromAsync(MessageHeader messageHeader, ReadOnlyCollection<MarketActivityRecord> marketActivityRecords)
+        public async Task<Stream> CreateFromAsync(MessageHeader messageHeader, IReadOnlyCollection<MarketActivityRecord> marketActivityRecords)
         {
             if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
             if (marketActivityRecords == null) throw new ArgumentNullException(nameof(marketActivityRecords));
@@ -50,7 +49,7 @@ namespace B2B.Transactions.OutgoingMessages
             return stream;
         }
 
-        private static async Task WriteMarketActivityRecordsAsync(ReadOnlyCollection<MarketActivityRecord> marketActivityRecords, XmlWriter writer)
+        private static async Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<MarketActivityRecord> marketActivityRecords, XmlWriter writer)
         {
             foreach (var marketActivityRecord in marketActivityRecords)
             {

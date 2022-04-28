@@ -18,7 +18,7 @@ using System.Linq;
 using System.Xml.Linq;
 using Xunit;
 
-namespace B2B.Transactions.IntegrationTests
+namespace B2B.Transactions.Tests.OutgoingMessages
 {
     internal static class AssertXmlMessage
     {
