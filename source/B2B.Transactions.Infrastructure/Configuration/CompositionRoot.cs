@@ -64,7 +64,7 @@ namespace B2B.Transactions.Infrastructure.Configuration
             services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
             services.AddScoped<IncomingMessageHandler>();
             services.AddScoped<IncomingMessageStore>();
-            services.AddScoped<MessageDispatcher>();
+            services.AddScoped<IMessageDispatcher, MessageDispatcher>();
             services.AddScoped<MessageFactory>();
             services.AddScoped<MessageRequestHandler>();
 
@@ -140,10 +140,10 @@ namespace B2B.Transactions.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddOutgoingMessageDispatcher()
+        public CompositionRoot AddOutgoingMessageDispatcher(IMessageDispatcher messageDispatcher)
         {
             _services.AddScoped<MessageFactory>();
-            _services.AddScoped<MessageDispatcher>();
+            _services.AddScoped<IMessageDispatcher>(_ => messageDispatcher);
             _services.AddScoped<MessageRequestHandler>();
 
             return this;

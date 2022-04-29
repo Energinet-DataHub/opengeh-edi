@@ -15,18 +15,20 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using B2B.Transactions.OutgoingMessages;
 using Energinet.DataHub.MessageHub.Model.Model;
 
-namespace B2B.Transactions.OutgoingMessages
+namespace B2B.Transactions.IntegrationTests.TestDoubles
 {
-    public class MessageDispatcher
+    public class MessageDispatcherSpy : IMessageDispatcher
     {
         public Stream? DispatchedMessage { get; private set; }
 
-        public async Task DispatchAsync(Stream message)
+        public async Task<Uri> DispatchAsync(Stream message, DataBundleRequestDto requestDto)
         {
+            if (requestDto == null) throw new ArgumentNullException(nameof(requestDto));
             DispatchedMessage = message;
-            await Task.CompletedTask.ConfigureAwait(false);
+            return await Task.FromResult(new Uri("https://randomUri.com")).ConfigureAwait(false);
         }
     }
 }
