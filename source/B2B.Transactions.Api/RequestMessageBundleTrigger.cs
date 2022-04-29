@@ -52,7 +52,7 @@ namespace B2B.Transactions.Api
             var bundleRequestDto = _requestBundleParser.Parse(data);
             var dataAvailableIds = await _storageHandler.GetDataAvailableNotificationIdsAsync(bundleRequestDto)
                 .ConfigureAwait(false);
-            await _messageRequestHandler.HandleAsync(dataAvailableIds.Select(x => x.ToString()).ToList(), bundleRequestDto).ConfigureAwait(false);
+            var result = await _messageRequestHandler.HandleAsync(dataAvailableIds.Select(x => x.ToString()).ToList(), bundleRequestDto).ConfigureAwait(false);
 
             _logger.LogInformation($"Dequeued with correlation id: {_correlationContext.Id}");
         }
