@@ -28,8 +28,7 @@ namespace B2B.Transactions.IntegrationTests.TestDoubles
         {
             if (requestDto == null) throw new ArgumentNullException(nameof(requestDto));
             DispatchedMessage = message;
-            await Task.CompletedTask.ConfigureAwait(false);
-            return new Uri("https://randomUri.com");
+            return await Task.FromResult(new Uri("https://randomUri.com")).ConfigureAwait(false);
         }
     }
 }
