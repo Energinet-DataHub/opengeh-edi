@@ -20,6 +20,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using B2B.Transactions.IncomingMessages;
 using B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier;
+using Energinet.DataHub.MessageHub.Model.Model;
+using Energinet.DataHub.MessageHub.Model.Peek;
 using MarketActivityRecord = B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier.MarketActivityRecord;
 
 namespace B2B.Transactions.OutgoingMessages
@@ -28,7 +30,7 @@ namespace B2B.Transactions.OutgoingMessages
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly IncomingMessageStore _incomingMessageStore;
-        private readonly IMessageDispatcher _messageDispatcherSpy;
+        private readonly IMessageDispatcher _messageDispatcher;
         private readonly MessageFactory _messageFactory;
 
         public MessageRequestHandler(
@@ -38,12 +40,12 @@ namespace B2B.Transactions.OutgoingMessages
             IncomingMessageStore incomingMessageStore)
         {
             _outgoingMessageStore = outgoingMessageStore;
-            _messageDispatcherSpy = messageDispatcherSpy;
+            _messageDispatcher = messageDispatcherSpy;
             _messageFactory = messageFactory;
             _incomingMessageStore = incomingMessageStore;
         }
 
-        public async Task<Result> HandleAsync(IReadOnlyCollection<string> requestedMessageIds)
+        public async Task<Result> HandleAsync(IReadOnlyCollection<string> requestedMessageIds, DataBundleRequestDto bundleRequestDto)
         {
             var messages = _outgoingMessageStore.GetByIds(requestedMessageIds);
             var exceptions = CheckBundleApplicability(requestedMessageIds, messages);
@@ -53,9 +55,9 @@ namespace B2B.Transactions.OutgoingMessages
             }
 
             var message = await CreateMessageFromAsync(messages).ConfigureAwait(false);
-            await _messageDispatcherSpy.DispatchAsync(message).ConfigureAwait(false);
+            var uri = await _messageDispatcher.DispatchAsync(message, bundleRequestDto).ConfigureAwait(false);
 
-            return Result.Succeeded();
+            return Result.Succeeded(uri);
         }
 
         private static IReadOnlyList<Exception> CheckBundleApplicability(IReadOnlyCollection<string> requestedMessageIds, ReadOnlyCollection<OutgoingMessage> messages)

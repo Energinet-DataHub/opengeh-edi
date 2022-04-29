@@ -12,17 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using B2B.Transactions.OutgoingMessages;
+using Energinet.DataHub.MessageHub.Client.Storage;
+using Energinet.DataHub.MessageHub.Model.Model;
 
 namespace B2B.Transactions.Infrastructure.OutgoingMessages
 {
     public class MessageDispatcher : IMessageDispatcher
     {
-        public async Task DispatchAsync(Stream message)
+        private readonly IStorageHandler _storageHandler;
+
+        public MessageDispatcher(IStorageHandler storageHandler)
         {
-            await Task.CompletedTask.ConfigureAwait(false);
+            _storageHandler = storageHandler;
+        }
+
+        public async Task<Uri> DispatchAsync(Stream message, DataBundleRequestDto requestDto)
+        {
+            return await _storageHandler.AddStreamToStorageAsync(message, requestDto).ConfigureAwait(false);
         }
     }
 }
