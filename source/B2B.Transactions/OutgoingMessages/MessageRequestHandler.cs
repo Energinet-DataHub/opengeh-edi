@@ -20,6 +20,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using B2B.Transactions.IncomingMessages;
 using B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier;
+using Energinet.DataHub.MessageHub.Model.Model;
 using MarketActivityRecord = B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier.MarketActivityRecord;
 
 namespace B2B.Transactions.OutgoingMessages

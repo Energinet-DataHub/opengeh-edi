@@ -35,6 +35,10 @@ using B2B.Transactions.Xml;
 using B2B.Transactions.Xml.Incoming;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using Energinet.DataHub.MessageHub.Client;
+using Energinet.DataHub.MessageHub.Client.Factories;
+using Energinet.DataHub.MessageHub.Client.Storage;
+using Energinet.DataHub.MessageHub.Model.Peek;
 using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -60,6 +64,9 @@ namespace B2B.Transactions.Infrastructure.Configuration
             services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
             services.AddScoped<IncomingMessageHandler>();
             services.AddScoped<IncomingMessageStore>();
+            services.AddScoped<MessageDispatcher>();
+            services.AddScoped<MessageFactory>();
+            services.AddScoped<MessageRequestHandler>();
 
             services.AddLogging();
             AddXmlSchema(services);
@@ -138,6 +145,18 @@ namespace B2B.Transactions.Infrastructure.Configuration
             _services.AddScoped<MessageFactory>();
             _services.AddScoped<MessageDispatcher>();
             _services.AddScoped<MessageRequestHandler>();
+
+            return this;
+        }
+
+        public CompositionRoot AddMessageHubServices(string storageServiceConnectionString, string storageServiceContainerName)
+        {
+            if (storageServiceConnectionString == null) throw new ArgumentNullException(nameof(storageServiceConnectionString));
+            if (storageServiceContainerName == null) throw new ArgumentNullException(nameof(storageServiceContainerName));
+            _services.AddSingleton<StorageConfig>(s => new StorageConfig(storageServiceContainerName));
+            _services.AddSingleton<IRequestBundleParser, RequestBundleParser>();
+            _services.AddSingleton<IStorageServiceClientFactory>(s => new StorageServiceClientFactory(storageServiceConnectionString));
+            _services.AddSingleton<IStorageHandler, StorageHandler>();
 
             return this;
         }
