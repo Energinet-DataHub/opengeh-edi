@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.IO;
 using System.Threading.Tasks;
+using Energinet.DataHub.MessageHub.Model.Model;
 
 namespace B2B.Transactions.OutgoingMessages
 {
@@ -21,8 +23,9 @@ namespace B2B.Transactions.OutgoingMessages
     {
         public Stream? DispatchedMessage { get; private set; }
 
-        public async Task DispatchAsync(Stream message)
+        public async Task DispatchAsync(Stream message, DataBundleRequestDto bundleRequestDto)
         {
+            if (bundleRequestDto == null) throw new ArgumentNullException(nameof(bundleRequestDto));
             DispatchedMessage = message;
             await Task.CompletedTask.ConfigureAwait(false);
         }
