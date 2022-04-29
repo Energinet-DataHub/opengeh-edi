@@ -44,7 +44,7 @@ namespace B2B.Transactions.OutgoingMessages
             _incomingMessageStore = incomingMessageStore;
         }
 
-        public async Task<Result> HandleAsync(IReadOnlyCollection<string> requestedMessageIds, DataBundleRequestDto bundleRequestDto)
+        public async Task<Result> HandleAsync(IReadOnlyCollection<string> requestedMessageIds)
         {
             var messages = _outgoingMessageStore.GetByIds(requestedMessageIds);
             var exceptions = CheckBundleApplicability(requestedMessageIds, messages);
@@ -54,7 +54,7 @@ namespace B2B.Transactions.OutgoingMessages
             }
 
             var message = await CreateMessageFromAsync(messages).ConfigureAwait(false);
-            await _messageDispatcher.DispatchAsync(message, bundleRequestDto).ConfigureAwait(false);
+            await _messageDispatcher.DispatchAsync(message).ConfigureAwait(false);
 
             return Result.Succeeded();
         }

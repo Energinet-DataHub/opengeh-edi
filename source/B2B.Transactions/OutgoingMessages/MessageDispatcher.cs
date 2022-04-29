@@ -23,9 +23,8 @@ namespace B2B.Transactions.OutgoingMessages
     {
         public Stream? DispatchedMessage { get; private set; }
 
-        public async Task DispatchAsync(Stream message, DataBundleRequestDto bundleRequestDto)
+        public async Task DispatchAsync(Stream message)
         {
-            if (bundleRequestDto == null) throw new ArgumentNullException(nameof(bundleRequestDto));
             DispatchedMessage = message;
             await Task.CompletedTask.ConfigureAwait(false);
         }
