@@ -18,7 +18,6 @@ using System.Threading.Tasks;
 using B2B.Transactions.Configuration.DataAccess;
 using B2B.Transactions.Infrastructure.Serialization;
 using Dapper;
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Microsoft.Extensions.Logging;
 using Polly;
 
