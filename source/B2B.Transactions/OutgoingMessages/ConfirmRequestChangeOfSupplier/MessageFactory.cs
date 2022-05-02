@@ -53,20 +53,20 @@ namespace B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier
             return stream;
         }
 
-        public async Task<Stream> CreateFromAsync(MessageHeader messageHeader, IReadOnlyCollection<OutgoingMessage> outgoingMessages)
+        public async Task<Stream> CreateFromAsync(MessageHeader messageHeader, IReadOnlyCollection<string> marketActivityPayloads)
         {
             if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
-            if (outgoingMessages == null) throw new ArgumentNullException(nameof(outgoingMessages));
+            if (marketActivityPayloads == null) throw new ArgumentNullException(nameof(marketActivityPayloads));
 
             var settings = new XmlWriterSettings { OmitXmlDeclaration = false, Encoding = Encoding.UTF8, Async = true };
             var stream = new MemoryStream();
             await using var writer = XmlWriter.Create(stream, settings);
             await WriteMessageHeaderAsync(messageHeader, writer).ConfigureAwait(false);
             var marketActivityRecords = new List<MarketActivityRecord>();
-            foreach (var outgoingMessage in outgoingMessages)
+            foreach (var payload in marketActivityPayloads)
             {
                 var marketActivityRecord =
-                    _marketActivityRecordParser.From<MarketActivityRecord>(outgoingMessage.MarketActivityRecordPayload);
+                    _marketActivityRecordParser.From<MarketActivityRecord>(payload);
                 marketActivityRecords.Add(marketActivityRecord);
             }
 

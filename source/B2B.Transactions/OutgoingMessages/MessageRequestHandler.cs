@@ -107,7 +107,7 @@ namespace B2B.Transactions.OutgoingMessages
         private Task<Stream> CreateMessageFromAsync(IReadOnlyCollection<OutgoingMessage> outgoingMessages)
         {
             var messageHeader = CreateMessageHeaderFrom(outgoingMessages.First());
-            return _messageFactory.CreateFromAsync(messageHeader, outgoingMessages);
+            return _messageFactory.CreateFromAsync(messageHeader, outgoingMessages.Select(message => message.MarketActivityRecordPayload).ToList());
         }
     }
 }
