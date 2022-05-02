@@ -15,8 +15,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using B2B.Transactions.Common;
 using B2B.Transactions.Infrastructure.Common;
 using B2B.Transactions.Infrastructure.Serialization;
 using B2B.Transactions.OutgoingMessages;
@@ -31,13 +33,15 @@ namespace B2B.Transactions.Tests.OutgoingMessages.ConfirmRequestChangeOfSupplier
     {
         private readonly MessageFactory _messageFactory;
         private readonly ISchemaProvider _schemaProvider;
+        private readonly IMarketActivityRecordParser _marketActivityRecordParser;
 
         public MessageFactoryTests()
         {
             _schemaProvider = new SchemaProvider(new SchemaStore());
+            _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
             _messageFactory = new MessageFactory(
                 new SystemDateTimeProviderStub(),
-                new MarketActivityRecordParser(new Serializer()));
+                _marketActivityRecordParser);
         }
 
         [Fact]
@@ -50,7 +54,7 @@ namespace B2B.Transactions.Tests.OutgoingMessages.ConfirmRequestChangeOfSupplier
                 new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId"),
             };
 
-            var message = await _messageFactory.CreateFromAsync(header, marketActivityRecords).ConfigureAwait(false);
+            var message = await _messageFactory.CreateFromAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
 
             await AssertMessage(message, header, marketActivityRecords).ConfigureAwait(false);
         }

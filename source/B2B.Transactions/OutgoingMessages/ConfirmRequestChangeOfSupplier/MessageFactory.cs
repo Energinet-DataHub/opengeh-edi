@@ -15,12 +15,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using B2B.Transactions.Common;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
-using Newtonsoft.Json;
 
 namespace B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier
 {
@@ -36,23 +36,6 @@ namespace B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier
             _marketActivityRecordParser = marketActivityRecordParser;
         }
 
-        public async Task<Stream> CreateFromAsync(MessageHeader messageHeader, IReadOnlyCollection<MarketActivityRecord> marketActivityRecords)
-        {
-            if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
-            if (marketActivityRecords == null) throw new ArgumentNullException(nameof(marketActivityRecords));
-
-            var settings = new XmlWriterSettings { OmitXmlDeclaration = false, Encoding = Encoding.UTF8, Async = true };
-            var stream = new MemoryStream();
-            await using var writer = XmlWriter.Create(stream, settings);
-            await WriteMessageHeaderAsync(messageHeader, writer).ConfigureAwait(false);
-            await WriteMarketActivityRecordsAsync(marketActivityRecords, writer).ConfigureAwait(false);
-            await writer.WriteEndElementAsync().ConfigureAwait(false);
-            writer.Close();
-            stream.Position = 0;
-
-            return stream;
-        }
-
         public async Task<Stream> CreateFromAsync(MessageHeader messageHeader, IReadOnlyCollection<string> marketActivityPayloads)
         {
             if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
@@ -62,15 +45,8 @@ namespace B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier
             var stream = new MemoryStream();
             await using var writer = XmlWriter.Create(stream, settings);
             await WriteMessageHeaderAsync(messageHeader, writer).ConfigureAwait(false);
-            var marketActivityRecords = new List<MarketActivityRecord>();
-            foreach (var payload in marketActivityPayloads)
-            {
-                var marketActivityRecord =
-                    _marketActivityRecordParser.From<MarketActivityRecord>(payload);
-                marketActivityRecords.Add(marketActivityRecord);
-            }
 
-            await WriteMarketActivityRecordsAsync(marketActivityRecords, writer).ConfigureAwait(false);
+            await WriteMarketActivityRecordsAsync(GetMarketActivityRecordsFrom(marketActivityPayloads), writer).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
             writer.Close();
             stream.Position = 0;
@@ -147,6 +123,13 @@ namespace B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier
         private string GetCurrentDateTime()
         {
             return _systemDateTimeProvider.Now().ToString();
+        }
+
+        private List<MarketActivityRecord> GetMarketActivityRecordsFrom(IReadOnlyCollection<string> marketActivityPayloads)
+        {
+            return marketActivityPayloads
+                .Select(payload => _marketActivityRecordParser.From<MarketActivityRecord>(payload))
+                .ToList();
         }
     }
 }
