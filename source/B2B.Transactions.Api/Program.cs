@@ -85,14 +85,10 @@ namespace B2B.Transactions.Api
                             runtime.TRANSACTIONS_QUEUE_NAME!)
                         .AddRequestLogging(
                             runtime.REQUEST_RESPONSE_LOGGING_CONNECTION_STRING!,
-                            runtime.REQUEST_RESPONSE_LOGGING_CONTAINER_NAME!);
-
-                    if (!runtime.IsRunningLocally())
-                    {
-                        compositionRoot.AddMessageHubServices(
+                            runtime.REQUEST_RESPONSE_LOGGING_CONTAINER_NAME!)
+                        .AddMessageHubServices(
                             runtime.MESSAGEHUB_STORAGE_CONNECTION_STRING!,
                             runtime.MESSAGEHUB_STORAGE_CONTAINER_NAME!);
-                    }
                 })
                 .Build();
         }
