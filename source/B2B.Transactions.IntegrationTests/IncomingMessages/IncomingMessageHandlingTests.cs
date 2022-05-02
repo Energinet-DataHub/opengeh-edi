@@ -26,7 +26,6 @@ namespace B2B.Transactions.IntegrationTests.IncomingMessages
     public class IncomingMessageHandlingTests : TestBase
     {
         private readonly ITransactionRepository _transactionRepository;
-        private readonly IncomingMessageStore _incomingMessageStore;
         private readonly IncomingMessageHandler _incomingMessageHandler;
 
         public IncomingMessageHandlingTests(DatabaseFixture databaseFixture)
@@ -34,7 +33,6 @@ namespace B2B.Transactions.IntegrationTests.IncomingMessages
         {
             _transactionRepository =
                 GetService<ITransactionRepository>();
-            _incomingMessageStore = GetService<IncomingMessageStore>();
             _incomingMessageHandler = GetService<IncomingMessageHandler>();
         }
 
@@ -47,16 +45,6 @@ namespace B2B.Transactions.IntegrationTests.IncomingMessages
 
             var savedTransaction = _transactionRepository.GetById(incomingMessage.MarketActivityRecord.Id);
             Assert.NotNull(savedTransaction);
-        }
-
-        [Fact]
-        public async Task Incoming_message_is_stored()
-        {
-            var incomingMessage = IncomingMessageBuilder.CreateMessage();
-
-            await _incomingMessageHandler.HandleAsync(incomingMessage).ConfigureAwait(false);
-
-            Assert.Equal(incomingMessage, _incomingMessageStore.GetById(incomingMessage.Id));
         }
     }
 }
