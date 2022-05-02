@@ -18,7 +18,6 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using B2B.Transactions.IncomingMessages;
 using B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Energinet.DataHub.MessageHub.Model.Model;
 
@@ -100,10 +99,14 @@ namespace B2B.Transactions.OutgoingMessages
             return messages.All(message => message.ProcessType.Equals(expectedProcessType, StringComparison.OrdinalIgnoreCase));
         }
 
+        private static MessageHeader CreateMessageHeaderFrom(OutgoingMessage message)
+        {
+            return new MessageHeader(message.ProcessType, message.RecipientId, message.ReceiverRole, message.SenderId, message.SenderRole);
+        }
+
         private Task<Stream> CreateMessageFromAsync(IReadOnlyCollection<OutgoingMessage> outgoingMessages)
         {
-            var firstMessage = outgoingMessages.First();
-            var messageHeader = new MessageHeader(firstMessage.ProcessType, firstMessage.RecipientId, firstMessage.ReceiverRole, firstMessage.SenderId, firstMessage.SenderRole);
+            var messageHeader = CreateMessageHeaderFrom(outgoingMessages.First());
             return _messageFactory.CreateFromAsync(messageHeader, outgoingMessages);
         }
     }
