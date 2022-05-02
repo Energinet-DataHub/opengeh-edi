@@ -18,6 +18,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using B2B.Transactions.Common;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Newtonsoft.Json;
 
@@ -27,10 +28,12 @@ namespace B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier
     {
         private const string Prefix = "cim";
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+        private readonly IMarketActivityRecordParser _marketActivityRecordParser;
 
-        public MessageFactory(ISystemDateTimeProvider systemDateTimeProvider)
+        public MessageFactory(ISystemDateTimeProvider systemDateTimeProvider, IMarketActivityRecordParser marketActivityRecordParser)
         {
             _systemDateTimeProvider = systemDateTimeProvider;
+            _marketActivityRecordParser = marketActivityRecordParser;
         }
 
         public async Task<Stream> CreateFromAsync(MessageHeader messageHeader, IReadOnlyCollection<MarketActivityRecord> marketActivityRecords)
@@ -63,7 +66,7 @@ namespace B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier
             foreach (var outgoingMessage in outgoingMessages)
             {
                 var marketActivityRecord =
-                    JsonConvert.DeserializeObject<MarketActivityRecord>(outgoingMessage.MarketActivityRecordPayload);
+                    _marketActivityRecordParser.From<MarketActivityRecord>(outgoingMessage.MarketActivityRecordPayload);
                 marketActivityRecords.Add(marketActivityRecord);
             }
 

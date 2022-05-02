@@ -14,11 +14,11 @@
 
 using System;
 using System.Threading.Tasks;
+using B2B.Transactions.Common;
 using B2B.Transactions.Configuration;
 using B2B.Transactions.Configuration.DataAccess;
 using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.Transactions;
-using Newtonsoft.Json;
 
 namespace B2B.Transactions.IncomingMessages
 {
@@ -28,13 +28,20 @@ namespace B2B.Transactions.IncomingMessages
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICorrelationContext _correlationContext;
+        private readonly IMarketActivityRecordParser _marketActivityRecordParser;
 
-        public IncomingMessageHandler(ITransactionRepository transactionRepository, IOutgoingMessageStore outgoingMessageStore, IUnitOfWork unitOfWork, ICorrelationContext correlationContext)
+        public IncomingMessageHandler(
+            ITransactionRepository transactionRepository,
+            IOutgoingMessageStore outgoingMessageStore,
+            IUnitOfWork unitOfWork,
+            ICorrelationContext correlationContext,
+            IMarketActivityRecordParser marketActivityRecordParser)
         {
             _transactionRepository = transactionRepository;
             _outgoingMessageStore = outgoingMessageStore;
             _unitOfWork = unitOfWork;
             _correlationContext = correlationContext;
+            _marketActivityRecordParser = marketActivityRecordParser;
         }
 
         public Task HandleAsync(IncomingMessage incomingMessage)
@@ -49,6 +56,7 @@ namespace B2B.Transactions.IncomingMessages
                 messageId.ToString(),
                 acceptedTransaction.TransactionId,
                 incomingMessage.MarketActivityRecord.MarketEvaluationPointId);
+
             var outgoingMessage = new OutgoingMessage(
                 "ConfirmRequestChangeOfSupplier",
                 incomingMessage.Message.SenderId,
@@ -58,7 +66,7 @@ namespace B2B.Transactions.IncomingMessages
                 incomingMessage.Message.SenderRole,
                 incomingMessage.Message.ReceiverId,
                 incomingMessage.Message.ReceiverRole,
-                JsonConvert.SerializeObject(marketActivityRecord));
+                _marketActivityRecordParser.From(marketActivityRecord));
             _outgoingMessageStore.Add(outgoingMessage);
 
             return _unitOfWork.CommitAsync();

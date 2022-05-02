@@ -17,11 +17,13 @@ using Azure.Messaging.ServiceBus;
 using B2B.CimMessageAdapter;
 using B2B.CimMessageAdapter.Messages;
 using B2B.CimMessageAdapter.Transactions;
+using B2B.Transactions.Common;
 using B2B.Transactions.Configuration;
 using B2B.Transactions.Configuration.Authentication;
 using B2B.Transactions.Configuration.DataAccess;
 using B2B.Transactions.IncomingMessages;
 using B2B.Transactions.Infrastructure.Authentication;
+using B2B.Transactions.Infrastructure.Common;
 using B2B.Transactions.Infrastructure.DataAccess;
 using B2B.Transactions.Infrastructure.DataAccess.Transaction;
 using B2B.Transactions.Infrastructure.Messages;
@@ -66,6 +68,7 @@ namespace B2B.Transactions.Infrastructure.Configuration
             services.AddScoped<IMessageDispatcher, MessageDispatcher>();
             services.AddScoped<MessageFactory>();
             services.AddScoped<MessageRequestHandler>();
+            services.AddScoped<IMarketActivityRecordParser, MarketActivityRecordParser>();
 
             services.AddLogging();
             AddXmlSchema(services);

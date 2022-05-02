@@ -17,6 +17,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using B2B.Transactions.Infrastructure.Common;
+using B2B.Transactions.Infrastructure.Serialization;
 using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using B2B.Transactions.Xml;
@@ -33,7 +35,9 @@ namespace B2B.Transactions.Tests.OutgoingMessages.ConfirmRequestChangeOfSupplier
         public MessageFactoryTests()
         {
             _schemaProvider = new SchemaProvider(new SchemaStore());
-            _messageFactory = new MessageFactory(new SystemDateTimeProviderStub());
+            _messageFactory = new MessageFactory(
+                new SystemDateTimeProviderStub(),
+                new MarketActivityRecordParser(new Serializer()));
         }
 
         [Fact]
