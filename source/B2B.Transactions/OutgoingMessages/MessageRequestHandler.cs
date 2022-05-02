@@ -111,13 +111,12 @@ namespace B2B.Transactions.OutgoingMessages
             var incomingMessage = _incomingMessageStore.GetById(outgoingMessages.First().OriginalMessageId);
             var messageHeader = new MessageHeader(firstMessage.ProcessType, firstMessage.RecipientId, firstMessage.ReceiverRole, firstMessage.SenderId, firstMessage.SenderRole);
             var marketActivityRecords = new List<MarketActivityRecord>();
-            foreach (var outgoingMessage in outgoingMessages)
-            {
-                marketActivityRecords.Add(
-                    new MarketActivityRecord(outgoingMessage.Id.ToString(), incomingMessage!.MarketActivityRecord.Id, incomingMessage.MarketActivityRecord.MarketEvaluationPointId));
-            }
-
-            return _messageFactory.CreateFromAsync(messageHeader, marketActivityRecords.AsReadOnly());
+            // foreach (var outgoingMessage in outgoingMessages)
+            // {
+            //     marketActivityRecords.Add(
+            //         new MarketActivityRecord(outgoingMessage.Id.ToString(), incomingMessage!.MarketActivityRecord.Id, incomingMessage.MarketActivityRecord.MarketEvaluationPointId));
+            // }
+            return _messageFactory.CreateFromAsync(messageHeader, outgoingMessages);
         }
     }
 }

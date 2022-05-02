@@ -19,6 +19,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using Newtonsoft.Json;
 
 namespace B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier
 {
@@ -41,6 +42,31 @@ namespace B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier
             var stream = new MemoryStream();
             await using var writer = XmlWriter.Create(stream, settings);
             await WriteMessageHeaderAsync(messageHeader, writer).ConfigureAwait(false);
+            await WriteMarketActivityRecordsAsync(marketActivityRecords, writer).ConfigureAwait(false);
+            await writer.WriteEndElementAsync().ConfigureAwait(false);
+            writer.Close();
+            stream.Position = 0;
+
+            return stream;
+        }
+
+        public async Task<Stream> CreateFromAsync(MessageHeader messageHeader, IReadOnlyCollection<OutgoingMessage> outgoingMessages)
+        {
+            if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
+            if (outgoingMessages == null) throw new ArgumentNullException(nameof(outgoingMessages));
+
+            var settings = new XmlWriterSettings { OmitXmlDeclaration = false, Encoding = Encoding.UTF8, Async = true };
+            var stream = new MemoryStream();
+            await using var writer = XmlWriter.Create(stream, settings);
+            await WriteMessageHeaderAsync(messageHeader, writer).ConfigureAwait(false);
+            var marketActivityRecords = new List<MarketActivityRecord>();
+            foreach (var outgoingMessage in outgoingMessages)
+            {
+                var marketActivityRecord =
+                    JsonConvert.DeserializeObject<MarketActivityRecord>(outgoingMessage.MarketActivityRecordPayload);
+                marketActivityRecords.Add(marketActivityRecord);
+            }
+
             await WriteMarketActivityRecordsAsync(marketActivityRecords, writer).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
             writer.Close();

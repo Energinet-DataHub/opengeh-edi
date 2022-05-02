@@ -18,7 +18,7 @@ namespace B2B.Transactions.OutgoingMessages
 {
     public class OutgoingMessage
     {
-        public OutgoingMessage(string documentType, string recipientId, string correlationId, string originalMessageId, string processType, string receiverRole, string senderId, string senderRole)
+        public OutgoingMessage(string documentType, string recipientId, string correlationId, string originalMessageId, string processType, string receiverRole, string senderId, string senderRole, string marketActivityRecordPayload)
         {
             DocumentType = documentType;
             RecipientId = recipientId;
@@ -28,10 +28,11 @@ namespace B2B.Transactions.OutgoingMessages
             ReceiverRole = receiverRole;
             SenderId = senderId;
             SenderRole = senderRole;
+            MarketActivityRecordPayload = marketActivityRecordPayload;
             Id = Guid.NewGuid();
         }
 
-        private OutgoingMessage(Guid id, string documentType, string recipientId, string correlationId, string originalMessageId, string processType, string receiverRole, string senderId, string senderRole)
+        private OutgoingMessage(Guid id, string documentType, string recipientId, string correlationId, string originalMessageId, string processType, string receiverRole, string senderId, string senderRole, string marketActivityRecordPayload)
         {
             DocumentType = documentType;
             RecipientId = recipientId;
@@ -41,6 +42,7 @@ namespace B2B.Transactions.OutgoingMessages
             ReceiverRole = receiverRole;
             SenderId = senderId;
             SenderRole = senderRole;
+            MarketActivityRecordPayload = marketActivityRecordPayload;
             Id = id;
         }
 
@@ -63,6 +65,8 @@ namespace B2B.Transactions.OutgoingMessages
         public string SenderId { get; }
 
         public string SenderRole { get; }
+
+        public string MarketActivityRecordPayload { get; }
 
         public void Published()
         {

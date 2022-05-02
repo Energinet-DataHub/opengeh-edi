@@ -73,7 +73,8 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
                 transaction.Message.ProcessType,
                 transaction.Message.ReceiverRole,
                 transaction.Message.SenderId,
-                transaction.Message.SenderRole);
+                transaction.Message.SenderRole,
+                string.Empty);
         }
     }
 }
