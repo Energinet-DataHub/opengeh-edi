@@ -12,21 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace B2B.Transactions.Api.Middleware.Correlation
-{
-    /// <summary>
-    /// Context for the session.
-    /// </summary>
-    public interface ISessionContext
-    {
-        /// <summary>
-        /// Get the current session id.
-        /// </summary>
-        string Id { get; }
+using System;
+using Energinet.DataHub.MessageHub.Model.Model;
 
-        /// <summary>
-        /// Set the current session id.
-        /// </summary>
-        void SetId(string id);
+namespace B2B.Transactions.Infrastructure.InternalCommands.RequestMessageResponses
+{
+    public class RequestMessageResponse : InternalCommand
+    {
+        public RequestMessageResponse(string sessionContextId, DataBundleRequestDto dataBundleRequestDto, Uri uri)
+        {
+            SessionContextId = sessionContextId;
+            DataBundleRequestDto = dataBundleRequestDto;
+            Uri = uri;
+        }
+
+        public string SessionContextId { get; }
+
+        public DataBundleRequestDto DataBundleRequestDto { get; }
+
+        public Uri Uri { get; }
     }
 }

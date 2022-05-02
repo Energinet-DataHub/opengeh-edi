@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using B2B.Transactions.Infrastructure.Configuration;
 
 namespace B2B.Transactions.Api.Middleware.Correlation
 {
