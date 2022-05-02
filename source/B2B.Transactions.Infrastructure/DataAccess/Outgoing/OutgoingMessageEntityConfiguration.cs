@@ -30,9 +30,12 @@ namespace B2B.Transactions.Infrastructure.DataAccess.Outgoing
             builder.Property(x => x.DocumentType);
             builder.Property(x => x.IsPublished);
             builder.Property(x => x.RecipientId);
+            builder.Property(x => x.ReceiverRole);
             builder.Property(x => x.CorrelationId);
             builder.Property(x => x.OriginalMessageId);
             builder.Property(x => x.ProcessType);
+            builder.Property(x => x.SenderId);
+            builder.Property(x => x.SenderRole);
         }
     }
 }

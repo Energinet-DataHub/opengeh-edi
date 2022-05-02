@@ -46,7 +46,15 @@ namespace B2B.Transactions.IncomingMessages
             var acceptedTransaction = new AcceptedTransaction(incomingMessage.MarketActivityRecord.Id);
             _transactionRepository.Add(acceptedTransaction);
 
-            var outgoingMessage = new OutgoingMessage("ConfirmRequestChangeOfSupplier", incomingMessage.Message.SenderId, _correlationContext.Id, incomingMessage.Id, incomingMessage.Message.ProcessType);
+            var outgoingMessage = new OutgoingMessage(
+                "ConfirmRequestChangeOfSupplier",
+                incomingMessage.Message.SenderId,
+                _correlationContext.Id,
+                incomingMessage.Id,
+                incomingMessage.Message.ProcessType,
+                incomingMessage.Message.SenderRole,
+                incomingMessage.Message.ReceiverId,
+                incomingMessage.Message.ReceiverRole);
             _outgoingMessageStore.Add(outgoingMessage);
 
             return _unitOfWork.CommitAsync();

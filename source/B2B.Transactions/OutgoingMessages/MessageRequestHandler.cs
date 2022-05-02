@@ -107,13 +107,14 @@ namespace B2B.Transactions.OutgoingMessages
 
         private Task<Stream> CreateMessageFromAsync(ReadOnlyCollection<OutgoingMessage> outgoingMessages)
         {
+            var firstMessage = outgoingMessages.First();
             var incomingMessage = _incomingMessageStore.GetById(outgoingMessages[0].OriginalMessageId);
-            var messageHeader = new MessageHeader(incomingMessage!.Message.ProcessType, incomingMessage.Message.ReceiverId, incomingMessage.Message.ReceiverRole, incomingMessage.Message.SenderId, incomingMessage.Message.SenderRole);
+            var messageHeader = new MessageHeader(firstMessage.ProcessType, firstMessage.RecipientId, firstMessage.ReceiverRole, firstMessage.SenderId, firstMessage.SenderRole);
             var marketActivityRecords = new List<MarketActivityRecord>();
             foreach (var outgoingMessage in outgoingMessages)
             {
                 marketActivityRecords.Add(
-                    new MarketActivityRecord(outgoingMessage.Id.ToString(), incomingMessage.MarketActivityRecord.Id, incomingMessage.MarketActivityRecord.MarketEvaluationPointId));
+                    new MarketActivityRecord(outgoingMessage.Id.ToString(), incomingMessage!.MarketActivityRecord.Id, incomingMessage.MarketActivityRecord.MarketEvaluationPointId));
             }
 
             return _messageFactory.CreateFromAsync(messageHeader, marketActivityRecords.AsReadOnly());
