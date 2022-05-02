@@ -24,10 +24,10 @@ namespace B2B.Transactions.IntegrationTests.TestDoubles
     {
         public Stream? DispatchedMessage { get; private set; }
 
-        public async Task<Uri> DispatchAsync(Stream message)
+        public async Task DispatchAsync(Stream message)
         {
             DispatchedMessage = message;
-            return await Task.FromResult(new Uri("https://randomUri.com")).ConfigureAwait(false);
+            await Task.CompletedTask.ConfigureAwait(false);
         }
     }
 }

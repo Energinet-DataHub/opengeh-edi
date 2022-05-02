@@ -32,9 +32,9 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
             _messageRequestContext = messageRequestContext;
         }
 
-        public async Task<Uri> DispatchAsync(Stream message)
+        public async Task DispatchAsync(Stream message)
         {
-            return await _storageHandler.AddStreamToStorageAsync(
+            await _storageHandler.AddStreamToStorageAsync(
                 message,
                 _messageRequestContext.DataBundleRequestDto ?? throw new InvalidOperationException())
                 .ConfigureAwait(false);

@@ -27,6 +27,6 @@ namespace B2B.Transactions.OutgoingMessages
         /// Dispatches the message
         /// </summary>
         /// <param name="message"></param>
-        Task<Uri> DispatchAsync(Stream message);
+        Task DispatchAsync(Stream message);
     }
 }

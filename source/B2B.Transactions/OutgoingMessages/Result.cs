@@ -29,13 +29,6 @@ namespace B2B.Transactions.OutgoingMessages
         {
         }
 
-        private Result(Uri uri)
-        {
-            Uri = uri;
-        }
-
-        public Uri? Uri { get; }
-
         public IReadOnlyCollection<Exception> Errors { get; } = new List<Exception>();
 
         public bool Success => Errors.Count == 0;
@@ -48,11 +41,6 @@ namespace B2B.Transactions.OutgoingMessages
         public static Result Succeeded()
         {
             return new Result();
-        }
-
-        public static Result Succeeded(Uri uri)
-        {
-            return new Result(uri);
         }
     }
 }

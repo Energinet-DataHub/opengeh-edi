@@ -53,9 +53,9 @@ namespace B2B.Transactions.OutgoingMessages
             }
 
             var message = await CreateMessageFromAsync(messages).ConfigureAwait(false);
-            var uri = await _messageDispatcher.DispatchAsync(message).ConfigureAwait(false);
+            await _messageDispatcher.DispatchAsync(message).ConfigureAwait(false);
 
-            return Result.Succeeded(uri);
+            return Result.Succeeded();
         }
 
         private static IReadOnlyList<Exception> CheckBundleApplicability(IReadOnlyCollection<string> requestedMessageIds, ReadOnlyCollection<OutgoingMessage> messages)
