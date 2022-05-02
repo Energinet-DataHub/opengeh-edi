@@ -17,7 +17,6 @@ using Azure.Messaging.ServiceBus;
 using B2B.CimMessageAdapter;
 using B2B.CimMessageAdapter.Messages;
 using B2B.CimMessageAdapter.Transactions;
-using B2B.Transactions.Api.Middleware.Correlation;
 using B2B.Transactions.Common;
 using B2B.Transactions.Configuration;
 using B2B.Transactions.Configuration.Authentication;
@@ -117,12 +116,6 @@ namespace B2B.Transactions.Infrastructure.Configuration
         public CompositionRoot AddCorrelationContext(Func<IServiceProvider, ICorrelationContext> action)
         {
             _services.AddScoped(action);
-            return this;
-        }
-
-        public CompositionRoot AddSessionContext()
-        {
-            _services.AddScoped<ISessionContext, SessionContext>();
             return this;
         }
 

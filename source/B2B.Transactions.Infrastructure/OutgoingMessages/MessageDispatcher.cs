@@ -30,18 +30,15 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
     {
         private readonly IStorageHandler _storageHandler;
         private readonly MessageRequestContext _messageRequestContext;
-        private readonly ISessionContext _sessionContext;
         private readonly ICommandScheduler _commandScheduler;
 
         public MessageDispatcher(
             IStorageHandler storageHandler,
             MessageRequestContext messageRequestContext,
-            ISessionContext sessionContext,
             ICommandScheduler commandScheduler)
         {
             _storageHandler = storageHandler;
             _messageRequestContext = messageRequestContext;
-            _sessionContext = sessionContext;
             _commandScheduler = commandScheduler;
         }
 
@@ -54,7 +51,6 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
 
             await _commandScheduler.EnqueueAsync(
                 new RequestMessageResponse(
-                    _sessionContext.Id,
                     _messageRequestContext.DataBundleRequestDto,
                     uri)).ConfigureAwait(false);
         }

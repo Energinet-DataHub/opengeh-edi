@@ -71,7 +71,6 @@ namespace B2B.Transactions.Api
                         .AddDatabaseConnectionFactory(databaseConnectionString!)
                         .AddSystemClock(new SystemDateTimeProvider())
                         .AddDatabaseContext(databaseConnectionString!)
-                        .AddSessionContext()
                         .AddCorrelationContext(sp =>
                         {
                             var correlationContext = new CorrelationContext();

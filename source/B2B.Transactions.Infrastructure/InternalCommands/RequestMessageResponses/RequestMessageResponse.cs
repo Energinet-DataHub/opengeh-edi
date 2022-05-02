@@ -19,14 +19,11 @@ namespace B2B.Transactions.Infrastructure.InternalCommands.RequestMessageRespons
 {
     public class RequestMessageResponse : InternalCommand
     {
-        public RequestMessageResponse(string sessionContextId, DataBundleRequestDto dataBundleRequestDto, Uri uri)
+        public RequestMessageResponse(DataBundleRequestDto dataBundleRequestDto, Uri uri)
         {
-            SessionContextId = sessionContextId;
             DataBundleRequestDto = dataBundleRequestDto;
             Uri = uri;
         }
-
-        public string SessionContextId { get; }
 
         public DataBundleRequestDto DataBundleRequestDto { get; }
 
