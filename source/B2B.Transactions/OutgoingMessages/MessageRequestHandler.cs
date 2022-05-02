@@ -20,8 +20,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using B2B.Transactions.IncomingMessages;
 using B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier;
-using Energinet.DataHub.MessageHub.Model.Model;
-using Energinet.DataHub.MessageHub.Model.Peek;
 using MarketActivityRecord = B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier.MarketActivityRecord;
 
 namespace B2B.Transactions.OutgoingMessages
@@ -45,7 +43,7 @@ namespace B2B.Transactions.OutgoingMessages
             _incomingMessageStore = incomingMessageStore;
         }
 
-        public async Task<Result> HandleAsync(IReadOnlyCollection<string> requestedMessageIds, DataBundleRequestDto bundleRequestDto)
+        public async Task<Result> HandleAsync(IReadOnlyCollection<string> requestedMessageIds)
         {
             var messages = _outgoingMessageStore.GetByIds(requestedMessageIds);
             var exceptions = CheckBundleApplicability(requestedMessageIds, messages);
@@ -55,7 +53,7 @@ namespace B2B.Transactions.OutgoingMessages
             }
 
             var message = await CreateMessageFromAsync(messages).ConfigureAwait(false);
-            var uri = await _messageDispatcher.DispatchAsync(message, bundleRequestDto).ConfigureAwait(false);
+            var uri = await _messageDispatcher.DispatchAsync(message).ConfigureAwait(false);
 
             return Result.Succeeded(uri);
         }

@@ -24,15 +24,20 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
     public class MessageDispatcher : IMessageDispatcher
     {
         private readonly IStorageHandler _storageHandler;
+        private readonly MessageRequestContext _messageRequestContext;
 
-        public MessageDispatcher(IStorageHandler storageHandler)
+        public MessageDispatcher(IStorageHandler storageHandler, MessageRequestContext messageRequestContext)
         {
             _storageHandler = storageHandler;
+            _messageRequestContext = messageRequestContext;
         }
 
-        public async Task<Uri> DispatchAsync(Stream message, DataBundleRequestDto requestDto)
+        public async Task<Uri> DispatchAsync(Stream message)
         {
-            return await _storageHandler.AddStreamToStorageAsync(message, requestDto).ConfigureAwait(false);
+            return await _storageHandler.AddStreamToStorageAsync(
+                message,
+                _messageRequestContext.DataBundleRequestDto ?? throw new InvalidOperationException())
+                .ConfigureAwait(false);
         }
     }
 }

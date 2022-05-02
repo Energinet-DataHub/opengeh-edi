@@ -67,6 +67,7 @@ namespace B2B.Transactions.Infrastructure.Configuration
             services.AddScoped<IMessageDispatcher, MessageDispatcher>();
             services.AddScoped<MessageFactory>();
             services.AddScoped<MessageRequestHandler>();
+            services.AddScoped<MessageRequestContext>();
 
             services.AddLogging();
             AddXmlSchema(services);
