@@ -24,15 +24,13 @@ namespace B2B.Transactions.IncomingMessages
 {
     public class IncomingMessageHandler
     {
-        private readonly IncomingMessageStore _store;
         private readonly ITransactionRepository _transactionRepository;
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICorrelationContext _correlationContext;
 
-        public IncomingMessageHandler(IncomingMessageStore store, ITransactionRepository transactionRepository, IOutgoingMessageStore outgoingMessageStore, IUnitOfWork unitOfWork, ICorrelationContext correlationContext)
+        public IncomingMessageHandler(ITransactionRepository transactionRepository, IOutgoingMessageStore outgoingMessageStore, IUnitOfWork unitOfWork, ICorrelationContext correlationContext)
         {
-            _store = store;
             _transactionRepository = transactionRepository;
             _outgoingMessageStore = outgoingMessageStore;
             _unitOfWork = unitOfWork;
@@ -42,7 +40,6 @@ namespace B2B.Transactions.IncomingMessages
         public Task HandleAsync(IncomingMessage incomingMessage)
         {
             if (incomingMessage == null) throw new ArgumentNullException(nameof(incomingMessage));
-            _store.Add(incomingMessage);
 
             var acceptedTransaction = new AcceptedTransaction(incomingMessage.MarketActivityRecord.Id);
             _transactionRepository.Add(acceptedTransaction);

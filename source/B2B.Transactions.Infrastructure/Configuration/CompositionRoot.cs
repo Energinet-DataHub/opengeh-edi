@@ -63,7 +63,6 @@ namespace B2B.Transactions.Infrastructure.Configuration
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
             services.AddScoped<IncomingMessageHandler>();
-            services.AddScoped<IncomingMessageStore>();
             services.AddScoped<IMessageDispatcher, MessageDispatcher>();
             services.AddScoped<MessageFactory>();
             services.AddScoped<MessageRequestHandler>();
