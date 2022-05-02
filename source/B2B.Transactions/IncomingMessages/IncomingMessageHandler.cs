@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
+using B2B.Transactions.Common;
 using B2B.Transactions.Configuration;
 using B2B.Transactions.Configuration.DataAccess;
 using B2B.Transactions.OutgoingMessages;
@@ -23,30 +24,49 @@ namespace B2B.Transactions.IncomingMessages
 {
     public class IncomingMessageHandler
     {
-        private readonly IncomingMessageStore _store;
         private readonly ITransactionRepository _transactionRepository;
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICorrelationContext _correlationContext;
+        private readonly IMarketActivityRecordParser _marketActivityRecordParser;
 
-        public IncomingMessageHandler(IncomingMessageStore store, ITransactionRepository transactionRepository, IOutgoingMessageStore outgoingMessageStore, IUnitOfWork unitOfWork, ICorrelationContext correlationContext)
+        public IncomingMessageHandler(
+            ITransactionRepository transactionRepository,
+            IOutgoingMessageStore outgoingMessageStore,
+            IUnitOfWork unitOfWork,
+            ICorrelationContext correlationContext,
+            IMarketActivityRecordParser marketActivityRecordParser)
         {
-            _store = store;
             _transactionRepository = transactionRepository;
             _outgoingMessageStore = outgoingMessageStore;
             _unitOfWork = unitOfWork;
             _correlationContext = correlationContext;
+            _marketActivityRecordParser = marketActivityRecordParser;
         }
 
         public Task HandleAsync(IncomingMessage incomingMessage)
         {
             if (incomingMessage == null) throw new ArgumentNullException(nameof(incomingMessage));
-            _store.Add(incomingMessage);
 
             var acceptedTransaction = new AcceptedTransaction(incomingMessage.MarketActivityRecord.Id);
             _transactionRepository.Add(acceptedTransaction);
 
-            var outgoingMessage = new OutgoingMessage("ConfirmRequestChangeOfSupplier", incomingMessage.Message.SenderId, _correlationContext.Id, incomingMessage.Id, incomingMessage.Message.ProcessType);
+            var messageId = Guid.NewGuid();
+            var marketActivityRecord = new OutgoingMessages.ConfirmRequestChangeOfSupplier.MarketActivityRecord(
+                messageId.ToString(),
+                acceptedTransaction.TransactionId,
+                incomingMessage.MarketActivityRecord.MarketEvaluationPointId);
+
+            var outgoingMessage = new OutgoingMessage(
+                "ConfirmRequestChangeOfSupplier",
+                incomingMessage.Message.SenderId,
+                _correlationContext.Id,
+                incomingMessage.Id,
+                incomingMessage.Message.ProcessType,
+                incomingMessage.Message.SenderRole,
+                incomingMessage.Message.ReceiverId,
+                incomingMessage.Message.ReceiverRole,
+                _marketActivityRecordParser.From(marketActivityRecord));
             _outgoingMessageStore.Add(outgoingMessage);
 
             return _unitOfWork.CommitAsync();

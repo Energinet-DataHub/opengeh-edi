@@ -15,9 +15,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using B2B.Transactions.Common;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 
 namespace B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier
@@ -26,22 +28,25 @@ namespace B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier
     {
         private const string Prefix = "cim";
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+        private readonly IMarketActivityRecordParser _marketActivityRecordParser;
 
-        public MessageFactory(ISystemDateTimeProvider systemDateTimeProvider)
+        public MessageFactory(ISystemDateTimeProvider systemDateTimeProvider, IMarketActivityRecordParser marketActivityRecordParser)
         {
             _systemDateTimeProvider = systemDateTimeProvider;
+            _marketActivityRecordParser = marketActivityRecordParser;
         }
 
-        public async Task<Stream> CreateFromAsync(MessageHeader messageHeader, IReadOnlyCollection<MarketActivityRecord> marketActivityRecords)
+        public async Task<Stream> CreateFromAsync(MessageHeader messageHeader, IReadOnlyCollection<string> marketActivityPayloads)
         {
             if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
-            if (marketActivityRecords == null) throw new ArgumentNullException(nameof(marketActivityRecords));
+            if (marketActivityPayloads == null) throw new ArgumentNullException(nameof(marketActivityPayloads));
 
             var settings = new XmlWriterSettings { OmitXmlDeclaration = false, Encoding = Encoding.UTF8, Async = true };
             var stream = new MemoryStream();
             await using var writer = XmlWriter.Create(stream, settings);
             await WriteMessageHeaderAsync(messageHeader, writer).ConfigureAwait(false);
-            await WriteMarketActivityRecordsAsync(marketActivityRecords, writer).ConfigureAwait(false);
+
+            await WriteMarketActivityRecordsAsync(GetMarketActivityRecordsFrom(marketActivityPayloads), writer).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
             writer.Close();
             stream.Position = 0;
@@ -118,6 +123,13 @@ namespace B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier
         private string GetCurrentDateTime()
         {
             return _systemDateTimeProvider.Now().ToString();
+        }
+
+        private List<MarketActivityRecord> GetMarketActivityRecordsFrom(IReadOnlyCollection<string> marketActivityPayloads)
+        {
+            return marketActivityPayloads
+                .Select(payload => _marketActivityRecordParser.From<MarketActivityRecord>(payload))
+                .ToList();
         }
     }
 }
