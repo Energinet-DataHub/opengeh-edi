@@ -13,31 +13,38 @@
 // limitations under the License.
 
 using System;
-using System.IO;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using B2B.Transactions.OutgoingMessages;
 using Energinet.DataHub.MessageHub.Client.Storage;
 using Energinet.DataHub.MessageHub.Model.Model;
+using Energinet.DataHub.MessageHub.Model.Peek;
 
 namespace B2B.Transactions.Infrastructure.OutgoingMessages
 {
-    public class MessageDispatcher : IMessageDispatcher
+    public class MessageRequestContext
     {
+        private readonly IRequestBundleParser _requestBundleParser;
         private readonly IStorageHandler _storageHandler;
-        private readonly MessageRequestContext _messageRequestContext;
 
-        public MessageDispatcher(IStorageHandler storageHandler, MessageRequestContext messageRequestContext)
+        public MessageRequestContext(
+            IRequestBundleParser requestBundleParser,
+            IStorageHandler storageHandler)
         {
+            _requestBundleParser = requestBundleParser;
             _storageHandler = storageHandler;
-            _messageRequestContext = messageRequestContext;
         }
 
-        public async Task DispatchAsync(Stream message)
+        public DataBundleRequestDto? DataBundleRequestDto { get; private set; }
+
+        public IReadOnlyCollection<string>? DataAvailableIds { get; private set; }
+
+        public async Task SetMessageRequestContextAsync(byte[] data)
         {
-            await _storageHandler.AddStreamToStorageAsync(
-                message,
-                _messageRequestContext.DataBundleRequestDto ?? throw new InvalidOperationException())
+            DataBundleRequestDto = _requestBundleParser.Parse(data);
+            var dataAvailableIds = await _storageHandler.GetDataAvailableNotificationIdsAsync(DataBundleRequestDto)
                 .ConfigureAwait(false);
+            DataAvailableIds = dataAvailableIds.Select(x => x.ToString()).ToList();
         }
     }
 }

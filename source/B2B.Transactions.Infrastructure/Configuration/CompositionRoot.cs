@@ -69,6 +69,7 @@ namespace B2B.Transactions.Infrastructure.Configuration
             services.AddScoped<MessageFactory>();
             services.AddScoped<MessageRequestHandler>();
             services.AddScoped<IMarketActivityRecordParser, MarketActivityRecordParser>();
+            services.AddScoped<MessageRequestContext>();
 
             services.AddLogging();
             AddXmlSchema(services);
