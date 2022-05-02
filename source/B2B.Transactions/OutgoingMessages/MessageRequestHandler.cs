@@ -21,28 +21,23 @@ using System.Threading.Tasks;
 using B2B.Transactions.IncomingMessages;
 using B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Energinet.DataHub.MessageHub.Model.Model;
-using Energinet.DataHub.MessageHub.Model.Peek;
-using MarketActivityRecord = B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier.MarketActivityRecord;
 
 namespace B2B.Transactions.OutgoingMessages
 {
     public class MessageRequestHandler
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
-        private readonly IncomingMessageStore _incomingMessageStore;
         private readonly IMessageDispatcher _messageDispatcher;
         private readonly MessageFactory _messageFactory;
 
         public MessageRequestHandler(
             IOutgoingMessageStore outgoingMessageStore,
             IMessageDispatcher messageDispatcherSpy,
-            MessageFactory messageFactory,
-            IncomingMessageStore incomingMessageStore)
+            MessageFactory messageFactory)
         {
             _outgoingMessageStore = outgoingMessageStore;
             _messageDispatcher = messageDispatcherSpy;
             _messageFactory = messageFactory;
-            _incomingMessageStore = incomingMessageStore;
         }
 
         public async Task<Result> HandleAsync(IReadOnlyCollection<string> requestedMessageIds, DataBundleRequestDto bundleRequestDto)
@@ -108,14 +103,7 @@ namespace B2B.Transactions.OutgoingMessages
         private Task<Stream> CreateMessageFromAsync(IReadOnlyCollection<OutgoingMessage> outgoingMessages)
         {
             var firstMessage = outgoingMessages.First();
-            var incomingMessage = _incomingMessageStore.GetById(outgoingMessages.First().OriginalMessageId);
             var messageHeader = new MessageHeader(firstMessage.ProcessType, firstMessage.RecipientId, firstMessage.ReceiverRole, firstMessage.SenderId, firstMessage.SenderRole);
-            var marketActivityRecords = new List<MarketActivityRecord>();
-            // foreach (var outgoingMessage in outgoingMessages)
-            // {
-            //     marketActivityRecords.Add(
-            //         new MarketActivityRecord(outgoingMessage.Id.ToString(), incomingMessage!.MarketActivityRecord.Id, incomingMessage.MarketActivityRecord.MarketEvaluationPointId));
-            // }
             return _messageFactory.CreateFromAsync(messageHeader, outgoingMessages);
         }
     }
