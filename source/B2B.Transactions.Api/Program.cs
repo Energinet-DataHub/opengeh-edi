@@ -66,7 +66,7 @@ namespace B2B.Transactions.Api
                 .ConfigureServices(services =>
                 {
                     var databaseConnectionString = runtime.DB_CONNECTION_STRING;
-                    CompositionRoot.Initialize(services)
+                    var compositionRoot = CompositionRoot.Initialize(services)
                         .AddBearerAuthentication(tokenValidationParameters)
                         .AddDatabaseConnectionFactory(databaseConnectionString!)
                         .AddSystemClock(new SystemDateTimeProvider())
@@ -85,10 +85,14 @@ namespace B2B.Transactions.Api
                             runtime.TRANSACTIONS_QUEUE_NAME!)
                         .AddRequestLogging(
                             runtime.REQUEST_RESPONSE_LOGGING_CONNECTION_STRING!,
-                            runtime.REQUEST_RESPONSE_LOGGING_CONTAINER_NAME!)
-                        .AddMessageHubServices(
+                            runtime.REQUEST_RESPONSE_LOGGING_CONTAINER_NAME!);
+
+                    if (!runtime.IsRunningLocally())
+                    {
+                        compositionRoot.AddMessageHubServices(
                             runtime.MESSAGEHUB_STORAGE_CONNECTION_STRING!,
                             runtime.MESSAGEHUB_STORAGE_CONTAINER_NAME!);
+                    }
                 })
                 .Build();
         }

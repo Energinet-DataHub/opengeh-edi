@@ -24,8 +24,10 @@ limitations under the License.
       <PackageReference Include="Energinet.DataHub.Core.Logging" Version="1.1.0" />
       <PackageReference Include="Energinet.DataHub.MessageHub.Client" Version="1.9.1" />
       <PackageReference Include="EntityFrameworkCore.SqlServer.NodaTime" Version="5.0.1" />
+      <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
       <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.0.0" />
+      <PackageReference Include="Polly" Version="7.2.2" />
     </ItemGroup>
 
     <ItemGroup>
