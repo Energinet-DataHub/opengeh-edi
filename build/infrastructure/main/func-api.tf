@@ -40,7 +40,7 @@ module "func_receiver" {
     TRANSACTIONS_QUEUE_SENDER_CONNECTION_STRING   = module.sb_marketroles.primary_connection_strings["send"]
     TRANSACTIONS_QUEUE_LISTENER_CONNECTION_STRING = module.sb_marketroles.primary_connection_strings["listen"]
     DB_CONNECTION_STRING             		          = local.MS_MARKETROLES_CONNECTION_STRING
-    TRANSACTIONS_QUEUE_NAME                       = module.sbq_marketactivity.name
+    TRANSACTIONS_QUEUE_NAME                       = "incomingmessagequeue"
     RAISE_TIME_HAS_PASSED_EVENT_SCHEDULE          = "*/10 * * * * *"
     MESSAGEHUB_QUEUE_CONNECTION_STRING    = data.azurerm_key_vault_secret.sb_domain_relay_transceiver_connection_string.value
     MESSAGEHUB_DATA_AVAILABLE_QUEUE       = data.azurerm_key_vault_secret.sbq_data_available_name.value
