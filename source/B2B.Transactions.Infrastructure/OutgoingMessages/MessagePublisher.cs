@@ -14,7 +14,6 @@
 
 using System;
 using System.Threading.Tasks;
-using B2B.Transactions.Configuration;
 using B2B.Transactions.Infrastructure.DataAccess;
 using B2B.Transactions.OutgoingMessages;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,16 +24,13 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
     public class MessagePublisher
     {
         private readonly INewMessageAvailableNotifier _newMessageAvailableNotifier;
-        private readonly ICorrelationContext _correlationContext;
         private readonly IOutgoingMessageStore _messageStore;
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly ILogger<MessagePublisher> _logger;
 
-        public MessagePublisher(INewMessageAvailableNotifier newMessageAvailableNotifier, ICorrelationContext correlationContext, IOutgoingMessageStore messageStore, IServiceScopeFactory serviceScopeFactory, ILogger<MessagePublisher> logger)
+        public MessagePublisher(INewMessageAvailableNotifier newMessageAvailableNotifier, IOutgoingMessageStore messageStore, IServiceScopeFactory serviceScopeFactory, ILogger<MessagePublisher> logger)
         {
             _newMessageAvailableNotifier = newMessageAvailableNotifier ?? throw new ArgumentNullException(nameof(newMessageAvailableNotifier));
-            _correlationContext = correlationContext;
-            _correlationContext = correlationContext ?? throw new ArgumentNullException(nameof(correlationContext));
             _messageStore = messageStore ?? throw new ArgumentNullException(nameof(messageStore));
             _serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
