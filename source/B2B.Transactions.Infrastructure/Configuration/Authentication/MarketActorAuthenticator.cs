@@ -17,7 +17,7 @@ using System.Linq;
 using System.Security.Claims;
 using B2B.Transactions.Configuration.Authentication;
 
-namespace B2B.Transactions.Infrastructure.Authentication
+namespace B2B.Transactions.Infrastructure.Configuration.Authentication
 {
     public class MarketActorAuthenticator : IMarketActorAuthenticator
     {

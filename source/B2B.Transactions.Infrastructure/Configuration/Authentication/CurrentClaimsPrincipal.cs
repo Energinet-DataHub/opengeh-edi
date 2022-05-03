@@ -12,15 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace B2B.Transactions.Infrastructure.Authentication.Errors
-{
-    public abstract class AuthenticationError
-    {
-        protected AuthenticationError(string message)
-        {
-            Message = message;
-        }
+using System.Security.Claims;
 
-        public string Message { get; set; }
+namespace B2B.Transactions.Infrastructure.Configuration.Authentication
+{
+    public class CurrentClaimsPrincipal
+    {
+        private ClaimsPrincipal? _currentUser;
+
+        public ClaimsPrincipal? ClaimsPrincipal => _currentUser;
+
+        public void SetCurrentUser(ClaimsPrincipal currentUser)
+        {
+            _currentUser = currentUser;
+        }
     }
 }

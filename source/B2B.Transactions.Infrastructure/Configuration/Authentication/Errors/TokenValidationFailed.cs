@@ -12,19 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Security.Claims;
-
-namespace B2B.Transactions.Infrastructure.Authentication
+namespace B2B.Transactions.Infrastructure.Configuration.Authentication.Errors
 {
-    public class CurrentClaimsPrincipal
+    public class TokenValidationFailed : AuthenticationError
     {
-        private ClaimsPrincipal? _currentUser;
-
-        public ClaimsPrincipal? ClaimsPrincipal => _currentUser;
-
-        public void SetCurrentUser(ClaimsPrincipal currentUser)
+        public TokenValidationFailed(string message)
+         : base(message)
         {
-            _currentUser = currentUser;
         }
     }
 }
