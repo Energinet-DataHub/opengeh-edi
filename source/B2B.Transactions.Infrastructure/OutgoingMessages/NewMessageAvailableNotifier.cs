@@ -45,11 +45,11 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
             return new DataAvailableNotificationDto(
                 message.Id,
                 new GlobalLocationNumberDto(message.RecipientId),
-                new MessageTypeDto(string.Empty),
+                new MessageTypeDto(message.DocumentType.Split('_')[0] + "_" + message.ProcessType),
                 DomainOrigin.MarketRoles,
                 false,
                 1,
-                message.DocumentType);
+                message.DocumentType.Split('_')[0]);
         }
     }
 }
