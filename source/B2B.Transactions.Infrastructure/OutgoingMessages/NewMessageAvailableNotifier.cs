@@ -42,14 +42,21 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
 
         private static DataAvailableNotificationDto CreateDataAvailableNotificationFrom(OutgoingMessage message)
         {
+            var documentType = ExtractDocumentType(message);
+
             return new DataAvailableNotificationDto(
                 message.Id,
                 new GlobalLocationNumberDto(message.RecipientId),
-                new MessageTypeDto(message.DocumentType.Split('_')[0] + "_" + message.ProcessType),
+                new MessageTypeDto(documentType + "_" + message.ProcessType),
                 DomainOrigin.MarketRoles,
-                false,
+                true,
                 1,
-                message.DocumentType.Split('_')[0]);
+                documentType);
+        }
+
+        private static string ExtractDocumentType(OutgoingMessage message)
+        {
+            return message.DocumentType.Split('_')[0];
         }
     }
 }
