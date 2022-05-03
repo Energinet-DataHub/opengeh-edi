@@ -31,7 +31,7 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
         private readonly ICorrelationContext _correlationContext;
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly MessagePublisher _messagePublisher;
-        private readonly DataAvailableNotificationPublisherSpy _dataAvailableNotificationPublisherSpy;
+        private readonly NewMessageAvailableNotifierSpy _newMessageAvailableNotifierSpy;
 
         public MessagePublisherTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
@@ -39,7 +39,7 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
             _correlationContext = GetService<ICorrelationContext>();
             _outgoingMessageStore = GetService<IOutgoingMessageStore>();
             _messagePublisher = GetService<MessagePublisher>();
-            _dataAvailableNotificationPublisherSpy = (DataAvailableNotificationPublisherSpy)GetService<IDataAvailableNotificationPublisher>();
+            _newMessageAvailableNotifierSpy = (NewMessageAvailableNotifierSpy)GetService<INewMessageAvailableNotifier>();
         }
 
         [Fact]
@@ -51,7 +51,7 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
             await _messagePublisher.PublishAsync().ConfigureAwait(false);
 
             var unpublishedMessages = _outgoingMessageStore.GetUnpublished();
-            var publishedMessage = _dataAvailableNotificationPublisherSpy.GetMessageFrom(outgoingMessage.CorrelationId);
+            var publishedMessage = _newMessageAvailableNotifierSpy.GetMessageFrom(outgoingMessage.CorrelationId);
             Assert.Empty(unpublishedMessages);
             Assert.NotNull(publishedMessage);
         }

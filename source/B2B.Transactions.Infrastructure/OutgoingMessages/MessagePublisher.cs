@@ -24,15 +24,15 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
 {
     public class MessagePublisher
     {
-        private readonly IDataAvailableNotificationPublisher _dataAvailableNotificationPublisher;
+        private readonly INewMessageAvailableNotifier _newMessageAvailableNotifier;
         private readonly ICorrelationContext _correlationContext;
         private readonly IOutgoingMessageStore _messageStore;
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly ILogger<MessagePublisher> _logger;
 
-        public MessagePublisher(IDataAvailableNotificationPublisher dataAvailableNotificationPublisher, ICorrelationContext correlationContext, IOutgoingMessageStore messageStore, IServiceScopeFactory serviceScopeFactory, ILogger<MessagePublisher> logger)
+        public MessagePublisher(INewMessageAvailableNotifier newMessageAvailableNotifier, ICorrelationContext correlationContext, IOutgoingMessageStore messageStore, IServiceScopeFactory serviceScopeFactory, ILogger<MessagePublisher> logger)
         {
-            _dataAvailableNotificationPublisher = dataAvailableNotificationPublisher ?? throw new ArgumentNullException(nameof(dataAvailableNotificationPublisher));
+            _newMessageAvailableNotifier = newMessageAvailableNotifier ?? throw new ArgumentNullException(nameof(newMessageAvailableNotifier));
             _correlationContext = correlationContext;
             _correlationContext = correlationContext ?? throw new ArgumentNullException(nameof(correlationContext));
             _messageStore = messageStore ?? throw new ArgumentNullException(nameof(messageStore));
@@ -78,7 +78,7 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
 
         private async Task SendNotificationAsync(OutgoingMessage message)
         {
-            await _dataAvailableNotificationPublisher.SendAsync(
+            await _newMessageAvailableNotifier.NotifyAsync(
                 message.CorrelationId,
                 message).ConfigureAwait(false);
         }

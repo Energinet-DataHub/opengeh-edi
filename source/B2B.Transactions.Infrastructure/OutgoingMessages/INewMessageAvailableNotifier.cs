@@ -14,20 +14,19 @@
 
 using System.Threading.Tasks;
 using B2B.Transactions.OutgoingMessages;
-using Energinet.DataHub.MessageHub.Model.Model;
 
 namespace B2B.Transactions.Infrastructure.OutgoingMessages
 {
     /// <summary>
-    /// Interface for data available notifications
+    /// Publishes notifications about new messages
     /// </summary>
-    public interface IDataAvailableNotificationPublisher
+    public interface INewMessageAvailableNotifier
     {
         /// <summary>
-        /// send the specified DataAvailableNotification to the post office DataAvailable queue.
+        /// Notify about new available of message
         /// </summary>
         /// <param name="correlationId">The correlation id that can be used to track the data represented by the notification.</param>
         /// <param name="message">The notification to send to the post office.</param>
-        Task SendAsync(string correlationId, OutgoingMessage message);
+        Task NotifyAsync(string correlationId, OutgoingMessage message);
     }
 }
