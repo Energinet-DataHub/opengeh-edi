@@ -26,6 +26,7 @@ using B2B.Transactions.Infrastructure.Authentication;
 using B2B.Transactions.Infrastructure.Common;
 using B2B.Transactions.Infrastructure.DataAccess;
 using B2B.Transactions.Infrastructure.DataAccess.Transaction;
+using B2B.Transactions.Infrastructure.InternalCommands;
 using B2B.Transactions.Infrastructure.Messages;
 using B2B.Transactions.Infrastructure.OutgoingMessages;
 using B2B.Transactions.Infrastructure.Serialization;
@@ -33,7 +34,6 @@ using B2B.Transactions.Infrastructure.Transactions;
 using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using B2B.Transactions.Transactions;
-using B2B.Transactions.Xml;
 using B2B.Transactions.Xml.Incoming;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
@@ -42,6 +42,7 @@ using Energinet.DataHub.MessageHub.Client.Factories;
 using Energinet.DataHub.MessageHub.Client.Storage;
 using Energinet.DataHub.MessageHub.Model.Peek;
 using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -73,6 +74,8 @@ namespace B2B.Transactions.Infrastructure.Configuration
 
             services.AddLogging();
             AddXmlSchema(services);
+            AddProcessing();
+            AddInternalCommandsProcessing();
         }
 
         public static CompositionRoot Initialize(IServiceCollection services)
@@ -169,6 +172,19 @@ namespace B2B.Transactions.Infrastructure.Configuration
             services.AddScoped<SchemaStore>();
             services.AddScoped<ISchemaProvider, SchemaProvider>();
             services.AddScoped<MessageReceiver>();
+        }
+
+        private void AddProcessing()
+        {
+            _services.AddMediatR(typeof(CompositionRoot));
+        }
+
+        private void AddInternalCommandsProcessing()
+        {
+            _services.AddTransient<CommandExecutor>();
+            _services.AddScoped<ICommandScheduler, CommandScheduler>();
+            _services.AddTransient<InternalCommandAccessor>();
+            _services.AddTransient<InternalCommandProcessor>();
         }
     }
 }

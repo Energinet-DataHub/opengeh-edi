@@ -14,21 +14,33 @@
 
 using System;
 using System.Threading.Tasks;
+using B2B.Transactions.Infrastructure.SystemTime;
+using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
 namespace B2B.Transactions.Api
 {
-    public static class SystemTimer
+    public class SystemTimer
     {
+        private readonly IMediator _mediator;
+        private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+
+        public SystemTimer(IMediator mediator, ISystemDateTimeProvider systemDateTimeProvider)
+        {
+            _mediator = mediator;
+            _systemDateTimeProvider = systemDateTimeProvider;
+        }
+
         [Function("RaiseTimeHasPassedEvent")]
-        public static Task RunAsync([TimerTrigger("%RAISE_TIME_HAS_PASSED_EVENT_SCHEDULE%")] TimerInfo timerTimerInfo, FunctionContext context)
+        public Task RunAsync([TimerTrigger("%RAISE_TIME_HAS_PASSED_EVENT_SCHEDULE%")] TimerInfo timerTimerInfo, FunctionContext context)
         {
             var logger = context.GetLogger("System timer");
             logger.LogInformation($"System timer trigger at: {DateTime.Now}");
             logger.LogInformation($"Next timer schedule at: {timerTimerInfo?.ScheduleStatus?.Next}");
 
-            return Task.CompletedTask;
+            return _mediator.Publish(new TimeHasPassed(_systemDateTimeProvider.Now()));
         }
     }
 }
