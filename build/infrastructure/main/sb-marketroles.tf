@@ -43,10 +43,20 @@ module "sbq_marketroles" {
   resource_group_name = azurerm_resource_group.this.name
 }
 
-module "sbq_marketactivity" {
-  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/service-bus-queue?ref=5.1.0"
+# module "sbq_marketactivity" {
+#   source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/service-bus-queue?ref=5.1.0"
 
-  name                = "marketactivity"
-  namespace_name      = module.sb_marketroles.name
-  resource_group_name = azurerm_resource_group.this.name
+#   name                = "marketactivity"
+#   namespace_name      = module.sb_marketroles.name
+#   resource_group_name = azurerm_resource_group.this.name
+
+# }
+
+resource "azurerm_servicebus_queue" "sbq_marketactivity" {
+  name                         = "marketactivity"
+  resource_group_name          = azurerm_resource_group.this.name
+  namespace_name               = module.sb_marketroles.name
+  requires_session             = false
+  requires_duplicate_detection = false
+  enable_partitioning          = false
 }

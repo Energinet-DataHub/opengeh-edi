@@ -16,18 +16,19 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using B2B.CimMessageAdapter.Transactions;
+using B2B.Transactions.IncomingMessages;
 using B2B.Transactions.Transactions;
 
 namespace B2B.Transactions.IntegrationTests.CimMessageAdapter.Stubs
 {
     public class TransactionQueueDispatcherStub : ITransactionQueueDispatcher
     {
-        private readonly List<B2BTransaction> _uncommittedItems = new();
-        private readonly List<B2BTransaction> _committedItems = new();
+        private readonly List<IncomingMessage> _uncommittedItems = new();
+        private readonly List<IncomingMessage> _committedItems = new();
 
-        public IReadOnlyCollection<B2BTransaction> CommittedItems => _committedItems.AsReadOnly();
+        public IReadOnlyCollection<IncomingMessage> CommittedItems => _committedItems.AsReadOnly();
 
-        public Task AddAsync(B2BTransaction transaction)
+        public Task AddAsync(IncomingMessage transaction)
         {
             if (transaction == null) throw new ArgumentNullException(nameof(transaction));
             _committedItems.Clear();

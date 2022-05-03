@@ -15,6 +15,7 @@
 using System;
 using System.Text;
 using B2B.Transactions.Api;
+using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -23,7 +24,7 @@ namespace B2B.Transactions.ArchitectureTests
     public class CompositionRootTests
     {
         [Fact]
-        public void All_dependencies_can_be_resolved()
+        public void All_dependencies_can_be_resolved_in_functions()
         {
             var host = Program.ConfigureHost(Program.DevelopmentTokenValidationParameters(), new TestEnvironment());
 
@@ -38,7 +39,26 @@ namespace B2B.Transactions.ArchitectureTests
             foreach (var dependency in dependencies)
             {
                 var resolvedInstance = scope.ServiceProvider.GetService(dependency);
-                Assert.True((bool)(resolvedInstance != null), $"Can resolve {dependency.Name}");
+                Assert.True(resolvedInstance != null, $"Unable to resolve {dependency.Name}");
+            }
+        }
+
+        [Fact]
+        public void All_dependencies_can_be_resolved_for_middleware()
+        {
+            var host = Program.ConfigureHost(Program.DevelopmentTokenValidationParameters(), new TestEnvironment());
+
+            var allTypes = FunctionsReflectionHelper.FindAllTypes();
+            var middlewareTypes = FunctionsReflectionHelper.FindAllTypesThatImplementType();
+            var constructorDependencies = FunctionsReflectionHelper.FindAllConstructorDependencies();
+
+            var dependencies = constructorDependencies(middlewareTypes(typeof(IFunctionsWorkerMiddleware), allTypes(typeof(Program))));
+            using var scope = host.Services.CreateScope();
+
+            foreach (var dependency in dependencies)
+            {
+                var resolvedInstance = scope.ServiceProvider.GetService(dependency);
+                Assert.True(resolvedInstance != null, $"Unable to resolve {dependency.Name}");
             }
         }
 

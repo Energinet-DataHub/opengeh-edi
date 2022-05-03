@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using B2B.Transactions.Infrastructure.DataAccess;
 using B2B.Transactions.OutgoingMessages;
-using Microsoft.EntityFrameworkCore;
 
 namespace B2B.Transactions.Infrastructure.OutgoingMessages
 {
@@ -37,10 +38,26 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
         public ReadOnlyCollection<OutgoingMessage> GetUnpublished()
         {
             return _context
-                    .OutgoingMessages
-                    .Where(x => x.IsPublished == false)
-                    .ToList()
-                    .AsReadOnly();
+                .OutgoingMessages
+                .Where(x => x.IsPublished == false)
+                .ToList()
+                .AsReadOnly();
+        }
+
+        public OutgoingMessage? GetById(Guid messageId)
+        {
+            return _context.OutgoingMessages.Find(messageId);
+        }
+
+        public OutgoingMessage? GetByOriginalMessageId(string incomingMessageId)
+        {
+            return _context.OutgoingMessages
+                .FirstOrDefault(message => message.OriginalMessageId == incomingMessageId);
+        }
+
+        public ReadOnlyCollection<OutgoingMessage> GetByIds(IReadOnlyCollection<string> messageIds)
+        {
+            return _context.OutgoingMessages.Where(message => messageIds.Contains(message.Id.ToString())).ToList().AsReadOnly();
         }
     }
 }

@@ -15,6 +15,7 @@
 using System;
 using B2B.Transactions.Infrastructure.DataAccess.Outgoing;
 using B2B.Transactions.Infrastructure.DataAccess.Transaction;
+using B2B.Transactions.Infrastructure.InternalCommands;
 using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.Transactions;
 using Microsoft.EntityFrameworkCore;
@@ -37,12 +38,15 @@ namespace B2B.Transactions.Infrastructure.DataAccess
 
         public DbSet<OutgoingMessage> OutgoingMessages { get; private set; }
 
+        public DbSet<QueuedInternalCommand> QueuedInternalCommands { get; private set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
 
             modelBuilder.ApplyConfiguration(new TransactionEntityConfiguration());
             modelBuilder.ApplyConfiguration(new OutgoingMessageEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new QueuedInternalCommandEntityConfiguration());
         }
     }
 }

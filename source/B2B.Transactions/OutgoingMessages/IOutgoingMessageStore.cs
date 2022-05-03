@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
-using B2B.Transactions.Transactions;
 
 namespace B2B.Transactions.OutgoingMessages
 {
@@ -35,5 +34,26 @@ namespace B2B.Transactions.OutgoingMessages
         /// </summary>
         /// <returns> A read only collection of unpublished messages</returns>
         ReadOnlyCollection<OutgoingMessage> GetUnpublished();
+
+        /// <summary>
+        /// Gets an outgoing message from message store
+        /// </summary>
+        /// <param name="messageId"></param>
+        /// <returns><see cref="OutgoingMessage"/></returns>
+        OutgoingMessage? GetById(Guid messageId);
+
+        /// <summary>
+        /// Get outgoing message by id of incoming message
+        /// </summary>
+        /// <param name="incomingMessageId"></param>
+        /// <returns><see cref="OutgoingMessage"/></returns>
+        OutgoingMessage? GetByOriginalMessageId(string incomingMessageId);
+
+        /// <summary>
+        /// Get outgoing messages by list of incoming message ids
+        /// </summary>
+        /// <param name="messageIds"></param>
+        /// <returns><see cref="ReadOnlyCollection{OutgoingMessage}"/></returns>
+        ReadOnlyCollection<OutgoingMessage> GetByIds(IReadOnlyCollection<string> messageIds);
     }
 }

@@ -56,4 +56,17 @@ limitations under the License.
       </EmbeddedResource>
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Remove="InternalCommands\QueuedInternalCommandEntityConfiguration.cs" />
+      <Compile Remove="InternalCommands\QueuedInternalCommand.cs" />
+      <Compile Remove="InternalCommands\ProcessInternalCommandsOnTimeHasPassed.cs" />
+      <Compile Remove="InternalCommands\InternalCommandProcessor.cs" />
+      <Compile Remove="InternalCommands\InternalCommandAccessor.cs" />
+      <Compile Remove="InternalCommands\CommandScheduler.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="InternalCommands" />
+    </ItemGroup>
+
 </Project>

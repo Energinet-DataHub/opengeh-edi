@@ -17,22 +17,32 @@ using Azure.Messaging.ServiceBus;
 using B2B.CimMessageAdapter;
 using B2B.CimMessageAdapter.Messages;
 using B2B.CimMessageAdapter.Transactions;
-using B2B.Transactions.Authentication;
+using B2B.Transactions.Common;
 using B2B.Transactions.Configuration;
-using B2B.Transactions.DataAccess;
+using B2B.Transactions.Configuration.Authentication;
+using B2B.Transactions.Configuration.DataAccess;
+using B2B.Transactions.IncomingMessages;
 using B2B.Transactions.Infrastructure.Authentication;
+using B2B.Transactions.Infrastructure.Common;
 using B2B.Transactions.Infrastructure.DataAccess;
 using B2B.Transactions.Infrastructure.DataAccess.Transaction;
+using B2B.Transactions.Infrastructure.InternalCommands;
 using B2B.Transactions.Infrastructure.Messages;
 using B2B.Transactions.Infrastructure.OutgoingMessages;
 using B2B.Transactions.Infrastructure.Serialization;
 using B2B.Transactions.Infrastructure.Transactions;
 using B2B.Transactions.OutgoingMessages;
+using B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using B2B.Transactions.Transactions;
 using B2B.Transactions.Xml.Incoming;
-using B2B.Transactions.Xml.Outgoing;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
+using Energinet.DataHub.MessageHub.Client;
+using Energinet.DataHub.MessageHub.Client.DataAvailable;
+using Energinet.DataHub.MessageHub.Client.Factories;
+using Energinet.DataHub.MessageHub.Client.Storage;
+using Energinet.DataHub.MessageHub.Model.Peek;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -50,17 +60,22 @@ namespace B2B.Transactions.Infrastructure.Configuration
             services.AddSingleton<ISerializer, Serializer>();
             services.AddScoped<ITransactionIds, TransactionIdRegistry>();
             services.AddScoped<IMessageIds, MessageIdRegistry>();
-            services.AddScoped<IMessageFactory<IDocument>, AcceptMessageFactory>();
             services.AddScoped<ITransactionQueueDispatcher, TransactionQueueDispatcher>();
             services.AddScoped<ITransactionRepository, TransactionRepository>();
             services.AddScoped<IMarketActorAuthenticator, MarketActorAuthenticator>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
-            services.AddScoped<IMessageFactory<IDocument>, AcceptMessageFactory>();
-            services.AddScoped<RegisterTransaction>();
-            services.AddScoped<MessageValidator>();
+            services.AddScoped<IncomingMessageHandler>();
+            services.AddScoped<IMessageDispatcher, MessageDispatcher>();
+            services.AddScoped<MessageFactory>();
+            services.AddScoped<MessageRequestHandler>();
+            services.AddScoped<IMarketActivityRecordParser, MarketActivityRecordParser>();
+            services.AddScoped<MessageRequestContext>();
+
             services.AddLogging();
             AddXmlSchema(services);
+            AddProcessing();
+            AddInternalCommandsProcessing();
         }
 
         public static CompositionRoot Initialize(IServiceCollection services)
@@ -123,11 +138,35 @@ namespace B2B.Transactions.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddMessagePublishing(IDataAvailableNotificationPublisher dataAvailableNotificationPublisher)
+        public CompositionRoot AddMessagePublishing(Func<IServiceProvider, INewMessageAvailableNotifier> action)
         {
-            _services.AddScoped<IDataAvailableNotificationPublisher>(_ => dataAvailableNotificationPublisher);
-            _services.AddScoped<MessagePublisher>();
+            _services.AddScoped(action);
+            _services.AddScoped<MessageAvailabilityPublisher>();
             _services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
+            return this;
+        }
+
+        public CompositionRoot AddOutgoingMessageDispatcher(IMessageDispatcher messageDispatcher)
+        {
+            _services.AddScoped<MessageFactory>();
+            _services.AddScoped<IMessageDispatcher>(_ => messageDispatcher);
+            _services.AddScoped<MessageRequestHandler>();
+
+            return this;
+        }
+
+        public CompositionRoot AddMessageHubServices(string storageServiceConnectionString, string storageServiceContainerName, string queueConnectionString, string dataAvailableQueue, string domainReplyQueue)
+        {
+            _services.AddSingleton<StorageConfig>(s => new StorageConfig(storageServiceContainerName));
+            _services.AddSingleton<IRequestBundleParser, RequestBundleParser>();
+            _services.AddSingleton<IStorageServiceClientFactory>(s => new StorageServiceClientFactory(storageServiceConnectionString));
+            _services.AddSingleton<IStorageHandler, StorageHandler>();
+
+            _services.AddSingleton<IServiceBusClientFactory>(_ => new ServiceBusClientFactory(queueConnectionString));
+            _services.AddSingleton<IMessageBusFactory, AzureServiceBusFactory>();
+            _services.AddSingleton<IDataAvailableNotificationSender, DataAvailableNotificationSender>();
+            _services.AddSingleton(_ => new MessageHubConfig(dataAvailableQueue, domainReplyQueue));
+
             return this;
         }
 
@@ -136,6 +175,19 @@ namespace B2B.Transactions.Infrastructure.Configuration
             services.AddScoped<SchemaStore>();
             services.AddScoped<ISchemaProvider, SchemaProvider>();
             services.AddScoped<MessageReceiver>();
+        }
+
+        private void AddProcessing()
+        {
+            _services.AddMediatR(typeof(CompositionRoot));
+        }
+
+        private void AddInternalCommandsProcessing()
+        {
+            _services.AddTransient<CommandExecutor>();
+            _services.AddScoped<ICommandScheduler, CommandScheduler>();
+            _services.AddTransient<InternalCommandAccessor>();
+            _services.AddTransient<InternalCommandProcessor>();
         }
     }
 }

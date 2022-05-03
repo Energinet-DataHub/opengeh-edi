@@ -38,6 +38,21 @@ namespace B2B.Transactions.Api
         public virtual string? AZURE_FUNCTIONS_ENVIRONMENT =>
             GetEnvironmentVariable(nameof(AZURE_FUNCTIONS_ENVIRONMENT));
 
+        public virtual string? MESSAGEHUB_STORAGE_CONNECTION_STRING =>
+            GetEnvironmentVariable(nameof(MESSAGEHUB_STORAGE_CONNECTION_STRING));
+
+        public virtual string? MESSAGEHUB_STORAGE_CONTAINER_NAME =>
+            GetEnvironmentVariable(nameof(MESSAGEHUB_STORAGE_CONTAINER_NAME));
+
+        public virtual string?MESSAGEHUB_QUEUE_CONNECTION_STRING =>
+            GetEnvironmentVariable(nameof(MESSAGEHUB_QUEUE_CONNECTION_STRING));
+
+        public virtual string? MESSAGEHUB_DATA_AVAILABLE_QUEUE =>
+            GetEnvironmentVariable(nameof(MESSAGEHUB_DATA_AVAILABLE_QUEUE));
+
+        public virtual string? MESSAGEHUB_DOMAIN_REPLY_QUEUE =>
+            GetEnvironmentVariable(nameof(MESSAGEHUB_DOMAIN_REPLY_QUEUE));
+
         public virtual bool IsRunningLocally()
         {
             return AZURE_FUNCTIONS_ENVIRONMENT == "Development";
