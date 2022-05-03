@@ -47,7 +47,7 @@ module "func_receiver" {
     MESSAGEHUB_DOMAIN_REPLY_QUEUE         = data.azurerm_key_vault_secret.sbq_marketroles_reply_name.value
     MESSAGEHUB_STORAGE_CONTAINER_NAME     = data.azurerm_key_vault_secret.st_market_operator_response_postofficereply_container_name.value
     MESSAGEHUB_STORAGE_CONNECTION_STRING  = data.azurerm_key_vault_secret.st_market_operator_response_primary_connection_string.value
-    REQUEST_BUNDLE_QUEUE_SUBSCRIBER_QUEUE = data.azurerm_key_vault_secret.sbq_marketroles_name.value
+    MESSAGE_REQUEST_QUEUE 		  = data.azurerm_key_vault_secret.sbq_marketroles_name.value
   }
   
   tags                                      = azurerm_resource_group.this.tags

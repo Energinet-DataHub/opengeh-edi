@@ -42,7 +42,7 @@ namespace B2B.Transactions.Api
         }
 
         [Function("RequestMessageBundleTrigger")]
-        public async Task RunAsync([ServiceBusTrigger("%REQUEST_BUNDLE_QUEUE_SUBSCRIBER_QUEUE%", Connection = "MESSAGEHUB_QUEUE_CONNECTION_STRING", IsSessionsEnabled = true)] byte[] data)
+        public async Task RunAsync([ServiceBusTrigger("%MESSAGE_REQUEST_QUEUE%", Connection = "MESSAGEHUB_QUEUE_CONNECTION_STRING", IsSessionsEnabled = true)] byte[] data)
         {
             await _messageRequestContext.SetMessageRequestContextAsync(data).ConfigureAwait(false);
             var result = await _messageRequestHandler.HandleAsync(
