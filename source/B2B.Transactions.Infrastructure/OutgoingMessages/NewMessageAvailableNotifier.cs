@@ -30,26 +30,36 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
             _dataAvailableNotificationSender = dataAvailableNotificationSender;
         }
 
-        public async Task NotifyAsync(string correlationId, OutgoingMessage message)
+        public async Task NotifyAsync(OutgoingMessage message)
         {
-            if (correlationId == null) throw new ArgumentNullException(nameof(correlationId));
             if (message == null) throw new ArgumentNullException(nameof(message));
 
             await _dataAvailableNotificationSender.SendAsync(
-                correlationId,
+                message.CorrelationId,
                 CreateDataAvailableNotificationFrom(message)).ConfigureAwait(false);
         }
 
         private static DataAvailableNotificationDto CreateDataAvailableNotificationFrom(OutgoingMessage message)
         {
+            var documentType = ExtractDocumentType(message);
             return new DataAvailableNotificationDto(
                 message.Id,
                 new GlobalLocationNumberDto(message.RecipientId),
-                new MessageTypeDto(string.Empty),
+                new MessageTypeDto(ExtractMessageTypeFrom(message.ProcessType, documentType)),
                 DomainOrigin.MarketRoles,
-                false,
+                true,
                 1,
-                message.DocumentType);
+                documentType);
+        }
+
+        private static string ExtractMessageTypeFrom(string processType, string documentType)
+        {
+            return documentType + "_" + processType;
+        }
+
+        private static string ExtractDocumentType(OutgoingMessage message)
+        {
+            return message.DocumentType.Split('_')[0];
         }
     }
 }

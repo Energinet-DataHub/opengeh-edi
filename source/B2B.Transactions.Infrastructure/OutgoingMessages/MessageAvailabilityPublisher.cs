@@ -74,9 +74,7 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
 
         private async Task SendNotificationAsync(OutgoingMessage message)
         {
-            await _newMessageAvailableNotifier.NotifyAsync(
-                message.CorrelationId,
-                message).ConfigureAwait(false);
+            await _newMessageAvailableNotifier.NotifyAsync(message).ConfigureAwait(false);
         }
     }
 }
