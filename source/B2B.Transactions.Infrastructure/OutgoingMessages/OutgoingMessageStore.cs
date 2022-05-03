@@ -16,7 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using B2B.Transactions.Infrastructure.DataAccess;
+using B2B.Transactions.Infrastructure.Configuration.DataAccess;
 using B2B.Transactions.OutgoingMessages;
 
 namespace B2B.Transactions.Infrastructure.OutgoingMessages

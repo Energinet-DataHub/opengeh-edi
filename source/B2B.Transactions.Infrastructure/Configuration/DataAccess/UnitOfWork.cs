@@ -15,7 +15,7 @@
 using System.Threading.Tasks;
 using B2B.Transactions.Configuration.DataAccess;
 
-namespace B2B.Transactions.Infrastructure.DataAccess
+namespace B2B.Transactions.Infrastructure.Configuration.DataAccess
 {
     public class UnitOfWork : IUnitOfWork
     {

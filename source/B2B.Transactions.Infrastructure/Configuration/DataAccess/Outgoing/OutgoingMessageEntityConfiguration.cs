@@ -17,7 +17,7 @@ using B2B.Transactions.OutgoingMessages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace B2B.Transactions.Infrastructure.DataAccess.Outgoing
+namespace B2B.Transactions.Infrastructure.Configuration.DataAccess.Outgoing
 {
     public class OutgoingMessageEntityConfiguration : IEntityTypeConfiguration<OutgoingMessage>
     {

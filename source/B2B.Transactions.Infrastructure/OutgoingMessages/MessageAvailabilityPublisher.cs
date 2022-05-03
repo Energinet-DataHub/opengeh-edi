@@ -14,7 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
-using B2B.Transactions.Infrastructure.DataAccess;
+using B2B.Transactions.Infrastructure.Configuration.DataAccess;
 using B2B.Transactions.OutgoingMessages;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

@@ -17,7 +17,7 @@ using System.Data;
 using B2B.Transactions.Configuration.DataAccess;
 using Microsoft.Data.SqlClient;
 
-namespace B2B.Transactions.Infrastructure.DataAccess
+namespace B2B.Transactions.Infrastructure.Configuration.DataAccess
 {
     public class SqlDbConnectionFactory : IDbConnectionFactory, IDisposable
     {

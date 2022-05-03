@@ -16,7 +16,7 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
-using B2B.Transactions.Infrastructure.DataAccess;
+using B2B.Transactions.Infrastructure.Configuration.DataAccess;
 
 namespace B2B.Transactions.Infrastructure.Configuration.InternalCommands
 {
