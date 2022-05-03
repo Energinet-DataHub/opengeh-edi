@@ -18,7 +18,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using B2B.Transactions.Infrastructure.DataAccess;
 
-namespace B2B.Transactions.Infrastructure.InternalCommands
+namespace B2B.Transactions.Infrastructure.Configuration.InternalCommands
 {
     public class InternalCommandAccessor
     {

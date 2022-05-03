@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using System;
+using B2B.Transactions.Infrastructure.Configuration.InternalCommands;
 using B2B.Transactions.Infrastructure.DataAccess.Outgoing;
 using B2B.Transactions.Infrastructure.DataAccess.Transaction;
-using B2B.Transactions.Infrastructure.InternalCommands;
 using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.Transactions;
 using Microsoft.EntityFrameworkCore;

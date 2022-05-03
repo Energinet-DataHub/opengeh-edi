@@ -12,16 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
+using System.Threading.Tasks;
+using NodaTime;
 
-namespace B2B.Transactions.Infrastructure.InternalCommands
+namespace B2B.Transactions.Infrastructure.Configuration.InternalCommands
 {
-    #pragma warning disable CA1040
     /// <summary>
-    /// CQRS command object
+    /// Service for scheduling and enqueueing internal commands for later processing
     /// </summary>
-    public interface ICommand : IRequest
+    public interface ICommandScheduler
     {
+        /// <summary>
+        /// Schedules or enqueues a command
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="scheduleDate"></param>
+        /// <typeparam name="TCommand"><see cref="InternalCommand"/></typeparam>
+        Task EnqueueAsync<TCommand>(TCommand command, Instant? scheduleDate = null)
+            where TCommand : InternalCommand;
     }
-#pragma warning restore
 }

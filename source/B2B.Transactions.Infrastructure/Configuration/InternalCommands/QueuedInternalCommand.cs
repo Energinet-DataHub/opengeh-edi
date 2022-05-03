@@ -16,7 +16,7 @@ using System;
 using B2B.Transactions.Infrastructure.Serialization;
 using NodaTime;
 
-namespace B2B.Transactions.Infrastructure.InternalCommands
+namespace B2B.Transactions.Infrastructure.Configuration.InternalCommands
 {
     public class QueuedInternalCommand
     {

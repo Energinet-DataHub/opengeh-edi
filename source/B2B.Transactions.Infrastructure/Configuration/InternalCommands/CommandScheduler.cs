@@ -19,7 +19,7 @@ using B2B.Transactions.Infrastructure.Serialization;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using NodaTime;
 
-namespace B2B.Transactions.Infrastructure.InternalCommands
+namespace B2B.Transactions.Infrastructure.Configuration.InternalCommands
 {
     public class CommandScheduler : ICommandScheduler
     {

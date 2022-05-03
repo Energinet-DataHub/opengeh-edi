@@ -14,7 +14,7 @@
 
 using System;
 
-namespace B2B.Transactions.Infrastructure.InternalCommands
+namespace B2B.Transactions.Infrastructure.Configuration.InternalCommands
 {
     public abstract class InternalCommand : ICommand
     {

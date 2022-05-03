@@ -12,26 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
+using B2B.Transactions.Infrastructure.SystemTime;
 using MediatR;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace B2B.Transactions.Infrastructure.InternalCommands
+namespace B2B.Transactions.Infrastructure.Configuration.InternalCommands
 {
-    public class CommandExecutor
+    public class ProcessInternalCommandsOnTimeHasPassed : INotificationHandler<TimeHasPassed>
     {
-        private readonly IServiceScopeFactory _serviceScopeFactory;
+        private readonly InternalCommandProcessor _internalCommandProcessor;
 
-        public CommandExecutor(IServiceScopeFactory serviceScopeFactory)
+        public ProcessInternalCommandsOnTimeHasPassed(InternalCommandProcessor internalCommandProcessor)
         {
-            _serviceScopeFactory = serviceScopeFactory;
+            _internalCommandProcessor = internalCommandProcessor ?? throw new ArgumentNullException(nameof(internalCommandProcessor));
         }
 
-        public async Task ExecuteAsync(InternalCommand command, CancellationToken cancellationToken)
+        public Task Handle(TimeHasPassed notification, CancellationToken cancellationToken)
         {
-            using var scope = _serviceScopeFactory.CreateScope();
-            await scope.ServiceProvider.GetRequiredService<IMediator>().Send(command, cancellationToken).ConfigureAwait(false);
+            return _internalCommandProcessor.ProcessPendingAsync();
         }
     }
 }

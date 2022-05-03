@@ -21,7 +21,7 @@ using Dapper;
 using Microsoft.Extensions.Logging;
 using Polly;
 
-namespace B2B.Transactions.Infrastructure.InternalCommands
+namespace B2B.Transactions.Infrastructure.Configuration.InternalCommands
 {
     public class InternalCommandProcessor
     {
