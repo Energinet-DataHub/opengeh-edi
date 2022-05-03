@@ -20,7 +20,7 @@ using B2B.Transactions.OutgoingMessages;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace B2B.Transactions.Api
+namespace B2B.Transactions.Api.OutgoingMessages
 {
     public class MessageRequestQueueListener
     {

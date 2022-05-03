@@ -23,7 +23,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 
-namespace B2B.Transactions.Api
+namespace B2B.Transactions.Api.IncomingMessages
 {
     public class RequestChangeOfSupplier
     {

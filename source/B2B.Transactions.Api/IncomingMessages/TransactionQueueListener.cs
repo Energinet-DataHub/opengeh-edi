@@ -18,11 +18,10 @@ using System.Threading.Tasks;
 using B2B.Transactions.Configuration;
 using B2B.Transactions.IncomingMessages;
 using B2B.Transactions.Infrastructure.Serialization;
-using B2B.Transactions.Transactions;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace B2B.Transactions.Api
+namespace B2B.Transactions.Api.IncomingMessages
 {
     public class TransactionQueueListener
     {
