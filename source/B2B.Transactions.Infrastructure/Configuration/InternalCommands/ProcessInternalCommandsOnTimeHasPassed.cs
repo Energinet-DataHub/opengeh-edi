@@ -15,7 +15,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using B2B.Transactions.Infrastructure.SystemTime;
+using B2B.Transactions.Infrastructure.Configuration.SystemTime;
 using MediatR;
 
 namespace B2B.Transactions.Infrastructure.Configuration.InternalCommands

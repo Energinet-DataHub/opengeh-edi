@@ -14,7 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
-using B2B.Transactions.Infrastructure.SystemTime;
+using B2B.Transactions.Infrastructure.Configuration.SystemTime;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;

@@ -15,7 +15,7 @@
 using MediatR;
 using NodaTime;
 
-namespace B2B.Transactions.Infrastructure.SystemTime
+namespace B2B.Transactions.Infrastructure.Configuration.SystemTime
 {
     public class TimeHasPassed : INotification
     {
