@@ -26,7 +26,7 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
         /// </summary>
         /// <param name="gsrnNumber"></param>
         /// <returns><see cref="AccountingPoint"/></returns>
-        Task<AccountingPoint> GetByGsrnNumberAsync(GsrnNumber gsrnNumber);
+        Task<AccountingPoint?> GetByGsrnNumberAsync(GsrnNumber gsrnNumber);
 
         /// <summary>
         /// Adds accounting point to repository
@@ -39,6 +39,6 @@ namespace Energinet.DataHub.MarketRoles.Domain.MeteringPoints
         /// </summary>
         /// <param name="accountingPointId"></param>
         /// <returns><see cref="AccountingPoint"/></returns>
-        Task<AccountingPoint> GetByIdAsync(AccountingPointId accountingPointId);
+        Task<AccountingPoint?> GetByIdAsync(AccountingPointId accountingPointId);
     }
 }

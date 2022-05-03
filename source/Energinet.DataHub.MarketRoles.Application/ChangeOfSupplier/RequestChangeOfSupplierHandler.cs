@@ -64,7 +64,7 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
 
             var startDate = InstantPattern.General.Parse(request.StartDate).Value;
 
-            _accountingPoint.AcceptChangeOfSupplier(_energySupplier.EnergySupplierId, startDate, new Transaction(request.TransactionId), _systemTimeProvider);
+            _accountingPoint?.AcceptChangeOfSupplier(_energySupplier!.EnergySupplierId, startDate, new Transaction(request.TransactionId), _systemTimeProvider);
 
             return BusinessProcessResult.Ok(request.TransactionId);
         }
@@ -94,12 +94,9 @@ namespace Energinet.DataHub.MarketRoles.Application.ChangeOfSupplier
             return new BusinessProcessResult(_request.TransactionId, validationResult.Errors);
         }
 
-        private Task<Domain.MeteringPoints.AccountingPoint> GetMeteringPointAsync(string gsrnNumber)
+        private Task<Domain.MeteringPoints.AccountingPoint?> GetMeteringPointAsync(string gsrnNumber)
         {
-            var meteringPointId = GsrnNumber.Create(gsrnNumber);
-            var meteringPoint =
-                _accountingPointRepository.GetByGsrnNumberAsync(meteringPointId);
-            return meteringPoint;
+            return _accountingPointRepository.GetByGsrnNumberAsync(GsrnNumber.Create(gsrnNumber));
         }
     }
 }

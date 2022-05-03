@@ -41,12 +41,12 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.EnergySupplier
             _context.EnergySuppliers.Add(energySupplier);
         }
 
-        public Task<EnergySupplier> GetByGlnNumberAsync(GlnNumber glnNumber)
+        public Task<EnergySupplier?> GetByGlnNumberAsync(GlnNumber glnNumber)
         {
             if (glnNumber == null) throw new ArgumentNullException(nameof(glnNumber));
             return _context.EnergySuppliers
                 .Where(x => x.GlnNumber.Equals(glnNumber))
-                .SingleAsync();
+                .SingleOrDefaultAsync();
         }
     }
 }
