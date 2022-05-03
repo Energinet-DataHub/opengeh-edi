@@ -19,18 +19,18 @@ using Energinet.DataHub.MessageHub.Client.Peek;
 using Energinet.DataHub.MessageHub.Model.Extensions;
 using MediatR;
 
-namespace B2B.Transactions.Infrastructure.InternalCommands.RequestMessageResponses
+namespace B2B.Transactions.Infrastructure.OutgoingMessages
 {
-    public class RequestMessageResponseHandler : IRequestHandler<RequestMessageResponse>
+    public class NotifyMessageHubHandler : IRequestHandler<NotifyMessageHub>
     {
         private readonly IDataBundleResponseSender _dataBundleResponseSender;
 
-        public RequestMessageResponseHandler(IDataBundleResponseSender dataBundleResponseSender)
+        public NotifyMessageHubHandler(IDataBundleResponseSender dataBundleResponseSender)
         {
             _dataBundleResponseSender = dataBundleResponseSender;
         }
 
-        public async Task<Unit> Handle(RequestMessageResponse request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(NotifyMessageHub request, CancellationToken cancellationToken)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 

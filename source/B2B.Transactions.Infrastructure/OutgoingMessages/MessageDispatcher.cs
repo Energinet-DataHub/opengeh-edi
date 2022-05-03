@@ -15,14 +15,9 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using B2B.Transactions.Infrastructure.Configuration;
 using B2B.Transactions.Infrastructure.InternalCommands;
-using B2B.Transactions.Infrastructure.InternalCommands.RequestMessageResponses;
 using B2B.Transactions.OutgoingMessages;
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MessageHub.Client.Storage;
-using Energinet.DataHub.MessageHub.Model.Model;
-using NodaTime;
 
 namespace B2B.Transactions.Infrastructure.OutgoingMessages
 {
@@ -50,7 +45,7 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
                 .ConfigureAwait(false);
 
             await _commandScheduler.EnqueueAsync(
-                new RequestMessageResponse(
+                new NotifyMessageHub(
                     _messageRequestContext.DataBundleRequestDto,
                     uri)).ConfigureAwait(false);
         }
