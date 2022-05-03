@@ -20,7 +20,10 @@ using B2B.Transactions.Api.Middleware.Authentication.MarketActors;
 using B2B.Transactions.Api.Middleware.Correlation;
 using B2B.Transactions.Api.Middleware.ServiceBus;
 using B2B.Transactions.Infrastructure.Configuration;
+using B2B.Transactions.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware;
+using Energinet.DataHub.MessageHub.Client.DataAvailable;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -66,7 +69,7 @@ namespace B2B.Transactions.Api
                 .ConfigureServices(services =>
                 {
                     var databaseConnectionString = runtime.DB_CONNECTION_STRING;
-                    var compositionRoot = CompositionRoot.Initialize(services)
+                    CompositionRoot.Initialize(services)
                         .AddBearerAuthentication(tokenValidationParameters)
                         .AddDatabaseConnectionFactory(databaseConnectionString!)
                         .AddSystemClock(new SystemDateTimeProvider())
@@ -86,9 +89,13 @@ namespace B2B.Transactions.Api
                         .AddRequestLogging(
                             runtime.REQUEST_RESPONSE_LOGGING_CONNECTION_STRING!,
                             runtime.REQUEST_RESPONSE_LOGGING_CONTAINER_NAME!)
+                        .AddMessagePublishing(sp => new NewMessageAvailableNotifier(sp.GetRequiredService<IDataAvailableNotificationSender>()))
                         .AddMessageHubServices(
                             runtime.MESSAGEHUB_STORAGE_CONNECTION_STRING!,
-                            runtime.MESSAGEHUB_STORAGE_CONTAINER_NAME!);
+                            runtime.MESSAGEHUB_STORAGE_CONTAINER_NAME!,
+                            runtime.MESSAGEHUB_QUEUE_CONNECTION_STRING!,
+                            runtime.MESSAGEHUB_DATA_AVAILABLE_QUEUE!,
+                            runtime.MESSAGEHUB_DOMAIN_REPLY_QUEUE!);
                 })
                 .Build();
         }
