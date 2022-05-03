@@ -20,7 +20,7 @@ using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace B2B.Transactions.Api
+namespace B2B.Transactions.Api.Configuration
 {
     public class SystemTimer
     {
