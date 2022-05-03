@@ -100,7 +100,9 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.AccountingPoin
                     .HasColumnName("MoveInDate");
 
                 y.Ignore(z => z.DomainEvents);
-                });
+
+                y.HasOne<Consumer>();
+            });
 
             builder.OwnsMany<SupplierRegistration>("_supplierRegistrations", y =>
             {
