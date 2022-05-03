@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using B2B.Transactions.Common;
 using B2B.Transactions.Infrastructure.Common;
-using B2B.Transactions.Infrastructure.Serialization;
+using B2B.Transactions.Infrastructure.Configuration.Serialization;
 using B2B.Transactions.OutgoingMessages;
 using B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using B2B.Transactions.Xml;

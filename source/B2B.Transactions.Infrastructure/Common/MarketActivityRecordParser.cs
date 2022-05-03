@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using B2B.Transactions.Common;
-using B2B.Transactions.Infrastructure.Serialization;
+using B2B.Transactions.Infrastructure.Configuration.Serialization;
 
 namespace B2B.Transactions.Infrastructure.Common
 {

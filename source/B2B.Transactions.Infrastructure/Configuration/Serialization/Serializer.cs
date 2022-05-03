@@ -16,10 +16,10 @@ using System;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
-using B2B.Transactions.Infrastructure.Serialization.Converters;
+using B2B.Transactions.Infrastructure.Configuration.Serialization.Converters;
 using NodaTime.Serialization.SystemTextJson;
 
-namespace B2B.Transactions.Infrastructure.Serialization
+namespace B2B.Transactions.Infrastructure.Configuration.Serialization
 {
     /// <summary>
     /// JSON serializer that specifically support NodaTime's <see cref="NodaTime.Instant"/>.

@@ -16,7 +16,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using B2B.Transactions.Configuration.DataAccess;
-using B2B.Transactions.Infrastructure.Serialization;
+using B2B.Transactions.Infrastructure.Configuration.Serialization;
 using Dapper;
 using Microsoft.Extensions.Logging;
 using Polly;

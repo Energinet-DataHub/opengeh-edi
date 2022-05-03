@@ -17,7 +17,7 @@ using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace B2B.Transactions.Infrastructure.Serialization
+namespace B2B.Transactions.Infrastructure.Configuration.Serialization
 {
     /// <summary>
     /// Contract serialization and deserialization of JSON.

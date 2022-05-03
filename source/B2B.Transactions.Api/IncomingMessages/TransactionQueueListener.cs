@@ -17,7 +17,7 @@ using System.Text;
 using System.Threading.Tasks;
 using B2B.Transactions.Configuration;
 using B2B.Transactions.IncomingMessages;
-using B2B.Transactions.Infrastructure.Serialization;
+using B2B.Transactions.Infrastructure.Configuration.Serialization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 

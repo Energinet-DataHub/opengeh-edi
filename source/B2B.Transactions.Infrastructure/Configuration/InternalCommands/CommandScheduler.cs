@@ -14,8 +14,8 @@
 
 using System;
 using System.Threading.Tasks;
+using B2B.Transactions.Infrastructure.Configuration.Serialization;
 using B2B.Transactions.Infrastructure.DataAccess;
-using B2B.Transactions.Infrastructure.Serialization;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using NodaTime;
 

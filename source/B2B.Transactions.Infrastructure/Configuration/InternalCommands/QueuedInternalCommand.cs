@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System;
-using B2B.Transactions.Infrastructure.Serialization;
+using B2B.Transactions.Infrastructure.Configuration.Serialization;
 using NodaTime;
 
 namespace B2B.Transactions.Infrastructure.Configuration.InternalCommands
