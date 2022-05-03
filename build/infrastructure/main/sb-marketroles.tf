@@ -52,8 +52,8 @@ module "sbq_marketroles" {
 
 # }
 
-resource "azurerm_servicebus_queue" "sbq_marketactivity" {
-  name                         = "marketactivity"
+resource "azurerm_servicebus_queue" "sbq_incomingmessagequeue" {
+  name                         = "incomingmessagequeue"
   resource_group_name          = azurerm_resource_group.this.name
   namespace_name               = module.sb_marketroles.name
   requires_session             = false
