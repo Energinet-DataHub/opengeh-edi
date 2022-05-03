@@ -25,8 +25,7 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
         /// <summary>
         /// Notify about new available of message
         /// </summary>
-        /// <param name="correlationId">The correlation id that can be used to track the data represented by the notification.</param>
         /// <param name="message">The notification to send to the post office.</param>
-        Task NotifyAsync(string correlationId, OutgoingMessage message);
+        Task NotifyAsync(OutgoingMessage message);
     }
 }
