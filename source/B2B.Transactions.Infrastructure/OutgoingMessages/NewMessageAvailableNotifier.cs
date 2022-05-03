@@ -30,13 +30,12 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
             _dataAvailableNotificationSender = dataAvailableNotificationSender;
         }
 
-        public async Task NotifyAsync(string correlationId, OutgoingMessage message)
+        public async Task NotifyAsync(OutgoingMessage message)
         {
-            if (correlationId == null) throw new ArgumentNullException(nameof(correlationId));
             if (message == null) throw new ArgumentNullException(nameof(message));
 
             await _dataAvailableNotificationSender.SendAsync(
-                correlationId,
+                message.CorrelationId,
                 CreateDataAvailableNotificationFrom(message)).ConfigureAwait(false);
         }
 
