@@ -16,7 +16,7 @@ using B2B.Transactions.Transactions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace B2B.Transactions.Infrastructure.DataAccess.Transaction
+namespace B2B.Transactions.Infrastructure.Transactions
 {
     internal class TransactionEntityConfiguration : IEntityTypeConfiguration<AcceptedTransaction>
     {

@@ -27,7 +27,6 @@ using B2B.Transactions.Infrastructure.Configuration.Authentication;
 using B2B.Transactions.Infrastructure.Configuration.InternalCommands;
 using B2B.Transactions.Infrastructure.Configuration.Serialization;
 using B2B.Transactions.Infrastructure.DataAccess;
-using B2B.Transactions.Infrastructure.DataAccess.Transaction;
 using B2B.Transactions.Infrastructure.Messages;
 using B2B.Transactions.Infrastructure.OutgoingMessages;
 using B2B.Transactions.Infrastructure.Transactions;

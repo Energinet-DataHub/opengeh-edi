@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
+using B2B.Transactions.Infrastructure.DataAccess;
 using B2B.Transactions.Transactions;
 
-namespace B2B.Transactions.Infrastructure.DataAccess.Transaction
+namespace B2B.Transactions.Infrastructure.Transactions
 {
     public class TransactionRepository : ITransactionRepository
     {
