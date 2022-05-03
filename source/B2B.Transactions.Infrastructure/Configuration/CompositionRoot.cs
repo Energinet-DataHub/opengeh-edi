@@ -141,7 +141,7 @@ namespace B2B.Transactions.Infrastructure.Configuration
         public CompositionRoot AddMessagePublishing(INewMessageAvailableNotifier newMessageAvailableNotifier)
         {
             _services.AddScoped<INewMessageAvailableNotifier>(_ => newMessageAvailableNotifier);
-            _services.AddScoped<MessagePublisher>();
+            _services.AddScoped<MessageAvailabilityPublisher>();
             _services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
             return this;
         }

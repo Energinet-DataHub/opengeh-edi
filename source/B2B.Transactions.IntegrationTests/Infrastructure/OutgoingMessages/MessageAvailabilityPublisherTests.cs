@@ -26,19 +26,19 @@ using Xunit.Categories;
 namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
 {
     [IntegrationTest]
-    public class MessagePublisherTests : TestBase
+    public class MessageAvailabilityPublisherTests : TestBase
     {
         private readonly ICorrelationContext _correlationContext;
         private readonly IOutgoingMessageStore _outgoingMessageStore;
-        private readonly MessagePublisher _messagePublisher;
+        private readonly MessageAvailabilityPublisher _messageAvailabilityPublisher;
         private readonly NewMessageAvailableNotifierSpy _newMessageAvailableNotifierSpy;
 
-        public MessagePublisherTests(DatabaseFixture databaseFixture)
+        public MessageAvailabilityPublisherTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
             _correlationContext = GetService<ICorrelationContext>();
             _outgoingMessageStore = GetService<IOutgoingMessageStore>();
-            _messagePublisher = GetService<MessagePublisher>();
+            _messageAvailabilityPublisher = GetService<MessageAvailabilityPublisher>();
             _newMessageAvailableNotifierSpy = (NewMessageAvailableNotifierSpy)GetService<INewMessageAvailableNotifier>();
         }
 
@@ -48,7 +48,7 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.OutgoingMessages
             var outgoingMessage = CreateOutgoingMessage();
             await StoreOutgoingMessage(outgoingMessage).ConfigureAwait(false);
 
-            await _messagePublisher.PublishAsync().ConfigureAwait(false);
+            await _messageAvailabilityPublisher.PublishAsync().ConfigureAwait(false);
 
             var unpublishedMessages = _outgoingMessageStore.GetUnpublished();
             var publishedMessage = _newMessageAvailableNotifierSpy.GetMessageFrom(outgoingMessage.CorrelationId);

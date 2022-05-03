@@ -21,14 +21,14 @@ using Microsoft.Extensions.Logging;
 
 namespace B2B.Transactions.Infrastructure.OutgoingMessages
 {
-    public class MessagePublisher
+    public class MessageAvailabilityPublisher
     {
         private readonly INewMessageAvailableNotifier _newMessageAvailableNotifier;
         private readonly IOutgoingMessageStore _messageStore;
         private readonly IServiceScopeFactory _serviceScopeFactory;
-        private readonly ILogger<MessagePublisher> _logger;
+        private readonly ILogger<MessageAvailabilityPublisher> _logger;
 
-        public MessagePublisher(INewMessageAvailableNotifier newMessageAvailableNotifier, IOutgoingMessageStore messageStore, IServiceScopeFactory serviceScopeFactory, ILogger<MessagePublisher> logger)
+        public MessageAvailabilityPublisher(INewMessageAvailableNotifier newMessageAvailableNotifier, IOutgoingMessageStore messageStore, IServiceScopeFactory serviceScopeFactory, ILogger<MessageAvailabilityPublisher> logger)
         {
             _newMessageAvailableNotifier = newMessageAvailableNotifier ?? throw new ArgumentNullException(nameof(newMessageAvailableNotifier));
             _messageStore = messageStore ?? throw new ArgumentNullException(nameof(messageStore));
