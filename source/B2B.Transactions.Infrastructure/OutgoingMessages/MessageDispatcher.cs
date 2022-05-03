@@ -15,9 +15,9 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using B2B.Transactions.Infrastructure.InternalCommands;
 using B2B.Transactions.OutgoingMessages;
 using Energinet.DataHub.MessageHub.Client.Storage;
-using Energinet.DataHub.MessageHub.Model.Model;
 
 namespace B2B.Transactions.Infrastructure.OutgoingMessages
 {
@@ -25,19 +25,29 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
     {
         private readonly IStorageHandler _storageHandler;
         private readonly MessageRequestContext _messageRequestContext;
+        private readonly ICommandScheduler _commandScheduler;
 
-        public MessageDispatcher(IStorageHandler storageHandler, MessageRequestContext messageRequestContext)
+        public MessageDispatcher(
+            IStorageHandler storageHandler,
+            MessageRequestContext messageRequestContext,
+            ICommandScheduler commandScheduler)
         {
             _storageHandler = storageHandler;
             _messageRequestContext = messageRequestContext;
+            _commandScheduler = commandScheduler;
         }
 
         public async Task DispatchAsync(Stream message)
         {
-            await _storageHandler.AddStreamToStorageAsync(
+            var uri = await _storageHandler.AddStreamToStorageAsync(
                 message,
                 _messageRequestContext.DataBundleRequestDto ?? throw new InvalidOperationException())
                 .ConfigureAwait(false);
+
+            await _commandScheduler.EnqueueAsync(
+                new NotifyMessageHub(
+                    _messageRequestContext.DataBundleRequestDto,
+                    uri)).ConfigureAwait(false);
         }
     }
 }
