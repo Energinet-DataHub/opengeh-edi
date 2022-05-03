@@ -23,7 +23,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;
 
-namespace B2B.Transactions.Api.Middleware.Authentication.Bearer
+namespace B2B.Transactions.Api.Configuration.Middleware.Authentication.Bearer
 {
     public class ClaimsEnrichmentMiddleware : IFunctionsWorkerMiddleware
     {

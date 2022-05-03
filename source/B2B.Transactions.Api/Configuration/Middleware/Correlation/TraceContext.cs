@@ -14,7 +14,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace B2B.Transactions.Api.Middleware.Correlation
+namespace B2B.Transactions.Api.Configuration.Middleware.Correlation
 {
     /// <summary>
     /// Implementation of w3c trace context

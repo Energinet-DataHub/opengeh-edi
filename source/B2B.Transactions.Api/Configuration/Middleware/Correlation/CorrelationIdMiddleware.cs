@@ -20,7 +20,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;
 
-namespace B2B.Transactions.Api.Middleware.Correlation
+namespace B2B.Transactions.Api.Configuration.Middleware.Correlation
 {
     public class CorrelationIdMiddleware : IFunctionsWorkerMiddleware
     {

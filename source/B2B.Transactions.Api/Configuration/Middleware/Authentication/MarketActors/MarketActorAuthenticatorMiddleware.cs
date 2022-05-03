@@ -13,27 +13,32 @@
 // limitations under the License.
 
 using System;
-using System.Text;
 using System.Threading.Tasks;
+using B2B.Transactions.Configuration.Authentication;
 using B2B.Transactions.Infrastructure.Authentication;
+using B2B.Transactions.Infrastructure.Serialization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;
 
-namespace B2B.Transactions.Api.Middleware.Authentication.Bearer
+namespace B2B.Transactions.Api.Configuration.Middleware.Authentication.MarketActors
 {
-    public class BearerAuthenticationMiddleware : IFunctionsWorkerMiddleware
+    public class MarketActorAuthenticatorMiddleware : IFunctionsWorkerMiddleware
     {
-        private readonly ILogger<BearerAuthenticationMiddleware> _logger;
+        private readonly ILogger<MarketActorAuthenticatorMiddleware> _logger;
 
-        public BearerAuthenticationMiddleware(ILogger<BearerAuthenticationMiddleware> logger)
+        public MarketActorAuthenticatorMiddleware(ILogger<MarketActorAuthenticatorMiddleware> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
         {
+            if (context == null) throw new ArgumentNullException(nameof(context));
             if (next == null) throw new ArgumentNullException(nameof(next));
+            var marketActorAuthenticator = context.GetService<IMarketActorAuthenticator>();
+            var currentClaimsPrincipal = context.GetService<CurrentClaimsPrincipal>();
+
             if (!context.Is(FunctionContextExtensions.TriggerType.HttpTrigger))
             {
                 _logger.LogInformation("Functions is not triggered by HTTP. Call next middleware.");
@@ -49,29 +54,30 @@ namespace B2B.Transactions.Api.Middleware.Authentication.Bearer
                 return;
             }
 
-            var jwtTokenParser = context.GetService<JwtTokenParser>();
-            var result = jwtTokenParser.ParseFrom(httpRequestData.Headers);
-            if (result.Success == false)
+            if (currentClaimsPrincipal.ClaimsPrincipal is null)
             {
-                LogParseResult(result);
+                _logger.LogError("Current claims principal is null. Cannot continue.");
                 context.RespondWithUnauthorized(httpRequestData);
                 return;
             }
 
-            var currentClaimsPrincipal = context.GetService<CurrentClaimsPrincipal>();
-            currentClaimsPrincipal.SetCurrentUser(result.ClaimsPrincipal!);
-            _logger.LogInformation("Bearer token authentication succeeded.");
+            marketActorAuthenticator.Authenticate(currentClaimsPrincipal.ClaimsPrincipal!);
+            if (marketActorAuthenticator.CurrentIdentity is NotAuthenticated)
+            {
+                _logger.LogError("Could not authenticate market actor identity. This is due to the current claims identity does hold the required claims.");
+                context.RespondWithUnauthorized(httpRequestData);
+                return;
+            }
+
+            var serializer = context.GetService<ISerializer>();
+            WriteAuthenticatedIdentityToLog(marketActorAuthenticator, serializer);
             await next(context).ConfigureAwait(false);
         }
 
-        private void LogParseResult(Result result)
+        private void WriteAuthenticatedIdentityToLog(IMarketActorAuthenticator marketActorAuthenticator, ISerializer serializer)
         {
-            var message = new StringBuilder();
-            message.AppendLine("Failed to parse claims principal from JWT:");
-            message.AppendLine(result.Error?.Message);
-            message.AppendLine("Token from HTTP request header:");
-            message.AppendLine(result.Token);
-            _logger.LogError(message.ToString());
+            _logger.LogInformation("Successfully authenticated market actor identity.");
+            _logger.LogInformation(serializer.Serialize(marketActorAuthenticator.CurrentIdentity));
         }
     }
 }

@@ -12,15 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace B2B.Transactions.Api.Middleware.ServiceBus
+namespace B2B.Transactions.Api.Configuration.Middleware.Correlation
 {
-    public class ServiceBusMessageMetadata
+    /// <summary>
+    /// Context for the session.
+    /// </summary>
+    public interface ISessionContext
     {
-        public ServiceBusMessageMetadata(string correlationId)
-        {
-            CorrelationID = correlationId;
-        }
+        /// <summary>
+        /// Get the current session id.
+        /// </summary>
+        string Id { get; }
 
-        public string CorrelationID { get; }
+        /// <summary>
+        /// Set the current session id.
+        /// </summary>
+        void SetId(string id);
     }
 }
