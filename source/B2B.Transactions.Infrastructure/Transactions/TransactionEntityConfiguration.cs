@@ -12,22 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using B2B.Transactions.Infrastructure.Configuration.InternalCommands;
-using Energinet.DataHub.MessageHub.Model.Model;
+using B2B.Transactions.Transactions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace B2B.Transactions.Infrastructure.OutgoingMessages
+namespace B2B.Transactions.Infrastructure.Transactions
 {
-    public class NotifyMessageHub : InternalCommand
+    internal class TransactionEntityConfiguration : IEntityTypeConfiguration<AcceptedTransaction>
     {
-        public NotifyMessageHub(DataBundleRequestDto dataBundleRequestDto, Uri uri)
+        public void Configure(EntityTypeBuilder<AcceptedTransaction> builder)
         {
-            DataBundleRequestDto = dataBundleRequestDto;
-            Uri = uri;
+            builder.ToTable("Transactions", "b2b");
+            builder.HasKey(x => x.TransactionId);
         }
-
-        public DataBundleRequestDto DataBundleRequestDto { get; }
-
-        public Uri Uri { get; }
     }
 }

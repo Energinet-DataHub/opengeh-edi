@@ -12,25 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading;
 using System.Threading.Tasks;
-using B2B.Transactions.Infrastructure.Configuration.SystemTime;
-using MediatR;
+using B2B.Transactions.Configuration.DataAccess;
 
-namespace B2B.Transactions.Infrastructure.OutgoingMessages
+namespace B2B.Transactions.Infrastructure.Configuration.DataAccess
 {
-    public class PublishNewMessagesOnTimeHasPassed : INotificationHandler<TimeHasPassed>
+    public class UnitOfWork : IUnitOfWork
     {
-        private readonly MessageAvailabilityPublisher _messageAvailabilityPublisher;
+        private readonly B2BContext _context;
 
-        public PublishNewMessagesOnTimeHasPassed(MessageAvailabilityPublisher messageAvailabilityPublisher)
+        public UnitOfWork(B2BContext context)
         {
-            _messageAvailabilityPublisher = messageAvailabilityPublisher;
+            _context = context;
         }
 
-        public Task Handle(TimeHasPassed notification, CancellationToken cancellationToken)
+        public Task CommitAsync()
         {
-            return _messageAvailabilityPublisher.PublishAsync();
+            return _context.SaveChangesAsync();
         }
     }
 }

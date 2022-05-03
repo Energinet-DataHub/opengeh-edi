@@ -12,25 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using B2B.Transactions.Infrastructure.Configuration.SystemTime;
 using MediatR;
 
-namespace B2B.Transactions.Infrastructure.OutgoingMessages
+namespace B2B.Transactions.Infrastructure.Configuration.InternalCommands
 {
-    public class PublishNewMessagesOnTimeHasPassed : INotificationHandler<TimeHasPassed>
+    public class ProcessInternalCommandsOnTimeHasPassed : INotificationHandler<TimeHasPassed>
     {
-        private readonly MessageAvailabilityPublisher _messageAvailabilityPublisher;
+        private readonly InternalCommandProcessor _internalCommandProcessor;
 
-        public PublishNewMessagesOnTimeHasPassed(MessageAvailabilityPublisher messageAvailabilityPublisher)
+        public ProcessInternalCommandsOnTimeHasPassed(InternalCommandProcessor internalCommandProcessor)
         {
-            _messageAvailabilityPublisher = messageAvailabilityPublisher;
+            _internalCommandProcessor = internalCommandProcessor ?? throw new ArgumentNullException(nameof(internalCommandProcessor));
         }
 
         public Task Handle(TimeHasPassed notification, CancellationToken cancellationToken)
         {
-            return _messageAvailabilityPublisher.PublishAsync();
+            return _internalCommandProcessor.ProcessPendingAsync();
         }
     }
 }

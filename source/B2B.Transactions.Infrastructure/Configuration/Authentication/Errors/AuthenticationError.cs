@@ -12,22 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using B2B.Transactions.Infrastructure.Configuration.InternalCommands;
-using Energinet.DataHub.MessageHub.Model.Model;
-
-namespace B2B.Transactions.Infrastructure.OutgoingMessages
+namespace B2B.Transactions.Infrastructure.Configuration.Authentication.Errors
 {
-    public class NotifyMessageHub : InternalCommand
+    public abstract class AuthenticationError
     {
-        public NotifyMessageHub(DataBundleRequestDto dataBundleRequestDto, Uri uri)
+        protected AuthenticationError(string message)
         {
-            DataBundleRequestDto = dataBundleRequestDto;
-            Uri = uri;
+            Message = message;
         }
 
-        public DataBundleRequestDto DataBundleRequestDto { get; }
-
-        public Uri Uri { get; }
+        public string Message { get; set; }
     }
 }

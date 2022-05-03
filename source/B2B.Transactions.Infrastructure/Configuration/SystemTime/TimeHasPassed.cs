@@ -12,22 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using B2B.Transactions.Infrastructure.Configuration.InternalCommands;
-using Energinet.DataHub.MessageHub.Model.Model;
+using MediatR;
+using NodaTime;
 
-namespace B2B.Transactions.Infrastructure.OutgoingMessages
+namespace B2B.Transactions.Infrastructure.Configuration.SystemTime
 {
-    public class NotifyMessageHub : InternalCommand
+    public class TimeHasPassed : INotification
     {
-        public NotifyMessageHub(DataBundleRequestDto dataBundleRequestDto, Uri uri)
+        public TimeHasPassed(Instant now)
         {
-            DataBundleRequestDto = dataBundleRequestDto;
-            Uri = uri;
+            Now = now;
         }
 
-        public DataBundleRequestDto DataBundleRequestDto { get; }
-
-        public Uri Uri { get; }
+        public Instant Now { get; }
     }
 }

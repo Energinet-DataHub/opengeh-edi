@@ -13,21 +13,21 @@
 // limitations under the License.
 
 using System;
-using B2B.Transactions.Infrastructure.Configuration.InternalCommands;
-using Energinet.DataHub.MessageHub.Model.Model;
 
-namespace B2B.Transactions.Infrastructure.OutgoingMessages
+namespace B2B.Transactions.Infrastructure.Configuration.InternalCommands
 {
-    public class NotifyMessageHub : InternalCommand
+    public abstract class InternalCommand : ICommand
     {
-        public NotifyMessageHub(DataBundleRequestDto dataBundleRequestDto, Uri uri)
+        protected InternalCommand()
         {
-            DataBundleRequestDto = dataBundleRequestDto;
-            Uri = uri;
+            Id = Guid.NewGuid();
         }
 
-        public DataBundleRequestDto DataBundleRequestDto { get; }
+        protected InternalCommand(Guid id)
+        {
+            Id = id;
+        }
 
-        public Uri Uri { get; }
+        public Guid Id { get; }
     }
 }

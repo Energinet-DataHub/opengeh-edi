@@ -12,22 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using B2B.Transactions.Infrastructure.Configuration.InternalCommands;
-using Energinet.DataHub.MessageHub.Model.Model;
+using MediatR;
 
-namespace B2B.Transactions.Infrastructure.OutgoingMessages
+namespace B2B.Transactions.Infrastructure.Configuration.InternalCommands
 {
-    public class NotifyMessageHub : InternalCommand
+    #pragma warning disable CA1040
+    /// <summary>
+    /// CQRS command object
+    /// </summary>
+    public interface ICommand : IRequest
     {
-        public NotifyMessageHub(DataBundleRequestDto dataBundleRequestDto, Uri uri)
-        {
-            DataBundleRequestDto = dataBundleRequestDto;
-            Uri = uri;
-        }
-
-        public DataBundleRequestDto DataBundleRequestDto { get; }
-
-        public Uri Uri { get; }
     }
+#pragma warning restore
 }

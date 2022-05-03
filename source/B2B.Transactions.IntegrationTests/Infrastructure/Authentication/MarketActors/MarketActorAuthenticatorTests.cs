@@ -16,7 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using B2B.Transactions.Configuration.Authentication;
-using B2B.Transactions.Infrastructure.Authentication;
+using B2B.Transactions.Infrastructure.Configuration.Authentication;
 using Xunit;
 using Xunit.Categories;
 

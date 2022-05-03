@@ -12,22 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using B2B.Transactions.Infrastructure.Configuration.InternalCommands;
-using Energinet.DataHub.MessageHub.Model.Model;
+using System.Security.Claims;
 
-namespace B2B.Transactions.Infrastructure.OutgoingMessages
+namespace B2B.Transactions.Infrastructure.Configuration.Authentication
 {
-    public class NotifyMessageHub : InternalCommand
+    public class CurrentClaimsPrincipal
     {
-        public NotifyMessageHub(DataBundleRequestDto dataBundleRequestDto, Uri uri)
+        private ClaimsPrincipal? _currentUser;
+
+        public ClaimsPrincipal? ClaimsPrincipal => _currentUser;
+
+        public void SetCurrentUser(ClaimsPrincipal currentUser)
         {
-            DataBundleRequestDto = dataBundleRequestDto;
-            Uri = uri;
+            _currentUser = currentUser;
         }
-
-        public DataBundleRequestDto DataBundleRequestDto { get; }
-
-        public Uri Uri { get; }
     }
 }

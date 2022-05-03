@@ -13,21 +13,18 @@
 // limitations under the License.
 
 using System;
-using B2B.Transactions.Infrastructure.Configuration.InternalCommands;
-using Energinet.DataHub.MessageHub.Model.Model;
 
-namespace B2B.Transactions.Infrastructure.OutgoingMessages
+namespace B2B.Transactions.Api.Configuration.Middleware.Correlation
 {
-    public class NotifyMessageHub : InternalCommand
+    public sealed class SessionContext : ISessionContext
     {
-        public NotifyMessageHub(DataBundleRequestDto dataBundleRequestDto, Uri uri)
+        private string? _id;
+
+        public string Id => _id ?? throw new InvalidOperationException("Session id not set");
+
+        public void SetId(string id)
         {
-            DataBundleRequestDto = dataBundleRequestDto;
-            Uri = uri;
+            _id = id;
         }
-
-        public DataBundleRequestDto DataBundleRequestDto { get; }
-
-        public Uri Uri { get; }
     }
 }

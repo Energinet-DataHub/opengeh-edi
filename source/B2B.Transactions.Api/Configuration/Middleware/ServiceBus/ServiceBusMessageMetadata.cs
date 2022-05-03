@@ -12,22 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using B2B.Transactions.Infrastructure.Configuration.InternalCommands;
-using Energinet.DataHub.MessageHub.Model.Model;
-
-namespace B2B.Transactions.Infrastructure.OutgoingMessages
+namespace B2B.Transactions.Api.Configuration.Middleware.ServiceBus
 {
-    public class NotifyMessageHub : InternalCommand
+    public class ServiceBusMessageMetadata
     {
-        public NotifyMessageHub(DataBundleRequestDto dataBundleRequestDto, Uri uri)
+        public ServiceBusMessageMetadata(string correlationId)
         {
-            DataBundleRequestDto = dataBundleRequestDto;
-            Uri = uri;
+            CorrelationID = correlationId;
         }
 
-        public DataBundleRequestDto DataBundleRequestDto { get; }
-
-        public Uri Uri { get; }
+        public string CorrelationID { get; }
     }
 }

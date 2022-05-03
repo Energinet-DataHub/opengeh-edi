@@ -14,23 +14,24 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using B2B.Transactions.Infrastructure.Configuration.SystemTime;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace B2B.Transactions.Infrastructure.OutgoingMessages
+namespace B2B.Transactions.Infrastructure.Configuration.InternalCommands
 {
-    public class PublishNewMessagesOnTimeHasPassed : INotificationHandler<TimeHasPassed>
+    public class CommandExecutor
     {
-        private readonly MessageAvailabilityPublisher _messageAvailabilityPublisher;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
 
-        public PublishNewMessagesOnTimeHasPassed(MessageAvailabilityPublisher messageAvailabilityPublisher)
+        public CommandExecutor(IServiceScopeFactory serviceScopeFactory)
         {
-            _messageAvailabilityPublisher = messageAvailabilityPublisher;
+            _serviceScopeFactory = serviceScopeFactory;
         }
 
-        public Task Handle(TimeHasPassed notification, CancellationToken cancellationToken)
+        public async Task ExecuteAsync(InternalCommand command, CancellationToken cancellationToken)
         {
-            return _messageAvailabilityPublisher.PublishAsync();
+            using var scope = _serviceScopeFactory.CreateScope();
+            await scope.ServiceProvider.GetRequiredService<IMediator>().Send(command, cancellationToken).ConfigureAwait(false);
         }
     }
 }
