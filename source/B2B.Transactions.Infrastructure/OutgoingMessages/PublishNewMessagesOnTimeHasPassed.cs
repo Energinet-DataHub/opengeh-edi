@@ -12,22 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading;
 using System.Threading.Tasks;
-using B2B.Transactions.OutgoingMessages;
-using Energinet.DataHub.MessageHub.Model.Model;
+using B2B.Transactions.Infrastructure.SystemTime;
+using MediatR;
 
 namespace B2B.Transactions.Infrastructure.OutgoingMessages
 {
-    /// <summary>
-    /// Interface for data available notifications
-    /// </summary>
-    public interface IDataAvailableNotificationPublisher
+    public class PublishNewMessagesOnTimeHasPassed : INotificationHandler<TimeHasPassed>
     {
-        /// <summary>
-        /// send the specified DataAvailableNotification to the post office DataAvailable queue.
-        /// </summary>
-        /// <param name="correlationId">The correlation id that can be used to track the data represented by the notification.</param>
-        /// <param name="message">The notification to send to the post office.</param>
-        Task SendAsync(string correlationId, OutgoingMessage message);
+        private readonly MessageAvailabilityPublisher _messageAvailabilityPublisher;
+
+        public PublishNewMessagesOnTimeHasPassed(MessageAvailabilityPublisher messageAvailabilityPublisher)
+        {
+            _messageAvailabilityPublisher = messageAvailabilityPublisher;
+        }
+
+        public Task Handle(TimeHasPassed notification, CancellationToken cancellationToken)
+        {
+            return _messageAvailabilityPublisher.PublishAsync();
+        }
     }
 }

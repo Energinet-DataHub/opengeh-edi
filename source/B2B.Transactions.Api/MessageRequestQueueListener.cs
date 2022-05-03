@@ -22,16 +22,16 @@ using Microsoft.Extensions.Logging;
 
 namespace B2B.Transactions.Api
 {
-    public class RequestMessageBundleTrigger
+    public class MessageRequestQueueListener
     {
         private readonly ICorrelationContext _correlationContext;
-        private readonly ILogger<RequestMessageBundleTrigger> _logger;
+        private readonly ILogger<MessageRequestQueueListener> _logger;
         private readonly MessageRequestHandler _messageRequestHandler;
         private readonly MessageRequestContext _messageRequestContext;
 
-        public RequestMessageBundleTrigger(
+        public MessageRequestQueueListener(
             ICorrelationContext correlationContext,
-            ILogger<RequestMessageBundleTrigger> logger,
+            ILogger<MessageRequestQueueListener> logger,
             MessageRequestHandler messageRequestHandler,
             MessageRequestContext messageRequestContext)
         {
@@ -41,8 +41,8 @@ namespace B2B.Transactions.Api
             _messageRequestContext = messageRequestContext;
         }
 
-        [Function("RequestMessageBundleTrigger")]
-        public async Task RunAsync([ServiceBusTrigger("%REQUEST_BUNDLE_QUEUE_SUBSCRIBER_QUEUE%", Connection = "MESSAGEHUB_QUEUE_CONNECTION_STRING", IsSessionsEnabled = true)] byte[] data)
+        [Function(nameof(MessageRequestQueueListener))]
+        public async Task RunAsync([ServiceBusTrigger("%MESSAGE_REQUEST_QUEUE%", Connection = "MESSAGEHUB_QUEUE_CONNECTION_STRING", IsSessionsEnabled = true)] byte[] data)
         {
             await _messageRequestContext.SetMessageRequestContextAsync(data).ConfigureAwait(false);
             var result = await _messageRequestHandler.HandleAsync(

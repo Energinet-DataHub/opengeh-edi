@@ -38,6 +38,7 @@ using B2B.Transactions.Xml.Incoming;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MessageHub.Client;
+using Energinet.DataHub.MessageHub.Client.DataAvailable;
 using Energinet.DataHub.MessageHub.Client.Factories;
 using Energinet.DataHub.MessageHub.Client.Storage;
 using Energinet.DataHub.MessageHub.Model.Peek;
@@ -138,10 +139,10 @@ namespace B2B.Transactions.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddMessagePublishing(IDataAvailableNotificationPublisher dataAvailableNotificationPublisher)
+        public CompositionRoot AddMessagePublishing(Func<IServiceProvider, INewMessageAvailableNotifier> action)
         {
-            _services.AddScoped<IDataAvailableNotificationPublisher>(_ => dataAvailableNotificationPublisher);
-            _services.AddScoped<MessagePublisher>();
+            _services.AddScoped(action);
+            _services.AddScoped<MessageAvailabilityPublisher>();
             _services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
             return this;
         }
@@ -155,14 +156,17 @@ namespace B2B.Transactions.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddMessageHubServices(string storageServiceConnectionString, string storageServiceContainerName)
+        public CompositionRoot AddMessageHubServices(string storageServiceConnectionString, string storageServiceContainerName, string queueConnectionString, string dataAvailableQueue, string domainReplyQueue)
         {
-            if (storageServiceConnectionString == null) throw new ArgumentNullException(nameof(storageServiceConnectionString));
-            if (storageServiceContainerName == null) throw new ArgumentNullException(nameof(storageServiceContainerName));
             _services.AddSingleton<StorageConfig>(s => new StorageConfig(storageServiceContainerName));
             _services.AddSingleton<IRequestBundleParser, RequestBundleParser>();
             _services.AddSingleton<IStorageServiceClientFactory>(s => new StorageServiceClientFactory(storageServiceConnectionString));
             _services.AddSingleton<IStorageHandler, StorageHandler>();
+
+            _services.AddSingleton<IServiceBusClientFactory>(_ => new ServiceBusClientFactory(queueConnectionString));
+            _services.AddSingleton<IMessageBusFactory, AzureServiceBusFactory>();
+            _services.AddSingleton<IDataAvailableNotificationSender, DataAvailableNotificationSender>();
+            _services.AddSingleton(_ => new MessageHubConfig(dataAvailableQueue, domainReplyQueue));
 
             return this;
         }

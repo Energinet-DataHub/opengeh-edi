@@ -20,17 +20,17 @@ using Energinet.DataHub.MessageHub.Model.Model;
 
 namespace B2B.Transactions.Infrastructure.OutgoingMessages
 {
-    public class DataAvailableNotificationPublisher : IDataAvailableNotificationPublisher
+    public class NewMessageAvailableNotifier : INewMessageAvailableNotifier
     {
         private readonly IDataAvailableNotificationSender _dataAvailableNotificationSender;
 
-        public DataAvailableNotificationPublisher(
+        public NewMessageAvailableNotifier(
             IDataAvailableNotificationSender dataAvailableNotificationSender)
         {
             _dataAvailableNotificationSender = dataAvailableNotificationSender;
         }
 
-        public async Task SendAsync(string correlationId, OutgoingMessage message)
+        public async Task NotifyAsync(string correlationId, OutgoingMessage message)
         {
             if (correlationId == null) throw new ArgumentNullException(nameof(correlationId));
             if (message == null) throw new ArgumentNullException(nameof(message));

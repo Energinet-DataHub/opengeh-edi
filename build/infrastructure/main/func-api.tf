@@ -43,9 +43,11 @@ module "func_receiver" {
     TRANSACTIONS_QUEUE_NAME                       = module.sbq_marketactivity.name
     RAISE_TIME_HAS_PASSED_EVENT_SCHEDULE          = "*/10 * * * * *"
     MESSAGEHUB_QUEUE_CONNECTION_STRING    = data.azurerm_key_vault_secret.sb_domain_relay_transceiver_connection_string.value
+    MESSAGEHUB_DATA_AVAILABLE_QUEUE       = data.azurerm_key_vault_secret.sbq_data_available_name.value
+    MESSAGEHUB_DOMAIN_REPLY_QUEUE         = data.azurerm_key_vault_secret.sbq_marketroles_reply_name.value
     MESSAGEHUB_STORAGE_CONTAINER_NAME     = data.azurerm_key_vault_secret.st_market_operator_response_postofficereply_container_name.value
     MESSAGEHUB_STORAGE_CONNECTION_STRING  = data.azurerm_key_vault_secret.st_market_operator_response_primary_connection_string.value
-    REQUEST_BUNDLE_QUEUE_SUBSCRIBER_QUEUE = data.azurerm_key_vault_secret.sbq_marketroles_name.value
+    MESSAGE_REQUEST_QUEUE 		  = data.azurerm_key_vault_secret.sbq_marketroles_name.value
   }
   
   tags                                      = azurerm_resource_group.this.tags

@@ -14,7 +14,6 @@
 
 using System;
 using System.Threading.Tasks;
-using B2B.Transactions.Configuration;
 using B2B.Transactions.Infrastructure.DataAccess;
 using B2B.Transactions.OutgoingMessages;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,19 +21,16 @@ using Microsoft.Extensions.Logging;
 
 namespace B2B.Transactions.Infrastructure.OutgoingMessages
 {
-    public class MessagePublisher
+    public class MessageAvailabilityPublisher
     {
-        private readonly IDataAvailableNotificationPublisher _dataAvailableNotificationPublisher;
-        private readonly ICorrelationContext _correlationContext;
+        private readonly INewMessageAvailableNotifier _newMessageAvailableNotifier;
         private readonly IOutgoingMessageStore _messageStore;
         private readonly IServiceScopeFactory _serviceScopeFactory;
-        private readonly ILogger<MessagePublisher> _logger;
+        private readonly ILogger<MessageAvailabilityPublisher> _logger;
 
-        public MessagePublisher(IDataAvailableNotificationPublisher dataAvailableNotificationPublisher, ICorrelationContext correlationContext, IOutgoingMessageStore messageStore, IServiceScopeFactory serviceScopeFactory, ILogger<MessagePublisher> logger)
+        public MessageAvailabilityPublisher(INewMessageAvailableNotifier newMessageAvailableNotifier, IOutgoingMessageStore messageStore, IServiceScopeFactory serviceScopeFactory, ILogger<MessageAvailabilityPublisher> logger)
         {
-            _dataAvailableNotificationPublisher = dataAvailableNotificationPublisher ?? throw new ArgumentNullException(nameof(dataAvailableNotificationPublisher));
-            _correlationContext = correlationContext;
-            _correlationContext = correlationContext ?? throw new ArgumentNullException(nameof(correlationContext));
+            _newMessageAvailableNotifier = newMessageAvailableNotifier ?? throw new ArgumentNullException(nameof(newMessageAvailableNotifier));
             _messageStore = messageStore ?? throw new ArgumentNullException(nameof(messageStore));
             _serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -78,7 +74,7 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
 
         private async Task SendNotificationAsync(OutgoingMessage message)
         {
-            await _dataAvailableNotificationPublisher.SendAsync(
+            await _newMessageAvailableNotifier.NotifyAsync(
                 message.CorrelationId,
                 message).ConfigureAwait(false);
         }

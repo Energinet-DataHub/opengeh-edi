@@ -20,11 +20,11 @@ using B2B.Transactions.OutgoingMessages;
 
 namespace B2B.Transactions.IntegrationTests.TestDoubles
 {
-    public class DataAvailableNotificationPublisherSpy : IDataAvailableNotificationPublisher
+    public class NewMessageAvailableNotifierSpy : INewMessageAvailableNotifier
     {
         private readonly Dictionary<string, OutgoingMessage> _publishedNotifications = new();
 
-        public Task SendAsync(string correlationId, OutgoingMessage message)
+        public Task NotifyAsync(string correlationId, OutgoingMessage message)
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
             _publishedNotifications.Add(correlationId, message);
