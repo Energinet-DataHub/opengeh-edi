@@ -66,7 +66,6 @@ namespace B2B.Transactions.Api
                     worker.UseMiddleware<BearerAuthenticationMiddleware>();
                     worker.UseMiddleware<ClaimsEnrichmentMiddleware>();
                     worker.UseMiddleware<MarketActorAuthenticatorMiddleware>();
-                    worker.UseMiddleware<ServiceBusMessageMetadataMiddleWare>();
                 })
                 .ConfigureServices(services =>
                 {
