@@ -24,10 +24,10 @@ namespace B2B.Transactions.Api
 
         public virtual string? DB_CONNECTION_STRING => GetEnvironmentVariable(nameof(DB_CONNECTION_STRING));
 
-        public virtual string? TRANSACTIONS_QUEUE_SENDER_CONNECTION_STRING =>
-            GetEnvironmentVariable(nameof(TRANSACTIONS_QUEUE_SENDER_CONNECTION_STRING));
+        public virtual string? INCOMING_MESSAGE_QUEUE_SENDER_CONNECTION_STRING =>
+            GetEnvironmentVariable(nameof(INCOMING_MESSAGE_QUEUE_SENDER_CONNECTION_STRING));
 
-        public virtual string? TRANSACTIONS_QUEUE_NAME => GetEnvironmentVariable(nameof(TRANSACTIONS_QUEUE_NAME));
+        public virtual string? INCOMING_MESSAGE_QUEUE_NAME => GetEnvironmentVariable(nameof(INCOMING_MESSAGE_QUEUE_NAME));
 
         public virtual string? REQUEST_RESPONSE_LOGGING_CONNECTION_STRING =>
             GetEnvironmentVariable(nameof(REQUEST_RESPONSE_LOGGING_CONNECTION_STRING));

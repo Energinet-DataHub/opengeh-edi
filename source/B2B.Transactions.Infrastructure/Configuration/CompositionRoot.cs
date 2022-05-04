@@ -117,7 +117,7 @@ namespace B2B.Transactions.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddTransactionQueue(string connectionString, string queueName)
+        public CompositionRoot AddIncomingMessageQueue(string connectionString, string queueName)
         {
             _services.AddSingleton<ServiceBusSender>(serviceProvider => new ServiceBusClient(connectionString).CreateSender(queueName));
             return this;

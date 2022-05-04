@@ -85,9 +85,9 @@ namespace B2B.Transactions.Api
 
                             return correlationContext;
                         })
-                        .AddTransactionQueue(
-                            runtime.TRANSACTIONS_QUEUE_SENDER_CONNECTION_STRING!,
-                            runtime.TRANSACTIONS_QUEUE_NAME!)
+                        .AddIncomingMessageQueue(
+                            runtime.INCOMING_MESSAGE_QUEUE_SENDER_CONNECTION_STRING!,
+                            runtime.INCOMING_MESSAGE_QUEUE_NAME!)
                         .AddRequestLogging(
                             runtime.REQUEST_RESPONSE_LOGGING_CONNECTION_STRING!,
                             runtime.REQUEST_RESPONSE_LOGGING_CONTAINER_NAME!)

@@ -64,7 +64,7 @@ namespace B2B.Transactions.ArchitectureTests
 
         private class TestEnvironment : RuntimeEnvironment
         {
-            public override string? TRANSACTIONS_QUEUE_SENDER_CONNECTION_STRING =>
+            public override string? INCOMING_MESSAGE_QUEUE_SENDER_CONNECTION_STRING =>
                 CreateFakeServiceBusConnectionString();
 
             public override string? REQUEST_RESPONSE_LOGGING_CONNECTION_STRING =>
