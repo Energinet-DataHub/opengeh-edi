@@ -170,7 +170,7 @@ namespace Messaging.Infrastructure.Configuration
 
         private static void AddXmlSchema(IServiceCollection services)
         {
-            services.AddScoped<SchemaStore>();
+            services.AddScoped<CimXmlSchemas>();
             services.AddScoped<ISchemaProvider, SchemaProvider>();
             services.AddScoped<MessageReceiver>();
         }

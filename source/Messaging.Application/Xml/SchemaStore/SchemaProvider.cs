@@ -20,16 +20,16 @@ namespace Messaging.Application.Xml.SchemaStore
 {
     public class SchemaProvider : ISchemaProvider
     {
-        private readonly SchemaStore _schemaStore;
+        private readonly CimXmlSchemas _cimXmlSchemas;
 
-        public SchemaProvider(SchemaStore schemaStore)
+        public SchemaProvider(CimXmlSchemas cimXmlSchemas)
         {
-            _schemaStore = schemaStore;
+            _cimXmlSchemas = cimXmlSchemas;
         }
 
         public Task<XmlSchema?> GetSchemaAsync(string businessProcessType, string version)
         {
-            var schemaName = _schemaStore.GetSchemaLocation(businessProcessType, version);
+            var schemaName = _cimXmlSchemas.GetSchemaLocation(businessProcessType, version);
 
             if (schemaName == null)
             {
@@ -56,7 +56,7 @@ namespace Messaging.Application.Xml.SchemaStore
                 }
 
                 external.Schema =
-                    await LoadSchemaWithDependentSchemasAsync(SchemaStore.SchemaPath + external.SchemaLocation).ConfigureAwait(false);
+                    await LoadSchemaWithDependentSchemasAsync(CimXmlSchemas.SchemaPath + external.SchemaLocation).ConfigureAwait(false);
             }
 
             return xmlSchema;

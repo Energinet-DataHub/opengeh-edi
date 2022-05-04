@@ -37,7 +37,7 @@ namespace Messaging.Tests.OutgoingMessages.ConfirmRequestChangeOfSupplier
 
         public MessageFactoryTests()
         {
-            _schemaProvider = new SchemaProvider(new SchemaStore());
+            _schemaProvider = new SchemaProvider(new CimXmlSchemas());
             _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
             _messageFactory = new MessageFactory(
                 new SystemDateTimeProviderStub(),

@@ -17,9 +17,9 @@ using System.IO;
 
 namespace Messaging.Application.Xml.SchemaStore
 {
-    public class SchemaStore
+    public class CimXmlSchemas
     {
-        public SchemaStore()
+        public CimXmlSchemas()
         {
             Schemas = new Dictionary<KeyValuePair<string, string>, string>
             {
