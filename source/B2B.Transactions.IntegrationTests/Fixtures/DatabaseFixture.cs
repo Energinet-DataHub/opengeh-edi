@@ -14,7 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
-using B2B.Transactions.Infrastructure.DataAccess;
+using B2B.Transactions.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Xunit;

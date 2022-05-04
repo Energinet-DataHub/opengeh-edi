@@ -15,7 +15,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using B2B.Transactions.Infrastructure.InternalCommands;
+using B2B.Transactions.Infrastructure.Configuration.InternalCommands;
 using B2B.Transactions.OutgoingMessages;
 using Energinet.DataHub.MessageHub.Client.Storage;
 

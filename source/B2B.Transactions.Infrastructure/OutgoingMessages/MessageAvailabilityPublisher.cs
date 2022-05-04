@@ -14,7 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
-using B2B.Transactions.Infrastructure.DataAccess;
+using B2B.Transactions.Infrastructure.Configuration.DataAccess;
 using B2B.Transactions.OutgoingMessages;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -74,9 +74,7 @@ namespace B2B.Transactions.Infrastructure.OutgoingMessages
 
         private async Task SendNotificationAsync(OutgoingMessage message)
         {
-            await _newMessageAvailableNotifier.NotifyAsync(
-                message.CorrelationId,
-                message).ConfigureAwait(false);
+            await _newMessageAvailableNotifier.NotifyAsync(message).ConfigureAwait(false);
         }
     }
 }

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System;
-using B2B.Transactions.Infrastructure.InternalCommands;
+using B2B.Transactions.Infrastructure.Configuration.InternalCommands;
 using Energinet.DataHub.MessageHub.Model.Model;
 
 namespace B2B.Transactions.Infrastructure.OutgoingMessages

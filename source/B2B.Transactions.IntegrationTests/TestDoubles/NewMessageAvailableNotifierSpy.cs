@@ -24,10 +24,10 @@ namespace B2B.Transactions.IntegrationTests.TestDoubles
     {
         private readonly Dictionary<string, OutgoingMessage> _publishedNotifications = new();
 
-        public Task NotifyAsync(string correlationId, OutgoingMessage message)
+        public Task NotifyAsync(OutgoingMessage message)
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
-            _publishedNotifications.Add(correlationId, message);
+            _publishedNotifications.Add(message.CorrelationId, message);
             return Task.CompletedTask;
         }
 
