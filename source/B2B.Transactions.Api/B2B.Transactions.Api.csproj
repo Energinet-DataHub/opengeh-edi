@@ -46,4 +46,7 @@ limitations under the License.
     <ItemGroup>
       <ProjectReference Include="..\B2B.Transactions.Infrastructure\B2B.Transactions.Infrastructure.csproj" />
     </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Configuration\Middleware\ServiceBus" />
+    </ItemGroup>
 </Project>
