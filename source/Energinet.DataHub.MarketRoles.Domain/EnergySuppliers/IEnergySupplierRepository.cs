@@ -39,6 +39,6 @@ namespace Energinet.DataHub.MarketRoles.Domain.EnergySuppliers
         /// </summary>
         /// <param name="glnNumber"></param>
         /// <returns><see cref="EnergySupplier"/></returns>
-        Task<EnergySupplier> GetByGlnNumberAsync(GlnNumber glnNumber);
+        Task<EnergySupplier?> GetByGlnNumberAsync(GlnNumber glnNumber);
     }
 }

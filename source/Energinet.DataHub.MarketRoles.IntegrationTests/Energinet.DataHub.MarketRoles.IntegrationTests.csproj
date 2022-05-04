@@ -1,4 +1,4 @@
-<!--
+﻿<!--
 Copyright 2020 Energinet DataHub A/S
 
 Licensed under the Apache License, Version 2.0 (the "License2");
@@ -16,26 +16,26 @@ limitations under the License.
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <LangVersion>9.0</LangVersion>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="2.0.0" />
-    <PackageReference Include="FluentAssertions" Version="5.10.3" />
-    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
+    <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="2.2.0" />
+    <PackageReference Include="FluentAssertions" Version="6.6.0" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="10.0.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
-    <PackageReference Include="Google.Protobuf" Version="3.19.4" />
-    <PackageReference Include="Grpc.Tools" Version="2.38.1" PrivateAssets="All" />
+    <PackageReference Include="Google.Protobuf" Version="3.20.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.45.0" PrivateAssets="All" />
     <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="xunit.categories" Version="2.0.5" />
+    <PackageReference Include="xunit.categories" Version="2.0.6" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="coverlet.collector" Version="3.0.3">
+    <PackageReference Include="coverlet.collector" Version="3.1.2">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -56,7 +56,7 @@ limitations under the License.
       <Access>Public</Access>
       <ProtoCompile>True</ProtoCompile>
       <CompileOutputs>True</CompileOutputs>
-      <OutputDir>obj\Debug\net5.0\</OutputDir>
+      <OutputDir>obj\Debug\net6.0\</OutputDir>
       <Generator>MSBuild:Compile</Generator>
     </Protobuf>
   </ItemGroup>

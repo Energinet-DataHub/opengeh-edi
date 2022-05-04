@@ -34,7 +34,7 @@ namespace Energinet.DataHub.MarketRoles.Application.Connected
             if (notification == null) throw new ArgumentNullException(nameof(notification));
             var accountingPoint = await _accountingPointRepository.GetByIdAsync(
                 AccountingPointId.Create(Guid.Parse(notification.MeteringPointId))).ConfigureAwait(false);
-            accountingPoint.Connect();
+            accountingPoint!.Connect();
         }
     }
 }

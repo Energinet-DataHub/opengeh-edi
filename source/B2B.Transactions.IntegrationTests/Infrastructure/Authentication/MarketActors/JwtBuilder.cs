@@ -49,7 +49,18 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.Authentication.Market
 
         public static JwtSecurityToken Parse(string token, SymmetricSecurityKey signingKey)
         {
-            _ = _tokenHandler.ValidateToken(token, new TokenValidationParameters { ValidateIssuerSigningKey = true, IssuerSigningKey = signingKey, ValidateIssuer = false, ValidateAudience = false, }, out SecurityToken jwtSecurityToken);
+#pragma warning disable CA5404 // Do not disable token validation checks
+            _ = _tokenHandler.ValidateToken(
+                token,
+                new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = signingKey,
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                },
+                out SecurityToken jwtSecurityToken);
+#pragma warning restore CA5404 // Do not disable token validation checks
             return (JwtSecurityToken)jwtSecurityToken;
         }
 

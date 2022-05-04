@@ -1,4 +1,4 @@
-<!--
+﻿<!--
 Copyright 2020 Energinet DataHub A/S
 
 Licensed under the Apache License, Version 2.0 (the "License2");
@@ -15,19 +15,18 @@ limitations under the License.
 -->
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <LangVersion>9.0</LangVersion>
-    <AzureFunctionsVersion>v3</AzureFunctionsVersion>
+    <AzureFunctionsVersion>v4</AzureFunctionsVersion>
     <OutputType>Exe</OutputType>
     <_FunctionsSkipCleanOutput>true</_FunctionsSkipCleanOutput>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="2.0.0" />
-    <PackageReference Include="EntityFrameworkCore.SqlServer.NodaTime" Version="5.0.1" />
-    <PackageReference Include="MediatR" Version="9.0.0" />
-    <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.18.0" />
+    <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="2.3.1" />
+    <PackageReference Include="MediatR" Version="10.0.1" />
+    <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.20.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.ServiceBus" Version="4.2.1" />
-    <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.0.3" OutputItemType="Analyzer" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.3.0" OutputItemType="Analyzer" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.6.0" />
   </ItemGroup>
   <ItemGroup>

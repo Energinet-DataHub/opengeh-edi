@@ -43,7 +43,7 @@ namespace B2B.Transactions.OutgoingMessages.ConfirmRequestChangeOfSupplier
 
             var settings = new XmlWriterSettings { OmitXmlDeclaration = false, Encoding = Encoding.UTF8, Async = true };
             var stream = new MemoryStream();
-            await using var writer = XmlWriter.Create(stream, settings);
+            using var writer = XmlWriter.Create(stream, settings);
             await WriteMessageHeaderAsync(messageHeader, writer).ConfigureAwait(false);
 
             await WriteMarketActivityRecordsAsync(GetMarketActivityRecordsFrom(marketActivityPayloads), writer).ConfigureAwait(false);

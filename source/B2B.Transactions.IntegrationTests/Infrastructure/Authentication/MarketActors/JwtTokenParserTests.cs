@@ -27,6 +27,7 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.Authentication.Market
     [IntegrationTest]
     public class JwtTokenParserTests
     {
+#pragma warning disable CA5404 // Do not disable token validation checks
         private static TokenValidationParameters DisableAllTokenValidations => new()
         {
             ValidateAudience = false,
@@ -34,6 +35,7 @@ namespace B2B.Transactions.IntegrationTests.Infrastructure.Authentication.Market
             ValidateIssuer = false,
             SignatureValidator = (token, parameters) => new JwtSecurityToken(token),
         };
+#pragma warning restore CA5404 // Do not disable token validation checks
 
         [Fact]
         public void Returns_failure_when_token_validation_fails()

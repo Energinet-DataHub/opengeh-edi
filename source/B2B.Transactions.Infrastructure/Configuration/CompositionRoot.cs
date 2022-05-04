@@ -41,7 +41,6 @@ using Energinet.DataHub.MessageHub.Client.DataAvailable;
 using Energinet.DataHub.MessageHub.Client.Factories;
 using Energinet.DataHub.MessageHub.Client.Storage;
 using Energinet.DataHub.MessageHub.Model.Peek;
-using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -131,7 +130,7 @@ namespace B2B.Transactions.Infrastructure.Configuration
             if (storageContainerName == null) throw new ArgumentNullException(nameof(storageContainerName));
             _services.AddSingleton<IRequestResponseLogging>(s =>
             {
-                var factory = s.GetService<ILoggerFactory>();
+                var factory = s.GetRequiredService<ILoggerFactory>();
                 var logger = factory.CreateLogger<RequestResponseLoggingBlobStorage>();
                 return new RequestResponseLoggingBlobStorage(blobStorageConnectionString, storageContainerName, logger);
             });

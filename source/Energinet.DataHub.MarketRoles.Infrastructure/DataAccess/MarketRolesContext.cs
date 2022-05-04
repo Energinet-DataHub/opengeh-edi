@@ -57,8 +57,8 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.DataAccess
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
 
             modelBuilder.ApplyConfiguration(new EnergySupplierEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new ConsumerEntityConfiguration());
             modelBuilder.ApplyConfiguration(new AccountingPointEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new ConsumerEntityConfiguration());
             modelBuilder.ApplyConfiguration(new OutboxMessageEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ProcessManagerEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ChangeOfSupplierProcessManagerEntityConfiguration());

@@ -55,13 +55,11 @@ using Energinet.DataHub.MarketRoles.Infrastructure.EDI.MoveIn;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChange;
 using Energinet.DataHub.MarketRoles.Infrastructure.Integration.Notifications;
 using Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands;
-using Energinet.DataHub.MarketRoles.Infrastructure.Messaging.Idempotency;
 using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integration;
 using Energinet.DataHub.MarketRoles.Infrastructure.Users;
-using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using FluentValidation;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
@@ -109,7 +107,8 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Processing
 
         protected override void ConfigureContainer(Container container)
         {
-            if (container == null) throw new ArgumentNullException(nameof(container));
+            if (container == null)
+                throw new ArgumentNullException(nameof(container));
             base.ConfigureContainer(container);
 
             container.Register<QueueSubscriber>(Lifestyle.Scoped);

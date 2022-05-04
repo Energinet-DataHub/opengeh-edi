@@ -46,7 +46,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.LocalMessageHub.Functions
             await _localMessageHubClient.BundleDequeuedAsync(data).ConfigureAwait(false);
             await _unitOfWork.CommitAsync().ConfigureAwait(false);
 
-            _logger.LogInformation("Dequeued with correlation id: {correlationId}", _correlationContext.Id);
+            _logger.LogInformation("Dequeued with correlation id: {CorrelationId}", _correlationContext.Id);
         }
     }
 }

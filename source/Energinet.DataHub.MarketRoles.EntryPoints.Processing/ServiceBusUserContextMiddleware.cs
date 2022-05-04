@@ -49,7 +49,7 @@ namespace Energinet.DataHub.MarketRoles.EntryPoints.Processing
             }
             else
             {
-                _logger.LogWarning("UserIdentity not found for invocation: {invocationId}", context.InvocationId);
+                _logger.LogWarning("UserIdentity not found for invocation: {InvocationId}", context.InvocationId);
                 throw new InvalidOperationException();
             }
 

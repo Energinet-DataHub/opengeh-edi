@@ -14,7 +14,6 @@
 
 using System;
 using Energinet.DataHub.MarketRoles.Domain.Consumers;
-using Energinet.DataHub.MarketRoles.Domain.MeteringPoints;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -47,9 +46,6 @@ namespace Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.Consumers
                 .HasColumnName("RowVersion")
                 .HasColumnType("timestamp")
                 .IsRowVersion();
-
-            builder.HasMany<ConsumerRegistration>()
-                .WithOne();
 
             builder.Ignore(x => x.DomainEvents);
         }

@@ -16,13 +16,13 @@ limitations under the License.
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <RootNamespace>B2B.CimMessageAdapter</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.5.0" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.7" />
+      <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.7.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.3" />
     </ItemGroup>
 
     <ItemGroup>

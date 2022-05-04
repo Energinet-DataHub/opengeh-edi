@@ -23,7 +23,6 @@ using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents
 using Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands;
 using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integration;
 using Energinet.DataHub.MarketRoles.IntegrationEventContracts;
-using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleInjector;

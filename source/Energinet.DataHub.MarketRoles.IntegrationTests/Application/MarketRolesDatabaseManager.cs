@@ -17,7 +17,6 @@ using System.Threading.Tasks;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Database;
 using Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.Helpers;
 using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
-using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application

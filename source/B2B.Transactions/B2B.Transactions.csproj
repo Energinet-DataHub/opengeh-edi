@@ -16,24 +16,19 @@ limitations under the License.
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
     </PropertyGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Dapper" Version="2.0.90" />
-      <PackageReference Include="Microsoft.Data.SqlClient" Version="2.0.1" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.7" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.7" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.0.123" />
+    <PackageReference Include="Energinet.DataHub.MessageHub.Model" Version="1.3.0" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="4.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.3" />
+  </ItemGroup>
 
     <ItemGroup>
       <None Remove="Xml\SchemaStore\Schemas\urn-ediel-org-structure-confirmrequestchangeofsupplier-0-1.xsd" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="Microsoft.Azure.DocumentDB.Core, Version=2.11.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-        <HintPath>..\..\..\..\Users\KristianFaurskovThom\AppData\Roaming\JetBrains\Rider2021.2\azure-functions-coretools\4.0.3971\Microsoft.Azure.DocumentDB.Core.dll</HintPath>
-      </Reference>
     </ItemGroup>
 
     <ItemGroup>

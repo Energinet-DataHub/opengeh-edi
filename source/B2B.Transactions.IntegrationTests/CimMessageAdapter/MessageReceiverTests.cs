@@ -125,23 +125,21 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
         [Fact]
         public async Task Message_must_be_valid_xml()
         {
-            await using var message = CreateMessageWithInvalidXmlStructure();
-            {
-                var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
+            using var message = CreateMessageWithInvalidXmlStructure();
 
-                Assert.False(result.Success);
-                AssertContainsError(result, "B2B-005");
-            }
+            var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
+
+            Assert.False(result.Success);
+            AssertContainsError(result, "B2B-005");
         }
 
         [Fact]
         public async Task Message_must_conform_to_xml_schema()
         {
-            await using var message =
-                BusinessMessageBuilder
-                    .RequestChangeOfSupplier()
-                    .WithSenderRole("FakeRoleType")
-                    .Message();
+            await using var message = BusinessMessageBuilder
+                .RequestChangeOfSupplier()
+                .WithSenderRole("FakeRoleType")
+                .Message();
 
             var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
 
@@ -205,6 +203,7 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
                 .RequestChangeOfSupplier()
                 .DuplicateMarketActivityRecords()
                 .Message();
+
             var result = await ReceiveRequestChangeOfSupplierMessage(message)
                 .ConfigureAwait(false);
 
@@ -254,17 +253,14 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
         private async Task SimulateDuplicationOfMessageIds(IMessageIds messageIds)
         {
             var messageBuilder = BusinessMessageBuilder.RequestChangeOfSupplier();
-            await using (var message = messageBuilder.Message())
-            {
-                await CreateMessageReceiver(messageIds).ReceiveAsync(message, "requestchangeofsupplier", "1.0")
-                    .ConfigureAwait(false);
-            }
 
-            await using (var message = messageBuilder.Message())
-            {
-                await CreateMessageReceiver(messageIds).ReceiveAsync(message, "requestchangeofsupplier", "1.0")
-                    .ConfigureAwait(false);
-            }
+            using var originalMessage = messageBuilder.Message();
+            await CreateMessageReceiver(messageIds).ReceiveAsync(originalMessage, "requestchangeofsupplier", "1.0")
+                .ConfigureAwait(false);
+
+            using var duplicateMessage = messageBuilder.Message();
+            await CreateMessageReceiver(messageIds).ReceiveAsync(duplicateMessage, "requestchangeofsupplier", "1.0")
+                .ConfigureAwait(false);
         }
 
         private ClaimsPrincipal CreateIdentity()
