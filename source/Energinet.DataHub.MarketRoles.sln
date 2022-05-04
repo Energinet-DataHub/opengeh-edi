@@ -33,23 +33,23 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energinet.DataHub.MarketRol
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energinet.DataHub.MarketRoles.Messaging", "Energinet.DataHub.MarketRoles.Messaging\Energinet.DataHub.MarketRoles.Messaging.csproj", "{2AC3F815-7722-42F8-9348-72CFEDCB81EE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "B2B.Transactions.CimMessageAdapter.Tests", "B2B.Transactions.CimMessageAdapter.Tests\B2B.Transactions.CimMessageAdapter.Tests.csproj", "{0B8E940E-A2CE-458B-BB51-C12050D91360}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.CimMessageAdapter.Tests", "Messaging.CimMessageAdapter.Tests\Messaging.CimMessageAdapter.Tests.csproj", "{0B8E940E-A2CE-458B-BB51-C12050D91360}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "B2B.Transactions.CimMessageAdapter", "B2B.Transactions.CimMessageAdapter\B2B.Transactions.CimMessageAdapter.csproj", "{27395443-B503-4A4A-B9F1-01C3F9C75222}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.CimMessageAdapter", "Messaging.CimMessageAdapter\Messaging.CimMessageAdapter.csproj", "{27395443-B503-4A4A-B9F1-01C3F9C75222}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "B2B", "B2B", "{1C877C68-8E3D-4371-B96A-7360850A538E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "B2B.Transactions.Api", "B2B.Transactions.Api\B2B.Transactions.Api.csproj", "{B14EBA74-CCAF-4677-8AE5-A0F6302ED54C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.Api", "Messaging.Api\Messaging.Api.csproj", "{B14EBA74-CCAF-4677-8AE5-A0F6302ED54C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "B2B.Transactions.IntegrationTests", "B2B.Transactions.IntegrationTests\B2B.Transactions.IntegrationTests.csproj", "{76FA7684-27E1-4022-9FB3-F72811E45C60}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.IntegrationTests", "Messaging.IntegrationTests\Messaging.IntegrationTests.csproj", "{76FA7684-27E1-4022-9FB3-F72811E45C60}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "B2B.Transactions", "B2B.Transactions\B2B.Transactions.csproj", "{FB4D9AE5-FCF2-442D-97EC-8AED1F9DDD2E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.Application", "Messaging.Application\Messaging.Application.csproj", "{FB4D9AE5-FCF2-442D-97EC-8AED1F9DDD2E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "B2B.Transactions.Infrastructure", "B2B.Transactions.Infrastructure\B2B.Transactions.Infrastructure.csproj", "{8B1DCD6E-013F-4B45-B9EB-167F1D874793}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.Infrastructure", "Messaging.Infrastructure\Messaging.Infrastructure.csproj", "{8B1DCD6E-013F-4B45-B9EB-167F1D874793}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "B2B.Transactions.ArchitectureTests", "B2B.Transactions.ArchitectureTests\B2B.Transactions.ArchitectureTests.csproj", "{D0C39286-C7BE-4714-8CA1-5654B68A9529}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Messaging.ArchitectureTests", "Messaging.ArchitectureTests\Messaging.ArchitectureTests.csproj", "{D0C39286-C7BE-4714-8CA1-5654B68A9529}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "B2B.Transactions.Tests", "B2B.Transactions.Tests\B2B.Transactions.Tests.csproj", "{87BCDB76-76A4-46A3-9F67-571847541C90}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Messaging.Tests", "Messaging.Tests\Messaging.Tests.csproj", "{87BCDB76-76A4-46A3-9F67-571847541C90}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
