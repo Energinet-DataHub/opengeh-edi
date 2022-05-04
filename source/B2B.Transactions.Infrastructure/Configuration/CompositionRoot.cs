@@ -16,7 +16,6 @@ using System;
 using Azure.Messaging.ServiceBus;
 using B2B.CimMessageAdapter;
 using B2B.CimMessageAdapter.Messages;
-using B2B.CimMessageAdapter.Transactions;
 using B2B.Transactions.Common;
 using B2B.Transactions.Configuration;
 using B2B.Transactions.Configuration.Authentication;
@@ -59,7 +58,7 @@ namespace B2B.Transactions.Infrastructure.Configuration
             services.AddSingleton<ISerializer, Serializer>();
             services.AddScoped<ITransactionIds, TransactionIdRegistry>();
             services.AddScoped<IMessageIds, MessageIdRegistry>();
-            services.AddScoped<ITransactionQueueDispatcher, TransactionQueueDispatcher>();
+            services.AddScoped<IMessageQueueDispatcher, MessageQueueDispatcher>();
             services.AddScoped<ITransactionRepository, TransactionRepository>();
             services.AddScoped<IMarketActorAuthenticator, MarketActorAuthenticator>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -118,7 +117,7 @@ namespace B2B.Transactions.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddTransactionQueue(string connectionString, string queueName)
+        public CompositionRoot AddIncomingMessageQueue(string connectionString, string queueName)
         {
             _services.AddSingleton<ServiceBusSender>(serviceProvider => new ServiceBusClient(connectionString).CreateSender(queueName));
             return this;

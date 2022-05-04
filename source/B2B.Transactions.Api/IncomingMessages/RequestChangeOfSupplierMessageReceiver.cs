@@ -25,14 +25,14 @@ using Microsoft.Extensions.Logging;
 
 namespace B2B.Transactions.Api.IncomingMessages
 {
-    public class RequestChangeOfSupplier
+    public class RequestChangeOfSupplierMessageReceiver
     {
-        private readonly ILogger<RequestChangeOfSupplier> _logger;
+        private readonly ILogger<RequestChangeOfSupplierMessageReceiver> _logger;
         private readonly ICorrelationContext _correlationContext;
         private readonly MessageReceiver _messageReceiver;
 
-        public RequestChangeOfSupplier(
-            ILogger<RequestChangeOfSupplier> logger,
+        public RequestChangeOfSupplierMessageReceiver(
+            ILogger<RequestChangeOfSupplierMessageReceiver> logger,
             ICorrelationContext correlationContext,
             MessageReceiver messageReceiver)
         {
@@ -41,12 +41,12 @@ namespace B2B.Transactions.Api.IncomingMessages
             _messageReceiver = messageReceiver ?? throw new ArgumentNullException(nameof(messageReceiver));
         }
 
-        [Function(nameof(RequestChangeOfSupplier))]
+        [Function("RequestChangeOfSupplier")]
         public async Task<HttpResponseData> RunAsync(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
             HttpRequestData request)
         {
-            _logger.LogInformation($"Received {nameof(RequestChangeOfSupplier)} request");
+            _logger.LogInformation($"Received {nameof(RequestChangeOfSupplierMessageReceiver)} request");
 
             if (request == null) throw new ArgumentNullException(nameof(request));
 

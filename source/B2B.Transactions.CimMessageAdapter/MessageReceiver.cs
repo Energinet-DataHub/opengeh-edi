@@ -19,7 +19,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using B2B.CimMessageAdapter.Errors;
 using B2B.CimMessageAdapter.Messages;
-using B2B.CimMessageAdapter.Transactions;
 using B2B.Transactions;
 using B2B.Transactions.Configuration.Authentication;
 using B2B.Transactions.IncomingMessages;
@@ -32,16 +31,16 @@ namespace B2B.CimMessageAdapter
     {
         private readonly List<ValidationError> _errors = new();
         private readonly IMessageIds _messageIds;
-        private readonly ITransactionQueueDispatcher _transactionQueueDispatcher;
+        private readonly IMessageQueueDispatcher _messageQueueDispatcher;
         private readonly ITransactionIds _transactionIds;
         private readonly ISchemaProvider _schemaProvider;
         private readonly IMarketActorAuthenticator _marketActorAuthenticator;
 
-        public MessageReceiver(IMessageIds messageIds, ITransactionQueueDispatcher transactionQueueDispatcher, ITransactionIds transactionIds, ISchemaProvider schemaProvider, IMarketActorAuthenticator marketActorAuthenticator)
+        public MessageReceiver(IMessageIds messageIds, IMessageQueueDispatcher messageQueueDispatcher, ITransactionIds transactionIds, ISchemaProvider schemaProvider, IMarketActorAuthenticator marketActorAuthenticator)
         {
             _messageIds = messageIds ?? throw new ArgumentNullException(nameof(messageIds));
-            _transactionQueueDispatcher = transactionQueueDispatcher ??
-                                             throw new ArgumentNullException(nameof(transactionQueueDispatcher));
+            _messageQueueDispatcher = messageQueueDispatcher ??
+                                             throw new ArgumentNullException(nameof(messageQueueDispatcher));
             _transactionIds = transactionIds;
             _schemaProvider = schemaProvider ?? throw new ArgumentNullException(nameof(schemaProvider));
             _marketActorAuthenticator = marketActorAuthenticator ?? throw new ArgumentNullException(nameof(marketActorAuthenticator));
@@ -80,7 +79,7 @@ namespace B2B.CimMessageAdapter
                 await AddToTransactionQueueAsync(CreateTransaction(messageHeader, marketActivityRecord)).ConfigureAwait(false);
             }
 
-            await _transactionQueueDispatcher.CommitAsync().ConfigureAwait(false);
+            await _messageQueueDispatcher.CommitAsync().ConfigureAwait(false);
             return Result.Succeeded();
         }
 
@@ -102,7 +101,7 @@ namespace B2B.CimMessageAdapter
 
         private Task AddToTransactionQueueAsync(IncomingMessage transaction)
         {
-            return _transactionQueueDispatcher.AddAsync(transaction);
+            return _messageQueueDispatcher.AddAsync(transaction);
         }
 
         private async Task CheckMessageIdAsync(string messageId)

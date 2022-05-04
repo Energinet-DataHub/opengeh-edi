@@ -45,7 +45,7 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
         private readonly IMarketActorAuthenticator _marketActorAuthenticator;
         private readonly ITransactionIds _transactionIds;
         private readonly IMessageIds _messageIds;
-        private TransactionQueueDispatcherStub _transactionQueueDispatcherSpy = new();
+        private MessageQueueDispatcherStub _messageQueueDispatcherSpy = new();
 
         public MessageReceiverTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
@@ -170,7 +170,7 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
             await ReceiveRequestChangeOfSupplierMessage(message)
                 .ConfigureAwait(false);
 
-            var transaction = _transactionQueueDispatcherSpy.CommittedItems.FirstOrDefault();
+            var transaction = _messageQueueDispatcherSpy.CommittedItems.FirstOrDefault();
             Assert.NotNull(transaction);
             Assert.Equal("78954612", transaction?.Message.MessageId);
             Assert.Equal("E65", transaction?.Message.ProcessType);
@@ -193,7 +193,7 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
         {
             await SimulateDuplicationOfMessageIds(_messageIds).ConfigureAwait(false);
 
-            Assert.Empty(_transactionQueueDispatcherSpy.CommittedItems);
+            Assert.Empty(_messageQueueDispatcherSpy.CommittedItems);
         }
 
         [Fact]
@@ -208,7 +208,7 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
                 .ConfigureAwait(false);
 
             AssertContainsError(result, "B2B-005");
-            Assert.Empty(_transactionQueueDispatcherSpy.CommittedItems);
+            Assert.Empty(_messageQueueDispatcherSpy.CommittedItems);
         }
 
         private static ClaimsPrincipal CreateClaimsPrincipal(IEnumerable<Claim> claims)
@@ -238,15 +238,15 @@ namespace B2B.Transactions.IntegrationTests.CimMessageAdapter
 
         private MessageReceiver CreateMessageReceiver()
         {
-            _transactionQueueDispatcherSpy = new TransactionQueueDispatcherStub();
-            var messageReceiver = new MessageReceiver(_messageIds, _transactionQueueDispatcherSpy, _transactionIds, new SchemaProvider(new SchemaStore()), _marketActorAuthenticator);
+            _messageQueueDispatcherSpy = new MessageQueueDispatcherStub();
+            var messageReceiver = new MessageReceiver(_messageIds, _messageQueueDispatcherSpy, _transactionIds, new SchemaProvider(new SchemaStore()), _marketActorAuthenticator);
             return messageReceiver;
         }
 
         private MessageReceiver CreateMessageReceiver(IMessageIds messageIds)
         {
-            _transactionQueueDispatcherSpy = new TransactionQueueDispatcherStub();
-            var messageReceiver = new MessageReceiver(messageIds, _transactionQueueDispatcherSpy, _transactionIds, new SchemaProvider(new SchemaStore()), _marketActorAuthenticator);
+            _messageQueueDispatcherSpy = new MessageQueueDispatcherStub();
+            var messageReceiver = new MessageReceiver(messageIds, _messageQueueDispatcherSpy, _transactionIds, new SchemaProvider(new SchemaStore()), _marketActorAuthenticator);
             return messageReceiver;
         }
 
