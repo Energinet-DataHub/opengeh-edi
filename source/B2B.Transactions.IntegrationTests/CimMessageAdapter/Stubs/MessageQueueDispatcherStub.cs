@@ -15,24 +15,24 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using B2B.CimMessageAdapter.Transactions;
+using B2B.CimMessageAdapter.Messages;
 using B2B.Transactions.IncomingMessages;
 using B2B.Transactions.Transactions;
 
 namespace B2B.Transactions.IntegrationTests.CimMessageAdapter.Stubs
 {
-    public class TransactionQueueDispatcherStub : ITransactionQueueDispatcher
+    public class MessageQueueDispatcherStub : IMessageQueueDispatcher
     {
         private readonly List<IncomingMessage> _uncommittedItems = new();
         private readonly List<IncomingMessage> _committedItems = new();
 
         public IReadOnlyCollection<IncomingMessage> CommittedItems => _committedItems.AsReadOnly();
 
-        public Task AddAsync(IncomingMessage transaction)
+        public Task AddAsync(IncomingMessage message)
         {
-            if (transaction == null) throw new ArgumentNullException(nameof(transaction));
+            if (message == null) throw new ArgumentNullException(nameof(message));
             _committedItems.Clear();
-            _uncommittedItems.Add(transaction);
+            _uncommittedItems.Add(message);
             return Task.CompletedTask;
         }
 

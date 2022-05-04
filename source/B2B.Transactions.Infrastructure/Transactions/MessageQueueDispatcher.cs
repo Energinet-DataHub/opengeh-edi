@@ -17,15 +17,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
 using Azure.Messaging.ServiceBus;
-using B2B.CimMessageAdapter.Transactions;
+using B2B.CimMessageAdapter.Messages;
 using B2B.Transactions.Configuration;
 using B2B.Transactions.IncomingMessages;
 using B2B.Transactions.Infrastructure.Configuration.Serialization;
-using B2B.Transactions.Transactions;
 
 namespace B2B.Transactions.Infrastructure.Transactions
 {
-    public class TransactionQueueDispatcher : ITransactionQueueDispatcher
+    public class MessageQueueDispatcher : IMessageQueueDispatcher
     {
         private const string CorrelationId = "CorrelationID";
         private readonly ISerializer _jsonSerializer;
@@ -33,7 +32,7 @@ namespace B2B.Transactions.Infrastructure.Transactions
         private readonly ServiceBusSender? _serviceBusSender;
         private readonly ICorrelationContext _correlationContext;
 
-        public TransactionQueueDispatcher(ISerializer jsonSerializer, ServiceBusSender? sender, ICorrelationContext correlationContext)
+        public MessageQueueDispatcher(ISerializer jsonSerializer, ServiceBusSender? sender, ICorrelationContext correlationContext)
         {
             _serviceBusSender = sender;
             _correlationContext = correlationContext;
@@ -41,10 +40,9 @@ namespace B2B.Transactions.Infrastructure.Transactions
             _transactionQueue = new List<ServiceBusMessage>();
         }
 
-        public Task AddAsync(IncomingMessage transaction)
+        public Task AddAsync(IncomingMessage message)
         {
-            var message = CreateMessage(transaction);
-            _transactionQueue.Add(message);
+            _transactionQueue.Add(CreateMessage(message));
             return Task.CompletedTask;
         }
 

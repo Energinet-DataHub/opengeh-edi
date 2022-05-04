@@ -24,15 +24,15 @@ using Microsoft.Extensions.Logging;
 
 namespace B2B.Transactions.Api.IncomingMessages
 {
-    public class TransactionQueueListener
+    public class IncomingMessageQueueListener
     {
-        private readonly ILogger<TransactionQueueListener> _logger;
+        private readonly ILogger<IncomingMessageQueueListener> _logger;
         private readonly ICorrelationContext _correlationContext;
         private readonly ISerializer _jsonSerializer;
         private readonly IncomingMessageHandler _incomingMessageHandler;
 
-        public TransactionQueueListener(
-            ILogger<TransactionQueueListener> logger,
+        public IncomingMessageQueueListener(
+            ILogger<IncomingMessageQueueListener> logger,
             ICorrelationContext correlationContext,
             ISerializer jsonSerializer,
             IncomingMessageHandler incomingMessageHandler)
@@ -43,9 +43,9 @@ namespace B2B.Transactions.Api.IncomingMessages
             _incomingMessageHandler = incomingMessageHandler;
         }
 
-        [Function(nameof(TransactionQueueListener))]
+        [Function(nameof(IncomingMessageQueueListener))]
         public async Task RunAsync(
-            [ServiceBusTrigger("%TRANSACTIONS_QUEUE_NAME%", Connection = "TRANSACTIONS_QUEUE_LISTENER_CONNECTION_STRING")] byte[] data,
+            [ServiceBusTrigger("%INCOMING_MESSAGE_QUEUE_NAME%", Connection = "INCOMING_MESSAGE_QUEUE_LISTENER_CONNECTION_STRING")] byte[] data,
             FunctionContext context)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));

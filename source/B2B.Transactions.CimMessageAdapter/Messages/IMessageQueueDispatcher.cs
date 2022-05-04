@@ -14,20 +14,19 @@
 
 using System.Threading.Tasks;
 using B2B.Transactions.IncomingMessages;
-using B2B.Transactions.Transactions;
 
-namespace B2B.CimMessageAdapter.Transactions
+namespace B2B.CimMessageAdapter.Messages
 {
     /// <summary>
-    /// Service for dispatching B2B transactions to transaction queue
+    /// Service for dispatching incoming messages to message queue
     /// </summary>
-    public interface ITransactionQueueDispatcher
+    public interface IMessageQueueDispatcher
     {
         /// <summary>
-        /// Adds a transaction to collection
+        /// Adds a message to collection
         /// </summary>
-        /// <param name="transaction"></param>
-        Task AddAsync(IncomingMessage transaction);
+        /// <param name="message"></param>
+        Task AddAsync(IncomingMessage message);
 
         /// <summary>
         /// Commits added transactions to queue
