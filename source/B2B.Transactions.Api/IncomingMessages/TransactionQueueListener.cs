@@ -15,6 +15,7 @@
 using System;
 using System.Text;
 using System.Threading.Tasks;
+using B2B.Transactions.Api.Configuration.Middleware.ServiceBus;
 using B2B.Transactions.Configuration;
 using B2B.Transactions.IncomingMessages;
 using B2B.Transactions.Infrastructure.Configuration.Serialization;
@@ -50,6 +51,8 @@ namespace B2B.Transactions.Api.IncomingMessages
             if (data == null) throw new ArgumentNullException(nameof(data));
             if (context == null) throw new ArgumentNullException(nameof(context));
 
+            SetCorrelationIdFromServiceBusMessage(context);
+
             var byteAsString = Encoding.UTF8.GetString(data);
 
             await _incomingMessageHandler.HandleAsync(
@@ -57,6 +60,21 @@ namespace B2B.Transactions.Api.IncomingMessages
                 .ConfigureAwait(false);
 
             _logger.LogInformation("B2B transaction dequeued with correlation id: {CorrelationId}", _correlationContext.Id);
+        }
+
+        private void SetCorrelationIdFromServiceBusMessage(FunctionContext context)
+        {
+            context.BindingContext.BindingData.TryGetValue("UserProperties", out var serviceBusMessageMetadata);
+
+            if (serviceBusMessageMetadata is null)
+            {
+                throw new InvalidOperationException($"Service bus metadata must be specified as User Properties attributes");
+            }
+
+            var metadata = _jsonSerializer.Deserialize<ServiceBusMessageMetadata>(serviceBusMessageMetadata.ToString() ?? throw new InvalidOperationException());
+            _correlationContext.SetId(metadata.CorrelationID ?? throw new InvalidOperationException("Service bus metadata property CorrelationID is missing"));
+
+            _logger.LogInformation("Dequeued service bus message with correlation id: " + _correlationContext.Id ?? string.Empty);
         }
     }
 }
