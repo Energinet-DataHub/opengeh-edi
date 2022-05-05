@@ -65,8 +65,4 @@ limitations under the License.
       <Compile Remove="InternalCommands\CommandScheduler.cs" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="InternalCommands" />
-    </ItemGroup>
-
 </Project>

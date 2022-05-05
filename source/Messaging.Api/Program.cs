@@ -14,6 +14,7 @@
 
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Reflection;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware;
 using Energinet.DataHub.MessageHub.Client.DataAvailable;
@@ -21,6 +22,7 @@ using Messaging.Api.Configuration.Middleware.Authentication.Bearer;
 using Messaging.Api.Configuration.Middleware.Authentication.MarketActors;
 using Messaging.Api.Configuration.Middleware.Correlation;
 using Messaging.Infrastructure.Configuration;
+using Messaging.Infrastructure.Configuration.SystemTime;
 using Messaging.Infrastructure.OutgoingMessages;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -95,7 +97,9 @@ namespace Messaging.Api
                             runtime.MESSAGEHUB_STORAGE_CONTAINER_NAME!,
                             runtime.MESSAGEHUB_QUEUE_CONNECTION_STRING!,
                             runtime.MESSAGEHUB_DATA_AVAILABLE_QUEUE!,
-                            runtime.MESSAGEHUB_DOMAIN_REPLY_QUEUE!);
+                            runtime.MESSAGEHUB_DOMAIN_REPLY_QUEUE!)
+                        .AddRequestHandler<NotifyMessageHubHandler, NotifyMessageHub>()
+                        .AddNotificationHandler<PublishNewMessagesOnTimeHasPassed, TimeHasPassed>();
                 })
                 .Build();
         }

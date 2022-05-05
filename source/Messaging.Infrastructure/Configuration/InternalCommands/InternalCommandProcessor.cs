@@ -62,6 +62,10 @@ namespace Messaging.Infrastructure.Configuration.InternalCommands
                     await MarkAsFailedAsync(queuedCommand, exception).ConfigureAwait(false);
                     _logger?.Log(LogLevel.Error, $"Failed to process internal command {queuedCommand.Id}", exception);
                 }
+                else
+                {
+                    await MarkAsProcessedAsync(queuedCommand).ConfigureAwait(false);
+                }
             }
         }
 
@@ -77,12 +81,26 @@ namespace Messaging.Infrastructure.Configuration.InternalCommands
             return connection.ExecuteScalarAsync(
                 "UPDATE [b2b].[QueuedInternalCommands] " +
                 "SET ProcessedDate = @NowDate, " +
-                "Error = @Error " +
+                "ErrorMessage = @Error " +
                 "WHERE [Id] = @Id",
                 new
                 {
                     NowDate = DateTime.UtcNow,
                     Error = exception,
+                    queuedCommand.Id,
+                });
+        }
+
+        private Task MarkAsProcessedAsync(QueuedInternalCommand queuedCommand)
+        {
+            var connection = _connectionFactory.GetOpenConnection();
+            return connection.ExecuteScalarAsync(
+                "UPDATE [b2b].[QueuedInternalCommands] " +
+                "SET ProcessedDate = @NowDate " +
+                "WHERE [Id] = @Id",
+                new
+                {
+                    NowDate = DateTime.UtcNow,
                     queuedCommand.Id,
                 });
         }
