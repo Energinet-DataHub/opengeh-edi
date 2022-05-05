@@ -18,6 +18,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 
 namespace Messaging.Application.OutgoingMessages
@@ -27,15 +28,18 @@ namespace Messaging.Application.OutgoingMessages
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly IMessageDispatcher _messageDispatcher;
         private readonly MessageFactory _messageFactory;
+        private readonly IUnitOfWork _unitOfWork;
 
         public MessageRequestHandler(
             IOutgoingMessageStore outgoingMessageStore,
             IMessageDispatcher messageDispatcherSpy,
-            MessageFactory messageFactory)
+            MessageFactory messageFactory,
+            IUnitOfWork unitOfWork)
         {
             _outgoingMessageStore = outgoingMessageStore;
             _messageDispatcher = messageDispatcherSpy;
             _messageFactory = messageFactory;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<Result> HandleAsync(IReadOnlyCollection<string> requestedMessageIds)
@@ -49,6 +53,7 @@ namespace Messaging.Application.OutgoingMessages
 
             var message = await CreateMessageFromAsync(messages).ConfigureAwait(false);
             await _messageDispatcher.DispatchAsync(message).ConfigureAwait(false);
+            await _unitOfWork.CommitAsync().ConfigureAwait(false);
 
             return Result.Succeeded();
         }

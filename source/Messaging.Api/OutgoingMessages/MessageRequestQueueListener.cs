@@ -30,20 +30,17 @@ namespace Messaging.Api.OutgoingMessages
         private readonly ILogger<MessageRequestQueueListener> _logger;
         private readonly MessageRequestHandler _messageRequestHandler;
         private readonly MessageRequestContext _messageRequestContext;
-        private readonly ISerializer _serializer;
 
         public MessageRequestQueueListener(
             ICorrelationContext correlationContext,
             ILogger<MessageRequestQueueListener> logger,
             MessageRequestHandler messageRequestHandler,
-            MessageRequestContext messageRequestContext,
-            ISerializer serializer)
+            MessageRequestContext messageRequestContext)
         {
             _correlationContext = correlationContext;
             _logger = logger;
             _messageRequestHandler = messageRequestHandler;
             _messageRequestContext = messageRequestContext;
-            _serializer = serializer;
         }
 
         [Function(nameof(MessageRequestQueueListener))]
@@ -55,21 +52,6 @@ namespace Messaging.Api.OutgoingMessages
                 ?? throw new InvalidOperationException()).ConfigureAwait(false);
 
             _logger.LogInformation($"Dequeued with correlation id: {_correlationContext.Id}");
-        }
-
-        private void SetCorrelationIdFromServiceBusMessage(FunctionContext context)
-        {
-            context.BindingContext.BindingData.TryGetValue("UserProperties", out var serviceBusMessageMetadata);
-
-            if (serviceBusMessageMetadata is null)
-            {
-                throw new InvalidOperationException($"Service bus metadata must be specified as User Properties attributes");
-            }
-
-            var metadata = _serializer.Deserialize<ServiceBusMessageMetadata>(serviceBusMessageMetadata.ToString() ?? throw new InvalidOperationException());
-            _correlationContext.SetId(metadata.CorrelationID ?? throw new InvalidOperationException("Service bus metadata property CorrelationID is missing"));
-
-            _logger.LogInformation("Dequeued service bus message with correlation id: " + _correlationContext.Id ?? string.Empty);
         }
     }
 }
