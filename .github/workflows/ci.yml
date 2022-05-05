@@ -47,7 +47,7 @@ jobs:
     needs: [ci_base, dotnet_solution_ci, terraform_validate]
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-create-function-artifact.yml@6.1.0
     with:
-      CSPROJ_FILE_PATH: 'source/B2B.Transactions.Api/B2B.Transactions.Api.csproj'
+      CSPROJ_FILE_PATH: 'source/Messaging.Api/Messaging.Api.csproj'
       DOTNET_VERSION: '6.0.201'
       ARTIFACT_NAME: api
 
