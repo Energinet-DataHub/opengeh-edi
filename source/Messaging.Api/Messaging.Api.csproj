@@ -42,6 +42,10 @@ limitations under the License.
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
           <CopyToPublishDirectory>Never</CopyToPublishDirectory>
         </None>
+        <None Update="local.settings.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+          <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+        </None>
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\Messaging.Infrastructure\Messaging.Infrastructure.csproj" />
