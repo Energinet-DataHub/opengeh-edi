@@ -73,7 +73,6 @@ namespace Messaging.Infrastructure.Configuration
 
             services.AddLogging();
             AddXmlSchema(services);
-            // AddProcessing();
             AddInternalCommandsProcessing();
         }
 
@@ -196,11 +195,6 @@ namespace Messaging.Infrastructure.Configuration
             services.AddScoped<CimXmlSchemas>();
             services.AddScoped<ISchemaProvider, SchemaProvider>();
             services.AddScoped<MessageReceiver>();
-        }
-
-        private void AddProcessing()
-        {
-            _services.AddMediatR(typeof(CompositionRoot).Assembly);
         }
 
         private void AddInternalCommandsProcessing()
