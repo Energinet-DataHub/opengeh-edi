@@ -19,6 +19,7 @@ using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MessageHub.Client;
 using Energinet.DataHub.MessageHub.Client.DataAvailable;
 using Energinet.DataHub.MessageHub.Client.Factories;
+using Energinet.DataHub.MessageHub.Client.Peek;
 using Energinet.DataHub.MessageHub.Client.Storage;
 using Energinet.DataHub.MessageHub.Model.Peek;
 using MediatR;
@@ -72,7 +73,6 @@ namespace Messaging.Infrastructure.Configuration
 
             services.AddLogging();
             AddXmlSchema(services);
-            AddProcessing();
             AddInternalCommandsProcessing();
         }
 
@@ -157,13 +157,35 @@ namespace Messaging.Infrastructure.Configuration
         {
             _services.AddSingleton<StorageConfig>(s => new StorageConfig(storageServiceContainerName));
             _services.AddSingleton<IRequestBundleParser, RequestBundleParser>();
+            _services.AddSingleton<IResponseBundleParser, ResponseBundleParser>();
             _services.AddSingleton<IStorageServiceClientFactory>(s => new StorageServiceClientFactory(storageServiceConnectionString));
             _services.AddSingleton<IStorageHandler, StorageHandler>();
 
             _services.AddSingleton<IServiceBusClientFactory>(_ => new ServiceBusClientFactory(queueConnectionString));
             _services.AddSingleton<IMessageBusFactory, AzureServiceBusFactory>();
             _services.AddSingleton<IDataAvailableNotificationSender, DataAvailableNotificationSender>();
+            _services.AddSingleton<IDataBundleResponseSender, DataBundleResponseSender>();
             _services.AddSingleton(_ => new MessageHubConfig(dataAvailableQueue, domainReplyQueue));
+
+            return this;
+        }
+
+        public CompositionRoot AddRequestHandler<TRequestHandler, TCommand>()
+            where TRequestHandler : class, IRequestHandler<TCommand>
+            where TCommand : IRequest<Unit>
+        {
+            _services.AddTransient<IRequestHandler<TCommand>, TRequestHandler>();
+            _services.AddMediatR(typeof(TRequestHandler));
+
+            return this;
+        }
+
+        public CompositionRoot AddNotificationHandler<TNotificationHandler, TNotification>()
+            where TNotificationHandler : class, INotificationHandler<TNotification>
+            where TNotification : INotification
+        {
+            _services.AddTransient<INotificationHandler<TNotification>, TNotificationHandler>();
+            _services.AddMediatR(typeof(TNotificationHandler));
 
             return this;
         }
@@ -173,11 +195,6 @@ namespace Messaging.Infrastructure.Configuration
             services.AddScoped<CimXmlSchemas>();
             services.AddScoped<ISchemaProvider, SchemaProvider>();
             services.AddScoped<MessageReceiver>();
-        }
-
-        private void AddProcessing()
-        {
-            _services.AddMediatR(typeof(CompositionRoot));
         }
 
         private void AddInternalCommandsProcessing()
