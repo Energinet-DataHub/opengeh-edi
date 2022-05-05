@@ -51,38 +51,6 @@ jobs:
       DOTNET_VERSION: '6.0.201'
       ARTIFACT_NAME: api
 
-  ingestion_ci:
-    needs: [ci_base, dotnet_solution_ci, terraform_validate]
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-create-function-artifact.yml@6.1.0
-    with:
-      CSPROJ_FILE_PATH: 'source/Energinet.DataHub.MarketRoles.EntryPoints.Ingestion/Energinet.DataHub.MarketRoles.EntryPoints.Ingestion.csproj'
-      DOTNET_VERSION: '6.0.201'
-      ARTIFACT_NAME: ingestion
-
-  outbox_ci:
-    needs: [ci_base, dotnet_solution_ci, terraform_validate]
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-create-function-artifact.yml@6.1.0
-    with:
-      CSPROJ_FILE_PATH: 'source/Energinet.DataHub.MarketRoles.EntryPoints.Outbox/Energinet.DataHub.MarketRoles.EntryPoints.Outbox.csproj'
-      DOTNET_VERSION: '6.0.201'
-      ARTIFACT_NAME: outbox
-
-  processing_ci:
-    needs: [ci_base, dotnet_solution_ci, terraform_validate]
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-create-function-artifact.yml@6.1.0
-    with:
-      CSPROJ_FILE_PATH: 'source/Energinet.DataHub.MarketRoles.EntryPoints.Processing/Energinet.DataHub.MarketRoles.EntryPoints.Processing.csproj'
-      DOTNET_VERSION: '6.0.201'
-      ARTIFACT_NAME: processing
-
-  internalcommanddispatcher_ci:
-    needs: [ci_base, dotnet_solution_ci, terraform_validate]
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-create-function-artifact.yml@6.1.0
-    with:
-      CSPROJ_FILE_PATH: 'source/Energinet.DataHub.MarketRoles.EntryPoints.InternalCommandDispatcher/Energinet.DataHub.MarketRoles.EntryPoints.InternalCommandDispatcher.csproj'
-      DOTNET_VERSION: '6.0.201'
-      ARTIFACT_NAME: internalcommanddispatcher
-
   database_migration_ci:
     needs: [ci_base, dotnet_solution_ci, terraform_validate]
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-create-function-artifact.yml@6.1.0
@@ -93,11 +61,7 @@ jobs:
 
   create_prerelease:
     needs: [
-      api_ci,
-      ingestion_ci,
-      outbox_ci,
-      processing_ci,
-      internalcommanddispatcher_ci,
+      api_ci,    
       database_migration_ci
     ]
     uses: Energinet-DataHub/.github/.github/workflows/create-prerelease.yml@6.0.0
