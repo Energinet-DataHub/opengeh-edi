@@ -36,6 +36,6 @@ resource "azurerm_storage_share" "postoffice" {
   quota                       = 50
 
   timeouts {
-    create = "15m"
+    create = "60m"
   }
 }
