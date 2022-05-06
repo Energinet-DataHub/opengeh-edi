@@ -34,4 +34,8 @@ resource "azurerm_storage_share" "postoffice" {
   name                        = "temppostoffice"
   storage_account_name        = module.st_postoffice.name
   quota                       = 50
+
+  timeouts {
+    create = "15m"
+  }
 }
