@@ -43,3 +43,10 @@ module "sbq_marketroles" {
   name                = "marketroles"
   namespace_id        = module.sb_marketroles.id
 }
+
+module "sbq_marketroles" {
+  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/service-bus-queue?ref=6.0.0"
+
+  name                = "incomingmessagequeue"
+  namespace_id        = module.sb_marketroles.id
+}

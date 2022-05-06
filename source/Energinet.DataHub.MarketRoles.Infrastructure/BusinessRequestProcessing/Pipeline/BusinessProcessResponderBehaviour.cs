@@ -21,7 +21,7 @@ using MediatR;
 namespace Energinet.DataHub.MarketRoles.Infrastructure.BusinessRequestProcessing.Pipeline
 {
     public class BusinessProcessResponderBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-        where TRequest : IBusinessRequest
+        where TRequest : IBusinessRequest, MediatR.IRequest<TResponse>
         where TResponse : BusinessProcessResult
     {
         private readonly IBusinessProcessResultHandler<TRequest> _businessProcessResultHandler;

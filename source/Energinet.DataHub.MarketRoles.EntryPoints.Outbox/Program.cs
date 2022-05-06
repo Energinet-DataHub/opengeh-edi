@@ -33,7 +33,6 @@ using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integratio
 using Energinet.DataHub.MarketRoles.Messaging;
 using Energinet.DataHub.MessageHub.Client;
 using Energinet.DataHub.MessageHub.Client.SimpleInjector;
-using EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleInjector;

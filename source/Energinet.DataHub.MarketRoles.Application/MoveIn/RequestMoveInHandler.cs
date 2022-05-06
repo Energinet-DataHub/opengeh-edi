@@ -51,13 +51,13 @@ namespace Energinet.DataHub.MarketRoles.Application.MoveIn
             var energySupplier = await _energySupplierRepository.GetByGlnNumberAsync(new GlnNumber(request.EnergySupplierGlnNumber)).ConfigureAwait(false);
             var accountingPoint = await _accountingPointRepository.GetByGsrnNumberAsync(GsrnNumber.Create(request.AccountingPointGsrnNumber)).ConfigureAwait(false);
 
-            var validationResult = Validate(energySupplier, accountingPoint, request);
+            var validationResult = Validate(energySupplier!, accountingPoint!, request);
             if (validationResult.Success == false)
             {
                 return validationResult;
             }
 
-            var businessRulesResult = CheckBusinessRules(accountingPoint, request);
+            var businessRulesResult = CheckBusinessRules(accountingPoint!, request);
             if (!businessRulesResult.Success)
             {
                 return businessRulesResult;
@@ -67,7 +67,7 @@ namespace Energinet.DataHub.MarketRoles.Application.MoveIn
 
             var startDate = Instant.FromDateTimeOffset(DateTimeOffset.Parse(request.MoveInDate, CultureInfo.InvariantCulture));
 
-            accountingPoint.AcceptConsumerMoveIn(consumer.ConsumerId, energySupplier.EnergySupplierId, startDate, Transaction.Create(request.TransactionId));
+            accountingPoint?.AcceptConsumerMoveIn(consumer.ConsumerId, energySupplier!.EnergySupplierId, startDate, Transaction.Create(request.TransactionId));
             return BusinessProcessResult.Ok(request.TransactionId);
         }
 
@@ -95,16 +95,14 @@ namespace Energinet.DataHub.MarketRoles.Application.MoveIn
 
         private async Task<Consumer> GetOrCreateConsumerAsync(RequestMoveIn request)
         {
-            Consumer consumer;
+            Consumer? consumer;
             if (string.IsNullOrWhiteSpace(request.SocialSecurityNumber) == false)
             {
-                consumer = await _consumerRepository.GetBySSNAsync(CprNumber.Create(request.SocialSecurityNumber))
-                    .ConfigureAwait(false);
+                consumer = await _consumerRepository.GetBySSNAsync(CprNumber.Create(request.SocialSecurityNumber)).ConfigureAwait(false);
             }
             else
             {
-                consumer = await _consumerRepository.GetByVATNumberAsync(CvrNumber.Create(request.VATNumber))
-                    .ConfigureAwait(false);
+                consumer = await _consumerRepository.GetByVATNumberAsync(CvrNumber.Create(request.VATNumber)).ConfigureAwait(false);
             }
 
             return consumer ?? CreateConsumer(request);

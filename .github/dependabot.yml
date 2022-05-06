@@ -5,11 +5,46 @@
 version: 2
 updates:
   - package-ecosystem: "nuget"
+    directory: "/source/B2B.Transactions.Tests"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "nuget"
+    directory: "/source/B2B.Transactions.ArchitectureTests"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "nuget"
+    directory: "/source/B2B.Transactions.Infrastructure"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+  
+  - package-ecosystem: "nuget"
+    directory: "/source/B2B.Transactions.IntegrationTests"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+  
+  - package-ecosystem: "nuget"
+    directory: "/source/B2B.Transactions"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "nuget"
     directory: "/source/B2B.Transactions.CimMessageAdapter"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
 
+  - package-ecosystem: "nuget"
+    directory: "/source/B2B.Transactions.CimMessageAdapter.Receiver"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
     directory: "/source/B2B.Transactions.CimMessageAdapter.Tests"
@@ -17,13 +52,11 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 0
 
-
   - package-ecosystem: "nuget"
     directory: "/source/Energinet.DataHub.MarketRoles.Application"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
-
 
   - package-ecosystem: "nuget"
     directory: "/source/Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp"
@@ -31,13 +64,11 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 0
 
-
   - package-ecosystem: "nuget"
     directory: "/source/Energinet.DataHub.MarketRoles.Domain"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
-
 
   - package-ecosystem: "nuget"
     directory: "/source/Energinet.DataHub.MarketRoles.EntryPoints.Common"
@@ -45,13 +76,11 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 0
 
-
   - package-ecosystem: "nuget"
     directory: "/source/Energinet.DataHub.MarketRoles.EntryPoints.Ingestion"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
-
 
   - package-ecosystem: "nuget"
     directory: "/source/Energinet.DataHub.MarketRoles.EntryPoints.InternalCommandDispatcher"
@@ -59,13 +88,11 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 0
 
-
   - package-ecosystem: "nuget"
     directory: "/source/Energinet.DataHub.MarketRoles.EntryPoints.LocalMessageHub"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
-
 
   - package-ecosystem: "nuget"
     directory: "/source/Energinet.DataHub.MarketRoles.EntryPoints.Outbox"
@@ -73,13 +100,11 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 0
 
-
   - package-ecosystem: "nuget"
     directory: "/source/Energinet.DataHub.MarketRoles.EntryPoints.Processing"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
-
 
   - package-ecosystem: "nuget"
     directory: "/source/Energinet.DataHub.MarketRoles.Infrastructure"
@@ -87,20 +112,17 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 0
 
-
   - package-ecosystem: "nuget"
     directory: "/source/Energinet.DataHub.MarketRoles.IntegrationTests"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
 
-
   - package-ecosystem: "nuget"
     directory: "/source/Energinet.DataHub.MarketRoles.Messaging"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
-
 
   - package-ecosystem: "nuget"
     directory: "/source/Energinet.DataHub.MarketRoles.Tests"

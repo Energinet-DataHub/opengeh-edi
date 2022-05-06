@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -56,6 +57,7 @@ namespace Energinet.DataHub.MarketRoles.Messaging
             _systemDateTimeProvider = systemDateTimeProvider;
         }
 
+        [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Issue: https://github.com/dotnet/roslyn-analyzers/issues/5712")]
         public async Task CreateBundleAsync(byte[] request, string sessionId)
         {
             var bundleRequestDto = _requestBundleParser.Parse(request);

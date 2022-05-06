@@ -37,7 +37,7 @@ namespace Energinet.DataHub.MarketRoles.Application.MoveIn.Processing
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
             var accountingPoint = await _accountingPointRepository.GetByIdAsync(AccountingPointId.Create(request.AccountingPointId)).ConfigureAwait(false);
-            accountingPoint.EffectuateConsumerMoveIn(Transaction.Create(request.Transaction), _systemDateTimeProvider);
+            accountingPoint?.EffectuateConsumerMoveIn(Transaction.Create(request.Transaction), _systemDateTimeProvider);
             return Unit.Value;
         }
     }

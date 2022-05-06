@@ -5,6 +5,8 @@ ChangeOfSupplier
 codecov
 composable
 csproj
+CPR
+CVR
 DataHub
 DDD
 deserialize

@@ -27,29 +27,11 @@ runs:
         mkdir ${{ inputs.RELEASE_FOLDER_PATH }}
         cp -fR ${{ inputs.REPO_FOLDER_PATH }}/build/infrastructure ${{ inputs.RELEASE_FOLDER_PATH }} 2>/dev/null || :
 
-    - name: Publish Ingestion to release folder
+    - name: Publish Api to release folder
       uses: actions/download-artifact@v2
       with:
-        name: ingestion
-        path: ${{ inputs.RELEASE_FOLDER_PATH }}/functions/ingestion
-
-    - name: Publish Outbox to release folder
-      uses: actions/download-artifact@v2
-      with:
-        name: outbox
-        path: ${{ inputs.RELEASE_FOLDER_PATH }}/functions/outbox
-
-    - name: Publish Processing to release folder
-      uses: actions/download-artifact@v2
-      with:
-        name: processing
-        path: ${{ inputs.RELEASE_FOLDER_PATH }}/functions/processing
-
-    - name: Publish Internal command dispatcher to release folder
-      uses: actions/download-artifact@v2
-      with:
-        name: internalcommanddispatcher
-        path: ${{ inputs.RELEASE_FOLDER_PATH }}/functions/internalcommanddispatcher
+        name: api
+        path: ${{ inputs.RELEASE_FOLDER_PATH }}/functions/api    
 
     - name: Publish Database Migration to release folder
       uses: actions/download-artifact@v2

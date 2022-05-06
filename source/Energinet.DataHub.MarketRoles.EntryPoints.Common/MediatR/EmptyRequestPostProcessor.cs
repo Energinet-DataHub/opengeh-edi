@@ -14,12 +14,13 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using MediatR;
 using MediatR.Pipeline;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Common.MediatR
 {
     public class EmptyRequestPostProcessor<TRequest, TResponse> : IRequestPostProcessor<TRequest, TResponse>
-        where TRequest : notnull
+        where TRequest : notnull, IRequest<TResponse>
     {
         public Task Process(TRequest request, TResponse response, CancellationToken cancellationToken)
         {

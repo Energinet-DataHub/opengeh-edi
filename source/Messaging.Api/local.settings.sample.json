@@ -1,0 +1,22 @@
+﻿{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "B2C_TENANT_ID": "<Azure B2C tenant id>",
+    "BACKEND_SERVICE_APP_ID": "<Backend service application id>",
+    "REQUEST_RESPONSE_LOGGING_CONTAINER_NAME": "<Name of storage container>",
+    "REQUEST_RESPONSE_LOGGING_CONNECTION_STRING": "<connection string for logging request and response to storage>",
+    "DB_CONNECTION_STRING": "<SQL database connection string>",
+    "INCOMING_MESSAGE_QUEUE_CONNECTION_STRING": "<connection string for service bus with sender permissions>",
+    "INCOMING_MESSAGE_QUEUE_LISTENER_CONNECTION_STRING": "<connection string for service bus with listener permissions>",
+    "INCOMING_MESSAGE_QUEUE_NAME": "<Name of transactions service bus queue>",
+    "RAISE_TIME_HAS_PASSED_EVENT_SCHEDULE": "*/10 * * * * *",
+    "MESSAGEHUB_STORAGE_CONNECTION_STRING": "<MessageHub Storage Account connection string>",
+    "MESSAGEHUB_STORAGE_CONTAINER_NAME": "<MessageHub Storage Account container name>",
+    "MESSAGEHUB_QUEUE_CONNECTION_STRING": "<PostOffice Service Bus connection string>",
+    "MESSAGEHUB_DATA_AVAILABLE_QUEUE": "<MessageHub Data Available Queue name>",
+    "MESSAGEHUB_DOMAIN_REPLY_QUEUE": "<MessageHub Domain Reply Queue name>",
+    "MESSAGE_REQUEST_QUEUE" : "<Queue for post office to request bundle>"
+  }
+}

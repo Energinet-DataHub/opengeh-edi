@@ -42,9 +42,9 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
         private readonly EnergySupplier _newEnergySupplier;
         private readonly Consumer _consumer;
         private readonly IMediator _mediator;
+        private readonly string _glnNumber = "7495563456235";
 
         private Transaction _transaction = CreateTransaction();
-        private string _glnNumber = "7495563456235";
 
         public ChangeSupplierTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
@@ -64,7 +64,7 @@ namespace Energinet.DataHub.MarketRoles.IntegrationTests.Application.ChangeOfSup
             var command = new ChangeSupplier(_accountingPoint.Id.Value, _transaction.Value);
             await GetService<IMediator>().Send(command, CancellationToken.None).ConfigureAwait(false);
 
-            string query = @"SELECT Count(1) FROM SupplierRegistrations WHERE AccountingPointId = @AccountingPointId AND StartOfSupplyDate IS NOT NULL AND EndOfSupplyDate IS NULL";
+            var query = @"SELECT Count(1) FROM SupplierRegistrations WHERE AccountingPointId = @AccountingPointId AND StartOfSupplyDate IS NOT NULL AND EndOfSupplyDate IS NULL";
             await using var sqlCommand = new SqlCommand(query, GetSqlDbConnection());
 
             sqlCommand.Parameters.Add(new SqlParameter("@AccountingPointId", _accountingPoint.Id.Value));
