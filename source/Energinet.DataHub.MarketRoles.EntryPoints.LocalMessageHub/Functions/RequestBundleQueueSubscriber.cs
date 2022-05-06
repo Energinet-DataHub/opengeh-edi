@@ -13,11 +13,11 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
-using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
 using Energinet.DataHub.MarketRoles.Messaging;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using Processing.Infrastructure.Correlation;
+using Processing.Infrastructure.DataAccess;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.LocalMessageHub.Functions
 {

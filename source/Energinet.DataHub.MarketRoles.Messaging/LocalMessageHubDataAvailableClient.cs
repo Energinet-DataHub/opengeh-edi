@@ -13,10 +13,10 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
-using Energinet.DataHub.MarketRoles.Infrastructure.EDI;
-using Energinet.DataHub.MarketRoles.Infrastructure.LocalMessageHub;
 using Energinet.DataHub.MessageHub.Model.Model;
+using Processing.Infrastructure.Correlation;
+using Processing.Infrastructure.EDI;
+using Processing.Infrastructure.LocalMessageHub;
 
 namespace Energinet.DataHub.MarketRoles.Messaging
 {

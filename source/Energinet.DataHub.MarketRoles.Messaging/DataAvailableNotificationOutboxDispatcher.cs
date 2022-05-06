@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketRoles.Infrastructure.LocalMessageHub;
-using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
+using Processing.Infrastructure.LocalMessageHub;
+using Processing.Infrastructure.Outbox;
 
 namespace Energinet.DataHub.MarketRoles.Messaging
 {

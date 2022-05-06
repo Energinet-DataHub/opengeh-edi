@@ -17,12 +17,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
-using Energinet.DataHub.MarketRoles.Infrastructure.LocalMessageHub;
 using Energinet.DataHub.MarketRoles.Messaging.Bundling;
 using Energinet.DataHub.MessageHub.Client.Storage;
 using Energinet.DataHub.MessageHub.Model.Dequeue;
 using Energinet.DataHub.MessageHub.Model.Peek;
+using Processing.Domain.SeedWork;
+using Processing.Infrastructure.LocalMessageHub;
 
 namespace Energinet.DataHub.MarketRoles.Messaging
 {

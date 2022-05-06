@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using Energinet.DataHub.MarketRoles.Infrastructure.LocalMessageHub;
 using MediatR;
+using Processing.Infrastructure.LocalMessageHub;
 
 namespace Energinet.DataHub.MarketRoles.Messaging.Bundling
 {

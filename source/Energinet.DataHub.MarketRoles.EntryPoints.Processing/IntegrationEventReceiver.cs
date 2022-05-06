@@ -17,11 +17,11 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Infrastructure.Integration.Notifications;
-using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
-using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using Processing.Infrastructure.Integration.Notifications;
+using Processing.Infrastructure.Serialization;
+using Processing.Infrastructure.Transport.Protobuf;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Processing
 {

@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.MessageHub.Bundling;
-using Energinet.DataHub.MarketRoles.Infrastructure.EDI.GenericNotification;
-using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
+using Processing.Infrastructure.DataAccess.MessageHub.Bundling;
+using Processing.Infrastructure.EDI.GenericNotification;
+using Processing.Infrastructure.Serialization;
 
 namespace Energinet.DataHub.MarketRoles.Messaging.Bundling.Generic
 {

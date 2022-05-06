@@ -15,16 +15,15 @@
 using System;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MarketRoles.EntryPoints.Common;
-using Energinet.DataHub.MarketRoles.Infrastructure;
-using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
-using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChange;
-using Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands;
-using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf.Integration;
 using Energinet.DataHub.MarketRoles.IntegrationEventContracts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Processing.Domain.SeedWork;
+using Processing.Infrastructure;
+using Processing.Infrastructure.DataAccess;
+using Processing.Infrastructure.InternalCommands;
+using Processing.Infrastructure.Transport.Protobuf.Integration;
 using SimpleInjector;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.InternalCommandDispatcher

@@ -15,10 +15,10 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Infrastructure.Integration.Helpers;
-using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
-using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
 using MediatR;
+using Processing.Infrastructure.Integration.Helpers;
+using Processing.Infrastructure.Outbox;
+using Processing.Infrastructure.Serialization;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox.Common
 {

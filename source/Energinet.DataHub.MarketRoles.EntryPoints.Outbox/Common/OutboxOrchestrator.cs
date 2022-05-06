@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess;
-using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
+using Processing.Infrastructure.DataAccess;
+using Processing.Infrastructure.Outbox;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox.Common
 {

@@ -16,8 +16,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Infrastructure.LocalMessageHub;
 using MediatR;
+using Processing.Infrastructure.LocalMessageHub;
 
 namespace Energinet.DataHub.MarketRoles.Messaging.Bundling
 {

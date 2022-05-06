@@ -17,10 +17,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.MessageHub.Bundling;
-using Energinet.DataHub.MarketRoles.Infrastructure.LocalMessageHub;
-using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
 using MediatR;
+using Processing.Infrastructure.DataAccess.MessageHub.Bundling;
+using Processing.Infrastructure.LocalMessageHub;
+using Processing.Infrastructure.Serialization;
 
 namespace Energinet.DataHub.MarketRoles.Messaging.Bundling
 {
