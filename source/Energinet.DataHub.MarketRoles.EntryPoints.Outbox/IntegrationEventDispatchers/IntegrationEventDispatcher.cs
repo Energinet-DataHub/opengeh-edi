@@ -15,12 +15,12 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.MarketRoles.Application.Common.Transport;
 using Energinet.DataHub.MarketRoles.EntryPoints.Outbox.Common;
-using Energinet.DataHub.MarketRoles.Infrastructure.Integration;
-using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
 using Google.Protobuf;
 using MediatR;
+using Processing.Application.Common.Transport;
+using Processing.Infrastructure.Integration;
+using Processing.Infrastructure.Transport.Protobuf;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox.IntegrationEventDispatchers
 {

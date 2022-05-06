@@ -11,19 +11,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energinet.DataHub.MarketRol
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EntryPoints", "EntryPoints", "{FD29AEE1-CB22-41FD-A875-1E99C4D5D81C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energinet.DataHub.MarketRoles.Application", "Energinet.DataHub.MarketRoles.Application\Energinet.DataHub.MarketRoles.Application.csproj", "{A39FBB1C-52A5-4197-853E-2F97A475C111}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Processing.Application", "Processing.Application\Processing.Application.csproj", "{A39FBB1C-52A5-4197-853E-2F97A475C111}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{1E0CD798-F373-475B-AF45-93D02A1D7D2C}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energinet.DataHub.MarketRoles.Tests", "Energinet.DataHub.MarketRoles.Tests\Energinet.DataHub.MarketRoles.Tests.csproj", "{4D32E38C-3001-43F5-824E-C271685521F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Processing.Tests", "Processing.Tests\Processing.Tests.csproj", "{4D32E38C-3001-43F5-824E-C271685521F0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energinet.DataHub.MarketRoles.EntryPoints.Common", "Energinet.DataHub.MarketRoles.EntryPoints.Common\Energinet.DataHub.MarketRoles.EntryPoints.Common.csproj", "{CAD21241-8CA0-4E1E-BE4C-7C2F902B138F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energinet.DataHub.MarketRoles.Infrastructure", "Energinet.DataHub.MarketRoles.Infrastructure\Energinet.DataHub.MarketRoles.Infrastructure.csproj", "{79DE71D0-7AA6-4B96-AB44-85F4C621608E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Processing.Infrastructure", "Processing.Infrastructure\Processing.Infrastructure.csproj", "{79DE71D0-7AA6-4B96-AB44-85F4C621608E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energinet.DataHub.MarketRoles.IntegrationTests", "Energinet.DataHub.MarketRoles.IntegrationTests\Energinet.DataHub.MarketRoles.IntegrationTests.csproj", "{3801DF77-3A40-460C-9529-7AD9422037B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Processing.IntegrationTests", "Processing.IntegrationTests\Processing.IntegrationTests.csproj", "{3801DF77-3A40-460C-9529-7AD9422037B0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energinet.DataHub.MarketRoles.Domain", "Energinet.DataHub.MarketRoles.Domain\Energinet.DataHub.MarketRoles.Domain.csproj", "{87D55C95-0790-42A1-B543-AF27BF2E0950}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Processing.Domain", "Processing.Domain\Processing.Domain.csproj", "{87D55C95-0790-42A1-B543-AF27BF2E0950}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp", "Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp\Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.csproj", "{2B806039-5BCF-4768-95FE-56778403E64D}"
 EndProject
@@ -50,6 +48,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Messaging.ArchitectureTests", "Messaging.ArchitectureTests\Messaging.ArchitectureTests.csproj", "{D0C39286-C7BE-4714-8CA1-5654B68A9529}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Messaging.Tests", "Messaging.Tests\Messaging.Tests.csproj", "{87BCDB76-76A4-46A3-9F67-571847541C90}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BusinessProcessing", "BusinessProcessing", "{582BFE4E-BBFB-4CBE-840D-2F97C2BA1D3C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -149,9 +149,7 @@ Global
 		{1A274305-4886-43D0-8A1C-D249DAEEC028} = {FD29AEE1-CB22-41FD-A875-1E99C4D5D81C}
 		{654DA496-60D8-47D8-923E-F24F71A31F84} = {FD29AEE1-CB22-41FD-A875-1E99C4D5D81C}
 		{883CEA94-E42C-44B9-83C1-104998502B74} = {FD29AEE1-CB22-41FD-A875-1E99C4D5D81C}
-		{4D32E38C-3001-43F5-824E-C271685521F0} = {1E0CD798-F373-475B-AF45-93D02A1D7D2C}
 		{CAD21241-8CA0-4E1E-BE4C-7C2F902B138F} = {FD29AEE1-CB22-41FD-A875-1E99C4D5D81C}
-		{3801DF77-3A40-460C-9529-7AD9422037B0} = {1E0CD798-F373-475B-AF45-93D02A1D7D2C}
 		{A49C8517-149C-4E72-9A6C-99878151589E} = {FD29AEE1-CB22-41FD-A875-1E99C4D5D81C}
 		{B631AE9E-A349-4CEE-8440-A54AE8272B26} = {FD29AEE1-CB22-41FD-A875-1E99C4D5D81C}
 		{0B8E940E-A2CE-458B-BB51-C12050D91360} = {1C877C68-8E3D-4371-B96A-7360850A538E}
@@ -162,6 +160,11 @@ Global
 		{8B1DCD6E-013F-4B45-B9EB-167F1D874793} = {1C877C68-8E3D-4371-B96A-7360850A538E}
 		{D0C39286-C7BE-4714-8CA1-5654B68A9529} = {1C877C68-8E3D-4371-B96A-7360850A538E}
 		{87BCDB76-76A4-46A3-9F67-571847541C90} = {1C877C68-8E3D-4371-B96A-7360850A538E}
+		{A39FBB1C-52A5-4197-853E-2F97A475C111} = {582BFE4E-BBFB-4CBE-840D-2F97C2BA1D3C}
+		{87D55C95-0790-42A1-B543-AF27BF2E0950} = {582BFE4E-BBFB-4CBE-840D-2F97C2BA1D3C}
+		{79DE71D0-7AA6-4B96-AB44-85F4C621608E} = {582BFE4E-BBFB-4CBE-840D-2F97C2BA1D3C}
+		{4D32E38C-3001-43F5-824E-C271685521F0} = {582BFE4E-BBFB-4CBE-840D-2F97C2BA1D3C}
+		{3801DF77-3A40-460C-9529-7AD9422037B0} = {582BFE4E-BBFB-4CBE-840D-2F97C2BA1D3C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D7925810-FA85-4F9E-A124-72F36BAEB9F0}

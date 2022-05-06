@@ -16,10 +16,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
-using Energinet.DataHub.MarketRoles.Infrastructure.DataAccess.MessageHub.Bundling;
-using Energinet.DataHub.MarketRoles.Infrastructure.EDI.Acknowledgements;
-using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
 using Energinet.DataHub.MarketRoles.Messaging.Bundling.Xml;
+using Processing.Infrastructure.DataAccess.MessageHub.Bundling;
+using Processing.Infrastructure.EDI.Acknowledgements;
+using Processing.Infrastructure.Serialization;
 
 namespace Energinet.DataHub.MarketRoles.Messaging.Bundling.Confirm
 {

@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
-using Energinet.DataHub.MarketRoles.Infrastructure.EDI;
-using Energinet.DataHub.MarketRoles.Infrastructure.LocalMessageHub;
+using Processing.Domain.SeedWork;
+using Processing.Infrastructure.EDI;
+using Processing.Infrastructure.LocalMessageHub;
 
 namespace Energinet.DataHub.MarketRoles.Messaging
 {

@@ -19,8 +19,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Messaging.Application.Common;
+using Processing.Domain.SeedWork;
 
 namespace Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier
 {

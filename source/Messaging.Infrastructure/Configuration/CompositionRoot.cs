@@ -15,7 +15,6 @@
 using System;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MessageHub.Client;
 using Energinet.DataHub.MessageHub.Client.DataAvailable;
 using Energinet.DataHub.MessageHub.Client.Factories;
@@ -46,6 +45,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Processing.Domain.SeedWork;
 
 namespace Messaging.Infrastructure.Configuration
 {

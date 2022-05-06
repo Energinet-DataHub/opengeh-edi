@@ -14,10 +14,10 @@
 
 using System;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Infrastructure.Messaging.Idempotency;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;
+using Processing.Infrastructure.Messaging.Idempotency;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Processing
 {

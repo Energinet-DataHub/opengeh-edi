@@ -14,10 +14,10 @@
 
 using System;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
-using Energinet.DataHub.MarketRoles.Infrastructure.Outbox;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
+using Processing.Infrastructure.Correlation;
+using Processing.Infrastructure.Outbox;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox.Common
 {

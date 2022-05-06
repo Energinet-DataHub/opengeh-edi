@@ -13,11 +13,11 @@
 // limitations under the License.
 
 using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.MarketRoles.Domain.MeteringPoints.Events;
 using Energinet.DataHub.MarketRoles.EntryPoints.Outbox.Common;
-using Energinet.DataHub.MarketRoles.Infrastructure.Integration;
-using Energinet.DataHub.MarketRoles.Infrastructure.Integration.IntegrationEvents.EnergySupplierChange;
-using Energinet.DataHub.MarketRoles.Infrastructure.Transport.Protobuf;
+using Processing.Domain.MeteringPoints.Events;
+using Processing.Infrastructure.Integration;
+using Processing.Infrastructure.Integration.IntegrationEvents.EnergySupplierChange;
+using Processing.Infrastructure.Transport.Protobuf;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox.IntegrationEventDispatchers
 {

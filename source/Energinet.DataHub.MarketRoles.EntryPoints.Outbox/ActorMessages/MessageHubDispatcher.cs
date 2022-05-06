@@ -15,9 +15,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Infrastructure.EDI;
 using Energinet.DataHub.MarketRoles.Messaging;
 using MediatR;
+using Processing.Infrastructure.EDI;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Outbox.ActorMessages
 {

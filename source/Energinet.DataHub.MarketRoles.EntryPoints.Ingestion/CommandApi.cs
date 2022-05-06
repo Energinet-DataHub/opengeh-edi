@@ -17,14 +17,14 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Application.Common;
-using Energinet.DataHub.MarketRoles.Application.Common.Transport;
-using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
-using Energinet.DataHub.MarketRoles.Infrastructure.EDI.XmlConverter;
-using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
+using Processing.Application.Common;
+using Processing.Application.Common.Transport;
+using Processing.Infrastructure.Correlation;
+using Processing.Infrastructure.EDI.XmlConverter;
+using Processing.Infrastructure.Transport;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
 {

@@ -14,9 +14,9 @@
 
 using System;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Infrastructure.InternalCommands;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using Processing.Infrastructure.InternalCommands;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.InternalCommandDispatcher
 {

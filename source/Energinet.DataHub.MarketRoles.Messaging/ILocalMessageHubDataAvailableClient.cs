@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Infrastructure.EDI;
+using Processing.Infrastructure.EDI;
 
 namespace Energinet.DataHub.MarketRoles.Messaging
 {

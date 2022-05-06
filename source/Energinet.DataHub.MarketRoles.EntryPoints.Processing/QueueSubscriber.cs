@@ -13,11 +13,11 @@
 // limitations under the License.
 using System;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
-using Energinet.DataHub.MarketRoles.Infrastructure.Transport;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using Processing.Infrastructure.Correlation;
+using Processing.Infrastructure.Transport;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Processing
 {
