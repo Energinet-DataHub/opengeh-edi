@@ -5,8 +5,6 @@ VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energinet.DataHub.MarketRoles.EntryPoints.Processing", "Energinet.DataHub.MarketRoles.EntryPoints.Processing\Energinet.DataHub.MarketRoles.EntryPoints.Processing.csproj", "{1A274305-4886-43D0-8A1C-D249DAEEC028}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energinet.DataHub.MarketRoles.EntryPoints.Ingestion", "Energinet.DataHub.MarketRoles.EntryPoints.Ingestion\Energinet.DataHub.MarketRoles.EntryPoints.Ingestion.csproj", "{654DA496-60D8-47D8-923E-F24F71A31F84}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energinet.DataHub.MarketRoles.EntryPoints.Outbox", "Energinet.DataHub.MarketRoles.EntryPoints.Outbox\Energinet.DataHub.MarketRoles.EntryPoints.Outbox.csproj", "{883CEA94-E42C-44B9-83C1-104998502B74}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EntryPoints", "EntryPoints", "{FD29AEE1-CB22-41FD-A875-1E99C4D5D81C}"
@@ -61,10 +59,6 @@ Global
 		{1A274305-4886-43D0-8A1C-D249DAEEC028}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1A274305-4886-43D0-8A1C-D249DAEEC028}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1A274305-4886-43D0-8A1C-D249DAEEC028}.Release|Any CPU.Build.0 = Release|Any CPU
-		{654DA496-60D8-47D8-923E-F24F71A31F84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{654DA496-60D8-47D8-923E-F24F71A31F84}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{654DA496-60D8-47D8-923E-F24F71A31F84}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{654DA496-60D8-47D8-923E-F24F71A31F84}.Release|Any CPU.Build.0 = Release|Any CPU
 		{883CEA94-E42C-44B9-83C1-104998502B74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{883CEA94-E42C-44B9-83C1-104998502B74}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{883CEA94-E42C-44B9-83C1-104998502B74}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -147,7 +141,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{1A274305-4886-43D0-8A1C-D249DAEEC028} = {FD29AEE1-CB22-41FD-A875-1E99C4D5D81C}
-		{654DA496-60D8-47D8-923E-F24F71A31F84} = {FD29AEE1-CB22-41FD-A875-1E99C4D5D81C}
 		{883CEA94-E42C-44B9-83C1-104998502B74} = {FD29AEE1-CB22-41FD-A875-1E99C4D5D81C}
 		{4D32E38C-3001-43F5-824E-C271685521F0} = {1E0CD798-F373-475B-AF45-93D02A1D7D2C}
 		{CAD21241-8CA0-4E1E-BE4C-7C2F902B138F} = {FD29AEE1-CB22-41FD-A875-1E99C4D5D81C}
