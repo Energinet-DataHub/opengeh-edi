@@ -5,10 +5,6 @@ VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energinet.DataHub.MarketRoles.EntryPoints.Processing", "Energinet.DataHub.MarketRoles.EntryPoints.Processing\Energinet.DataHub.MarketRoles.EntryPoints.Processing.csproj", "{1A274305-4886-43D0-8A1C-D249DAEEC028}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energinet.DataHub.MarketRoles.EntryPoints.Ingestion", "Energinet.DataHub.MarketRoles.EntryPoints.Ingestion\Energinet.DataHub.MarketRoles.EntryPoints.Ingestion.csproj", "{654DA496-60D8-47D8-923E-F24F71A31F84}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energinet.DataHub.MarketRoles.EntryPoints.Outbox", "Energinet.DataHub.MarketRoles.EntryPoints.Outbox\Energinet.DataHub.MarketRoles.EntryPoints.Outbox.csproj", "{883CEA94-E42C-44B9-83C1-104998502B74}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EntryPoints", "EntryPoints", "{FD29AEE1-CB22-41FD-A875-1E99C4D5D81C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Processing.Application", "Processing.Application\Processing.Application.csproj", "{A39FBB1C-52A5-4197-853E-2F97A475C111}"
@@ -24,10 +20,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Processing.Domain", "Processing.Domain\Processing.Domain.csproj", "{87D55C95-0790-42A1-B543-AF27BF2E0950}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp", "Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp\Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.csproj", "{2B806039-5BCF-4768-95FE-56778403E64D}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energinet.DataHub.MarketRoles.EntryPoints.InternalCommandDispatcher", "Energinet.DataHub.MarketRoles.EntryPoints.InternalCommandDispatcher\Energinet.DataHub.MarketRoles.EntryPoints.InternalCommandDispatcher.csproj", "{A49C8517-149C-4E72-9A6C-99878151589E}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energinet.DataHub.MarketRoles.EntryPoints.LocalMessageHub", "Energinet.DataHub.MarketRoles.EntryPoints.LocalMessageHub\Energinet.DataHub.MarketRoles.EntryPoints.LocalMessageHub.csproj", "{B631AE9E-A349-4CEE-8440-A54AE8272B26}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energinet.DataHub.MarketRoles.Messaging", "Energinet.DataHub.MarketRoles.Messaging\Energinet.DataHub.MarketRoles.Messaging.csproj", "{2AC3F815-7722-42F8-9348-72CFEDCB81EE}"
 EndProject
@@ -61,14 +53,6 @@ Global
 		{1A274305-4886-43D0-8A1C-D249DAEEC028}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1A274305-4886-43D0-8A1C-D249DAEEC028}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1A274305-4886-43D0-8A1C-D249DAEEC028}.Release|Any CPU.Build.0 = Release|Any CPU
-		{654DA496-60D8-47D8-923E-F24F71A31F84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{654DA496-60D8-47D8-923E-F24F71A31F84}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{654DA496-60D8-47D8-923E-F24F71A31F84}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{654DA496-60D8-47D8-923E-F24F71A31F84}.Release|Any CPU.Build.0 = Release|Any CPU
-		{883CEA94-E42C-44B9-83C1-104998502B74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{883CEA94-E42C-44B9-83C1-104998502B74}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{883CEA94-E42C-44B9-83C1-104998502B74}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{883CEA94-E42C-44B9-83C1-104998502B74}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A39FBB1C-52A5-4197-853E-2F97A475C111}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A39FBB1C-52A5-4197-853E-2F97A475C111}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A39FBB1C-52A5-4197-853E-2F97A475C111}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -97,14 +81,6 @@ Global
 		{2B806039-5BCF-4768-95FE-56778403E64D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B806039-5BCF-4768-95FE-56778403E64D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B806039-5BCF-4768-95FE-56778403E64D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A49C8517-149C-4E72-9A6C-99878151589E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A49C8517-149C-4E72-9A6C-99878151589E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A49C8517-149C-4E72-9A6C-99878151589E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A49C8517-149C-4E72-9A6C-99878151589E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B631AE9E-A349-4CEE-8440-A54AE8272B26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B631AE9E-A349-4CEE-8440-A54AE8272B26}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B631AE9E-A349-4CEE-8440-A54AE8272B26}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B631AE9E-A349-4CEE-8440-A54AE8272B26}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2AC3F815-7722-42F8-9348-72CFEDCB81EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2AC3F815-7722-42F8-9348-72CFEDCB81EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2AC3F815-7722-42F8-9348-72CFEDCB81EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -147,11 +123,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{1A274305-4886-43D0-8A1C-D249DAEEC028} = {FD29AEE1-CB22-41FD-A875-1E99C4D5D81C}
-		{654DA496-60D8-47D8-923E-F24F71A31F84} = {FD29AEE1-CB22-41FD-A875-1E99C4D5D81C}
-		{883CEA94-E42C-44B9-83C1-104998502B74} = {FD29AEE1-CB22-41FD-A875-1E99C4D5D81C}
 		{CAD21241-8CA0-4E1E-BE4C-7C2F902B138F} = {FD29AEE1-CB22-41FD-A875-1E99C4D5D81C}
-		{A49C8517-149C-4E72-9A6C-99878151589E} = {FD29AEE1-CB22-41FD-A875-1E99C4D5D81C}
-		{B631AE9E-A349-4CEE-8440-A54AE8272B26} = {FD29AEE1-CB22-41FD-A875-1E99C4D5D81C}
 		{0B8E940E-A2CE-458B-BB51-C12050D91360} = {1C877C68-8E3D-4371-B96A-7360850A538E}
 		{27395443-B503-4A4A-B9F1-01C3F9C75222} = {1C877C68-8E3D-4371-B96A-7360850A538E}
 		{B14EBA74-CCAF-4677-8AE5-A0F6302ED54C} = {1C877C68-8E3D-4371-B96A-7360850A538E}
@@ -163,8 +135,8 @@ Global
 		{A39FBB1C-52A5-4197-853E-2F97A475C111} = {582BFE4E-BBFB-4CBE-840D-2F97C2BA1D3C}
 		{87D55C95-0790-42A1-B543-AF27BF2E0950} = {582BFE4E-BBFB-4CBE-840D-2F97C2BA1D3C}
 		{79DE71D0-7AA6-4B96-AB44-85F4C621608E} = {582BFE4E-BBFB-4CBE-840D-2F97C2BA1D3C}
-		{4D32E38C-3001-43F5-824E-C271685521F0} = {582BFE4E-BBFB-4CBE-840D-2F97C2BA1D3C}
 		{3801DF77-3A40-460C-9529-7AD9422037B0} = {582BFE4E-BBFB-4CBE-840D-2F97C2BA1D3C}
+		{4D32E38C-3001-43F5-824E-C271685521F0} = {582BFE4E-BBFB-4CBE-840D-2F97C2BA1D3C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D7925810-FA85-4F9E-A124-72F36BAEB9F0}
