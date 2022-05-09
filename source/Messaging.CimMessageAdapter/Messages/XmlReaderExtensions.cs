@@ -94,17 +94,4 @@ internal static class XmlReaderExtensions
         while (await reader.ReadAsync().ConfigureAwait(false))
         { }
     }
-
-    internal class RootElement
-    {
-        internal RootElement(string rootElementName, string defaultNamespace)
-        {
-            RootElementName = rootElementName;
-            DefaultNamespace = defaultNamespace;
-        }
-
-        public string RootElementName { get; }
-
-        public string DefaultNamespace { get; }
-    }
 }

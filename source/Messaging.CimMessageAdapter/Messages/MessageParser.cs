@@ -82,7 +82,7 @@ namespace Messaging.CimMessageAdapter.Messages
 
         private static async IAsyncEnumerable<MarketActivityRecord> MarketActivityRecordsFromAsync(
             XmlReader reader,
-            XmlReaderExtensions.RootElement rootElement)
+            RootElement rootElement)
         {
             var id = string.Empty;
             var marketEvaluationPointId = string.Empty;
@@ -157,7 +157,7 @@ namespace Messaging.CimMessageAdapter.Messages
 
         private static async Task<MessageHeader> ExtractMessageHeaderAsync(
             XmlReader reader,
-            XmlReaderExtensions.RootElement rootElement)
+            RootElement rootElement)
         {
             var messageId = string.Empty;
             var processType = string.Empty;
