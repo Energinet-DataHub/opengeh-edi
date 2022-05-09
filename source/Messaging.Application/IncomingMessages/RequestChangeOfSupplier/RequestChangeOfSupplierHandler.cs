@@ -81,15 +81,11 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
                 transactionId,
                 incomingMessage.MarketActivityRecord.MarketEvaluationPointId);
 
-            return new OutgoingMessage(
-                "ConfirmRequestChangeOfSupplier",
-                incomingMessage.Message.SenderId,
-                _correlationContext.Id,
+            return CreateOutgoingMessage(
                 incomingMessage.Id,
+                "ConfirmRequestChangeOfSupplier",
                 incomingMessage.Message.ProcessType,
-                incomingMessage.Message.SenderRole,
-                incomingMessage.Message.ReceiverId,
-                incomingMessage.Message.ReceiverRole,
+                incomingMessage.Message.SenderId,
                 _marketActivityRecordParser.From(marketActivityRecord));
         }
 
@@ -102,16 +98,26 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
                 incomingMessage.MarketActivityRecord.MarketEvaluationPointId,
                 businessRequestResult.ValidationErrors.Select(validationError => new Reason(validationError.Message, validationError.Code)));
 
-            return new OutgoingMessage(
-                "RejectRequestChangeOfSupplier",
-                incomingMessage.Message.SenderId,
-                _correlationContext.Id,
+            return CreateOutgoingMessage(
                 incomingMessage.Id,
+                "RejectRequestChangeOfSupplier",
                 incomingMessage.Message.ProcessType,
-                incomingMessage.Message.SenderRole,
-                incomingMessage.Message.ReceiverId,
-                incomingMessage.Message.ReceiverRole,
+                incomingMessage.Message.SenderId,
                 _marketActivityRecordParser.From(marketActivityRecord));
+        }
+
+        private OutgoingMessage CreateOutgoingMessage(string id, string documentType, string processType, string receiverId, string marketActivityRecordPayload)
+        {
+            return new OutgoingMessage(
+                documentType,
+                receiverId,
+                _correlationContext.Id,
+                id,
+                processType,
+                MarketRoles.EnergySupplier,
+                DataHubDetails.IdentificationNumber,
+                MarketRoles.MeteringPointAdministrator,
+                marketActivityRecordPayload);
         }
     }
 }
