@@ -52,6 +52,10 @@ limitations under the License.
       <EmbeddedResource Include="Xml\SchemaStore\Schemas\urn-entsoe-eu-wgedi-codelists.xsd">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
+      <None Remove="Xml\SchemaStore\Schemas\urn-ediel-org-structure-rejectrequestchangeofsupplier-0-1.xsd" />
+      <EmbeddedResource Include="Xml\SchemaStore\Schemas\urn-ediel-org-structure-rejectrequestchangeofsupplier-0-1.xsd">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
     </ItemGroup>
 
 </Project>

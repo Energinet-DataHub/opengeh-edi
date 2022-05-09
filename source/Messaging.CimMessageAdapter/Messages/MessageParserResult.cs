@@ -14,6 +14,7 @@
 
 using System.Collections.Generic;
 using Messaging.Application.IncomingMessages;
+using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.CimMessageAdapter.Errors;
 
 namespace Messaging.CimMessageAdapter.Messages

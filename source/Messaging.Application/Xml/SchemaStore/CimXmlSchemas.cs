@@ -31,6 +31,10 @@ namespace Messaging.Application.Xml.SchemaStore
                     new KeyValuePair<string, string>("confirmrequestchangeofsupplier", "1.0"),
                     SchemaPath + "urn-ediel-org-structure-confirmrequestchangeofsupplier-0-1.xsd"
                 },
+                {
+                    new KeyValuePair<string, string>("rejectrequestchangeofsupplier", "1.0"),
+                    SchemaPath + "urn-ediel-org-structure-rejectrequestchangeofsupplier-0-1.xsd"
+                },
             };
         }
 

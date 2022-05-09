@@ -12,22 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Application.IncomingMessages
+namespace Messaging.Application.Common;
+
+public class DocumentDetails
 {
-    public class MarketActivityRecord
+    public DocumentDetails(string type, string schemaLocation, string xmlNamespace, string prefix)
     {
-        public string Id { get; init; } = string.Empty;
-
-        public string? ConsumerId { get; init; }
-
-        public string? BalanceResponsibleId { get; init; }
-
-        public string? EnergySupplierId { get; init; }
-
-        public string MarketEvaluationPointId { get; init; } = string.Empty;
-
-        public string? ConsumerName { get; init; }
-
-        public string EffectiveDate { get; init; } = string.Empty;
+        Type = type;
+        SchemaLocation = schemaLocation;
+        XmlNamespace = xmlNamespace;
+        Prefix = prefix;
     }
+
+    public string Type { get; }
+
+    public string SchemaLocation { get; }
+
+    public string XmlNamespace { get; }
+
+    public string Prefix { get; }
 }

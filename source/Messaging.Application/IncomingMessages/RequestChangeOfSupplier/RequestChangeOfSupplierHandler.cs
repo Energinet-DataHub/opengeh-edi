@@ -13,16 +13,19 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Messaging.Application.Common;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages;
+using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Application.Transactions;
+using Messaging.Application.Transactions.MoveIn;
 
-namespace Messaging.Application.IncomingMessages
+namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
 {
-    public class IncomingMessageHandler
+    public class RequestChangeOfSupplierHandler
     {
         private readonly ITransactionRepository _transactionRepository;
         private readonly IOutgoingMessageStore _outgoingMessageStore;
@@ -30,7 +33,7 @@ namespace Messaging.Application.IncomingMessages
         private readonly ICorrelationContext _correlationContext;
         private readonly IMarketActivityRecordParser _marketActivityRecordParser;
 
-        public IncomingMessageHandler(
+        public RequestChangeOfSupplierHandler(
             ITransactionRepository transactionRepository,
             IOutgoingMessageStore outgoingMessageStore,
             IUnitOfWork unitOfWork,
@@ -44,20 +47,41 @@ namespace Messaging.Application.IncomingMessages
             _marketActivityRecordParser = marketActivityRecordParser;
         }
 
-        public Task HandleAsync(IncomingMessage incomingMessage)
+        public async Task HandleAsync(IncomingMessage incomingMessage)
         {
             if (incomingMessage == null) throw new ArgumentNullException(nameof(incomingMessage));
 
             var acceptedTransaction = new AcceptedTransaction(incomingMessage.MarketActivityRecord.Id);
             _transactionRepository.Add(acceptedTransaction);
 
+            var businessProcessResult = await InvokeBusinessProcessAsync(incomingMessage).ConfigureAwait(false);
+            if (businessProcessResult.Success == false)
+            {
+                _outgoingMessageStore.Add(RejectMessageFrom(incomingMessage, acceptedTransaction.TransactionId, businessProcessResult));
+            }
+            else
+            {
+                _outgoingMessageStore.Add(ConfirmMessageFrom(incomingMessage, acceptedTransaction.TransactionId));
+            }
+
+            await _unitOfWork.CommitAsync().ConfigureAwait(false);
+        }
+
+        private static Task<BusinessRequestResult> InvokeBusinessProcessAsync(IncomingMessage incomingMessage)
+        {
+            var businessProcess = new MoveInRequest(incomingMessage.MarketActivityRecord.ConsumerName);
+            return MoveInRequestHandler.InvokeAsync(businessProcess);
+        }
+
+        private OutgoingMessage ConfirmMessageFrom(IncomingMessage incomingMessage, string transactionId)
+        {
             var messageId = Guid.NewGuid();
             var marketActivityRecord = new OutgoingMessages.ConfirmRequestChangeOfSupplier.MarketActivityRecord(
                 messageId.ToString(),
-                acceptedTransaction.TransactionId,
+                transactionId,
                 incomingMessage.MarketActivityRecord.MarketEvaluationPointId);
 
-            var outgoingMessage = new OutgoingMessage(
+            return new OutgoingMessage(
                 "ConfirmRequestChangeOfSupplier",
                 incomingMessage.Message.SenderId,
                 _correlationContext.Id,
@@ -67,9 +91,27 @@ namespace Messaging.Application.IncomingMessages
                 incomingMessage.Message.ReceiverId,
                 incomingMessage.Message.ReceiverRole,
                 _marketActivityRecordParser.From(marketActivityRecord));
-            _outgoingMessageStore.Add(outgoingMessage);
+        }
 
-            return _unitOfWork.CommitAsync();
+        private OutgoingMessage RejectMessageFrom(IncomingMessage incomingMessage, string transactionId, BusinessRequestResult businessRequestResult)
+        {
+            var messageId = Guid.NewGuid();
+            var marketActivityRecord = new OutgoingMessages.RejectRequestChangeOfSupplier.MarketActivityRecord(
+                messageId.ToString(),
+                transactionId,
+                incomingMessage.MarketActivityRecord.MarketEvaluationPointId,
+                businessRequestResult.ValidationErrors.Select(validationError => new Reason(validationError.Message, validationError.Code)));
+
+            return new OutgoingMessage(
+                "RejectRequestChangeOfSupplier",
+                incomingMessage.Message.SenderId,
+                _correlationContext.Id,
+                incomingMessage.Id,
+                incomingMessage.Message.ProcessType,
+                incomingMessage.Message.SenderRole,
+                incomingMessage.Message.ReceiverId,
+                incomingMessage.Message.ReceiverRole,
+                _marketActivityRecordParser.From(marketActivityRecord));
         }
     }
 }
