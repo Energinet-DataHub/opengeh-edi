@@ -155,43 +155,6 @@ namespace Messaging.CimMessageAdapter.Messages
             return marketActivityRecord;
         }
 
-        private static async Task MoveToEndOfMarketActivityRecordAsync(XmlReader reader)
-        {
-            while (await reader.ReadAsync().ConfigureAwait(false))
-            {
-                if (EndOfMarketActivityRecord(reader))
-                {
-                    break;
-                }
-            }
-        }
-
-        private static bool EndOfMarketActivityRecord(XmlReader reader)
-        {
-            return reader.NodeType == XmlNodeType.EndElement &&
-                   reader.LocalName.Equals(MarketActivityRecordElementName, StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static bool StartOfMessageHeader(XmlReader reader)
-        {
-            return reader.NodeType == XmlNodeType.Element &&
-                   reader.LocalName.Equals(HeaderElementName, StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static bool StartOfMarketActivityRecord(XmlReader reader)
-        {
-            return reader.NodeType == XmlNodeType.Element &&
-                   reader.LocalName.Equals(MarketActivityRecordElementName, StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static void TryExtractValueFrom(string elementName, XmlReader reader, Func<string, string> variable)
-        {
-            if (reader.LocalName.Equals(elementName, StringComparison.OrdinalIgnoreCase) && reader.NodeType == XmlNodeType.Element)
-            {
-                variable(reader.ReadElementString());
-            }
-        }
-
         private static async Task<MessageHeader> ExtractMessageHeaderAsync(
             XmlReader reader,
             XmlReaderExtensions.RootElement rootElement)
