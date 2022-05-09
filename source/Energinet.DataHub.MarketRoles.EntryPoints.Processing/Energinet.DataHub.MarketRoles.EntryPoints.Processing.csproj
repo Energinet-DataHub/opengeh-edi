@@ -55,7 +55,6 @@ limitations under the License.
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Messaging.CimMessageAdapter\Messaging.CimMessageAdapter.csproj" />
     <ProjectReference Include="..\Energinet.DataHub.MarketRoles.EntryPoints.Common\Energinet.DataHub.MarketRoles.EntryPoints.Common.csproj" />
     <ProjectReference Include="..\Processing.Infrastructure\Processing.Infrastructure.csproj" />
   </ItemGroup>
