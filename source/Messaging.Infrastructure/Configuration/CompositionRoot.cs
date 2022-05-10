@@ -26,12 +26,12 @@ using Messaging.Application.Common;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.IncomingMessages;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Application.Transactions;
+using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Xml.SchemaStore;
 using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Messages;
@@ -43,6 +43,7 @@ using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.IncomingMessages;
 using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.Infrastructure.Transactions;
+using Messaging.Infrastructure.Transactions.MoveIn;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -190,6 +191,12 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddTransient<INotificationHandler<TNotification>, TNotificationHandler>();
             _services.AddMediatR(typeof(TNotificationHandler));
 
+            return this;
+        }
+
+        public CompositionRoot AddMoveInRequestHandler(IMoveInRequestAdapter handler)
+        {
+            _services.AddScoped(_ => handler);
             return this;
         }
 

@@ -49,7 +49,8 @@ namespace Messaging.IntegrationTests
                 })
                 .AddMessagePublishing(_ => new NewMessageAvailableNotifierSpy())
                 .AddOutgoingMessageDispatcher(new MessageDispatcherSpy())
-                .AddRequestHandler<TestCommandHandler, TestCommand>();
+                .AddRequestHandler<TestCommandHandler, TestCommand>()
+                .AddMoveInRequestHandler(new MoveInRequestHandlerStub());
             _serviceProvider = services.BuildServiceProvider();
         }
 

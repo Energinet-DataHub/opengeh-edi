@@ -14,19 +14,20 @@
 
 using System;
 using System.Threading.Tasks;
+using Messaging.Application.Transactions;
+using Messaging.Application.Transactions.MoveIn;
 
-namespace Messaging.Application.Transactions.MoveIn;
-
-public static class MoveInRequestHandler
-{
-    public static Task<BusinessRequestResult> InvokeAsync(MoveInRequest request)
+namespace Messaging.Infrastructure.Transactions.MoveIn;
+public class MoveInRequestAdapter : IMoveInRequestAdapter
     {
-        if (request == null) throw new ArgumentNullException(nameof(request));
-        if (string.IsNullOrEmpty(request.ConsumerName))
+        public Task<BusinessRequestResult> InvokeAsync(MoveInRequest request)
         {
-            return Task.FromResult(BusinessRequestResult.Failure(new ValidationError("999", "somemessage")));
-        }
+            if (request == null) throw new ArgumentNullException(nameof(request));
+            if (string.IsNullOrEmpty(request.ConsumerName))
+            {
+                return Task.FromResult(BusinessRequestResult.Failure(new ValidationError("999", "somemessage")));
+            }
 
-        return Task.FromResult<BusinessRequestResult>(BusinessRequestResult.Succeeded());
+            return Task.FromResult(BusinessRequestResult.Succeeded());
+        }
     }
-}
