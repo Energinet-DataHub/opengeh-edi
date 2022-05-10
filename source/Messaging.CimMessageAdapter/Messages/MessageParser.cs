@@ -49,14 +49,15 @@ namespace Messaging.CimMessageAdapter.Messages
             {
                 try
                 {
-                    var messageHeader = await ExtractMessageHeaderAsync(reader).ConfigureAwait(false);
+                    var root = await reader.ReadRootElementAsync().ConfigureAwait(false);
+                    var messageHeader = await ExtractMessageHeaderAsync(reader, root).ConfigureAwait(false);
                     if (_errors.Count > 0)
                     {
                         return MessageParserResult.Failure(_errors.ToArray());
                     }
 
                     var marketActivityRecords = new List<MarketActivityRecord>();
-                    await foreach (var marketActivityRecord in MarketActivityRecordsFromAsync(reader))
+                    await foreach (var marketActivityRecord in MarketActivityRecordsFromAsync(reader, root))
                     {
                         marketActivityRecords.Add(marketActivityRecord);
                     }
@@ -79,7 +80,9 @@ namespace Messaging.CimMessageAdapter.Messages
             return MessageParserResult.Failure(InvalidMessageStructure.From(exception));
         }
 
-        private static async IAsyncEnumerable<MarketActivityRecord> MarketActivityRecordsFromAsync(XmlReader reader)
+        private static async IAsyncEnumerable<MarketActivityRecord> MarketActivityRecordsFromAsync(
+            XmlReader reader,
+            RootElement rootElement)
         {
             var id = string.Empty;
             var marketEvaluationPointId = string.Empty;
@@ -88,89 +91,73 @@ namespace Messaging.CimMessageAdapter.Messages
             var consumerId = string.Empty;
             var consumerName = string.Empty;
             var effectiveDate = string.Empty;
+            var ns = rootElement.DefaultNamespace;
 
-            while (await reader.ReadAsync().ConfigureAwait(false))
+            await reader.AdvanceToAsync(MarketActivityRecordElementName, ns).ConfigureAwait(false);
+
+            while (!reader.EOF)
             {
-                if (EndOfMarketActivityRecord(reader))
+                if (reader.Is(MarketActivityRecordElementName, ns, XmlNodeType.EndElement))
                 {
-                    var marketActivityRecord = new MarketActivityRecord()
-                    {
-                        Id = id,
-                        ConsumerName = consumerName,
-                        ConsumerId = consumerId,
-                        MarketEvaluationPointId = marketEvaluationPointId,
-                        EnergySupplierId = energySupplierId,
-                        EffectiveDate = effectiveDate,
-                        BalanceResponsibleId =
-                            balanceResponsibleId,
-                    };
-
-                    id = string.Empty;
-                    marketEvaluationPointId = string.Empty;
-                    energySupplierId = string.Empty;
-                    balanceResponsibleId = string.Empty;
-                    consumerId = string.Empty;
-                    consumerName = string.Empty;
-                    effectiveDate = string.Empty;
-
-                    yield return marketActivityRecord;
+                    var record = CreateMarketActivityRecord(ref id, ref consumerName, ref consumerId, ref marketEvaluationPointId, ref energySupplierId, ref effectiveDate, ref balanceResponsibleId);
+                    yield return record;
                 }
 
                 if (reader.NodeType == XmlNodeType.Element && reader.SchemaInfo?.Validity == XmlSchemaValidity.Invalid)
-                {
-                    await MoveToEndOfMarketActivityRecordAsync(reader).ConfigureAwait(false);
-                }
-                else
-                {
-                    TryExtractValueFrom("mRID", reader, (value) => id = value);
-                    TryExtractValueFrom("marketEvaluationPoint.mRID", reader, (value) => marketEvaluationPointId = value);
-                    TryExtractValueFrom("marketEvaluationPoint.energySupplier_MarketParticipant.mRID", reader, (value) => energySupplierId = value);
-                    TryExtractValueFrom("marketEvaluationPoint.balanceResponsibleParty_MarketParticipant.mRID", reader, (value) => balanceResponsibleId = value);
-                    TryExtractValueFrom("marketEvaluationPoint.customer_MarketParticipant.mRID", reader, (value) => consumerId = value);
-                    TryExtractValueFrom("marketEvaluationPoint.customer_MarketParticipant.name", reader, (value) => consumerName = value);
-                    TryExtractValueFrom("start_DateAndOrTime.dateTime", reader, (value) => effectiveDate = value);
-                }
+                    await reader.ReadToEndAsync().ConfigureAwait(false);
+
+                if (reader.Is("mRID", ns))
+                    id = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                else if (reader.Is("marketEvaluationPoint.mRID", ns))
+                    marketEvaluationPointId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                else if (reader.Is("marketEvaluationPoint.energySupplier_MarketParticipant.mRID", ns))
+                    energySupplierId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                else if (reader.Is("marketEvaluationPoint.balanceResponsibleParty_MarketParticipant.mRID", ns))
+                    balanceResponsibleId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                else if (reader.Is("marketEvaluationPoint.customer_MarketParticipant.mRID", ns))
+                    consumerId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                else if (reader.Is("marketEvaluationPoint.customer_MarketParticipant.name", ns))
+                    consumerName = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                else if (reader.Is("start_DateAndOrTime.dateTime", ns))
+                    effectiveDate = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                else await reader.ReadAsync().ConfigureAwait(false);
             }
         }
 
-        private static async Task MoveToEndOfMarketActivityRecordAsync(XmlReader reader)
+        private static MarketActivityRecord CreateMarketActivityRecord(
+            ref string id,
+            ref string consumerName,
+            ref string consumerId,
+            ref string marketEvaluationPointId,
+            ref string energySupplierId,
+            ref string effectiveDate,
+            ref string balanceResponsibleId)
         {
-            while (await reader.ReadAsync().ConfigureAwait(false))
+            var marketActivityRecord = new MarketActivityRecord()
             {
-                if (EndOfMarketActivityRecord(reader))
-                {
-                    break;
-                }
-            }
+                Id = id,
+                ConsumerName = consumerName,
+                ConsumerId = consumerId,
+                MarketEvaluationPointId = marketEvaluationPointId,
+                EnergySupplierId = energySupplierId,
+                EffectiveDate = effectiveDate,
+                BalanceResponsibleId =
+                    balanceResponsibleId,
+            };
+
+            id = string.Empty;
+            marketEvaluationPointId = string.Empty;
+            energySupplierId = string.Empty;
+            balanceResponsibleId = string.Empty;
+            consumerId = string.Empty;
+            consumerName = string.Empty;
+            effectiveDate = string.Empty;
+            return marketActivityRecord;
         }
 
-        private static bool EndOfMarketActivityRecord(XmlReader reader)
-        {
-            return reader.NodeType == XmlNodeType.EndElement &&
-                   reader.LocalName.Equals(MarketActivityRecordElementName, StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static bool StartOfMessageHeader(XmlReader reader)
-        {
-            return reader.NodeType == XmlNodeType.Element &&
-                   reader.LocalName.Equals(HeaderElementName, StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static bool StartOfMarketActivityRecord(XmlReader reader)
-        {
-            return reader.NodeType == XmlNodeType.Element &&
-                   reader.LocalName.Equals(MarketActivityRecordElementName, StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static void TryExtractValueFrom(string elementName, XmlReader reader, Func<string, string> variable)
-        {
-            if (reader.LocalName.Equals(elementName, StringComparison.OrdinalIgnoreCase) && reader.NodeType == XmlNodeType.Element)
-            {
-                variable(reader.ReadElementString());
-            }
-        }
-
-        private static async Task<MessageHeader> ExtractMessageHeaderAsync(XmlReader reader)
+        private static async Task<MessageHeader> ExtractMessageHeaderAsync(
+            XmlReader reader,
+            RootElement rootElement)
         {
             var messageId = string.Empty;
             var processType = string.Empty;
@@ -179,29 +166,29 @@ namespace Messaging.CimMessageAdapter.Messages
             var receiverId = string.Empty;
             var receiverRole = string.Empty;
             var createdAt = string.Empty;
+            var ns = rootElement.DefaultNamespace;
 
-            while (await reader.ReadAsync().ConfigureAwait(false))
+            await reader.AdvanceToAsync(HeaderElementName, rootElement.DefaultNamespace).ConfigureAwait(false);
+
+            while (!reader.EOF)
             {
-                if (StartOfMessageHeader(reader))
-                {
-                    while (await reader.ReadAsync().ConfigureAwait(false))
-                    {
-                        if (StartOfMarketActivityRecord(reader))
-                        {
-                            break;
-                        }
+                if (reader.Is("mRID", ns))
+                    messageId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                else if (reader.Is("process.processType", ns))
+                    processType = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                else if (reader.Is("sender_MarketParticipant.mRID", ns))
+                    senderId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                else if (reader.Is("sender_MarketParticipant.marketRole.type", ns))
+                    senderRole = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                else if (reader.Is("receiver_MarketParticipant.mRID", ns))
+                    receiverId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                else if (reader.Is("receiver_MarketParticipant.marketRole.type", ns))
+                    receiverRole = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                else if (reader.Is("createdDateTime", ns))
+                    createdAt = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                else await reader.ReadAsync().ConfigureAwait(false);
 
-                        TryExtractValueFrom("mRID", reader, value => messageId = value);
-                        TryExtractValueFrom("process.processType", reader, value => processType = value);
-                        TryExtractValueFrom("sender_MarketParticipant.mRID", reader, value => senderId = value);
-                        TryExtractValueFrom("sender_MarketParticipant.marketRole.type", reader, value => senderRole = value);
-                        TryExtractValueFrom("receiver_MarketParticipant.mRID", reader, value => receiverId = value);
-                        TryExtractValueFrom("receiver_MarketParticipant.marketRole.type", reader, value => receiverRole = value);
-                        TryExtractValueFrom("createdDateTime", reader, value => createdAt = value);
-                    }
-
-                    break;
-                }
+                if (reader.Is(MarketActivityRecordElementName, ns)) break;
             }
 
             return new MessageHeader(messageId, processType, senderId, senderRole, receiverId, receiverRole, createdAt);

@@ -54,7 +54,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter.Messages
         public Stream Message()
         {
             var message = new MemoryStream();
-            _document.Save(message);
+            _document.Save(message, SaveOptions.DisableFormatting);
             message.Position = 0;
             return message;
         }
