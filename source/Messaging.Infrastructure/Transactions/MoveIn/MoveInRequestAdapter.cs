@@ -13,21 +13,49 @@
 // limitations under the License.
 
 using System;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
 
 namespace Messaging.Infrastructure.Transactions.MoveIn;
-public class MoveInRequestAdapter : IMoveInRequestAdapter
-    {
-        public Task<BusinessRequestResult> InvokeAsync(MoveInRequest request)
-        {
-            if (request == null) throw new ArgumentNullException(nameof(request));
-            if (string.IsNullOrEmpty(request.ConsumerName))
-            {
-                return Task.FromResult(BusinessRequestResult.Failure(new ValidationError("999", "somemessage")));
-            }
+public sealed class MoveInRequestAdapter : IMoveInRequestAdapter, IDisposable
+{
+    private readonly Uri _moveInRequestUrl;
+    private readonly HttpClient _httpClient;
+    private bool _disposed;
 
-            return Task.FromResult(BusinessRequestResult.Succeeded());
-        }
+    public MoveInRequestAdapter(Uri moveInRequestUrl)
+    {
+        _moveInRequestUrl = moveInRequestUrl ?? throw new ArgumentNullException(nameof(moveInRequestUrl));
+        _httpClient = new HttpClient();
     }
+
+    public async Task<BusinessRequestResult> InvokeAsync(MoveInRequest request)
+    {
+        if (request == null) throw new ArgumentNullException(nameof(request));
+
+        var response = await _httpClient.PostAsJsonAsync(_moveInRequestUrl, request).ConfigureAwait(false);
+        return await response.Content.ReadFromJsonAsync<BusinessRequestResult>().ConfigureAwait(false) ?? throw new InvalidOperationException();
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    private void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                _httpClient.Dispose();
+            }
+        }
+
+        _disposed = true;
+    }
+}

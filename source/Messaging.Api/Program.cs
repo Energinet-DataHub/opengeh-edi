@@ -100,7 +100,7 @@ namespace Messaging.Api
                             runtime.MESSAGEHUB_DOMAIN_REPLY_QUEUE!)
                         .AddRequestHandler<NotifyMessageHubHandler, NotifyMessageHub>()
                         .AddNotificationHandler<PublishNewMessagesOnTimeHasPassed, TimeHasPassed>()
-                        .AddMoveInRequestHandler(new MoveInRequestAdapter());
+                        .AddMoveInRequestHandler(new MoveInRequestAdapter(runtime.MOVE_IN_REQUEST_URL));
                 })
                 .Build();
         }
