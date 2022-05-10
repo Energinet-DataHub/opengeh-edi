@@ -27,15 +27,12 @@ module "st_postoffice" {
     use_file                        = true
     log_analytics_workspace_id      = data.azurerm_key_vault_secret.log_shared_id.value
 
+    shares                      = [
+      {
+        name  = "temppostoffice",
+        quota = 50,
+      },
+    ]
+
     tags                            = azurerm_resource_group.this.tags
-}
-
-resource "azurerm_storage_share" "postoffice" {
-  name                        = "temppostoffice"
-  storage_account_name        = module.st_postoffice.name
-  quota                       = 50
-
-  timeouts {
-    create = "60m"
-  }
 }
