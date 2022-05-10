@@ -22,7 +22,7 @@ public class ValidationErrorDto
         Message = message;
     }
 
-    public string Code { get; protected init; } = string.Empty;
+    public string Code { get; }
 
-    public string Message { get; protected init; } = string.Empty;
+    public string Message { get; }
 }
