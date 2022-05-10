@@ -19,7 +19,7 @@ using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
-using Processing.Infrastructure.Correlation;
+using Processing.Infrastructure.Configuration.Correlation;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Common.Telemetry
 {
