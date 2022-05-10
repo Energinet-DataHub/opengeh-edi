@@ -14,6 +14,7 @@
 
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware;
 using Energinet.DataHub.MessageHub.Client.DataAvailable;
@@ -100,7 +101,7 @@ namespace Messaging.Api
                             runtime.MESSAGEHUB_DOMAIN_REPLY_QUEUE!)
                         .AddRequestHandler<NotifyMessageHubHandler, NotifyMessageHub>()
                         .AddNotificationHandler<PublishNewMessagesOnTimeHasPassed, TimeHasPassed>()
-                        .AddMoveInRequestHandler(new MoveInRequestAdapter(runtime.MOVE_IN_REQUEST_URL));
+                        .AddMoveInRequestHandler(sp => new MoveInRequestAdapter(runtime.MOVE_IN_REQUEST_URL, sp.GetRequiredService<HttpClient>()));
                 })
                 .Build();
         }

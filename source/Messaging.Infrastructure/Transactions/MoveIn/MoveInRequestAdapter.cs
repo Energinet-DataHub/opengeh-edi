@@ -20,16 +20,15 @@ using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
 
 namespace Messaging.Infrastructure.Transactions.MoveIn;
-public sealed class MoveInRequestAdapter : IMoveInRequestAdapter, IDisposable
+public sealed class MoveInRequestAdapter : IMoveInRequestAdapter
 {
     private readonly Uri _moveInRequestUrl;
     private readonly HttpClient _httpClient;
-    private bool _disposed;
 
-    public MoveInRequestAdapter(Uri moveInRequestUrl)
+    public MoveInRequestAdapter(Uri moveInRequestUrl, HttpClient httpClient)
     {
         _moveInRequestUrl = moveInRequestUrl ?? throw new ArgumentNullException(nameof(moveInRequestUrl));
-        _httpClient = new HttpClient();
+        _httpClient = httpClient;
     }
 
     public async Task<BusinessRequestResult> InvokeAsync(MoveInRequest request)
@@ -38,24 +37,5 @@ public sealed class MoveInRequestAdapter : IMoveInRequestAdapter, IDisposable
 
         var response = await _httpClient.PostAsJsonAsync(_moveInRequestUrl, request).ConfigureAwait(false);
         return await response.Content.ReadFromJsonAsync<BusinessRequestResult>().ConfigureAwait(false) ?? throw new InvalidOperationException();
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    private void Dispose(bool disposing)
-    {
-        if (!_disposed)
-        {
-            if (disposing)
-            {
-                _httpClient.Dispose();
-            }
-        }
-
-        _disposed = true;
     }
 }

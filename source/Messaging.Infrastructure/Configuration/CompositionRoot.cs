@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Net.Http;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Energinet.DataHub.MessageHub.Client;
@@ -43,7 +44,6 @@ using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.IncomingMessages;
 using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.Infrastructure.Transactions;
-using Messaging.Infrastructure.Transactions.MoveIn;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -59,6 +59,7 @@ namespace Messaging.Infrastructure.Configuration
         private CompositionRoot(IServiceCollection services)
         {
             _services = services;
+            services.AddSingleton<HttpClient>();
             services.AddSingleton<ISerializer, Serializer>();
             services.AddScoped<ITransactionIds, TransactionIdRegistry>();
             services.AddScoped<IMessageIds, MessageIdRegistry>();
@@ -194,9 +195,9 @@ namespace Messaging.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddMoveInRequestHandler(IMoveInRequestAdapter handler)
+        public CompositionRoot AddMoveInRequestHandler(Func<IServiceProvider, IMoveInRequestAdapter> action)
         {
-            _services.AddScoped(_ => handler);
+            _services.AddScoped(action);
             return this;
         }
 
