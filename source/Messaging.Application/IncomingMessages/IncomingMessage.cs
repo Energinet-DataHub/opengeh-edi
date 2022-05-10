@@ -19,11 +19,10 @@ namespace Messaging.Application.IncomingMessages
 {
     public class IncomingMessage
     {
-        public IncomingMessage(MessageHeader message, MarketActivityRecord marketActivityRecord)
+        private IncomingMessage(MessageHeader message, MarketActivityRecord marketActivityRecord)
         {
-            if (message == null) throw new ArgumentNullException(nameof(message));
             Id = Guid.NewGuid().ToString();
-            Message = message;
+            Message = message ?? throw new ArgumentNullException(nameof(message));
             MarketActivityRecord = marketActivityRecord;
         }
 
