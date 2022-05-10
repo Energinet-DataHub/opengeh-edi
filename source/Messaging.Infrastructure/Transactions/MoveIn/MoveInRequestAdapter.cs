@@ -34,10 +34,14 @@ public sealed class MoveInRequestAdapter : IMoveInRequestAdapter
         _httpClient = httpClient;
     }
 
-    public async Task<BusinessRequestResult> InvokeAsync(MoveInRequest request)
+    public Task<BusinessRequestResult> InvokeAsync(MoveInRequest request)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
+        return InvokeInternalAsync(request);
+    }
 
+    private async Task<BusinessRequestResult> InvokeInternalAsync(MoveInRequest request)
+    {
         var moveInRequestDto = new MoveInRequestDto(
             request.ConsumerName,
             request.EnergySupplierGlnNumber,
