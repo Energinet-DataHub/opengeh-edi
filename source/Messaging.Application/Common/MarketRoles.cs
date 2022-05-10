@@ -12,13 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using NodaTime;
-using Processing.Domain.SeedWork;
+namespace Messaging.Application.Common;
 
-namespace Messaging.Infrastructure.Configuration
+public static class MarketRoles
 {
-    public class SystemDateTimeProvider : ISystemDateTimeProvider
-    {
-        public Instant Now() => SystemClock.Instance.GetCurrentInstant();
-    }
+    public const string MeteringPointAdministrator = "DDZ";
+    public const string EnergySupplier = "DDQ";
 }

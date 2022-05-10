@@ -19,6 +19,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.IncomingMessages;
+using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.Xml.SchemaStore;
 using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Messages;

@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using NodaTime;
-using Processing.Domain.SeedWork;
+namespace Messaging.Application.Transactions.MoveIn;
 
-namespace Messaging.Infrastructure.Configuration
+public class MoveInRequest
 {
-    public class SystemDateTimeProvider : ISystemDateTimeProvider
+    public MoveInRequest(string? consumerName)
     {
-        public Instant Now() => SystemClock.Instance.GetCurrentInstant();
+        ConsumerName = consumerName;
     }
+
+    public string? ConsumerName { get; }
 }

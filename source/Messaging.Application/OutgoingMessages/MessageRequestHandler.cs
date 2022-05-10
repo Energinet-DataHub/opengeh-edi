@@ -20,6 +20,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
+using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Processing.Domain.SeedWork;
 
 namespace Messaging.Application.OutgoingMessages
 {
@@ -27,19 +29,25 @@ namespace Messaging.Application.OutgoingMessages
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly IMessageDispatcher _messageDispatcher;
-        private readonly MessageFactory _messageFactory;
+        private readonly ConfirmRequestChangeOfSupplierMessageFactory _confirmRequestChangeOfSupplierMessageFactory;
+        private readonly RejectRequestChangeOfSupplierMessageFactory _rejectRequestChangeOfSupplierMessageFactory;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
         public MessageRequestHandler(
             IOutgoingMessageStore outgoingMessageStore,
             IMessageDispatcher messageDispatcherSpy,
-            MessageFactory messageFactory,
-            IUnitOfWork unitOfWork)
+            ConfirmRequestChangeOfSupplierMessageFactory confirmRequestChangeOfSupplierMessageFactory,
+            RejectRequestChangeOfSupplierMessageFactory rejectRequestChangeOfSupplierMessageFactory,
+            IUnitOfWork unitOfWork,
+            ISystemDateTimeProvider systemDateTimeProvider)
         {
             _outgoingMessageStore = outgoingMessageStore;
             _messageDispatcher = messageDispatcherSpy;
-            _messageFactory = messageFactory;
+            _confirmRequestChangeOfSupplierMessageFactory = confirmRequestChangeOfSupplierMessageFactory;
+            _rejectRequestChangeOfSupplierMessageFactory = rejectRequestChangeOfSupplierMessageFactory;
             _unitOfWork = unitOfWork;
+            _systemDateTimeProvider = systemDateTimeProvider;
         }
 
         public async Task<Result> HandleAsync(IReadOnlyCollection<string> requestedMessageIds)
@@ -103,15 +111,17 @@ namespace Messaging.Application.OutgoingMessages
             return messages.All(message => message.ProcessType.Equals(expectedProcessType, StringComparison.OrdinalIgnoreCase));
         }
 
-        private static MessageHeader CreateMessageHeaderFrom(OutgoingMessage message)
+        private MessageHeader CreateMessageHeaderFrom(OutgoingMessage message, string reasonCode)
         {
-            return new MessageHeader(message.ProcessType, message.RecipientId, message.ReceiverRole, message.SenderId, message.SenderRole);
+            return new MessageHeader(message.ProcessType, message.SenderId, message.SenderRole, message.RecipientId, message.ReceiverRole, MessageIdGenerator.Generate(), _systemDateTimeProvider.Now(), reasonCode);
         }
 
         private Task<Stream> CreateMessageFromAsync(IReadOnlyCollection<OutgoingMessage> outgoingMessages)
         {
-            var messageHeader = CreateMessageHeaderFrom(outgoingMessages.First());
-            return _messageFactory.CreateFromAsync(messageHeader, outgoingMessages.Select(message => message.MarketActivityRecordPayload).ToList());
+            var firstMessageInList = outgoingMessages.First();
+            return outgoingMessages.First().DocumentType == "ConfirmRequestChangeOfSupplier"
+                ? _confirmRequestChangeOfSupplierMessageFactory.CreateFromAsync(CreateMessageHeaderFrom(firstMessageInList, "A01"), outgoingMessages.Select(message => message.MarketActivityRecordPayload).ToList())
+                : _rejectRequestChangeOfSupplierMessageFactory.CreateFromAsync(CreateMessageHeaderFrom(firstMessageInList, "A02"), outgoingMessages.Select(message => message.MarketActivityRecordPayload).ToList());
         }
     }
 }

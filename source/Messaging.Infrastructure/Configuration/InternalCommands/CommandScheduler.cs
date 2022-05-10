@@ -14,10 +14,10 @@
 
 using System;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.Serialization;
 using NodaTime;
+using Processing.Domain.SeedWork;
 
 namespace Messaging.Infrastructure.Configuration.InternalCommands
 {

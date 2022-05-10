@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Messaging.Api.Configuration;
 using Messaging.Application.Configuration;
 using Messaging.Application.IncomingMessages;
+using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
@@ -29,18 +30,18 @@ namespace Messaging.Api.IncomingMessages
         private readonly ILogger<IncomingMessageQueueListener> _logger;
         private readonly ICorrelationContext _correlationContext;
         private readonly ISerializer _jsonSerializer;
-        private readonly IncomingMessageHandler _incomingMessageHandler;
+        private readonly RequestChangeOfSupplierHandler _requestChangeOfSupplierHandler;
 
         public IncomingMessageQueueListener(
             ILogger<IncomingMessageQueueListener> logger,
             ICorrelationContext correlationContext,
             ISerializer jsonSerializer,
-            IncomingMessageHandler incomingMessageHandler)
+            RequestChangeOfSupplierHandler requestChangeOfSupplierHandler)
         {
             _logger = logger;
             _correlationContext = correlationContext;
             _jsonSerializer = jsonSerializer;
-            _incomingMessageHandler = incomingMessageHandler;
+            _requestChangeOfSupplierHandler = requestChangeOfSupplierHandler;
         }
 
         [Function(nameof(IncomingMessageQueueListener))]
@@ -55,7 +56,7 @@ namespace Messaging.Api.IncomingMessages
 
             var byteAsString = Encoding.UTF8.GetString(data);
 
-            await _incomingMessageHandler.HandleAsync(
+            await _requestChangeOfSupplierHandler.HandleAsync(
                     _jsonSerializer.Deserialize<IncomingMessage>(byteAsString))
                 .ConfigureAwait(false);
 

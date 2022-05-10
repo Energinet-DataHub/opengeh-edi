@@ -15,6 +15,7 @@
 using System;
 using Messaging.Application.Configuration;
 using Messaging.Application.IncomingMessages;
+using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 
 namespace Messaging.IntegrationTests.IncomingMessages
 {
@@ -22,6 +23,8 @@ namespace Messaging.IntegrationTests.IncomingMessages
     {
         private string _processType = "NotSet";
         private string _senderId = "NotSet";
+        private string _receiverId = DataHubDetails.IdentificationNumber;
+        private string? _consumerName = "NotSet";
 
         internal static IncomingMessage CreateMessage()
         {
@@ -51,6 +54,18 @@ namespace Messaging.IntegrationTests.IncomingMessages
             return this;
         }
 
+        internal IncomingMessageBuilder WithConsumerName(string? consumerName)
+        {
+            _consumerName = consumerName;
+            return this;
+        }
+
+        internal IncomingMessageBuilder WithReceiver(string receiverId)
+        {
+            _receiverId = receiverId;
+            return this;
+        }
+
         internal IncomingMessage Build()
         {
             return IncomingMessage.Create(
@@ -59,7 +74,7 @@ namespace Messaging.IntegrationTests.IncomingMessages
                     _processType,
                     _senderId,
                     "DDZ",
-                    DataHubDetails.IdentificationNumber,
+                    _receiverId,
                     "DDQ",
                     "fake"),
                 new MarketActivityRecord()
@@ -67,7 +82,7 @@ namespace Messaging.IntegrationTests.IncomingMessages
                     BalanceResponsibleId = "fake",
                     Id = Guid.NewGuid().ToString(),
                     ConsumerId = "fake",
-                    ConsumerName = "fake",
+                    ConsumerName = _consumerName,
                     EffectiveDate = "fake",
                     EnergySupplierId = "fake",
                     MarketEvaluationPointId = "fake",

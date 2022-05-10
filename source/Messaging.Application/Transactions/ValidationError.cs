@@ -12,13 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using NodaTime;
-using Processing.Domain.SeedWork;
+namespace Messaging.Application.Transactions;
 
-namespace Messaging.Infrastructure.Configuration
+public class ValidationError
 {
-    public class SystemDateTimeProvider : ISystemDateTimeProvider
+    public ValidationError(string code, string message)
     {
-        public Instant Now() => SystemClock.Instance.GetCurrentInstant();
+        Code = code;
+        Message = message;
     }
+
+    public string Code { get; protected init; } = string.Empty;
+
+    public string Message { get; protected init; } = string.Empty;
 }

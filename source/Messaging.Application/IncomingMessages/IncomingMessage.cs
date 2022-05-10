@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 
 namespace Messaging.Application.IncomingMessages
 {

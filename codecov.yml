@@ -1,16 +1,19 @@
 flags:
   unit:
     paths:
-      - source/Energinet.DataHub.MarketRoles.Application/
-      - source/Energinet.DataHub.MarketRoles.Domain/
-      - source/Energinet.DataHub.MarketRoles.Tests/
+      - source/Messagging.Application/
+      - source/Messagging.Tests/
+      - source/Processing.Application/
+      - source/Processing.Domain/
+      - source/Processing.Tests/
   integration:
     paths:
       - source/Energinet.DataHub.MarketRoles.EntryPoints.Common
-      - source/Energinet.DataHub.MarketRoles.EntryPoints.Ingestion
-      - source/Energinet.DataHub.MarketRoles.EntryPoints.Outbox
       - source/Energinet.DataHub.MarketRoles.EntryPoints.Processing
-      - source/Energinet.DataHub.MarketRoles.Infrastructure
+      - source/Processing.Infrastructure
+      - source/Messaging.Infrastructure
+      - source/Messaging.IntegrationTests
+      - source/Processing.IntegrationTests
 
 coverage:
   status:

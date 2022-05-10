@@ -15,7 +15,6 @@
 using System;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using Energinet.DataHub.MessageHub.Client;
 using Energinet.DataHub.MessageHub.Client.DataAvailable;
 using Energinet.DataHub.MessageHub.Client.Factories;
@@ -28,8 +27,10 @@ using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.IncomingMessages;
+using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
+using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Application.Transactions;
 using Messaging.Application.Xml.SchemaStore;
 using Messaging.CimMessageAdapter;
@@ -46,6 +47,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Processing.Domain.SeedWork;
 
 namespace Messaging.Infrastructure.Configuration
 {
@@ -64,9 +66,10 @@ namespace Messaging.Infrastructure.Configuration
             services.AddScoped<IMarketActorAuthenticator, MarketActorAuthenticator>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
-            services.AddScoped<IncomingMessageHandler>();
+            services.AddScoped<RequestChangeOfSupplierHandler>();
             services.AddScoped<IMessageDispatcher, MessageDispatcher>();
-            services.AddScoped<MessageFactory>();
+            services.AddScoped<ConfirmRequestChangeOfSupplierMessageFactory>();
+            services.AddScoped<RejectRequestChangeOfSupplierMessageFactory>();
             services.AddScoped<MessageRequestHandler>();
             services.AddScoped<IMarketActivityRecordParser, MarketActivityRecordParser>();
             services.AddScoped<MessageRequestContext>();
@@ -146,7 +149,7 @@ namespace Messaging.Infrastructure.Configuration
 
         public CompositionRoot AddOutgoingMessageDispatcher(IMessageDispatcher messageDispatcher)
         {
-            _services.AddScoped<MessageFactory>();
+            _services.AddScoped<ConfirmRequestChangeOfSupplierMessageFactory>();
             _services.AddScoped<IMessageDispatcher>(_ => messageDispatcher);
             _services.AddScoped<MessageRequestHandler>();
 

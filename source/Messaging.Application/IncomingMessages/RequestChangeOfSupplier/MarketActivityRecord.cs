@@ -12,13 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using NodaTime;
-using Processing.Domain.SeedWork;
-
-namespace Messaging.Infrastructure.Configuration
+namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
 {
-    public class SystemDateTimeProvider : ISystemDateTimeProvider
+    public class MarketActivityRecord
     {
-        public Instant Now() => SystemClock.Instance.GetCurrentInstant();
+        public string Id { get; init; } = string.Empty;
+
+        public string? ConsumerId { get; init; }
+
+        public string? BalanceResponsibleId { get; init; }
+
+        public string? EnergySupplierId { get; init; }
+
+        public string MarketEvaluationPointId { get; init; } = string.Empty;
+
+        public string? ConsumerName { get; init; }
+
+        public string EffectiveDate { get; init; } = string.Empty;
     }
 }

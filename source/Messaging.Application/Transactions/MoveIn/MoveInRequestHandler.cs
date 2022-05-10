@@ -12,13 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using NodaTime;
-using Processing.Domain.SeedWork;
+using System;
+using System.Threading.Tasks;
 
-namespace Messaging.Infrastructure.Configuration
+namespace Messaging.Application.Transactions.MoveIn;
+
+public static class MoveInRequestHandler
 {
-    public class SystemDateTimeProvider : ISystemDateTimeProvider
+    public static Task<BusinessRequestResult> InvokeAsync(MoveInRequest request)
     {
-        public Instant Now() => SystemClock.Instance.GetCurrentInstant();
+        if (request == null) throw new ArgumentNullException(nameof(request));
+        if (string.IsNullOrEmpty(request.ConsumerName))
+        {
+            return Task.FromResult(BusinessRequestResult.Failure(new ValidationError("999", "somemessage")));
+        }
+
+        return Task.FromResult<BusinessRequestResult>(BusinessRequestResult.Succeeded());
     }
 }

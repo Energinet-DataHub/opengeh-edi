@@ -12,17 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using NodaTime;
+
 namespace Messaging.Application.OutgoingMessages
 {
     public class MessageHeader
     {
-        public MessageHeader(string processType, string senderId, string senderRole, string receiverId, string receiverRole)
+        public MessageHeader(string processType, string senderId, string senderRole, string receiverId, string receiverRole, string messageId, Instant timeStamp, string reasonCode)
         {
             ProcessType = processType;
             SenderId = senderId;
             SenderRole = senderRole;
             ReceiverId = receiverId;
             ReceiverRole = receiverRole;
+            MessageId = messageId;
+            TimeStamp = timeStamp;
+            ReasonCode = reasonCode;
         }
 
         public string ProcessType { get; }
@@ -34,5 +39,11 @@ namespace Messaging.Application.OutgoingMessages
         public string ReceiverId { get; }
 
         public string ReceiverRole { get; }
+
+        public string MessageId { get; }
+
+        public Instant TimeStamp { get; }
+
+        public string ReasonCode { get; }
     }
 }

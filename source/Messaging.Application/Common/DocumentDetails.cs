@@ -12,13 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using NodaTime;
-using Processing.Domain.SeedWork;
+namespace Messaging.Application.Common;
 
-namespace Messaging.Infrastructure.Configuration
+public class DocumentDetails
 {
-    public class SystemDateTimeProvider : ISystemDateTimeProvider
+    public DocumentDetails(string type, string schemaLocation, string xmlNamespace, string prefix)
     {
-        public Instant Now() => SystemClock.Instance.GetCurrentInstant();
+        Type = type;
+        SchemaLocation = schemaLocation;
+        XmlNamespace = xmlNamespace;
+        Prefix = prefix;
     }
+
+    public string Type { get; }
+
+    public string SchemaLocation { get; }
+
+    public string XmlNamespace { get; }
+
+    public string Prefix { get; }
 }

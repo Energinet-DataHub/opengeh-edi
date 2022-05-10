@@ -12,13 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using NodaTime;
-using Processing.Domain.SeedWork;
+namespace Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 
-namespace Messaging.Infrastructure.Configuration
+public class Reason
 {
-    public class SystemDateTimeProvider : ISystemDateTimeProvider
+    public Reason(string text, string code)
     {
-        public Instant Now() => SystemClock.Instance.GetCurrentInstant();
+        Text = text;
+        Code = code;
     }
+
+    public string Text { get; }
+
+    public string Code { get; }
 }

@@ -14,11 +14,11 @@
 
 using System;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Domain.SeedWork;
 using MediatR;
 using Messaging.Infrastructure.Configuration.SystemTime;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using Processing.Domain.SeedWork;
 
 namespace Messaging.Api.Configuration
 {
