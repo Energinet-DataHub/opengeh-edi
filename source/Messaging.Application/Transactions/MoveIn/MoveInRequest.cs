@@ -16,7 +16,7 @@ namespace Messaging.Application.Transactions.MoveIn;
 
 public class MoveInRequest
 {
-    public MoveInRequest(string? consumerName, string energySupplierGlnNumber, string? socialSecurityNumber, string? vatNumber, string accountingPointGsrnNumber, string startDate, string transactionId)
+    public MoveInRequest(string? consumerName, string? energySupplierGlnNumber, string? socialSecurityNumber, string? vatNumber, string accountingPointGsrnNumber, string startDate, string transactionId)
     {
         ConsumerName = consumerName;
         EnergySupplierGlnNumber = energySupplierGlnNumber;
@@ -31,7 +31,7 @@ public class MoveInRequest
 
     public string? ConsumerName { get; }
 
-    public string EnergySupplierGlnNumber { get; }
+    public string? EnergySupplierGlnNumber { get; }
 
     public string? SocialSecurityNumber { get; }
 

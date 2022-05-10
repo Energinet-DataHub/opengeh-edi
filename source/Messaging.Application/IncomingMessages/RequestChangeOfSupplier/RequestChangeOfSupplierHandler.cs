@@ -69,7 +69,14 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
 
         private static Task<BusinessRequestResult> InvokeBusinessProcessAsync(IncomingMessage incomingMessage)
         {
-            var businessProcess = new MoveInRequest(incomingMessage.MarketActivityRecord.ConsumerName);
+            var businessProcess = new MoveInRequest(
+                incomingMessage.MarketActivityRecord.ConsumerName,
+                incomingMessage.MarketActivityRecord.EnergySupplierId,
+                incomingMessage.MarketActivityRecord.ConsumerId!.Length == 10 ? incomingMessage.MarketActivityRecord.ConsumerId : string.Empty,
+                incomingMessage.MarketActivityRecord.ConsumerId.Length == 8 ? incomingMessage.MarketActivityRecord.ConsumerId : string.Empty,
+                incomingMessage.MarketActivityRecord.MarketEvaluationPointId,
+                incomingMessage.MarketActivityRecord.EffectiveDate,
+                incomingMessage.MarketActivityRecord.Id);
             return MoveInRequestHandler.InvokeAsync(businessProcess);
         }
 
