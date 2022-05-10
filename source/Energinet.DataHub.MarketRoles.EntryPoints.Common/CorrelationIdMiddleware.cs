@@ -18,8 +18,8 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;
-using Processing.Infrastructure.Correlation;
-using TraceContext = Processing.Infrastructure.Correlation.TraceContext;
+using Processing.Infrastructure.Configuration.Correlation;
+using TraceContext = Processing.Infrastructure.Configuration.Correlation.TraceContext;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Common
 {
