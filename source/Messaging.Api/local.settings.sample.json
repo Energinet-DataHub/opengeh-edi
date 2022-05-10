@@ -17,6 +17,7 @@
     "MESSAGEHUB_QUEUE_CONNECTION_STRING": "<PostOffice Service Bus connection string>",
     "MESSAGEHUB_DATA_AVAILABLE_QUEUE": "<MessageHub Data Available Queue name>",
     "MESSAGEHUB_DOMAIN_REPLY_QUEUE": "<MessageHub Domain Reply Queue name>",
-    "MESSAGE_REQUEST_QUEUE" : "<Queue for post office to request bundle>"
+    "MESSAGE_REQUEST_QUEUE" : "<Queue for post office to request bundle>",
+    "MOVE_IN_REQUEST_URL" : "<Move in request url>"
   }
 }

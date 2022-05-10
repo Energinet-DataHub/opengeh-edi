@@ -49,6 +49,7 @@ module "func_receiver" {
     MESSAGEHUB_STORAGE_CONTAINER_NAME     = data.azurerm_key_vault_secret.st_market_operator_response_postofficereply_container_name.value
     MESSAGEHUB_STORAGE_CONNECTION_STRING  = data.azurerm_key_vault_secret.st_market_operator_response_primary_connection_string.value
     MESSAGE_REQUEST_QUEUE 		  = data.azurerm_key_vault_secret.sbq_marketroles_name.value
+    MOVE_IN_REQUEST_URL           = "func-api-${lower(var.domain_name_short)}-${lower(var.environment_short)}-${lower(var.environment_instance)}.azurewebsites.net/api/MoveIn"
   }
 
   tags                                      = azurerm_resource_group.this.tags

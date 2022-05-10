@@ -32,19 +32,22 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICorrelationContext _correlationContext;
         private readonly IMarketActivityRecordParser _marketActivityRecordParser;
+        private readonly IMoveInRequestAdapter _moveInRequestAdapter;
 
         public RequestChangeOfSupplierHandler(
             ITransactionRepository transactionRepository,
             IOutgoingMessageStore outgoingMessageStore,
             IUnitOfWork unitOfWork,
             ICorrelationContext correlationContext,
-            IMarketActivityRecordParser marketActivityRecordParser)
+            IMarketActivityRecordParser marketActivityRecordParser,
+            IMoveInRequestAdapter moveInRequestAdapter)
         {
             _transactionRepository = transactionRepository;
             _outgoingMessageStore = outgoingMessageStore;
             _unitOfWork = unitOfWork;
             _correlationContext = correlationContext;
             _marketActivityRecordParser = marketActivityRecordParser;
+            _moveInRequestAdapter = moveInRequestAdapter;
         }
 
         public async Task HandleAsync(IncomingMessage incomingMessage)
@@ -67,7 +70,7 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
             await _unitOfWork.CommitAsync().ConfigureAwait(false);
         }
 
-        private static Task<BusinessRequestResult> InvokeBusinessProcessAsync(IncomingMessage incomingMessage)
+        private Task<BusinessRequestResult> InvokeBusinessProcessAsync(IncomingMessage incomingMessage)
         {
             var businessProcess = new MoveInRequest(
                 incomingMessage.MarketActivityRecord.ConsumerName,
@@ -77,7 +80,7 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
                 incomingMessage.MarketActivityRecord.MarketEvaluationPointId,
                 incomingMessage.MarketActivityRecord.EffectiveDate,
                 incomingMessage.MarketActivityRecord.Id);
-            return MoveInRequestHandler.InvokeAsync(businessProcess);
+            return _moveInRequestAdapter.InvokeAsync(businessProcess);
         }
 
         private OutgoingMessage ConfirmMessageFrom(IncomingMessage incomingMessage, string transactionId)
