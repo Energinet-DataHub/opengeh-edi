@@ -13,11 +13,14 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
+using Messaging.Infrastructure.Transactions.MoveIn.Dtos;
+using MoveInRequestDto = Messaging.Infrastructure.Transactions.MoveIn.Dtos.MoveInRequestDto;
 
 namespace Messaging.Infrastructure.Transactions.MoveIn;
 public sealed class MoveInRequestAdapter : IMoveInRequestAdapter
@@ -35,7 +38,24 @@ public sealed class MoveInRequestAdapter : IMoveInRequestAdapter
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
 
-        var response = await _httpClient.PostAsJsonAsync(_moveInRequestUrl, request).ConfigureAwait(false);
-        return await response.Content.ReadFromJsonAsync<BusinessRequestResult>().ConfigureAwait(false) ?? throw new InvalidOperationException();
+        var moveInRequestDto = new MoveInRequestDto(
+            request.ConsumerName,
+            request.EnergySupplierGlnNumber,
+            request.SocialSecurityNumber,
+            request.VATNumber,
+            request.AccountingPointGsrnNumber,
+            request.StartDate,
+            request.TransactionId);
+
+        var response = await _httpClient.PostAsJsonAsync(_moveInRequestUrl, moveInRequestDto).ConfigureAwait(false);
+        var moveInResponseDto = await response.Content.ReadFromJsonAsync<MoveInResponseDto>().ConfigureAwait(false) ?? throw new InvalidOperationException();
+
+        if (moveInResponseDto.ValidationErrors.Count > 0)
+        {
+            var validationErrors = moveInResponseDto.ValidationErrors.Select(error => new ValidationError(error.Code, error.Message));
+            return BusinessRequestResult.Failure(validationErrors.ToArray());
+        }
+
+        return BusinessRequestResult.Succeeded();
     }
 }
