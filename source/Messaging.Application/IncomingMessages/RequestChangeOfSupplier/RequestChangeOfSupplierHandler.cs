@@ -96,8 +96,6 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
             var businessProcess = new MoveInRequest(
                 incomingMessage.MarketActivityRecord.ConsumerName,
                 incomingMessage.MarketActivityRecord.EnergySupplierId,
-                incomingMessage.MarketActivityRecord.ConsumerId,
-                incomingMessage.MarketActivityRecord.ConsumerId,
                 incomingMessage.MarketActivityRecord.MarketEvaluationPointId,
                 incomingMessage.MarketActivityRecord.EffectiveDate,
                 incomingMessage.MarketActivityRecord.Id,

@@ -45,11 +45,11 @@ public sealed class MoveInRequestAdapter : IMoveInRequestAdapter
         var moveInRequestDto = new MoveInRequestDto(
             request.ConsumerName,
             request.EnergySupplierGlnNumber,
-            request.SocialSecurityNumber,
-            request.VATNumber,
             request.AccountingPointGsrnNumber,
             request.StartDate,
-            request.TransactionId);
+            request.TransactionId,
+            request.ConsumerId,
+            request.ConsumerIdType);
 
         var response = await _httpClient.PostAsJsonAsync(_moveInRequestUrl, moveInRequestDto).ConfigureAwait(false);
         var moveInResponseDto = await response.Content.ReadFromJsonAsync<MoveInResponseDto>().ConfigureAwait(false) ?? throw new InvalidOperationException();
