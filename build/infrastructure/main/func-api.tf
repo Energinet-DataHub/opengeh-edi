@@ -12,19 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 module "func_receiver" {
-  source                                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/function-app?ref=5.12.0"
+  source = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/function-app?ref=5.12.0"
 
-  name                                      = "api"
-  project_name                              = var.domain_name_short
-  environment_short                         = var.environment_short
-  environment_instance                      = var.environment_instance
-  resource_group_name                       = azurerm_resource_group.this.name
-  location                                  = azurerm_resource_group.this.location
-  app_service_plan_id                       = data.azurerm_key_vault_secret.plan_shared_id.value
-  application_insights_instrumentation_key  = data.azurerm_key_vault_secret.appi_instrumentation_key.value
-  log_analytics_workspace_id                = data.azurerm_key_vault_secret.log_shared_id.value
-  always_on                                 = true
-  app_settings                              = {
+  name                                     = "api"
+  project_name                             = var.domain_name_short
+  environment_short                        = var.environment_short
+  environment_instance                     = var.environment_instance
+  resource_group_name                      = azurerm_resource_group.this.name
+  location                                 = azurerm_resource_group.this.location
+  app_service_plan_id                      = data.azurerm_key_vault_secret.plan_shared_id.value
+  application_insights_instrumentation_key = data.azurerm_key_vault_secret.appi_instrumentation_key.value
+  log_analytics_workspace_id               = data.azurerm_key_vault_secret.log_shared_id.value
+  always_on                                = true
+  app_settings                             = {
     # Region: Default Values
     WEBSITE_ENABLE_SYNC_UPDATE_SITE                   = true
     WEBSITE_RUN_FROM_PACKAGE                          = 1
@@ -40,7 +40,7 @@ module "func_receiver" {
     MARKET_DATA_QUEUE_URL                             = "${module.sb_marketroles.name}.servicebus.windows.net:9093"
     INCOMING_MESSAGE_QUEUE_SENDER_CONNECTION_STRING   = module.sb_marketroles.primary_connection_strings["send"]
     INCOMING_MESSAGE_QUEUE_LISTENER_CONNECTION_STRING = module.sb_marketroles.primary_connection_strings["listen"]
-    DB_CONNECTION_STRING             		              = local.MS_MARKETROLES_CONNECTION_STRING
+    DB_CONNECTION_STRING                              = local.MS_MARKETROLES_CONNECTION_STRING
     INCOMING_MESSAGE_QUEUE_NAME                       = "incomingmessagequeue"
     RAISE_TIME_HAS_PASSED_EVENT_SCHEDULE              = "*/10 * * * * *"
     MESSAGEHUB_QUEUE_CONNECTION_STRING                = data.azurerm_key_vault_secret.sb_domain_relay_transceiver_connection_string.value
@@ -48,9 +48,9 @@ module "func_receiver" {
     MESSAGEHUB_DOMAIN_REPLY_QUEUE                     = data.azurerm_key_vault_secret.sbq_marketroles_reply_name.value
     MESSAGEHUB_STORAGE_CONTAINER_NAME                 = data.azurerm_key_vault_secret.st_market_operator_response_postofficereply_container_name.value
     MESSAGEHUB_STORAGE_CONNECTION_STRING              = data.azurerm_key_vault_secret.st_market_operator_response_primary_connection_string.value
-    MESSAGE_REQUEST_QUEUE 		                        = data.azurerm_key_vault_secret.sbq_marketroles_name.value
-    MOVE_IN_REQUEST_URL                               = "func-api-${lower(var.domain_name_short)}-${lower(var.environment_short)}-${lower(var.environment_instance)}.azurewebsites.net/api/MoveIn"
+    MESSAGE_REQUEST_QUEUE                             = data.azurerm_key_vault_secret.sbq_marketroles_name.value
+    MOVE_IN_REQUEST_ENDPOINT                          = "func-processing-${lower(var.domain_name_short)}-${lower(var.environment_short)}-${lower(var.environment_instance)}.azurewebsites.net/api/MoveIn"
   }
 
-  tags                                      = azurerm_resource_group.this.tags
+  tags = azurerm_resource_group.this.tags
 }
