@@ -18,6 +18,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Messaging.Application.Common;
+using Messaging.Application.Common.Reasons;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages;
@@ -141,14 +142,10 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
     }
 
     #pragma warning disable
-    internal interface IValidationErrorTranslator
-    {
-        Task<ReadOnlyCollection<Reason>> TranslateAsync(IReadOnlyCollection<ValidationError> validationErrors);
-    }
 
     internal class ValidationErrorTranslator : IValidationErrorTranslator
     {
-        public Task<ReadOnlyCollection<Reason>> TranslateAsync(IReadOnlyCollection<ValidationError> validationErrors)
+        public Task<ReadOnlyCollection<Reason>> TranslateAsync(IEnumerable<ValidationError> validationErrors)
         {
             var reasons = validationErrors
                 .Select(validationError => new Reason(validationError.Message, validationError.Code))
