@@ -18,10 +18,10 @@ namespace Messaging.Infrastructure.Transactions.MoveIn.Dtos;
 
 public class MoveInResponseDto
 {
-    public MoveInResponseDto(IReadOnlyCollection<ValidationErrorDto> validationErrors)
+    public MoveInResponseDto(IReadOnlyCollection<string> validationErrors)
     {
         ValidationErrors = validationErrors;
     }
 
-    public IReadOnlyCollection<ValidationErrorDto> ValidationErrors { get; }
+    public IReadOnlyCollection<string> ValidationErrors { get; }
 }

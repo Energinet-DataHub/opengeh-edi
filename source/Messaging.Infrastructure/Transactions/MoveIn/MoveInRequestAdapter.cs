@@ -54,12 +54,6 @@ public sealed class MoveInRequestAdapter : IMoveInRequestAdapter
         var response = await _httpClient.PostAsJsonAsync(_moveInRequestUrl, moveInRequestDto).ConfigureAwait(false);
         var moveInResponseDto = await response.Content.ReadFromJsonAsync<MoveInResponseDto>().ConfigureAwait(false) ?? throw new InvalidOperationException();
 
-        if (moveInResponseDto.ValidationErrors.Count > 0)
-        {
-            var validationErrors = moveInResponseDto.ValidationErrors.Select(error => new ValidationError(error.Code, error.Message));
-            return BusinessRequestResult.Failure(validationErrors.ToArray());
-        }
-
-        return BusinessRequestResult.Succeeded();
+        return moveInResponseDto.ValidationErrors.Count > 0 ? BusinessRequestResult.Failure(moveInResponseDto.ValidationErrors.ToArray()) : BusinessRequestResult.Succeeded();
     }
 }
