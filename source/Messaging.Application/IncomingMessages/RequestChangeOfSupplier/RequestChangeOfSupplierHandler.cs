@@ -34,6 +34,7 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
         private readonly ICorrelationContext _correlationContext;
         private readonly IMarketActivityRecordParser _marketActivityRecordParser;
         private readonly IMoveInRequestAdapter _moveInRequestAdapter;
+        private readonly ValidationErrorTranslator _validationErrorTranslator = new ValidationErrorTranslator();
 
         public RequestChangeOfSupplierHandler(
             ITransactionRepository transactionRepository,
@@ -120,6 +121,7 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
         #pragma warning disable
         private static IEnumerable<Reason> CreateReasonsFrom(IReadOnlyCollection<ValidationError> validationErrors)
         {
+            var reasons = _validationErrorTranslator.TranslateAsync(validationErrors);
             return validationErrors.Select(validationError => new Reason(validationError.Message, validationError.Code));
         }
 
@@ -135,6 +137,15 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
                 DataHubDetails.IdentificationNumber,
                 MarketRoles.MeteringPointAdministrator,
                 marketActivityRecordPayload);
+        }
+    }
+
+    #pragma warning disable
+    internal class ValidationErrorTranslator
+    {
+        public Task<IReadOnlyCollection<Reason>> TranslateAsync(IReadOnlyCollection<ValidationError> validationErrors)
+        {
+            return Task.FromResult(validationErrors.Select(validationError => new Reason(validationError.Message, validationError.Code)).ToList());
         }
     }
 }
