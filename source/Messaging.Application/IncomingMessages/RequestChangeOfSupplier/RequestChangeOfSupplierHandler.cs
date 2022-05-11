@@ -93,8 +93,6 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
 
         private Task<BusinessRequestResult> InvokeBusinessProcessAsync(IncomingMessage incomingMessage)
         {
-            var consumerType = GetConsumerIdType(incomingMessage.MarketActivityRecord);
-
             var businessProcess = new MoveInRequest(
                 incomingMessage.MarketActivityRecord.ConsumerName,
                 incomingMessage.MarketActivityRecord.EnergySupplierId,
@@ -104,7 +102,7 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
                 incomingMessage.MarketActivityRecord.EffectiveDate,
                 incomingMessage.MarketActivityRecord.Id,
                 incomingMessage.MarketActivityRecord.ConsumerId,
-                consumerType);
+                GetConsumerIdType(incomingMessage.MarketActivityRecord));
             return _moveInRequestAdapter.InvokeAsync(businessProcess);
         }
 
