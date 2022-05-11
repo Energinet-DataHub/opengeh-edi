@@ -51,7 +51,7 @@ public sealed class MoveInRequestAdapter : IMoveInRequestAdapter
             request.ConsumerIdType);
 
         var response = await _httpClient.PostAsJsonAsync(_moveInRequestUrl, moveInRequestDto).ConfigureAwait(false);
-        var moveInResponseDto = await response.Content.ReadFromJsonAsync<MoveInResponseDto>().ConfigureAwait(false) ?? throw new InvalidOperationException();
+        var moveInResponseDto = await response.Content.ReadFromJsonAsync<BusinessProcessResponse>().ConfigureAwait(false) ?? throw new InvalidOperationException();
 
         return moveInResponseDto.ValidationErrors.Count > 0 ? BusinessRequestResult.Failure(moveInResponseDto.ValidationErrors.ToArray()) : BusinessRequestResult.Succeeded();
     }
@@ -66,4 +66,4 @@ public record MoveInRequestDto(
     string? ConsumerId,
     string? ConsumerIdType);
 
-public record MoveInResponseDto(IReadOnlyCollection<string> ValidationErrors);
+public record BusinessProcessResponse(IReadOnlyCollection<string> ValidationErrors);
