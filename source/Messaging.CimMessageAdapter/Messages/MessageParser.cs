@@ -89,6 +89,7 @@ namespace Messaging.CimMessageAdapter.Messages
             var energySupplierId = string.Empty;
             var balanceResponsibleId = string.Empty;
             var consumerId = string.Empty;
+            var consumerIdType = string.Empty;
             var consumerName = string.Empty;
             var effectiveDate = string.Empty;
             var ns = rootElement.DefaultNamespace;
@@ -99,7 +100,15 @@ namespace Messaging.CimMessageAdapter.Messages
             {
                 if (reader.Is(MarketActivityRecordElementName, ns, XmlNodeType.EndElement))
                 {
-                    var record = CreateMarketActivityRecord(ref id, ref consumerName, ref consumerId, ref marketEvaluationPointId, ref energySupplierId, ref effectiveDate, ref balanceResponsibleId);
+                    var record = CreateMarketActivityRecord(
+                        ref id,
+                        ref consumerName,
+                        ref consumerId,
+                        ref consumerIdType,
+                        ref marketEvaluationPointId,
+                        ref energySupplierId,
+                        ref effectiveDate,
+                        ref balanceResponsibleId);
                     yield return record;
                 }
 
@@ -107,20 +116,38 @@ namespace Messaging.CimMessageAdapter.Messages
                     await reader.ReadToEndAsync().ConfigureAwait(false);
 
                 if (reader.Is("mRID", ns))
+                {
                     id = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                }
                 else if (reader.Is("marketEvaluationPoint.mRID", ns))
+                {
                     marketEvaluationPointId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                }
                 else if (reader.Is("marketEvaluationPoint.energySupplier_MarketParticipant.mRID", ns))
+                {
                     energySupplierId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                }
                 else if (reader.Is("marketEvaluationPoint.balanceResponsibleParty_MarketParticipant.mRID", ns))
+                {
                     balanceResponsibleId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                }
                 else if (reader.Is("marketEvaluationPoint.customer_MarketParticipant.mRID", ns))
+                {
+                    consumerIdType = reader.GetAttribute("codingScheme") ?? string.Empty;
                     consumerId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                }
                 else if (reader.Is("marketEvaluationPoint.customer_MarketParticipant.name", ns))
+                {
                     consumerName = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                }
                 else if (reader.Is("start_DateAndOrTime.dateTime", ns))
+                {
                     effectiveDate = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-                else await reader.ReadAsync().ConfigureAwait(false);
+                }
+                else
+                {
+                    await reader.ReadAsync().ConfigureAwait(false);
+                }
             }
         }
 
@@ -128,6 +155,7 @@ namespace Messaging.CimMessageAdapter.Messages
             ref string id,
             ref string consumerName,
             ref string consumerId,
+            ref string consumerIdType,
             ref string marketEvaluationPointId,
             ref string energySupplierId,
             ref string effectiveDate,
@@ -138,6 +166,7 @@ namespace Messaging.CimMessageAdapter.Messages
                 Id = id,
                 ConsumerName = consumerName,
                 ConsumerId = consumerId,
+                ConsumerIdType = consumerIdType,
                 MarketEvaluationPointId = marketEvaluationPointId,
                 EnergySupplierId = energySupplierId,
                 EffectiveDate = effectiveDate,
@@ -150,6 +179,7 @@ namespace Messaging.CimMessageAdapter.Messages
             energySupplierId = string.Empty;
             balanceResponsibleId = string.Empty;
             consumerId = string.Empty;
+            consumerIdType = string.Empty;
             consumerName = string.Empty;
             effectiveDate = string.Empty;
             return marketActivityRecord;
