@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading.Tasks;
 using Messaging.Application.Common;
 using Messaging.Application.Common.Reasons;
@@ -36,7 +35,7 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
         private readonly ICorrelationContext _correlationContext;
         private readonly IMarketActivityRecordParser _marketActivityRecordParser;
         private readonly IMoveInRequestAdapter _moveInRequestAdapter;
-        private readonly IValidationErrorTranslator _validationErrorTranslator = new ValidationErrorTranslator();
+        private readonly IValidationErrorTranslator _validationErrorTranslator;
 
         public RequestChangeOfSupplierHandler(
             ITransactionRepository transactionRepository,
@@ -44,7 +43,8 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
             IUnitOfWork unitOfWork,
             ICorrelationContext correlationContext,
             IMarketActivityRecordParser marketActivityRecordParser,
-            IMoveInRequestAdapter moveInRequestAdapter)
+            IMoveInRequestAdapter moveInRequestAdapter,
+            IValidationErrorTranslator validationErrorTranslator)
         {
             _transactionRepository = transactionRepository;
             _outgoingMessageStore = outgoingMessageStore;
@@ -52,6 +52,7 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
             _correlationContext = correlationContext;
             _marketActivityRecordParser = marketActivityRecordParser;
             _moveInRequestAdapter = moveInRequestAdapter;
+            _validationErrorTranslator = validationErrorTranslator;
         }
 
         public async Task HandleAsync(IncomingMessage incomingMessage)
@@ -142,15 +143,4 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
     }
 
     #pragma warning disable
-
-    internal class ValidationErrorTranslator : IValidationErrorTranslator
-    {
-        public Task<ReadOnlyCollection<Reason>> TranslateAsync(IEnumerable<ValidationError> validationErrors)
-        {
-            var reasons = validationErrors
-                .Select(validationError => new Reason(validationError.Message, validationError.Code))
-                .ToList();
-            return Task.FromResult(reasons.AsReadOnly());
-        }
-    }
 }

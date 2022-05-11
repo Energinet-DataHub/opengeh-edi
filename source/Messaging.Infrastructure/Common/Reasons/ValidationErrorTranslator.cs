@@ -14,21 +14,23 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
+using Messaging.Application.Common.Reasons;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Application.Transactions;
 
-namespace Messaging.Application.Common.Reasons;
+namespace Messaging.Infrastructure.Common.Reasons;
 
-/// <summary>
-/// Translates from validation errors returned from business request processing to reasons to be included in reject messages
-/// </summary>
-public interface IValidationErrorTranslator
+internal class ValidationErrorTranslator : IValidationErrorTranslator
 {
-    /// <summary>
-    /// Translate from validation errors
-    /// </summary>
-    /// <param name="validationErrors"></param>
-    /// <returns><see cref="Reason"/></returns>
-    Task<ReadOnlyCollection<Reason>> TranslateAsync(IEnumerable<ValidationError> validationErrors);
+#pragma warning disable CA1822 // Cannot be made static
+    public Task<ReadOnlyCollection<Reason>> TranslateAsync(IEnumerable<ValidationError> validationErrors)
+#pragma warning restore CA1822
+    {
+        var reasons = validationErrors
+            .Select(validationError => new Reason(validationError.Message, validationError.Code))
+            .ToList();
+        return Task.FromResult(reasons.AsReadOnly());
+    }
 }

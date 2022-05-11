@@ -24,6 +24,7 @@ using Energinet.DataHub.MessageHub.Client.Storage;
 using Energinet.DataHub.MessageHub.Model.Peek;
 using MediatR;
 using Messaging.Application.Common;
+using Messaging.Application.Common.Reasons;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.Configuration.DataAccess;
@@ -37,6 +38,7 @@ using Messaging.Application.Xml.SchemaStore;
 using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.Infrastructure.Common;
+using Messaging.Infrastructure.Common.Reasons;
 using Messaging.Infrastructure.Configuration.Authentication;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.InternalCommands;
@@ -79,6 +81,7 @@ namespace Messaging.Infrastructure.Configuration
             services.AddLogging();
             AddXmlSchema(services);
             AddInternalCommandsProcessing();
+            AddCimMessagingServices();
         }
 
         public static CompositionRoot Initialize(IServiceCollection services)
@@ -214,6 +217,11 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddScoped<ICommandScheduler, CommandScheduler>();
             _services.AddTransient<InternalCommandAccessor>();
             _services.AddTransient<InternalCommandProcessor>();
+        }
+
+        private void AddCimMessagingServices()
+        {
+            _services.AddScoped<IValidationErrorTranslator, ValidationErrorTranslator>();
         }
     }
 }
