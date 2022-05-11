@@ -80,7 +80,7 @@ namespace Messaging.Infrastructure.Configuration
             services.AddLogging();
             AddXmlSchema(services);
             AddInternalCommandsProcessing();
-            AddCimMessagingServices();
+            AddMessageGenerationServices();
         }
 
         public static CompositionRoot Initialize(IServiceCollection services)
@@ -218,7 +218,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddTransient<InternalCommandProcessor>();
         }
 
-        private void AddCimMessagingServices()
+        private void AddMessageGenerationServices()
         {
             _services.AddScoped<IValidationErrorTranslator, ValidationErrorTranslator>();
             _services.AddScoped<IMarketActivityRecordParser, MarketActivityRecordParser>();
