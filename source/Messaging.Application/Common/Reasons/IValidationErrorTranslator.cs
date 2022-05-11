@@ -16,7 +16,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
-using Messaging.Application.Transactions;
 
 namespace Messaging.Application.Common.Reasons;
 
@@ -30,5 +29,5 @@ public interface IValidationErrorTranslator
     /// </summary>
     /// <param name="validationErrors"></param>
     /// <returns><see cref="Reason"/></returns>
-    Task<ReadOnlyCollection<Reason>> TranslateAsync(IEnumerable<ValidationError> validationErrors);
+    Task<ReadOnlyCollection<Reason>> TranslateAsync(IEnumerable<string> validationErrors);
 }

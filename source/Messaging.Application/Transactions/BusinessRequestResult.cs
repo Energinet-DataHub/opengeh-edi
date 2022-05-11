@@ -22,16 +22,16 @@ public class BusinessRequestResult
     {
     }
 
-    private BusinessRequestResult(IReadOnlyCollection<ValidationError> validationErrors)
+    private BusinessRequestResult(IReadOnlyCollection<string> validationErrors)
     {
         ValidationErrors = validationErrors;
     }
 
     public bool Success => ValidationErrors.Count == 0;
 
-    public IReadOnlyCollection<ValidationError> ValidationErrors { get; } = new List<ValidationError>();
+    public IReadOnlyCollection<string> ValidationErrors { get; } = new List<string>();
 
-    public static BusinessRequestResult Failure(params ValidationError[] validationErrors)
+    public static BusinessRequestResult Failure(params string[] validationErrors)
     {
         return new BusinessRequestResult(validationErrors);
     }

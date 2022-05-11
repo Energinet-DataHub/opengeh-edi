@@ -122,7 +122,7 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
                 _marketActivityRecordParser.From(marketActivityRecord));
         }
 
-        private Task<ReadOnlyCollection<Reason>> CreateReasonsFromAsync(IReadOnlyCollection<ValidationError> validationErrors)
+        private Task<ReadOnlyCollection<Reason>> CreateReasonsFromAsync(IReadOnlyCollection<string> validationErrors)
         {
             return _validationErrorTranslator.TranslateAsync(validationErrors);
         }

@@ -18,18 +18,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using Messaging.Application.Common.Reasons;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
-using Messaging.Application.Transactions;
 
 namespace Messaging.Infrastructure.Common.Reasons;
 
 internal class ValidationErrorTranslator : IValidationErrorTranslator
 {
 #pragma warning disable CA1822 // Cannot be made static
-    public Task<ReadOnlyCollection<Reason>> TranslateAsync(IEnumerable<ValidationError> validationErrors)
+    public Task<ReadOnlyCollection<Reason>> TranslateAsync(IEnumerable<string> validationErrors)
 #pragma warning restore CA1822
     {
         var reasons = validationErrors
-            .Select(validationError => new Reason(validationError.Message, validationError.Code))
+            .Select(validationError => new Reason("ErrorMessage", "999"))
             .ToList();
         return Task.FromResult(reasons.AsReadOnly());
     }
