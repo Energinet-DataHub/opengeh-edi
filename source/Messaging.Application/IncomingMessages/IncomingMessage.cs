@@ -13,12 +13,21 @@
 // limitations under the License.
 
 using System;
+using System.Text.Json.Serialization;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 
 namespace Messaging.Application.IncomingMessages
 {
     public class IncomingMessage
     {
+        [JsonConstructor]
+        public IncomingMessage(MessageHeader message, MarketActivityRecord marketActivityRecord, string id)
+        {
+            Message = message;
+            MarketActivityRecord = marketActivityRecord;
+            Id = id;
+        }
+
         private IncomingMessage(MessageHeader message, MarketActivityRecord marketActivityRecord)
         {
             Id = Guid.NewGuid().ToString();
