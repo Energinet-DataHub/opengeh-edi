@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+
 namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
 {
     public class MarketActivityRecord
@@ -29,5 +31,7 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
         public string? ConsumerName { get; init; }
 
         public string EffectiveDate { get; init; } = string.Empty;
+
+        public string? ConsumerIdType { get; init; }
     }
 }

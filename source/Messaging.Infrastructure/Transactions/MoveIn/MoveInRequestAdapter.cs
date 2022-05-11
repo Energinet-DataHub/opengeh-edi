@@ -13,14 +13,13 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
-using Messaging.Infrastructure.Transactions.MoveIn.Dtos;
-using MoveInRequestDto = Messaging.Infrastructure.Transactions.MoveIn.Dtos.MoveInRequestDto;
 
 namespace Messaging.Infrastructure.Transactions.MoveIn;
 public sealed class MoveInRequestAdapter : IMoveInRequestAdapter
@@ -45,15 +44,26 @@ public sealed class MoveInRequestAdapter : IMoveInRequestAdapter
         var moveInRequestDto = new MoveInRequestDto(
             request.ConsumerName,
             request.EnergySupplierGlnNumber,
-            request.SocialSecurityNumber,
-            request.VATNumber,
             request.AccountingPointGsrnNumber,
             request.StartDate,
-            request.TransactionId);
+            request.TransactionId,
+            request.ConsumerId,
+            request.ConsumerIdType);
 
         var response = await _httpClient.PostAsJsonAsync(_moveInRequestUrl, moveInRequestDto).ConfigureAwait(false);
-        var moveInResponseDto = await response.Content.ReadFromJsonAsync<MoveInResponseDto>().ConfigureAwait(false) ?? throw new InvalidOperationException();
+        var moveInResponseDto = await response.Content.ReadFromJsonAsync<BusinessProcessResponse>().ConfigureAwait(false) ?? throw new InvalidOperationException();
 
         return moveInResponseDto.ValidationErrors.Count > 0 ? BusinessRequestResult.Failure(moveInResponseDto.ValidationErrors.ToArray()) : BusinessRequestResult.Succeeded();
     }
 }
+
+public record MoveInRequestDto(
+    string? ConsumerName,
+    string? EnergySupplierGlnNumber,
+    string AccountingPointGsrnNumber,
+    string StartDate,
+    string TransactionId,
+    string? ConsumerId,
+    string? ConsumerIdType);
+
+public record BusinessProcessResponse(IReadOnlyCollection<string> ValidationErrors);
