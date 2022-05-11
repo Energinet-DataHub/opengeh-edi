@@ -76,8 +76,25 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
             await _unitOfWork.CommitAsync().ConfigureAwait(false);
         }
 
+        private static string GetConsumerIdType(MarketActivityRecord marketActivityRecord)
+        {
+            var cprNumberTypeIdentifier = "ARR";
+            var consumerType = string.Empty;
+            if (marketActivityRecord.ConsumerIdType is not null)
+            {
+                consumerType =
+                    marketActivityRecord.ConsumerIdType.Equals(cprNumberTypeIdentifier, StringComparison.OrdinalIgnoreCase)
+                        ? "CPR"
+                        : "CVR";
+            }
+
+            return consumerType;
+        }
+
         private Task<BusinessRequestResult> InvokeBusinessProcessAsync(IncomingMessage incomingMessage)
         {
+            var consumerType = GetConsumerIdType(incomingMessage.MarketActivityRecord);
+
             var businessProcess = new MoveInRequest(
                 incomingMessage.MarketActivityRecord.ConsumerName,
                 incomingMessage.MarketActivityRecord.EnergySupplierId,
@@ -85,7 +102,9 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
                 incomingMessage.MarketActivityRecord.ConsumerId,
                 incomingMessage.MarketActivityRecord.MarketEvaluationPointId,
                 incomingMessage.MarketActivityRecord.EffectiveDate,
-                incomingMessage.MarketActivityRecord.Id);
+                incomingMessage.MarketActivityRecord.Id,
+                incomingMessage.MarketActivityRecord.ConsumerId,
+                consumerType);
             return _moveInRequestAdapter.InvokeAsync(businessProcess);
         }
 
