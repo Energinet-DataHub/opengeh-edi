@@ -64,7 +64,7 @@ namespace Messaging.ArchitectureTests
 
         private class TestEnvironment : RuntimeEnvironment
         {
-            public override string? MOVE_IN_REQUEST_WEB_ADDRESS => "https://test.dk";
+            public override string? MOVE_IN_REQUEST_ENDPOINT => "https://test.dk";
 
             public override string? INCOMING_MESSAGE_QUEUE_SENDER_CONNECTION_STRING =>
                 CreateFakeServiceBusConnectionString();

@@ -103,7 +103,7 @@ namespace Messaging.Api
                         .AddNotificationHandler<PublishNewMessagesOnTimeHasPassed, TimeHasPassed>()
                         .AddMoveInRequestHandler(sp => new MoveInRequestAdapter(
                             new Uri(
-                            runtime.MOVE_IN_REQUEST_WEB_ADDRESS ?? throw new ArgumentException(nameof(runtime.MOVE_IN_REQUEST_WEB_ADDRESS))),
+                            runtime.MOVE_IN_REQUEST_ENDPOINT ?? throw new ArgumentException(nameof(runtime.MOVE_IN_REQUEST_ENDPOINT))),
                             sp.GetRequiredService<HttpClient>()));
                 })
                 .Build();
