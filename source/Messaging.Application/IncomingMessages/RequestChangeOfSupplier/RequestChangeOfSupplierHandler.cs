@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Messaging.Application.Common;
@@ -106,7 +107,7 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
                 messageId.ToString(),
                 transactionId,
                 incomingMessage.MarketActivityRecord.MarketEvaluationPointId,
-                businessRequestResult.ValidationErrors.Select(validationError => new Reason(validationError.Message, validationError.Code)));
+                CreateReasonsFrom(businessRequestResult.ValidationErrors));
 
             return CreateOutgoingMessage(
                 incomingMessage.Id,
@@ -114,6 +115,12 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
                 incomingMessage.Message.ProcessType,
                 incomingMessage.Message.SenderId,
                 _marketActivityRecordParser.From(marketActivityRecord));
+        }
+
+        #pragma warning disable
+        private static IEnumerable<Reason> CreateReasonsFrom(IReadOnlyCollection<ValidationError> validationErrors)
+        {
+            return validationErrors.Select(validationError => new Reason(validationError.Message, validationError.Code));
         }
 
         private OutgoingMessage CreateOutgoingMessage(string id, string documentType, string processType, string receiverId, string marketActivityRecordPayload)
