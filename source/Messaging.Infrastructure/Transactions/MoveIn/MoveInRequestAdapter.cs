@@ -20,7 +20,6 @@ using System.Threading.Tasks;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Transactions.MoveIn.Dtos;
-using MoveInRequestDto = Messaging.Infrastructure.Transactions.MoveIn.Dtos.MoveInRequestDto;
 
 namespace Messaging.Infrastructure.Transactions.MoveIn;
 public sealed class MoveInRequestAdapter : IMoveInRequestAdapter
@@ -57,3 +56,12 @@ public sealed class MoveInRequestAdapter : IMoveInRequestAdapter
         return moveInResponseDto.ValidationErrors.Count > 0 ? BusinessRequestResult.Failure(moveInResponseDto.ValidationErrors.ToArray()) : BusinessRequestResult.Succeeded();
     }
 }
+
+public record MoveInRequestDto(
+    string? ConsumerName,
+    string? EnergySupplierGlnNumber,
+    string AccountingPointGsrnNumber,
+    string StartDate,
+    string TransactionId,
+    string? ConsumerId,
+    string? ConsumerIdType);
