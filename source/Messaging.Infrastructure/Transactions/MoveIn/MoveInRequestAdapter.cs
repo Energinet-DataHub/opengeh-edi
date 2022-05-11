@@ -13,13 +13,13 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
-using Messaging.Infrastructure.Transactions.MoveIn.Dtos;
 
 namespace Messaging.Infrastructure.Transactions.MoveIn;
 public sealed class MoveInRequestAdapter : IMoveInRequestAdapter
@@ -65,3 +65,5 @@ public record MoveInRequestDto(
     string TransactionId,
     string? ConsumerId,
     string? ConsumerIdType);
+
+public record MoveInResponseDto(IReadOnlyCollection<string> ValidationErrors);
