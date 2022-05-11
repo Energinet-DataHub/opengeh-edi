@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Messaging.Application.Common;
@@ -34,7 +35,7 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
         private readonly ICorrelationContext _correlationContext;
         private readonly IMarketActivityRecordParser _marketActivityRecordParser;
         private readonly IMoveInRequestAdapter _moveInRequestAdapter;
-        private readonly ValidationErrorTranslator _validationErrorTranslator = new ValidationErrorTranslator();
+        private readonly IValidationErrorTranslator _validationErrorTranslator = new ValidationErrorTranslator();
 
         public RequestChangeOfSupplierHandler(
             ITransactionRepository transactionRepository,
@@ -62,7 +63,8 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
             var businessProcessResult = await InvokeBusinessProcessAsync(incomingMessage).ConfigureAwait(false);
             if (businessProcessResult.Success == false)
             {
-                _outgoingMessageStore.Add(RejectMessageFrom(incomingMessage, acceptedTransaction.TransactionId, businessProcessResult));
+                var reasons = await CreateReasonsFromAsync(businessProcessResult.ValidationErrors).ConfigureAwait(false);
+                _outgoingMessageStore.Add(RejectMessageFrom(incomingMessage, acceptedTransaction.TransactionId, reasons));
             }
             else
             {
@@ -101,14 +103,14 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
                 _marketActivityRecordParser.From(marketActivityRecord));
         }
 
-        private OutgoingMessage RejectMessageFrom(IncomingMessage incomingMessage, string transactionId, BusinessRequestResult businessRequestResult)
+        private OutgoingMessage RejectMessageFrom(IncomingMessage incomingMessage, string transactionId, IReadOnlyCollection<Reason> reasons)
         {
             var messageId = Guid.NewGuid();
             var marketActivityRecord = new OutgoingMessages.RejectRequestChangeOfSupplier.MarketActivityRecord(
                 messageId.ToString(),
                 transactionId,
                 incomingMessage.MarketActivityRecord.MarketEvaluationPointId,
-                CreateReasonsFrom(businessRequestResult.ValidationErrors));
+                reasons);
 
             return CreateOutgoingMessage(
                 incomingMessage.Id,
@@ -118,11 +120,9 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
                 _marketActivityRecordParser.From(marketActivityRecord));
         }
 
-        #pragma warning disable
-        private static IEnumerable<Reason> CreateReasonsFrom(IReadOnlyCollection<ValidationError> validationErrors)
+        private Task<ReadOnlyCollection<Reason>> CreateReasonsFromAsync(IReadOnlyCollection<ValidationError> validationErrors)
         {
-            var reasons = _validationErrorTranslator.TranslateAsync(validationErrors);
-            return validationErrors.Select(validationError => new Reason(validationError.Message, validationError.Code));
+            return _validationErrorTranslator.TranslateAsync(validationErrors);
         }
 
         private OutgoingMessage CreateOutgoingMessage(string id, string documentType, string processType, string receiverId, string marketActivityRecordPayload)
@@ -141,11 +141,19 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
     }
 
     #pragma warning disable
-    internal class ValidationErrorTranslator
+    internal interface IValidationErrorTranslator
     {
-        public Task<IReadOnlyCollection<Reason>> TranslateAsync(IReadOnlyCollection<ValidationError> validationErrors)
+        Task<ReadOnlyCollection<Reason>> TranslateAsync(IReadOnlyCollection<ValidationError> validationErrors);
+    }
+
+    internal class ValidationErrorTranslator : IValidationErrorTranslator
+    {
+        public Task<ReadOnlyCollection<Reason>> TranslateAsync(IReadOnlyCollection<ValidationError> validationErrors)
         {
-            return Task.FromResult(validationErrors.Select(validationError => new Reason(validationError.Message, validationError.Code)).ToList());
+            var reasons = validationErrors
+                .Select(validationError => new Reason(validationError.Message, validationError.Code))
+                .ToList();
+            return Task.FromResult(reasons.AsReadOnly());
         }
     }
 }
