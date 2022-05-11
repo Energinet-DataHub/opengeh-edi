@@ -51,13 +51,13 @@ jobs:
       DOTNET_VERSION: '6.0.201'
       ARTIFACT_NAME: api
 
-  business_processing_ci:
+  processing_ci:
     needs: [ci_base, dotnet_solution_ci, terraform_validate]
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-create-function-artifact.yml@6.1.0
     with:
       CSPROJ_FILE_PATH: 'source/Processing.Api/Processing.Api.csproj'
       DOTNET_VERSION: '6.0.201'
-      ARTIFACT_NAME: processingapi
+      ARTIFACT_NAME: processing
 
   database_migration_ci:
     needs: [ci_base, dotnet_solution_ci, terraform_validate]
@@ -69,7 +69,8 @@ jobs:
 
   create_prerelease:
     needs: [
-      api_ci,    
+      api_ci,
+      processing_ci,    
       database_migration_ci
     ]
     uses: Energinet-DataHub/.github/.github/workflows/create-prerelease.yml@6.0.0
