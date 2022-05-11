@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Application.Transactions.MoveIn;
+namespace Messaging.Infrastructure.Transactions.MoveIn.Dtos;
 
-public class MoveInRequest
+public class MoveInRequestDto
 {
-    public MoveInRequest(string? consumerName, string? energySupplierGlnNumber, string? socialSecurityNumber, string? vatNumber, string accountingPointGsrnNumber, string startDate, string transactionId)
+    public MoveInRequestDto(string? consumerName, string? energySupplierGlnNumber, string? socialSecurityNumber, string? vatNumber, string accountingPointGsrnNumber, string startDate, string transactionId)
     {
         ConsumerName = consumerName;
         EnergySupplierGlnNumber = energySupplierGlnNumber;

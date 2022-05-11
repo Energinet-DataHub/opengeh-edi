@@ -18,8 +18,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
-using Processing.Infrastructure.Correlation;
-using Processing.Infrastructure.Serialization;
+using Processing.Infrastructure.Configuration.Correlation;
+using Processing.Infrastructure.Configuration.Serialization;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Common
 {

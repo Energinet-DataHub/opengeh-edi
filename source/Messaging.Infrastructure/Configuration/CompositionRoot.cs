@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Net.Http;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Energinet.DataHub.MessageHub.Client;
@@ -26,12 +27,12 @@ using Messaging.Application.Common;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.IncomingMessages;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Application.Transactions;
+using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Xml.SchemaStore;
 using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Messages;
@@ -58,6 +59,7 @@ namespace Messaging.Infrastructure.Configuration
         private CompositionRoot(IServiceCollection services)
         {
             _services = services;
+            services.AddSingleton<HttpClient>();
             services.AddSingleton<ISerializer, Serializer>();
             services.AddScoped<ITransactionIds, TransactionIdRegistry>();
             services.AddScoped<IMessageIds, MessageIdRegistry>();
@@ -190,6 +192,12 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddTransient<INotificationHandler<TNotification>, TNotificationHandler>();
             _services.AddMediatR(typeof(TNotificationHandler));
 
+            return this;
+        }
+
+        public CompositionRoot AddMoveInRequestHandler(Func<IServiceProvider, IMoveInRequestAdapter> action)
+        {
+            _services.AddScoped(action);
             return this;
         }
 

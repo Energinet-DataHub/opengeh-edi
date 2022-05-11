@@ -12,21 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading.Tasks;
+namespace Messaging.Infrastructure.Transactions.MoveIn.Dtos;
 
-namespace Messaging.Application.Transactions.MoveIn;
-
-public static class MoveInRequestHandler
+public class ValidationErrorDto
 {
-    public static Task<BusinessRequestResult> InvokeAsync(MoveInRequest request)
+    public ValidationErrorDto(string code, string message)
     {
-        if (request == null) throw new ArgumentNullException(nameof(request));
-        if (string.IsNullOrEmpty(request.ConsumerName))
-        {
-            return Task.FromResult(BusinessRequestResult.Failure(new ValidationError("999", "somemessage")));
-        }
-
-        return Task.FromResult<BusinessRequestResult>(BusinessRequestResult.Succeeded());
+        Code = code;
+        Message = message;
     }
+
+    public string Code { get; }
+
+    public string Message { get; }
 }

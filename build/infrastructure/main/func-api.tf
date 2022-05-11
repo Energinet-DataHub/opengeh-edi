@@ -28,29 +28,30 @@ module "func_receiver" {
   always_on                                 = true
   app_settings                              = {
     # Region: Default Values
-    WEBSITE_ENABLE_SYNC_UPDATE_SITE                               = true
-    WEBSITE_RUN_FROM_PACKAGE                                      = 1
-    WEBSITES_ENABLE_APP_SERVICE_STORAGE                           = true
-    FUNCTIONS_WORKER_RUNTIME                                      = "dotnet-isolated"
+    WEBSITE_ENABLE_SYNC_UPDATE_SITE                   = true
+    WEBSITE_RUN_FROM_PACKAGE                          = 1
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE               = true
+    FUNCTIONS_WORKER_RUNTIME                          = "dotnet-isolated"
     # Endregion: Default Values
     # Shared resources logging
-    REQUEST_RESPONSE_LOGGING_CONNECTION_STRING    = data.azurerm_key_vault_secret.st_market_operator_logs_primary_connection_string.value
-    REQUEST_RESPONSE_LOGGING_CONTAINER_NAME       = data.azurerm_key_vault_secret.st_market_operator_logs_container_name.value
-    B2C_TENANT_ID                                 = data.azurerm_key_vault_secret.b2c_tenant_id.value
-    BACKEND_SERVICE_APP_ID                        = data.azurerm_key_vault_secret.backend_service_app_id.value
+    REQUEST_RESPONSE_LOGGING_CONNECTION_STRING        = data.azurerm_key_vault_secret.st_market_operator_logs_primary_connection_string.value
+    REQUEST_RESPONSE_LOGGING_CONTAINER_NAME           = data.azurerm_key_vault_secret.st_market_operator_logs_container_name.value
+    B2C_TENANT_ID                                     = data.azurerm_key_vault_secret.b2c_tenant_id.value
+    BACKEND_SERVICE_APP_ID                            = data.azurerm_key_vault_secret.backend_service_app_id.value
     # Endregion: Default Values
-    MARKET_DATA_QUEUE_URL                         = "${module.sb_marketroles.name}.servicebus.windows.net:9093"
+    MARKET_DATA_QUEUE_URL                             = "${module.sb_marketroles.name}.servicebus.windows.net:9093"
     INCOMING_MESSAGE_QUEUE_SENDER_CONNECTION_STRING   = module.sb_marketroles.primary_connection_strings["send"]
     INCOMING_MESSAGE_QUEUE_LISTENER_CONNECTION_STRING = module.sb_marketroles.primary_connection_strings["listen"]
-    DB_CONNECTION_STRING             		          = local.MS_MARKETROLES_CONNECTION_STRING
-    INCOMING_MESSAGE_QUEUE_NAME           = "incomingmessagequeue"
-    RAISE_TIME_HAS_PASSED_EVENT_SCHEDULE  = "*/10 * * * * *"
-    MESSAGEHUB_QUEUE_CONNECTION_STRING    = data.azurerm_key_vault_secret.sb_domain_relay_transceiver_connection_string.value
-    MESSAGEHUB_DATA_AVAILABLE_QUEUE       = data.azurerm_key_vault_secret.sbq_data_available_name.value
-    MESSAGEHUB_DOMAIN_REPLY_QUEUE         = data.azurerm_key_vault_secret.sbq_marketroles_reply_name.value
-    MESSAGEHUB_STORAGE_CONTAINER_NAME     = data.azurerm_key_vault_secret.st_market_operator_response_postofficereply_container_name.value
-    MESSAGEHUB_STORAGE_CONNECTION_STRING  = data.azurerm_key_vault_secret.st_market_operator_response_primary_connection_string.value
-    MESSAGE_REQUEST_QUEUE 		  = data.azurerm_key_vault_secret.sbq_marketroles_name.value
+    DB_CONNECTION_STRING             		              = local.MS_MARKETROLES_CONNECTION_STRING
+    INCOMING_MESSAGE_QUEUE_NAME                       = "incomingmessagequeue"
+    RAISE_TIME_HAS_PASSED_EVENT_SCHEDULE              = "*/10 * * * * *"
+    MESSAGEHUB_QUEUE_CONNECTION_STRING                = data.azurerm_key_vault_secret.sb_domain_relay_transceiver_connection_string.value
+    MESSAGEHUB_DATA_AVAILABLE_QUEUE                   = data.azurerm_key_vault_secret.sbq_data_available_name.value
+    MESSAGEHUB_DOMAIN_REPLY_QUEUE                     = data.azurerm_key_vault_secret.sbq_marketroles_reply_name.value
+    MESSAGEHUB_STORAGE_CONTAINER_NAME                 = data.azurerm_key_vault_secret.st_market_operator_response_postofficereply_container_name.value
+    MESSAGEHUB_STORAGE_CONNECTION_STRING              = data.azurerm_key_vault_secret.st_market_operator_response_primary_connection_string.value
+    MESSAGE_REQUEST_QUEUE 		                        = data.azurerm_key_vault_secret.sbq_marketroles_name.value
+    MOVE_IN_REQUEST_URL                               = "func-api-${lower(var.domain_name_short)}-${lower(var.environment_short)}-${lower(var.environment_instance)}.azurewebsites.net/api/MoveIn"
   }
 
   tags                                      = azurerm_resource_group.this.tags

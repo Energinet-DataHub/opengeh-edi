@@ -22,6 +22,8 @@ namespace Messaging.Api
     {
         public static RuntimeEnvironment Default => new();
 
+        public virtual string? MOVE_IN_REQUEST_WEB_ADDRESS => GetEnvironmentVariable(nameof(MOVE_IN_REQUEST_WEB_ADDRESS));
+
         public virtual string? DB_CONNECTION_STRING => GetEnvironmentVariable(nameof(DB_CONNECTION_STRING));
 
         public virtual string? INCOMING_MESSAGE_QUEUE_SENDER_CONNECTION_STRING =>
