@@ -33,6 +33,12 @@ runs:
         name: api
         path: ${{ inputs.RELEASE_FOLDER_PATH }}/functions/api    
 
+    - name: Publish Processing to release folder
+      uses: actions/download-artifact@v2
+      with:
+        name: processing
+        path: ${{ inputs.RELEASE_FOLDER_PATH }}/functions/processing
+
     - name: Publish Database Migration to release folder
       uses: actions/download-artifact@v2
       with:
