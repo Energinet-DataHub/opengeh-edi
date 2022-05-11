@@ -27,7 +27,7 @@ public class MoveInRequestAdapterStub : IMoveInRequestAdapter
         if (request == null) throw new ArgumentNullException(nameof(request));
         if (string.IsNullOrEmpty(request.ConsumerName))
         {
-            return Task.FromResult(BusinessRequestResult.Failure(new ValidationError("999", "somemessage")));
+            return Task.FromResult(BusinessRequestResult.Failure(new []{ "SomeError" }));
         }
 
         return Task.FromResult(BusinessRequestResult.Succeeded());

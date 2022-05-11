@@ -13,9 +13,11 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Messaging.Application.Common;
+using Messaging.Application.Common.Reasons;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages;
@@ -33,6 +35,7 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
         private readonly ICorrelationContext _correlationContext;
         private readonly IMarketActivityRecordParser _marketActivityRecordParser;
         private readonly IMoveInRequestAdapter _moveInRequestAdapter;
+        private readonly IValidationErrorTranslator _validationErrorTranslator;
 
         public RequestChangeOfSupplierHandler(
             ITransactionRepository transactionRepository,
@@ -40,7 +43,8 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
             IUnitOfWork unitOfWork,
             ICorrelationContext correlationContext,
             IMarketActivityRecordParser marketActivityRecordParser,
-            IMoveInRequestAdapter moveInRequestAdapter)
+            IMoveInRequestAdapter moveInRequestAdapter,
+            IValidationErrorTranslator validationErrorTranslator)
         {
             _transactionRepository = transactionRepository;
             _outgoingMessageStore = outgoingMessageStore;
@@ -48,6 +52,7 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
             _correlationContext = correlationContext;
             _marketActivityRecordParser = marketActivityRecordParser;
             _moveInRequestAdapter = moveInRequestAdapter;
+            _validationErrorTranslator = validationErrorTranslator;
         }
 
         public async Task HandleAsync(IncomingMessage incomingMessage)
@@ -60,7 +65,8 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
             var businessProcessResult = await InvokeBusinessProcessAsync(incomingMessage).ConfigureAwait(false);
             if (businessProcessResult.Success == false)
             {
-                _outgoingMessageStore.Add(RejectMessageFrom(incomingMessage, acceptedTransaction.TransactionId, businessProcessResult));
+                var reasons = await CreateReasonsFromAsync(businessProcessResult.ValidationErrors).ConfigureAwait(false);
+                _outgoingMessageStore.Add(RejectMessageFrom(incomingMessage, acceptedTransaction.TransactionId, reasons));
             }
             else
             {
@@ -99,14 +105,14 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
                 _marketActivityRecordParser.From(marketActivityRecord));
         }
 
-        private OutgoingMessage RejectMessageFrom(IncomingMessage incomingMessage, string transactionId, BusinessRequestResult businessRequestResult)
+        private OutgoingMessage RejectMessageFrom(IncomingMessage incomingMessage, string transactionId, IReadOnlyCollection<Reason> reasons)
         {
             var messageId = Guid.NewGuid();
             var marketActivityRecord = new OutgoingMessages.RejectRequestChangeOfSupplier.MarketActivityRecord(
                 messageId.ToString(),
                 transactionId,
                 incomingMessage.MarketActivityRecord.MarketEvaluationPointId,
-                businessRequestResult.ValidationErrors.Select(validationError => new Reason(validationError.Message, validationError.Code)));
+                reasons);
 
             return CreateOutgoingMessage(
                 incomingMessage.Id,
@@ -114,6 +120,11 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
                 incomingMessage.Message.ProcessType,
                 incomingMessage.Message.SenderId,
                 _marketActivityRecordParser.From(marketActivityRecord));
+        }
+
+        private Task<ReadOnlyCollection<Reason>> CreateReasonsFromAsync(IReadOnlyCollection<string> validationErrors)
+        {
+            return _validationErrorTranslator.TranslateAsync(validationErrors);
         }
 
         private OutgoingMessage CreateOutgoingMessage(string id, string documentType, string processType, string receiverId, string marketActivityRecordPayload)
