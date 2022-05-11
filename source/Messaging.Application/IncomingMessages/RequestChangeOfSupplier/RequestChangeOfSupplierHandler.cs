@@ -141,6 +141,4 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
                 marketActivityRecordPayload);
         }
     }
-
-    #pragma warning disable
 }
