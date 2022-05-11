@@ -75,7 +75,6 @@ namespace Messaging.Infrastructure.Configuration
             services.AddScoped<ConfirmRequestChangeOfSupplierMessageFactory>();
             services.AddScoped<RejectRequestChangeOfSupplierMessageFactory>();
             services.AddScoped<MessageRequestHandler>();
-            services.AddScoped<IMarketActivityRecordParser, MarketActivityRecordParser>();
             services.AddScoped<MessageRequestContext>();
 
             services.AddLogging();
@@ -222,6 +221,7 @@ namespace Messaging.Infrastructure.Configuration
         private void AddCimMessagingServices()
         {
             _services.AddScoped<IValidationErrorTranslator, ValidationErrorTranslator>();
+            _services.AddScoped<IMarketActivityRecordParser, MarketActivityRecordParser>();
         }
     }
 }
