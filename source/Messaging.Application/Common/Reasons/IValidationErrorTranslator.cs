@@ -30,4 +30,12 @@ public interface IValidationErrorTranslator
     /// <param name="validationErrors"></param>
     /// <returns><see cref="Reason"/></returns>
     Task<ReadOnlyCollection<Reason>> TranslateAsync(IEnumerable<string> validationErrors);
+
+    /// <summary>
+    /// Translate from validation errors
+    /// </summary>
+    /// <param name="validationErrors"></param>
+    /// <param name="language"></param>
+    /// <returns><see cref="Reason"/></returns>
+    Task<ReadOnlyCollection<Reason>> TranslateAsync(IEnumerable<string> validationErrors, string language);
 }

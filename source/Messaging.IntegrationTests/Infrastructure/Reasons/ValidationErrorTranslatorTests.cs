@@ -27,9 +27,10 @@ public class ValidationErrorTranslatorTests : TestBase
             "CONSUMERDOESNOTEXIST",
         };
 
-        var reasons = await _validationErrorTranslator.TranslateAsync(validationErrors);
+        var reasons = await _validationErrorTranslator.TranslateAsync(validationErrors, "dk");
 
         Assert.NotEmpty(reasons);
         Assert.Equal("D64", reasons.FirstOrDefault()?.Code);
+        Assert.Equal("dk", reasons.FirstOrDefault()?.Lang);
     }
 }

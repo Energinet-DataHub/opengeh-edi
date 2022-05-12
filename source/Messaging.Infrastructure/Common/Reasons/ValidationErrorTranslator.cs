@@ -33,20 +33,26 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
         _connectionFactory = connectionFactory;
     }
 
-    public async Task<ReadOnlyCollection<Reason>> TranslateAsync(IEnumerable<string> validationErrors)
+    public Task<ReadOnlyCollection<Reason>> TranslateAsync(IEnumerable<string> validationErrors)
     {
-        var sql = "select Text, Code, ErrorCode, Id, Lang from [b2b].Reasons";
+        return TranslateAsync(validationErrors, string.Empty);
+    }
+
+    public async Task<ReadOnlyCollection<Reason>> TranslateAsync(IEnumerable<string> validationErrors, string language)
+    {
+        var sql = "SELECT [Text], [Code], [ErrorCode], [Id], [Lang] FROM [b2b].[Reasons] WHERE [Lang] = @Lang";
 
         var result = await _connectionFactory
             .GetOpenConnection()
-            .QueryAsync<Reason>(sql)
+            .QueryAsync<Reason>(sql, new { Lang = language })
             .ConfigureAwait(false);
 
         var reasons = validationErrors
             .Select(error => result
                 .ToList()
-                .FirstOrDefault(x => x.ErrorCode.Equals(error, StringComparison.OrdinalIgnoreCase))
-                             ?? new Reason(string.Empty, string.Empty, string.Empty, Guid.NewGuid(), string.Empty))
+                .FirstOrDefault(x => x.ErrorCode.Equals(error, StringComparison.OrdinalIgnoreCase)
+                                     && x.Lang.Equals(language, StringComparison.OrdinalIgnoreCase))
+                             ?? new Reason(string.Empty, string.Empty, string.Empty, Guid.Empty, string.Empty))
             .ToList().AsReadOnly();
 
         return reasons;
