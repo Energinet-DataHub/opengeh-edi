@@ -12,17 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 
 public class Reason
 {
-    public Reason(string text, string code)
+    public Reason(string text, string code, string errorCode, Guid id, string lang)
     {
         Text = text;
         Code = code;
+        ErrorCode = errorCode;
+        Id = id;
+        Lang = lang;
     }
+
+    public Guid Id { get; }
+
+    public string ErrorCode { get; }
+
+    public string Code { get; }
 
     public string Text { get; }
 
-    public string Code { get; }
+    public string Lang { get; }
 }
