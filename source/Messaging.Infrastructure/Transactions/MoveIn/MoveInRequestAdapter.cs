@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -50,7 +51,11 @@ public sealed class MoveInRequestAdapter : IMoveInRequestAdapter
             request.ConsumerId,
             request.ConsumerIdType);
 
-        var response = await _httpClient.PostAsJsonAsync(_moveInRequestUrl, moveInRequestDto).ConfigureAwait(false);
+        using var ms = new MemoryStream();
+        await System.Text.Json.JsonSerializer.SerializeAsync(ms, moveInRequestDto).ConfigureAwait(false);
+        ms.Position = 0;
+        using var content = new StreamContent(ms);
+        var response = await _httpClient.PostAsync(new Uri("http://localhost:7071/api/MoveIn"), content).ConfigureAwait(false); //.PostAsJsonAsync("http://localhost:7071/api/MoveIn", moveInRequestDto).ConfigureAwait(false);
         var moveInResponseDto = await response.Content.ReadFromJsonAsync<BusinessProcessResponse>().ConfigureAwait(false) ?? throw new InvalidOperationException();
 
         return moveInResponseDto.ValidationErrors.Count > 0 ? BusinessRequestResult.Failure(moveInResponseDto.ValidationErrors.ToArray()) : BusinessRequestResult.Succeeded();
