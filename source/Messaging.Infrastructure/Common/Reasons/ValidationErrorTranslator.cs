@@ -73,14 +73,17 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
         {
             foreach (var secondReason in reasons)
             {
-                if (firstReason.ErrorCode.Equals(secondReason.ErrorCode, StringComparison.OrdinalIgnoreCase) &&
-                    firstReason.Code.Equals(secondReason.Code, StringComparison.OrdinalIgnoreCase) &&
-                    !firstReason.Lang.Equals(secondReason.Lang))
+                if (!result.Exists(x => x.ErrorCode.Equals(firstReason.ErrorCode, StringComparison.OrdinalIgnoreCase)))
                 {
-                    var merged = firstReason.Text + "/" + secondReason.Text;
-                    firstReason.Text = merged;
-                    firstReason.Lang = ReasonLanguage.Mixed;
-                    result.Add(firstReason);
+                    if (firstReason.ErrorCode.Equals(secondReason.ErrorCode, StringComparison.OrdinalIgnoreCase) &&
+                        firstReason.Code.Equals(secondReason.Code, StringComparison.OrdinalIgnoreCase) &&
+                        !firstReason.Lang.Equals(secondReason.Lang))
+                    {
+                        var merged = firstReason.Text + "/" + secondReason.Text;
+                        firstReason.Text = merged;
+                        firstReason.Lang = ReasonLanguage.Mixed;
+                        result.Add(firstReason);
+                    }
                 }
             }
         }

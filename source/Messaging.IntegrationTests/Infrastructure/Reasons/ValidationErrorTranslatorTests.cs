@@ -21,6 +21,28 @@ public class ValidationErrorTranslatorTests : TestBase
     }
 
     [Fact]
+    public async Task Translator_can_translate_multiple_validation_errors_to_reason()
+    {
+        var validationErrors = new List<string>()
+        {
+            "CONSUMERDOESNOTEXIST",
+            "MPDOESNOTEXIST",
+        };
+
+        var reasons = await _validationErrorTranslator.TranslateAsync(validationErrors).ConfigureAwait(false);
+
+        Assert.NotEmpty(reasons);
+        Assert.Equal("D64", reasons[0].Code);
+        Assert.Equal("Mixed", Enum.GetName(typeof(ReasonLanguage), reasons[0].Lang));
+        Assert.Equal("Kundenavn er påkrævet/Consumer name is required", reasons[0].Text);
+
+        Assert.NotEmpty(reasons);
+        Assert.Equal("D64", reasons[1].Code);
+        Assert.Equal("Mixed", Enum.GetName(typeof(ReasonLanguage), reasons[1].Lang));
+        Assert.Equal("Målepunkts ID er påkrævet/Metering point ID is required", reasons[1].Text);
+    }
+
+    [Fact]
     public async Task Translator_can_translate_validation_error_to_reason()
     {
         var validationErrors = new List<string>()
