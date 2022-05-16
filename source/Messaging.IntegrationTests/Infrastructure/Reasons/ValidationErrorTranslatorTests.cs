@@ -78,7 +78,7 @@ public class ValidationErrorTranslatorTests : TestBase
             "ConsumerNameIsRequired",
         };
 
-        var reasons = await _validationErrorTranslator.TranslateAsync(validationErrors, "en");
+        var reasons = await _validationErrorTranslator.TranslateAsync(validationErrors, "en").ConfigureAwait(false);
 
         Assert.NotEmpty(reasons);
         Assert.Equal("D64", reasons.FirstOrDefault()?.Code);

@@ -58,7 +58,7 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
     private static ReadOnlyCollection<Reason> FilterReasonsByLang(IEnumerable<string> validationErrors, string? language, List<Reason>? reasons)
     {
         var result = validationErrors
-            .Select(error => (reasons ?? throw new InvalidOperationException()).ToList().FirstOrDefault(reason =>
+            .Select(error => (reasons ?? throw new InvalidOperationException()).FirstOrDefault(reason =>
                                  reason.ErrorCode.Equals(error, StringComparison.OrdinalIgnoreCase)
                                  && reason.Lang.EnumToString().Equals(language, StringComparison.OrdinalIgnoreCase))
                              ?? new Reason(string.Empty, string.Empty, string.Empty, Guid.Empty, ReasonLanguage.Unknown))
@@ -73,17 +73,15 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
         {
             foreach (var secondReason in reasons)
             {
-                if (!result.Exists(x => x.ErrorCode.Equals(firstReason.ErrorCode, StringComparison.OrdinalIgnoreCase)))
+                if (!result.Exists(x => x.ErrorCode.Equals(firstReason.ErrorCode, StringComparison.OrdinalIgnoreCase)) &&
+                    firstReason.ErrorCode.Equals(secondReason.ErrorCode, StringComparison.OrdinalIgnoreCase) &&
+                    firstReason.Code.Equals(secondReason.Code, StringComparison.OrdinalIgnoreCase) &&
+                    !firstReason.Lang.Equals(secondReason.Lang))
                 {
-                    if (firstReason.ErrorCode.Equals(secondReason.ErrorCode, StringComparison.OrdinalIgnoreCase) &&
-                        firstReason.Code.Equals(secondReason.Code, StringComparison.OrdinalIgnoreCase) &&
-                        !firstReason.Lang.Equals(secondReason.Lang))
-                    {
-                        var merged = firstReason.Text + "/" + secondReason.Text;
-                        firstReason.Text = merged;
-                        firstReason.Lang = ReasonLanguage.Mixed;
-                        result.Add(firstReason);
-                    }
+                    var merged = firstReason.Text + "/" + secondReason.Text;
+                    firstReason.Text = merged;
+                    firstReason.Lang = ReasonLanguage.Mixed;
+                    result.Add(firstReason);
                 }
             }
         }
