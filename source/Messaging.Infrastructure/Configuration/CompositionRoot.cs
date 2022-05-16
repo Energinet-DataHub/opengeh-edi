@@ -114,7 +114,7 @@ namespace Messaging.Infrastructure.Configuration
         public CompositionRoot AddDatabaseConnectionFactory(string connectionString)
         {
             if (connectionString == null) throw new ArgumentNullException(nameof(connectionString));
-            _services.AddSingleton<IDbConnectionFactory>(_ => new SqlDbConnectionFactory(connectionString));
+            _services.AddScoped<IDbConnectionFactory>(_ => new SqlDbConnectionFactory(connectionString));
             return this;
         }
 
@@ -160,12 +160,7 @@ namespace Messaging.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddMessageHubServices(
-            string storageServiceConnectionString,
-            string storageServiceContainerName,
-            string queueConnectionString,
-            string dataAvailableQueue,
-            string domainReplyQueue)
+        public CompositionRoot AddMessageHubServices(string storageServiceConnectionString, string storageServiceContainerName, string queueConnectionString, string dataAvailableQueue, string domainReplyQueue)
         {
             _services.AddSingleton<StorageConfig>(s => new StorageConfig(storageServiceContainerName));
             _services.AddSingleton<IRequestBundleParser, RequestBundleParser>();
