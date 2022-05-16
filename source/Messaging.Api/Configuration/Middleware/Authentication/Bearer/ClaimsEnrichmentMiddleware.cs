@@ -19,8 +19,10 @@ using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.Authentication;
+using Messaging.Infrastructure.Configuration.DataAccess;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Messaging.Api.Configuration.Middleware.Authentication.Bearer
@@ -70,7 +72,7 @@ namespace Messaging.Api.Configuration.Middleware.Authentication.Bearer
                 return;
             }
 
-            var connectionFactory = context.GetService<IDbConnectionFactory>();
+            var connectionFactory = context.GetService<B2BContext>();
             var actor = await GetActorAsync(Guid.Parse(marketActorId), connectionFactory).ConfigureAwait(false);
             if (actor is null)
             {
@@ -105,12 +107,11 @@ namespace Messaging.Api.Configuration.Middleware.Authentication.Bearer
             return identity;
         }
 
-        private static async Task<Actor?> GetActorAsync(Guid actorId, IDbConnectionFactory connectionFactory)
+        private static async Task<Actor?> GetActorAsync(Guid actorId, B2BContext context)
         {
             var sql = "SELECT TOP 1 [Id] AS ActorId,[IdentificationType],[IdentificationNumber] AS Identifier,[Roles] FROM [dbo].[Actor] WHERE Id = @ActorId";
 
-            var result = await connectionFactory
-                .GetOpenConnection()
+            var result = await context.Database.GetDbConnection()
                 .QuerySingleOrDefaultAsync<Actor>(sql, new { ActorId = actorId })
                 .ConfigureAwait(false);
 

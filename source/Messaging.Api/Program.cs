@@ -104,7 +104,8 @@ namespace Messaging.Api
                         .AddMoveInRequestHandler(sp => new MoveInRequestAdapter(
                             new Uri(
                             runtime.MOVE_IN_REQUEST_ENDPOINT ?? throw new ArgumentException(nameof(runtime.MOVE_IN_REQUEST_ENDPOINT))),
-                            sp.GetRequiredService<HttpClient>()));
+                            sp.GetRequiredService<HttpClient>(),
+                            sp.GetService<Messaging.Infrastructure.Configuration.Serialization.ISerializer>()!));
                 })
                 .Build();
         }
