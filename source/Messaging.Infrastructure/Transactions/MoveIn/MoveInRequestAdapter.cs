@@ -21,17 +21,23 @@ using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
+using Messaging.Infrastructure.Configuration.Serialization;
 
 namespace Messaging.Infrastructure.Transactions.MoveIn;
 public sealed class MoveInRequestAdapter : IMoveInRequestAdapter
 {
     private readonly Uri _moveInRequestUrl;
     private readonly HttpClient _httpClient;
+    private readonly ISerializer _serializer;
 
-    public MoveInRequestAdapter(Uri moveInRequestUrl, HttpClient httpClient)
+    public MoveInRequestAdapter(
+        Uri moveInRequestUrl,
+        HttpClient httpClient,
+        ISerializer serializer)
     {
         _moveInRequestUrl = moveInRequestUrl ?? throw new ArgumentNullException(nameof(moveInRequestUrl));
         _httpClient = httpClient;
+        _serializer = serializer;
     }
 
     public Task<BusinessRequestResult> InvokeAsync(MoveInRequest request)
@@ -51,14 +57,19 @@ public sealed class MoveInRequestAdapter : IMoveInRequestAdapter
             request.ConsumerId,
             request.ConsumerIdType);
 
-        using var ms = new MemoryStream();
-        await System.Text.Json.JsonSerializer.SerializeAsync(ms, moveInRequestDto).ConfigureAwait(false);
-        ms.Position = 0;
-        using var content = new StreamContent(ms);
-        var response = await _httpClient.PostAsync(new Uri("http://localhost:7071/api/MoveIn"), content).ConfigureAwait(false); //.PostAsJsonAsync("http://localhost:7071/api/MoveIn", moveInRequestDto).ConfigureAwait(false);
+        var response = await MoveInAsync(moveInRequestDto).ConfigureAwait(false);
         var moveInResponseDto = await response.Content.ReadFromJsonAsync<BusinessProcessResponse>().ConfigureAwait(false) ?? throw new InvalidOperationException();
 
         return moveInResponseDto.ValidationErrors.Count > 0 ? BusinessRequestResult.Failure(moveInResponseDto.ValidationErrors.ToArray()) : BusinessRequestResult.Succeeded();
+    }
+
+    private async Task<HttpResponseMessage> MoveInAsync(MoveInRequestDto moveInRequestDto)
+    {
+        using var ms = new MemoryStream();
+        await _serializer.SerializeAsync(ms, moveInRequestDto).ConfigureAwait(false);
+        ms.Position = 0;
+        using var content = new StreamContent(ms);
+        return await _httpClient.PostAsync(_moveInRequestUrl, content).ConfigureAwait(false);
     }
 }
 
