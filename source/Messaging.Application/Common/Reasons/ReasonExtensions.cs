@@ -13,28 +13,13 @@
 // limitations under the License.
 
 using System;
-using Messaging.Application.Common.Reasons;
 
-namespace Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
+namespace Messaging.Application.Common.Reasons;
 
-public class Reason
+public static class ReasonExtensions
 {
-    public Reason(string text, string code, string errorCode, Guid id, ReasonLanguage lang)
+    public static string EnumToString(this ReasonLanguage lang)
     {
-        Text = text;
-        Code = code;
-        ErrorCode = errorCode;
-        Id = id;
-        Lang = lang;
+        return Enum.GetName(typeof(ReasonLanguage), lang) ?? string.Empty;
     }
-
-    public Guid Id { get; }
-
-    public string ErrorCode { get; }
-
-    public string Code { get; }
-
-    public string Text { get; set; }
-
-    public ReasonLanguage Lang { get; set; }
 }

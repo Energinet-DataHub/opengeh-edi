@@ -12,29 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Messaging.Application.Common.Reasons;
+namespace Messaging.Application.Common.Reasons;
 
-namespace Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
-
-public class Reason
+public enum ReasonLanguage
 {
-    public Reason(string text, string code, string errorCode, Guid id, ReasonLanguage lang)
-    {
-        Text = text;
-        Code = code;
-        ErrorCode = errorCode;
-        Id = id;
-        Lang = lang;
-    }
-
-    public Guid Id { get; }
-
-    public string ErrorCode { get; }
-
-    public string Code { get; }
-
-    public string Text { get; set; }
-
-    public ReasonLanguage Lang { get; set; }
+    DK,
+    EN,
+    Mixed,
+    Unknown,
 }
