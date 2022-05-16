@@ -13,12 +13,13 @@
 // limitations under the License.
 
 using System;
+using Messaging.Application.Common.Reasons;
 
 namespace Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 
 public class Reason
 {
-    public Reason(string text, string code, string errorCode, Guid id, string lang)
+    public Reason(string text, string code, string errorCode, Guid id, ReasonLanguage lang)
     {
         Text = text;
         Code = code;
@@ -33,7 +34,7 @@ public class Reason
 
     public string Code { get; }
 
-    public string Text { get; }
+    public string Text { get; set; }
 
-    public string Lang { get; }
+    public ReasonLanguage Lang { get; set; }
 }

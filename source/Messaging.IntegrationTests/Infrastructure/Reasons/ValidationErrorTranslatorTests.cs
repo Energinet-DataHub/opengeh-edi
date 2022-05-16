@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,17 +21,33 @@ public class ValidationErrorTranslatorTests : TestBase
     }
 
     [Fact]
-    public async Task Translator_can_validation_error_to_reason()
+    public async Task Translator_can_translate_validation_error_to_reason()
     {
         var validationErrors = new List<string>()
         {
             "CONSUMERDOESNOTEXIST",
         };
 
-        var reasons = await _validationErrorTranslator.TranslateAsync(validationErrors, "dk");
+        var reasons = await _validationErrorTranslator.TranslateAsync(validationErrors).ConfigureAwait(false);
 
         Assert.NotEmpty(reasons);
         Assert.Equal("D64", reasons.FirstOrDefault()?.Code);
-        Assert.Equal("dk", reasons.FirstOrDefault()?.Lang);
+        Assert.Equal("Mixed", Enum.GetName(typeof(ReasonLanguage), reasons.FirstOrDefault()?.Lang ?? ReasonLanguage.Unknown));
+        Assert.Equal("Kundenavn er påkrævet/Consumer name is required", reasons.FirstOrDefault()?.Text);
+    }
+
+    [Fact]
+    public async Task Translator_can_translate_validation_error_to_reason_by_language()
+    {
+        var validationErrors = new List<string>()
+        {
+            "CONSUMERDOESNOTEXIST",
+        };
+
+        var reasons = await _validationErrorTranslator.TranslateAsync(validationErrors, "en");
+
+        Assert.NotEmpty(reasons);
+        Assert.Equal("D64", reasons.FirstOrDefault()?.Code);
+        Assert.Equal("EN", Enum.GetName(typeof(ReasonLanguage), reasons.FirstOrDefault()?.Lang ?? ReasonLanguage.Unknown));
     }
 }
