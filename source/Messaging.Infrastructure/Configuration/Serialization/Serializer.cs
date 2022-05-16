@@ -56,5 +56,13 @@ namespace Messaging.Infrastructure.Configuration.Serialization
             if (value == null) throw new ArgumentNullException(nameof(value));
             return System.Text.Json.JsonSerializer.Serialize<object>(value, _options);
         }
+
+        public Task SerializeAsync<TValue>(Stream stream, TValue value)
+        {
+            if (stream == null) throw new ArgumentNullException(nameof(stream));
+            if (value == null) throw new ArgumentNullException(nameof(value));
+
+            return System.Text.Json.JsonSerializer.SerializeAsync(stream, value, _options);
+        }
     }
 }

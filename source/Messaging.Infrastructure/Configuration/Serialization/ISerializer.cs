@@ -85,5 +85,13 @@ namespace Messaging.Infrastructure.Configuration.Serialization
         /// encoding since the implementation internally uses UTF-8.
         /// </remarks>
         string Serialize<TValue>(TValue value);
+
+        /// <summary>
+        /// Convert the provided value into a <see cref="string"/>.
+        /// </summary>
+        /// <returns>A <see cref="string"/> representation of the value.</returns>
+        /// <param name="stream">The stream to stream the converted value to</param>
+        /// <param name="value">The value to convert.</param>
+        Task SerializeAsync<TValue>(Stream stream, TValue value);
     }
 }
