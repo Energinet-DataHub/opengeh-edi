@@ -25,8 +25,8 @@ public class ValidationErrorTranslatorTests : TestBase
     {
         var validationErrors = new List<string>()
         {
-            "CONSUMERDOESNOTEXIST",
-            "MPDOESNOTEXIST",
+            "ConsumerNameIsRequired",
+            "AccountingPointIdentifierIsRequired",
         };
 
         var reasons = await _validationErrorTranslator.TranslateAsync(validationErrors).ConfigureAwait(false);
@@ -34,7 +34,7 @@ public class ValidationErrorTranslatorTests : TestBase
         Assert.NotEmpty(reasons);
         Assert.Equal("D64", reasons[0].Code);
         Assert.Equal("Mixed", Enum.GetName(typeof(ReasonLanguage), reasons[0].Lang));
-        Assert.Equal("Kundenavn er påkrævet/Consumer name is required", reasons[0].Text);
+        Assert.Equal("Kundenavn er påkrævet/Customer name is required", reasons[0].Text);
 
         Assert.NotEmpty(reasons);
         Assert.Equal("D64", reasons[1].Code);
@@ -47,7 +47,7 @@ public class ValidationErrorTranslatorTests : TestBase
     {
         var validationErrors = new List<string>()
         {
-            "CONSUMERDOESNOTEXIST",
+            "ConsumerNameIsRequired",
         };
 
         var reasons = await _validationErrorTranslator.TranslateAsync(validationErrors).ConfigureAwait(false);
@@ -55,7 +55,7 @@ public class ValidationErrorTranslatorTests : TestBase
         Assert.NotEmpty(reasons);
         Assert.Equal("D64", reasons.FirstOrDefault()?.Code);
         Assert.Equal("Mixed", Enum.GetName(typeof(ReasonLanguage), reasons.FirstOrDefault()?.Lang ?? ReasonLanguage.Unknown));
-        Assert.Equal("Kundenavn er påkrævet/Consumer name is required", reasons.FirstOrDefault()?.Text);
+        Assert.Equal("Kundenavn er påkrævet/Customer name is required", reasons.FirstOrDefault()?.Text);
     }
 
     [Fact]
@@ -63,7 +63,7 @@ public class ValidationErrorTranslatorTests : TestBase
     {
         var validationErrors = new List<string>()
         {
-            "CONSUMERDOESNOTEXIST",
+            "ConsumerNameIsRequired",
         };
 
         var reasons = await _validationErrorTranslator.TranslateAsync(validationErrors, "en");
