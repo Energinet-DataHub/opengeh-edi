@@ -45,10 +45,10 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
             : FilterReasonsByLang(validationErrors.ToList(), language, await GetReasonsByLanguageAsync(language).ConfigureAwait(false) as List<Reason>);
     }
 
-    private static ReadOnlyCollection<Reason> FilterReasons(IEnumerable<string> validationErrors, List<Reason> reasons)
+    private static ReadOnlyCollection<Reason> FilterReasons(IEnumerable<string> validationErrors, IReadOnlyCollection<Reason> reasons)
     {
         var result = validationErrors
-            .SelectMany(error => reasons.Where(x => x.ErrorCode.Equals(error, StringComparison.OrdinalIgnoreCase)))
+            .SelectMany(error => reasons.Where(reason => reason.ErrorCode.Equals(error, StringComparison.OrdinalIgnoreCase)))
             .ToList()
             .AsReadOnly();
 
@@ -58,9 +58,9 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
     private static ReadOnlyCollection<Reason> FilterReasonsByLang(IEnumerable<string> validationErrors, string? language, List<Reason>? reasons)
     {
         var result = validationErrors
-            .Select(error => (reasons ?? throw new InvalidOperationException()).ToList().FirstOrDefault(x =>
-                                 x.ErrorCode.Equals(error, StringComparison.OrdinalIgnoreCase)
-                                 && x.Lang.EnumToString().Equals(language, StringComparison.OrdinalIgnoreCase))
+            .Select(error => (reasons ?? throw new InvalidOperationException()).ToList().FirstOrDefault(reason =>
+                                 reason.ErrorCode.Equals(error, StringComparison.OrdinalIgnoreCase)
+                                 && reason.Lang.EnumToString().Equals(language, StringComparison.OrdinalIgnoreCase))
                              ?? new Reason(string.Empty, string.Empty, string.Empty, Guid.Empty, ReasonLanguage.Unknown))
             .ToList().AsReadOnly();
         return result;
@@ -69,18 +69,18 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
     private static ReadOnlyCollection<Reason> MergeTexts(ReadOnlyCollection<Reason> reasons)
     {
         var result = new List<Reason>();
-        foreach (var item in reasons)
+        foreach (var firstReason in reasons)
         {
-            foreach (var item2 in reasons)
+            foreach (var secondReason in reasons)
             {
-                if (item.ErrorCode.Equals(item2.ErrorCode, StringComparison.OrdinalIgnoreCase) &&
-                    item.Code.Equals(item2.Code, StringComparison.OrdinalIgnoreCase) &&
-                    !item.Lang.Equals(item2.Lang))
+                if (firstReason.ErrorCode.Equals(secondReason.ErrorCode, StringComparison.OrdinalIgnoreCase) &&
+                    firstReason.Code.Equals(secondReason.Code, StringComparison.OrdinalIgnoreCase) &&
+                    !firstReason.Lang.Equals(secondReason.Lang))
                 {
-                    var merged = item.Text + "/" + item2.Text;
-                    item.Text = merged;
-                    item.Lang = ReasonLanguage.Mixed;
-                    result.Add(item);
+                    var merged = firstReason.Text + "/" + secondReason.Text;
+                    firstReason.Text = merged;
+                    firstReason.Lang = ReasonLanguage.Mixed;
+                    result.Add(firstReason);
                 }
             }
         }
@@ -90,7 +90,7 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
 
     private async Task<IEnumerable<Reason>> GetReasonsAsync()
     {
-        var sql = "SELECT [Text], [Code], [ErrorCode], [Id], [Lang] FROM [b2b].[Reasons]";
+        const string sql = "SELECT [Text], [Code], [ErrorCode], [Id], [Lang] FROM [b2b].[Reasons]";
 
         var result = await _connectionFactory
             .GetOpenConnection()
@@ -101,7 +101,7 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
 
     private async Task<IEnumerable<Reason>> GetReasonsByLanguageAsync(string language)
     {
-        var sql = "SELECT [Text], [Code], [ErrorCode], [Id], [Lang] FROM [b2b].[Reasons] WHERE [Lang] = @Lang";
+        const string sql = "SELECT [Text], [Code], [ErrorCode], [Id], [Lang] FROM [b2b].[Reasons] WHERE [Lang] = @Lang";
 
         var result = await _connectionFactory
             .GetOpenConnection()
