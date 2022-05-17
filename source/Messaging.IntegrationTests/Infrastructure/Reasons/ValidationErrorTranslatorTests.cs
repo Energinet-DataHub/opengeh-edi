@@ -84,4 +84,14 @@ public class ValidationErrorTranslatorTests : TestBase
         Assert.Equal("D64", reasons.FirstOrDefault()?.Code);
         Assert.Equal("EN", Enum.GetName(typeof(ReasonLanguage), reasons.FirstOrDefault()?.Lang ?? ReasonLanguage.Unknown));
     }
+
+    [Fact]
+    public async Task Translator_returns_default_reason_if_error_is_not_found_in_db()
+    {
+        var validationErrors = new List<string>() { "unknown error code" };
+
+        var reasons = await _validationErrorTranslator.TranslateAsync(validationErrors).ConfigureAwait(false);
+
+        Assert.Equal("000", reasons.First().Code);
+    }
 }
