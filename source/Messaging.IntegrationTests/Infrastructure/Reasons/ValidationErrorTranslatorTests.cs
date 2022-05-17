@@ -86,7 +86,7 @@ public class ValidationErrorTranslatorTests : TestBase
     }
 
     [Fact]
-    public async Task Translator_returns_default_reason_if_error_is_not_found_in_db()
+    public async Task Return_default_reason_if_no_translation_is_registered_for_error_code()
     {
         var validationErrors = new List<string>() { "unknown error code" };
 
