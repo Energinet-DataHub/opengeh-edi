@@ -93,5 +93,6 @@ public class ValidationErrorTranslatorTests : TestBase
         var reasons = await _validationErrorTranslator.TranslateAsync(validationErrors).ConfigureAwait(false);
 
         Assert.Equal("000", reasons.First().Code);
+        Assert.Equal("Unknown validation error", reasons.First().Text);
     }
 }

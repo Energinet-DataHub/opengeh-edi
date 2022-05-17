@@ -16,7 +16,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using Dapper;
 using Messaging.Application.Common.Reasons;
 using Messaging.Application.Configuration.DataAccess;
@@ -33,9 +35,37 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
         _connectionFactory = connectionFactory;
     }
 
-    public Task<ReadOnlyCollection<Reason>> TranslateAsync(IEnumerable<string> validationErrors)
+    public async Task<ReadOnlyCollection<Reason>> TranslateAsync(IEnumerable<string> validationErrors)
     {
-        return TranslateAsync(validationErrors, null);
+        var reasons = new List<Reason>();
+        var errorDescriptions = await GetReasonsAsync(validationErrors).ConfigureAwait(false);
+
+        foreach (var validationError in validationErrors)
+        {
+            var translations =
+                errorDescriptions.Where(error => error.ErrorCode.Equals(validationError, StringComparison.OrdinalIgnoreCase)).ToList();
+            if (translations.Count == 0)
+            {
+                reasons.Add(new Reason("Unknown validation error", "000", validationError, Guid.NewGuid(), ReasonLanguage.EN));
+                continue;
+            }
+
+            var code = translations.First().Code;
+            var text = new StringBuilder();
+            foreach (var errorDescription in translations)
+            {
+                if (text.Length > 0)
+                {
+                    text.Append('/');
+                }
+
+                text.Append(errorDescription.Text);
+            }
+
+            reasons.Add(new Reason(text.ToString(), code, string.Empty, Guid.Empty, ReasonLanguage.Mixed));
+        }
+
+        return reasons.AsReadOnly();
     }
 
     public async Task<ReadOnlyCollection<Reason>> TranslateAsync(IEnumerable<string> validationErrors, string? language)
@@ -110,4 +140,18 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
             .ConfigureAwait(false);
         return result;
     }
+
+    private async Task<List<ErrorDescription>> GetReasonsAsync(IEnumerable<string> errorCodes)
+    {
+        const string sql = "SELECT [Text], [Code], [ErrorCode], [Id], [Lang] FROM [b2b].[Reasons] WHERE ErrorCode IN @ErrorCodes";
+
+        var result = await _connectionFactory
+            .GetOpenConnection()
+            .QueryAsync<ErrorDescription>(sql, new { ErrorCodes = errorCodes })
+            .ConfigureAwait(false);
+
+        return result.ToList();
+    }
+
+    private record ErrorDescription(string Text, string Code, string ErrorCode, Guid Id, string Lang);
 }
