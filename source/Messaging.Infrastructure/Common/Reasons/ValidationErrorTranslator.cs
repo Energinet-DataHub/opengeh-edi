@@ -39,7 +39,7 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
     {
         var reasons = new List<Reason>();
         var errorCodes = validationErrors.ToList();
-        var reasonTranslations = await GetReasonsAsync(errorCodes).ConfigureAwait(false);
+        var reasonTranslations = await GetTranslationsAsync(errorCodes).ConfigureAwait(false);
 
         reasons.AddRange(GetUnregisteredReasons(errorCodes, reasonTranslations));
 
@@ -47,25 +47,22 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
         {
             var translations =
                 reasonTranslations.Where(error => error.ErrorCode.Equals(validationError, StringComparison.OrdinalIgnoreCase)).ToList();
-            if (translations.Count == 0)
+            if (translations.Count > 0)
             {
-                //reasons.Add(new Reason("Unknown validation error", "000", validationError, Guid.NewGuid(), ReasonLanguage.EN));
-                continue;
-            }
-
-            var code = translations.First().Code;
-            var text = new StringBuilder();
-            foreach (var errorDescription in translations)
-            {
-                if (text.Length > 0)
+                var code = translations.First().Code;
+                var text = new StringBuilder();
+                foreach (var errorDescription in translations)
                 {
-                    text.Append('/');
+                    if (text.Length > 0)
+                    {
+                        text.Append('/');
+                    }
+
+                    text.Append(errorDescription.Text);
                 }
 
-                text.Append(errorDescription.Text);
+                reasons.Add(new Reason(text.ToString(), code, string.Empty, Guid.Empty, ReasonLanguage.Mixed));
             }
-
-            reasons.Add(new Reason(text.ToString(), code, string.Empty, Guid.Empty, ReasonLanguage.Mixed));
         }
 
         return reasons.AsReadOnly();
@@ -125,7 +122,7 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
     private static IEnumerable<Reason> GetUnregisteredReasons(List<string> errorCodes, List<ReasonTranslation> reasonTranslations)
     {
         var unregisteredCodes = errorCodes.Except(reasonTranslations.Select(x => x.ErrorCode));
-        return unregisteredCodes.Select(errorCode => new Reason($"No code and text found for {errorCode}", "000", errorCode, Guid.Empty, ReasonLanguage.Unknown)).ToList();
+        return unregisteredCodes.Select(errorCode => new Reason($"No code and text found for {errorCode}", "999", errorCode, Guid.Empty, ReasonLanguage.Unknown)).ToList();
     }
 
     private async Task<IEnumerable<Reason>> GetReasonsAsync()
@@ -150,7 +147,7 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
         return result;
     }
 
-    private async Task<List<ReasonTranslation>> GetReasonsAsync(IEnumerable<string> errorCodes)
+    private async Task<List<ReasonTranslation>> GetTranslationsAsync(IEnumerable<string> errorCodes)
     {
         const string sql = "SELECT [Text], [Code], [ErrorCode], [Id], [Lang] FROM [b2b].[Reasons] WHERE ErrorCode IN @ErrorCodes";
 
