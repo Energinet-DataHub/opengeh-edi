@@ -16,11 +16,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Dapper;
 using Messaging.Application.Common.Reasons;
+using Messaging.Application.Configuration.DataAccess;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 
-namespace Messaging.IntegrationTests.Infrastructure.Reasons;
+namespace Messaging.IntegrationTests.Infrastructure.Common.Reasons;
 
 public class ValidationErrorTranslatorTests : TestBase
 {
@@ -33,38 +35,21 @@ public class ValidationErrorTranslatorTests : TestBase
     }
 
     [Fact]
-    public async Task Translator_can_translate_multiple_validation_errors_to_reason()
-    {
-        var validationErrors = new List<string>()
-        {
-            "ConsumerNameIsRequired",
-            "AccountingPointIdentifierIsRequired",
-        };
-
-        var reasons = await _validationErrorTranslator.TranslateAsync(validationErrors).ConfigureAwait(false);
-
-        Assert.NotEmpty(reasons);
-        Assert.Equal("D64", reasons[0].Code);
-        Assert.Equal("Kundenavn er påkrævet", reasons[0].Text);
-
-        Assert.NotEmpty(reasons);
-        Assert.Equal("D64", reasons[1].Code);
-        Assert.Equal("Målepunkts ID er påkrævet", reasons[1].Text);
-    }
-
-    [Fact]
     public async Task Translator_can_translate_validation_error_to_reason()
     {
+        var errorCode = "SomeErrorCode";
+        var code = "123";
+        var text = "Some error description";
+        await RegisterTranslation(errorCode, code, text).ConfigureAwait(false);
         var validationErrors = new List<string>()
         {
-            "ConsumerNameIsRequired",
+            errorCode,
         };
 
         var reasons = await _validationErrorTranslator.TranslateAsync(validationErrors).ConfigureAwait(false);
 
         Assert.NotEmpty(reasons);
-        Assert.Equal("D64", reasons.FirstOrDefault()?.Code);
-        Assert.Equal("Kundenavn er påkrævet", reasons.FirstOrDefault()?.Text);
+        Assert.Equal(code, reasons.FirstOrDefault()?.Code);
     }
 
     [Fact]
@@ -75,5 +60,21 @@ public class ValidationErrorTranslatorTests : TestBase
         var reasons = await _validationErrorTranslator.TranslateAsync(validationErrors).ConfigureAwait(false);
 
         Assert.Equal("999", reasons.First().Code);
+    }
+
+    private Task RegisterTranslation(string errorCode, string code, string text)
+    {
+        var connection = GetService<IDbConnectionFactory>().GetOpenConnection();
+
+        var insertStatement = $"INSERT INTO [b2b].[ReasonTranslations] (Id, ErrorCode, Code, Text, LanguageCode) " +
+                                    $"VALUES (@Id, @ErrorCode, @Code, @Text, 'dk');";
+
+        return connection.ExecuteAsync(insertStatement, new
+        {
+            Id = Guid.NewGuid().ToString(),
+            ErrorCode = errorCode,
+            Code = code,
+            Text = text,
+        });
     }
 }
