@@ -52,7 +52,7 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
 
     private async Task<List<ReasonTranslation>> GetTranslationsAsync(IEnumerable<string> errorCodes)
     {
-        const string sql = "SELECT [Text], [Code], [ErrorCode], [Id], [LanguageCode] FROM [b2b].[ReasonTranslations] WHERE ErrorCode IN @ErrorCodes AND LanguageCode = 'dk'";
+        const string sql = "SELECT [Text], [Code], [ErrorCode] FROM [b2b].[ReasonTranslations] WHERE ErrorCode IN @ErrorCodes AND LanguageCode = 'dk'";
 
         var result = await _connectionFactory
             .GetOpenConnection()
@@ -62,5 +62,5 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
         return result.ToList();
     }
 
-    private record ReasonTranslation(string Text, string Code, string ErrorCode, Guid Id, string LanguageCode);
+    private record ReasonTranslation(string Text, string Code, string ErrorCode);
 }
