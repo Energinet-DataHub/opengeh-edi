@@ -44,88 +44,15 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
         return reasons.AsReadOnly();
     }
 
-    public async Task<ReadOnlyCollection<Reason>> TranslateAsync(IEnumerable<string> validationErrors, string? language)
-    {
-        return string.IsNullOrEmpty(language) ?
-            FilterReasons(validationErrors.ToList(), await GetReasonsAsync().ConfigureAwait(false) as List<Reason> ?? throw new InvalidOperationException())
-            : FilterReasonsByLang(validationErrors.ToList(), language, await GetReasonsByLanguageAsync(language).ConfigureAwait(false) as List<Reason>);
-    }
-
-    private static ReadOnlyCollection<Reason> FilterReasons(IEnumerable<string> validationErrors, IReadOnlyCollection<Reason> reasons)
-    {
-        var result = validationErrors
-            .SelectMany(error => reasons.Where(reason => reason.ErrorCode.Equals(error, StringComparison.OrdinalIgnoreCase)))
-            .ToList()
-            .AsReadOnly();
-
-        return MergeTexts(result);
-    }
-
-    private static ReadOnlyCollection<Reason> FilterReasonsByLang(IEnumerable<string> validationErrors, string? language, List<Reason>? reasons)
-    {
-        var result = validationErrors
-            .Select(error => (reasons ?? throw new InvalidOperationException()).FirstOrDefault(reason =>
-                                 reason.ErrorCode.Equals(error, StringComparison.OrdinalIgnoreCase)
-                                 && reason.Lang.EnumToString().Equals(language, StringComparison.OrdinalIgnoreCase))
-                             ?? new Reason(string.Empty, string.Empty, string.Empty, Guid.Empty, ReasonLanguage.Unknown))
-            .ToList().AsReadOnly();
-        return result;
-    }
-
-    private static ReadOnlyCollection<Reason> MergeTexts(ReadOnlyCollection<Reason> reasons)
-    {
-        var result = new List<Reason>();
-        foreach (var firstReason in reasons)
-        {
-            foreach (var secondReason in reasons)
-            {
-                if (!result.Exists(x => x.ErrorCode.Equals(firstReason.ErrorCode, StringComparison.OrdinalIgnoreCase)) &&
-                    firstReason.ErrorCode.Equals(secondReason.ErrorCode, StringComparison.OrdinalIgnoreCase) &&
-                    firstReason.Code.Equals(secondReason.Code, StringComparison.OrdinalIgnoreCase) &&
-                    !firstReason.Lang.Equals(secondReason.Lang))
-                {
-                    var merged = firstReason.Text + "/" + secondReason.Text;
-                    firstReason.Text = merged;
-                    firstReason.Lang = ReasonLanguage.Mixed;
-                    result.Add(firstReason);
-                }
-            }
-        }
-
-        return new ReadOnlyCollection<Reason>(result);
-    }
-
     private static IEnumerable<Reason> GetUnregisteredReasons(List<string> errorCodes, List<ReasonTranslation> reasonTranslations)
     {
         var unregisteredCodes = errorCodes.Except(reasonTranslations.Select(x => x.ErrorCode));
         return unregisteredCodes.Select(errorCode => new Reason($"No code and text found for {errorCode}", "999", errorCode, Guid.Empty, ReasonLanguage.Unknown)).ToList();
     }
 
-    private async Task<IEnumerable<Reason>> GetReasonsAsync()
-    {
-        const string sql = "SELECT [Text], [Code], [ErrorCode], [Id], [Lang] FROM [b2b].[Reasons]";
-
-        var result = await _connectionFactory
-            .GetOpenConnection()
-            .QueryAsync<Reason>(sql)
-            .ConfigureAwait(false);
-        return result;
-    }
-
-    private async Task<IEnumerable<Reason>> GetReasonsByLanguageAsync(string language)
-    {
-        const string sql = "SELECT [Text], [Code], [ErrorCode], [Id], [Lang] FROM [b2b].[Reasons] WHERE [Lang] = @Lang";
-
-        var result = await _connectionFactory
-            .GetOpenConnection()
-            .QueryAsync<Reason>(sql, new { Lang = language })
-            .ConfigureAwait(false);
-        return result;
-    }
-
     private async Task<List<ReasonTranslation>> GetTranslationsAsync(IEnumerable<string> errorCodes)
     {
-        const string sql = "SELECT [Text], [Code], [ErrorCode], [Id], [Lang] FROM [b2b].[Reasons] WHERE ErrorCode IN @ErrorCodes AND Lang = 'dk'";
+        const string sql = "SELECT [Text], [Code], [ErrorCode], [Id], [LanguageCode] FROM [b2b].[ReasonTranslations] WHERE ErrorCode IN @ErrorCodes AND LanguageCode = 'dk'";
 
         var result = await _connectionFactory
             .GetOpenConnection()
@@ -135,5 +62,5 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
         return result.ToList();
     }
 
-    private record ReasonTranslation(string Text, string Code, string ErrorCode, Guid Id, string Lang);
+    private record ReasonTranslation(string Text, string Code, string ErrorCode, Guid Id, string LanguageCode);
 }
