@@ -42,29 +42,7 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
         var reasonTranslations = await GetTranslationsAsync(errorCodes).ConfigureAwait(false);
 
         reasons.AddRange(GetUnregisteredReasons(errorCodes, reasonTranslations));
-
-        foreach (var validationError in errorCodes)
-        {
-            var translations =
-                reasonTranslations.Where(error => error.ErrorCode.Equals(validationError, StringComparison.OrdinalIgnoreCase)).ToList();
-            if (translations.Count > 0)
-            {
-                var code = translations.First().Code;
-                var text = new StringBuilder();
-                foreach (var errorDescription in translations)
-                {
-                    if (text.Length > 0)
-                    {
-                        text.Append('/');
-                    }
-
-                    text.Append(errorDescription.Text);
-                }
-
-                reasons.Add(new Reason(text.ToString(), code, string.Empty, Guid.Empty, ReasonLanguage.Mixed));
-            }
-        }
-
+        reasons.AddRange(reasonTranslations.Select(translation => new Reason(translation.Text, translation.Code, string.Empty, Guid.Empty, ReasonLanguage.DK)));
         return reasons.AsReadOnly();
     }
 
