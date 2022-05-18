@@ -19,13 +19,12 @@ namespace Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 
 public class Reason
 {
-    public Reason(string text, string code, string errorCode, Guid id, ReasonLanguage lang)
+    public Reason(string text, string code, string errorCode, Guid id)
     {
         Text = text;
         Code = code;
         ErrorCode = errorCode;
         Id = id;
-        Lang = lang;
     }
 
     public Guid Id { get; }
@@ -35,6 +34,4 @@ public class Reason
     public string Code { get; }
 
     public string Text { get; set; }
-
-    public ReasonLanguage Lang { get; set; }
 }
