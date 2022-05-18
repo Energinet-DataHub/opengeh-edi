@@ -40,14 +40,14 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
         var reasonTranslations = await GetTranslationsAsync(errorCodes).ConfigureAwait(false);
 
         reasons.AddRange(GetUnregisteredReasons(errorCodes, reasonTranslations));
-        reasons.AddRange(reasonTranslations.Select(translation => new Reason(translation.Text, translation.Code, string.Empty, Guid.Empty)));
+        reasons.AddRange(reasonTranslations.Select(translation => new Reason(translation.Text, translation.Code, Guid.Empty)));
         return reasons.AsReadOnly();
     }
 
     private static IEnumerable<Reason> GetUnregisteredReasons(List<string> errorCodes, List<ReasonTranslation> reasonTranslations)
     {
         var unregisteredCodes = errorCodes.Except(reasonTranslations.Select(x => x.ErrorCode));
-        return unregisteredCodes.Select(errorCode => new Reason($"No code and text found for {errorCode}", "999", errorCode, Guid.Empty)).ToList();
+        return unregisteredCodes.Select(errorCode => new Reason($"No code and text found for {errorCode}", "999", Guid.Empty)).ToList();
     }
 
     private async Task<List<ReasonTranslation>> GetTranslationsAsync(IEnumerable<string> errorCodes)
