@@ -22,7 +22,7 @@ using Messaging.Application.Configuration.DataAccess;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 
-namespace Messaging.IntegrationTests.Infrastructure.Reasons;
+namespace Messaging.IntegrationTests.Infrastructure.Common.Reasons;
 
 public class ValidationErrorTranslatorTests : TestBase
 {
