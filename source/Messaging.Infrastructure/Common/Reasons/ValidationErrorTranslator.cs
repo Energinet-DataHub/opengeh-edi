@@ -149,7 +149,7 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
 
     private async Task<List<ReasonTranslation>> GetTranslationsAsync(IEnumerable<string> errorCodes)
     {
-        const string sql = "SELECT [Text], [Code], [ErrorCode], [Id], [Lang] FROM [b2b].[Reasons] WHERE ErrorCode IN @ErrorCodes";
+        const string sql = "SELECT [Text], [Code], [ErrorCode], [Id], [Lang] FROM [b2b].[Reasons] WHERE ErrorCode IN @ErrorCodes AND Lang = 'dk'";
 
         var result = await _connectionFactory
             .GetOpenConnection()
