@@ -71,21 +71,6 @@ public class ValidationErrorTranslatorTests : TestBase
     }
 
     [Fact]
-    public async Task Translator_can_translate_validation_error_to_reason_by_language()
-    {
-        var validationErrors = new List<string>()
-        {
-            "ConsumerNameIsRequired",
-        };
-
-        var reasons = await _validationErrorTranslator.TranslateAsync(validationErrors, "en").ConfigureAwait(false);
-
-        Assert.NotEmpty(reasons);
-        Assert.Equal("D64", reasons.FirstOrDefault()?.Code);
-        Assert.Equal("EN", Enum.GetName(typeof(ReasonLanguage), reasons.FirstOrDefault()?.Lang ?? ReasonLanguage.Unknown));
-    }
-
-    [Fact]
     public async Task Return_default_reason_if_no_translation_is_registered_for_error_code()
     {
         var validationErrors = new List<string>() { "unknown error code" };
