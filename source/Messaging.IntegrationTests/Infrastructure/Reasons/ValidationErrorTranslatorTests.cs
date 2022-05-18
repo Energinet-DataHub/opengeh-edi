@@ -45,13 +45,13 @@ public class ValidationErrorTranslatorTests : TestBase
 
         Assert.NotEmpty(reasons);
         Assert.Equal("D64", reasons[0].Code);
-        Assert.Equal("Mixed", Enum.GetName(typeof(ReasonLanguage), reasons[0].Lang));
-        Assert.Equal("Kundenavn er påkrævet/Customer name is required", reasons[0].Text);
+        Assert.Equal("DK", Enum.GetName(typeof(ReasonLanguage), reasons[0].Lang));
+        Assert.Equal("Kundenavn er påkrævet", reasons[0].Text);
 
         Assert.NotEmpty(reasons);
         Assert.Equal("D64", reasons[1].Code);
-        Assert.Equal("Mixed", Enum.GetName(typeof(ReasonLanguage), reasons[1].Lang));
-        Assert.Equal("Målepunkts ID er påkrævet/Metering point ID is required", reasons[1].Text);
+        Assert.Equal("DK", Enum.GetName(typeof(ReasonLanguage), reasons[1].Lang));
+        Assert.Equal("Målepunkts ID er påkrævet", reasons[1].Text);
     }
 
     [Fact]
@@ -66,8 +66,8 @@ public class ValidationErrorTranslatorTests : TestBase
 
         Assert.NotEmpty(reasons);
         Assert.Equal("D64", reasons.FirstOrDefault()?.Code);
-        Assert.Equal("Mixed", Enum.GetName(typeof(ReasonLanguage), reasons.FirstOrDefault()?.Lang ?? ReasonLanguage.Unknown));
-        Assert.Equal("Kundenavn er påkrævet/Customer name is required", reasons.FirstOrDefault()?.Text);
+        Assert.Equal("DK", Enum.GetName(typeof(ReasonLanguage), reasons.FirstOrDefault()?.Lang ?? ReasonLanguage.Unknown));
+        Assert.Equal("Kundenavn er påkrævet", reasons.FirstOrDefault()?.Text);
     }
 
     [Fact]
@@ -86,12 +86,12 @@ public class ValidationErrorTranslatorTests : TestBase
     }
 
     [Fact]
-    public async Task Translator_returns_default_reason_if_error_is_not_found_in_db()
+    public async Task Return_default_reason_if_no_translation_is_registered_for_error_code()
     {
         var validationErrors = new List<string>() { "unknown error code" };
 
         var reasons = await _validationErrorTranslator.TranslateAsync(validationErrors).ConfigureAwait(false);
 
-        Assert.Equal("000", reasons.First().Code);
+        Assert.Equal("999", reasons.First().Code);
     }
 }

@@ -33,9 +33,15 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
         _connectionFactory = connectionFactory;
     }
 
-    public Task<ReadOnlyCollection<Reason>> TranslateAsync(IEnumerable<string> validationErrors)
+    public async Task<ReadOnlyCollection<Reason>> TranslateAsync(IEnumerable<string> validationErrors)
     {
-        return TranslateAsync(validationErrors, null);
+        var reasons = new List<Reason>();
+        var errorCodes = validationErrors.ToList();
+        var reasonTranslations = await GetTranslationsAsync(errorCodes).ConfigureAwait(false);
+
+        reasons.AddRange(GetUnregisteredReasons(errorCodes, reasonTranslations));
+        reasons.AddRange(reasonTranslations.Select(translation => new Reason(translation.Text, translation.Code, string.Empty, Guid.Empty, ReasonLanguage.DK)));
+        return reasons.AsReadOnly();
     }
 
     public async Task<ReadOnlyCollection<Reason>> TranslateAsync(IEnumerable<string> validationErrors, string? language)
@@ -89,6 +95,12 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
         return new ReadOnlyCollection<Reason>(result);
     }
 
+    private static IEnumerable<Reason> GetUnregisteredReasons(List<string> errorCodes, List<ReasonTranslation> reasonTranslations)
+    {
+        var unregisteredCodes = errorCodes.Except(reasonTranslations.Select(x => x.ErrorCode));
+        return unregisteredCodes.Select(errorCode => new Reason($"No code and text found for {errorCode}", "999", errorCode, Guid.Empty, ReasonLanguage.Unknown)).ToList();
+    }
+
     private async Task<IEnumerable<Reason>> GetReasonsAsync()
     {
         const string sql = "SELECT [Text], [Code], [ErrorCode], [Id], [Lang] FROM [b2b].[Reasons]";
@@ -110,4 +122,18 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
             .ConfigureAwait(false);
         return result;
     }
+
+    private async Task<List<ReasonTranslation>> GetTranslationsAsync(IEnumerable<string> errorCodes)
+    {
+        const string sql = "SELECT [Text], [Code], [ErrorCode], [Id], [Lang] FROM [b2b].[Reasons] WHERE ErrorCode IN @ErrorCodes AND Lang = 'dk'";
+
+        var result = await _connectionFactory
+            .GetOpenConnection()
+            .QueryAsync<ReasonTranslation>(sql, new { ErrorCodes = errorCodes })
+            .ConfigureAwait(false);
+
+        return result.ToList();
+    }
+
+    private record ReasonTranslation(string Text, string Code, string ErrorCode, Guid Id, string Lang);
 }
