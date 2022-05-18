@@ -35,26 +35,6 @@ public class ValidationErrorTranslatorTests : TestBase
     }
 
     [Fact]
-    public async Task Translator_can_translate_multiple_validation_errors_to_reason()
-    {
-        var validationErrors = new List<string>()
-        {
-            "ConsumerNameIsRequired",
-            "AccountingPointIdentifierIsRequired",
-        };
-
-        var reasons = await _validationErrorTranslator.TranslateAsync(validationErrors).ConfigureAwait(false);
-
-        Assert.NotEmpty(reasons);
-        Assert.Equal("D64", reasons[0].Code);
-        Assert.Equal("Kundenavn er påkrævet", reasons[0].Text);
-
-        Assert.NotEmpty(reasons);
-        Assert.Equal("D64", reasons[1].Code);
-        Assert.Equal("Målepunkts ID er påkrævet", reasons[1].Text);
-    }
-
-    [Fact]
     public async Task Translator_can_translate_validation_error_to_reason()
     {
         var errorCode = "SomeErrorCode";
