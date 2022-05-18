@@ -24,5 +24,5 @@ public class Reason
 
     public string Code { get; }
 
-    public string Text { get; set; }
+    public string Text { get; }
 }
