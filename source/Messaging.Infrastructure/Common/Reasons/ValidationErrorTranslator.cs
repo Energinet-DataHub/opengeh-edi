@@ -103,7 +103,7 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
 
     private async Task<IEnumerable<Reason>> GetReasonsAsync()
     {
-        const string sql = "SELECT [Text], [Code], [ErrorCode], [Id], [Lang] FROM [b2b].[Reasons]";
+        const string sql = "SELECT [Text], [Code], [ErrorCode], [Id], [LanguageCode] FROM [b2b].[ReasonTranslations]";
 
         var result = await _connectionFactory
             .GetOpenConnection()
@@ -114,7 +114,7 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
 
     private async Task<IEnumerable<Reason>> GetReasonsByLanguageAsync(string language)
     {
-        const string sql = "SELECT [Text], [Code], [ErrorCode], [Id], [Lang] FROM [b2b].[Reasons] WHERE [Lang] = @Lang";
+        const string sql = "SELECT [Text], [Code], [ErrorCode], [Id], [LanguageCode] FROM [b2b].[ReasonTranslations] WHERE [LanguageCode] = @Lang";
 
         var result = await _connectionFactory
             .GetOpenConnection()
@@ -125,7 +125,7 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
 
     private async Task<List<ReasonTranslation>> GetTranslationsAsync(IEnumerable<string> errorCodes)
     {
-        const string sql = "SELECT [Text], [Code], [ErrorCode], [Id], [Lang] FROM [b2b].[Reasons] WHERE ErrorCode IN @ErrorCodes AND Lang = 'dk'";
+        const string sql = "SELECT [Text], [Code], [ErrorCode], [Id], [LanguageCode] FROM [b2b].[ReasonTranslations] WHERE ErrorCode IN @ErrorCodes AND LanguageCode = 'dk'";
 
         var result = await _connectionFactory
             .GetOpenConnection()
@@ -135,5 +135,5 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
         return result.ToList();
     }
 
-    private record ReasonTranslation(string Text, string Code, string ErrorCode, Guid Id, string Lang);
+    private record ReasonTranslation(string Text, string Code, string ErrorCode, Guid Id, string LanguageCode);
 }
