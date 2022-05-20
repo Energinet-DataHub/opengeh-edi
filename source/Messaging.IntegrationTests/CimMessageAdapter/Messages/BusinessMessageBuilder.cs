@@ -69,6 +69,13 @@ namespace Messaging.IntegrationTests.CimMessageAdapter.Messages
             return this;
         }
 
+        public BusinessMessageBuilder RemoveElementFromMarketActivityRecord(string elementName)
+        {
+            var elementToRemove = _document.Root?.Element(_xmlNamespace + "MktActivityRecord")?.Element(_xmlNamespace + elementName);
+            elementToRemove?.Remove();
+            return this;
+        }
+
         private void SetRootChildElementValue(string elementName, string value)
         {
             _document.Root!

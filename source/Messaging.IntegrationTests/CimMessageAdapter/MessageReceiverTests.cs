@@ -134,6 +134,20 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
         }
 
         [Fact]
+        public async Task Return_error_if_message_is_missing_a_required_element()
+        {
+            using var message = BusinessMessageBuilder
+                .RequestChangeOfSupplier()
+                .RemoveElementFromMarketActivityRecord("mRID")
+                .Message();
+
+            var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
+
+            Assert.False(result.Success);
+            AssertContainsError(result, "B2B-005");
+        }
+
+        [Fact]
         public async Task Message_must_conform_to_xml_schema()
         {
             await using var message = BusinessMessageBuilder
