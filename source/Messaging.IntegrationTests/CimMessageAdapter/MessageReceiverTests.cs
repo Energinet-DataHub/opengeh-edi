@@ -148,6 +148,20 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
         }
 
         [Fact]
+        public async Task Return_error_if_a_required_value_is_missing()
+        {
+            using var message = BusinessMessageBuilder
+                .RequestChangeOfSupplier()
+                .RemoveElementFromMarketActivityRecordValue("start_DateAndOrTime.dateTime")
+                .Message();
+
+            var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
+
+            Assert.False(result.Success);
+            AssertContainsError(result, "B2B-005");
+        }
+
+        [Fact]
         public async Task Message_must_conform_to_xml_schema()
         {
             await using var message = BusinessMessageBuilder
