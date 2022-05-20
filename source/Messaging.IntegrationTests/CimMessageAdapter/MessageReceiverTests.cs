@@ -134,7 +134,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
         }
 
         [Fact]
-        public async Task Return_error_if_message_is_missing_a_required_element()
+        public async Task Return_error_if_a_required_element_is_missing()
         {
             using var message = BusinessMessageBuilder
                 .RequestChangeOfSupplier()
