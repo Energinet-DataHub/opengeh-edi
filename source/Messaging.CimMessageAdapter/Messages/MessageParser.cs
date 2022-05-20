@@ -62,6 +62,11 @@ namespace Messaging.CimMessageAdapter.Messages
                         marketActivityRecords.Add(marketActivityRecord);
                     }
 
+                    if (_errors.Count > 0)
+                    {
+                        return MessageParserResult.Failure(_errors.ToArray());
+                    }
+
                     return MessageParserResult.Succeeded(messageHeader, marketActivityRecords);
                 }
                 catch (XmlException exception)
