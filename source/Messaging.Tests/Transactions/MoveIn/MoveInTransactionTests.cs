@@ -24,7 +24,7 @@ public class MoveInTransactionTests
     [Fact]
     public void State_change_to_pending_when_no_validation_errors()
     {
-        var transaction = new MoveInTransaction(Guid.NewGuid().ToString());
+        var transaction = CreateTransaction();
 
         var requestResult = BusinessRequestResult.Succeeded();
         transaction.Start(requestResult);
@@ -36,7 +36,7 @@ public class MoveInTransactionTests
     [Fact]
     public void State_change_to_completed_when_business_request_result_contain_validation_errors()
     {
-        var transaction = new MoveInTransaction(Guid.NewGuid().ToString());
+        var transaction = CreateTransaction();
 
         var requestResult = BusinessRequestResult.Failure("This is an validation error");
         transaction.Start(requestResult);
@@ -48,11 +48,16 @@ public class MoveInTransactionTests
     [Fact]
     public void State_can_change_to_completed_when_current_state_is_pending()
     {
-        var transaction = new MoveInTransaction(Guid.NewGuid().ToString());
+        var transaction = CreateTransaction();
         transaction.Start(BusinessRequestResult.Succeeded());
 
         transaction.Complete();
 
         Assert.Contains(transaction.DomainEvents, e => e is MoveInTransactionCompleted);
+    }
+
+    private static MoveInTransaction CreateTransaction()
+    {
+        return new MoveInTransaction(Guid.NewGuid().ToString());
     }
 }
