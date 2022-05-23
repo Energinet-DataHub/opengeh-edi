@@ -41,6 +41,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Messaging.Tests", "Messagin
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BusinessProcessing", "BusinessProcessing", "{582BFE4E-BBFB-4CBE-840D-2F97C2BA1D3C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "Contracts\Contracts.csproj", "{4AA95CA9-C2EB-4F47-88D5-8E320F62142C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -111,6 +113,10 @@ Global
 		{87BCDB76-76A4-46A3-9F67-571847541C90}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{87BCDB76-76A4-46A3-9F67-571847541C90}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{87BCDB76-76A4-46A3-9F67-571847541C90}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4AA95CA9-C2EB-4F47-88D5-8E320F62142C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AA95CA9-C2EB-4F47-88D5-8E320F62142C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AA95CA9-C2EB-4F47-88D5-8E320F62142C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AA95CA9-C2EB-4F47-88D5-8E320F62142C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
