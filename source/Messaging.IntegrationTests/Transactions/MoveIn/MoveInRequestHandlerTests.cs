@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -35,15 +34,12 @@ namespace Messaging.IntegrationTests.Transactions.MoveIn
     public class MoveInRequestHandlerTests : TestBase
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
-        private readonly IMoveInTransactionRepository _moveInTransactionRepository;
         private readonly MoveInRequestHandler _moveInRequestHandler;
 
         public MoveInRequestHandlerTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
             _outgoingMessageStore = GetService<IOutgoingMessageStore>();
-            _moveInTransactionRepository =
-                GetService<IMoveInTransactionRepository>();
             _moveInRequestHandler = GetService<MoveInRequestHandler>();
         }
 
@@ -58,17 +54,6 @@ namespace Messaging.IntegrationTests.Transactions.MoveIn
             var context = GetService<B2BContext>();
             var transaction = context.Transactions.FromSqlRaw(checkStatement).FirstOrDefault();
             Assert.NotNull(transaction);
-        }
-
-        [Fact]
-        public async Task Transaction_is_registered()
-        {
-            var incomingMessage = IncomingMessageBuilder.CreateMessage();
-
-            await _moveInRequestHandler.HandleAsync(incomingMessage).ConfigureAwait(false);
-
-            var savedTransaction = _moveInTransactionRepository.GetById(incomingMessage.MarketActivityRecord.Id);
-            Assert.NotNull(savedTransaction);
         }
 
         [Fact]
