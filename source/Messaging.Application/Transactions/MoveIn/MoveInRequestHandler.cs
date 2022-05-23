@@ -20,14 +20,14 @@ using Messaging.Application.Common;
 using Messaging.Application.Common.Reasons;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.IncomingMessages;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
-using Messaging.Application.Transactions;
-using Messaging.Application.Transactions.MoveIn;
+using MarketActivityRecord = Messaging.Application.IncomingMessages.RequestChangeOfSupplier.MarketActivityRecord;
 
-namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
+namespace Messaging.Application.Transactions.MoveIn
 {
-    public class RequestChangeOfSupplierHandler
+    public class MoveInRequestHandler
     {
         private readonly IMoveInTransactionRepository _moveInTransactionRepository;
         private readonly IOutgoingMessageStore _outgoingMessageStore;
@@ -37,7 +37,7 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
         private readonly IMoveInRequestAdapter _moveInRequestAdapter;
         private readonly IValidationErrorTranslator _validationErrorTranslator;
 
-        public RequestChangeOfSupplierHandler(
+        public MoveInRequestHandler(
             IMoveInTransactionRepository moveInTransactionRepository,
             IOutgoingMessageStore outgoingMessageStore,
             IUnitOfWork unitOfWork,

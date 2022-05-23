@@ -70,7 +70,7 @@ namespace Messaging.Infrastructure.Configuration
             services.AddScoped<IMarketActorAuthenticator, MarketActorAuthenticator>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
-            services.AddScoped<RequestChangeOfSupplierHandler>();
+            services.AddScoped<MoveInRequestHandler>();
             services.AddScoped<IMessageDispatcher, MessageDispatcher>();
             services.AddScoped<ConfirmRequestChangeOfSupplierMessageFactory>();
             services.AddScoped<RejectRequestChangeOfSupplierMessageFactory>();
