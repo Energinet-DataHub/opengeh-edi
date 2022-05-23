@@ -16,6 +16,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Messaging.Application.IncomingMessages;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Xml;
@@ -50,10 +51,7 @@ namespace Messaging.IntegrationTests.Transactions.MoveIn
 
             await _moveInRequestHandler.HandleAsync(incomingMessage).ConfigureAwait(false);
 
-            var checkStatement = $"SELECT * FROM b2b.transactions WHERE TransactionId = '{incomingMessage.MarketActivityRecord.Id}' AND Started = 1";
-            var context = GetService<B2BContext>();
-            var transaction = context.Transactions.FromSqlRaw(checkStatement).FirstOrDefault();
-            Assert.NotNull(transaction);
+            AssertTransactionIsStarted(incomingMessage.MarketActivityRecord.Id);
         }
 
         [Fact]
@@ -145,6 +143,15 @@ namespace Messaging.IntegrationTests.Transactions.MoveIn
 
             var validationResult = await MessageValidator.ValidateAsync(dispatchedDocument, schema!);
             Assert.True(validationResult.IsValid);
+        }
+
+        private void AssertTransactionIsStarted(string transactionId)
+        {
+            var checkStatement =
+                $"SELECT * FROM b2b.transactions WHERE TransactionId = '{transactionId}' AND Started = 1";
+            var context = GetService<B2BContext>();
+            var transaction = context.Transactions.FromSqlRaw(checkStatement).FirstOrDefault();
+            Assert.NotNull(transaction);
         }
     }
 }
