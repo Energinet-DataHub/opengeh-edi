@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
 using Xunit;
@@ -43,6 +42,17 @@ public class MoveInTransactionTests
         transaction.Start(requestResult);
 
         Assert.Equal(1, transaction.DomainEvents.Count);
+        Assert.Contains(transaction.DomainEvents, e => e is MoveInTransactionCompleted);
+    }
+
+    [Fact]
+    public void State_can_change_to_completed_when_current_state_is_pending()
+    {
+        var transaction = new MoveInTransaction(Guid.NewGuid().ToString());
+        transaction.Start(BusinessRequestResult.Succeeded());
+
+        transaction.Complete();
+
         Assert.Contains(transaction.DomainEvents, e => e is MoveInTransactionCompleted);
     }
 }

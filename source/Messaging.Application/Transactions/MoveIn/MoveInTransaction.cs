@@ -20,6 +20,7 @@ namespace Messaging.Application.Transactions.MoveIn
     public class MoveInTransaction
     {
         private readonly List<object> _domainEvents = new List<object>();
+        private bool _started;
 
         public MoveInTransaction(string transactionId)
         {
@@ -39,7 +40,16 @@ namespace Messaging.Application.Transactions.MoveIn
             }
             else
             {
+                _started = true;
                 _domainEvents.Add(new PendingBusinessProcess());
+            }
+        }
+
+        public void Complete()
+        {
+            if (_started)
+            {
+                _domainEvents.Add(new MoveInTransactionCompleted());
             }
         }
     }
