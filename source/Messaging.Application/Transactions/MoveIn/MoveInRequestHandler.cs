@@ -58,9 +58,7 @@ namespace Messaging.Application.Transactions.MoveIn
         public async Task HandleAsync(IncomingMessage incomingMessage)
         {
             if (incomingMessage == null) throw new ArgumentNullException(nameof(incomingMessage));
-
             var transaction = new MoveInTransaction(incomingMessage.MarketActivityRecord.Id);
-            _moveInTransactionRepository.Add(transaction);
 
             var businessProcessResult = await InvokeBusinessProcessAsync(incomingMessage).ConfigureAwait(false);
             if (businessProcessResult.Success == false)
@@ -74,6 +72,7 @@ namespace Messaging.Application.Transactions.MoveIn
             }
 
             transaction.Start(businessProcessResult);
+            _moveInTransactionRepository.Add(transaction);
             await _unitOfWork.CommitAsync().ConfigureAwait(false);
         }
 
