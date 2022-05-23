@@ -25,6 +25,8 @@ namespace Messaging.Infrastructure.Transactions
         {
             builder.ToTable("Transactions", "b2b");
             builder.HasKey(x => x.TransactionId);
+            builder.Property<bool>("_started")
+                .HasColumnName("Started");
         }
     }
 }

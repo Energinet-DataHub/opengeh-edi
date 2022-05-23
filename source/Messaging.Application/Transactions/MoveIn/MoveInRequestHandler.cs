@@ -73,6 +73,7 @@ namespace Messaging.Application.Transactions.MoveIn
                 _outgoingMessageStore.Add(ConfirmMessageFrom(incomingMessage, acceptedTransaction.TransactionId));
             }
 
+            acceptedTransaction.Start(businessProcessResult);
             await _unitOfWork.CommitAsync().ConfigureAwait(false);
         }
 

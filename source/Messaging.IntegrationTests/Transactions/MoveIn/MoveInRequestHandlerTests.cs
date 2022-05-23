@@ -12,16 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Data;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Xml;
 using Messaging.Application.Xml.SchemaStore;
+using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.IncomingMessages;
 using Messaging.IntegrationTests.TestDoubles;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Xunit.Categories;
 
@@ -41,6 +45,19 @@ namespace Messaging.IntegrationTests.Transactions.MoveIn
             _moveInTransactionRepository =
                 GetService<IMoveInTransactionRepository>();
             _moveInRequestHandler = GetService<MoveInRequestHandler>();
+        }
+
+        [Fact]
+        public async Task Transaction_is_started()
+        {
+            var incomingMessage = IncomingMessageBuilder.CreateMessage();
+
+            await _moveInRequestHandler.HandleAsync(incomingMessage).ConfigureAwait(false);
+
+            var checkStatement = $"SELECT * FROM b2b.transactions WHERE TransactionId = '{incomingMessage.MarketActivityRecord.Id}' AND Started = 1";
+            var context = GetService<B2BContext>();
+            var transaction = context.Transactions.FromSqlRaw(checkStatement).FirstOrDefault();
+            Assert.NotNull(transaction);
         }
 
         [Fact]
