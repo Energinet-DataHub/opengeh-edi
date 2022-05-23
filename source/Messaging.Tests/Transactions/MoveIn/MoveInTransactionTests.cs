@@ -12,26 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using System;
+using Messaging.Application.Transactions;
+using Messaging.Application.Transactions.MoveIn;
+using Xunit;
 
-namespace Messaging.Application.Transactions.MoveIn
+namespace Messaging.Tests.Transactions.MoveIn;
+
+public class MoveInTransactionTests
 {
-    public class MoveInTransaction
+    [Fact]
+    public void State_change_to_pending_when_no_validation_errors()
     {
-        private readonly List<object> _domainEvents = new List<object>();
+        var transaction = new MoveInTransaction(Guid.NewGuid().ToString());
 
-        public MoveInTransaction(string transactionId)
-        {
-            TransactionId = transactionId;
-        }
+        var requestResult = BusinessRequestResult.Succeeded();
+        transaction.Start(requestResult);
 
-        public string TransactionId { get; }
-
-        public IReadOnlyCollection<object> DomainEvents => _domainEvents.AsReadOnly();
-
-        public void Start(BusinessRequestResult businessRequestResult)
-        {
-            _domainEvents.Add(new PendingBusinessProcess());
-        }
+        Assert.Contains(transaction.DomainEvents, e => e is PendingBusinessProcess);
     }
 }
