@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Messaging.Application.Transactions;
+using Messaging.Application.Transactions.MoveIn;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

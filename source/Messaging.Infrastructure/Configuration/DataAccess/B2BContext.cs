@@ -15,6 +15,7 @@
 using System;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.Transactions;
+using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.DataAccess.Outgoing;
 using Messaging.Infrastructure.Configuration.InternalCommands;
 using Messaging.Infrastructure.Transactions;
