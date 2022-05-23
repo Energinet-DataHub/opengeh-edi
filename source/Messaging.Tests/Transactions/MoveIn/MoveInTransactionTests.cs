@@ -22,7 +22,7 @@ namespace Messaging.Tests.Transactions.MoveIn;
 public class MoveInTransactionTests
 {
     [Fact]
-    public void State_change_to_pending_when_no_validation_errors()
+    public void Transaction_is_started_when_business_request_result_contain_no_validation_errors()
     {
         var transaction = CreateTransaction();
 
@@ -34,7 +34,7 @@ public class MoveInTransactionTests
     }
 
     [Fact]
-    public void State_change_to_completed_when_business_request_result_contain_validation_errors()
+    public void Transaction_is_completed_when_business_request_result_contain_validation_errors()
     {
         var transaction = CreateTransaction();
 
@@ -46,7 +46,7 @@ public class MoveInTransactionTests
     }
 
     [Fact]
-    public void State_can_change_to_completed_when_current_state_is_pending()
+    public void Transaction_can_complete_when_started()
     {
         var transaction = CreateTransaction();
         transaction.Start(BusinessRequestResult.Succeeded());
