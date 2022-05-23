@@ -30,6 +30,7 @@ public class MoveInTransactionTests
         var requestResult = BusinessRequestResult.Succeeded();
         transaction.Start(requestResult);
 
+        Assert.Equal(1, transaction.DomainEvents.Count);
         Assert.Contains(transaction.DomainEvents, e => e is PendingBusinessProcess);
     }
 
