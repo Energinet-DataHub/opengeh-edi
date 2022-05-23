@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 
 namespace Messaging.Application.Transactions.MoveIn
@@ -31,7 +32,15 @@ namespace Messaging.Application.Transactions.MoveIn
 
         public void Start(BusinessRequestResult businessRequestResult)
         {
-            _domainEvents.Add(new PendingBusinessProcess());
+            if (businessRequestResult == null) throw new ArgumentNullException(nameof(businessRequestResult));
+            if (businessRequestResult.Success == false)
+            {
+                _domainEvents.Add(new MoveInTransactionCompleted());
+            }
+            else
+            {
+                _domainEvents.Add(new PendingBusinessProcess());
+            }
         }
     }
 }

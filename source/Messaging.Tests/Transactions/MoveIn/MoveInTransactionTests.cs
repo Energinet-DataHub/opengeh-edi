@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
 using Xunit;
@@ -30,5 +31,17 @@ public class MoveInTransactionTests
         transaction.Start(requestResult);
 
         Assert.Contains(transaction.DomainEvents, e => e is PendingBusinessProcess);
+    }
+
+    [Fact]
+    public void State_change_to_completed_when_business_request_result_contain_validation_errors()
+    {
+        var transaction = new MoveInTransaction(Guid.NewGuid().ToString());
+
+        var requestResult = BusinessRequestResult.Failure("This is an validation error");
+        transaction.Start(requestResult);
+
+        Assert.Equal(1, transaction.DomainEvents.Count);
+        Assert.Contains(transaction.DomainEvents, e => e is MoveInTransactionCompleted);
     }
 }
