@@ -59,21 +59,21 @@ namespace Messaging.Application.Transactions.MoveIn
         {
             if (incomingMessage == null) throw new ArgumentNullException(nameof(incomingMessage));
 
-            var acceptedTransaction = new MoveInTransaction(incomingMessage.MarketActivityRecord.Id);
-            _moveInTransactionRepository.Add(acceptedTransaction);
+            var transaction = new MoveInTransaction(incomingMessage.MarketActivityRecord.Id);
+            _moveInTransactionRepository.Add(transaction);
 
             var businessProcessResult = await InvokeBusinessProcessAsync(incomingMessage).ConfigureAwait(false);
             if (businessProcessResult.Success == false)
             {
                 var reasons = await CreateReasonsFromAsync(businessProcessResult.ValidationErrors).ConfigureAwait(false);
-                _outgoingMessageStore.Add(RejectMessageFrom(incomingMessage, acceptedTransaction.TransactionId, reasons));
+                _outgoingMessageStore.Add(RejectMessageFrom(incomingMessage, transaction.TransactionId, reasons));
             }
             else
             {
-                _outgoingMessageStore.Add(ConfirmMessageFrom(incomingMessage, acceptedTransaction.TransactionId));
+                _outgoingMessageStore.Add(ConfirmMessageFrom(incomingMessage, transaction.TransactionId));
             }
 
-            acceptedTransaction.Start(businessProcessResult);
+            transaction.Start(businessProcessResult);
             await _unitOfWork.CommitAsync().ConfigureAwait(false);
         }
 
