@@ -29,7 +29,7 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
 {
     public class RequestChangeOfSupplierHandler
     {
-        private readonly ITransactionRepository _transactionRepository;
+        private readonly IMoveInTransactionRepository _moveInTransactionRepository;
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICorrelationContext _correlationContext;
@@ -38,7 +38,7 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
         private readonly IValidationErrorTranslator _validationErrorTranslator;
 
         public RequestChangeOfSupplierHandler(
-            ITransactionRepository transactionRepository,
+            IMoveInTransactionRepository moveInTransactionRepository,
             IOutgoingMessageStore outgoingMessageStore,
             IUnitOfWork unitOfWork,
             ICorrelationContext correlationContext,
@@ -46,7 +46,7 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
             IMoveInRequestAdapter moveInRequestAdapter,
             IValidationErrorTranslator validationErrorTranslator)
         {
-            _transactionRepository = transactionRepository;
+            _moveInTransactionRepository = moveInTransactionRepository;
             _outgoingMessageStore = outgoingMessageStore;
             _unitOfWork = unitOfWork;
             _correlationContext = correlationContext;
@@ -59,8 +59,8 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
         {
             if (incomingMessage == null) throw new ArgumentNullException(nameof(incomingMessage));
 
-            var acceptedTransaction = new AcceptedTransaction(incomingMessage.MarketActivityRecord.Id);
-            _transactionRepository.Add(acceptedTransaction);
+            var acceptedTransaction = new MoveInTransaction(incomingMessage.MarketActivityRecord.Id);
+            _moveInTransactionRepository.Add(acceptedTransaction);
 
             var businessProcessResult = await InvokeBusinessProcessAsync(incomingMessage).ConfigureAwait(false);
             if (businessProcessResult.Success == false)

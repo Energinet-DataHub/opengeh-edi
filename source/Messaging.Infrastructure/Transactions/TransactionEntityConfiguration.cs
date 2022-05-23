@@ -18,9 +18,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Messaging.Infrastructure.Transactions
 {
-    internal class TransactionEntityConfiguration : IEntityTypeConfiguration<AcceptedTransaction>
+    internal class TransactionEntityConfiguration : IEntityTypeConfiguration<MoveInTransaction>
     {
-        public void Configure(EntityTypeBuilder<AcceptedTransaction> builder)
+        public void Configure(EntityTypeBuilder<MoveInTransaction> builder)
         {
             builder.ToTable("Transactions", "b2b");
             builder.HasKey(x => x.TransactionId);

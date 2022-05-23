@@ -17,21 +17,21 @@ using Messaging.Infrastructure.Configuration.DataAccess;
 
 namespace Messaging.Infrastructure.Transactions
 {
-    public class TransactionRepository : ITransactionRepository
+    public class MoveInTransactionRepository : IMoveInTransactionRepository
     {
         private readonly B2BContext _b2BContext;
 
-        public TransactionRepository(B2BContext b2BContext)
+        public MoveInTransactionRepository(B2BContext b2BContext)
         {
             _b2BContext = b2BContext;
         }
 
-        public void Add(AcceptedTransaction acceptedTransaction)
+        public void Add(MoveInTransaction moveInTransaction)
         {
-            _b2BContext.Transactions.Add(acceptedTransaction);
+            _b2BContext.Transactions.Add(moveInTransaction);
         }
 
-        public AcceptedTransaction? GetById(string transactionId)
+        public MoveInTransaction? GetById(string transactionId)
         {
             return _b2BContext.Transactions.Find(transactionId);
         }

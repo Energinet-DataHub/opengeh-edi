@@ -14,9 +14,9 @@
 
 namespace Messaging.Application.Transactions
 {
-    public class AcceptedTransaction
+    public class MoveInTransaction
     {
-        public AcceptedTransaction(string transactionId)
+        public MoveInTransaction(string transactionId)
         {
             TransactionId = transactionId;
         }

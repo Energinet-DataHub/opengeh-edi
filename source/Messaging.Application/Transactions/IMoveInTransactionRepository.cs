@@ -17,19 +17,19 @@ namespace Messaging.Application.Transactions
     /// <summary>
     /// Storage for transactions
     /// </summary>
-    public interface ITransactionRepository
+    public interface IMoveInTransactionRepository
     {
         /// <summary>
         /// Adds a transaction to store
         /// </summary>
-        /// <param name="acceptedTransaction"></param>
-        void Add(AcceptedTransaction acceptedTransaction);
+        /// <param name="moveInTransaction"></param>
+        void Add(MoveInTransaction moveInTransaction);
 
         /// <summary>
         /// Find a transaction by transaction id
         /// </summary>
         /// <param name="transactionId"></param>
-        /// <returns><see cref="AcceptedTransaction"/></returns>
-        AcceptedTransaction? GetById(string transactionId);
+        /// <returns><see cref="MoveInTransaction"/></returns>
+        MoveInTransaction? GetById(string transactionId);
     }
 }

@@ -32,15 +32,15 @@ namespace Messaging.IntegrationTests.IncomingMessages
     public class RequestChangeOfSupplierHandlingTests : TestBase
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
-        private readonly ITransactionRepository _transactionRepository;
+        private readonly IMoveInTransactionRepository _moveInTransactionRepository;
         private readonly RequestChangeOfSupplierHandler _requestChangeOfSupplierHandler;
 
         public RequestChangeOfSupplierHandlingTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
             _outgoingMessageStore = GetService<IOutgoingMessageStore>();
-            _transactionRepository =
-                GetService<ITransactionRepository>();
+            _moveInTransactionRepository =
+                GetService<IMoveInTransactionRepository>();
             _requestChangeOfSupplierHandler = GetService<RequestChangeOfSupplierHandler>();
         }
 
@@ -51,7 +51,7 @@ namespace Messaging.IntegrationTests.IncomingMessages
 
             await _requestChangeOfSupplierHandler.HandleAsync(incomingMessage).ConfigureAwait(false);
 
-            var savedTransaction = _transactionRepository.GetById(incomingMessage.MarketActivityRecord.Id);
+            var savedTransaction = _moveInTransactionRepository.GetById(incomingMessage.MarketActivityRecord.Id);
             Assert.NotNull(savedTransaction);
         }
 

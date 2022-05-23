@@ -34,7 +34,7 @@ namespace Messaging.Infrastructure.Configuration.DataAccess
         {
         }
 
-        public DbSet<AcceptedTransaction> Transactions { get; private set; }
+        public DbSet<MoveInTransaction> Transactions { get; private set; }
 
         public DbSet<OutgoingMessage> OutgoingMessages { get; private set; }
 
