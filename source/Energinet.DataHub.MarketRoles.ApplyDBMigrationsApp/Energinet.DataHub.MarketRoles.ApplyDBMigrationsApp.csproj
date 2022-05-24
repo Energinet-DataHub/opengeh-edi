@@ -84,6 +84,8 @@ limitations under the License.
     <None Remove="Scripts\Seed\202250181230 Test.sql" />
     <None Remove="Scripts\Seed\202250190741 Updates from actor registry.sql" />
     <EmbeddedResource Include="Scripts\Seed\202250190741 Updates from actor registry.sql" />
+    <None Remove="Scripts\Seed\202250201055 Add gsrn reason translations.sql" />
+    <EmbeddedResource Include="Scripts\Seed\202250201055 Add gsrn reason translations.sql" />
   </ItemGroup>
 
 </Project>
