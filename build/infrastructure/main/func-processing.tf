@@ -35,6 +35,7 @@ module "func_processing" {
     MARKET_DATA_DB_CONNECTION_STRING        = local.MS_MARKETROLES_CONNECTION_STRING
     INTEGRATION_EVENT_QUEUE                 = data.azurerm_key_vault_secret.sbq_event_forwarded_queue.value
     INTEGRATION_EVENT_QUEUE_CONNECTION      = data.azurerm_key_vault_secret.sb_domain_relay_listener_connection_string.value
+    RAISE_TIME_HAS_PASSED_EVENT_SCHEDULE    = "*/10 * * * * *"
   }
 
   tags                                      = azurerm_resource_group.this.tags
