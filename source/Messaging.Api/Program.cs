@@ -27,6 +27,7 @@ using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.Infrastructure.Transactions.MoveIn;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
@@ -105,7 +106,8 @@ namespace Messaging.Api
                             new Uri(
                             runtime.MOVE_IN_REQUEST_ENDPOINT ?? throw new ArgumentException(nameof(runtime.MOVE_IN_REQUEST_ENDPOINT))),
                             sp.GetRequiredService<HttpClient>(),
-                            sp.GetService<Messaging.Infrastructure.Configuration.Serialization.ISerializer>()!));
+                            sp.GetService<Messaging.Infrastructure.Configuration.Serialization.ISerializer>()!,
+                            sp.GetRequiredService<ILogger<MoveInRequestAdapter>>()));
                 })
                 .Build();
         }

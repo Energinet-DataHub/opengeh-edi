@@ -56,6 +56,7 @@ namespace Messaging.Api.IncomingMessages
             SetCorrelationIdFromServiceBusMessage(context);
 
             var byteAsString = Encoding.UTF8.GetString(data);
+            _logger.LogInformation($"Received incoming message: {byteAsString}");
 
             await _moveInRequestHandler.HandleAsync(
                     _jsonSerializer.Deserialize<IncomingMessage>(byteAsString))
