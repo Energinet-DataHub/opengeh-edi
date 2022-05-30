@@ -17,7 +17,7 @@ syntax = "proto3";
 
 option csharp_namespace = "Contracts.IntegrationEvents";
 /**
- * This message is sent out when consumer.
+ * This message is sent out when consumer has moved in.
  */
 
 message ConsumerMovedIn {
