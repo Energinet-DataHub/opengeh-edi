@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.Serialization;
+using Microsoft.Extensions.Logging;
 
 namespace Messaging.Infrastructure.Transactions.MoveIn;
 public sealed class MoveInRequestAdapter : IMoveInRequestAdapter
@@ -29,15 +30,18 @@ public sealed class MoveInRequestAdapter : IMoveInRequestAdapter
     private readonly Uri _moveInRequestUrl;
     private readonly HttpClient _httpClient;
     private readonly ISerializer _serializer;
+    private readonly ILogger<MoveInRequestAdapter> _logger;
 
     public MoveInRequestAdapter(
         Uri moveInRequestUrl,
         HttpClient httpClient,
-        ISerializer serializer)
+        ISerializer serializer,
+        ILogger<MoveInRequestAdapter> logger)
     {
         _moveInRequestUrl = moveInRequestUrl ?? throw new ArgumentNullException(nameof(moveInRequestUrl));
         _httpClient = httpClient;
         _serializer = serializer;
+        _logger = logger;
     }
 
     public Task<BusinessRequestResult> InvokeAsync(MoveInRequest request)
@@ -58,7 +62,7 @@ public sealed class MoveInRequestAdapter : IMoveInRequestAdapter
             request.ConsumerIdType);
 
         var response = await MoveInAsync(moveInRequestDto).ConfigureAwait(false);
-        var moveInResponseDto = await response.Content.ReadFromJsonAsync<BusinessProcessResponse>().ConfigureAwait(false) ?? throw new InvalidOperationException();
+        var moveInResponseDto = await ParseFromAsync(response).ConfigureAwait(false);
 
         return moveInResponseDto.ValidationErrors.Count > 0 ? BusinessRequestResult.Failure(moveInResponseDto.ValidationErrors.ToArray()) : BusinessRequestResult.Succeeded();
     }
@@ -70,6 +74,21 @@ public sealed class MoveInRequestAdapter : IMoveInRequestAdapter
         ms.Position = 0;
         using var content = new StreamContent(ms);
         return await _httpClient.PostAsync(_moveInRequestUrl, content).ConfigureAwait(false);
+    }
+
+    private async Task<BusinessProcessResponse> ParseFromAsync(HttpResponseMessage response)
+    {
+        try
+        {
+            var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            _logger.LogInformation($"Response body from business processing: {responseBody}");
+            return _serializer.Deserialize<BusinessProcessResponse>(responseBody);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to deserialize response from business processing.");
+            throw;
+        }
     }
 }
 
