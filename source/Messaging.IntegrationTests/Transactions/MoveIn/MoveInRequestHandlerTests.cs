@@ -13,46 +13,45 @@
 // limitations under the License.
 
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Messaging.Application.Common;
-using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
+using Messaging.Application.IncomingMessages;
 using Messaging.Application.OutgoingMessages;
-using Messaging.Application.Transactions;
+using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Xml;
 using Messaging.Application.Xml.SchemaStore;
+using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.IntegrationTests.Fixtures;
+using Messaging.IntegrationTests.IncomingMessages;
 using Messaging.IntegrationTests.TestDoubles;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Xunit.Categories;
 
-namespace Messaging.IntegrationTests.IncomingMessages
+namespace Messaging.IntegrationTests.Transactions.MoveIn
 {
     [IntegrationTest]
-    public class RequestChangeOfSupplierHandlingTests : TestBase
+    public class MoveInRequestHandlerTests : TestBase
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
-        private readonly ITransactionRepository _transactionRepository;
-        private readonly RequestChangeOfSupplierHandler _requestChangeOfSupplierHandler;
+        private readonly MoveInRequestHandler _moveInRequestHandler;
 
-        public RequestChangeOfSupplierHandlingTests(DatabaseFixture databaseFixture)
+        public MoveInRequestHandlerTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
             _outgoingMessageStore = GetService<IOutgoingMessageStore>();
-            _transactionRepository =
-                GetService<ITransactionRepository>();
-            _requestChangeOfSupplierHandler = GetService<RequestChangeOfSupplierHandler>();
+            _moveInRequestHandler = GetService<MoveInRequestHandler>();
         }
 
         [Fact]
-        public async Task Transaction_is_registered()
+        public async Task Transaction_is_started()
         {
             var incomingMessage = IncomingMessageBuilder.CreateMessage();
 
-            await _requestChangeOfSupplierHandler.HandleAsync(incomingMessage).ConfigureAwait(false);
+            await _moveInRequestHandler.HandleAsync(incomingMessage).ConfigureAwait(false);
 
-            var savedTransaction = _transactionRepository.GetById(incomingMessage.MarketActivityRecord.Id);
-            Assert.NotNull(savedTransaction);
+            AssertTransactionIsStarted(incomingMessage.MarketActivityRecord.Id);
         }
 
         [Fact]
@@ -65,7 +64,7 @@ namespace Messaging.IntegrationTests.IncomingMessages
                 .WithConsumerName("John Doe")
                 .Build();
 
-            await _requestChangeOfSupplierHandler.HandleAsync(incomingMessage).ConfigureAwait(false);
+            await _moveInRequestHandler.HandleAsync(incomingMessage).ConfigureAwait(false);
             var confirmMessage = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage.Id)!;
             await RequestMessage(confirmMessage.Id.ToString()).ConfigureAwait(false);
 
@@ -82,7 +81,7 @@ namespace Messaging.IntegrationTests.IncomingMessages
                 .WithConsumerName(null)
                 .Build();
 
-            await _requestChangeOfSupplierHandler.HandleAsync(incomingMessage).ConfigureAwait(false);
+            await _moveInRequestHandler.HandleAsync(incomingMessage).ConfigureAwait(false);
             var rejectMessage = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage.Id)!;
             await RequestMessage(rejectMessage.Id.ToString()).ConfigureAwait(false);
 
@@ -144,6 +143,15 @@ namespace Messaging.IntegrationTests.IncomingMessages
 
             var validationResult = await MessageValidator.ValidateAsync(dispatchedDocument, schema!);
             Assert.True(validationResult.IsValid);
+        }
+
+        private void AssertTransactionIsStarted(string transactionId)
+        {
+            var checkStatement =
+                $"SELECT * FROM b2b.transactions WHERE TransactionId = '{transactionId}' AND Started = 1";
+            var context = GetService<B2BContext>();
+            var transaction = context.Transactions.FromSqlRaw(checkStatement).FirstOrDefault();
+            Assert.NotNull(transaction);
         }
     }
 }

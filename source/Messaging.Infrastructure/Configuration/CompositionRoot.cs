@@ -66,11 +66,11 @@ namespace Messaging.Infrastructure.Configuration
             services.AddScoped<ITransactionIds, TransactionIdRegistry>();
             services.AddScoped<IMessageIds, MessageIdRegistry>();
             services.AddScoped<IMessageQueueDispatcher, MessageQueueDispatcher>();
-            services.AddScoped<ITransactionRepository, TransactionRepository>();
+            services.AddScoped<IMoveInTransactionRepository, MoveInTransactionRepository>();
             services.AddScoped<IMarketActorAuthenticator, MarketActorAuthenticator>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
-            services.AddScoped<RequestChangeOfSupplierHandler>();
+            services.AddScoped<MoveInRequestHandler>();
             services.AddScoped<IMessageDispatcher, MessageDispatcher>();
             services.AddScoped<ConfirmRequestChangeOfSupplierMessageFactory>();
             services.AddScoped<RejectRequestChangeOfSupplierMessageFactory>();

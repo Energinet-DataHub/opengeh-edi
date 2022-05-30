@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Messaging.Application.IncomingMessages;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages;
+using Messaging.Application.Transactions.MoveIn;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.IncomingMessages;
 using Messaging.IntegrationTests.TestDoubles;
@@ -29,14 +30,14 @@ namespace Messaging.IntegrationTests.OutgoingMessages
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly MessageRequestHandler _messageRequestHandler;
-        private readonly RequestChangeOfSupplierHandler _requestChangeOfSupplierHandler;
+        private readonly MoveInRequestHandler _moveInRequestHandler;
         private readonly MessageDispatcherSpy _messageDispatcherSpy;
 
         public MessageRequestTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
             _outgoingMessageStore = GetService<IOutgoingMessageStore>();
-            _requestChangeOfSupplierHandler = GetService<RequestChangeOfSupplierHandler>();
+            _moveInRequestHandler = GetService<MoveInRequestHandler>();
             _messageRequestHandler = GetService<MessageRequestHandler>();
             _messageDispatcherSpy = (MessageDispatcherSpy)GetService<IMessageDispatcher>();
         }
@@ -120,13 +121,13 @@ namespace Messaging.IntegrationTests.OutgoingMessages
         private async Task<IncomingMessage> MessageArrived()
         {
             var incomingMessage = IncomingMessageBuilder.CreateMessage();
-            await _requestChangeOfSupplierHandler.HandleAsync(incomingMessage).ConfigureAwait(false);
+            await _moveInRequestHandler.HandleAsync(incomingMessage).ConfigureAwait(false);
             return incomingMessage;
         }
 
         private async Task<IncomingMessage> MessageArrived(IncomingMessage arrivedMessage)
         {
-            await _requestChangeOfSupplierHandler.HandleAsync(arrivedMessage).ConfigureAwait(false);
+            await _moveInRequestHandler.HandleAsync(arrivedMessage).ConfigureAwait(false);
             return arrivedMessage;
         }
     }

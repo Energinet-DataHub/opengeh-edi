@@ -12,15 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Application.Transactions
-{
-    public class AcceptedTransaction
-    {
-        public AcceptedTransaction(string transactionId)
-        {
-            TransactionId = transactionId;
-        }
+namespace Messaging.Application.Transactions.MoveIn;
 
-        public string TransactionId { get; }
-    }
+public class PendingBusinessProcess
+{
 }
