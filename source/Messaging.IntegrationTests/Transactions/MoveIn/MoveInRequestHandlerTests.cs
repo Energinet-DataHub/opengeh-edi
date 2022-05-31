@@ -12,22 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Messaging.Application.IncomingMessages;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Xml;
 using Messaging.Application.Xml.SchemaStore;
 using Messaging.Infrastructure.Configuration.DataAccess;
+using Messaging.Infrastructure.Transactions;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.IncomingMessages;
+using Messaging.IntegrationTests.Infrastructure.Transactions.MoveIn;
 using Messaging.IntegrationTests.TestDoubles;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Xunit.Categories;
+using Xunit.Sdk;
 
 namespace Messaging.IntegrationTests.Transactions.MoveIn
 {
@@ -74,6 +78,9 @@ namespace Messaging.IntegrationTests.Transactions.MoveIn
         [Fact]
         public async Task Reject_if_business_request_is_invalid()
         {
+            var httpClientMock = GetHttpClientMock();
+            httpClientMock.RespondWithValidationErrors(new List<string> { "InvalidConsumer" });
+
             var incomingMessage = MessageBuilder()
                 .WithProcessType("E03")
                 .WithReceiver("5790001330552")
@@ -152,6 +159,12 @@ namespace Messaging.IntegrationTests.Transactions.MoveIn
             var context = GetService<B2BContext>();
             var transaction = context.Transactions.FromSqlRaw(checkStatement).FirstOrDefault();
             Assert.NotNull(transaction);
+        }
+
+        private HttpClientSpy GetHttpClientMock()
+        {
+            var adapter = GetService<IHttpClientAdapter>();
+            return adapter as HttpClientSpy ?? throw new InvalidCastException();
         }
     }
 }
