@@ -91,11 +91,11 @@ namespace Messaging.Api.Configuration.Middleware.Authentication.Bearer
             return claimsPrincipal.FindFirst(claim => claim.Type.Equals("azp", StringComparison.OrdinalIgnoreCase))?.Value;
         }
 
-        private static ClaimsIdentity CreateClaimsIdentityFrom(Actors actors, CurrentClaimsPrincipal currentClaimsPrincipal)
+        private static ClaimsIdentity CreateClaimsIdentityFrom(Actor actor, CurrentClaimsPrincipal currentClaimsPrincipal)
         {
             var claims = currentClaimsPrincipal.ClaimsPrincipal!.Claims.ToList();
-            claims.Add(new Claim("actorid", actors.Identifier));
-            claims.Add(new Claim("actoridtype", actors.IdentificationType));
+            claims.Add(new Claim("actorid", actor.Identifier));
+            claims.Add(new Claim("actoridtype", actor.IdentificationType));
 
             var currentIdentity = currentClaimsPrincipal.ClaimsPrincipal?.Identity as ClaimsIdentity;
             var identity = new ClaimsIdentity(
@@ -106,17 +106,15 @@ namespace Messaging.Api.Configuration.Middleware.Authentication.Bearer
             return identity;
         }
 
-        private static async Task<Actors?> GetActorAsync(Guid actorId, B2BContext context)
+        private static async Task<Actor?> GetActorAsync(Guid actorId, B2BContext context)
         {
             var sql = "SELECT TOP 1 [Id] AS ActorId,[IdentificationType],[IdentificationNumber] AS Identifier,[Roles] FROM [dbo].[Actor] WHERE Id = @ActorId";
 
             var result = await context.Database.GetDbConnection()
-                .QuerySingleOrDefaultAsync<Actors>(sql, new { ActorId = actorId })
+                .QuerySingleOrDefaultAsync<Actor>(sql, new { ActorId = actorId })
                 .ConfigureAwait(false);
 
             return result;
         }
     }
-
-    public record Actors(Guid ActorId, string IdentificationType, string Identifier, string Roles);
 }

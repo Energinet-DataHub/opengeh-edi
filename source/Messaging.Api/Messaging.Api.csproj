@@ -54,7 +54,4 @@ limitations under the License.
     <ItemGroup>
       <ProjectReference Include="..\Messaging.Infrastructure\Messaging.Infrastructure.csproj" />
     </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Configuration\Middleware\ServiceBus" />
-    </ItemGroup>
 </Project>
