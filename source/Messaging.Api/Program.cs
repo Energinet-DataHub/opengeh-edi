@@ -103,7 +103,10 @@ namespace Messaging.Api
                         .AddRequestHandler<NotifyMessageHubHandler, NotifyMessageHub>()
                         .AddNotificationHandler<PublishNewMessagesOnTimeHasPassed, TimeHasPassed>()
                         .AddLiveHealthCheck()
-                        .AddServiceBusQueuesHealthCheck(runtime.INCOMING_MESSAGE_QUEUE_MANAGE_CONNECTION_STRING!)
+                        .AddInternalDomainServiceBusQueuesHealthCheck(
+                            runtime.INCOMING_MESSAGE_QUEUE_MANAGE_CONNECTION_STRING!,
+                            runtime.INCOMING_MESSAGE_QUEUE_NAME!,
+                            runtime.MESSAGE_REQUEST_QUEUE!)
                         .AddSqlServerHealthCheck(runtime.DB_CONNECTION_STRING!)
                         .AddMoveInRequestHandler(sp => new MoveInRequestAdapter(
                             new Uri(

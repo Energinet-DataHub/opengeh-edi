@@ -62,6 +62,11 @@ data "azurerm_key_vault_secret" "sb_domain_relay_sender_connection_string" {
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }
 
+data "azurerm_key_vault_secret" "sb_domain_relay_manage_connection_string" {
+  name         = "kvs_sb_domain_relay_manage_connection_string"
+  key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
+}
+
 data "azurerm_key_vault_secret" "st_market_operator_response_primary_connection_string" {
   name         = "st-marketres-primary-connection-string"
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id

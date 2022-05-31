@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
@@ -109,13 +110,16 @@ namespace Messaging.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddServiceBusQueuesHealthCheck(string serviceBusConnectionString)
+        public CompositionRoot AddInternalDomainServiceBusQueuesHealthCheck(string serviceBusConnectionString, [NotNull] params string[] queueNames)
         {
-            _services.AddHealthChecks()
-                .AddAzureServiceBusQueue(
-                    name: "IncomingMessageQueueExists",
-                    connectionString: serviceBusConnectionString,
-                    queueName: "incomingmessagequeue");
+            foreach (var name in queueNames)
+            {
+                _services.AddHealthChecks()
+                    .AddAzureServiceBusQueue(
+                        name: name + "Exists",
+                        connectionString: serviceBusConnectionString,
+                        queueName: name);
+            }
 
             return this;
         }
