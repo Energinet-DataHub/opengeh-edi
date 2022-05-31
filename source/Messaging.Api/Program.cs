@@ -91,8 +91,8 @@ namespace Messaging.Api
                             runtime.INCOMING_MESSAGE_QUEUE_SENDER_CONNECTION_STRING!,
                             runtime.INCOMING_MESSAGE_QUEUE_NAME!)
                         .AddRequestLogging(
-                            Environment.GetEnvironmentVariable("REQUEST_RESPONSE_LOGGING_CONNECTION_STRING")!,
-                            Environment.GetEnvironmentVariable("REQUEST_RESPONSE_LOGGING_CONTAINER_NAME")!)
+                            runtime.REQUEST_RESPONSE_LOGGING_CONNECTION_STRING!,
+                            runtime.REQUEST_RESPONSE_LOGGING_CONTAINER_NAME!)
                         .AddMessagePublishing(sp => new NewMessageAvailableNotifier(sp.GetRequiredService<IDataAvailableNotificationSender>()))
                         .AddMessageHubServices(
                             runtime.MESSAGEHUB_STORAGE_CONNECTION_STRING!,
