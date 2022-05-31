@@ -17,7 +17,7 @@ using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 
-namespace B2B.Transactions.Api.Monitor
+namespace Messaging.Api.Monitor
 {
     public class HealthCheckEndpoint
     {

@@ -15,6 +15,8 @@
 using System;
 using System.Net.Http;
 using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
+using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Energinet.DataHub.MessageHub.Client;
 using Energinet.DataHub.MessageHub.Client.DataAvailable;
@@ -76,6 +78,10 @@ namespace Messaging.Infrastructure.Configuration
             services.AddScoped<RejectRequestChangeOfSupplierMessageFactory>();
             services.AddScoped<MessageRequestHandler>();
             services.AddScoped<MessageRequestContext>();
+
+            services.AddScoped<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>();
+            services.AddHealthChecks()
+                .AddLiveCheck();
 
             services.AddLogging();
             AddXmlSchema(services);
