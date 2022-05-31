@@ -20,59 +20,59 @@ using Messaging.Application.Common;
 using Messaging.Application.Common.Reasons;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.IncomingMessages;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
-using Messaging.Application.Transactions;
-using Messaging.Application.Transactions.MoveIn;
+using MarketActivityRecord = Messaging.Application.IncomingMessages.RequestChangeOfSupplier.MarketActivityRecord;
 
-namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
+namespace Messaging.Application.Transactions.MoveIn
 {
-    public class RequestChangeOfSupplierHandler
+    public class MoveInRequestHandler
     {
-        private readonly ITransactionRepository _transactionRepository;
+        private readonly IMoveInTransactionRepository _moveInTransactionRepository;
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICorrelationContext _correlationContext;
         private readonly IMarketActivityRecordParser _marketActivityRecordParser;
-        private readonly IMoveInRequestAdapter _moveInRequestAdapter;
+        private readonly IMoveInRequester _moveInRequester;
         private readonly IValidationErrorTranslator _validationErrorTranslator;
 
-        public RequestChangeOfSupplierHandler(
-            ITransactionRepository transactionRepository,
+        public MoveInRequestHandler(
+            IMoveInTransactionRepository moveInTransactionRepository,
             IOutgoingMessageStore outgoingMessageStore,
             IUnitOfWork unitOfWork,
             ICorrelationContext correlationContext,
             IMarketActivityRecordParser marketActivityRecordParser,
-            IMoveInRequestAdapter moveInRequestAdapter,
+            IMoveInRequester moveInRequester,
             IValidationErrorTranslator validationErrorTranslator)
         {
-            _transactionRepository = transactionRepository;
+            _moveInTransactionRepository = moveInTransactionRepository;
             _outgoingMessageStore = outgoingMessageStore;
             _unitOfWork = unitOfWork;
             _correlationContext = correlationContext;
             _marketActivityRecordParser = marketActivityRecordParser;
-            _moveInRequestAdapter = moveInRequestAdapter;
+            _moveInRequester = moveInRequester;
             _validationErrorTranslator = validationErrorTranslator;
         }
 
         public async Task HandleAsync(IncomingMessage incomingMessage)
         {
             if (incomingMessage == null) throw new ArgumentNullException(nameof(incomingMessage));
-
-            var acceptedTransaction = new AcceptedTransaction(incomingMessage.MarketActivityRecord.Id);
-            _transactionRepository.Add(acceptedTransaction);
+            var transaction = new MoveInTransaction(incomingMessage.MarketActivityRecord.Id);
 
             var businessProcessResult = await InvokeBusinessProcessAsync(incomingMessage).ConfigureAwait(false);
             if (businessProcessResult.Success == false)
             {
                 var reasons = await CreateReasonsFromAsync(businessProcessResult.ValidationErrors).ConfigureAwait(false);
-                _outgoingMessageStore.Add(RejectMessageFrom(incomingMessage, acceptedTransaction.TransactionId, reasons));
+                _outgoingMessageStore.Add(RejectMessageFrom(incomingMessage, transaction.TransactionId, reasons));
             }
             else
             {
-                _outgoingMessageStore.Add(ConfirmMessageFrom(incomingMessage, acceptedTransaction.TransactionId));
+                _outgoingMessageStore.Add(ConfirmMessageFrom(incomingMessage, transaction.TransactionId));
             }
 
+            transaction.Start(businessProcessResult);
+            _moveInTransactionRepository.Add(transaction);
             await _unitOfWork.CommitAsync().ConfigureAwait(false);
         }
 
@@ -101,7 +101,7 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
                 incomingMessage.MarketActivityRecord.Id,
                 incomingMessage.MarketActivityRecord.ConsumerId,
                 GetConsumerIdType(incomingMessage.MarketActivityRecord));
-            return _moveInRequestAdapter.InvokeAsync(businessProcess);
+            return _moveInRequester.InvokeAsync(businessProcess);
         }
 
         private OutgoingMessage ConfirmMessageFrom(IncomingMessage incomingMessage, string transactionId)

@@ -12,47 +12,50 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Messaging.Application.Common;
-using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages;
-using Messaging.Application.Transactions;
+using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Xml;
 using Messaging.Application.Xml.SchemaStore;
+using Messaging.Infrastructure.Configuration.DataAccess;
+using Messaging.Infrastructure.Transactions;
 using Messaging.IntegrationTests.Fixtures;
+using Messaging.IntegrationTests.IncomingMessages;
+using Messaging.IntegrationTests.Infrastructure.Transactions.MoveIn;
 using Messaging.IntegrationTests.TestDoubles;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Xunit.Categories;
+using Xunit.Sdk;
 
-namespace Messaging.IntegrationTests.IncomingMessages
+namespace Messaging.IntegrationTests.Transactions.MoveIn
 {
     [IntegrationTest]
-    public class RequestChangeOfSupplierHandlingTests : TestBase
+    public class MoveInRequestHandlerTests : TestBase
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
-        private readonly ITransactionRepository _transactionRepository;
-        private readonly RequestChangeOfSupplierHandler _requestChangeOfSupplierHandler;
+        private readonly MoveInRequestHandler _moveInRequestHandler;
 
-        public RequestChangeOfSupplierHandlingTests(DatabaseFixture databaseFixture)
+        public MoveInRequestHandlerTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
             _outgoingMessageStore = GetService<IOutgoingMessageStore>();
-            _transactionRepository =
-                GetService<ITransactionRepository>();
-            _requestChangeOfSupplierHandler = GetService<RequestChangeOfSupplierHandler>();
+            _moveInRequestHandler = GetService<MoveInRequestHandler>();
         }
 
         [Fact]
-        public async Task Transaction_is_registered()
+        public async Task Transaction_is_started()
         {
             var incomingMessage = IncomingMessageBuilder.CreateMessage();
 
-            await _requestChangeOfSupplierHandler.HandleAsync(incomingMessage).ConfigureAwait(false);
+            await _moveInRequestHandler.HandleAsync(incomingMessage).ConfigureAwait(false);
 
-            var savedTransaction = _transactionRepository.GetById(incomingMessage.MarketActivityRecord.Id);
-            Assert.NotNull(savedTransaction);
+            AssertTransactionIsStarted(incomingMessage.MarketActivityRecord.Id);
         }
 
         [Fact]
@@ -65,7 +68,7 @@ namespace Messaging.IntegrationTests.IncomingMessages
                 .WithConsumerName("John Doe")
                 .Build();
 
-            await _requestChangeOfSupplierHandler.HandleAsync(incomingMessage).ConfigureAwait(false);
+            await _moveInRequestHandler.HandleAsync(incomingMessage).ConfigureAwait(false);
             var confirmMessage = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage.Id)!;
             await RequestMessage(confirmMessage.Id.ToString()).ConfigureAwait(false);
 
@@ -75,6 +78,9 @@ namespace Messaging.IntegrationTests.IncomingMessages
         [Fact]
         public async Task Reject_if_business_request_is_invalid()
         {
+            var httpClientMock = GetHttpClientMock();
+            httpClientMock.RespondWithValidationErrors(new List<string> { "InvalidConsumer" });
+
             var incomingMessage = MessageBuilder()
                 .WithProcessType("E03")
                 .WithReceiver("5790001330552")
@@ -82,7 +88,7 @@ namespace Messaging.IntegrationTests.IncomingMessages
                 .WithConsumerName(null)
                 .Build();
 
-            await _requestChangeOfSupplierHandler.HandleAsync(incomingMessage).ConfigureAwait(false);
+            await _moveInRequestHandler.HandleAsync(incomingMessage).ConfigureAwait(false);
             var rejectMessage = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage.Id)!;
             await RequestMessage(rejectMessage.Id.ToString()).ConfigureAwait(false);
 
@@ -144,6 +150,21 @@ namespace Messaging.IntegrationTests.IncomingMessages
 
             var validationResult = await MessageValidator.ValidateAsync(dispatchedDocument, schema!);
             Assert.True(validationResult.IsValid);
+        }
+
+        private void AssertTransactionIsStarted(string transactionId)
+        {
+            var checkStatement =
+                $"SELECT * FROM b2b.transactions WHERE TransactionId = '{transactionId}' AND Started = 1";
+            var context = GetService<B2BContext>();
+            var transaction = context.Transactions.FromSqlRaw(checkStatement).FirstOrDefault();
+            Assert.NotNull(transaction);
+        }
+
+        private HttpClientSpy GetHttpClientMock()
+        {
+            var adapter = GetService<IHttpClientAdapter>();
+            return adapter as HttpClientSpy ?? throw new InvalidCastException();
         }
     }
 }

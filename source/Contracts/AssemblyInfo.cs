@@ -12,20 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
+namespace Contracts;
 
-namespace Messaging.Application.Transactions.MoveIn
+public class AssemblyInfo
 {
-    /// <summary>
-    /// Interface for move in request adapter
-    /// </summary>
-    public interface IMoveInRequestAdapter
-    {
-        /// <summary>
-        /// Invokes a move in business process asynchronously
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns><see cref="Task"/></returns>
-        Task<BusinessRequestResult> InvokeAsync(MoveInRequest request);
-    }
 }

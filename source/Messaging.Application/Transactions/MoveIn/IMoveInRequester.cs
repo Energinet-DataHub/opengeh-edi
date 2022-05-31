@@ -12,21 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.Application.Transactions;
-using Messaging.Application.Transactions.MoveIn;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Threading.Tasks;
 
-namespace Messaging.Infrastructure.Transactions
+namespace Messaging.Application.Transactions.MoveIn
 {
-    internal class TransactionEntityConfiguration : IEntityTypeConfiguration<MoveInTransaction>
+    /// <summary>
+    /// Interface for move in request adapter
+    /// </summary>
+    public interface IMoveInRequester
     {
-        public void Configure(EntityTypeBuilder<MoveInTransaction> builder)
-        {
-            builder.ToTable("Transactions", "b2b");
-            builder.HasKey(x => x.TransactionId);
-            builder.Property<bool>("_started")
-                .HasColumnName("Started");
-        }
+        /// <summary>
+        /// Invokes a move in business process asynchronously
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns><see cref="Task"/></returns>
+        Task<BusinessRequestResult> InvokeAsync(MoveInRequest request);
     }
 }

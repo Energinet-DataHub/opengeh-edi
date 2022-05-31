@@ -12,15 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Application.Transactions
-{
-    public class AcceptedTransaction
-    {
-        public AcceptedTransaction(string transactionId)
-        {
-            TransactionId = transactionId;
-        }
+using System;
+using System.Net.Http;
+using System.Threading.Tasks;
 
-        public string TransactionId { get; }
+namespace Messaging.Infrastructure.Transactions;
+
+public class HttpClientAdapter : IHttpClientAdapter
+{
+    private readonly HttpClient _httpClient;
+
+    public HttpClientAdapter(HttpClient httpClient)
+    {
+        _httpClient = httpClient;
+    }
+
+    public Task<HttpResponseMessage> PostAsync(Uri uri, HttpContent content)
+    {
+        return _httpClient.PostAsync(uri, content);
     }
 }

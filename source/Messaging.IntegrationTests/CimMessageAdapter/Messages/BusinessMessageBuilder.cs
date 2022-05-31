@@ -69,10 +69,28 @@ namespace Messaging.IntegrationTests.CimMessageAdapter.Messages
             return this;
         }
 
+        public BusinessMessageBuilder RemoveElementFromMarketActivityRecord(string elementName)
+        {
+            var elementToRemove = _document.Root?.Element(_xmlNamespace + "MktActivityRecord")?.Element(_xmlNamespace + elementName);
+            elementToRemove?.Remove();
+            return this;
+        }
+
+        public BusinessMessageBuilder RemoveElementFromMarketActivityRecordValue(string elementName)
+        {
+            GetMarketActivityRecordChildElement(elementName).Value = string.Empty;
+            return this;
+        }
+
         private void SetRootChildElementValue(string elementName, string value)
         {
             _document.Root!
                 .Element(_xmlNamespace + elementName)!.Value = value;
+        }
+
+        private XElement GetMarketActivityRecordChildElement(string elementName)
+        {
+            return _document.Root?.Element(_xmlNamespace + "MktActivityRecord")?.Element(_xmlNamespace + elementName)!;
         }
     }
 }

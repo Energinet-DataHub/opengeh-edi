@@ -24,9 +24,11 @@ using Messaging.Api.Configuration.Middleware.Correlation;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.SystemTime;
 using Messaging.Infrastructure.OutgoingMessages;
+using Messaging.Infrastructure.Transactions;
 using Messaging.Infrastructure.Transactions.MoveIn;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
@@ -92,7 +94,8 @@ namespace Messaging.Api
                         .AddRequestLogging(
                             runtime.REQUEST_RESPONSE_LOGGING_CONNECTION_STRING!,
                             runtime.REQUEST_RESPONSE_LOGGING_CONTAINER_NAME!)
-                        .AddMessagePublishing(sp => new NewMessageAvailableNotifier(sp.GetRequiredService<IDataAvailableNotificationSender>()))
+                        .AddMessagePublishing(sp =>
+                            new NewMessageAvailableNotifier(sp.GetRequiredService<IDataAvailableNotificationSender>()))
                         .AddMessageHubServices(
                             runtime.MESSAGEHUB_STORAGE_CONNECTION_STRING!,
                             runtime.MESSAGEHUB_STORAGE_CONTAINER_NAME!,
@@ -101,11 +104,8 @@ namespace Messaging.Api
                             runtime.MESSAGEHUB_DOMAIN_REPLY_QUEUE!)
                         .AddRequestHandler<NotifyMessageHubHandler, NotifyMessageHub>()
                         .AddNotificationHandler<PublishNewMessagesOnTimeHasPassed, TimeHasPassed>()
-                        .AddMoveInRequestHandler(sp => new MoveInRequestAdapter(
-                            new Uri(
-                            runtime.MOVE_IN_REQUEST_ENDPOINT ?? throw new ArgumentException(nameof(runtime.MOVE_IN_REQUEST_ENDPOINT))),
-                            sp.GetRequiredService<HttpClient>(),
-                            sp.GetService<Messaging.Infrastructure.Configuration.Serialization.ISerializer>()!));
+                        .AddHttpClientAdapter(sp => new HttpClientAdapter(sp.GetRequiredService<HttpClient>()))
+                        .AddMoveInServices(new MoveInConfiguration(new Uri(runtime.MOVE_IN_REQUEST_ENDPOINT ?? throw new ArgumentException(nameof(runtime.MOVE_IN_REQUEST_ENDPOINT)))));
                 })
                 .Build();
         }

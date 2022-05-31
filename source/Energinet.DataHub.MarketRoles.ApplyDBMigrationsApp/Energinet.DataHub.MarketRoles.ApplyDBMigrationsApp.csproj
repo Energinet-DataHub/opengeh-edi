@@ -34,6 +34,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202105051000 Initial Market Roles DB.sql" />
     <EmbeddedResource Include="Scripts\Model\202108171123 Add IncomingMessages.sql" />
     <EmbeddedResource Include="Scripts\Model\202109010920 Alter Correlation in QueuedInternalCommands.sql" />
+    <EmbeddedResource Include="Scripts\Model\202250231343 Add started column.sql" />
     <EmbeddedResource Include="Scripts\Seed\202250181248 Add reason translations.sql" />
     <None Remove="Scripts\Model\202109010720 Add Correlation to OutboxMessages.sql" />
     <EmbeddedResource Include="Scripts\Model\202109010720 Add Correlation to OutboxMessages.sql" />
@@ -84,6 +85,8 @@ limitations under the License.
     <None Remove="Scripts\Seed\202250181230 Test.sql" />
     <None Remove="Scripts\Seed\202250190741 Updates from actor registry.sql" />
     <EmbeddedResource Include="Scripts\Seed\202250190741 Updates from actor registry.sql" />
+    <None Remove="Scripts\Seed\202250201055 Add gsrn reason translations.sql" />
+    <EmbeddedResource Include="Scripts\Seed\202250201055 Add gsrn reason translations.sql" />
   </ItemGroup>
 
 </Project>

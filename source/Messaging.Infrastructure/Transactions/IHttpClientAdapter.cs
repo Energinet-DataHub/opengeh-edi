@@ -12,24 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Application.Transactions
+using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+
+namespace Messaging.Infrastructure.Transactions;
+
+/// <summary>
+/// Adapter for HTTP Client
+/// </summary>
+public interface IHttpClientAdapter
 {
     /// <summary>
-    /// Storage for transactions
+    /// Post message
     /// </summary>
-    public interface ITransactionRepository
-    {
-        /// <summary>
-        /// Adds a transaction to store
-        /// </summary>
-        /// <param name="acceptedTransaction"></param>
-        void Add(AcceptedTransaction acceptedTransaction);
-
-        /// <summary>
-        /// Find a transaction by transaction id
-        /// </summary>
-        /// <param name="transactionId"></param>
-        /// <returns><see cref="AcceptedTransaction"/></returns>
-        AcceptedTransaction? GetById(string transactionId);
-    }
+    /// <param name="uri"></param>
+    /// <param name="content"></param>
+    Task<HttpResponseMessage> PostAsync(Uri uri, HttpContent content);
 }

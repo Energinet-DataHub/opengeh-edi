@@ -46,6 +46,7 @@ using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.IncomingMessages;
 using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.Infrastructure.Transactions;
+using Messaging.Infrastructure.Transactions.MoveIn;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -66,11 +67,10 @@ namespace Messaging.Infrastructure.Configuration
             services.AddScoped<ITransactionIds, TransactionIdRegistry>();
             services.AddScoped<IMessageIds, MessageIdRegistry>();
             services.AddScoped<IMessageQueueDispatcher, MessageQueueDispatcher>();
-            services.AddScoped<ITransactionRepository, TransactionRepository>();
+            services.AddScoped<IMoveInTransactionRepository, MoveInTransactionRepository>();
             services.AddScoped<IMarketActorAuthenticator, MarketActorAuthenticator>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
-            services.AddScoped<RequestChangeOfSupplierHandler>();
             services.AddScoped<IMessageDispatcher, MessageDispatcher>();
             services.AddScoped<ConfirmRequestChangeOfSupplierMessageFactory>();
             services.AddScoped<RejectRequestChangeOfSupplierMessageFactory>();
@@ -197,9 +197,17 @@ namespace Messaging.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddMoveInRequestHandler(Func<IServiceProvider, IMoveInRequestAdapter> action)
+        public CompositionRoot AddMoveInServices(MoveInConfiguration configuration)
         {
-            _services.AddScoped(action);
+            _services.AddScoped(_ => configuration);
+            _services.AddScoped<MoveInRequestHandler>();
+            _services.AddScoped<IMoveInRequester, MoveInRequester>();
+            return this;
+        }
+
+        public CompositionRoot AddHttpClientAdapter(Func<IServiceProvider, IHttpClientAdapter> action)
+        {
+            _services.AddSingleton(action);
             return this;
         }
 

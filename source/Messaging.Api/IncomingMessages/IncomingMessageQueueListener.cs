@@ -19,6 +19,7 @@ using Messaging.Api.Configuration;
 using Messaging.Application.Configuration;
 using Messaging.Application.IncomingMessages;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
+using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
@@ -30,18 +31,18 @@ namespace Messaging.Api.IncomingMessages
         private readonly ILogger<IncomingMessageQueueListener> _logger;
         private readonly ICorrelationContext _correlationContext;
         private readonly ISerializer _jsonSerializer;
-        private readonly RequestChangeOfSupplierHandler _requestChangeOfSupplierHandler;
+        private readonly MoveInRequestHandler _moveInRequestHandler;
 
         public IncomingMessageQueueListener(
             ILogger<IncomingMessageQueueListener> logger,
             ICorrelationContext correlationContext,
             ISerializer jsonSerializer,
-            RequestChangeOfSupplierHandler requestChangeOfSupplierHandler)
+            MoveInRequestHandler moveInRequestHandler)
         {
             _logger = logger;
             _correlationContext = correlationContext;
             _jsonSerializer = jsonSerializer;
-            _requestChangeOfSupplierHandler = requestChangeOfSupplierHandler;
+            _moveInRequestHandler = moveInRequestHandler;
         }
 
         [Function(nameof(IncomingMessageQueueListener))]
@@ -55,8 +56,9 @@ namespace Messaging.Api.IncomingMessages
             SetCorrelationIdFromServiceBusMessage(context);
 
             var byteAsString = Encoding.UTF8.GetString(data);
+            _logger.LogInformation($"Received incoming message: {byteAsString}");
 
-            await _requestChangeOfSupplierHandler.HandleAsync(
+            await _moveInRequestHandler.HandleAsync(
                     _jsonSerializer.Deserialize<IncomingMessage>(byteAsString))
                 .ConfigureAwait(false);
 
