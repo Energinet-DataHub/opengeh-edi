@@ -16,4 +16,4 @@ using System;
 
 namespace Messaging.Api.Configuration.Middleware.Authentication;
 
-public record Actor(Guid ActorId, string IdentificationType, string Identifier, string Roles);
+public record ActorForAuthentication(Guid ActorId, string IdentificationType, string Identifier, string Roles);

@@ -23,7 +23,6 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using auth = Messaging.Api.Configuration.Middleware.Authentication;
 
 namespace Messaging.Api.Configuration.Middleware.Authentication.Bearer
 {
@@ -92,11 +91,11 @@ namespace Messaging.Api.Configuration.Middleware.Authentication.Bearer
             return claimsPrincipal.FindFirst(claim => claim.Type.Equals("azp", StringComparison.OrdinalIgnoreCase))?.Value;
         }
 
-        private static ClaimsIdentity CreateClaimsIdentityFrom(auth.Actor actor, CurrentClaimsPrincipal currentClaimsPrincipal)
+        private static ClaimsIdentity CreateClaimsIdentityFrom(ActorForAuthentication actorForAuthentication, CurrentClaimsPrincipal currentClaimsPrincipal)
         {
             var claims = currentClaimsPrincipal.ClaimsPrincipal!.Claims.ToList();
-            claims.Add(new Claim("actorid", actor.Identifier));
-            claims.Add(new Claim("actoridtype", actor.IdentificationType));
+            claims.Add(new Claim("actorid", actorForAuthentication.Identifier));
+            claims.Add(new Claim("actoridtype", actorForAuthentication.IdentificationType));
 
             var currentIdentity = currentClaimsPrincipal.ClaimsPrincipal?.Identity as ClaimsIdentity;
             var identity = new ClaimsIdentity(
@@ -107,12 +106,12 @@ namespace Messaging.Api.Configuration.Middleware.Authentication.Bearer
             return identity;
         }
 
-        private static async Task<auth.Actor?> GetActorAsync(Guid actorId, B2BContext context)
+        private static async Task<ActorForAuthentication?> GetActorAsync(Guid actorId, B2BContext context)
         {
             var sql = "SELECT TOP 1 [Id] AS ActorId,[IdentificationType],[IdentificationNumber] AS Identifier,[Roles] FROM [dbo].[Actor] WHERE Id = @ActorId";
 
             var result = await context.Database.GetDbConnection()
-                .QuerySingleOrDefaultAsync<auth.Actor>(sql, new { ActorId = actorId })
+                .QuerySingleOrDefaultAsync<ActorForAuthentication>(sql, new { ActorId = actorId })
                 .ConfigureAwait(false);
 
             return result;
