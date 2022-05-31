@@ -31,11 +31,9 @@ using Messaging.Application.Common.Reasons;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
-using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Xml.SchemaStore;
 using Messaging.CimMessageAdapter;
@@ -97,39 +95,6 @@ namespace Messaging.Infrastructure.Configuration
             {
                 x.UseSqlServer(connectionString, y => y.UseNodaTime());
             });
-            return this;
-        }
-
-        public CompositionRoot AddSqlServerHealthCheck(string dbConnectionString)
-        {
-            _services.AddHealthChecks()
-                .AddSqlServer(
-                    name: "MarketRolesDB",
-                    connectionString: dbConnectionString);
-
-            return this;
-        }
-
-        public CompositionRoot AddInternalDomainServiceBusQueuesHealthCheck(string serviceBusConnectionString, [NotNull] params string[] queueNames)
-        {
-            foreach (var name in queueNames)
-            {
-                _services.AddHealthChecks()
-                    .AddAzureServiceBusQueue(
-                        name: name + "Exists",
-                        connectionString: serviceBusConnectionString,
-                        queueName: name);
-            }
-
-            return this;
-        }
-
-        public CompositionRoot AddLiveHealthCheck()
-        {
-            _services.AddScoped<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>();
-            _services.AddHealthChecks()
-                .AddLiveCheck();
-
             return this;
         }
 
