@@ -15,11 +15,11 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;
-using TraceContext = Energinet.DataHub.MarketRoles.Infrastructure.Correlation.TraceContext;
+using Processing.Infrastructure.Configuration.Correlation;
+using TraceContext = Processing.Infrastructure.Configuration.Correlation.TraceContext;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Common
 {

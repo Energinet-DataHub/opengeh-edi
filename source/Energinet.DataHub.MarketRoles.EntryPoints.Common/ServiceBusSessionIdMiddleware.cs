@@ -16,10 +16,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketRoles.Infrastructure.Correlation;
-using Energinet.DataHub.MarketRoles.Infrastructure.Serialization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
+using Processing.Infrastructure.Configuration.Correlation;
+using Processing.Infrastructure.Configuration.Serialization;
 
 namespace Energinet.DataHub.MarketRoles.EntryPoints.Common
 {
