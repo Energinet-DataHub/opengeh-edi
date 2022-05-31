@@ -99,14 +99,32 @@ namespace Messaging.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddHealthChecks(string dbConnectionString)
+        public CompositionRoot AddSqlServerHealthCheck(string dbConnectionString)
         {
-            _services.AddScoped<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>();
             _services.AddHealthChecks()
-                .AddLiveCheck()
                 .AddSqlServer(
                     name: "MarketRolesDB",
                     connectionString: dbConnectionString);
+
+            return this;
+        }
+
+        public CompositionRoot AddServiceBusQueuesHealthCheck(string serviceBusConnectionString)
+        {
+            _services.AddHealthChecks()
+                .AddAzureServiceBusQueue(
+                    name: "IncomingMessageQueueExists",
+                    connectionString: serviceBusConnectionString,
+                    queueName: "incomingmessagequeue");
+
+            return this;
+        }
+
+        public CompositionRoot AddLiveHealthCheck()
+        {
+            _services.AddScoped<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>();
+            _services.AddHealthChecks()
+                .AddLiveCheck();
 
             return this;
         }

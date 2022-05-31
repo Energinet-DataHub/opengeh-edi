@@ -26,6 +26,9 @@ namespace Messaging.Api
 
         public virtual string? DB_CONNECTION_STRING => GetEnvironmentVariable(nameof(DB_CONNECTION_STRING));
 
+        public virtual string? INCOMING_MESSAGE_QUEUE_MANAGE_CONNECTION_STRING =>
+            GetEnvironmentVariable(nameof(INCOMING_MESSAGE_QUEUE_MANAGE_CONNECTION_STRING));
+
         public virtual string? INCOMING_MESSAGE_QUEUE_SENDER_CONNECTION_STRING =>
             GetEnvironmentVariable(nameof(INCOMING_MESSAGE_QUEUE_SENDER_CONNECTION_STRING));
 
