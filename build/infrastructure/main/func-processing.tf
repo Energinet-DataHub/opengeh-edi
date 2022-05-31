@@ -38,6 +38,7 @@ module "func_processing" {
     INTEGRATION_EVENT_QUEUE                 = data.azurerm_key_vault_secret.sbq_event_forwarded_queue.value
     INTEGRATION_EVENT_QUEUE_CONNECTION      = data.azurerm_key_vault_secret.sb_domain_relay_listener_connection_string.value
     RAISE_TIME_HAS_PASSED_EVENT_SCHEDULE    = "*/10 * * * * *"
+    SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS = data.azurerm_key_vault_secret.sb_domain_relay_sender_connection_string.value
   }
 
   tags                                      = azurerm_resource_group.this.tags
