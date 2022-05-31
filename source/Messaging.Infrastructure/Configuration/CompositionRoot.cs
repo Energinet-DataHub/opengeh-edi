@@ -79,10 +79,6 @@ namespace Messaging.Infrastructure.Configuration
             services.AddScoped<MessageRequestHandler>();
             services.AddScoped<MessageRequestContext>();
 
-            services.AddScoped<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>();
-            services.AddHealthChecks()
-                .AddLiveCheck();
-
             services.AddLogging();
             AddXmlSchema(services);
             AddInternalCommandsProcessing();
@@ -100,6 +96,18 @@ namespace Messaging.Infrastructure.Configuration
             {
                 x.UseSqlServer(connectionString, y => y.UseNodaTime());
             });
+            return this;
+        }
+
+        public CompositionRoot AddHealthChecks(string dbConnectionString)
+        {
+            _services.AddScoped<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>();
+            _services.AddHealthChecks()
+                .AddLiveCheck()
+                .AddSqlServer(
+                    name: "MarketRolesDB",
+                    connectionString: dbConnectionString);
+
             return this;
         }
 

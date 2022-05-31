@@ -102,6 +102,7 @@ namespace Messaging.Api
                             runtime.MESSAGEHUB_DOMAIN_REPLY_QUEUE!)
                         .AddRequestHandler<NotifyMessageHubHandler, NotifyMessageHub>()
                         .AddNotificationHandler<PublishNewMessagesOnTimeHasPassed, TimeHasPassed>()
+                        .AddHealthChecks(runtime.DB_CONNECTION_STRING!)
                         .AddMoveInRequestHandler(sp => new MoveInRequestAdapter(
                             new Uri(
                             runtime.MOVE_IN_REQUEST_ENDPOINT ?? throw new ArgumentException(nameof(runtime.MOVE_IN_REQUEST_ENDPOINT))),
