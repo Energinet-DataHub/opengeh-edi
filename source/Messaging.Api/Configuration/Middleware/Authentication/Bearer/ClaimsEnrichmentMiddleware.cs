@@ -17,7 +17,6 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Dapper;
-using Messaging.Application.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.Authentication;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Microsoft.Azure.Functions.Worker;
@@ -92,11 +91,11 @@ namespace Messaging.Api.Configuration.Middleware.Authentication.Bearer
             return claimsPrincipal.FindFirst(claim => claim.Type.Equals("azp", StringComparison.OrdinalIgnoreCase))?.Value;
         }
 
-        private static ClaimsIdentity CreateClaimsIdentityFrom(Actor actor, CurrentClaimsPrincipal currentClaimsPrincipal)
+        private static ClaimsIdentity CreateClaimsIdentityFrom(Actors actors, CurrentClaimsPrincipal currentClaimsPrincipal)
         {
             var claims = currentClaimsPrincipal.ClaimsPrincipal!.Claims.ToList();
-            claims.Add(new Claim("actorid", actor.Identifier));
-            claims.Add(new Claim("actoridtype", actor.IdentificationType));
+            claims.Add(new Claim("actorid", actors.Identifier));
+            claims.Add(new Claim("actoridtype", actors.IdentificationType));
 
             var currentIdentity = currentClaimsPrincipal.ClaimsPrincipal?.Identity as ClaimsIdentity;
             var identity = new ClaimsIdentity(
@@ -107,17 +106,17 @@ namespace Messaging.Api.Configuration.Middleware.Authentication.Bearer
             return identity;
         }
 
-        private static async Task<Actor?> GetActorAsync(Guid actorId, B2BContext context)
+        private static async Task<Actors?> GetActorAsync(Guid actorId, B2BContext context)
         {
             var sql = "SELECT TOP 1 [Id] AS ActorId,[IdentificationType],[IdentificationNumber] AS Identifier,[Roles] FROM [dbo].[Actor] WHERE Id = @ActorId";
 
             var result = await context.Database.GetDbConnection()
-                .QuerySingleOrDefaultAsync<Actor>(sql, new { ActorId = actorId })
+                .QuerySingleOrDefaultAsync<Actors>(sql, new { ActorId = actorId })
                 .ConfigureAwait(false);
 
             return result;
         }
     }
 
-    public record Actor(Guid ActorId, string IdentificationType, string Identifier, string Roles);
+    public record Actors(Guid ActorId, string IdentificationType, string Identifier, string Roles);
 }
