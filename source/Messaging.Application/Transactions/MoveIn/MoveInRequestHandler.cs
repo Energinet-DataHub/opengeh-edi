@@ -34,7 +34,7 @@ namespace Messaging.Application.Transactions.MoveIn
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICorrelationContext _correlationContext;
         private readonly IMarketActivityRecordParser _marketActivityRecordParser;
-        private readonly IMoveInRequestAdapter _moveInRequestAdapter;
+        private readonly IMoveInRequester _moveInRequester;
         private readonly IValidationErrorTranslator _validationErrorTranslator;
 
         public MoveInRequestHandler(
@@ -43,7 +43,7 @@ namespace Messaging.Application.Transactions.MoveIn
             IUnitOfWork unitOfWork,
             ICorrelationContext correlationContext,
             IMarketActivityRecordParser marketActivityRecordParser,
-            IMoveInRequestAdapter moveInRequestAdapter,
+            IMoveInRequester moveInRequester,
             IValidationErrorTranslator validationErrorTranslator)
         {
             _moveInTransactionRepository = moveInTransactionRepository;
@@ -51,7 +51,7 @@ namespace Messaging.Application.Transactions.MoveIn
             _unitOfWork = unitOfWork;
             _correlationContext = correlationContext;
             _marketActivityRecordParser = marketActivityRecordParser;
-            _moveInRequestAdapter = moveInRequestAdapter;
+            _moveInRequester = moveInRequester;
             _validationErrorTranslator = validationErrorTranslator;
         }
 
@@ -101,7 +101,7 @@ namespace Messaging.Application.Transactions.MoveIn
                 incomingMessage.MarketActivityRecord.Id,
                 incomingMessage.MarketActivityRecord.ConsumerId,
                 GetConsumerIdType(incomingMessage.MarketActivityRecord));
-            return _moveInRequestAdapter.InvokeAsync(businessProcess);
+            return _moveInRequester.InvokeAsync(businessProcess);
         }
 
         private OutgoingMessage ConfirmMessageFrom(IncomingMessage incomingMessage, string transactionId)

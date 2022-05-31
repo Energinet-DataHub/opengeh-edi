@@ -12,20 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Messaging.Application.Transactions.MoveIn
+namespace Messaging.Infrastructure.Transactions;
+
+public class HttpClientAdapter : IHttpClientAdapter
 {
-    /// <summary>
-    /// Interface for move in request adapter
-    /// </summary>
-    public interface IMoveInRequestAdapter
+    private readonly HttpClient _httpClient;
+
+    public HttpClientAdapter(HttpClient httpClient)
     {
-        /// <summary>
-        /// Invokes a move in business process asynchronously
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns><see cref="Task"/></returns>
-        Task<BusinessRequestResult> InvokeAsync(MoveInRequest request);
+        _httpClient = httpClient;
+    }
+
+    public Task<HttpResponseMessage> PostAsync(Uri uri, HttpContent content)
+    {
+        return _httpClient.PostAsync(uri, content);
     }
 }

@@ -13,11 +13,14 @@
 // limitations under the License.
 
 using System;
-using System.Reflection;
 using Messaging.Api.Configuration.Middleware.Correlation;
 using Messaging.Infrastructure.Configuration;
+using Messaging.Infrastructure.Configuration.Serialization;
+using Messaging.Infrastructure.Transactions;
+using Messaging.Infrastructure.Transactions.MoveIn;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.Infrastructure.InternalCommands;
+using Messaging.IntegrationTests.Infrastructure.Transactions.MoveIn;
 using Messaging.IntegrationTests.TestDoubles;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -50,7 +53,8 @@ namespace Messaging.IntegrationTests
                 .AddMessagePublishing(_ => new NewMessageAvailableNotifierSpy())
                 .AddOutgoingMessageDispatcher(new MessageDispatcherSpy())
                 .AddRequestHandler<TestCommandHandler, TestCommand>()
-                .AddMoveInRequestHandler(sp => new MoveInRequestAdapterStub());
+                .AddHttpClientAdapter(_ => new HttpClientSpy())
+                .AddMoveInServices(new MoveInConfiguration(new Uri("http://someuri")));
             _serviceProvider = services.BuildServiceProvider();
         }
 
