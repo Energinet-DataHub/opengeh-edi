@@ -26,6 +26,7 @@ module "func_processing" {
   application_insights_instrumentation_key  = data.azurerm_key_vault_secret.appi_instrumentation_key.value
   log_analytics_workspace_id                = data.azurerm_key_vault_secret.log_shared_id.value
   always_on                                 = true
+  health_check_path                         = "/api/monitor/ready"
   app_settings                              = {
     # Region: Default Values
     WEBSITE_ENABLE_SYNC_UPDATE_SITE         = true
@@ -39,6 +40,7 @@ module "func_processing" {
     INTEGRATION_EVENT_QUEUE_CONNECTION      = data.azurerm_key_vault_secret.sb_domain_relay_listener_connection_string.value
     RAISE_TIME_HAS_PASSED_EVENT_SCHEDULE    = "*/10 * * * * *"
     SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS = data.azurerm_key_vault_secret.sb_domain_relay_sender_connection_string.value
+    SERVICE_BUS_CONNECTION_STRING_MANAGE_FOR_INTEGRATION_EVENTS = data.azurerm_key_vault_secret.sb_domain_relay_manage_connection_string.value
   }
 
   tags                                      = azurerm_resource_group.this.tags

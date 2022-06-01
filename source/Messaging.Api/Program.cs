@@ -106,6 +106,13 @@ namespace Messaging.Api
                         .AddNotificationHandler<PublishNewMessagesOnTimeHasPassed, TimeHasPassed>()
                         .AddHttpClientAdapter(sp => new HttpClientAdapter(sp.GetRequiredService<HttpClient>()))
                         .AddMoveInServices(new MoveInConfiguration(new Uri(runtime.MOVE_IN_REQUEST_ENDPOINT ?? throw new ArgumentException(nameof(runtime.MOVE_IN_REQUEST_ENDPOINT)))));
+
+                    services.AddLiveHealthCheck();
+                    services.AddInternalDomainServiceBusQueuesHealthCheck(
+                        runtime.INCOMING_MESSAGE_QUEUE_MANAGE_CONNECTION_STRING!,
+                        runtime.INCOMING_MESSAGE_QUEUE_NAME!,
+                        runtime.MESSAGE_REQUEST_QUEUE!);
+                    services.AddSqlServerHealthCheck(runtime.DB_CONNECTION_STRING!);
                 })
                 .Build();
         }

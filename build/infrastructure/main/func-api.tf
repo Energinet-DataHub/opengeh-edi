@@ -26,6 +26,7 @@ module "func_receiver" {
   vnet_integration_subnet_id                = data.azurerm_key_vault_secret.snet_vnet_integrations_id.value
   private_endpoint_subnet_id                = data.azurerm_key_vault_secret.snet_private_endpoints_id.value
   always_on                                = true
+  health_check_path                         = "/api/monitor/ready"
   app_settings                             = {
     # Region: Default Values
     WEBSITE_ENABLE_SYNC_UPDATE_SITE                   = true
@@ -39,7 +40,8 @@ module "func_receiver" {
     B2C_TENANT_ID                                     = data.azurerm_key_vault_secret.b2c_tenant_id.value
     BACKEND_SERVICE_APP_ID                            = data.azurerm_key_vault_secret.backend_service_app_id.value
     # Endregion: Default Values
-    MARKET_DATA_QUEUE_URL                             = "${module.sb_marketroles.name}.servicebus.windows.net:9093"
+    MARKET_DATA_QUEUE_URL                             = "${module.sb_marketroles.name}.servicebus.windows.net:9093",
+    INCOMING_MESSAGE_QUEUE_MANAGE_CONNECTION_STRING   = module.sb_marketroles.primary_connection_strings["manage"]
     INCOMING_MESSAGE_QUEUE_SENDER_CONNECTION_STRING   = module.sb_marketroles.primary_connection_strings["send"]
     INCOMING_MESSAGE_QUEUE_LISTENER_CONNECTION_STRING = module.sb_marketroles.primary_connection_strings["listen"]
     DB_CONNECTION_STRING                              = local.MS_MARKETROLES_CONNECTION_STRING

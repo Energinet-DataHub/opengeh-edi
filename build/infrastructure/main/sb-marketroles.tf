@@ -32,6 +32,10 @@ module "sb_marketroles" {
       name    = "send",
       send    = true
     },
+    {
+      name    = "manage",
+      manage  = true
+    }
   ]
 
   tags                  = azurerm_resource_group.this.tags
