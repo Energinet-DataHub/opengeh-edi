@@ -34,6 +34,8 @@ module "sb_marketroles" {
     },
     {
       name    = "manage",
+      send    = true,
+      listen  = true,
       manage  = true
     }
   ]
