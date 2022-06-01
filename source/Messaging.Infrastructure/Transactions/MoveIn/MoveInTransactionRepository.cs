@@ -15,7 +15,7 @@
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.DataAccess;
 
-namespace Messaging.Infrastructure.Transactions
+namespace Messaging.Infrastructure.Transactions.MoveIn
 {
     public class MoveInTransactionRepository : IMoveInTransactionRepository
     {

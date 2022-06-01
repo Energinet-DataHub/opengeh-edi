@@ -22,7 +22,7 @@ using Messaging.Application.IncomingMessages;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.Infrastructure.Configuration.Serialization;
 
-namespace Messaging.Infrastructure.Transactions
+namespace Messaging.Infrastructure.IncomingMessages
 {
     public class MessageQueueDispatcher : IMessageQueueDispatcher
     {
