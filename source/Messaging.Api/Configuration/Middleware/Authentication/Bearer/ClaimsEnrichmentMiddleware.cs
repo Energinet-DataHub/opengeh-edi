@@ -41,7 +41,7 @@ namespace Messaging.Api.Configuration.Middleware.Authentication.Bearer
             if (next == null) throw new ArgumentNullException(nameof(next));
             var currentClaimsPrincipal = context.GetService<CurrentClaimsPrincipal>();
 
-            if (!context.Is(FunctionContextExtensions.TriggerType.HttpTrigger))
+            if (!context.IsRequestFromUser())
             {
                 _logger.LogInformation("Functions is not triggered by HTTP. Call next middleware.");
                 await next(context).ConfigureAwait(false);

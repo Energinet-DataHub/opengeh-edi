@@ -40,6 +40,14 @@ namespace Messaging.Api.Configuration.Middleware
             return context.FunctionDefinition.InputBindings.Any(input => input.Value.Type.Equals(triggerType.ToString(), StringComparison.OrdinalIgnoreCase));
         }
 
+        internal static bool IsRequestFromUser(this FunctionContext context)
+        {
+            if (context == null) throw new ArgumentNullException(nameof(context));
+
+            return context.Is(TriggerType.HttpTrigger) &&
+                   context.FunctionDefinition.Name != "HealthCheck";
+        }
+
         internal static HttpRequestData? GetHttpRequestData(this FunctionContext functionContext)
         {
             if (functionContext == null) throw new ArgumentNullException(nameof(functionContext));

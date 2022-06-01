@@ -34,7 +34,7 @@ namespace Messaging.Api.Configuration.Middleware.Authentication.Bearer
         public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
         {
             if (next == null) throw new ArgumentNullException(nameof(next));
-            if (!context.Is(FunctionContextExtensions.TriggerType.HttpTrigger))
+            if (!context.IsRequestFromUser())
             {
                 _logger.LogInformation("Functions is not triggered by HTTP. Call next middleware.");
                 await next(context).ConfigureAwait(false);
