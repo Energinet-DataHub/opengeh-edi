@@ -63,7 +63,7 @@ data "azurerm_key_vault_secret" "sb_domain_relay_sender_connection_string" {
 }
 
 data "azurerm_key_vault_secret" "sb_domain_relay_manage_connection_string" {
-  name         = "kvs-sb-domain-relay-manage-connection-string"
+  name         = "sb-domain-relay-manage-connection-string"
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }
 
