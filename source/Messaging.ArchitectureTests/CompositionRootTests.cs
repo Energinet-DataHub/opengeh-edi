@@ -85,12 +85,11 @@ namespace Messaging.ArchitectureTests
 
             private static string CreateFakeServiceBusConnectionString()
             {
-                var cultureInfo = CultureInfo.InvariantCulture;
-                var sb = new StringBuilder();
-                sb.Append(cultureInfo, $"Endpoint=sb://sb-{Guid.NewGuid():N}.servicebus.windows.net/;");
-                sb.Append("SharedAccessKeyName=send;");
-                sb.Append(cultureInfo, $"SharedAccessKey={Guid.NewGuid():N}");
-                return sb.ToString();
+                return new StringBuilder()
+                    .Append(CultureInfo.InvariantCulture, $"Endpoint=sb://sb-{Guid.NewGuid():N}.servicebus.windows.net/;")
+                    .Append("SharedAccessKeyName=send;")
+                    .Append(CultureInfo.InvariantCulture, $"SharedAccessKey={Guid.NewGuid():N}")
+                    .ToString();
             }
         }
     }
