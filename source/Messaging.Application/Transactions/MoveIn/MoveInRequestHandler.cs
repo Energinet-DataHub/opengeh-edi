@@ -98,7 +98,6 @@ namespace Messaging.Application.Transactions.MoveIn
                 incomingMessage.MarketActivityRecord.EnergySupplierId,
                 incomingMessage.MarketActivityRecord.MarketEvaluationPointId,
                 incomingMessage.MarketActivityRecord.EffectiveDate,
-                incomingMessage.MarketActivityRecord.Id,
                 incomingMessage.MarketActivityRecord.ConsumerId,
                 GetConsumerIdType(incomingMessage.MarketActivityRecord));
             return _moveInRequester.InvokeAsync(businessProcess);
