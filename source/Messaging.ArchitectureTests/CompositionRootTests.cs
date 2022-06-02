@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Globalization;
 using System.Text;
 using Messaging.Api;
 using Microsoft.Azure.Functions.Worker.Middleware;
@@ -84,13 +85,12 @@ namespace Messaging.ArchitectureTests
 
             private static string CreateFakeServiceBusConnectionString()
             {
-#pragma warning disable
+                var cultureInfo = CultureInfo.InvariantCulture;
                 var sb = new StringBuilder();
-                sb.Append($"Endpoint=sb://sb-{Guid.NewGuid():N}.servicebus.windows.net/;");
+                sb.Append(cultureInfo, $"Endpoint=sb://sb-{Guid.NewGuid():N}.servicebus.windows.net/;");
                 sb.Append("SharedAccessKeyName=send;");
-                sb.Append($"SharedAccessKey={Guid.NewGuid():N}");
+                sb.Append(cultureInfo, $"SharedAccessKey={Guid.NewGuid():N}");
                 return sb.ToString();
-#pragma warning restore
             }
         }
     }
