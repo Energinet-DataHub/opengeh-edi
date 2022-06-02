@@ -29,6 +29,8 @@ namespace Messaging.Application.Transactions.MoveIn
 
         public string TransactionId { get; }
 
+        public string? ProcessId { get; private set; }
+
         public IReadOnlyCollection<object> DomainEvents => _domainEvents.AsReadOnly();
 
         public void Start(BusinessRequestResult businessRequestResult)

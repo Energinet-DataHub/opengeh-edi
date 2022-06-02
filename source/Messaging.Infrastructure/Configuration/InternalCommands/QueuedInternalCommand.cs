@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using Messaging.Application.Common.Commands;
 using Messaging.Infrastructure.Configuration.Serialization;
 using NodaTime;
 

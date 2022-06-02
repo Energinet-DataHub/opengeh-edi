@@ -73,7 +73,7 @@ public sealed class MoveInRequester : IMoveInRequester
             _logger.LogInformation($"Response body from business processing: {responseBody}");
 
             var result = _serializer.Deserialize<BusinessProcessResponse>(responseBody);
-            return result.ValidationErrors.Count > 0 ? BusinessRequestResult.Failure(result.ValidationErrors.ToArray()) : BusinessRequestResult.Succeeded();
+            return result.ValidationErrors.Count > 0 ? BusinessRequestResult.Failure(result.ValidationErrors.ToArray()) : BusinessRequestResult.Succeeded(result.ProcessId);
         }
         catch (Exception e)
         {
@@ -92,4 +92,4 @@ public record MoveInRequestDto(
     string? ConsumerId,
     string? ConsumerIdType);
 
-public record BusinessProcessResponse(IReadOnlyCollection<string> ValidationErrors);
+public record BusinessProcessResponse(IReadOnlyCollection<string> ValidationErrors, string ProcessId);

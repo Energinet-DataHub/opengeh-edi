@@ -14,6 +14,7 @@
 
 using System;
 using Energinet.DataHub.MessageHub.Model.Model;
+using Messaging.Application.Common.Commands;
 using Messaging.Infrastructure.Configuration.InternalCommands;
 
 namespace Messaging.Infrastructure.OutgoingMessages

@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading.Tasks;
+
 namespace Messaging.Application.Transactions.MoveIn
 {
     /// <summary>
@@ -31,5 +33,12 @@ namespace Messaging.Application.Transactions.MoveIn
         /// <param name="transactionId"></param>
         /// <returns><see cref="MoveInTransaction"/></returns>
         MoveInTransaction? GetById(string transactionId);
+
+        /// <summary>
+        /// Find transaction by business process id
+        /// </summary>
+        /// <param name="processId"></param>
+        /// <returns><see cref="MoveInTransaction"/></returns>
+        Task<MoveInTransaction?> GetByProcessIdAsync(string processId);
     }
 }
