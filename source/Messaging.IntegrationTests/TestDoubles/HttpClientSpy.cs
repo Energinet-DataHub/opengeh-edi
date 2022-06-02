@@ -56,7 +56,7 @@ public class HttpClientSpy : IHttpClientAdapter
 
     private HttpResponseMessage CreateResponseFromProcessing()
     {
-        var businessProcessResponse = new BusinessProcessResponse(_validationErrors);
+        var businessProcessResponse = new BusinessProcessResponse(_validationErrors, Guid.NewGuid().ToString());
         var content = new StringContent(JsonConvert.SerializeObject(businessProcessResponse));
         var response = new HttpResponseMessage(_responseCode);
         response.Content = content;

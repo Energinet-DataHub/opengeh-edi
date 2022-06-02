@@ -12,22 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.Application.Transactions;
+using System.Threading.Tasks;
 using Messaging.Application.Transactions.MoveIn;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Messaging.IntegrationTests.Fixtures;
+using Xunit;
 
-namespace Messaging.Infrastructure.Transactions
+namespace Messaging.IntegrationTests.Transactions.MoveIn;
+
+public class CompleteMoveInTests : TestBase
 {
-    internal class TransactionEntityConfiguration : IEntityTypeConfiguration<MoveInTransaction>
+    public CompleteMoveInTests(DatabaseFixture databaseFixture)
+        : base(databaseFixture)
     {
-        public void Configure(EntityTypeBuilder<MoveInTransaction> builder)
-        {
-            builder.ToTable("Transactions", "b2b");
-            builder.HasKey(x => x.TransactionId);
-            builder.Property(x => x.ProcessId);
-            builder.Property<bool>("_started")
-                .HasColumnName("Started");
-        }
+    }
+
+    [Fact]
+    public async Task Transaction_must_exist()
+    {
+        var processId = "Not existing";
+        var command = new CompleteMoveInTransaction(processId);
+
+        await Assert.ThrowsAsync<TransactionNotFoundException>(() => InvokeCommandAsync(command)).ConfigureAwait(false);
     }
 }

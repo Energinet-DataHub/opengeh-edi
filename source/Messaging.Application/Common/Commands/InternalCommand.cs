@@ -14,7 +14,7 @@
 
 using System;
 
-namespace Messaging.Infrastructure.Configuration.InternalCommands
+namespace Messaging.Application.Common.Commands
 {
     public abstract class InternalCommand : ICommand
     {

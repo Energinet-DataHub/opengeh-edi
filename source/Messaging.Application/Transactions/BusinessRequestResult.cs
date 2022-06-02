@@ -12,14 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 
 namespace Messaging.Application.Transactions;
 
 public class BusinessRequestResult
 {
-    private BusinessRequestResult()
+    private BusinessRequestResult(string processId)
     {
+        ProcessId = processId;
     }
 
     private BusinessRequestResult(IReadOnlyCollection<string> validationErrors)
@@ -29,6 +31,8 @@ public class BusinessRequestResult
 
     public bool Success => ValidationErrors.Count == 0;
 
+    public string? ProcessId { get; }
+
     public IReadOnlyCollection<string> ValidationErrors { get; } = new List<string>();
 
     public static BusinessRequestResult Failure(params string[] validationErrors)
@@ -36,8 +40,9 @@ public class BusinessRequestResult
         return new BusinessRequestResult(validationErrors);
     }
 
-    public static BusinessRequestResult Succeeded()
+    public static BusinessRequestResult Succeeded(string processId)
     {
-        return new BusinessRequestResult();
+        if (string.IsNullOrEmpty(processId)) throw new ArgumentNullException(nameof(processId));
+        return new BusinessRequestResult(processId);
     }
 }

@@ -200,6 +200,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddScoped(_ => configuration);
             _services.AddScoped<MoveInRequestHandler>();
             _services.AddScoped<IMoveInRequester, MoveInRequester>();
+            _services.AddMediatR(typeof(CompleteMoveInTransactionHandler).Assembly);
             return this;
         }
 
