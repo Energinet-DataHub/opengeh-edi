@@ -22,9 +22,12 @@ namespace Messaging.IntegrationTests.Transactions.MoveIn;
 
 public class CompleteMoveInTests : TestBase
 {
+    private readonly IMoveInTransactionRepository _transactionRepository;
+
     public CompleteMoveInTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
+        _transactionRepository = GetService<IMoveInTransactionRepository>();
     }
 
     [Fact]
@@ -32,7 +35,7 @@ public class CompleteMoveInTests : TestBase
     {
         var processId = "Not existing";
         var command = new CompleteMoveInTransaction(processId);
-        var handler = new CompleteMoveInTransactionHandler(GetService<IMoveInTransactionRepository>());
+        var handler = new CompleteMoveInTransactionHandler(_transactionRepository);
 
         await Assert.ThrowsAsync<TransactionNotFoundException>(() => handler.HandleAsync(command)).ConfigureAwait(false);
     }
