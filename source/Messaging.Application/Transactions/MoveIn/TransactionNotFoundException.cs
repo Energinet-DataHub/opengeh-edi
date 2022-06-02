@@ -12,26 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Messaging.Application.Transactions.MoveIn;
-using Messaging.IntegrationTests.Fixtures;
-using Xunit;
+using System;
 
-namespace Messaging.IntegrationTests.Transactions.MoveIn;
+namespace Messaging.Application.Transactions.MoveIn;
 
-public class CompleteMoveInTests : TestBase
+public class TransactionNotFoundException : Exception
 {
-    public CompleteMoveInTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    public TransactionNotFoundException(string processId)
+        : base($"Could not find a transaction for business process id {processId}")
     {
     }
 
-    [Fact]
-    public async Task Transaction_must_exist()
+    private TransactionNotFoundException()
     {
-        var processId = "Not existing";
-        var command = new CompleteMoveInTransaction(processId);
+    }
 
-        await Assert.ThrowsAsync<TransactionNotFoundException>(() => InvokeCommandAsync(command)).ConfigureAwait(false);
+    private TransactionNotFoundException(string message, Exception innerException)
+        : base(message, innerException)
+    {
     }
 }
