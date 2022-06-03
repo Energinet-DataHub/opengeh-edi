@@ -58,6 +58,14 @@ jobs:
       DOTNET_VERSION: '6.0.201'
       ARTIFACT_NAME: processing
 
+  actorsync_ci:
+    needs: [ci_base, dotnet_solution_ci, terraform_validate]
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-create-function-artifact.yml@6.1.0
+    with:
+      CSPROJ_FILE_PATH: 'source/Energinet.DataHub.MarketRoles.ActorRegistrySync/Energinet.DataHub.MarketRoles.ActorRegistrySync.csproj'
+      DOTNET_VERSION: '6.0.201'
+      ARTIFACT_NAME: actorsync    
+
   database_migration_ci:
     needs: [ci_base, dotnet_solution_ci, terraform_validate]
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-create-function-artifact.yml@6.1.0
