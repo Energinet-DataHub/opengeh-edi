@@ -21,7 +21,7 @@ using Messaging.Application.Common;
 
 namespace Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 
-public class ConfirmChangeOfSupplierDocumentWriter
+public class ConfirmChangeOfSupplierDocumentWriter : IDocumentWriter<MarketActivityRecord>
 {
     private const string Prefix = "cim";
     private const string DocumentType = "ConfirmRequestChangeOfSupplier_MarketDocument";
