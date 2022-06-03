@@ -23,6 +23,7 @@ using Energinet.DataHub.MessageHub.Client.Peek;
 using Energinet.DataHub.MessageHub.Client.Storage;
 using Energinet.DataHub.MessageHub.Model.Peek;
 using MediatR;
+using MediatR.Registration;
 using Messaging.Application.Common;
 using Messaging.Application.Common.Reasons;
 using Messaging.Application.Configuration;
@@ -41,6 +42,7 @@ using Messaging.Infrastructure.Configuration.Authentication;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.InternalCommands;
 using Messaging.Infrastructure.Configuration.Serialization;
+using Messaging.Infrastructure.Configuration.SystemTime;
 using Messaging.Infrastructure.IncomingMessages;
 using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.Infrastructure.Transactions;
@@ -75,6 +77,7 @@ namespace Messaging.Infrastructure.Configuration
             services.AddScoped<MessageRequestHandler>();
             services.AddScoped<MessageRequestContext>();
 
+            AddMediatR();
             services.AddLogging();
             AddXmlSchema(services);
             AddInternalCommandsProcessing();
@@ -146,6 +149,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddScoped(action);
             _services.AddScoped<MessageAvailabilityPublisher>();
             _services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
+            _services.AddTransient<INotificationHandler<TimeHasPassed>, PublishNewMessagesOnTimeHasPassed>();
             return this;
         }
 
@@ -180,7 +184,6 @@ namespace Messaging.Infrastructure.Configuration
             where TCommand : IRequest<Unit>
         {
             _services.AddTransient<IRequestHandler<TCommand>, TRequestHandler>();
-            _services.AddMediatR(typeof(TRequestHandler));
 
             return this;
         }
@@ -190,7 +193,6 @@ namespace Messaging.Infrastructure.Configuration
             where TNotification : INotification
         {
             _services.AddTransient<INotificationHandler<TNotification>, TNotificationHandler>();
-            _services.AddMediatR(typeof(TNotificationHandler));
 
             return this;
         }
@@ -200,7 +202,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddScoped(_ => configuration);
             _services.AddScoped<MoveInRequestHandler>();
             _services.AddScoped<IMoveInRequester, MoveInRequester>();
-            _services.AddMediatR(typeof(CompleteMoveInTransactionHandler).Assembly);
+            _services.AddTransient<IRequestHandler<CompleteMoveInTransaction, Unit>, CompleteMoveInTransactionHandler>();
             return this;
         }
 
@@ -223,12 +225,19 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddScoped<ICommandScheduler, CommandScheduler>();
             _services.AddTransient<InternalCommandAccessor>();
             _services.AddTransient<InternalCommandProcessor>();
+            _services.AddTransient<INotificationHandler<TimeHasPassed>, ProcessInternalCommandsOnTimeHasPassed>();
         }
 
         private void AddMessageGenerationServices()
         {
             _services.AddScoped<IValidationErrorTranslator, ValidationErrorTranslator>();
             _services.AddScoped<IMarketActivityRecordParser, MarketActivityRecordParser>();
+        }
+
+        private void AddMediatR()
+        {
+            var configuration = new MediatRServiceConfiguration();
+            ServiceRegistrar.AddRequiredServices(_services, configuration);
         }
     }
 }
