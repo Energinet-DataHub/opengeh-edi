@@ -15,9 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
 using Messaging.Application.Common;
 
 namespace Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier
@@ -31,23 +29,12 @@ namespace Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier
             _marketActivityRecordParser = marketActivityRecordParser;
         }
 
-        public async Task<Stream> CreateFromAsync(MessageHeader messageHeader, IReadOnlyCollection<string> marketActivityPayloads)
+        public Task<Stream> CreateFromAsync(MessageHeader messageHeader, IReadOnlyCollection<string> marketActivityPayloads)
         {
             if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
             if (marketActivityPayloads == null) throw new ArgumentNullException(nameof(marketActivityPayloads));
-
-            var settings = new XmlWriterSettings { OmitXmlDeclaration = false, Encoding = Encoding.UTF8, Async = true };
-            var stream = new MemoryStream();
-
-            using var writer = XmlWriter.Create(stream, settings);
             var documentWriter = new ConfirmChangeOfSupplierDocumentWriter(_marketActivityRecordParser);
-            await HeaderWriter.WriteAsync(writer, messageHeader, documentWriter.DocumentDetails).ConfigureAwait(false);
-            await documentWriter.WriteAsync(marketActivityPayloads, writer).ConfigureAwait(false);
-            await writer.WriteEndElementAsync().ConfigureAwait(false);
-            writer.Close();
-            stream.Position = 0;
-
-            return stream;
+            return documentWriter.WriteAsync(messageHeader, marketActivityPayloads);
         }
     }
 }

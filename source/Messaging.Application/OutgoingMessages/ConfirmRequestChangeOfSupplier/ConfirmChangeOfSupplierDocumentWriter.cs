@@ -21,7 +21,7 @@ using Messaging.Application.Common;
 
 namespace Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 
-public class ConfirmChangeOfSupplierDocumentWriter : IDocumentWriter<MarketActivityRecord>
+public class ConfirmChangeOfSupplierDocumentWriter : DocumentWriter
 {
     private const string Prefix = "cim";
     private const string DocumentType = "ConfirmRequestChangeOfSupplier_MarketDocument";
@@ -30,14 +30,12 @@ public class ConfirmChangeOfSupplierDocumentWriter : IDocumentWriter<MarketActiv
     private readonly IMarketActivityRecordParser _marketActivityRecordParser;
 
     public ConfirmChangeOfSupplierDocumentWriter(IMarketActivityRecordParser marketActivityRecordParser)
+    : base(new DocumentDetails(DocumentType, SchemaLocation, XmlNamespace, Prefix))
     {
         _marketActivityRecordParser = marketActivityRecordParser;
-        DocumentDetails = new DocumentDetails(DocumentType, SchemaLocation, XmlNamespace, Prefix);
     }
 
-    public DocumentDetails DocumentDetails { get; }
-
-    public Task WriteAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer)
+    protected override Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer)
     {
         if (writer == null) throw new ArgumentNullException(nameof(writer));
         return WriteMarketActivityRecordsAsync(GetMarketActivityRecordsFrom(marketActivityPayloads), writer);
