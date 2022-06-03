@@ -52,7 +52,6 @@ public sealed class MoveInRequester : IMoveInRequester
             request.EnergySupplierGlnNumber,
             request.AccountingPointGsrnNumber,
             request.StartDate,
-            request.TransactionId,
             request.ConsumerId,
             request.ConsumerIdType);
     }
@@ -88,7 +87,6 @@ public record MoveInRequestDto(
     string? EnergySupplierGlnNumber,
     string AccountingPointGsrnNumber,
     string StartDate,
-    string TransactionId,
     string? ConsumerId,
     string? ConsumerIdType);
 
