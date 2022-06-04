@@ -33,7 +33,7 @@ namespace Messaging.Tests.OutgoingMessages.ConfirmRequestChangeOfSupplier
 {
     public class MessageFactoryTests
     {
-        private readonly ConfirmRequestChangeOfSupplierMessageFactory _confirmRequestChangeOfSupplierMessageFactory;
+        private readonly ConfirmRequestChangeOfSupplierMessageFactory _documentWriter;
         private readonly ISchemaProvider _schemaProvider;
         private readonly IMarketActivityRecordParser _marketActivityRecordParser;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
@@ -43,7 +43,7 @@ namespace Messaging.Tests.OutgoingMessages.ConfirmRequestChangeOfSupplier
             _systemDateTimeProvider = new SystemDateTimeProvider();
             _schemaProvider = new SchemaProvider(new CimXmlSchemas());
             _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
-            _confirmRequestChangeOfSupplierMessageFactory = new ConfirmRequestChangeOfSupplierMessageFactory(_marketActivityRecordParser);
+            _documentWriter = new ConfirmRequestChangeOfSupplierMessageFactory(_marketActivityRecordParser);
         }
 
         [Fact]
@@ -56,7 +56,7 @@ namespace Messaging.Tests.OutgoingMessages.ConfirmRequestChangeOfSupplier
                 new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId"),
             };
 
-            var message = await _confirmRequestChangeOfSupplierMessageFactory.CreateFromAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
+            var message = await _documentWriter.CreateFromAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
 
             await AssertMessage(message, header, marketActivityRecords).ConfigureAwait(false);
         }
