@@ -17,9 +17,9 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using Messaging.Application.Common;
+using Messaging.Application.OutgoingMessages;
 
-namespace Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
+namespace Messaging.Application.Common;
 
 public abstract class DocumentWriter
 {
