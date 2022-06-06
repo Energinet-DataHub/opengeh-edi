@@ -68,23 +68,10 @@ namespace Messaging.Tests.OutgoingMessages.ConfirmRequestChangeOfSupplier
             }
         }
 
-        private static void AssertHeader(MessageHeader header, XDocument document)
-        {
-            Assert.NotEmpty(AssertXmlMessage.GetMessageHeaderValue(document, "mRID")!);
-            AssertXmlMessage.AssertHasHeaderValue(document, "type", "414");
-            AssertXmlMessage.AssertHasHeaderValue(document, "process.processType", header.ProcessType);
-            AssertXmlMessage.AssertHasHeaderValue(document, "businessSector.type", "23");
-            AssertXmlMessage.AssertHasHeaderValue(document, "sender_MarketParticipant.mRID", header.SenderId);
-            AssertXmlMessage.AssertHasHeaderValue(document, "sender_MarketParticipant.marketRole.type", "DDZ");
-            AssertXmlMessage.AssertHasHeaderValue(document, "receiver_MarketParticipant.mRID", header.ReceiverId);
-            AssertXmlMessage.AssertHasHeaderValue(document, "receiver_MarketParticipant.marketRole.type", header.ReceiverRole);
-            AssertXmlMessage.AssertHasHeaderValue(document, "reason.code", "A01");
-        }
-
         private async Task AssertMessage(Stream message, MessageHeader header, List<MarketActivityRecord> marketActivityRecords)
         {
             var document = XDocument.Load(message);
-            AssertHeader(header, document);
+            AssertXmlMessage.AssertHeader(header, document);
 
             AssertMarketActivityRecords(marketActivityRecords, document);
 
