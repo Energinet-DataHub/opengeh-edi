@@ -229,6 +229,7 @@ namespace Messaging.Infrastructure.Configuration
 
         private void AddMessageGenerationServices()
         {
+            _services.AddScoped<MessageFactory>();
             _services.AddScoped<ConfirmRequestChangeOfSupplierMessageFactory>();
             _services.AddScoped<RejectRequestChangeOfSupplierMessageFactory>();
             _services.AddScoped<IValidationErrorTranslator, ValidationErrorTranslator>();
