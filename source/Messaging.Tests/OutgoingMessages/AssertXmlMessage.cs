@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
 using Messaging.Application.OutgoingMessages;
+using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Application.Xml;
 using Xunit;
 
@@ -85,6 +86,12 @@ namespace Messaging.Tests.OutgoingMessages
             if (schema == null) throw new ArgumentNullException(nameof(schema));
             var validationResult = await MessageValidator.ValidateAsync(message, schema).ConfigureAwait(false);
             Assert.True(validationResult.IsValid);
+        }
+
+        internal static void AssertReasons(XElement marketActivityRecord, IEnumerable<Reason> expectedReasons)
+        {
+            var reasonsElements = marketActivityRecord.Elements(marketActivityRecord.Name.Namespace + "Reason");
+            Assert.Equal(expectedReasons.Count(), reasonsElements.Count());
         }
 
         private static XElement? GetHeaderElement(XDocument document)

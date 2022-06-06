@@ -74,6 +74,7 @@ public class RejectRequestChangeOfSupplierDocumentWriterTests
             Assert.NotNull(marketActivityRecord);
             AssertXmlMessage.AssertMarketActivityRecordValue(marketActivityRecord, "originalTransactionIDReference_MktActivityRecord.mRID", activityRecord.OriginalTransactionId);
             AssertXmlMessage.AssertMarketActivityRecordValue(marketActivityRecord, "marketEvaluationPoint.mRID", activityRecord.MarketEvaluationPointId);
+            AssertXmlMessage.AssertReasons(marketActivityRecord, activityRecord.Reasons);
         }
     }
 
