@@ -15,29 +15,25 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Messaging.Application.Common;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Application.Xml;
 using Messaging.Application.Xml.SchemaStore;
-using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Configuration;
-using Messaging.Infrastructure.Configuration.Serialization;
 using Processing.Domain.SeedWork;
 using Xunit;
 
 namespace Messaging.Tests.OutgoingMessages.ConfirmRequestChangeOfSupplier
 {
-    public class MessageFactoryTests
+    public class ConfirmRequestChangeOfSupplierDocumentWriterTests
     {
         private readonly ConfirmChangeOfSupplierDocumentWriter _documentWriter;
         private readonly ISchemaProvider _schemaProvider;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
-        public MessageFactoryTests()
+        public ConfirmRequestChangeOfSupplierDocumentWriterTests()
         {
             _systemDateTimeProvider = new SystemDateTimeProvider();
             _schemaProvider = new SchemaProvider(new CimXmlSchemas());
@@ -45,7 +41,7 @@ namespace Messaging.Tests.OutgoingMessages.ConfirmRequestChangeOfSupplier
         }
 
         [Fact]
-        public async Task Message_is_valid()
+        public async Task Document_is_valid()
         {
             var header = new MessageHeader("E03", "SenderId", "DDZ", "ReceiverId", "DDQ", Guid.NewGuid().ToString(), _systemDateTimeProvider.Now(), "A01");
             var marketActivityRecords = new List<MarketActivityRecord>()
