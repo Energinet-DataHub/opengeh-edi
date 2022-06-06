@@ -14,9 +14,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Xml.Linq;
+using System.Xml.Schema;
 using Messaging.Application.OutgoingMessages;
+using Messaging.Application.Xml;
 using Xunit;
 
 namespace Messaging.Tests.OutgoingMessages
@@ -74,6 +78,13 @@ namespace Messaging.Tests.OutgoingMessages
             AssertXmlMessage.AssertHasHeaderValue(document, "receiver_MarketParticipant.mRID", header.ReceiverId);
             AssertXmlMessage.AssertHasHeaderValue(document, "receiver_MarketParticipant.marketRole.type", header.ReceiverRole);
             AssertXmlMessage.AssertHasHeaderValue(document, "reason.code", header.ReasonCode);
+        }
+
+        internal static async Task AssertConformsToSchemaAsync(Stream message, XmlSchema schema)
+        {
+            if (schema == null) throw new ArgumentNullException(nameof(schema));
+            var validationResult = await MessageValidator.ValidateAsync(message, schema).ConfigureAwait(false);
+            Assert.True(validationResult.IsValid);
         }
 
         private static XElement? GetHeaderElement(XDocument document)
