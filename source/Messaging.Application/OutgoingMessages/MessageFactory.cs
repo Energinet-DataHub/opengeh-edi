@@ -16,8 +16,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
-using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Messaging.Application.Common;
 using Processing.Domain.SeedWork;
 
 namespace Messaging.Application.OutgoingMessages;
@@ -25,23 +24,30 @@ namespace Messaging.Application.OutgoingMessages;
 public class MessageFactory
 {
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-    private readonly ConfirmRequestChangeOfSupplierMessageFactory _confirmRequestChangeOfSupplierMessageFactory;
-    private readonly RejectRequestChangeOfSupplierMessageFactory _rejectRequestChangeOfSupplierMessageFactory;
+    private readonly IReadOnlyCollection<DocumentWriter> _documentWriters;
 
-    public MessageFactory(ConfirmRequestChangeOfSupplierMessageFactory confirmRequestChangeOfSupplierMessageFactory, RejectRequestChangeOfSupplierMessageFactory rejectRequestChangeOfSupplierMessageFactory, ISystemDateTimeProvider systemDateTimeProvider)
+    public MessageFactory(
+        ISystemDateTimeProvider systemDateTimeProvider,
+        IEnumerable<DocumentWriter> documentWriters)
     {
-        _confirmRequestChangeOfSupplierMessageFactory = confirmRequestChangeOfSupplierMessageFactory;
-        _rejectRequestChangeOfSupplierMessageFactory = rejectRequestChangeOfSupplierMessageFactory;
         _systemDateTimeProvider = systemDateTimeProvider;
+        _documentWriters = documentWriters.ToList();
     }
 
     public Task<Stream> CreateFromAsync(IReadOnlyCollection<OutgoingMessage> outgoingMessages)
     {
         var firstMessageInList = outgoingMessages.First();
         var processType = ProcessType.FromCode(firstMessageInList.ProcessType);
-        return firstMessageInList.DocumentType == "ConfirmRequestChangeOfSupplier"
-            ? _confirmRequestChangeOfSupplierMessageFactory.CreateFromAsync(CreateMessageHeaderFrom(firstMessageInList, processType.ReasonCodeForConfirm), outgoingMessages.Select(message => message.MarketActivityRecordPayload).ToList())
-            : _rejectRequestChangeOfSupplierMessageFactory.CreateFromAsync(CreateMessageHeaderFrom(firstMessageInList, processType.ReasonCodeForReject), outgoingMessages.Select(message => message.MarketActivityRecordPayload).ToList());
+        var documentWriter =
+            _documentWriters.First(writer => writer.HandlesDocumentType(firstMessageInList.DocumentType));
+
+        var messageHeader = firstMessageInList.DocumentType == "ConfirmRequestChangeOfSupplier"
+            ? CreateMessageHeaderFrom(firstMessageInList, processType.ReasonCodeForConfirm)
+            : CreateMessageHeaderFrom(firstMessageInList, processType.ReasonCodeForReject);
+
+        return documentWriter.WriteAsync(
+            messageHeader,
+            outgoingMessages.Select(message => message.MarketActivityRecordPayload).ToList());
     }
 
     private MessageHeader CreateMessageHeaderFrom(OutgoingMessage message, string reasonCode)

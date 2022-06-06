@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -40,6 +41,12 @@ public abstract class DocumentWriter
         await WriteEndAsync(writer).ConfigureAwait(false);
         stream.Position = 0;
         return stream;
+    }
+
+    public bool HandlesDocumentType(string documentType)
+    {
+        if (documentType == null) throw new ArgumentNullException(nameof(documentType));
+        return _documentDetails.Type[..documentType.Length].Equals(documentType, StringComparison.OrdinalIgnoreCase);
     }
 
     protected abstract Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer);

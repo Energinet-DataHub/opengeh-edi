@@ -154,7 +154,6 @@ namespace Messaging.Infrastructure.Configuration
 
         public CompositionRoot AddOutgoingMessageDispatcher(IMessageDispatcher messageDispatcher)
         {
-            _services.AddScoped<ConfirmRequestChangeOfSupplierMessageFactory>();
             _services.AddScoped<IMessageDispatcher>(_ => messageDispatcher);
             _services.AddScoped<MessageRequestHandler>();
 
@@ -230,8 +229,8 @@ namespace Messaging.Infrastructure.Configuration
         private void AddMessageGenerationServices()
         {
             _services.AddScoped<MessageFactory>();
-            _services.AddScoped<ConfirmRequestChangeOfSupplierMessageFactory>();
-            _services.AddScoped<RejectRequestChangeOfSupplierMessageFactory>();
+            _services.AddScoped<DocumentWriter, ConfirmChangeOfSupplierDocumentWriter>();
+            _services.AddScoped<DocumentWriter, RejectRequestChangeOfSupplierDocumentWriter>();
             _services.AddScoped<IValidationErrorTranslator, ValidationErrorTranslator>();
             _services.AddScoped<IMarketActivityRecordParser, MarketActivityRecordParser>();
         }
