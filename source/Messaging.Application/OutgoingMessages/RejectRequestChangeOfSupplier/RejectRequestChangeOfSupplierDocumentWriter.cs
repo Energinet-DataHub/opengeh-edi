@@ -20,24 +20,27 @@ using Messaging.Application.Common;
 
 namespace Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 
-public class RejectRequestChangeOfSupplierDocumentWriter : DocumentWriter<MarketActivityRecord>
+public class RejectRequestChangeOfSupplierDocumentWriter : DocumentWriter
 {
     private const string Prefix = "cim";
     private const string DocumentType = "RejectRequestChangeOfSupplier_MarketDocument";
     private const string XmlNamespace = "urn:ediel.org:structure:rejectrequestchangeofsupplier:0:1";
     private const string SchemaLocation = "urn:ediel.org:structure:rejectrequestchangeofsupplier:0:1 urn-ediel-org-structure-rejectrequestchangeofsupplier-0-1.xsd";
+    private readonly IMarketActivityRecordParser _parser;
 
-    public RejectRequestChangeOfSupplierDocumentWriter()
+    public RejectRequestChangeOfSupplierDocumentWriter(IMarketActivityRecordParser parser)
         : base(new DocumentDetails(DocumentType, SchemaLocation, XmlNamespace, Prefix))
     {
+        _parser = parser;
     }
 
-    protected override async Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<MarketActivityRecord> marketActivityPayloads, XmlWriter writer)
+    protected override async Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer)
     {
         if (marketActivityPayloads == null) throw new ArgumentNullException(nameof(marketActivityPayloads));
         if (writer == null) throw new ArgumentNullException(nameof(writer));
-        foreach (var marketActivityRecord in marketActivityPayloads)
+        foreach (var payload in marketActivityPayloads)
         {
+            var marketActivityRecord = _parser.From<MarketActivityRecord>(payload);
             await writer.WriteStartElementAsync(Prefix, "MktActivityRecord", null).ConfigureAwait(false);
             await writer.WriteElementStringAsync(Prefix, "mRID", null, marketActivityRecord.Id.ToString())
                 .ConfigureAwait(false);

@@ -21,7 +21,7 @@ using Messaging.Application.OutgoingMessages;
 
 namespace Messaging.Application.Common;
 
-public abstract class DocumentWriter<TMarketActivityRecord>
+public abstract class DocumentWriter
 {
     private readonly DocumentDetails _documentDetails;
 
@@ -30,7 +30,7 @@ public abstract class DocumentWriter<TMarketActivityRecord>
         _documentDetails = documentDetails;
     }
 
-    public async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<TMarketActivityRecord> marketActivityRecords)
+    public async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
     {
         var settings = new XmlWriterSettings { OmitXmlDeclaration = false, Encoding = Encoding.UTF8, Async = true };
         var stream = new MemoryStream();
@@ -42,7 +42,7 @@ public abstract class DocumentWriter<TMarketActivityRecord>
         return stream;
     }
 
-    protected abstract Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<TMarketActivityRecord> marketActivityPayloads, XmlWriter writer);
+    protected abstract Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer);
 
     private static Task WriteHeaderAsync(MessageHeader header, DocumentDetails documentDetails, XmlWriter writer)
     {

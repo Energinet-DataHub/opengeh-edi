@@ -37,15 +37,8 @@ namespace Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier
         {
             if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
             if (marketActivityPayloads == null) throw new ArgumentNullException(nameof(marketActivityPayloads));
-            var documentWriter = new RejectRequestChangeOfSupplierDocumentWriter();
-            return documentWriter.WriteAsync(messageHeader, GetMarketActivityRecordsFrom(marketActivityPayloads));
-        }
-
-        private List<MarketActivityRecord> GetMarketActivityRecordsFrom(IReadOnlyCollection<string> marketActivityPayloads)
-        {
-            return marketActivityPayloads
-                .Select(payload => _marketActivityRecordParser.From<MarketActivityRecord>(payload))
-                .ToList();
+            var documentWriter = new RejectRequestChangeOfSupplierDocumentWriter(_marketActivityRecordParser);
+            return documentWriter.WriteAsync(messageHeader, marketActivityPayloads);
         }
     }
 }
