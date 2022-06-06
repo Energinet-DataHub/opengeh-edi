@@ -75,15 +75,9 @@ namespace Messaging.Tests.OutgoingMessages.ConfirmRequestChangeOfSupplier
 
             AssertMarketActivityRecords(marketActivityRecords, document);
 
-            await AssertConformsToSchema(message).ConfigureAwait(false);
-        }
-
-        private async Task AssertConformsToSchema(Stream message)
-        {
             var schema = await _schemaProvider.GetSchemaAsync("confirmrequestchangeofsupplier", "1.0")
                 .ConfigureAwait(false);
-            var validationResult = await MessageValidator.ValidateAsync(message, schema!).ConfigureAwait(false);
-            Assert.True(validationResult.IsValid);
+            await AssertXmlMessage.AssertConformsToSchemaAsync(message, schema!).ConfigureAwait(false);
         }
     }
 }
