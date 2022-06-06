@@ -20,7 +20,6 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
-using Messaging.Application.Xml;
 using Messaging.Application.Xml.SchemaStore;
 using Messaging.Infrastructure.Configuration;
 using Processing.Domain.SeedWork;
@@ -55,8 +54,8 @@ public class RejectRequestChangeOfSupplierDocumentWriterTests
             new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId",
             new List<Reason>()
             {
-                new Reason("Reason1", "999"),
-                new Reason("Reason2", "999"),
+                new Reason("Reason3", "999"),
+                new Reason("Reason4", "999"),
             }),
         };
 

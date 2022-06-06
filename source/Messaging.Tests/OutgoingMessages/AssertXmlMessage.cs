@@ -71,14 +71,14 @@ namespace Messaging.Tests.OutgoingMessages
         internal static void AssertHeader(MessageHeader header, XDocument document)
         {
             Assert.NotEmpty(AssertXmlMessage.GetMessageHeaderValue(document, "mRID")!);
-            AssertXmlMessage.AssertHasHeaderValue(document, "type", "414");
-            AssertXmlMessage.AssertHasHeaderValue(document, "process.processType", header.ProcessType);
-            AssertXmlMessage.AssertHasHeaderValue(document, "businessSector.type", "23");
-            AssertXmlMessage.AssertHasHeaderValue(document, "sender_MarketParticipant.mRID", header.SenderId);
-            AssertXmlMessage.AssertHasHeaderValue(document, "sender_MarketParticipant.marketRole.type", header.SenderRole);
-            AssertXmlMessage.AssertHasHeaderValue(document, "receiver_MarketParticipant.mRID", header.ReceiverId);
-            AssertXmlMessage.AssertHasHeaderValue(document, "receiver_MarketParticipant.marketRole.type", header.ReceiverRole);
-            AssertXmlMessage.AssertHasHeaderValue(document, "reason.code", header.ReasonCode);
+            AssertHasHeaderValue(document, "type", "414");
+            AssertHasHeaderValue(document, "process.processType", header.ProcessType);
+            AssertHasHeaderValue(document, "businessSector.type", "23");
+            AssertHasHeaderValue(document, "sender_MarketParticipant.mRID", header.SenderId);
+            AssertHasHeaderValue(document, "sender_MarketParticipant.marketRole.type", header.SenderRole);
+            AssertHasHeaderValue(document, "receiver_MarketParticipant.mRID", header.ReceiverId);
+            AssertHasHeaderValue(document, "receiver_MarketParticipant.marketRole.type", header.ReceiverRole);
+            AssertHasHeaderValue(document, "reason.code", header.ReasonCode);
         }
 
         internal static async Task AssertConformsToSchemaAsync(Stream message, XmlSchema schema)
