@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Messaging.Application.OutgoingMessages;
@@ -74,7 +75,7 @@ public class RejectRequestChangeOfSupplierDocumentWriterTests
             Assert.NotNull(marketActivityRecord);
             AssertXmlMessage.AssertMarketActivityRecordValue(marketActivityRecord, "originalTransactionIDReference_MktActivityRecord.mRID", activityRecord.OriginalTransactionId);
             AssertXmlMessage.AssertMarketActivityRecordValue(marketActivityRecord, "marketEvaluationPoint.mRID", activityRecord.MarketEvaluationPointId);
-            AssertXmlMessage.AssertReasons(marketActivityRecord, activityRecord.Reasons);
+            AssertXmlMessage.AssertReasons(marketActivityRecord, activityRecord.Reasons.ToList());
         }
     }
 

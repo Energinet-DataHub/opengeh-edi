@@ -88,10 +88,17 @@ namespace Messaging.Tests.OutgoingMessages
             Assert.True(validationResult.IsValid);
         }
 
-        internal static void AssertReasons(XElement marketActivityRecord, IEnumerable<Reason> expectedReasons)
+        internal static void AssertReasons(XElement marketActivityRecord, IReadOnlyList<Reason> expectedReasons)
         {
-            var reasonsElements = marketActivityRecord.Elements(marketActivityRecord.Name.Namespace + "Reason");
-            Assert.Equal(expectedReasons.Count(), reasonsElements.Count());
+            var reasonsElements = marketActivityRecord.Elements(marketActivityRecord.Name.Namespace + "Reason").ToList();
+            Assert.Equal(expectedReasons.Count, reasonsElements.Count);
+            for (int i = 0; i < expectedReasons.Count; i++)
+            {
+                var actualCode = reasonsElements[i].Element(marketActivityRecord.Name.Namespace + "code")?.Value;
+                var actualText = reasonsElements[i].Element(marketActivityRecord.Name.Namespace + "text")?.Value;
+                Assert.Equal(expectedReasons[i].Code, actualCode);
+                Assert.Equal(expectedReasons[i].Text, actualText);
+            }
         }
 
         private static XElement? GetHeaderElement(XDocument document)
