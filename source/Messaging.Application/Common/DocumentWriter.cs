@@ -21,7 +21,7 @@ using Messaging.Application.OutgoingMessages;
 
 namespace Messaging.Application.Common;
 
-public abstract class DocumentWriter
+public abstract class DocumentWriter<TMarketActivityRecord>
 {
     private readonly DocumentDetails _documentDetails;
 
@@ -30,19 +30,19 @@ public abstract class DocumentWriter
         _documentDetails = documentDetails;
     }
 
-    public async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityPayloads)
+    public async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<TMarketActivityRecord> marketActivityRecords)
     {
         var settings = new XmlWriterSettings { OmitXmlDeclaration = false, Encoding = Encoding.UTF8, Async = true };
         var stream = new MemoryStream();
         using var writer = XmlWriter.Create(stream, settings);
         await WriteHeaderAsync(header, _documentDetails, writer).ConfigureAwait(false);
-        await WriteMarketActivityRecordsAsync(marketActivityPayloads, writer).ConfigureAwait(false);
+        await WriteMarketActivityRecordsAsync(marketActivityRecords, writer).ConfigureAwait(false);
         await WriteEndAsync(writer).ConfigureAwait(false);
         stream.Position = 0;
         return stream;
     }
 
-    protected abstract Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer);
+    protected abstract Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<TMarketActivityRecord> marketActivityPayloads, XmlWriter writer);
 
     private static Task WriteHeaderAsync(MessageHeader header, DocumentDetails documentDetails, XmlWriter writer)
     {

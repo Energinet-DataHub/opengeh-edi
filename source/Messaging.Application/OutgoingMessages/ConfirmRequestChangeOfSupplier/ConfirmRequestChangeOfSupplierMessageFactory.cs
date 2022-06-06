@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Messaging.Application.Common;
 
@@ -33,8 +34,8 @@ namespace Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier
         {
             if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
             if (marketActivityPayloads == null) throw new ArgumentNullException(nameof(marketActivityPayloads));
-            var documentWriter = new ConfirmChangeOfSupplierDocumentWriter(_marketActivityRecordParser);
-            return documentWriter.WriteAsync(messageHeader, marketActivityPayloads);
+            var documentWriter = new ConfirmChangeOfSupplierDocumentWriter();
+            return documentWriter.WriteAsync(messageHeader, marketActivityPayloads.Select(payload => _marketActivityRecordParser.From<MarketActivityRecord>(payload)).ToList());
         }
     }
 }
