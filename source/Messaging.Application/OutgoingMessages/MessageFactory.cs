@@ -38,9 +38,10 @@ public class MessageFactory
     public Task<Stream> CreateFromAsync(IReadOnlyCollection<OutgoingMessage> outgoingMessages)
     {
         var firstMessageInList = outgoingMessages.First();
+        var processType = ProcessType.FromCode(firstMessageInList.ProcessType);
         return firstMessageInList.DocumentType == "ConfirmRequestChangeOfSupplier"
-            ? _confirmRequestChangeOfSupplierMessageFactory.CreateFromAsync(CreateMessageHeaderFrom(firstMessageInList, "A01"), outgoingMessages.Select(message => message.MarketActivityRecordPayload).ToList())
-            : _rejectRequestChangeOfSupplierMessageFactory.CreateFromAsync(CreateMessageHeaderFrom(firstMessageInList, "A02"), outgoingMessages.Select(message => message.MarketActivityRecordPayload).ToList());
+            ? _confirmRequestChangeOfSupplierMessageFactory.CreateFromAsync(CreateMessageHeaderFrom(firstMessageInList, processType.ReasonCodeForConfirm), outgoingMessages.Select(message => message.MarketActivityRecordPayload).ToList())
+            : _rejectRequestChangeOfSupplierMessageFactory.CreateFromAsync(CreateMessageHeaderFrom(firstMessageInList, processType.ReasonCodeForReject), outgoingMessages.Select(message => message.MarketActivityRecordPayload).ToList());
     }
 
     private MessageHeader CreateMessageHeaderFrom(OutgoingMessage message, string reasonCode)
