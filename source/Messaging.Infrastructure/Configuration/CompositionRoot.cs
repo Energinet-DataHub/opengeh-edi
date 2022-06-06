@@ -231,7 +231,6 @@ namespace Messaging.Infrastructure.Configuration
         {
             _services.AddScoped<ConfirmRequestChangeOfSupplierMessageFactory>();
             _services.AddScoped<RejectRequestChangeOfSupplierMessageFactory>();
-            _services.AddScoped<DocumentWriter<MarketActivityRecord>, ConfirmChangeOfSupplierDocumentWriter>();
             _services.AddScoped<IValidationErrorTranslator, ValidationErrorTranslator>();
             _services.AddScoped<IMarketActivityRecordParser, MarketActivityRecordParser>();
         }
