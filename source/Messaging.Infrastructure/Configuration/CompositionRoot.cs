@@ -52,6 +52,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Processing.Domain.SeedWork;
+using MarketActivityRecord = Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier.MarketActivityRecord;
 
 namespace Messaging.Infrastructure.Configuration
 {
@@ -72,8 +73,6 @@ namespace Messaging.Infrastructure.Configuration
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
             services.AddScoped<IMessageDispatcher, MessageDispatcher>();
-            services.AddScoped<ConfirmRequestChangeOfSupplierMessageFactory>();
-            services.AddScoped<RejectRequestChangeOfSupplierMessageFactory>();
             services.AddScoped<MessageRequestHandler>();
             services.AddScoped<MessageRequestContext>();
 
@@ -230,6 +229,9 @@ namespace Messaging.Infrastructure.Configuration
 
         private void AddMessageGenerationServices()
         {
+            _services.AddScoped<ConfirmRequestChangeOfSupplierMessageFactory>();
+            _services.AddScoped<RejectRequestChangeOfSupplierMessageFactory>();
+            _services.AddScoped<DocumentWriter<MarketActivityRecord>, ConfirmChangeOfSupplierDocumentWriter>();
             _services.AddScoped<IValidationErrorTranslator, ValidationErrorTranslator>();
             _services.AddScoped<IMarketActivityRecordParser, MarketActivityRecordParser>();
         }
