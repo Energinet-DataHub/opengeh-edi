@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+using Messaging.Application.OutgoingMessages;
 using Xunit;
 
 namespace Messaging.Tests.OutgoingMessages
@@ -60,6 +61,19 @@ namespace Messaging.Tests.OutgoingMessages
         internal static void AssertMarketActivityRecordCount(XDocument document, int expectedCount)
         {
             Assert.Equal(expectedCount, GetMarketActivityRecords(document).Count);
+        }
+
+        internal static void AssertHeader(MessageHeader header, XDocument document)
+        {
+            Assert.NotEmpty(AssertXmlMessage.GetMessageHeaderValue(document, "mRID")!);
+            AssertXmlMessage.AssertHasHeaderValue(document, "type", "414");
+            AssertXmlMessage.AssertHasHeaderValue(document, "process.processType", header.ProcessType);
+            AssertXmlMessage.AssertHasHeaderValue(document, "businessSector.type", "23");
+            AssertXmlMessage.AssertHasHeaderValue(document, "sender_MarketParticipant.mRID", header.SenderId);
+            AssertXmlMessage.AssertHasHeaderValue(document, "sender_MarketParticipant.marketRole.type", header.SenderRole);
+            AssertXmlMessage.AssertHasHeaderValue(document, "receiver_MarketParticipant.mRID", header.ReceiverId);
+            AssertXmlMessage.AssertHasHeaderValue(document, "receiver_MarketParticipant.marketRole.type", header.ReceiverRole);
+            AssertXmlMessage.AssertHasHeaderValue(document, "reason.code", header.ReasonCode);
         }
 
         private static XElement? GetHeaderElement(XDocument document)
