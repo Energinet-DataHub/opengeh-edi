@@ -14,11 +14,5 @@
 
 namespace Contracts.BusinessRequests.MoveIn
 {
-    public record MoveInRequestDto(
-        string? ConsumerName,
-        string? EnergySupplierGlnNumber,
-        string AccountingPointGsrnNumber,
-        string StartDate,
-        string? ConsumerId,
-        string? ConsumerIdType);
+    public record Response(IEnumerable<string> ValidationErrors, string? ProcessId = null);
 }
