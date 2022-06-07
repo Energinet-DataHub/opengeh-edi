@@ -37,26 +37,58 @@ namespace Messaging.CimMessageAdapter.Messages
             _schemaProvider = schemaProvider ?? throw new ArgumentNullException(nameof(schemaProvider));
         }
 
-        public static async Task<string> GetBusinessProcessTypeAsync(Stream message)
+        public static string GetBusinessProcessType(Stream message)
         {
-            await Task.Delay(1).ConfigureAwait(false);
-            return "requestchangeofsupplier";
+            if (message == null) throw new ArgumentNullException(nameof(message));
+            var processType = string.Empty;
+
+            ResetMessagePosition(message);
+            using var reader = XmlReader.Create(message);
+
+            while (reader.Read())
+            {
+                if (!string.IsNullOrEmpty(reader.NamespaceURI))
+                {
+                    var @namespace = reader.NamespaceURI;
+                    var split = @namespace.Split(':');
+                    processType = split[3];
+                }
+            }
+
+            return processType;
         }
 
-        public static async Task<string> GetVersionAsync(Stream message)
+        public static string GetVersion(Stream message)
         {
-            await Task.Delay(1).ConfigureAwait(false);
-            return "1.0";
+            if (message == null) throw new ArgumentNullException(nameof(message));
+            var version = string.Empty;
+
+            ResetMessagePosition(message);
+            using var reader = XmlReader.Create(message);
+
+            while (reader.Read())
+            {
+                if (!string.IsNullOrEmpty(reader.NamespaceURI))
+                {
+                    var @namespace = reader.NamespaceURI;
+                    var split = @namespace.Split(':');
+                    version = split[4] + "." + split[5];
+                }
+            }
+
+            return version;
         }
 
         public async Task<MessageParserResult> ParseAsync(Stream message, string businessProcessType, string version)
         {
+            if (message == null) throw new ArgumentNullException(nameof(message));
             var xmlSchema = await _schemaProvider.GetSchemaAsync(businessProcessType, version).ConfigureAwait(true);
             if (xmlSchema is null)
             {
                 return MessageParserResult.Failure(new UnknownBusinessProcessTypeOrVersion(businessProcessType, version));
             }
 
+            ResetMessagePosition(message);
             using (var reader = XmlReader.Create(message, CreateXmlReaderSettings(xmlSchema)))
             {
                 try
@@ -95,6 +127,11 @@ namespace Messaging.CimMessageAdapter.Messages
         private static MessageParserResult InvalidXmlFailure(Exception exception)
         {
             return MessageParserResult.Failure(InvalidMessageStructure.From(exception));
+        }
+
+        private static void ResetMessagePosition(Stream message)
+        {
+            message.Position = 0;
         }
 
         private static async IAsyncEnumerable<MarketActivityRecord> MarketActivityRecordsFromAsync(

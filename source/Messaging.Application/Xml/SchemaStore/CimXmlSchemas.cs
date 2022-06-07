@@ -24,15 +24,15 @@ namespace Messaging.Application.Xml.SchemaStore
             Schemas = new Dictionary<KeyValuePair<string, string>, string>
             {
                 {
-                    new KeyValuePair<string, string>("requestchangeofsupplier", "1.0"),
+                    new KeyValuePair<string, string>("requestchangeofsupplier", "0.1"),
                     SchemaPath + "urn-ediel-org-structure-requestchangeofsupplier-0-1.xsd"
                 },
                 {
-                    new KeyValuePair<string, string>("confirmrequestchangeofsupplier", "1.0"),
+                    new KeyValuePair<string, string>("confirmrequestchangeofsupplier", "0.1"),
                     SchemaPath + "urn-ediel-org-structure-confirmrequestchangeofsupplier-0-1.xsd"
                 },
                 {
-                    new KeyValuePair<string, string>("rejectrequestchangeofsupplier", "1.0"),
+                    new KeyValuePair<string, string>("rejectrequestchangeofsupplier", "0.1"),
                     SchemaPath + "urn-ediel-org-structure-rejectrequestchangeofsupplier-0-1.xsd"
                 },
             };

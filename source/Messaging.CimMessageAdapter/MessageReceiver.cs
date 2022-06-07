@@ -50,8 +50,9 @@ namespace Messaging.CimMessageAdapter
             if (message == null) throw new ArgumentNullException(nameof(message));
 
             var messageParser = new MessageParser(_schemaProvider);
-            var businessProcess = await MessageParser.GetBusinessProcessTypeAsync(message).ConfigureAwait(false);
-            var version2 = await MessageParser.GetVersionAsync(message).ConfigureAwait(false);
+            var version2 = MessageParser.GetVersion(message);
+            var businessProcess = MessageParser.GetBusinessProcessType(message);
+
             var messageParserResult =
                  await messageParser.ParseAsync(message, businessProcess, version2).ConfigureAwait(false);
 
