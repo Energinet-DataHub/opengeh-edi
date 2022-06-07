@@ -21,7 +21,7 @@ using MediatR;
 
 namespace Messaging.Infrastructure.OutgoingMessages
 {
-    public class NotifyMessageHubHandler : IRequestHandler<NotifyMessageHub>
+    public class NotifyMessageHubHandler : IRequestHandler<NotifyMessageHub, Unit>
     {
         private readonly IDataBundleResponseSender _dataBundleResponseSender;
 
