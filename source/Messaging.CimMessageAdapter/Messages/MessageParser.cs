@@ -37,6 +37,18 @@ namespace Messaging.CimMessageAdapter.Messages
             _schemaProvider = schemaProvider ?? throw new ArgumentNullException(nameof(schemaProvider));
         }
 
+        public static async Task<string> GetBusinessProcessTypeAsync(Stream message)
+        {
+            await Task.Delay(1).ConfigureAwait(false);
+            return "requestchangeofsupplier";
+        }
+
+        public static async Task<string> GetVersionAsync(Stream message)
+        {
+            await Task.Delay(1).ConfigureAwait(false);
+            return "1.0";
+        }
+
         public async Task<MessageParserResult> ParseAsync(Stream message, string businessProcessType, string version)
         {
             var xmlSchema = await _schemaProvider.GetSchemaAsync(businessProcessType, version).ConfigureAwait(true);
