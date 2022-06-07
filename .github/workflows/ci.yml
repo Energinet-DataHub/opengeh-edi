@@ -78,7 +78,8 @@ jobs:
     needs: [
       api_ci,
       processing_ci,    
-      database_migration_ci
+      database_migration_ci,
+      actorsync_ci
     ]
     uses: Energinet-DataHub/.github/.github/workflows/create-prerelease.yml@6.0.0
     with:
