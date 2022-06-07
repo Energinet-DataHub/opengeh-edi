@@ -50,7 +50,6 @@ namespace Messaging.Api.IncomingMessages
 
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            // TODO extract version and business process type from request
             var result = await _messageReceiver.ReceiveAsync(request.Body)
                 .ConfigureAwait(false);
 
