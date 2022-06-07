@@ -26,68 +26,19 @@ namespace Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier
 {
     public class RejectRequestChangeOfSupplierMessageFactory
     {
-        private const string Prefix = "cim";
-        private const string DocumentType = "RejectRequestChangeOfSupplier_MarketDocument";
-        private const string XmlNamespace = "urn:ediel.org:structure:rejectrequestchangeofsupplier:0:1";
-        private const string SchemaLocation = "urn:ediel.org:structure:rejectrequestchangeofsupplier:0:1 urn-ediel-org-structure-rejectrequestchangeofsupplier-0-1.xsd";
-        private readonly ISystemDateTimeProvider _systemDateTimeProvider;
         private readonly IMarketActivityRecordParser _marketActivityRecordParser;
 
-        public RejectRequestChangeOfSupplierMessageFactory(ISystemDateTimeProvider systemDateTimeProvider, IMarketActivityRecordParser marketActivityRecordParser)
+        public RejectRequestChangeOfSupplierMessageFactory(IMarketActivityRecordParser marketActivityRecordParser)
         {
-            _systemDateTimeProvider = systemDateTimeProvider;
             _marketActivityRecordParser = marketActivityRecordParser;
         }
 
-        public async Task<Stream> CreateFromAsync(MessageHeader messageHeader, IReadOnlyCollection<string> marketActivityPayloads)
+        public Task<Stream> CreateFromAsync(MessageHeader messageHeader, IReadOnlyCollection<string> marketActivityPayloads)
         {
             if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
             if (marketActivityPayloads == null) throw new ArgumentNullException(nameof(marketActivityPayloads));
-
-            var settings = new XmlWriterSettings { OmitXmlDeclaration = false, Encoding = Encoding.UTF8, Async = true };
-            var stream = new MemoryStream();
-            using var writer = XmlWriter.Create(stream, settings);
-            await HeaderWriter.WriteAsync(writer, messageHeader, CreateDocumentDetails()).ConfigureAwait(false);
-
-            await WriteMarketActivityRecordsAsync(GetMarketActivityRecordsFrom(marketActivityPayloads), writer).ConfigureAwait(false);
-            await writer.WriteEndElementAsync().ConfigureAwait(false);
-            writer.Close();
-            stream.Position = 0;
-
-            return stream;
-        }
-
-        private static async Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<MarketActivityRecord> marketActivityRecords, XmlWriter writer)
-        {
-            foreach (var marketActivityRecord in marketActivityRecords)
-            {
-                await writer.WriteStartElementAsync(Prefix, "MktActivityRecord", null).ConfigureAwait(false);
-                await writer.WriteElementStringAsync(Prefix, "mRID", null, marketActivityRecord.Id.ToString())
-                    .ConfigureAwait(false);
-                await writer.WriteElementStringAsync(
-                    Prefix,
-                    "originalTransactionIDReference_MktActivityRecord.mRID",
-                    null,
-                    marketActivityRecord.OriginalTransactionId).ConfigureAwait(false);
-                await writer.WriteStartElementAsync(Prefix, "marketEvaluationPoint.mRID", null).ConfigureAwait(false);
-                await writer.WriteAttributeStringAsync(null, "codingScheme", null, "A10").ConfigureAwait(false);
-                writer.WriteValue(marketActivityRecord.MarketEvaluationPointId);
-                await writer.WriteEndElementAsync().ConfigureAwait(false);
-                foreach (var reason in marketActivityRecord.Reasons)
-                {
-                    await writer.WriteStartElementAsync(Prefix, "Reason", null).ConfigureAwait(false);
-                    await writer.WriteElementStringAsync(Prefix, "code", null, reason.Code).ConfigureAwait(false);
-                    await writer.WriteElementStringAsync(Prefix, "text", null, reason.Text).ConfigureAwait(false);
-                    await writer.WriteEndElementAsync().ConfigureAwait(false);
-                }
-
-                await writer.WriteEndElementAsync().ConfigureAwait(false);
-            }
-        }
-
-        private static DocumentDetails CreateDocumentDetails()
-        {
-            return new DocumentDetails(DocumentType, SchemaLocation, XmlNamespace, Prefix);
+            var documentWriter = new RejectRequestChangeOfSupplierDocumentWriter();
+            return documentWriter.WriteAsync(messageHeader, GetMarketActivityRecordsFrom(marketActivityPayloads));
         }
 
         private List<MarketActivityRecord> GetMarketActivityRecordsFrom(IReadOnlyCollection<string> marketActivityPayloads)
