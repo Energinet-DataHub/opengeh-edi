@@ -13,17 +13,13 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text;
 using MediatR;
 using Messaging.Api;
-using Messaging.Application.Common.Commands;
 using Messaging.Infrastructure.Configuration;
-using Messaging.Infrastructure.OutgoingMessages;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -33,18 +29,23 @@ namespace Messaging.ArchitectureTests
 {
     public class CompositionRootTests
     {
+        private readonly IHost _host;
+
+        public CompositionRootTests()
+        {
+            _host = Program.ConfigureHost(Program.DevelopmentTokenValidationParameters(), new TestEnvironment());
+        }
+
         [Fact]
         public void All_dependencies_can_be_resolved_in_functions()
         {
-            var host = Program.ConfigureHost(Program.DevelopmentTokenValidationParameters(), new TestEnvironment());
-
             var allTypes = FunctionsReflectionHelper.FindAllTypes();
             var functionTypes = FunctionsReflectionHelper.FindAllFunctionTypes();
             var constructorDependencies = FunctionsReflectionHelper.FindAllConstructorDependencies();
 
             var dependencies = constructorDependencies(functionTypes(allTypes(typeof(Program))));
 
-            using var scope = host.Services.CreateScope();
+            using var scope = _host.Services.CreateScope();
 
             foreach (var dependency in dependencies)
             {
@@ -56,14 +57,12 @@ namespace Messaging.ArchitectureTests
         [Fact]
         public void All_dependencies_can_be_resolved_for_middleware()
         {
-            var host = Program.ConfigureHost(Program.DevelopmentTokenValidationParameters(), new TestEnvironment());
-
             var allTypes = FunctionsReflectionHelper.FindAllTypes();
             var middlewareTypes = FunctionsReflectionHelper.FindAllTypesThatImplementType();
             var constructorDependencies = FunctionsReflectionHelper.FindAllConstructorDependencies();
 
             var dependencies = constructorDependencies(middlewareTypes(typeof(IFunctionsWorkerMiddleware), allTypes(typeof(Program))));
-            using var scope = host.Services.CreateScope();
+            using var scope = _host.Services.CreateScope();
 
             foreach (var dependency in dependencies)
             {
@@ -75,24 +74,22 @@ namespace Messaging.ArchitectureTests
         [Fact]
         public void All_request_handlers_are_registered()
         {
-            var host = Program.ConfigureHost(Program.DevelopmentTokenValidationParameters(), new TestEnvironment());
             var assemblies = new[] { ApplicationAssemblies.Application, ApplicationAssemblies.Infrastructure, };
             var typeToLookFor = typeof(IRequestHandler<,>);
 
-            AssertTypeIsRegistered(typeToLookFor, assemblies, host);
+            AssertTypeIsRegistered(typeToLookFor, assemblies);
         }
 
         [Fact]
         public void All_notification_handlers_are_registered()
         {
-            var host = Program.ConfigureHost(Program.DevelopmentTokenValidationParameters(), new TestEnvironment());
             var assemblies = new[] { ApplicationAssemblies.Application, ApplicationAssemblies.Infrastructure, };
             var typeToLookFor = typeof(INotificationHandler<>);
 
-            AssertTypeIsRegistered(typeToLookFor, assemblies, host);
+            AssertTypeIsRegistered(typeToLookFor, assemblies);
         }
 
-        private static void AssertTypeIsRegistered(Type typeToLookFor, Assembly[] lookInAssemblies, IHost host)
+        private void AssertTypeIsRegistered(Type typeToLookFor, Assembly[] lookInAssemblies)
         {
             foreach (var assembly in lookInAssemblies)
             {
@@ -106,7 +103,7 @@ namespace Messaging.ArchitectureTests
 
                 requestHandlerTypes.ForEach(t =>
                 {
-                    host.Services.GetRequiredService(t);
+                    _host.Services.GetRequiredService(t);
                 });
             }
         }
