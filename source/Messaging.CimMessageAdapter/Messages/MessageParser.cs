@@ -68,25 +68,7 @@ namespace Messaging.CimMessageAdapter.Messages
             {
                 try
                 {
-                    var root = await reader.ReadRootElementAsync().ConfigureAwait(false);
-                    var messageHeader = await ExtractMessageHeaderAsync(reader, root).ConfigureAwait(false);
-                    if (_errors.Count > 0)
-                    {
-                        return MessageParserResult.Failure(_errors.ToArray());
-                    }
-
-                    var marketActivityRecords = new List<MarketActivityRecord>();
-                    await foreach (var marketActivityRecord in MarketActivityRecordsFromAsync(reader, root))
-                    {
-                        marketActivityRecords.Add(marketActivityRecord);
-                    }
-
-                    if (_errors.Count > 0)
-                    {
-                        return MessageParserResult.Failure(_errors.ToArray());
-                    }
-
-                    return MessageParserResult.Succeeded(messageHeader, marketActivityRecords);
+                    return await ParseXmlDataAsync(reader).ConfigureAwait(false);
                 }
                 catch (XmlException exception)
                 {
@@ -307,6 +289,29 @@ namespace Messaging.CimMessageAdapter.Messages
             settings.Schemas.Add(xmlSchema);
             settings.ValidationEventHandler += OnValidationError;
             return settings;
+        }
+
+        private async Task<MessageParserResult> ParseXmlDataAsync(XmlReader reader)
+        {
+            var root = await reader.ReadRootElementAsync().ConfigureAwait(false);
+            var messageHeader = await ExtractMessageHeaderAsync(reader, root).ConfigureAwait(false);
+            if (_errors.Count > 0)
+            {
+                return MessageParserResult.Failure(_errors.ToArray());
+            }
+
+            var marketActivityRecords = new List<MarketActivityRecord>();
+            await foreach (var marketActivityRecord in MarketActivityRecordsFromAsync(reader, root))
+            {
+                marketActivityRecords.Add(marketActivityRecord);
+            }
+
+            if (_errors.Count > 0)
+            {
+                return MessageParserResult.Failure(_errors.ToArray());
+            }
+
+            return MessageParserResult.Succeeded(messageHeader, marketActivityRecords);
         }
     }
 }
