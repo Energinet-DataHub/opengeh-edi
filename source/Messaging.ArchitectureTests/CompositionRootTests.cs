@@ -95,6 +95,30 @@ namespace Messaging.ArchitectureTests
             }
         }
 
+        [Fact]
+        public void All_notification_handlers_are_registered()
+        {
+            var host = Program.ConfigureHost(Program.DevelopmentTokenValidationParameters(), new TestEnvironment());
+            var assemblies = new[] { ApplicationAssemblies.Application, ApplicationAssemblies.Infrastructure, };
+            var typeToLookFor = typeof(INotificationHandler<>);
+
+            foreach (var assembly in assemblies)
+            {
+                var requestHandlerTypes = assembly
+                    .GetTypes()
+                    .Where(t => t.GetInterfaces()
+                        .Any(i => i.IsGenericType &&
+                                  i.GetGenericTypeDefinition() == typeToLookFor))
+                    .SelectMany(t => t.GetInterfaces())
+                    .ToList();
+
+                requestHandlerTypes.ForEach(t =>
+                {
+                    host.Services.GetRequiredService(t);
+                });
+            }
+        }
+
         private class TestEnvironment : RuntimeEnvironment
         {
             public override string? MOVE_IN_REQUEST_ENDPOINT => "https://test.dk";
@@ -103,6 +127,12 @@ namespace Messaging.ArchitectureTests
                 CreateFakeServiceBusConnectionString();
 
             public override string? REQUEST_RESPONSE_LOGGING_CONNECTION_STRING =>
+                CreateFakeServiceBusConnectionString();
+
+            public override string? INCOMING_MESSAGE_QUEUE_MANAGE_CONNECTION_STRING =>
+                CreateFakeServiceBusConnectionString();
+
+            public override string? MESSAGEHUB_QUEUE_CONNECTION_STRING =>
                 CreateFakeServiceBusConnectionString();
 
             public override bool IsRunningLocally()
