@@ -14,5 +14,5 @@
 
 namespace Contracts.BusinessRequests.MoveIn
 {
-    public record Response(IEnumerable<string> ValidationErrors, string? ProcessId = null);
+    public record Response(IEnumerable<string> ValidationErrors, string ProcessId = "");
 }
