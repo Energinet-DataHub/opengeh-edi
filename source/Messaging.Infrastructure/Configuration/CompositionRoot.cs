@@ -178,11 +178,10 @@ namespace Messaging.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddRequestHandler<TRequestHandler, TCommand>()
-            where TRequestHandler : class, IRequestHandler<TCommand>
-            where TCommand : IRequest<Unit>
+        public CompositionRoot AddRequestHandler<TRequestHandler>()
+            where TRequestHandler : class
         {
-            _services.AddTransient<IRequestHandler<TCommand>, TRequestHandler>();
+            _services.AddTransient<TRequestHandler>();
 
             return this;
         }

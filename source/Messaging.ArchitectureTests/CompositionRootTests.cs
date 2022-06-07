@@ -13,9 +13,17 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
+using MediatR;
 using Messaging.Api;
+using Messaging.Application.Common.Commands;
+using Messaging.Infrastructure.Configuration;
+using Messaging.Infrastructure.OutgoingMessages;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -60,6 +68,30 @@ namespace Messaging.ArchitectureTests
             {
                 var resolvedInstance = scope.ServiceProvider.GetService(dependency);
                 Assert.True(resolvedInstance != null, $"Unable to resolve {dependency.Name}");
+            }
+        }
+
+        [Fact]
+        public void All_request_handlers_are_registered()
+        {
+            var host = Program.ConfigureHost(Program.DevelopmentTokenValidationParameters(), new TestEnvironment());
+            var assemblies = new[] { ApplicationAssemblies.Application, ApplicationAssemblies.Infrastructure, };
+            var typeToLookFor = typeof(IRequestHandler<,>);
+
+            foreach (var assembly in assemblies)
+            {
+                var requestHandlerTypes = assembly
+                    .GetTypes()
+                    .Where(t => t.GetInterfaces()
+                        .Any(i => i.IsGenericType &&
+                                  i.GetGenericTypeDefinition() == typeToLookFor))
+                    .SelectMany(t => t.GetInterfaces())
+                    .ToList();
+
+                requestHandlerTypes.ForEach(t =>
+                {
+                    host.Services.GetRequiredService(t);
+                });
             }
         }
 
