@@ -174,6 +174,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddSingleton<IDataAvailableNotificationSender, DataAvailableNotificationSender>();
             _services.AddSingleton<IDataBundleResponseSender, DataBundleResponseSender>();
             _services.AddSingleton(_ => new MessageHubConfig(dataAvailableQueue, domainReplyQueue));
+            _services.AddTransient<IRequestHandler<NotifyMessageHub, Unit>, NotifyMessageHubHandler>();
 
             return this;
         }
