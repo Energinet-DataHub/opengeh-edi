@@ -48,7 +48,7 @@ namespace Messaging.IntegrationTests.OutgoingMessages
             var builder = new IncomingMessageBuilder();
             var message1 = await MessageArrived(
                 builder
-                    .WithProcessType("ProcessType1")
+                    .WithProcessType(ProcessType.MoveIn.Code)
                     .Build()).ConfigureAwait(false);
             var message2 = await MessageArrived(
                 builder

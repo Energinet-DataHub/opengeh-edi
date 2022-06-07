@@ -19,13 +19,16 @@ namespace Messaging.Application.OutgoingMessages;
 
 public sealed class ProcessType : EnumerationType
 {
-    public static readonly ProcessType MoveIn = new(0, nameof(MoveIn), "E03", "A01", "A02");
+    public static readonly ProcessType MoveIn = new(0, nameof(MoveIn), "E03", "A01", "A02", new ProcessDetails("A01", "ConfirmRequestChangeOfSupplier"), new ProcessDetails("A02", "RejectRequestChangeOfSupplier"));
+    public static readonly ProcessType Unknown = new(999, nameof(MoveIn), "Unknown", "Unknown", "UnknownA02", new ProcessDetails("Unknown", "Unknown"), new ProcessDetails("Unknown", "Unknown"));
 
-    private ProcessType(int id, string name, string code, string reasonCodeForConfirm, string reasonCodeForReject)
+    private ProcessType(int id, string name, string code, string reasonCodeForConfirm, string reasonCodeForReject, ProcessDetails confirm, ProcessDetails reject)
      : base(id, name)
     {
         ReasonCodeForConfirm = reasonCodeForConfirm;
         ReasonCodeForReject = reasonCodeForReject;
+        Confirm = confirm;
+        Reject = reject;
         Code = code;
     }
 
@@ -35,8 +38,15 @@ public sealed class ProcessType : EnumerationType
 
     public string ReasonCodeForReject { get; }
 
+    public ProcessDetails Reject { get; }
+
+    public ProcessDetails Confirm { get; }
+
     public static ProcessType FromCode(string code)
     {
-        return GetAll<ProcessType>().First(p => p.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
+        var processType = GetAll<ProcessType>().FirstOrDefault(p => p.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
+        return processType ?? Unknown;
     }
 }
+
+public record ProcessDetails(string BusinessReasonCode, string DocumentType);

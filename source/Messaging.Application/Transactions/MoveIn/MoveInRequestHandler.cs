@@ -111,10 +111,11 @@ namespace Messaging.Application.Transactions.MoveIn
                 transactionId,
                 incomingMessage.MarketActivityRecord.MarketEvaluationPointId);
 
+            var processType = ProcessType.FromCode(incomingMessage.Message.ProcessType);
             return CreateOutgoingMessage(
                 incomingMessage.Id,
-                "ConfirmRequestChangeOfSupplier",
-                incomingMessage.Message.ProcessType,
+                processType.Confirm.DocumentType,
+                processType.Code,
                 incomingMessage.Message.SenderId,
                 _marketActivityRecordParser.From(marketActivityRecord));
         }
@@ -127,11 +128,11 @@ namespace Messaging.Application.Transactions.MoveIn
                 transactionId,
                 incomingMessage.MarketActivityRecord.MarketEvaluationPointId,
                 reasons);
-
+            var processType = ProcessType.FromCode(incomingMessage.Message.ProcessType);
             return CreateOutgoingMessage(
                 incomingMessage.Id,
-                "RejectRequestChangeOfSupplier",
-                incomingMessage.Message.ProcessType,
+                processType.Reject.DocumentType,
+                processType.Code,
                 incomingMessage.Message.SenderId,
                 _marketActivityRecordParser.From(marketActivityRecord));
         }
