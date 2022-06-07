@@ -99,7 +99,7 @@ namespace Messaging.Tests.OutgoingMessages.ConfirmRequestChangeOfSupplier
 
         private async Task AssertConformsToSchema(Stream message)
         {
-            var schema = await _schemaProvider.GetSchemaAsync("confirmrequestchangeofsupplier", "1.0")
+            var schema = await _schemaProvider.GetSchemaAsync("confirmrequestchangeofsupplier", "0.1")
                 .ConfigureAwait(false);
             var validationResult = await MessageValidator.ValidateAsync(message, schema!).ConfigureAwait(false);
             Assert.True(validationResult.IsValid);

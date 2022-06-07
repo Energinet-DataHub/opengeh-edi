@@ -116,7 +116,7 @@ namespace Messaging.IntegrationTests.Transactions.MoveIn
         private async Task AssertRejectMessage(OutgoingMessage rejectMessage)
         {
             var dispatchedDocument = GetDispatchedDocument();
-            await ValidateDocument(dispatchedDocument, "rejectrequestchangeofsupplier", "1.0").ConfigureAwait(false);
+            await ValidateDocument(dispatchedDocument, "rejectrequestchangeofsupplier", "0.1").ConfigureAwait(false);
 
             var document = XDocument.Load(dispatchedDocument);
             AssertHeader(document, rejectMessage, "A02");
@@ -126,7 +126,7 @@ namespace Messaging.IntegrationTests.Transactions.MoveIn
         {
             var dispatchedDocument = GetDispatchedDocument();
 
-            await ValidateDocument(dispatchedDocument, "confirmrequestchangeofsupplier", "1.0").ConfigureAwait(false);
+            await ValidateDocument(dispatchedDocument, "confirmrequestchangeofsupplier", "0.1").ConfigureAwait(false);
 
             var document = XDocument.Load(dispatchedDocument);
             AssertHeader(document, message, "A01");
