@@ -26,6 +26,7 @@ using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.OutgoingMessages;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Xunit;
 
 namespace Messaging.ArchitectureTests
@@ -78,21 +79,7 @@ namespace Messaging.ArchitectureTests
             var assemblies = new[] { ApplicationAssemblies.Application, ApplicationAssemblies.Infrastructure, };
             var typeToLookFor = typeof(IRequestHandler<,>);
 
-            foreach (var assembly in assemblies)
-            {
-                var requestHandlerTypes = assembly
-                    .GetTypes()
-                    .Where(t => t.GetInterfaces()
-                        .Any(i => i.IsGenericType &&
-                                  i.GetGenericTypeDefinition() == typeToLookFor))
-                    .SelectMany(t => t.GetInterfaces())
-                    .ToList();
-
-                requestHandlerTypes.ForEach(t =>
-                {
-                    host.Services.GetRequiredService(t);
-                });
-            }
+            AssertTypeIsRegistered(typeToLookFor, assemblies, host);
         }
 
         [Fact]
@@ -102,7 +89,12 @@ namespace Messaging.ArchitectureTests
             var assemblies = new[] { ApplicationAssemblies.Application, ApplicationAssemblies.Infrastructure, };
             var typeToLookFor = typeof(INotificationHandler<>);
 
-            foreach (var assembly in assemblies)
+            AssertTypeIsRegistered(typeToLookFor, assemblies, host);
+        }
+
+        private static void AssertTypeIsRegistered(Type typeToLookFor, Assembly[] lookInAssemblies, IHost host)
+        {
+            foreach (var assembly in lookInAssemblies)
             {
                 var requestHandlerTypes = assembly
                     .GetTypes()
