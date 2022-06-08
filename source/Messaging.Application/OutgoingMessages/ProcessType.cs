@@ -19,24 +19,18 @@ namespace Messaging.Application.OutgoingMessages;
 
 public sealed class ProcessType : EnumerationType
 {
-    public static readonly ProcessType MoveIn = new(0, nameof(MoveIn), "E03", "A01", "A02", new ProcessDetails("A01", "ConfirmRequestChangeOfSupplier"), new ProcessDetails("A02", "RejectRequestChangeOfSupplier"));
-    public static readonly ProcessType Unknown = new(999, nameof(MoveIn), "Unknown", "Unknown", "UnknownA02", new ProcessDetails("Unknown", "Unknown"), new ProcessDetails("Unknown", "Unknown"));
+    public static readonly ProcessType MoveIn = new(0, nameof(MoveIn), "E03", new ProcessDetails("A01", "ConfirmRequestChangeOfSupplier"), new ProcessDetails("A02", "RejectRequestChangeOfSupplier"));
+    public static readonly ProcessType Unknown = new(999, nameof(MoveIn), "Unknown", new ProcessDetails("Unknown", "Unknown"), new ProcessDetails("Unknown", "Unknown"));
 
-    private ProcessType(int id, string name, string code, string reasonCodeForConfirm, string reasonCodeForReject, ProcessDetails confirm, ProcessDetails reject)
+    private ProcessType(int id, string name, string code, ProcessDetails confirm, ProcessDetails reject)
      : base(id, name)
     {
-        ReasonCodeForConfirm = reasonCodeForConfirm;
-        ReasonCodeForReject = reasonCodeForReject;
         Confirm = confirm;
         Reject = reject;
         Code = code;
     }
 
     public string Code { get; }
-
-    public string ReasonCodeForConfirm { get; }
-
-    public string ReasonCodeForReject { get; }
 
     public ProcessDetails Reject { get; }
 
