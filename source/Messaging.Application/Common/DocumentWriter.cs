@@ -25,10 +25,12 @@ namespace Messaging.Application.Common;
 public abstract class DocumentWriter
 {
     private readonly DocumentDetails _documentDetails;
+    private readonly IMarketActivityRecordParser _parser;
 
-    protected DocumentWriter(DocumentDetails documentDetails)
+    protected DocumentWriter(DocumentDetails documentDetails, IMarketActivityRecordParser parser)
     {
         _documentDetails = documentDetails;
+        _parser = parser;
     }
 
     public async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
@@ -50,6 +52,18 @@ public abstract class DocumentWriter
     }
 
     protected abstract Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer);
+
+    protected IReadOnlyCollection<TMarketActivityRecord> ParseFrom<TMarketActivityRecord>(IReadOnlyCollection<string> payloads)
+    {
+        if (payloads == null) throw new ArgumentNullException(nameof(payloads));
+        var marketActivityRecords = new List<TMarketActivityRecord>();
+        foreach (var payload in payloads)
+        {
+            marketActivityRecords.Add(_parser.From<TMarketActivityRecord>(payload));
+        }
+
+        return marketActivityRecords;
+    }
 
     private static Task WriteHeaderAsync(MessageHeader header, DocumentDetails documentDetails, XmlWriter writer)
     {

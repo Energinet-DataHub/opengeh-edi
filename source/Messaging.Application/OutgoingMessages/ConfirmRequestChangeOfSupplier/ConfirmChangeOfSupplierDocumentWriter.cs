@@ -26,21 +26,18 @@ public class ConfirmChangeOfSupplierDocumentWriter : DocumentWriter
     private const string DocumentType = "ConfirmRequestChangeOfSupplier_MarketDocument";
     private const string XmlNamespace = "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1";
     private const string SchemaLocation = "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1 urn-ediel-org-structure-confirmrequestchangeofsupplier-0-1.xsd";
-    private readonly IMarketActivityRecordParser _parser;
 
     public ConfirmChangeOfSupplierDocumentWriter(IMarketActivityRecordParser parser)
-    : base(new DocumentDetails(DocumentType, SchemaLocation, XmlNamespace, Prefix))
+    : base(new DocumentDetails(DocumentType, SchemaLocation, XmlNamespace, Prefix), parser)
     {
-        _parser = parser;
     }
 
     protected override async Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer)
     {
         if (marketActivityPayloads == null) throw new ArgumentNullException(nameof(marketActivityPayloads));
         if (writer == null) throw new ArgumentNullException(nameof(writer));
-        foreach (var payload in marketActivityPayloads)
+        foreach (var marketActivityRecord in ParseFrom<MarketActivityRecord>(marketActivityPayloads))
         {
-            var marketActivityRecord = _parser.From<MarketActivityRecord>(payload);
             await writer.WriteStartElementAsync(Prefix, "MktActivityRecord", null).ConfigureAwait(false);
             await writer.WriteElementStringAsync(Prefix, "mRID", null, marketActivityRecord.Id.ToString())
                 .ConfigureAwait(false);
