@@ -54,12 +54,8 @@ public class SyncActors : IDisposable
 
     private async Task SyncActorsFromExternalSourceToDbAsync()
     {
-        var userActors = await _actorSyncService.GetUserActorsAsync().ConfigureAwait(false);
         await _actorSyncService.DatabaseCleanUpAsync().ConfigureAwait(false);
         await _actorSyncService.SyncActorsAsync().ConfigureAwait(false);
-        await _actorSyncService.SyncGridAreasAsync().ConfigureAwait(false);
-        await _actorSyncService.SyncGridAreaLinksAsync().ConfigureAwait(false);
-        await _actorSyncService.InsertUserActorsAsync(userActors).ConfigureAwait(false);
 
         await _actorSyncService.CommitTransactionAsync().ConfigureAwait(false);
     }

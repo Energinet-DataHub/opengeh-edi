@@ -34,41 +34,11 @@ public class MeteringPointDbService : IDisposable
         _sqlConnection = new SqlConnection(connectionString);
     }
 
-    public SqlConnection SqlConnection => _sqlConnection;
-
     public async Task CleanUpAsync()
     {
         if (_transaction == null) await BeginTransactionAsync().ConfigureAwait(false);
-        await _sqlConnection.ExecuteAsync("DELETE FROM [dbo].[GridAreaLinks]", transaction: _transaction)
-            .ConfigureAwait(false);
-        await _sqlConnection.ExecuteAsync("DELETE FROM [dbo].[GridAreas]", transaction: _transaction)
-            .ConfigureAwait(false);
-        await _sqlConnection.ExecuteAsync("DELETE FROM [dbo].[UserActor]", transaction: _transaction)
-            .ConfigureAwait(false);
         await _sqlConnection.ExecuteAsync("DELETE FROM [dbo].[Actor]", transaction: _transaction)
             .ConfigureAwait(false);
-    }
-
-    public async Task<IEnumerable<UserActor>> GetUserActorsAsync()
-    {
-        return await _sqlConnection.QueryAsync<UserActor>(
-            @"SELECT UserId, ActorId
-                   FROM [dbo].[UserActor]").ConfigureAwait(false) ?? (IEnumerable<UserActor>)Array.Empty<object>();
-    }
-
-    public async Task InsertGriAreaLinkAsync(IEnumerable<GridAreaLink> gridAreaLinks)
-    {
-        if (gridAreaLinks == null) throw new ArgumentNullException(nameof(gridAreaLinks));
-
-        if (_transaction == null) await BeginTransactionAsync().ConfigureAwait(false);
-
-        foreach (var gridAreaLink in gridAreaLinks)
-        {
-            await _sqlConnection.ExecuteAsync(
-                "INSERT INTO [dbo].[GridAreaLinks] ([Id],[GridAreaId]) VALUES (@GridLinkId ,@GridAreaId)",
-                new { gridAreaLink.GridLinkId, gridAreaLink.GridAreaId },
-                _transaction).ConfigureAwait(false);
-        }
     }
 
     public async Task InsertActorsAsync(IEnumerable<Actor> actors)
@@ -86,43 +56,6 @@ public class MeteringPointDbService : IDisposable
                     actor.Id, actor.IdentificationNumber, IdentificationType = GetType(actor.IdentificationType), Roles = GetRoles(actor.Roles),
                 },
                 _transaction).ConfigureAwait(false);
-        }
-    }
-
-    public async Task InsertGridAreasAsync(IEnumerable<GridArea> gridAreas)
-    {
-        if (gridAreas == null) throw new ArgumentNullException(nameof(gridAreas));
-
-        if (_transaction == null) await BeginTransactionAsync().ConfigureAwait(false);
-
-        foreach (var gridArea in gridAreas)
-        {
-            await _sqlConnection.ExecuteAsync(
-                "INSERT INTO [dbo].[GridAreas]([Id],[Code],[Name],[PriceAreaCode],[FullFlexFromDate],[ActorId]) VALUES (@Id, @Code, @Name, @PriceAreaCode, null, @ActorId)",
-                new
-                {
-                    gridArea.Id,
-                    gridArea.Code,
-                    gridArea.Name,
-                    gridArea.PriceAreaCode,
-                    gridArea.ActorId,
-                },
-                _transaction).ConfigureAwait(false);
-        }
-    }
-
-    public async Task InsertUserActorsAsync(IEnumerable<UserActor> userActors)
-    {
-        if (userActors == null) throw new ArgumentNullException(nameof(userActors));
-        {
-            if (_transaction == null) await BeginTransactionAsync().ConfigureAwait(false);
-            foreach (var userActor in userActors)
-            {
-                await _sqlConnection.ExecuteAsync(
-                    "INSERT INTO [dbo].[UserActor] (UserId, ActorId) VALUES (@UserId, @ActorId)",
-                    new { userActor.UserId, userActor.ActorId },
-                    _transaction).ConfigureAwait(false);
-            }
         }
     }
 

@@ -24,7 +24,6 @@ public class ActorSyncService : IDisposable
 {
     private readonly ActorRegistryDbService _actorRegistryDbService;
     private readonly MeteringPointDbService _meteringPointDbService;
-    private IEnumerable<Actor>? _actors;
 
     private bool _disposed;
 
@@ -42,36 +41,10 @@ public class ActorSyncService : IDisposable
         await _meteringPointDbService.CleanUpAsync().ConfigureAwait(false);
     }
 
-    public async Task<IEnumerable<UserActor>> GetUserActorsAsync()
-    {
-       return await _meteringPointDbService.GetUserActorsAsync().ConfigureAwait(false);
-    }
-
-    public async Task InsertUserActorsAsync(IEnumerable<UserActor> userActors)
-    {
-        if (_actors != null)
-        {
-            var userActorsToInsert = userActors.Where(u => _actors.Any(actor => u.ActorId == actor.Id));
-            await _meteringPointDbService.InsertUserActorsAsync(userActorsToInsert).ConfigureAwait(false);
-        }
-    }
-
     public async Task SyncActorsAsync()
     {
-        _actors = await _actorRegistryDbService.GetActorsAsync().ConfigureAwait(false);
-        await _meteringPointDbService.InsertActorsAsync(_actors).ConfigureAwait(false);
-    }
-
-    public async Task SyncGridAreaLinksAsync()
-    {
-        var gridAreaLinks = await _actorRegistryDbService.GetGriAreaLinkAsync().ConfigureAwait(false);
-        await _meteringPointDbService.InsertGriAreaLinkAsync(gridAreaLinks).ConfigureAwait(false);
-    }
-
-    public async Task SyncGridAreasAsync()
-    {
-        var gridAreas = await _actorRegistryDbService.GetGridAreasAsync().ConfigureAwait(false);
-        await _meteringPointDbService.InsertGridAreasAsync(gridAreas).ConfigureAwait(false);
+        var actors = await _actorRegistryDbService.GetActorsAsync().ConfigureAwait(false);
+        await _meteringPointDbService.InsertActorsAsync(actors).ConfigureAwait(false);
     }
 
     public async Task CommitTransactionAsync()

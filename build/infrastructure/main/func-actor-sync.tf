@@ -33,7 +33,9 @@ module "func_actor_sync" {
     WEBSITES_ENABLE_APP_SERVICE_STORAGE     = true
     FUNCTIONS_WORKER_RUNTIME                = "dotnet-isolated"
     # Endregion: Default Values
-    DB_CONNECTION_STRING                    = local.MS_MARKETROLES_CONNECTION_STRING
+    METERINGPOINT_DB_CONNECTION_STRING    = local.MS_METERING_POINT_CONNECTION_STRING
+    ACTOR_REGISTRY_DB_CONNECTION_STRING   = local.ACTOR_REGISTRY_DB_CONNECTION_STRING
+    TIMER_TRIGGER                         = "0 0 * * * *"
   }
 
   tags                                      = azurerm_resource_group.this.tags
