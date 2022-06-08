@@ -37,37 +37,38 @@ namespace Messaging.CimMessageAdapter.Messages
             _schemaProvider = schemaProvider ?? throw new ArgumentNullException(nameof(schemaProvider));
         }
 
-        public async Task<MessageParserResult> ParseAsync(Stream message, string businessProcessType, string version)
+        public async Task<MessageParserResult> ParseAsync(Stream message)
         {
+            if (message == null) throw new ArgumentNullException(nameof(message));
+
+            string version;
+            string businessProcessType;
+            try
+            {
+                version = GetVersion(message);
+                businessProcessType = GetBusinessProcessType(message);
+            }
+            catch (XmlException exception)
+            {
+                return InvalidXmlFailure(exception);
+            }
+            catch (ObjectDisposedException generalException)
+            {
+                return InvalidXmlFailure(generalException);
+            }
+
             var xmlSchema = await _schemaProvider.GetSchemaAsync(businessProcessType, version).ConfigureAwait(true);
             if (xmlSchema is null)
             {
                 return MessageParserResult.Failure(new UnknownBusinessProcessTypeOrVersion(businessProcessType, version));
             }
 
+            ResetMessagePosition(message);
             using (var reader = XmlReader.Create(message, CreateXmlReaderSettings(xmlSchema)))
             {
                 try
                 {
-                    var root = await reader.ReadRootElementAsync().ConfigureAwait(false);
-                    var messageHeader = await ExtractMessageHeaderAsync(reader, root).ConfigureAwait(false);
-                    if (_errors.Count > 0)
-                    {
-                        return MessageParserResult.Failure(_errors.ToArray());
-                    }
-
-                    var marketActivityRecords = new List<MarketActivityRecord>();
-                    await foreach (var marketActivityRecord in MarketActivityRecordsFromAsync(reader, root))
-                    {
-                        marketActivityRecords.Add(marketActivityRecord);
-                    }
-
-                    if (_errors.Count > 0)
-                    {
-                        return MessageParserResult.Failure(_errors.ToArray());
-                    }
-
-                    return MessageParserResult.Succeeded(messageHeader, marketActivityRecords);
+                    return await ParseXmlDataAsync(reader).ConfigureAwait(false);
                 }
                 catch (XmlException exception)
                 {
@@ -83,6 +84,45 @@ namespace Messaging.CimMessageAdapter.Messages
         private static MessageParserResult InvalidXmlFailure(Exception exception)
         {
             return MessageParserResult.Failure(InvalidMessageStructure.From(exception));
+        }
+
+        private static void ResetMessagePosition(Stream message)
+        {
+            if (message.CanRead && message.Position > 0)
+                message.Position = 0;
+        }
+
+        private static string GetBusinessProcessType(Stream message)
+        {
+            if (message == null) throw new ArgumentNullException(nameof(message));
+            var split = SplitNamespace(message);
+            var processType = split[3];
+            return processType;
+        }
+
+        private static string GetVersion(Stream message)
+        {
+            if (message == null) throw new ArgumentNullException(nameof(message));
+            var split = SplitNamespace(message);
+            var version = split[4] + "." + split[5];
+            return version;
+        }
+
+        private static string[] SplitNamespace(Stream message)
+        {
+            ResetMessagePosition(message);
+            using var reader = XmlReader.Create(message);
+
+            var split = Array.Empty<string>();
+            while (reader.Read())
+            {
+                if (string.IsNullOrEmpty(reader.NamespaceURI)) continue;
+                var @namespace = reader.NamespaceURI;
+                split = @namespace.Split(':');
+                break;
+            }
+
+            return split;
         }
 
         private static async IAsyncEnumerable<MarketActivityRecord> MarketActivityRecordsFromAsync(
@@ -249,6 +289,29 @@ namespace Messaging.CimMessageAdapter.Messages
             settings.Schemas.Add(xmlSchema);
             settings.ValidationEventHandler += OnValidationError;
             return settings;
+        }
+
+        private async Task<MessageParserResult> ParseXmlDataAsync(XmlReader reader)
+        {
+            var root = await reader.ReadRootElementAsync().ConfigureAwait(false);
+            var messageHeader = await ExtractMessageHeaderAsync(reader, root).ConfigureAwait(false);
+            if (_errors.Count > 0)
+            {
+                return MessageParserResult.Failure(_errors.ToArray());
+            }
+
+            var marketActivityRecords = new List<MarketActivityRecord>();
+            await foreach (var marketActivityRecord in MarketActivityRecordsFromAsync(reader, root))
+            {
+                marketActivityRecords.Add(marketActivityRecord);
+            }
+
+            if (_errors.Count > 0)
+            {
+                return MessageParserResult.Failure(_errors.ToArray());
+            }
+
+            return MessageParserResult.Succeeded(messageHeader, marketActivityRecords);
         }
     }
 }
