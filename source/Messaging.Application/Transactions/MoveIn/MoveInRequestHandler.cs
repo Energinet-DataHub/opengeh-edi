@@ -105,13 +105,13 @@ namespace Messaging.Application.Transactions.MoveIn
 
         private OutgoingMessage ConfirmMessageFrom(IncomingMessage incomingMessage, string transactionId)
         {
-            var messageId = Guid.NewGuid();
             var marketActivityRecord = new OutgoingMessages.ConfirmRequestChangeOfSupplier.MarketActivityRecord(
-                messageId.ToString(),
+                Guid.NewGuid().ToString(),
                 transactionId,
                 incomingMessage.MarketActivityRecord.MarketEvaluationPointId);
 
             var processType = ProcessType.FromCode(incomingMessage.Message.ProcessType);
+
             return CreateOutgoingMessage(
                 incomingMessage.Id,
                 processType.Confirm.DocumentType,
@@ -122,13 +122,14 @@ namespace Messaging.Application.Transactions.MoveIn
 
         private OutgoingMessage RejectMessageFrom(IncomingMessage incomingMessage, string transactionId, IReadOnlyCollection<Reason> reasons)
         {
-            var messageId = Guid.NewGuid();
             var marketActivityRecord = new OutgoingMessages.RejectRequestChangeOfSupplier.MarketActivityRecord(
-                messageId.ToString(),
+                Guid.NewGuid().ToString(),
                 transactionId,
                 incomingMessage.MarketActivityRecord.MarketEvaluationPointId,
                 reasons);
+
             var processType = ProcessType.FromCode(incomingMessage.Message.ProcessType);
+
             return CreateOutgoingMessage(
                 incomingMessage.Id,
                 processType.Reject.DocumentType,
