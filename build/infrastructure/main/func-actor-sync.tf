@@ -25,6 +25,7 @@ module "func_actor_sync" {
   app_service_plan_id                       = data.azurerm_key_vault_secret.plan_shared_id.value
   application_insights_instrumentation_key  = data.azurerm_key_vault_secret.appi_instrumentation_key.value
   log_analytics_workspace_id                = data.azurerm_key_vault_secret.log_shared_id.value
+  health_check_path                         = "/api/monitor/ready"
   always_on                                 = true
   app_settings                              = {
     # Region: Default Values
