@@ -50,8 +50,7 @@ namespace Messaging.Api.IncomingMessages
 
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            // TODO extract version and business process type from request
-            var result = await _messageReceiver.ReceiveAsync(request.Body, "requestchangeofsupplier", "1.0")
+            var result = await _messageReceiver.ReceiveAsync(request.Body)
                 .ConfigureAwait(false);
 
             var httpStatusCode = result.Success ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;

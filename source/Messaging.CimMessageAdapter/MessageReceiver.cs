@@ -45,13 +45,14 @@ namespace Messaging.CimMessageAdapter
             _marketActorAuthenticator = marketActorAuthenticator ?? throw new ArgumentNullException(nameof(marketActorAuthenticator));
         }
 
-        public async Task<Result> ReceiveAsync(Stream message, string businessProcessType, string version)
+        public async Task<Result> ReceiveAsync(Stream message)
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
 
             var messageParser = new MessageParser(_schemaProvider);
+
             var messageParserResult =
-                 await messageParser.ParseAsync(message, businessProcessType, version).ConfigureAwait(false);
+                 await messageParser.ParseAsync(message).ConfigureAwait(false);
 
             if (InvalidMessageHeader(messageParserResult))
             {
