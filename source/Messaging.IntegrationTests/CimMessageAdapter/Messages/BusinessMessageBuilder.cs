@@ -28,9 +28,9 @@ namespace Messaging.IntegrationTests.CimMessageAdapter.Messages
             _document = XDocument.Load(pathToXmlFile);
         }
 
-        public static BusinessMessageBuilder RequestChangeOfSupplier()
+        public static BusinessMessageBuilder RequestChangeOfSupplier(string pathToXmlFile = "CimMessageAdapter//Messages//RequestChangeOfSupplier.xml")
         {
-            return new BusinessMessageBuilder("CimMessageAdapter//Messages//RequestChangeOfSupplier.xml", "urn:ediel.org:structure:requestchangeofsupplier:0:1");
+            return new BusinessMessageBuilder(pathToXmlFile, "urn:ediel.org:structure:requestchangeofsupplier:0:1");
         }
 
         public BusinessMessageBuilder WithSenderRole(string roleType)

@@ -14,41 +14,47 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Messaging.Application.Xml.SchemaStore
 {
     public class CimXmlSchemas
     {
+        private readonly Dictionary<KeyValuePair<string, string>, string> _schemas;
+
         public CimXmlSchemas()
         {
-            Schemas = new Dictionary<KeyValuePair<string, string>, string>
-            {
-                {
-                    new KeyValuePair<string, string>("requestchangeofsupplier", "1.0"),
-                    SchemaPath + "urn-ediel-org-structure-requestchangeofsupplier-0-1.xsd"
-                },
-                {
-                    new KeyValuePair<string, string>("confirmrequestchangeofsupplier", "1.0"),
-                    SchemaPath + "urn-ediel-org-structure-confirmrequestchangeofsupplier-0-1.xsd"
-                },
-                {
-                    new KeyValuePair<string, string>("rejectrequestchangeofsupplier", "1.0"),
-                    SchemaPath + "urn-ediel-org-structure-rejectrequestchangeofsupplier-0-1.xsd"
-                },
-            };
+            _schemas = FillSchemaDictionary();
         }
 
         public static string SchemaPath => $"Xml{Path.DirectorySeparatorChar}SchemaStore{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}";
 
-        public Dictionary<KeyValuePair<string, string>, string> Schemas { get; }
-
         public string? GetSchemaLocation(string businessProcessType, string version)
         {
-            Schemas.TryGetValue(
+            _schemas.TryGetValue(
                 new KeyValuePair<string, string>(businessProcessType, version),
                 out var schemaName);
 
             return schemaName;
+        }
+
+        private static Dictionary<KeyValuePair<string, string>, string> FillSchemaDictionary()
+        {
+            var schemaDictionary = new Dictionary<KeyValuePair<string, string>, string>();
+            var schemas = Directory.GetFiles(SchemaPath).ToList();
+            foreach (var schema in schemas)
+            {
+                var filename = Path.GetFileNameWithoutExtension(schema);
+                var filenameSplit = filename.Split('-');
+                if (filenameSplit.Length == 7)
+                {
+                    schemaDictionary.Add(
+                        new KeyValuePair<string, string>(filenameSplit[4], filenameSplit[5] + "." + filenameSplit[6]),
+                        schema);
+                }
+            }
+
+            return schemaDictionary;
         }
     }
 }
