@@ -117,7 +117,8 @@ namespace Messaging.Application.Transactions.MoveIn
                 processType.Confirm.DocumentType,
                 processType.Code,
                 incomingMessage.Message.SenderId,
-                _marketActivityRecordParser.From(marketActivityRecord));
+                _marketActivityRecordParser.From(marketActivityRecord),
+                processType.Confirm.BusinessReasonCode);
         }
 
         private OutgoingMessage RejectMessageFrom(IncomingMessage incomingMessage, string transactionId, IReadOnlyCollection<Reason> reasons)
@@ -135,7 +136,8 @@ namespace Messaging.Application.Transactions.MoveIn
                 processType.Reject.DocumentType,
                 processType.Code,
                 incomingMessage.Message.SenderId,
-                _marketActivityRecordParser.From(marketActivityRecord));
+                _marketActivityRecordParser.From(marketActivityRecord),
+                processType.Reject.BusinessReasonCode);
         }
 
         private Task<ReadOnlyCollection<Reason>> CreateReasonsFromAsync(IReadOnlyCollection<string> validationErrors)
@@ -143,7 +145,7 @@ namespace Messaging.Application.Transactions.MoveIn
             return _validationErrorTranslator.TranslateAsync(validationErrors);
         }
 
-        private OutgoingMessage CreateOutgoingMessage(string id, string documentType, string processType, string receiverId, string marketActivityRecordPayload)
+        private OutgoingMessage CreateOutgoingMessage(string id, string documentType, string processType, string receiverId, string marketActivityRecordPayload, string reasonCode)
         {
             return new OutgoingMessage(
                 documentType,
@@ -154,7 +156,8 @@ namespace Messaging.Application.Transactions.MoveIn
                 MarketRoles.EnergySupplier,
                 DataHubDetails.IdentificationNumber,
                 MarketRoles.MeteringPointAdministrator,
-                marketActivityRecordPayload);
+                marketActivityRecordPayload,
+                reasonCode);
         }
     }
 }
