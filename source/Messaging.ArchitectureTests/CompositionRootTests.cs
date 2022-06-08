@@ -13,28 +13,39 @@
 // limitations under the License.
 
 using System;
+using System.Globalization;
+using System.Linq;
+using System.Reflection;
 using System.Text;
+using MediatR;
 using Messaging.Api;
+using Messaging.Infrastructure.Configuration;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Xunit;
 
 namespace Messaging.ArchitectureTests
 {
     public class CompositionRootTests
     {
+        private readonly IHost _host;
+
+        public CompositionRootTests()
+        {
+            _host = Program.ConfigureHost(Program.DevelopmentTokenValidationParameters(), new TestEnvironment());
+        }
+
         [Fact]
         public void All_dependencies_can_be_resolved_in_functions()
         {
-            var host = Program.ConfigureHost(Program.DevelopmentTokenValidationParameters(), new TestEnvironment());
-
             var allTypes = FunctionsReflectionHelper.FindAllTypes();
             var functionTypes = FunctionsReflectionHelper.FindAllFunctionTypes();
             var constructorDependencies = FunctionsReflectionHelper.FindAllConstructorDependencies();
 
             var dependencies = constructorDependencies(functionTypes(allTypes(typeof(Program))));
 
-            using var scope = host.Services.CreateScope();
+            using var scope = _host.Services.CreateScope();
 
             foreach (var dependency in dependencies)
             {
@@ -46,19 +57,54 @@ namespace Messaging.ArchitectureTests
         [Fact]
         public void All_dependencies_can_be_resolved_for_middleware()
         {
-            var host = Program.ConfigureHost(Program.DevelopmentTokenValidationParameters(), new TestEnvironment());
-
             var allTypes = FunctionsReflectionHelper.FindAllTypes();
             var middlewareTypes = FunctionsReflectionHelper.FindAllTypesThatImplementType();
             var constructorDependencies = FunctionsReflectionHelper.FindAllConstructorDependencies();
 
             var dependencies = constructorDependencies(middlewareTypes(typeof(IFunctionsWorkerMiddleware), allTypes(typeof(Program))));
-            using var scope = host.Services.CreateScope();
+            using var scope = _host.Services.CreateScope();
 
             foreach (var dependency in dependencies)
             {
                 var resolvedInstance = scope.ServiceProvider.GetService(dependency);
                 Assert.True(resolvedInstance != null, $"Unable to resolve {dependency.Name}");
+            }
+        }
+
+        [Fact]
+        public void All_request_handlers_are_registered()
+        {
+            var assemblies = new[] { ApplicationAssemblies.Application, ApplicationAssemblies.Infrastructure, };
+            var typeToLookFor = typeof(IRequestHandler<,>);
+
+            AssertTypeIsRegistered(typeToLookFor, assemblies);
+        }
+
+        [Fact]
+        public void All_notification_handlers_are_registered()
+        {
+            var assemblies = new[] { ApplicationAssemblies.Application, ApplicationAssemblies.Infrastructure, };
+            var typeToLookFor = typeof(INotificationHandler<>);
+
+            AssertTypeIsRegistered(typeToLookFor, assemblies);
+        }
+
+        private void AssertTypeIsRegistered(Type typeToLookFor, Assembly[] lookInAssemblies)
+        {
+            foreach (var assembly in lookInAssemblies)
+            {
+                var requestHandlerTypes = assembly
+                    .GetTypes()
+                    .Where(t => t.GetInterfaces()
+                        .Any(i => i.IsGenericType &&
+                                  i.GetGenericTypeDefinition() == typeToLookFor))
+                    .SelectMany(t => t.GetInterfaces())
+                    .ToList();
+
+                requestHandlerTypes.ForEach(t =>
+                {
+                    _host.Services.GetRequiredService(t);
+                });
             }
         }
 
@@ -70,6 +116,12 @@ namespace Messaging.ArchitectureTests
                 CreateFakeServiceBusConnectionString();
 
             public override string? REQUEST_RESPONSE_LOGGING_CONNECTION_STRING =>
+                CreateFakeServiceBusConnectionString();
+
+            public override string? INCOMING_MESSAGE_QUEUE_MANAGE_CONNECTION_STRING =>
+                CreateFakeServiceBusConnectionString();
+
+            public override string? MESSAGEHUB_QUEUE_CONNECTION_STRING =>
                 CreateFakeServiceBusConnectionString();
 
             public override bool IsRunningLocally()
@@ -84,13 +136,11 @@ namespace Messaging.ArchitectureTests
 
             private static string CreateFakeServiceBusConnectionString()
             {
-#pragma warning disable
-                var sb = new StringBuilder();
-                sb.Append($"Endpoint=sb://sb-{Guid.NewGuid():N}.servicebus.windows.net/;");
-                sb.Append("SharedAccessKeyName=send;");
-                sb.Append($"SharedAccessKey={Guid.NewGuid():N}");
-                return sb.ToString();
-#pragma warning restore
+                return new StringBuilder()
+                    .Append(CultureInfo.InvariantCulture, $"Endpoint=sb://sb-{Guid.NewGuid():N}.servicebus.windows.net/;")
+                    .Append("SharedAccessKeyName=send;")
+                    .Append(CultureInfo.InvariantCulture, $"SharedAccessKey={Guid.NewGuid():N}")
+                    .ToString();
             }
         }
     }

@@ -13,26 +13,22 @@
 // limitations under the License.
 
 using System;
-using System.Text.Json.Serialization;
-using Messaging.Application.Common.Commands;
-using Messaging.Infrastructure.Configuration.InternalCommands;
 
-namespace Messaging.IntegrationTests.Infrastructure.InternalCommands
+namespace Messaging.Application.Transactions.MoveIn;
+
+public class TransactionNotFoundException : Exception
 {
-    public class TestCommand : InternalCommand
+    public TransactionNotFoundException(string processId)
+        : base($"Could not find a transaction for business process id {processId}")
     {
-        [JsonConstructor]
-        public TestCommand(Guid id, bool throwException)
-            : base(id)
-        {
-            ThrowException = throwException;
-        }
+    }
 
-        public TestCommand(bool throwException = false)
-        {
-            ThrowException = throwException;
-        }
+    private TransactionNotFoundException()
+    {
+    }
 
-        public bool ThrowException { get; }
+    private TransactionNotFoundException(string message, Exception innerException)
+        : base(message, innerException)
+    {
     }
 }

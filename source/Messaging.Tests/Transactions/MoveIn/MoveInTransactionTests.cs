@@ -26,7 +26,7 @@ public class MoveInTransactionTests
     {
         var transaction = CreateTransaction();
 
-        var requestResult = BusinessRequestResult.Succeeded();
+        var requestResult = BusinessRequestSucceeded();
         transaction.Start(requestResult);
 
         Assert.Equal(1, transaction.DomainEvents.Count);
@@ -49,7 +49,7 @@ public class MoveInTransactionTests
     public void Transaction_can_complete_when_started()
     {
         var transaction = CreateTransaction();
-        transaction.Start(BusinessRequestResult.Succeeded());
+        transaction.Start(BusinessRequestSucceeded());
 
         transaction.Complete();
 
@@ -59,5 +59,10 @@ public class MoveInTransactionTests
     private static MoveInTransaction CreateTransaction()
     {
         return new MoveInTransaction(Guid.NewGuid().ToString());
+    }
+
+    private static BusinessRequestResult BusinessRequestSucceeded()
+    {
+        return BusinessRequestResult.Succeeded(Guid.NewGuid().ToString());
     }
 }

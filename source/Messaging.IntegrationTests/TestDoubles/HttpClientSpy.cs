@@ -14,12 +14,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Contracts.BusinessRequests.MoveIn;
 using Messaging.Infrastructure.Transactions;
-using Messaging.Infrastructure.Transactions.MoveIn;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -56,7 +55,7 @@ public class HttpClientSpy : IHttpClientAdapter
 
     private HttpResponseMessage CreateResponseFromProcessing()
     {
-        var businessProcessResponse = new BusinessProcessResponse(_validationErrors);
+        var businessProcessResponse = new Response(_validationErrors, Guid.NewGuid().ToString());
         var content = new StringContent(JsonConvert.SerializeObject(businessProcessResponse));
         var response = new HttpResponseMessage(_responseCode);
         response.Content = content;

@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Contracts.BusinessRequests.MoveIn;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.Serialization;
@@ -45,19 +46,18 @@ public sealed class MoveInRequester : IMoveInRequester
         return await ParseResultFromAsync(response).ConfigureAwait(false);
     }
 
-    private static MoveInRequestDto CreateRequestFrom(MoveInRequest request)
+    private static Request CreateRequestFrom(MoveInRequest request)
     {
-        return new MoveInRequestDto(
+        return new Request(
             request.ConsumerName,
             request.EnergySupplierGlnNumber,
             request.AccountingPointGsrnNumber,
             request.StartDate,
-            request.TransactionId,
             request.ConsumerId,
             request.ConsumerIdType);
     }
 
-    private async Task<HttpResponseMessage> TryCallAsync(MoveInRequestDto request)
+    private async Task<HttpResponseMessage> TryCallAsync(Request request)
     {
         using var content = new StringContent(_serializer.Serialize(request));
         var response = await _httpClientAdapter.PostAsync(_configuration.RequestUri, content).ConfigureAwait(false);
@@ -72,8 +72,14 @@ public sealed class MoveInRequester : IMoveInRequester
             var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             _logger.LogInformation($"Response body from business processing: {responseBody}");
 
-            var result = _serializer.Deserialize<BusinessProcessResponse>(responseBody);
-            return result.ValidationErrors.Count > 0 ? BusinessRequestResult.Failure(result.ValidationErrors.ToArray()) : BusinessRequestResult.Succeeded();
+            var result = _serializer.Deserialize<Response>(responseBody);
+            var validationErrors = result.ValidationErrors.ToList();
+            if (validationErrors.Count > 0)
+            {
+                return BusinessRequestResult.Failure(validationErrors.ToArray());
+            }
+
+            return BusinessRequestResult.Succeeded(result.ProcessId);
         }
         catch (Exception e)
         {
@@ -82,14 +88,3 @@ public sealed class MoveInRequester : IMoveInRequester
         }
     }
 }
-
-public record MoveInRequestDto(
-    string? ConsumerName,
-    string? EnergySupplierGlnNumber,
-    string AccountingPointGsrnNumber,
-    string StartDate,
-    string TransactionId,
-    string? ConsumerId,
-    string? ConsumerIdType);
-
-public record BusinessProcessResponse(IReadOnlyCollection<string> ValidationErrors);

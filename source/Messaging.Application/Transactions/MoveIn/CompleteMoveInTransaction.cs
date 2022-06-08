@@ -12,27 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Text.Json.Serialization;
 using Messaging.Application.Common.Commands;
-using Messaging.Infrastructure.Configuration.InternalCommands;
 
-namespace Messaging.IntegrationTests.Infrastructure.InternalCommands
+namespace Messaging.Application.Transactions.MoveIn;
+
+public class CompleteMoveInTransaction : InternalCommand
 {
-    public class TestCommand : InternalCommand
+    public CompleteMoveInTransaction(string processId)
     {
-        [JsonConstructor]
-        public TestCommand(Guid id, bool throwException)
-            : base(id)
-        {
-            ThrowException = throwException;
-        }
-
-        public TestCommand(bool throwException = false)
-        {
-            ThrowException = throwException;
-        }
-
-        public bool ThrowException { get; }
+        ProcessId = processId;
     }
+
+    public string ProcessId { get; }
 }

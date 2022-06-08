@@ -14,8 +14,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Xml.Linq;
+using System.Xml.Schema;
+using Messaging.Application.OutgoingMessages;
+using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Messaging.Application.Xml;
 using Xunit;
 
 namespace Messaging.Tests.OutgoingMessages
@@ -60,6 +66,39 @@ namespace Messaging.Tests.OutgoingMessages
         internal static void AssertMarketActivityRecordCount(XDocument document, int expectedCount)
         {
             Assert.Equal(expectedCount, GetMarketActivityRecords(document).Count);
+        }
+
+        internal static void AssertHeader(MessageHeader header, XDocument document)
+        {
+            Assert.NotEmpty(AssertXmlMessage.GetMessageHeaderValue(document, "mRID")!);
+            AssertHasHeaderValue(document, "type", "414");
+            AssertHasHeaderValue(document, "process.processType", header.ProcessType);
+            AssertHasHeaderValue(document, "businessSector.type", "23");
+            AssertHasHeaderValue(document, "sender_MarketParticipant.mRID", header.SenderId);
+            AssertHasHeaderValue(document, "sender_MarketParticipant.marketRole.type", header.SenderRole);
+            AssertHasHeaderValue(document, "receiver_MarketParticipant.mRID", header.ReceiverId);
+            AssertHasHeaderValue(document, "receiver_MarketParticipant.marketRole.type", header.ReceiverRole);
+            AssertHasHeaderValue(document, "reason.code", header.ReasonCode);
+        }
+
+        internal static async Task AssertConformsToSchemaAsync(Stream message, XmlSchema schema)
+        {
+            if (schema == null) throw new ArgumentNullException(nameof(schema));
+            var validationResult = await MessageValidator.ValidateAsync(message, schema).ConfigureAwait(false);
+            Assert.True(validationResult.IsValid);
+        }
+
+        internal static void AssertReasons(XElement marketActivityRecord, IReadOnlyList<Reason> expectedReasons)
+        {
+            var reasonsElements = marketActivityRecord.Elements(marketActivityRecord.Name.Namespace + "Reason").ToList();
+            Assert.Equal(expectedReasons.Count, reasonsElements.Count);
+            for (int i = 0; i < expectedReasons.Count; i++)
+            {
+                var actualCode = reasonsElements[i].Element(marketActivityRecord.Name.Namespace + "code")?.Value;
+                var actualText = reasonsElements[i].Element(marketActivityRecord.Name.Namespace + "text")?.Value;
+                Assert.Equal(expectedReasons[i].Code, actualCode);
+                Assert.Equal(expectedReasons[i].Text, actualText);
+            }
         }
 
         private static XElement? GetHeaderElement(XDocument document)

@@ -12,23 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Energinet.DataHub.MessageHub.Model.Model;
-using Messaging.Application.Common.Commands;
-using Messaging.Infrastructure.Configuration.InternalCommands;
-
-namespace Messaging.Infrastructure.OutgoingMessages
+namespace Contracts.BusinessRequests.MoveIn
 {
-    public class NotifyMessageHub : InternalCommand
-    {
-        public NotifyMessageHub(DataBundleRequestDto dataBundleRequestDto, Uri uri)
-        {
-            DataBundleRequestDto = dataBundleRequestDto;
-            Uri = uri;
-        }
-
-        public DataBundleRequestDto DataBundleRequestDto { get; }
-
-        public Uri Uri { get; }
-    }
+    public record Response(IEnumerable<string> ValidationErrors, string ProcessId = "");
 }

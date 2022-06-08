@@ -12,27 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Text.Json.Serialization;
+using System.Reflection;
 using Messaging.Application.Common.Commands;
-using Messaging.Infrastructure.Configuration.InternalCommands;
 
-namespace Messaging.IntegrationTests.Infrastructure.InternalCommands
+namespace Messaging.Infrastructure.Configuration;
+
+public static class ApplicationAssemblies
 {
-    public class TestCommand : InternalCommand
-    {
-        [JsonConstructor]
-        public TestCommand(Guid id, bool throwException)
-            : base(id)
-        {
-            ThrowException = throwException;
-        }
+    public static Assembly Application => typeof(InternalCommand).Assembly;
 
-        public TestCommand(bool throwException = false)
-        {
-            ThrowException = throwException;
-        }
-
-        public bool ThrowException { get; }
-    }
+    public static Assembly Infrastructure => typeof(ApplicationAssemblies).Assembly;
 }

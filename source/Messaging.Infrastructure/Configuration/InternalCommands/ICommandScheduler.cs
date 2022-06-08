@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
+using Messaging.Application.Common.Commands;
 using NodaTime;
 
 namespace Messaging.Infrastructure.Configuration.InternalCommands

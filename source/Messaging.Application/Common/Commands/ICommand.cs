@@ -14,7 +14,7 @@
 
 using MediatR;
 
-namespace Messaging.Infrastructure.Configuration.InternalCommands
+namespace Messaging.Application.Common.Commands
 {
     #pragma warning disable CA1040
     /// <summary>

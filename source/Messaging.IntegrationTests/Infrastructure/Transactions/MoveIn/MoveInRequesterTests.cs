@@ -63,7 +63,6 @@ public class MoveInRequesterTests : TestBase
         return new MoveInRequest(
             "Consumer1",
             Guid.NewGuid().ToString(),
-            Guid.NewGuid().ToString(),
             SystemClock.Instance.GetCurrentInstant().ToString(),
             Guid.NewGuid().ToString(),
             Guid.NewGuid().ToString(),
