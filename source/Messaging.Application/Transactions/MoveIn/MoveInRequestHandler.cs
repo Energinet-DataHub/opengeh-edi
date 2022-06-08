@@ -105,35 +105,39 @@ namespace Messaging.Application.Transactions.MoveIn
 
         private OutgoingMessage ConfirmMessageFrom(IncomingMessage incomingMessage, string transactionId)
         {
-            var messageId = Guid.NewGuid();
             var marketActivityRecord = new OutgoingMessages.ConfirmRequestChangeOfSupplier.MarketActivityRecord(
-                messageId.ToString(),
+                Guid.NewGuid().ToString(),
                 transactionId,
                 incomingMessage.MarketActivityRecord.MarketEvaluationPointId);
 
+            var processType = ProcessType.FromCode(incomingMessage.Message.ProcessType);
+
             return CreateOutgoingMessage(
                 incomingMessage.Id,
-                "ConfirmRequestChangeOfSupplier",
-                incomingMessage.Message.ProcessType,
+                processType.Confirm.DocumentType,
+                processType.Code,
                 incomingMessage.Message.SenderId,
-                _marketActivityRecordParser.From(marketActivityRecord));
+                _marketActivityRecordParser.From(marketActivityRecord),
+                processType.Confirm.BusinessReasonCode);
         }
 
         private OutgoingMessage RejectMessageFrom(IncomingMessage incomingMessage, string transactionId, IReadOnlyCollection<Reason> reasons)
         {
-            var messageId = Guid.NewGuid();
             var marketActivityRecord = new OutgoingMessages.RejectRequestChangeOfSupplier.MarketActivityRecord(
-                messageId.ToString(),
+                Guid.NewGuid().ToString(),
                 transactionId,
                 incomingMessage.MarketActivityRecord.MarketEvaluationPointId,
                 reasons);
 
+            var processType = ProcessType.FromCode(incomingMessage.Message.ProcessType);
+
             return CreateOutgoingMessage(
                 incomingMessage.Id,
-                "RejectRequestChangeOfSupplier",
-                incomingMessage.Message.ProcessType,
+                processType.Reject.DocumentType,
+                processType.Code,
                 incomingMessage.Message.SenderId,
-                _marketActivityRecordParser.From(marketActivityRecord));
+                _marketActivityRecordParser.From(marketActivityRecord),
+                processType.Reject.BusinessReasonCode);
         }
 
         private Task<ReadOnlyCollection<Reason>> CreateReasonsFromAsync(IReadOnlyCollection<string> validationErrors)
@@ -141,7 +145,7 @@ namespace Messaging.Application.Transactions.MoveIn
             return _validationErrorTranslator.TranslateAsync(validationErrors);
         }
 
-        private OutgoingMessage CreateOutgoingMessage(string id, string documentType, string processType, string receiverId, string marketActivityRecordPayload)
+        private OutgoingMessage CreateOutgoingMessage(string id, string documentType, string processType, string receiverId, string marketActivityRecordPayload, string reasonCode)
         {
             return new OutgoingMessage(
                 documentType,
@@ -152,7 +156,8 @@ namespace Messaging.Application.Transactions.MoveIn
                 MarketRoles.EnergySupplier,
                 DataHubDetails.IdentificationNumber,
                 MarketRoles.MeteringPointAdministrator,
-                marketActivityRecordPayload);
+                marketActivityRecordPayload,
+                reasonCode);
         }
     }
 }

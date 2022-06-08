@@ -28,6 +28,7 @@ namespace Messaging.Infrastructure.Configuration.DataAccess.Outgoing
             builder.ToTable("OutgoingMessages", "b2b");
             builder.HasKey(x => x.Id);
             builder.Property(x => x.DocumentType);
+            builder.Property(x => x.ReasonCode);
             builder.Property(x => x.IsPublished);
             builder.Property(x => x.RecipientId);
             builder.Property(x => x.ReceiverRole);

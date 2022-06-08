@@ -15,13 +15,17 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Messaging.Application.Common;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Application.Xml;
 using Messaging.Application.Xml.SchemaStore;
+using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Configuration;
+using Messaging.Infrastructure.Configuration.Serialization;
 using Processing.Domain.SeedWork;
 using Xunit;
 
@@ -32,12 +36,14 @@ namespace Messaging.Tests.OutgoingMessages.ConfirmRequestChangeOfSupplier
         private readonly ConfirmChangeOfSupplierDocumentWriter _documentWriter;
         private readonly ISchemaProvider _schemaProvider;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+        private readonly IMarketActivityRecordParser _marketActivityRecordParser;
 
         public ConfirmRequestChangeOfSupplierDocumentWriterTests()
         {
             _systemDateTimeProvider = new SystemDateTimeProvider();
             _schemaProvider = new SchemaProvider(new CimXmlSchemas());
-            _documentWriter = new ConfirmChangeOfSupplierDocumentWriter();
+            _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
+            _documentWriter = new ConfirmChangeOfSupplierDocumentWriter(_marketActivityRecordParser);
         }
 
         [Fact]
@@ -50,7 +56,7 @@ namespace Messaging.Tests.OutgoingMessages.ConfirmRequestChangeOfSupplier
                 new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId"),
             };
 
-            var message = await _documentWriter.WriteAsync(header, marketActivityRecords).ConfigureAwait(false);
+            var message = await _documentWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
 
             await AssertMessage(message, header, marketActivityRecords).ConfigureAwait(false);
         }

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -21,16 +22,18 @@ using Messaging.Application.OutgoingMessages;
 
 namespace Messaging.Application.Common;
 
-public abstract class DocumentWriter<TMarketActivityRecord>
+public abstract class DocumentWriter
 {
     private readonly DocumentDetails _documentDetails;
+    private readonly IMarketActivityRecordParser _parser;
 
-    protected DocumentWriter(DocumentDetails documentDetails)
+    protected DocumentWriter(DocumentDetails documentDetails, IMarketActivityRecordParser parser)
     {
         _documentDetails = documentDetails;
+        _parser = parser;
     }
 
-    public async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<TMarketActivityRecord> marketActivityRecords)
+    public async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
     {
         var settings = new XmlWriterSettings { OmitXmlDeclaration = false, Encoding = Encoding.UTF8, Async = true };
         var stream = new MemoryStream();
@@ -42,7 +45,25 @@ public abstract class DocumentWriter<TMarketActivityRecord>
         return stream;
     }
 
-    protected abstract Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<TMarketActivityRecord> marketActivityPayloads, XmlWriter writer);
+    public bool HandlesDocumentType(string documentType)
+    {
+        if (documentType == null) throw new ArgumentNullException(nameof(documentType));
+        return _documentDetails.Type[..documentType.Length].Equals(documentType, StringComparison.OrdinalIgnoreCase);
+    }
+
+    protected abstract Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer);
+
+    protected IReadOnlyCollection<TMarketActivityRecord> ParseFrom<TMarketActivityRecord>(IReadOnlyCollection<string> payloads)
+    {
+        if (payloads == null) throw new ArgumentNullException(nameof(payloads));
+        var marketActivityRecords = new List<TMarketActivityRecord>();
+        foreach (var payload in payloads)
+        {
+            marketActivityRecords.Add(_parser.From<TMarketActivityRecord>(payload));
+        }
+
+        return marketActivityRecords;
+    }
 
     private static Task WriteHeaderAsync(MessageHeader header, DocumentDetails documentDetails, XmlWriter writer)
     {

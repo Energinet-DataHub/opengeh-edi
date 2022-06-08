@@ -30,12 +30,6 @@ namespace Messaging.Tests.OutgoingMessages
     {
         private const string MarketActivityRecordElementName = "MktActivityRecord";
 
-        internal static string? GetMessageHeaderValue(XDocument document, string elementName)
-        {
-            var header = GetHeaderElement(document);
-            return header?.Element(header.Name.Namespace + elementName)?.Value;
-        }
-
         internal static XElement? GetMarketActivityRecordById(XDocument document, string id)
         {
             var header = document.Root!;
@@ -99,6 +93,12 @@ namespace Messaging.Tests.OutgoingMessages
                 Assert.Equal(expectedReasons[i].Code, actualCode);
                 Assert.Equal(expectedReasons[i].Text, actualText);
             }
+        }
+
+        private static string? GetMessageHeaderValue(XDocument document, string elementName)
+        {
+            var header = GetHeaderElement(document);
+            return header?.Element(header.Name.Namespace + elementName)?.Value;
         }
 
         private static XElement? GetHeaderElement(XDocument document)

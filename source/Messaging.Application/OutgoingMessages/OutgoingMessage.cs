@@ -18,7 +18,7 @@ namespace Messaging.Application.OutgoingMessages
 {
     public class OutgoingMessage
     {
-        public OutgoingMessage(string documentType, string recipientId, string correlationId, string originalMessageId, string processType, string receiverRole, string senderId, string senderRole, string marketActivityRecordPayload)
+        public OutgoingMessage(string documentType, string recipientId, string correlationId, string originalMessageId, string processType, string receiverRole, string senderId, string senderRole, string marketActivityRecordPayload, string reasonCode)
         {
             DocumentType = documentType;
             RecipientId = recipientId;
@@ -29,10 +29,11 @@ namespace Messaging.Application.OutgoingMessages
             SenderId = senderId;
             SenderRole = senderRole;
             MarketActivityRecordPayload = marketActivityRecordPayload;
+            ReasonCode = reasonCode;
             Id = Guid.NewGuid();
         }
 
-        private OutgoingMessage(Guid id, string documentType, string recipientId, string correlationId, string originalMessageId, string processType, string receiverRole, string senderId, string senderRole, string marketActivityRecordPayload)
+        private OutgoingMessage(Guid id, string documentType, string recipientId, string correlationId, string originalMessageId, string processType, string receiverRole, string senderId, string senderRole, string marketActivityRecordPayload, string reasonCode)
         {
             DocumentType = documentType;
             RecipientId = recipientId;
@@ -43,6 +44,7 @@ namespace Messaging.Application.OutgoingMessages
             SenderId = senderId;
             SenderRole = senderRole;
             MarketActivityRecordPayload = marketActivityRecordPayload;
+            ReasonCode = reasonCode;
             Id = id;
         }
 
@@ -53,6 +55,8 @@ namespace Messaging.Application.OutgoingMessages
         public string RecipientId { get; }
 
         public string DocumentType { get; }
+
+        public string ReasonCode { get; }
 
         public string CorrelationId { get; }
 
