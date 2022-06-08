@@ -31,7 +31,7 @@ module "func_actor_sync" {
     WEBSITE_ENABLE_SYNC_UPDATE_SITE         = true
     WEBSITE_RUN_FROM_PACKAGE                = 1
     WEBSITES_ENABLE_APP_SERVICE_STORAGE     = true
-    FUNCTIONS_WORKER_RUNTIME                = "dotnet-isolated"
+    FUNCTIONS_WORKER_RUNTIME                = "dotnet"
     # Endregion: Default Values
     METERINGPOINT_DB_CONNECTION_STRING    = local.MS_METERING_POINT_CONNECTION_STRING
     ACTOR_REGISTRY_DB_CONNECTION_STRING   = local.ACTOR_REGISTRY_DB_CONNECTION_STRING
