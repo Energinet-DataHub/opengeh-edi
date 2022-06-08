@@ -32,7 +32,7 @@ public class ActorSyncService : IDisposable
         _actorRegistryDbService =
             new ActorRegistryDbService(Environment.GetEnvironmentVariable("ACTOR_REGISTRY_DB_CONNECTION_STRING") ?? throw new InvalidOperationException());
         _meteringPointDbService = new MeteringPointDbService(
-            Environment.GetEnvironmentVariable("METERINGPOINT_DB_CONNECTION_STRING") ??
+            Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ??
             throw new InvalidOperationException());
     }
 
