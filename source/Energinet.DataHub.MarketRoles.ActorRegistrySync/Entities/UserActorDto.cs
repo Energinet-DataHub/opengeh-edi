@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketRoles.ActorRegistrySync;
-public record Actor(
-    string IdentificationNumber,
-    int IdentificationType,
-    string Roles,
-    bool Active,
-    Guid Id);
+namespace Energinet.DataHub.MarketRoles.ActorRegistrySync.Entities;
+
+public record UserActorDto(
+    string? UserObjectId,
+    IReadOnlyCollection<string>? GlnNumbers);

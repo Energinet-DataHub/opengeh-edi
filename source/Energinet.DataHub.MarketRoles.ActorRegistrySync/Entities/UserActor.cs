@@ -14,11 +14,6 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketRoles.ActorRegistrySync;
-public record GridArea(
-    string Code,
-    string Name,
-    bool Active,
-    Guid ActorId,
-    string PriceAreaCode,
-    Guid Id);
+namespace Energinet.DataHub.MarketRoles.ActorRegistrySync.Entities;
+
+public record UserActor(Guid UserId, Guid ActorId);
