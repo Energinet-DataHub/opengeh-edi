@@ -90,7 +90,7 @@ public class RejectRequestChangeOfSupplierDocumentWriterTests
 
         AssertMarketActivityRecords(marketActivityRecords, document);
 
-        var schema = await _schemaProvider.GetSchemaAsync("rejectrequestchangeofsupplier", "1.0")
+        var schema = await _schemaProvider.GetSchemaAsync("rejectrequestchangeofsupplier", "0.1")
             .ConfigureAwait(false);
         await AssertXmlMessage.AssertConformsToSchemaAsync(message, schema!).ConfigureAwait(false);
     }

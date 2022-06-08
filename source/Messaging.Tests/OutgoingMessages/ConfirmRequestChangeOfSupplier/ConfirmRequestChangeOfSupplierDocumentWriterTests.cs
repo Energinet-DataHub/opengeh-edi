@@ -81,7 +81,12 @@ namespace Messaging.Tests.OutgoingMessages.ConfirmRequestChangeOfSupplier
 
             AssertMarketActivityRecords(marketActivityRecords, document);
 
-            var schema = await _schemaProvider.GetSchemaAsync("confirmrequestchangeofsupplier", "1.0")
+            await AssertConformsToSchema(message).ConfigureAwait(false);
+        }
+
+        private async Task AssertConformsToSchema(Stream message)
+        {
+            var schema = await _schemaProvider.GetSchemaAsync("confirmrequestchangeofsupplier", "0.1")
                 .ConfigureAwait(false);
             await AssertXmlMessage.AssertConformsToSchemaAsync(message, schema!).ConfigureAwait(false);
         }

@@ -178,10 +178,10 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
         public async Task Return_failure_if_xml_schema_for_business_process_type_does_not_exist()
         {
             await using var message = BusinessMessageBuilder
-                .RequestChangeOfSupplier()
+                .RequestChangeOfSupplier("CimMessageAdapter//Messages//BadRequestChangeOfSupplier.xml")
                 .Message();
 
-            var result = await ReceiveRequestChangeOfSupplierMessage(message, "non_existing_version")
+            var result = await ReceiveRequestChangeOfSupplierMessage(message)
                 .ConfigureAwait(false);
 
             Assert.False(result.Success);
@@ -252,7 +252,9 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
             writer.Write("This is not XML");
             writer.Flush();
             messageStream.Position = 0;
-            return messageStream;
+            var returnStream = new MemoryStream();
+            messageStream.CopyTo(returnStream);
+            return returnStream;
         }
 
         private static void AssertContainsError(Result result, string errorCode)
@@ -260,9 +262,9 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
             Assert.Contains(result.Errors, error => error.Code.Equals(errorCode, StringComparison.OrdinalIgnoreCase));
         }
 
-        private Task<Result> ReceiveRequestChangeOfSupplierMessage(Stream message, string version = "1.0")
+        private Task<Result> ReceiveRequestChangeOfSupplierMessage(Stream message)
         {
-            return CreateMessageReceiver().ReceiveAsync(message, "requestchangeofsupplier", version);
+            return CreateMessageReceiver().ReceiveAsync(message);
         }
 
         private MessageReceiver CreateMessageReceiver()
@@ -284,11 +286,11 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
             var messageBuilder = BusinessMessageBuilder.RequestChangeOfSupplier();
 
             using var originalMessage = messageBuilder.Message();
-            await CreateMessageReceiver(messageIds).ReceiveAsync(originalMessage, "requestchangeofsupplier", "1.0")
+            await CreateMessageReceiver(messageIds).ReceiveAsync(originalMessage)
                 .ConfigureAwait(false);
 
             using var duplicateMessage = messageBuilder.Message();
-            await CreateMessageReceiver(messageIds).ReceiveAsync(duplicateMessage, "requestchangeofsupplier", "1.0")
+            await CreateMessageReceiver(messageIds).ReceiveAsync(duplicateMessage)
                 .ConfigureAwait(false);
         }
 
