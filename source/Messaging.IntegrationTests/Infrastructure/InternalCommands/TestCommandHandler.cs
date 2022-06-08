@@ -19,7 +19,7 @@ using MediatR;
 
 namespace Messaging.IntegrationTests.Infrastructure.InternalCommands
 {
-    public class TestCommandHandler : IRequestHandler<TestCommand>
+    public class TestCommandHandler : IRequestHandler<TestCommand, Unit>
     {
         public Task<Unit> Handle(TestCommand request, CancellationToken cancellationToken)
         {

@@ -19,7 +19,7 @@ using MediatR;
 
 namespace Messaging.Application.Transactions.MoveIn;
 
-public class CompleteMoveInTransactionHandler : IRequestHandler<CompleteMoveInTransaction>
+public class CompleteMoveInTransactionHandler : IRequestHandler<CompleteMoveInTransaction, Unit>
 {
     private readonly IMoveInTransactionRepository _transactionRepository;
 

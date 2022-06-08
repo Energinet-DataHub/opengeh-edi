@@ -174,15 +174,15 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddSingleton<IDataAvailableNotificationSender, DataAvailableNotificationSender>();
             _services.AddSingleton<IDataBundleResponseSender, DataBundleResponseSender>();
             _services.AddSingleton(_ => new MessageHubConfig(dataAvailableQueue, domainReplyQueue));
+            _services.AddTransient<IRequestHandler<NotifyMessageHub, Unit>, NotifyMessageHubHandler>();
 
             return this;
         }
 
-        public CompositionRoot AddRequestHandler<TRequestHandler, TCommand>()
-            where TRequestHandler : class, IRequestHandler<TCommand>
-            where TCommand : IRequest<Unit>
+        public CompositionRoot AddRequestHandler<TRequestHandler>()
+            where TRequestHandler : class
         {
-            _services.AddTransient<IRequestHandler<TCommand>, TRequestHandler>();
+            _services.AddTransient<TRequestHandler>();
 
             return this;
         }
