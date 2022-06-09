@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -26,6 +25,8 @@ namespace Messaging.Infrastructure.Transactions
             builder.ToTable("Transactions", "b2b");
             builder.HasKey(x => x.TransactionId);
             builder.Property(x => x.ProcessId);
+            builder.Property(x => x.EffectiveDate);
+            builder.Property(x => x.MarketEvaluationPointId);
             builder.Property<bool>("_started")
                 .HasColumnName("Started");
         }

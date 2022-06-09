@@ -12,9 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Linq;
 using System.Threading.Tasks;
+using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.OutgoingMessages;
+using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
+using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.IntegrationTests.Fixtures;
+using NodaTime;
 using Xunit;
 
 namespace Messaging.IntegrationTests.Transactions.MoveIn;
@@ -33,5 +40,22 @@ public class CompleteMoveInTests : TestBase
         var command = new CompleteMoveInTransaction(processId);
 
         await Assert.ThrowsAsync<TransactionNotFoundException>(() => InvokeCommandAsync(command)).ConfigureAwait(false);
+    }
+
+    [Fact]
+    public async Task Current_energy_supplier_is_notified_when_consumer_move_in_is_completed()
+    {
+        var transaction = new MoveInTransaction(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SystemClock.Instance.GetCurrentInstant());
+        transaction.Start(BusinessRequestResult.Succeeded(Guid.NewGuid().ToString()));
+        GetService<IMoveInTransactionRepository>().Add(transaction);
+        await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
+
+        var completeCommand = new CompleteMoveInTransaction(transaction.ProcessId!);
+        await InvokeCommandAsync(completeCommand).ConfigureAwait(false);
+
+        var context = GetService<B2BContext>();
+        var message = context.OutgoingMessages.FirstOrDefault(m => m.DocumentType == "GenericNotification" && m.ProcessType == "E01");
+
+        Assert.NotNull(message);
     }
 }

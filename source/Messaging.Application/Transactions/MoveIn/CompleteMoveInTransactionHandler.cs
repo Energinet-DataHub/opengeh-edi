@@ -16,16 +16,29 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Messaging.Application.Common;
+using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.OutgoingMessages;
+using Messaging.Application.OutgoingMessages.GenericNotification;
+using Processing.Domain.SeedWork;
 
 namespace Messaging.Application.Transactions.MoveIn;
 
 public class CompleteMoveInTransactionHandler : IRequestHandler<CompleteMoveInTransaction, Unit>
 {
     private readonly IMoveInTransactionRepository _transactionRepository;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly IMarketActivityRecordParser _marketActivityRecordParser;
+    private readonly IOutgoingMessageStore _outgoingMessageStore;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public CompleteMoveInTransactionHandler(IMoveInTransactionRepository transactionRepository)
+    public CompleteMoveInTransactionHandler(IMoveInTransactionRepository transactionRepository, ISystemDateTimeProvider systemDateTimeProvider, IMarketActivityRecordParser marketActivityRecordParser, IOutgoingMessageStore outgoingMessageStore, IUnitOfWork unitOfWork)
     {
         _transactionRepository = transactionRepository;
+        _systemDateTimeProvider = systemDateTimeProvider;
+        _marketActivityRecordParser = marketActivityRecordParser;
+        _outgoingMessageStore = outgoingMessageStore;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Unit> Handle(CompleteMoveInTransaction request, CancellationToken cancellationToken)
@@ -36,6 +49,35 @@ public class CompleteMoveInTransactionHandler : IRequestHandler<CompleteMoveInTr
         {
             throw new TransactionNotFoundException(request.ProcessId);
         }
+
+        var header = new MessageHeader(
+        "E01",
+        "senderid",
+        "senderrole",
+        "receiverid",
+        "receiverrole",
+        Guid.NewGuid().ToString(),
+        _systemDateTimeProvider.Now());
+        var marketActivityRecord = new MarketActivityRecord(
+            Guid.NewGuid().ToString(),
+            transaction.TransactionId,
+            transaction.MarketEvaluationPointId,
+            transaction.EffectiveDate);
+
+        var message = new OutgoingMessage(
+            "GenericNotification",
+            header.ReceiverId,
+            Guid.NewGuid().ToString(),
+            Guid.NewGuid().ToString(),
+            header.ProcessType,
+            header.ReceiverRole,
+            header.SenderId,
+            header.SenderRole,
+            _marketActivityRecordParser.From(marketActivityRecord),
+            null);
+
+        _outgoingMessageStore.Add(message);
+        await _unitOfWork.CommitAsync().ConfigureAwait(false);
 
         return Unit.Value;
     }

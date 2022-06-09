@@ -23,6 +23,7 @@ using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.IncomingMessages;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
+using NodaTime.Text;
 using MarketActivityRecord = Messaging.Application.IncomingMessages.RequestChangeOfSupplier.MarketActivityRecord;
 
 namespace Messaging.Application.Transactions.MoveIn
@@ -58,7 +59,7 @@ namespace Messaging.Application.Transactions.MoveIn
         public async Task HandleAsync(IncomingMessage incomingMessage)
         {
             if (incomingMessage == null) throw new ArgumentNullException(nameof(incomingMessage));
-            var transaction = new MoveInTransaction(incomingMessage.MarketActivityRecord.Id);
+            var transaction = new MoveInTransaction(incomingMessage.MarketActivityRecord.Id, incomingMessage.MarketActivityRecord.MarketEvaluationPointId, InstantPattern.General.Parse(incomingMessage.MarketActivityRecord.EffectiveDate).GetValueOrThrow());
 
             var businessProcessResult = await InvokeBusinessProcessAsync(incomingMessage).ConfigureAwait(false);
             if (businessProcessResult.Success == false)
@@ -97,7 +98,7 @@ namespace Messaging.Application.Transactions.MoveIn
                 incomingMessage.MarketActivityRecord.ConsumerName,
                 incomingMessage.MarketActivityRecord.EnergySupplierId,
                 incomingMessage.MarketActivityRecord.MarketEvaluationPointId,
-                incomingMessage.MarketActivityRecord.EffectiveDate,
+                incomingMessage.MarketActivityRecord.EffectiveDate.ToString(),
                 incomingMessage.MarketActivityRecord.ConsumerId,
                 GetConsumerIdType(incomingMessage.MarketActivityRecord));
             return _moveInRequester.InvokeAsync(businessProcess);
