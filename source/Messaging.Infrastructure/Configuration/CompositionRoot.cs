@@ -202,6 +202,7 @@ namespace Messaging.Infrastructure.Configuration
 
         public CompositionRoot AddMoveInServices(MoveInConfiguration configuration)
         {
+            _services.AddScoped<MoveInNotifications>();
             _services.AddScoped(_ => configuration);
             _services.AddScoped<MoveInRequestHandler>();
             _services.AddScoped<IMoveInRequester, MoveInRequester>();

@@ -17,29 +17,22 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.Common;
-using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages;
-using Messaging.Application.OutgoingMessages.GenericNotification;
-using Processing.Domain.SeedWork;
 
 namespace Messaging.Application.Transactions.MoveIn;
 
 public class CompleteMoveInTransactionHandler : IRequestHandler<CompleteMoveInTransaction, Unit>
 {
     private readonly IMoveInTransactionRepository _transactionRepository;
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-    private readonly IMarketActivityRecordParser _marketActivityRecordParser;
-    private readonly IOutgoingMessageStore _outgoingMessageStore;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly MoveInNotifications _notifications;
 
-    public CompleteMoveInTransactionHandler(IMoveInTransactionRepository transactionRepository, ISystemDateTimeProvider systemDateTimeProvider, IMarketActivityRecordParser marketActivityRecordParser, IOutgoingMessageStore outgoingMessageStore, IUnitOfWork unitOfWork)
+    public CompleteMoveInTransactionHandler(IMoveInTransactionRepository transactionRepository, IMarketActivityRecordParser marketActivityRecordParser, IOutgoingMessageStore outgoingMessageStore, IUnitOfWork unitOfWork, MoveInNotifications notifications)
     {
         _transactionRepository = transactionRepository;
-        _systemDateTimeProvider = systemDateTimeProvider;
-        _marketActivityRecordParser = marketActivityRecordParser;
-        _outgoingMessageStore = outgoingMessageStore;
         _unitOfWork = unitOfWork;
+        _notifications = notifications;
     }
 
     public async Task<Unit> Handle(CompleteMoveInTransaction request, CancellationToken cancellationToken)
@@ -51,25 +44,8 @@ public class CompleteMoveInTransactionHandler : IRequestHandler<CompleteMoveInTr
             throw new TransactionNotFoundException(request.ProcessId);
         }
 
-        var marketActivityRecord = new MarketActivityRecord(
-            Guid.NewGuid().ToString(),
-            transaction.TransactionId,
-            transaction.MarketEvaluationPointId,
-            transaction.EffectiveDate);
+        _notifications.InformCurrentEnergySupplierAboutEndOfSupply(transaction);
 
-        var message = new OutgoingMessage(
-            "GenericNotification",
-            transaction.CurrentEnergySupplierId,
-            Guid.NewGuid().ToString(),
-            transaction.TransactionId,
-            "E01",
-            MarketRoles.EnergySupplier,
-            DataHubDetails.IdentificationNumber,
-            MarketRoles.MeteringPointAdministrator,
-            _marketActivityRecordParser.From(marketActivityRecord),
-            null);
-
-        _outgoingMessageStore.Add(message);
         await _unitOfWork.CommitAsync().ConfigureAwait(false);
 
         return Unit.Value;

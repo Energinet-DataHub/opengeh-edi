@@ -62,10 +62,10 @@ public class CompleteMoveInTests : TestBase
             .HasSenderRole(MarketRoles.MeteringPointAdministrator)
             .HasReasonCode(null)
             .WithMarketActivityRecord()
-            .HasId()
-            .HasValidityStart(transaction.EffectiveDate.ToDateTimeUtc())
-            .HasOriginalTransactionId(transaction.TransactionId)
-            .HasMarketEvaluationPointId(transaction.MarketEvaluationPointId);
+                .HasId()
+                .HasValidityStart(transaction.EffectiveDate.ToDateTimeUtc())
+                .HasOriginalTransactionId(transaction.TransactionId)
+                .HasMarketEvaluationPointId(transaction.MarketEvaluationPointId);
     }
 
     private async Task<MoveInTransaction> CompleteMoveIn()
