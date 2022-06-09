@@ -29,18 +29,18 @@ module "func_processing" {
   health_check_path                         = "/api/monitor/ready"
   app_settings                              = {
     # Region: Default Values
-    WEBSITE_ENABLE_SYNC_UPDATE_SITE         = true
-    WEBSITE_RUN_FROM_PACKAGE                = 1
-    WEBSITES_ENABLE_APP_SERVICE_STORAGE     = true
-    FUNCTIONS_WORKER_RUNTIME                = "dotnet-isolated"
+    WEBSITE_ENABLE_SYNC_UPDATE_SITE                             = true
+    WEBSITE_RUN_FROM_PACKAGE                                    = 1
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE                         = true
+    FUNCTIONS_WORKER_RUNTIME                                    = "dotnet-isolated"
     # Endregion: Default Values
-    MARKET_DATA_QUEUE_URL                   = "${module.sb_marketroles.name}.servicebus.windows.net:9093"
-    MARKET_DATA_DB_CONNECTION_STRING        = local.MS_MARKETROLES_CONNECTION_STRING
-    INTEGRATION_EVENT_QUEUE                 = data.azurerm_key_vault_secret.sbq_event_forwarded_queue.value
-    INTEGRATION_EVENT_QUEUE_CONNECTION      = data.azurerm_key_vault_secret.sb_domain_relay_listener_connection_string.value
-    RAISE_TIME_HAS_PASSED_EVENT_SCHEDULE    = "*/10 * * * * *"
-    SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS = data.azurerm_key_vault_secret.sb_domain_relay_sender_connection_string.value
-    SERVICE_BUS_CONNECTION_STRING_MANAGE_FOR_INTEGRATION_EVENTS = data.azurerm_key_vault_secret.sb_domain_relay_manage_connection_string.value
+    MARKET_DATA_QUEUE_URL                                       = "${module.sb_marketroles.name}.servicebus.windows.net:9093"
+    MARKET_DATA_DB_CONNECTION_STRING                            = local.MS_MARKETROLES_CONNECTION_STRING
+    INTEGRATION_EVENT_QUEUE                                     = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sbq-market-roles-forward-name)",
+    INTEGRATION_EVENT_QUEUE_CONNECTION                          = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-listen-connection-string)",
+    RAISE_TIME_HAS_PASSED_EVENT_SCHEDULE                        = "*/10 * * * * *"
+    SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS        = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-send-connection-string)",
+    SERVICE_BUS_CONNECTION_STRING_MANAGE_FOR_INTEGRATION_EVENTS = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-manage-connection-string)",
   }
 
   tags                                      = azurerm_resource_group.this.tags
