@@ -18,10 +18,8 @@ using System.Threading.Tasks;
 using Messaging.Application.Common;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.OutgoingMessages.GenericNotification;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
-using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.TestDoubles;
 using Processing.Domain.SeedWork;
@@ -57,22 +55,17 @@ public class CompleteMoveInTests : TestBase
     {
         var transaction = await CompleteMoveIn().ConfigureAwait(false);
 
-        var context = GetService<B2BContext>();
-        var message = context.OutgoingMessages.FirstOrDefault(m => m.DocumentType == "GenericNotification" && m.OriginalMessageId == transaction.TransactionId);
-        Assert.NotNull(message);
-        Assert.Equal(transaction.CurrentEnergySupplierId, message!.ReceiverId);
-        Assert.Equal(MarketRoles.EnergySupplier, message.ReceiverRole);
-        Assert.Equal(DataHubDetails.IdentificationNumber, message.SenderId);
-        Assert.Equal(MarketRoles.MeteringPointAdministrator, message.SenderRole);
-        Assert.Equal("E01", message.ProcessType);
-        Assert.Null(message.ReasonCode);
-        Assert.Equal("GenericNotification", message.DocumentType);
-        var marketActivityRecord = GetService<IMarketActivityRecordParser>()
-            .From<MarketActivityRecord>(message!.MarketActivityRecordPayload);
-        Assert.NotNull(marketActivityRecord.Id);
-        Assert.Equal(transaction.TransactionId, marketActivityRecord.OriginalTransactionId);
-        Assert.Equal(transaction.MarketEvaluationPointId, marketActivityRecord.MarketEvaluationPointId);
-        Assert.Equal(transaction.EffectiveDate, marketActivityRecord.ValidityStart);
+        AssertThat(transaction.TransactionId, "GenericNotification", "E01")
+            .HasReceiverId(transaction.CurrentEnergySupplierId)
+            .HasReceiverRole(MarketRoles.EnergySupplier)
+            .HasSenderId(DataHubDetails.IdentificationNumber)
+            .HasSenderRole(MarketRoles.MeteringPointAdministrator)
+            .HasReasonCode(null)
+            .WithMarketActivityRecord()
+            .HasId()
+            .HasValidityStart(transaction.EffectiveDate.ToDateTimeUtc())
+            .HasOriginalTransactionId(transaction.TransactionId)
+            .HasMarketEvaluationPointId(transaction.MarketEvaluationPointId);
     }
 
     private async Task<MoveInTransaction> CompleteMoveIn()
@@ -95,5 +88,10 @@ public class CompleteMoveInTests : TestBase
         _transactionRepository.Add(transaction);
         await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
         return transaction;
+    }
+
+    private AssertOutgoingMessage AssertThat(string transactionId, string documentType, string processType)
+    {
+        return AssertOutgoingMessage.OutgoingMessage(transactionId, documentType, processType, GetService<IDbConnectionFactory>());
     }
 }
