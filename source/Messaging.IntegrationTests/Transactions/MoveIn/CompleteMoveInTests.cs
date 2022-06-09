@@ -82,5 +82,6 @@ public class CompleteMoveInTests : TestBase
             .From<MarketActivityRecord>(message!.MarketActivityRecordPayload);
         Assert.NotNull(marketActivityRecord.Id);
         Assert.Equal(transaction.TransactionId, marketActivityRecord.OriginalTransactionId);
+        Assert.Equal(transaction.MarketEvaluationPointId, marketActivityRecord.MarketEvaluationPointId);
     }
 }
