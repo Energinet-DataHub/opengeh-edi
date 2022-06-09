@@ -51,7 +51,8 @@ namespace Messaging.IntegrationTests.Transactions.MoveIn
         [Fact]
         public async Task Transaction_is_started()
         {
-            var incomingMessage = IncomingMessageBuilder.CreateMessage();
+            var incomingMessage = MessageBuilder()
+                    .Build();
 
             await _moveInRequestHandler.HandleAsync(incomingMessage).ConfigureAwait(false);
 

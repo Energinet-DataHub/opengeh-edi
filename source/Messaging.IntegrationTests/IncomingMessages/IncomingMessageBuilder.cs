@@ -16,31 +16,21 @@ using System;
 using Messaging.Application.Configuration;
 using Messaging.Application.IncomingMessages;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
+using NodaTime;
 
 namespace Messaging.IntegrationTests.IncomingMessages
 {
     internal class IncomingMessageBuilder
     {
-        private string _processType = "NotSet";
+        private readonly string _createdAt = SystemClock.Instance.GetCurrentInstant().ToString();
+        private readonly string _receiverRole = "DDQ";
+        private readonly string _senderRole = "DDZ";
+        private readonly Instant _effectiveDate = SystemClock.Instance.GetCurrentInstant();
+        private readonly string _messageId = Guid.NewGuid().ToString();
+        private string _processType = "E03";
         private string _senderId = "NotSet";
         private string _receiverId = DataHubDetails.IdentificationNumber;
         private string? _consumerName = "NotSet";
-
-        internal static IncomingMessage CreateMessage()
-        {
-            return IncomingMessage.Create(
-                new MessageHeader(Guid.NewGuid().ToString(), "E03", "senderIdfake", "DDZ", DataHubDetails.IdentificationNumber, "DDQ", "fake"),
-                new MarketActivityRecord()
-                {
-                    BalanceResponsibleId = "fake",
-                    Id = Guid.NewGuid().ToString(),
-                    ConsumerId = "fake",
-                    ConsumerName = "fake",
-                    EffectiveDate = "fake",
-                    EnergySupplierId = "fake",
-                    MarketEvaluationPointId = "fake",
-                });
-        }
 
         internal IncomingMessageBuilder WithProcessType(string processType)
         {
@@ -69,24 +59,34 @@ namespace Messaging.IntegrationTests.IncomingMessages
         internal IncomingMessage Build()
         {
             return IncomingMessage.Create(
-                new MessageHeader(
-                    Guid.NewGuid().ToString(),
-                    _processType,
-                    _senderId,
-                    "DDZ",
-                    _receiverId,
-                    "DDQ",
-                    "fake"),
-                new MarketActivityRecord()
-                {
-                    BalanceResponsibleId = "fake",
-                    Id = Guid.NewGuid().ToString(),
-                    ConsumerId = "fake",
-                    ConsumerName = _consumerName,
-                    EffectiveDate = "fake",
-                    EnergySupplierId = "fake",
-                    MarketEvaluationPointId = "fake",
-                });
+                CreateHeader(),
+                CreateMarketActivityRecord());
+        }
+
+        private MarketActivityRecord CreateMarketActivityRecord()
+        {
+            return new MarketActivityRecord()
+            {
+                BalanceResponsibleId = "fake",
+                Id = Guid.NewGuid().ToString(),
+                ConsumerId = "fake",
+                ConsumerName = _consumerName,
+                EffectiveDate = _effectiveDate.ToString(),
+                EnergySupplierId = "fake",
+                MarketEvaluationPointId = "fake",
+            };
+        }
+
+        private MessageHeader CreateHeader()
+        {
+            return new MessageHeader(
+                _messageId,
+                _processType,
+                _senderId,
+                _senderRole,
+                _receiverId,
+                _receiverRole,
+                _createdAt);
         }
     }
 }

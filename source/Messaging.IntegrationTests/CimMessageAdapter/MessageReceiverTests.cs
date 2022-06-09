@@ -214,7 +214,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
             Assert.Equal("0801741527", transaction?.MarketActivityRecord.ConsumerId);
             Assert.Equal("ARR", transaction?.MarketActivityRecord.ConsumerIdType);
             Assert.Equal("Jan Hansen", transaction?.MarketActivityRecord.ConsumerName);
-            Assert.Equal("2022-09-07T22:00:00Z", transaction?.MarketActivityRecord.EffectiveDate);
+            Assert.Equal("2022-09-07T22:00:00Z", transaction?.MarketActivityRecord.EffectiveDate.ToString());
         }
 
         [Fact]

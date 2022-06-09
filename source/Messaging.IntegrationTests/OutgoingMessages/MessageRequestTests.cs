@@ -120,7 +120,7 @@ namespace Messaging.IntegrationTests.OutgoingMessages
 
         private async Task<IncomingMessage> MessageArrived()
         {
-            var incomingMessage = IncomingMessageBuilder.CreateMessage();
+            var incomingMessage = new IncomingMessageBuilder().Build();
             await _moveInRequestHandler.HandleAsync(incomingMessage).ConfigureAwait(false);
             return incomingMessage;
         }

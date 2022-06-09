@@ -15,6 +15,7 @@
 using System;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
+using NodaTime;
 using Xunit;
 
 namespace Messaging.Tests.Transactions.MoveIn;
@@ -58,7 +59,7 @@ public class MoveInTransactionTests
 
     private static MoveInTransaction CreateTransaction()
     {
-        return new MoveInTransaction(Guid.NewGuid().ToString());
+        return new MoveInTransaction(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SystemClock.Instance.GetCurrentInstant());
     }
 
     private static BusinessRequestResult BusinessRequestSucceeded()
