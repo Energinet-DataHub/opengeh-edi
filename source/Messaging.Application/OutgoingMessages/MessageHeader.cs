@@ -16,34 +16,13 @@ using NodaTime;
 
 namespace Messaging.Application.OutgoingMessages
 {
-    public class MessageHeader
-    {
-        public MessageHeader(string processType, string senderId, string senderRole, string receiverId, string receiverRole, string messageId, Instant timeStamp, string reasonCode)
-        {
-            ProcessType = processType;
-            SenderId = senderId;
-            SenderRole = senderRole;
-            ReceiverId = receiverId;
-            ReceiverRole = receiverRole;
-            MessageId = messageId;
-            TimeStamp = timeStamp;
-            ReasonCode = reasonCode;
-        }
-
-        public string ProcessType { get; }
-
-        public string SenderId { get; }
-
-        public string SenderRole { get; }
-
-        public string ReceiverId { get; }
-
-        public string ReceiverRole { get; }
-
-        public string MessageId { get; }
-
-        public Instant TimeStamp { get; }
-
-        public string ReasonCode { get; }
-    }
+    public record MessageHeader(
+        string ProcessType,
+        string SenderId,
+        string SenderRole,
+        string ReceiverId,
+        string ReceiverRole,
+        string MessageId,
+        Instant TimeStamp,
+        string? ReasonCode = null);
 }
