@@ -18,14 +18,13 @@ using System.Threading.Tasks;
 using Messaging.Application.Common;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.GenericNotification;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.TestDoubles;
-using NodaTime;
+using Processing.Domain.SeedWork;
 using Xunit;
 
 namespace Messaging.IntegrationTests.Transactions.MoveIn;
@@ -33,11 +32,15 @@ namespace Messaging.IntegrationTests.Transactions.MoveIn;
 public class CompleteMoveInTests : TestBase
 {
     private readonly MarketEvaluationPointProviderStub _marketEvaluationPointProvider;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly IMoveInTransactionRepository _transactionRepository;
 
     public CompleteMoveInTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _marketEvaluationPointProvider = (MarketEvaluationPointProviderStub)GetService<IMarketEvaluationPointProvider>();
+        _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
+        _transactionRepository = GetService<IMoveInTransactionRepository>();
     }
 
     [Fact]
@@ -52,11 +55,11 @@ public class CompleteMoveInTests : TestBase
     [Fact]
     public async Task Current_energy_supplier_is_notified_when_consumer_move_in_is_completed()
     {
-        var transaction = await CompleteMoveIn();
+        var transaction = await CompleteMoveIn().ConfigureAwait(false);
 
         var context = GetService<B2BContext>();
-        var message = context.OutgoingMessages.FirstOrDefault(m => m.DocumentType == "GenericNotification" && m.ProcessType == "E01");
-
+        //var message = context.OutgoingMessages.FirstOrDefault(m => m.DocumentType == "GenericNotification" && m.ProcessType == "E01");
+        var message = context.OutgoingMessages.FirstOrDefault(m => m.DocumentType == "GenericNotification" && m.OriginalMessageId == transaction.TransactionId);
         Assert.NotNull(message);
         Assert.Equal(transaction.CurrentEnergySupplierId, message!.ReceiverId);
         Assert.Equal(MarketRoles.EnergySupplier, message.ReceiverRole);
@@ -86,10 +89,11 @@ public class CompleteMoveInTests : TestBase
         var transaction = new MoveInTransaction(
             Guid.NewGuid().ToString(),
             marketEvaluationPoint.GsrnNumber,
-            SystemClock.Instance.GetCurrentInstant(),
+            _systemDateTimeProvider.Now(),
             marketEvaluationPoint.GlnNumberOfEnergySupplier);
+
         transaction.Start(BusinessRequestResult.Succeeded(Guid.NewGuid().ToString()));
-        GetService<IMoveInTransactionRepository>().Add(transaction);
+        _transactionRepository.Add(transaction);
         await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
         return transaction;
     }

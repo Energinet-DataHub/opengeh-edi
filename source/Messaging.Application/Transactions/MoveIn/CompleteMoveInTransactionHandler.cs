@@ -69,7 +69,7 @@ public class CompleteMoveInTransactionHandler : IRequestHandler<CompleteMoveInTr
             "GenericNotification",
             header.ReceiverId,
             Guid.NewGuid().ToString(),
-            Guid.NewGuid().ToString(),
+            transaction.TransactionId,
             header.ProcessType,
             header.ReceiverRole,
             header.SenderId,
