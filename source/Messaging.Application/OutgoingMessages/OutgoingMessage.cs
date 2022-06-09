@@ -18,10 +18,10 @@ namespace Messaging.Application.OutgoingMessages
 {
     public class OutgoingMessage
     {
-        public OutgoingMessage(string documentType, string recipientId, string correlationId, string originalMessageId, string processType, string receiverRole, string senderId, string senderRole, string marketActivityRecordPayload, string? reasonCode)
+        public OutgoingMessage(string documentType, string receiverId, string correlationId, string originalMessageId, string processType, string receiverRole, string senderId, string senderRole, string marketActivityRecordPayload, string? reasonCode)
         {
             DocumentType = documentType;
-            RecipientId = recipientId;
+            ReceiverId = receiverId;
             CorrelationId = correlationId;
             OriginalMessageId = originalMessageId;
             ProcessType = processType;
@@ -33,10 +33,10 @@ namespace Messaging.Application.OutgoingMessages
             Id = Guid.NewGuid();
         }
 
-        private OutgoingMessage(Guid id, string documentType, string recipientId, string correlationId, string originalMessageId, string processType, string receiverRole, string senderId, string senderRole, string marketActivityRecordPayload, string? reasonCode)
+        private OutgoingMessage(Guid id, string documentType, string receiverId, string correlationId, string originalMessageId, string processType, string receiverRole, string senderId, string senderRole, string marketActivityRecordPayload, string? reasonCode)
         {
             DocumentType = documentType;
-            RecipientId = recipientId;
+            ReceiverId = receiverId;
             CorrelationId = correlationId;
             OriginalMessageId = originalMessageId;
             ProcessType = processType;
@@ -52,7 +52,7 @@ namespace Messaging.Application.OutgoingMessages
 
         public bool IsPublished { get; private set; }
 
-        public string RecipientId { get; }
+        public string ReceiverId { get; }
 
         public string DocumentType { get; }
 

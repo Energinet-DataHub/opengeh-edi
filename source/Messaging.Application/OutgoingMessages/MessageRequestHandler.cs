@@ -84,8 +84,8 @@ namespace Messaging.Application.OutgoingMessages
 
         private static bool HasMatchingReceiver(IReadOnlyCollection<OutgoingMessage> messages)
         {
-            var expectedReceiver = messages.First().RecipientId;
-            return messages.All(message => message.RecipientId.Equals(expectedReceiver, StringComparison.OrdinalIgnoreCase));
+            var expectedReceiver = messages.First().ReceiverId;
+            return messages.All(message => message.ReceiverId.Equals(expectedReceiver, StringComparison.OrdinalIgnoreCase));
         }
 
         private static List<string> MessageIdsNotFound(IReadOnlyCollection<string> requestedMessageIds, ReadOnlyCollection<OutgoingMessage> messages)
