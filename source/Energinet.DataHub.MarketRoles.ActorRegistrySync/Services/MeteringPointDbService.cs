@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.MarketRoles.ActorRegistrySync.Entities;
@@ -47,16 +48,17 @@ public class MeteringPointDbService : IDisposable
 
         if (_transaction == null) await BeginTransactionAsync().ConfigureAwait(false);
 
+        var stringBuilder = new StringBuilder();
         foreach (var actor in actors)
         {
-            await _sqlConnection.ExecuteAsync(
-                "INSERT INTO [dbo].[Actor] ([Id],[IdentificationNumber],[IdentificationType],[Roles]) VALUES (@Id,@IdentificationNumber,@IdentificationType, @Roles)",
-                new
-                {
-                    actor.Id, actor.IdentificationNumber, IdentificationType = GetType(actor.IdentificationType), Roles = GetRoles(actor.Roles),
-                },
-                _transaction).ConfigureAwait(false);
+            stringBuilder.Append(@"INSERT INTO [dbo].[Actor] ([Id],[IdentificationNumber],[IdentificationType],[Roles])
+             VALUES ('" + actor.Id + "', '" + actor.IdentificationNumber + "', '" + GetType(actor.IdentificationType) + "', '" + GetRoles(actor.Roles) + "')");
+            stringBuilder.AppendLine();
         }
+
+        await _sqlConnection.ExecuteAsync(
+            stringBuilder.ToString(),
+            transaction: _transaction).ConfigureAwait(false);
     }
 
     public async Task CommitTransactionAsync()
