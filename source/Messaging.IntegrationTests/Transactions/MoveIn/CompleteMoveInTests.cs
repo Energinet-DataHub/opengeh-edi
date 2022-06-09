@@ -81,5 +81,6 @@ public class CompleteMoveInTests : TestBase
         var marketActivityRecord = GetService<IMarketActivityRecordParser>()
             .From<MarketActivityRecord>(message!.MarketActivityRecordPayload);
         Assert.NotNull(marketActivityRecord.Id);
+        Assert.Equal(transaction.TransactionId, marketActivityRecord.OriginalTransactionId);
     }
 }
