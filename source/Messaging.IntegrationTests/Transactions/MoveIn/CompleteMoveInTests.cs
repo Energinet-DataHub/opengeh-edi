@@ -79,5 +79,6 @@ public class CompleteMoveInTests : TestBase
         Assert.Equal(MarketRoles.MeteringPointAdministrator, message.SenderRole);
         Assert.Equal("E01", message.ProcessType);
         Assert.Null(message.ReasonCode);
+        Assert.Equal("GenericNotification", message.DocumentType);
     }
 }
