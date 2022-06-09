@@ -73,10 +73,10 @@ public class CompleteMoveInTests : TestBase
         Assert.NotNull(message);
         var extractedMessage = GetService<IMarketActivityRecordParser>()
             .From<MarketActivityRecord>(message!.MarketActivityRecordPayload);
-        Assert.Equal(message.ReceiverId, transaction.CurrentEnergySupplierId);
-        Assert.Equal(message.ReceiverRole, MarketRoles.EnergySupplier);
-        Assert.Equal(message.SenderId, DataHubDetails.IdentificationNumber);
-        Assert.Equal(message.SenderRole, MarketRoles.MeteringPointAdministrator);
+        Assert.Equal(transaction.CurrentEnergySupplierId, message.ReceiverId);
+        Assert.Equal(MarketRoles.EnergySupplier, message.ReceiverRole);
+        Assert.Equal(DataHubDetails.IdentificationNumber, message.SenderId);
+        Assert.Equal(MarketRoles.MeteringPointAdministrator, message.SenderRole);
         Assert.Equal("E01", message.ProcessType);
     }
 }
