@@ -52,20 +52,7 @@ public class CompleteMoveInTests : TestBase
     [Fact]
     public async Task Current_energy_supplier_is_notified_when_consumer_move_in_is_completed()
     {
-        var marketEvaluationPoint = new MarketEvaluationPoint(Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
-        _marketEvaluationPointProvider.Add(marketEvaluationPoint);
-
-        var transaction = new MoveInTransaction(
-            Guid.NewGuid().ToString(),
-            marketEvaluationPoint.GsrnNumber,
-            SystemClock.Instance.GetCurrentInstant(),
-            marketEvaluationPoint.GlnNumberOfEnergySupplier);
-        transaction.Start(BusinessRequestResult.Succeeded(Guid.NewGuid().ToString()));
-        GetService<IMoveInTransactionRepository>().Add(transaction);
-        await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
-
-        var completeCommand = new CompleteMoveInTransaction(transaction.ProcessId!);
-        await InvokeCommandAsync(completeCommand).ConfigureAwait(false);
+        var transaction = await CompleteMoveIn();
 
         var context = GetService<B2BContext>();
         var message = context.OutgoingMessages.FirstOrDefault(m => m.DocumentType == "GenericNotification" && m.ProcessType == "E01");
@@ -84,5 +71,26 @@ public class CompleteMoveInTests : TestBase
         Assert.Equal(transaction.TransactionId, marketActivityRecord.OriginalTransactionId);
         Assert.Equal(transaction.MarketEvaluationPointId, marketActivityRecord.MarketEvaluationPointId);
         Assert.Equal(transaction.EffectiveDate, marketActivityRecord.ValidityStart);
+    }
+
+    private async Task<MoveInTransaction> CompleteMoveIn()
+    {
+        var transaction = await StartMoveInTransaction();
+        await InvokeCommandAsync(new CompleteMoveInTransaction(transaction.ProcessId!)).ConfigureAwait(false);
+        return transaction;
+    }
+
+    private async Task<MoveInTransaction> StartMoveInTransaction()
+    {
+        var marketEvaluationPoint = _marketEvaluationPointProvider.MarketEvaluationPoints.First();
+        var transaction = new MoveInTransaction(
+            Guid.NewGuid().ToString(),
+            marketEvaluationPoint.GsrnNumber,
+            SystemClock.Instance.GetCurrentInstant(),
+            marketEvaluationPoint.GlnNumberOfEnergySupplier);
+        transaction.Start(BusinessRequestResult.Succeeded(Guid.NewGuid().ToString()));
+        GetService<IMoveInTransactionRepository>().Add(transaction);
+        await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
+        return transaction;
     }
 }
