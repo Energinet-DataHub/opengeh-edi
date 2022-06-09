@@ -71,14 +71,15 @@ public class CompleteMoveInTests : TestBase
         var message = context.OutgoingMessages.FirstOrDefault(m => m.DocumentType == "GenericNotification" && m.ProcessType == "E01");
 
         Assert.NotNull(message);
-        var extractedMessage = GetService<IMarketActivityRecordParser>()
-            .From<MarketActivityRecord>(message!.MarketActivityRecordPayload);
-        Assert.Equal(transaction.CurrentEnergySupplierId, message.ReceiverId);
+        Assert.Equal(transaction.CurrentEnergySupplierId, message!.ReceiverId);
         Assert.Equal(MarketRoles.EnergySupplier, message.ReceiverRole);
         Assert.Equal(DataHubDetails.IdentificationNumber, message.SenderId);
         Assert.Equal(MarketRoles.MeteringPointAdministrator, message.SenderRole);
         Assert.Equal("E01", message.ProcessType);
         Assert.Null(message.ReasonCode);
         Assert.Equal("GenericNotification", message.DocumentType);
+        var marketActivityRecord = GetService<IMarketActivityRecordParser>()
+            .From<MarketActivityRecord>(message!.MarketActivityRecordPayload);
+        Assert.NotNull(marketActivityRecord.Id);
     }
 }
