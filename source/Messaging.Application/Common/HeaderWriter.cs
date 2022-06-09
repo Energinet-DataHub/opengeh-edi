@@ -63,6 +63,9 @@ public static class HeaderWriter
             .WriteElementStringAsync(documentDetails.Prefix, "receiver_MarketParticipant.marketRole.type", null, messageHeader.ReceiverRole)
             .ConfigureAwait(false);
         await writer.WriteElementStringAsync(documentDetails.Prefix, "createdDateTime", null, messageHeader.TimeStamp.ToString()).ConfigureAwait(false);
-        await writer.WriteElementStringAsync(documentDetails.Prefix, "reason.code", null, messageHeader.ReasonCode).ConfigureAwait(false);
+        if (messageHeader.ReasonCode is not null)
+        {
+            await writer.WriteElementStringAsync(documentDetails.Prefix, "reason.code", null, messageHeader.ReasonCode).ConfigureAwait(false);
+        }
     }
 }
