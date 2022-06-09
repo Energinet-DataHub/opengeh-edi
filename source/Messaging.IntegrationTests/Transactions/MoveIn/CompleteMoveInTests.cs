@@ -78,5 +78,6 @@ public class CompleteMoveInTests : TestBase
         Assert.Equal(DataHubDetails.IdentificationNumber, message.SenderId);
         Assert.Equal(MarketRoles.MeteringPointAdministrator, message.SenderRole);
         Assert.Equal("E01", message.ProcessType);
+        Assert.Null(message.ReasonCode);
     }
 }
