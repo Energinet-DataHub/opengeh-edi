@@ -76,5 +76,6 @@ public class CompleteMoveInTests : TestBase
         Assert.Equal(message.ReceiverId, transaction.CurrentEnergySupplierId);
         Assert.Equal(message.ReceiverRole, MarketRoles.EnergySupplier);
         Assert.Equal(message.SenderId, DataHubDetails.IdentificationNumber);
+        Assert.Equal(message.SenderRole, MarketRoles.MeteringPointAdministrator);
     }
 }

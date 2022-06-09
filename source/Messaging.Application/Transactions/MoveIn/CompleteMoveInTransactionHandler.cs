@@ -54,7 +54,7 @@ public class CompleteMoveInTransactionHandler : IRequestHandler<CompleteMoveInTr
         var header = new MessageHeader(
         "E01",
         DataHubDetails.IdentificationNumber,
-        "senderrole",
+        MarketRoles.MeteringPointAdministrator,
         transaction.CurrentEnergySupplierId,
         MarketRoles.EnergySupplier,
         Guid.NewGuid().ToString(),
