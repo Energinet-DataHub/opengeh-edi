@@ -58,7 +58,6 @@ public class CompleteMoveInTests : TestBase
         var transaction = await CompleteMoveIn().ConfigureAwait(false);
 
         var context = GetService<B2BContext>();
-        //var message = context.OutgoingMessages.FirstOrDefault(m => m.DocumentType == "GenericNotification" && m.ProcessType == "E01");
         var message = context.OutgoingMessages.FirstOrDefault(m => m.DocumentType == "GenericNotification" && m.OriginalMessageId == transaction.TransactionId);
         Assert.NotNull(message);
         Assert.Equal(transaction.CurrentEnergySupplierId, message!.ReceiverId);
