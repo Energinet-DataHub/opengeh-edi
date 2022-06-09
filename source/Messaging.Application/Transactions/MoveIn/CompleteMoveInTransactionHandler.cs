@@ -51,14 +51,6 @@ public class CompleteMoveInTransactionHandler : IRequestHandler<CompleteMoveInTr
             throw new TransactionNotFoundException(request.ProcessId);
         }
 
-        var header = new MessageHeader(
-        "E01",
-        DataHubDetails.IdentificationNumber,
-        MarketRoles.MeteringPointAdministrator,
-        transaction.CurrentEnergySupplierId,
-        MarketRoles.EnergySupplier,
-        Guid.NewGuid().ToString(),
-        _systemDateTimeProvider.Now());
         var marketActivityRecord = new MarketActivityRecord(
             Guid.NewGuid().ToString(),
             transaction.TransactionId,
@@ -67,13 +59,13 @@ public class CompleteMoveInTransactionHandler : IRequestHandler<CompleteMoveInTr
 
         var message = new OutgoingMessage(
             "GenericNotification",
-            header.ReceiverId,
+            transaction.CurrentEnergySupplierId,
             Guid.NewGuid().ToString(),
             transaction.TransactionId,
-            header.ProcessType,
-            header.ReceiverRole,
-            header.SenderId,
-            header.SenderRole,
+            "E01",
+            MarketRoles.EnergySupplier,
+            DataHubDetails.IdentificationNumber,
+            MarketRoles.MeteringPointAdministrator,
             _marketActivityRecordParser.From(marketActivityRecord),
             null);
 
