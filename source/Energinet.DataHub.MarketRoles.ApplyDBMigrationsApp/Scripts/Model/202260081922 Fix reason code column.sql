@@ -1,6 +1,8 @@
-﻿ALTER TABLE [b2b].[OutgoingMessages]
-    ADD [ReasonCode] [nvarchar](10) NOT NULL
-    GO
+﻿ALTER TABLE [b2b].[OutgoingMessages] DROP COLUMN IF EXISTS ReasonCode
+GO
+ALTER TABLE [b2b].[OutgoingMessages]
+    ADD [ReasonCode] [nvarchar](10) NULL
+GO
 UPDATE [b2b].[OutgoingMessages]
 SET ReasonCode =  CASE
     WHEN DocumentType = 'ConfirmRequestChangeOfSupplier' THEN 'A01'
