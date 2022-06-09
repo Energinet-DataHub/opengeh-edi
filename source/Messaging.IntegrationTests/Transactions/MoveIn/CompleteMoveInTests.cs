@@ -73,5 +73,6 @@ public class CompleteMoveInTests : TestBase
         var extractedMessage = GetService<IMarketActivityRecordParser>()
             .From<MarketActivityRecord>(message!.MarketActivityRecordPayload);
         Assert.Equal(message.ReceiverId, transaction.CurrentEnergySupplierId);
+        Assert.Equal(message.ReceiverRole, MarketRoles.EnergySupplier);
     }
 }

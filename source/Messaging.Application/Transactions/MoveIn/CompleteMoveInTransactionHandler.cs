@@ -55,7 +55,7 @@ public class CompleteMoveInTransactionHandler : IRequestHandler<CompleteMoveInTr
         "senderid",
         "senderrole",
         transaction.CurrentEnergySupplierId,
-        "receiverrole",
+        MarketRoles.EnergySupplier,
         Guid.NewGuid().ToString(),
         _systemDateTimeProvider.Now());
         var marketActivityRecord = new MarketActivityRecord(
