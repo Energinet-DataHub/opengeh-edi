@@ -52,7 +52,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Processing.Domain.SeedWork;
-using MarketActivityRecord = Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier.MarketActivityRecord;
 
 namespace Messaging.Infrastructure.Configuration
 {
@@ -86,6 +85,12 @@ namespace Messaging.Infrastructure.Configuration
         public static CompositionRoot Initialize(IServiceCollection services)
         {
             return new CompositionRoot(services);
+        }
+
+        public CompositionRoot AddMasterDataServices(IMarketEvaluationPointProvider marketEvaluationPointProvider)
+        {
+            _services.AddScoped(_ => marketEvaluationPointProvider);
+            return this;
         }
 
         public CompositionRoot AddDatabaseContext(string connectionString)

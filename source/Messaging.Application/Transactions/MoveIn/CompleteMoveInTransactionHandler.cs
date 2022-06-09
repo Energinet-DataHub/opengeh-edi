@@ -54,7 +54,7 @@ public class CompleteMoveInTransactionHandler : IRequestHandler<CompleteMoveInTr
         "E01",
         "senderid",
         "senderrole",
-        "receiverid",
+        transaction.CurrentEnergySupplierId,
         "receiverrole",
         Guid.NewGuid().ToString(),
         _systemDateTimeProvider.Now());

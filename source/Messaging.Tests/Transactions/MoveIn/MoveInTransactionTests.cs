@@ -59,7 +59,11 @@ public class MoveInTransactionTests
 
     private static MoveInTransaction CreateTransaction()
     {
-        return new MoveInTransaction(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SystemClock.Instance.GetCurrentInstant());
+        return new MoveInTransaction(
+            Guid.NewGuid().ToString(),
+            Guid.NewGuid().ToString(),
+            SystemClock.Instance.GetCurrentInstant(),
+            Guid.NewGuid().ToString());
     }
 
     private static BusinessRequestResult BusinessRequestSucceeded()

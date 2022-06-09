@@ -27,6 +27,7 @@ namespace Messaging.Infrastructure.Transactions
             builder.Property(x => x.ProcessId);
             builder.Property(x => x.EffectiveDate);
             builder.Property(x => x.MarketEvaluationPointId);
+            builder.Property(x => x.CurrentEnergySupplierId);
             builder.Property<bool>("_started")
                 .HasColumnName("Started");
         }

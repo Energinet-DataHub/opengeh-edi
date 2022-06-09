@@ -40,6 +40,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202260021518 Remove transaction id.sql" />
     <EmbeddedResource Include="Scripts\Model\202260081922 Fix reason code column.sql" />
     <EmbeddedResource Include="Scripts\Model\202260091028 Add columns to move in transaction.sql" />
+    <EmbeddedResource Include="Scripts\Model\202260091238 Add current energy supplier column.sql" />
     <EmbeddedResource Include="Scripts\Seed\202250181248 Add reason translations.sql" />
     <None Remove="Scripts\Model\202109010720 Add Correlation to OutboxMessages.sql" />
     <EmbeddedResource Include="Scripts\Model\202109010720 Add Correlation to OutboxMessages.sql" />

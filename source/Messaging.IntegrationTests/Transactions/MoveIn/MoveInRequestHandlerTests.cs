@@ -18,6 +18,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Messaging.Application.Common;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Xml;
@@ -26,18 +27,17 @@ using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.Infrastructure.Transactions;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.IncomingMessages;
-using Messaging.IntegrationTests.Infrastructure.Transactions.MoveIn;
 using Messaging.IntegrationTests.TestDoubles;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Xunit.Categories;
-using Xunit.Sdk;
 
 namespace Messaging.IntegrationTests.Transactions.MoveIn
 {
     [IntegrationTest]
     public class MoveInRequestHandlerTests : TestBase
     {
+        private readonly MarketEvaluationPointProviderStub _marketEvaluationPointProvider;
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly MoveInRequestHandler _moveInRequestHandler;
 
@@ -46,6 +46,7 @@ namespace Messaging.IntegrationTests.Transactions.MoveIn
         {
             _outgoingMessageStore = GetService<IOutgoingMessageStore>();
             _moveInRequestHandler = GetService<MoveInRequestHandler>();
+            _marketEvaluationPointProvider = (MarketEvaluationPointProviderStub)GetService<IMarketEvaluationPointProvider>();
         }
 
         [Fact]
@@ -96,11 +97,6 @@ namespace Messaging.IntegrationTests.Transactions.MoveIn
             await AssertRejectMessage(rejectMessage).ConfigureAwait(false);
         }
 
-        private static IncomingMessageBuilder MessageBuilder()
-        {
-            return new IncomingMessageBuilder();
-        }
-
         private static void AssertHeader(XDocument document, OutgoingMessage message, string expectedReasonCode)
         {
             Assert.NotEmpty(AssertXmlMessage.GetMessageHeaderValue(document, "mRID")!);
@@ -112,6 +108,12 @@ namespace Messaging.IntegrationTests.Transactions.MoveIn
             AssertXmlMessage.AssertHasHeaderValue(document, "receiver_MarketParticipant.mRID", message.RecipientId);
             AssertXmlMessage.AssertHasHeaderValue(document, "receiver_MarketParticipant.marketRole.type", message.ReceiverRole);
             AssertXmlMessage.AssertHasHeaderValue(document, "reason.code", expectedReasonCode);
+        }
+
+        private IncomingMessageBuilder MessageBuilder()
+        {
+            return new IncomingMessageBuilder()
+                .WithMarketEvaluationPointId(_marketEvaluationPointProvider.MarketEvaluationPoints.First().GsrnNumber);
         }
 
         private async Task AssertRejectMessage(OutgoingMessage rejectMessage)

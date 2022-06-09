@@ -31,6 +31,13 @@ namespace Messaging.IntegrationTests.IncomingMessages
         private string _senderId = "NotSet";
         private string _receiverId = DataHubDetails.IdentificationNumber;
         private string? _consumerName = "NotSet";
+        private string _marketEvaluationPointId = "NotSet";
+
+        internal IncomingMessageBuilder WithMarketEvaluationPointId(string marketEvaluationPointId)
+        {
+            _marketEvaluationPointId = marketEvaluationPointId;
+            return this;
+        }
 
         internal IncomingMessageBuilder WithProcessType(string processType)
         {
@@ -73,7 +80,7 @@ namespace Messaging.IntegrationTests.IncomingMessages
                 ConsumerName = _consumerName,
                 EffectiveDate = _effectiveDate.ToString(),
                 EnergySupplierId = "fake",
-                MarketEvaluationPointId = "fake",
+                MarketEvaluationPointId = _marketEvaluationPointId,
             };
         }
 
