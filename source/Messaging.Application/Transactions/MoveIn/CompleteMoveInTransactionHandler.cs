@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.Common;
+using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.GenericNotification;
@@ -52,7 +53,7 @@ public class CompleteMoveInTransactionHandler : IRequestHandler<CompleteMoveInTr
 
         var header = new MessageHeader(
         "E01",
-        "senderid",
+        DataHubDetails.IdentificationNumber,
         "senderrole",
         transaction.CurrentEnergySupplierId,
         MarketRoles.EnergySupplier,

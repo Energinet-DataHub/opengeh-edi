@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Messaging.Application.Common;
+using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.GenericNotification;
@@ -74,5 +75,6 @@ public class CompleteMoveInTests : TestBase
             .From<MarketActivityRecord>(message!.MarketActivityRecordPayload);
         Assert.Equal(message.ReceiverId, transaction.CurrentEnergySupplierId);
         Assert.Equal(message.ReceiverRole, MarketRoles.EnergySupplier);
+        Assert.Equal(message.SenderId, DataHubDetails.IdentificationNumber);
     }
 }
