@@ -9,6 +9,3 @@ SET ReasonCode =  CASE
     WHEN DocumentType = 'RejectRequestChangeOfSupplier' THEN 'A02'
 END
 WHERE DocumentType IN ('ConfirmRequestChangeOfSupplier', 'RejectRequestChangeOfSupplier')
-GO
-ALTER TABLE [b2b].[OutgoingMessages]
-ALTER COLUMN ReasonCode [nvarchar](10) NOT NULL;
