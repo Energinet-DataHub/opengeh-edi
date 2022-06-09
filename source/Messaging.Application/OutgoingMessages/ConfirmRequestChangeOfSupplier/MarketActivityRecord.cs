@@ -14,19 +14,5 @@
 
 namespace Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier
 {
-    public class MarketActivityRecord
-    {
-        public MarketActivityRecord(string id, string originalTransactionId, string marketEvaluationPointId)
-        {
-            Id = id;
-            OriginalTransactionId = originalTransactionId;
-            MarketEvaluationPointId = marketEvaluationPointId;
-        }
-
-        public string Id { get; }
-
-        public string OriginalTransactionId { get; }
-
-        public string MarketEvaluationPointId { get; }
-    }
+    public record MarketActivityRecord(string Id, string OriginalTransactionId, string MarketEvaluationPointId);
 }
