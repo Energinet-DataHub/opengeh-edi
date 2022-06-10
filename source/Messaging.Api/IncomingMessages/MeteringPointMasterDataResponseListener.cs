@@ -18,21 +18,21 @@ using Microsoft.Extensions.Logging;
 
 namespace Messaging.Api.IncomingMessages;
 
-public class MasterDataResponseListener
+public class MeteringPointMasterDataResponseListener
 {
-    private readonly ILogger<MasterDataResponseListener> _logger;
+    private readonly ILogger<MeteringPointMasterDataResponseListener> _logger;
 
-    public MasterDataResponseListener(ILogger<MasterDataResponseListener> logger)
+    public MeteringPointMasterDataResponseListener(ILogger<MeteringPointMasterDataResponseListener> logger)
     {
         _logger = logger;
     }
 
-    [Function("MasterDataResponseListener")]
-    public void Run([ServiceBusTrigger("%MASTER_DATA_RESPONSE_QUEUE_NAME%", Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS_LISTENER")] byte[] data, FunctionContext context)
+    [Function("MeteringPointMasterDataResponseListener")]
+    public void Run([ServiceBusTrigger("%METERING_POINT_MASTER_DATA_RESPONSE_QUEUE_NAME%", Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS_LISTENER")] byte[] data, FunctionContext context)
     {
         if (data == null) throw new ArgumentNullException(nameof(data));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        _logger.LogInformation($"C# ServiceBus queue trigger function processed message: {data}");
+        _logger.LogInformation($"Master data response received: {data}");
     }
 }
