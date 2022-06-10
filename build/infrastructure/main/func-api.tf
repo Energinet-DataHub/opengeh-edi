@@ -55,6 +55,9 @@ module "func_receiver" {
     MESSAGE_REQUEST_QUEUE                                         = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sbq-marketroles-name)",
     MOVE_IN_REQUEST_ENDPOINT                                      = "https://func-processing-${lower(var.domain_name_short)}-${lower(var.environment_short)}-${lower(var.environment_instance)}.azurewebsites.net/api/MoveIn"
     SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS_LISTENER = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-listen-connection-string)",
+    SERVICE_BUS_CONNECTION_SENDER_STRING                          = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-send-connection-string)",
+    MASTER_DATA_RESPONSE_QUEUE_NAME                               = data.azurerm_key_vault_secret.sbq_metering_point_master_data_response_name.value
+    MASTER_DATA_REQUEST_QUEUE_NAME                                = data.azurerm_key_vault_secret.sbq_metering_point_master_data_request_name.value
   }
 
   tags = azurerm_resource_group.this.tags
