@@ -23,6 +23,5 @@
     "SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS_LISTENER": "<service bus connection string for integration events listener permissions>",
     "SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS_LISTENER": "<service bus connection string for integration events listener permissions>",
     "MASTER_DATA_RESPONSE_QUEUE_NAME": "<Master data response queue name>",
-    "MASTER_DATA_RESPONSE_QUEUE_CONNECTION_STRING": "<Master data response queue connection string>"
   }
 }
