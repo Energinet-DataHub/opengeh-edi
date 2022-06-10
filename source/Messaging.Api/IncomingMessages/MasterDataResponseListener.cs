@@ -28,7 +28,7 @@ public class MasterDataResponseListener
     }
 
     [Function("MasterDataResponseListener")]
-    public void Run([ServiceBusTrigger("%MASTER_DATA_RESPONSE_QUEUE_NAME%", Connection = "MASTER_DATA_RESPONSE_QUEUE_CONNECTION_STRING")] byte[] data, FunctionContext context)
+    public void Run([ServiceBusTrigger("%MASTER_DATA_RESPONSE_QUEUE_NAME%", Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS_LISTENER")] byte[] data, FunctionContext context)
     {
         if (data == null) throw new ArgumentNullException(nameof(data));
         if (context == null) throw new ArgumentNullException(nameof(context));
