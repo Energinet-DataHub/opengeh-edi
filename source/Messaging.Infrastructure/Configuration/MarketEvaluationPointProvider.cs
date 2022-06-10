@@ -12,24 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
+using System.Threading.Tasks;
+using Messaging.Application.Common;
+
+namespace Messaging.Infrastructure.Configuration;
+
+public class MarketEvaluationPointProvider : IMarketEvaluationPointProvider
 {
-    public class MarketActivityRecord
+    public Task<MarketEvaluationPoint?> GetByGsrnNumberAsync(string marketEvaluationPointId)
     {
-        public string Id { get; init; } = string.Empty;
-
-        public string? ConsumerId { get; init; }
-
-        public string? BalanceResponsibleId { get; init; }
-
-        public string? EnergySupplierId { get; init; }
-
-        public string MarketEvaluationPointId { get; init; } = string.Empty;
-
-        public string? ConsumerName { get; init; }
-
-        public string EffectiveDate { get; init; } = string.Empty;
-
-        public string? ConsumerIdType { get; init; }
+        return Task.FromResult(default(MarketEvaluationPoint));
     }
 }

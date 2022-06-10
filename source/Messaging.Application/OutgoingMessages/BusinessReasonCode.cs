@@ -12,24 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
+namespace Messaging.Application.OutgoingMessages;
+
+public class BusinessReasonCode : EnumerationType
 {
-    public class MarketActivityRecord
+    public static readonly BusinessReasonCode CustomerMoveInOrMoveOut = new(0, nameof(CustomerMoveInOrMoveOut), "E01");
+
+    private BusinessReasonCode(int id, string name, string code)
+        : base(id, name)
     {
-        public string Id { get; init; } = string.Empty;
-
-        public string? ConsumerId { get; init; }
-
-        public string? BalanceResponsibleId { get; init; }
-
-        public string? EnergySupplierId { get; init; }
-
-        public string MarketEvaluationPointId { get; init; } = string.Empty;
-
-        public string? ConsumerName { get; init; }
-
-        public string EffectiveDate { get; init; } = string.Empty;
-
-        public string? ConsumerIdType { get; init; }
+        Code = code;
     }
+
+    public string Code { get; }
 }

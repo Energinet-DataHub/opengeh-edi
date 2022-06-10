@@ -64,7 +64,7 @@ namespace Messaging.IntegrationTests.Infrastructure.OutgoingMessages
 
         private OutgoingMessage CreateOutgoingMessage()
         {
-            var transaction = IncomingMessageBuilder.CreateMessage();
+            var transaction = new IncomingMessageBuilder().Build();
             return new OutgoingMessage(
                 "FakeDocumentType",
                 transaction.Message.ReceiverId,

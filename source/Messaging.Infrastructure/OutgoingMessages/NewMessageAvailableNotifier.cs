@@ -44,7 +44,7 @@ namespace Messaging.Infrastructure.OutgoingMessages
             var documentType = ExtractDocumentType(message);
             return new DataAvailableNotificationDto(
                 message.Id,
-                new GlobalLocationNumberDto(message.RecipientId),
+                new GlobalLocationNumberDto(message.ReceiverId),
                 new MessageTypeDto(ExtractMessageTypeFrom(message.ProcessType, documentType)),
                 DomainOrigin.MarketRoles,
                 true,

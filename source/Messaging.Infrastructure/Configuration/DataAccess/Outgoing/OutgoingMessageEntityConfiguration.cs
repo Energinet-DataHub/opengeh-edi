@@ -30,7 +30,8 @@ namespace Messaging.Infrastructure.Configuration.DataAccess.Outgoing
             builder.Property(x => x.DocumentType);
             builder.Property(x => x.ReasonCode);
             builder.Property(x => x.IsPublished);
-            builder.Property(x => x.RecipientId);
+            builder.Property(x => x.ReceiverId)
+                .HasColumnName("RecipientId");
             builder.Property(x => x.ReceiverRole);
             builder.Property(x => x.CorrelationId);
             builder.Property(x => x.OriginalMessageId);

@@ -16,16 +16,23 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Messaging.Application.Common;
+using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.OutgoingMessages;
 
 namespace Messaging.Application.Transactions.MoveIn;
 
 public class CompleteMoveInTransactionHandler : IRequestHandler<CompleteMoveInTransaction, Unit>
 {
     private readonly IMoveInTransactionRepository _transactionRepository;
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly MoveInNotifications _notifications;
 
-    public CompleteMoveInTransactionHandler(IMoveInTransactionRepository transactionRepository)
+    public CompleteMoveInTransactionHandler(IMoveInTransactionRepository transactionRepository, IMarketActivityRecordParser marketActivityRecordParser, IOutgoingMessageStore outgoingMessageStore, IUnitOfWork unitOfWork, MoveInNotifications notifications)
     {
         _transactionRepository = transactionRepository;
+        _unitOfWork = unitOfWork;
+        _notifications = notifications;
     }
 
     public async Task<Unit> Handle(CompleteMoveInTransaction request, CancellationToken cancellationToken)
@@ -36,6 +43,10 @@ public class CompleteMoveInTransactionHandler : IRequestHandler<CompleteMoveInTr
         {
             throw new TransactionNotFoundException(request.ProcessId);
         }
+
+        _notifications.InformCurrentEnergySupplierAboutEndOfSupply(transaction);
+
+        await _unitOfWork.CommitAsync().ConfigureAwait(false);
 
         return Unit.Value;
     }

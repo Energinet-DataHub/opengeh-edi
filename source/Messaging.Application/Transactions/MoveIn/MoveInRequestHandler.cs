@@ -23,6 +23,7 @@ using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.IncomingMessages;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
+using NodaTime.Text;
 using MarketActivityRecord = Messaging.Application.IncomingMessages.RequestChangeOfSupplier.MarketActivityRecord;
 
 namespace Messaging.Application.Transactions.MoveIn
@@ -36,6 +37,7 @@ namespace Messaging.Application.Transactions.MoveIn
         private readonly IMarketActivityRecordParser _marketActivityRecordParser;
         private readonly IMoveInRequester _moveInRequester;
         private readonly IValidationErrorTranslator _validationErrorTranslator;
+        private readonly IMarketEvaluationPointProvider _marketEvaluationPointProvider;
 
         public MoveInRequestHandler(
             IMoveInTransactionRepository moveInTransactionRepository,
@@ -44,7 +46,8 @@ namespace Messaging.Application.Transactions.MoveIn
             ICorrelationContext correlationContext,
             IMarketActivityRecordParser marketActivityRecordParser,
             IMoveInRequester moveInRequester,
-            IValidationErrorTranslator validationErrorTranslator)
+            IValidationErrorTranslator validationErrorTranslator,
+            IMarketEvaluationPointProvider marketEvaluationPointProvider)
         {
             _moveInTransactionRepository = moveInTransactionRepository;
             _outgoingMessageStore = outgoingMessageStore;
@@ -53,12 +56,21 @@ namespace Messaging.Application.Transactions.MoveIn
             _marketActivityRecordParser = marketActivityRecordParser;
             _moveInRequester = moveInRequester;
             _validationErrorTranslator = validationErrorTranslator;
+            _marketEvaluationPointProvider = marketEvaluationPointProvider;
         }
 
         public async Task HandleAsync(IncomingMessage incomingMessage)
         {
             if (incomingMessage == null) throw new ArgumentNullException(nameof(incomingMessage));
-            var transaction = new MoveInTransaction(incomingMessage.MarketActivityRecord.Id);
+
+            var marketEvaluationPoint =
+                await _marketEvaluationPointProvider.GetByGsrnNumberAsync(incomingMessage.MarketActivityRecord.MarketEvaluationPointId).ConfigureAwait(false);
+
+            var transaction = new MoveInTransaction(
+                incomingMessage.MarketActivityRecord.Id,
+                incomingMessage.MarketActivityRecord.MarketEvaluationPointId,
+                InstantPattern.General.Parse(incomingMessage.MarketActivityRecord.EffectiveDate).GetValueOrThrow(),
+                marketEvaluationPoint!.GlnNumberOfEnergySupplier);
 
             var businessProcessResult = await InvokeBusinessProcessAsync(incomingMessage).ConfigureAwait(false);
             if (businessProcessResult.Success == false)
@@ -97,7 +109,7 @@ namespace Messaging.Application.Transactions.MoveIn
                 incomingMessage.MarketActivityRecord.ConsumerName,
                 incomingMessage.MarketActivityRecord.EnergySupplierId,
                 incomingMessage.MarketActivityRecord.MarketEvaluationPointId,
-                incomingMessage.MarketActivityRecord.EffectiveDate,
+                incomingMessage.MarketActivityRecord.EffectiveDate.ToString(),
                 incomingMessage.MarketActivityRecord.ConsumerId,
                 GetConsumerIdType(incomingMessage.MarketActivityRecord));
             return _moveInRequester.InvokeAsync(businessProcess);

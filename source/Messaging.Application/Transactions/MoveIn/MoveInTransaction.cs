@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using NodaTime;
 
 namespace Messaging.Application.Transactions.MoveIn
 {
@@ -22,9 +23,12 @@ namespace Messaging.Application.Transactions.MoveIn
         private readonly List<object> _domainEvents = new List<object>();
         private bool _started;
 
-        public MoveInTransaction(string transactionId)
+        public MoveInTransaction(string transactionId, string marketEvaluationPointId, Instant effectiveDate, string currentEnergySupplierId)
         {
             TransactionId = transactionId;
+            MarketEvaluationPointId = marketEvaluationPointId;
+            EffectiveDate = effectiveDate;
+            CurrentEnergySupplierId = currentEnergySupplierId;
         }
 
         public string TransactionId { get; }
@@ -32,6 +36,12 @@ namespace Messaging.Application.Transactions.MoveIn
         public string? ProcessId { get; private set; }
 
         public IReadOnlyCollection<object> DomainEvents => _domainEvents.AsReadOnly();
+
+        public string MarketEvaluationPointId { get; }
+
+        public Instant EffectiveDate { get; }
+
+        public string CurrentEnergySupplierId { get; }
 
         public void Start(BusinessRequestResult businessRequestResult)
         {

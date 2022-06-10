@@ -12,18 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Linq;
 using System.Threading.Tasks;
+using Messaging.Application.Common;
+using Messaging.Application.Configuration;
+using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.OutgoingMessages;
+using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.IntegrationTests.Fixtures;
+using Messaging.IntegrationTests.TestDoubles;
+using Processing.Domain.SeedWork;
 using Xunit;
 
 namespace Messaging.IntegrationTests.Transactions.MoveIn;
 
 public class CompleteMoveInTests : TestBase
 {
+    private readonly MarketEvaluationPointProviderStub _marketEvaluationPointProvider;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly IMoveInTransactionRepository _transactionRepository;
+
     public CompleteMoveInTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
+        _marketEvaluationPointProvider = (MarketEvaluationPointProviderStub)GetService<IMarketEvaluationPointProvider>();
+        _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
+        _transactionRepository = GetService<IMoveInTransactionRepository>();
     }
 
     [Fact]
@@ -33,5 +49,50 @@ public class CompleteMoveInTests : TestBase
         var command = new CompleteMoveInTransaction(processId);
 
         await Assert.ThrowsAsync<TransactionNotFoundException>(() => InvokeCommandAsync(command)).ConfigureAwait(false);
+    }
+
+    [Fact]
+    public async Task Current_energy_supplier_is_notified_when_consumer_move_in_is_completed()
+    {
+        var transaction = await CompleteMoveIn().ConfigureAwait(false);
+
+        AssertThat(transaction.TransactionId, DocumentType.GenericNotification.ToString(), BusinessReasonCode.CustomerMoveInOrMoveOut.Code)
+            .HasReceiverId(transaction.CurrentEnergySupplierId)
+            .HasReceiverRole(MarketRoles.EnergySupplier)
+            .HasSenderId(DataHubDetails.IdentificationNumber)
+            .HasSenderRole(MarketRoles.MeteringPointAdministrator)
+            .HasReasonCode(null)
+            .WithMarketActivityRecord()
+                .HasId()
+                .HasValidityStart(transaction.EffectiveDate.ToDateTimeUtc())
+                .HasOriginalTransactionId(transaction.TransactionId)
+                .HasMarketEvaluationPointId(transaction.MarketEvaluationPointId);
+    }
+
+    private async Task<MoveInTransaction> CompleteMoveIn()
+    {
+        var transaction = await StartMoveInTransaction();
+        await InvokeCommandAsync(new CompleteMoveInTransaction(transaction.ProcessId!)).ConfigureAwait(false);
+        return transaction;
+    }
+
+    private async Task<MoveInTransaction> StartMoveInTransaction()
+    {
+        var marketEvaluationPoint = _marketEvaluationPointProvider.MarketEvaluationPoints.First();
+        var transaction = new MoveInTransaction(
+            Guid.NewGuid().ToString(),
+            marketEvaluationPoint.GsrnNumber,
+            _systemDateTimeProvider.Now(),
+            marketEvaluationPoint.GlnNumberOfEnergySupplier);
+
+        transaction.Start(BusinessRequestResult.Succeeded(Guid.NewGuid().ToString()));
+        _transactionRepository.Add(transaction);
+        await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
+        return transaction;
+    }
+
+    private AssertOutgoingMessage AssertThat(string transactionId, string documentType, string processType)
+    {
+        return AssertOutgoingMessage.OutgoingMessage(transactionId, documentType, processType, GetService<IDbConnectionFactory>());
     }
 }

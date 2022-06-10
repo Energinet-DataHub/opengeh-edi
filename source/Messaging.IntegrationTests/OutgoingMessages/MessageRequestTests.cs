@@ -14,9 +14,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Messaging.Application.Common;
 using Messaging.Application.IncomingMessages;
-using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.IntegrationTests.Fixtures;
@@ -32,6 +33,7 @@ namespace Messaging.IntegrationTests.OutgoingMessages
         private readonly MessageRequestHandler _messageRequestHandler;
         private readonly MoveInRequestHandler _moveInRequestHandler;
         private readonly MessageDispatcherSpy _messageDispatcherSpy;
+        private readonly MarketEvaluationPointProviderStub _marketEvaluationPointProviderStub;
 
         public MessageRequestTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
@@ -40,12 +42,13 @@ namespace Messaging.IntegrationTests.OutgoingMessages
             _moveInRequestHandler = GetService<MoveInRequestHandler>();
             _messageRequestHandler = GetService<MessageRequestHandler>();
             _messageDispatcherSpy = (MessageDispatcherSpy)GetService<IMessageDispatcher>();
+            _marketEvaluationPointProviderStub = (MarketEvaluationPointProviderStub)GetService<IMarketEvaluationPointProvider>();
         }
 
         [Fact]
         public async Task Messages_must_originate_from_the_same_type_of_business_process()
         {
-            var builder = new IncomingMessageBuilder();
+            var builder = MessageBuilder();
             var message1 = await MessageArrived(
                 builder
                     .WithProcessType(ProcessType.MoveIn.Code)
@@ -70,7 +73,7 @@ namespace Messaging.IntegrationTests.OutgoingMessages
         [Fact]
         public async Task Messages_must_same_receipient()
         {
-            var builder = new IncomingMessageBuilder();
+            var builder = MessageBuilder();
             var message1 = await MessageArrived(
                 builder
                     .WithSenderId("SenderId1")
@@ -120,7 +123,8 @@ namespace Messaging.IntegrationTests.OutgoingMessages
 
         private async Task<IncomingMessage> MessageArrived()
         {
-            var incomingMessage = IncomingMessageBuilder.CreateMessage();
+            var incomingMessage = MessageBuilder()
+                .Build();
             await _moveInRequestHandler.HandleAsync(incomingMessage).ConfigureAwait(false);
             return incomingMessage;
         }
@@ -129,6 +133,13 @@ namespace Messaging.IntegrationTests.OutgoingMessages
         {
             await _moveInRequestHandler.HandleAsync(arrivedMessage).ConfigureAwait(false);
             return arrivedMessage;
+        }
+
+        private IncomingMessageBuilder MessageBuilder()
+        {
+            return new IncomingMessageBuilder()
+                .WithMarketEvaluationPointId(_marketEvaluationPointProviderStub.MarketEvaluationPoints.First()
+                    .GsrnNumber);
         }
     }
 }
