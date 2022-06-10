@@ -45,7 +45,7 @@ public class MoveInNotifications
             transaction.CurrentEnergySupplierId,
             Guid.NewGuid().ToString(),
             transaction.TransactionId,
-            "E01",
+            BusinessReasonCode.CustomerMoveInOrMoveOut.Code,
             MarketRoles.EnergySupplier,
             DataHubDetails.IdentificationNumber,
             MarketRoles.MeteringPointAdministrator,

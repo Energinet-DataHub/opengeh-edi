@@ -56,7 +56,7 @@ public class CompleteMoveInTests : TestBase
     {
         var transaction = await CompleteMoveIn().ConfigureAwait(false);
 
-        AssertThat(transaction.TransactionId, DocumentType.GenericNotification.ToString(), "E01")
+        AssertThat(transaction.TransactionId, DocumentType.GenericNotification.ToString(), BusinessReasonCode.CustomerMoveInOrMoveOut.Code)
             .HasReceiverId(transaction.CurrentEnergySupplierId)
             .HasReceiverRole(MarketRoles.EnergySupplier)
             .HasSenderId(DataHubDetails.IdentificationNumber)
