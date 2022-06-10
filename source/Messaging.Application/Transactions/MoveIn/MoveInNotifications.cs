@@ -41,7 +41,7 @@ public class MoveInNotifications
             transaction.EffectiveDate);
 
         var message = new OutgoingMessage(
-            "GenericNotification",
+            DocumentType.GenericNotification.ToString(),
             transaction.CurrentEnergySupplierId,
             Guid.NewGuid().ToString(),
             transaction.TransactionId,

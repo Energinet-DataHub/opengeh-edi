@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Messaging.Application.Common;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.OutgoingMessages;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.IntegrationTests.Fixtures;
@@ -55,7 +56,7 @@ public class CompleteMoveInTests : TestBase
     {
         var transaction = await CompleteMoveIn().ConfigureAwait(false);
 
-        AssertThat(transaction.TransactionId, "GenericNotification", "E01")
+        AssertThat(transaction.TransactionId, DocumentType.GenericNotification.ToString(), "E01")
             .HasReceiverId(transaction.CurrentEnergySupplierId)
             .HasReceiverRole(MarketRoles.EnergySupplier)
             .HasSenderId(DataHubDetails.IdentificationNumber)
