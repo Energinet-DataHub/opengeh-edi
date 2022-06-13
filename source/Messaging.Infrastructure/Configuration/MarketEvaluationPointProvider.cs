@@ -19,8 +19,8 @@ namespace Messaging.Infrastructure.Configuration;
 
 public class MarketEvaluationPointProvider : IMarketEvaluationPointProvider
 {
-    public Task<MarketEvaluationPoint?> GetByGsrnNumberAsync(string marketEvaluationPointId)
+    public Task<MarketEvaluationPoint> GetByGsrnNumberAsync(string marketEvaluationPointId)
     {
-        return Task.FromResult(default(MarketEvaluationPoint));
+        return Task.FromResult(new MarketEvaluationPoint(null, marketEvaluationPointId));
     }
 }

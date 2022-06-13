@@ -23,7 +23,7 @@ namespace Messaging.Application.Transactions.MoveIn
         private readonly List<object> _domainEvents = new List<object>();
         private bool _started;
 
-        public MoveInTransaction(string transactionId, string marketEvaluationPointId, Instant effectiveDate, string currentEnergySupplierId)
+        public MoveInTransaction(string transactionId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId)
         {
             TransactionId = transactionId;
             MarketEvaluationPointId = marketEvaluationPointId;
@@ -41,7 +41,7 @@ namespace Messaging.Application.Transactions.MoveIn
 
         public Instant EffectiveDate { get; }
 
-        public string CurrentEnergySupplierId { get; }
+        public string? CurrentEnergySupplierId { get; }
 
         public void Start(BusinessRequestResult businessRequestResult)
         {

@@ -34,6 +34,11 @@ public class MoveInNotifications
     public void InformCurrentEnergySupplierAboutEndOfSupply(MoveInTransaction transaction)
     {
         if (transaction == null) throw new ArgumentNullException(nameof(transaction));
+        if (transaction.CurrentEnergySupplierId is null)
+        {
+            throw new MoveInException("Energy supplier number cannot be empty.");
+        }
+
         var marketActivityRecord = new MarketActivityRecord(
             Guid.NewGuid().ToString(),
             transaction.TransactionId,

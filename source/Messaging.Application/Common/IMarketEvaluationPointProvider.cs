@@ -25,5 +25,5 @@ public interface IMarketEvaluationPointProvider
     /// Find a market evaluation point by GSRN-number
     /// </summary>
     /// <param name="marketEvaluationPointId"></param>
-    Task<MarketEvaluationPoint?> GetByGsrnNumberAsync(string marketEvaluationPointId);
+    Task<MarketEvaluationPoint> GetByGsrnNumberAsync(string marketEvaluationPointId);
 }
