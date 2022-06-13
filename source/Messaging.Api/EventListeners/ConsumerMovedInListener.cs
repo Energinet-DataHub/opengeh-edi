@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using EnergySupplier.IntegrationEvents;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
@@ -35,7 +36,7 @@ public class ConsumerMovedInListener
         if (data == null) throw new ArgumentNullException(nameof(data));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        var consumerMovedIn = Contracts.IntegrationEvents.ConsumerMovedIn.Parser.ParseFrom(data);
+        var consumerMovedIn = ConsumerMovedIn.Parser.ParseFrom(data);
         _logger.LogInformation($"Received consumer moved in event: {consumerMovedIn}");
     }
 }
