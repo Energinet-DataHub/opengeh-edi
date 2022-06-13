@@ -29,9 +29,9 @@ public class MarketEvaluationPointProviderStub : IMarketEvaluationPointProvider
 
     public IReadOnlyCollection<MarketEvaluationPoint> MarketEvaluationPoints => _marketEvaluationPoints.AsReadOnly();
 
-    public Task<MarketEvaluationPoint?> GetByGsrnNumberAsync(string marketEvaluationPointId)
+    public Task<MarketEvaluationPoint> GetByGsrnNumberAsync(string marketEvaluationPointId)
     {
-        return Task.FromResult(_marketEvaluationPoints.FirstOrDefault(x => x.GsrnNumber.Equals(marketEvaluationPointId, StringComparison.OrdinalIgnoreCase)));
+        return Task.FromResult(_marketEvaluationPoints.First(x => x.GsrnNumber.Equals(marketEvaluationPointId, StringComparison.OrdinalIgnoreCase)));
     }
 
     public void Add(MarketEvaluationPoint marketEvaluationPoint)
