@@ -24,7 +24,7 @@ public class MarketEvaluationPointProviderStub : IMarketEvaluationPointProvider
 {
     private readonly List<MarketEvaluationPoint> _marketEvaluationPoints = new()
     {
-        new MarketEvaluationPoint(Guid.NewGuid().ToString().Substring(10)),
+        new MarketEvaluationPoint(Guid.NewGuid().ToString().Substring(5), Guid.NewGuid().ToString().Substring(10)),
     };
 
     public IReadOnlyCollection<MarketEvaluationPoint> MarketEvaluationPoints => _marketEvaluationPoints.AsReadOnly();

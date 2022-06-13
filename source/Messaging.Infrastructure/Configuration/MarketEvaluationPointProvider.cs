@@ -21,6 +21,6 @@ public class MarketEvaluationPointProvider : IMarketEvaluationPointProvider
 {
     public Task<MarketEvaluationPoint> GetByGsrnNumberAsync(string marketEvaluationPointId)
     {
-        return Task.FromResult(new MarketEvaluationPoint(string.Empty, marketEvaluationPointId));
+        return Task.FromResult(new MarketEvaluationPoint(null, marketEvaluationPointId));
     }
 }
