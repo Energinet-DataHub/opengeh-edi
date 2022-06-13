@@ -112,9 +112,12 @@ public class MeteringPointDbService : IDisposable
             case "DDK": return "BalanceResponsibleParty";
             case "DDM": return "GridAccessProvider";
             case "DDQ": return "BalancePowerSupplier";
+            case "DDX": return "ImBalanceSettlementResponsible";
             case "DDZ": return "MeteringPointAdministrator";
+            case "DEA": return "MeteredDataAggregator";
             case "EZ": return "SystemOperator";
             case "MDR": return "MeteredDataResponsible";
+            case "STS": return "DanishEnegeryAgency";
             default: throw new InvalidOperationException("Role not known: " + ediRole);
         }
     }
