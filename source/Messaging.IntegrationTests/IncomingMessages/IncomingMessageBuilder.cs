@@ -27,7 +27,7 @@ namespace Messaging.IntegrationTests.IncomingMessages
         private readonly string _senderRole = "DDZ";
         private readonly Instant _effectiveDate = SystemClock.Instance.GetCurrentInstant();
         private readonly string _messageId = Guid.NewGuid().ToString();
-        private string _processType = "E03";
+        private string _processType = "NotSet";
         private string _senderId = "NotSet";
         private string _receiverId = DataHubDetails.IdentificationNumber;
         private string? _consumerName = "NotSet";
