@@ -14,10 +14,11 @@
 
 using System;
 using Messaging.Application.OutgoingMessages;
-using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
+using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Infrastructure.Configuration.DataAccess.Outgoing;
 using Messaging.Infrastructure.Configuration.InternalCommands;
+using Messaging.Infrastructure.MasterData.MarketEvaluationPoints;
 using Messaging.Infrastructure.Transactions;
 using Microsoft.EntityFrameworkCore;
 
@@ -41,6 +42,8 @@ namespace Messaging.Infrastructure.Configuration.DataAccess
 
         public DbSet<QueuedInternalCommand> QueuedInternalCommands { get; private set; }
 
+        public DbSet<MarketEvaluationPoint> MarketEvaluationPoints { get; private set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
@@ -48,6 +51,7 @@ namespace Messaging.Infrastructure.Configuration.DataAccess
             modelBuilder.ApplyConfiguration(new TransactionEntityConfiguration());
             modelBuilder.ApplyConfiguration(new OutgoingMessageEntityConfiguration());
             modelBuilder.ApplyConfiguration(new QueuedInternalCommandEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new MarketEvaluationPointEntityConfiguration());
         }
     }
 }
