@@ -42,6 +42,11 @@ namespace Messaging.ArchitectureTests
                 .SelectMany(GetConstructorParameters);
         }
 
+        public static Func<Type, IEnumerable<Type>> FindAllConstructorDependenciesForType()
+        {
+            return type => GetConstructorParameters(GetOnePublicConstructor(type));
+        }
+
         public static Func<Type, IEnumerable<Type>, IEnumerable<Type>> FindAllTypesThatImplementType()
         {
             return (targetType, types) =>
@@ -54,11 +59,11 @@ namespace Messaging.ArchitectureTests
                 types.Where(t => t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == targetType));
         }
 
-        public static Func<IEnumerable<Type>, Type, IEnumerable<Type>> MapToUnderlyingType()
+        public static Func<Type, Type, IEnumerable<Type>> MapToUnderlyingType()
         {
-            return (types, targetType) =>
+            return (type, targetType) =>
             {
-                return types.SelectMany(t => t.GetInterfaces())
+                return type.GetInterfaces()
                     .Where(i => i.IsGenericType && i.GetGenericTypeDefinition().IsAssignableFrom(targetType));
             };
         }
