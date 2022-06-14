@@ -20,12 +20,12 @@ using Messaging.Application.Common;
 using Messaging.Application.IncomingMessages;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.Transactions.MoveIn;
+using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Fixtures;
-using Messaging.IntegrationTests.IncomingMessages;
 using Messaging.IntegrationTests.TestDoubles;
 using Xunit;
 
-namespace Messaging.IntegrationTests.OutgoingMessages
+namespace Messaging.IntegrationTests.Application.OutgoingMessages
 {
     public class MessageRequestTests : TestBase
     {

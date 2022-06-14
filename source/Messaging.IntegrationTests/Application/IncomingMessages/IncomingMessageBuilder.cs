@@ -18,7 +18,7 @@ using Messaging.Application.IncomingMessages;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using NodaTime;
 
-namespace Messaging.IntegrationTests.IncomingMessages
+namespace Messaging.IntegrationTests.Application.IncomingMessages
 {
     internal class IncomingMessageBuilder
     {

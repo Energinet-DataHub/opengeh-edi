@@ -29,6 +29,7 @@ using Messaging.Application.Common.Reasons;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.MasterData.MarketEvaluationPoints;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
@@ -36,6 +37,7 @@ using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Xml.SchemaStore;
 using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Messages;
+using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Common.Reasons;
 using Messaging.Infrastructure.Configuration.Authentication;
@@ -44,6 +46,7 @@ using Messaging.Infrastructure.Configuration.InternalCommands;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.Configuration.SystemTime;
 using Messaging.Infrastructure.IncomingMessages;
+using Messaging.Infrastructure.MasterData.MarketEvaluationPoints;
 using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.Infrastructure.Transactions;
 using Messaging.Infrastructure.Transactions.MoveIn;
@@ -80,6 +83,7 @@ namespace Messaging.Infrastructure.Configuration
             AddXmlSchema(services);
             AddInternalCommandsProcessing();
             AddMessageGenerationServices();
+            AddMasterDataServices();
         }
 
         public static CompositionRoot Initialize(IServiceCollection services)
@@ -245,6 +249,12 @@ namespace Messaging.Infrastructure.Configuration
         {
             var configuration = new MediatRServiceConfiguration();
             ServiceRegistrar.AddRequiredServices(_services, configuration);
+        }
+
+        private void AddMasterDataServices()
+        {
+            _services.AddScoped<IMarketEvaluationPointRepository, MarketEvaluationPointRepository>();
+            _services.AddTransient<IRequestHandler<SetEnergySupplier, Unit>, SetEnergySupplierHandler>();
         }
     }
 }
