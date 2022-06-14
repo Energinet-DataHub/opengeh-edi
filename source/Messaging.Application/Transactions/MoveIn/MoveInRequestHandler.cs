@@ -70,7 +70,7 @@ namespace Messaging.Application.Transactions.MoveIn
                 incomingMessage.MarketActivityRecord.Id,
                 incomingMessage.MarketActivityRecord.MarketEvaluationPointId,
                 InstantPattern.General.Parse(incomingMessage.MarketActivityRecord.EffectiveDate).GetValueOrThrow(),
-                marketEvaluationPoint!.GlnNumberOfEnergySupplier);
+                marketEvaluationPoint.GlnNumberOfEnergySupplier);
 
             var businessProcessResult = await InvokeBusinessProcessAsync(incomingMessage).ConfigureAwait(false);
             if (businessProcessResult.Success == false)

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -36,12 +37,22 @@ namespace Messaging.ArchitectureTests
             _host = Program.ConfigureHost(Program.DevelopmentTokenValidationParameters(), new TestEnvironment());
         }
 
+        public static IEnumerable<object[]> GetRequestHandlers()
+            => ResolveTypes(
+                typeof(IRequestHandler<,>),
+                new[] { ApplicationAssemblies.Application, ApplicationAssemblies.Infrastructure });
+
+        public static IEnumerable<object[]> GetNotificationsHandlers()
+            => ResolveTypes(
+                typeof(INotificationHandler<>),
+                new[] { ApplicationAssemblies.Application, ApplicationAssemblies.Infrastructure });
+
         [Fact]
         public void All_dependencies_can_be_resolved_in_functions()
         {
-            var allTypes = FunctionsReflectionHelper.FindAllTypes();
-            var functionTypes = FunctionsReflectionHelper.FindAllFunctionTypes();
-            var constructorDependencies = FunctionsReflectionHelper.FindAllConstructorDependencies();
+            var allTypes = ReflectionHelper.FindAllTypes();
+            var functionTypes = ReflectionHelper.FindAllFunctionTypes();
+            var constructorDependencies = ReflectionHelper.FindAllConstructorDependencies();
 
             var dependencies = constructorDependencies(functionTypes(allTypes(typeof(Program))));
 
@@ -57,9 +68,9 @@ namespace Messaging.ArchitectureTests
         [Fact]
         public void All_dependencies_can_be_resolved_for_middleware()
         {
-            var allTypes = FunctionsReflectionHelper.FindAllTypes();
-            var middlewareTypes = FunctionsReflectionHelper.FindAllTypesThatImplementType();
-            var constructorDependencies = FunctionsReflectionHelper.FindAllConstructorDependencies();
+            var allTypes = ReflectionHelper.FindAllTypes();
+            var middlewareTypes = ReflectionHelper.FindAllTypesThatImplementType();
+            var constructorDependencies = ReflectionHelper.FindAllConstructorDependencies();
 
             var dependencies = constructorDependencies(middlewareTypes(typeof(IFunctionsWorkerMiddleware), allTypes(typeof(Program))));
             using var scope = _host.Services.CreateScope();
@@ -71,41 +82,31 @@ namespace Messaging.ArchitectureTests
             }
         }
 
-        [Fact]
-        public void All_request_handlers_are_registered()
+        [Theory]
+        [MemberData(nameof(GetRequestHandlers))]
+        public void All_request_handlers_are_registered(Type implementationType)
         {
-            var assemblies = new[] { ApplicationAssemblies.Application, ApplicationAssemblies.Infrastructure, };
-            var typeToLookFor = typeof(IRequestHandler<,>);
-
-            AssertTypeIsRegistered(typeToLookFor, assemblies);
+            using var scope = _host.Services.CreateScope();
+            var resolvedInstance = scope.ServiceProvider.GetService(implementationType);
+            Assert.NotNull(resolvedInstance);
         }
 
-        [Fact]
-        public void All_notification_handlers_are_registered()
+        [Theory]
+        [MemberData(nameof(GetNotificationsHandlers))]
+        public void All_notification_handlers_are_registered(Type implementationType)
         {
-            var assemblies = new[] { ApplicationAssemblies.Application, ApplicationAssemblies.Infrastructure, };
-            var typeToLookFor = typeof(INotificationHandler<>);
-
-            AssertTypeIsRegistered(typeToLookFor, assemblies);
+            using var scope = _host.Services.CreateScope();
+            var resolvedInstance = scope.ServiceProvider.GetService(implementationType);
+            Assert.NotNull(resolvedInstance);
         }
 
-        private void AssertTypeIsRegistered(Type typeToLookFor, Assembly[] lookInAssemblies)
+        private static IEnumerable<object[]> ResolveTypes(Type targetType, Assembly[] assemblies)
         {
-            foreach (var assembly in lookInAssemblies)
-            {
-                var requestHandlerTypes = assembly
-                    .GetTypes()
-                    .Where(t => t.GetInterfaces()
-                        .Any(i => i.IsGenericType &&
-                                  i.GetGenericTypeDefinition() == typeToLookFor))
-                    .SelectMany(t => t.GetInterfaces())
-                    .ToList();
+            var allTypes = ReflectionHelper.FindAllTypesInAssemblies();
+            var allImplementations = ReflectionHelper.FindAllTypesThatImplementGenericInterface();
+            var getGenericTypeDefinition = ReflectionHelper.MapToUnderlyingType();
 
-                requestHandlerTypes.ForEach(t =>
-                {
-                    _host.Services.GetRequiredService(t);
-                });
-            }
+            return getGenericTypeDefinition(allImplementations(targetType, allTypes(assemblies)), targetType).Select(t => new[] { t });
         }
 
         private class TestEnvironment : RuntimeEnvironment

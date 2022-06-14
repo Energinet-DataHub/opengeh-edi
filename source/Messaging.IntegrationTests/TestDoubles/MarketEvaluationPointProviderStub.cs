@@ -24,14 +24,14 @@ public class MarketEvaluationPointProviderStub : IMarketEvaluationPointProvider
 {
     private readonly List<MarketEvaluationPoint> _marketEvaluationPoints = new()
     {
-        new MarketEvaluationPoint(Guid.NewGuid().ToString().Substring(10)),
+        new MarketEvaluationPoint(Guid.NewGuid().ToString().Substring(5), Guid.NewGuid().ToString().Substring(10)),
     };
 
     public IReadOnlyCollection<MarketEvaluationPoint> MarketEvaluationPoints => _marketEvaluationPoints.AsReadOnly();
 
-    public Task<MarketEvaluationPoint?> GetByGsrnNumberAsync(string marketEvaluationPointId)
+    public Task<MarketEvaluationPoint> GetByGsrnNumberAsync(string marketEvaluationPointId)
     {
-        return Task.FromResult(_marketEvaluationPoints.FirstOrDefault(x => x.GsrnNumber.Equals(marketEvaluationPointId, StringComparison.OrdinalIgnoreCase)));
+        return Task.FromResult(_marketEvaluationPoints.First(x => x.GsrnNumber.Equals(marketEvaluationPointId, StringComparison.OrdinalIgnoreCase)));
     }
 
     public void Add(MarketEvaluationPoint marketEvaluationPoint)

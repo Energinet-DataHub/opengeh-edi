@@ -44,10 +44,18 @@ public class CompleteMoveInTransactionHandler : IRequestHandler<CompleteMoveInTr
             throw new TransactionNotFoundException(request.ProcessId);
         }
 
-        _notifications.InformCurrentEnergySupplierAboutEndOfSupply(transaction);
+        InformSupplierIfAny(transaction);
 
         await _unitOfWork.CommitAsync().ConfigureAwait(false);
 
         return Unit.Value;
+    }
+
+    private void InformSupplierIfAny(MoveInTransaction transaction)
+    {
+        if (transaction.CurrentEnergySupplierId is not null)
+        {
+            _notifications.InformCurrentEnergySupplierAboutEndOfSupply(transaction);
+        }
     }
 }
