@@ -13,6 +13,10 @@
 // limitations under the License.
 
 using System;
+using System.Threading.Tasks;
+using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.Transactions.MoveIn;
+using Messaging.Infrastructure.Configuration.InternalCommands;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
@@ -21,14 +25,18 @@ namespace Messaging.Api.EventListeners;
 public class ConsumerMovedInListener
 {
     private readonly ILogger<ConsumerMovedInListener> _logger;
+    private readonly ICommandScheduler _commandScheduler;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public ConsumerMovedInListener(ILogger<ConsumerMovedInListener> logger)
+    public ConsumerMovedInListener(ILogger<ConsumerMovedInListener> logger, ICommandScheduler commandScheduler, IUnitOfWork unitOfWork)
     {
         _logger = logger;
+        _commandScheduler = commandScheduler;
+        _unitOfWork = unitOfWork;
     }
 
     [Function("ConsumerMovedInListener")]
-    public void Run(
+    public async Task RunAsync(
         [ServiceBusTrigger("consumer-moved-in", "consumer-moved-in", Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS_LISTENER")] byte[] data,
         FunctionContext context)
     {
@@ -37,5 +45,8 @@ public class ConsumerMovedInListener
 
         var consumerMovedIn = Contracts.IntegrationEvents.ConsumerMovedIn.Parser.ParseFrom(data);
         _logger.LogInformation($"Received consumer moved in event: {consumerMovedIn}");
+        await _commandScheduler.EnqueueAsync(new CompleteMoveInTransaction(consumerMovedIn.ProcessId))
+            .ConfigureAwait(false);
+        await _unitOfWork.CommitAsync().ConfigureAwait(false);
     }
 }
