@@ -22,6 +22,3 @@ internal static class SampleData
 
     internal static string NewEnergySupplierNumber => "5790000555551";
 }
-public record Result(EnergySupplierRecord? EnergySupplier, string Error = "");
-
-public record EnergySupplierRecord(DateTime StartOfSupplyDate, string EnergySupplierNumber);
