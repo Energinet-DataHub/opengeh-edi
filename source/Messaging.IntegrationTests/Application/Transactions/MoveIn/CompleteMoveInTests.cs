@@ -21,23 +21,22 @@ using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
+using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.IntegrationTests.Fixtures;
-using Messaging.IntegrationTests.TestDoubles;
 using Processing.Domain.SeedWork;
 using Xunit;
+using MarketEvaluationPoint = Messaging.Domain.MasterData.MarketEvaluationPoints.MarketEvaluationPoint;
 
 namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
 
 public class CompleteMoveInTests : TestBase
 {
-    private readonly MarketEvaluationPointProviderStub _marketEvaluationPointProvider;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMoveInTransactionRepository _transactionRepository;
 
     public CompleteMoveInTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _marketEvaluationPointProvider = (MarketEvaluationPointProviderStub)GetService<IMarketEvaluationPointProvider>();
         _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
         _transactionRepository = GetService<IMoveInTransactionRepository>();
     }
@@ -78,17 +77,23 @@ public class CompleteMoveInTests : TestBase
 
     private async Task<MoveInTransaction> StartMoveInTransaction()
     {
-        var marketEvaluationPoint = _marketEvaluationPointProvider.MarketEvaluationPoints.First();
+        await SetupMasterDataDetailsAsync();
         var transaction = new MoveInTransaction(
             Guid.NewGuid().ToString(),
-            marketEvaluationPoint.GsrnNumber,
+            SampleData.MateringPointNumber,
             _systemDateTimeProvider.Now(),
-            marketEvaluationPoint.GlnNumberOfEnergySupplier);
+            SampleData.EnergySupplierNumber);
 
         transaction.Start(BusinessRequestResult.Succeeded(Guid.NewGuid().ToString()));
         _transactionRepository.Add(transaction);
         await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
         return transaction;
+    }
+
+    private Task SetupMasterDataDetailsAsync()
+    {
+        GetService<IMarketEvaluationPointRepository>().Add(MarketEvaluationPoint.Create(SampleData.EnergySupplierNumber, SampleData.MateringPointNumber));
+        return Task.CompletedTask;
     }
 
     private AssertOutgoingMessage AssertThat(string transactionId, string documentType, string processType)
