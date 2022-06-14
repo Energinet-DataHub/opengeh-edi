@@ -13,6 +13,10 @@
 // limitations under the License.
 
 using System;
+using System.Threading.Tasks;
+using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.MasterData.MarketEvaluationPoints;
+using Messaging.Infrastructure.Configuration.InternalCommands;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
@@ -21,14 +25,18 @@ namespace Messaging.Api.EventListeners;
 public class EnergySupplierChangedListener
 {
     private readonly ILogger<EnergySupplierChangedListener> _logger;
+    private readonly ICommandScheduler _commandScheduler;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public EnergySupplierChangedListener(ILogger<EnergySupplierChangedListener> logger)
+    public EnergySupplierChangedListener(ILogger<EnergySupplierChangedListener> logger, ICommandScheduler commandScheduler, IUnitOfWork unitOfWork)
     {
         _logger = logger;
+        _commandScheduler = commandScheduler;
+        _unitOfWork = unitOfWork;
     }
 
     [Function("EnergySupplierChangedListener")]
-    public void Run(
+    public async Task RunAsync(
         [ServiceBusTrigger("%ENERGY_SUPPLIER_CHANGED_TOPIC%", "%ENERGY_SUPPLIER_CHANGED_SUBSCRIPTION%", Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS_LISTENER")] byte[] data,
         FunctionContext context)
     {
@@ -37,5 +45,10 @@ public class EnergySupplierChangedListener
 
         var energySupplierChanged = Contracts.IntegrationEvents.EnergySupplierChanged.Parser.ParseFrom(data);
         _logger.LogInformation($"Received EnergySupplierChanged integration event: {data}");
+        await _commandScheduler.EnqueueAsync(
+            new SetEnergySupplier(
+            energySupplierChanged.GsrnNumber,
+            energySupplierChanged.EnergySupplierGln)).ConfigureAwait(false);
+        await _unitOfWork.CommitAsync().ConfigureAwait(false);
     }
 }
