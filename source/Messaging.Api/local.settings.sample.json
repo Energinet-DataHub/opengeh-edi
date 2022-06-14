@@ -21,6 +21,8 @@
     "MESSAGE_REQUEST_QUEUE": "<Queue for post office to request bundle>",
     "MOVE_IN_REQUEST_ENDPOINT": "<Move in request url>",
     "SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS_LISTENER": "<service bus connection string for integration events listener permissions>",
-    "METERING_POINT_MASTER_DATA_RESPONSE_QUEUE_NAME": "<Master data response queue name>"
+    "METERING_POINT_MASTER_DATA_RESPONSE_QUEUE_NAME": "<Master data response queue name>",
+    "ENERGY_SUPPLIER_CHANGED_TOPIC": "<Energy supplier changed topic>",
+    "ENERGY_SUPPLIER_CHANGED_SUBSCRIPTION": "<Energy supplier changed subscription>"
   }
 }
