@@ -37,7 +37,6 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
     [IntegrationTest]
     public class MoveInRequestHandlerTests : TestBase
     {
-        private readonly MarketEvaluationPointProviderStub _marketEvaluationPointProvider;
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly MoveInRequestHandler _moveInRequestHandler;
 
@@ -46,7 +45,6 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         {
             _outgoingMessageStore = GetService<IOutgoingMessageStore>();
             _moveInRequestHandler = GetService<MoveInRequestHandler>();
-            _marketEvaluationPointProvider = (MarketEvaluationPointProviderStub)GetService<IMarketEvaluationPointProvider>();
         }
 
         [Fact]
@@ -110,10 +108,9 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             AssertXmlMessage.AssertHasHeaderValue(document, "reason.code", expectedReasonCode);
         }
 
-        private IncomingMessageBuilder MessageBuilder()
+        private static IncomingMessageBuilder MessageBuilder()
         {
-            return new IncomingMessageBuilder()
-                .WithMarketEvaluationPointId(_marketEvaluationPointProvider.MarketEvaluationPoints.First().GsrnNumber);
+            return new IncomingMessageBuilder();
         }
 
         private async Task AssertRejectMessage(OutgoingMessage rejectMessage)
