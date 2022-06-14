@@ -14,7 +14,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.InternalCommands;
 using Microsoft.Azure.Functions.Worker;
@@ -25,14 +24,12 @@ namespace Messaging.Api.EventListeners;
 public class ConsumerMovedInListener
 {
     private readonly ILogger<ConsumerMovedInListener> _logger;
-    private readonly ICommandScheduler _commandScheduler;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly CommandSchedulerFacade _commandScheduler;
 
-    public ConsumerMovedInListener(ILogger<ConsumerMovedInListener> logger, ICommandScheduler commandScheduler, IUnitOfWork unitOfWork)
+    public ConsumerMovedInListener(ILogger<ConsumerMovedInListener> logger, CommandSchedulerFacade commandScheduler)
     {
         _logger = logger;
         _commandScheduler = commandScheduler;
-        _unitOfWork = unitOfWork;
     }
 
     [Function("ConsumerMovedInListener")]
@@ -47,6 +44,5 @@ public class ConsumerMovedInListener
         _logger.LogInformation($"Received consumer moved in event: {consumerMovedIn}");
         await _commandScheduler.EnqueueAsync(new CompleteMoveInTransaction(consumerMovedIn.ProcessId))
             .ConfigureAwait(false);
-        await _unitOfWork.CommitAsync().ConfigureAwait(false);
     }
 }

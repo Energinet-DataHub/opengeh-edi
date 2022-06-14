@@ -25,14 +25,12 @@ namespace Messaging.Api.EventListeners;
 public class EnergySupplierChangedListener
 {
     private readonly ILogger<EnergySupplierChangedListener> _logger;
-    private readonly ICommandScheduler _commandScheduler;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly CommandSchedulerFacade _commandScheduler;
 
-    public EnergySupplierChangedListener(ILogger<EnergySupplierChangedListener> logger, ICommandScheduler commandScheduler, IUnitOfWork unitOfWork)
+    public EnergySupplierChangedListener(ILogger<EnergySupplierChangedListener> logger, CommandSchedulerFacade commandScheduler)
     {
         _logger = logger;
         _commandScheduler = commandScheduler;
-        _unitOfWork = unitOfWork;
     }
 
     [Function("EnergySupplierChangedListener")]
@@ -49,6 +47,5 @@ public class EnergySupplierChangedListener
             new SetEnergySupplier(
             energySupplierChanged.GsrnNumber,
             energySupplierChanged.EnergySupplierGln)).ConfigureAwait(false);
-        await _unitOfWork.CommitAsync().ConfigureAwait(false);
     }
 }
