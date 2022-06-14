@@ -37,6 +37,7 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Messaging.Domain\Messaging.Domain.csproj" />
       <ProjectReference Include="..\Processing.Domain\Processing.Domain.csproj" />
     </ItemGroup>
 

@@ -26,7 +26,7 @@ using Messaging.IntegrationTests.TestDoubles;
 using Processing.Domain.SeedWork;
 using Xunit;
 
-namespace Messaging.IntegrationTests.Transactions.MoveIn;
+namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
 
 public class CompleteMoveInTests : TestBase
 {
