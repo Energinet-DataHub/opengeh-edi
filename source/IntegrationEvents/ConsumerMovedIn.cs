@@ -9,7 +9,7 @@ using pb = global::Google.Protobuf;
 using pbc = global::Google.Protobuf.Collections;
 using pbr = global::Google.Protobuf.Reflection;
 using scg = global::System.Collections.Generic;
-namespace Energinet.DataHub.EnergySupplier.IntegrationEvents {
+namespace Energinet.DataHub.EnergySupplying.IntegrationEvents {
 
   /// <summary>Holder for reflection information generated from IntegrationEvents/ConsumerMovedIn.proto</summary>
   public static partial class ConsumerMovedInReflection {
@@ -26,12 +26,12 @@ namespace Energinet.DataHub.EnergySupplier.IntegrationEvents {
           string.Concat(
             "CidJbnRlZ3JhdGlvbkV2ZW50cy9Db25zdW1lck1vdmVkSW4ucHJvdG8iLgoP",
             "Q29uc3VtZXJNb3ZlZEluEhsKE2FjY291bnRpbmdfcG9pbnRfaWQYASABKAlC",
-            "NaoCMkVuZXJnaW5ldC5EYXRhSHViLkVuZXJneVN1cHBsaWVyLkludGVncmF0",
-            "aW9uRXZlbnRzYgZwcm90bzM="));
+            "NqoCM0VuZXJnaW5ldC5EYXRhSHViLkVuZXJneVN1cHBseWluZy5JbnRlZ3Jh",
+            "dGlvbkV2ZW50c2IGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Energinet.DataHub.EnergySupplier.IntegrationEvents.ConsumerMovedIn), global::Energinet.DataHub.EnergySupplier.IntegrationEvents.ConsumerMovedIn.Parser, new[]{ "AccountingPointId" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Energinet.DataHub.EnergySupplying.IntegrationEvents.ConsumerMovedIn), global::Energinet.DataHub.EnergySupplying.IntegrationEvents.ConsumerMovedIn.Parser, new[]{ "AccountingPointId" }, null, null, null, null)
           }));
     }
     #endregion
@@ -52,7 +52,7 @@ namespace Energinet.DataHub.EnergySupplier.IntegrationEvents {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Energinet.DataHub.EnergySupplier.IntegrationEvents.ConsumerMovedInReflection.Descriptor.MessageTypes[0]; }
+      get { return global::Energinet.DataHub.EnergySupplying.IntegrationEvents.ConsumerMovedInReflection.Descriptor.MessageTypes[0]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]

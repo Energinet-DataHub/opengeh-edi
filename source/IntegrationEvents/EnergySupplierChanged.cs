@@ -9,7 +9,7 @@ using pb = global::Google.Protobuf;
 using pbc = global::Google.Protobuf.Collections;
 using pbr = global::Google.Protobuf.Reflection;
 using scg = global::System.Collections.Generic;
-namespace Energinet.DataHub.EnergySupplier.IntegrationEvents {
+namespace Energinet.DataHub.EnergySupplying.IntegrationEvents {
 
   /// <summary>Holder for reflection information generated from IntegrationEvents/EnergySupplierChanged.proto</summary>
   public static partial class EnergySupplierChangedReflection {
@@ -27,13 +27,13 @@ namespace Energinet.DataHub.EnergySupplier.IntegrationEvents {
             "Ci1JbnRlZ3JhdGlvbkV2ZW50cy9FbmVyZ3lTdXBwbGllckNoYW5nZWQucHJv",
             "dG8ifQoVRW5lcmd5U3VwcGxpZXJDaGFuZ2VkEhoKEmFjY291bnRpbmdwb2lu",
             "dF9pZBgBIAEoCRITCgtnc3JuX251bWJlchgCIAEoCRIbChNlbmVyZ3lfc3Vw",
-            "cGxpZXJfZ2xuGAMgASgJEhYKDmVmZmVjdGl2ZV9kYXRlGAQgASgJQjWqAjJF",
-            "bmVyZ2luZXQuRGF0YUh1Yi5FbmVyZ3lTdXBwbGllci5JbnRlZ3JhdGlvbkV2",
-            "ZW50c2IGcHJvdG8z"));
+            "cGxpZXJfZ2xuGAMgASgJEhYKDmVmZmVjdGl2ZV9kYXRlGAQgASgJQjaqAjNF",
+            "bmVyZ2luZXQuRGF0YUh1Yi5FbmVyZ3lTdXBwbHlpbmcuSW50ZWdyYXRpb25F",
+            "dmVudHNiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Energinet.DataHub.EnergySupplier.IntegrationEvents.EnergySupplierChanged), global::Energinet.DataHub.EnergySupplier.IntegrationEvents.EnergySupplierChanged.Parser, new[]{ "AccountingpointId", "GsrnNumber", "EnergySupplierGln", "EffectiveDate" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Energinet.DataHub.EnergySupplying.IntegrationEvents.EnergySupplierChanged), global::Energinet.DataHub.EnergySupplying.IntegrationEvents.EnergySupplierChanged.Parser, new[]{ "AccountingpointId", "GsrnNumber", "EnergySupplierGln", "EffectiveDate" }, null, null, null, null)
           }));
     }
     #endregion
@@ -54,7 +54,7 @@ namespace Energinet.DataHub.EnergySupplier.IntegrationEvents {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Energinet.DataHub.EnergySupplier.IntegrationEvents.EnergySupplierChangedReflection.Descriptor.MessageTypes[0]; }
+      get { return global::Energinet.DataHub.EnergySupplying.IntegrationEvents.EnergySupplierChangedReflection.Descriptor.MessageTypes[0]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
