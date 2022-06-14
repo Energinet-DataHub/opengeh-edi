@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System;
-using EnergySupplier.IntegrationEvents;
+using Energinet.DataHub.EnergySupplier.IntegrationEvents;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
