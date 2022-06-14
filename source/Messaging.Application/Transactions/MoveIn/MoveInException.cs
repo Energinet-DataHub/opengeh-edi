@@ -12,22 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Application.Common;
+using System;
 
-public class MarketEvaluationPoint
+namespace Messaging.Application.Transactions.MoveIn;
+
+public class MoveInException : Exception
 {
-    public MarketEvaluationPoint(string? glnNumberOfEnergySupplier, string gsrnNumber)
+    public MoveInException(string message)
+        : base(message)
     {
-        GlnNumberOfEnergySupplier = glnNumberOfEnergySupplier;
-        GsrnNumber = gsrnNumber;
     }
 
-    public MarketEvaluationPoint(string gsrnNumber)
+    private MoveInException()
     {
-        GsrnNumber = gsrnNumber;
     }
 
-    public string GsrnNumber { get; }
-
-    public string? GlnNumberOfEnergySupplier { get; }
+    private MoveInException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
 }

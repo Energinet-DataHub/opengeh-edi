@@ -20,12 +20,15 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace Messaging.ArchitectureTests
 {
-    public static class FunctionsReflectionHelper
+    public static class ReflectionHelper
     {
         private static readonly Type _functionAttribute = typeof(FunctionAttribute);
 
         public static Func<Type, IEnumerable<Type>> FindAllTypes()
             => t => t.Assembly.GetTypes();
+
+        public static Func<Assembly[], IEnumerable<Type>> FindAllTypesInAssemblies()
+            => assemblies => assemblies.SelectMany(t => t.GetTypes());
 
         public static Func<IEnumerable<Type>, IEnumerable<Type>> FindAllFunctionTypes()
         {
@@ -43,6 +46,21 @@ namespace Messaging.ArchitectureTests
         {
             return (targetType, types) =>
                 types.Where(targetType.IsAssignableFrom);
+        }
+
+        public static Func<Type, IEnumerable<Type>, IEnumerable<Type>> FindAllTypesThatImplementGenericInterface()
+        {
+            return (targetType, types) =>
+                types.Where(t => t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == targetType));
+        }
+
+        public static Func<IEnumerable<Type>, Type, IEnumerable<Type>> MapToUnderlyingType()
+        {
+            return (types, targetType) =>
+            {
+                return types.SelectMany(t => t.GetInterfaces())
+                    .Where(i => i.IsGenericType && i.GetGenericTypeDefinition().IsAssignableFrom(targetType));
+            };
         }
 
         private static ConstructorInfo? GetOnePublicConstructor(Type? type)

@@ -138,6 +138,7 @@ namespace Messaging.IntegrationTests.OutgoingMessages
         private IncomingMessageBuilder MessageBuilder()
         {
             return new IncomingMessageBuilder()
+                .WithProcessType(ProcessType.MoveIn.Code)
                 .WithMarketEvaluationPointId(_marketEvaluationPointProviderStub.MarketEvaluationPoints.First()
                     .GsrnNumber);
         }

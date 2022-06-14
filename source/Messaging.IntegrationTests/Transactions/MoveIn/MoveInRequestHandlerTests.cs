@@ -64,7 +64,7 @@ namespace Messaging.IntegrationTests.Transactions.MoveIn
         public async Task Confirm_if_business_request_is_valid()
         {
             var incomingMessage = MessageBuilder()
-                .WithProcessType("E03")
+                .WithProcessType(ProcessType.MoveIn.Code)
                 .WithReceiver("5790001330552")
                 .WithSenderId("123456")
                 .WithConsumerName("John Doe")
@@ -84,7 +84,7 @@ namespace Messaging.IntegrationTests.Transactions.MoveIn
             httpClientMock.RespondWithValidationErrors(new List<string> { "InvalidConsumer" });
 
             var incomingMessage = MessageBuilder()
-                .WithProcessType("E03")
+                .WithProcessType(ProcessType.MoveIn.Code)
                 .WithReceiver("5790001330552")
                 .WithSenderId("123456")
                 .WithConsumerName(null)
