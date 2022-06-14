@@ -22,4 +22,5 @@ option csharp_namespace = "Contracts.IntegrationEvents";
 
 message ConsumerMovedIn {
   string accounting_point_id = 1;
+  string process_id = 2;
 }
