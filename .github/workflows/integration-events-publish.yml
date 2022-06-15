@@ -60,7 +60,7 @@ jobs:
         uses: Energinet-DataHub/.github/.github/actions/dotnet-solution-build-and-test@7.5.0
         with:
           SOLUTION_FILE_PATH: './source/IntegrationEvents/IntegrationEvents.sln'
-          CODE_COVERAGE_FLAGS: integrationevents
+          USE_CODE_COVERAGE: 'false'
 
       - name: Pack IntegrationEvents project
         uses: Energinet-DataHub/.github/.github/actions/nuget-project-pack@7.5.0
