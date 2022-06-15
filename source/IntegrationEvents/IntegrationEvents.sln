@@ -1,6 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationsEvents", "IntegrationsEvents.csproj", "{54A43FFA-4B1E-4F8B-BE1C-8F183972A8B0}"
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32526.322
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationsEvents", "source\IntegrationEvents\IntegrationsEvents.csproj", "{4C5AFBBF-9992-4104-BC0B-3E3714C5D538}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -8,9 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{54A43FFA-4B1E-4F8B-BE1C-8F183972A8B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{54A43FFA-4B1E-4F8B-BE1C-8F183972A8B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{54A43FFA-4B1E-4F8B-BE1C-8F183972A8B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{54A43FFA-4B1E-4F8B-BE1C-8F183972A8B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C5AFBBF-9992-4104-BC0B-3E3714C5D538}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C5AFBBF-9992-4104-BC0B-3E3714C5D538}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C5AFBBF-9992-4104-BC0B-3E3714C5D538}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C5AFBBF-9992-4104-BC0B-3E3714C5D538}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8B52F641-A8BE-44D9-B5FE-5E8584103161}
 	EndGlobalSection
 EndGlobal
