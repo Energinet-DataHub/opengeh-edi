@@ -155,7 +155,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         private void AssertTransactionIsStarted(string transactionId)
         {
             var checkStatement =
-                $"SELECT * FROM b2b.transactions WHERE TransactionId = '{transactionId}' AND Started = 1";
+                $"SELECT * FROM b2b.transactions WHERE TransactionId = '{transactionId}' AND State = 'Started'";
             var context = GetService<B2BContext>();
             var transaction = context.Transactions.FromSqlRaw(checkStatement).FirstOrDefault();
             Assert.NotNull(transaction);

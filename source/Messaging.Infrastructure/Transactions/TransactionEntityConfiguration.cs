@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Messaging.Application.Transactions.MoveIn;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -28,6 +29,9 @@ namespace Messaging.Infrastructure.Transactions
             builder.Property(x => x.EffectiveDate);
             builder.Property(x => x.MarketEvaluationPointId);
             builder.Property(x => x.CurrentEnergySupplierId);
+            builder.Property<MoveInTransaction.State>("_state")
+                .HasConversion(toDbValue => toDbValue.ToString(), fromDbValue => Enum.Parse<MoveInTransaction.State>(fromDbValue, true))
+                .HasColumnName("State");
             builder.Property<bool>("_started")
                 .HasColumnName("Started");
         }
