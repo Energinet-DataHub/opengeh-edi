@@ -57,7 +57,7 @@ module "func_receiver" {
     SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS_LISTENER = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-listen-connection-string)",
     METERING_POINT_MASTER_DATA_RESPONSE_QUEUE_NAME                = data.azurerm_key_vault_secret.sbq_metering_point_master_data_response_name.value,
     ENERGY_SUPPLIER_CHANGED_TOPIC                                 = data.azurerm_key_vault_secret.sbt_energy_supplier_changed_name.value,
-    ENERGY_SUPPLIER_CHANGED_SUBSCRIPTION                          = data.azurerm_key_vault_secret.sbt_energy_supplier_changed_to_messaging_name.value
+    ENERGY_SUPPLIER_CHANGED_SUBSCRIPTION                          = data.azurerm_key_vault_secret.sbs_energy_supplier_changed_to_messaging_name.value
   }
 
   tags = azurerm_resource_group.this.tags
