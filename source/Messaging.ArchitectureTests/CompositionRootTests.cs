@@ -37,67 +37,71 @@ namespace Messaging.ArchitectureTests
             _host = Program.ConfigureHost(Program.DevelopmentTokenValidationParameters(), new TestEnvironment());
         }
 
-        public static IEnumerable<object[]> GetRequestHandlers()
+        #region Member data providers
+
+        public static IEnumerable<object[]> GetRequestHandlerRequirements()
             => ResolveTypes(
                 typeof(IRequestHandler<,>),
                 new[] { ApplicationAssemblies.Application, ApplicationAssemblies.Infrastructure });
 
-        public static IEnumerable<object[]> GetNotificationsHandlers()
+        public static IEnumerable<object[]> GetNotificationsHandlerRequirements()
             => ResolveTypes(
                 typeof(INotificationHandler<>),
                 new[] { ApplicationAssemblies.Application, ApplicationAssemblies.Infrastructure });
 
-        [Fact]
-        public void All_dependencies_can_be_resolved_in_functions()
+        public static IEnumerable<object[]> GetFunctionRequirements()
         {
             var allTypes = ReflectionHelper.FindAllTypes();
             var functionTypes = ReflectionHelper.FindAllFunctionTypes();
-            var constructorDependencies = ReflectionHelper.FindAllConstructorDependencies();
+            var constructorDependencies = ReflectionHelper.FindAllConstructorDependenciesForType();
 
-            var dependencies = constructorDependencies(functionTypes(allTypes(typeof(Program))));
-
-            using var scope = _host.Services.CreateScope();
-
-            foreach (var dependency in dependencies)
-            {
-                var resolvedInstance = scope.ServiceProvider.GetService(dependency);
-                Assert.True(resolvedInstance != null, $"Unable to resolve {dependency.Name}");
-            }
+            return functionTypes(allTypes(typeof(Program)))
+                .Select(f => new object[] { new Requirement(f.Name, constructorDependencies(f)) });
         }
 
-        [Fact]
-        public void All_dependencies_can_be_resolved_for_middleware()
+        public static IEnumerable<object[]> GetMiddlewareRequirements()
         {
             var allTypes = ReflectionHelper.FindAllTypes();
             var middlewareTypes = ReflectionHelper.FindAllTypesThatImplementType();
-            var constructorDependencies = ReflectionHelper.FindAllConstructorDependencies();
+            var constructorDependencies = ReflectionHelper.FindAllConstructorDependenciesForType();
 
-            var dependencies = constructorDependencies(middlewareTypes(typeof(IFunctionsWorkerMiddleware), allTypes(typeof(Program))));
-            using var scope = _host.Services.CreateScope();
-
-            foreach (var dependency in dependencies)
-            {
-                var resolvedInstance = scope.ServiceProvider.GetService(dependency);
-                Assert.True(resolvedInstance != null, $"Unable to resolve {dependency.Name}");
-            }
+            return
+                middlewareTypes(typeof(IFunctionsWorkerMiddleware), allTypes(typeof(Program)))
+                    .Select(m => new object[] { new Requirement(m.Name, constructorDependencies(m)) });
         }
 
-        [Theory]
-        [MemberData(nameof(GetRequestHandlers))]
-        public void All_request_handlers_are_registered(Type implementationType)
+        #endregion
+
+        [Theory(DisplayName = nameof(All_request_handlers_are_registered))]
+        [MemberData(nameof(GetRequestHandlerRequirements))]
+        public void All_request_handlers_are_registered(Requirement requirement)
         {
             using var scope = _host.Services.CreateScope();
-            var resolvedInstance = scope.ServiceProvider.GetService(implementationType);
-            Assert.NotNull(resolvedInstance);
+            Assert.True(scope.ServiceProvider.CanSatisfyRequirement(requirement));
         }
 
-        [Theory]
-        [MemberData(nameof(GetNotificationsHandlers))]
-        public void All_notification_handlers_are_registered(Type implementationType)
+        [Theory(DisplayName = nameof(All_notification_handlers_are_registered))]
+        [MemberData(nameof(GetNotificationsHandlerRequirements))]
+        public void All_notification_handlers_are_registered(Requirement requirement)
         {
             using var scope = _host.Services.CreateScope();
-            var resolvedInstance = scope.ServiceProvider.GetService(implementationType);
-            Assert.NotNull(resolvedInstance);
+            Assert.True(scope.ServiceProvider.CanSatisfyRequirement(requirement));
+        }
+
+        [Theory(DisplayName = nameof(All_dependencies_can_be_resolved_for_middleware))]
+        [MemberData(nameof(GetMiddlewareRequirements))]
+        public void All_dependencies_can_be_resolved_for_middleware(Requirement requirement)
+        {
+            using var scope = _host.Services.CreateScope();
+            Assert.True(scope.ServiceProvider.CanSatisfyRequirement(requirement));
+        }
+
+        [Theory(DisplayName = nameof(All_dependencies_can_be_resolved_in_functions))]
+        [MemberData(nameof(GetFunctionRequirements))]
+        public void All_dependencies_can_be_resolved_in_functions(Requirement requirement)
+        {
+            using var scope = _host.Services.CreateScope();
+            Assert.True(scope.ServiceProvider.CanSatisfyRequirement(requirement));
         }
 
         private static IEnumerable<object[]> ResolveTypes(Type targetType, Assembly[] assemblies)
@@ -106,7 +110,8 @@ namespace Messaging.ArchitectureTests
             var allImplementations = ReflectionHelper.FindAllTypesThatImplementGenericInterface();
             var getGenericTypeDefinition = ReflectionHelper.MapToUnderlyingType();
 
-            return getGenericTypeDefinition(allImplementations(targetType, allTypes(assemblies)), targetType).Select(t => new[] { t });
+            return allImplementations(targetType, allTypes(assemblies))
+                .Select(type => new object[] { new Requirement(type.Name, getGenericTypeDefinition(type, targetType)) });
         }
 
         private class TestEnvironment : RuntimeEnvironment

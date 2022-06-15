@@ -91,12 +91,6 @@ namespace Messaging.Infrastructure.Configuration
             return new CompositionRoot(services);
         }
 
-        public CompositionRoot AddMasterDataServices(IMarketEvaluationPointProvider marketEvaluationPointProvider)
-        {
-            _services.AddScoped(_ => marketEvaluationPointProvider);
-            return this;
-        }
-
         public CompositionRoot AddDatabaseContext(string connectionString)
         {
             _services.AddDbContext<B2BContext>(x =>

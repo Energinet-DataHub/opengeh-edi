@@ -12,15 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Messaging.Application.Common;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace Messaging.Infrastructure.Configuration;
+namespace Messaging.ArchitectureTests;
 
-public class MarketEvaluationPointProvider : IMarketEvaluationPointProvider
+public record Requirement(string Name, IEnumerable<Type> DependentOn)
 {
-    public Task<MarketEvaluationPoint> GetByGsrnNumberAsync(string marketEvaluationPointId)
+    public override string ToString()
     {
-        return Task.FromResult(new MarketEvaluationPoint(null, marketEvaluationPointId));
+        return Name;
+    }
+}
+
+internal static class IServiceProviderHelpers
+{
+    public static bool CanSatisfyRequirement(this IServiceProvider services, Requirement requirement)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+        ArgumentNullException.ThrowIfNull(requirement);
+
+        return requirement.DependentOn.All(dependency => services.GetService(dependency) != null);
     }
 }

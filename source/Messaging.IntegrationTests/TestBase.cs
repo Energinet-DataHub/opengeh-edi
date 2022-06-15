@@ -53,8 +53,7 @@ namespace Messaging.IntegrationTests
                 .AddOutgoingMessageDispatcher(new MessageDispatcherSpy())
                 .AddRequestHandler<TestCommandHandler>()
                 .AddHttpClientAdapter(_ => new HttpClientSpy())
-                .AddMoveInServices(new MoveInConfiguration(new Uri("http://someuri")))
-                .AddMasterDataServices(new MarketEvaluationPointProviderStub());
+                .AddMoveInServices(new MoveInConfiguration(new Uri("http://someuri")));
             _serviceProvider = services.BuildServiceProvider();
         }
 
