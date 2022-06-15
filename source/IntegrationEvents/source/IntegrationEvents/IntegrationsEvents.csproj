@@ -41,17 +41,17 @@ limitations under the License.
 			Is shown in Azure DevOps artifacts Release Notes section.
 		-->
 		<PackageReleaseNotes>
-		[Release Notes](https://github.com/Energinet-DataHub/geh-core/blob/master/source/IntegrationEvents/documents/release-notes/release-notes.md)
-		[Documentation](https://github.com/Energinet-DataHub/geh-core/blob/master/source/IntegrationEvents/documents/development.md)
-		</PackageReleaseNotes>
+      [Release Notes](https://github.com/Energinet-DataHub/geh-market-roles/blob/master/source/IntegrationEvents/documents/release-notes/release-notes.md)
+      [Documentation](https://github.com/Energinet-DataHub/geh-market-roles/blob/master/source/IntegrationEvents/documents/development.md)
+    </PackageReleaseNotes>
 		<!-- PackageDescription:
 			Is shown in GitHub packages "About this package" section,
 			and in Visual Studio package manager view.
 		-->
 		<PackageDescription>
-			[Release Notes](https://github.com/Energinet-DataHub/geh-core/blob/master/source/IntegrationEvents/documents/release-notes/release-notes.md)
-			[Documentation](https://github.com/Energinet-DataHub/geh-core/blob/master/source/IntegrationEvents/documents/development.md)
-		</PackageDescription>
+      [Release Notes](https://github.com/Energinet-DataHub/geh-market-roles/blob/master/source/IntegrationEvents/documents/release-notes/release-notes.md)
+      [Documentation](https://github.com/Energinet-DataHub/geh-market-roles/blob/master/source/IntegrationEvents/documents/development.md)
+    </PackageDescription>
 		<Description>Library to use for implementation of integration events from EnergySupplying (MarketRoles) domain.</Description>
 		<PackageTags>energinet;datahub;integrationevent</PackageTags>
 		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
