@@ -16,4 +16,5 @@ namespace Messaging.Application.Transactions.MoveIn;
 
 public class PendingBusinessProcess
 {
+    public string? ProcessId { get; set; }
 }

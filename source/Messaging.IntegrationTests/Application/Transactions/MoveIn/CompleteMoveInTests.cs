@@ -46,10 +46,11 @@ public class CompleteMoveInTests : TestBase
     [Fact]
     public async Task Transaction_is_completed()
     {
-        await CompleteMoveIn().ConfigureAwait(false);
+        var transaction = await CompleteMoveIn().ConfigureAwait(false);
 
         AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>())
-            .HasState(MoveInTransaction.State.Completed);
+            .HasState(MoveInTransaction.State.Completed)
+            .HasProcessId(transaction.ProcessId!);
     }
 
     [Fact]

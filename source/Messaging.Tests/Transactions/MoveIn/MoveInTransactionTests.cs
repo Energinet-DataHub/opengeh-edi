@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
 using NodaTime;
@@ -32,6 +33,8 @@ public class MoveInTransactionTests
 
         Assert.Equal(1, transaction.DomainEvents.Count);
         Assert.Contains(transaction.DomainEvents, e => e is PendingBusinessProcess);
+
+        AssertProcessId(transaction);
     }
 
     [Fact]
@@ -79,5 +82,12 @@ public class MoveInTransactionTests
     private static BusinessRequestResult BusinessRequestSucceeded()
     {
         return BusinessRequestResult.Succeeded(Guid.NewGuid().ToString());
+    }
+
+    private static void AssertProcessId(MoveInTransaction transaction)
+    {
+        var pendingBusinessProcess = transaction.DomainEvents.First() as PendingBusinessProcess;
+        Assert.NotNull(pendingBusinessProcess?.ProcessId);
+        Assert.Equal(pendingBusinessProcess?.ProcessId, transaction.ProcessId);
     }
 }
