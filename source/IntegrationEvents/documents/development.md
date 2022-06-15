@@ -28,6 +28,5 @@ If the workflow is triggered:
 
 ## Updating integration events
 
-If the integration event proto files are updated, building Energinet.DataHub.MArketRoles will compile them
-and put them in IntegrationEvents folder root. They must be copied to IntegrationEvents/source/Events and 
-license comments must be applied to each file.
+If the integration event proto files are updated, building Energinet.DataHub.MArketRoles will compile them and put them in IntegrationEvents/source/IntegrationEvents/ folder. 
+License comments must be applied to each file if not present.
