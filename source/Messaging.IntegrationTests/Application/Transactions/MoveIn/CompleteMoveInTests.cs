@@ -48,7 +48,8 @@ public class CompleteMoveInTests : TestBase
     {
         await CompleteMoveIn().ConfigureAwait(false);
 
-        AssertTransactionIsCompleted();
+        AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>())
+            .WithState(MoveInTransaction.State.Completed);
     }
 
     [Fact]
@@ -98,15 +99,6 @@ public class CompleteMoveInTests : TestBase
         _transactionRepository.Add(transaction);
         await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
         return transaction;
-    }
-
-    private void AssertTransactionIsCompleted()
-    {
-        var checkStatement =
-            $"SELECT * FROM b2b.MoveInTransactions WHERE TransactionId = '{SampleData.TransactionId}' AND State = 'Completed'";
-        var context = GetService<B2BContext>();
-        var transaction = context.Transactions.FromSqlRaw(checkStatement).FirstOrDefault();
-        Assert.NotNull(transaction);
     }
 
     private Task SetupMasterDataDetailsAsync()
