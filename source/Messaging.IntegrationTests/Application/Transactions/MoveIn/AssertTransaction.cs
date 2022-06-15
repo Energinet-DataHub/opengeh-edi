@@ -46,7 +46,7 @@ public class AssertTransaction
         return new AssertTransaction(transaction);
     }
 
-    public AssertTransaction WithState(MoveInTransaction.State expectedState)
+    public AssertTransaction HasState(MoveInTransaction.State expectedState)
     {
         Assert.Equal(expectedState.ToString(), _transaction.State);
         return this;

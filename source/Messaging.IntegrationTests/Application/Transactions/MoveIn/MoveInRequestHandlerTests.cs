@@ -57,7 +57,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             await _moveInRequestHandler.HandleAsync(incomingMessage).ConfigureAwait(false);
 
             AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>())
-                .WithState(MoveInTransaction.State.Started);
+                .HasState(MoveInTransaction.State.Started);
         }
 
         [Fact]

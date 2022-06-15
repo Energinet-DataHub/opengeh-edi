@@ -49,7 +49,7 @@ public class CompleteMoveInTests : TestBase
         await CompleteMoveIn().ConfigureAwait(false);
 
         AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>())
-            .WithState(MoveInTransaction.State.Completed);
+            .HasState(MoveInTransaction.State.Completed);
     }
 
     [Fact]
