@@ -55,7 +55,6 @@ public class AssertTransaction
 
     public AssertTransaction HasProcessId(string expectedProcessId)
     {
-        Assert.NotNull(_transaction.ProcessId);
         Assert.Equal(expectedProcessId, _transaction.ProcessId);
         return this;
     }
