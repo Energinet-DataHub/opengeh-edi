@@ -57,6 +57,16 @@ public class MoveInTransactionTests
         Assert.Contains(transaction.DomainEvents, e => e is MoveInTransactionCompleted);
     }
 
+    [Fact]
+    public void Can_not_complete_transaction_if_already_completed()
+    {
+        var transaction = CreateTransaction();
+        transaction.Start(BusinessRequestSucceeded());
+        transaction.Complete();
+
+        Assert.Throws<MoveInException>(() => transaction.Complete());
+    }
+
     private static MoveInTransaction CreateTransaction()
     {
         return new MoveInTransaction(
