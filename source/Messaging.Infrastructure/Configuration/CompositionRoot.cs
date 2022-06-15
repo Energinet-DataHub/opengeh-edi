@@ -225,6 +225,7 @@ namespace Messaging.Infrastructure.Configuration
         {
             _services.AddTransient<CommandExecutor>();
             _services.AddScoped<ICommandScheduler, CommandScheduler>();
+            _services.AddScoped<CommandSchedulerFacade>();
             _services.AddTransient<InternalCommandAccessor>();
             _services.AddTransient<InternalCommandProcessor>();
             _services.AddTransient<INotificationHandler<TimeHasPassed>, ProcessInternalCommandsOnTimeHasPassed>();
