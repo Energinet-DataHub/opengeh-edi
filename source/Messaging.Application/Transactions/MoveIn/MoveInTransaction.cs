@@ -21,16 +21,7 @@ namespace Messaging.Application.Transactions.MoveIn
     public class MoveInTransaction
     {
         private readonly List<object> _domainEvents = new List<object>();
-        #pragma warning disable
-        private bool _started;
         private State _state = State.NotStarted;
-
-        public enum State
-        {
-            NotStarted,
-            Started,
-            Completed,
-        }
 
         public MoveInTransaction(string transactionId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId)
         {
@@ -38,6 +29,13 @@ namespace Messaging.Application.Transactions.MoveIn
             MarketEvaluationPointId = marketEvaluationPointId;
             EffectiveDate = effectiveDate;
             CurrentEnergySupplierId = currentEnergySupplierId;
+        }
+
+        public enum State
+        {
+            NotStarted,
+            Started,
+            Completed,
         }
 
         public string TransactionId { get; }
@@ -62,7 +60,6 @@ namespace Messaging.Application.Transactions.MoveIn
             else
             {
                 _state = State.Started;
-                _started = true;
                 _domainEvents.Add(new PendingBusinessProcess());
             }
         }
