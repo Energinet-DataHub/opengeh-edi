@@ -6,7 +6,7 @@ flags:
       - source/Processing.Application/
       - source/Processing.Domain/
       - source/Processing.Tests/
-      - source/IntegrationEvents/
+
   integration:
     paths:
       - source/Energinet.DataHub.MarketRoles.EntryPoints.Common
@@ -15,6 +15,7 @@ flags:
       - source/Messaging.Infrastructure
       - source/Messaging.IntegrationTests
       - source/Processing.IntegrationTests
+      - source/IntegrationEvents
 
 coverage:
   status:
