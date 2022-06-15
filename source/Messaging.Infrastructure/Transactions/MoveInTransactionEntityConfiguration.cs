@@ -19,11 +19,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Messaging.Infrastructure.Transactions
 {
-    internal class TransactionEntityConfiguration : IEntityTypeConfiguration<MoveInTransaction>
+    internal class MoveInTransactionEntityConfiguration : IEntityTypeConfiguration<MoveInTransaction>
     {
         public void Configure(EntityTypeBuilder<MoveInTransaction> builder)
         {
-            builder.ToTable("Transactions", "b2b");
+            builder.ToTable("MoveInTransactions", "b2b");
             builder.HasKey(x => x.TransactionId);
             builder.Property(x => x.ProcessId);
             builder.Property(x => x.EffectiveDate);
@@ -32,8 +32,6 @@ namespace Messaging.Infrastructure.Transactions
             builder.Property<MoveInTransaction.State>("_state")
                 .HasConversion(toDbValue => toDbValue.ToString(), fromDbValue => Enum.Parse<MoveInTransaction.State>(fromDbValue, true))
                 .HasColumnName("State");
-            builder.Property<bool>("_started")
-                .HasColumnName("Started");
         }
     }
 }
