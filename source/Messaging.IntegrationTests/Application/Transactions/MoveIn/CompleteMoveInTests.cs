@@ -22,7 +22,9 @@ using Messaging.Application.OutgoingMessages;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
+using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.IntegrationTests.Fixtures;
+using Microsoft.EntityFrameworkCore;
 using Processing.Domain.SeedWork;
 using Xunit;
 using MarketEvaluationPoint = Messaging.Domain.MasterData.MarketEvaluationPoints.MarketEvaluationPoint;
@@ -39,6 +41,14 @@ public class CompleteMoveInTests : TestBase
     {
         _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
         _transactionRepository = GetService<IMoveInTransactionRepository>();
+    }
+
+    [Fact]
+    public async Task Transaction_is_completed()
+    {
+        await CompleteMoveIn().ConfigureAwait(false);
+
+        AssertTransactionIsCompleted();
     }
 
     [Fact]
@@ -79,7 +89,7 @@ public class CompleteMoveInTests : TestBase
     {
         await SetupMasterDataDetailsAsync();
         var transaction = new MoveInTransaction(
-            Guid.NewGuid().ToString(),
+            SampleData.TransactionId,
             SampleData.MateringPointNumber,
             _systemDateTimeProvider.Now(),
             SampleData.EnergySupplierNumber);
@@ -88,6 +98,15 @@ public class CompleteMoveInTests : TestBase
         _transactionRepository.Add(transaction);
         await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
         return transaction;
+    }
+
+    private void AssertTransactionIsCompleted()
+    {
+        var checkStatement =
+            $"SELECT * FROM b2b.MoveInTransactions WHERE TransactionId = '{SampleData.TransactionId}' AND State = 'Completed'";
+        var context = GetService<B2BContext>();
+        var transaction = context.Transactions.FromSqlRaw(checkStatement).FirstOrDefault();
+        Assert.NotNull(transaction);
     }
 
     private Task SetupMasterDataDetailsAsync()

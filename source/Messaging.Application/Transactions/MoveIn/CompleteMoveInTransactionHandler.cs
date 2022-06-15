@@ -44,6 +44,8 @@ public class CompleteMoveInTransactionHandler : IRequestHandler<CompleteMoveInTr
             throw new TransactionNotFoundException(request.ProcessId);
         }
 
+        transaction.Complete();
+
         InformSupplierIfAny(transaction);
 
         await _unitOfWork.CommitAsync().ConfigureAwait(false);
