@@ -14,9 +14,9 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.EnergySupplying.IntegrationEvents;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.InternalCommands;
-using Energinet.DataHub.EnergySupplying.IntegrationEvents;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
