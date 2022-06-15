@@ -49,7 +49,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energinet.DataHub.MarketRol
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.Domain", "Messaging.Domain\Messaging.Domain.csproj", "{093FBBA9-B7CF-411E-93DA-2B743FA153AB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationsEvents", "IntegrationEvents\source\IntegrationEvents\IntegrationsEvents.csproj", "{4C5AFBBF-9992-4104-BC0B-3E3714C5D538}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationEvents", "IntegrationEvents\source\IntegrationEvents\IntegrationEvents.csproj", "{4C5AFBBF-9992-4104-BC0B-3E3714C5D538}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32526.322
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationsEvents", "source\IntegrationEvents\IntegrationsEvents.csproj", "{4C5AFBBF-9992-4104-BC0B-3E3714C5D538}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationEvents", "source\IntegrationEvents\IntegrationEvents.csproj", "{4C5AFBBF-9992-4104-BC0B-3E3714C5D538}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

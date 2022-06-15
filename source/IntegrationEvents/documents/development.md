@@ -4,7 +4,7 @@ Notes regarding the development of the NuGet package bundle `IntegrationEvents`.
 
 The bundle contains the following packages:
 
-* `Energinet.DataHub.EnergySupplying.IntegrationsEvents`
+* `Energinet.DataHub.EnergySupplying.IntegrationEvents`
 
 The package contains integration event classes for energy supplying domain (formerly market roles)
 
