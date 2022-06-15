@@ -19,6 +19,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Messaging.Application.Common;
+using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Xml;
@@ -51,11 +52,12 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         public async Task Transaction_is_started()
         {
             var incomingMessage = MessageBuilder()
-                    .Build();
+                .Build();
 
             await _moveInRequestHandler.HandleAsync(incomingMessage).ConfigureAwait(false);
 
-            AssertTransactionIsStarted(incomingMessage.MarketActivityRecord.Id);
+            AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>())
+                .HasState(MoveInTransaction.State.Started);
         }
 
         [Fact]
@@ -110,7 +112,8 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
         private static IncomingMessageBuilder MessageBuilder()
         {
-            return new IncomingMessageBuilder();
+            return new IncomingMessageBuilder()
+                .WithTransactionId(SampleData.TransactionId);
         }
 
         private async Task AssertRejectMessage(OutgoingMessage rejectMessage)
@@ -150,15 +153,6 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
             var validationResult = await MessageValidator.ValidateAsync(dispatchedDocument, schema!);
             Assert.True(validationResult.IsValid);
-        }
-
-        private void AssertTransactionIsStarted(string transactionId)
-        {
-            var checkStatement =
-                $"SELECT * FROM b2b.MoveInTransactions WHERE TransactionId = '{transactionId}' AND State = 'Started'";
-            var context = GetService<B2BContext>();
-            var transaction = context.Transactions.FromSqlRaw(checkStatement).FirstOrDefault();
-            Assert.NotNull(transaction);
         }
 
         private HttpClientSpy GetHttpClientMock()
