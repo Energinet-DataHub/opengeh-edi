@@ -8,11 +8,9 @@ The bundle contains the following packages:
 
 The package contains integration event classes for energy supplying domain (formerly market roles)
 
-> Information that is relevant for multiple NuGet package bundles should be written in the general [development.md](../../../documents/development.md).
-
 ## Workflows
 
-### `integration-events.yml`
+### `integration-events-publish.yml`
 
 This workflow handles test, build, pack and publish of the bundle.
 
@@ -28,6 +26,6 @@ If the workflow is triggered:
 
 ## Updating integration events
 
-If the integration event proto files are updated, building Energinet.DataHub.MarketRoles will compile them and put them in /integrationevents/source/integrationevents/ folder.
+If the integration event proto files are updated, building `Energinet.DataHub.MarketRoles` solution will compile them and put them in `/integrationevents/source/integrationevents/` folder.
 
 License comments must be applied to each file if not present.

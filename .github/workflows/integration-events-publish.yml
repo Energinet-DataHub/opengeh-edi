@@ -21,16 +21,16 @@ on:
     branches:
       - main
     paths:
-      - source/IntegrationEvents/source/Events/**
-      - .github/workflows/integration-events.yml
+      - source/IntegrationEvents/source/IntegrationEvents/**
+      - .github/workflows/integration-events-publish.yml
   # Build, test, pack
-  # Executed if TestCommon folder or build scripts has changed; including if documentation or tests has changed
+  # Executed if Integration events folder or build scripts has changed; including if documentation or tests has changed
   pull_request:
     branches:
       - main
     paths:
       - source/IntegrationEvents/**
-      - .github/workflows/integration-events.yml
+      - .github/workflows/integration-events-publish.yml
   # Build, test, pack and publish prerelease packages
   # Executed if manually triggered
   workflow_dispatch: {}
@@ -53,23 +53,21 @@ jobs:
     permissions:
       contents: read
 
-    environment: CI
-
     steps:
       - name: Checkout repository
-        uses: Energinet-DataHub/.github/.github/actions/nuget-checkout-repository@7.4.0
+        uses: Energinet-DataHub/.github/.github/actions/nuget-checkout-repository@7.5.0
 
       - name: Setup dotnet and tools
-        uses: Energinet-DataHub/.github/.github/actions/dotnet-setup-and-tools@7.4.0
+        uses: Energinet-DataHub/.github/.github/actions/dotnet-setup-and-tools@7.5.0
         with:
-          DOTNET_VERSION: '5.0.407'
+          DOTNET_VERSION: '6.0.300'
           USE_AZURE_FUNCTIONS_TOOLS: 'true'
           NODE_VERSION: '16'
           AZURITE_VERSION: '3.15.0'
           AZURE_FUNCTIONS_CORE_TOOLS_VERSION: '4.0.3971'
 
       - name: Build and test solution
-        uses: Energinet-DataHub/.github/.github/actions/dotnet-solution-build-and-test@7.4.0
+        uses: Energinet-DataHub/.github/.github/actions/dotnet-solution-build-and-test@7.5.0
         with:
           SOLUTION_FILE_PATH: './source/IntegrationEvents/IntegrationEvents.sln'
           CODE_COVERAGE_FLAGS: integrationevents
@@ -80,7 +78,7 @@ jobs:
           AZURE_SPN_SECRET: ${{ secrets.AZURE_SPN_SECRET }}
 
       - name: Pack IntegrationEvents project
-        uses: Energinet-DataHub/.github/.github/actions/nuget-project-pack@7.4.0
+        uses: Energinet-DataHub/.github/.github/actions/nuget-project-pack@7.5.0
         with:
           PROJECT_PATH: './source/IntegrationEvents/IntegrationEvents.csproj'
 
@@ -93,7 +91,7 @@ jobs:
             .github/workflows/integration-events.yml
 
       - name: Assert versions of NuGet packages and push them to NuGet.org
-        uses: Energinet-DataHub/.github/.github/actions/nuget-packages-assert-and-push@7.4.0
+        uses: Energinet-DataHub/.github/.github/actions/nuget-packages-assert-and-push@7.5.0
         with:
           PUSH_PACKAGES: ${{ env.PUSH_PACKAGES }}
           CONTENT_CHANGED: ${{ steps.changed-content.outputs.any_changed }}
