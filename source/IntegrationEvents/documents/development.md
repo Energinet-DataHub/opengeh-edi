@@ -22,7 +22,7 @@ Before publishing anything an action verifies that there is no released version 
 
 If the workflow is triggered:
 
-* Manually (`workflow_dispatch`), a pre-release version of the packages are published.
+* Manually (`workflow_dispatch`), a prerelease version of the packages are published.
 * By `pull_request`, then the packages are not published.
 * By `push` to main, the a release version of the packages are published.
 
