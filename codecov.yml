@@ -15,7 +15,6 @@ flags:
       - source/Messaging.Infrastructure
       - source/Messaging.IntegrationTests
       - source/Processing.IntegrationTests
-      - source/IntegrationEvents
 
 coverage:
   status:
