@@ -22,12 +22,12 @@ Before publishing anything an action verifies that there is no released version 
 
 If the workflow is triggered:
 
-* Manually (`workflow_dispatch`), a pre release version of the packages are published.
+* Manually (`workflow_dispatch`), a pre-release version of the packages are published.
 * By `pull_request`, then the packages are not published.
 * By `push` to main, the a release version of the packages are published.
 
 ## Updating integration events
 
-If the integration event proto files are updated, building Energinet.DataHub.MarketRoles will compile them and put them in entegrationevents/source/integrationevents/ folder.
+If the integration event proto files are updated, building Energinet.DataHub.MarketRoles will compile them and put them in /integrationevents/source/integrationevents/ folder.
 
 License comments must be applied to each file if not present.
