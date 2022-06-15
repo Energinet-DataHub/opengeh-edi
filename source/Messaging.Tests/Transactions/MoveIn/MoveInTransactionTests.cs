@@ -34,7 +34,7 @@ public class MoveInTransactionTests
         Assert.Equal(1, transaction.DomainEvents.Count);
         Assert.Contains(transaction.DomainEvents, e => e is PendingBusinessProcess);
 
-        AssertProcessId(transaction);
+        AssertProcessId(requestResult, transaction);
     }
 
     [Fact]
@@ -84,10 +84,9 @@ public class MoveInTransactionTests
         return BusinessRequestResult.Succeeded(Guid.NewGuid().ToString());
     }
 
-    private static void AssertProcessId(MoveInTransaction transaction)
+    private static void AssertProcessId(BusinessRequestResult requestResult, MoveInTransaction transaction)
     {
         var pendingBusinessProcess = transaction.DomainEvents.First() as PendingBusinessProcess;
-        Assert.NotNull(pendingBusinessProcess?.ProcessId);
-        Assert.Equal(pendingBusinessProcess?.ProcessId, transaction.ProcessId);
+        Assert.Equal(pendingBusinessProcess?.ProcessId, requestResult.ProcessId);
     }
 }
