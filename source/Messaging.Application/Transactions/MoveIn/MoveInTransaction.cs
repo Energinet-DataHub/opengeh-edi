@@ -61,7 +61,7 @@ namespace Messaging.Application.Transactions.MoveIn
             {
                 ProcessId = businessRequestResult.ProcessId;
                 _state = State.Started;
-                _domainEvents.Add(new PendingBusinessProcess() { ProcessId = ProcessId! });
+                _domainEvents.Add(new PendingBusinessProcess(ProcessId!));
             }
         }
 

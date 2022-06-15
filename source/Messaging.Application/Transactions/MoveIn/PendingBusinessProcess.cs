@@ -12,9 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace Messaging.Application.Transactions.MoveIn;
 
 public class PendingBusinessProcess
 {
-    public string? ProcessId { get; set; }
+    public PendingBusinessProcess(string processId)
+    {
+        if (processId == null) throw new ArgumentNullException(nameof(processId));
+        ProcessId = processId;
+    }
+
+    public string ProcessId { get; }
 }
