@@ -16,6 +16,7 @@ using System;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.Transactions.MoveIn;
+using Processing.Domain.MeteringPoints;
 using Xunit;
 
 namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
@@ -49,6 +50,12 @@ public class AssertTransaction
     public AssertTransaction HasState(MoveInTransaction.State expectedState)
     {
         Assert.Equal(expectedState.ToString(), _transaction.State);
+        return this;
+    }
+
+    public AssertTransaction HasProcessId(string expectedProcessId)
+    {
+        Assert.Equal(expectedProcessId, _transaction.ProcessId);
         return this;
     }
 }
