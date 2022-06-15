@@ -13,6 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Threading.Tasks;
+using Messaging.Application.Transactions.MoveIn;
+using Messaging.Infrastructure.Configuration.InternalCommands;
 using Energinet.DataHub.EnergySupplying.IntegrationEvents;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
@@ -22,14 +25,16 @@ namespace Messaging.Api.EventListeners;
 public class ConsumerMovedInListener
 {
     private readonly ILogger<ConsumerMovedInListener> _logger;
+    private readonly CommandSchedulerFacade _commandScheduler;
 
-    public ConsumerMovedInListener(ILogger<ConsumerMovedInListener> logger)
+    public ConsumerMovedInListener(ILogger<ConsumerMovedInListener> logger, CommandSchedulerFacade commandScheduler)
     {
         _logger = logger;
+        _commandScheduler = commandScheduler;
     }
 
     [Function("ConsumerMovedInListener")]
-    public void Run(
+    public async Task RunAsync(
         [ServiceBusTrigger("consumer-moved-in", "consumer-moved-in", Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS_LISTENER")] byte[] data,
         FunctionContext context)
     {
@@ -38,5 +43,7 @@ public class ConsumerMovedInListener
 
         var consumerMovedIn = ConsumerMovedIn.Parser.ParseFrom(data);
         _logger.LogInformation($"Received consumer moved in event: {consumerMovedIn}");
+        await _commandScheduler.EnqueueAsync(new CompleteMoveInTransaction(consumerMovedIn.ProcessId))
+            .ConfigureAwait(false);
     }
 }

@@ -23,6 +23,7 @@ using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.IncomingMessages;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using NodaTime.Text;
 using MarketActivityRecord = Messaging.Application.IncomingMessages.RequestChangeOfSupplier.MarketActivityRecord;
 
@@ -37,7 +38,7 @@ namespace Messaging.Application.Transactions.MoveIn
         private readonly IMarketActivityRecordParser _marketActivityRecordParser;
         private readonly IMoveInRequester _moveInRequester;
         private readonly IValidationErrorTranslator _validationErrorTranslator;
-        private readonly IMarketEvaluationPointProvider _marketEvaluationPointProvider;
+        private readonly IMarketEvaluationPointRepository _marketEvaluationPointRepository;
 
         public MoveInRequestHandler(
             IMoveInTransactionRepository moveInTransactionRepository,
@@ -47,7 +48,7 @@ namespace Messaging.Application.Transactions.MoveIn
             IMarketActivityRecordParser marketActivityRecordParser,
             IMoveInRequester moveInRequester,
             IValidationErrorTranslator validationErrorTranslator,
-            IMarketEvaluationPointProvider marketEvaluationPointProvider)
+            IMarketEvaluationPointRepository marketEvaluationPointRepository)
         {
             _moveInTransactionRepository = moveInTransactionRepository;
             _outgoingMessageStore = outgoingMessageStore;
@@ -56,7 +57,7 @@ namespace Messaging.Application.Transactions.MoveIn
             _marketActivityRecordParser = marketActivityRecordParser;
             _moveInRequester = moveInRequester;
             _validationErrorTranslator = validationErrorTranslator;
-            _marketEvaluationPointProvider = marketEvaluationPointProvider;
+            _marketEvaluationPointRepository = marketEvaluationPointRepository;
         }
 
         public async Task HandleAsync(IncomingMessage incomingMessage)
@@ -64,13 +65,13 @@ namespace Messaging.Application.Transactions.MoveIn
             if (incomingMessage == null) throw new ArgumentNullException(nameof(incomingMessage));
 
             var marketEvaluationPoint =
-                await _marketEvaluationPointProvider.GetByGsrnNumberAsync(incomingMessage.MarketActivityRecord.MarketEvaluationPointId).ConfigureAwait(false);
+                await _marketEvaluationPointRepository.GetByNumberAsync(incomingMessage.MarketActivityRecord.MarketEvaluationPointId).ConfigureAwait(false);
 
             var transaction = new MoveInTransaction(
                 incomingMessage.MarketActivityRecord.Id,
                 incomingMessage.MarketActivityRecord.MarketEvaluationPointId,
                 InstantPattern.General.Parse(incomingMessage.MarketActivityRecord.EffectiveDate).GetValueOrThrow(),
-                marketEvaluationPoint.GlnNumberOfEnergySupplier);
+                marketEvaluationPoint?.EnergySupplierNumber);
 
             var businessProcessResult = await InvokeBusinessProcessAsync(incomingMessage).ConfigureAwait(false);
             if (businessProcessResult.Success == false)

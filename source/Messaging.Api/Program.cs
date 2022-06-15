@@ -104,8 +104,7 @@ namespace Messaging.Api
                         .AddRequestHandler<NotifyMessageHubHandler>()
                         .AddNotificationHandler<PublishNewMessagesOnTimeHasPassed, TimeHasPassed>()
                         .AddHttpClientAdapter(sp => new HttpClientAdapter(sp.GetRequiredService<HttpClient>()))
-                        .AddMoveInServices(new MoveInConfiguration(new Uri(runtime.MOVE_IN_REQUEST_ENDPOINT ?? throw new ArgumentException(nameof(runtime.MOVE_IN_REQUEST_ENDPOINT)))))
-                        .AddMasterDataServices(new MarketEvaluationPointProvider());
+                        .AddMoveInServices(new MoveInConfiguration(new Uri(runtime.MOVE_IN_REQUEST_ENDPOINT ?? throw new ArgumentException(nameof(runtime.MOVE_IN_REQUEST_ENDPOINT)))));
 
                     services.AddLiveHealthCheck();
                     services.AddInternalDomainServiceBusQueuesHealthCheck(

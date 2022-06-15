@@ -33,7 +33,6 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
         private readonly MessageRequestHandler _messageRequestHandler;
         private readonly MoveInRequestHandler _moveInRequestHandler;
         private readonly MessageDispatcherSpy _messageDispatcherSpy;
-        private readonly MarketEvaluationPointProviderStub _marketEvaluationPointProviderStub;
 
         public MessageRequestTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
@@ -42,7 +41,6 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
             _moveInRequestHandler = GetService<MoveInRequestHandler>();
             _messageRequestHandler = GetService<MessageRequestHandler>();
             _messageDispatcherSpy = (MessageDispatcherSpy)GetService<IMessageDispatcher>();
-            _marketEvaluationPointProviderStub = (MarketEvaluationPointProviderStub)GetService<IMarketEvaluationPointProvider>();
         }
 
         [Fact]
@@ -121,6 +119,12 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
             Assert.Contains(result.Errors, error => error is OutgoingMessageNotFoundException);
         }
 
+        private static IncomingMessageBuilder MessageBuilder()
+        {
+            return new IncomingMessageBuilder()
+                .WithProcessType(ProcessType.MoveIn.Code);
+        }
+
         private async Task<IncomingMessage> MessageArrived()
         {
             var incomingMessage = MessageBuilder()
@@ -133,14 +137,6 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
         {
             await _moveInRequestHandler.HandleAsync(arrivedMessage).ConfigureAwait(false);
             return arrivedMessage;
-        }
-
-        private IncomingMessageBuilder MessageBuilder()
-        {
-            return new IncomingMessageBuilder()
-                .WithProcessType(ProcessType.MoveIn.Code)
-                .WithMarketEvaluationPointId(_marketEvaluationPointProviderStub.MarketEvaluationPoints.First()
-                    .GsrnNumber);
         }
     }
 }

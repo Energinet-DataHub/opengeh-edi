@@ -91,12 +91,6 @@ namespace Messaging.Infrastructure.Configuration
             return new CompositionRoot(services);
         }
 
-        public CompositionRoot AddMasterDataServices(IMarketEvaluationPointProvider marketEvaluationPointProvider)
-        {
-            _services.AddScoped(_ => marketEvaluationPointProvider);
-            return this;
-        }
-
         public CompositionRoot AddDatabaseContext(string connectionString)
         {
             _services.AddDbContext<B2BContext>(x =>
@@ -231,6 +225,7 @@ namespace Messaging.Infrastructure.Configuration
         {
             _services.AddTransient<CommandExecutor>();
             _services.AddScoped<ICommandScheduler, CommandScheduler>();
+            _services.AddScoped<CommandSchedulerFacade>();
             _services.AddTransient<InternalCommandAccessor>();
             _services.AddTransient<InternalCommandProcessor>();
             _services.AddTransient<INotificationHandler<TimeHasPassed>, ProcessInternalCommandsOnTimeHasPassed>();
