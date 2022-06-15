@@ -12,22 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Application.Common;
+namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
 
-public class MarketEvaluationPoint
+internal static class SampleData
 {
-    public MarketEvaluationPoint(string? glnNumberOfEnergySupplier, string gsrnNumber)
-    {
-        GlnNumberOfEnergySupplier = glnNumberOfEnergySupplier;
-        GsrnNumber = gsrnNumber;
-    }
+    internal static string MateringPointNumber => "571234567891234568";
 
-    public MarketEvaluationPoint(string gsrnNumber)
-    {
-        GsrnNumber = gsrnNumber;
-    }
-
-    public string GsrnNumber { get; }
-
-    public string? GlnNumberOfEnergySupplier { get; }
+    internal static string EnergySupplierNumber => "5790000555550";
 }
