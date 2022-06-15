@@ -38,12 +38,6 @@ on:
 env:
   # Conditions
   PUSH_PACKAGES: ${{ github.event_name != 'pull_request' }}
-  # Variables necessary to manage Azure resources for tests (similar to local use of 'integrationtest.local.settings.json')
-  AZURE_KEYVAULT_URL: ${{ secrets.AZURE_KEYVAULT_URL }}
-  # Set value used by 'AzuriteManager'
-  AzuriteBlobFolderPath: '${{ github.workspace }}\node_modules\.bin\'
-  # Overrides settings in 'functionhost.settings.json'
-  FunctionAppHostPath: '${{ github.workspace }}\node_modules\azure-functions-core-tools\bin\func.dll'
 
 jobs:
   build_and_publish:
@@ -61,33 +55,24 @@ jobs:
         uses: Energinet-DataHub/.github/.github/actions/dotnet-setup-and-tools@7.5.0
         with:
           DOTNET_VERSION: '6.0.300'
-          USE_AZURE_FUNCTIONS_TOOLS: 'true'
-          NODE_VERSION: '16'
-          AZURITE_VERSION: '3.15.0'
-          AZURE_FUNCTIONS_CORE_TOOLS_VERSION: '4.0.3971'
 
       - name: Build and test solution
         uses: Energinet-DataHub/.github/.github/actions/dotnet-solution-build-and-test@7.5.0
         with:
           SOLUTION_FILE_PATH: './source/IntegrationEvents/IntegrationEvents.sln'
           CODE_COVERAGE_FLAGS: integrationevents
-          AZURE_KEYVAULT_URL: ${{ secrets.AZURE_KEYVAULT_URL }}
-          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          AZURE_SPN_ID: ${{ secrets.AZURE_SPN_ID }}
-          AZURE_SPN_SECRET: ${{ secrets.AZURE_SPN_SECRET }}
 
       - name: Pack IntegrationEvents project
         uses: Energinet-DataHub/.github/.github/actions/nuget-project-pack@7.5.0
         with:
-          PROJECT_PATH: './source/IntegrationEvents/IntegrationEvents.csproj'
+          PROJECT_PATH: './source/IntegrationEvents/source/IntegrationEvents/IntegrationEvents.csproj'
 
       - name: Package content or build has changed
         id: changed-content
         uses: tj-actions/changed-files@v17.2
         with:
           files: |
-            source/IntegrationEvents/source/Events/**/*.*
+            source/IntegrationEvents/source/IntegrationEvents/**/*.*
             .github/workflows/integration-events.yml
 
       - name: Assert versions of NuGet packages and push them to NuGet.org
