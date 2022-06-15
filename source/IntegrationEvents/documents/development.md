@@ -1,4 +1,4 @@
-# Development notes for IntegrationEvents
+# Development notes for integration events
 
 Notes regarding the development of the NuGet package bundle `IntegrationEvents`.
 
@@ -6,7 +6,7 @@ The bundle contains the following packages:
 
 * `Energinet.DataHub.EnergySupplying.IntegrationsEvents`
 
-The package contains integration event classes for EnergySupplying domain (formerly MarketRoles)
+The package contains integration event classes for energy supplying domain (formerly market roles)
 
 > Information that is relevant for multiple NuGet package bundles should be written in the general [development.md](../../../documents/development.md).
 
@@ -22,12 +22,12 @@ Before publishing anything an action verifies that there is no released version 
 
 If the workflow is triggered:
 
-* Manually (`workflow_dispatch`), a prerelease version of the packages are published.
+* Manually (`workflow_dispatch`), a pre release version of the packages are published.
 * By `pull_request`, then the packages are not published.
 * By `push` to main, the a release version of the packages are published.
 
 ## Updating integration events
 
-If the integration event proto files are updated, building Energinet.DataHub.MArketRoles will compile them and put them in IntegrationEvents/source/IntegrationEvents/ folder.
+If the integration event proto files are updated, building Energinet.DataHub.MarketRoles will compile them and put them in entegrationevents/source/integrationevents/ folder.
 
 License comments must be applied to each file if not present.
