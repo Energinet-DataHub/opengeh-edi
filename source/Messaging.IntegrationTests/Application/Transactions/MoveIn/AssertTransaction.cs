@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Runtime.CompilerServices;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.Transactions.MoveIn;
