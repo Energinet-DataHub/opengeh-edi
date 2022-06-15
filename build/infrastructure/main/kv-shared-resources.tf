@@ -87,7 +87,7 @@ data "azurerm_key_vault_secret" "sbt_energy_supplier_changed_name" {
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }
 
-data "azurerm_key_vault_secret" "sbt_energy_supplier_changed_to_messaging_name" {
+data "azurerm_key_vault_secret" "sbs_energy_supplier_changed_to_messaging_name" {
   name = "sbt-energy-supplier-changed-to-messaging-name"
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }
