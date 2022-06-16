@@ -64,4 +64,10 @@ public class AssertTransaction
         Assert.Equal(startedByMessageId, _transaction.StartedByMessageId);
         return this;
     }
+
+    public AssertTransaction HasNewEnergySupplierId(string newEnergySupplierId)
+    {
+        Assert.Equal(newEnergySupplierId, _transaction.NewEnergySupplierId);
+        return this;
+    }
 }

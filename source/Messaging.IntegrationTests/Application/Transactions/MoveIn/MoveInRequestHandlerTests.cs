@@ -56,7 +56,8 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
             AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>())
                 .HasState(MoveInTransaction.State.Started)
-                .HasStartedByMessageId(incomingMessage.Message.MessageId);
+                .HasStartedByMessageId(incomingMessage.Message.MessageId)
+                .HasNewEnergySupplierId(incomingMessage.Message.SenderId);
         }
 
         [Fact]

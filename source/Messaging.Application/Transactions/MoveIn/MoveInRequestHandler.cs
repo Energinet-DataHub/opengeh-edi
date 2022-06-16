@@ -72,7 +72,8 @@ namespace Messaging.Application.Transactions.MoveIn
                 incomingMessage.MarketActivityRecord.MarketEvaluationPointId,
                 InstantPattern.General.Parse(incomingMessage.MarketActivityRecord.EffectiveDate).GetValueOrThrow(),
                 marketEvaluationPoint?.EnergySupplierNumber,
-                incomingMessage.Message.MessageId);
+                incomingMessage.Message.MessageId,
+                incomingMessage.Message.SenderId);
 
             var businessProcessResult = await InvokeBusinessProcessAsync(incomingMessage).ConfigureAwait(false);
             if (businessProcessResult.Success == false)
@@ -130,7 +131,7 @@ namespace Messaging.Application.Transactions.MoveIn
                 transaction.StartedByMessageId,
                 processType.Confirm.DocumentType,
                 processType.Code,
-                incomingMessage.Message.SenderId,
+                transaction.NewEnergySupplierId,
                 _marketActivityRecordParser.From(marketActivityRecord),
                 processType.Confirm.BusinessReasonCode);
         }

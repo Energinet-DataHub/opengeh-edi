@@ -18,7 +18,9 @@ internal static class SampleData
 {
     internal static string MateringPointNumber => "571234567891234568";
 
-    internal static string EnergySupplierNumber => "5790000555550";
+    internal static string CurrentEnergySupplierNumber => "5790000555550";
+
+    internal static string NewEnergySupplierNumber => "5790000555551";
 
     internal static string TransactionId => "8BA514FA-2E4D-4CB7-8B4A-1B1137185BD7";
 

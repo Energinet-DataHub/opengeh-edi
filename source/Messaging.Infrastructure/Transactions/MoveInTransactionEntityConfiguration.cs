@@ -29,6 +29,7 @@ namespace Messaging.Infrastructure.Transactions
             builder.Property(x => x.EffectiveDate);
             builder.Property(x => x.MarketEvaluationPointId);
             builder.Property(x => x.CurrentEnergySupplierId);
+            builder.Property(x => x.NewEnergySupplierId);
             builder.Property<MoveInTransaction.State>("_state")
                 .HasConversion(toDbValue => toDbValue.ToString(), fromDbValue => Enum.Parse<MoveInTransaction.State>(fromDbValue, true))
                 .HasColumnName("State");
