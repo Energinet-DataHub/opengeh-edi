@@ -79,7 +79,7 @@ namespace Messaging.Application.Transactions.MoveIn
             if (businessProcessResult.Success == false)
             {
                 var reasons = await CreateReasonsFromAsync(businessProcessResult.ValidationErrors).ConfigureAwait(false);
-                _outgoingMessageStore.Add(RejectMessageFrom(incomingMessage, transaction.TransactionId, reasons));
+                _outgoingMessageStore.Add(RejectMessageFrom(reasons, transaction));
             }
             else
             {
@@ -134,23 +134,21 @@ namespace Messaging.Application.Transactions.MoveIn
                 ProcessType.MoveIn.Confirm.BusinessReasonCode);
         }
 
-        private OutgoingMessage RejectMessageFrom(IncomingMessage incomingMessage, string transactionId, IReadOnlyCollection<Reason> reasons)
+        private OutgoingMessage RejectMessageFrom(IReadOnlyCollection<Reason> reasons, MoveInTransaction transaction)
         {
             var marketActivityRecord = new OutgoingMessages.RejectRequestChangeOfSupplier.MarketActivityRecord(
                 Guid.NewGuid().ToString(),
-                transactionId,
-                incomingMessage.MarketActivityRecord.MarketEvaluationPointId,
+                transaction.TransactionId,
+                transaction.MarketEvaluationPointId,
                 reasons);
 
-            var processType = ProcessType.FromCode(incomingMessage.Message.ProcessType);
-
             return CreateOutgoingMessage(
-                incomingMessage.Id,
-                processType.Reject.DocumentType,
-                processType.Code,
-                incomingMessage.Message.SenderId,
+                transaction.StartedByMessageId,
+                ProcessType.MoveIn.Reject.DocumentType,
+                ProcessType.MoveIn.Code,
+                transaction.NewEnergySupplierId,
                 _marketActivityRecordParser.From(marketActivityRecord),
-                processType.Reject.BusinessReasonCode);
+                ProcessType.MoveIn.Reject.BusinessReasonCode);
         }
 
         private Task<ReadOnlyCollection<Reason>> CreateReasonsFromAsync(IReadOnlyCollection<string> validationErrors)
