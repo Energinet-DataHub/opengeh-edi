@@ -21,7 +21,7 @@ namespace Messaging.Application.Transactions.MoveIn
     public class MoveInTransaction
     {
         private readonly List<object> _domainEvents = new List<object>();
-        private bool _started;
+        private State _state = State.NotStarted;
 
         public MoveInTransaction(string transactionId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId)
         {
@@ -29,6 +29,13 @@ namespace Messaging.Application.Transactions.MoveIn
             MarketEvaluationPointId = marketEvaluationPointId;
             EffectiveDate = effectiveDate;
             CurrentEnergySupplierId = currentEnergySupplierId;
+        }
+
+        public enum State
+        {
+            NotStarted,
+            Started,
+            Completed,
         }
 
         public string TransactionId { get; }
@@ -52,17 +59,21 @@ namespace Messaging.Application.Transactions.MoveIn
             }
             else
             {
-                _started = true;
-                _domainEvents.Add(new PendingBusinessProcess());
+                ProcessId = businessRequestResult.ProcessId;
+                _state = State.Started;
+                _domainEvents.Add(new PendingBusinessProcess(ProcessId!));
             }
         }
 
         public void Complete()
         {
-            if (_started)
+            if (_state == State.Completed)
             {
-                _domainEvents.Add(new MoveInTransactionCompleted());
+                throw new MoveInException($"Transaction {TransactionId} is already completed.");
             }
+
+            _state = State.Completed;
+            _domainEvents.Add(new MoveInTransactionCompleted());
         }
     }
 }

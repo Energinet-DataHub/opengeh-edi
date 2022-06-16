@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
 using NodaTime;
@@ -32,6 +33,8 @@ public class MoveInTransactionTests
 
         Assert.Equal(1, transaction.DomainEvents.Count);
         Assert.Contains(transaction.DomainEvents, e => e is PendingBusinessProcess);
+
+        AssertProcessId(requestResult, transaction);
     }
 
     [Fact]
@@ -57,6 +60,16 @@ public class MoveInTransactionTests
         Assert.Contains(transaction.DomainEvents, e => e is MoveInTransactionCompleted);
     }
 
+    [Fact]
+    public void Can_not_complete_transaction_if_already_completed()
+    {
+        var transaction = CreateTransaction();
+        transaction.Start(BusinessRequestSucceeded());
+        transaction.Complete();
+
+        Assert.Throws<MoveInException>(() => transaction.Complete());
+    }
+
     private static MoveInTransaction CreateTransaction()
     {
         return new MoveInTransaction(
@@ -69,5 +82,11 @@ public class MoveInTransactionTests
     private static BusinessRequestResult BusinessRequestSucceeded()
     {
         return BusinessRequestResult.Succeeded(Guid.NewGuid().ToString());
+    }
+
+    private static void AssertProcessId(BusinessRequestResult requestResult, MoveInTransaction transaction)
+    {
+        var pendingBusinessProcess = transaction.DomainEvents.First() as PendingBusinessProcess;
+        Assert.Equal(pendingBusinessProcess?.ProcessId, requestResult.ProcessId);
     }
 }

@@ -48,7 +48,7 @@ namespace Messaging.Infrastructure.Configuration.DataAccess
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
 
-            modelBuilder.ApplyConfiguration(new TransactionEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new MoveInTransactionEntityConfiguration());
             modelBuilder.ApplyConfiguration(new OutgoingMessageEntityConfiguration());
             modelBuilder.ApplyConfiguration(new QueuedInternalCommandEntityConfiguration());
             modelBuilder.ApplyConfiguration(new MarketEvaluationPointEntityConfiguration());

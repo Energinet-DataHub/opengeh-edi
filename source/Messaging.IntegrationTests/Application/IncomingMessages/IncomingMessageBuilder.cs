@@ -22,16 +22,18 @@ namespace Messaging.IntegrationTests.Application.IncomingMessages
 {
     internal class IncomingMessageBuilder
     {
+        private const string NotSet = "NotSet";
         private readonly string _createdAt = SystemClock.Instance.GetCurrentInstant().ToString();
         private readonly string _receiverRole = "DDQ";
         private readonly string _senderRole = "DDZ";
         private readonly Instant _effectiveDate = SystemClock.Instance.GetCurrentInstant();
         private readonly string _messageId = Guid.NewGuid().ToString();
-        private string _processType = "NotSet";
-        private string _senderId = "NotSet";
+        private string _processType = NotSet;
+        private string _senderId = NotSet;
         private string _receiverId = DataHubDetails.IdentificationNumber;
-        private string? _consumerName = "NotSet";
-        private string _marketEvaluationPointId = "NotSet";
+        private string? _consumerName = NotSet;
+        private string _marketEvaluationPointId = NotSet;
+        private string? _transactionId;
 
         internal IncomingMessageBuilder WithMarketEvaluationPointId(string marketEvaluationPointId)
         {
@@ -63,6 +65,12 @@ namespace Messaging.IntegrationTests.Application.IncomingMessages
             return this;
         }
 
+        internal IncomingMessageBuilder WithTransactionId(string transactionId)
+        {
+            _transactionId = transactionId;
+            return this;
+        }
+
         internal IncomingMessage Build()
         {
             return IncomingMessage.Create(
@@ -75,7 +83,7 @@ namespace Messaging.IntegrationTests.Application.IncomingMessages
             return new MarketActivityRecord()
             {
                 BalanceResponsibleId = "fake",
-                Id = Guid.NewGuid().ToString(),
+                Id = _transactionId ?? Guid.NewGuid().ToString(),
                 ConsumerId = "fake",
                 ConsumerName = _consumerName,
                 EffectiveDate = _effectiveDate.ToString(),
