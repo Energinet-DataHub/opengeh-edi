@@ -83,7 +83,7 @@ namespace Messaging.Application.Transactions.MoveIn
             }
             else
             {
-                _outgoingMessageStore.Add(ConfirmMessageFrom(incomingMessage, transaction.TransactionId, transaction));
+                _outgoingMessageStore.Add(ConfirmMessageFrom(transaction.TransactionId, transaction));
             }
 
             transaction.Start(businessProcessResult);
@@ -118,22 +118,20 @@ namespace Messaging.Application.Transactions.MoveIn
             return _moveInRequester.InvokeAsync(businessProcess);
         }
 
-        private OutgoingMessage ConfirmMessageFrom(IncomingMessage incomingMessage, string transactionId, MoveInTransaction transaction)
+        private OutgoingMessage ConfirmMessageFrom(string transactionId, MoveInTransaction transaction)
         {
             var marketActivityRecord = new OutgoingMessages.ConfirmRequestChangeOfSupplier.MarketActivityRecord(
                 Guid.NewGuid().ToString(),
                 transactionId,
                 transaction.MarketEvaluationPointId);
 
-            var processType = ProcessType.FromCode(incomingMessage.Message.ProcessType);
-
             return CreateOutgoingMessage(
                 transaction.StartedByMessageId,
-                processType.Confirm.DocumentType,
-                processType.Code,
+                ProcessType.MoveIn.Confirm.DocumentType,
+                ProcessType.MoveIn.Code,
                 transaction.NewEnergySupplierId,
                 _marketActivityRecordParser.From(marketActivityRecord),
-                processType.Confirm.BusinessReasonCode);
+                ProcessType.MoveIn.Confirm.BusinessReasonCode);
         }
 
         private OutgoingMessage RejectMessageFrom(IncomingMessage incomingMessage, string transactionId, IReadOnlyCollection<Reason> reasons)
