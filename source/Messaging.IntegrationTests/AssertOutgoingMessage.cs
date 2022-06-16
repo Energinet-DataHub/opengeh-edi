@@ -35,7 +35,7 @@ namespace Messaging.IntegrationTests
             if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
 
             var message = connectionFactory.GetOpenConnection().QuerySingle(
-                $"SELECT m.Id, m.RecordId, m.DocumentType, m.RecipientId, m.CorrelationId, m.OriginalMessageId, m.ProcessType," +
+                $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.CorrelationId, m.OriginalMessageId, m.ProcessType," +
                 $"m.ReceiverRole, m.SenderId, m.SenderRole, m.ReasonCode, m.MarketActivityRecordPayload " +
                 $" FROM [b2b].[OutgoingMessages] m" +
                 $" WHERE m.OriginalMessageId = '{transactionId}' AND m.DocumentType = '{documentType}' AND m.ProcessType = '{processType}'");
@@ -46,7 +46,7 @@ namespace Messaging.IntegrationTests
 
         public AssertOutgoingMessage HasReceiverId(string receiverId)
         {
-            Assert.Equal(receiverId, _message.RecipientId);
+            Assert.Equal(receiverId, _message.ReceiverId);
             return this;
         }
 

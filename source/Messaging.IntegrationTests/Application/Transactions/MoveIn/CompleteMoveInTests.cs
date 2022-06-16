@@ -22,7 +22,9 @@ using Messaging.Application.OutgoingMessages;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
+using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.IntegrationTests.Fixtures;
+using Microsoft.EntityFrameworkCore;
 using Processing.Domain.SeedWork;
 using Xunit;
 using MarketEvaluationPoint = Messaging.Domain.MasterData.MarketEvaluationPoints.MarketEvaluationPoint;
@@ -39,6 +41,16 @@ public class CompleteMoveInTests : TestBase
     {
         _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
         _transactionRepository = GetService<IMoveInTransactionRepository>();
+    }
+
+    [Fact]
+    public async Task Transaction_is_completed()
+    {
+        var transaction = await CompleteMoveIn().ConfigureAwait(false);
+
+        AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>())
+            .HasState(MoveInTransaction.State.Completed)
+            .HasProcessId(transaction.ProcessId!);
     }
 
     [Fact]
@@ -79,7 +91,7 @@ public class CompleteMoveInTests : TestBase
     {
         await SetupMasterDataDetailsAsync();
         var transaction = new MoveInTransaction(
-            Guid.NewGuid().ToString(),
+            SampleData.TransactionId,
             SampleData.MateringPointNumber,
             _systemDateTimeProvider.Now(),
             SampleData.EnergySupplierNumber);

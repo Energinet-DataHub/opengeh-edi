@@ -53,7 +53,7 @@ namespace Messaging.IntegrationTests.Fixtures
         public void CleanupDatabase()
         {
             var cleanupStatement =
-                $"DELETE FROM [b2b].[Transactions] " +
+                $"DELETE FROM [b2b].[MoveInTransactions] " +
                 $"DELETE FROM [b2b].[MessageIds] " +
                 $"DELETE FROM [b2b].[TransactionIds]" +
                 $"DELETE FROM [b2b].[OutgoingMessages] " +
