@@ -23,7 +23,7 @@ namespace Energinet.DataHub.MarketRoles.ActorRegistrySync.Services;
 public class ActorSyncService : IDisposable
 {
     private readonly ActorRegistryDbService _actorRegistryDbService;
-    private readonly MeteringPointDbService _meteringPointDbService;
+    private readonly MarketRolesDbService _marketRolesDbService;
 
     private bool _disposed;
 
@@ -31,31 +31,31 @@ public class ActorSyncService : IDisposable
     {
         _actorRegistryDbService =
             new ActorRegistryDbService(Environment.GetEnvironmentVariable("ACTOR_REGISTRY_DB_CONNECTION_STRING") ?? throw new InvalidOperationException());
-        _meteringPointDbService = new MeteringPointDbService(
+        _marketRolesDbService = new MarketRolesDbService(
             Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ??
             throw new InvalidOperationException());
     }
 
     public async Task DatabaseCleanUpAsync()
     {
-        await _meteringPointDbService.CleanUpAsync().ConfigureAwait(false);
+        await _marketRolesDbService.CleanUpAsync().ConfigureAwait(false);
     }
 
     public async Task SyncActorsAsync()
     {
         var actors = await _actorRegistryDbService.GetActorsAsync().ConfigureAwait(false);
-        await _meteringPointDbService.InsertActorsAsync(actors).ConfigureAwait(false);
+        await _marketRolesDbService.InsertActorsAsync(actors).ConfigureAwait(false);
     }
 
     public async Task SyncEnergySuppliersAsync()
     {
         var actors = await _actorRegistryDbService.GetEnergySuppliersAsync().ConfigureAwait(false);
-        await _meteringPointDbService.InsertEnergySuppliersAsync(actors).ConfigureAwait(false);
+        await _marketRolesDbService.InsertEnergySuppliersAsync(actors).ConfigureAwait(false);
     }
 
     public async Task CommitTransactionAsync()
     {
-        await _meteringPointDbService.CommitTransactionAsync().ConfigureAwait(false);
+        await _marketRolesDbService.CommitTransactionAsync().ConfigureAwait(false);
     }
 
     public void Dispose()
@@ -74,7 +74,7 @@ public class ActorSyncService : IDisposable
         if (disposing)
         {
             _actorRegistryDbService.Dispose();
-            _meteringPointDbService.Dispose();
+            _marketRolesDbService.Dispose();
         }
 
         _disposed = true;

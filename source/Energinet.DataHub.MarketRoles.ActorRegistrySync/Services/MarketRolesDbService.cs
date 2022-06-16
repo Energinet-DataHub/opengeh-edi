@@ -24,13 +24,13 @@ using Energinet.DataHub.MarketRoles.ActorRegistrySync.Entities;
 
 namespace Energinet.DataHub.MarketRoles.ActorRegistrySync.Services;
 
-public class MeteringPointDbService : IDisposable
+public class MarketRolesDbService : IDisposable
 {
     private readonly SqlConnection _sqlConnection;
     private DbTransaction? _transaction;
     private bool _disposed;
 
-    public MeteringPointDbService(string connectionString)
+    public MarketRolesDbService(string connectionString)
     {
         _sqlConnection = new SqlConnection(connectionString);
     }
