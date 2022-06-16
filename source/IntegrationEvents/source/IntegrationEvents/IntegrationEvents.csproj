@@ -23,7 +23,6 @@ limitations under the License.
     <AssemblyName>Energinet.DataHub.EnergySupplying.IntegrationEvents</AssemblyName>
     <RootNamespace>Energinet.DataHub.EnergySupplying.IntegrationEvents</RootNamespace>
     <Nullable>enable</Nullable>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <IsPackable>true</IsPackable>
     <IsTestProject>false</IsTestProject>
