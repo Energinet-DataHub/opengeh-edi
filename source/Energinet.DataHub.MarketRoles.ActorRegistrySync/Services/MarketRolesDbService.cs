@@ -40,6 +40,8 @@ public class MarketRolesDbService : IDisposable
         if (_transaction == null) await BeginTransactionAsync().ConfigureAwait(false);
         await _sqlConnection.ExecuteAsync("DELETE FROM [dbo].[Actor]", transaction: _transaction)
             .ConfigureAwait(false);
+        await _sqlConnection.ExecuteAsync("DELETE FROM [dbo].[EnergySuppliers]", transaction: _transaction)
+            .ConfigureAwait(false);
     }
 
     public async Task InsertActorsAsync(IEnumerable<Actor> actors)
@@ -70,7 +72,7 @@ public class MarketRolesDbService : IDisposable
         var stringBuilder = new StringBuilder();
         foreach (var energySupplier in energySuppliers)
         {
-            stringBuilder.Append(@"INSERT INTO [dbo].[EnergySupplier] ([Id],[GlnNumber])
+            stringBuilder.Append(@"INSERT INTO [dbo].[EnergySuppliers] ([Id],[GlnNumber])
              VALUES ('" + energySupplier.Id + "', '" + energySupplier.IdentificationNumber + "')");
             stringBuilder.AppendLine();
         }
