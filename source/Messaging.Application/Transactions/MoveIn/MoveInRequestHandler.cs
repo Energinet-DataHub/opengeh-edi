@@ -15,7 +15,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading;
 using System.Threading.Tasks;
+using MediatR;
 using Messaging.Application.Common;
 using Messaging.Application.Common.Reasons;
 using Messaging.Application.Configuration;
@@ -28,7 +30,7 @@ using NodaTime.Text;
 
 namespace Messaging.Application.Transactions.MoveIn
 {
-    public class MoveInRequestHandler
+    public class MoveInRequestHandler : IRequestHandler<IncomingMessage, Unit>
     {
         private readonly IMoveInTransactionRepository _moveInTransactionRepository;
         private readonly IOutgoingMessageStore _outgoingMessageStore;
@@ -59,23 +61,23 @@ namespace Messaging.Application.Transactions.MoveIn
             _marketEvaluationPointRepository = marketEvaluationPointRepository;
         }
 
-        public async Task HandleAsync(IncomingMessage incomingMessage)
+        public async Task<Unit> Handle(IncomingMessage request, CancellationToken cancellationToken)
         {
-            if (incomingMessage == null) throw new ArgumentNullException(nameof(incomingMessage));
+            if (request == null) throw new ArgumentNullException(nameof(request));
 
             var marketEvaluationPoint =
-                await _marketEvaluationPointRepository.GetByNumberAsync(incomingMessage.MarketActivityRecord.MarketEvaluationPointId).ConfigureAwait(false);
+                await _marketEvaluationPointRepository.GetByNumberAsync(request.MarketActivityRecord.MarketEvaluationPointId).ConfigureAwait(false);
 
             var transaction = new MoveInTransaction(
-                incomingMessage.MarketActivityRecord.Id,
-                incomingMessage.MarketActivityRecord.MarketEvaluationPointId,
-                InstantPattern.General.Parse(incomingMessage.MarketActivityRecord.EffectiveDate).GetValueOrThrow(),
+                request.MarketActivityRecord.Id,
+                request.MarketActivityRecord.MarketEvaluationPointId,
+                InstantPattern.General.Parse(request.MarketActivityRecord.EffectiveDate).GetValueOrThrow(),
                 marketEvaluationPoint?.EnergySupplierNumber,
-                incomingMessage.Message.MessageId,
-                incomingMessage.Message.SenderId,
-                incomingMessage.MarketActivityRecord.ConsumerId,
-                incomingMessage.MarketActivityRecord.ConsumerName,
-                incomingMessage.MarketActivityRecord.ConsumerIdType);
+                request.Message.MessageId,
+                request.Message.SenderId,
+                request.MarketActivityRecord.ConsumerId,
+                request.MarketActivityRecord.ConsumerName,
+                request.MarketActivityRecord.ConsumerIdType);
 
             var businessProcessResult = await InvokeBusinessProcessAsync(transaction).ConfigureAwait(false);
             if (businessProcessResult.Success == false)
@@ -91,6 +93,7 @@ namespace Messaging.Application.Transactions.MoveIn
             transaction.Start(businessProcessResult);
             _moveInTransactionRepository.Add(transaction);
             await _unitOfWork.CommitAsync().ConfigureAwait(false);
+            return Unit.Value;
         }
 
         private static string GetConsumerIdType(string? consumerIdType)

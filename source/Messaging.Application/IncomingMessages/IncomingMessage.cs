@@ -14,11 +14,13 @@
 
 using System;
 using System.Text.Json.Serialization;
+using MediatR;
+using Messaging.Application.Common.Commands;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 
 namespace Messaging.Application.IncomingMessages
 {
-    public class IncomingMessage
+    public class IncomingMessage : ICommand<Unit>
     {
         [JsonConstructor]
         public IncomingMessage(MessageHeader message, MarketActivityRecord marketActivityRecord, string id)

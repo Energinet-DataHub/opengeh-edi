@@ -29,6 +29,7 @@ using Messaging.Application.Common.Reasons;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.IncomingMessages;
 using Messaging.Application.MasterData.MarketEvaluationPoints;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
@@ -201,8 +202,8 @@ namespace Messaging.Infrastructure.Configuration
         {
             _services.AddScoped<MoveInNotifications>();
             _services.AddScoped(_ => configuration);
-            _services.AddScoped<MoveInRequestHandler>();
             _services.AddScoped<IMoveInRequester, MoveInRequester>();
+            _services.AddTransient<IRequestHandler<IncomingMessage, Unit>, MoveInRequestHandler>();
             _services.AddTransient<IRequestHandler<CompleteMoveInTransaction, Unit>, CompleteMoveInTransactionHandler>();
             return this;
         }
