@@ -76,4 +76,10 @@ public class AssertTransaction
         Assert.Equal(consumerId, _transaction.ConsumerId);
         return this;
     }
+
+    public AssertTransaction HasConsumerName(string consumerName)
+    {
+        Assert.Equal(consumerName, _transaction.ConsumerName);
+        return this;
+    }
 }

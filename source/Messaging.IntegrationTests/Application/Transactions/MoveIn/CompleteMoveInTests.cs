@@ -97,7 +97,8 @@ public class CompleteMoveInTests : TestBase
             SampleData.CurrentEnergySupplierNumber,
             SampleData.OriginalMessageId,
             SampleData.NewEnergySupplierNumber,
-            SampleData.ConsumerId);
+            SampleData.ConsumerId,
+            SampleData.ConsumerName);
 
         transaction.Start(BusinessRequestResult.Succeeded(Guid.NewGuid().ToString()));
         _transactionRepository.Add(transaction);

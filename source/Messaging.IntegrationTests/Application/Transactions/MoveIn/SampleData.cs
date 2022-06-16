@@ -27,4 +27,6 @@ internal static class SampleData
     internal static string OriginalMessageId => "EDE97146-C592-489A-B23A-3C73C096E368";
 
     internal static string ConsumerId => "12341234";
+
+    internal static string ConsumerName => "John Doe";
 }

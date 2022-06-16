@@ -74,7 +74,8 @@ namespace Messaging.Application.Transactions.MoveIn
                 marketEvaluationPoint?.EnergySupplierNumber,
                 incomingMessage.Message.MessageId,
                 incomingMessage.Message.SenderId,
-                incomingMessage.MarketActivityRecord.ConsumerId!);
+                incomingMessage.MarketActivityRecord.ConsumerId!,
+                incomingMessage.MarketActivityRecord.ConsumerName!);
 
             var businessProcessResult = await InvokeBusinessProcessAsync(incomingMessage, transaction).ConfigureAwait(false);
             if (businessProcessResult.Success == false)
@@ -110,7 +111,7 @@ namespace Messaging.Application.Transactions.MoveIn
         private Task<BusinessRequestResult> InvokeBusinessProcessAsync(IncomingMessage incomingMessage, MoveInTransaction transaction)
         {
             var businessProcess = new MoveInRequest(
-                incomingMessage.MarketActivityRecord.ConsumerName,
+                transaction.ConsumerName,
                 transaction.NewEnergySupplierId,
                 transaction.MarketEvaluationPointId,
                 transaction.EffectiveDate.ToString(),
