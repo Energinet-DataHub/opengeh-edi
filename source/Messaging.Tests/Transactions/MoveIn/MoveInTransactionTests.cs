@@ -78,6 +78,7 @@ public class MoveInTransactionTests
             SystemClock.Instance.GetCurrentInstant(),
             Guid.NewGuid().ToString(),
             Guid.NewGuid().ToString(),
+            Guid.NewGuid().ToString(),
             Guid.NewGuid().ToString());
     }
 

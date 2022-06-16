@@ -70,4 +70,10 @@ public class AssertTransaction
         Assert.Equal(newEnergySupplierId, _transaction.NewEnergySupplierId);
         return this;
     }
+
+    public AssertTransaction HasConsumerId(string consumerId)
+    {
+        Assert.Equal(consumerId, _transaction.ConsumerId);
+        return this;
+    }
 }

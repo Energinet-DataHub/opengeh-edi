@@ -23,7 +23,7 @@ namespace Messaging.Application.Transactions.MoveIn
         private readonly List<object> _domainEvents = new List<object>();
         private State _state = State.NotStarted;
 
-        public MoveInTransaction(string transactionId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId, string startedByMessageId, string newEnergySupplierId)
+        public MoveInTransaction(string transactionId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId, string startedByMessageId, string newEnergySupplierId, string consumerId)
         {
             TransactionId = transactionId;
             MarketEvaluationPointId = marketEvaluationPointId;
@@ -31,6 +31,7 @@ namespace Messaging.Application.Transactions.MoveIn
             CurrentEnergySupplierId = currentEnergySupplierId;
             StartedByMessageId = startedByMessageId;
             NewEnergySupplierId = newEnergySupplierId;
+            ConsumerId = consumerId;
         }
 
         public enum State
@@ -55,6 +56,8 @@ namespace Messaging.Application.Transactions.MoveIn
         public string StartedByMessageId { get; }
 
         public string NewEnergySupplierId { get; }
+
+        public string ConsumerId { get; }
 
         public void Start(BusinessRequestResult businessRequestResult)
         {
