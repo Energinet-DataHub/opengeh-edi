@@ -75,7 +75,7 @@ namespace Messaging.Application.Transactions.MoveIn
                 incomingMessage.Message.MessageId,
                 incomingMessage.Message.SenderId);
 
-            var businessProcessResult = await InvokeBusinessProcessAsync(incomingMessage).ConfigureAwait(false);
+            var businessProcessResult = await InvokeBusinessProcessAsync(incomingMessage, transaction).ConfigureAwait(false);
             if (businessProcessResult.Success == false)
             {
                 var reasons = await CreateReasonsFromAsync(businessProcessResult.ValidationErrors).ConfigureAwait(false);
@@ -106,13 +106,13 @@ namespace Messaging.Application.Transactions.MoveIn
             return consumerType;
         }
 
-        private Task<BusinessRequestResult> InvokeBusinessProcessAsync(IncomingMessage incomingMessage)
+        private Task<BusinessRequestResult> InvokeBusinessProcessAsync(IncomingMessage incomingMessage, MoveInTransaction transaction)
         {
             var businessProcess = new MoveInRequest(
                 incomingMessage.MarketActivityRecord.ConsumerName,
-                incomingMessage.MarketActivityRecord.EnergySupplierId,
-                incomingMessage.MarketActivityRecord.MarketEvaluationPointId,
-                incomingMessage.MarketActivityRecord.EffectiveDate.ToString(),
+                transaction.NewEnergySupplierId,
+                transaction.MarketEvaluationPointId,
+                transaction.EffectiveDate.ToString(),
                 incomingMessage.MarketActivityRecord.ConsumerId,
                 GetConsumerIdType(incomingMessage.MarketActivityRecord));
             return _moveInRequester.InvokeAsync(businessProcess);
