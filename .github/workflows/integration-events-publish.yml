@@ -38,6 +38,7 @@ on:
 env:
   # Conditions
   PUSH_PACKAGES: true
+  AZURE_KEYVAULT_URL: ${{ secrets.AZURE_KEYVAULT_URL }}
 
 jobs:
   build_and_publish:
