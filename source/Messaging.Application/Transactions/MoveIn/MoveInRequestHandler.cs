@@ -122,7 +122,7 @@ namespace Messaging.Application.Transactions.MoveIn
             var marketActivityRecord = new OutgoingMessages.ConfirmRequestChangeOfSupplier.MarketActivityRecord(
                 Guid.NewGuid().ToString(),
                 transactionId,
-                incomingMessage.MarketActivityRecord.MarketEvaluationPointId);
+                transaction.MarketEvaluationPointId);
 
             var processType = ProcessType.FromCode(incomingMessage.Message.ProcessType);
 
