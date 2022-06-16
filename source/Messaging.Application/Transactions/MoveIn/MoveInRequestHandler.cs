@@ -25,7 +25,6 @@ using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using NodaTime.Text;
-using MarketActivityRecord = Messaging.Application.IncomingMessages.RequestChangeOfSupplier.MarketActivityRecord;
 
 namespace Messaging.Application.Transactions.MoveIn
 {
@@ -78,7 +77,7 @@ namespace Messaging.Application.Transactions.MoveIn
                 incomingMessage.MarketActivityRecord.ConsumerName,
                 incomingMessage.MarketActivityRecord.ConsumerIdType);
 
-            var businessProcessResult = await InvokeBusinessProcessAsync(incomingMessage, transaction).ConfigureAwait(false);
+            var businessProcessResult = await InvokeBusinessProcessAsync(transaction).ConfigureAwait(false);
             if (businessProcessResult.Success == false)
             {
                 var reasons = await CreateReasonsFromAsync(businessProcessResult.ValidationErrors).ConfigureAwait(false);
@@ -109,7 +108,7 @@ namespace Messaging.Application.Transactions.MoveIn
             return consumerType;
         }
 
-        private Task<BusinessRequestResult> InvokeBusinessProcessAsync(IncomingMessage incomingMessage, MoveInTransaction transaction)
+        private Task<BusinessRequestResult> InvokeBusinessProcessAsync(MoveInTransaction transaction)
         {
             var businessProcess = new MoveInRequest(
                 transaction.ConsumerName,
