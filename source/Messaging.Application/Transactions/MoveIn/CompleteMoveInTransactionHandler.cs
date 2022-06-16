@@ -57,7 +57,7 @@ public class CompleteMoveInTransactionHandler : IRequestHandler<CompleteMoveInTr
     {
         if (transaction.CurrentEnergySupplierId is not null)
         {
-            _notifications.InformCurrentEnergySupplierAboutEndOfSupply(transaction);
+            _notifications.InformCurrentEnergySupplierAboutEndOfSupply(transaction.TransactionId);
         }
     }
 }
