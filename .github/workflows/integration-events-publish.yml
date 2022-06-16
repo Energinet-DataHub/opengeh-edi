@@ -20,6 +20,7 @@ on:
   push:
     branches:
       - main
+      - 'mathiesen/energysupplier_nuget'
     paths:
       - source/IntegrationEvents/source/IntegrationEvents/**
       - .github/workflows/integration-events-publish.yml
