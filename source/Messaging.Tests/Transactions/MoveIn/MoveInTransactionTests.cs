@@ -80,7 +80,8 @@ public class MoveInTransactionTests
             Guid.NewGuid().ToString(),
             Guid.NewGuid().ToString(),
             Guid.NewGuid().ToString(),
-            Guid.NewGuid().ToString());
+            Guid.NewGuid().ToString(),
+            "ARR");
     }
 
     private static BusinessRequestResult BusinessRequestSucceeded()

@@ -82,4 +82,10 @@ public class AssertTransaction
         Assert.Equal(consumerName, _transaction.ConsumerName);
         return this;
     }
+
+    public AssertTransaction HasConsumerIdType(string consumerIdType)
+    {
+        Assert.Equal(consumerIdType, _transaction.ConsumerIdType);
+        return this;
+    }
 }

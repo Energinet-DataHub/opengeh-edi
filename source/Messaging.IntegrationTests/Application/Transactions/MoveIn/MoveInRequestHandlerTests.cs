@@ -59,7 +59,8 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
                 .HasStartedByMessageId(incomingMessage.Message.MessageId)
                 .HasNewEnergySupplierId(incomingMessage.Message.SenderId)
                 .HasConsumerId(incomingMessage.MarketActivityRecord.ConsumerId!)
-                .HasConsumerName(incomingMessage.MarketActivityRecord.ConsumerName!);
+                .HasConsumerName(incomingMessage.MarketActivityRecord.ConsumerName!)
+                .HasConsumerIdType(incomingMessage.MarketActivityRecord.ConsumerIdType!);
         }
 
         [Fact]

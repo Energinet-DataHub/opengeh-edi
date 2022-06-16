@@ -75,7 +75,8 @@ namespace Messaging.Application.Transactions.MoveIn
                 incomingMessage.Message.MessageId,
                 incomingMessage.Message.SenderId,
                 incomingMessage.MarketActivityRecord.ConsumerId,
-                incomingMessage.MarketActivityRecord.ConsumerName);
+                incomingMessage.MarketActivityRecord.ConsumerName,
+                incomingMessage.MarketActivityRecord.ConsumerIdType);
 
             var businessProcessResult = await InvokeBusinessProcessAsync(incomingMessage, transaction).ConfigureAwait(false);
             if (businessProcessResult.Success == false)
@@ -116,7 +117,7 @@ namespace Messaging.Application.Transactions.MoveIn
                 transaction.MarketEvaluationPointId,
                 transaction.EffectiveDate.ToString(),
                 transaction.ConsumerId,
-                GetConsumerIdType(incomingMessage.MarketActivityRecord.ConsumerIdType));
+                GetConsumerIdType(transaction.ConsumerIdType));
             return _moveInRequester.InvokeAsync(businessProcess);
         }
 

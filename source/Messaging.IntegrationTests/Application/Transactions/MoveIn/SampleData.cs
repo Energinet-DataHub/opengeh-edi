@@ -29,4 +29,6 @@ internal static class SampleData
     internal static string ConsumerId => "12341234";
 
     internal static string ConsumerName => "John Doe";
+
+    internal static string ConsumerIdType => "ARR";
 }
