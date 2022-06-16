@@ -17,7 +17,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Messaging.Application.Common;
-using Processing.Domain.SeedWork;
+using Messaging.Application.Configuration;
 
 namespace Messaging.Application.OutgoingMessages;
 
