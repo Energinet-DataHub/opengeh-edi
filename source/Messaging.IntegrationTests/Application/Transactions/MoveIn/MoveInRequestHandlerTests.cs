@@ -24,12 +24,10 @@ using Messaging.Application.OutgoingMessages;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Xml;
 using Messaging.Application.Xml.SchemaStore;
-using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.Infrastructure.Transactions;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.TestDoubles;
-using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Xunit.Categories;
 
@@ -57,7 +55,8 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             await _moveInRequestHandler.HandleAsync(incomingMessage).ConfigureAwait(false);
 
             AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>())
-                .HasState(MoveInTransaction.State.Started);
+                .HasState(MoveInTransaction.State.Started)
+                .HasStartedByMessageId(incomingMessage.Message.MessageId);
         }
 
         [Fact]

@@ -58,4 +58,10 @@ public class AssertTransaction
         Assert.Equal(expectedProcessId, _transaction.ProcessId);
         return this;
     }
+
+    public AssertTransaction HasStartedByMessageId(string startedByMessageId)
+    {
+        Assert.Equal(startedByMessageId, _transaction.StartedByMessageId);
+        return this;
+    }
 }
