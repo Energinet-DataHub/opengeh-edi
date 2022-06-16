@@ -21,4 +21,6 @@ internal static class SampleData
     internal static string EnergySupplierNumber => "5790000555550";
 
     internal static string TransactionId => "8BA514FA-2E4D-4CB7-8B4A-1B1137185BD7";
+
+    internal static string OriginalMessageId => "EDE97146-C592-489A-B23A-3C73C096E368";
 }

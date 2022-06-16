@@ -71,7 +71,8 @@ namespace Messaging.Application.Transactions.MoveIn
                 incomingMessage.MarketActivityRecord.Id,
                 incomingMessage.MarketActivityRecord.MarketEvaluationPointId,
                 InstantPattern.General.Parse(incomingMessage.MarketActivityRecord.EffectiveDate).GetValueOrThrow(),
-                marketEvaluationPoint?.EnergySupplierNumber);
+                marketEvaluationPoint?.EnergySupplierNumber,
+                incomingMessage.Message.MessageId);
 
             var businessProcessResult = await InvokeBusinessProcessAsync(incomingMessage).ConfigureAwait(false);
             if (businessProcessResult.Success == false)
@@ -81,7 +82,7 @@ namespace Messaging.Application.Transactions.MoveIn
             }
             else
             {
-                _outgoingMessageStore.Add(ConfirmMessageFrom(incomingMessage, transaction.TransactionId));
+                _outgoingMessageStore.Add(ConfirmMessageFrom(incomingMessage, transaction.TransactionId, transaction));
             }
 
             transaction.Start(businessProcessResult);
@@ -116,7 +117,7 @@ namespace Messaging.Application.Transactions.MoveIn
             return _moveInRequester.InvokeAsync(businessProcess);
         }
 
-        private OutgoingMessage ConfirmMessageFrom(IncomingMessage incomingMessage, string transactionId)
+        private OutgoingMessage ConfirmMessageFrom(IncomingMessage incomingMessage, string transactionId, MoveInTransaction transaction)
         {
             var marketActivityRecord = new OutgoingMessages.ConfirmRequestChangeOfSupplier.MarketActivityRecord(
                 Guid.NewGuid().ToString(),
@@ -126,7 +127,7 @@ namespace Messaging.Application.Transactions.MoveIn
             var processType = ProcessType.FromCode(incomingMessage.Message.ProcessType);
 
             return CreateOutgoingMessage(
-                incomingMessage.Id,
+                transaction.StartedByMessageId,
                 processType.Confirm.DocumentType,
                 processType.Code,
                 incomingMessage.Message.SenderId,

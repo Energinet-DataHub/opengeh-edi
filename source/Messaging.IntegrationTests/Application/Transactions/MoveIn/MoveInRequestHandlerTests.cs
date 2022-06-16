@@ -71,7 +71,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
                 .Build();
 
             await _moveInRequestHandler.HandleAsync(incomingMessage).ConfigureAwait(false);
-            var confirmMessage = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage.Id)!;
+            var confirmMessage = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage.Message.MessageId)!;
             await RequestMessage(confirmMessage.Id.ToString()).ConfigureAwait(false);
 
             await AsserConfirmMessage(confirmMessage).ConfigureAwait(false);
@@ -113,6 +113,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         private static IncomingMessageBuilder MessageBuilder()
         {
             return new IncomingMessageBuilder()
+                .WithMessageId(SampleData.OriginalMessageId)
                 .WithTransactionId(SampleData.TransactionId);
         }
 

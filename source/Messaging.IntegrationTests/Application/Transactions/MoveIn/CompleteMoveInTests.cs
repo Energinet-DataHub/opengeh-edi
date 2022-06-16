@@ -94,7 +94,8 @@ public class CompleteMoveInTests : TestBase
             SampleData.TransactionId,
             SampleData.MateringPointNumber,
             _systemDateTimeProvider.Now(),
-            SampleData.EnergySupplierNumber);
+            SampleData.EnergySupplierNumber,
+            SampleData.OriginalMessageId);
 
         transaction.Start(BusinessRequestResult.Succeeded(Guid.NewGuid().ToString()));
         _transactionRepository.Add(transaction);
