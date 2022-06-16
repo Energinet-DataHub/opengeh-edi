@@ -83,7 +83,7 @@ namespace Messaging.Application.Transactions.MoveIn
             }
             else
             {
-                _outgoingMessageStore.Add(ConfirmMessageFrom(transaction.TransactionId, transaction));
+                _outgoingMessageStore.Add(ConfirmMessageFrom(transaction));
             }
 
             transaction.Start(businessProcessResult);
@@ -118,11 +118,11 @@ namespace Messaging.Application.Transactions.MoveIn
             return _moveInRequester.InvokeAsync(businessProcess);
         }
 
-        private OutgoingMessage ConfirmMessageFrom(string transactionId, MoveInTransaction transaction)
+        private OutgoingMessage ConfirmMessageFrom(MoveInTransaction transaction)
         {
             var marketActivityRecord = new OutgoingMessages.ConfirmRequestChangeOfSupplier.MarketActivityRecord(
                 Guid.NewGuid().ToString(),
-                transactionId,
+                transaction.TransactionId,
                 transaction.MarketEvaluationPointId);
 
             return CreateOutgoingMessage(
