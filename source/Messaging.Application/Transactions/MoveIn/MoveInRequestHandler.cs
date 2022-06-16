@@ -74,8 +74,8 @@ namespace Messaging.Application.Transactions.MoveIn
                 marketEvaluationPoint?.EnergySupplierNumber,
                 incomingMessage.Message.MessageId,
                 incomingMessage.Message.SenderId,
-                incomingMessage.MarketActivityRecord.ConsumerId!,
-                incomingMessage.MarketActivityRecord.ConsumerName!);
+                incomingMessage.MarketActivityRecord.ConsumerId,
+                incomingMessage.MarketActivityRecord.ConsumerName);
 
             var businessProcessResult = await InvokeBusinessProcessAsync(incomingMessage, transaction).ConfigureAwait(false);
             if (businessProcessResult.Success == false)
@@ -93,14 +93,14 @@ namespace Messaging.Application.Transactions.MoveIn
             await _unitOfWork.CommitAsync().ConfigureAwait(false);
         }
 
-        private static string GetConsumerIdType(MarketActivityRecord marketActivityRecord)
+        private static string GetConsumerIdType(string? consumerIdType)
         {
             var cprNumberTypeIdentifier = "ARR";
             var consumerType = string.Empty;
-            if (marketActivityRecord.ConsumerIdType is not null)
+            if (!string.IsNullOrEmpty(consumerIdType))
             {
                 consumerType =
-                    marketActivityRecord.ConsumerIdType.Equals(cprNumberTypeIdentifier, StringComparison.OrdinalIgnoreCase)
+                   consumerIdType.Equals(cprNumberTypeIdentifier, StringComparison.OrdinalIgnoreCase)
                         ? "CPR"
                         : "CVR";
             }
@@ -116,7 +116,7 @@ namespace Messaging.Application.Transactions.MoveIn
                 transaction.MarketEvaluationPointId,
                 transaction.EffectiveDate.ToString(),
                 transaction.ConsumerId,
-                GetConsumerIdType(incomingMessage.MarketActivityRecord));
+                GetConsumerIdType(incomingMessage.MarketActivityRecord.ConsumerIdType));
             return _moveInRequester.InvokeAsync(businessProcess);
         }
 
