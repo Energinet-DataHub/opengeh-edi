@@ -37,7 +37,7 @@ on:
 
 env:
   # Conditions
-  PUSH_PACKAGES: true
+  PUSH_PACKAGES: ${{ github.event_name != 'pull_request' }}
   AZURE_KEYVAULT_URL: ${{ secrets.AZURE_KEYVAULT_URL }}
 
 jobs:
