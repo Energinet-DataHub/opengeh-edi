@@ -61,6 +61,25 @@ public class MeteringPointDbService : IDisposable
             transaction: _transaction).ConfigureAwait(false);
     }
 
+    public async Task InsertEnergySuppliersAsync(IEnumerable<EnergySupplier> energySuppliers)
+    {
+        if (energySuppliers == null) throw new ArgumentNullException(nameof(energySuppliers));
+
+        if (_transaction == null) await BeginTransactionAsync().ConfigureAwait(false);
+
+        var stringBuilder = new StringBuilder();
+        foreach (var energySupplier in energySuppliers)
+        {
+            stringBuilder.Append(@"INSERT INTO [dbo].[EnergySupplier] ([Id],[GlnNumber])
+             VALUES ('" + energySupplier.Id + "', '" + energySupplier.IdentificationNumber + "')");
+            stringBuilder.AppendLine();
+        }
+
+        await _sqlConnection.ExecuteAsync(
+            stringBuilder.ToString(),
+            transaction: _transaction).ConfigureAwait(false);
+    }
+
     public async Task CommitTransactionAsync()
     {
         if (_transaction != null)

@@ -42,6 +42,18 @@ public class ActorRegistryDbService : IDisposable
         FROM [dbo].[Actor]").ConfigureAwait(false) ?? (IEnumerable<Actor>)Array.Empty<object>();
     }
 
+    public async Task<IEnumerable<EnergySupplier>> GetEnergySuppliersAsync()
+    {
+        return await _sqlConnection.QueryAsync<EnergySupplier>(
+            @"SELECT [IdentificationNumber]
+                       ,[IdentificationType]
+                       ,[Roles]
+                       ,[Active]
+                       ,[Id]
+        FROM [dbo].[Actor]
+        WHERE [Roles] LIKE 'DDQ'").ConfigureAwait(false) ?? (IEnumerable<EnergySupplier>)Array.Empty<object>();
+    }
+
     public void Dispose()
     {
         Dispose(true);

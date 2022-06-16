@@ -56,6 +56,7 @@ public class SyncActors : IDisposable
     {
         await _actorSyncService.DatabaseCleanUpAsync().ConfigureAwait(false);
         await _actorSyncService.SyncActorsAsync().ConfigureAwait(false);
+        await _actorSyncService.SyncEnergySuppliersAsync().ConfigureAwait(false);
 
         await _actorSyncService.CommitTransactionAsync().ConfigureAwait(false);
     }

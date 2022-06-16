@@ -47,6 +47,12 @@ public class ActorSyncService : IDisposable
         await _meteringPointDbService.InsertActorsAsync(actors).ConfigureAwait(false);
     }
 
+    public async Task SyncEnergySuppliersAsync()
+    {
+        var actors = await _actorRegistryDbService.GetEnergySuppliersAsync().ConfigureAwait(false);
+        await _meteringPointDbService.InsertEnergySuppliersAsync(actors).ConfigureAwait(false);
+    }
+
     public async Task CommitTransactionAsync()
     {
         await _meteringPointDbService.CommitTransactionAsync().ConfigureAwait(false);
