@@ -41,7 +41,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
             _messageDispatcherSpy = (MessageDispatcherSpy)GetService<IMessageDispatcher>();
         }
 
-        [Fact]
+        [Fact(Skip = "Currently we only have one process type")]
         public async Task Messages_must_originate_from_the_same_type_of_business_process()
         {
             var builder = MessageBuilder();
@@ -53,6 +53,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
                 builder
                 .WithProcessType("ProcessType2")
                 .Build()).ConfigureAwait(false);
+
             var outgoingMessage1 = _outgoingMessageStore.GetByOriginalMessageId(message1.Message.MessageId)!;
             var outgoingMessage2 = _outgoingMessageStore.GetByOriginalMessageId(message2.Message.MessageId)!;
 
