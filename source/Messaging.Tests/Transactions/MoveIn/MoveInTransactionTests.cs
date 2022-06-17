@@ -76,7 +76,12 @@ public class MoveInTransactionTests
             Guid.NewGuid().ToString(),
             Guid.NewGuid().ToString(),
             SystemClock.Instance.GetCurrentInstant(),
-            Guid.NewGuid().ToString());
+            Guid.NewGuid().ToString(),
+            Guid.NewGuid().ToString(),
+            Guid.NewGuid().ToString(),
+            Guid.NewGuid().ToString(),
+            Guid.NewGuid().ToString(),
+            "ARR");
     }
 
     private static BusinessRequestResult BusinessRequestSucceeded()

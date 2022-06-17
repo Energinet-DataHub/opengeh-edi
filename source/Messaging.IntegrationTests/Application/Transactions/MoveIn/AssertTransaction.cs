@@ -58,4 +58,34 @@ public class AssertTransaction
         Assert.Equal(expectedProcessId, _transaction.ProcessId);
         return this;
     }
+
+    public AssertTransaction HasStartedByMessageId(string startedByMessageId)
+    {
+        Assert.Equal(startedByMessageId, _transaction.StartedByMessageId);
+        return this;
+    }
+
+    public AssertTransaction HasNewEnergySupplierId(string newEnergySupplierId)
+    {
+        Assert.Equal(newEnergySupplierId, _transaction.NewEnergySupplierId);
+        return this;
+    }
+
+    public AssertTransaction HasConsumerId(string consumerId)
+    {
+        Assert.Equal(consumerId, _transaction.ConsumerId);
+        return this;
+    }
+
+    public AssertTransaction HasConsumerName(string consumerName)
+    {
+        Assert.Equal(consumerName, _transaction.ConsumerName);
+        return this;
+    }
+
+    public AssertTransaction HasConsumerIdType(string consumerIdType)
+    {
+        Assert.Equal(consumerIdType, _transaction.ConsumerIdType);
+        return this;
+    }
 }

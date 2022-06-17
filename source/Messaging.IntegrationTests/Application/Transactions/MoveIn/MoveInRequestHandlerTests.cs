@@ -24,12 +24,10 @@ using Messaging.Application.OutgoingMessages;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Xml;
 using Messaging.Application.Xml.SchemaStore;
-using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.Infrastructure.Transactions;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.TestDoubles;
-using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Xunit.Categories;
 
@@ -57,7 +55,12 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             await _moveInRequestHandler.HandleAsync(incomingMessage).ConfigureAwait(false);
 
             AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>())
-                .HasState(MoveInTransaction.State.Started);
+                .HasState(MoveInTransaction.State.Started)
+                .HasStartedByMessageId(incomingMessage.Message.MessageId)
+                .HasNewEnergySupplierId(incomingMessage.Message.SenderId)
+                .HasConsumerId(incomingMessage.MarketActivityRecord.ConsumerId!)
+                .HasConsumerName(incomingMessage.MarketActivityRecord.ConsumerName!)
+                .HasConsumerIdType(incomingMessage.MarketActivityRecord.ConsumerIdType!);
         }
 
         [Fact]
@@ -71,7 +74,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
                 .Build();
 
             await _moveInRequestHandler.HandleAsync(incomingMessage).ConfigureAwait(false);
-            var confirmMessage = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage.Id)!;
+            var confirmMessage = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage.Message.MessageId)!;
             await RequestMessage(confirmMessage.Id.ToString()).ConfigureAwait(false);
 
             await AsserConfirmMessage(confirmMessage).ConfigureAwait(false);
@@ -91,7 +94,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
                 .Build();
 
             await _moveInRequestHandler.HandleAsync(incomingMessage).ConfigureAwait(false);
-            var rejectMessage = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage.Id)!;
+            var rejectMessage = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage.Message.MessageId)!;
             await RequestMessage(rejectMessage.Id.ToString()).ConfigureAwait(false);
 
             await AssertRejectMessage(rejectMessage).ConfigureAwait(false);
@@ -113,6 +116,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         private static IncomingMessageBuilder MessageBuilder()
         {
             return new IncomingMessageBuilder()
+                .WithMessageId(SampleData.OriginalMessageId)
                 .WithTransactionId(SampleData.TransactionId);
         }
 
