@@ -60,7 +60,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         }
 
         [Fact]
-        public async Task Confirm_if_business_request_is_valid()
+        public async Task A_confirm_message_created_when_the_transaction_is_accepted()
         {
             var incomingMessage = MessageBuilder()
                 .WithProcessType(ProcessType.MoveIn.Code)
@@ -77,7 +77,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         }
 
         [Fact]
-        public async Task Reject_if_business_request_is_invalid()
+        public async Task A_reject_message_is_created_when_the_transaction_is_rejected()
         {
             var httpClientMock = GetHttpClientMock();
             httpClientMock.RespondWithValidationErrors(new List<string> { "InvalidConsumer" });
