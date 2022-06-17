@@ -18,4 +18,10 @@ namespace Messaging.Domain.Transactions.MoveIn.Events;
 
 public class MoveInWasStarted : DomainEvent
 {
+    public MoveInWasStarted(string transactionId)
+    {
+        TransactionId = transactionId;
+    }
+
+    public string TransactionId { get; }
 }
