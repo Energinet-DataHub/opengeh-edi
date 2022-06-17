@@ -51,7 +51,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
 
             AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>())
-                .HasState(MoveInTransaction.State.Started)
+                .HasState(MoveInTransaction.State.AcceptedByBusinessProcess)
                 .HasStartedByMessageId(incomingMessage.Message.MessageId)
                 .HasNewEnergySupplierId(incomingMessage.Message.SenderId)
                 .HasConsumerId(incomingMessage.MarketActivityRecord.ConsumerId!)

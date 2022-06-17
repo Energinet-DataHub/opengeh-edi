@@ -37,6 +37,7 @@ namespace Messaging.Infrastructure.Transactions
                 .HasConversion(toDbValue => toDbValue.ToString(), fromDbValue => Enum.Parse<MoveInTransaction.State>(fromDbValue, true))
                 .HasColumnName("State");
             builder.Property(x => x.StartedByMessageId);
+            builder.Ignore(x => x.DomainEvents);
         }
     }
 }

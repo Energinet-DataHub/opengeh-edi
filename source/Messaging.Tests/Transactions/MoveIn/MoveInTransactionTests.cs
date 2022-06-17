@@ -16,7 +16,7 @@ using System;
 using System.Linq;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
-using NodaTime;
+using Messaging.Domain.Transactions.MoveIn.Events;
 using Xunit;
 
 namespace Messaging.Tests.Transactions.MoveIn;
@@ -24,47 +24,85 @@ namespace Messaging.Tests.Transactions.MoveIn;
 public class MoveInTransactionTests
 {
     [Fact]
-    public void Transaction_is_started_when_business_request_result_contain_no_validation_errors()
+    public void Transaction_is_started()
     {
         var transaction = CreateTransaction();
 
-        var requestResult = BusinessRequestSucceeded();
-        transaction.Start(requestResult);
-
-        Assert.Equal(1, transaction.DomainEvents.Count);
-        Assert.Contains(transaction.DomainEvents, e => e is PendingBusinessProcess);
-
-        AssertProcessId(requestResult, transaction);
+        var startedEvent = transaction.DomainEvents.FirstOrDefault(e => e is MoveInWasStarted) as MoveInWasStarted;
+        Assert.NotNull(startedEvent);
+        Assert.Equal(SampleData.TransactionId, startedEvent?.TransactionId);
     }
 
     [Fact]
-    public void Transaction_is_completed_when_business_request_result_contain_validation_errors()
+    public void Transaction_is_accepted()
     {
         var transaction = CreateTransaction();
 
-        var requestResult = BusinessRequestResult.Failure("This is an validation error");
-        transaction.Start(requestResult);
+        transaction.AcceptedByBusinessProcess(SampleData.ProcessId);
 
-        Assert.Equal(1, transaction.DomainEvents.Count);
-        Assert.Contains(transaction.DomainEvents, e => e is MoveInTransactionCompleted);
+        var acceptedEvent = transaction.DomainEvents.FirstOrDefault(e => e is MoveInWasAccepted) as MoveInWasAccepted;
+        Assert.NotNull(acceptedEvent);
+        Assert.Equal(SampleData.ProcessId, acceptedEvent?.BusinessProcessId);
+    }
+
+    [Fact]
+    public void Transaction_can_only_be_accepted_while_in_the_state_of_started()
+    {
+        var transaction = CreateTransaction();
+
+        transaction.AcceptedByBusinessProcess(SampleData.ProcessId);
+
+        Assert.Throws<MoveInException>(() => transaction.AcceptedByBusinessProcess(SampleData.ProcessId));
+    }
+
+    [Fact]
+    public void Transaction_is_rejected()
+    {
+        var transaction = CreateTransaction();
+
+        transaction.RejectedByBusinessProcess();
+
+        var rejectedEvent = transaction.DomainEvents.FirstOrDefault(e => e is MoveInWasRejected) as MoveInWasRejected;
+        Assert.NotNull(rejectedEvent);
+        Assert.Equal(SampleData.TransactionId, rejectedEvent?.TransactionId);
+    }
+
+    [Fact]
+    public void Transaction_can_only_be_rejected_while_in_the_state_of_started()
+    {
+        var transaction = CreateTransaction();
+
+        transaction.RejectedByBusinessProcess();
+
+        Assert.Throws<MoveInException>(() => transaction.RejectedByBusinessProcess());
+    }
+
+    [Fact]
+    public void Transaction_is_completed_if_business_request_is_rejected()
+    {
+        var transaction = CreateTransaction();
+
+        transaction.RejectedByBusinessProcess();
+
+        Assert.Contains(transaction.DomainEvents, e => e is MoveInWasCompleted);
     }
 
     [Fact]
     public void Transaction_can_complete_when_started()
     {
         var transaction = CreateTransaction();
-        transaction.Start(BusinessRequestSucceeded());
+        transaction.AcceptedByBusinessProcess(SampleData.ProcessId);
 
         transaction.Complete();
 
-        Assert.Contains(transaction.DomainEvents, e => e is MoveInTransactionCompleted);
+        Assert.Contains(transaction.DomainEvents, e => e is MoveInWasCompleted);
     }
 
     [Fact]
     public void Can_not_complete_transaction_if_already_completed()
     {
         var transaction = CreateTransaction();
-        transaction.Start(BusinessRequestSucceeded());
+        transaction.AcceptedByBusinessProcess(SampleData.ProcessId);
         transaction.Complete();
 
         Assert.Throws<MoveInException>(() => transaction.Complete());
@@ -73,25 +111,14 @@ public class MoveInTransactionTests
     private static MoveInTransaction CreateTransaction()
     {
         return new MoveInTransaction(
-            Guid.NewGuid().ToString(),
-            Guid.NewGuid().ToString(),
-            SystemClock.Instance.GetCurrentInstant(),
-            Guid.NewGuid().ToString(),
-            Guid.NewGuid().ToString(),
-            Guid.NewGuid().ToString(),
-            Guid.NewGuid().ToString(),
-            Guid.NewGuid().ToString(),
-            "ARR");
-    }
-
-    private static BusinessRequestResult BusinessRequestSucceeded()
-    {
-        return BusinessRequestResult.Succeeded(Guid.NewGuid().ToString());
-    }
-
-    private static void AssertProcessId(BusinessRequestResult requestResult, MoveInTransaction transaction)
-    {
-        var pendingBusinessProcess = transaction.DomainEvents.First() as PendingBusinessProcess;
-        Assert.Equal(pendingBusinessProcess?.ProcessId, requestResult.ProcessId);
+            SampleData.TransactionId,
+            SampleData.MarketEvaluationPointId,
+            SampleData.EffectiveDate,
+            SampleData.CurrentEnergySupplierId,
+            SampleData.StartedByMessageId,
+            SampleData.NewEnergySupplierId,
+            SampleData.ConsumerId,
+            SampleData.ConsumerName,
+            SampleData.ConsumerIdType);
     }
 }

@@ -12,17 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Messaging.Domain.SeedWork;
 
-namespace Messaging.Application.Transactions.MoveIn;
+namespace Messaging.Domain.Transactions.MoveIn.Events;
 
-public class PendingBusinessProcess
+public class MoveInWasRejected : DomainEvent
 {
-    public PendingBusinessProcess(string processId)
+    public MoveInWasRejected(string transactionId)
     {
-        if (processId == null) throw new ArgumentNullException(nameof(processId));
-        ProcessId = processId;
+        TransactionId = transactionId;
     }
 
-    public string ProcessId { get; }
+    public string TransactionId { get; }
 }
