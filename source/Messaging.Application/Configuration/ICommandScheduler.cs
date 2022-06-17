@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 using Messaging.Application.Common.Commands;
 using NodaTime;
 
-namespace Messaging.Infrastructure.Configuration.InternalCommands
+namespace Messaging.Application.Configuration
 {
     /// <summary>
     /// Service for scheduling and enqueueing internal commands for later processing

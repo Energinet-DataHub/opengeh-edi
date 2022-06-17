@@ -12,27 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading;
 using System.Threading.Tasks;
-using Messaging.Application.Common.Commands;
+using MediatR;
 using Messaging.Application.Configuration;
-using Messaging.Application.Configuration.DataAccess;
+using Messaging.Domain.Transactions.MoveIn.Events;
 
-namespace Messaging.Infrastructure.Configuration.InternalCommands;
+namespace Messaging.Application.Transactions.MoveIn;
 
-public class CommandSchedulerFacade
+public class FetchMeteringPointMasterDataWhenAccepted : INotificationHandler<MoveInWasAccepted>
 {
     private readonly ICommandScheduler _commandScheduler;
-    private readonly IUnitOfWork _unitOfWork;
 
-    public CommandSchedulerFacade(ICommandScheduler commandScheduler, IUnitOfWork unitOfWork)
+    public FetchMeteringPointMasterDataWhenAccepted(ICommandScheduler commandScheduler)
     {
         _commandScheduler = commandScheduler;
-        _unitOfWork = unitOfWork;
     }
 
-    public async Task EnqueueAsync(InternalCommand command)
+    public Task Handle(MoveInWasAccepted notification, CancellationToken cancellationToken)
     {
-        await _commandScheduler.EnqueueAsync(command).ConfigureAwait(false);
-        await _unitOfWork.CommitAsync().ConfigureAwait(false);
+        return _commandScheduler.EnqueueAsync(new FetchMeteringPointMasterData());
     }
 }
