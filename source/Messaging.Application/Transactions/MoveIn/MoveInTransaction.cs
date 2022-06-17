@@ -93,8 +93,8 @@ namespace Messaging.Application.Transactions.MoveIn
 
         public void AcceptedByBusinessProcess(string processId)
         {
-            ProcessId = processId;
-            AddDomainEvent(new MoveInWasAccepted());
+            ProcessId = processId ?? throw new ArgumentNullException(nameof(processId));
+            AddDomainEvent(new MoveInWasAccepted(ProcessId));
         }
     }
 }

@@ -18,4 +18,10 @@ namespace Messaging.Domain.Transactions.MoveIn.Events;
 
 public class MoveInWasAccepted : DomainEvent
 {
+    public MoveInWasAccepted(string businessProcessId)
+    {
+        BusinessProcessId = businessProcessId;
+    }
+
+    public string BusinessProcessId { get; }
 }

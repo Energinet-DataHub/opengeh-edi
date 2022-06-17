@@ -43,6 +43,7 @@ public class MoveInTransactionTests
 
         var acceptedEvent = transaction.DomainEvents.FirstOrDefault(e => e is MoveInWasAccepted) as MoveInWasAccepted;
         Assert.NotNull(acceptedEvent);
+        Assert.Equal(SampleData.ProcessId, acceptedEvent?.BusinessProcessId);
     }
 
     [Fact]
