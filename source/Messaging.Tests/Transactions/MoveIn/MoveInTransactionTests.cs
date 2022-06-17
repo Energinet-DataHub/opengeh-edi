@@ -81,15 +81,15 @@ public class MoveInTransactionTests
     private static MoveInTransaction CreateTransaction()
     {
         return new MoveInTransaction(
-            Guid.NewGuid().ToString(),
-            Guid.NewGuid().ToString(),
-            SystemClock.Instance.GetCurrentInstant(),
-            Guid.NewGuid().ToString(),
-            Guid.NewGuid().ToString(),
-            Guid.NewGuid().ToString(),
-            Guid.NewGuid().ToString(),
-            Guid.NewGuid().ToString(),
-            "ARR");
+            SampleData.TransactionId,
+            SampleData.MarketEvaluationPointId,
+            SampleData.EffectiveDate,
+            SampleData.CurrentEnergySupplierId,
+            SampleData.StartedByMessageId,
+            SampleData.NewEnergySupplierId,
+            SampleData.ConsumerId,
+            SampleData.ConsumerName,
+            SampleData.ConsumerIdType);
     }
 
     private static BusinessRequestResult BusinessRequestSucceeded()
