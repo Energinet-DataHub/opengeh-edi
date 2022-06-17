@@ -32,11 +32,11 @@ using Xunit.Categories;
 namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 {
     [IntegrationTest]
-    public class MoveInRequestHandlerTests : TestBase
+    public class RequestMoveInTests : TestBase
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
 
-        public MoveInRequestHandlerTests(DatabaseFixture databaseFixture)
+        public RequestMoveInTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
             _outgoingMessageStore = GetService<IOutgoingMessageStore>();
