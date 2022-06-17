@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using Messaging.Domain.SeedWork;
 using Messaging.Domain.Transactions.MoveIn.Events;
 using NodaTime;
@@ -22,7 +21,7 @@ namespace Messaging.Application.Transactions.MoveIn
 {
     public class MoveInTransaction : Entity
     {
-        private State _state = State.NotStarted;
+        private State _state = State.Started;
 
         public MoveInTransaction(string transactionId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId, string startedByMessageId, string newEnergySupplierId, string? consumerId, string? consumerName, string? consumerIdType)
         {
@@ -43,6 +42,7 @@ namespace Messaging.Application.Transactions.MoveIn
             NotStarted,
             Started,
             Completed,
+            AcceptedByBusinessProcess,
         }
 
         public string TransactionId { get; }
@@ -93,6 +93,12 @@ namespace Messaging.Application.Transactions.MoveIn
 
         public void AcceptedByBusinessProcess(string processId)
         {
+            if (_state != State.Started)
+            {
+                throw new MoveInException($"Cannot accept transaction while in state '{_state.ToString()}'");
+            }
+
+            _state = State.AcceptedByBusinessProcess;
             ProcessId = processId ?? throw new ArgumentNullException(nameof(processId));
             AddDomainEvent(new MoveInWasAccepted(ProcessId));
         }
