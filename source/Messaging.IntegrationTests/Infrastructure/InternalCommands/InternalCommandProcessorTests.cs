@@ -16,11 +16,11 @@ using System.Data;
 using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Common.Commands;
+using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.InternalCommands;
 using Messaging.IntegrationTests.Fixtures;
 using NodaTime;
-using Processing.Domain.SeedWork;
 using Xunit;
 using Xunit.Categories;
 

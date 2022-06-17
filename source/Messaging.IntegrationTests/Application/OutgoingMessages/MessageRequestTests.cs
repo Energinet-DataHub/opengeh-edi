@@ -14,12 +14,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Messaging.Application.Common;
 using Messaging.Application.IncomingMessages;
 using Messaging.Application.OutgoingMessages;
-using Messaging.Application.Transactions.MoveIn;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.TestDoubles;
@@ -31,19 +28,17 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly MessageRequestHandler _messageRequestHandler;
-        private readonly MoveInRequestHandler _moveInRequestHandler;
         private readonly MessageDispatcherSpy _messageDispatcherSpy;
 
         public MessageRequestTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
             _outgoingMessageStore = GetService<IOutgoingMessageStore>();
-            _moveInRequestHandler = GetService<MoveInRequestHandler>();
             _messageRequestHandler = GetService<MessageRequestHandler>();
             _messageDispatcherSpy = (MessageDispatcherSpy)GetService<IMessageDispatcher>();
         }
 
-        [Fact]
+        [Fact(Skip = "Currently we only have one process type")]
         public async Task Messages_must_originate_from_the_same_type_of_business_process()
         {
             var builder = MessageBuilder();
@@ -55,8 +50,9 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
                 builder
                 .WithProcessType("ProcessType2")
                 .Build()).ConfigureAwait(false);
-            var outgoingMessage1 = _outgoingMessageStore.GetByOriginalMessageId(message1.Id)!;
-            var outgoingMessage2 = _outgoingMessageStore.GetByOriginalMessageId(message2.Id)!;
+
+            var outgoingMessage1 = _outgoingMessageStore.GetByOriginalMessageId(message1.Message.MessageId)!;
+            var outgoingMessage2 = _outgoingMessageStore.GetByOriginalMessageId(message2.Message.MessageId)!;
 
             var result = await _messageRequestHandler.HandleAsync(
                 new List<string>()
@@ -80,8 +76,8 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
                 builder
                     .WithSenderId("SenderId2")
                     .Build()).ConfigureAwait(false);
-            var outgoingMessage1 = _outgoingMessageStore.GetByOriginalMessageId(message1.Id)!;
-            var outgoingMessage2 = _outgoingMessageStore.GetByOriginalMessageId(message2.Id)!;
+            var outgoingMessage1 = _outgoingMessageStore.GetByOriginalMessageId(message1.Message.MessageId)!;
+            var outgoingMessage2 = _outgoingMessageStore.GetByOriginalMessageId(message2.Message.MessageId)!;
 
             var result = await _messageRequestHandler.HandleAsync(
                 new List<string>()
@@ -98,8 +94,8 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
         {
             var incomingMessage1 = await MessageArrived().ConfigureAwait(false);
             var incomingMessage2 = await MessageArrived().ConfigureAwait(false);
-            var outgoingMessage1 = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage1.Id)!;
-            var outgoingMessage2 = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage2.Id)!;
+            var outgoingMessage1 = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage1.Message.MessageId)!;
+            var outgoingMessage2 = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage2.Message.MessageId)!;
 
             var requestedMessageIds = new List<string> { outgoingMessage1.Id.ToString(), outgoingMessage2.Id.ToString(), };
             var result = await _messageRequestHandler.HandleAsync(requestedMessageIds.AsReadOnly()).ConfigureAwait(false);
@@ -129,13 +125,13 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
         {
             var incomingMessage = MessageBuilder()
                 .Build();
-            await _moveInRequestHandler.HandleAsync(incomingMessage).ConfigureAwait(false);
+            await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
             return incomingMessage;
         }
 
         private async Task<IncomingMessage> MessageArrived(IncomingMessage arrivedMessage)
         {
-            await _moveInRequestHandler.HandleAsync(arrivedMessage).ConfigureAwait(false);
+            await InvokeCommandAsync(arrivedMessage).ConfigureAwait(false);
             return arrivedMessage;
         }
     }

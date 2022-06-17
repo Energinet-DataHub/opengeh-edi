@@ -19,6 +19,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Messaging.Application.Common;
+using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Application.Xml;
@@ -26,7 +27,6 @@ using Messaging.Application.Xml.SchemaStore;
 using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Serialization;
-using Processing.Domain.SeedWork;
 using Xunit;
 
 namespace Messaging.Tests.OutgoingMessages.ConfirmRequestChangeOfSupplier

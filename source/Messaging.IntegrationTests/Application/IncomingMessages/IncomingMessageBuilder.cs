@@ -27,7 +27,7 @@ namespace Messaging.IntegrationTests.Application.IncomingMessages
         private readonly string _receiverRole = "DDQ";
         private readonly string _senderRole = "DDZ";
         private readonly Instant _effectiveDate = SystemClock.Instance.GetCurrentInstant();
-        private readonly string _messageId = Guid.NewGuid().ToString();
+        private string? _messageId;
         private string _processType = NotSet;
         private string _senderId = NotSet;
         private string _receiverId = DataHubDetails.IdentificationNumber;
@@ -71,6 +71,12 @@ namespace Messaging.IntegrationTests.Application.IncomingMessages
             return this;
         }
 
+        internal IncomingMessageBuilder WithMessageId(string originalMessageId)
+        {
+            _messageId = originalMessageId;
+            return this;
+        }
+
         internal IncomingMessage Build()
         {
             return IncomingMessage.Create(
@@ -95,7 +101,7 @@ namespace Messaging.IntegrationTests.Application.IncomingMessages
         private MessageHeader CreateHeader()
         {
             return new MessageHeader(
-                _messageId,
+                _messageId ?? Guid.NewGuid().ToString(),
                 _processType,
                 _senderId,
                 _senderRole,
