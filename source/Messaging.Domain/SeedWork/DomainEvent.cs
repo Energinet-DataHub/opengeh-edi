@@ -12,8 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Application.Transactions.MoveIn;
+using MediatR;
+using NodaTime;
 
-public class MoveInTransactionCompleted
+namespace Messaging.Domain.SeedWork
 {
+    public class DomainEvent : INotification
+    {
+        public DomainEvent()
+        {
+            Id = Guid.NewGuid();
+            OccurredOn = SystemClock.Instance.GetCurrentInstant();
+        }
+
+        public Guid Id { get; }
+
+        public Instant OccurredOn { get; }
+    }
 }

@@ -44,6 +44,7 @@ using Messaging.Infrastructure.Common.Reasons;
 using Messaging.Infrastructure.Configuration.Authentication;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.InternalCommands;
+using Messaging.Infrastructure.Configuration.Processing;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.Configuration.SystemTime;
 using Messaging.Infrastructure.IncomingMessages;
@@ -84,6 +85,7 @@ namespace Messaging.Infrastructure.Configuration
             AddInternalCommandsProcessing();
             AddMessageGenerationServices();
             AddMasterDataServices();
+            AddProcessing();
         }
 
         public static CompositionRoot Initialize(IServiceCollection services)
@@ -250,6 +252,11 @@ namespace Messaging.Infrastructure.Configuration
         {
             _services.AddScoped<IMarketEvaluationPointRepository, MarketEvaluationPointRepository>();
             _services.AddTransient<IRequestHandler<SetEnergySupplier, Unit>, SetEnergySupplierHandler>();
+        }
+
+        private void AddProcessing()
+        {
+            _services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehaviour<,>));
         }
     }
 }
