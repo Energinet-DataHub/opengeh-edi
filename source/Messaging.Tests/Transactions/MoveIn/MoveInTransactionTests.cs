@@ -78,19 +78,6 @@ public class MoveInTransactionTests
     }
 
     [Fact]
-    public void Transaction_is_started_when_business_request_result_contain_no_validation_errors()
-    {
-        var transaction = CreateTransaction();
-
-        var requestResult = BusinessRequestSucceeded();
-        transaction.Start(requestResult);
-
-        Assert.Contains(transaction.DomainEvents, e => e is PendingBusinessProcess);
-
-        AssertProcessId(requestResult, transaction);
-    }
-
-    [Fact]
     public void Transaction_is_completed_if_business_request_is_rejected()
     {
         var transaction = CreateTransaction();
