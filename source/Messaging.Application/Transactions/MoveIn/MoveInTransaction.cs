@@ -64,21 +64,6 @@ namespace Messaging.Application.Transactions.MoveIn
 
         public string? ConsumerIdType { get; }
 
-        public void Start(BusinessRequestResult businessRequestResult)
-        {
-            if (businessRequestResult == null) throw new ArgumentNullException(nameof(businessRequestResult));
-            if (businessRequestResult.Success == false)
-            {
-                AddDomainEvent(new MoveInWasCompleted());
-            }
-            else
-            {
-                ProcessId = businessRequestResult.ProcessId;
-                _state = State.Started;
-                AddDomainEvent(new PendingBusinessProcess(ProcessId!));
-            }
-        }
-
         public void Complete()
         {
             if (_state == State.Completed)
