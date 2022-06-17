@@ -41,7 +41,7 @@ public class EnergySupplierChangedListener
         if (data == null) throw new ArgumentNullException(nameof(data));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        var energySupplierChanged = Contracts.IntegrationEvents.EnergySupplierChanged.Parser.ParseFrom(data);
+        var energySupplierChanged = Energinet.DataHub.EnergySupplying.IntegrationEvents.EnergySupplierChanged.Parser.ParseFrom(data);
         _logger.LogInformation($"Received EnergySupplierChanged integration event: {data}");
         await _commandScheduler.EnqueueAsync(
             new SetEnergySupplier(

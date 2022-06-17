@@ -13,36 +13,42 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
+using Messaging.Domain.SeedWork;
+using Messaging.Domain.Transactions.MoveIn.Events;
 using NodaTime;
 
 namespace Messaging.Application.Transactions.MoveIn
 {
-    public class MoveInTransaction
+    public class MoveInTransaction : Entity
     {
-        private readonly List<object> _domainEvents = new List<object>();
-        private State _state = State.NotStarted;
+        private State _state = State.Started;
+        #pragma warning disable
+        private bool _forwardedMeteringPointMasterData;
 
-        public MoveInTransaction(string transactionId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId)
+        public MoveInTransaction(string transactionId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId, string startedByMessageId, string newEnergySupplierId, string? consumerId, string? consumerName, string? consumerIdType)
         {
             TransactionId = transactionId;
             MarketEvaluationPointId = marketEvaluationPointId;
             EffectiveDate = effectiveDate;
             CurrentEnergySupplierId = currentEnergySupplierId;
+            StartedByMessageId = startedByMessageId;
+            NewEnergySupplierId = newEnergySupplierId;
+            ConsumerId = consumerId;
+            ConsumerName = consumerName;
+            ConsumerIdType = consumerIdType;
+            AddDomainEvent(new MoveInWasStarted(TransactionId));
         }
 
         public enum State
         {
-            NotStarted,
             Started,
             Completed,
+            AcceptedByBusinessProcess,
         }
 
         public string TransactionId { get; }
 
         public string? ProcessId { get; private set; }
-
-        public IReadOnlyCollection<object> DomainEvents => _domainEvents.AsReadOnly();
 
         public string MarketEvaluationPointId { get; }
 
@@ -50,20 +56,15 @@ namespace Messaging.Application.Transactions.MoveIn
 
         public string? CurrentEnergySupplierId { get; }
 
-        public void Start(BusinessRequestResult businessRequestResult)
-        {
-            if (businessRequestResult == null) throw new ArgumentNullException(nameof(businessRequestResult));
-            if (businessRequestResult.Success == false)
-            {
-                _domainEvents.Add(new MoveInTransactionCompleted());
-            }
-            else
-            {
-                ProcessId = businessRequestResult.ProcessId;
-                _state = State.Started;
-                _domainEvents.Add(new PendingBusinessProcess(ProcessId!));
-            }
-        }
+        public string StartedByMessageId { get; }
+
+        public string NewEnergySupplierId { get; }
+
+        public string? ConsumerId { get; }
+
+        public string? ConsumerName { get; }
+
+        public string? ConsumerIdType { get; }
 
         public void Complete()
         {
@@ -72,8 +73,41 @@ namespace Messaging.Application.Transactions.MoveIn
                 throw new MoveInException($"Transaction {TransactionId} is already completed.");
             }
 
+            if (_state == State.AcceptedByBusinessProcess && _forwardedMeteringPointMasterData == false)
+            {
+                throw new MoveInException($"Cannot complete transaction {TransactionId} because metering point master data has not been forwarded.");
+            }
+
             _state = State.Completed;
-            _domainEvents.Add(new MoveInTransactionCompleted());
+            AddDomainEvent(new MoveInWasCompleted());
+        }
+
+        public void AcceptedByBusinessProcess(string processId)
+        {
+            if (_state != State.Started)
+            {
+                throw new MoveInException($"Cannot accept transaction while in state '{_state.ToString()}'");
+            }
+
+            _state = State.AcceptedByBusinessProcess;
+            ProcessId = processId ?? throw new ArgumentNullException(nameof(processId));
+            AddDomainEvent(new MoveInWasAccepted(ProcessId));
+        }
+
+        public void RejectedByBusinessProcess()
+        {
+            if (_state != State.Started)
+            {
+                throw new MoveInException($"Cannot reject transaction while in state '{_state.ToString()}'");
+            }
+
+            AddDomainEvent(new MoveInWasRejected(TransactionId));
+            Complete();
+        }
+
+        public void HasForwardedMeteringPointMasterData()
+        {
+            _forwardedMeteringPointMasterData = true;
         }
     }
 }

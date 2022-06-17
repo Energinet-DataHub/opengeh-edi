@@ -15,10 +15,10 @@
 using System;
 using System.Threading.Tasks;
 using MediatR;
+using Messaging.Application.Configuration;
 using Messaging.Infrastructure.Configuration.SystemTime;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using Processing.Domain.SeedWork;
 
 namespace Messaging.Api.Configuration
 {

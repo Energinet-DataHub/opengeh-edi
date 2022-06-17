@@ -22,18 +22,22 @@ namespace Messaging.Application.Transactions.MoveIn;
 
 public class MoveInNotifications
 {
+    private readonly IMoveInTransactionRepository _transactionRepository;
     private readonly IOutgoingMessageStore _outgoingMessageStore;
     private readonly IMarketActivityRecordParser _marketActivityRecordParser;
 
-    public MoveInNotifications(IOutgoingMessageStore outgoingMessageStore, IMarketActivityRecordParser marketActivityRecordParser)
+    public MoveInNotifications(IOutgoingMessageStore outgoingMessageStore, IMarketActivityRecordParser marketActivityRecordParser, IMoveInTransactionRepository transactionRepository)
     {
         _outgoingMessageStore = outgoingMessageStore;
         _marketActivityRecordParser = marketActivityRecordParser;
+        _transactionRepository = transactionRepository;
     }
 
-    public void InformCurrentEnergySupplierAboutEndOfSupply(MoveInTransaction transaction)
+    public void InformCurrentEnergySupplierAboutEndOfSupply(string transactionId)
     {
-        if (transaction == null) throw new ArgumentNullException(nameof(transaction));
+        var transaction = _transactionRepository.GetById(transactionId);
+        if (transaction == null) throw new MoveInException($"Move in transaction {transactionId} was not found.");
+
         if (transaction.CurrentEnergySupplierId is null)
         {
             throw new MoveInException("Energy supplier number cannot be empty.");

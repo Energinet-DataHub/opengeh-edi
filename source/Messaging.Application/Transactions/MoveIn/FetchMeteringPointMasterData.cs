@@ -12,17 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Messaging.Application.Common.Commands;
 
 namespace Messaging.Application.Transactions.MoveIn;
 
-public class PendingBusinessProcess
+public class FetchMeteringPointMasterData : InternalCommand
 {
-    public PendingBusinessProcess(string processId)
-    {
-        if (processId == null) throw new ArgumentNullException(nameof(processId));
-        ProcessId = processId;
-    }
-
-    public string ProcessId { get; }
 }

@@ -25,7 +25,6 @@ using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.IntegrationTests.Fixtures;
 using Microsoft.EntityFrameworkCore;
-using Processing.Domain.SeedWork;
 using Xunit;
 using MarketEvaluationPoint = Messaging.Domain.MasterData.MarketEvaluationPoints.MarketEvaluationPoint;
 
@@ -94,9 +93,15 @@ public class CompleteMoveInTests : TestBase
             SampleData.TransactionId,
             SampleData.MateringPointNumber,
             _systemDateTimeProvider.Now(),
-            SampleData.EnergySupplierNumber);
+            SampleData.CurrentEnergySupplierNumber,
+            SampleData.OriginalMessageId,
+            SampleData.NewEnergySupplierNumber,
+            SampleData.ConsumerId,
+            SampleData.ConsumerName,
+            SampleData.ConsumerIdType);
 
-        transaction.Start(BusinessRequestResult.Succeeded(Guid.NewGuid().ToString()));
+        transaction.AcceptedByBusinessProcess(BusinessRequestResult.Succeeded(Guid.NewGuid().ToString()).ProcessId!);
+        transaction.HasForwardedMeteringPointMasterData();
         _transactionRepository.Add(transaction);
         await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
         return transaction;
@@ -104,7 +109,7 @@ public class CompleteMoveInTests : TestBase
 
     private Task SetupMasterDataDetailsAsync()
     {
-        GetService<IMarketEvaluationPointRepository>().Add(MarketEvaluationPoint.Create(SampleData.EnergySupplierNumber, SampleData.MateringPointNumber));
+        GetService<IMarketEvaluationPointRepository>().Add(MarketEvaluationPoint.Create(SampleData.CurrentEnergySupplierNumber, SampleData.MateringPointNumber));
         return Task.CompletedTask;
     }
 

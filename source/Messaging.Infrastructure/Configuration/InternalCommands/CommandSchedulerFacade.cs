@@ -14,6 +14,7 @@
 
 using System.Threading.Tasks;
 using Messaging.Application.Common.Commands;
+using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
 
 namespace Messaging.Infrastructure.Configuration.InternalCommands;

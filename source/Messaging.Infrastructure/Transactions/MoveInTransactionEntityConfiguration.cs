@@ -29,9 +29,17 @@ namespace Messaging.Infrastructure.Transactions
             builder.Property(x => x.EffectiveDate);
             builder.Property(x => x.MarketEvaluationPointId);
             builder.Property(x => x.CurrentEnergySupplierId);
+            builder.Property(x => x.NewEnergySupplierId);
+            builder.Property(x => x.ConsumerId);
+            builder.Property(x => x.ConsumerIdType);
+            builder.Property(x => x.ConsumerName);
+            builder.Property<bool>("_forwardedMeteringPointMasterData")
+                .HasColumnName("ForwardedMeteringPointMasterData");
             builder.Property<MoveInTransaction.State>("_state")
                 .HasConversion(toDbValue => toDbValue.ToString(), fromDbValue => Enum.Parse<MoveInTransaction.State>(fromDbValue, true))
                 .HasColumnName("State");
+            builder.Property(x => x.StartedByMessageId);
+            builder.Ignore(x => x.DomainEvents);
         }
     }
 }

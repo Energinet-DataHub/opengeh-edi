@@ -12,8 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading;
+using System.Threading.Tasks;
+using MediatR;
+using Messaging.Application.Configuration;
+using Messaging.Domain.Transactions.MoveIn.Events;
+
 namespace Messaging.Application.Transactions.MoveIn;
 
-public class MoveInTransactionCompleted
+public class FetchMeteringPointMasterDataWhenAccepted : INotificationHandler<MoveInWasAccepted>
 {
+    private readonly ICommandScheduler _commandScheduler;
+
+    public FetchMeteringPointMasterDataWhenAccepted(ICommandScheduler commandScheduler)
+    {
+        _commandScheduler = commandScheduler;
+    }
+
+    public Task Handle(MoveInWasAccepted notification, CancellationToken cancellationToken)
+    {
+        return _commandScheduler.EnqueueAsync(new FetchMeteringPointMasterData());
+    }
 }

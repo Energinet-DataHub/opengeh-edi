@@ -16,7 +16,6 @@ using System;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.Transactions.MoveIn;
-using Processing.Domain.MeteringPoints;
 using Xunit;
 
 namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
@@ -56,6 +55,42 @@ public class AssertTransaction
     public AssertTransaction HasProcessId(string expectedProcessId)
     {
         Assert.Equal(expectedProcessId, _transaction.ProcessId);
+        return this;
+    }
+
+    public AssertTransaction HasStartedByMessageId(string startedByMessageId)
+    {
+        Assert.Equal(startedByMessageId, _transaction.StartedByMessageId);
+        return this;
+    }
+
+    public AssertTransaction HasNewEnergySupplierId(string newEnergySupplierId)
+    {
+        Assert.Equal(newEnergySupplierId, _transaction.NewEnergySupplierId);
+        return this;
+    }
+
+    public AssertTransaction HasConsumerId(string consumerId)
+    {
+        Assert.Equal(consumerId, _transaction.ConsumerId);
+        return this;
+    }
+
+    public AssertTransaction HasConsumerName(string consumerName)
+    {
+        Assert.Equal(consumerName, _transaction.ConsumerName);
+        return this;
+    }
+
+    public AssertTransaction HasConsumerIdType(string consumerIdType)
+    {
+        Assert.Equal(consumerIdType, _transaction.ConsumerIdType);
+        return this;
+    }
+
+    public AssertTransaction HasForwardedMeteringPointMasterData(bool expected)
+    {
+        Assert.Equal(expected, _transaction.ForwardedMeteringPointMasterData);
         return this;
     }
 }

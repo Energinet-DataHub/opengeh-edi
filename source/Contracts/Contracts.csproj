@@ -20,20 +20,4 @@ limitations under the License.
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Google.Protobuf" Version="3.20.0" />
-    <PackageReference Include="Grpc.Tools" Version="2.45.0" PrivateAssets="All" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Protobuf Include="**/*.proto">
-      <GrpcServices>None</GrpcServices>
-      <Access>Public</Access>
-      <ProtoCompile>True</ProtoCompile>
-      <CompileOutputs>True</CompileOutputs>
-      <OutputDir>obj\Debug\net6.0\</OutputDir>
-      <Generator>MSBuild:Compile</Generator>
-    </Protobuf>
-  </ItemGroup>
 </Project>
