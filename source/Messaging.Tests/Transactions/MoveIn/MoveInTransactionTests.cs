@@ -121,15 +121,4 @@ public class MoveInTransactionTests
             SampleData.ConsumerName,
             SampleData.ConsumerIdType);
     }
-
-    private static BusinessRequestResult BusinessRequestSucceeded()
-    {
-        return BusinessRequestResult.Succeeded(Guid.NewGuid().ToString());
-    }
-
-    private static void AssertProcessId(BusinessRequestResult requestResult, MoveInTransaction transaction)
-    {
-        var pendingBusinessProcess = transaction.DomainEvents.First(e => e is PendingBusinessProcess) as PendingBusinessProcess;
-        Assert.Equal(pendingBusinessProcess?.ProcessId, requestResult.ProcessId);
-    }
 }
