@@ -68,6 +68,16 @@ public class MoveInTransactionTests
     }
 
     [Fact]
+    public void Transaction_can_only_be_rejected_while_in_the_state_of_started()
+    {
+        var transaction = CreateTransaction();
+
+        transaction.RejectedByBusinessProcess();
+
+        Assert.Throws<MoveInException>(() => transaction.RejectedByBusinessProcess());
+    }
+
+    [Fact]
     public void Transaction_is_started_when_business_request_result_contain_no_validation_errors()
     {
         var transaction = CreateTransaction();

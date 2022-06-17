@@ -43,6 +43,7 @@ namespace Messaging.Application.Transactions.MoveIn
             Started,
             Completed,
             AcceptedByBusinessProcess,
+            RejectedByBusinessProcess,
         }
 
         public string TransactionId { get; }
@@ -105,6 +106,12 @@ namespace Messaging.Application.Transactions.MoveIn
 
         public void RejectedByBusinessProcess()
         {
+            if (_state != State.Started)
+            {
+                throw new MoveInException($"Cannot rejected transaction while in state '{_state.ToString()}'");
+            }
+
+            _state = State.RejectedByBusinessProcess;
             AddDomainEvent(new MoveInWasRejected(TransactionId));
         }
     }
