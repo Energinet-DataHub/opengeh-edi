@@ -34,7 +34,6 @@ namespace Messaging.Application.Transactions.MoveIn
     {
         private readonly IMoveInTransactionRepository _moveInTransactionRepository;
         private readonly IOutgoingMessageStore _outgoingMessageStore;
-        private readonly IUnitOfWork _unitOfWork;
         private readonly ICorrelationContext _correlationContext;
         private readonly IMarketActivityRecordParser _marketActivityRecordParser;
         private readonly IMoveInRequester _moveInRequester;
@@ -44,7 +43,6 @@ namespace Messaging.Application.Transactions.MoveIn
         public MoveInRequestHandler(
             IMoveInTransactionRepository moveInTransactionRepository,
             IOutgoingMessageStore outgoingMessageStore,
-            IUnitOfWork unitOfWork,
             ICorrelationContext correlationContext,
             IMarketActivityRecordParser marketActivityRecordParser,
             IMoveInRequester moveInRequester,
@@ -53,7 +51,6 @@ namespace Messaging.Application.Transactions.MoveIn
         {
             _moveInTransactionRepository = moveInTransactionRepository;
             _outgoingMessageStore = outgoingMessageStore;
-            _unitOfWork = unitOfWork;
             _correlationContext = correlationContext;
             _marketActivityRecordParser = marketActivityRecordParser;
             _moveInRequester = moveInRequester;
@@ -93,7 +90,6 @@ namespace Messaging.Application.Transactions.MoveIn
             }
 
             _moveInTransactionRepository.Add(transaction);
-            await _unitOfWork.CommitAsync().ConfigureAwait(false);
             return Unit.Value;
         }
 
