@@ -69,7 +69,7 @@ namespace Messaging.Application.Transactions.MoveIn
             if (businessRequestResult == null) throw new ArgumentNullException(nameof(businessRequestResult));
             if (businessRequestResult.Success == false)
             {
-                AddDomainEvent(new MoveInTransactionCompleted());
+                AddDomainEvent(new MoveInWasCompleted());
             }
             else
             {
@@ -87,7 +87,7 @@ namespace Messaging.Application.Transactions.MoveIn
             }
 
             _state = State.Completed;
-            AddDomainEvent(new MoveInTransactionCompleted());
+            AddDomainEvent(new MoveInWasCompleted());
         }
 
         public void AcceptedByBusinessProcess(string processId)

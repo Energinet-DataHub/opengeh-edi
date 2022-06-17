@@ -84,7 +84,7 @@ public class MoveInTransactionTests
 
         transaction.RejectedByBusinessProcess();
 
-        Assert.Contains(transaction.DomainEvents, e => e is MoveInTransactionCompleted);
+        Assert.Contains(transaction.DomainEvents, e => e is MoveInWasCompleted);
     }
 
     [Fact]
@@ -95,7 +95,7 @@ public class MoveInTransactionTests
 
         transaction.Complete();
 
-        Assert.Contains(transaction.DomainEvents, e => e is MoveInTransactionCompleted);
+        Assert.Contains(transaction.DomainEvents, e => e is MoveInWasCompleted);
     }
 
     [Fact]
