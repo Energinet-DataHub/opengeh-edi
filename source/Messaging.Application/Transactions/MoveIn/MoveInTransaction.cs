@@ -91,7 +91,7 @@ namespace Messaging.Application.Transactions.MoveIn
         {
             if (_state != State.Started)
             {
-                throw new MoveInException($"Cannot rejected transaction while in state '{_state.ToString()}'");
+                throw new MoveInException($"Cannot reject transaction while in state '{_state.ToString()}'");
             }
 
             AddDomainEvent(new MoveInWasRejected(TransactionId));
