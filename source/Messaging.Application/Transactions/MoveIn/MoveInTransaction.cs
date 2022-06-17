@@ -96,5 +96,10 @@ namespace Messaging.Application.Transactions.MoveIn
             ProcessId = processId ?? throw new ArgumentNullException(nameof(processId));
             AddDomainEvent(new MoveInWasAccepted(ProcessId));
         }
+
+        public void RejectedByBusinessProcess()
+        {
+            AddDomainEvent(new MoveInWasRejected());
+        }
     }
 }

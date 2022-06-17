@@ -17,7 +17,6 @@ using System.Linq;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Domain.Transactions.MoveIn.Events;
-using NodaTime;
 using Xunit;
 
 namespace Messaging.Tests.Transactions.MoveIn;
@@ -44,6 +43,17 @@ public class MoveInTransactionTests
         var acceptedEvent = transaction.DomainEvents.FirstOrDefault(e => e is MoveInWasAccepted) as MoveInWasAccepted;
         Assert.NotNull(acceptedEvent);
         Assert.Equal(SampleData.ProcessId, acceptedEvent?.BusinessProcessId);
+    }
+
+    [Fact]
+    public void Transaction_is_rejected()
+    {
+        var transaction = CreateTransaction();
+
+        transaction.RejectedByBusinessProcess();
+
+        var rejectedEvent = transaction.DomainEvents.FirstOrDefault(e => e is MoveInWasRejected) as MoveInWasRejected;
+        Assert.NotNull(rejectedEvent);
     }
 
     [Fact]
