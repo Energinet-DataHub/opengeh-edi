@@ -31,7 +31,7 @@ public class ForwardMeteringPointMasterDataTests : TestBase
     [Fact]
     public async Task Metering_point_master_data_is_forwarded_to_the_new_energy_supplier()
     {
-        await InvokeCommandAsync(MessageBuilder().Build()).ConfigureAwait(false);
+        await SetupAnAcceptedMoveInTransaction().ConfigureAwait(false);
 
         var forwardMeteringPointMasterData = new ForwardMeteringPointMasterData(SampleData.TransactionId);
         await InvokeCommandAsync(forwardMeteringPointMasterData).ConfigureAwait(false);
@@ -45,5 +45,10 @@ public class ForwardMeteringPointMasterDataTests : TestBase
         return new IncomingMessageBuilder()
             .WithMessageId(SampleData.OriginalMessageId)
             .WithTransactionId(SampleData.TransactionId);
+    }
+
+    private async Task SetupAnAcceptedMoveInTransaction()
+    {
+        await InvokeCommandAsync(MessageBuilder().Build()).ConfigureAwait(false);
     }
 }
