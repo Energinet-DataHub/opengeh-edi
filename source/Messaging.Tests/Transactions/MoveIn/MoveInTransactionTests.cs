@@ -91,7 +91,7 @@ public class MoveInTransactionTests
     public void Transaction_can_complete_when_started()
     {
         var transaction = CreateTransaction();
-        transaction.Start(BusinessRequestSucceeded());
+        transaction.AcceptedByBusinessProcess(SampleData.ProcessId);
 
         transaction.Complete();
 
@@ -102,7 +102,7 @@ public class MoveInTransactionTests
     public void Can_not_complete_transaction_if_already_completed()
     {
         var transaction = CreateTransaction();
-        transaction.Start(BusinessRequestSucceeded());
+        transaction.AcceptedByBusinessProcess(SampleData.ProcessId);
         transaction.Complete();
 
         Assert.Throws<MoveInException>(() => transaction.Complete());
