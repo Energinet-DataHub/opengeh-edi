@@ -35,6 +35,17 @@ public class MoveInTransactionTests
     }
 
     [Fact]
+    public void Transaction_is_accepted()
+    {
+        var transaction = CreateTransaction();
+
+        transaction.AcceptedByBusinessProcess(SampleData.ProcessId);
+
+        var acceptedEvent = transaction.DomainEvents.FirstOrDefault(e => e is MoveInWasAccepted) as MoveInWasAccepted;
+        Assert.NotNull(acceptedEvent);
+    }
+
+    [Fact]
     public void Transaction_is_started_when_business_request_result_contain_no_validation_errors()
     {
         var transaction = CreateTransaction();

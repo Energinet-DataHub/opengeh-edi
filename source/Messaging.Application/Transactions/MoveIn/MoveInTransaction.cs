@@ -90,5 +90,11 @@ namespace Messaging.Application.Transactions.MoveIn
             _state = State.Completed;
             AddDomainEvent(new MoveInTransactionCompleted());
         }
+
+        public void AcceptedByBusinessProcess(string processId)
+        {
+            ProcessId = processId;
+            AddDomainEvent(new MoveInWasAccepted());
+        }
     }
 }
