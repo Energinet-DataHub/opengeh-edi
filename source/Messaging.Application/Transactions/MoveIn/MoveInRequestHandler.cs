@@ -84,13 +84,14 @@ namespace Messaging.Application.Transactions.MoveIn
             {
                 var reasons = await CreateReasonsFromAsync(businessProcessResult.ValidationErrors).ConfigureAwait(false);
                 _outgoingMessageStore.Add(RejectMessageFrom(reasons, transaction));
+                transaction.RejectedByBusinessProcess();
             }
             else
             {
                 _outgoingMessageStore.Add(ConfirmMessageFrom(transaction));
+                transaction.AcceptedByBusinessProcess(businessProcessResult.ProcessId ?? throw new MoveInException("Business process id cannot be empty."));
             }
 
-            transaction.Start(businessProcessResult);
             _moveInTransactionRepository.Add(transaction);
             await _unitOfWork.CommitAsync().ConfigureAwait(false);
             return Unit.Value;
