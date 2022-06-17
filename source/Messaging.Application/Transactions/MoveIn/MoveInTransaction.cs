@@ -39,11 +39,9 @@ namespace Messaging.Application.Transactions.MoveIn
 
         public enum State
         {
-            NotStarted,
             Started,
             Completed,
             AcceptedByBusinessProcess,
-            RejectedByBusinessProcess,
         }
 
         public string TransactionId { get; }
@@ -111,8 +109,8 @@ namespace Messaging.Application.Transactions.MoveIn
                 throw new MoveInException($"Cannot rejected transaction while in state '{_state.ToString()}'");
             }
 
-            _state = State.RejectedByBusinessProcess;
             AddDomainEvent(new MoveInWasRejected(TransactionId));
+            Complete();
         }
     }
 }

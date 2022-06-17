@@ -91,12 +91,11 @@ public class MoveInTransactionTests
     }
 
     [Fact]
-    public void Transaction_is_completed_when_business_request_result_contain_validation_errors()
+    public void Transaction_is_completed_if_business_request_is_rejected()
     {
         var transaction = CreateTransaction();
 
-        var requestResult = BusinessRequestResult.Failure("This is an validation error");
-        transaction.Start(requestResult);
+        transaction.RejectedByBusinessProcess();
 
         Assert.Contains(transaction.DomainEvents, e => e is MoveInTransactionCompleted);
     }
