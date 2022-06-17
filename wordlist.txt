@@ -119,3 +119,6 @@ MeteringPointDetails
 ChargeDetails
 dequeued
 AwaitingChargeDetailsDispatch
+IntegrationEvents
+integrationevents
+prerelease

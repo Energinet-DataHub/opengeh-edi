@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.EnergySupplying.IntegrationEvents;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.InternalCommands;
 using Microsoft.Azure.Functions.Worker;
@@ -40,7 +41,7 @@ public class ConsumerMovedInListener
         if (data == null) throw new ArgumentNullException(nameof(data));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        var consumerMovedIn = Contracts.IntegrationEvents.ConsumerMovedIn.Parser.ParseFrom(data);
+        var consumerMovedIn = ConsumerMovedIn.Parser.ParseFrom(data);
         _logger.LogInformation($"Received consumer moved in event: {consumerMovedIn}");
         await _commandScheduler.EnqueueAsync(new CompleteMoveInTransaction(consumerMovedIn.ProcessId))
             .ConfigureAwait(false);
