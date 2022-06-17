@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 module "func_receiver" {
-  source                                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/function-app?ref=6.0.0"
+  source                                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/function-app?ref=7.0.0"
 
   name                                      = "api"
   project_name                              = var.domain_name_short
@@ -26,14 +26,10 @@ module "func_receiver" {
   vnet_integration_subnet_id                = data.azurerm_key_vault_secret.snet_vnet_integrations_id.value
   private_endpoint_subnet_id                = data.azurerm_key_vault_secret.snet_private_endpoints_id.value
   always_on                                 = true
+  dotnet_framework_version                  = "6"
+  use_dotnet_isolated_runtime               = false
   health_check_path                         = "/api/monitor/ready"
   app_settings                              = {
-    # Region: Default Values
-    WEBSITE_ENABLE_SYNC_UPDATE_SITE                               = true
-    WEBSITE_RUN_FROM_PACKAGE                                      = 1
-    WEBSITES_ENABLE_APP_SERVICE_STORAGE                           = true
-    FUNCTIONS_WORKER_RUNTIME                                      = "dotnet-isolated"
-    # Endregion: Default Values
     # Shared resources logging
     REQUEST_RESPONSE_LOGGING_CONNECTION_STRING                    = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=st-marketoplogs-primary-connection-string)",
     REQUEST_RESPONSE_LOGGING_CONTAINER_NAME                       = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=st-marketoplogs-container-name)",
