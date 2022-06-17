@@ -36,21 +36,44 @@ public class ActorSyncService : IDisposable
             throw new InvalidOperationException());
     }
 
+    public static IEnumerable<EnergySupplier> MapActorsToEnergySuppliers(IEnumerable<Actor> actors)
+    {
+        return actors.Where(actor => actor.Roles.Contains("DDQ", StringComparison.InvariantCultureIgnoreCase)).Select(actor => new EnergySupplier(actor.Id, actor.IdentificationNumber));
+    }
+
+    public static IEnumerable<SupplierRegistration> FilterObsoleteSupplierRegistrations(IEnumerable<SupplierRegistration> supplierRegistrations, IEnumerable<EnergySupplier> energySuppliers)
+    {
+        return supplierRegistrations.Where(supplierRegistration => energySuppliers.Any(energySupplier => supplierRegistration.EnergySupplierId == energySupplier.Id));
+    }
+
     public async Task DatabaseCleanUpAsync()
     {
         await _marketRolesDbService.CleanUpAsync().ConfigureAwait(false);
     }
 
-    public async Task SyncActorsAsync()
+    public async Task InsertActorsAsync(IEnumerable<Actor> actors)
     {
-        var actors = await _actorRegistryDbService.GetActorsAsync().ConfigureAwait(false);
         await _marketRolesDbService.InsertActorsAsync(actors).ConfigureAwait(false);
     }
 
-    public async Task SyncEnergySuppliersAsync()
+    public async Task InsertEnergySuppliersAsync(IEnumerable<EnergySupplier> energySuppliers)
     {
-        var actors = await _actorRegistryDbService.GetEnergySuppliersAsync().ConfigureAwait(false);
-        await _marketRolesDbService.InsertEnergySuppliersAsync(actors).ConfigureAwait(false);
+        await _marketRolesDbService.InsertEnergySuppliersAsync(energySuppliers).ConfigureAwait(false);
+    }
+
+    public async Task InsertSupplierRegistrationsAsync(IEnumerable<SupplierRegistration> supplierRegistrations)
+    {
+        await _marketRolesDbService.InsertSupplierRegistrationsAsync(supplierRegistrations).ConfigureAwait(false);
+    }
+
+    public async Task<IEnumerable<SupplierRegistration>> GetSupplierRegistrationsAsync()
+    {
+        return await _marketRolesDbService.GetSupplierRegistrationsAsync().ConfigureAwait(false);
+    }
+
+    public async Task<IEnumerable<Actor>> GetActorsAsync()
+    {
+        return await _actorRegistryDbService.GetActorsAsync().ConfigureAwait(false);
     }
 
     public async Task CommitTransactionAsync()
