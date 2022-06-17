@@ -77,6 +77,21 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         }
 
         [Fact]
+        public async Task Fetch_metering_point_master_data_when_the_transaction_is_accepted()
+        {
+            var incomingMessage = MessageBuilder()
+                .WithProcessType(ProcessType.MoveIn.Code)
+                .WithReceiver("5790001330552")
+                .WithSenderId("123456")
+                .WithConsumerName("John Doe")
+                .Build();
+
+            await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
+
+            AssertQueuedCommand.QueuedCommand<FetchMeteringPointMasterData>(GetService<IDbConnectionFactory>());
+        }
+
+        [Fact]
         public async Task A_reject_message_is_created_when_the_transaction_is_rejected()
         {
             var httpClientMock = GetHttpClientMock();
