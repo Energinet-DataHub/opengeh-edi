@@ -99,7 +99,7 @@ namespace Messaging.Application.Transactions.MoveIn
 
         public void RejectedByBusinessProcess()
         {
-            AddDomainEvent(new MoveInWasRejected());
+            AddDomainEvent(new MoveInWasRejected(TransactionId));
         }
     }
 }

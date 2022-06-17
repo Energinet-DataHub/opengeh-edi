@@ -54,6 +54,7 @@ public class MoveInTransactionTests
 
         var rejectedEvent = transaction.DomainEvents.FirstOrDefault(e => e is MoveInWasRejected) as MoveInWasRejected;
         Assert.NotNull(rejectedEvent);
+        Assert.Equal(SampleData.TransactionId, rejectedEvent?.TransactionId);
     }
 
     [Fact]
