@@ -37,7 +37,6 @@ limitations under the License.
       <ProjectReference Include="..\Contracts\Contracts.csproj" />
       <ProjectReference Include="..\Messaging.CimMessageAdapter\Messaging.CimMessageAdapter.csproj" />
       <ProjectReference Include="..\Messaging.Application\Messaging.Application.csproj" />
-      <ProjectReference Include="..\Processing.Domain\Processing.Domain.csproj" />
     </ItemGroup>
 
 </Project>

@@ -12,23 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.Application.Configuration;
 using NodaTime;
 
-namespace Messaging.IntegrationTests.TestDoubles
+namespace Messaging.Application.Configuration
 {
-    public class SystemDateTimeProviderStub : ISystemDateTimeProvider
+    /// <summary>
+    /// System time provider
+    /// </summary>
+    public interface ISystemDateTimeProvider
     {
-        private Instant _now = SystemClock.Instance.GetCurrentInstant();
-
-        public void SetNow(Instant now)
-        {
-            _now = now;
-        }
-
-        public Instant Now()
-        {
-            return _now;
-        }
+        /// <summary>
+        /// Return current date and time
+        /// </summary>
+        /// <returns><see cref="Instant"/></returns>
+        Instant Now();
     }
 }

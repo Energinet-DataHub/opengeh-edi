@@ -25,7 +25,6 @@ using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.IntegrationTests.Fixtures;
 using Microsoft.EntityFrameworkCore;
-using Processing.Domain.SeedWork;
 using Xunit;
 using MarketEvaluationPoint = Messaging.Domain.MasterData.MarketEvaluationPoints.MarketEvaluationPoint;
 

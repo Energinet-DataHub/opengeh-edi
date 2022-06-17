@@ -16,7 +16,6 @@ using System;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.Transactions.MoveIn;
-using Processing.Domain.MeteringPoints;
 using Xunit;
 
 namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;

@@ -15,10 +15,10 @@
 using System;
 using System.Threading.Tasks;
 using Messaging.Application.Common.Commands;
+using Messaging.Application.Configuration;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.Serialization;
 using NodaTime;
-using Processing.Domain.SeedWork;
 
 namespace Messaging.Infrastructure.Configuration.InternalCommands
 {

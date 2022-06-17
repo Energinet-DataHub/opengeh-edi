@@ -15,11 +15,10 @@
 using System;
 using System.Text;
 using System.Threading.Tasks;
+using MediatR;
 using Messaging.Api.Configuration;
 using Messaging.Application.Configuration;
 using Messaging.Application.IncomingMessages;
-using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
-using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
@@ -31,18 +30,18 @@ namespace Messaging.Api.IncomingMessages
         private readonly ILogger<IncomingMessageQueueListener> _logger;
         private readonly ICorrelationContext _correlationContext;
         private readonly ISerializer _jsonSerializer;
-        private readonly MoveInRequestHandler _moveInRequestHandler;
+        private readonly IMediator _mediator;
 
         public IncomingMessageQueueListener(
             ILogger<IncomingMessageQueueListener> logger,
             ICorrelationContext correlationContext,
             ISerializer jsonSerializer,
-            MoveInRequestHandler moveInRequestHandler)
+            IMediator mediator)
         {
             _logger = logger;
             _correlationContext = correlationContext;
             _jsonSerializer = jsonSerializer;
-            _moveInRequestHandler = moveInRequestHandler;
+            _mediator = mediator;
         }
 
         [Function(nameof(IncomingMessageQueueListener))]
@@ -58,7 +57,7 @@ namespace Messaging.Api.IncomingMessages
             var byteAsString = Encoding.UTF8.GetString(data);
             _logger.LogInformation($"Received incoming message: {byteAsString}");
 
-            await _moveInRequestHandler.HandleAsync(
+            await _mediator.Send(
                     _jsonSerializer.Deserialize<IncomingMessage>(byteAsString))
                 .ConfigureAwait(false);
 
