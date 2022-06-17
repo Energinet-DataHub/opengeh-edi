@@ -22,7 +22,7 @@ limitations under the License.
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="MediatR" Version="9.0.0" />
+      <PackageReference Include="MediatR" Version="10.0.1" />
       <PackageReference Include="NodaTime" Version="3.0.10" />
     </ItemGroup>
 
