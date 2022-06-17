@@ -46,7 +46,7 @@ public class MoveInTransactionTests
     }
 
     [Fact]
-    public void Transaction_can_only_be_acceptec_while_in_the_state_of_started()
+    public void Transaction_can_only_be_accepted_while_in_the_state_of_started()
     {
         var transaction = CreateTransaction();
 
