@@ -14,13 +14,14 @@
 
 using System;
 using System.Collections.Generic;
+using Messaging.Domain.SeedWork;
+using Messaging.Domain.Transactions.MoveIn.Events;
 using NodaTime;
 
 namespace Messaging.Application.Transactions.MoveIn
 {
-    public class MoveInTransaction
+    public class MoveInTransaction : Entity
     {
-        private readonly List<object> _domainEvents = new List<object>();
         private State _state = State.NotStarted;
 
         public MoveInTransaction(string transactionId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId, string startedByMessageId, string newEnergySupplierId, string? consumerId, string? consumerName, string? consumerIdType)
@@ -34,6 +35,7 @@ namespace Messaging.Application.Transactions.MoveIn
             ConsumerId = consumerId;
             ConsumerName = consumerName;
             ConsumerIdType = consumerIdType;
+            AddDomainEvent(new MoveInWasStarted());
         }
 
         public enum State
@@ -46,8 +48,6 @@ namespace Messaging.Application.Transactions.MoveIn
         public string TransactionId { get; }
 
         public string? ProcessId { get; private set; }
-
-        public IReadOnlyCollection<object> DomainEvents => _domainEvents.AsReadOnly();
 
         public string MarketEvaluationPointId { get; }
 
@@ -70,13 +70,13 @@ namespace Messaging.Application.Transactions.MoveIn
             if (businessRequestResult == null) throw new ArgumentNullException(nameof(businessRequestResult));
             if (businessRequestResult.Success == false)
             {
-                _domainEvents.Add(new MoveInTransactionCompleted());
+                AddDomainEvent(new MoveInTransactionCompleted());
             }
             else
             {
                 ProcessId = businessRequestResult.ProcessId;
                 _state = State.Started;
-                _domainEvents.Add(new PendingBusinessProcess(ProcessId!));
+                AddDomainEvent(new PendingBusinessProcess(ProcessId!));
             }
         }
 
@@ -88,7 +88,7 @@ namespace Messaging.Application.Transactions.MoveIn
             }
 
             _state = State.Completed;
-            _domainEvents.Add(new MoveInTransactionCompleted());
+            AddDomainEvent(new MoveInTransactionCompleted());
         }
     }
 }

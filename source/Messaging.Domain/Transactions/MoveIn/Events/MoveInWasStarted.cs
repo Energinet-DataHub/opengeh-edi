@@ -14,8 +14,8 @@
 
 using Messaging.Domain.SeedWork;
 
-namespace Messaging.Application.Transactions.MoveIn;
+namespace Messaging.Domain.Transactions.MoveIn.Events;
 
-public class MoveInTransactionCompleted : DomainEvent
+public class MoveInWasStarted : DomainEvent
 {
 }

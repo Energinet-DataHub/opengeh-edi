@@ -13,10 +13,11 @@
 // limitations under the License.
 
 using System;
+using Messaging.Domain.SeedWork;
 
 namespace Messaging.Application.Transactions.MoveIn;
 
-public class PendingBusinessProcess
+public class PendingBusinessProcess : DomainEvent
 {
     public PendingBusinessProcess(string processId)
     {

@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
+using Messaging.Domain.Transactions.MoveIn.Events;
 using NodaTime;
 using Xunit;
 
@@ -24,6 +25,15 @@ namespace Messaging.Tests.Transactions.MoveIn;
 public class MoveInTransactionTests
 {
     [Fact]
+    public void Transaction_is_started()
+    {
+        var transaction = CreateTransaction();
+
+        var startedEvent = transaction.DomainEvents.FirstOrDefault(e => e is MoveInWasStarted) as MoveInWasStarted;
+        Assert.NotNull(startedEvent);
+    }
+
+    [Fact]
     public void Transaction_is_started_when_business_request_result_contain_no_validation_errors()
     {
         var transaction = CreateTransaction();
@@ -31,7 +41,6 @@ public class MoveInTransactionTests
         var requestResult = BusinessRequestSucceeded();
         transaction.Start(requestResult);
 
-        Assert.Equal(1, transaction.DomainEvents.Count);
         Assert.Contains(transaction.DomainEvents, e => e is PendingBusinessProcess);
 
         AssertProcessId(requestResult, transaction);
@@ -45,7 +54,6 @@ public class MoveInTransactionTests
         var requestResult = BusinessRequestResult.Failure("This is an validation error");
         transaction.Start(requestResult);
 
-        Assert.Equal(1, transaction.DomainEvents.Count);
         Assert.Contains(transaction.DomainEvents, e => e is MoveInTransactionCompleted);
     }
 
@@ -91,7 +99,7 @@ public class MoveInTransactionTests
 
     private static void AssertProcessId(BusinessRequestResult requestResult, MoveInTransaction transaction)
     {
-        var pendingBusinessProcess = transaction.DomainEvents.First() as PendingBusinessProcess;
+        var pendingBusinessProcess = transaction.DomainEvents.First(e => e is PendingBusinessProcess) as PendingBusinessProcess;
         Assert.Equal(pendingBusinessProcess?.ProcessId, requestResult.ProcessId);
     }
 }
