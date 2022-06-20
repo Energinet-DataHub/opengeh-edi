@@ -33,6 +33,7 @@ using Messaging.Application.IncomingMessages;
 using Messaging.Application.MasterData.MarketEvaluationPoints;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
+using Messaging.Application.OutgoingMessages.GenericNotification;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Xml.SchemaStore;
@@ -242,6 +243,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddScoped<MessageFactory>();
             _services.AddScoped<DocumentWriter, ConfirmChangeOfSupplierDocumentWriter>();
             _services.AddScoped<DocumentWriter, RejectRequestChangeOfSupplierDocumentWriter>();
+            _services.AddScoped<DocumentWriter, GenericNotificationDocumentWriter>();
             _services.AddScoped<IValidationErrorTranslator, ValidationErrorTranslator>();
             _services.AddScoped<IMarketActivityRecordParser, MarketActivityRecordParser>();
         }
