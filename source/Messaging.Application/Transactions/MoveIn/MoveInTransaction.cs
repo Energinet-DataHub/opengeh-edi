@@ -22,6 +22,8 @@ namespace Messaging.Application.Transactions.MoveIn
     public class MoveInTransaction : Entity
     {
         private State _state = State.Started;
+        #pragma warning disable
+        private bool _forwardedMeteringPointMasterData;
 
         public MoveInTransaction(string transactionId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId, string startedByMessageId, string newEnergySupplierId, string? consumerId, string? consumerName, string? consumerIdType)
         {
@@ -71,6 +73,11 @@ namespace Messaging.Application.Transactions.MoveIn
                 throw new MoveInException($"Transaction {TransactionId} is already completed.");
             }
 
+            if (_state == State.AcceptedByBusinessProcess && _forwardedMeteringPointMasterData == false)
+            {
+                throw new MoveInException($"Cannot complete transaction {TransactionId} because metering point master data has not been forwarded.");
+            }
+
             _state = State.Completed;
             AddDomainEvent(new MoveInWasCompleted());
         }
@@ -96,6 +103,11 @@ namespace Messaging.Application.Transactions.MoveIn
 
             AddDomainEvent(new MoveInWasRejected(TransactionId));
             Complete();
+        }
+
+        public void HasForwardedMeteringPointMasterData()
+        {
+            _forwardedMeteringPointMasterData = true;
         }
     }
 }

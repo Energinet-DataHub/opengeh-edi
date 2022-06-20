@@ -92,6 +92,7 @@ public class MoveInTransactionTests
     {
         var transaction = CreateTransaction();
         transaction.AcceptedByBusinessProcess(SampleData.ProcessId);
+        transaction.HasForwardedMeteringPointMasterData();
 
         transaction.Complete();
 
@@ -103,7 +104,17 @@ public class MoveInTransactionTests
     {
         var transaction = CreateTransaction();
         transaction.AcceptedByBusinessProcess(SampleData.ProcessId);
+        transaction.HasForwardedMeteringPointMasterData();
         transaction.Complete();
+
+        Assert.Throws<MoveInException>(() => transaction.Complete());
+    }
+
+    [Fact]
+    public void Metering_point_master_data_must_have_been_forwarded_when_accepted()
+    {
+        var transaction = CreateTransaction();
+        transaction.AcceptedByBusinessProcess(SampleData.ProcessId);
 
         Assert.Throws<MoveInException>(() => transaction.Complete());
     }
