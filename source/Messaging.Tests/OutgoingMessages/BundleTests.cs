@@ -28,34 +28,44 @@ public class BundleTests
     {
         var messages = new List<OutgoingMessage>()
         {
-            new OutgoingMessage(
-                "DocumentType1",
-                "Receiver1",
-                "FakeId",
-                "FakeId",
-                "ProcessType1",
-                "ReceiverRole1",
-                "SenderId",
-                "SenderRole",
-                string.Empty,
-                "ReasonCode"),
-            new OutgoingMessage(
-                "DocumentType1",
-                "Receiver1",
-                "FakeId",
-                "FakeId",
-                "ProcessType2",
-                "ReceiverRole1",
-                "SenderId",
-                "SenderRole",
-                string.Empty,
-                "ReasonCode"),
+            CreateOutgoingMessage("ProcessType1", "SenderId"),
+            CreateOutgoingMessage("ProcessType2", "SenderId"),
         };
 
         var bundle = new Bundle(SystemClock.Instance.GetCurrentInstant());
         bundle.Add(messages[0]);
 
         Assert.Throws<ProcessTypesDoesNotMatchException>(() => bundle.Add(messages[1]));
+    }
+
+    [Fact]
+    public void Messages_must_same_receiver()
+    {
+        var messages = new List<OutgoingMessage>()
+        {
+            CreateOutgoingMessage("ProcessType1", "Sender1"),
+            CreateOutgoingMessage("ProcessType1", "Sender2"),
+        };
+
+        var bundle = new Bundle(SystemClock.Instance.GetCurrentInstant());
+        bundle.Add(messages[0]);
+
+        Assert.Throws<ReceiverIdsDoesNotMatchException>(() => bundle.Add(messages[1]));
+    }
+
+    private static OutgoingMessage CreateOutgoingMessage(string processType, string receiverId)
+    {
+        return new OutgoingMessage(
+            "DocumentType1",
+            receiverId,
+            "FakeId",
+            "FakeId",
+            processType,
+            "ReceiverRole1",
+            "SenderId",
+            "SenderRole",
+            string.Empty,
+            "ReasonCode");
     }
 }
 
@@ -79,9 +89,26 @@ public class Bundle
         }
 
         EnsureProcessType(message);
+        EnsureReceiverId(message);
 
         _messages.Add(message);
 
+    }
+
+    private void EnsureReceiverId(OutgoingMessage message)
+    {
+        if (message.ReceiverId.Equals(_header.ReceiverId, StringComparison.OrdinalIgnoreCase) == false)
+        {
+            throw new ReceiverIdsDoesNotMatchException(message.Id.ToString());
+        }
+    }
+
+    private void EnsureProcessType(OutgoingMessage message)
+    {
+        if (message.ProcessType.Equals(_header.ProcessType) == false)
+        {
+            throw new ProcessTypesDoesNotMatchException(message.Id.ToString());
+        }
     }
 
     private bool IsFirstMessageInBundle()
@@ -99,13 +126,5 @@ public class Bundle
             message.ReceiverRole,
             Guid.NewGuid().ToString(),
             _timestamp, message.ReasonCode);
-    }
-
-    private void EnsureProcessType(OutgoingMessage message)
-    {
-        if (message.ProcessType.Equals(_header.ProcessType) == false)
-        {
-            throw new ProcessTypesDoesNotMatchException(message.Id.ToString());
-        }
     }
 }
