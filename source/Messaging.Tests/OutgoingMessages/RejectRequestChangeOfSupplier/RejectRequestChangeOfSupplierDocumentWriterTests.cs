@@ -26,6 +26,7 @@ using Messaging.Application.Xml.SchemaStore;
 using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Serialization;
+using Messaging.Tests.OutgoingMessages.Asserts;
 using Xunit;
 
 namespace Messaging.Tests.OutgoingMessages.RejectRequestChangeOfSupplier;

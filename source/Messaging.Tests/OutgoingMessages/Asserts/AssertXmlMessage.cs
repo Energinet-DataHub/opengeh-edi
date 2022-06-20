@@ -24,7 +24,7 @@ using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Application.Xml;
 using Xunit;
 
-namespace Messaging.Tests.OutgoingMessages
+namespace Messaging.Tests.OutgoingMessages.Asserts
 {
     internal static class AssertXmlMessage
     {
