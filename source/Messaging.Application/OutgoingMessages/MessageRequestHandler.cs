@@ -18,6 +18,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Messaging.Application.Configuration.DataAccess;
+using Messaging.Domain.OutgoingMessages;
 
 namespace Messaging.Application.OutgoingMessages
 {
