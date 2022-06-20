@@ -23,6 +23,13 @@ namespace Messaging.Tests.OutgoingMessages;
 
 public class BundleTests
 {
+    private readonly Bundle _bundle;
+
+    public BundleTests()
+    {
+        _bundle = new Bundle(SystemClock.Instance.GetCurrentInstant());
+    }
+
     [Fact]
     public void Messages_must_originate_from_the_same_type_of_business_process()
     {
@@ -32,10 +39,9 @@ public class BundleTests
             CreateOutgoingMessage("ProcessType2", "SenderId"),
         };
 
-        var bundle = new Bundle(SystemClock.Instance.GetCurrentInstant());
-        bundle.Add(messages[0]);
+        _bundle.Add(messages[0]);
 
-        Assert.Throws<ProcessTypesDoesNotMatchException>(() => bundle.Add(messages[1]));
+        Assert.Throws<ProcessTypesDoesNotMatchException>(() => _bundle.Add(messages[1]));
     }
 
     [Fact]
@@ -47,10 +53,9 @@ public class BundleTests
             CreateOutgoingMessage("ProcessType1", "Sender2"),
         };
 
-        var bundle = new Bundle(SystemClock.Instance.GetCurrentInstant());
-        bundle.Add(messages[0]);
+        _bundle.Add(messages[0]);
 
-        Assert.Throws<ReceiverIdsDoesNotMatchException>(() => bundle.Add(messages[1]));
+        Assert.Throws<ReceiverIdsDoesNotMatchException>(() => _bundle.Add(messages[1]));
     }
 
     private static OutgoingMessage CreateOutgoingMessage(string processType, string receiverId)
