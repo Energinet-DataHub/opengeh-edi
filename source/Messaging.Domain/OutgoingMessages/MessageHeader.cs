@@ -14,7 +14,7 @@
 
 using NodaTime;
 
-namespace Messaging.Application.OutgoingMessages
+namespace Messaging.Domain.OutgoingMessages
 {
     public record MessageHeader(
         string ProcessType,
