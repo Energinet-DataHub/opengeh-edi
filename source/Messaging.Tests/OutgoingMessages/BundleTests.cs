@@ -73,7 +73,7 @@ public class Bundle
 
     public void Add(OutgoingMessage message)
     {
-        if (_messages.Count == 0)
+        if (IsFirstMessageInBundle())
         {
             CreateHeaderFrom(message);
         }
@@ -82,6 +82,11 @@ public class Bundle
 
         _messages.Add(message);
 
+    }
+
+    private bool IsFirstMessageInBundle()
+    {
+        return _messages.Count == 0;
     }
 
     private void CreateHeaderFrom(OutgoingMessage message)
