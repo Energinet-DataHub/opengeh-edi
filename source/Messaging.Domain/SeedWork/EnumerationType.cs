@@ -12,12 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
-namespace Messaging.Application.OutgoingMessages
+namespace Messaging.Domain.SeedWork
 {
     public abstract class EnumerationType : IComparable
     {
