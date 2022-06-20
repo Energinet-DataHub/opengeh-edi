@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.ActorRegistrySync.Services;
 using Microsoft.Azure.WebJobs;
@@ -54,8 +55,14 @@ public class SyncActors : IDisposable
 
     private async Task SyncActorsFromExternalSourceToDbAsync()
     {
+        var actors = (await _actorSyncService.GetActorsAsync().ConfigureAwait(false)).ToList();
+        var energySuppliers = ActorSyncService.MapActorsToEnergySuppliers(actors).ToList();
+        var supplierRegistrations = ActorSyncService.FilterObsoleteSupplierRegistrations(await _actorSyncService.GetSupplierRegistrationsAsync().ConfigureAwait(false), energySuppliers);
+
         await _actorSyncService.DatabaseCleanUpAsync().ConfigureAwait(false);
-        await _actorSyncService.SyncActorsAsync().ConfigureAwait(false);
+        await _actorSyncService.InsertActorsAsync(actors).ConfigureAwait(false);
+        await _actorSyncService.InsertEnergySuppliersAsync(energySuppliers).ConfigureAwait(false);
+        await _actorSyncService.InsertSupplierRegistrationsAsync(supplierRegistrations).ConfigureAwait(false);
 
         await _actorSyncService.CommitTransactionAsync().ConfigureAwait(false);
     }
