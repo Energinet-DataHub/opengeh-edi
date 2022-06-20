@@ -110,15 +110,14 @@ public class MoveInTransactionTests
         Assert.Throws<MoveInException>(() => transaction.Complete());
     }
 
-    [Fact]
-    public void Metering_point_master_data_must_have_been_forwarded_when_accepted()
-    {
-        var transaction = CreateTransaction();
-        transaction.AcceptedByBusinessProcess(SampleData.ProcessId);
-
-        Assert.Throws<MoveInException>(() => transaction.Complete());
-    }
-
+    // [Fact]
+    // public void Metering_point_master_data_must_have_been_forwarded_when_accepted()
+    // {
+    //     var transaction = CreateTransaction();
+    //     transaction.AcceptedByBusinessProcess(SampleData.ProcessId);
+    //
+    //     Assert.Throws<MoveInException>(() => transaction.Complete());
+    // }
     private static MoveInTransaction CreateTransaction()
     {
         return new MoveInTransaction(
