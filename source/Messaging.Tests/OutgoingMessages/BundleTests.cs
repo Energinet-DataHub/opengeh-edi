@@ -53,9 +53,9 @@ public class BundleTests
         };
 
         var bundle = new Bundle(SystemClock.Instance.GetCurrentInstant());
-        bundle.Include(messages[0]);
+        bundle.Add(messages[0]);
 
-        Assert.Throws<ProcessTypesDoesNotMatchException>(() => bundle.Include(messages[1]));
+        Assert.Throws<ProcessTypesDoesNotMatchException>(() => bundle.Add(messages[1]));
     }
 }
 
@@ -71,7 +71,7 @@ public class Bundle
         _timestamp = timestamp;
     }
 
-    public void Include(OutgoingMessage message)
+    public void Add(OutgoingMessage message)
     {
         if (_messages.Count == 0)
         {
