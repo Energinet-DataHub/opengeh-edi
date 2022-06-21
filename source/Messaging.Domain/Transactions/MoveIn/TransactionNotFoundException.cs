@@ -12,17 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-
 namespace Messaging.Application.Transactions.MoveIn;
 
-public class PendingBusinessProcess
+public class TransactionNotFoundException : Exception
 {
-    public PendingBusinessProcess(string processId)
+    public TransactionNotFoundException(string processId)
+        : base($"Could not find a transaction for business process id {processId}")
     {
-        if (processId == null) throw new ArgumentNullException(nameof(processId));
-        ProcessId = processId;
     }
 
-    public string ProcessId { get; }
+    private TransactionNotFoundException()
+    {
+    }
+
+    private TransactionNotFoundException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
 }

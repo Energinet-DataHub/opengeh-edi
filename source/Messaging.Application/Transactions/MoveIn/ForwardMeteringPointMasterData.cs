@@ -12,24 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
 using Messaging.Application.Common.Commands;
-using NodaTime;
 
-namespace Messaging.Infrastructure.Configuration.InternalCommands
+namespace Messaging.Application.Transactions.MoveIn;
+
+public class ForwardMeteringPointMasterData : InternalCommand
 {
-    /// <summary>
-    /// Service for scheduling and enqueueing internal commands for later processing
-    /// </summary>
-    public interface ICommandScheduler
+    public ForwardMeteringPointMasterData(string transactionId)
     {
-        /// <summary>
-        /// Schedules or enqueues a command
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="scheduleDate"></param>
-        /// <typeparam name="TCommand"><see cref="InternalCommand"/></typeparam>
-        Task EnqueueAsync<TCommand>(TCommand command, Instant? scheduleDate = null)
-            where TCommand : InternalCommand;
+        TransactionId = transactionId;
     }
+
+    public string TransactionId { get; }
 }

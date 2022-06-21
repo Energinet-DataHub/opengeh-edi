@@ -87,4 +87,10 @@ public class AssertTransaction
         Assert.Equal(consumerIdType, _transaction.ConsumerIdType);
         return this;
     }
+
+    public AssertTransaction HasForwardedMeteringPointMasterData(bool expected)
+    {
+        Assert.Equal(expected, _transaction.ForwardedMeteringPointMasterData);
+        return this;
+    }
 }

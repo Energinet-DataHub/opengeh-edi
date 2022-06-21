@@ -12,8 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Application.Transactions.MoveIn;
+using System;
 
-public class MoveInTransactionCompleted
-{
-}
+namespace Energinet.DataHub.MarketRoles.ActorRegistrySync.Entities;
+
+public record SupplierRegistration(
+    Guid Id,
+    Guid EnergySupplierId,
+    Guid BusinessProcessId,
+    DateTime? StartOfSupplyDate,
+    DateTime? EndOfSupplyDate,
+    Guid AccountingPointId);

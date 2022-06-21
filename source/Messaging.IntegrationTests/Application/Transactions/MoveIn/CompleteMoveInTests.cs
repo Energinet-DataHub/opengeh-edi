@@ -100,7 +100,8 @@ public class CompleteMoveInTests : TestBase
             SampleData.ConsumerName,
             SampleData.ConsumerIdType);
 
-        transaction.Start(BusinessRequestResult.Succeeded(Guid.NewGuid().ToString()));
+        transaction.AcceptedByBusinessProcess(BusinessRequestResult.Succeeded(Guid.NewGuid().ToString()).ProcessId!);
+        transaction.HasForwardedMeteringPointMasterData();
         _transactionRepository.Add(transaction);
         await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
         return transaction;

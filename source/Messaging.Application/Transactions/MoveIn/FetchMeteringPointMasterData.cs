@@ -12,23 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Messaging.Application.Common.Commands;
 
 namespace Messaging.Application.Transactions.MoveIn;
 
-public class TransactionNotFoundException : Exception
+public class FetchMeteringPointMasterData : InternalCommand
 {
-    public TransactionNotFoundException(string processId)
-        : base($"Could not find a transaction for business process id {processId}")
-    {
-    }
-
-    private TransactionNotFoundException()
-    {
-    }
-
-    private TransactionNotFoundException(string message, Exception innerException)
-        : base(message, innerException)
-    {
-    }
 }

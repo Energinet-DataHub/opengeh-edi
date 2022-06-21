@@ -16,8 +16,8 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Energinet.DataHub.MessageHub.Client.Storage;
+using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages;
-using Messaging.Infrastructure.Configuration.InternalCommands;
 
 namespace Messaging.Infrastructure.OutgoingMessages
 {

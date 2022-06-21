@@ -52,9 +52,14 @@ limitations under the License.
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
           <CopyToPublishDirectory>Never</CopyToPublishDirectory>
         </None>
+        <None Update="local.settings.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+          <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+        </None>
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\Contracts\Contracts.csproj" />
       <ProjectReference Include="..\Messaging.Infrastructure\Messaging.Infrastructure.csproj" />
+      <ProjectReference Include="..\Processing.Application\Processing.Application.csproj" />
     </ItemGroup>
 </Project>

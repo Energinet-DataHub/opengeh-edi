@@ -33,17 +33,20 @@ using Messaging.Application.IncomingMessages;
 using Messaging.Application.MasterData.MarketEvaluationPoints;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
+using Messaging.Application.OutgoingMessages.GenericNotification;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Xml.SchemaStore;
 using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
+using Messaging.Domain.Transactions.MoveIn.Events;
 using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Common.Reasons;
 using Messaging.Infrastructure.Configuration.Authentication;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.InternalCommands;
+using Messaging.Infrastructure.Configuration.Processing;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.Configuration.SystemTime;
 using Messaging.Infrastructure.IncomingMessages;
@@ -84,6 +87,7 @@ namespace Messaging.Infrastructure.Configuration
             AddInternalCommandsProcessing();
             AddMessageGenerationServices();
             AddMasterDataServices();
+            AddProcessing();
         }
 
         public static CompositionRoot Initialize(IServiceCollection services)
@@ -204,7 +208,10 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddScoped(_ => configuration);
             _services.AddScoped<IMoveInRequester, MoveInRequester>();
             _services.AddTransient<IRequestHandler<IncomingMessage, Unit>, MoveInRequestHandler>();
+            _services.AddTransient<IRequestHandler<FetchMeteringPointMasterData, Unit>, FetchMeteringPointMasterDataHandler>();
             _services.AddTransient<IRequestHandler<CompleteMoveInTransaction, Unit>, CompleteMoveInTransactionHandler>();
+            _services.AddTransient<IRequestHandler<ForwardMeteringPointMasterData, Unit>, ForwardMeteringPointMasterDataHandler>();
+            _services.AddTransient<INotificationHandler<MoveInWasAccepted>, FetchMeteringPointMasterDataWhenAccepted>();
             return this;
         }
 
@@ -236,6 +243,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddScoped<MessageFactory>();
             _services.AddScoped<DocumentWriter, ConfirmChangeOfSupplierDocumentWriter>();
             _services.AddScoped<DocumentWriter, RejectRequestChangeOfSupplierDocumentWriter>();
+            _services.AddScoped<DocumentWriter, GenericNotificationDocumentWriter>();
             _services.AddScoped<IValidationErrorTranslator, ValidationErrorTranslator>();
             _services.AddScoped<IMarketActivityRecordParser, MarketActivityRecordParser>();
         }
@@ -250,6 +258,13 @@ namespace Messaging.Infrastructure.Configuration
         {
             _services.AddScoped<IMarketEvaluationPointRepository, MarketEvaluationPointRepository>();
             _services.AddTransient<IRequestHandler<SetEnergySupplier, Unit>, SetEnergySupplierHandler>();
+        }
+
+        private void AddProcessing()
+        {
+            _services.AddScoped<DomainEventsAccessor>();
+            _services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehaviour<,>));
+            _services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RaiseDomainEventsBehaviour<,>));
         }
     }
 }

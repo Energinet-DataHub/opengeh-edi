@@ -17,7 +17,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.Common;
-using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages;
 
 namespace Messaging.Application.Transactions.MoveIn;
@@ -25,13 +24,11 @@ namespace Messaging.Application.Transactions.MoveIn;
 public class CompleteMoveInTransactionHandler : IRequestHandler<CompleteMoveInTransaction, Unit>
 {
     private readonly IMoveInTransactionRepository _transactionRepository;
-    private readonly IUnitOfWork _unitOfWork;
     private readonly MoveInNotifications _notifications;
 
-    public CompleteMoveInTransactionHandler(IMoveInTransactionRepository transactionRepository, IMarketActivityRecordParser marketActivityRecordParser, IOutgoingMessageStore outgoingMessageStore, IUnitOfWork unitOfWork, MoveInNotifications notifications)
+    public CompleteMoveInTransactionHandler(IMoveInTransactionRepository transactionRepository, IMarketActivityRecordParser marketActivityRecordParser, IOutgoingMessageStore outgoingMessageStore, MoveInNotifications notifications)
     {
         _transactionRepository = transactionRepository;
-        _unitOfWork = unitOfWork;
         _notifications = notifications;
     }
 
@@ -45,11 +42,7 @@ public class CompleteMoveInTransactionHandler : IRequestHandler<CompleteMoveInTr
         }
 
         transaction.Complete();
-
         InformSupplierIfAny(transaction);
-
-        await _unitOfWork.CommitAsync().ConfigureAwait(false);
-
         return Unit.Value;
     }
 
