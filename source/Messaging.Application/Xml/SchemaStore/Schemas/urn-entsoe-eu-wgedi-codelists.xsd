@@ -1424,7 +1424,7 @@
           <xsd:documentation>
             <CodeDescription>
               <Title>Net Production / Consumption</Title>
-              <Definition>Net production/consumption - where signed values will be used. 
+              <Definition>Net production/consumption - where signed values will be used.
 With the following rules: In area=Out area, In party=Out party, + means production and - means consumption.</Definition>
             </CodeDescription>
           </xsd:documentation>
@@ -1635,7 +1635,7 @@ With the following rules: In area=Out area, In party=Out party, + means producti
           <xsd:documentation>
             <CodeDescription>
               <Title>Control Area Program</Title>
-              <Definition>A time series providing the total exchanges between two TSOs (including the commercial transactions, the compensation program and the losses compensation program). 
+              <Definition>A time series providing the total exchanges between two TSOs (including the commercial transactions, the compensation program and the losses compensation program).
 Note this definition might change when UCTE brings forward its coding requirements.</Definition>
             </CodeDescription>
           </xsd:documentation>
@@ -2707,8 +2707,8 @@ Note this definition might change when UCTE brings forward its coding requiremen
             <CodeDescription>
               <Title>Constraint situation</Title>
               <Definition>The timeseries describes the constraint situation for a given TimeInterval.
-A constraint situation can be: 
-- composed of a list of network elements in outage associated for each outage to a list of network elements on which remedial actions have been carried out accordingly to contingency process 
+A constraint situation can be:
+- composed of a list of network elements in outage associated for each outage to a list of network elements on which remedial actions have been carried out accordingly to contingency process
 - or it can be an external constraint.</Definition>
             </CodeDescription>
           </xsd:documentation>
@@ -2719,7 +2719,7 @@ A constraint situation can be:
           <xsd:documentation>
             <CodeDescription>
               <Title>Initial domain</Title>
-              <Definition>The timeseries describe the full flow based domain for a given TimeInterval. 
+              <Definition>The timeseries describe the full flow based domain for a given TimeInterval.
 Critical network elements are displayed in details and their impact on the market is quantified.</Definition>
             </CodeDescription>
           </xsd:documentation>
@@ -2730,7 +2730,7 @@ Critical network elements are displayed in details and their impact on the marke
           <xsd:documentation>
             <CodeDescription>
               <Title>Flow based domain adjusted to long term schedules</Title>
-              <Definition>The timeseries describe the full flow based domain for a given TimeInterval adjusted to the latest update of the schedules. 
+              <Definition>The timeseries describe the full flow based domain for a given TimeInterval adjusted to the latest update of the schedules.
 Critical network elements are displayed in details and their impact on the market is quantified.</Definition>
             </CodeDescription>
           </xsd:documentation>
@@ -4808,7 +4808,7 @@ Critical network elements are displayed in details and their impact on the marke
     <xsd:annotation>
       <xsd:documentation>
         <Uid>ET0010</Uid>
-        <Definition>The contract type defines the conditions under which the capacity is allocated and handled, e.g. daily auction, weekly auction, monthly auction, yearly auction, etc. 
+        <Definition>The contract type defines the conditions under which the capacity is allocated and handled, e.g. daily auction, weekly auction, monthly auction, yearly auction, etc.
 The significance of this type is dependent on area specific coded working methods.</Definition>
       </xsd:documentation>
     </xsd:annotation>
@@ -5421,7 +5421,7 @@ The significance of this type is dependent on area specific coded working method
     <xsd:annotation>
       <xsd:documentation>
         <Uid>ET0003</Uid>
-        <Definition>The DocumentTypeList is only used in XML instances using deprecated ENTSO-E schema; otherwise for XML instances based CIM, the codelist is MessageTypeList. 
+        <Definition>The DocumentTypeList is only used in XML instances using deprecated ENTSO-E schema; otherwise for XML instances based CIM, the codelist is MessageTypeList.
 Therefore, you are kindly advised to refer to the MessageType enumeration, which includes the same enumeration codes.</Definition>
       </xsd:documentation>
     </xsd:annotation>
@@ -7422,7 +7422,7 @@ This enumeration is used in the XML instances based on IEC 62325.</Definition>
           </xsd:documentation>
         </xsd:annotation>
       </xsd:enumeration>
-      <xsd:enumeration value="414">
+      <xsd:enumeration value="E44">
         <xsd:annotation>
           <xsd:documentation>
             <CodeDescription>
@@ -12025,8 +12025,8 @@ This enumeration is used in the XML instances based on IEC 62325.</Definition>
           <xsd:documentation>
             <CodeDescription>
               <Title>Counterpart time series missing </Title>
-              <Definition>This provides an indication that the time series has not got a counterpart time series. 
-In the case of an Intermediate Confirmation Report this is advising the recipient that the time series may be rejected at nomination closure if the counterpart time series is not received. 
+              <Definition>This provides an indication that the time series has not got a counterpart time series.
+In the case of an Intermediate Confirmation Report this is advising the recipient that the time series may be rejected at nomination closure if the counterpart time series is not received.
 In the case of a Final Confirmation Report this is informing the recipient that the time series has been rejected because the counterpart time series has not been forthcoming. </Definition>
             </CodeDescription>
           </xsd:documentation>
@@ -14774,7 +14774,7 @@ In the case of a Final Confirmation Report this is informing the recipient that 
           <xsd:documentation>
             <CodeDescription>
               <Title>Market information aggregator</Title>
-              <Definition>Refer to role model definitions in the ENTSO-E Harmonised Role Model Document. 
+              <Definition>Refer to role model definitions in the ENTSO-E Harmonised Role Model Document.
 A party that collects information from different sources and assembles  it to provide a summary of the market.</Definition>
             </CodeDescription>
           </xsd:documentation>
@@ -14785,7 +14785,7 @@ A party that collects information from different sources and assembles  it to pr
           <xsd:documentation>
             <CodeDescription>
               <Title>Information receiver</Title>
-              <Definition>Refer to role model definitions in the ENTSO-E Harmonised Role Model Document. 
+              <Definition>Refer to role model definitions in the ENTSO-E Harmonised Role Model Document.
 A party, not necessarily a market participant, which receives information about the market.</Definition>
             </CodeDescription>
           </xsd:documentation>
@@ -14796,7 +14796,7 @@ A party, not necessarily a market participant, which receives information about 
           <xsd:documentation>
             <CodeDescription>
               <Title>Reserve Allocator</Title>
-              <Definition>Refer to role model definitions in the ENTSO-E Harmonised Role Model Document. 
+              <Definition>Refer to role model definitions in the ENTSO-E Harmonised Role Model Document.
 A party that informs the market of reserve requirements, receives tenders against the requirements and in compliance with the prequalification criteria, determines what tenders meet requirements and assigns tenders.</Definition>
             </CodeDescription>
           </xsd:documentation>
@@ -14807,7 +14807,7 @@ A party that informs the market of reserve requirements, receives tenders agains
           <xsd:documentation>
             <CodeDescription>
               <Title>MOL Responsible</Title>
-              <Definition>Refer to role model definitions in the ENTSO-E Harmonised Role Model Document. 
+              <Definition>Refer to role model definitions in the ENTSO-E Harmonised Role Model Document.
 A party that Informs the market of reserve requirements, receives tenders against the requirements and in compliance with the prequalification criteria, determines what tenders meet requirements and assigns tenders.</Definition>
             </CodeDescription>
           </xsd:documentation>
@@ -14818,7 +14818,7 @@ A party that Informs the market of reserve requirements, receives tenders agains
           <xsd:documentation>
             <CodeDescription>
               <Title>Capacity Coordinator</Title>
-              <Definition>Refer to role model definitions in the ENTSO-E Harmonised Role Model Document. 
+              <Definition>Refer to role model definitions in the ENTSO-E Harmonised Role Model Document.
 A party, acting on behalf of the SOs involved, responsible for establishing a coordinated Offered Capacity and/or NTC and/or ATC between several Market Balance Areas.</Definition>
             </CodeDescription>
           </xsd:documentation>
@@ -14829,7 +14829,7 @@ A party, acting on behalf of the SOs involved, responsible for establishing a co
           <xsd:documentation>
             <CodeDescription>
               <Title>Reconciliation Accountable</Title>
-              <Definition>Refer to role model definitions in the ENTSO-E Harmonised Role Model Document. 
+              <Definition>Refer to role model definitions in the ENTSO-E Harmonised Role Model Document.
 A party that is financially accountable for the reconciled volume of energy products for a profiled local metering point.</Definition>
             </CodeDescription>
           </xsd:documentation>
