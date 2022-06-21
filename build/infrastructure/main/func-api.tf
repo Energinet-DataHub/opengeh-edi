@@ -27,7 +27,7 @@ module "func_receiver" {
   private_endpoint_subnet_id                = data.azurerm_key_vault_secret.snet_private_endpoints_id.value
   always_on                                 = true
   dotnet_framework_version                  = "6"
-  use_dotnet_isolated_runtime               = false
+  use_dotnet_isolated_runtime               = true
   health_check_path                         = "/api/monitor/ready"
   app_settings                              = {
     # Shared resources logging

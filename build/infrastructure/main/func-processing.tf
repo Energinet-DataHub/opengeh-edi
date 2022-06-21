@@ -27,7 +27,7 @@ module "func_processing" {
   log_analytics_workspace_id                = data.azurerm_key_vault_secret.log_shared_id.value
   always_on                                 = true
   dotnet_framework_version                  = "6"
-  use_dotnet_isolated_runtime               = false
+  use_dotnet_isolated_runtime               = true
   health_check_path                         = "/api/monitor/ready"
   app_settings                              = {
     MARKET_DATA_QUEUE_URL                                       = "${module.sb_marketroles.name}.servicebus.windows.net:9093"
