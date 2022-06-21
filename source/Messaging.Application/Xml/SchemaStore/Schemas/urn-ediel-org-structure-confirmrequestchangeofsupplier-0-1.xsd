@@ -32,7 +32,7 @@
 	<xs:complexType name="ConfirmRequestChangeOfSupplier_MarketDocument" sawsdl:modelReference="http://iec.ch/TC57/CIM101#MarketDocument">
 		<xs:sequence>
 			<xs:element name="mRID" type="xs:string" minOccurs="1" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#IdentifiedObject.mRID"/>
-			<xs:element name="type" type="cim:MessageKind_String" default="414" minOccurs="1" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#Document.type"/>
+			<xs:element name="type" type="cim:MessageKind_String" default="E44" minOccurs="1" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#Document.type"/>
 			<xs:element name="process.processType" type="cim:ProcessKind_String" minOccurs="1" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#Process.processType"/>
 			<xs:element name="businessSector.type" type="cim:BusinessSectorKind_String" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#BusinessSector.type"/>
 			<xs:element name="sender_MarketParticipant.mRID" type="cim:PartyID_String" minOccurs="1" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#IdentifiedObject.mRID"/>
