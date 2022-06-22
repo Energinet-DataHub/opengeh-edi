@@ -102,11 +102,15 @@ public class MarketRolesDbService : IDisposable
     {
         if (supplierRegistrations == null) throw new ArgumentNullException(nameof(supplierRegistrations));
 
+        var registrations = supplierRegistrations.ToList();
+
+        if (!registrations.Any()) return;
+
         if (_transaction == null) await BeginTransactionAsync().ConfigureAwait(false);
 
         var stringBuilder = new StringBuilder();
         var culture = new CultureInfo("da-DK");
-        foreach (var supplierRegistration in supplierRegistrations)
+        foreach (var supplierRegistration in registrations)
         {
             var startDate = supplierRegistration.StartOfSupplyDate != null ? $"'{supplierRegistration.StartOfSupplyDate.Value.ToString("o", culture)}'" : "null";
             var endDate = supplierRegistration.EndOfSupplyDate != null ? $"'{supplierRegistration.EndOfSupplyDate.Value.ToString("o", culture)}'" : "null";
