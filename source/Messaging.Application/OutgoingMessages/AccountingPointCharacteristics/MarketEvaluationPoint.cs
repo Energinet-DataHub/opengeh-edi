@@ -20,7 +20,7 @@ namespace Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
 
 public class MarketEvaluationPoint
 {
-    public MarketEvaluationPoint(string id, string meteringPointResponsible, string type, string settlementMethod, string meteringMethod, string connectionState, string readCycle, string netSettlementGroup, string? nextReadingDate, string meteringGridAreaId, string inMeteringGridAreaId, string outMeteringGridAreaId, string linkedMarketEvaluationPointId, string physicalConnectionCapacity, string connectionType, string disconnectionMethod, string psrType, string productionObligation, string contractedConnectionCapacity, string ratedCurrent, string meterId, ReadOnlyCollection<Series> series, string energySupplier, Instant supplyStart, string description, string geoInfoReference, Address mainAddress, string isActualAddress, ParentMarketEvaluationPoint parentMktEvaluationPoint, ChildMarketEvaluationPoint childMktEvaluationPoint)
+    public MarketEvaluationPoint(string id, string meteringPointResponsible, string type, string settlementMethod, string meteringMethod, string connectionState, string readCycle, string netSettlementGroup, string nextReadingDate, string meteringGridAreaId, string inMeteringGridAreaId, string outMeteringGridAreaId, string linkedMarketEvaluationPointId, string physicalConnectionCapacity, string connectionType, string disconnectionMethod, string psrType, string productionObligation, string contractedConnectionCapacity, string ratedCurrent, string meterId, ReadOnlyCollection<Series> series, string energySupplier, Instant supplyStart, string description, string geoInfoReference, Address mainAddress, string isActualAddress, ParentMarketEvaluationPoint parentMktEvaluationPoint, ChildMarketEvaluationPoint childMktEvaluationPoint)
     {
         Id = id;
         MeteringPointResponsible = meteringPointResponsible;
@@ -70,7 +70,7 @@ public class MarketEvaluationPoint
 
     public string NetSettlementGroup { get; }
 
-    public string? NextReadingDate { get; }
+    public string NextReadingDate { get; }
 
     public string MeteringGridAreaId { get; }
 
