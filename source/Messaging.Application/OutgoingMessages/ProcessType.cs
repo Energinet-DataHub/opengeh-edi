@@ -14,6 +14,7 @@
 
 using System;
 using System.Linq;
+using Messaging.Domain.SeedWork;
 
 namespace Messaging.Application.OutgoingMessages;
 

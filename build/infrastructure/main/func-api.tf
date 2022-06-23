@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 module "func_receiver" {
-  source                                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/function-app?ref=6.0.0"
+  source                                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/function-app?ref=7.0.0"
 
   name                                      = "api"
   project_name                              = var.domain_name_short
@@ -26,14 +26,10 @@ module "func_receiver" {
   vnet_integration_subnet_id                = data.azurerm_key_vault_secret.snet_vnet_integrations_id.value
   private_endpoint_subnet_id                = data.azurerm_key_vault_secret.snet_private_endpoints_id.value
   always_on                                 = true
+  dotnet_framework_version                  = "6"
+  use_dotnet_isolated_runtime               = true
   health_check_path                         = "/api/monitor/ready"
   app_settings                              = {
-    # Region: Default Values
-    WEBSITE_ENABLE_SYNC_UPDATE_SITE                               = true
-    WEBSITE_RUN_FROM_PACKAGE                                      = 1
-    WEBSITES_ENABLE_APP_SERVICE_STORAGE                           = true
-    FUNCTIONS_WORKER_RUNTIME                                      = "dotnet-isolated"
-    # Endregion: Default Values
     # Shared resources logging
     REQUEST_RESPONSE_LOGGING_CONNECTION_STRING                    = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=st-marketoplogs-primary-connection-string)",
     REQUEST_RESPONSE_LOGGING_CONTAINER_NAME                       = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=st-marketoplogs-container-name)",
@@ -57,7 +53,7 @@ module "func_receiver" {
     SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS_LISTENER = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-listen-connection-string)",
     METERING_POINT_MASTER_DATA_RESPONSE_QUEUE_NAME                = data.azurerm_key_vault_secret.sbq_metering_point_master_data_response_name.value,
     ENERGY_SUPPLIER_CHANGED_TOPIC                                 = data.azurerm_key_vault_secret.sbt_energy_supplier_changed_name.value,
-    ENERGY_SUPPLIER_CHANGED_SUBSCRIPTION                          = data.azurerm_key_vault_secret.sbt_energy_supplier_changed_to_messaging_name.value
+    ENERGY_SUPPLIER_CHANGED_SUBSCRIPTION                          = data.azurerm_key_vault_secret.sbs_energy_supplier_changed_to_messaging_name.value
   }
 
   tags = azurerm_resource_group.this.tags

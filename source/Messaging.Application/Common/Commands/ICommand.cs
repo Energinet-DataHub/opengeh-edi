@@ -20,7 +20,7 @@ namespace Messaging.Application.Common.Commands
     /// <summary>
     /// CQRS command object
     /// </summary>
-    public interface ICommand : IRequest
+    public interface ICommand<out TResponse> : IRequest<TResponse>
     {
     }
 #pragma warning restore

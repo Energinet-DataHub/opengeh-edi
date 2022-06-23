@@ -47,8 +47,6 @@ limitations under the License.
       <ProjectReference Include="..\Messaging.Infrastructure\Messaging.Infrastructure.csproj" />
       <ProjectReference Include="..\Messaging.Application\Messaging.Application.csproj" />
       <ProjectReference Include="..\Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp\Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.csproj" />
-      <ProjectReference Include="..\Processing.Domain\Processing.Domain.csproj" />
-      <ProjectReference Include="..\Processing.Infrastructure\Processing.Infrastructure.csproj" />
     </ItemGroup>
 
     <ItemGroup>

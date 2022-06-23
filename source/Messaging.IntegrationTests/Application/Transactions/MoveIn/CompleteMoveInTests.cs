@@ -21,25 +21,35 @@ using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
+using Messaging.Domain.MasterData.MarketEvaluationPoints;
+using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.IntegrationTests.Fixtures;
-using Messaging.IntegrationTests.TestDoubles;
-using Processing.Domain.SeedWork;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
+using MarketEvaluationPoint = Messaging.Domain.MasterData.MarketEvaluationPoints.MarketEvaluationPoint;
 
 namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
 
 public class CompleteMoveInTests : TestBase
 {
-    private readonly MarketEvaluationPointProviderStub _marketEvaluationPointProvider;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMoveInTransactionRepository _transactionRepository;
 
     public CompleteMoveInTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _marketEvaluationPointProvider = (MarketEvaluationPointProviderStub)GetService<IMarketEvaluationPointProvider>();
         _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
         _transactionRepository = GetService<IMoveInTransactionRepository>();
+    }
+
+    [Fact]
+    public async Task Transaction_is_completed()
+    {
+        var transaction = await CompleteMoveIn().ConfigureAwait(false);
+
+        AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>())
+            .HasState(MoveInTransaction.State.Completed)
+            .HasProcessId(transaction.ProcessId!);
     }
 
     [Fact]
@@ -78,17 +88,29 @@ public class CompleteMoveInTests : TestBase
 
     private async Task<MoveInTransaction> StartMoveInTransaction()
     {
-        var marketEvaluationPoint = _marketEvaluationPointProvider.MarketEvaluationPoints.First();
+        await SetupMasterDataDetailsAsync();
         var transaction = new MoveInTransaction(
-            Guid.NewGuid().ToString(),
-            marketEvaluationPoint.GsrnNumber,
+            SampleData.TransactionId,
+            SampleData.MateringPointNumber,
             _systemDateTimeProvider.Now(),
-            marketEvaluationPoint.GlnNumberOfEnergySupplier);
+            SampleData.CurrentEnergySupplierNumber,
+            SampleData.OriginalMessageId,
+            SampleData.NewEnergySupplierNumber,
+            SampleData.ConsumerId,
+            SampleData.ConsumerName,
+            SampleData.ConsumerIdType);
 
-        transaction.Start(BusinessRequestResult.Succeeded(Guid.NewGuid().ToString()));
+        transaction.AcceptedByBusinessProcess(BusinessRequestResult.Succeeded(Guid.NewGuid().ToString()).ProcessId!);
+        transaction.HasForwardedMeteringPointMasterData();
         _transactionRepository.Add(transaction);
         await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
         return transaction;
+    }
+
+    private Task SetupMasterDataDetailsAsync()
+    {
+        GetService<IMarketEvaluationPointRepository>().Add(MarketEvaluationPoint.Create(SampleData.CurrentEnergySupplierNumber, SampleData.MateringPointNumber));
+        return Task.CompletedTask;
     }
 
     private AssertOutgoingMessage AssertThat(string transactionId, string documentType, string processType)

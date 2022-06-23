@@ -42,6 +42,10 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202260091028 Add columns to move in transaction.sql" />
     <EmbeddedResource Include="Scripts\Model\202260091238 Add current energy supplier column.sql" />
     <EmbeddedResource Include="Scripts\Model\202260141226 Add market evaluation points table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202260151056 Add state column and rename table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202260151247 Rename recipientid to receiverid.sql" />
+    <EmbeddedResource Include="Scripts\Model\202260161742 Add additional transaction properties.sql" />
+    <EmbeddedResource Include="Scripts\Model\202260171349 Add MP master data forwarded.sql" />
     <EmbeddedResource Include="Scripts\Seed\202250181248 Add reason translations.sql" />
     <None Remove="Scripts\Model\202109010720 Add Correlation to OutboxMessages.sql" />
     <EmbeddedResource Include="Scripts\Model\202109010720 Add Correlation to OutboxMessages.sql" />

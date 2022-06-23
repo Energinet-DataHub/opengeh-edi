@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Messaging.Application.Configuration;
 using NodaTime;
-using Processing.Domain.SeedWork;
 
 namespace Messaging.IntegrationTests.TestDoubles
 {
