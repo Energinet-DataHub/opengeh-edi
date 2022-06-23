@@ -16,13 +16,12 @@ namespace Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
 
 public class TownDetail
 {
-    public TownDetail(string code, string name, string section, string country, string postalCode)
+    public TownDetail(string code, string name, string section, string country)
     {
         Code = code;
         Name = name;
         Section = section;
         Country = country;
-        PostalCode = postalCode;
     }
 
     public string Code { get; }
@@ -32,6 +31,4 @@ public class TownDetail
     public string Section { get; }
 
     public string Country { get; }
-
-    public string PostalCode { get; }
 }

@@ -123,6 +123,7 @@ public class AccountingPointCharacteristicsDocumentWriter : DocumentWriter
         await writer.WriteStartElementAsync(Prefix, "usagePointLocation.mainAddress", null).ConfigureAwait(false);
         await WriteStreetDetailsAsync(address.Street, writer).ConfigureAwait(false);
         await WriteTownDetailsAsync(address.Town, writer).ConfigureAwait(false);
+        await writer.WriteElementStringAsync(Prefix, "postalCode", null, address.PostalCode).ConfigureAwait(false);
         await writer.WriteEndElementAsync().ConfigureAwait(false);
     }
 

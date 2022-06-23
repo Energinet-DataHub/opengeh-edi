@@ -16,13 +16,16 @@ namespace Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
 
 public class Address
 {
-    public Address(StreetDetail street, TownDetail town)
+    public Address(StreetDetail street, TownDetail town, string postalCode)
     {
         Street = street;
         Town = town;
+        PostalCode = postalCode;
     }
 
     public StreetDetail Street { get; }
 
     public TownDetail Town { get; }
+
+    public string PostalCode { get; }
 }
