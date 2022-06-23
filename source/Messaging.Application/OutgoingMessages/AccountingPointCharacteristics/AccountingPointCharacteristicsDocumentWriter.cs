@@ -51,12 +51,8 @@ public class AccountingPointCharacteristicsDocumentWriter : DocumentWriter
     private static async Task WriteMarketEvaluationPointAsync(MarketEvaluationPoint marketEvaluationPoint, XmlWriter writer)
     {
         await writer.WriteStartElementAsync(Prefix, "MarketEvaluationPoint", null).ConfigureAwait(false);
-
-        await WriteMridAsync("mRID", marketEvaluationPoint.MRID, writer)
-            .ConfigureAwait(false);
-
+        await WriteMridAsync("mRID", marketEvaluationPoint.MRID, writer).ConfigureAwait(false);
         await WriteMridAsync("meteringPointResponsible_MarketParticipant.mRID", marketEvaluationPoint.MeteringPointResponsible, writer).ConfigureAwait(false);
-
         await writer.WriteElementStringAsync(Prefix, "type", null, marketEvaluationPoint.Type).ConfigureAwait(false);
         await writer.WriteElementStringAsync(Prefix, "settlementMethod", null, marketEvaluationPoint.SettlementMethod).ConfigureAwait(false);
         await writer.WriteElementStringAsync(Prefix, "meteringMethod", null, marketEvaluationPoint.MeteringMethod).ConfigureAwait(false);
@@ -64,41 +60,29 @@ public class AccountingPointCharacteristicsDocumentWriter : DocumentWriter
         await writer.WriteElementStringAsync(Prefix, "readCycle", null, marketEvaluationPoint.ReadCycle).ConfigureAwait(false);
         await writer.WriteElementStringAsync(Prefix, "netSettlementGroup", null, marketEvaluationPoint.NetSettlementGroup).ConfigureAwait(false);
         await writer.WriteElementStringAsync(Prefix, "nextReadingDate", null, marketEvaluationPoint.NextReadingDate).ConfigureAwait(false);
-
         await WriteMridAsync("meteringGridArea_Domain.mRID", marketEvaluationPoint.MeteringGridAreaId, writer).ConfigureAwait(false);
         await WriteMridAsync("inMeteringGridArea_Domain.mRID", marketEvaluationPoint.InMeteringGridAreaId, writer).ConfigureAwait(false);
         await WriteMridAsync("outMeteringGridArea_Domain.mRID", marketEvaluationPoint.OutMeteringGridAreaId, writer).ConfigureAwait(false);
         await WriteUnitValueAsync("physicalConnectionCapacity", marketEvaluationPoint.PhysicalConnectionCapacity, writer).ConfigureAwait(false);
-
         await writer.WriteElementStringAsync(Prefix, "mPConnectionType", null, marketEvaluationPoint.ConnectionType).ConfigureAwait(false);
         await writer.WriteElementStringAsync(Prefix, "disconnectionMethod", null, marketEvaluationPoint.DisconnectionMethod).ConfigureAwait(false);
         await writer.WriteElementStringAsync(Prefix, "asset_MktPSRType.psrType", null, marketEvaluationPoint.PsrType).ConfigureAwait(false);
         await writer.WriteElementStringAsync(Prefix, "productionObligation", null, marketEvaluationPoint.ProductionObligation).ConfigureAwait(false);
-
         await WriteUnitValueAsync("contractedConnectionCapacity", marketEvaluationPoint.ContractedConnectionCapacity, writer).ConfigureAwait(false);
         await WriteUnitValueAsync("ratedCurrent", marketEvaluationPoint.RatedCurrent, writer).ConfigureAwait(false);
-
         await writer.WriteElementStringAsync(Prefix, "meter.mRID", null, marketEvaluationPoint.MeterId).ConfigureAwait(false);
-
         await writer.WriteStartElementAsync(Prefix, "Series", null).ConfigureAwait(false);
         await writer.WriteElementStringAsync(Prefix, "product", null, marketEvaluationPoint.Series.Product).ConfigureAwait(false);
         await writer.WriteElementStringAsync(Prefix, "quantity_Measure_Unit.name", null, marketEvaluationPoint.Series.QuantityMeasureUnit).ConfigureAwait(false);
         await writer.WriteEndElementAsync().ConfigureAwait(false);
-
         await WriteMridAsync("energySupplier_MarketParticipant.mRID", marketEvaluationPoint.EnergySupplier, writer).ConfigureAwait(false);
-
         await writer.WriteElementStringAsync(Prefix, "supplyStart_DateAndOrTime.dateTime", null, marketEvaluationPoint.SupplyStart.ToString()).ConfigureAwait(false);
         await writer.WriteElementStringAsync(Prefix, "description", null, marketEvaluationPoint.Description).ConfigureAwait(false);
         await writer.WriteElementStringAsync(Prefix, "usagePointLocation.geoInfoReference", null, marketEvaluationPoint.GeoInfoReference).ConfigureAwait(false);
-
         await WriteAddressAsync(marketEvaluationPoint.MainAddress, writer).ConfigureAwait(false);
-
         await writer.WriteElementStringAsync(Prefix, "usagePointLocation.actualAddressIndicator", null, marketEvaluationPoint.IsActualAddress).ConfigureAwait(false);
-
         await WriteParentMarketEvaluationPointAsync(marketEvaluationPoint.ParentMktEvaluationPoint, writer).ConfigureAwait(false);
-
         await WriteChildMarketEvaluationPointAsync(marketEvaluationPoint.ChildMktEvaluationPoint, writer).ConfigureAwait(false);
-
         await writer.WriteEndElementAsync().ConfigureAwait(false);
     }
 

@@ -14,15 +14,24 @@
 
 namespace Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
 
-public class Address
+public class TownDetail
 {
-    public Address(StreetDetail street, TownDetail town)
+    public TownDetail(string code, string name, string section, string country, string postalCode)
     {
-        Street = street;
-        Town = town;
+        Code = code;
+        Name = name;
+        Section = section;
+        Country = country;
+        PostalCode = postalCode;
     }
 
-    public StreetDetail Street { get; }
+    public string Code { get; }
 
-    public TownDetail Town { get; }
+    public string Name { get; }
+
+    public string Section { get; }
+
+    public string Country { get; }
+
+    public string PostalCode { get; }
 }
