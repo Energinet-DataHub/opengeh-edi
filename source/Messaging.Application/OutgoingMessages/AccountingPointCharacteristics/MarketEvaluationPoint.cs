@@ -20,9 +20,39 @@ namespace Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
 
 public class MarketEvaluationPoint
 {
-    public MarketEvaluationPoint(string id, string meteringPointResponsible, string type, string settlementMethod, string meteringMethod, string connectionState, string readCycle, string netSettlementGroup, string nextReadingDate, string meteringGridAreaId, string inMeteringGridAreaId, string outMeteringGridAreaId, string linkedMarketEvaluationPointId, string physicalConnectionCapacity, string connectionType, string disconnectionMethod, string psrType, string productionObligation, string contractedConnectionCapacity, string ratedCurrent, string meterId, ReadOnlyCollection<Series> series, string energySupplier, Instant supplyStart, string description, string geoInfoReference, Address mainAddress, string isActualAddress, ParentMarketEvaluationPoint parentMktEvaluationPoint, ChildMarketEvaluationPoint childMktEvaluationPoint)
+    public MarketEvaluationPoint(
+        Mrid mrid,
+        Mrid meteringPointResponsible,
+        string type,
+        string settlementMethod,
+        string meteringMethod,
+        string connectionState,
+        string readCycle,
+        string netSettlementGroup,
+        string nextReadingDate,
+        Mrid meteringGridAreaId,
+        Mrid inMeteringGridAreaId,
+        Mrid outMeteringGridAreaId,
+        Mrid linkedMarketEvaluationPointId,
+        UnitValue physicalConnectionCapacity,
+        string connectionType,
+        string disconnectionMethod,
+        string psrType,
+        string productionObligation,
+        UnitValue contractedConnectionCapacity,
+        UnitValue ratedCurrent,
+        string meterId,
+        Series series,
+        Mrid energySupplier,
+        Instant supplyStart,
+        string description,
+        string geoInfoReference,
+        Address mainAddress,
+        string isActualAddress,
+        ParentMarketEvaluationPoint parentMktEvaluationPoint,
+        ChildMarketEvaluationPoint childMktEvaluationPoint)
     {
-        Id = id;
+        MRID = mrid;
         MeteringPointResponsible = meteringPointResponsible;
         Type = type;
         SettlementMethod = settlementMethod;
@@ -54,9 +84,9 @@ public class MarketEvaluationPoint
         ChildMktEvaluationPoint = childMktEvaluationPoint;
     }
 
-    public string Id { get; }
+    public Mrid MRID { get; }
 
-    public string MeteringPointResponsible { get; }
+    public Mrid MeteringPointResponsible { get; }
 
     public string Type { get; }
 
@@ -72,15 +102,15 @@ public class MarketEvaluationPoint
 
     public string NextReadingDate { get; }
 
-    public string MeteringGridAreaId { get; }
+    public Mrid MeteringGridAreaId { get; }
 
-    public string InMeteringGridAreaId { get; }
+    public Mrid InMeteringGridAreaId { get; }
 
-    public string OutMeteringGridAreaId { get; }
+    public Mrid OutMeteringGridAreaId { get; }
 
-    public string LinkedMarketEvaluationPointId { get; }
+    public Mrid LinkedMarketEvaluationPointId { get; }
 
-    public string PhysicalConnectionCapacity { get; }
+    public UnitValue PhysicalConnectionCapacity { get; }
 
     public string ConnectionType { get; }
 
@@ -90,15 +120,15 @@ public class MarketEvaluationPoint
 
     public string ProductionObligation { get; }
 
-    public string ContractedConnectionCapacity { get; }
+    public UnitValue ContractedConnectionCapacity { get; }
 
-    public string RatedCurrent { get; }
+    public UnitValue RatedCurrent { get; }
 
     public string MeterId { get; }
 
-    public ReadOnlyCollection<Series> Series { get; }
+    public Series Series { get; }
 
-    public string EnergySupplier { get; }
+    public Mrid EnergySupplier { get; }
 
     public Instant SupplyStart { get; }
 
@@ -113,4 +143,30 @@ public class MarketEvaluationPoint
     public ParentMarketEvaluationPoint ParentMktEvaluationPoint { get; }
 
     public ChildMarketEvaluationPoint ChildMktEvaluationPoint { get; }
+}
+
+public class Mrid
+{
+    public Mrid(string id, string codingScheme)
+    {
+        Id = id;
+        CodingScheme = codingScheme;
+    }
+
+    public string Id { get; }
+
+    public string CodingScheme { get; }
+}
+
+public class UnitValue
+{
+    public UnitValue(string value, string unit)
+    {
+        Value = value;
+        Unit = unit;
+    }
+
+    public string Value { get; }
+
+    public string Unit { get; }
 }

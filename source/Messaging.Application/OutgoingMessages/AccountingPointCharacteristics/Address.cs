@@ -16,10 +16,10 @@ namespace Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
 
 public class Address
 {
-    public Address(string streetCode, string streetNmae, string streetNumber, string floorIdentification, string suiteNumber, string townCode, string townName, string townSection, string country, string postalCode)
+    public Address(string streetCode, string streetName, string streetNumber, string floorIdentification, string suiteNumber, string townCode, string townName, string townSection, string country, string postalCode)
     {
         StreetCode = streetCode;
-        StreetNmae = streetNmae;
+        StreetName = streetName;
         StreetNumber = streetNumber;
         FloorIdentification = floorIdentification;
         SuiteNumber = suiteNumber;
@@ -32,7 +32,7 @@ public class Address
 
     public string StreetCode { get; }
 
-    public string StreetNmae { get; }
+    public string StreetName { get; }
 
     public string StreetNumber { get; }
 
