@@ -43,10 +43,6 @@ public class AccountingPointCharacteristicsDocumentWriter : DocumentWriter
             await writer.WriteElementStringAsync(Prefix, "mRID", null, marketActivityRecord.Id.ToString()).ConfigureAwait(false);
             await writer.WriteElementStringAsync(Prefix, "originalTransactionIDReference_MktActivityRecord.mRID", null, marketActivityRecord.OriginalTransactionId).ConfigureAwait(false);
             await writer.WriteElementStringAsync(Prefix, "validityStart_DateAndOrTime.dateTime", null, marketActivityRecord.ValidityStartDate.ToString()).ConfigureAwait(false);
-            await writer.WriteStartElementAsync(Prefix, "marketEvaluationPoint.mRID", null).ConfigureAwait(false);
-            await writer.WriteAttributeStringAsync(null, "codingScheme", null, "A10").ConfigureAwait(false);
-            writer.WriteValue(marketActivityRecord.Id);
-            await writer.WriteEndElementAsync().ConfigureAwait(false);
             await WriteMarketEvaluationPointAsync(marketActivityRecord.MarketEvaluationPt, writer).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
         }
@@ -82,30 +78,22 @@ public class AccountingPointCharacteristicsDocumentWriter : DocumentWriter
         await WriteUnitValueAsync("contractedConnectionCapacity", marketEvaluationPoint.ContractedConnectionCapacity, writer).ConfigureAwait(false);
         await WriteUnitValueAsync("ratedCurrent", marketEvaluationPoint.RatedCurrent, writer).ConfigureAwait(false);
 
-        await writer.WriteElementStringAsync(Prefix, "meter.mRID", null, marketEvaluationPoint.MeterId)
-            .ConfigureAwait(false);
+        await writer.WriteElementStringAsync(Prefix, "meter.mRID", null, marketEvaluationPoint.MeterId).ConfigureAwait(false);
 
         await writer.WriteStartElementAsync(Prefix, "Series", null).ConfigureAwait(false);
-        await writer.WriteElementStringAsync(Prefix, "product", null, marketEvaluationPoint.Series.Product)
-            .ConfigureAwait(false);
-        await writer.WriteElementStringAsync(Prefix, "quantity_Measure_Unit.name", null, marketEvaluationPoint.Series.QuantityMeasureUnit)
-            .ConfigureAwait(false);
+        await writer.WriteElementStringAsync(Prefix, "product", null, marketEvaluationPoint.Series.Product).ConfigureAwait(false);
+        await writer.WriteElementStringAsync(Prefix, "quantity_Measure_Unit.name", null, marketEvaluationPoint.Series.QuantityMeasureUnit).ConfigureAwait(false);
         await writer.WriteEndElementAsync().ConfigureAwait(false);
 
         await WriteMridAsync("energySupplier_MarketParticipant.mRID", marketEvaluationPoint.EnergySupplier, writer).ConfigureAwait(false);
 
-        await writer.WriteElementStringAsync(Prefix, "supplyStart_DateAndOrTime.dateTime", null, marketEvaluationPoint.SupplyStart.ToString())
-            .ConfigureAwait(false);
-        await writer.WriteElementStringAsync(Prefix, "description", null, marketEvaluationPoint.Description)
-            .ConfigureAwait(false);
-        await writer
-            .WriteElementStringAsync(Prefix, "usagePointLocation.geoInfoReference", null, marketEvaluationPoint.GeoInfoReference)
-            .ConfigureAwait(false);
+        await writer.WriteElementStringAsync(Prefix, "supplyStart_DateAndOrTime.dateTime", null, marketEvaluationPoint.SupplyStart.ToString()).ConfigureAwait(false);
+        await writer.WriteElementStringAsync(Prefix, "description", null, marketEvaluationPoint.Description).ConfigureAwait(false);
+        await writer.WriteElementStringAsync(Prefix, "usagePointLocation.geoInfoReference", null, marketEvaluationPoint.GeoInfoReference).ConfigureAwait(false);
 
         await WriteAddressAsync(marketEvaluationPoint.MainAddress, writer).ConfigureAwait(false);
 
-        await writer.WriteElementStringAsync(Prefix, "usagePointLocation.actualAddressIndicator", null, marketEvaluationPoint.IsActualAddress)
-            .ConfigureAwait(false);
+        await writer.WriteElementStringAsync(Prefix, "usagePointLocation.actualAddressIndicator", null, marketEvaluationPoint.IsActualAddress).ConfigureAwait(false);
 
         await WriteParentMarketEvaluationPointAsync(marketEvaluationPoint.ParentMktEvaluationPoint, writer).ConfigureAwait(false);
 
@@ -149,22 +137,29 @@ public class AccountingPointCharacteristicsDocumentWriter : DocumentWriter
     private static async Task WriteAddressAsync(Address address, XmlWriter writer)
     {
         await writer.WriteStartElementAsync(Prefix, "usagePointLocation.mainAddress", null).ConfigureAwait(false);
+        await WriteStreetDetailsAsync(address.Street, writer).ConfigureAwait(false);
+        await WriteTownDetailsAsync(address.Town, writer).ConfigureAwait(false);
+        await writer.WriteEndElementAsync().ConfigureAwait(false);
+    }
 
+    private static async Task WriteStreetDetailsAsync(StreetDetail street, XmlWriter writer)
+    {
         await writer.WriteStartElementAsync(Prefix, "streetDetail", null).ConfigureAwait(false);
-        await writer.WriteElementStringAsync(Prefix, "code", null, address.StreetCode).ConfigureAwait(false);
-        await writer.WriteElementStringAsync(Prefix, "name", null, address.StreetName).ConfigureAwait(false);
-        await writer.WriteElementStringAsync(Prefix, "number", null, address.StreetNumber).ConfigureAwait(false);
-        await writer.WriteElementStringAsync(Prefix, "floorIdentification", null, address.FloorIdentification).ConfigureAwait(false);
-        await writer.WriteElementStringAsync(Prefix, "suiteNumber", null, address.SuiteNumber).ConfigureAwait(false);
+        await writer.WriteElementStringAsync(Prefix, "code", null, street.Code).ConfigureAwait(false);
+        await writer.WriteElementStringAsync(Prefix, "name", null, street.Name).ConfigureAwait(false);
+        await writer.WriteElementStringAsync(Prefix, "number", null, street.Number).ConfigureAwait(false);
+        await writer.WriteElementStringAsync(Prefix, "floorIdentification", null, street.FloorIdentification).ConfigureAwait(false);
+        await writer.WriteElementStringAsync(Prefix, "suiteNumber", null, street.SuiteNumber).ConfigureAwait(false);
         await writer.WriteEndElementAsync().ConfigureAwait(false);
+    }
 
+    private static async Task WriteTownDetailsAsync(TownDetail town, XmlWriter writer)
+    {
         await writer.WriteStartElementAsync(Prefix, "townDetail", null).ConfigureAwait(false);
-        await writer.WriteElementStringAsync(Prefix, "code", null, address.TownCode).ConfigureAwait(false);
-        await writer.WriteElementStringAsync(Prefix, "name", null, address.TownName).ConfigureAwait(false);
-        await writer.WriteElementStringAsync(Prefix, "section", null, address.TownSection).ConfigureAwait(false);
-        await writer.WriteElementStringAsync(Prefix, "country", null, address.Country).ConfigureAwait(false);
-        await writer.WriteEndElementAsync().ConfigureAwait(false);
-
+        await writer.WriteElementStringAsync(Prefix, "code", null, town.Code).ConfigureAwait(false);
+        await writer.WriteElementStringAsync(Prefix, "name", null, town.Name).ConfigureAwait(false);
+        await writer.WriteElementStringAsync(Prefix, "section", null, town.Section).ConfigureAwait(false);
+        await writer.WriteElementStringAsync(Prefix, "country", null, town.Country).ConfigureAwait(false);
         await writer.WriteEndElementAsync().ConfigureAwait(false);
     }
 }

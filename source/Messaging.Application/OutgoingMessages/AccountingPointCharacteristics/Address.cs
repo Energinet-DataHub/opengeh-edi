@@ -16,35 +16,55 @@ namespace Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
 
 public class Address
 {
-    public Address(string streetCode, string streetName, string streetNumber, string floorIdentification, string suiteNumber, string townCode, string townName, string townSection, string country, string postalCode)
+    public Address(StreetDetail street, TownDetail town)
     {
-        StreetCode = streetCode;
-        StreetName = streetName;
-        StreetNumber = streetNumber;
-        FloorIdentification = floorIdentification;
-        SuiteNumber = suiteNumber;
-        TownCode = townCode;
-        TownName = townName;
-        TownSection = townSection;
-        Country = country;
-        PostalCode = postalCode;
+        Street = street;
+        Town = town;
     }
 
-    public string StreetCode { get; }
+    public StreetDetail Street { get; }
 
-    public string StreetName { get; }
+    public TownDetail Town { get; }
+}
 
-    public string StreetNumber { get; }
+public class StreetDetail
+{
+    public StreetDetail(string code, string name, string number, string floorIdentification, string suiteNumber)
+    {
+        Code = code;
+        Name = name;
+        Number = number;
+        FloorIdentification = floorIdentification;
+        SuiteNumber = suiteNumber;
+    }
+
+    public string Code { get; }
+
+    public string Name { get; }
+
+    public string Number { get; }
 
     public string FloorIdentification { get; }
 
     public string SuiteNumber { get; }
+}
 
-    public string TownCode { get; }
+public class TownDetail
+{
+    public TownDetail(string code, string name, string section, string country, string postalCode)
+    {
+        Code = code;
+        Name = name;
+        Section = section;
+        Country = country;
+        PostalCode = postalCode;
+    }
 
-    public string TownName { get; }
+    public string Code { get; }
 
-    public string TownSection { get; }
+    public string Name { get; }
+
+    public string Section { get; }
 
     public string Country { get; }
 
