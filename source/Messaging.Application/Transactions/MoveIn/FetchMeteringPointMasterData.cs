@@ -18,13 +18,13 @@ namespace Messaging.Application.Transactions.MoveIn;
 
 public class FetchMeteringPointMasterData : InternalCommand
 {
-    public FetchMeteringPointMasterData(string businessProcessId, string marketEvaluationPointId)
+    public FetchMeteringPointMasterData(string businessProcessId, string marketEvaluationPointNumber)
     {
         BusinessProcessId = businessProcessId;
-        MarketEvaluationPointId = marketEvaluationPointId;
+        MarketEvaluationPointNumber = marketEvaluationPointNumber;
     }
 
     public string BusinessProcessId { get; }
 
-    public string MarketEvaluationPointId { get; }
+    public string MarketEvaluationPointNumber { get; }
 }
