@@ -82,7 +82,7 @@ namespace Messaging.Application.Transactions.MoveIn
             AddDomainEvent(new MoveInWasCompleted());
         }
 
-        public void AcceptedByBusinessProcess(string processId)
+        public void AcceptedByBusinessProcess(string processId, string marketEvaluationPointId)
         {
             if (_state != State.Started)
             {
@@ -91,7 +91,7 @@ namespace Messaging.Application.Transactions.MoveIn
 
             _state = State.AcceptedByBusinessProcess;
             ProcessId = processId ?? throw new ArgumentNullException(nameof(processId));
-            AddDomainEvent(new MoveInWasAccepted(ProcessId));
+            AddDomainEvent(new MoveInWasAccepted(ProcessId, marketEvaluationPointId));
         }
 
         public void RejectedByBusinessProcess()
