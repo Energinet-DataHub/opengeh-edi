@@ -80,8 +80,8 @@ public class AccountingPointCharacteristicsDocumentWriter : DocumentWriter
         await writer.WriteElementStringAsync(Prefix, "usagePointLocation.geoInfoReference", null, marketEvaluationPoint.GeoInfoReference).ConfigureAwait(false);
         await WriteAddressAsync(marketEvaluationPoint.MainAddress, writer).ConfigureAwait(false);
         await writer.WriteElementStringAsync(Prefix, "usagePointLocation.actualAddressIndicator", null, marketEvaluationPoint.IsActualAddress).ConfigureAwait(false);
-        await WriteParentMarketEvaluationPointAsync(marketEvaluationPoint.ParentMktEvaluationPoint, writer).ConfigureAwait(false);
-        await WriteChildMarketEvaluationPointAsync(marketEvaluationPoint.ChildMktEvaluationPoint, writer).ConfigureAwait(false);
+        await WriteRelatedMarketEvaluationPointAsync(marketEvaluationPoint.ParentMktEvaluationPoint, "Parent_MarketEvaluationPoint", writer).ConfigureAwait(false);
+        await WriteRelatedMarketEvaluationPointAsync(marketEvaluationPoint.ChildMktEvaluationPoint, "Child_MarketEvaluationPoint", writer).ConfigureAwait(false);
         await writer.WriteEndElementAsync().ConfigureAwait(false);
     }
 
@@ -101,19 +101,11 @@ public class AccountingPointCharacteristicsDocumentWriter : DocumentWriter
         await writer.WriteEndElementAsync().ConfigureAwait(false);
     }
 
-    private static async Task WriteChildMarketEvaluationPointAsync(ChildMarketEvaluationPoint childMktEvaluationPoint, XmlWriter writer)
+    private static async Task WriteRelatedMarketEvaluationPointAsync(RelatedMarketEvaluationPoint childMktEvaluationPoint, string localName, XmlWriter writer)
     {
-        await writer.WriteStartElementAsync(Prefix, "Child_MarketEvaluationPoint", null).ConfigureAwait(false);
+        await writer.WriteStartElementAsync(Prefix, localName, null).ConfigureAwait(false);
         await WriteMridAsync("mRID", childMktEvaluationPoint.Id, writer).ConfigureAwait(false);
         await writer.WriteElementStringAsync(Prefix, "description", null, childMktEvaluationPoint.Description).ConfigureAwait(false);
-        await writer.WriteEndElementAsync().ConfigureAwait(false);
-    }
-
-    private static async Task WriteParentMarketEvaluationPointAsync(ParentMarketEvaluationPoint parentMktEvaluationPoint, XmlWriter writer)
-    {
-        await writer.WriteStartElementAsync(Prefix, "Parent_MarketEvaluationPoint", null).ConfigureAwait(false);
-        await WriteMridAsync("mRID", parentMktEvaluationPoint.Id, writer).ConfigureAwait(false);
-        await writer.WriteElementStringAsync(Prefix, "description", null, parentMktEvaluationPoint.Description).ConfigureAwait(false);
         await writer.WriteEndElementAsync().ConfigureAwait(false);
     }
 

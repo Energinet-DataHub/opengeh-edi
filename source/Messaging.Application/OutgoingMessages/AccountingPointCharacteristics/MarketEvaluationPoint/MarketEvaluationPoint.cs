@@ -49,8 +49,8 @@ public class MarketEvaluationPoint
         string geoInfoReference,
         Address mainAddress,
         string isActualAddress,
-        ParentMarketEvaluationPoint parentMktEvaluationPoint,
-        ChildMarketEvaluationPoint childMktEvaluationPoint)
+        RelatedMarketEvaluationPoint parentMktEvaluationPoint,
+        RelatedMarketEvaluationPoint childMktEvaluationPoint)
     {
         MRID = mrid;
         MeteringPointResponsible = meteringPointResponsible;
@@ -140,7 +140,7 @@ public class MarketEvaluationPoint
 
     public string IsActualAddress { get; }
 
-    public ParentMarketEvaluationPoint ParentMktEvaluationPoint { get; }
+    public RelatedMarketEvaluationPoint ParentMktEvaluationPoint { get; }
 
-    public ChildMarketEvaluationPoint ChildMktEvaluationPoint { get; }
+    public RelatedMarketEvaluationPoint ChildMktEvaluationPoint { get; }
 }

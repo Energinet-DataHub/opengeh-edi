@@ -14,9 +14,9 @@
 
 namespace Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
 
-public class ParentMarketEvaluationPoint
+public class RelatedMarketEvaluationPoint
 {
-    public ParentMarketEvaluationPoint(Mrid id, string description)
+    public RelatedMarketEvaluationPoint(Mrid id, string description)
     {
         Id = id;
         Description = description;
