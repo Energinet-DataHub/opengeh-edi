@@ -144,29 +144,3 @@ public class MarketEvaluationPoint
 
     public ChildMarketEvaluationPoint ChildMktEvaluationPoint { get; }
 }
-
-public class Mrid
-{
-    public Mrid(string id, string codingScheme)
-    {
-        Id = id;
-        CodingScheme = codingScheme;
-    }
-
-    public string Id { get; }
-
-    public string CodingScheme { get; }
-}
-
-public class UnitValue
-{
-    public UnitValue(string value, string unit)
-    {
-        Value = value;
-        Unit = unit;
-    }
-
-    public string Value { get; }
-
-    public string Unit { get; }
-}

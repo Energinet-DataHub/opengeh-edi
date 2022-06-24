@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Metrics;
 using System.Threading.Tasks;
 using System.Xml;
 using Messaging.Application.Common;
