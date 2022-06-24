@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.IncomingMessages;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
-using Messaging.Application.Xml.SchemaStore;
+using Messaging.Application.SchemaStore;
 using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Messages;
 
@@ -45,11 +45,11 @@ namespace Messaging.CimMessageAdapter
             _marketActorAuthenticator = marketActorAuthenticator ?? throw new ArgumentNullException(nameof(marketActorAuthenticator));
         }
 
-        public async Task<Result> ReceiveAsync(Stream message)
+        public async Task<Result> ReceiveAsync(Stream message, string? contentType)
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
 
-            var messageParser = new MessageParser(_schemaProvider);
+            var messageParser = new MessageParser(contentType);
 
             var messageParserResult =
                  await messageParser.ParseAsync(message).ConfigureAwait(false);

@@ -16,10 +16,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Mime;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Messaging.Application.Configuration.Authentication;
-using Messaging.Application.Xml.SchemaStore;
+using Messaging.Application.SchemaStore;
 using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.IntegrationTests.CimMessageAdapter.Messages;
@@ -65,7 +66,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
                 .WithReceiverId(unknownReceiverId)
                 .Message();
 
-            var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
+            var result = await ReceiveRequestChangeOfSupplierMessage(message, MediaTypeNames.Application.Xml).ConfigureAwait(false);
 
             AssertContainsError(result, "B2B-008");
         }
@@ -78,7 +79,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
                 .WithReceiverRole("DDK")
                 .Message();
 
-            var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
+            var result = await ReceiveRequestChangeOfSupplierMessage(message, MediaTypeNames.Application.Xml).ConfigureAwait(false);
 
             AssertContainsError(result, "B2B-008");
         }
@@ -91,7 +92,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
                 .WithSenderRole("DDK")
                 .Message();
 
-            var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
+            var result = await ReceiveRequestChangeOfSupplierMessage(message, MediaTypeNames.Application.Xml).ConfigureAwait(false);
 
             AssertContainsError(result, "B2B-008");
         }
@@ -104,7 +105,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
                 .RequestChangeOfSupplier()
                 .Message();
 
-            var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
+            var result = await ReceiveRequestChangeOfSupplierMessage(message, MediaTypeNames.Application.Xml).ConfigureAwait(false);
 
             AssertContainsError(result, "B2B-008");
         }
@@ -117,7 +118,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
                 .RequestChangeOfSupplier()
                 .Message();
 
-            var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
+            var result = await ReceiveRequestChangeOfSupplierMessage(message, MediaTypeNames.Application.Xml).ConfigureAwait(false);
 
             AssertContainsError(result, "B2B-008");
         }
@@ -127,7 +128,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
         {
             using var message = CreateMessageWithInvalidXmlStructure();
 
-            var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
+            var result = await ReceiveRequestChangeOfSupplierMessage(message, MediaTypeNames.Application.Xml).ConfigureAwait(false);
 
             Assert.False(result.Success);
             AssertContainsError(result, "B2B-005");
@@ -141,7 +142,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
                 .RemoveElementFromMarketActivityRecord("mRID")
                 .Message();
 
-            var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
+            var result = await ReceiveRequestChangeOfSupplierMessage(message, MediaTypeNames.Application.Xml).ConfigureAwait(false);
 
             Assert.False(result.Success);
             AssertContainsError(result, "B2B-005");
@@ -155,7 +156,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
                 .RemoveElementFromMarketActivityRecordValue("start_DateAndOrTime.dateTime")
                 .Message();
 
-            var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
+            var result = await ReceiveRequestChangeOfSupplierMessage(message, MediaTypeNames.Application.Xml).ConfigureAwait(false);
 
             Assert.False(result.Success);
             AssertContainsError(result, "B2B-005");
@@ -169,7 +170,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
                 .WithSenderRole("FakeRoleType")
                 .Message();
 
-            var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
+            var result = await ReceiveRequestChangeOfSupplierMessage(message, MediaTypeNames.Application.Xml).ConfigureAwait(false);
 
             AssertContainsError(result, "B2B-005");
         }
@@ -181,7 +182,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
                 .RequestChangeOfSupplier("CimMessageAdapter//Messages//BadRequestChangeOfSupplier.xml")
                 .Message();
 
-            var result = await ReceiveRequestChangeOfSupplierMessage(message)
+            var result = await ReceiveRequestChangeOfSupplierMessage(message, MediaTypeNames.Application.Xml)
                 .ConfigureAwait(false);
 
             Assert.False(result.Success);
@@ -195,7 +196,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
                 .RequestChangeOfSupplier()
                 .Message();
 
-            await ReceiveRequestChangeOfSupplierMessage(message)
+            await ReceiveRequestChangeOfSupplierMessage(message, MediaTypeNames.Application.Xml)
                 .ConfigureAwait(false);
 
             var transaction = _messageQueueDispatcherSpy.CommittedItems.FirstOrDefault();
@@ -233,7 +234,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
                 .DuplicateMarketActivityRecords()
                 .Message();
 
-            var result = await ReceiveRequestChangeOfSupplierMessage(message)
+            var result = await ReceiveRequestChangeOfSupplierMessage(message, MediaTypeNames.Application.Xml)
                 .ConfigureAwait(false);
 
             AssertContainsError(result, "B2B-005");
@@ -262,9 +263,9 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
             Assert.Contains(result.Errors, error => error.Code.Equals(errorCode, StringComparison.OrdinalIgnoreCase));
         }
 
-        private Task<Result> ReceiveRequestChangeOfSupplierMessage(Stream message)
+        private Task<Result> ReceiveRequestChangeOfSupplierMessage(Stream message, string contentType)
         {
-            return CreateMessageReceiver().ReceiveAsync(message);
+            return CreateMessageReceiver().ReceiveAsync(message, contentType);
         }
 
         private MessageReceiver CreateMessageReceiver()
@@ -286,11 +287,11 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
             var messageBuilder = BusinessMessageBuilder.RequestChangeOfSupplier();
 
             using var originalMessage = messageBuilder.Message();
-            await CreateMessageReceiver(messageIds).ReceiveAsync(originalMessage)
+            await CreateMessageReceiver(messageIds).ReceiveAsync(originalMessage, MediaTypeNames.Application.Xml)
                 .ConfigureAwait(false);
 
             using var duplicateMessage = messageBuilder.Message();
-            await CreateMessageReceiver(messageIds).ReceiveAsync(duplicateMessage)
+            await CreateMessageReceiver(messageIds).ReceiveAsync(duplicateMessage, MediaTypeNames.Application.Xml)
                 .ConfigureAwait(false);
         }
 

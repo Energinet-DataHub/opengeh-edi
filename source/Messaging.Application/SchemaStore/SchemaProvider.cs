@@ -16,20 +16,20 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 
-namespace Messaging.Application.Xml.SchemaStore
+namespace Messaging.Application.SchemaStore
 {
     public class SchemaProvider : ISchemaProvider
     {
-        private readonly CimXmlSchemas _cimXmlSchemas;
+        private readonly ISchema _schemas;
 
-        public SchemaProvider(CimXmlSchemas cimXmlSchemas)
+        public SchemaProvider(ISchema schemas)
         {
-            _cimXmlSchemas = cimXmlSchemas;
+            _schemas = schemas;
         }
 
         public Task<XmlSchema?> GetSchemaAsync(string businessProcessType, string version)
         {
-            var schemaName = _cimXmlSchemas.GetSchemaLocation(businessProcessType, version);
+            var schemaName = _schemas.GetSchemaLocation(businessProcessType, version);
 
             if (schemaName == null)
             {
@@ -56,7 +56,7 @@ namespace Messaging.Application.Xml.SchemaStore
                 }
 
                 external.Schema =
-                    await LoadSchemaWithDependentSchemasAsync(CimXmlSchemas.SchemaPath + external.SchemaLocation).ConfigureAwait(false);
+                    await LoadSchemaWithDependentSchemasAsync(_schemas.SchemaPath + external.SchemaLocation).ConfigureAwait(false);
             }
 
             return xmlSchema;
