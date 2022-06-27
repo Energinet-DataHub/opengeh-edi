@@ -30,13 +30,13 @@ module "func_processing" {
   use_dotnet_isolated_runtime               = true
   health_check_path                         = "/api/monitor/ready"
   app_settings                              = {
-    MARKET_DATA_QUEUE_URL                                       = "${module.sb_marketroles.name}.servicebus.windows.net:9093"
-    MARKET_DATA_DB_CONNECTION_STRING                            = local.MS_MARKETROLES_CONNECTION_STRING
-    INTEGRATION_EVENT_QUEUE                                     = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sbq-market-roles-forward-name)",
-    INTEGRATION_EVENT_QUEUE_CONNECTION                          = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-listen-connection-string)",
-    RAISE_TIME_HAS_PASSED_EVENT_SCHEDULE                        = "*/10 * * * * *"
-    SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS        = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-send-connection-string)",
-    SERVICE_BUS_CONNECTION_STRING_MANAGE_FOR_INTEGRATION_EVENTS = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-manage-connection-string)",
+    
+    MARKET_DATA_QUEUE_URL                                         = "${module.sb_marketroles.name}.servicebus.windows.net:9093"
+    MARKET_DATA_DB_CONNECTION_STRING                              = local.MS_MARKETROLES_CONNECTION_STRING
+    RAISE_TIME_HAS_PASSED_EVENT_SCHEDULE                          = "*/10 * * * * *"
+    SERVICE_BUS_CONNECTION_STRING_LISTENER_FOR_INTEGRATION_EVENTS = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-listen-connection-string)",
+    SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS          = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-send-connection-string)",
+    SERVICE_BUS_CONNECTION_STRING_MANAGE_FOR_INTEGRATION_EVENTS   = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-manage-connection-string)",
   }
 
   tags                                      = azurerm_resource_group.this.tags
