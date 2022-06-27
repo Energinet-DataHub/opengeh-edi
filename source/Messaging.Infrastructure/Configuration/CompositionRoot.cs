@@ -80,6 +80,8 @@ namespace Messaging.Infrastructure.Configuration
             services.AddScoped<IMessageDispatcher, MessageDispatcher>();
             services.AddScoped<MessageRequestHandler>();
             services.AddScoped<MessageRequestContext>();
+            services.AddScoped<ISchema, CimXmlSchemas>();
+            services.AddScoped<ISchema, CimJsonSchemas>();
 
             AddMediatR();
             services.AddLogging();

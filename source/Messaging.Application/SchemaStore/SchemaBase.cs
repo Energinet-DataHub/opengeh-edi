@@ -20,7 +20,23 @@ namespace Messaging.Application.SchemaStore;
 
 public class SchemaBase
 {
-    protected static Dictionary<KeyValuePair<string, string>, string> FillSchemaDictionary(string schemaPath)
+    private readonly Dictionary<KeyValuePair<string, string>, string> _schemas;
+
+    protected SchemaBase(string schemaPath)
+    {
+        _schemas = FillSchemaDictionary(schemaPath);
+    }
+
+    public string? GetSchemaLocation(string businessProcessType, string version)
+    {
+        _schemas.TryGetValue(
+            new KeyValuePair<string, string>(businessProcessType, version),
+            out var schemaName);
+
+        return schemaName;
+    }
+
+    private static Dictionary<KeyValuePair<string, string>, string> FillSchemaDictionary(string schemaPath)
     {
         var schemaDictionary = new Dictionary<KeyValuePair<string, string>, string>();
         var schemas = Directory.GetFiles(schemaPath).ToList();

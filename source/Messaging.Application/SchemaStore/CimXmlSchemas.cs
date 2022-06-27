@@ -19,22 +19,13 @@ namespace Messaging.Application.SchemaStore
 {
     public class CimXmlSchemas : SchemaBase, ISchema
     {
-        private readonly Dictionary<KeyValuePair<string, string>, string> _schemas;
+        private static readonly string _schemaPath = $"SchemaStore{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}Xml{Path.DirectorySeparatorChar}";
 
         public CimXmlSchemas()
+            : base(_schemaPath)
         {
-            _schemas = FillSchemaDictionary(SchemaPath);
         }
 
-        public string SchemaPath => $"SchemaStore{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}Xml{Path.DirectorySeparatorChar}";
-
-        public string? GetSchemaLocation(string businessProcessType, string version)
-        {
-            _schemas.TryGetValue(
-                new KeyValuePair<string, string>(businessProcessType, version),
-                out var schemaName);
-
-            return schemaName;
-        }
+        public string SchemaPath => _schemaPath;
     }
 }

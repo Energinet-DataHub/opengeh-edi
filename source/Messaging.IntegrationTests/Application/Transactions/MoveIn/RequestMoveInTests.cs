@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Messaging.Application.Configuration.DataAccess;
@@ -124,6 +125,15 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             AssertXmlMessage.AssertHasHeaderValue(document, "reason.code", expectedReasonCode);
         }
 
+        private static async Task ValidateDocument(Stream dispatchedDocument, string schemaName, string schemaVersion)
+        {
+            var schema = await SchemaProviderFactory.GetProvider(MediaTypeNames.Application.Xml)
+                .GetSchemaAsync(schemaName, schemaVersion).ConfigureAwait(false);
+
+            var validationResult = await MessageValidator.ValidateAsync(dispatchedDocument, schema!);
+            Assert.True(validationResult.IsValid);
+        }
+
         private static IncomingMessageBuilder MessageBuilder()
         {
             return new IncomingMessageBuilder()
@@ -159,15 +169,6 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         {
             var messageDispatcher = GetService<IMessageDispatcher>() as MessageDispatcherSpy;
             return messageDispatcher!.DispatchedMessage!;
-        }
-
-        private async Task ValidateDocument(Stream dispatchedDocument, string schemaName, string schemaVersion)
-        {
-            var schema = await GetService<ISchemaProvider>().GetSchemaAsync(schemaName, schemaVersion)
-                .ConfigureAwait(false);
-
-            var validationResult = await MessageValidator.ValidateAsync(dispatchedDocument, schema!);
-            Assert.True(validationResult.IsValid);
         }
 
         private HttpClientSpy GetHttpClientMock()

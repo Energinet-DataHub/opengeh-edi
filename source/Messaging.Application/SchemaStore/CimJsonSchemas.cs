@@ -16,12 +16,14 @@ using System.IO;
 
 namespace Messaging.Application.SchemaStore;
 
-public class CimJsonSchemas : ISchema
+public class CimJsonSchemas : SchemaBase, ISchema
 {
-    public string SchemaPath => $"SchemaStore{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}Json{Path.DirectorySeparatorChar}";
+    private static readonly string _schemaPath = $"SchemaStore{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}Json{Path.DirectorySeparatorChar}";
 
-    public string? GetSchemaLocation(string businessProcessType, string version)
+    public CimJsonSchemas()
+        : base(_schemaPath)
     {
-        throw new System.NotImplementedException();
     }
+
+    public string SchemaPath => _schemaPath;
 }
