@@ -1,143 +1,190 @@
 ﻿IF OBJECT_ID(N'b2b.MarketEvaluationPoints', N'U') IS NULL
     BEGIN
-        create table b2b.MarketEvaluationPoints
+        CREATE TABLE [b2b].[MarketEvaluationPoints]
         (
-            Id                          uniqueidentifier not null
-                constraint PK_MarketEvaluationPoints
-                    primary key nonclustered,
-            RecordId                    int identity,
-            MarketEvaluationPointNumber nvarchar(50)     not null
-                unique,
-            EnergySupplierNumber        nvarchar(50)     not null
-        )
+            [Id]                          [uniqueidentifier]   NOT NULL,
+            [RecordId]                    [int] IDENTITY (1,1) NOT NULL,
+            [MarketEvaluationPointNumber] [nvarchar](50)       NOT NULL,
+            [EnergySupplierNumber]        [nvarchar](50)       NOT NULL,
+            CONSTRAINT [PK_MarketEvaluationPoints] PRIMARY KEY NONCLUSTERED
+                (
+                 [Id] ASC
+                    ) WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF) ON [PRIMARY],
+            UNIQUE NONCLUSTERED
+                (
+                 [MarketEvaluationPointNumber] ASC
+                    ) WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF) ON [PRIMARY]
+        ) ON [PRIMARY]
     END
 go
 
 IF OBJECT_ID(N'b2b.MessageIds', N'U') IS NULL
     BEGIN
-        create table b2b.MessageIds
+        CREATE TABLE [b2b].[MessageIds]
         (
-            RecordId  int identity,
-            MessageId nvarchar(50) not null
-                constraint PK_MessageIds
-                    primary key nonclustered
-        )
+            [RecordId]  [int] IDENTITY (1,1) NOT NULL,
+            [MessageId] [nvarchar](50)       NOT NULL,
+            CONSTRAINT [PK_MessageIds] PRIMARY KEY NONCLUSTERED
+                (
+                 [MessageId] ASC
+                    ) WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF) ON [PRIMARY]
+        ) ON [PRIMARY]
     END
 go
 
 IF OBJECT_ID(N'b2b.MoveInTransactions', N'U') IS NULL
     BEGIN
-        create table b2b.MoveInTransactions
+        CREATE TABLE [b2b].[MoveInTransactions]
         (
-            RecordId                         int identity,
-            TransactionId                    nvarchar(50)                not null
-                constraint PK_Transactions
-                    primary key nonclustered,
-            ProcessId                        nvarchar(50),
-            MarketEvaluationPointId          nvarchar(50),
-            EffectiveDate                    datetime2,
-            CurrentEnergySupplierId          nvarchar(50),
-            State                            nvarchar(50)
-                constraint DF_State default 'Started'                    not null,
-            StartedByMessageId               nvarchar(50)
-                constraint DF_StartedByMessageId default 'NotSet'        not null,
-            NewEnergySupplierId              nvarchar(50)
-                constraint DF_NewEnergySupplierId default 'NotSet'       not null,
-            ConsumerId                       nvarchar(50),
-            ConsumerName                     nvarchar(255),
-            ConsumerIdType                   nvarchar(50),
-            ForwardedMeteringPointMasterData bit
-                constraint DF_ForwardedMeteringPointMasterData default 0 not null
-        )
+            [RecordId]                         [int] IDENTITY (1,1) NOT NULL,
+            [TransactionId]                    [nvarchar](50)       NOT NULL,
+            [ProcessId]                        [nvarchar](50)       NULL,
+            [MarketEvaluationPointId]          [nvarchar](50)       NULL,
+            [EffectiveDate]                    [datetime2](7)       NULL,
+            [CurrentEnergySupplierId]          [nvarchar](50)       NULL,
+            [State]                            [nvarchar](50)       NOT NULL,
+            [StartedByMessageId]               [nvarchar](50)       NOT NULL,
+            [NewEnergySupplierId]              [nvarchar](50)       NOT NULL,
+            [ConsumerId]                       [nvarchar](50)       NULL,
+            [ConsumerName]                     [nvarchar](255)      NULL,
+            [ConsumerIdType]                   [nvarchar](50)       NULL,
+            [ForwardedMeteringPointMasterData] [bit]                NOT NULL,
+            CONSTRAINT [PK_Transactions] PRIMARY KEY NONCLUSTERED
+                (
+                 [TransactionId] ASC
+                    ) WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF) ON [PRIMARY]
+        ) ON [PRIMARY];
+
+        ALTER TABLE [b2b].[MoveInTransactions]
+            ADD CONSTRAINT [DF_State] DEFAULT ('Started') FOR [State]
+
+        ALTER TABLE [b2b].[MoveInTransactions]
+            ADD CONSTRAINT [DF_StartedByMessageId] DEFAULT ('NotSet') FOR [StartedByMessageId]
+
+        ALTER TABLE [b2b].[MoveInTransactions]
+            ADD CONSTRAINT [DF_NewEnergySupplierId] DEFAULT ('NotSet') FOR [NewEnergySupplierId]
+
+        ALTER TABLE [b2b].[MoveInTransactions]
+            ADD CONSTRAINT [DF_ForwardedMeteringPointMasterData] DEFAULT ((0)) FOR [ForwardedMeteringPointMasterData]
     END
 go
 
 IF OBJECT_ID(N'b2b.OutboxMessages', N'U') IS NULL
     BEGIN
-        create table b2b.OutboxMessages
+        CREATE TABLE [b2b].[OutboxMessages]
         (
-            Id            uniqueidentifier not null
-                constraint PK_OutboxMessages
-                    primary key nonclustered,
-            RecordId      int identity,
-            Type          nvarchar(255)    not null,
-            Data          nvarchar(max)    not null,
-            CreationDate  datetime2        not null,
-            ProcessedDate datetime2
-        )
+            [Id]            [uniqueidentifier]   NOT NULL,
+            [RecordId]      [int] IDENTITY (1,1) NOT NULL,
+            [Type]          [nvarchar](255)      NOT NULL,
+            [Data]          [nvarchar](max)      NOT NULL,
+            [CreationDate]  [datetime2](7)       NOT NULL,
+            [ProcessedDate] [datetime2](7)       NULL,
+            CONSTRAINT [PK_OutboxMessages] PRIMARY KEY NONCLUSTERED
+                (
+                 [Id] ASC
+                    ) WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF) ON [PRIMARY]
+        ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
     END
 go
 
 IF OBJECT_ID(N'b2b.OutgoingMessages', N'U') IS NULL
     BEGIN
-        create table b2b.OutgoingMessages
+        CREATE TABLE [b2b].[OutgoingMessages]
         (
-            Id                          uniqueidentifier             not null
-                constraint PK_OutgoingMessages
-                    primary key nonclustered,
-            RecordId                    int identity,
-            DocumentType                nvarchar(255)                not null,
-            ReceiverId                  nvarchar(255)                not null,
-            IsPublished                 bit                          not null,
-            CorrelationId               nvarchar(255) default 'None' not null,
-            OriginalMessageId           nvarchar(50)  default 'None' not null,
-            ProcessType                 nvarchar(50)                 not null,
-            ReceiverRole                nvarchar(50)                 not null,
-            SenderId                    nvarchar(50)                 not null,
-            SenderRole                  nvarchar(50)                 not null,
-            MarketActivityRecordPayload nvarchar(max)                not null,
-            ReasonCode                  nvarchar(10)
-        )
+            [Id]                          [uniqueidentifier]   NOT NULL,
+            [RecordId]                    [int] IDENTITY (1,1) NOT NULL,
+            [DocumentType]                [nvarchar](255)      NOT NULL,
+            [ReceiverId]                  [nvarchar](255)      NOT NULL,
+            [IsPublished]                 [bit]                NOT NULL,
+            [CorrelationId]               [nvarchar](255)      NOT NULL,
+            [OriginalMessageId]           [nvarchar](50)       NOT NULL,
+            [ProcessType]                 [nvarchar](50)       NOT NULL,
+            [ReceiverRole]                [nvarchar](50)       NOT NULL,
+            [SenderId]                    [nvarchar](50)       NOT NULL,
+            [SenderRole]                  [nvarchar](50)       NOT NULL,
+            [MarketActivityRecordPayload] [nvarchar](max)      NOT NULL,
+            [ReasonCode]                  [nvarchar](10)       NULL,
+            CONSTRAINT [PK_OutgoingMessages] PRIMARY KEY NONCLUSTERED
+                (
+                 [Id] ASC
+                    ) WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF) ON [PRIMARY]
+        ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+
+        ALTER TABLE [b2b].[OutgoingMessages]
+            ADD DEFAULT ('None') FOR [CorrelationId]
+
+        ALTER TABLE [b2b].[OutgoingMessages]
+            ADD DEFAULT ('None') FOR [OriginalMessageId]
+
+        ALTER TABLE [dbo].[OutboxMessages]
+            ADD DEFAULT ('None') FOR [Correlation]
     END
 go
 
 IF OBJECT_ID(N'b2b.QueuedInternalCommands', N'U') IS NULL
     BEGIN
-        create table b2b.QueuedInternalCommands
+        CREATE TABLE [b2b].[QueuedInternalCommands]
         (
-            Id            uniqueidentifier not null
-                constraint PK_InternalCommandQueue
-                    primary key nonclustered,
-            RecordId      int identity
-                constraint UC_InternalCommandQueue_Id
-                    unique clustered,
-            Type          nvarchar(255)    not null,
-            Data          nvarchar(max)    not null,
-            ProcessedDate datetime2(1),
-            CreationDate  datetime2        not null,
-            ErrorMessage  nvarchar(max)
-        )
+            [Id]            [uniqueidentifier]   NOT NULL,
+            [RecordId]      [int] IDENTITY (1,1) NOT NULL,
+            [Type]          [nvarchar](255)      NOT NULL,
+            [Data]          [nvarchar](max)      NOT NULL,
+            [ProcessedDate] [datetime2](1)       NULL,
+            [CreationDate]  [datetime2](7)       NOT NULL,
+            [ErrorMessage]  [nvarchar](max)      NULL,
+            CONSTRAINT [PK_InternalCommandQueue] PRIMARY KEY NONCLUSTERED
+                (
+                 [Id] ASC
+                    ) WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF) ON [PRIMARY],
+            CONSTRAINT [UC_InternalCommandQueue_Id] UNIQUE CLUSTERED
+                (
+                 [RecordId] ASC
+                    ) WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF) ON [PRIMARY]
+        ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+
+        ALTER TABLE [dbo].[QueuedInternalCommands]
+            ADD DEFAULT ('None') FOR [Correlation]
+
     END
 go
 
 IF OBJECT_ID(N'b2b.ReasonTranslations', N'U') IS NULL
     BEGIN
-        create table b2b.ReasonTranslations
+        CREATE TABLE [b2b].[ReasonTranslations]
         (
-            Id           uniqueidentifier not null
-                constraint PK_ReasonTranslations
-                    primary key nonclustered,
-            RecordId     int identity
-                constraint UC_ReasonTranslations_Id
-                    unique clustered,
-            ErrorCode    nvarchar(250)    not null,
-            Code         nvarchar(3)      not null,
-            Text         nvarchar(max)    not null,
-            LanguageCode nvarchar(2)      not null,
-            constraint UC_Code
-                unique (ErrorCode, LanguageCode)
-        )
+            [Id]           [uniqueidentifier]   NOT NULL,
+            [RecordId]     [int] IDENTITY (1,1) NOT NULL,
+            [ErrorCode]    [nvarchar](250)      NOT NULL,
+            [Code]         [nvarchar](3)        NOT NULL,
+            [Text]         [nvarchar](max)      NOT NULL,
+            [LanguageCode] [nvarchar](2)        NOT NULL,
+            CONSTRAINT [PK_ReasonTranslations] PRIMARY KEY NONCLUSTERED
+                (
+                 [Id] ASC
+                    ) WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF) ON [PRIMARY],
+            CONSTRAINT [UC_ReasonTranslations_Id] UNIQUE CLUSTERED
+                (
+                 [RecordId] ASC
+                    ) WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF) ON [PRIMARY],
+            CONSTRAINT [UC_Code] UNIQUE NONCLUSTERED
+                (
+                 [ErrorCode] ASC,
+                 [LanguageCode] ASC
+                    ) WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF) ON [PRIMARY]
+        ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
     END
 go
 
 IF OBJECT_ID(N'b2b.TransactionIds', N'U') IS NULL
     BEGIN
-        create table b2b.TransactionIds
+        CREATE TABLE [b2b].[TransactionIds]
         (
-            RecordId      int identity,
-            TransactionId nvarchar(50) not null
-                constraint PK_TransactionIds
-                    primary key nonclustered
-        )
+            [RecordId]      [int] IDENTITY (1,1) NOT NULL,
+            [TransactionId] [nvarchar](50)       NOT NULL,
+            CONSTRAINT [PK_TransactionIds] PRIMARY KEY NONCLUSTERED
+                (
+                 [TransactionId] ASC
+                    ) WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF) ON [PRIMARY]
+        ) ON [PRIMARY]
     END
 go
