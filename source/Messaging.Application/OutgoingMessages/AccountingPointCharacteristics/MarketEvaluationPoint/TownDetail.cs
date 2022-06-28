@@ -12,19 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.Application.Common.Commands;
+namespace Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
 
-namespace Messaging.Application.Transactions.MoveIn;
-
-public class FetchMeteringPointMasterData : InternalCommand
+public class TownDetail
 {
-    public FetchMeteringPointMasterData(string businessProcessId, string marketEvaluationPointNumber)
+    public TownDetail(string code, string name, string section, string country)
     {
-        BusinessProcessId = businessProcessId;
-        MarketEvaluationPointNumber = marketEvaluationPointNumber;
+        Code = code;
+        Name = name;
+        Section = section;
+        Country = country;
     }
 
-    public string BusinessProcessId { get; }
+    public string Code { get; }
 
-    public string MarketEvaluationPointNumber { get; }
+    public string Name { get; }
+
+    public string Section { get; }
+
+    public string Country { get; }
 }
