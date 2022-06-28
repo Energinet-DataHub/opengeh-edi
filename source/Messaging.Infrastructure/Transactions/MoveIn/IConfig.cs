@@ -22,10 +22,10 @@ public interface IConfig
     /// <summary>
     /// Name of queue
     /// </summary>
-    string QueueName { get; }
+    string? QueueName { get; }
 
     /// <summary>
-    /// The name to affiliate a service bus client with
+    /// The name to affiliate a service with
     /// </summary>
     string WithName { get; }
 }
