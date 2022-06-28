@@ -20,11 +20,6 @@ namespace Messaging.Infrastructure.Transactions.MoveIn;
 public interface IConfig
 {
     /// <summary>
-    /// Name of queue
-    /// </summary>
-    string? QueueName { get; }
-
-    /// <summary>
     /// The name to affiliate a service with
     /// </summary>
     string WithName { get; }
