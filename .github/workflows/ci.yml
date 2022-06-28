@@ -44,7 +44,9 @@ jobs:
 
   create_prerelease:
     needs: [
-      dotnet_solution_ci
+      ci_base,
+      dotnet_solution_ci,
+      terraform_validate
     ]
     uses: Energinet-DataHub/.github/.github/workflows/create-prerelease.yml@7.6.0
     with:
