@@ -32,16 +32,14 @@ namespace Messaging.CimMessageAdapter
         private readonly IMessageIds _messageIds;
         private readonly IMessageQueueDispatcher _messageQueueDispatcher;
         private readonly ITransactionIds _transactionIds;
-        private readonly ISchemaProvider _schemaProvider;
         private readonly IMarketActorAuthenticator _marketActorAuthenticator;
 
-        public MessageReceiver(IMessageIds messageIds, IMessageQueueDispatcher messageQueueDispatcher, ITransactionIds transactionIds, ISchemaProvider schemaProvider, IMarketActorAuthenticator marketActorAuthenticator)
+        public MessageReceiver(IMessageIds messageIds, IMessageQueueDispatcher messageQueueDispatcher, ITransactionIds transactionIds, IMarketActorAuthenticator marketActorAuthenticator)
         {
             _messageIds = messageIds ?? throw new ArgumentNullException(nameof(messageIds));
             _messageQueueDispatcher = messageQueueDispatcher ??
                                              throw new ArgumentNullException(nameof(messageQueueDispatcher));
             _transactionIds = transactionIds;
-            _schemaProvider = schemaProvider ?? throw new ArgumentNullException(nameof(schemaProvider));
             _marketActorAuthenticator = marketActorAuthenticator ?? throw new ArgumentNullException(nameof(marketActorAuthenticator));
         }
 

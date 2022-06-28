@@ -9,19 +9,21 @@ namespace Messaging.Tests;
 
 public class SchemaProviderTests
 {
+    private ISchemaProvider? _provider;
+
     [Fact]
-    public async Task SomeTest()
+    public async Task Schema_provider_can_get_xml_schema()
     {
-        var xmlProvider = SchemaProviderFactory.GetProvider(MediaTypeNames.Application.Xml);
-        var schema = await xmlProvider.GetSchemaAsync<XmlSchema>("confirmrequestchangeofsupplier", "0.1").ConfigureAwait(false);
+        _provider = SchemaProviderFactory.GetProvider(MediaTypeNames.Application.Xml);
+        var schema = await _provider.GetSchemaAsync<XmlSchema>("confirmrequestchangeofsupplier", "0.1").ConfigureAwait(false);
         Assert.Equal(typeof(XmlSchema), schema?.GetType());
     }
 
     [Fact]
-    public async Task SomeTest2()
+    public async Task Schema_provider_can_get_json_schema()
     {
-        var jsonProvider = SchemaProviderFactory.GetProvider(MediaTypeNames.Application.Json);
-        var schema = await jsonProvider.GetSchemaAsync<JsonSchema>("Request-Change-of-Supplier-assembly-model.schema", "0").ConfigureAwait(false);
+        _provider = SchemaProviderFactory.GetProvider(MediaTypeNames.Application.Json);
+        var schema = await _provider.GetSchemaAsync<JsonSchema>("Request-Change-of-Supplier-assembly-model.schema", "0").ConfigureAwait(false);
         Assert.Equal(typeof(JsonSchema), schema?.GetType());
     }
 }

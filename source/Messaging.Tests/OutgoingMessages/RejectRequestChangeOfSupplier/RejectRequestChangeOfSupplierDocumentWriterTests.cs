@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
@@ -34,14 +35,13 @@ namespace Messaging.Tests.OutgoingMessages.RejectRequestChangeOfSupplier;
 public class RejectRequestChangeOfSupplierDocumentWriterTests
 {
     private readonly RejectRequestChangeOfSupplierDocumentWriter _documentWriter;
-    private readonly ISchemaProvider _schemaProvider;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMarketActivityRecordParser _marketActivityRecordParser;
+    private ISchemaProvider? _schemaProvider;
 
     public RejectRequestChangeOfSupplierDocumentWriterTests()
     {
         _systemDateTimeProvider = new SystemDateTimeProvider();
-        _schemaProvider = new XmlSchemaProvider();
         _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
         _documentWriter = new RejectRequestChangeOfSupplierDocumentWriter(_marketActivityRecordParser);
     }
@@ -86,6 +86,7 @@ public class RejectRequestChangeOfSupplierDocumentWriterTests
 
     private async Task AssertMessage(Stream message, MessageHeader header, List<MarketActivityRecord> marketActivityRecords)
     {
+        _schemaProvider = SchemaProviderFactory.GetProvider(MediaTypeNames.Application.Xml);
         var document = XDocument.Load(message);
         AssertXmlMessage.AssertHeader(header, document);
 

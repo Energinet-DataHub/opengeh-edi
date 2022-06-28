@@ -43,6 +43,6 @@ public class JsonSchemaProvider : SchemaProvider
         where T : default
     {
         var schema = await JsonSchema.FromFileAsync(location).ConfigureAwait(false);
-        throw new System.NotImplementedException();
+        return (T?)(object)schema;
     }
 }

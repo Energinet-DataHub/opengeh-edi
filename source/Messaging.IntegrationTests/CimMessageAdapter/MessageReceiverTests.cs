@@ -271,14 +271,14 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
         private MessageReceiver CreateMessageReceiver()
         {
             _messageQueueDispatcherSpy = new MessageQueueDispatcherStub();
-            var messageReceiver = new MessageReceiver(_messageIds, _messageQueueDispatcherSpy, _transactionIds, new XmlSchemaProvider(), _marketActorAuthenticator);
+            var messageReceiver = new MessageReceiver(_messageIds, _messageQueueDispatcherSpy, _transactionIds, _marketActorAuthenticator);
             return messageReceiver;
         }
 
         private MessageReceiver CreateMessageReceiver(IMessageIds messageIds)
         {
             _messageQueueDispatcherSpy = new MessageQueueDispatcherStub();
-            var messageReceiver = new MessageReceiver(messageIds, _messageQueueDispatcherSpy, _transactionIds, new XmlSchemaProvider(), _marketActorAuthenticator);
+            var messageReceiver = new MessageReceiver(messageIds, _messageQueueDispatcherSpy, _transactionIds, _marketActorAuthenticator);
             return messageReceiver;
         }
 

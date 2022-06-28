@@ -35,14 +35,13 @@ namespace Messaging.Tests.OutgoingMessages.ConfirmRequestChangeOfSupplier
     public class ConfirmRequestChangeOfSupplierDocumentWriterTests
     {
         private readonly ConfirmChangeOfSupplierDocumentWriter _documentWriter;
-        private readonly ISchemaProvider _schemaProvider;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
         private readonly IMarketActivityRecordParser _marketActivityRecordParser;
+        private ISchemaProvider? _schemaProvider;
 
         public ConfirmRequestChangeOfSupplierDocumentWriterTests()
         {
             _systemDateTimeProvider = new SystemDateTimeProvider();
-            _schemaProvider = SchemaProviderFactory.GetProvider(MediaTypeNames.Application.Xml);
             _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
             _documentWriter = new ConfirmChangeOfSupplierDocumentWriter(_marketActivityRecordParser);
         }
@@ -87,6 +86,7 @@ namespace Messaging.Tests.OutgoingMessages.ConfirmRequestChangeOfSupplier
 
         private async Task AssertConformsToSchema(Stream message)
         {
+            _schemaProvider = SchemaProviderFactory.GetProvider(MediaTypeNames.Application.Xml);
             var schema = await _schemaProvider.GetSchemaAsync<XmlSchema>("confirmrequestchangeofsupplier", "0.1")
                 .ConfigureAwait(false);
             await AssertXmlMessage.AssertConformsToSchemaAsync(message, schema!).ConfigureAwait(false);

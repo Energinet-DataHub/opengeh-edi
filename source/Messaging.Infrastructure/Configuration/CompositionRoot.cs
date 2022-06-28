@@ -58,6 +58,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using NJsonSchema;
 
 namespace Messaging.Infrastructure.Configuration
 {
@@ -80,12 +81,10 @@ namespace Messaging.Infrastructure.Configuration
             services.AddScoped<IMessageDispatcher, MessageDispatcher>();
             services.AddScoped<MessageRequestHandler>();
             services.AddScoped<MessageRequestContext>();
-            services.AddScoped<ISchema, CimXmlSchemas>();
-            services.AddScoped<ISchema, CimJsonSchemas>();
+            services.AddScoped<MessageReceiver>();
 
             AddMediatR();
             services.AddLogging();
-            AddXmlSchema(services);
             AddInternalCommandsProcessing();
             AddMessageGenerationServices();
             AddMasterDataServices();
@@ -221,13 +220,6 @@ namespace Messaging.Infrastructure.Configuration
         {
             _services.AddSingleton(action);
             return this;
-        }
-
-        private static void AddXmlSchema(IServiceCollection services)
-        {
-            services.AddScoped<CimXmlSchemas>();
-            services.AddScoped<ISchemaProvider, SchemaProvider>();
-            services.AddScoped<MessageReceiver>();
         }
 
         private void AddInternalCommandsProcessing()
