@@ -1,4 +1,10 @@
-﻿IF OBJECT_ID(N'b2b.MarketEvaluationPoints', N'U') IS NULL
+﻿IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'b2b')
+    BEGIN
+        EXEC('CREATE SCHEMA [b2b] AUTHORIZATION [dbo];')
+    END
+GO
+
+IF OBJECT_ID(N'b2b.MarketEvaluationPoints', N'U') IS NULL
     BEGIN
         CREATE TABLE [b2b].[MarketEvaluationPoints]
         (
