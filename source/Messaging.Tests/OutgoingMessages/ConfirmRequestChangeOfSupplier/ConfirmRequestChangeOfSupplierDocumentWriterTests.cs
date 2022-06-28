@@ -16,14 +16,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using System.Xml.Schema;
 using Messaging.Application.Common;
 using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Application.SchemaStore;
-using Messaging.Application.Xml;
 using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Serialization;
@@ -41,7 +42,7 @@ namespace Messaging.Tests.OutgoingMessages.ConfirmRequestChangeOfSupplier
         public ConfirmRequestChangeOfSupplierDocumentWriterTests()
         {
             _systemDateTimeProvider = new SystemDateTimeProvider();
-            _schemaProvider = new SchemaProvider(new CimXmlSchemas());
+            _schemaProvider = SchemaProviderFactory.GetProvider(MediaTypeNames.Application.Xml);
             _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
             _documentWriter = new ConfirmChangeOfSupplierDocumentWriter(_marketActivityRecordParser);
         }
@@ -86,7 +87,7 @@ namespace Messaging.Tests.OutgoingMessages.ConfirmRequestChangeOfSupplier
 
         private async Task AssertConformsToSchema(Stream message)
         {
-            var schema = await _schemaProvider.GetSchemaAsync("confirmrequestchangeofsupplier", "0.1")
+            var schema = await _schemaProvider.GetSchemaAsync<XmlSchema>("confirmrequestchangeofsupplier", "0.1")
                 .ConfigureAwait(false);
             await AssertXmlMessage.AssertConformsToSchemaAsync(message, schema!).ConfigureAwait(false);
         }

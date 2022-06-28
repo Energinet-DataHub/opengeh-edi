@@ -24,6 +24,6 @@ public static class SchemaProviderFactory
         if (contentType == null) throw new ArgumentNullException(nameof(contentType));
 
         return contentType.Equals(MediaTypeNames.Application.Json, StringComparison.OrdinalIgnoreCase)
-            ? new SchemaProvider(new CimJsonSchemas()) : new SchemaProvider(new CimXmlSchemas());
+            ? new JsonSchemaProvider() : new XmlSchemaProvider();
     }
 }

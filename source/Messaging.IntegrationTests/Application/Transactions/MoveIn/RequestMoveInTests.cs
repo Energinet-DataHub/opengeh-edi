@@ -18,6 +18,7 @@ using System.IO;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using System.Xml.Schema;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.SchemaStore;
@@ -128,7 +129,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         private static async Task ValidateDocument(Stream dispatchedDocument, string schemaName, string schemaVersion)
         {
             var schema = await SchemaProviderFactory.GetProvider(MediaTypeNames.Application.Xml)
-                .GetSchemaAsync(schemaName, schemaVersion).ConfigureAwait(false);
+                .GetSchemaAsync<XmlSchema>(schemaName, schemaVersion).ConfigureAwait(false);
 
             var validationResult = await MessageValidator.ValidateAsync(dispatchedDocument, schema!);
             Assert.True(validationResult.IsValid);

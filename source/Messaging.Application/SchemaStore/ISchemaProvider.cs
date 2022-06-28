@@ -28,6 +28,6 @@ namespace Messaging.Application.SchemaStore
         /// <param name="businessProcessType"></param>
         /// <param name="version"></param>
         /// <returns><see cref="XmlSchema"/></returns>
-        Task<XmlSchema?> GetSchemaAsync(string businessProcessType, string version);
+        Task<T?> GetSchemaAsync<T>(string businessProcessType, string version);
     }
 }

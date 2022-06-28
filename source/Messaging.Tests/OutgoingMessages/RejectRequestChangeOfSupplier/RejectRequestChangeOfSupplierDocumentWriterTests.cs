@@ -18,6 +18,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using System.Xml.Schema;
 using Messaging.Application.Common;
 using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages;
@@ -40,7 +41,7 @@ public class RejectRequestChangeOfSupplierDocumentWriterTests
     public RejectRequestChangeOfSupplierDocumentWriterTests()
     {
         _systemDateTimeProvider = new SystemDateTimeProvider();
-        _schemaProvider = new SchemaProvider(new CimXmlSchemas());
+        _schemaProvider = new XmlSchemaProvider();
         _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
         _documentWriter = new RejectRequestChangeOfSupplierDocumentWriter(_marketActivityRecordParser);
     }
@@ -90,7 +91,7 @@ public class RejectRequestChangeOfSupplierDocumentWriterTests
 
         AssertMarketActivityRecords(marketActivityRecords, document);
 
-        var schema = await _schemaProvider.GetSchemaAsync("rejectrequestchangeofsupplier", "0.1")
+        var schema = await _schemaProvider.GetSchemaAsync<XmlSchema>("rejectrequestchangeofsupplier", "0.1")
             .ConfigureAwait(false);
         await AssertXmlMessage.AssertConformsToSchemaAsync(message, schema!).ConfigureAwait(false);
     }

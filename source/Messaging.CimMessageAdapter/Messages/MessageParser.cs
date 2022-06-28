@@ -59,7 +59,7 @@ namespace Messaging.CimMessageAdapter.Messages
                 return InvalidXmlFailure(generalException);
             }
 
-            var xmlSchema = await _schemaProvider.GetSchemaAsync(businessProcessType, version).ConfigureAwait(true);
+            var xmlSchema = await _schemaProvider.GetSchemaAsync<XmlSchema>(businessProcessType, version).ConfigureAwait(true);
             if (xmlSchema is null)
             {
                 return MessageParserResult.Failure(new UnknownBusinessProcessTypeOrVersion(businessProcessType, version));

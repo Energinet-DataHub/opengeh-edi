@@ -14,18 +14,43 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Messaging.Application.SchemaStore
 {
-    public class CimXmlSchemas : SchemaBase, ISchema
+    public sealed class CimXmlSchemas : SchemaBase, ISchema
     {
         private static readonly string _schemaPath = $"SchemaStore{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}Xml{Path.DirectorySeparatorChar}";
 
         public CimXmlSchemas()
-            : base(_schemaPath)
         {
+            InitializeSchemas(FillSchemaDictionary(_schemaPath));
         }
 
         public string SchemaPath => _schemaPath;
+
+        string? ISchema.GetSchemaLocation(string businessProcessType, string version)
+        {
+            return GetSchemaLocation(businessProcessType, version);
+        }
+
+        protected override Dictionary<KeyValuePair<string, string>, string> FillSchemaDictionary(string schemaPath)
+        {
+            var schemaDictionary = new Dictionary<KeyValuePair<string, string>, string>();
+            var schemas = Directory.GetFiles(schemaPath).ToList();
+            foreach (var schema in schemas)
+            {
+                var filename = Path.GetFileNameWithoutExtension(schema);
+                var filenameSplit = filename.Split('-');
+                if (filenameSplit.Length == 7)
+                {
+                    schemaDictionary.Add(
+                        new KeyValuePair<string, string>(filenameSplit[4], filenameSplit[5] + "." + filenameSplit[6]),
+                        schema);
+                }
+            }
+
+            return schemaDictionary;
+        }
     }
 }
