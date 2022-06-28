@@ -1,6 +1,6 @@
 ﻿DELETE
 FROM SchemaVersions
-WHERE ScriptName like 'Energinet.DataHub.MeteringPoints.ApplyDBMigrationsApp.Scripts.Model%';
+WHERE ScriptName like 'Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.Scripts.Model%';
 
 IF OBJECT_ID(N'dbo.AccountingPoints', N'U') IS NULL
     BEGIN
