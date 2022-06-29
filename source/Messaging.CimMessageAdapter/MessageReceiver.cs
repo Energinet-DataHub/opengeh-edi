@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.IncomingMessages;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
-using Messaging.Application.Xml.SchemaStore;
+using Messaging.Application.SchemaStore;
 using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Messages;
 
@@ -32,24 +32,22 @@ namespace Messaging.CimMessageAdapter
         private readonly IMessageIds _messageIds;
         private readonly IMessageQueueDispatcher _messageQueueDispatcher;
         private readonly ITransactionIds _transactionIds;
-        private readonly ISchemaProvider _schemaProvider;
         private readonly IMarketActorAuthenticator _marketActorAuthenticator;
 
-        public MessageReceiver(IMessageIds messageIds, IMessageQueueDispatcher messageQueueDispatcher, ITransactionIds transactionIds, ISchemaProvider schemaProvider, IMarketActorAuthenticator marketActorAuthenticator)
+        public MessageReceiver(IMessageIds messageIds, IMessageQueueDispatcher messageQueueDispatcher, ITransactionIds transactionIds, IMarketActorAuthenticator marketActorAuthenticator)
         {
             _messageIds = messageIds ?? throw new ArgumentNullException(nameof(messageIds));
             _messageQueueDispatcher = messageQueueDispatcher ??
                                              throw new ArgumentNullException(nameof(messageQueueDispatcher));
             _transactionIds = transactionIds;
-            _schemaProvider = schemaProvider ?? throw new ArgumentNullException(nameof(schemaProvider));
             _marketActorAuthenticator = marketActorAuthenticator ?? throw new ArgumentNullException(nameof(marketActorAuthenticator));
         }
 
-        public async Task<Result> ReceiveAsync(Stream message)
+        public async Task<Result> ReceiveAsync(Stream message, string? contentType)
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
 
-            var messageParser = new MessageParser(_schemaProvider);
+            var messageParser = new MessageParser(contentType);
 
             var messageParserResult =
                  await messageParser.ParseAsync(message).ConfigureAwait(false);

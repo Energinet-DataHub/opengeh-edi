@@ -20,7 +20,7 @@ using System.Xml;
 using System.Xml.Schema;
 using Messaging.Application.IncomingMessages;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
-using Messaging.Application.Xml.SchemaStore;
+using Messaging.Application.SchemaStore;
 using Messaging.CimMessageAdapter.Errors;
 using NodaTime;
 using NodaTime.Text;
@@ -34,9 +34,9 @@ namespace Messaging.CimMessageAdapter.Messages
         private readonly List<ValidationError> _errors = new();
         private readonly ISchemaProvider _schemaProvider;
 
-        public MessageParser(ISchemaProvider schemaProvider)
+        public MessageParser(string? contentType)
         {
-            _schemaProvider = schemaProvider ?? throw new ArgumentNullException(nameof(schemaProvider));
+            _schemaProvider = SchemaProviderFactory.GetProvider(contentType);
         }
 
         public async Task<MessageParserResult> ParseAsync(Stream message)
@@ -59,7 +59,7 @@ namespace Messaging.CimMessageAdapter.Messages
                 return InvalidXmlFailure(generalException);
             }
 
-            var xmlSchema = await _schemaProvider.GetSchemaAsync(businessProcessType, version).ConfigureAwait(true);
+            var xmlSchema = await _schemaProvider.GetSchemaAsync<XmlSchema>(businessProcessType, version).ConfigureAwait(true);
             if (xmlSchema is null)
             {
                 return MessageParserResult.Failure(new UnknownBusinessProcessTypeOrVersion(businessProcessType, version));
