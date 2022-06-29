@@ -17,37 +17,10 @@ using System.Threading.Tasks;
 
 namespace Messaging.Application.SchemaStore
 {
-    public abstract class SchemaProvider : ISchemaProvider, IDisposable
+    public abstract class SchemaProvider : ISchemaProvider
     {
-        private bool _disposed;
-
-        ~SchemaProvider()
-        {
-            Dispose(false);
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
         public abstract Task<T?> GetSchemaAsync<T>(string businessProcessType, string version);
 
         protected abstract Task<T?> LoadSchemaWithDependentSchemasAsync<T>(string location);
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposed)
-            {
-                return;
-            }
-
-            if (disposing)
-            {
-            }
-
-            _disposed = true;
-        }
     }
 }

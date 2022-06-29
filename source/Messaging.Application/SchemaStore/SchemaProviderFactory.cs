@@ -23,16 +23,7 @@ public static class SchemaProviderFactory
     {
         if (contentType == null) throw new ArgumentNullException(nameof(contentType));
 
-        if (contentType.Equals(MediaTypeNames.Application.Json, StringComparison.OrdinalIgnoreCase))
-        {
-            using var t = new JsonSchemaProvider();
-            return t;
-        }
-
-        using var y = new XmlSchemaProvider();
-        return y;
-
-        //return contentType.Equals(MediaTypeNames.Application.Json, StringComparison.OrdinalIgnoreCase)
-        //    ? new JsonSchemaProvider() : new XmlSchemaProvider();
+        return contentType.Equals(MediaTypeNames.Application.Json, StringComparison.OrdinalIgnoreCase)
+            ? new JsonSchemaProvider() : new XmlSchemaProvider();
     }
 }
