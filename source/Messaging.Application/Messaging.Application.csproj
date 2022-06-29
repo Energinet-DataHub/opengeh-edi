@@ -79,6 +79,10 @@ limitations under the License.
       <EmbeddedResource Include="SchemaStore\Schemas\Json\urn-entsoe-eu-local-extension-types.schema.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
+      <None Remove="Xml\SchemaStore\Schemas\urn-ediel-org-structure-accountingpointcharacteristics-0-1.xsd" />
+      <EmbeddedResource Include="Xml\SchemaStore\Schemas\urn-ediel-org-structure-accountingpointcharacteristics-0-1.xsd">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
     </ItemGroup>
 
 </Project>

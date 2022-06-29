@@ -20,8 +20,16 @@ namespace Messaging.Application.Transactions.MoveIn;
 
 public class FetchMeteringPointMasterDataHandler : IRequestHandler<FetchMeteringPointMasterData, Unit>
 {
-    public Task<Unit> Handle(FetchMeteringPointMasterData request, CancellationToken cancellationToken)
+    private readonly IRequestMeteringPointMasterData _requestMeteringPointMasterData;
+
+    public FetchMeteringPointMasterDataHandler(IRequestMeteringPointMasterData requestMeteringPointMasterData)
     {
-        return Task.FromResult(Unit.Value);
+        _requestMeteringPointMasterData = requestMeteringPointMasterData;
+    }
+
+    public async Task<Unit> Handle(FetchMeteringPointMasterData request, CancellationToken cancellationToken)
+    {
+        await _requestMeteringPointMasterData.RequestMasterDataForAsync(request).ConfigureAwait(false);
+        return await Task.FromResult(Unit.Value).ConfigureAwait(false);
     }
 }
