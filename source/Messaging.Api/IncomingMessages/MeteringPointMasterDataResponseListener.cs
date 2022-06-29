@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MeteringPoints.RequestResponse.Response;
+using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
@@ -21,10 +23,14 @@ namespace Messaging.Api.IncomingMessages;
 public class MeteringPointMasterDataResponseListener
 {
     private readonly ILogger<MeteringPointMasterDataResponseListener> _logger;
+    private readonly ISerializer _serializer;
 
-    public MeteringPointMasterDataResponseListener(ILogger<MeteringPointMasterDataResponseListener> logger)
+    public MeteringPointMasterDataResponseListener(
+        ILogger<MeteringPointMasterDataResponseListener> logger,
+        ISerializer serializer)
     {
         _logger = logger;
+        _serializer = serializer;
     }
 
     [Function("MeteringPointMasterDataResponseListener")]
@@ -33,6 +39,21 @@ public class MeteringPointMasterDataResponseListener
         if (data == null) throw new ArgumentNullException(nameof(data));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
+        var metadata = GetMetaData(context);
+        var masterData = MasterDataRequestResponse.Parser.ParseFrom(data);
+
         _logger.LogInformation($"Master data response received: {data}");
+    }
+
+    private MasterDataResponseMetadata GetMetaData(FunctionContext context)
+    {
+        context.BindingContext.BindingData.TryGetValue("UserProperties", out var metadata);
+
+        if (metadata is null)
+        {
+            throw new InvalidOperationException($"Service bus metadata must be specified as User Properties attributes");
+        }
+
+        return _serializer.Deserialize<MasterDataResponseMetadata>(metadata.ToString() ?? throw new InvalidOperationException());
     }
 }
