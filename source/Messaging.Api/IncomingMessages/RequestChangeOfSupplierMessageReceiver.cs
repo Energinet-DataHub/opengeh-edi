@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Net;
+using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 using Messaging.Application.Configuration;
@@ -50,7 +52,8 @@ namespace Messaging.Api.IncomingMessages
 
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            var result = await _messageReceiver.ReceiveAsync(request.Body)
+            var contentType = request.Headers.GetValues("Content-Type").FirstOrDefault();
+            var result = await _messageReceiver.ReceiveAsync(request.Body, contentType)
                 .ConfigureAwait(false);
 
             var httpStatusCode = result.Success ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;

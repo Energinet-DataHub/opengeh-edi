@@ -52,6 +52,7 @@ public class RequestMeteringPointMasterDataDispatcher
             ContentType = "application/octet-stream;charset=utf-8",
         };
         serviceBusMessage.ApplicationProperties.Add("BusinessProcessId", fetchMeteringPointMasterData.BusinessProcessId);
+        serviceBusMessage.ApplicationProperties.Add("TransactionId", fetchMeteringPointMasterData.TransactionId);
 
         return serviceBusMessage;
     }

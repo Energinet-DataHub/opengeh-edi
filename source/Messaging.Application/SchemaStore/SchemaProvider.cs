@@ -12,22 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
-using System.Xml.Schema;
 
-namespace Messaging.Application.Xml.SchemaStore
+namespace Messaging.Application.SchemaStore
 {
-    /// <summary>
-    /// Provides XML schemas for CIM messages
-    /// </summary>
-    public interface ISchemaProvider
+    public abstract class SchemaProvider : ISchemaProvider
     {
-        /// <summary>
-        /// Get schema for specific business process and version
-        /// </summary>
-        /// <param name="businessProcessType"></param>
-        /// <param name="version"></param>
-        /// <returns><see cref="XmlSchema"/></returns>
-        Task<XmlSchema?> GetSchemaAsync(string businessProcessType, string version);
+        public abstract Task<T?> GetSchemaAsync<T>(string businessProcessType, string version);
+
+        protected abstract Task<T?> LoadSchemaWithDependentSchemasAsync<T>(string location);
     }
 }

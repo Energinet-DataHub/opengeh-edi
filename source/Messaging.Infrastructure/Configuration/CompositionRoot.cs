@@ -36,8 +36,8 @@ using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages.GenericNotification;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Messaging.Application.SchemaStore;
 using Messaging.Application.Transactions.MoveIn;
-using Messaging.Application.Xml.SchemaStore;
 using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
@@ -60,6 +60,7 @@ using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using NJsonSchema;
 
 namespace Messaging.Infrastructure.Configuration
 {
@@ -82,10 +83,10 @@ namespace Messaging.Infrastructure.Configuration
             services.AddScoped<IMessageDispatcher, MessageDispatcher>();
             services.AddScoped<MessageRequestHandler>();
             services.AddScoped<MessageRequestContext>();
+            services.AddScoped<MessageReceiver>();
 
             AddMediatR();
             services.AddLogging();
-            AddXmlSchema(services);
             AddInternalCommandsProcessing();
             AddMessageGenerationServices();
             AddMasterDataServices();
@@ -236,13 +237,6 @@ namespace Messaging.Infrastructure.Configuration
         {
             _services.AddSingleton(action);
             return this;
-        }
-
-        private static void AddXmlSchema(IServiceCollection services)
-        {
-            services.AddScoped<CimXmlSchemas>();
-            services.AddScoped<ISchemaProvider, SchemaProvider>();
-            services.AddScoped<MessageReceiver>();
         }
 
         private void AddInternalCommandsProcessing()

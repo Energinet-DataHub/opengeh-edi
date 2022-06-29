@@ -16,32 +16,28 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Messaging.Application.Xml.SchemaStore
+namespace Messaging.Application.SchemaStore
 {
-    public class CimXmlSchemas
+    public sealed class CimXmlSchemas : SchemaBase, ISchema
     {
-        private readonly Dictionary<KeyValuePair<string, string>, string> _schemas;
+        private static readonly string _schemaPath = $"SchemaStore{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}Xml{Path.DirectorySeparatorChar}";
 
         public CimXmlSchemas()
         {
-            _schemas = FillSchemaDictionary();
+            InitializeSchemas(FillSchemaDictionary(_schemaPath));
         }
 
-        public static string SchemaPath => $"Xml{Path.DirectorySeparatorChar}SchemaStore{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}";
+        public string SchemaPath => _schemaPath;
 
-        public string? GetSchemaLocation(string businessProcessType, string version)
+        string? ISchema.GetSchemaLocation(string businessProcessType, string version)
         {
-            _schemas.TryGetValue(
-                new KeyValuePair<string, string>(businessProcessType, version),
-                out var schemaName);
-
-            return schemaName;
+            return GetSchemaLocation(businessProcessType, version);
         }
 
-        private static Dictionary<KeyValuePair<string, string>, string> FillSchemaDictionary()
+        protected override Dictionary<KeyValuePair<string, string>, string> FillSchemaDictionary(string schemaPath)
         {
             var schemaDictionary = new Dictionary<KeyValuePair<string, string>, string>();
-            var schemas = Directory.GetFiles(SchemaPath).ToList();
+            var schemas = Directory.GetFiles(schemaPath).ToList();
             foreach (var schema in schemas)
             {
                 var filename = Path.GetFileNameWithoutExtension(schema);

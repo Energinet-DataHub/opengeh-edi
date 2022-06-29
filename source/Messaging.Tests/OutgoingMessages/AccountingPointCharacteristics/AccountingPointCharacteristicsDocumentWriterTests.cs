@@ -16,13 +16,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using System.Xml.Schema;
 using Messaging.Application.Common;
 using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
-using Messaging.Application.Xml.SchemaStore;
+using Messaging.Application.SchemaStore;
 using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Serialization;
@@ -34,15 +36,14 @@ namespace Messaging.Tests.OutgoingMessages.AccountingPointCharacteristics;
 public class AccountingPointCharacteristicsDocumentWriterTests
 {
     private readonly AccountingPointCharacteristicsDocumentWriter _documentWriter;
-    private readonly ISchemaProvider _schemaProvider;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMarketActivityRecordParser _marketActivityRecordParser;
     private readonly SampleData _sampleData;
+    private ISchemaProvider? _schemaProvider;
 
     public AccountingPointCharacteristicsDocumentWriterTests()
     {
         _systemDateTimeProvider = new SystemDateTimeProvider();
-        _schemaProvider = new SchemaProvider(new CimXmlSchemas());
         _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
         _documentWriter = new AccountingPointCharacteristicsDocumentWriter(_marketActivityRecordParser);
         _sampleData = new SampleData();
@@ -87,7 +88,8 @@ public class AccountingPointCharacteristicsDocumentWriterTests
 
     private async Task AssertConformsToSchema(Stream message)
     {
-        var schema = await _schemaProvider.GetSchemaAsync("accountingpointcharacteristics", "0.1")
+        _schemaProvider = SchemaProviderFactory.GetProvider(MediaTypeNames.Application.Xml);
+        var schema = await _schemaProvider.GetSchemaAsync<XmlSchema>("accountingpointcharacteristics", "0.1")
             .ConfigureAwait(false);
         await AssertXmlMessage.AssertConformsToSchemaAsync(message, schema!).ConfigureAwait(false);
     }

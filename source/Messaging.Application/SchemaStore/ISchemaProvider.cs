@@ -12,22 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.Application.Common.Commands;
+using System.Threading.Tasks;
+using System.Xml.Schema;
 
-namespace Messaging.Application.Transactions.MoveIn;
-
-public class FetchMeteringPointMasterData : InternalCommand
+namespace Messaging.Application.SchemaStore
 {
-    public FetchMeteringPointMasterData(string businessProcessId, string marketEvaluationPointNumber, string transactionId)
+    /// <summary>
+    /// Provides XML schemas for CIM messages
+    /// </summary>
+    public interface ISchemaProvider
     {
-        BusinessProcessId = businessProcessId;
-        MarketEvaluationPointNumber = marketEvaluationPointNumber;
-        TransactionId = transactionId;
+        /// <summary>
+        /// Get schema for specific business process and version
+        /// </summary>
+        /// <param name="businessProcessType"></param>
+        /// <param name="version"></param>
+        /// <returns><see cref="XmlSchema"/></returns>
+        Task<T?> GetSchemaAsync<T>(string businessProcessType, string version);
     }
-
-    public string BusinessProcessId { get; }
-
-    public string TransactionId { get; }
-
-    public string MarketEvaluationPointNumber { get; }
 }

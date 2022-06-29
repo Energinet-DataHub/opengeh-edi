@@ -12,22 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.Application.Common.Commands;
+namespace Messaging.Application.SchemaStore;
 
-namespace Messaging.Application.Transactions.MoveIn;
-
-public class FetchMeteringPointMasterData : InternalCommand
+/// <summary>
+/// bla
+/// </summary>
+public interface ISchema
 {
-    public FetchMeteringPointMasterData(string businessProcessId, string marketEvaluationPointNumber, string transactionId)
-    {
-        BusinessProcessId = businessProcessId;
-        MarketEvaluationPointNumber = marketEvaluationPointNumber;
-        TransactionId = transactionId;
-    }
+    /// <summary>
+    /// bla
+    /// </summary>
+    public string SchemaPath { get; }
 
-    public string BusinessProcessId { get; }
-
-    public string TransactionId { get; }
-
-    public string MarketEvaluationPointNumber { get; }
+    /// <summary>
+    /// bla
+    /// </summary>
+    /// <param name="businessProcessType"></param>
+    /// <param name="version"></param>
+    /// <returns><see cref="string"/></returns>
+    public string? GetSchemaLocation(string businessProcessType, string version);
 }

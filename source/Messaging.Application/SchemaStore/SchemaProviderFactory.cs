@@ -12,22 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.Application.Common.Commands;
+using System;
+using System.Net.Mime;
 
-namespace Messaging.Application.Transactions.MoveIn;
+namespace Messaging.Application.SchemaStore;
 
-public class FetchMeteringPointMasterData : InternalCommand
+public static class SchemaProviderFactory
 {
-    public FetchMeteringPointMasterData(string businessProcessId, string marketEvaluationPointNumber, string transactionId)
+    public static ISchemaProvider GetProvider(string? contentType)
     {
-        BusinessProcessId = businessProcessId;
-        MarketEvaluationPointNumber = marketEvaluationPointNumber;
-        TransactionId = transactionId;
+        if (contentType == null) throw new ArgumentNullException(nameof(contentType));
+
+        return contentType.Equals(MediaTypeNames.Application.Json, StringComparison.OrdinalIgnoreCase)
+            ? new JsonSchemaProvider() : new XmlSchemaProvider();
     }
-
-    public string BusinessProcessId { get; }
-
-    public string TransactionId { get; }
-
-    public string MarketEvaluationPointNumber { get; }
 }
