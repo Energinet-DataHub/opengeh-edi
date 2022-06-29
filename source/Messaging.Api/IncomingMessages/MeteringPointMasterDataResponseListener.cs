@@ -18,6 +18,7 @@ using Energinet.DataHub.MeteringPoints.RequestResponse.Response;
 using Messaging.Application.Configuration;
 using Messaging.Application.MasterData;
 using Messaging.Application.Transactions.MoveIn;
+using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
@@ -29,15 +30,18 @@ public class MeteringPointMasterDataResponseListener
     private readonly ILogger<MeteringPointMasterDataResponseListener> _logger;
     private readonly ISerializer _serializer;
     private readonly ICommandScheduler _commandScheduler;
+    private readonly B2BContext _context;
 
     public MeteringPointMasterDataResponseListener(
         ILogger<MeteringPointMasterDataResponseListener> logger,
         ISerializer serializer,
-        ICommandScheduler commandScheduler)
+        ICommandScheduler commandScheduler,
+        B2BContext context)
     {
         _logger = logger;
         _serializer = serializer;
         _commandScheduler = commandScheduler;
+        _context = context;
     }
 
     [Function("MeteringPointMasterDataResponseListener")]
@@ -53,6 +57,7 @@ public class MeteringPointMasterDataResponseListener
             metadata.TransactionId ?? throw new InvalidOperationException("Service bus metadata property TransactionId is missing"),
             masterDataContent);
         await _commandScheduler.EnqueueAsync(forwardMeteringPointMasterData).ConfigureAwait(false);
+        await _context.SaveChangesAsync().ConfigureAwait(false);
         _logger.LogInformation($"Master data response received: {data}");
     }
 
