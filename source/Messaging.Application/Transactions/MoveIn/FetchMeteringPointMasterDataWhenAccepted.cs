@@ -33,6 +33,6 @@ public class FetchMeteringPointMasterDataWhenAccepted : INotificationHandler<Mov
     public Task Handle(MoveInWasAccepted notification, CancellationToken cancellationToken)
     {
         if (notification == null) throw new ArgumentNullException(nameof(notification));
-        return _commandScheduler.EnqueueAsync(new FetchMeteringPointMasterData(notification.BusinessProcessId, notification.MarketEvaluationPointNumber));
+        return _commandScheduler.EnqueueAsync(new FetchMeteringPointMasterData(notification.BusinessProcessId, notification.MarketEvaluationPointNumber, notification.TransactionId));
     }
 }
