@@ -60,6 +60,12 @@ namespace Messaging.Api
         public virtual string? MESSAGEHUB_DOMAIN_REPLY_QUEUE =>
             GetEnvironmentVariable(nameof(MESSAGEHUB_DOMAIN_REPLY_QUEUE));
 
+        public virtual string? MASTER_DATA_REQUEST_QUEUE_NAME =>
+            GetEnvironmentVariable(nameof(MASTER_DATA_REQUEST_QUEUE_NAME));
+
+        public virtual string? SHARED_SERVICE_BUS_SEND_CONNECTION_STRING =>
+            GetEnvironmentVariable(nameof(SHARED_SERVICE_BUS_SEND_CONNECTION_STRING));
+
         public virtual bool IsRunningLocally()
         {
             return AZURE_FUNCTIONS_ENVIRONMENT == "Development";

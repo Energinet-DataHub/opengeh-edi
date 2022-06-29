@@ -82,6 +82,11 @@ data "azurerm_key_vault_secret" "sbq_metering_point_master_data_response_name" {
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }
 
+data "azurerm_key_vault_secret" "sbq_metering_point_master_data_request_name" {
+  name = "sbq-metering-point-master-data-request-name"
+  key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
+}
+
 data "azurerm_key_vault_secret" "sbt_energy_supplier_changed_name" {
   name = "sbt-energy-supplier-changed-name"
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id

@@ -12,19 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.Application.Common.Commands;
+using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
 
-namespace Messaging.Application.Transactions.MoveIn;
+namespace Messaging.Infrastructure.Transactions.MoveIn;
 
-public class FetchMeteringPointMasterData : InternalCommand
+public class RequestMasterDataConfiguration : IConfig
 {
-    public FetchMeteringPointMasterData(string businessProcessId, string marketEvaluationPointNumber)
+    public RequestMasterDataConfiguration(string queueName, string withName)
     {
-        BusinessProcessId = businessProcessId;
-        MarketEvaluationPointNumber = marketEvaluationPointNumber;
+        QueueName = queueName;
+        WithName = withName;
     }
 
-    public string BusinessProcessId { get; }
+    public string QueueName { get; }
 
-    public string MarketEvaluationPointNumber { get; }
+    public string WithName { get; }
 }

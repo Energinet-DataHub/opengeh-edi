@@ -12,19 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.Application.Common.Commands;
+using System.Threading.Tasks;
 
 namespace Messaging.Application.Transactions.MoveIn;
 
-public class FetchMeteringPointMasterData : InternalCommand
+/// <summary>
+/// Interface for fetching metering point master data service
+/// </summary>
+public interface IRequestMeteringPointMasterData
 {
-    public FetchMeteringPointMasterData(string businessProcessId, string marketEvaluationPointNumber)
-    {
-        BusinessProcessId = businessProcessId;
-        MarketEvaluationPointNumber = marketEvaluationPointNumber;
-    }
-
-    public string BusinessProcessId { get; }
-
-    public string MarketEvaluationPointNumber { get; }
+    /// <summary>
+    /// Request Master data for a market evaluation point
+    /// </summary>
+    /// <param name="fetchMeteringPointMasterData"></param>
+    /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
+    Task RequestMasterDataForAsync(FetchMeteringPointMasterData fetchMeteringPointMasterData);
 }
