@@ -12,22 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.Application.Common.Commands;
+namespace Messaging.Api.IncomingMessages;
 
-namespace Messaging.Application.Transactions.MoveIn;
-
-public class FetchMeteringPointMasterData : InternalCommand
+public class MasterDataResponseMetadata
 {
-    public FetchMeteringPointMasterData(string businessProcessId, string marketEvaluationPointNumber, string transactionId)
-    {
-        BusinessProcessId = businessProcessId;
-        MarketEvaluationPointNumber = marketEvaluationPointNumber;
-        TransactionId = transactionId;
-    }
+    public string? BusinessProcessId { get; set; }
 
-    public string BusinessProcessId { get; }
-
-    public string TransactionId { get; }
-
-    public string MarketEvaluationPointNumber { get; }
+    public string? TransactionId { get; set; }
 }
