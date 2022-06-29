@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
@@ -55,6 +56,7 @@ using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.Infrastructure.Transactions;
 using Messaging.Infrastructure.Transactions.MoveIn;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -207,11 +209,26 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddScoped<MoveInNotifications>();
             _services.AddScoped(_ => configuration);
             _services.AddScoped<IMoveInRequester, MoveInRequester>();
+            _services.AddScoped<IRequestMeteringPointMasterData, RequestMeteringPointMasterData>();
+            _services.AddScoped<RequestMeteringPointMasterDataDispatcher>();
             _services.AddTransient<IRequestHandler<IncomingMessage, Unit>, MoveInRequestHandler>();
             _services.AddTransient<IRequestHandler<FetchMeteringPointMasterData, Unit>, FetchMeteringPointMasterDataHandler>();
             _services.AddTransient<IRequestHandler<CompleteMoveInTransaction, Unit>, CompleteMoveInTransactionHandler>();
             _services.AddTransient<IRequestHandler<ForwardMeteringPointMasterData, Unit>, ForwardMeteringPointMasterDataHandler>();
             _services.AddTransient<INotificationHandler<MoveInWasAccepted>, FetchMeteringPointMasterDataWhenAccepted>();
+            return this;
+        }
+
+        public CompositionRoot AddServiceBusClient<TConfiguration>(string connectionString, TConfiguration configuration)
+            where TConfiguration : class, IConfig
+        {
+            _services.AddScoped(_ => configuration);
+
+            _services.AddAzureClients(builder =>
+            {
+                builder.AddServiceBusClient(connectionString).WithName(configuration.WithName);
+            });
+
             return this;
         }
 

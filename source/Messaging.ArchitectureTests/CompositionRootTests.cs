@@ -130,6 +130,11 @@ namespace Messaging.ArchitectureTests
             public override string? MESSAGEHUB_QUEUE_CONNECTION_STRING =>
                 CreateFakeServiceBusConnectionString();
 
+            public override string? SHARED_SERVICE_BUS_SEND_CONNECTION_STRING =>
+                CreateFakeServiceBusConnectionString();
+
+            public override string? MASTER_DATA_REQUEST_QUEUE_NAME => "metering-point-master-data-request";
+
             public override bool IsRunningLocally()
             {
                 return true;
