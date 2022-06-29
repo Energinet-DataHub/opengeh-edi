@@ -49,7 +49,9 @@ public class MeteringPointMasterDataResponseListener
         var metadata = GetMetaData(context);
         var masterDataContent = GetMasterDataContent(MasterDataRequestResponse.Parser.ParseFrom(data));
 
-        var forwardMeteringPointMasterData = new ForwardMeteringPointMasterData(metadata.TransactionId ?? throw new InvalidOperationException("Service bus metadata property TransactionId is missing"));
+        var forwardMeteringPointMasterData = new ForwardMeteringPointMasterData(
+            metadata.TransactionId ?? throw new InvalidOperationException("Service bus metadata property TransactionId is missing"),
+            masterDataContent);
         await _commandScheduler.EnqueueAsync(forwardMeteringPointMasterData).ConfigureAwait(false);
         _logger.LogInformation($"Master data response received: {data}");
     }

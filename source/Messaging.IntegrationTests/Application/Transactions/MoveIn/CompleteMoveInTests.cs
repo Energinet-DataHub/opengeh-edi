@@ -91,7 +91,7 @@ public class CompleteMoveInTests : TestBase
         await SetupMasterDataDetailsAsync();
         var transaction = new MoveInTransaction(
             SampleData.TransactionId,
-            SampleData.MateringPointNumber,
+            SampleData.MeteringPointNumber,
             _systemDateTimeProvider.Now(),
             SampleData.CurrentEnergySupplierNumber,
             SampleData.OriginalMessageId,
@@ -100,7 +100,7 @@ public class CompleteMoveInTests : TestBase
             SampleData.ConsumerName,
             SampleData.ConsumerIdType);
 
-        transaction.AcceptedByBusinessProcess(BusinessRequestResult.Succeeded(Guid.NewGuid().ToString()).ProcessId!, SampleData.MateringPointNumber);
+        transaction.AcceptedByBusinessProcess(BusinessRequestResult.Succeeded(Guid.NewGuid().ToString()).ProcessId!, SampleData.MeteringPointNumber);
         transaction.HasForwardedMeteringPointMasterData();
         _transactionRepository.Add(transaction);
         await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
@@ -109,7 +109,7 @@ public class CompleteMoveInTests : TestBase
 
     private Task SetupMasterDataDetailsAsync()
     {
-        GetService<IMarketEvaluationPointRepository>().Add(MarketEvaluationPoint.Create(SampleData.CurrentEnergySupplierNumber, SampleData.MateringPointNumber));
+        GetService<IMarketEvaluationPointRepository>().Add(MarketEvaluationPoint.Create(SampleData.CurrentEnergySupplierNumber, SampleData.MeteringPointNumber));
         return Task.CompletedTask;
     }
 
