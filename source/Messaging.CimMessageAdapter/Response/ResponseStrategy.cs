@@ -20,16 +20,16 @@ namespace Messaging.CimMessageAdapter.Response;
 
 public static class ResponseStrategy
 {
-    private static readonly IDictionary<string, ResponseFactory> _strategies = new Dictionary<string, ResponseFactory>()
+    private static readonly IDictionary<string, Func<ResponseFactory>> _strategies = new Dictionary<string, Func<ResponseFactory>>()
     {
-        { "application/xml", new XmlResponseFactory() },
-        { "application/json", new JsonResponseFactory() },
+        { "application/xml", () => new XmlResponseFactory() },
+        { "application/json", () => new JsonResponseFactory() },
     };
 
     public static ResponseFactory GetResponseStrategy(string contentType)
     {
         var strategy = _strategies.FirstOrDefault(s => string.Equals(s.Key, contentType, StringComparison.OrdinalIgnoreCase));
         if (strategy.Key is null) throw new InvalidOperationException($"No response strategy found for content type {contentType}");
-        return strategy.Value;
+        return strategy.Value();
     }
 }
