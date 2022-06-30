@@ -13,15 +13,19 @@
 // limitations under the License.
 
 using Messaging.Application.Common.Commands;
+using Messaging.Application.MasterData;
 
 namespace Messaging.Application.Transactions.MoveIn;
 
 public class ForwardMeteringPointMasterData : InternalCommand
 {
-    public ForwardMeteringPointMasterData(string transactionId)
+    public ForwardMeteringPointMasterData(string transactionId, MasterDataContent masterDataContent)
     {
         TransactionId = transactionId;
+        MasterDataContent = masterDataContent;
     }
 
     public string TransactionId { get; }
+
+    public MasterDataContent MasterDataContent { get; set; }
 }

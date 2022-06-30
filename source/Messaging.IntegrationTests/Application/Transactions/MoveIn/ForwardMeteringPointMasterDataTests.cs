@@ -12,11 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Globalization;
 using System.Threading.Tasks;
 using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.MasterData;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Fixtures;
+using Processing.IntegrationTests.Application;
 using Xunit;
 
 namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
@@ -33,7 +37,7 @@ public class ForwardMeteringPointMasterDataTests : TestBase
     {
         await SetupAnAcceptedMoveInTransaction().ConfigureAwait(false);
 
-        var forwardMeteringPointMasterData = new ForwardMeteringPointMasterData(SampleData.TransactionId);
+        var forwardMeteringPointMasterData = new ForwardMeteringPointMasterData(SampleData.TransactionId, CreateMasterDataContent());
         await InvokeCommandAsync(forwardMeteringPointMasterData).ConfigureAwait(false);
 
         AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>())
@@ -45,6 +49,50 @@ public class ForwardMeteringPointMasterDataTests : TestBase
         return new IncomingMessageBuilder()
             .WithMessageId(SampleData.OriginalMessageId)
             .WithTransactionId(SampleData.TransactionId);
+    }
+
+    private static MasterDataContent CreateMasterDataContent()
+    {
+        return MasterDataContent.Create(
+            SampleData.MeteringPointNumber,
+            new Address(
+                MasterDataSampleData.StreetName,
+                MasterDataSampleData.StreetCode,
+                MasterDataSampleData.PostCode,
+                MasterDataSampleData.CityName,
+                MasterDataSampleData.CountryCode,
+                MasterDataSampleData.CitySubdivision,
+                MasterDataSampleData.Floor,
+                MasterDataSampleData.Room,
+                MasterDataSampleData.BuildingNumber,
+                MasterDataSampleData.MunicipalityCode,
+                MasterDataSampleData.IsActualAddress,
+                Guid.Parse(MasterDataSampleData.GeoInfoReference),
+                MasterDataSampleData.LocationDescription),
+            new Series(
+                MasterDataSampleData.ProductType,
+                MasterDataSampleData.UnitType),
+            new GridAreaDetails(
+                "some string code",
+                "some string to code",
+                "some string from code"),
+            string.Empty,
+            string.Empty,
+            string.Empty,
+            MasterDataSampleData.TypeName,
+            MasterDataSampleData.MaximumCurrent,
+            MasterDataSampleData.MaximumPower,
+            MasterDataSampleData.PowerPlant,
+            DateTime.Parse(MasterDataSampleData.EffectiveDate, CultureInfo.InvariantCulture),
+            MasterDataSampleData.MeterNumber,
+            double.Parse(MasterDataSampleData.Capacity, CultureInfo.InvariantCulture),
+            MasterDataSampleData.AssetType,
+            MasterDataSampleData.SettlementMethod,
+            MasterDataSampleData.ScheduledMeterReadingDate,
+            false,
+            MasterDataSampleData.NetSettlementGroup,
+            MasterDataSampleData.DisconnectionType,
+            MasterDataSampleData.ConnectionType);
     }
 
     private async Task SetupAnAcceptedMoveInTransaction()
