@@ -47,7 +47,7 @@ namespace Messaging.CimMessageAdapter
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
 
-            var messageParser = new MessageParser(contentType);
+            var messageParser = new XmlMessageParser(contentType);
 
             var messageParserResult =
                  await messageParser.ParseAsync(message).ConfigureAwait(false);

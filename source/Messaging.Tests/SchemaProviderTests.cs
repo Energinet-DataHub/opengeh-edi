@@ -37,7 +37,7 @@ public class SchemaProviderTests
     public async Task Schema_provider_can_get_json_schema()
     {
         _provider = SchemaProviderFactory.GetProvider(MediaTypeNames.Application.Json);
-        var schema = await _provider.GetSchemaAsync<JsonSchema>("Request-Change-of-Supplier-assembly-model.schema", "0").ConfigureAwait(false);
+        var schema = await _provider.GetSchemaAsync<JsonSchema>("RequestChangeofSupplier", "0").ConfigureAwait(false);
         Assert.Equal(typeof(JsonSchema), schema?.GetType());
     }
 }

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -38,9 +39,17 @@ public sealed class CimJsonSchemas : SchemaBase, ISchema
     {
         var schemaDictionary = new Dictionary<KeyValuePair<string, string>, string>();
         var schemas = Directory.GetFiles(schemaPath).ToList();
+
         foreach (var schema in schemas)
         {
             var filename = Path.GetFileNameWithoutExtension(schema);
+            if (filename.Contains("assembly", StringComparison.OrdinalIgnoreCase))
+            {
+                var split = filename.Substring(0, filename.IndexOf("assembly", StringComparison.OrdinalIgnoreCase));
+                var splitArray = split.Split('-');
+                filename = string.Join(string.Empty, splitArray);
+            }
+
             schemaDictionary.Add(
                     new KeyValuePair<string, string>(filename, "0"),
                     schema);
