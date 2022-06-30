@@ -14,12 +14,15 @@
 
 using System;
 using System.Globalization;
+using System.IO;
 using System.Threading.Tasks;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.MasterData;
+using Messaging.Application.OutgoingMessages;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Fixtures;
+using Messaging.IntegrationTests.TestDoubles;
 using Processing.IntegrationTests.Application;
 using Xunit;
 
@@ -42,6 +45,8 @@ public class ForwardMeteringPointMasterDataTests : TestBase
 
         AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>())
             .HasForwardedMeteringPointMasterData(true);
+
+        Assert.NotNull(GetDispatchedDocument());
     }
 
     private static IncomingMessageBuilder MessageBuilder()
@@ -98,5 +103,11 @@ public class ForwardMeteringPointMasterDataTests : TestBase
     private async Task SetupAnAcceptedMoveInTransaction()
     {
         await InvokeCommandAsync(MessageBuilder().Build()).ConfigureAwait(false);
+    }
+
+    private Stream GetDispatchedDocument()
+    {
+        var messageDispatcher = GetService<IMessageDispatcher>() as MessageDispatcherSpy;
+        return messageDispatcher!.DispatchedMessage!;
     }
 }

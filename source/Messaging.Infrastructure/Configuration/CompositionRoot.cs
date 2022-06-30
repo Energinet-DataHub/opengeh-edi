@@ -33,6 +33,7 @@ using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.IncomingMessages;
 using Messaging.Application.MasterData.MarketEvaluationPoints;
 using Messaging.Application.OutgoingMessages;
+using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
 using Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages.GenericNotification;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
@@ -255,6 +256,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddScoped<DocumentWriter, ConfirmChangeOfSupplierDocumentWriter>();
             _services.AddScoped<DocumentWriter, RejectRequestChangeOfSupplierDocumentWriter>();
             _services.AddScoped<DocumentWriter, GenericNotificationDocumentWriter>();
+            _services.AddScoped<DocumentWriter, AccountingPointCharacteristicsDocumentWriter>();
             _services.AddScoped<IValidationErrorTranslator, ValidationErrorTranslator>();
             _services.AddScoped<IMarketActivityRecordParser, MarketActivityRecordParser>();
         }
