@@ -13,16 +13,18 @@
 // limitations under the License.
 
 using System;
+using Messaging.CimMessageAdapter.Response;
+using Xunit;
+using Xunit.Categories;
 
-namespace Messaging.CimMessageAdapter.Response;
+namespace Messaging.CimMessageAdapter.Tests;
 
-public abstract class ResponseFactory
+[UnitTest]
+public class ResponseFactoryErrorTests
 {
-    public ResponseMessage From(Result result)
+    [Fact]
+    public void Throws_if_content_type_is_unknown()
     {
-        if (result == null) throw new ArgumentNullException(nameof(result));
-        return result.Success ? new ResponseMessage() : new ResponseMessage(CreateMessageBodyFrom(result));
+        Assert.Throws<InvalidOperationException>(() => ResponseStrategy.GetResponseStrategy("unknown content type"));
     }
-
-    protected abstract string CreateMessageBodyFrom(Result result);
 }
