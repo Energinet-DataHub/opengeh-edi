@@ -41,7 +41,7 @@ public class MessageParserTests
 
     private static Stream LoadJsonFileAsMemoryStream()
     {
-        var jsonDoc = File.ReadAllText($"json{Path.DirectorySeparatorChar}Reject request Change of Supplier.json");
+        var jsonDoc = File.ReadAllText($"json{Path.DirectorySeparatorChar}Request Change of Supplier.json");
         var stream = new MemoryStream();
         var writer = new StreamWriter(stream);
         writer.Write(jsonDoc);

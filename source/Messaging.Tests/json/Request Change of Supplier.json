@@ -47,6 +47,28 @@
 				},
 				"start_DateAndOrTime.dateTime": "2022-09-07T22:00:00Z"
 			}
-		]
+		], "MktActivityRecord": [
+      {
+        "mRID": "12345689",
+        "marketEvaluationPoint.balanceResponsibleParty_MarketParticipant.mRID": {
+          "codingScheme": "A10",
+          "value": "5799999933340"
+        },
+        "marketEvaluationPoint.customer_MarketParticipant.mRID": {
+          "codingScheme": "ARR",
+          "value": "0801741527"
+        },
+        "marketEvaluationPoint.customer_MarketParticipant.name": "Jan Hansen",
+        "marketEvaluationPoint.energySupplier_MarketParticipant.mRID": {
+          "codingScheme": "A10",
+          "value": "5799999933318"
+        },
+        "marketEvaluationPoint.mRID": {
+          "codingScheme": "A10",
+          "value": "579999993331812345"
+        },
+        "start_DateAndOrTime.dateTime": "2022-09-07T22:00:00Z"
+      }
+    ]
 	}
 }
