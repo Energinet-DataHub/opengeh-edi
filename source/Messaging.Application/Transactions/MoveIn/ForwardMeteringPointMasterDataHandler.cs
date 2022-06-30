@@ -32,24 +32,18 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
     private readonly IMoveInTransactionRepository _transactionRepository;
     private readonly ICorrelationContext _correlationContext;
     private readonly IMarketActivityRecordParser _marketActivityRecordParser;
-    private readonly MessageFactory _messageFactory;
-    private readonly IMessageDispatcher _messageDispatcher;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IOutgoingMessageStore _outgoingMessageStore;
 
     public ForwardMeteringPointMasterDataHandler(
         IMoveInTransactionRepository transactionRepository,
         ICorrelationContext correlationContext,
         IMarketActivityRecordParser marketActivityRecordParser,
-        MessageFactory messageFactory,
-        IMessageDispatcher messageDispatcher,
-        IUnitOfWork unitOfWork)
+        IOutgoingMessageStore outgoingMessageStore)
     {
         _transactionRepository = transactionRepository;
         _correlationContext = correlationContext;
         _marketActivityRecordParser = marketActivityRecordParser;
-        _messageFactory = messageFactory;
-        _messageDispatcher = messageDispatcher;
-        _unitOfWork = unitOfWork;
+        _outgoingMessageStore = outgoingMessageStore;
     }
 
     public async Task<Unit> Handle(ForwardMeteringPointMasterData request, CancellationToken cancellationToken)
@@ -62,10 +56,7 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
         }
 
         //TODO: Handle message creation and dispatching
-        var outGoingMessage = AccountingPointCharacteristicsMessageFrom(request, transaction);
-        var message = await _messageFactory.CreateFromAsync(new Collection<OutgoingMessage>() { outGoingMessage }).ConfigureAwait(false);
-        await _messageDispatcher.DispatchAsync(message).ConfigureAwait(false);
-        await _unitOfWork.CommitAsync().ConfigureAwait(false);
+        _outgoingMessageStore.Add(AccountingPointCharacteristicsMessageFrom(request, transaction));
 
         transaction.HasForwardedMeteringPointMasterData();
         return await Task.FromResult(Unit.Value).ConfigureAwait(false);
