@@ -40,4 +40,15 @@ limitations under the License.
       <ProjectReference Include="..\Messaging.Application\Messaging.Application.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="xml\Confirm request Change of Supplier.xml" />
+      <EmbeddedResource Include="xml\Confirm request Change of Supplier.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="json\Reject request Change of Supplier.json" />
+      <EmbeddedResource Include="json\Reject request Change of Supplier.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+    </ItemGroup>
+
 </Project>

@@ -1,0 +1,19 @@
+<cim:RequestChangeOfSupplier_MarketDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cim="urn:ediel.org:structure:requestchangeofsupplier:0:1" xsi:schemaLocation="urn:ediel.org:structure:requestchangeofsupplier:0:1 urn-ediel-org-structure-requestchangeofsupplier-0-1.xsd">
+    <cim:mRID>26E65F44-5D67-443A-98A8-95FF40178A25</cim:mRID>
+    <cim:type>392</cim:type>
+    <cim:process.processType>E65</cim:process.processType>
+    <cim:businessSector.type>23</cim:businessSector.type>
+    <cim:sender_MarketParticipant.mRID codingScheme="A10">1234</cim:sender_MarketParticipant.mRID>
+    <cim:sender_MarketParticipant.marketRole.type>DDQ</cim:sender_MarketParticipant.marketRole.type>
+    <cim:receiver_MarketParticipant.mRID codingScheme="A10">5790001330552</cim:receiver_MarketParticipant.mRID>
+    <cim:receiver_MarketParticipant.marketRole.type>DDZ</cim:receiver_MarketParticipant.marketRole.type>
+    <cim:createdDateTime>2022-09-07T09:30:47Z</cim:createdDateTime>
+    <cim:MktActivityRecord>
+        <cim:mRID>A106081F-B5CA-4090-88E1-F45849E61C37</cim:mRID>
+        <cim:marketEvaluationPoint.mRID codingScheme="A10">577489701109152347</cim:marketEvaluationPoint.mRID>
+        <cim:marketEvaluationPoint.energySupplier_MarketParticipant.mRID codingScheme="A10">5678</cim:marketEvaluationPoint.energySupplier_MarketParticipant.mRID>
+        <cim:marketEvaluationPoint.customer_MarketParticipant.mRID codingScheme="ARR" >0801741527</cim:marketEvaluationPoint.customer_MarketParticipant.mRID>
+        <cim:marketEvaluationPoint.customer_MarketParticipant.name>Jan Hansen</cim:marketEvaluationPoint.customer_MarketParticipant.name>
+        <cim:start_DateAndOrTime.dateTime>2022-06-27T22:00:00Z</cim:start_DateAndOrTime.dateTime>
+    </cim:MktActivityRecord>
+</cim:RequestChangeOfSupplier_MarketDocument>

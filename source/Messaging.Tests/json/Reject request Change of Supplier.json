@@ -1,0 +1,50 @@
+{
+	"RejectRequestChangeOfSupplier_MarketDocument": {
+		"mRID": "45678912",
+		"businessSector.type": {
+			"value": "23"
+		},
+		"createdDateTime": "2022-12-17T09:30:47Z",
+		"process.processType": {
+			"value": "E03"
+		},
+		"reason.code": {
+			"value": "A02"
+		},
+		"receiver_MarketParticipant.mRID": {
+			"codingScheme": "A10",
+			"value": "5799999933318"
+		},
+		"receiver_MarketParticipant.marketRole.type": {
+			"value": "DDQ"
+		},
+		"sender_MarketParticipant.mRID": {
+			"codingScheme": "A10",
+			"value": "5790001330552"
+		},
+		"sender_MarketParticipant.marketRole.type": {
+			"value": "DDZ"
+		},
+		"type": {
+			"value": "414"
+		},
+		"MktActivityRecord": [
+			{
+				"mRID": "25836921",
+				"marketEvaluationPoint.mRID": {
+					"codingScheme": "A10",
+					"value": "579999993331812345"
+				},
+				"originalTransactionIDReference_MktActivityRecord.mRID": "25814796",
+				"Reason": [
+					{
+						"code": {
+							"value": "E17"
+						},
+						"text": "Startdato 2010-07-09T22:00:00Z er ikke korrekt"
+					}
+				]
+			}
+		]
+	}
+}
