@@ -16,7 +16,9 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MeteringPoints.RequestResponse.Response;
 using Messaging.Application.Configuration;
+using Messaging.Application.MasterData;
 using Messaging.Application.Transactions.MoveIn;
+using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
@@ -28,15 +30,18 @@ public class MeteringPointMasterDataResponseListener
     private readonly ILogger<MeteringPointMasterDataResponseListener> _logger;
     private readonly ISerializer _serializer;
     private readonly ICommandScheduler _commandScheduler;
+    private readonly B2BContext _context;
 
     public MeteringPointMasterDataResponseListener(
         ILogger<MeteringPointMasterDataResponseListener> logger,
         ISerializer serializer,
-        ICommandScheduler commandScheduler)
+        ICommandScheduler commandScheduler,
+        B2BContext context)
     {
         _logger = logger;
         _serializer = serializer;
         _commandScheduler = commandScheduler;
+        _context = context;
     }
 
     [Function("MeteringPointMasterDataResponseListener")]
@@ -46,11 +51,55 @@ public class MeteringPointMasterDataResponseListener
         if (context == null) throw new ArgumentNullException(nameof(context));
 
         var metadata = GetMetaData(context);
-        var masterData = MasterDataRequestResponse.Parser.ParseFrom(data);
+        var masterDataContent = GetMasterDataContent(MasterDataRequestResponse.Parser.ParseFrom(data));
 
-        var forwardMeteringPointMasterData = new ForwardMeteringPointMasterData(metadata.TransactionId ?? throw new InvalidOperationException("Service bus metadata property TransactionId is missing"));
+        var forwardMeteringPointMasterData = new ForwardMeteringPointMasterData(
+            metadata.TransactionId ?? throw new InvalidOperationException("Service bus metadata property TransactionId is missing"),
+            masterDataContent);
         await _commandScheduler.EnqueueAsync(forwardMeteringPointMasterData).ConfigureAwait(false);
+        await _context.SaveChangesAsync().ConfigureAwait(false);
         _logger.LogInformation($"Master data response received: {data}");
+    }
+
+    private static MasterDataContent GetMasterDataContent(MasterDataRequestResponse masterData)
+    {
+        var address = new Application.MasterData.Address(
+            masterData.Address.StreetName,
+            StreetCode: masterData.Address.StreetCode,
+            PostCode: masterData.Address.PostCode,
+            City: masterData.Address.City,
+            CountryCode: masterData.Address.CountryCode,
+            CitySubDivision: masterData.Address.CitySubDivision,
+            Floor: masterData.Address.Floor,
+            Room: masterData.Address.Room,
+            BuildingNumber: masterData.Address.BuildingNumber,
+            MunicipalityCode: masterData.Address.MunicipalityCode,
+            IsActualAddress: masterData.Address.IsActualAddress,
+            GeoInfoReference: Guid.Parse(masterData.Address.GeoInfoReference),
+            LocationDescription: masterData.Address.LocationDescription);
+
+        return MasterDataContent.Create(
+            masterData.GsrnNumber,
+            address,
+            new Application.MasterData.Series(masterData.Series.Product, masterData.Series.UnitType),
+            new Application.MasterData.GridAreaDetails(masterData.GridAreaDetails.Code, masterData.GridAreaDetails.ToCode, masterData.GridAreaDetails.FromCode),
+            masterData.ConnectionState,
+            masterData.MeteringMethod,
+            masterData.ReadingPeriodicity,
+            masterData.Type,
+            masterData.MaximumCurrent,
+            masterData.MaximumPower,
+            masterData.PowerPlantGsrnNumber,
+            masterData.EffectiveDate.ToDateTime(),
+            masterData.MeterNumber,
+            masterData.Capacity,
+            masterData.AssetType,
+            masterData.SettlementMethod,
+            masterData.ScheduledMeterReadingDate,
+            masterData.ProductionObligation,
+            masterData.NetSettlementGroup,
+            masterData.DisconnetionType,
+            masterData.ConnectionType);
     }
 
     private MasterDataResponseMetadata GetMetaData(FunctionContext context)

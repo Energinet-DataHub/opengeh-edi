@@ -86,7 +86,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
                 .WithReceiver("5790001330552")
                 .WithSenderId("123456")
                 .WithConsumerName("John Doe")
-                .WithMarketEvaluationPointId(SampleData.MateringPointNumber)
+                .WithMarketEvaluationPointId(SampleData.MeteringPointNumber)
                 .Build();
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
