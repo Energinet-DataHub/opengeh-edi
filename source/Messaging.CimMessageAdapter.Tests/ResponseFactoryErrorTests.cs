@@ -12,20 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.Application.Common.Commands;
-using Messaging.Application.MasterData;
+using System;
+using Messaging.CimMessageAdapter.Response;
+using Xunit;
+using Xunit.Categories;
 
-namespace Messaging.Application.Transactions.MoveIn;
+namespace Messaging.CimMessageAdapter.Tests;
 
-public class ForwardMeteringPointMasterData : InternalCommand
+[UnitTest]
+public class ResponseFactoryErrorTests
 {
-    public ForwardMeteringPointMasterData(string transactionId, MasterDataContent masterDataContent)
+    [Fact]
+    public void Throws_if_content_type_is_unknown()
     {
-        TransactionId = transactionId;
-        MasterDataContent = masterDataContent;
+        Assert.Throws<InvalidOperationException>(() => ResponseStrategy.GetResponseStrategy("unknown content type"));
     }
-
-    public string TransactionId { get; }
-
-    public MasterDataContent MasterDataContent { get; set; }
 }

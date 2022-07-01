@@ -22,14 +22,15 @@ using Xunit.Categories;
 namespace Messaging.CimMessageAdapter.Tests
 {
     [UnitTest]
-    public class ResponseFactoryTests
+    public class XmlResponseFactoryTests
     {
         [Fact]
         public void Generate_empty_response_when_no_validation_errors_has_occurred()
         {
             var result = Result.Succeeded();
+            var responseFactory = ResponseStrategy.GetResponseStrategy("Application/XML");
 
-            var response = ResponseFactory.From(result);
+            var response = responseFactory.From(result);
 
             Assert.False(response.IsErrorResponse);
             Assert.Empty(response.MessageBody);
@@ -40,8 +41,9 @@ namespace Messaging.CimMessageAdapter.Tests
         {
             var duplicateMessageIdError = new DuplicateMessageIdDetected("Duplicate message id");
             var result = Result.Failure(duplicateMessageIdError);
+            var responseFactory = ResponseStrategy.GetResponseStrategy("Application/XML");
 
-            var response = ResponseFactory.From(result);
+            var response = responseFactory.From(result);
 
             Assert.True(response.IsErrorResponse);
             AssertHasValue(response, "Code", duplicateMessageIdError.Code);
@@ -54,8 +56,9 @@ namespace Messaging.CimMessageAdapter.Tests
             var duplicateMessageIdError = new DuplicateMessageIdDetected("Duplicate message id");
             var duplicateTransactionIdError = new DuplicateTransactionIdDetected("Fake transaction id");
             var result = Result.Failure(duplicateMessageIdError, duplicateTransactionIdError);
+            var responseFactory = ResponseStrategy.GetResponseStrategy("Application/XML");
 
-            var response = ResponseFactory.From(result);
+            var response = responseFactory.From(result);
 
             Assert.True(response.IsErrorResponse);
             AssertHasValue(response, "Code", "BadRequest");

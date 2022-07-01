@@ -16,7 +16,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
 
 internal static class SampleData
 {
-    internal static string MateringPointNumber => "571234567891234568";
+    internal static string MeteringPointNumber => "571234567891234568";
 
     internal static string CurrentEnergySupplierNumber => "5790000555550";
 
