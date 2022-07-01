@@ -30,18 +30,15 @@ namespace Messaging.Application.Transactions.MoveIn;
 public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMeteringPointMasterData, Unit>
 {
     private readonly IMoveInTransactionRepository _transactionRepository;
-    private readonly ICorrelationContext _correlationContext;
     private readonly IMarketActivityRecordParser _marketActivityRecordParser;
     private readonly IOutgoingMessageStore _outgoingMessageStore;
 
     public ForwardMeteringPointMasterDataHandler(
         IMoveInTransactionRepository transactionRepository,
-        ICorrelationContext correlationContext,
         IMarketActivityRecordParser marketActivityRecordParser,
         IOutgoingMessageStore outgoingMessageStore)
     {
         _transactionRepository = transactionRepository;
-        _correlationContext = correlationContext;
         _marketActivityRecordParser = marketActivityRecordParser;
         _outgoingMessageStore = outgoingMessageStore;
     }
@@ -114,6 +111,21 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
             new RelatedMarketEvaluationPoint(new Mrid("id", "codingScheme"), "description"));
     }
 
+    private static OutgoingMessage CreateOutgoingMessage(string id, string documentType, string processType, string receiverId, string marketActivityRecordPayload, string reasonCode)
+    {
+        return new OutgoingMessage(
+            documentType,
+            receiverId,
+            Guid.NewGuid().ToString(),
+            id,
+            processType,
+            MarketRoles.EnergySupplier,
+            DataHubDetails.IdentificationNumber,
+            MarketRoles.MeteringPointAdministrator,
+            marketActivityRecordPayload,
+            reasonCode);
+    }
+
     private OutgoingMessage AccountingPointCharacteristicsMessageFrom(ForwardMeteringPointMasterData forwardMeteringPointMasterData, MoveInTransaction transaction)
     {
         var marketEvaluationPoint = CreateMarketEvaluationPointFrom(forwardMeteringPointMasterData);
@@ -130,20 +142,5 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
             transaction.NewEnergySupplierId,
             _marketActivityRecordParser.From(marketActivityRecord),
             "E65");
-    }
-
-    private OutgoingMessage CreateOutgoingMessage(string id, string documentType, string processType, string receiverId, string marketActivityRecordPayload, string reasonCode)
-    {
-        return new OutgoingMessage(
-            documentType,
-            receiverId,
-            _correlationContext.Id,
-            id,
-            processType,
-            MarketRoles.EnergySupplier,
-            DataHubDetails.IdentificationNumber,
-            MarketRoles.MeteringPointAdministrator,
-            marketActivityRecordPayload,
-            reasonCode);
     }
 }
