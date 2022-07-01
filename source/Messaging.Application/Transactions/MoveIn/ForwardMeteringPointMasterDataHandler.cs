@@ -143,5 +143,4 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
             _marketActivityRecordParser.From(marketActivityRecord),
             "E65");
     }
-
 }
