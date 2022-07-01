@@ -18,7 +18,7 @@ namespace Messaging.Application.MasterData;
 
 public class MasterDataContent
 {
-    private MasterDataContent(string gsrnNumber, Address address, Series series, GridAreaDetails gridAreaDetails, string connectionState, string meteringMethod, string readingPeriodicity, string type, int maximumCurrent, int maximumPower, string powerPlantGsrnNumber, DateTime effectiveDate, string meterNumber, double capacity, string assetType, string settlementMethod, string scheduledMeterReadingDate, bool productionObligation, string netSettlementGroup, string disconnectionType, string connectionType)
+    public MasterDataContent(string gsrnNumber, Address address, Series series, GridAreaDetails gridAreaDetails, string connectionState, string meteringMethod, string readingPeriodicity, string type, int maximumCurrent, int maximumPower, string powerPlantGsrnNumber, DateTime effectiveDate, string meterNumber, double capacity, string assetType, string settlementMethod, string scheduledMeterReadingDate, bool productionObligation, string netSettlementGroup, string disconnectionType, string connectionType)
     {
         GsrnNumber = gsrnNumber;
         Address = address;
@@ -84,32 +84,6 @@ public class MasterDataContent
     public string? DisconnectionType { get; set; }
 
     public string? ConnectionType { get; set; }
-
-    public static MasterDataContent Create(string gsrnNumber, Address address, Series series, GridAreaDetails gridAreaDetails, string connectionState, string meteringMethod, string readingPeriodicity, string type, int maximumCurrent, int maximumPower, string powerPlantGsrnNumber, DateTime effectiveDate, string meterNumber, double capacity, string assetType, string settlementMethod, string scheduledMeterReadingDate, bool productionObligation, string netSettlementGroup, string disconnectionType, string connectionType)
-    {
-        return new MasterDataContent(
-            gsrnNumber,
-            address,
-            series,
-            gridAreaDetails,
-            connectionState,
-            meteringMethod,
-            readingPeriodicity,
-            type,
-            maximumCurrent,
-            maximumPower,
-            powerPlantGsrnNumber,
-            effectiveDate,
-            meterNumber,
-            capacity,
-            assetType,
-            settlementMethod,
-            scheduledMeterReadingDate,
-            productionObligation,
-            netSettlementGroup,
-            disconnectionType,
-            connectionType);
-    }
 }
 
 public record Address(

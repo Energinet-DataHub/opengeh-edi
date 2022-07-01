@@ -78,7 +78,7 @@ public class MeteringPointMasterDataResponseListener
             GeoInfoReference: Guid.Parse(masterData.Address.GeoInfoReference),
             LocationDescription: masterData.Address.LocationDescription);
 
-        return MasterDataContent.Create(
+        return new MasterDataContent(
             masterData.GsrnNumber,
             address,
             new Application.MasterData.Series(masterData.Series.Product, masterData.Series.UnitType),

@@ -53,7 +53,7 @@ public class ForwardMeteringPointMasterDataTests : TestBase
 
     private static MasterDataContent CreateMasterDataContent()
     {
-        return MasterDataContent.Create(
+        return new MasterDataContent(
             SampleData.MeteringPointNumber,
             new Address(
                 MasterDataSampleData.StreetName,
