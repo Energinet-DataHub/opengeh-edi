@@ -75,7 +75,6 @@ public class SampleData
             Guid.NewGuid().ToString(),
             CreateAddress(),
             "true",
-            new RelatedMarketEvaluationPoint(new Mrid("FakeId", "A10"), "E17"),
-            new RelatedMarketEvaluationPoint(new Mrid("FakeId", "A10"), "D06"));
+            new RelatedMarketEvaluationPoint(new Mrid("FakeId", "A10"), "E17"));
     }
 }

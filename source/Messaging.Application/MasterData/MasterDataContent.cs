@@ -43,47 +43,47 @@ public class MasterDataContent
         ConnectionType = connectionType;
     }
 
-    public string? GsrnNumber { get; set; }
+    public string? GsrnNumber { get; }
 
-    public Address? Address { get; set; }
+    public Address? Address { get; }
 
-    public Series? Series { get; set; }
+    public Series? Series { get; }
 
-    public GridAreaDetails? GridAreaDetails { get; set; }
+    public GridAreaDetails? GridAreaDetails { get; }
 
-    public string? ConnectionState { get; set; }
+    public string? ConnectionState { get; }
 
-    public string? MeteringMethod { get; set; }
+    public string? MeteringMethod { get; }
 
-    public string? ReadingPeriodicity { get; set; }
+    public string? ReadingPeriodicity { get; }
 
-    public string? Type { get; set; }
+    public string? Type { get; }
 
-    public int MaximumCurrent { get; set; }
+    public int MaximumCurrent { get; }
 
-    public int MaximumPower { get; set; }
+    public int MaximumPower { get; }
 
-    public string? PowerPlantGsrnNumber { get; set; }
+    public string? PowerPlantGsrnNumber { get; }
 
-    public DateTime EffectiveDate { get; set; }
+    public DateTime EffectiveDate { get; }
 
-    public string? MeterNumber { get; set; }
+    public string? MeterNumber { get; }
 
-    public double Capacity { get; set; }
+    public double Capacity { get; }
 
-    public string? AssetType { get; set; }
+    public string? AssetType { get; }
 
-    public string? SettlementMethod { get; set; }
+    public string? SettlementMethod { get; }
 
-    public string? ScheduledMeterReadingDate { get; set; }
+    public string? ScheduledMeterReadingDate { get; }
 
-    public bool ProductionObligation { get; set; }
+    public bool ProductionObligation { get; }
 
-    public string? NetSettlementGroup { get; set; }
+    public string? NetSettlementGroup { get; }
 
-    public string? DisconnectionType { get; set; }
+    public string? DisconnectionType { get; }
 
-    public string? ConnectionType { get; set; }
+    public string? ConnectionType { get; }
 }
 
 public record Address(
