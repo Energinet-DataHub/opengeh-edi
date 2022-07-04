@@ -92,7 +92,7 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
             new Mrid(masterData.GridAreaDetails!.Code, "NDK"),
             new Mrid(masterData.GridAreaDetails.ToCode, "NDK"),
             new Mrid(masterData.GridAreaDetails.FromCode, "NDK"),
-            new Mrid("Linked_MarketEvaluation_Point", "codingscheme"),
+            new Mrid(masterData.PowerPlantGsrnNumber!, "A10"),
             new UnitValue(masterData.Capacity!.ToString(CultureInfo.InvariantCulture), "KWT"),
             masterData.ConnectionType!,
             masterData.DisconnectionType!,
