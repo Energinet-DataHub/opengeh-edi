@@ -45,6 +45,8 @@ public class BundleTests
         Assert.Equal(outgoingMessage1.ReasonCode, bundledMessage.Header.ReasonCode);
         Assert.Equal(outgoingMessage1.ReceiverId, bundledMessage.Header.ReceiverId);
         Assert.Equal(outgoingMessage1.ReceiverRole, bundledMessage.Header.ReceiverRole);
+        Assert.Equal(outgoingMessage1.SenderId, bundledMessage.Header.SenderId);
+        Assert.Equal(outgoingMessage1.SenderRole, bundledMessage.Header.SenderRole);
         Assert.NotNull(bundledMessage.Header.MessageId);
     }
 
