@@ -31,6 +31,19 @@ public class BundleTests
     }
 
     [Fact]
+    public void Can_create_message()
+    {
+        var outgoingMessage1 = CreateOutgoingMessage("ProcessType1", "SenderId");
+        _bundle.Add(outgoingMessage1);
+        var outgoingMessage2 = CreateOutgoingMessage("ProcessType1", "SenderId");
+        _bundle.Add(outgoingMessage2);
+
+        var bundledMessage = _bundle.CreateMessage();
+
+        Assert.Equal(outgoingMessage1.DocumentType, bundledMessage.DocumentType);
+    }
+
+    [Fact]
     public void Messages_must_originate_from_the_same_type_of_business_process()
     {
         _bundle.Add(CreateOutgoingMessage("ProcessType1", "SenderId"));
@@ -68,6 +81,7 @@ public class Bundle
     private readonly Instant _timestamp;
     private readonly List<OutgoingMessage> _messages = new();
     private MessageHeader? _header;
+    private string? _documentType;
 
     public Bundle(Instant timestamp)
     {
@@ -79,6 +93,7 @@ public class Bundle
         if (IsFirstMessageInBundle())
         {
             CreateHeaderFrom(message);
+            _documentType = message.DocumentType;
         }
 
         EnsureProcessType(message);
@@ -120,4 +135,11 @@ public class Bundle
             Guid.NewGuid().ToString(),
             _timestamp, message.ReasonCode);
     }
+
+    public CimMessage CreateMessage()
+    {
+        return new CimMessage(_documentType);
+    }
 }
+
+public record CimMessage(string DocumentType);
