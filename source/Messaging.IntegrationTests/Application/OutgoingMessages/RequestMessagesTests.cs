@@ -47,9 +47,8 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
             var outgoingMessage2 = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage2.Message.MessageId)!;
 
             var requestedMessageIds = new List<string> { outgoingMessage1.Id.ToString(), outgoingMessage2.Id.ToString(), };
-            var result = await RequestMessages(requestedMessageIds.AsReadOnly()).ConfigureAwait(false);
+            await RequestMessages(requestedMessageIds.AsReadOnly()).ConfigureAwait(false);
 
-            Assert.True(result.Success);
             Assert.NotNull(_messageDispatcherSpy.DispatchedMessage);
         }
 
