@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Net.Mime;
 using System.Threading.Tasks;
 using System.Xml.Schema;
+using Json.Schema;
 using Messaging.Application.SchemaStore;
-using NJsonSchema;
 using Xunit;
 
 namespace Messaging.Tests;

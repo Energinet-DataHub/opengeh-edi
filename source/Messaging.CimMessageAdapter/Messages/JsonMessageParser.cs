@@ -3,18 +3,20 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Json.Schema;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.SchemaStore;
 using Messaging.CimMessageAdapter.Errors;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using NJsonSchema;
 using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
 
 namespace Messaging.CimMessageAdapter.Messages;
 
 public class JsonMessageParser : MessageParser
 {
+    private const string MarketActivityRecordElementName = "MktActivityRecord";
+    private const string HeaderElementName = "RequestChangeOfSupplier_MarketDocument";
     private readonly ISchemaProvider _schemaProvider;
 
     public JsonMessageParser()
@@ -103,9 +105,9 @@ public class JsonMessageParser : MessageParser
         var marketActivityRecords = new List<MarketActivityRecord>();
         var serializer = new JsonSerializer();
         var jsonRequest = serializer.Deserialize<JObject>(jsonTextReader);
-        var token = jsonRequest.SelectToken("RequestChangeOfSupplier_MarketDocument");
-        var messageHeader = MessageHeaderFrom(token);
-        marketActivityRecords.AddRange(token["MktActivityRecord"].Select(MarketActivityRecordFrom));
+        var headerToken = jsonRequest.SelectToken(HeaderElementName);
+        var messageHeader = MessageHeaderFrom(headerToken);
+        marketActivityRecords.AddRange(headerToken[MarketActivityRecordElementName].Select(MarketActivityRecordFrom));
 
         return MessageParserResult.Succeeded(messageHeader, marketActivityRecords);
     }
