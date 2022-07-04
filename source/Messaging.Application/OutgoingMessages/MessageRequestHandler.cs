@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Domain.OutgoingMessages;
 
@@ -28,65 +28,42 @@ namespace Messaging.Application.OutgoingMessages
         private readonly IMessageDispatcher _messageDispatcher;
         private readonly IUnitOfWork _unitOfWork;
         private readonly MessageFactory _messageFactory;
+        private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
         public MessageRequestHandler(
             IOutgoingMessageStore outgoingMessageStore,
             IMessageDispatcher messageDispatcherSpy,
             IUnitOfWork unitOfWork,
-            MessageFactory messageFactory)
+            MessageFactory messageFactory,
+            ISystemDateTimeProvider systemDateTimeProvider)
         {
             _outgoingMessageStore = outgoingMessageStore;
             _messageDispatcher = messageDispatcherSpy;
             _unitOfWork = unitOfWork;
             _messageFactory = messageFactory;
+            _systemDateTimeProvider = systemDateTimeProvider;
         }
 
         public async Task<Result> HandleAsync(IReadOnlyCollection<string> requestedMessageIds)
         {
             var messages = _outgoingMessageStore.GetByIds(requestedMessageIds);
-            var exceptions = CheckBundleApplicability(requestedMessageIds, messages);
-            if (exceptions.Count > 0)
+            var messageIdsNotFound = MessageIdsNotFound(requestedMessageIds, messages);
+            if (messageIdsNotFound.Any())
             {
-                return Result.Failure(exceptions.ToArray());
+                return Result.Failure(new OutgoingMessageNotFoundException(messageIdsNotFound));
             }
 
-            var message = await _messageFactory.CreateFromAsync(messages).ConfigureAwait(false);
+            var bundle = new Bundle(_systemDateTimeProvider.Now());
+            foreach (var outgoingMessage in messages)
+            {
+                bundle.Add(outgoingMessage);
+            }
+
+            var message = await _messageFactory.CreateFromAsync(bundle.CreateMessage()).ConfigureAwait(false);
             await _messageDispatcher.DispatchAsync(message).ConfigureAwait(false);
             await _unitOfWork.CommitAsync().ConfigureAwait(false);
 
             return Result.Succeeded();
-        }
-
-        private static IReadOnlyList<Exception> CheckBundleApplicability(IReadOnlyCollection<string> requestedMessageIds, ReadOnlyCollection<OutgoingMessage> messages)
-        {
-            var exceptions = new List<Exception>();
-
-            var messageIdsNotFound = MessageIdsNotFound(requestedMessageIds, messages);
-            if (messageIdsNotFound.Any())
-            {
-                exceptions.AddRange(messageIdsNotFound
-                    .Select(messageId => new OutgoingMessageNotFoundException(messageId))
-                    .ToArray());
-                return exceptions;
-            }
-
-            if (HasMatchingProcessTypes(messages) == false)
-            {
-                exceptions.Add(new ProcessTypesDoesNotMatchException(requestedMessageIds.ToArray()));
-            }
-
-            if (HasMatchingReceiver(messages) == false)
-            {
-                exceptions.Add(new ReceiverIdsDoesNotMatchException(requestedMessageIds.ToArray()));
-            }
-
-            return exceptions;
-        }
-
-        private static bool HasMatchingReceiver(IReadOnlyCollection<OutgoingMessage> messages)
-        {
-            var expectedReceiver = messages.First().ReceiverId;
-            return messages.All(message => message.ReceiverId.Equals(expectedReceiver, StringComparison.OrdinalIgnoreCase));
         }
 
         private static List<string> MessageIdsNotFound(IReadOnlyCollection<string> requestedMessageIds, ReadOnlyCollection<OutgoingMessage> messages)
@@ -94,12 +71,6 @@ namespace Messaging.Application.OutgoingMessages
             return requestedMessageIds
                 .Except(messages.Select(message => message.Id.ToString()))
                 .ToList();
-        }
-
-        private static bool HasMatchingProcessTypes(IReadOnlyCollection<OutgoingMessage> messages)
-        {
-            var expectedProcessType = messages.First().ProcessType;
-            return messages.All(message => message.ProcessType.Equals(expectedProcessType, StringComparison.OrdinalIgnoreCase));
         }
     }
 }
