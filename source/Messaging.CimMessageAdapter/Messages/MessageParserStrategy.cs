@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mime;
 using Messaging.CimMessageAdapter.Response;
 
 namespace Messaging.CimMessageAdapter.Messages;
@@ -23,8 +24,8 @@ public static class MessageParserStrategy
 {
     private static readonly IDictionary<string, Func<MessageParser>> _strategies = new Dictionary<string, Func<MessageParser>>()
     {
-        { "application/xml", () => new XmlMessageParser() },
-        { "application/json", () => new JsonMessageParser() },
+        { MediaTypeNames.Application.Xml, () => new XmlMessageParser() },
+        { MediaTypeNames.Application.Json, () => new JsonMessageParser() },
     };
 
     public static MessageParser GetMessageParserStrategy(string contentType)

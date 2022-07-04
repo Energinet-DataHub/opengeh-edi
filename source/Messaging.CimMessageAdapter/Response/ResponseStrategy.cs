@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mime;
 
 namespace Messaging.CimMessageAdapter.Response;
 
@@ -22,8 +23,8 @@ public static class ResponseStrategy
 {
     private static readonly IDictionary<string, Func<ResponseFactory>> _strategies = new Dictionary<string, Func<ResponseFactory>>()
     {
-        { "application/xml", () => new XmlResponseFactory() },
-        { "application/json", () => new JsonResponseFactory() },
+        { MediaTypeNames.Application.Xml, () => new XmlResponseFactory() },
+        { MediaTypeNames.Application.Json, () => new JsonResponseFactory() },
     };
 
     public static ResponseFactory GetResponseStrategy(string contentType)

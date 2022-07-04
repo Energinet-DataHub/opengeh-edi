@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Net.Mime;
 using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Response;
 using Newtonsoft.Json.Linq;
@@ -27,7 +28,7 @@ public class JsonResponseFactoryTests
     public void Generate_empty_response_when_no_validation_errors_has_occurred()
     {
         var result = Result.Succeeded();
-        var responseFactory = ResponseStrategy.GetResponseStrategy("application/json");
+        var responseFactory = ResponseStrategy.GetResponseStrategy(MediaTypeNames.Application.Json);
 
         var response = responseFactory.From(result);
 
@@ -40,7 +41,7 @@ public class JsonResponseFactoryTests
     {
         var duplicateMessageIdError = new DuplicateMessageIdDetected("Duplicate message id");
         var result = Result.Failure(duplicateMessageIdError);
-        var responseFactory = ResponseStrategy.GetResponseStrategy("application/json");
+        var responseFactory = ResponseStrategy.GetResponseStrategy(MediaTypeNames.Application.Json);
 
         var response = responseFactory.From(result);
 
@@ -55,7 +56,7 @@ public class JsonResponseFactoryTests
         var duplicateMessageIdError = new DuplicateMessageIdDetected("Duplicate message id");
         var duplicateTransactionIdError = new DuplicateTransactionIdDetected("Fake transaction id");
         var result = Result.Failure(duplicateMessageIdError, duplicateTransactionIdError);
-        var responseFactory = ResponseStrategy.GetResponseStrategy("application/json");
+        var responseFactory = ResponseStrategy.GetResponseStrategy(MediaTypeNames.Application.Json);
 
         var response = responseFactory.From(result);
 
