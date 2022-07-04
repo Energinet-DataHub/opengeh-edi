@@ -77,11 +77,5 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
             return incomingMessage;
         }
-
-        private async Task<IncomingMessage> MessageArrived(IncomingMessage arrivedMessage)
-        {
-            await InvokeCommandAsync(arrivedMessage).ConfigureAwait(false);
-            return arrivedMessage;
-        }
     }
 }
