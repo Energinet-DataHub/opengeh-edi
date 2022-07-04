@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Messaging.Application.Configuration;
@@ -50,11 +52,22 @@ namespace Messaging.Api.IncomingMessages
 
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            var result = await _messageReceiver.ReceiveAsync(request.Body)
+            var contentType = GetContentType(request.Headers);
+
+            var responseFactory = ResponseStrategy.GetResponseStrategy(contentType);
+
+            var result = await _messageReceiver.ReceiveAsync(request.Body, contentType)
                 .ConfigureAwait(false);
 
             var httpStatusCode = result.Success ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
-            return CreateResponse(request, httpStatusCode, ResponseFactory.From(result));
+            return CreateResponse(request, httpStatusCode, responseFactory.From(result));
+        }
+
+        private static string GetContentType(HttpHeaders headers)
+        {
+            var contentHeader = headers.GetValues("Content-Type").FirstOrDefault();
+            if (contentHeader == null) throw new InvalidOperationException("No Content-Type found in request headers");
+            return contentHeader;
         }
 
         private HttpResponseData CreateResponse(HttpRequestData request, HttpStatusCode statusCode, ResponseMessage responseMessage)

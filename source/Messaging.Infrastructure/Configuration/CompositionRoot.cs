@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
@@ -32,10 +33,12 @@ using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.IncomingMessages;
 using Messaging.Application.MasterData.MarketEvaluationPoints;
 using Messaging.Application.OutgoingMessages;
+using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
 using Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
+using Messaging.Application.OutgoingMessages.GenericNotification;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Messaging.Application.SchemaStore;
 using Messaging.Application.Transactions.MoveIn;
-using Messaging.Application.Xml.SchemaStore;
 using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
@@ -54,9 +57,11 @@ using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.Infrastructure.Transactions;
 using Messaging.Infrastructure.Transactions.MoveIn;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using NJsonSchema;
 
 namespace Messaging.Infrastructure.Configuration
 {
@@ -79,10 +84,10 @@ namespace Messaging.Infrastructure.Configuration
             services.AddScoped<IMessageDispatcher, MessageDispatcher>();
             services.AddScoped<MessageRequestHandler>();
             services.AddScoped<MessageRequestContext>();
+            services.AddScoped<MessageReceiver>();
 
             AddMediatR();
             services.AddLogging();
-            AddXmlSchema(services);
             AddInternalCommandsProcessing();
             AddMessageGenerationServices();
             AddMasterDataServices();
@@ -206,6 +211,8 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddScoped<MoveInNotifications>();
             _services.AddScoped(_ => configuration);
             _services.AddScoped<IMoveInRequester, MoveInRequester>();
+            _services.AddScoped<IRequestMeteringPointMasterData, RequestMeteringPointMasterData>();
+            _services.AddScoped<RequestMeteringPointMasterDataDispatcher>();
             _services.AddTransient<IRequestHandler<IncomingMessage, Unit>, MoveInRequestHandler>();
             _services.AddTransient<IRequestHandler<FetchMeteringPointMasterData, Unit>, FetchMeteringPointMasterDataHandler>();
             _services.AddTransient<IRequestHandler<CompleteMoveInTransaction, Unit>, CompleteMoveInTransactionHandler>();
@@ -214,17 +221,23 @@ namespace Messaging.Infrastructure.Configuration
             return this;
         }
 
+        public CompositionRoot AddServiceBusClient<TConfiguration>(string connectionString, TConfiguration configuration)
+            where TConfiguration : class, IConfig
+        {
+            _services.AddScoped(_ => configuration);
+
+            _services.AddAzureClients(builder =>
+            {
+                builder.AddServiceBusClient(connectionString).WithName(configuration.WithName);
+            });
+
+            return this;
+        }
+
         public CompositionRoot AddHttpClientAdapter(Func<IServiceProvider, IHttpClientAdapter> action)
         {
             _services.AddSingleton(action);
             return this;
-        }
-
-        private static void AddXmlSchema(IServiceCollection services)
-        {
-            services.AddScoped<CimXmlSchemas>();
-            services.AddScoped<ISchemaProvider, SchemaProvider>();
-            services.AddScoped<MessageReceiver>();
         }
 
         private void AddInternalCommandsProcessing()
@@ -242,6 +255,8 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddScoped<MessageFactory>();
             _services.AddScoped<DocumentWriter, ConfirmChangeOfSupplierDocumentWriter>();
             _services.AddScoped<DocumentWriter, RejectRequestChangeOfSupplierDocumentWriter>();
+            _services.AddScoped<DocumentWriter, GenericNotificationDocumentWriter>();
+            _services.AddScoped<DocumentWriter, AccountingPointCharacteristicsDocumentWriter>();
             _services.AddScoped<IValidationErrorTranslator, ValidationErrorTranslator>();
             _services.AddScoped<IMarketActivityRecordParser, MarketActivityRecordParser>();
         }

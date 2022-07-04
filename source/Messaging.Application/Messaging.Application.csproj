@@ -26,6 +26,7 @@ limitations under the License.
     <PackageReference Include="Microsoft.Data.SqlClient" Version="4.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.3" />
+    <PackageReference Include="NJsonSchema" Version="10.7.2" />
     <PackageReference Include="NodaTime" Version="3.0.10" />
   </ItemGroup>
 
@@ -43,26 +44,45 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="Xml\SchemaStore\Schemas\urn-ediel-org-structure-confirmrequestchangeofsupplier-0-1.xsd">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="Xml\SchemaStore\Schemas\urn-ediel-org-structure-requestchangeofsupplier-0-1.xsd">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="Xml\SchemaStore\Schemas\urn-entsoe-eu-local-extension-types.xsd">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="Xml\SchemaStore\Schemas\urn-entsoe-eu-wgedi-codelists.xsd">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </EmbeddedResource>
       <None Remove="Xml\SchemaStore\Schemas\urn-ediel-org-structure-rejectrequestchangeofsupplier-0-1.xsd" />
-      <EmbeddedResource Include="Xml\SchemaStore\Schemas\urn-ediel-org-structure-rejectrequestchangeofsupplier-0-1.xsd">
+      <None Remove="Xml\SchemaStore\Schemas\urn-ediel-org-structure-genericnotification-0-1.xsd" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="SchemaStore\Schemas\Xml\urn-ediel-org-structure-accountingpointcharacteristics-0-1.xsd">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
-      <None Remove="Xml\SchemaStore\Schemas\urn-ediel-org-structure-genericnotification-0-1.xsd" />
-      <EmbeddedResource Include="Xml\SchemaStore\Schemas\urn-ediel-org-structure-genericnotification-0-1.xsd">
+      <EmbeddedResource Include="SchemaStore\Schemas\Xml\urn-ediel-org-structure-confirmrequestchangeofsupplier-0-1.xsd">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
+      <EmbeddedResource Include="SchemaStore\Schemas\Xml\urn-ediel-org-structure-genericnotification-0-1.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="SchemaStore\Schemas\Xml\urn-ediel-org-structure-rejectrequestchangeofsupplier-0-1.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="SchemaStore\Schemas\Xml\urn-ediel-org-structure-requestchangeofsupplier-0-1.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="SchemaStore\Schemas\Xml\urn-entsoe-eu-local-extension-types.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="SchemaStore\Schemas\Xml\urn-entsoe-eu-wgedi-codelists.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="SchemaStore\Schemas\Json\Request-Change-of-Supplier-assembly-model.schema.json" />
+      <EmbeddedResource Include="SchemaStore\Schemas\Json\Request-Change-of-Supplier-assembly-model.schema.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="SchemaStore\Schemas\Json\urn-entsoe-eu-wgedi-codelists.schema.json" />
+      <EmbeddedResource Include="SchemaStore\Schemas\Json\urn-entsoe-eu-wgedi-codelists.schema.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="SchemaStore\Schemas\Json\urn-entsoe-eu-local-extension-types.schema.json" />
+      <EmbeddedResource Include="SchemaStore\Schemas\Json\urn-entsoe-eu-local-extension-types.schema.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="Xml\SchemaStore\Schemas\urn-ediel-org-structure-accountingpointcharacteristics-0-1.xsd" />
     </ItemGroup>
 
 </Project>

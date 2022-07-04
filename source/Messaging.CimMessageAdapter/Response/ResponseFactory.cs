@@ -13,47 +13,16 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
-using System.Text;
-using System.Xml;
 
-namespace Messaging.CimMessageAdapter.Response
+namespace Messaging.CimMessageAdapter.Response;
+
+public abstract class ResponseFactory
 {
-    public static class ResponseFactory
+    public ResponseMessage From(Result result)
     {
-        public static ResponseMessage From(Result result)
-        {
-            if (result == null) throw new ArgumentNullException(nameof(result));
-            return result.Success ? new ResponseMessage() : new ResponseMessage(CreateMessageBodyFrom(result));
-        }
-
-        private static string CreateMessageBodyFrom(Result result)
-        {
-            var messageBody = new StringBuilder();
-            var settings = new XmlWriterSettings() { OmitXmlDeclaration = true, };
-
-            using var writer = XmlWriter.Create(messageBody, settings);
-            writer.WriteStartElement("Error");
-            writer.WriteElementString("Code", result.Errors.Count == 1 ? result.Errors.First().Code : "BadRequest");
-            writer.WriteElementString("Message", result.Errors.Count == 1 ? result.Errors.First().Message : "Multiple errors in message");
-            if (result.Errors.Count > 1)
-            {
-                writer.WriteStartElement("Details");
-                foreach (var validationError in result.Errors)
-                {
-                    writer.WriteStartElement("Error");
-                    writer.WriteElementString("Code", validationError.Code);
-                    writer.WriteElementString("Message", validationError.Message);
-                    writer.WriteEndElement();
-                }
-
-                writer.WriteEndElement();
-            }
-
-            writer.WriteEndElement();
-            writer.Close();
-
-            return messageBody.ToString();
-        }
+        if (result == null) throw new ArgumentNullException(nameof(result));
+        return result.Success ? new ResponseMessage() : new ResponseMessage(CreateMessageBodyFrom(result));
     }
+
+    protected abstract string CreateMessageBodyFrom(Result result);
 }

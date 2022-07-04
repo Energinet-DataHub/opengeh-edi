@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 module "func_processing" {
-  source                                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/function-app?ref=6.0.0"
+  source                                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/function-app?ref=7.0.0"
 
   name                                      = "processing"
   project_name                              = var.domain_name_short
@@ -26,21 +26,17 @@ module "func_processing" {
   application_insights_instrumentation_key  = data.azurerm_key_vault_secret.appi_instrumentation_key.value
   log_analytics_workspace_id                = data.azurerm_key_vault_secret.log_shared_id.value
   always_on                                 = true
+  dotnet_framework_version                  = "6"
+  use_dotnet_isolated_runtime               = true
   health_check_path                         = "/api/monitor/ready"
   app_settings                              = {
-    # Region: Default Values
-    WEBSITE_ENABLE_SYNC_UPDATE_SITE                             = true
-    WEBSITE_RUN_FROM_PACKAGE                                    = 1
-    WEBSITES_ENABLE_APP_SERVICE_STORAGE                         = true
-    FUNCTIONS_WORKER_RUNTIME                                    = "dotnet-isolated"
-    # Endregion: Default Values
-    MARKET_DATA_QUEUE_URL                                       = "${module.sb_marketroles.name}.servicebus.windows.net:9093"
-    MARKET_DATA_DB_CONNECTION_STRING                            = local.MS_MARKETROLES_CONNECTION_STRING
-    INTEGRATION_EVENT_QUEUE                                     = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sbq-market-roles-forward-name)",
-    INTEGRATION_EVENT_QUEUE_CONNECTION                          = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-listen-connection-string)",
-    RAISE_TIME_HAS_PASSED_EVENT_SCHEDULE                        = "*/10 * * * * *"
-    SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS        = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-send-connection-string)",
-    SERVICE_BUS_CONNECTION_STRING_MANAGE_FOR_INTEGRATION_EVENTS = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-manage-connection-string)",
+    
+    MARKET_DATA_QUEUE_URL                                         = "${module.sb_marketroles.name}.servicebus.windows.net:9093"
+    MARKET_DATA_DB_CONNECTION_STRING                              = local.MS_MARKETROLES_CONNECTION_STRING
+    RAISE_TIME_HAS_PASSED_EVENT_SCHEDULE                          = "*/10 * * * * *"
+    SERVICE_BUS_CONNECTION_STRING_LISTENER_FOR_INTEGRATION_EVENTS = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-listen-connection-string)",
+    SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS          = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-send-connection-string)",
+    SERVICE_BUS_CONNECTION_STRING_MANAGE_FOR_INTEGRATION_EVENTS   = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-manage-connection-string)",
   }
 
   tags                                      = azurerm_resource_group.this.tags

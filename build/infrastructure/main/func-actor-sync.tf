@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 module "func_actor_sync" {
-  source                                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/function-app?ref=6.0.0"
+  source                                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/function-app?ref=7.0.0"
 
   name                                      = "actorsync"
   project_name                              = var.domain_name_short
@@ -27,13 +27,9 @@ module "func_actor_sync" {
   log_analytics_workspace_id                = data.azurerm_key_vault_secret.log_shared_id.value
   health_check_path                         = "/api/monitor/ready"
   always_on                                 = true
+  dotnet_framework_version                  = "6"
+  use_dotnet_isolated_runtime               = false
   app_settings                              = {
-    # Region: Default Values
-    WEBSITE_ENABLE_SYNC_UPDATE_SITE         = true
-    WEBSITE_RUN_FROM_PACKAGE                = 1
-    WEBSITES_ENABLE_APP_SERVICE_STORAGE     = true
-    FUNCTIONS_WORKER_RUNTIME                = "dotnet"
-    # Endregion: Default Values
     DB_CONNECTION_STRING                    = local.MS_MARKETROLES_CONNECTION_STRING
     ACTOR_REGISTRY_DB_CONNECTION_STRING     = local.ACTOR_REGISTRY_DB_CONNECTION_STRING
     TIMER_TRIGGER                           = "0 0 * * * *"

@@ -72,16 +72,17 @@ namespace Messaging.Application.Transactions.MoveIn
                 throw new MoveInException($"Transaction {TransactionId} is already completed.");
             }
 
-            if (_state == State.AcceptedByBusinessProcess && _forwardedMeteringPointMasterData == false)
-            {
-                throw new MoveInException($"Cannot complete transaction {TransactionId} because metering point master data has not been forwarded.");
-            }
+            //TODO: Uncomment below when HasForwardedMeteringPointMasterData has been implemented with masterdata response from MP (remember test as well)
+            // if (_state == State.AcceptedByBusinessProcess && _forwardedMeteringPointMasterData == false)
+            // {
+            //     throw new MoveInException($"Cannot complete transaction {TransactionId} because metering point master data has not been forwarded.");
+            // }
 
             _state = State.Completed;
             AddDomainEvent(new MoveInWasCompleted());
         }
 
-        public void AcceptedByBusinessProcess(string processId)
+        public void AcceptedByBusinessProcess(string processId, string marketEvaluationPointNumber)
         {
             if (_state != State.Started)
             {
@@ -90,7 +91,7 @@ namespace Messaging.Application.Transactions.MoveIn
 
             _state = State.AcceptedByBusinessProcess;
             ProcessId = processId ?? throw new ArgumentNullException(nameof(processId));
-            AddDomainEvent(new MoveInWasAccepted(ProcessId));
+            AddDomainEvent(new MoveInWasAccepted(ProcessId, marketEvaluationPointNumber, TransactionId));
         }
 
         public void RejectedByBusinessProcess()

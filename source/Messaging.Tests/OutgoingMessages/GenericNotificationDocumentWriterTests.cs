@@ -16,18 +16,18 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using System.Xml.Schema;
 using Messaging.Application.Common;
 using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.GenericNotification;
-using Messaging.Application.Xml.SchemaStore;
-using Messaging.Domain.OutgoingMessages;
+using Messaging.Application.SchemaStore;
 using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Serialization;
-using Messaging.Tests.OutgoingMessages.Asserts;
 using Xunit;
 
 namespace Messaging.Tests.OutgoingMessages
@@ -35,14 +35,13 @@ namespace Messaging.Tests.OutgoingMessages
     public class GenericNotificationDocumentWriterTests
     {
         private readonly GenericNotificationDocumentWriter _documentWriter;
-        private readonly ISchemaProvider _schemaProvider;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
         private readonly IMarketActivityRecordParser _marketActivityRecordParser;
+        private ISchemaProvider? _schemaProvider;
 
         public GenericNotificationDocumentWriterTests()
         {
             _systemDateTimeProvider = new SystemDateTimeProvider();
-            _schemaProvider = new SchemaProvider(new CimXmlSchemas());
             _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
             _documentWriter = new GenericNotificationDocumentWriter(_marketActivityRecordParser);
         }
@@ -88,7 +87,8 @@ namespace Messaging.Tests.OutgoingMessages
 
         private async Task AssertConformsToSchema(Stream message)
         {
-            var schema = await _schemaProvider.GetSchemaAsync("genericnotification", "0.1")
+            _schemaProvider = SchemaProviderFactory.GetProvider(MediaTypeNames.Application.Xml);
+            var schema = await _schemaProvider.GetSchemaAsync<XmlSchema>("genericnotification", "0.1")
                 .ConfigureAwait(false);
             await AssertXmlMessage.AssertConformsToSchemaAsync(message, schema!).ConfigureAwait(false);
         }

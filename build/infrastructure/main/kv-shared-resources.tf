@@ -58,7 +58,7 @@ data "azurerm_key_vault_secret" "sbq_marketroles_dequeue_name" {
 }
 
 data "azurerm_key_vault_secret" "plan_shared_id" {
-  name         = "plan-shared-id"
+  name         = "plan-services-id"
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }
 
@@ -73,12 +73,17 @@ data "azurerm_key_vault_secret" "snet_private_endpoints_id" {
 }
 
 data "azurerm_key_vault_secret" "snet_vnet_integrations_id" {
-  name         = "snet-vnet-integrations-id"
+  name         = "snet-vnet-integration-id"
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }
 
 data "azurerm_key_vault_secret" "sbq_metering_point_master_data_response_name" {
   name = "sbq-metering-point-master-data-response-name"
+  key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
+}
+
+data "azurerm_key_vault_secret" "sbq_metering_point_master_data_request_name" {
+  name = "sbq-metering-point-master-data-request-name"
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }
 

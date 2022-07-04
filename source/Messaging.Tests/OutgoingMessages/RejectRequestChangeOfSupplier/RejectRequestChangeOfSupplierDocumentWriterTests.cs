@@ -16,18 +16,18 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using System.Xml.Schema;
 using Messaging.Application.Common;
 using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
-using Messaging.Application.Xml.SchemaStore;
-using Messaging.Domain.OutgoingMessages;
+using Messaging.Application.SchemaStore;
 using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Serialization;
-using Messaging.Tests.OutgoingMessages.Asserts;
 using Xunit;
 
 namespace Messaging.Tests.OutgoingMessages.RejectRequestChangeOfSupplier;
@@ -35,14 +35,13 @@ namespace Messaging.Tests.OutgoingMessages.RejectRequestChangeOfSupplier;
 public class RejectRequestChangeOfSupplierDocumentWriterTests
 {
     private readonly RejectRequestChangeOfSupplierDocumentWriter _documentWriter;
-    private readonly ISchemaProvider _schemaProvider;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMarketActivityRecordParser _marketActivityRecordParser;
+    private ISchemaProvider? _schemaProvider;
 
     public RejectRequestChangeOfSupplierDocumentWriterTests()
     {
         _systemDateTimeProvider = new SystemDateTimeProvider();
-        _schemaProvider = new SchemaProvider(new CimXmlSchemas());
         _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
         _documentWriter = new RejectRequestChangeOfSupplierDocumentWriter(_marketActivityRecordParser);
     }
@@ -87,12 +86,13 @@ public class RejectRequestChangeOfSupplierDocumentWriterTests
 
     private async Task AssertMessage(Stream message, MessageHeader header, List<MarketActivityRecord> marketActivityRecords)
     {
+        _schemaProvider = SchemaProviderFactory.GetProvider(MediaTypeNames.Application.Xml);
         var document = XDocument.Load(message);
         AssertXmlMessage.AssertHeader(header, document);
 
         AssertMarketActivityRecords(marketActivityRecords, document);
 
-        var schema = await _schemaProvider.GetSchemaAsync("rejectrequestchangeofsupplier", "0.1")
+        var schema = await _schemaProvider.GetSchemaAsync<XmlSchema>("rejectrequestchangeofsupplier", "0.1")
             .ConfigureAwait(false);
         await AssertXmlMessage.AssertConformsToSchemaAsync(message, schema!).ConfigureAwait(false);
     }

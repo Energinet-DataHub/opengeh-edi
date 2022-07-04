@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -31,6 +32,7 @@ public class FetchMeteringPointMasterDataWhenAccepted : INotificationHandler<Mov
 
     public Task Handle(MoveInWasAccepted notification, CancellationToken cancellationToken)
     {
-        return _commandScheduler.EnqueueAsync(new FetchMeteringPointMasterData());
+        if (notification == null) throw new ArgumentNullException(nameof(notification));
+        return _commandScheduler.EnqueueAsync(new FetchMeteringPointMasterData(notification.BusinessProcessId, notification.MarketEvaluationPointNumber, notification.TransactionId));
     }
 }
