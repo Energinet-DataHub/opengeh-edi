@@ -42,6 +42,7 @@ public class BundleTests
 
         Assert.Equal(outgoingMessage1.DocumentType, bundledMessage.DocumentType);
         Assert.Equal(outgoingMessage1.ProcessType, bundledMessage.Header.ProcessType);
+        Assert.NotNull(bundledMessage.Header.MessageId);
     }
 
     [Fact]
