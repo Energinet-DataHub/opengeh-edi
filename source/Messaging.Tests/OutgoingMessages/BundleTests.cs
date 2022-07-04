@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages;
 using NodaTime;
@@ -47,6 +48,7 @@ public class BundleTests
         Assert.Equal(outgoingMessage1.ReceiverRole, bundledMessage.Header.ReceiverRole);
         Assert.Equal(outgoingMessage1.SenderId, bundledMessage.Header.SenderId);
         Assert.Equal(outgoingMessage1.SenderRole, bundledMessage.Header.SenderRole);
+        Assert.Equal(2, bundledMessage.MarketActivityRecordPayloads.Count);
         Assert.NotNull(bundledMessage.Header.MessageId);
     }
 
@@ -145,8 +147,9 @@ public class Bundle
 
     public CimMessage CreateMessage()
     {
-        return new CimMessage(_documentType, _header);
+        var payloads = _messages.Select(message => message.MarketActivityRecordPayload).ToList();
+        return new CimMessage(_documentType, _header, payloads);
     }
 }
 
-public record CimMessage(string DocumentType, MessageHeader Header);
+public record CimMessage(string DocumentType, MessageHeader Header, IReadOnlyList<string> MarketActivityRecordPayloads);
