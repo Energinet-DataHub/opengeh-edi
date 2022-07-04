@@ -53,13 +53,9 @@ namespace Messaging.Application.OutgoingMessages
                 return Result.Failure(new OutgoingMessageNotFoundException(messageIdsNotFound));
             }
 
-            var bundle = new Bundle(_systemDateTimeProvider.Now());
-            foreach (var outgoingMessage in messages)
-            {
-                bundle.Add(outgoingMessage);
-            }
+            var messageBundle = CreateBundleFrom(messages);
 
-            var message = await _messageFactory.CreateFromAsync(bundle.CreateMessage()).ConfigureAwait(false);
+            var message = await _messageFactory.CreateFromAsync(messageBundle.CreateMessage()).ConfigureAwait(false);
             await _messageDispatcher.DispatchAsync(message).ConfigureAwait(false);
             await _unitOfWork.CommitAsync().ConfigureAwait(false);
 
@@ -71,6 +67,17 @@ namespace Messaging.Application.OutgoingMessages
             return requestedMessageIds
                 .Except(messages.Select(message => message.Id.ToString()))
                 .ToList();
+        }
+
+        private Bundle CreateBundleFrom(IReadOnlyList<OutgoingMessage> messages)
+        {
+            var bundle = new Bundle(_systemDateTimeProvider.Now());
+            foreach (var outgoingMessage in messages)
+            {
+                bundle.Add(outgoingMessage);
+            }
+
+            return bundle;
         }
     }
 }
