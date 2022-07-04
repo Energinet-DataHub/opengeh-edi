@@ -110,7 +110,8 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
             masterData.Address.GeoInfoReference.ToString(),
             address,
             masterData.Address.IsActualAddress.ToString(),
-            new RelatedMarketEvaluationPoint(new Mrid("id", "codingScheme"), "description"));
+            new RelatedMarketEvaluationPoint(new Mrid("id", "codingScheme"), "description"),
+            null);
     }
 
     private static OutgoingMessage CreateOutgoingMessage(string id, string documentType, string processType, string receiverId, string marketActivityRecordPayload, string reasonCode)
