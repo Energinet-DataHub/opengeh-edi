@@ -12,10 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Messaging.Application.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages;
 using NodaTime;
 using Xunit;
@@ -87,77 +83,5 @@ public class BundleTests
             "SenderRole",
             string.Empty,
             "ReasonCode");
-    }
-}
-
-#pragma warning disable
-public class Bundle
-{
-    private readonly Instant _timestamp;
-    private readonly List<OutgoingMessage> _messages = new();
-    private MessageHeader? _header;
-    private string? _documentType;
-
-    public Bundle(Instant timestamp)
-    {
-        _timestamp = timestamp;
-    }
-
-    public void Add(OutgoingMessage message)
-    {
-        if (IsFirstMessageInBundle())
-        {
-            CreateHeaderFrom(message);
-            _documentType = message.DocumentType;
-        }
-
-        EnsureProcessType(message);
-        EnsureReceiverId(message);
-
-        _messages.Add(message);
-
-    }
-
-    private void EnsureReceiverId(OutgoingMessage message)
-    {
-        if (message.ReceiverId.Equals(_header.ReceiverId, StringComparison.OrdinalIgnoreCase) == false)
-        {
-            throw new ReceiverIdsDoesNotMatchException(message.Id.ToString());
-        }
-    }
-
-    private void EnsureProcessType(OutgoingMessage message)
-    {
-        if (message.ProcessType.Equals(_header.ProcessType) == false)
-        {
-            throw new ProcessTypesDoesNotMatchException(message.Id.ToString());
-        }
-    }
-
-    private bool IsFirstMessageInBundle()
-    {
-        return _messages.Count == 0;
-    }
-
-    private void CreateHeaderFrom(OutgoingMessage message)
-    {
-        _header = new MessageHeader(
-            message.ProcessType,
-            message.SenderId,
-            message.SenderRole,
-            message.ReceiverId,
-            message.ReceiverRole,
-            Guid.NewGuid().ToString(),
-            _timestamp, message.ReasonCode);
-    }
-
-    public CimMessage CreateMessage()
-    {
-        if (_messages.Count == 0)
-        {
-            throw new NoMessagesInBundleException();
-        }
-        var payloads = _messages.Select(message => message.MarketActivityRecordPayload).ToList();
-        return new CimMessage(_documentType, _header, payloads);
     }
 }
