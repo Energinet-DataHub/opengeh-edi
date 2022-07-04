@@ -82,7 +82,7 @@ namespace Messaging.Infrastructure.Configuration
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
             services.AddScoped<IMessageDispatcher, MessageDispatcher>();
-            services.AddScoped<MessageRequestHandler>();
+            services.AddScoped<RequestMessagesHandler>();
             services.AddScoped<MessageRequestContext>();
             services.AddScoped<MessageReceiver>();
 
@@ -166,7 +166,7 @@ namespace Messaging.Infrastructure.Configuration
         public CompositionRoot AddOutgoingMessageDispatcher(IMessageDispatcher messageDispatcher)
         {
             _services.AddScoped<IMessageDispatcher>(_ => messageDispatcher);
-            _services.AddScoped<MessageRequestHandler>();
+            _services.AddScoped<RequestMessagesHandler>();
 
             return this;
         }

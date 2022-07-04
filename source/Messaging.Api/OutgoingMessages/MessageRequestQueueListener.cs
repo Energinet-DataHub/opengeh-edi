@@ -28,18 +28,18 @@ namespace Messaging.Api.OutgoingMessages
     {
         private readonly ICorrelationContext _correlationContext;
         private readonly ILogger<MessageRequestQueueListener> _logger;
-        private readonly MessageRequestHandler _messageRequestHandler;
+        private readonly RequestMessagesHandler _requestMessagesHandler;
         private readonly MessageRequestContext _messageRequestContext;
 
         public MessageRequestQueueListener(
             ICorrelationContext correlationContext,
             ILogger<MessageRequestQueueListener> logger,
-            MessageRequestHandler messageRequestHandler,
+            RequestMessagesHandler requestMessagesHandler,
             MessageRequestContext messageRequestContext)
         {
             _correlationContext = correlationContext;
             _logger = logger;
-            _messageRequestHandler = messageRequestHandler;
+            _requestMessagesHandler = requestMessagesHandler;
             _messageRequestContext = messageRequestContext;
         }
 
@@ -47,7 +47,7 @@ namespace Messaging.Api.OutgoingMessages
         public async Task RunAsync([ServiceBusTrigger("%MESSAGE_REQUEST_QUEUE%", Connection = "MESSAGEHUB_QUEUE_CONNECTION_STRING", IsSessionsEnabled = true)] byte[] data)
         {
             await _messageRequestContext.SetMessageRequestContextAsync(data).ConfigureAwait(false);
-            var result = await _messageRequestHandler.HandleAsync(
+            var result = await _requestMessagesHandler.HandleAsync(
                 _messageRequestContext.DataAvailableIds
                 ?? throw new InvalidOperationException()).ConfigureAwait(false);
 

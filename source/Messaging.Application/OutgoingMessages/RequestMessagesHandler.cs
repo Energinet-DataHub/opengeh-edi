@@ -22,7 +22,7 @@ using Messaging.Domain.OutgoingMessages;
 
 namespace Messaging.Application.OutgoingMessages
 {
-    public class MessageRequestHandler
+    public class RequestMessagesHandler
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly IMessageDispatcher _messageDispatcher;
@@ -30,7 +30,7 @@ namespace Messaging.Application.OutgoingMessages
         private readonly MessageFactory _messageFactory;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
-        public MessageRequestHandler(
+        public RequestMessagesHandler(
             IOutgoingMessageStore outgoingMessageStore,
             IMessageDispatcher messageDispatcherSpy,
             IUnitOfWork unitOfWork,

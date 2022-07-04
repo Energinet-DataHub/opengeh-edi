@@ -165,7 +165,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
         private async Task RequestMessage(string id)
         {
-            await GetService<MessageRequestHandler>().HandleAsync(new[] { id }).ConfigureAwait(false);
+            await GetService<RequestMessagesHandler>().HandleAsync(new[] { id }).ConfigureAwait(false);
         }
 
         private Stream GetDispatchedDocument()

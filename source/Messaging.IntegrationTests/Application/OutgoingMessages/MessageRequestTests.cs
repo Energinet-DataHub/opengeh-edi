@@ -27,14 +27,14 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
     public class MessageRequestTests : TestBase
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
-        private readonly MessageRequestHandler _messageRequestHandler;
+        private readonly RequestMessagesHandler _requestMessagesHandler;
         private readonly MessageDispatcherSpy _messageDispatcherSpy;
 
         public MessageRequestTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
             _outgoingMessageStore = GetService<IOutgoingMessageStore>();
-            _messageRequestHandler = GetService<MessageRequestHandler>();
+            _requestMessagesHandler = GetService<RequestMessagesHandler>();
             _messageDispatcherSpy = (MessageDispatcherSpy)GetService<IMessageDispatcher>();
         }
 
@@ -47,7 +47,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
             var outgoingMessage2 = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage2.Message.MessageId)!;
 
             var requestedMessageIds = new List<string> { outgoingMessage1.Id.ToString(), outgoingMessage2.Id.ToString(), };
-            var result = await _messageRequestHandler.HandleAsync(requestedMessageIds.AsReadOnly()).ConfigureAwait(false);
+            var result = await _requestMessagesHandler.HandleAsync(requestedMessageIds.AsReadOnly()).ConfigureAwait(false);
 
             Assert.True(result.Success);
             Assert.NotNull(_messageDispatcherSpy.DispatchedMessage);
@@ -58,7 +58,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
         {
             var nonExistingMessage = new List<string> { Guid.NewGuid().ToString() };
 
-            var result = await _messageRequestHandler.HandleAsync(nonExistingMessage.AsReadOnly()).ConfigureAwait(false);
+            var result = await _requestMessagesHandler.HandleAsync(nonExistingMessage.AsReadOnly()).ConfigureAwait(false);
 
             Assert.False(result.Success);
             Assert.Contains(result.Errors, error => error is OutgoingMessageNotFoundException);
