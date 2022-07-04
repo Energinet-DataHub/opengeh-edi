@@ -41,15 +41,9 @@ public class BundleTests
     [Fact]
     public void Messages_must_same_receiver()
     {
-        var messages = new List<OutgoingMessage>()
-        {
-            CreateOutgoingMessage("ProcessType1", "Sender1"),
-            CreateOutgoingMessage("ProcessType1", "Sender2"),
-        };
+        _bundle.Add(CreateOutgoingMessage("ProcessType1", "Sender1"));
 
-        _bundle.Add(messages[0]);
-
-        Assert.Throws<ReceiverIdsDoesNotMatchException>(() => _bundle.Add(messages[1]));
+        Assert.Throws<ReceiverIdsDoesNotMatchException>(() => _bundle.Add(CreateOutgoingMessage("ProcessType1", "Sender2")));
     }
 
     private static OutgoingMessage CreateOutgoingMessage(string processType, string receiverId)
