@@ -38,57 +38,6 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
             _messageDispatcherSpy = (MessageDispatcherSpy)GetService<IMessageDispatcher>();
         }
 
-        [Fact(Skip = "Currently we only have one process type")]
-        public async Task Messages_must_originate_from_the_same_type_of_business_process()
-        {
-            var builder = MessageBuilder();
-            var message1 = await MessageArrived(
-                builder
-                    .WithProcessType(ProcessType.MoveIn.Code)
-                    .Build()).ConfigureAwait(false);
-            var message2 = await MessageArrived(
-                builder
-                .WithProcessType("ProcessType2")
-                .Build()).ConfigureAwait(false);
-
-            var outgoingMessage1 = _outgoingMessageStore.GetByOriginalMessageId(message1.Message.MessageId)!;
-            var outgoingMessage2 = _outgoingMessageStore.GetByOriginalMessageId(message2.Message.MessageId)!;
-
-            var result = await _messageRequestHandler.HandleAsync(
-                new List<string>()
-            {
-                outgoingMessage1.Id.ToString(),
-                outgoingMessage2.Id.ToString(),
-            }).ConfigureAwait(false);
-
-            Assert.False(result.Success);
-        }
-
-        [Fact]
-        public async Task Messages_must_same_receipient()
-        {
-            var builder = MessageBuilder();
-            var message1 = await MessageArrived(
-                builder
-                    .WithSenderId("SenderId1")
-                    .Build()).ConfigureAwait(false);
-            var message2 = await MessageArrived(
-                builder
-                    .WithSenderId("SenderId2")
-                    .Build()).ConfigureAwait(false);
-            var outgoingMessage1 = _outgoingMessageStore.GetByOriginalMessageId(message1.Message.MessageId)!;
-            var outgoingMessage2 = _outgoingMessageStore.GetByOriginalMessageId(message2.Message.MessageId)!;
-
-            var result = await _messageRequestHandler.HandleAsync(
-                new List<string>()
-            {
-                outgoingMessage1.Id.ToString(),
-                outgoingMessage2.Id.ToString(),
-            }).ConfigureAwait(false);
-
-            Assert.False(result.Success);
-        }
-
         [Fact]
         public async Task Message_is_dispatched_on_request()
         {
