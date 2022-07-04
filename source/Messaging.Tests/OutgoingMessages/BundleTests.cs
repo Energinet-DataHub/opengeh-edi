@@ -161,5 +161,3 @@ public class Bundle
         return new CimMessage(_documentType, _header, payloads);
     }
 }
-
-public record CimMessage(string DocumentType, MessageHeader Header, IReadOnlyList<string> MarketActivityRecordPayloads);

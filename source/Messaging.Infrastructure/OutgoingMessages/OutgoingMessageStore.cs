@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Messaging.Application.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Configuration.DataAccess;
 
 namespace Messaging.Infrastructure.OutgoingMessages
