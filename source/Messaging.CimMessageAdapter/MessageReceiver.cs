@@ -43,11 +43,11 @@ namespace Messaging.CimMessageAdapter
             _marketActorAuthenticator = marketActorAuthenticator ?? throw new ArgumentNullException(nameof(marketActorAuthenticator));
         }
 
-        public async Task<Result> ReceiveAsync(Stream message, string? contentType)
+        public async Task<Result> ReceiveAsync(Stream message, string contentType)
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
 
-            var messageParser = new XmlMessageParser(contentType);
+            var messageParser = MessageParserStrategy.GetMessageParserStrategy(contentType);
 
             var messageParserResult =
                  await messageParser.ParseAsync(message).ConfigureAwait(false);

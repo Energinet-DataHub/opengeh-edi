@@ -27,4 +27,9 @@ limitations under the License.
     <ItemGroup>
       <ProjectReference Include="..\Messaging.Application\Messaging.Application.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="JsonMessageConverter.cs" />
+      <Compile Remove="Messages\MktActivityRecord.cs" />
+    </ItemGroup>
 </Project>

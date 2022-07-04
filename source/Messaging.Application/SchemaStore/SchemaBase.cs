@@ -20,13 +20,13 @@ namespace Messaging.Application.SchemaStore;
 
 public abstract class SchemaBase
 {
-    private static Dictionary<KeyValuePair<string, string>, string>? _schemas;
+    private Dictionary<KeyValuePair<string, string>, string>? _schemas;
 
     protected SchemaBase()
     {
     }
 
-    protected static void InitializeSchemas(Dictionary<KeyValuePair<string, string>, string> schemas)
+    protected void InitializeSchemas(Dictionary<KeyValuePair<string, string>, string> schemas)
     {
         _schemas = new Dictionary<KeyValuePair<string, string>, string>();
         schemas.ToList().ForEach((x) =>
@@ -36,7 +36,7 @@ public abstract class SchemaBase
         });
     }
 
-    protected static string? GetSchemaLocation(string businessProcessType, string version)
+    protected string? GetSchemaLocation(string businessProcessType, string version)
     {
         if (businessProcessType == null) throw new ArgumentNullException(nameof(businessProcessType));
 

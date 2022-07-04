@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Messaging.Application.IncomingMessages;
+using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.SchemaStore;
 using Messaging.CimMessageAdapter.Errors;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
+using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
 
 namespace Messaging.CimMessageAdapter.Messages;
 
@@ -99,33 +102,14 @@ public class JsonMessageParser : MessageParser
 
     private static MessageParserResult ParseJsonData(JsonTextReader jsonTextReader)
     {
+        var marketActivityRecords = new List<MarketActivityRecord>();
         var serializer = new JsonSerializer();
-        var deserialized = serializer.Deserialize<JObject>(jsonTextReader);  // <-----
-        foreach (var pair in deserialized)
-        {
-            var value = pair.Value;
-            var test = value["businessSector.type"]["value"];
-            var jmessage = new JsonMessage
-            {
-                MessageId = value["mRID"].ToString(),
-                CreatedAt = value["createdDateTime"].ToString(),
-                ProcessType = value["process.processType"]["value"].ToString(),
-                ReceiverId = value["receiver_MarketParticipant.mRID"]["value"].ToString(),
-                ReceiverRole = value["receiver_MarketParticipant.marketRole.type"]["value"].ToString(),
-                SenderId = value["sender_MarketParticipant.mRID"]["value"].ToString(),
-                SenderRole = value["sender_MarketParticipant.marketRole.type"]["value"].ToString(),
-            };
-            var marketActivityRecords = new List<MktActivityRecord>();
-            foreach (var record in value["MktActivityRecord"])
-            {
-                marketActivityRecords.Add(new MktActivityRecord
-                {
-                    Id = record["mRID"].ToString(),
-                });
-            }
-        }
+        var jsonRequest = serializer.Deserialize<JObject>(jsonTextReader);
+        var token = jsonRequest.SelectToken("RequestChangeOfSupplier_MarketDocument");
+        var messageHeader = MessageHeaderFrom(token);
+        marketActivityRecords.AddRange(token["MktActivityRecord"].Select(MarketActivityRecordFrom));
 
-        throw new NotImplementedException();
+        return MessageParserResult.Succeeded(messageHeader, marketActivityRecords);
     }
 
     private static void ResetMessagePosition(Stream message)
@@ -137,5 +121,31 @@ public class JsonMessageParser : MessageParser
     private static MessageParserResult InvalidJsonFailure(Exception exception)
     {
         return MessageParserResult.Failure(InvalidMessageStructure.From(exception));
+    }
+
+    private static MessageHeader MessageHeaderFrom(JToken token)
+    {
+        return new MessageHeader(
+            token["mRID"].ToString(),
+            token["process.processType"]["value"].ToString(),
+            token["sender_MarketParticipant.mRID"]["value"].ToString(),
+            token["sender_MarketParticipant.marketRole.type"]["value"].ToString(),
+            token["receiver_MarketParticipant.mRID"]["value"].ToString(),
+            token["receiver_MarketParticipant.marketRole.type"]["value"].ToString(),
+            token["createdDateTime"].ToString());
+    }
+
+    private static MarketActivityRecord MarketActivityRecordFrom(JToken token)
+    {
+        return new MarketActivityRecord()
+        {
+            Id = token["mRID"].ToString(),
+            ConsumerId = token["marketEvaluationPoint.customer_MarketParticipant.mRID"]["value"].ToString(),
+            BalanceResponsibleId = token["marketEvaluationPoint.balanceResponsibleParty_MarketParticipant.mRID"]["value"].ToString(),
+            EnergySupplierId = token["marketEvaluationPoint.energySupplier_MarketParticipant.mRID"]["value"].ToString(),
+            MarketEvaluationPointId = token["marketEvaluationPoint.mRID"]["value"].ToString(),
+            ConsumerName = token["marketEvaluationPoint.customer_MarketParticipant.name"].ToString(),
+            EffectiveDate = token["start_DateAndOrTime.dateTime"].ToString(),
+        };
     }
 }
