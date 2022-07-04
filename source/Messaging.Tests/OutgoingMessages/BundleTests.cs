@@ -44,6 +44,7 @@ public class BundleTests
         Assert.Equal(outgoingMessage1.ProcessType, bundledMessage.Header.ProcessType);
         Assert.Equal(outgoingMessage1.ReasonCode, bundledMessage.Header.ReasonCode);
         Assert.Equal(outgoingMessage1.ReceiverId, bundledMessage.Header.ReceiverId);
+        Assert.Equal(outgoingMessage1.ReceiverRole, bundledMessage.Header.ReceiverRole);
         Assert.NotNull(bundledMessage.Header.MessageId);
     }
 
