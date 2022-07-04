@@ -19,9 +19,9 @@ public class JsonMessageParser : MessageParser
 {
     private readonly ISchemaProvider _schemaProvider;
 
-    public JsonMessageParser(string? contentType)
+    public JsonMessageParser()
     {
-        _schemaProvider = SchemaProviderFactory.GetProvider(contentType);
+        _schemaProvider = new JsonSchemaProvider();
     }
 
     public override async Task<MessageParserResult> ParseAsync(Stream message)

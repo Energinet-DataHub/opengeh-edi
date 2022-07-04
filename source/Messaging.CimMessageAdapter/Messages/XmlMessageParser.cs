@@ -18,9 +18,9 @@ public class XmlMessageParser : MessageParser
     private readonly List<ValidationError> _errors = new();
     private readonly ISchemaProvider _schemaProvider;
 
-    public XmlMessageParser(string? contentType)
+    public XmlMessageParser()
     {
-        _schemaProvider = SchemaProviderFactory.GetProvider(contentType);
+        _schemaProvider = new XmlSchemaProvider();
     }
 
     public override async Task<MessageParserResult> ParseAsync(Stream message)

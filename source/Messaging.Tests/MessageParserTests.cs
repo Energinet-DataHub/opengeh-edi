@@ -13,7 +13,7 @@ public class MessageParserTests
     [Fact]
     public async Task Message_parser_can_parse_xml_messages()
     {
-        var parser = new XmlMessageParser(MediaTypeNames.Application.Xml);
+        var parser = new XmlMessageParser();
         var stream = LoadXmlFileAsMemoryStream();
         var parsedResult = await parser.ParseAsync(stream).ConfigureAwait(false);
 
@@ -23,7 +23,7 @@ public class MessageParserTests
     [Fact]
     public async Task Message_parser_can_parse_json_messages()
     {
-        var parser = new JsonMessageParser(MediaTypeNames.Application.Json);
+        var parser = new JsonMessageParser();
         var stream = LoadJsonFileAsMemoryStream();
         var parsedResult = await parser.ParseAsync(stream).ConfigureAwait(false);
 

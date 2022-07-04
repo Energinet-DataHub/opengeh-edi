@@ -23,8 +23,8 @@ public static class MessageParserStrategy
 {
     private static readonly IDictionary<string, Func<MessageParser>> _strategies = new Dictionary<string, Func<MessageParser>>()
     {
-        { "application/xml", () => new XmlMessageParser("application/xml") },
-        { "application/json", () => new JsonMessageParser("application/json") },
+        { "application/xml", () => new XmlMessageParser() },
+        { "application/json", () => new JsonMessageParser() },
     };
 
     public static MessageParser GetMessageParserStrategy(string contentType)

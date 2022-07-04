@@ -28,7 +28,7 @@ public class SchemaProviderTests
     [Fact]
     public async Task Schema_provider_can_get_xml_schema()
     {
-        _provider = SchemaProviderFactory.GetProvider(MediaTypeNames.Application.Xml);
+        _provider = new XmlSchemaProvider();
         var schema = await _provider.GetSchemaAsync<XmlSchema>("confirmrequestchangeofsupplier", "0.1").ConfigureAwait(false);
         Assert.Equal(typeof(XmlSchema), schema?.GetType());
     }
@@ -36,7 +36,7 @@ public class SchemaProviderTests
     [Fact]
     public async Task Schema_provider_can_get_json_schema()
     {
-        _provider = SchemaProviderFactory.GetProvider(MediaTypeNames.Application.Json);
+        _provider = new JsonSchemaProvider();
         var schema = await _provider.GetSchemaAsync<JsonSchema>("RequestChangeofSupplier", "0").ConfigureAwait(false);
         Assert.Equal(typeof(JsonSchema), schema?.GetType());
     }
