@@ -41,6 +41,7 @@ public class BundleTests
         var bundledMessage = _bundle.CreateMessage();
 
         Assert.Equal(outgoingMessage1.DocumentType, bundledMessage.DocumentType);
+        Assert.Equal(outgoingMessage1.ProcessType, bundledMessage.Header.ProcessType);
     }
 
     [Fact]
@@ -138,8 +139,8 @@ public class Bundle
 
     public CimMessage CreateMessage()
     {
-        return new CimMessage(_documentType);
+        return new CimMessage(_documentType, _header);
     }
 }
 
-public record CimMessage(string DocumentType);
+public record CimMessage(string DocumentType, MessageHeader Header);
