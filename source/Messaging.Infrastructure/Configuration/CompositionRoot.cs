@@ -61,8 +61,6 @@ using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using NJsonSchema;
-using Result = Messaging.Application.OutgoingMessages.Result;
 
 namespace Messaging.Infrastructure.Configuration
 {
@@ -83,7 +81,7 @@ namespace Messaging.Infrastructure.Configuration
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
             services.AddScoped<IMessageDispatcher, MessageDispatcher>();
-            services.AddTransient<IRequestHandler<RequestMessages, Result>, RequestMessagesHandler>();
+            services.AddTransient<IRequestHandler<RequestMessages, Unit>, RequestMessagesHandler>();
             services.AddScoped<MessageRequestContext>();
             services.AddScoped<MessageReceiver>();
 

@@ -24,7 +24,7 @@ using Messaging.Domain.OutgoingMessages;
 
 namespace Messaging.Application.OutgoingMessages
 {
-    public class RequestMessagesHandler : IRequestHandler<RequestMessages, Result>
+    public class RequestMessagesHandler : IRequestHandler<RequestMessages, Unit>
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly IMessageDispatcher _messageDispatcher;
@@ -43,7 +43,7 @@ namespace Messaging.Application.OutgoingMessages
             _systemDateTimeProvider = systemDateTimeProvider;
         }
 
-        public async Task<Result> Handle(RequestMessages request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(RequestMessages request, CancellationToken cancellationToken)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
             var requestedMessageIds = request.MessageIds.ToList();
@@ -59,7 +59,7 @@ namespace Messaging.Application.OutgoingMessages
             var message = await _messageFactory.CreateFromAsync(messageBundle.CreateMessage()).ConfigureAwait(false);
             await _messageDispatcher.DispatchAsync(message).ConfigureAwait(false);
 
-            return Result.Succeeded();
+            return Unit.Value;
         }
 
         private static List<string> MessageIdsNotFound(IReadOnlyCollection<string> requestedMessageIds, ReadOnlyCollection<OutgoingMessage> messages)

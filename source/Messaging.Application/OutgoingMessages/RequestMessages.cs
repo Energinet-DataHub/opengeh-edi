@@ -13,11 +13,12 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using MediatR;
 using Messaging.Application.Common.Commands;
 
 namespace Messaging.Application.OutgoingMessages;
 
-public class RequestMessages : ICommand<Result>
+public class RequestMessages : ICommand<Unit>
 {
     public RequestMessages(IEnumerable<string> messageIds)
     {

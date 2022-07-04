@@ -74,7 +74,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
             return incomingMessage;
         }
 
-        private Task<Result> RequestMessages(IEnumerable<string> messageIds)
+        private Task RequestMessages(IEnumerable<string> messageIds)
         {
             return GetService<IMediator>().Send(new RequestMessages(messageIds.ToList()));
         }
