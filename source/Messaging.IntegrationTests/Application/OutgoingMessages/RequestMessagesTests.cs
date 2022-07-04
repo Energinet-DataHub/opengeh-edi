@@ -26,12 +26,12 @@ using Xunit;
 
 namespace Messaging.IntegrationTests.Application.OutgoingMessages
 {
-    public class MessageRequestTests : TestBase
+    public class RequestMessagesTests : TestBase
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly MessageDispatcherSpy _messageDispatcherSpy;
 
-        public MessageRequestTests(DatabaseFixture databaseFixture)
+        public RequestMessagesTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
             _outgoingMessageStore = GetService<IOutgoingMessageStore>();
