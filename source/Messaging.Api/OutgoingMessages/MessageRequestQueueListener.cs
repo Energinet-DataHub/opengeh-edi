@@ -14,10 +14,9 @@
 
 using System;
 using System.Threading.Tasks;
-using Messaging.Api.Configuration;
+using MediatR;
 using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages;
-using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.OutgoingMessages;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
@@ -28,29 +27,27 @@ namespace Messaging.Api.OutgoingMessages
     {
         private readonly ICorrelationContext _correlationContext;
         private readonly ILogger<MessageRequestQueueListener> _logger;
-        private readonly RequestMessagesHandler _requestMessagesHandler;
         private readonly MessageRequestContext _messageRequestContext;
+        private readonly IMediator _mediator;
 
         public MessageRequestQueueListener(
             ICorrelationContext correlationContext,
             ILogger<MessageRequestQueueListener> logger,
-            RequestMessagesHandler requestMessagesHandler,
-            MessageRequestContext messageRequestContext)
+            MessageRequestContext messageRequestContext,
+            IMediator mediator)
         {
             _correlationContext = correlationContext;
             _logger = logger;
-            _requestMessagesHandler = requestMessagesHandler;
             _messageRequestContext = messageRequestContext;
+            _mediator = mediator;
         }
 
         [Function(nameof(MessageRequestQueueListener))]
         public async Task RunAsync([ServiceBusTrigger("%MESSAGE_REQUEST_QUEUE%", Connection = "MESSAGEHUB_QUEUE_CONNECTION_STRING", IsSessionsEnabled = true)] byte[] data)
         {
             await _messageRequestContext.SetMessageRequestContextAsync(data).ConfigureAwait(false);
-            var result = await _requestMessagesHandler.HandleAsync(
-                _messageRequestContext.DataAvailableIds
-                ?? throw new InvalidOperationException()).ConfigureAwait(false);
-
+            await _mediator.Send(new RequestMessages(_messageRequestContext.DataAvailableIds
+                                                     ?? throw new InvalidOperationException())).ConfigureAwait(false);
             _logger.LogInformation($"Dequeued with correlation id: {_correlationContext.Id}");
         }
     }

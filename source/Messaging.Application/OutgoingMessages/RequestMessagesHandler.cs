@@ -12,21 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using MediatR;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Domain.OutgoingMessages;
 
 namespace Messaging.Application.OutgoingMessages
 {
-    public class RequestMessagesHandler
+    public class RequestMessagesHandler : IRequestHandler<RequestMessages, Result>
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly IMessageDispatcher _messageDispatcher;
-        private readonly IUnitOfWork _unitOfWork;
         private readonly MessageFactory _messageFactory;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
@@ -39,13 +41,14 @@ namespace Messaging.Application.OutgoingMessages
         {
             _outgoingMessageStore = outgoingMessageStore;
             _messageDispatcher = messageDispatcherSpy;
-            _unitOfWork = unitOfWork;
             _messageFactory = messageFactory;
             _systemDateTimeProvider = systemDateTimeProvider;
         }
 
-        public async Task<Result> HandleAsync(IReadOnlyCollection<string> requestedMessageIds)
+        public async Task<Result> Handle(RequestMessages request, CancellationToken cancellationToken)
         {
+            if (request == null) throw new ArgumentNullException(nameof(request));
+            var requestedMessageIds = request.MessageIds.ToList();
             var messages = _outgoingMessageStore.GetByIds(requestedMessageIds);
             var messageIdsNotFound = MessageIdsNotFound(requestedMessageIds, messages);
             if (messageIdsNotFound.Any())
@@ -57,7 +60,6 @@ namespace Messaging.Application.OutgoingMessages
 
             var message = await _messageFactory.CreateFromAsync(messageBundle.CreateMessage()).ConfigureAwait(false);
             await _messageDispatcher.DispatchAsync(message).ConfigureAwait(false);
-            await _unitOfWork.CommitAsync().ConfigureAwait(false);
 
             return Result.Succeeded();
         }

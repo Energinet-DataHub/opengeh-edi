@@ -144,6 +144,11 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
                 .WithTransactionId(SampleData.TransactionId);
         }
 
+        private async Task RequestMessage(string id)
+        {
+            await InvokeCommandAsync(new RequestMessages(new[] { id })).ConfigureAwait(false);
+        }
+
         private async Task AssertRejectMessage(OutgoingMessage rejectMessage)
         {
             var dispatchedDocument = GetDispatchedDocument();
@@ -161,11 +166,6 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
             var document = XDocument.Load(dispatchedDocument);
             AssertHeader(document, message, "A01");
-        }
-
-        private async Task RequestMessage(string id)
-        {
-            await GetService<RequestMessagesHandler>().HandleAsync(new[] { id }).ConfigureAwait(false);
         }
 
         private Stream GetDispatchedDocument()
