@@ -53,6 +53,12 @@ public class BundleTests
     }
 
     [Fact]
+    public void Cannot_create_message_when_bundle_does_not_contain_any_messages()
+    {
+        Assert.Throws<NoMessagesInBundleException>(() => _bundle.CreateMessage());
+    }
+
+    [Fact]
     public void Messages_must_originate_from_the_same_type_of_business_process()
     {
         _bundle.Add(CreateOutgoingMessage("ProcessType1", "SenderId"));
@@ -147,6 +153,10 @@ public class Bundle
 
     public CimMessage CreateMessage()
     {
+        if (_messages.Count == 0)
+        {
+            throw new NoMessagesInBundleException();
+        }
         var payloads = _messages.Select(message => message.MarketActivityRecordPayload).ToList();
         return new CimMessage(_documentType, _header, payloads);
     }
