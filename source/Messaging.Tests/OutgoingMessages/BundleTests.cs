@@ -33,15 +33,9 @@ public class BundleTests
     [Fact]
     public void Messages_must_originate_from_the_same_type_of_business_process()
     {
-        var messages = new List<OutgoingMessage>()
-        {
-            CreateOutgoingMessage("ProcessType1", "SenderId"),
-            CreateOutgoingMessage("ProcessType2", "SenderId"),
-        };
+        _bundle.Add(CreateOutgoingMessage("ProcessType1", "SenderId"));
 
-        _bundle.Add(messages[0]);
-
-        Assert.Throws<ProcessTypesDoesNotMatchException>(() => _bundle.Add(messages[1]));
+        Assert.Throws<ProcessTypesDoesNotMatchException>(() => _bundle.Add(CreateOutgoingMessage("ProcessType2", "SenderId")));
     }
 
     [Fact]
