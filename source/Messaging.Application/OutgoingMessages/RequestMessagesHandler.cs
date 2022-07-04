@@ -20,7 +20,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.Configuration;
-using Messaging.Application.Configuration.DataAccess;
 using Messaging.Domain.OutgoingMessages;
 
 namespace Messaging.Application.OutgoingMessages
@@ -35,7 +34,6 @@ namespace Messaging.Application.OutgoingMessages
         public RequestMessagesHandler(
             IOutgoingMessageStore outgoingMessageStore,
             IMessageDispatcher messageDispatcherSpy,
-            IUnitOfWork unitOfWork,
             MessageFactory messageFactory,
             ISystemDateTimeProvider systemDateTimeProvider)
         {
