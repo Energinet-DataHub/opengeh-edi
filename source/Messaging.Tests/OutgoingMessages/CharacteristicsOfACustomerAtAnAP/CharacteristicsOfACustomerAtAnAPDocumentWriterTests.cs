@@ -58,19 +58,24 @@ namespace Messaging.Tests.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
 
             var message = await _documentWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
 
-            await AssertMessage(message, header, marketActivityRecords).ConfigureAwait(false);
+            var schema = await GetSchema().ConfigureAwait(false);
+            var assertDocument = await AssertXmlDocument
+                .Document(message)
+                .HasHeader(header)
+                .NumberOfMarketActivityRecordsIs(2)
+                .HasValidStructureAsync(schema!).ConfigureAwait(false);
+            AssertMarketActivityRecords(marketActivityRecords, assertDocument);
         }
 
-        private static void AssertMarketActivityRecords(List<MarketActivityRecord> marketActivityRecords, XDocument document)
+        private static void AssertMarketActivityRecords(List<MarketActivityRecord> marketActivityRecords, AssertXmlDocument assertDocument)
         {
-            AssertXmlMessage.AssertMarketActivityRecordCount(document, 2);
-            foreach (var activityRecord in marketActivityRecords)
+            foreach (var marketActivityRecord in marketActivityRecords)
             {
-                var marketActivityRecord = AssertXmlMessage.GetMarketActivityRecordById(document, activityRecord.Id)!;
-
-                Assert.NotNull(marketActivityRecord);
-                AssertXmlMessage.AssertMarketActivityRecordValue(marketActivityRecord, "originalTransactionIDReference_MktActivityRecord.mRID", activityRecord.OriginalTransactionId);
-                AssertXmlMessage.AssertMarketActivityRecordValue(marketActivityRecord, "validityStart_DateAndOrTime.dateTime", activityRecord.ValidityStart.ToString());
+                assertDocument
+                    .HasMarketActivityRecordValue(marketActivityRecord.Id, "originalTransactionIDReference_MktActivityRecord.mRID", marketActivityRecord.OriginalTransactionId)
+                    .HasMarketActivityRecordValue(marketActivityRecord.Id, "validityStart_DateAndOrTime.dateTime", marketActivityRecord.ValidityStart.ToString())
+                    .CharacteristicsOfACustomerAtAnAp()
+                    .HasMarketEvaluationPointId(marketActivityRecord.Id, marketActivityRecord.MarketEvaluationPoint.MarketEvaluationPointId);
             }
         }
 
@@ -110,21 +115,10 @@ namespace Messaging.Tests.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
                     }));
         }
 
-        private async Task AssertMessage(Stream message, MessageHeader header, List<MarketActivityRecord> marketActivityRecords)
-        {
-            var document = XDocument.Load(message);
-            AssertXmlMessage.AssertHeader(header, document);
-
-            AssertMarketActivityRecords(marketActivityRecords, document);
-            await AssertConformsToSchema(message).ConfigureAwait(false);
-        }
-
-        private async Task AssertConformsToSchema(Stream message)
+        private Task<XmlSchema?> GetSchema()
         {
             _schemaProvider = SchemaProviderFactory.GetProvider(MediaTypeNames.Application.Xml);
-            var schema = await _schemaProvider.GetSchemaAsync<XmlSchema>("characteristicsofacustomeratanap", "0.1")
-                .ConfigureAwait(false);
-            await AssertXmlMessage.AssertConformsToSchemaAsync(message, schema!).ConfigureAwait(false);
+            return _schemaProvider.GetSchemaAsync<XmlSchema>("characteristicsofacustomeratanap", "0.1");
         }
     }
 }
