@@ -33,6 +33,8 @@ public abstract class DocumentWriter
         _parser = parser;
     }
 
+    protected DocumentDetails DocumentDetails => _documentDetails;
+
     public async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
     {
         var settings = new XmlWriterSettings { OmitXmlDeclaration = false, Encoding = Encoding.UTF8, Async = true };
