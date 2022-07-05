@@ -18,7 +18,7 @@ namespace Messaging.Application.MasterData;
 
 public class MasterDataContent
 {
-    public MasterDataContent(string gsrnNumber, Address address, Series series, GridAreaDetails gridAreaDetails, string connectionState, string meteringMethod, string readingPeriodicity, string type, int maximumCurrent, int maximumPower, string powerPlantGsrnNumber, DateTime effectiveDate, string meterNumber, double capacity, string assetType, string settlementMethod, string scheduledMeterReadingDate, bool productionObligation, string netSettlementGroup, string disconnectionType, string connectionType)
+    public MasterDataContent(string gsrnNumber, Address address, Series series, GridAreaDetails gridAreaDetails, string connectionState, string meteringMethod, string readingPeriodicity, string type, int maximumCurrent, int maximumPower, string powerPlantGsrnNumber, DateTime effectiveDate, string meterNumber, double capacity, string assetType, string settlementMethod, string scheduledMeterReadingDate, bool productionObligation, string netSettlementGroup, string disconnectionType, string connectionType, string? parentMarketEvaluationPointId, string meteringPointResponsible)
     {
         GsrnNumber = gsrnNumber;
         Address = address;
@@ -41,6 +41,8 @@ public class MasterDataContent
         NetSettlementGroup = netSettlementGroup;
         DisconnectionType = disconnectionType;
         ConnectionType = connectionType;
+        ParentMarketEvaluationPointId = parentMarketEvaluationPointId;
+        MeteringPointResponsible = meteringPointResponsible;
     }
 
     public string? GsrnNumber { get; }
@@ -84,6 +86,10 @@ public class MasterDataContent
     public string? DisconnectionType { get; }
 
     public string? ConnectionType { get; }
+
+    public string? ParentMarketEvaluationPointId { get; }
+
+    public string MeteringPointResponsible { get; }
 }
 
 public record Address(

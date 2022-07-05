@@ -82,7 +82,7 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
 
         return new MarketEvaluationPoint(
             new Mrid(transaction.MarketEvaluationPointId, "A10"),
-            new Mrid("id", "codingSceme"),
+            new Mrid(masterData.MeteringPointResponsible, "A10"),
             masterData.Type!,
             masterData.SettlementMethod!,
             masterData.MeteringMethod!,
@@ -111,7 +111,7 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
             masterData.Address.GeoInfoReference.ToString(),
             address,
             masterData.Address.IsActualAddress.ToString(),
-            new RelatedMarketEvaluationPoint(new Mrid("id", "codingScheme"), "description"),
+            string.IsNullOrEmpty(masterData.ParentMarketEvaluationPointId) ? null : new RelatedMarketEvaluationPoint(new Mrid(masterData.ParentMarketEvaluationPointId, "A10"), "description"),
             null);
     }
 

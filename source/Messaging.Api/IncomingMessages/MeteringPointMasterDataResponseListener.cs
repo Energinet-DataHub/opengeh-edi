@@ -99,7 +99,9 @@ public class MeteringPointMasterDataResponseListener
             masterData.ProductionObligation,
             masterData.NetSettlementGroup,
             masterData.DisconnetionType,
-            masterData.ConnectionType);
+            masterData.ConnectionType,
+            masterData.ParentRelatedMeteringPoint,
+            masterData.GridOperatorId);
     }
 
     private MasterDataResponseMetadata GetMetaData(FunctionContext context)
