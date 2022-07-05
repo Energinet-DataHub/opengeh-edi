@@ -30,7 +30,7 @@ limitations under the License.
 
 	<PropertyGroup>
 		<PackageId>Energinet.DataHub.EnergySupplying.IntegrationEvents</PackageId>
-		<PackageVersion>1.0.0$(VersionSuffix)</PackageVersion>
+		<PackageVersion>1.0.1$(VersionSuffix)</PackageVersion>
 		<Title>EnergySupplying IntegrationEvents library</Title>
 		<Company>Energinet-DataHub</Company>
 		<Authors>Energinet-DataHub</Authors>
@@ -72,5 +72,28 @@ limitations under the License.
 
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.21.1" />
+    <PackageReference Include="Grpc.Tools" Version="2.46.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="**/*.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Public</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+      <Generator>MSBuild:Compile</Generator>
+    </Protobuf>
+    <Protobuf Update="ConsumerMovedIn.proto">
+      <OutputDir>obj\Debug\net6.0\</OutputDir>
+    </Protobuf>
+    <Protobuf Update="EnergySupplierChanged.proto">
+      <OutputDir>obj\Debug\net6.0\</OutputDir>
+    </Protobuf>
+    <Protobuf Update="FutureEnergySupplierChangeRegistered.proto">
+      <OutputDir>obj\Debug\net6.0\</OutputDir>
+    </Protobuf>
   </ItemGroup>
 </Project>
