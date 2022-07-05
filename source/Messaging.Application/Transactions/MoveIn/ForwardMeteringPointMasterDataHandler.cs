@@ -24,6 +24,7 @@ using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.MasterData;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
+using Messaging.Domain.OutgoingMessages;
 using NodaTime.Extensions;
 using Address = Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.Address;
 using Series = Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.Series;

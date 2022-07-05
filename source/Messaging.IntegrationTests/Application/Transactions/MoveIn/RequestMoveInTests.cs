@@ -24,6 +24,7 @@ using Messaging.Application.OutgoingMessages;
 using Messaging.Application.SchemaStore;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Xml;
+using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Transactions;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Fixtures;
@@ -143,6 +144,11 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
                 .WithTransactionId(SampleData.TransactionId);
         }
 
+        private async Task RequestMessage(string id)
+        {
+            await InvokeCommandAsync(new RequestMessages(new[] { id })).ConfigureAwait(false);
+        }
+
         private async Task AssertRejectMessage(OutgoingMessage rejectMessage)
         {
             var dispatchedDocument = GetDispatchedDocument();
@@ -160,11 +166,6 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
             var document = XDocument.Load(dispatchedDocument);
             AssertHeader(document, message, "A01");
-        }
-
-        private async Task RequestMessage(string id)
-        {
-            await GetService<MessageRequestHandler>().HandleAsync(new[] { id }).ConfigureAwait(false);
         }
 
         private Stream GetDispatchedDocument()

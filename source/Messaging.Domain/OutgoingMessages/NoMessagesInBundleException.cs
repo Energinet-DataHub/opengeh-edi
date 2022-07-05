@@ -12,21 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Messaging.Application.OutgoingMessages;
-using Messaging.Domain.OutgoingMessages;
+namespace Messaging.Domain.OutgoingMessages;
 
-namespace Messaging.Infrastructure.OutgoingMessages
+public class NoMessagesInBundleException : Exception
 {
-    /// <summary>
-    /// Publishes notifications about new messages
-    /// </summary>
-    public interface INewMessageAvailableNotifier
+    public NoMessagesInBundleException()
+        : base("Cannot not create message from a bundle that does not contain any messages")
     {
-        /// <summary>
-        /// Notify about new available of message
-        /// </summary>
-        /// <param name="message">The notification to send to the post office.</param>
-        Task NotifyAsync(OutgoingMessage message);
+    }
+
+    private NoMessagesInBundleException(string message)
+        : base(message)
+    {
+    }
+
+    private NoMessagesInBundleException(string message, Exception innerException)
+        : base(message, innerException)
+    {
     }
 }

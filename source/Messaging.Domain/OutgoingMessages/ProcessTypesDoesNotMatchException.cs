@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections;
 
-namespace Messaging.Application.OutgoingMessages
+namespace Messaging.Domain.OutgoingMessages
 {
     public class ProcessTypesDoesNotMatchException : Exception
     {

@@ -13,23 +13,33 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Messaging.Application.OutgoingMessages
 {
     public class OutgoingMessageNotFoundException : Exception
     {
-        public OutgoingMessageNotFoundException(string messageId)
-            : base($"Message with id:{messageId} does not exist")
+        public OutgoingMessageNotFoundException(IEnumerable<string> messageIds)
+            : base($"One or more messages was not found")
         {
+            MessageIds = messageIds.ToList();
         }
 
-        public OutgoingMessageNotFoundException(string message, Exception innerException)
+        private OutgoingMessageNotFoundException(string message, Exception innerException)
             : base(message, innerException)
         {
         }
 
-        public OutgoingMessageNotFoundException()
+        private OutgoingMessageNotFoundException()
         {
         }
+
+        private OutgoingMessageNotFoundException(string message)
+            : base(message)
+        {
+        }
+
+        public IReadOnlyList<string> MessageIds { get; } = new List<string>();
     }
 }

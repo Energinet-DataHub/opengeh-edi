@@ -12,35 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
+using MediatR;
+using Messaging.Application.Common.Commands;
 
-namespace Messaging.Application.OutgoingMessages
+namespace Messaging.Application.OutgoingMessages;
+
+public class RequestMessages : ICommand<Unit>
 {
-    public class Result
+    public RequestMessages(IEnumerable<string> messageIds)
     {
-        private Result(IEnumerable<Exception> exceptions)
-        {
-            Errors = exceptions.ToList();
-        }
-
-        private Result()
-        {
-        }
-
-        public IReadOnlyCollection<Exception> Errors { get; } = new List<Exception>();
-
-        public bool Success => Errors.Count == 0;
-
-        public static Result Failure(params Exception[] exceptions)
-        {
-            return new Result(exceptions);
-        }
-
-        public static Result Succeeded()
-        {
-            return new Result();
-        }
+        MessageIds = messageIds;
     }
+
+    public IEnumerable<string> MessageIds { get; }
 }
