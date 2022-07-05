@@ -73,6 +73,15 @@ public abstract class DocumentWriter
         return writer.WriteElementStringAsync(DocumentDetails.Prefix, name, null, value);
     }
 
+    protected async Task WriteMridAsync(string localName, string id, string codingScheme, XmlWriter writer)
+    {
+        if (writer == null) throw new ArgumentNullException(nameof(writer));
+        await writer.WriteStartElementAsync(DocumentDetails.Prefix, localName, null).ConfigureAwait(false);
+        await writer.WriteAttributeStringAsync(null, "codingScheme", null, codingScheme).ConfigureAwait(false);
+        writer.WriteValue(id);
+        await writer.WriteEndElementAsync().ConfigureAwait(false);
+    }
+
     private static Task WriteHeaderAsync(MessageHeader header, DocumentDetails documentDetails, XmlWriter writer)
     {
         return HeaderWriter.WriteAsync(writer, header, documentDetails);
