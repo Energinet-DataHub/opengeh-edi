@@ -14,6 +14,7 @@
 
 using System;
 using Messaging.Application.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

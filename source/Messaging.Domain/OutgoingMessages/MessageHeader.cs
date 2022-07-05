@@ -12,21 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Messaging.Application.OutgoingMessages;
-using Messaging.Domain.OutgoingMessages;
+using NodaTime;
 
-namespace Messaging.Infrastructure.OutgoingMessages
+namespace Messaging.Domain.OutgoingMessages
 {
-    /// <summary>
-    /// Publishes notifications about new messages
-    /// </summary>
-    public interface INewMessageAvailableNotifier
-    {
-        /// <summary>
-        /// Notify about new available of message
-        /// </summary>
-        /// <param name="message">The notification to send to the post office.</param>
-        Task NotifyAsync(OutgoingMessage message);
-    }
+    public record MessageHeader(
+        string ProcessType,
+        string SenderId,
+        string SenderRole,
+        string ReceiverId,
+        string ReceiverRole,
+        string MessageId,
+        Instant TimeStamp,
+        string? ReasonCode = null);
 }

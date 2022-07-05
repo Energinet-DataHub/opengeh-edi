@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Messaging.Application.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.OutgoingMessages;
 
 namespace Messaging.IntegrationTests.TestDoubles
