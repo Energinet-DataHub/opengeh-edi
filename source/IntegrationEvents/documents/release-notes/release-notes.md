@@ -2,7 +2,7 @@
 
 ## Version 1.0.1
 
-- Added protobuf contract files
+- Added Protobuf contract files
 
 ## Version 1.0.0
 
