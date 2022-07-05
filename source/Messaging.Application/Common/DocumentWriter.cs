@@ -67,6 +67,12 @@ public abstract class DocumentWriter
         return marketActivityRecords;
     }
 
+    protected Task WriteElementAsync(string name, string value, XmlWriter writer)
+    {
+        if (writer == null) throw new ArgumentNullException(nameof(writer));
+        return writer.WriteElementStringAsync(DocumentDetails.Prefix, name, null, value);
+    }
+
     private static Task WriteHeaderAsync(MessageHeader header, DocumentDetails documentDetails, XmlWriter writer)
     {
         return HeaderWriter.WriteAsync(writer, header, documentDetails);

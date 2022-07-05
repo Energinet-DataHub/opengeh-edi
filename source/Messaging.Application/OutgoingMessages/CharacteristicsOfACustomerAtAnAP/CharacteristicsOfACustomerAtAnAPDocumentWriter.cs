@@ -112,11 +112,6 @@ public class CharacteristicsOfACustomerAtAnAPDocumentWriter : DocumentWriter
         await writer.WriteEndElementAsync().ConfigureAwait(false);
     }
 
-    private Task WriteElementAsync(string name, string value, XmlWriter writer)
-    {
-        return writer.WriteElementStringAsync(DocumentDetails.Prefix, name, null, value);
-    }
-
     private async Task WriteMridAsync(string localName, string id, string codingScheme, XmlWriter writer)
     {
         await writer.WriteStartElementAsync(DocumentDetails.Prefix, localName, null).ConfigureAwait(false);
