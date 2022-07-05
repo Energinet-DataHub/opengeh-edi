@@ -45,47 +45,47 @@ public class MasterDataContent
         MeteringPointResponsible = meteringPointResponsible;
     }
 
-    public string? GsrnNumber { get; }
+    public string GsrnNumber { get; }
 
-    public Address? Address { get; }
+    public Address Address { get; }
 
-    public Series? Series { get; }
+    public Series Series { get; }
 
-    public GridAreaDetails? GridAreaDetails { get; }
+    public GridAreaDetails GridAreaDetails { get; }
 
-    public string? ConnectionState { get; }
+    public string ConnectionState { get; }
 
-    public string? MeteringMethod { get; }
+    public string MeteringMethod { get; }
 
-    public string? ReadingPeriodicity { get; }
+    public string ReadingPeriodicity { get; }
 
-    public string? Type { get; }
+    public string Type { get; }
 
     public int MaximumCurrent { get; }
 
     public int MaximumPower { get; }
 
-    public string? PowerPlantGsrnNumber { get; }
+    public string PowerPlantGsrnNumber { get; }
 
     public DateTime EffectiveDate { get; }
 
-    public string? MeterNumber { get; }
+    public string MeterNumber { get; }
 
     public double Capacity { get; }
 
-    public string? AssetType { get; }
+    public string AssetType { get; }
 
-    public string? SettlementMethod { get; }
+    public string SettlementMethod { get; }
 
-    public string? ScheduledMeterReadingDate { get; }
+    public string ScheduledMeterReadingDate { get; }
 
     public bool ProductionObligation { get; }
 
-    public string? NetSettlementGroup { get; }
+    public string NetSettlementGroup { get; }
 
-    public string? DisconnectionType { get; }
+    public string DisconnectionType { get; }
 
-    public string? ConnectionType { get; }
+    public string ConnectionType { get; }
 
     public string? ParentMarketEvaluationPointId { get; }
 
