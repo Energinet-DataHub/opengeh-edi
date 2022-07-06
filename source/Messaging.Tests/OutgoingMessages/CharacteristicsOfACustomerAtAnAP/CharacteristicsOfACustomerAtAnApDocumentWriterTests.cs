@@ -100,7 +100,13 @@ namespace Messaging.Tests.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
                     .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:mainAddress/cim:townDetail/cim:name", firstUsagePointLocation.MainAddress.TownDetail.Name)
                     .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:mainAddress/cim:townDetail/cim:country", firstUsagePointLocation.MainAddress.TownDetail.Country)
                     .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:mainAddress/cim:townDetail/cim:code", firstUsagePointLocation.MainAddress.TownDetail.Code)
-                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:mainAddress/cim:townDetail/cim:section", firstUsagePointLocation.MainAddress.TownDetail.Section);
+                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:mainAddress/cim:townDetail/cim:section", firstUsagePointLocation.MainAddress.TownDetail.Section)
+                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:name", firstUsagePointLocation.Name)
+                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:attn_Names.name", firstUsagePointLocation.AttnName)
+                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:phone1/cim:ituPhone", firstUsagePointLocation.Phone1)
+                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:phone2/cim:ituPhone", firstUsagePointLocation.Phone2)
+                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:electronicAddress/cim:email1", firstUsagePointLocation.EmailAddress)
+                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:protectedAddress", firstUsagePointLocation.ProtectedAddress.ToStringValue());
             }
         }
 
