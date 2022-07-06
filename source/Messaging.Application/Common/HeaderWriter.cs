@@ -41,7 +41,7 @@ public static class HeaderWriter
                 documentDetails.SchemaLocation)
             .ConfigureAwait(false);
         await writer.WriteElementStringAsync(documentDetails.Prefix, "mRID", null, messageHeader.MessageId).ConfigureAwait(false);
-        await writer.WriteElementStringAsync(documentDetails.Prefix, "type", null, "E44").ConfigureAwait(false);
+        await writer.WriteElementStringAsync(documentDetails.Prefix, "type", null, documentDetails.TypeCode).ConfigureAwait(false);
         await writer.WriteElementStringAsync(documentDetails.Prefix, "process.processType", null, messageHeader.ProcessType)
             .ConfigureAwait(false);
         await writer.WriteElementStringAsync(documentDetails.Prefix, "businessSector.type", null, "23").ConfigureAwait(false);

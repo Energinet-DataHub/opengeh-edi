@@ -81,6 +81,7 @@ public class AccountingPointCharacteristicsDocumentWriterTests
     {
         var document = XDocument.Load(message);
         AssertXmlMessage.AssertHeader(header, document);
+        AssertXmlMessage.AssertHasHeaderValue(document, "type", "E07");
 
         AssertMarketActivityRecords(marketActivityRecords, document);
 
