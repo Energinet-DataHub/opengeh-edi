@@ -20,7 +20,6 @@ using System.Threading.Tasks;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.IncomingMessages;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
-using Messaging.Application.SchemaStore;
 using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Messages;
 
@@ -49,7 +48,7 @@ namespace Messaging.CimMessageAdapter
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
 
-            var messageParser = _messageParserStrategy.GetMessageParserStrategy(contentType);
+            var messageParser = _messageParserStrategy.GetMessageParser(contentType);
 
             var messageParserResult =
                  await messageParser.ParseAsync(message).ConfigureAwait(false);

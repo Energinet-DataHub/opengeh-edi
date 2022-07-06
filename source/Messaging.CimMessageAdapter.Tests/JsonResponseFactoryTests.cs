@@ -28,7 +28,7 @@ public class JsonResponseFactoryTests
     public void Generate_empty_response_when_no_validation_errors_has_occurred()
     {
         var result = Result.Succeeded();
-        var responseFactory = ResponseStrategy.GetResponseStrategy(MediaTypeNames.Application.Json);
+        var responseFactory = ResponseStrategy.GetResponseFactory(MediaTypeNames.Application.Json);
 
         var response = responseFactory.From(result);
 
@@ -41,7 +41,7 @@ public class JsonResponseFactoryTests
     {
         var duplicateMessageIdError = new DuplicateMessageIdDetected("Duplicate message id");
         var result = Result.Failure(duplicateMessageIdError);
-        var responseFactory = ResponseStrategy.GetResponseStrategy(MediaTypeNames.Application.Json);
+        var responseFactory = ResponseStrategy.GetResponseFactory(MediaTypeNames.Application.Json);
 
         var response = responseFactory.From(result);
 
@@ -56,7 +56,7 @@ public class JsonResponseFactoryTests
         var duplicateMessageIdError = new DuplicateMessageIdDetected("Duplicate message id");
         var duplicateTransactionIdError = new DuplicateTransactionIdDetected("Fake transaction id");
         var result = Result.Failure(duplicateMessageIdError, duplicateTransactionIdError);
-        var responseFactory = ResponseStrategy.GetResponseStrategy(MediaTypeNames.Application.Json);
+        var responseFactory = ResponseStrategy.GetResponseFactory(MediaTypeNames.Application.Json);
 
         var response = responseFactory.From(result);
 

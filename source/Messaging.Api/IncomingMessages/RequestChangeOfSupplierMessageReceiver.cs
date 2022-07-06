@@ -54,7 +54,7 @@ namespace Messaging.Api.IncomingMessages
 
             var contentType = GetContentType(request.Headers);
 
-            var responseFactory = ResponseStrategy.GetResponseStrategy(contentType);
+            var responseFactory = ResponseStrategy.GetResponseFactory(contentType);
 
             var result = await _messageReceiver.ReceiveAsync(request.Body, contentType)
                 .ConfigureAwait(false);

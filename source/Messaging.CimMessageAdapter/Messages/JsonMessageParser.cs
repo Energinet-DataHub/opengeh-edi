@@ -167,8 +167,10 @@ public class JsonMessageParser : MessageParser
     {
         var jsonDocument = await JsonDocument.ParseAsync(message).ConfigureAwait(false);
 
-        var validationOptions = new ValidationOptions();
-        validationOptions.OutputFormat = OutputFormat.Detailed;
+        var validationOptions = new ValidationOptions()
+        {
+            OutputFormat = OutputFormat.Detailed,
+        };
 
         var validationResult = schema.Validate(jsonDocument, validationOptions);
 

@@ -27,7 +27,7 @@ public static class ResponseStrategy
         { MediaTypeNames.Application.Json, () => new JsonResponseFactory() },
     };
 
-    public static ResponseFactory GetResponseStrategy(string contentType)
+    public static ResponseFactory GetResponseFactory(string contentType)
     {
         var strategy = _strategies.FirstOrDefault(s => string.Equals(s.Key, contentType, StringComparison.OrdinalIgnoreCase));
         if (strategy.Key is null) throw new InvalidOperationException($"No response strategy found for content type {contentType}");

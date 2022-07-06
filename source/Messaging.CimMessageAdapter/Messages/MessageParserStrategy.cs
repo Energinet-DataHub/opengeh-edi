@@ -38,7 +38,7 @@ public class MessageParserStrategy
         };
     }
 
-    public MessageParser GetMessageParserStrategy(string contentType)
+    public MessageParser GetMessageParser(string contentType)
     {
         var strategy = _strategies.FirstOrDefault(s => string.Equals(s.Key, contentType, StringComparison.OrdinalIgnoreCase));
         if (strategy.Key is null) throw new InvalidOperationException($"No message parser strategy found for content type {contentType}");
