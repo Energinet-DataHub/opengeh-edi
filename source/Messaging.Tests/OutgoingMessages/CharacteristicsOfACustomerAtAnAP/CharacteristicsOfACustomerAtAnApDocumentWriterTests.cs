@@ -80,7 +80,9 @@ namespace Messaging.Tests.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
                     .HasValue("serviceCategory.ElectricalHeating", marketActivityRecord.MarketEvaluationPoint.ElectricalHeating.ToStringValue())
                     .HasValue("mRID", marketActivityRecord.MarketEvaluationPoint.MarketEvaluationPointId)
                     .HasValue("firstCustomer_MarketParticipant.mRID", marketActivityRecord.MarketEvaluationPoint.FirstCustomerId.Id)
-                    .HasValue("firstCustomer_MarketParticipant.name", marketActivityRecord.MarketEvaluationPoint.FirstCustomerName);
+                    .HasValue("firstCustomer_MarketParticipant.name", marketActivityRecord.MarketEvaluationPoint.FirstCustomerName)
+                    .HasValue("secondCustomer_MarketParticipant.mRID", marketActivityRecord.MarketEvaluationPoint.SecondCustomerId.Id)
+                    .HasValue("secondCustomer_MarketParticipant.name", marketActivityRecord.MarketEvaluationPoint.SecondCustomerName);
             }
         }
 
