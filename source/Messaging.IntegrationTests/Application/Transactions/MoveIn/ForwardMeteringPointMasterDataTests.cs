@@ -16,12 +16,14 @@ using System;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Dapper;
 using Messaging.Application.Common;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.MasterData;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
 using Messaging.Application.Transactions.MoveIn;
+using Messaging.Domain.OutgoingMessages;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Fixtures;
 using NodaTime.Extensions;
@@ -60,7 +62,7 @@ public class ForwardMeteringPointMasterDataTests : TestBase
         var forwardMeteringPointMasterData = new ForwardMeteringPointMasterData(SampleData.TransactionId, masterData);
         await InvokeCommandAsync(forwardMeteringPointMasterData).ConfigureAwait(false);
 
-        var marketActivityRecord = GetMarketActivityRecord("AccountingPointCharacteristics");
+        var marketActivityRecord = await GetMarketActivityRecordAsync("AccountingPointCharacteristics").ConfigureAwait(false);
         AssertMasterData(masterData, marketActivityRecord.MarketEvaluationPt);
     }
 
@@ -123,6 +125,20 @@ public class ForwardMeteringPointMasterDataTests : TestBase
             .WithMarketEvaluationPointId(SampleData.MarketEvaluationPointId);
     }
 
+    private static async Task<OutgoingMessage> GetMessageAsync(IDbConnectionFactory connectionFactory, string documentType)
+    {
+        if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
+
+        var outgoingMessage = await connectionFactory.GetOpenConnection().QuerySingleAsync<OutgoingMessage>(
+            $"SELECT [DocumentType], [ReceiverId], [CorrelationId], [OriginalMessageId], [ProcessType], [ReceiverRole], [SenderId], [SenderRole], [MarketActivityRecordPayload],[ReasonCode] FROM b2b.OutgoingMessages WHERE DocumentType = @DocumentType",
+            new
+            {
+                DocumentType = documentType,
+            }).ConfigureAwait(false);
+
+        return outgoingMessage;
+    }
+
     private static MasterDataContent CreateMasterDataContent()
     {
         return new MasterDataContent(
@@ -169,12 +185,13 @@ public class ForwardMeteringPointMasterDataTests : TestBase
             Guid.NewGuid().ToString());
     }
 
-    private MarketActivityRecord GetMarketActivityRecord(string documentType)
+    private async Task<MarketActivityRecord> GetMarketActivityRecordAsync(string documentType)
     {
         var outgoingMessageStore = GetService<IOutgoingMessageStore>();
         var parser = GetService<IMarketActivityRecordParser>();
-        var message = outgoingMessageStore.GetUnpublished()
-            .FirstOrDefault(x => x.DocumentType == documentType);
+        // var message = outgoingMessageStore.GetUnpublished()
+        //     .FirstOrDefault(x => x.DocumentType == documentType);
+        var message = await GetMessageAsync(GetService<IDbConnectionFactory>(), documentType).ConfigureAwait(false);
         var marketActivityRecord =
             parser.From<Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.MarketActivityRecord>(
                 message!.MarketActivityRecordPayload);
