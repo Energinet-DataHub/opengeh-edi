@@ -21,6 +21,7 @@ using System.Xml.Linq;
 using System.Xml.Schema;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.Xml;
+using Messaging.Domain.OutgoingMessages;
 using Xunit;
 
 namespace Messaging.Tests.OutgoingMessages;
