@@ -13,14 +13,12 @@
 // limitations under the License.
 
 using System;
-using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.Common;
 using Messaging.Application.Configuration;
-using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.MasterData;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
