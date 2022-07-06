@@ -22,13 +22,15 @@ namespace Messaging.Application.OutgoingMessages.GenericNotification;
 
 public class GenericNotificationDocumentWriter : DocumentWriter
 {
-    private const string Prefix = "cim";
-    private const string DocumentType = "GenericNotification_MarketDocument";
-    private const string XmlNamespace = "urn:ediel.org:structure:genericnotification:0:1";
-    private const string SchemaLocation = "urn:ediel.org:structure:genericnotification:0:1 urn-ediel-org-structure-genericnotification-0-1.xsd";
-
     public GenericNotificationDocumentWriter(IMarketActivityRecordParser parser)
-    : base(new DocumentDetails(DocumentType, SchemaLocation, XmlNamespace, Prefix, "E44"), parser)
+    : base(
+        new DocumentDetails(
+        "GenericNotification_MarketDocument",
+        "urn:ediel.org:structure:genericnotification:0:1 urn-ediel-org-structure-genericnotification-0-1.xsd",
+        "urn:ediel.org:structure:genericnotification:0:1",
+        "cim",
+        "E44"),
+        parser)
     {
     }
 
