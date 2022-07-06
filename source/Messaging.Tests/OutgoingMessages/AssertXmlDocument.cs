@@ -83,16 +83,6 @@ public class AssertXmlDocument
         return new AssertMarketEvaluationPoint(marketEvaluationPoint!);
     }
 
-    public AssertXmlDocument HasMarketEvaluationPointId(string marketActivityRecordId, string expectedMrid)
-    {
-        var marketActivityRecord = GetMarketActivityRecordById(marketActivityRecordId);
-        var marketEvaluationPoint =
-            marketActivityRecord!.Element(marketActivityRecord.Name.Namespace + "MarketEvaluationPoint");
-        Assert.NotNull(marketEvaluationPoint);
-        Assert.Equal(expectedMrid, marketEvaluationPoint?.Element(marketActivityRecord.Name.Namespace + "mRID")?.Value);
-        return this;
-    }
-
     public async Task<AssertXmlDocument> HasValidStructureAsync(XmlSchema schema)
     {
         if (schema == null) throw new ArgumentNullException(nameof(schema));

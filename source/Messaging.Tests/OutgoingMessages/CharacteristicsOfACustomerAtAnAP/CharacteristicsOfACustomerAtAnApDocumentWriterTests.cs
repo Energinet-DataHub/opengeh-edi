@@ -76,9 +76,9 @@ namespace Messaging.Tests.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
                 assertDocument
                     .HasMarketActivityRecordValue(marketActivityRecord.Id, "originalTransactionIDReference_MktActivityRecord.mRID", marketActivityRecord.OriginalTransactionId)
                     .HasMarketActivityRecordValue(marketActivityRecord.Id, "validityStart_DateAndOrTime.dateTime", marketActivityRecord.ValidityStart.ToString())
-                    .HasMarketEvaluationPointId(marketActivityRecord.Id, marketActivityRecord.MarketEvaluationPoint.MarketEvaluationPointId)
                     .MarketEvaluationPoint(marketActivityRecord.Id)
-                    .HasValue("serviceCategory.ElectricalHeating", marketActivityRecord.MarketEvaluationPoint.ElectricalHeating.ToStringValue());
+                    .HasValue("serviceCategory.ElectricalHeating", marketActivityRecord.MarketEvaluationPoint.ElectricalHeating.ToStringValue())
+                    .HasValue("mRID", marketActivityRecord.MarketEvaluationPoint.MarketEvaluationPointId);
             }
         }
 
