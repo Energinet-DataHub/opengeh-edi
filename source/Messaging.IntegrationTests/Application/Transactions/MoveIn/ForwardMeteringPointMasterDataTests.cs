@@ -14,14 +14,20 @@
 
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
+using Messaging.Application.Common;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.MasterData;
+using Messaging.Application.OutgoingMessages;
+using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Fixtures;
 using Processing.IntegrationTests.Application;
 using Xunit;
+using Address = Messaging.Application.MasterData.Address;
+using Series = Messaging.Application.MasterData.Series;
 
 namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
 
@@ -42,6 +48,19 @@ public class ForwardMeteringPointMasterDataTests : TestBase
 
         AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>())
             .HasForwardedMeteringPointMasterData(true);
+    }
+
+    [Fact]
+    public async Task Correct_metering_point_master_data_message_is_added_to_outgoing_message_store()
+    {
+        await SetupAnAcceptedMoveInTransaction().ConfigureAwait(false);
+
+        var masterData = CreateMasterDataContent();
+        var forwardMeteringPointMasterData = new ForwardMeteringPointMasterData(SampleData.TransactionId, masterData);
+        await InvokeCommandAsync(forwardMeteringPointMasterData).ConfigureAwait(false);
+
+        var marketActivityRecord = GetMarketActivityRecord("AccountingPointCharacteristics");
+        Assert.NotNull(marketActivityRecord);
     }
 
     private static IncomingMessageBuilder MessageBuilder()
@@ -95,6 +114,18 @@ public class ForwardMeteringPointMasterDataTests : TestBase
             MasterDataSampleData.ConnectionType,
             MasterDataSampleData.ParentRelatedMeteringPoint,
             Guid.NewGuid().ToString());
+    }
+
+    private MarketActivityRecord GetMarketActivityRecord(string documentType)
+    {
+        var outgoingMessageStore = GetService<IOutgoingMessageStore>();
+        var parser = GetService<IMarketActivityRecordParser>();
+        var message = outgoingMessageStore.GetUnpublished()
+            .FirstOrDefault(x => x.DocumentType == documentType);
+        var marketActivityRecord =
+            parser.From<Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.MarketActivityRecord>(
+                message!.MarketActivityRecordPayload);
+        return marketActivityRecord;
     }
 
     private async Task SetupAnAcceptedMoveInTransaction()
