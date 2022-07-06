@@ -86,10 +86,16 @@ namespace Messaging.Tests.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
                     .HasValue("secondCustomer_MarketParticipant.name", marketActivityRecord.MarketEvaluationPoint.SecondCustomerName)
                     .HasValue("protectedName", marketActivityRecord.MarketEvaluationPoint.ProtectedName.ToStringValue())
                     .HasValue("hasEnergySupplier", marketActivityRecord.MarketEvaluationPoint.HasEnergySupplier.ToStringValue())
-                    .HasValue("supplyStart_DateAndOrTime.dateTime", marketActivityRecord.MarketEvaluationPoint.SupplyStart.ToString())
+                    .HasValue("supplyStart_DateAndOrTime.dateTime", marketActivityRecord.MarketEvaluationPoint.SupplyStart.ToString());
+
+                var usagePointLocations = marketActivityRecord.MarketEvaluationPoint.UsagePointLocation.ToList();
+                var firstUsagePointLocation = usagePointLocations[0];
+                assertDocument
+                    .MarketEvaluationPoint(marketActivityRecord.Id)
                     .NumberOfUsagePointLocationsIs(marketActivityRecord.MarketEvaluationPoint.UsagePointLocation.Count())
                     .UsagePointLocation(0)
-                    .HasValue("type", marketActivityRecord.MarketEvaluationPoint.UsagePointLocation.ToList()[0].Type);
+                    .HasValue("type", firstUsagePointLocation.Type)
+                    .HasValue("geoInfoReference", firstUsagePointLocation.GeoInfoReference);
             }
         }
 
