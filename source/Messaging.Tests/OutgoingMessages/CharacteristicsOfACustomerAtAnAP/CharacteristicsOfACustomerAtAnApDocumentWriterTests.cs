@@ -14,11 +14,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using System.Xml.Schema;
 using Messaging.Application.Common;
 using Messaging.Application.Configuration;
@@ -35,6 +33,7 @@ namespace Messaging.Tests.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
 {
     public class CharacteristicsOfACustomerAtAnApDocumentWriterTests
     {
+        private const string NamespacePrefix = "cim";
         private readonly CharacteristicsOfACustomerAtAnApDocumentWriter _documentWriter;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
         private readonly IMarketActivityRecordParser _marketActivityRecordParser;
@@ -61,53 +60,55 @@ namespace Messaging.Tests.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
 
             var schema = await GetSchema().ConfigureAwait(false);
             var assertDocument = await AssertXmlDocument
-                .Document(message)
-                .HasHeader(header)
-                .HasType("E21")
+                .Document(message, NamespacePrefix)
+                .HasValue("type", "E21")
+                .HasValue("process.processType", header.ProcessType)
+                .HasValue("businessSector.type", "23")
+                .HasValue("sender_MarketParticipant.mRID", header.SenderId)
+                .HasValue("sender_MarketParticipant.marketRole.type", header.SenderRole)
+                .HasValue("receiver_MarketParticipant.mRID", header.ReceiverId)
+                .HasValue("receiver_MarketParticipant.marketRole.type", header.ReceiverRole)
                 .NumberOfMarketActivityRecordsIs(2)
                 .HasValidStructureAsync(schema!).ConfigureAwait(false);
-            AssertMarketActivityRecords(marketActivityRecords, assertDocument);
+            AssertMarketActivityRecord(marketActivityRecords.First(), assertDocument);
         }
 
-        private static void AssertMarketActivityRecords(List<MarketActivityRecord> marketActivityRecords, AssertXmlDocument assertDocument)
+        private static void AssertMarketActivityRecord(MarketActivityRecord marketActivityRecord, AssertXmlDocument assertDocument)
         {
-            foreach (var marketActivityRecord in marketActivityRecords)
-            {
-                assertDocument
-                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "cim:originalTransactionIDReference_MktActivityRecord.mRID", marketActivityRecord.OriginalTransactionId)
-                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "cim:validityStart_DateAndOrTime.dateTime", marketActivityRecord.ValidityStart.ToString())
-                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "cim:MarketEvaluationPoint/cim:mRID", marketActivityRecord.MarketEvaluationPoint.MarketEvaluationPointId)
-                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "cim:MarketEvaluationPoint/cim:serviceCategory.ElectricalHeating", marketActivityRecord.MarketEvaluationPoint.ElectricalHeating.ToStringValue())
-                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "cim:MarketEvaluationPoint/cim:eletricalHeating_DateAndOrTime.dateTime", marketActivityRecord.MarketEvaluationPoint.ElectricalHeatingStart.ToString())
-                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "cim:MarketEvaluationPoint/cim:firstCustomer_MarketParticipant.mRID", marketActivityRecord.MarketEvaluationPoint.FirstCustomerId.Id)
-                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "cim:MarketEvaluationPoint/cim:firstCustomer_MarketParticipant.name", marketActivityRecord.MarketEvaluationPoint.FirstCustomerName)
-                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "cim:MarketEvaluationPoint/cim:secondCustomer_MarketParticipant.mRID", marketActivityRecord.MarketEvaluationPoint.SecondCustomerId.Id)
-                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "cim:MarketEvaluationPoint/cim:secondCustomer_MarketParticipant.name", marketActivityRecord.MarketEvaluationPoint.SecondCustomerName)
-                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "cim:MarketEvaluationPoint/cim:protectedName", marketActivityRecord.MarketEvaluationPoint.ProtectedName.ToStringValue())
-                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "cim:MarketEvaluationPoint/cim:hasEnergySupplier", marketActivityRecord.MarketEvaluationPoint.HasEnergySupplier.ToStringValue())
-                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "cim:MarketEvaluationPoint/cim:supplyStart_DateAndOrTime.dateTime", marketActivityRecord.MarketEvaluationPoint.SupplyStart.ToString());
+            var usagePointLocations = marketActivityRecord.MarketEvaluationPoint.UsagePointLocation.ToList();
+            var firstUsagePointLocation = usagePointLocations.First();
 
-                var usagePointLocations = marketActivityRecord.MarketEvaluationPoint.UsagePointLocation.ToList();
-                var firstUsagePointLocation = usagePointLocations[0];
-                assertDocument
-                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:type", firstUsagePointLocation.Type)
-                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:geoInfoReference", firstUsagePointLocation.GeoInfoReference)
-                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:mainAddress/cim:streetDetail/cim:code", firstUsagePointLocation.MainAddress.StreetDetail.Code)
-                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:mainAddress/cim:streetDetail/cim:name", firstUsagePointLocation.MainAddress.StreetDetail.Name)
-                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:mainAddress/cim:streetDetail/cim:number", firstUsagePointLocation.MainAddress.StreetDetail.Number)
-                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:mainAddress/cim:streetDetail/cim:floorIdentification", firstUsagePointLocation.MainAddress.StreetDetail.FloorIdentification)
-                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:mainAddress/cim:streetDetail/cim:suiteNumber", firstUsagePointLocation.MainAddress.StreetDetail.SuiteNumber)
-                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:mainAddress/cim:townDetail/cim:name", firstUsagePointLocation.MainAddress.TownDetail.Name)
-                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:mainAddress/cim:townDetail/cim:country", firstUsagePointLocation.MainAddress.TownDetail.Country)
-                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:mainAddress/cim:townDetail/cim:code", firstUsagePointLocation.MainAddress.TownDetail.Code)
-                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:mainAddress/cim:townDetail/cim:section", firstUsagePointLocation.MainAddress.TownDetail.Section)
-                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:name", firstUsagePointLocation.Name)
-                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:attn_Names.name", firstUsagePointLocation.AttnName)
-                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:phone1/cim:ituPhone", firstUsagePointLocation.Phone1)
-                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:phone2/cim:ituPhone", firstUsagePointLocation.Phone2)
-                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:electronicAddress/cim:email1", firstUsagePointLocation.EmailAddress)
-                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:protectedAddress", firstUsagePointLocation.ProtectedAddress.ToStringValue());
-            }
+            assertDocument
+                    .HasValue("MktActivityRecord[1]/originalTransactionIDReference_MktActivityRecord.mRID", marketActivityRecord.OriginalTransactionId)
+                    .HasValue("MktActivityRecord[1]/validityStart_DateAndOrTime.dateTime", marketActivityRecord.ValidityStart.ToString())
+                    .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/mRID", marketActivityRecord.MarketEvaluationPoint.MarketEvaluationPointId)
+                    .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/serviceCategory.ElectricalHeating", marketActivityRecord.MarketEvaluationPoint.ElectricalHeating.ToStringValue())
+                    .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/eletricalHeating_DateAndOrTime.dateTime", marketActivityRecord.MarketEvaluationPoint.ElectricalHeatingStart.ToString())
+                    .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/firstCustomer_MarketParticipant.mRID", marketActivityRecord.MarketEvaluationPoint.FirstCustomerId.Id)
+                    .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/firstCustomer_MarketParticipant.name", marketActivityRecord.MarketEvaluationPoint.FirstCustomerName)
+                    .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/secondCustomer_MarketParticipant.mRID", marketActivityRecord.MarketEvaluationPoint.SecondCustomerId.Id)
+                    .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/secondCustomer_MarketParticipant.name", marketActivityRecord.MarketEvaluationPoint.SecondCustomerName)
+                    .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/protectedName", marketActivityRecord.MarketEvaluationPoint.ProtectedName.ToStringValue())
+                    .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/hasEnergySupplier", marketActivityRecord.MarketEvaluationPoint.HasEnergySupplier.ToStringValue())
+                    .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/supplyStart_DateAndOrTime.dateTime", marketActivityRecord.MarketEvaluationPoint.SupplyStart.ToString())
+                    .NumberOfUsagePointLocationsIs(2)
+                    .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/UsagePointLocation[1]/type", firstUsagePointLocation.Type)
+                    .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/UsagePointLocation[1]/geoInfoReference", firstUsagePointLocation.GeoInfoReference)
+                    .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/UsagePointLocation[1]/mainAddress/streetDetail/code", firstUsagePointLocation.MainAddress.StreetDetail.Code)
+                    .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/UsagePointLocation[1]/mainAddress/streetDetail/name", firstUsagePointLocation.MainAddress.StreetDetail.Name)
+                    .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/UsagePointLocation[1]/mainAddress/streetDetail/number", firstUsagePointLocation.MainAddress.StreetDetail.Number)
+                    .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/UsagePointLocation[1]/mainAddress/streetDetail/floorIdentification", firstUsagePointLocation.MainAddress.StreetDetail.FloorIdentification)
+                    .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/UsagePointLocation[1]/mainAddress/streetDetail/suiteNumber", firstUsagePointLocation.MainAddress.StreetDetail.SuiteNumber)
+                    .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/UsagePointLocation[1]/mainAddress/townDetail/name", firstUsagePointLocation.MainAddress.TownDetail.Name)
+                    .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/UsagePointLocation[1]/mainAddress/townDetail/country", firstUsagePointLocation.MainAddress.TownDetail.Country)
+                    .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/UsagePointLocation[1]/mainAddress/townDetail/code", firstUsagePointLocation.MainAddress.TownDetail.Code)
+                    .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/UsagePointLocation[1]/mainAddress/townDetail/section", firstUsagePointLocation.MainAddress.TownDetail.Section)
+                    .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/UsagePointLocation[1]/name", firstUsagePointLocation.Name)
+                    .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/UsagePointLocation[1]/attn_Names.name", firstUsagePointLocation.AttnName)
+                    .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/UsagePointLocation[1]/phone1/ituPhone", firstUsagePointLocation.Phone1)
+                    .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/UsagePointLocation[1]/phone2/ituPhone", firstUsagePointLocation.Phone2)
+                    .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/UsagePointLocation[1]/electronicAddress/email1", firstUsagePointLocation.EmailAddress)
+                    .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/UsagePointLocation[1]/protectedAddress", firstUsagePointLocation.ProtectedAddress.ToStringValue());
         }
 
         private MarketActivityRecord CreateMarketActivityRecord()

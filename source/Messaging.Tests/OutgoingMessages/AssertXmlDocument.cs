@@ -16,13 +16,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
 using System.Xml.XPath;
 using Messaging.Application.Xml;
-using Messaging.Domain.OutgoingMessages;
 using Xunit;
 
 namespace Messaging.Tests.OutgoingMessages;
@@ -31,41 +31,24 @@ public class AssertXmlDocument
 {
     private const string MarketActivityRecordElementName = "MktActivityRecord";
     private readonly Stream _stream;
+    private readonly string _prefix;
     private readonly XDocument _document;
     private readonly XmlReader _reader;
+    private readonly XmlNamespaceManager _xmlNamespaceManager;
 
-    private AssertXmlDocument(Stream stream)
+    private AssertXmlDocument(Stream stream, string prefix)
     {
         _stream = stream;
+        _prefix = prefix;
         _reader = XmlReader.Create(stream);
         _document = XDocument.Load(_reader);
+        _xmlNamespaceManager = new XmlNamespaceManager(_reader.NameTable);
+        _xmlNamespaceManager.AddNamespace(prefix, _document.Root!.Name.NamespaceName);
     }
 
-    public static AssertXmlDocument Document(Stream document)
+    public static AssertXmlDocument Document(Stream document, string prefix)
     {
-        return new AssertXmlDocument(document);
-    }
-
-    public AssertXmlDocument HasHeader(MessageHeader expectedHeader)
-    {
-        if (expectedHeader == null) throw new ArgumentNullException(nameof(expectedHeader));
-        Assert.NotEmpty(GetMessageHeaderValue("mRID")!);
-        Assert.Equal(expectedHeader.ProcessType, GetMessageHeaderValue("process.processType"));
-        Assert.Equal("23", GetMessageHeaderValue("businessSector.type"));
-        Assert.Equal(expectedHeader.SenderId, GetMessageHeaderValue("sender_MarketParticipant.mRID"));
-        Assert.Equal(expectedHeader.SenderRole, GetMessageHeaderValue("sender_MarketParticipant.marketRole.type"));
-        Assert.Equal(expectedHeader.ReceiverId, GetMessageHeaderValue("receiver_MarketParticipant.mRID"));
-        Assert.Equal(expectedHeader.ReceiverRole, GetMessageHeaderValue("receiver_MarketParticipant.marketRole.type"));
-        Assert.Equal(expectedHeader.ReasonCode, GetMessageHeaderValue("reason.code"));
-        return this;
-    }
-
-    public AssertXmlDocument HasMarketActivityRecordValue(string marketActivityRecordId, string elementName, string? expectedValue)
-    {
-        var marketActivityRecord = GetMarketActivityRecordById(marketActivityRecordId);
-        Assert.NotNull(marketActivityRecord);
-        Assert.Equal(expectedValue, marketActivityRecord!.Element(marketActivityRecord.Name.Namespace + elementName)?.Value);
-        return this;
+        return new AssertXmlDocument(document, prefix);
     }
 
     public AssertXmlDocument NumberOfMarketActivityRecordsIs(int expectedNumber)
@@ -74,26 +57,17 @@ public class AssertXmlDocument
         return this;
     }
 
-    public AssertXmlDocument HasType(string expectedTypeCode)
+    public AssertXmlDocument NumberOfUsagePointLocationsIs(int expectedNumber)
     {
-        Assert.Equal(expectedTypeCode, GetMessageHeaderValue("type"));
+        Assert.Equal(expectedNumber, GetUsagePointLocations().Count);
         return this;
     }
 
-    public AssertXmlDocument HasMarketActivityRecordValue1(string marketActivityRecordId, string elementName, string expectedValue)
+    public AssertXmlDocument HasValue(string xpath, string expectedValue)
     {
-        var marketActivityRecord = GetMarketActivityRecordById(marketActivityRecordId);
-        var namespaceManager = new XmlNamespaceManager(_reader.NameTable);
-        namespaceManager.AddNamespace("cim", marketActivityRecord!.Name.NamespaceName);
-        Assert.Equal(expectedValue, marketActivityRecord?.XPathSelectElement("./" + elementName, namespaceManager)?.Value);
+        if (xpath == null) throw new ArgumentNullException(nameof(xpath));
+        Assert.Equal(expectedValue, _document.Root?.XPathSelectElement(CreateXPathWithPrefix(xpath), _xmlNamespaceManager)?.Value);
         return this;
-    }
-
-    public AssertMarketEvaluationPoint MarketEvaluationPoint(string marketActivityRecordId)
-    {
-        var marketActivityRecord = GetMarketActivityRecordById(marketActivityRecordId);
-        var marketEvaluationPoint = marketActivityRecord!.Element(marketActivityRecord.Name.Namespace + "MarketEvaluationPoint");
-        return new AssertMarketEvaluationPoint(marketEvaluationPoint!, _reader);
     }
 
     public async Task<AssertXmlDocument> HasValidStructureAsync(XmlSchema schema)
@@ -104,96 +78,36 @@ public class AssertXmlDocument
         return this;
     }
 
-    internal XElement? GetMarketActivityRecordById(string id)
-    {
-        var header = _document.Root!;
-        var ns = header.Name.Namespace;
-        return header
-            .Elements(ns + MarketActivityRecordElementName)
-            .FirstOrDefault(x => x.Element(ns + "mRID")?.Value
-                .Equals(id, StringComparison.OrdinalIgnoreCase) ?? false);
-    }
-
-    private string? GetMessageHeaderValue(string elementName)
-    {
-        var header = GetHeaderElement();
-        return header?.Element(header.Name.Namespace + elementName)?.Value;
-    }
-
-    private XElement? GetHeaderElement()
-    {
-        return _document.Root;
-    }
-
     private List<XElement> GetMarketActivityRecords()
     {
         return _document.Root?.Elements()
             .Where(x => x.Name.LocalName.Equals(MarketActivityRecordElementName, StringComparison.OrdinalIgnoreCase))
             .ToList() ?? new List<XElement>();
     }
-}
-
-#pragma warning disable
-public class AssertMarketEvaluationPoint
-{
-    private readonly XElement _marketEvaluationPointElement;
-    private readonly XmlReader _reader;
-
-    public AssertMarketEvaluationPoint(XElement marketEvaluationPointElement, XmlReader reader)
-    {
-        _marketEvaluationPointElement = marketEvaluationPointElement;
-        _reader = reader;
-    }
-
-    public AssertMarketEvaluationPoint HasValue(string elementName, string expectedValue)
-    {
-        Assert.Equal(expectedValue, _marketEvaluationPointElement.Element(_marketEvaluationPointElement.Name.Namespace + elementName)?.Value);
-        return this;
-    }
-
-    public AssertMarketEvaluationPoint NumberOfUsagePointLocationsIs(int expectedNumber)
-    {
-        Assert.Equal(expectedNumber, GetUsagePointLocations().Count);
-        return this;
-    }
 
     private List<XElement> GetUsagePointLocations()
     {
-        return _marketEvaluationPointElement.Elements()
+        return _document.Root?.Descendants()
             .Where(x => x.Name.LocalName.Equals("UsagePointLocation", StringComparison.OrdinalIgnoreCase))
             .ToList() ?? new List<XElement>();
     }
 
-    public AssertUsagePointLocation UsagePointLocation(int index)
+    private string CreateXPathWithPrefix(string xpath)
     {
-        return new AssertUsagePointLocation(GetUsagePointLocations()[index], _reader);
-    }
-}
+        var elementNames = xpath.Split("/");
+        var xpathBuilder = new StringBuilder();
+        xpathBuilder.Append('.');
+        foreach (var elementName in elementNames)
+        {
+            xpathBuilder.Append('/');
+            if (!elementName.StartsWith(_prefix + ':', StringComparison.OrdinalIgnoreCase))
+            {
+                xpathBuilder.Append(_prefix + ":");
+            }
 
-public class AssertUsagePointLocation
-{
-    private readonly XElement _usagePointLocationElement;
-    private readonly XmlReader _xmlReader;
+            xpathBuilder.Append(elementName);
+        }
 
-    public AssertUsagePointLocation(XElement usagePointLocationElement, XmlReader xmlReader)
-    {
-        _usagePointLocationElement = usagePointLocationElement;
-        _xmlReader = xmlReader;
-    }
-
-    public AssertUsagePointLocation HasValue(string elementName, string expectedValue)
-    {
-        Assert.Equal(expectedValue, _usagePointLocationElement.Element(_usagePointLocationElement.Name.Namespace + elementName)?.Value);
-        return this;
-    }
-
-    public AssertUsagePointLocation HasValue1(string elementName, string expectedValue)
-    {
-        // cim="urn:ediel.org:structure:characteristicsofacustomeratanap:0:1"
-        var namespaceManager = new XmlNamespaceManager(_xmlReader.NameTable);
-        namespaceManager.AddNamespace("cim", "urn:ediel.org:structure:characteristicsofacustomeratanap:0:1");
-        var value = _usagePointLocationElement.XPathSelectElement("./cim:" + elementName, namespaceManager).Value;
-        Assert.Equal(expectedValue, value);
-        return this;
+        return xpathBuilder.ToString();
     }
 }
