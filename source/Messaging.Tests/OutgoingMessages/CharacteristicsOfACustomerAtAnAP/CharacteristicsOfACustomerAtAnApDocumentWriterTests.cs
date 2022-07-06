@@ -87,7 +87,9 @@ namespace Messaging.Tests.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
                     .HasValue("protectedName", marketActivityRecord.MarketEvaluationPoint.ProtectedName.ToStringValue())
                     .HasValue("hasEnergySupplier", marketActivityRecord.MarketEvaluationPoint.HasEnergySupplier.ToStringValue())
                     .HasValue("supplyStart_DateAndOrTime.dateTime", marketActivityRecord.MarketEvaluationPoint.SupplyStart.ToString())
-                    .NumberOfUsagePointLocationsIs(marketActivityRecord.MarketEvaluationPoint.UsagePointLocation.Count());
+                    .NumberOfUsagePointLocationsIs(marketActivityRecord.MarketEvaluationPoint.UsagePointLocation.Count())
+                    .UsagePointLocation(0)
+                    .HasValue("type", marketActivityRecord.MarketEvaluationPoint.UsagePointLocation.ToList()[0].Type);
             }
         }
 

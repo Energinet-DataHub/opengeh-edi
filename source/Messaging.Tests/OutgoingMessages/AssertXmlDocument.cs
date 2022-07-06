@@ -148,4 +148,25 @@ public class AssertMarketEvaluationPoint
             .Where(x => x.Name.LocalName.Equals("UsagePointLocation", StringComparison.OrdinalIgnoreCase))
             .ToList() ?? new List<XElement>();
     }
+
+    public AssertUsagePointLocation UsagePointLocation(int index)
+    {
+        return new AssertUsagePointLocation(GetUsagePointLocations()[index]);
+    }
+}
+
+public class AssertUsagePointLocation
+{
+    private readonly XElement _usagePointLocationElement;
+
+    public AssertUsagePointLocation(XElement usagePointLocationElement)
+    {
+        _usagePointLocationElement = usagePointLocationElement;
+    }
+
+    public AssertUsagePointLocation HasValue(string elementName, string expectedValue)
+    {
+        Assert.Equal(expectedValue, _usagePointLocationElement.Element(_usagePointLocationElement.Name.Namespace + elementName)?.Value);
+        return this;
+    }
 }
