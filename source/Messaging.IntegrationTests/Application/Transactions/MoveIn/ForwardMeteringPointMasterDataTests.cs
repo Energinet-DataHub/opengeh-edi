@@ -92,7 +92,9 @@ public class ForwardMeteringPointMasterDataTests : TestBase
             false,
             MasterDataSampleData.NetSettlementGroup,
             MasterDataSampleData.DisconnectionType,
-            MasterDataSampleData.ConnectionType);
+            MasterDataSampleData.ConnectionType,
+            MasterDataSampleData.ParentRelatedMeteringPoint,
+            Guid.NewGuid().ToString());
     }
 
     private async Task SetupAnAcceptedMoveInTransaction()

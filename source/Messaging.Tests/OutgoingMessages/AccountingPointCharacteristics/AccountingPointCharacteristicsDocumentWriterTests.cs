@@ -22,12 +22,13 @@ using System.Xml.Linq;
 using System.Xml.Schema;
 using Messaging.Application.Common;
 using Messaging.Application.Configuration;
-using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
 using Messaging.Application.SchemaStore;
+using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Serialization;
+using Messaging.Tests.OutgoingMessages.Asserts;
 using Xunit;
 using MarketActivityRecord = Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.MarketActivityRecord;
 
@@ -80,6 +81,7 @@ public class AccountingPointCharacteristicsDocumentWriterTests
     {
         var document = XDocument.Load(message);
         AssertXmlMessage.AssertHeader(header, document);
+        AssertXmlMessage.AssertHasHeaderValue(document, "type", "E07");
 
         AssertMarketActivityRecords(marketActivityRecords, document);
 

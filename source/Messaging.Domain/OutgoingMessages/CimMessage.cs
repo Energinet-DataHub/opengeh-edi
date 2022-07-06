@@ -12,26 +12,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Application.Common;
-
-public class DocumentDetails
-{
-    public DocumentDetails(string type, string schemaLocation, string xmlNamespace, string prefix, string typeCode)
-    {
-        Type = type;
-        SchemaLocation = schemaLocation;
-        XmlNamespace = xmlNamespace;
-        Prefix = prefix;
-        TypeCode = typeCode;
-    }
-
-    public string Type { get; }
-
-    public string SchemaLocation { get; }
-
-    public string XmlNamespace { get; }
-
-    public string Prefix { get; }
-
-    public string TypeCode { get; }
-}
+namespace Messaging.Domain.OutgoingMessages;
+public record CimMessage(string DocumentType, MessageHeader Header, IReadOnlyList<string> MarketActivityRecordPayloads);

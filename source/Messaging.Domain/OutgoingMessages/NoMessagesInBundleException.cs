@@ -12,26 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Application.Common;
+namespace Messaging.Domain.OutgoingMessages;
 
-public class DocumentDetails
+public class NoMessagesInBundleException : Exception
 {
-    public DocumentDetails(string type, string schemaLocation, string xmlNamespace, string prefix, string typeCode)
+    public NoMessagesInBundleException()
+        : base("Cannot not create message from a bundle that does not contain any messages")
     {
-        Type = type;
-        SchemaLocation = schemaLocation;
-        XmlNamespace = xmlNamespace;
-        Prefix = prefix;
-        TypeCode = typeCode;
     }
 
-    public string Type { get; }
+    private NoMessagesInBundleException(string message)
+        : base(message)
+    {
+    }
 
-    public string SchemaLocation { get; }
-
-    public string XmlNamespace { get; }
-
-    public string Prefix { get; }
-
-    public string TypeCode { get; }
+    private NoMessagesInBundleException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
 }

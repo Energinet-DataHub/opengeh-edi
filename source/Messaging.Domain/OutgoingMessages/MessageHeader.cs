@@ -12,26 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Application.Common;
+using NodaTime;
 
-public class DocumentDetails
+namespace Messaging.Domain.OutgoingMessages
 {
-    public DocumentDetails(string type, string schemaLocation, string xmlNamespace, string prefix, string typeCode)
-    {
-        Type = type;
-        SchemaLocation = schemaLocation;
-        XmlNamespace = xmlNamespace;
-        Prefix = prefix;
-        TypeCode = typeCode;
-    }
-
-    public string Type { get; }
-
-    public string SchemaLocation { get; }
-
-    public string XmlNamespace { get; }
-
-    public string Prefix { get; }
-
-    public string TypeCode { get; }
+    public record MessageHeader(
+        string ProcessType,
+        string SenderId,
+        string SenderRole,
+        string ReceiverId,
+        string ReceiverRole,
+        string MessageId,
+        Instant TimeStamp,
+        string? ReasonCode = null);
 }

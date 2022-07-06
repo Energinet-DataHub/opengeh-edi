@@ -22,13 +22,15 @@ namespace Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 
 public class ConfirmChangeOfSupplierDocumentWriter : DocumentWriter
 {
-    private const string Prefix = "cim";
-    private const string DocumentType = "ConfirmRequestChangeOfSupplier_MarketDocument";
-    private const string XmlNamespace = "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1";
-    private const string SchemaLocation = "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1 urn-ediel-org-structure-confirmrequestchangeofsupplier-0-1.xsd";
-
     public ConfirmChangeOfSupplierDocumentWriter(IMarketActivityRecordParser parser)
-    : base(new DocumentDetails(DocumentType, SchemaLocation, XmlNamespace, Prefix), parser)
+    : base(
+        new DocumentDetails(
+            "ConfirmRequestChangeOfSupplier_MarketDocument",
+            "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1 urn-ediel-org-structure-confirmrequestchangeofsupplier-0-1.xsd",
+            "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1",
+            "cim",
+            "E44"),
+        parser)
     {
     }
 
@@ -38,15 +40,15 @@ public class ConfirmChangeOfSupplierDocumentWriter : DocumentWriter
         if (writer == null) throw new ArgumentNullException(nameof(writer));
         foreach (var marketActivityRecord in ParseFrom<MarketActivityRecord>(marketActivityPayloads))
         {
-            await writer.WriteStartElementAsync(Prefix, "MktActivityRecord", null).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(Prefix, "mRID", null, marketActivityRecord.Id.ToString())
+            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "MktActivityRecord", null).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, marketActivityRecord.Id.ToString())
                 .ConfigureAwait(false);
             await writer.WriteElementStringAsync(
-                Prefix,
+                DocumentDetails.Prefix,
                 "originalTransactionIDReference_MktActivityRecord.mRID",
                 null,
                 marketActivityRecord.OriginalTransactionId).ConfigureAwait(false);
-            await writer.WriteStartElementAsync(Prefix, "marketEvaluationPoint.mRID", null).ConfigureAwait(false);
+            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "marketEvaluationPoint.mRID", null).ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "codingScheme", null, "A10").ConfigureAwait(false);
             writer.WriteValue(marketActivityRecord.MarketEvaluationPointId);
             await writer.WriteEndElementAsync().ConfigureAwait(false);

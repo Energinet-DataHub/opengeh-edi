@@ -15,6 +15,7 @@
 using System;
 using System.Threading.Tasks;
 using Messaging.Application.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

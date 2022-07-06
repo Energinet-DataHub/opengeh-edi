@@ -17,6 +17,7 @@ using Messaging.Application.Common;
 using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.GenericNotification;
+using Messaging.Domain.OutgoingMessages;
 
 namespace Messaging.Application.Transactions.MoveIn;
 

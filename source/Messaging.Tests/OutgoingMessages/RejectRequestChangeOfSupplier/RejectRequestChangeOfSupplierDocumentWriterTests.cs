@@ -25,9 +25,11 @@ using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Application.SchemaStore;
+using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Serialization;
+using Messaging.Tests.OutgoingMessages.Asserts;
 using Xunit;
 
 namespace Messaging.Tests.OutgoingMessages.RejectRequestChangeOfSupplier;
@@ -89,6 +91,7 @@ public class RejectRequestChangeOfSupplierDocumentWriterTests
         _schemaProvider = new XmlSchemaProvider();
         var document = XDocument.Load(message);
         AssertXmlMessage.AssertHeader(header, document);
+        AssertXmlMessage.AssertHasHeaderValue(document, "type", "E44");
 
         AssertMarketActivityRecords(marketActivityRecords, document);
 
