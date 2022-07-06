@@ -76,7 +76,6 @@ namespace Messaging.Tests.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
                 assertDocument
                     .HasMarketActivityRecordValue(marketActivityRecord.Id, "originalTransactionIDReference_MktActivityRecord.mRID", marketActivityRecord.OriginalTransactionId)
                     .HasMarketActivityRecordValue(marketActivityRecord.Id, "validityStart_DateAndOrTime.dateTime", marketActivityRecord.ValidityStart.ToString())
-                    .CharacteristicsOfACustomerAtAnAp()
                     .HasMarketEvaluationPointId(marketActivityRecord.Id, marketActivityRecord.MarketEvaluationPoint.MarketEvaluationPointId);
             }
         }

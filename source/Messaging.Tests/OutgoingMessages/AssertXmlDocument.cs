@@ -19,7 +19,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
-using Messaging.Application.OutgoingMessages;
 using Messaging.Application.Xml;
 using Messaging.Domain.OutgoingMessages;
 using Xunit;
@@ -77,9 +76,14 @@ public class AssertXmlDocument
         return this;
     }
 
-    public AssertCharacteristicsOfACustomerAtAnAp CharacteristicsOfACustomerAtAnAp()
+    public AssertXmlDocument HasMarketEvaluationPointId(string marketActivityRecordId, string expectedMrid)
     {
-        return new AssertCharacteristicsOfACustomerAtAnAp(this);
+        var marketActivityRecord = GetMarketActivityRecordById(marketActivityRecordId);
+        var marketEvaluationPoint =
+            marketActivityRecord!.Element(marketActivityRecord.Name.Namespace + "MarketEvaluationPoint");
+        Assert.NotNull(marketEvaluationPoint);
+        Assert.Equal(expectedMrid, marketEvaluationPoint?.Element(marketActivityRecord.Name.Namespace + "mRID")?.Value);
+        return this;
     }
 
     public async Task<AssertXmlDocument> HasValidStructureAsync(XmlSchema schema)
@@ -116,24 +120,5 @@ public class AssertXmlDocument
         return _document.Root?.Elements()
             .Where(x => x.Name.LocalName.Equals(MarketActivityRecordElementName, StringComparison.OrdinalIgnoreCase))
             .ToList() ?? new List<XElement>();
-    }
-}
-
-public class AssertCharacteristicsOfACustomerAtAnAp
-{
-    private readonly AssertXmlDocument _assertXmlDocument;
-
-    public AssertCharacteristicsOfACustomerAtAnAp(AssertXmlDocument assertXmlDocument)
-    {
-        _assertXmlDocument = assertXmlDocument;
-    }
-
-    public AssertCharacteristicsOfACustomerAtAnAp HasMarketEvaluationPointId(string marketActivityRecordId, string expectedMrid)
-    {
-        var marketActivityRecord = _assertXmlDocument.GetMarketActivityRecordById(marketActivityRecordId);
-        var marketEvaluationPoint = marketActivityRecord!.Element(marketActivityRecord.Name.Namespace + "MarketEvaluationPoint");
-        Assert.NotNull(marketEvaluationPoint);
-        Assert.Equal(expectedMrid, marketEvaluationPoint?.Element(marketActivityRecord.Name.Namespace + "mRID")?.Value);
-        return this;
     }
 }
