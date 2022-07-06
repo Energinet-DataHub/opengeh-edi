@@ -18,7 +18,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using Messaging.Application.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages;
 
 namespace Messaging.Application.Common;
 

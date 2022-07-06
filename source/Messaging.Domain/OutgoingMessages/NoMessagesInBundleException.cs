@@ -12,17 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using NodaTime;
+namespace Messaging.Domain.OutgoingMessages;
 
-namespace Messaging.Application.OutgoingMessages
+public class NoMessagesInBundleException : Exception
 {
-    public record MessageHeader(
-        string ProcessType,
-        string SenderId,
-        string SenderRole,
-        string ReceiverId,
-        string ReceiverRole,
-        string MessageId,
-        Instant TimeStamp,
-        string? ReasonCode = null);
+    public NoMessagesInBundleException()
+        : base("Cannot not create message from a bundle that does not contain any messages")
+    {
+    }
+
+    private NoMessagesInBundleException(string message)
+        : base(message)
+    {
+    }
+
+    private NoMessagesInBundleException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
 }

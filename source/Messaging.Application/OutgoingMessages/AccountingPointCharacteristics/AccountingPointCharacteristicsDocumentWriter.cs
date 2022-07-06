@@ -131,8 +131,16 @@ public class AccountingPointCharacteristicsDocumentWriter : DocumentWriter
         await writer.WriteElementStringAsync(Prefix, "usagePointLocation.geoInfoReference", null, marketEvaluationPoint.GeoInfoReference).ConfigureAwait(false);
         await WriteAddressAsync(marketEvaluationPoint.MainAddress, writer).ConfigureAwait(false);
         await writer.WriteElementStringAsync(Prefix, "usagePointLocation.actualAddressIndicator", null, marketEvaluationPoint.IsActualAddress).ConfigureAwait(false);
-        await WriteRelatedMarketEvaluationPointAsync(marketEvaluationPoint.ParentMarketEvaluationPoint, "Parent_MarketEvaluationPoint", writer).ConfigureAwait(false);
-        await WriteRelatedMarketEvaluationPointAsync(marketEvaluationPoint.ChildMarketEvaluationPoint, "Child_MarketEvaluationPoint", writer).ConfigureAwait(false);
+        if (marketEvaluationPoint.ParentMarketEvaluationPoint != null)
+        {
+            await WriteRelatedMarketEvaluationPointAsync(marketEvaluationPoint.ParentMarketEvaluationPoint, "Parent_MarketEvaluationPoint", writer).ConfigureAwait(false);
+        }
+
+        if (marketEvaluationPoint.ChildMarketEvaluationPoint != null)
+        {
+            await WriteRelatedMarketEvaluationPointAsync(marketEvaluationPoint.ChildMarketEvaluationPoint, "Child_MarketEvaluationPoint", writer).ConfigureAwait(false);
+        }
+
         await writer.WriteEndElementAsync().ConfigureAwait(false);
     }
 }
