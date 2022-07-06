@@ -33,21 +33,23 @@ namespace Messaging.CimMessageAdapter
         private readonly IMessageQueueDispatcher _messageQueueDispatcher;
         private readonly ITransactionIds _transactionIds;
         private readonly IMarketActorAuthenticator _marketActorAuthenticator;
+        private readonly MessageParserStrategy _messageParserStrategy;
 
-        public MessageReceiver(IMessageIds messageIds, IMessageQueueDispatcher messageQueueDispatcher, ITransactionIds transactionIds, IMarketActorAuthenticator marketActorAuthenticator)
+        public MessageReceiver(IMessageIds messageIds, IMessageQueueDispatcher messageQueueDispatcher, ITransactionIds transactionIds, IMarketActorAuthenticator marketActorAuthenticator, MessageParserStrategy messageParserStrategy)
         {
             _messageIds = messageIds ?? throw new ArgumentNullException(nameof(messageIds));
             _messageQueueDispatcher = messageQueueDispatcher ??
                                              throw new ArgumentNullException(nameof(messageQueueDispatcher));
             _transactionIds = transactionIds;
             _marketActorAuthenticator = marketActorAuthenticator ?? throw new ArgumentNullException(nameof(marketActorAuthenticator));
+            _messageParserStrategy = messageParserStrategy;
         }
 
         public async Task<Result> ReceiveAsync(Stream message, string contentType)
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
 
-            var messageParser = MessageParserStrategy.GetMessageParserStrategy(contentType);
+            var messageParser = _messageParserStrategy.GetMessageParserStrategy(contentType);
 
             var messageParserResult =
                  await messageParser.ParseAsync(message).ConfigureAwait(false);

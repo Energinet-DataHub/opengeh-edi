@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Net.Mime;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Messaging.CimMessageAdapter.Messages;
@@ -7,15 +6,23 @@ using Xunit;
 
 namespace Messaging.Tests;
 
-#pragma warning disable
 public class MessageParserTests
 {
+    private readonly XmlMessageParser _xmlMessageParser;
+    private readonly JsonMessageParser _jsonMessageParser;
+
+    public MessageParserTests()
+    {
+        _xmlMessageParser = new XmlMessageParser();
+        _jsonMessageParser = new JsonMessageParser();
+    }
+
+    #pragma warning disable
     [Fact]
     public async Task Message_parser_can_parse_xml_messages()
     {
-        var parser = new XmlMessageParser();
-        var stream = LoadXmlFileAsMemoryStream();
-        var parsedResult = await parser.ParseAsync(stream).ConfigureAwait(false);
+        using var stream = LoadXmlFileAsMemoryStream();
+        var parsedResult = await _xmlMessageParser.ParseAsync(stream).ConfigureAwait(false);
 
         Assert.True(parsedResult.Success);
     }
@@ -23,11 +30,20 @@ public class MessageParserTests
     [Fact]
     public async Task Message_parser_can_parse_json_messages()
     {
-        var parser = new JsonMessageParser();
         var stream = LoadJsonFileAsMemoryStream();
-        var parsedResult = await parser.ParseAsync(stream).ConfigureAwait(false);
+        var parsedResult = await _jsonMessageParser.ParseAsync(stream).ConfigureAwait(false);
 
         Assert.True(parsedResult.Success);
+    }
+
+    [Fact]
+    public async Task Message_parser_returns_error_when_json_is_invalid()
+    {
+        var stream = LoadInvalidJsonFileAsMemoryStream();
+        var parsedResult = await _jsonMessageParser.ParseAsync(stream).ConfigureAwait(false);
+
+        Assert.False(parsedResult.Success);
+        Assert.Equal(2, parsedResult.Errors.Count);
     }
 
     private static Stream LoadXmlFileAsMemoryStream()
@@ -50,5 +66,15 @@ public class MessageParserTests
         return stream;
     }
 
+    private static Stream LoadInvalidJsonFileAsMemoryStream()
+    {
+        var jsonDoc = File.ReadAllText($"json{Path.DirectorySeparatorChar}Invalid Request Change of Supplier.json");
+        var stream = new MemoryStream();
+        var writer = new StreamWriter(stream);
+        writer.Write(jsonDoc);
+        writer.Flush();
+        stream.Position = 0;
+        return stream;
+    }
     #pragma warning restore
 }

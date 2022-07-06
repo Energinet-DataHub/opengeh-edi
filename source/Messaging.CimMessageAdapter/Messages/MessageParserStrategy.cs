@@ -16,22 +16,32 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mime;
-using Messaging.CimMessageAdapter.Response;
 
 namespace Messaging.CimMessageAdapter.Messages;
 
-public static class MessageParserStrategy
+public class MessageParserStrategy
 {
-    private static readonly IDictionary<string, Func<MessageParser>> _strategies = new Dictionary<string, Func<MessageParser>>()
-    {
-        { MediaTypeNames.Application.Xml, () => new XmlMessageParser() },
-        { MediaTypeNames.Application.Json, () => new JsonMessageParser() },
-    };
+    private readonly XmlMessageParser _xmlMessageParser;
+    private readonly JsonMessageParser _jsonMessageParser;
 
-    public static MessageParser GetMessageParserStrategy(string contentType)
+    private readonly IDictionary<string, MessageParser> _strategies;
+
+    public MessageParserStrategy(XmlMessageParser xmlMessageParser, JsonMessageParser jsonMessageParser)
+    {
+        _xmlMessageParser = xmlMessageParser;
+        _jsonMessageParser = jsonMessageParser;
+
+        _strategies = new Dictionary<string, MessageParser>()
+        {
+            { MediaTypeNames.Application.Xml, _xmlMessageParser },
+            { MediaTypeNames.Application.Json, _jsonMessageParser },
+        };
+    }
+
+    public MessageParser GetMessageParserStrategy(string contentType)
     {
         var strategy = _strategies.FirstOrDefault(s => string.Equals(s.Key, contentType, StringComparison.OrdinalIgnoreCase));
         if (strategy.Key is null) throw new InvalidOperationException($"No message parser strategy found for content type {contentType}");
-        return strategy.Value();
+        return strategy.Value;
     }
 }

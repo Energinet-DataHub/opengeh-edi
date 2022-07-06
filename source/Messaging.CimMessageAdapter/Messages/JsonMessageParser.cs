@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Json.Schema;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
@@ -9,6 +11,8 @@ using Messaging.Application.SchemaStore;
 using Messaging.CimMessageAdapter.Errors;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using JsonException = Newtonsoft.Json.JsonException;
+using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
 
 namespace Messaging.CimMessageAdapter.Messages;
@@ -18,6 +22,7 @@ public class JsonMessageParser : MessageParser
     private const string MarketActivityRecordElementName = "MktActivityRecord";
     private const string HeaderElementName = "RequestChangeOfSupplier_MarketDocument";
     private readonly ISchemaProvider _schemaProvider;
+    private readonly List<ValidationError> _errors = new();
 
     public JsonMessageParser()
     {
@@ -39,12 +44,23 @@ public class JsonMessageParser : MessageParser
         }
 
         var schema = await _schemaProvider.GetSchemaAsync<JsonSchema>(processType, "0").ConfigureAwait(false);
+
         if (schema is null)
         {
             return MessageParserResult.Failure(new UnknownBusinessProcessTypeOrVersion(processType, "0"));
         }
 
         ResetMessagePosition(message);
+
+        await ValidateMessageAsync(schema, message).ConfigureAwait(false);
+
+        if (_errors.Count > 0)
+        {
+            return MessageParserResult.Failure(_errors.ToArray());
+        }
+
+        ResetMessagePosition(message);
+
         var streamReader = new StreamReader(message, leaveOpen: true);
         try
         {
@@ -147,5 +163,41 @@ public class JsonMessageParser : MessageParser
             ConsumerName = token["marketEvaluationPoint.customer_MarketParticipant.name"].ToString(),
             EffectiveDate = token["start_DateAndOrTime.dateTime"].ToString(),
         };
+    }
+
+    private async Task ValidateMessageAsync(JsonSchema schema, Stream message)
+    {
+        var jsonDocument = await JsonDocument.ParseAsync(message).ConfigureAwait(false);
+
+        var validationOptions = new ValidationOptions();
+        validationOptions.OutputFormat = OutputFormat.Detailed;
+
+        var validationResult = schema.Validate(jsonDocument, validationOptions);
+
+        if (!validationResult.IsValid)
+        {
+            AddErrorsFrom(validationResult);
+        }
+    }
+
+    private void AddErrorsFrom(ValidationResults validationResult)
+    {
+        AddErrorFrom(validationResult.Message);
+
+        if (validationResult.HasNestedResults)
+        {
+            foreach (var result in validationResult.NestedResults)
+            {
+                AddErrorFrom(result.Message);
+            }
+        }
+    }
+
+    private void AddErrorFrom(string? errorMessage)
+    {
+        if (errorMessage != null)
+        {
+            _errors.Add(InvalidMessageStructure.From(errorMessage));
+        }
     }
 }

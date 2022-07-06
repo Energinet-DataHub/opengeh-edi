@@ -221,6 +221,14 @@ namespace Messaging.Infrastructure.Configuration
             return this;
         }
 
+        public CompositionRoot AddMessageParserServices()
+        {
+            _services.AddSingleton<MessageParserStrategy>();
+            _services.AddSingleton<XmlMessageParser>();
+            _services.AddSingleton<JsonMessageParser>();
+            return this;
+        }
+
         public CompositionRoot AddServiceBusClient<TConfiguration>(string connectionString, TConfiguration configuration)
             where TConfiguration : class, IConfig
         {

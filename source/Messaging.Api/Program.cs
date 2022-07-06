@@ -109,7 +109,8 @@ namespace Messaging.Api
                             new RequestMasterDataConfiguration(
                                 runtime.MASTER_DATA_REQUEST_QUEUE_NAME!,
                                 "shared-service-bus-send-permission"))
-                        .AddMoveInServices(new MoveInConfiguration(new Uri(runtime.MOVE_IN_REQUEST_ENDPOINT ?? throw new ArgumentException(nameof(runtime.MOVE_IN_REQUEST_ENDPOINT)))));
+                        .AddMoveInServices(new MoveInConfiguration(new Uri(runtime.MOVE_IN_REQUEST_ENDPOINT ?? throw new ArgumentException(nameof(runtime.MOVE_IN_REQUEST_ENDPOINT)))))
+                        .AddMessageParserServices();
 
                     services.AddLiveHealthCheck();
                     services.AddInternalDomainServiceBusQueuesHealthCheck(
