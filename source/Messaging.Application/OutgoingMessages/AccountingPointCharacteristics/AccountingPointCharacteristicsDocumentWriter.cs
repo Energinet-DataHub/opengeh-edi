@@ -28,7 +28,7 @@ public class AccountingPointCharacteristicsDocumentWriter : DocumentWriter
     private const string SchemaLocation = "urn:ediel.org:structure:accountingpointcharacteristics:0:1 urn-ediel-org-structure-accountingpointcharacteristics-0-1.xsd";
 
     public AccountingPointCharacteristicsDocumentWriter(IMarketActivityRecordParser parser)
-        : base(new DocumentDetails(DocumentType, SchemaLocation, XmlNamespace, Prefix), parser)
+        : base(new DocumentDetails(DocumentType, SchemaLocation, XmlNamespace, Prefix, "E07"), parser)
     {
     }
 

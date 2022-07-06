@@ -28,7 +28,7 @@ public class GenericNotificationDocumentWriter : DocumentWriter
     private const string SchemaLocation = "urn:ediel.org:structure:genericnotification:0:1 urn-ediel-org-structure-genericnotification-0-1.xsd";
 
     public GenericNotificationDocumentWriter(IMarketActivityRecordParser parser)
-    : base(new DocumentDetails(DocumentType, SchemaLocation, XmlNamespace, Prefix), parser)
+    : base(new DocumentDetails(DocumentType, SchemaLocation, XmlNamespace, Prefix, "E44"), parser)
     {
     }
 
