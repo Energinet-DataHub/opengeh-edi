@@ -63,10 +63,10 @@ public class ForwardMeteringPointMasterDataTests : TestBase
         await InvokeCommandAsync(forwardMeteringPointMasterData).ConfigureAwait(false);
 
         var marketActivityRecord = await GetMarketActivityRecordAsync("AccountingPointCharacteristics").ConfigureAwait(false);
-        AssertMasterData(masterData, marketActivityRecord.MarketEvaluationPt);
+        AssertMarketEvaluationPoint(masterData, marketActivityRecord.MarketEvaluationPt);
     }
 
-    private static void AssertMasterData(MasterDataContent masterDataContent, MarketEvaluationPoint marketEvaluationPoint)
+    private static void AssertMarketEvaluationPoint(MasterDataContent masterDataContent, MarketEvaluationPoint marketEvaluationPoint)
     {
         Assert.Equal(SampleData.MarketEvaluationPointId, marketEvaluationPoint.MRID.Id);
         Assert.Equal(masterDataContent.MeteringPointResponsible, marketEvaluationPoint.MeteringPointResponsible.Id);
