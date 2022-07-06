@@ -20,9 +20,9 @@ using Messaging.Application.Common;
 
 namespace Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAP;
 
-public class CharacteristicsOfACustomerAtAnAPDocumentWriter : DocumentWriter
+public class CharacteristicsOfACustomerAtAnApDocumentWriter : DocumentWriter
 {
-    public CharacteristicsOfACustomerAtAnAPDocumentWriter(IMarketActivityRecordParser parser)
+    public CharacteristicsOfACustomerAtAnApDocumentWriter(IMarketActivityRecordParser parser)
         : base(
             new DocumentDetails(
             "CharacteristicsOfACustomerAtAnAP_MarketDocument",

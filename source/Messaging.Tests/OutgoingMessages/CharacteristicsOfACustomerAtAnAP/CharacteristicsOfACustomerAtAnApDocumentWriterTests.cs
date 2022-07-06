@@ -33,18 +33,18 @@ using Xunit;
 
 namespace Messaging.Tests.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
 {
-    public class CharacteristicsOfACustomerAtAnAPDocumentWriterTests
+    public class CharacteristicsOfACustomerAtAnApDocumentWriterTests
     {
-        private readonly CharacteristicsOfACustomerAtAnAPDocumentWriter _documentWriter;
+        private readonly CharacteristicsOfACustomerAtAnApDocumentWriter _documentWriter;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
         private readonly IMarketActivityRecordParser _marketActivityRecordParser;
         private ISchemaProvider? _schemaProvider;
 
-        public CharacteristicsOfACustomerAtAnAPDocumentWriterTests()
+        public CharacteristicsOfACustomerAtAnApDocumentWriterTests()
         {
             _systemDateTimeProvider = new SystemDateTimeProvider();
             _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
-            _documentWriter = new CharacteristicsOfACustomerAtAnAPDocumentWriter(_marketActivityRecordParser);
+            _documentWriter = new CharacteristicsOfACustomerAtAnApDocumentWriter(_marketActivityRecordParser);
         }
 
         [Fact]
