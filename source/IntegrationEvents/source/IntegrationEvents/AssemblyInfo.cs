@@ -12,17 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using NodaTime;
+namespace Energinet.DataHub.EnergySupplying.IntegrationEvents;
 
-namespace Messaging.Application.OutgoingMessages
+internal class AssemblyInfo
 {
-    public record MessageHeader(
-        string ProcessType,
-        string SenderId,
-        string SenderRole,
-        string ReceiverId,
-        string ReceiverRole,
-        string MessageId,
-        Instant TimeStamp,
-        string? ReasonCode = null);
 }

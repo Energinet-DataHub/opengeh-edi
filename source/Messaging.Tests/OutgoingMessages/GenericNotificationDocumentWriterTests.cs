@@ -25,9 +25,11 @@ using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.GenericNotification;
 using Messaging.Application.SchemaStore;
+using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Serialization;
+using Messaging.Tests.OutgoingMessages.Asserts;
 using Xunit;
 
 namespace Messaging.Tests.OutgoingMessages

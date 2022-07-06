@@ -12,21 +12,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Messaging.Application.OutgoingMessages;
-using Messaging.Domain.OutgoingMessages;
-
-namespace Messaging.Infrastructure.OutgoingMessages
-{
-    /// <summary>
-    /// Publishes notifications about new messages
-    /// </summary>
-    public interface INewMessageAvailableNotifier
-    {
-        /// <summary>
-        /// Notify about new available of message
-        /// </summary>
-        /// <param name="message">The notification to send to the post office.</param>
-        Task NotifyAsync(OutgoingMessage message);
-    }
-}
+namespace Messaging.Domain.OutgoingMessages;
+public record CimMessage(string DocumentType, MessageHeader Header, IReadOnlyList<string> MarketActivityRecordPayloads);

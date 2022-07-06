@@ -23,6 +23,7 @@ using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
+using Messaging.Domain.OutgoingMessages;
 using NodaTime.Extensions;
 
 namespace Messaging.Application.Transactions.MoveIn;

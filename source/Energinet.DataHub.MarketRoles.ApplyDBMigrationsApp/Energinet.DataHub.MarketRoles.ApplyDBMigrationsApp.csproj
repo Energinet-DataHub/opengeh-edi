@@ -31,6 +31,7 @@ limitations under the License.
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Scripts\Model\202207041353 Re-create QueuedInternalCommands table.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281100 Seed cleanup.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281101 Insert Reasons.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241100 Consolidated dbo model.sql" />
