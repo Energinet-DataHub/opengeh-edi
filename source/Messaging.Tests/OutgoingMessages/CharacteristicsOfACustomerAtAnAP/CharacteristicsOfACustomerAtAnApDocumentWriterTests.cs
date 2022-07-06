@@ -82,7 +82,8 @@ namespace Messaging.Tests.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
                     .HasValue("firstCustomer_MarketParticipant.mRID", marketActivityRecord.MarketEvaluationPoint.FirstCustomerId.Id)
                     .HasValue("firstCustomer_MarketParticipant.name", marketActivityRecord.MarketEvaluationPoint.FirstCustomerName)
                     .HasValue("secondCustomer_MarketParticipant.mRID", marketActivityRecord.MarketEvaluationPoint.SecondCustomerId.Id)
-                    .HasValue("secondCustomer_MarketParticipant.name", marketActivityRecord.MarketEvaluationPoint.SecondCustomerName);
+                    .HasValue("secondCustomer_MarketParticipant.name", marketActivityRecord.MarketEvaluationPoint.SecondCustomerName)
+                    .HasValue("protectedName", marketActivityRecord.MarketEvaluationPoint.ProtectedName.ToStringValue());
             }
         }
 
