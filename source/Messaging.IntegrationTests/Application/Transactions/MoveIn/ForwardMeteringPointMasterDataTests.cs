@@ -187,10 +187,7 @@ public class ForwardMeteringPointMasterDataTests : TestBase
 
     private async Task<MarketActivityRecord> GetMarketActivityRecordAsync(string documentType)
     {
-        var outgoingMessageStore = GetService<IOutgoingMessageStore>();
         var parser = GetService<IMarketActivityRecordParser>();
-        // var message = outgoingMessageStore.GetUnpublished()
-        //     .FirstOrDefault(x => x.DocumentType == documentType);
         var message = await GetMessageAsync(GetService<IDbConnectionFactory>(), documentType).ConfigureAwait(false);
         var marketActivityRecord =
             parser.From<Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.MarketActivityRecord>(
