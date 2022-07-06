@@ -140,7 +140,7 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
             marketEvaluationPoint);
 
         return CreateOutgoingMessage(
-            transaction.TransactionId,
+            transaction.StartedByMessageId,
             "AccountingPointCharacteristics",
             "E32",
             transaction.NewEnergySupplierId,
