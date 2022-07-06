@@ -22,13 +22,15 @@ namespace Messaging.Application.OutgoingMessages.GenericNotification;
 
 public class GenericNotificationDocumentWriter : DocumentWriter
 {
-    private const string Prefix = "cim";
-    private const string DocumentType = "GenericNotification_MarketDocument";
-    private const string XmlNamespace = "urn:ediel.org:structure:genericnotification:0:1";
-    private const string SchemaLocation = "urn:ediel.org:structure:genericnotification:0:1 urn-ediel-org-structure-genericnotification-0-1.xsd";
-
     public GenericNotificationDocumentWriter(IMarketActivityRecordParser parser)
-    : base(new DocumentDetails(DocumentType, SchemaLocation, XmlNamespace, Prefix), parser)
+    : base(
+        new DocumentDetails(
+        "GenericNotification_MarketDocument",
+        "urn:ediel.org:structure:genericnotification:0:1 urn-ediel-org-structure-genericnotification-0-1.xsd",
+        "urn:ediel.org:structure:genericnotification:0:1",
+        "cim",
+        "E44"),
+        parser)
     {
     }
 
@@ -38,17 +40,17 @@ public class GenericNotificationDocumentWriter : DocumentWriter
         if (writer == null) throw new ArgumentNullException(nameof(writer));
         foreach (var marketActivityRecord in ParseFrom<MarketActivityRecord>(marketActivityPayloads))
         {
-            await writer.WriteStartElementAsync(Prefix, "MktActivityRecord", null).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(Prefix, "mRID", null, marketActivityRecord.Id.ToString())
+            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "MktActivityRecord", null).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, marketActivityRecord.Id.ToString())
                 .ConfigureAwait(false);
             await writer.WriteElementStringAsync(
-                Prefix,
+                DocumentDetails.Prefix,
                 "originalTransactionIDReference_MktActivityRecord.mRID",
                 null,
                 marketActivityRecord.OriginalTransactionId).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(Prefix, "validityStart_DateAndOrTime.dateTime", null, marketActivityRecord.ValidityStart.ToString())
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "validityStart_DateAndOrTime.dateTime", null, marketActivityRecord.ValidityStart.ToString())
                 .ConfigureAwait(false);
-            await writer.WriteStartElementAsync(Prefix, "marketEvaluationPoint.mRID", null).ConfigureAwait(false);
+            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "marketEvaluationPoint.mRID", null).ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "codingScheme", null, "A10").ConfigureAwait(false);
             writer.WriteValue(marketActivityRecord.MarketEvaluationPointId);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
