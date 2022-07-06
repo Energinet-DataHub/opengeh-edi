@@ -22,13 +22,15 @@ namespace Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 
 public class ConfirmChangeOfSupplierDocumentWriter : DocumentWriter
 {
-    private const string Prefix = "cim";
-    private const string DocumentType = "ConfirmRequestChangeOfSupplier_MarketDocument";
-    private const string XmlNamespace = "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1";
-    private const string SchemaLocation = "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1 urn-ediel-org-structure-confirmrequestchangeofsupplier-0-1.xsd";
-
     public ConfirmChangeOfSupplierDocumentWriter(IMarketActivityRecordParser parser)
-    : base(new DocumentDetails(DocumentType, SchemaLocation, XmlNamespace, Prefix, "E44"), parser)
+    : base(
+        new DocumentDetails(
+            "ConfirmRequestChangeOfSupplier_MarketDocument",
+            "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1 urn-ediel-org-structure-confirmrequestchangeofsupplier-0-1.xsd",
+            "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1",
+            "cim",
+            "E44"),
+        parser)
     {
     }
 
