@@ -226,6 +226,8 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddSingleton<MessageParserStrategy>();
             _services.AddSingleton<XmlMessageParser>();
             _services.AddSingleton<JsonMessageParser>();
+            _services.AddSingleton<XmlSchemaProvider>();
+            _services.AddSingleton<JsonSchemaProvider>();
             return this;
         }
 

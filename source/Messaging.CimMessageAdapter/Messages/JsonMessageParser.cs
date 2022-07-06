@@ -59,8 +59,6 @@ public class JsonMessageParser : MessageParser
             return MessageParserResult.Failure(_errors.ToArray());
         }
 
-        ResetMessagePosition(message);
-
         var streamReader = new StreamReader(message, leaveOpen: true);
         try
         {
@@ -178,6 +176,8 @@ public class JsonMessageParser : MessageParser
         {
             AddErrorsFrom(validationResult);
         }
+
+        ResetMessagePosition(message);
     }
 
     private void AddErrorsFrom(ValidationResults validationResult)

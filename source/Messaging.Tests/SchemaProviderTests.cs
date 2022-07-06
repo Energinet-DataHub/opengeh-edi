@@ -20,23 +20,28 @@ using Xunit;
 
 namespace Messaging.Tests;
 
-public class SchemaProviderTests
+public class SchemaProviderTests : TestBase
 {
-    private ISchemaProvider? _provider;
+    private readonly XmlSchemaProvider _xmlSchemaProvider;
+    private readonly JsonSchemaProvider _jsonSchemaProvider;
+
+    public SchemaProviderTests()
+    {
+        _xmlSchemaProvider = GetService<XmlSchemaProvider>();
+        _jsonSchemaProvider = GetService<JsonSchemaProvider>();
+    }
 
     [Fact]
     public async Task Schema_provider_can_get_xml_schema()
     {
-        _provider = new XmlSchemaProvider();
-        var schema = await _provider.GetSchemaAsync<XmlSchema>("confirmrequestchangeofsupplier", "0.1").ConfigureAwait(false);
+        var schema = await _xmlSchemaProvider.GetSchemaAsync<XmlSchema>("confirmrequestchangeofsupplier", "0.1").ConfigureAwait(false);
         Assert.Equal(typeof(XmlSchema), schema?.GetType());
     }
 
     [Fact]
     public async Task Schema_provider_can_get_json_schema()
     {
-        _provider = new JsonSchemaProvider();
-        var schema = await _provider.GetSchemaAsync<JsonSchema>("RequestChangeofSupplier", "0").ConfigureAwait(false);
+        var schema = await _jsonSchemaProvider.GetSchemaAsync<JsonSchema>("RequestChangeofSupplier", "0").ConfigureAwait(false);
         Assert.Equal(typeof(JsonSchema), schema?.GetType());
     }
 }

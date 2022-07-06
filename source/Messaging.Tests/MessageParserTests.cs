@@ -6,15 +6,15 @@ using Xunit;
 
 namespace Messaging.Tests;
 
-public class MessageParserTests
+public class MessageParserTests : TestBase
 {
     private readonly XmlMessageParser _xmlMessageParser;
     private readonly JsonMessageParser _jsonMessageParser;
 
     public MessageParserTests()
     {
-        _xmlMessageParser = new XmlMessageParser();
-        _jsonMessageParser = new JsonMessageParser();
+        _xmlMessageParser = GetService<XmlMessageParser>();
+        _jsonMessageParser = GetService<JsonMessageParser>();
     }
 
     #pragma warning disable
