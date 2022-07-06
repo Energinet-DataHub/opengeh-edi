@@ -66,7 +66,7 @@ public class AssertXmlDocument
     public AssertXmlDocument HasValue(string xpath, string expectedValue)
     {
         if (xpath == null) throw new ArgumentNullException(nameof(xpath));
-        Assert.Equal(expectedValue, _document.Root?.XPathSelectElement(CreateXPathWithPrefix(xpath), _xmlNamespaceManager)?.Value);
+        Assert.Equal(expectedValue, _document.Root?.XPathSelectElement(EnsureXPathHasPrefix(xpath), _xmlNamespaceManager)?.Value);
         return this;
     }
 
@@ -92,7 +92,7 @@ public class AssertXmlDocument
             .ToList() ?? new List<XElement>();
     }
 
-    private string CreateXPathWithPrefix(string xpath)
+    private string EnsureXPathHasPrefix(string xpath)
     {
         var elementNames = xpath.Split("/");
         var xpathBuilder = new StringBuilder();
