@@ -74,28 +74,33 @@ namespace Messaging.Tests.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
             foreach (var marketActivityRecord in marketActivityRecords)
             {
                 assertDocument
-                    .HasMarketActivityRecordValue(marketActivityRecord.Id, "originalTransactionIDReference_MktActivityRecord.mRID", marketActivityRecord.OriginalTransactionId)
-                    .HasMarketActivityRecordValue(marketActivityRecord.Id, "validityStart_DateAndOrTime.dateTime", marketActivityRecord.ValidityStart.ToString())
-                    .MarketEvaluationPoint(marketActivityRecord.Id)
-                    .HasValue("serviceCategory.ElectricalHeating", marketActivityRecord.MarketEvaluationPoint.ElectricalHeating.ToStringValue())
-                    .HasValue("eletricalHeating_DateAndOrTime.dateTime", marketActivityRecord.MarketEvaluationPoint.ElectricalHeatingStart.ToString())
-                    .HasValue("mRID", marketActivityRecord.MarketEvaluationPoint.MarketEvaluationPointId)
-                    .HasValue("firstCustomer_MarketParticipant.mRID", marketActivityRecord.MarketEvaluationPoint.FirstCustomerId.Id)
-                    .HasValue("firstCustomer_MarketParticipant.name", marketActivityRecord.MarketEvaluationPoint.FirstCustomerName)
-                    .HasValue("secondCustomer_MarketParticipant.mRID", marketActivityRecord.MarketEvaluationPoint.SecondCustomerId.Id)
-                    .HasValue("secondCustomer_MarketParticipant.name", marketActivityRecord.MarketEvaluationPoint.SecondCustomerName)
-                    .HasValue("protectedName", marketActivityRecord.MarketEvaluationPoint.ProtectedName.ToStringValue())
-                    .HasValue("hasEnergySupplier", marketActivityRecord.MarketEvaluationPoint.HasEnergySupplier.ToStringValue())
-                    .HasValue("supplyStart_DateAndOrTime.dateTime", marketActivityRecord.MarketEvaluationPoint.SupplyStart.ToString());
+                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "cim:originalTransactionIDReference_MktActivityRecord.mRID", marketActivityRecord.OriginalTransactionId)
+                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "cim:validityStart_DateAndOrTime.dateTime", marketActivityRecord.ValidityStart.ToString())
+                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "cim:MarketEvaluationPoint/cim:mRID", marketActivityRecord.MarketEvaluationPoint.MarketEvaluationPointId)
+                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "cim:MarketEvaluationPoint/cim:serviceCategory.ElectricalHeating", marketActivityRecord.MarketEvaluationPoint.ElectricalHeating.ToStringValue())
+                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "cim:MarketEvaluationPoint/cim:eletricalHeating_DateAndOrTime.dateTime", marketActivityRecord.MarketEvaluationPoint.ElectricalHeatingStart.ToString())
+                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "cim:MarketEvaluationPoint/cim:firstCustomer_MarketParticipant.mRID", marketActivityRecord.MarketEvaluationPoint.FirstCustomerId.Id)
+                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "cim:MarketEvaluationPoint/cim:firstCustomer_MarketParticipant.name", marketActivityRecord.MarketEvaluationPoint.FirstCustomerName)
+                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "cim:MarketEvaluationPoint/cim:secondCustomer_MarketParticipant.mRID", marketActivityRecord.MarketEvaluationPoint.SecondCustomerId.Id)
+                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "cim:MarketEvaluationPoint/cim:secondCustomer_MarketParticipant.name", marketActivityRecord.MarketEvaluationPoint.SecondCustomerName)
+                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "cim:MarketEvaluationPoint/cim:protectedName", marketActivityRecord.MarketEvaluationPoint.ProtectedName.ToStringValue())
+                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "cim:MarketEvaluationPoint/cim:hasEnergySupplier", marketActivityRecord.MarketEvaluationPoint.HasEnergySupplier.ToStringValue())
+                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "cim:MarketEvaluationPoint/cim:supplyStart_DateAndOrTime.dateTime", marketActivityRecord.MarketEvaluationPoint.SupplyStart.ToString());
 
                 var usagePointLocations = marketActivityRecord.MarketEvaluationPoint.UsagePointLocation.ToList();
                 var firstUsagePointLocation = usagePointLocations[0];
                 assertDocument
-                    .MarketEvaluationPoint(marketActivityRecord.Id)
-                    .NumberOfUsagePointLocationsIs(marketActivityRecord.MarketEvaluationPoint.UsagePointLocation.Count())
-                    .UsagePointLocation(0)
-                    .HasValue("type", firstUsagePointLocation.Type)
-                    .HasValue("geoInfoReference", firstUsagePointLocation.GeoInfoReference);
+                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:type", firstUsagePointLocation.Type)
+                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:geoInfoReference", firstUsagePointLocation.GeoInfoReference)
+                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:mainAddress/cim:streetDetail/cim:code", firstUsagePointLocation.MainAddress.StreetDetail.Code)
+                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:mainAddress/cim:streetDetail/cim:name", firstUsagePointLocation.MainAddress.StreetDetail.Name)
+                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:mainAddress/cim:streetDetail/cim:number", firstUsagePointLocation.MainAddress.StreetDetail.Number)
+                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:mainAddress/cim:streetDetail/cim:floorIdentification", firstUsagePointLocation.MainAddress.StreetDetail.FloorIdentification)
+                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:mainAddress/cim:streetDetail/cim:suiteNumber", firstUsagePointLocation.MainAddress.StreetDetail.SuiteNumber)
+                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:mainAddress/cim:townDetail/cim:name", firstUsagePointLocation.MainAddress.TownDetail.Name)
+                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:mainAddress/cim:townDetail/cim:country", firstUsagePointLocation.MainAddress.TownDetail.Country)
+                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:mainAddress/cim:townDetail/cim:code", firstUsagePointLocation.MainAddress.TownDetail.Code)
+                    .HasMarketActivityRecordValue1(marketActivityRecord.Id, "/cim:UsagePointLocation[1]/cim:mainAddress/cim:townDetail/cim:section", firstUsagePointLocation.MainAddress.TownDetail.Section);
             }
         }
 

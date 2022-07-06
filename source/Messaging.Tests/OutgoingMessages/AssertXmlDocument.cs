@@ -17,8 +17,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
+using System.Xml.XPath;
 using Messaging.Application.Xml;
 using Messaging.Domain.OutgoingMessages;
 using Xunit;
@@ -30,11 +32,13 @@ public class AssertXmlDocument
     private const string MarketActivityRecordElementName = "MktActivityRecord";
     private readonly Stream _stream;
     private readonly XDocument _document;
+    private readonly XmlReader _reader;
 
     private AssertXmlDocument(Stream stream)
     {
         _stream = stream;
-        _document = XDocument.Load(_stream);
+        _reader = XmlReader.Create(stream);
+        _document = XDocument.Load(_reader);
     }
 
     public static AssertXmlDocument Document(Stream document)
@@ -76,11 +80,20 @@ public class AssertXmlDocument
         return this;
     }
 
+    public AssertXmlDocument HasMarketActivityRecordValue1(string marketActivityRecordId, string elementName, string expectedValue)
+    {
+        var marketActivityRecord = GetMarketActivityRecordById(marketActivityRecordId);
+        var namespaceManager = new XmlNamespaceManager(_reader.NameTable);
+        namespaceManager.AddNamespace("cim", marketActivityRecord!.Name.NamespaceName);
+        Assert.Equal(expectedValue, marketActivityRecord?.XPathSelectElement("./" + elementName, namespaceManager)?.Value);
+        return this;
+    }
+
     public AssertMarketEvaluationPoint MarketEvaluationPoint(string marketActivityRecordId)
     {
         var marketActivityRecord = GetMarketActivityRecordById(marketActivityRecordId);
         var marketEvaluationPoint = marketActivityRecord!.Element(marketActivityRecord.Name.Namespace + "MarketEvaluationPoint");
-        return new AssertMarketEvaluationPoint(marketEvaluationPoint!);
+        return new AssertMarketEvaluationPoint(marketEvaluationPoint!, _reader);
     }
 
     public async Task<AssertXmlDocument> HasValidStructureAsync(XmlSchema schema)
@@ -124,10 +137,12 @@ public class AssertXmlDocument
 public class AssertMarketEvaluationPoint
 {
     private readonly XElement _marketEvaluationPointElement;
+    private readonly XmlReader _reader;
 
-    public AssertMarketEvaluationPoint(XElement marketEvaluationPointElement)
+    public AssertMarketEvaluationPoint(XElement marketEvaluationPointElement, XmlReader reader)
     {
         _marketEvaluationPointElement = marketEvaluationPointElement;
+        _reader = reader;
     }
 
     public AssertMarketEvaluationPoint HasValue(string elementName, string expectedValue)
@@ -151,22 +166,34 @@ public class AssertMarketEvaluationPoint
 
     public AssertUsagePointLocation UsagePointLocation(int index)
     {
-        return new AssertUsagePointLocation(GetUsagePointLocations()[index]);
+        return new AssertUsagePointLocation(GetUsagePointLocations()[index], _reader);
     }
 }
 
 public class AssertUsagePointLocation
 {
     private readonly XElement _usagePointLocationElement;
+    private readonly XmlReader _xmlReader;
 
-    public AssertUsagePointLocation(XElement usagePointLocationElement)
+    public AssertUsagePointLocation(XElement usagePointLocationElement, XmlReader xmlReader)
     {
         _usagePointLocationElement = usagePointLocationElement;
+        _xmlReader = xmlReader;
     }
 
     public AssertUsagePointLocation HasValue(string elementName, string expectedValue)
     {
         Assert.Equal(expectedValue, _usagePointLocationElement.Element(_usagePointLocationElement.Name.Namespace + elementName)?.Value);
+        return this;
+    }
+
+    public AssertUsagePointLocation HasValue1(string elementName, string expectedValue)
+    {
+        // cim="urn:ediel.org:structure:characteristicsofacustomeratanap:0:1"
+        var namespaceManager = new XmlNamespaceManager(_xmlReader.NameTable);
+        namespaceManager.AddNamespace("cim", "urn:ediel.org:structure:characteristicsofacustomeratanap:0:1");
+        var value = _usagePointLocationElement.XPathSelectElement("./cim:" + elementName, namespaceManager).Value;
+        Assert.Equal(expectedValue, value);
         return this;
     }
 }
