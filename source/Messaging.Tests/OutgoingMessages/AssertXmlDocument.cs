@@ -135,4 +135,17 @@ public class AssertMarketEvaluationPoint
         Assert.Equal(expectedValue, _marketEvaluationPointElement.Element(_marketEvaluationPointElement.Name.Namespace + elementName)?.Value);
         return this;
     }
+
+    public AssertMarketEvaluationPoint NumberOfUsagePointLocationsIs(int expectedNumber)
+    {
+        Assert.Equal(expectedNumber, GetUsagePointLocations().Count);
+        return this;
+    }
+
+    private List<XElement> GetUsagePointLocations()
+    {
+        return _marketEvaluationPointElement.Elements()
+            .Where(x => x.Name.LocalName.Equals("UsagePointLocation", StringComparison.OrdinalIgnoreCase))
+            .ToList() ?? new List<XElement>();
+    }
 }
