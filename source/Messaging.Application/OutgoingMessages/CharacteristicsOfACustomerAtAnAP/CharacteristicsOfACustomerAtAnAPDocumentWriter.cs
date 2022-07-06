@@ -29,7 +29,7 @@ public class CharacteristicsOfACustomerAtAnAPDocumentWriter : DocumentWriter
             schemaLocation: "urn:ediel.org:structure:characteristicsofacustomeratanap:0:1 urn-ediel-org-structure-characteristicsofacustomeratanap-0-1",
             xmlNamespace: "urn:ediel.org:structure:characteristicsofacustomeratanap:0:1",
             prefix: "cim",
-            typeCode: "XX"),
+            typeCode: "E21"),
             parser)
     {
     }

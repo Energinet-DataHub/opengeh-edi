@@ -63,6 +63,7 @@ namespace Messaging.Tests.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
             var assertDocument = await AssertXmlDocument
                 .Document(message)
                 .HasHeader(header)
+                .HasType("E21")
                 .NumberOfMarketActivityRecordsIs(2)
                 .HasValidStructureAsync(schema!).ConfigureAwait(false);
             AssertMarketActivityRecords(marketActivityRecords, assertDocument);

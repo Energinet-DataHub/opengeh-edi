@@ -47,7 +47,6 @@ public class AssertXmlDocument
     {
         if (expectedHeader == null) throw new ArgumentNullException(nameof(expectedHeader));
         Assert.NotEmpty(GetMessageHeaderValue("mRID")!);
-        Assert.Equal("E44", GetMessageHeaderValue("type"));
         Assert.Equal(expectedHeader.ProcessType, GetMessageHeaderValue("process.processType"));
         Assert.Equal("23", GetMessageHeaderValue("businessSector.type"));
         Assert.Equal(expectedHeader.SenderId, GetMessageHeaderValue("sender_MarketParticipant.mRID"));
@@ -69,6 +68,12 @@ public class AssertXmlDocument
     public AssertXmlDocument NumberOfMarketActivityRecordsIs(int expectedNumber)
     {
         Assert.Equal(expectedNumber, GetMarketActivityRecords().Count);
+        return this;
+    }
+
+    public AssertXmlDocument HasType(string expectedTypeCode)
+    {
+        Assert.Equal(expectedTypeCode, GetMessageHeaderValue("type"));
         return this;
     }
 
