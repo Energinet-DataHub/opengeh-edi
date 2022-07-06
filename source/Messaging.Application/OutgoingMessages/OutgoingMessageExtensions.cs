@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAP;
+namespace Messaging.Application.OutgoingMessages;
 
-internal static class Extensions
+public static class OutgoingMessageExtensions
 {
-    internal static string ToStringValue(this bool value)
+    public static string ToStringValue(this bool value)
     {
         return value ? "true" : "false";
     }

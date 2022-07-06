@@ -76,6 +76,13 @@ public class AssertXmlDocument
         return this;
     }
 
+    public AssertMarketEvaluationPoint MarketEvaluationPoint(string marketActivityRecordId)
+    {
+        var marketActivityRecord = GetMarketActivityRecordById(marketActivityRecordId);
+        var marketEvaluationPoint = marketActivityRecord!.Element(marketActivityRecord.Name.Namespace + "MarketEvaluationPoint");
+        return new AssertMarketEvaluationPoint(marketEvaluationPoint!);
+    }
+
     public AssertXmlDocument HasMarketEvaluationPointId(string marketActivityRecordId, string expectedMrid)
     {
         var marketActivityRecord = GetMarketActivityRecordById(marketActivityRecordId);
@@ -120,5 +127,22 @@ public class AssertXmlDocument
         return _document.Root?.Elements()
             .Where(x => x.Name.LocalName.Equals(MarketActivityRecordElementName, StringComparison.OrdinalIgnoreCase))
             .ToList() ?? new List<XElement>();
+    }
+}
+
+#pragma warning disable
+public class AssertMarketEvaluationPoint
+{
+    private readonly XElement _marketEvaluationPointElement;
+
+    public AssertMarketEvaluationPoint(XElement marketEvaluationPointElement)
+    {
+        _marketEvaluationPointElement = marketEvaluationPointElement;
+    }
+
+    public AssertMarketEvaluationPoint HasValue(string elementName, string expectedValue)
+    {
+        Assert.Equal(expectedValue, _marketEvaluationPointElement.Element(_marketEvaluationPointElement.Name.Namespace + elementName)?.Value);
+        return this;
     }
 }
