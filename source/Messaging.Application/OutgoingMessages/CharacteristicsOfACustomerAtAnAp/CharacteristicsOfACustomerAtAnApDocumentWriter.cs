@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Messaging.Application.Common;
 
-namespace Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAP;
+namespace Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 
 public class CharacteristicsOfACustomerAtAnApDocumentWriter : DocumentWriter
 {

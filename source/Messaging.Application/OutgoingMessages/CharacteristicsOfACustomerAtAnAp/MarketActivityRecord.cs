@@ -15,7 +15,7 @@
 using System.Collections.Generic;
 using NodaTime;
 
-namespace Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAP;
+namespace Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 
 public record MarketActivityRecord(string Id, string OriginalTransactionId, Instant ValidityStart, MarketEvaluationPoint MarketEvaluationPoint);
 
