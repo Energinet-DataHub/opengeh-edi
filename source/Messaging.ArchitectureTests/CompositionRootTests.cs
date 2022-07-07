@@ -42,9 +42,11 @@ namespace Messaging.ArchitectureTests
 
         public static IEnumerable<object[]> GetDocumentWriterRequirements()
         {
+            var constructorDependencies = ReflectionHelper.FindAllConstructorDependenciesForType();
+
             return ApplicationAssemblies.Application.GetTypes()
                 .Where(t => t.IsSubclassOf(typeof(DocumentWriter)))
-                .Select(t => new object[] { t });
+                .Select(t => new object[] { new Requirement(t.Name, constructorDependencies(t), t) });
         }
 
         public static IEnumerable<object[]> GetRequestHandlerRequirements()
@@ -80,14 +82,13 @@ namespace Messaging.ArchitectureTests
 
         #endregion
 
-        [Theory(DisplayName = nameof(All_document_writers_are_registered))]
+        [Theory(DisplayName = nameof(All_document_writers_are_satisfied))]
         [MemberData(nameof(GetDocumentWriterRequirements))]
-        public void All_document_writers_are_registered(Type type)
+        public void All_document_writers_are_satisfied(Requirement requirement)
         {
             using var scope = _host.Services.CreateScope();
-            var registered = (scope.ServiceProvider.GetService<IEnumerable<DocumentWriter>>() ?? Array.Empty<DocumentWriter>())
-                .Any(r => r.GetType() == type);
-            Assert.True(registered);
+            Assert.True(scope.ServiceProvider.CanSatisfyRequirement(requirement));
+            Assert.True(scope.ServiceProvider.RequirementIsPartOfCollection<DocumentWriter>(requirement));
         }
 
         [Theory(DisplayName = nameof(All_request_handlers_are_registered))]
