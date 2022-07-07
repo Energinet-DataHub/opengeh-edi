@@ -23,6 +23,7 @@ using Messaging.Application.MasterData;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
 using Messaging.Application.Transactions.MoveIn;
+using Messaging.Domain.MasterData.Dictionaries;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Fixtures;
@@ -69,24 +70,24 @@ public class ForwardMeteringPointMasterDataTests : TestBase
     private static void AssertMarketEvaluationPoint(MasterDataContent masterDataContent, MarketEvaluationPoint marketEvaluationPoint)
     {
         Assert.Equal(SampleData.MarketEvaluationPointId, marketEvaluationPoint.MRID.Id);
-        Assert.Equal(masterDataContent.MeteringPointResponsible, marketEvaluationPoint.MeteringPointResponsible.Id);
-        Assert.Equal(masterDataContent.Type, marketEvaluationPoint.Type);
-        Assert.Equal(masterDataContent.SettlementMethod, marketEvaluationPoint.SettlementMethod);
-        Assert.Equal(masterDataContent.MeteringMethod, marketEvaluationPoint.MeteringMethod);
-        Assert.Equal(masterDataContent.ConnectionState, marketEvaluationPoint.ConnectionState);
-        Assert.Equal(masterDataContent.ReadingPeriodicity, marketEvaluationPoint.ReadCycle);
-        Assert.Equal(masterDataContent.NetSettlementGroup, marketEvaluationPoint.NetSettlementGroup);
-        Assert.Equal(masterDataContent.ScheduledMeterReadingDate, marketEvaluationPoint.NextReadingDate);
+        Assert.Null(marketEvaluationPoint.MeteringPointResponsible);
+        Assert.Equal(MasterDataTranslation.Translations[masterDataContent.Type], marketEvaluationPoint.Type);
+        Assert.Equal(MasterDataTranslation.Translations[masterDataContent.SettlementMethod], marketEvaluationPoint.SettlementMethod);
+        Assert.Equal(MasterDataTranslation.Translations[masterDataContent.MeteringMethod], marketEvaluationPoint.MeteringMethod);
+        Assert.Equal(MasterDataTranslation.Translations[masterDataContent.ConnectionState], marketEvaluationPoint.ConnectionState);
+        Assert.Equal(MasterDataTranslation.Translations[masterDataContent.ReadingPeriodicity], marketEvaluationPoint.ReadCycle);
+        Assert.Equal(MasterDataTranslation.Translations[masterDataContent.NetSettlementGroup], marketEvaluationPoint.NetSettlementGroup);
+        Assert.Equal(MasterDataTranslation.TranslateToNextReadingDate(masterDataContent.ScheduledMeterReadingDate), marketEvaluationPoint.NextReadingDate);
         Assert.Equal(masterDataContent.GridAreaDetails.Code, marketEvaluationPoint.MeteringGridAreaId.Id);
-        Assert.Equal(masterDataContent.GridAreaDetails.FromCode, marketEvaluationPoint.OutMeteringGridAreaId.Id);
-        Assert.Equal(masterDataContent.GridAreaDetails.ToCode, marketEvaluationPoint.InMeteringGridAreaId.Id);
+        Assert.Null(marketEvaluationPoint.OutMeteringGridAreaId);
+        Assert.Null(marketEvaluationPoint.InMeteringGridAreaId);
         Assert.Equal(masterDataContent.PowerPlantGsrnNumber, marketEvaluationPoint.LinkedMarketEvaluationPointId.Id);
         Assert.Equal(
             masterDataContent.Capacity.ToString(CultureInfo.InvariantCulture),
             marketEvaluationPoint.PhysicalConnectionCapacity.Value);
-        Assert.Equal(masterDataContent.ConnectionType, marketEvaluationPoint.ConnectionType);
-        Assert.Equal(masterDataContent.DisconnectionType, marketEvaluationPoint.DisconnectionMethod);
-        Assert.Equal(masterDataContent.AssetType, marketEvaluationPoint.PsrType);
+        Assert.Equal(MasterDataTranslation.Translations[masterDataContent.ConnectionType], marketEvaluationPoint.ConnectionType);
+        Assert.Equal(MasterDataTranslation.Translations[masterDataContent.DisconnectionType], marketEvaluationPoint.DisconnectionMethod);
+        Assert.Equal(MasterDataTranslation.Translations[masterDataContent.AssetType], marketEvaluationPoint.PsrType);
         Assert.Equal(
             masterDataContent.ProductionObligation.ToString(CultureInfo.InvariantCulture),
             marketEvaluationPoint.ProductionObligation);
@@ -97,8 +98,8 @@ public class ForwardMeteringPointMasterDataTests : TestBase
             masterDataContent.MaximumCurrent.ToString(CultureInfo.InvariantCulture),
             marketEvaluationPoint.RatedCurrent.Value);
         Assert.Equal(masterDataContent.MeterNumber, marketEvaluationPoint.MeterId);
-        Assert.Equal(masterDataContent.Series.Product, marketEvaluationPoint.Series.Product);
-        Assert.Equal(masterDataContent.Series.UnitType, marketEvaluationPoint.Series.QuantityMeasureUnit);
+        Assert.Equal(MasterDataTranslation.Translations[masterDataContent.Series.Product], marketEvaluationPoint.Series.Product);
+        Assert.Equal(MasterDataTranslation.Translations[masterDataContent.Series.UnitType], marketEvaluationPoint.Series.QuantityMeasureUnit);
         Assert.Equal(masterDataContent.EffectiveDate.ToUniversalTime().ToInstant(), marketEvaluationPoint.SupplyStart);
         Assert.Equal(masterDataContent.Address.LocationDescription, marketEvaluationPoint.Description);
         Assert.Equal(masterDataContent.Address.GeoInfoReference.ToString(), marketEvaluationPoint.GeoInfoReference);
@@ -182,7 +183,7 @@ public class ForwardMeteringPointMasterDataTests : TestBase
             MasterDataSampleData.DisconnectionType,
             MasterDataSampleData.ConnectionType,
             MasterDataSampleData.ParentRelatedMeteringPoint,
-            Guid.NewGuid().ToString());
+            null);
     }
 
     private async Task<MarketActivityRecord> GetMarketActivityRecordAsync(string documentType)
