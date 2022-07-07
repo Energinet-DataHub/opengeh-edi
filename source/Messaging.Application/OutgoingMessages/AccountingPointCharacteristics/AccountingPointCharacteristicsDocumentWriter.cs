@@ -76,10 +76,22 @@ public class AccountingPointCharacteristicsDocumentWriter : DocumentWriter
         await writer.WriteElementStringAsync(DocumentDetails.Prefix, "connectionState", null, marketEvaluationPoint.ConnectionState).ConfigureAwait(false);
         await writer.WriteElementStringAsync(DocumentDetails.Prefix, "readCycle", null, marketEvaluationPoint.ReadCycle).ConfigureAwait(false);
         await writer.WriteElementStringAsync(DocumentDetails.Prefix, "netSettlementGroup", null, marketEvaluationPoint.NetSettlementGroup).ConfigureAwait(false);
-        await writer.WriteElementStringAsync(DocumentDetails.Prefix, "nextReadingDate", null, marketEvaluationPoint.NextReadingDate).ConfigureAwait(false);
+        if (marketEvaluationPoint.NetSettlementGroup == "6")
+        {
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "nextReadingDate", null, marketEvaluationPoint.NextReadingDate).ConfigureAwait(false);
+        }
+
         await WriteMridAsync("meteringGridArea_Domain.mRID", marketEvaluationPoint.MeteringGridAreaId, writer).ConfigureAwait(false);
-        await WriteMridAsync("inMeteringGridArea_Domain.mRID", marketEvaluationPoint.InMeteringGridAreaId, writer).ConfigureAwait(false);
-        await WriteMridAsync("outMeteringGridArea_Domain.mRID", marketEvaluationPoint.OutMeteringGridAreaId, writer).ConfigureAwait(false);
+        if (marketEvaluationPoint.InMeteringGridAreaId != null)
+        {
+            await WriteMridAsync("inMeteringGridArea_Domain.mRID", marketEvaluationPoint.InMeteringGridAreaId, writer).ConfigureAwait(false);
+        }
+
+        if (marketEvaluationPoint.OutMeteringGridAreaId != null)
+        {
+            await WriteMridAsync("outMeteringGridArea_Domain.mRID", marketEvaluationPoint.OutMeteringGridAreaId, writer).ConfigureAwait(false);
+        }
+
         await WriteUnitValueAsync("physicalConnectionCapacity", marketEvaluationPoint.PhysicalConnectionCapacity, writer).ConfigureAwait(false);
         await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mPConnectionType", null, marketEvaluationPoint.ConnectionType).ConfigureAwait(false);
         await writer.WriteElementStringAsync(DocumentDetails.Prefix, "disconnectionMethod", null, marketEvaluationPoint.DisconnectionMethod).ConfigureAwait(false);

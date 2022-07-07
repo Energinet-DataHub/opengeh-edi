@@ -31,8 +31,8 @@ public class MarketEvaluationPoint
         string netSettlementGroup,
         string nextReadingDate,
         Mrid meteringGridAreaId,
-        Mrid inMeteringGridAreaId,
-        Mrid outMeteringGridAreaId,
+        Mrid? inMeteringGridAreaId,
+        Mrid? outMeteringGridAreaId,
         Mrid linkedMarketEvaluationPointId,
         UnitValue physicalConnectionCapacity,
         string connectionType,
@@ -104,9 +104,9 @@ public class MarketEvaluationPoint
 
     public Mrid MeteringGridAreaId { get; }
 
-    public Mrid InMeteringGridAreaId { get; }
+    public Mrid? InMeteringGridAreaId { get; }
 
-    public Mrid OutMeteringGridAreaId { get; }
+    public Mrid? OutMeteringGridAreaId { get; }
 
     public Mrid LinkedMarketEvaluationPointId { get; }
 
