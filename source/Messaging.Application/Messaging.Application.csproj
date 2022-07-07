@@ -83,7 +83,6 @@ limitations under the License.
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
       <None Remove="Xml\SchemaStore\Schemas\urn-ediel-org-structure-accountingpointcharacteristics-0-1.xsd" />
-      <None Remove="SchemaStore\Schemas\Xml\urn-ediel-org-structure-characteristicsofacustomeratanap-0-1.xsd" />
       <EmbeddedResource Include="SchemaStore\Schemas\Xml\urn-ediel-org-structure-characteristicsofacustomeratanap-0-1.xsd">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
