@@ -22,7 +22,7 @@ public class MarketEvaluationPoint
 {
     public MarketEvaluationPoint(
         Mrid mrid,
-        Mrid meteringPointResponsible,
+        Mrid? meteringPointResponsible,
         string type,
         string settlementMethod,
         string meteringMethod,
@@ -86,7 +86,7 @@ public class MarketEvaluationPoint
 
     public Mrid MRID { get; }
 
-    public Mrid MeteringPointResponsible { get; }
+    public Mrid? MeteringPointResponsible { get; }
 
     public string Type { get; }
 

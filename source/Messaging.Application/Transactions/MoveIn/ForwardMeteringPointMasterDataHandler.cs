@@ -22,6 +22,7 @@ using Messaging.Application.Configuration;
 using Messaging.Application.MasterData;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
+using Messaging.Domain.MasterData.Dictionaries;
 using Messaging.Domain.OutgoingMessages;
 using NodaTime.Extensions;
 using Address = Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.Address;
@@ -64,28 +65,16 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
         MasterDataContent masterData,
         MoveInTransaction transaction)
     {
-        var address = new Address(
-            new StreetDetail(
-                masterData.Address!.StreetCode,
-                masterData.Address.StreetName,
-                masterData.Address.BuildingNumber,
-                masterData.Address.Floor,
-                masterData.Address.Room),
-            new TownDetail(
-                masterData.Address.MunicipalityCode.ToString(CultureInfo.InvariantCulture),
-                masterData.Address.City,
-                masterData.Address.CitySubDivision,
-                masterData.Address.CountryCode),
-            masterData.Address.PostCode);
+        var address = CreateAddress(masterData);
 
         return new MarketEvaluationPoint(
             new Mrid(transaction.MarketEvaluationPointId, "A10"),
-            new Mrid(masterData.MeteringPointResponsible, "A10"),
-            masterData.Type,
-            masterData.SettlementMethod,
-            masterData.MeteringMethod,
-            masterData.ConnectionState,
-            masterData.ReadingPeriodicity,
+            null,
+            DictionaryTranslation.Translations[masterData.Type],
+            DictionaryTranslation.Translations[masterData.SettlementMethod],
+            DictionaryTranslation.Translations[masterData.MeteringMethod],
+            DictionaryTranslation.Translations[masterData.ConnectionState],
+            DictionaryTranslation.Translations[masterData.ReadingPeriodicity],
             masterData.NetSettlementGroup,
             masterData.ScheduledMeterReadingDate,
             new Mrid(masterData.GridAreaDetails.Code, "NDK"),
@@ -113,7 +102,24 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
             null);
     }
 
-    private static OutgoingMessage CreateOutgoingMessage(string id, string documentType, string processType, string receiverId, string marketActivityRecordPayload, string reasonCode)
+    private static Address CreateAddress(MasterDataContent masterData)
+    {
+        return new Address(
+            new StreetDetail(
+                masterData.Address!.StreetCode,
+                masterData.Address.StreetName,
+                masterData.Address.BuildingNumber,
+                masterData.Address.Floor,
+                masterData.Address.Room),
+            new TownDetail(
+                masterData.Address.MunicipalityCode.ToString(CultureInfo.InvariantCulture),
+                masterData.Address.City,
+                masterData.Address.CitySubDivision,
+                masterData.Address.CountryCode),
+            masterData.Address.PostCode);
+    }
+
+    private static OutgoingMessage CreateOutgoingMessage(string id, string documentType, string processType, string receiverId, string marketActivityRecordPayload)
     {
         return new OutgoingMessage(
             documentType,
@@ -125,7 +131,7 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
             DataHubDetails.IdentificationNumber,
             MarketRoles.MeteringPointAdministrator,
             marketActivityRecordPayload,
-            reasonCode);
+            null);
     }
 
     private OutgoingMessage AccountingPointCharacteristicsMessageFrom(MasterDataContent masterData, MoveInTransaction transaction)
@@ -133,16 +139,15 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
         var marketEvaluationPoint = CreateMarketEvaluationPointFrom(masterData, transaction);
         var marketActivityRecord = new OutgoingMessages.AccountingPointCharacteristics.MarketActivityRecord(
             Guid.NewGuid().ToString(),
-            transaction.TransactionId,
+            null,
             transaction.EffectiveDate,
             marketEvaluationPoint);
 
         return CreateOutgoingMessage(
             transaction.StartedByMessageId,
             "AccountingPointCharacteristics",
-            "E32",
+            "E65",
             transaction.NewEnergySupplierId,
-            _marketActivityRecordParser.From(marketActivityRecord),
-            "E65");
+            _marketActivityRecordParser.From(marketActivityRecord));
     }
 }
