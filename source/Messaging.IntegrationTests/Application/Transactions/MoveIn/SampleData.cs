@@ -24,6 +24,8 @@ internal static class SampleData
 
     internal static string TransactionId => "8BA514FA-2E4D-4CB7-8B4A-1B1137185BD7";
 
+    internal static string MarketEvaluationPointId => "e17fe44f-ea4e-47e0-bbb0-64bfb382922a";
+
     internal static string OriginalMessageId => "EDE97146-C592-489A-B23A-3C73C096E368";
 
     internal static string ConsumerId => "12341234";
