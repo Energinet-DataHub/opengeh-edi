@@ -15,10 +15,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Messaging.ArchitectureTests;
 
-public record Requirement(string Name, IEnumerable<Type> DependentOn)
+public record Requirement(string Name, IEnumerable<Type> DependentOn, Type? ActualType = null)
 {
     public override string ToString()
     {
@@ -34,5 +35,15 @@ internal static class IServiceProviderHelpers
         ArgumentNullException.ThrowIfNull(requirement);
 
         return requirement.DependentOn.All(dependency => services.GetService(dependency) != null);
+    }
+
+    public static bool RequirementIsPartOfCollection<T>(this IServiceProvider serviceProvider, Requirement requirement)
+        where T : class
+    {
+        ArgumentNullException.ThrowIfNull(serviceProvider);
+        ArgumentNullException.ThrowIfNull(requirement);
+
+        var collection = serviceProvider.GetServices<T>().ToLookup(t => t.GetType());
+        return requirement.ActualType != null && collection.Contains(requirement.ActualType);
     }
 }
