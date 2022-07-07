@@ -20,6 +20,7 @@ using System.Reflection;
 using System.Text;
 using MediatR;
 using Messaging.Api;
+using Messaging.Application.Common;
 using Messaging.Infrastructure.Configuration;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,6 +39,13 @@ namespace Messaging.ArchitectureTests
         }
 
         #region Member data providers
+
+        public static IEnumerable<object[]> GetDocumentWriterRequirements()
+        {
+            return ApplicationAssemblies.Application.GetTypes()
+                .Where(t => t.IsSubclassOf(typeof(DocumentWriter)))
+                .Select(t => new object[] { t });
+        }
 
         public static IEnumerable<object[]> GetRequestHandlerRequirements()
             => ResolveTypes(
@@ -71,6 +79,16 @@ namespace Messaging.ArchitectureTests
         }
 
         #endregion
+
+        [Theory(DisplayName = nameof(All_document_writers_are_registered))]
+        [MemberData(nameof(GetDocumentWriterRequirements))]
+        public void All_document_writers_are_registered(Type type)
+        {
+            using var scope = _host.Services.CreateScope();
+            var registered = (scope.ServiceProvider.GetService<IEnumerable<DocumentWriter>>() ?? Array.Empty<DocumentWriter>())
+                .Any(r => r.GetType() == type);
+            Assert.True(registered);
+        }
 
         [Theory(DisplayName = nameof(All_request_handlers_are_registered))]
         [MemberData(nameof(GetRequestHandlerRequirements))]
