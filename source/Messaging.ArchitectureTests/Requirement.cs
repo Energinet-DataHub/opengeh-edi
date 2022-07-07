@@ -43,7 +43,13 @@ internal static class IServiceProviderHelpers
         ArgumentNullException.ThrowIfNull(serviceProvider);
         ArgumentNullException.ThrowIfNull(requirement);
 
+        if (requirement.ActualType == null)
+        {
+            throw new InvalidOperationException(
+                $"{nameof(requirement)} must have the property {nameof(requirement.ActualType)} set");
+        }
+
         var collection = serviceProvider.GetServices<T>().ToLookup(t => t.GetType());
-        return requirement.ActualType != null && collection.Contains(requirement.ActualType);
+        return collection.Contains(requirement.ActualType);
     }
 }
