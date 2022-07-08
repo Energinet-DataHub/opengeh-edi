@@ -43,7 +43,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
             new(ClaimTypes.Role, "electricalsupplier"),
         };
 
-        private readonly MessageParserStrategy _messageParserStrategy;
+        private readonly MessageParser _messageParser;
         private readonly IMarketActorAuthenticator _marketActorAuthenticator;
         private readonly ITransactionIds _transactionIds;
         private readonly IMessageIds _messageIds;
@@ -52,7 +52,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
         public MessageReceiverTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
-            _messageParserStrategy = GetService<MessageParserStrategy>();
+            _messageParser = GetService<MessageParser>();
             _transactionIds = GetService<ITransactionIds>();
             _messageIds = GetService<IMessageIds>();
             _marketActorAuthenticator = GetService<IMarketActorAuthenticator>();
@@ -181,7 +181,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
         public async Task Return_failure_if_xml_schema_for_business_process_type_does_not_exist()
         {
             await using var message = BusinessMessageBuilder
-                .RequestChangeOfSupplier("CimMessageAdapter//Messages//BadRequestChangeOfSupplier.xml")
+                .RequestChangeOfSupplier("CimMessageAdapter//Messages//Xml//BadRequestChangeOfSupplier.xml")
                 .Message();
 
             var result = await ReceiveRequestChangeOfSupplierMessage(message, MediaTypeNames.Application.Xml)
@@ -273,14 +273,14 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
         private MessageReceiver CreateMessageReceiver()
         {
             _messageQueueDispatcherSpy = new MessageQueueDispatcherStub();
-            var messageReceiver = new MessageReceiver(_messageIds, _messageQueueDispatcherSpy, _transactionIds, _marketActorAuthenticator, _messageParserStrategy);
+            var messageReceiver = new MessageReceiver(_messageIds, _messageQueueDispatcherSpy, _transactionIds, _marketActorAuthenticator, _messageParser);
             return messageReceiver;
         }
 
         private MessageReceiver CreateMessageReceiver(IMessageIds messageIds)
         {
             _messageQueueDispatcherSpy = new MessageQueueDispatcherStub();
-            var messageReceiver = new MessageReceiver(messageIds, _messageQueueDispatcherSpy, _transactionIds, _marketActorAuthenticator, _messageParserStrategy);
+            var messageReceiver = new MessageReceiver(messageIds, _messageQueueDispatcherSpy, _transactionIds, _marketActorAuthenticator, _messageParser);
             return messageReceiver;
         }
 

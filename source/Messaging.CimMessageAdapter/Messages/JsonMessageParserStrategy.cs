@@ -31,14 +31,14 @@ using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
 
 namespace Messaging.CimMessageAdapter.Messages;
 
-public class JsonMessageParser : MessageParser
+public class JsonMessageParserStrategy : MessageParserStrategy
 {
     private const string MarketActivityRecordElementName = "MktActivityRecord";
     private const string HeaderElementName = "RequestChangeOfSupplier_MarketDocument";
     private readonly ISchemaProvider _schemaProvider;
     private readonly List<ValidationError> _errors = new();
 
-    public JsonMessageParser()
+    public JsonMessageParserStrategy()
     {
         _schemaProvider = new JsonSchemaProvider();
     }

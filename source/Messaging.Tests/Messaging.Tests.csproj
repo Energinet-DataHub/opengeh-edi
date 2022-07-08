@@ -43,18 +43,9 @@ limitations under the License.
 
     <ItemGroup>
       <None Remove="xml\Confirm request Change of Supplier.xml" />
-      <EmbeddedResource Include="xml\Confirm request Change of Supplier.xml">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
       <None Remove="json\Reject request Change of Supplier.json" />
       <None Remove="json\Request Change of Supplier.json" />
-      <EmbeddedResource Include="json\Request Change of Supplier.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
       <None Remove="json\Invalid Request Change of Supplier.json" />
-      <EmbeddedResource Include="json\Invalid Request Change of Supplier.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
     </ItemGroup>
 
 </Project>

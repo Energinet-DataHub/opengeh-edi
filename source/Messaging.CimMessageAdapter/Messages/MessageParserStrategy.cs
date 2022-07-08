@@ -12,36 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mime;
+using System.IO;
+using System.Threading.Tasks;
 
-namespace Messaging.CimMessageAdapter.Messages;
-
-public class MessageParserStrategy
+namespace Messaging.CimMessageAdapter.Messages
 {
-    private readonly XmlMessageParser _xmlMessageParser;
-    private readonly JsonMessageParser _jsonMessageParser;
-
-    private readonly IDictionary<string, MessageParser> _strategies;
-
-    public MessageParserStrategy(XmlMessageParser xmlMessageParser, JsonMessageParser jsonMessageParser)
+    public abstract class MessageParserStrategy
     {
-        _xmlMessageParser = xmlMessageParser;
-        _jsonMessageParser = jsonMessageParser;
+        public abstract Task<MessageParserResult> ParseAsync(Stream message);
 
-        _strategies = new Dictionary<string, MessageParser>()
-        {
-            { MediaTypeNames.Application.Xml, _xmlMessageParser },
-            { MediaTypeNames.Application.Json, _jsonMessageParser },
-        };
-    }
+        protected abstract string[] SplitNamespace(Stream message);
 
-    public MessageParser GetMessageParser(string contentType)
-    {
-        var strategy = _strategies.FirstOrDefault(s => string.Equals(s.Key, contentType, StringComparison.OrdinalIgnoreCase));
-        if (strategy.Key is null) throw new InvalidOperationException($"No message parser strategy found for content type {contentType}");
-        return strategy.Value;
+        protected abstract string GetBusinessProcessType(Stream message);
     }
 }

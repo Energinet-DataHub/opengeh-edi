@@ -223,9 +223,9 @@ namespace Messaging.Infrastructure.Configuration
 
         public CompositionRoot AddMessageParserServices()
         {
-            _services.AddSingleton<MessageParserStrategy>();
-            _services.AddSingleton<XmlMessageParser>();
-            _services.AddSingleton<JsonMessageParser>();
+            _services.AddSingleton<MessageParser>();
+            _services.AddSingleton<XmlMessageParserStrategy>();
+            _services.AddSingleton<JsonMessageParserStrategy>();
             _services.AddSingleton<XmlSchemaProvider>();
             _services.AddSingleton<JsonSchemaProvider>();
             return this;

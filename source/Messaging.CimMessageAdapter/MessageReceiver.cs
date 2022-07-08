@@ -32,26 +32,26 @@ namespace Messaging.CimMessageAdapter
         private readonly IMessageQueueDispatcher _messageQueueDispatcher;
         private readonly ITransactionIds _transactionIds;
         private readonly IMarketActorAuthenticator _marketActorAuthenticator;
-        private readonly MessageParserStrategy _messageParserStrategy;
+        private readonly MessageParser _messageParser;
 
-        public MessageReceiver(IMessageIds messageIds, IMessageQueueDispatcher messageQueueDispatcher, ITransactionIds transactionIds, IMarketActorAuthenticator marketActorAuthenticator, MessageParserStrategy messageParserStrategy)
+        public MessageReceiver(IMessageIds messageIds, IMessageQueueDispatcher messageQueueDispatcher, ITransactionIds transactionIds, IMarketActorAuthenticator marketActorAuthenticator, MessageParser messageParser)
         {
             _messageIds = messageIds ?? throw new ArgumentNullException(nameof(messageIds));
             _messageQueueDispatcher = messageQueueDispatcher ??
                                              throw new ArgumentNullException(nameof(messageQueueDispatcher));
             _transactionIds = transactionIds;
             _marketActorAuthenticator = marketActorAuthenticator ?? throw new ArgumentNullException(nameof(marketActorAuthenticator));
-            _messageParserStrategy = messageParserStrategy;
+            _messageParser = messageParser;
         }
 
         public async Task<Result> ReceiveAsync(Stream message, string contentType)
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
 
-            var messageParser = _messageParserStrategy.GetMessageParser(contentType);
+            var messageParserStrategy = _messageParser.GetMessageParserStrategy(contentType);
 
             var messageParserResult =
-                 await messageParser.ParseAsync(message).ConfigureAwait(false);
+                 await messageParserStrategy.ParseAsync(message).ConfigureAwait(false);
 
             if (InvalidMessageHeader(messageParserResult))
             {

@@ -25,14 +25,14 @@ using Messaging.CimMessageAdapter.Errors;
 
 namespace Messaging.CimMessageAdapter.Messages;
 
-public class XmlMessageParser : MessageParser
+public class XmlMessageParserStrategy : MessageParserStrategy
 {
     private const string MarketActivityRecordElementName = "MktActivityRecord";
     private const string HeaderElementName = "RequestChangeOfSupplier_MarketDocument";
     private readonly List<ValidationError> _errors = new();
     private readonly ISchemaProvider _schemaProvider;
 
-    public XmlMessageParser()
+    public XmlMessageParserStrategy()
     {
         _schemaProvider = new XmlSchemaProvider();
     }
