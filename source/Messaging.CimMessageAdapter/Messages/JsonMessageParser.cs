@@ -44,7 +44,6 @@ public class JsonMessageParser : MessageParser
         }
 
         var schema = await _schemaProvider.GetSchemaAsync<JsonSchema>(processType, "0").ConfigureAwait(false);
-
         if (schema is null)
         {
             return MessageParserResult.Failure(new UnknownBusinessProcessTypeOrVersion(processType, "0"));
