@@ -149,7 +149,7 @@ namespace Messaging.Tests.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
 
         private Task<XmlSchema?> GetSchema()
         {
-            _schemaProvider = SchemaProviderFactory.GetProvider(MediaTypeNames.Application.Xml);
+            _schemaProvider = new XmlSchemaProvider();
             return _schemaProvider.GetSchemaAsync<XmlSchema>("characteristicsofacustomeratanap", "0.1");
         }
     }
