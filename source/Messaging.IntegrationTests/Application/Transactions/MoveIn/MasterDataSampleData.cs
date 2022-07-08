@@ -71,7 +71,7 @@ namespace Processing.IntegrationTests.Application
 
         public static string ConnectionType => string.Empty;
 
-        public static string AssetType => "KWh";
+        public static string AssetType => "WindTurbines";
 
         public static string Floor => string.Empty;
 

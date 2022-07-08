@@ -22,6 +22,7 @@ using Messaging.Application.Configuration;
 using Messaging.Application.MasterData;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
+using Messaging.Domain.MasterData.Dictionaries;
 using Messaging.Domain.OutgoingMessages;
 using NodaTime.Extensions;
 using Address = Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.Address;
@@ -64,7 +65,46 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
         MasterDataContent masterData,
         MoveInTransaction transaction)
     {
-        var address = new Address(
+        var address = CreateAddress(masterData);
+
+        return new MarketEvaluationPoint(
+            new Mrid(transaction.MarketEvaluationPointId, "A10"),
+            null,
+            MasterDataTranslation.Translations[masterData.Type],
+            MasterDataTranslation.Translations[masterData.SettlementMethod],
+            MasterDataTranslation.Translations[masterData.MeteringMethod],
+            MasterDataTranslation.Translations[masterData.ConnectionState],
+            MasterDataTranslation.Translations[masterData.ReadingPeriodicity],
+            MasterDataTranslation.Translations[masterData.NetSettlementGroup],
+            MasterDataTranslation.TranslateToNextReadingDate(masterData.ScheduledMeterReadingDate),
+            new Mrid(masterData.GridAreaDetails.Code, "NDK"),
+            null,
+            null,
+            new Mrid(masterData.PowerPlantGsrnNumber, "A10"),
+            new UnitValue(masterData.Capacity.ToString(CultureInfo.InvariantCulture), "KWT"),
+            MasterDataTranslation.Translations[masterData.ConnectionType],
+            MasterDataTranslation.Translations[masterData.DisconnectionType],
+            MasterDataTranslation.Translations[masterData.AssetType],
+            masterData.ProductionObligation.ToString(),
+            new UnitValue(masterData.MaximumPower.ToString(CultureInfo.InvariantCulture), "KWT"),
+            new UnitValue(masterData.MaximumCurrent.ToString(CultureInfo.InvariantCulture), "AMP"),
+            masterData.MeterNumber,
+            new Series(
+                MasterDataTranslation.Translations[masterData.Series.Product],
+                MasterDataTranslation.Translations[masterData.Series.UnitType]),
+            new Mrid(transaction.CurrentEnergySupplierId!, "A10"),
+            masterData.EffectiveDate.ToUniversalTime().ToInstant(),
+            masterData.Address.LocationDescription,
+            masterData.Address.GeoInfoReference.ToString(),
+            address,
+            masterData.Address.IsActualAddress.ToString(),
+            string.IsNullOrEmpty(masterData.ParentMarketEvaluationPointId) ? null : new RelatedMarketEvaluationPoint(new Mrid(masterData.ParentMarketEvaluationPointId, "A10"), "description"),
+            null);
+    }
+
+    private static Address CreateAddress(MasterDataContent masterData)
+    {
+        return new Address(
             new StreetDetail(
                 masterData.Address!.StreetCode,
                 masterData.Address.StreetName,
@@ -77,43 +117,9 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
                 masterData.Address.CitySubDivision,
                 masterData.Address.CountryCode),
             masterData.Address.PostCode);
-
-        return new MarketEvaluationPoint(
-            new Mrid(transaction.MarketEvaluationPointId, "A10"),
-            new Mrid(masterData.MeteringPointResponsible, "A10"),
-            masterData.Type,
-            masterData.SettlementMethod,
-            masterData.MeteringMethod,
-            masterData.ConnectionState,
-            masterData.ReadingPeriodicity,
-            masterData.NetSettlementGroup,
-            masterData.ScheduledMeterReadingDate,
-            new Mrid(masterData.GridAreaDetails.Code, "NDK"),
-            new Mrid(masterData.GridAreaDetails.ToCode, "NDK"),
-            new Mrid(masterData.GridAreaDetails.FromCode, "NDK"),
-            new Mrid(masterData.PowerPlantGsrnNumber!, "A10"),
-            new UnitValue(masterData.Capacity.ToString(CultureInfo.InvariantCulture), "KWT"),
-            masterData.ConnectionType,
-            masterData.DisconnectionType,
-            masterData.AssetType,
-            masterData.ProductionObligation.ToString(),
-            new UnitValue(masterData.MaximumPower.ToString(CultureInfo.InvariantCulture), "KWH"),
-            new UnitValue(masterData.MaximumCurrent.ToString(CultureInfo.InvariantCulture), "AMP"),
-            masterData.MeterNumber,
-            new Series(
-                masterData.Series.Product,
-                masterData.Series.UnitType),
-            new Mrid(transaction.CurrentEnergySupplierId!, "A10"),
-            masterData.EffectiveDate.ToUniversalTime().ToInstant(),
-            masterData.Address.LocationDescription,
-            masterData.Address.GeoInfoReference.ToString(),
-            address,
-            masterData.Address.IsActualAddress.ToString(),
-            string.IsNullOrEmpty(masterData.ParentMarketEvaluationPointId) ? null : new RelatedMarketEvaluationPoint(new Mrid(masterData.ParentMarketEvaluationPointId, "A10"), "description"),
-            null);
     }
 
-    private static OutgoingMessage CreateOutgoingMessage(string id, string documentType, string processType, string receiverId, string marketActivityRecordPayload, string reasonCode)
+    private static OutgoingMessage CreateOutgoingMessage(string id, string documentType, string processType, string receiverId, string marketActivityRecordPayload)
     {
         return new OutgoingMessage(
             documentType,
@@ -125,7 +131,7 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
             DataHubDetails.IdentificationNumber,
             MarketRoles.MeteringPointAdministrator,
             marketActivityRecordPayload,
-            reasonCode);
+            null);
     }
 
     private OutgoingMessage AccountingPointCharacteristicsMessageFrom(MasterDataContent masterData, MoveInTransaction transaction)
@@ -133,16 +139,15 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
         var marketEvaluationPoint = CreateMarketEvaluationPointFrom(masterData, transaction);
         var marketActivityRecord = new OutgoingMessages.AccountingPointCharacteristics.MarketActivityRecord(
             Guid.NewGuid().ToString(),
-            transaction.TransactionId,
+            null,
             transaction.EffectiveDate,
             marketEvaluationPoint);
 
         return CreateOutgoingMessage(
             transaction.StartedByMessageId,
             "AccountingPointCharacteristics",
-            "E32",
+            "E65",
             transaction.NewEnergySupplierId,
-            _marketActivityRecordParser.From(marketActivityRecord),
-            "E65");
+            _marketActivityRecordParser.From(marketActivityRecord));
     }
 }
