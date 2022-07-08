@@ -118,7 +118,7 @@ public class AccountingPointCharacteristicsDocumentWriter : DocumentWriter
         }
 
         await writer.WriteElementStringAsync(DocumentDetails.Prefix, "type", null, marketEvaluationPoint.Type).ConfigureAwait(false);
-        if (marketEvaluationPoint.SettlementMethod == "E17")
+        if (marketEvaluationPoint.Type == "E17")
         {
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "settlementMethod", null, marketEvaluationPoint.SettlementMethod).ConfigureAwait(false);
         }
