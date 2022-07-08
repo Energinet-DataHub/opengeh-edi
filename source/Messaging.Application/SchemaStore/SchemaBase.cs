@@ -12,52 +12,53 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace Messaging.Application.SchemaStore;
 
-public class SchemaBase
+public abstract class SchemaBase
 {
-    private static Dictionary<KeyValuePair<string, string>, string>? _schemas;
+    private Dictionary<KeyValuePair<string, string>, string>? _schemas;
 
     protected SchemaBase()
     {
     }
 
-    protected static void InitializeSchemas(Dictionary<KeyValuePair<string, string>, string> schemas)
+    protected void InitializeSchemas(Dictionary<KeyValuePair<string, string>, string> schemas)
     {
-        _schemas = schemas;
+        _schemas = new Dictionary<KeyValuePair<string, string>, string>();
+        schemas.ToList().ForEach((x) =>
+        {
+            var keyToUpper = x.Key.Key.ToUpperInvariant();
+            _schemas.Add(new KeyValuePair<string, string>(keyToUpper, x.Key.Value), x.Value);
+        });
     }
 
-    protected static string? GetSchemaLocation(string businessProcessType, string version)
+    protected string? GetSchemaLocation(string businessProcessType, string version)
     {
-        var schemaName = string.Empty;
+        if (businessProcessType == null) throw new ArgumentNullException(nameof(businessProcessType));
 
-        _schemas?.TryGetValue(
-            new KeyValuePair<string, string>(businessProcessType, version),
-            out schemaName);
+        var schemaName = string.Empty;
+        var businessProcessTypeToUpper = businessProcessType.ToUpperInvariant();
+
+        if (_schemas == null) return schemaName;
+
+        foreach (var key in _schemas.Keys)
+        {
+            if (key.Key.Equals(businessProcessTypeToUpper, StringComparison.OrdinalIgnoreCase))
+            {
+                _schemas.TryGetValue(
+                    new KeyValuePair<string, string>(businessProcessTypeToUpper, version),
+                    out schemaName);
+
+                return schemaName;
+            }
+        }
 
         return schemaName;
     }
 
-    protected virtual Dictionary<KeyValuePair<string, string>, string> FillSchemaDictionary(string schemaPath)
-    {
-        var schemaDictionary = new Dictionary<KeyValuePair<string, string>, string>();
-        var schemas = Directory.GetFiles(schemaPath).ToList();
-        foreach (var schema in schemas)
-        {
-            var filename = Path.GetFileNameWithoutExtension(schema);
-            var filenameSplit = filename.Split('-');
-            if (filenameSplit.Length == 7)
-            {
-                schemaDictionary.Add(
-                    new KeyValuePair<string, string>(filenameSplit[4], filenameSplit[5] + "." + filenameSplit[6]),
-                    schema);
-            }
-        }
-
-        return schemaDictionary;
-    }
+    protected abstract Dictionary<KeyValuePair<string, string>, string> FillSchemaDictionary(string schemaPath);
 }

@@ -25,6 +25,6 @@ public class ResponseFactoryErrorTests
     [Fact]
     public void Throws_if_content_type_is_unknown()
     {
-        Assert.Throws<InvalidOperationException>(() => ResponseStrategy.GetResponseStrategy("unknown content type"));
+        Assert.Throws<InvalidOperationException>(() => ResponseStrategy.GetResponseFactory("unknown content type"));
     }
 }

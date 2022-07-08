@@ -12,14 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Json.Schema;
 
 namespace Messaging.Application.SchemaStore;
 
 public sealed class CimJsonSchemas : SchemaBase, ISchema
 {
+    private const string SchemaBaseUri = @"file:///C:/Users/Public/Documents/iec.ch/TC57/2020/";
     private static readonly string _schemaPath = $"SchemaStore{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}Json{Path.DirectorySeparatorChar}";
 
     public CimJsonSchemas()
@@ -38,14 +41,31 @@ public sealed class CimJsonSchemas : SchemaBase, ISchema
     {
         var schemaDictionary = new Dictionary<KeyValuePair<string, string>, string>();
         var schemas = Directory.GetFiles(schemaPath).ToList();
+
         foreach (var schema in schemas)
         {
             var filename = Path.GetFileNameWithoutExtension(schema);
+            if (filename.Contains("assembly", StringComparison.OrdinalIgnoreCase))
+            {
+                var split = filename.Substring(0, filename.IndexOf("assembly", StringComparison.OrdinalIgnoreCase));
+                var splitArray = split.Split('-');
+                filename = string.Join(string.Empty, splitArray);
+            }
+
             schemaDictionary.Add(
                     new KeyValuePair<string, string>(filename, "0"),
                     schema);
+
+            RegisterSchema(schema);
         }
 
         return schemaDictionary;
+    }
+
+    private static void RegisterSchema(string schemaPath)
+    {
+        var schema = JsonSchema.FromFile(schemaPath);
+        var schemaName = Path.GetFileName(schemaPath);
+        SchemaRegistry.Global.Register(new Uri(SchemaBaseUri + schemaName), schema);
     }
 }

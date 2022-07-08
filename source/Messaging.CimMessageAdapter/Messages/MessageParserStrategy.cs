@@ -12,18 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Net.Mime;
+using System.IO;
+using System.Threading.Tasks;
 
-namespace Messaging.Application.SchemaStore;
-
-public static class SchemaProviderFactory
+namespace Messaging.CimMessageAdapter.Messages
 {
-    public static ISchemaProvider GetProvider(string? contentType)
+    public abstract class MessageParserStrategy
     {
-        if (contentType == null) throw new ArgumentNullException(nameof(contentType));
+        public abstract Task<MessageParserResult> ParseAsync(Stream message);
 
-        return contentType.Equals(MediaTypeNames.Application.Json, StringComparison.OrdinalIgnoreCase)
-            ? new JsonSchemaProvider() : new XmlSchemaProvider();
+        protected abstract string[] SplitNamespace(Stream message);
+
+        protected abstract string GetBusinessProcessType(Stream message);
     }
 }
