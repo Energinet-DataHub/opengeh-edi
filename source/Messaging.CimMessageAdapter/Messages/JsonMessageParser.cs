@@ -175,26 +175,26 @@ public class JsonMessageParser : MessageParser
 
         if (!validationResult.IsValid)
         {
-            AddErrorsFrom(validationResult);
+            AddValidationErrors(validationResult);
         }
 
         ResetMessagePosition(message);
     }
 
-    private void AddErrorsFrom(ValidationResults validationResult)
+    private void AddValidationErrors(ValidationResults validationResult)
     {
-        AddErrorFrom(validationResult.Message);
+        AddValidationError(validationResult.Message);
 
         if (validationResult.HasNestedResults)
         {
             foreach (var result in validationResult.NestedResults)
             {
-                AddErrorFrom(result.Message);
+                AddValidationError(result.Message);
             }
         }
     }
 
-    private void AddErrorFrom(string? errorMessage)
+    private void AddValidationError(string? errorMessage)
     {
         if (errorMessage != null)
         {
