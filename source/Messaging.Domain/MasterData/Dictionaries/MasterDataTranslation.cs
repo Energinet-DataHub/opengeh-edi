@@ -30,8 +30,6 @@ public static class MasterDataTranslation
         AddAssetTypes();
         AddProductTypes();
         AddMeasurementUnitType();
-        Translations.Add("s", "5790001330590");
-        Translations.Add("Taridasdff", "5790001330590");
     }
 
     public static Dictionary<string, string> Translations { get; } = new();
