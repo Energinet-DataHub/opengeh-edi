@@ -143,6 +143,7 @@ public class AccountingPointCharacteristicsDocumentWriter : DocumentWriter
             await WriteMridAsync("outMeteringGridArea_Domain.mRID", marketEvaluationPoint.OutMeteringGridAreaId, writer).ConfigureAwait(false);
         }
 
+        await WriteMridAsync("linked_MarketEvaluationPoint.mRID", marketEvaluationPoint.LinkedMarketEvaluationPointId, writer).ConfigureAwait(false);
         await WriteUnitValueAsync("physicalConnectionCapacity", marketEvaluationPoint.PhysicalConnectionCapacity, writer).ConfigureAwait(false);
         await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mPConnectionType", null, marketEvaluationPoint.ConnectionType).ConfigureAwait(false);
         await writer.WriteElementStringAsync(DocumentDetails.Prefix, "disconnectionMethod", null, marketEvaluationPoint.DisconnectionMethod).ConfigureAwait(false);
