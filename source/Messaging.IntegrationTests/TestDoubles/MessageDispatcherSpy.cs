@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Messaging.Application.OutgoingMessages;
@@ -22,9 +23,17 @@ namespace Messaging.IntegrationTests.TestDoubles
     {
         public Stream? DispatchedMessage { get; private set; }
 
+        public bool Error { get; private set; }
+
         public async Task DispatchAsync(Stream message)
         {
             DispatchedMessage = message;
+            await Task.CompletedTask.ConfigureAwait(false);
+        }
+
+        public async Task DispatchAsync(IReadOnlyList<string> messageIds)
+        {
+            Error = true;
             await Task.CompletedTask.ConfigureAwait(false);
         }
     }
