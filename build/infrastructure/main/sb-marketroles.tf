@@ -56,3 +56,17 @@ module "sbq_incomingmessagequeue" {
   name                = "incomingmessagequeue"
   namespace_id        = module.sb_marketroles.id
 }
+
+module "sbq_customermasterdatarequestqueue" {
+  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/service-bus-queue?ref=7.0.0"
+
+  name                = "customermasterdatarequestqueue"
+  namespace_id        = module.sb_marketroles.id
+}
+
+module "sbq_customermasterdataresponsequeue" {
+  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/service-bus-queue?ref=7.0.0"
+
+  name                = "customermasterdataresponsequeue"
+  namespace_id        = module.sb_marketroles.id
+}
