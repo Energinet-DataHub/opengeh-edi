@@ -37,6 +37,7 @@ module "func_processing" {
     SERVICE_BUS_CONNECTION_STRING_LISTENER_FOR_INTEGRATION_EVENTS = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-listen-connection-string)",
     SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS          = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-send-connection-string)",
     SERVICE_BUS_CONNECTION_STRING_MANAGE_FOR_INTEGRATION_EVENTS   = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-manage-connection-string)",
+    CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME                       = "customermasterdatarequestqueue",
   }
 
   tags                                      = azurerm_resource_group.this.tags
