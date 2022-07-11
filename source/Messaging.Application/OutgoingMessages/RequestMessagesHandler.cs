@@ -51,7 +51,8 @@ namespace Messaging.Application.OutgoingMessages
             var messageIdsNotFound = MessageIdsNotFound(requestedMessageIds, messages);
             if (messageIdsNotFound.Any())
             {
-                throw new OutgoingMessageNotFoundException(messageIdsNotFound);
+                await _messageDispatcher.DispatchAsync(messageIdsNotFound).ConfigureAwait(false);
+                return Unit.Value;
             }
 
             var messageBundle = CreateBundleFrom(messages);

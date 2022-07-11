@@ -34,7 +34,10 @@ namespace Messaging.Infrastructure.OutgoingMessages
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            await _dataBundleResponseSender.SendAsync(request.DataBundleRequestDto.CreateResponse(request.Uri)).ConfigureAwait(false);
+            if (request.Uri != null)
+                await _dataBundleResponseSender.SendAsync(request.DataBundleRequestDto.CreateResponse(request.Uri)).ConfigureAwait(false);
+            if (request.DataBundleResponseErrorDto != null)
+                await _dataBundleResponseSender.SendAsync(request.DataBundleRequestDto.CreateErrorResponse(request.DataBundleResponseErrorDto)).ConfigureAwait(false);
 
             return Unit.Value;
         }

@@ -57,7 +57,8 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
         {
             var nonExistingMessage = new List<string> { Guid.NewGuid().ToString() };
 
-            await Assert.ThrowsAsync<OutgoingMessageNotFoundException>(() => RequestMessages(nonExistingMessage.AsReadOnly())).ConfigureAwait(false);
+            await RequestMessages(nonExistingMessage.AsReadOnly()).ConfigureAwait(false);
+            Assert.True(_messageDispatcherSpy.Error);
         }
 
         private static IncomingMessageBuilder MessageBuilder()

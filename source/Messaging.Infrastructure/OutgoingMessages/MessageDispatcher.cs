@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Energinet.DataHub.MessageHub.Client.Storage;
@@ -48,6 +49,15 @@ namespace Messaging.Infrastructure.OutgoingMessages
                 new NotifyMessageHub(
                     _messageRequestContext.DataBundleRequestDto,
                     uri)).ConfigureAwait(false);
+        }
+
+        public async Task DispatchAsync(IReadOnlyList<string> messageIds)
+        {
+            await _commandScheduler.EnqueueAsync(
+                new NotifyMessageHub(
+                    _messageRequestContext.DataBundleRequestDto ?? throw new InvalidOperationException(),
+                    MessageRequestContext.CreateErrorDataNotFoundResponse(
+                        messageIds))).ConfigureAwait(false);
         }
     }
 }

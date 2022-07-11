@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -37,6 +38,16 @@ namespace Messaging.Infrastructure.OutgoingMessages
         public DataBundleRequestDto? DataBundleRequestDto { get; private set; }
 
         public IReadOnlyCollection<string>? DataAvailableIds { get; private set; }
+
+        public static DataBundleResponseErrorDto CreateErrorDataNotFoundResponse(IReadOnlyList<string> messageIds)
+        {
+            var error = new DataBundleResponseErrorDto();
+
+            error.Reason = DataBundleResponseErrorReason.DatasetNotFound;
+            error.FailureDescription = $"Message(s) with the following id(s) not found {messageIds}";
+
+            return error;
+        }
 
         public async Task SetMessageRequestContextAsync(byte[] data)
         {
