@@ -41,6 +41,7 @@ module "func_processing" {
     CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME                      = module.sbq_customermasterdataresponsequeue.name
     MARKET_ROLES_SERVICE_BUS_LISTEN_CONNECTION_STRING             = module.sb_marketroles.primary_connection_strings["listen"]
     MARKET_ROLES_SERVICE_BUS_SENDER_CONNECTION_STRING             = module.sb_marketroles.primary_connection_strings["send"]
+    MARKET_ROLES_SERVICE_BUS_MANAGE_CONNECTION_STRING             = module.sb_marketroles.primary_connection_strings["manage"]
   }
 
   tags                                      = azurerm_resource_group.this.tags
