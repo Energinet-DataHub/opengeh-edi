@@ -58,7 +58,7 @@ trigger {
 }
 
 resource "azurerm_monitor_scheduled_query_rules_alert" "marketroles_internal_commands_alert" {
-  name                      = "alert-marketroles-${lower(var.domain_name_short)}-${lower(var.environment_short)}-${lower(var.environment_instance)}"
+  name                      = "alert-internal-commands-marketroles-${lower(var.domain_name_short)}-${lower(var.environment_short)}-${lower(var.environment_instance)}"
   location                  = azurerm_resource_group.this.location
   resource_group_name       = var.shared_resources_resource_group_name
 
