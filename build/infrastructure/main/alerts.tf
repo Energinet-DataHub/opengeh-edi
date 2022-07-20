@@ -56,3 +56,31 @@ exceptions
     threshold = 0
   }
 }
+
+resource "azurerm_monitor_scheduled_query_rules_alert" "marketroles_internal_commands_alert" {
+  name                = "alert-marketroles-${lower(var.domain_name_short)}-${lower(var.environment_short)}-${lower(var.environment_instance)}"
+  location            = azurerm_resource_group.this.location
+  resource_group_name = var.shared_resources_resource_group_name
+
+  action {
+    action_group           = [azurerm_monitor_action_group.marketroles.id]
+  }
+  data_source_id = data.azurerm_key_vault_secret.appi_shared_id.value
+  description    = "Alert when total results cross threshold"
+  enabled        = true
+  query       = <<-QUERY
+  traces
+| where timestamp > ago(60m)
+| where message has "Failed to process internal command"
+and sdkVersion has "azurefunctions"
+and cloud_RoleName has "markrol"
+| order by timestamp desc
+  QUERY
+  severity    = 1
+  frequency   = 5
+  time_window = 10
+  trigger {
+    operator  = "GreaterThan"
+    threshold = 0
+  }
+}
