@@ -13,16 +13,17 @@
 // limitations under the License.
 
 using System;
+using System.Text.Json.Serialization;
 using Energinet.DataHub.MessageHub.Model.Model;
 using Messaging.Application.Common.Commands;
-using Newtonsoft.Json;
 
 namespace Messaging.Infrastructure.OutgoingMessages
 {
     public class NotifyMessageHub : InternalCommand
     {
         [JsonConstructor]
-        public NotifyMessageHub(DataBundleRequestDto dataBundleRequestDto, Uri? uri, DataBundleResponseErrorDto? dataBundleResponseErrorDto)
+        public NotifyMessageHub(Guid id, DataBundleRequestDto dataBundleRequestDto, Uri? uri, DataBundleResponseErrorDto? dataBundleResponseErrorDto)
+        : base(id)
         {
             DataBundleRequestDto = dataBundleRequestDto;
             Uri = uri;
