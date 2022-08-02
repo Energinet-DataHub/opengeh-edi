@@ -25,8 +25,7 @@ jobs:
   dotnet_solution_ci:
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@temporarily_disable_integration_test # TODO: Revert to next version when integration test issue is solved
     with:
-      SOLUTION_FILE_PATH: 'source/Energinet.DataHub.MarketRoles.sln'
-      DOTNET_VERSION: '6.0.301'
+      SOLUTION_FILE_PATH: 'source/Energinet.DataHub.MarketRoles.sln'      
       USE_SQLLOCALDB_2019: true
       PREPARE_OUTPUTS: true
     secrets:
