@@ -18,7 +18,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using Messaging.Application.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages;
 
 namespace Messaging.Application.Common;
 
@@ -32,6 +32,8 @@ public abstract class DocumentWriter
         _documentDetails = documentDetails;
         _parser = parser;
     }
+
+    protected DocumentDetails DocumentDetails => _documentDetails;
 
     public async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
     {
@@ -63,6 +65,21 @@ public abstract class DocumentWriter
         }
 
         return marketActivityRecords;
+    }
+
+    protected Task WriteElementAsync(string name, string value, XmlWriter writer)
+    {
+        if (writer == null) throw new ArgumentNullException(nameof(writer));
+        return writer.WriteElementStringAsync(DocumentDetails.Prefix, name, null, value);
+    }
+
+    protected async Task WriteMridAsync(string localName, string id, string codingScheme, XmlWriter writer)
+    {
+        if (writer == null) throw new ArgumentNullException(nameof(writer));
+        await writer.WriteStartElementAsync(DocumentDetails.Prefix, localName, null).ConfigureAwait(false);
+        await writer.WriteAttributeStringAsync(null, "codingScheme", null, codingScheme).ConfigureAwait(false);
+        writer.WriteValue(id);
+        await writer.WriteEndElementAsync().ConfigureAwait(false);
     }
 
     private static Task WriteHeaderAsync(MessageHeader header, DocumentDetails documentDetails, XmlWriter writer)

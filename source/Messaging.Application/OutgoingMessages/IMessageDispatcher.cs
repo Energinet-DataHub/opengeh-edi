@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -27,5 +28,10 @@ namespace Messaging.Application.OutgoingMessages
         /// </summary>
         /// <param name="message"></param>
         Task DispatchAsync(Stream message);
+
+        /// <summary>
+        /// Dispatches the message
+        /// </summary>
+        Task DispatchAsync(IReadOnlyList<string> messageIds);
     }
 }

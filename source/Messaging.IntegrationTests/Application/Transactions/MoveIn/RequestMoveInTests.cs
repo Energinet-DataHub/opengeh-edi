@@ -24,6 +24,7 @@ using Messaging.Application.OutgoingMessages;
 using Messaging.Application.SchemaStore;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Xml;
+using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Transactions;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Fixtures;
@@ -129,8 +130,8 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
         private static async Task ValidateDocument(Stream dispatchedDocument, string schemaName, string schemaVersion)
         {
-            var schema = await SchemaProviderFactory.GetProvider(MediaTypeNames.Application.Xml)
-                .GetSchemaAsync<XmlSchema>(schemaName, schemaVersion).ConfigureAwait(false);
+            var schemaProvider = new XmlSchemaProvider();
+            var schema = await schemaProvider.GetSchemaAsync<XmlSchema>(schemaName, schemaVersion).ConfigureAwait(false);
 
             var validationResult = await MessageValidator.ValidateAsync(dispatchedDocument, schema!);
             Assert.True(validationResult.IsValid);
@@ -141,6 +142,11 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             return new IncomingMessageBuilder()
                 .WithMessageId(SampleData.OriginalMessageId)
                 .WithTransactionId(SampleData.TransactionId);
+        }
+
+        private async Task RequestMessage(string id)
+        {
+            await InvokeCommandAsync(new RequestMessages(new[] { id })).ConfigureAwait(false);
         }
 
         private async Task AssertRejectMessage(OutgoingMessage rejectMessage)
@@ -160,11 +166,6 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
             var document = XDocument.Load(dispatchedDocument);
             AssertHeader(document, message, "A01");
-        }
-
-        private async Task RequestMessage(string id)
-        {
-            await GetService<MessageRequestHandler>().HandleAsync(new[] { id }).ConfigureAwait(false);
         }
 
         private Stream GetDispatchedDocument()

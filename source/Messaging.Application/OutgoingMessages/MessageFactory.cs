@@ -12,43 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Messaging.Application.Common;
-using Messaging.Application.Configuration;
+using Messaging.Domain.OutgoingMessages;
 
 namespace Messaging.Application.OutgoingMessages;
 
 public class MessageFactory
 {
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IReadOnlyCollection<DocumentWriter> _documentWriters;
 
     public MessageFactory(
-        ISystemDateTimeProvider systemDateTimeProvider,
         IEnumerable<DocumentWriter> documentWriters)
     {
-        _systemDateTimeProvider = systemDateTimeProvider;
         _documentWriters = documentWriters.ToList();
     }
 
-    public Task<Stream> CreateFromAsync(IReadOnlyCollection<OutgoingMessage> outgoingMessages)
+    public Task<Stream> CreateFromAsync(CimMessage message)
     {
-        var firstMessageInList = outgoingMessages.First();
+        if (message == null) throw new ArgumentNullException(nameof(message));
         var documentWriter =
-            _documentWriters.First(writer => writer.HandlesDocumentType(firstMessageInList.DocumentType));
-
-        var messageHeader = CreateMessageHeaderFrom(firstMessageInList);
+            _documentWriters.First(writer => writer.HandlesDocumentType(message.DocumentType));
 
         return documentWriter.WriteAsync(
-            messageHeader,
-            outgoingMessages.Select(message => message.MarketActivityRecordPayload).ToList());
-    }
-
-    private MessageHeader CreateMessageHeaderFrom(OutgoingMessage message)
-    {
-        return new MessageHeader(message.ProcessType, message.SenderId, message.SenderRole, message.ReceiverId, message.ReceiverRole, MessageIdGenerator.Generate(), _systemDateTimeProvider.Now(), message.ReasonCode);
+            message.Header,
+            message.MarketActivityRecordPayloads);
     }
 }

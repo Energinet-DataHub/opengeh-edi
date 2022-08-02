@@ -16,12 +16,13 @@ namespace Messaging.Application.Common;
 
 public class DocumentDetails
 {
-    public DocumentDetails(string type, string schemaLocation, string xmlNamespace, string prefix)
+    public DocumentDetails(string type, string schemaLocation, string xmlNamespace, string prefix, string typeCode)
     {
         Type = type;
         SchemaLocation = schemaLocation;
         XmlNamespace = xmlNamespace;
         Prefix = prefix;
+        TypeCode = typeCode;
     }
 
     public string Type { get; }
@@ -31,4 +32,6 @@ public class DocumentDetails
     public string XmlNamespace { get; }
 
     public string Prefix { get; }
+
+    public string TypeCode { get; }
 }

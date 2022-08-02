@@ -22,6 +22,7 @@ limitations under the License.
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="JsonSchema.Net" Version="3.1.2" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
         <PackageReference Include="NJsonSchema" Version="10.7.2" />
         <PackageReference Include="xunit" Version="2.4.1" />
@@ -38,6 +39,13 @@ limitations under the License.
     <ItemGroup>
       <ProjectReference Include="..\Messaging.Infrastructure\Messaging.Infrastructure.csproj" />
       <ProjectReference Include="..\Messaging.Application\Messaging.Application.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="xml\Confirm request Change of Supplier.xml" />
+      <None Remove="json\Reject request Change of Supplier.json" />
+      <None Remove="json\Request Change of Supplier.json" />
+      <None Remove="json\Invalid Request Change of Supplier.json" />
     </ItemGroup>
 
 </Project>

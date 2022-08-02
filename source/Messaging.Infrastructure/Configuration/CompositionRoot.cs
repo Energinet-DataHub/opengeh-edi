@@ -34,6 +34,7 @@ using Messaging.Application.IncomingMessages;
 using Messaging.Application.MasterData.MarketEvaluationPoints;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
+using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages.GenericNotification;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
@@ -61,7 +62,6 @@ using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using NJsonSchema;
 
 namespace Messaging.Infrastructure.Configuration
 {
@@ -82,7 +82,7 @@ namespace Messaging.Infrastructure.Configuration
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
             services.AddScoped<IMessageDispatcher, MessageDispatcher>();
-            services.AddScoped<MessageRequestHandler>();
+            services.AddTransient<IRequestHandler<RequestMessages, Unit>, RequestMessagesHandler>();
             services.AddScoped<MessageRequestContext>();
             services.AddScoped<MessageReceiver>();
 
@@ -166,7 +166,7 @@ namespace Messaging.Infrastructure.Configuration
         public CompositionRoot AddOutgoingMessageDispatcher(IMessageDispatcher messageDispatcher)
         {
             _services.AddScoped<IMessageDispatcher>(_ => messageDispatcher);
-            _services.AddScoped<MessageRequestHandler>();
+            _services.AddScoped<RequestMessagesHandler>();
 
             return this;
         }
@@ -221,6 +221,16 @@ namespace Messaging.Infrastructure.Configuration
             return this;
         }
 
+        public CompositionRoot AddMessageParserServices()
+        {
+            _services.AddSingleton<MessageParser>();
+            _services.AddSingleton<XmlMessageParserStrategy>();
+            _services.AddSingleton<JsonMessageParserStrategy>();
+            _services.AddSingleton<XmlSchemaProvider>();
+            _services.AddSingleton<JsonSchemaProvider>();
+            return this;
+        }
+
         public CompositionRoot AddServiceBusClient<TConfiguration>(string connectionString, TConfiguration configuration)
             where TConfiguration : class, IConfig
         {
@@ -257,6 +267,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddScoped<DocumentWriter, RejectRequestChangeOfSupplierDocumentWriter>();
             _services.AddScoped<DocumentWriter, GenericNotificationDocumentWriter>();
             _services.AddScoped<DocumentWriter, AccountingPointCharacteristicsDocumentWriter>();
+            _services.AddScoped<DocumentWriter, CharacteristicsOfACustomerAtAnApDocumentWriter>();
             _services.AddScoped<IValidationErrorTranslator, ValidationErrorTranslator>();
             _services.AddScoped<IMarketActivityRecordParser, MarketActivityRecordParser>();
         }

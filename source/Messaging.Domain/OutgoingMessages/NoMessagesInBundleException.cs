@@ -12,18 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Net.Mime;
+namespace Messaging.Domain.OutgoingMessages;
 
-namespace Messaging.Application.SchemaStore;
-
-public static class SchemaProviderFactory
+public class NoMessagesInBundleException : Exception
 {
-    public static ISchemaProvider GetProvider(string? contentType)
+    public NoMessagesInBundleException()
+        : base("Cannot not create message from a bundle that does not contain any messages")
     {
-        if (contentType == null) throw new ArgumentNullException(nameof(contentType));
+    }
 
-        return contentType.Equals(MediaTypeNames.Application.Json, StringComparison.OrdinalIgnoreCase)
-            ? new JsonSchemaProvider() : new XmlSchemaProvider();
+    private NoMessagesInBundleException(string message)
+        : base(message)
+    {
+    }
+
+    private NoMessagesInBundleException(string message, Exception innerException)
+        : base(message, innerException)
+    {
     }
 }

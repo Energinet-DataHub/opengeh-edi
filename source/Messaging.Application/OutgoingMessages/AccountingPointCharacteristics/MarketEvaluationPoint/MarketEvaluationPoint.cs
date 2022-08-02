@@ -22,7 +22,7 @@ public class MarketEvaluationPoint
 {
     public MarketEvaluationPoint(
         Mrid mrid,
-        Mrid meteringPointResponsible,
+        Mrid? meteringPointResponsible,
         string type,
         string settlementMethod,
         string meteringMethod,
@@ -31,8 +31,8 @@ public class MarketEvaluationPoint
         string netSettlementGroup,
         string nextReadingDate,
         Mrid meteringGridAreaId,
-        Mrid inMeteringGridAreaId,
-        Mrid outMeteringGridAreaId,
+        Mrid? inMeteringGridAreaId,
+        Mrid? outMeteringGridAreaId,
         Mrid linkedMarketEvaluationPointId,
         UnitValue physicalConnectionCapacity,
         string connectionType,
@@ -49,8 +49,8 @@ public class MarketEvaluationPoint
         string geoInfoReference,
         Address mainAddress,
         string isActualAddress,
-        RelatedMarketEvaluationPoint parentMarketEvaluationPoint,
-        RelatedMarketEvaluationPoint childMarketEvaluationPoint)
+        RelatedMarketEvaluationPoint? parentMarketEvaluationPoint,
+        RelatedMarketEvaluationPoint? childMarketEvaluationPoint)
     {
         MRID = mrid;
         MeteringPointResponsible = meteringPointResponsible;
@@ -86,7 +86,7 @@ public class MarketEvaluationPoint
 
     public Mrid MRID { get; }
 
-    public Mrid MeteringPointResponsible { get; }
+    public Mrid? MeteringPointResponsible { get; }
 
     public string Type { get; }
 
@@ -104,9 +104,9 @@ public class MarketEvaluationPoint
 
     public Mrid MeteringGridAreaId { get; }
 
-    public Mrid InMeteringGridAreaId { get; }
+    public Mrid? InMeteringGridAreaId { get; }
 
-    public Mrid OutMeteringGridAreaId { get; }
+    public Mrid? OutMeteringGridAreaId { get; }
 
     public Mrid LinkedMarketEvaluationPointId { get; }
 
@@ -140,7 +140,7 @@ public class MarketEvaluationPoint
 
     public string IsActualAddress { get; }
 
-    public RelatedMarketEvaluationPoint ParentMarketEvaluationPoint { get; }
+    public RelatedMarketEvaluationPoint? ParentMarketEvaluationPoint { get; }
 
-    public RelatedMarketEvaluationPoint ChildMarketEvaluationPoint { get; }
+    public RelatedMarketEvaluationPoint? ChildMarketEvaluationPoint { get; }
 }

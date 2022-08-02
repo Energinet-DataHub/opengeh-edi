@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
-using NJsonSchema;
+using Json.Schema;
 
 namespace Messaging.Application.SchemaStore;
 
@@ -39,10 +40,10 @@ public class JsonSchemaProvider : SchemaProvider
         return (Task<T?>)(object)LoadSchemaWithDependentSchemasAsync<JsonSchema>(schemaName);
     }
 
-    protected override async Task<T?> LoadSchemaWithDependentSchemasAsync<T>(string location)
+    protected override Task<T?> LoadSchemaWithDependentSchemasAsync<T>(string location)
         where T : default
     {
-        var schema = await JsonSchema.FromFileAsync(location).ConfigureAwait(false);
-        return (T?)(object)schema;
+        var schema = JsonSchema.FromFile(location);
+        return Task.FromResult((T?)(object)schema);
     }
 }

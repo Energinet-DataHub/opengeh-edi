@@ -13,22 +13,39 @@
 // limitations under the License.
 
 using System;
+using System.Text.Json.Serialization;
 using Energinet.DataHub.MessageHub.Model.Model;
 using Messaging.Application.Common.Commands;
-using Messaging.Infrastructure.Configuration.InternalCommands;
 
 namespace Messaging.Infrastructure.OutgoingMessages
 {
     public class NotifyMessageHub : InternalCommand
     {
+        [JsonConstructor]
+        public NotifyMessageHub(Guid id, DataBundleRequestDto dataBundleRequestDto, Uri? uri, DataBundleResponseErrorDto? dataBundleResponseErrorDto)
+        : base(id)
+        {
+            DataBundleRequestDto = dataBundleRequestDto;
+            Uri = uri;
+            DataBundleResponseErrorDto = dataBundleResponseErrorDto;
+        }
+
         public NotifyMessageHub(DataBundleRequestDto dataBundleRequestDto, Uri uri)
         {
             DataBundleRequestDto = dataBundleRequestDto;
             Uri = uri;
         }
 
+        public NotifyMessageHub(DataBundleRequestDto dataBundleRequestDto, DataBundleResponseErrorDto dataBundleResponseErrorDto)
+        {
+            DataBundleRequestDto = dataBundleRequestDto;
+            DataBundleResponseErrorDto = dataBundleResponseErrorDto;
+        }
+
         public DataBundleRequestDto DataBundleRequestDto { get; }
 
-        public Uri Uri { get; }
+        public Uri? Uri { get; }
+
+        public DataBundleResponseErrorDto? DataBundleResponseErrorDto { get; }
     }
 }

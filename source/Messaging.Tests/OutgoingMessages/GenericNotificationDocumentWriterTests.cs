@@ -25,9 +25,11 @@ using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.GenericNotification;
 using Messaging.Application.SchemaStore;
+using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Serialization;
+using Messaging.Tests.OutgoingMessages.Asserts;
 using Xunit;
 
 namespace Messaging.Tests.OutgoingMessages
@@ -79,6 +81,7 @@ namespace Messaging.Tests.OutgoingMessages
         {
             var document = XDocument.Load(message);
             AssertXmlMessage.AssertHeader(header, document);
+            AssertXmlMessage.AssertHasHeaderValue(document, "type", "E44");
 
             AssertMarketActivityRecords(marketActivityRecords, document);
 
@@ -87,7 +90,7 @@ namespace Messaging.Tests.OutgoingMessages
 
         private async Task AssertConformsToSchema(Stream message)
         {
-            _schemaProvider = SchemaProviderFactory.GetProvider(MediaTypeNames.Application.Xml);
+            _schemaProvider = new XmlSchemaProvider();
             var schema = await _schemaProvider.GetSchemaAsync<XmlSchema>("genericnotification", "0.1")
                 .ConfigureAwait(false);
             await AssertXmlMessage.AssertConformsToSchemaAsync(message, schema!).ConfigureAwait(false);
