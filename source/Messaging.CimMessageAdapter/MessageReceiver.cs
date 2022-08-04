@@ -62,6 +62,11 @@ namespace Messaging.CimMessageAdapter
 
             await AuthorizeSenderAsync(messageHeader!).ConfigureAwait(false);
             await VerifyReceiverAsync(messageHeader!).ConfigureAwait(false);
+            if (MessageIdIsEmpty(messageHeader!.MessageId))
+            {
+                return Result.Failure(_errors.ToArray());
+            }
+
             await CheckMessageIdAsync(messageHeader!.MessageId).ConfigureAwait(false);
             if (_errors.Count > 0)
             {
@@ -70,6 +75,11 @@ namespace Messaging.CimMessageAdapter
 
             foreach (var marketActivityRecord in messageParserResult.MarketActivityRecords)
             {
+                if (string.IsNullOrEmpty(marketActivityRecord.Id))
+                {
+                    return Result.Failure(new EmptyTransactionId(marketActivityRecord.Id));
+                }
+
                 if (await CheckTransactionIdAsync(marketActivityRecord.Id).ConfigureAwait(false) == false)
                 {
                     return Result.Failure(new DuplicateTransactionIdDetected(marketActivityRecord.Id));
@@ -101,6 +111,18 @@ namespace Messaging.CimMessageAdapter
         private Task AddToTransactionQueueAsync(IncomingMessage transaction)
         {
             return _messageQueueDispatcher.AddAsync(transaction);
+        }
+
+        private bool MessageIdIsEmpty(string messageId)
+        {
+            if (messageId == null) throw new ArgumentNullException(nameof(messageId));
+            if (string.IsNullOrEmpty(messageId))
+            {
+                _errors.Add(new EmptyMessageId());
+                return true;
+            }
+
+            return false;
         }
 
         private async Task CheckMessageIdAsync(string messageId)
