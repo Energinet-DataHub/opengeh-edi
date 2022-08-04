@@ -32,6 +32,11 @@ These are the processes maintained by this domain.
 
 ![Market role domain context](https://user-images.githubusercontent.com/72008816/160091489-023a18f5-9c78-4c10-99b8-7b32383c9858.png)
 
+Events sent from market role to other domains
+
+![image](https://user-images.githubusercontent.com/72008816/182849372-8fae47d9-3561-4e5a-99dc-1a8681874977.png)
+
+
 ## Market Participants
 
 The market roles domain introduces the following roles into the Green Energy Hub ecosystem:
@@ -47,7 +52,7 @@ The market roles domain introduces the following roles into the Green Energy Hub
 
 ## Domain Roadmap
 
-In this program increment we are working on the move-in process
+In this program increment we are working on
 
 - A energy supplier can receive responses in CIM JSON format
 - The future energy supplier can receive customer master data
