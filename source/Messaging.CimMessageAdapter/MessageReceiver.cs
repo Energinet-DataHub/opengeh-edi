@@ -62,7 +62,11 @@ namespace Messaging.CimMessageAdapter
 
             await AuthorizeSenderAsync(messageHeader!).ConfigureAwait(false);
             await VerifyReceiverAsync(messageHeader!).ConfigureAwait(false);
-            EnsureMessageId(messageHeader!.MessageId);
+            if (MessageIdIsEmpty(messageHeader!.MessageId))
+            {
+                return Result.Failure(_errors.ToArray());
+            }
+
             await CheckMessageIdAsync(messageHeader!.MessageId).ConfigureAwait(false);
             if (_errors.Count > 0)
             {
@@ -109,13 +113,16 @@ namespace Messaging.CimMessageAdapter
             return _messageQueueDispatcher.AddAsync(transaction);
         }
 
-        private void EnsureMessageId(string messageId)
+        private bool MessageIdIsEmpty(string messageId)
         {
             if (messageId == null) throw new ArgumentNullException(nameof(messageId));
             if (string.IsNullOrEmpty(messageId))
             {
                 _errors.Add(new EmptyMessageId());
+                return true;
             }
+
+            return false;
         }
 
         private async Task CheckMessageIdAsync(string messageId)
