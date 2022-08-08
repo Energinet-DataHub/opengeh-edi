@@ -61,7 +61,7 @@ namespace Messaging.Api.IncomingMessages
                 return request.CreateResponse(HttpStatusCode.UnsupportedMediaType);
             }
 
-            var responseFactory = ResponseStrategy.GetResponseFactory(contentType);
+            var responseFactory = ResponseStrategy.GetResponseFactory(cimFormat.Name);
 
             var result = await _messageReceiver.ReceiveAsync(request.Body, contentType)
                 .ConfigureAwait(false);
