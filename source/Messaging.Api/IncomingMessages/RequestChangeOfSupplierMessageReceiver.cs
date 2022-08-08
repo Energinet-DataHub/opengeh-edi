@@ -53,17 +53,16 @@ namespace Messaging.Api.IncomingMessages
 
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            var contentType = GetContentType(request.Headers);
-            var cimFormat = CimFormatParser.ParseFromContentTypeHeaderValue(contentType);
+            var cimFormat = CimFormatParser.ParseFromContentTypeHeaderValue(GetContentType(request.Headers));
             if (cimFormat is null)
             {
-                _logger.LogInformation($"Could not parse desired CIM format from Content-Type header value: {contentType}");
+                _logger.LogInformation($"Could not parse desired CIM format from Content-Type header value: {GetContentType(request.Headers)}");
                 return request.CreateResponse(HttpStatusCode.UnsupportedMediaType);
             }
 
             var responseFactory = ResponseStrategy.GetResponseFactory(cimFormat.Name);
 
-            var result = await _messageReceiver.ReceiveAsync(request.Body, contentType)
+            var result = await _messageReceiver.ReceiveAsync(request.Body, cimFormat.Name)
                 .ConfigureAwait(false);
 
             var httpStatusCode = result.Success ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;

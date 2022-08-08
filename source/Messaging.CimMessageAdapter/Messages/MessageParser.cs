@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Mime;
 
 namespace Messaging.CimMessageAdapter.Messages;
 
@@ -33,15 +32,15 @@ public class MessageParser
 
         _strategies = new Dictionary<string, MessageParserStrategy>()
         {
-            { MediaTypeNames.Application.Xml, _xmlMessageParserStrategy },
-            { MediaTypeNames.Application.Json, _jsonMessageParserStrategy },
+            { CimFormat.Xml.Name, _xmlMessageParserStrategy },
+            { CimFormat.Json.Name, _jsonMessageParserStrategy },
         };
     }
 
-    public MessageParserStrategy GetMessageParserStrategy(string contentType)
+    public MessageParserStrategy GetMessageParserStrategy(string cimFormat)
     {
-        var strategy = _strategies.FirstOrDefault(s => string.Equals(s.Key, contentType, StringComparison.OrdinalIgnoreCase));
-        if (strategy.Key is null) throw new InvalidOperationException($"No message parser strategy found for content type {contentType}");
+        var strategy = _strategies.FirstOrDefault(s => string.Equals(s.Key, cimFormat, StringComparison.OrdinalIgnoreCase));
+        if (strategy.Key is null) throw new InvalidOperationException($"No message parser strategy found for content type {cimFormat}");
         return strategy.Value;
     }
 }
