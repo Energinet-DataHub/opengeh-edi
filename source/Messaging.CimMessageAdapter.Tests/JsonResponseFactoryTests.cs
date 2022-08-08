@@ -28,7 +28,7 @@ public class JsonResponseFactoryTests
 
     public JsonResponseFactoryTests()
     {
-        _responseFactory = ResponseStrategy.GetResponseFactory(CimFormat.Json.Name);
+        _responseFactory = ResponseStrategy.GetResponseFactory(CimFormat.Json);
     }
 
     [Fact]

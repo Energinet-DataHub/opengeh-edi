@@ -29,7 +29,7 @@ namespace Messaging.CimMessageAdapter.Tests
 
         public XmlResponseFactoryTests()
         {
-            _responseFactory = ResponseStrategy.GetResponseFactory(CimFormat.Xml.Name);
+            _responseFactory = ResponseStrategy.GetResponseFactory(CimFormat.Xml);
         }
 
         [Fact]

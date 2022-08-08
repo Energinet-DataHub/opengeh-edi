@@ -21,15 +21,15 @@ namespace Messaging.CimMessageAdapter.Response;
 
 public static class ResponseStrategy
 {
-    private static readonly IDictionary<string, Func<ResponseFactory>> _strategies = new Dictionary<string, Func<ResponseFactory>>()
+    private static readonly IDictionary<CimFormat, Func<ResponseFactory>> _strategies = new Dictionary<CimFormat, Func<ResponseFactory>>()
     {
-        { CimFormat.Xml.Name, () => new XmlResponseFactory() },
-        { CimFormat.Json.Name, () => new JsonResponseFactory() },
+        { CimFormat.Xml, () => new XmlResponseFactory() },
+        { CimFormat.Json, () => new JsonResponseFactory() },
     };
 
-    public static ResponseFactory GetResponseFactory(string cimFormat)
+    public static ResponseFactory GetResponseFactory(CimFormat cimFormat)
     {
-        var strategy = _strategies.FirstOrDefault(s => string.Equals(s.Key, cimFormat, StringComparison.OrdinalIgnoreCase));
+        var strategy = _strategies.FirstOrDefault(s => s.Key.Equals(cimFormat));
         if (strategy.Key is null) throw new InvalidOperationException($"No response strategy found for CIM format {cimFormat}");
         return strategy.Value();
     }
