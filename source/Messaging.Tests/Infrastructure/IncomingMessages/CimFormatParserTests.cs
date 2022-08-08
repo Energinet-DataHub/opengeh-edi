@@ -14,6 +14,7 @@
 
 using System;
 using System.Linq;
+using Messaging.CimMessageAdapter.Messages;
 using Messaging.Domain.SeedWork;
 using Xunit;
 
@@ -30,7 +31,7 @@ public class CimFormatParserTests
     public void Can_parse_from_known_content_header_value(string contentHeaderValue, string expectedCimFormat)
     {
         var expectedFormat = EnumerationType.FromName<CimFormat>(expectedCimFormat);
-        var parsedFormat = CimFormat.ParseFromContentHeaderValue(contentHeaderValue);
+        var parsedFormat = CimFormatParser.ParseFromContentHeaderValue(contentHeaderValue);
 
         Assert.Equal(expectedFormat, parsedFormat);
     }
@@ -40,7 +41,7 @@ public class CimFormatParserTests
     [InlineData("text")]
     public void Return_null_if_content_type_is_unknown(string contentType)
     {
-        var parsedFormat = CimFormat.ParseFromContentHeaderValue(contentType);
+        var parsedFormat = CimFormatParser.ParseFromContentHeaderValue(contentType);
 
         Assert.Null(parsedFormat);
     }
@@ -48,22 +49,15 @@ public class CimFormatParserTests
 
 #pragma warning disable
 
-public class CimFormat : EnumerationType
+public static class CimFormatParser
 {
-    public static readonly CimFormat Xml = new CimFormat(0, nameof(Xml));
-    public static readonly CimFormat Json = new CimFormat(1, nameof(Json));
-    private CimFormat(int id, string name)
-        : base(id, name)
-    {
-    }
-
     public static CimFormat ParseFromContentHeaderValue(string value)
     {
         var contentTypeValues = value.Split(";");
         var contentTypeValue = contentTypeValues[0].Trim();
         var contentType = contentTypeValue.Substring(contentTypeValue.IndexOf("/", StringComparison.OrdinalIgnoreCase) + 1);
 
-        return GetAll
+        return EnumerationType.GetAll
                 <CimFormat>()
             .FirstOrDefault(v => v.Name.Equals(contentType, StringComparison.OrdinalIgnoreCase));
     }
