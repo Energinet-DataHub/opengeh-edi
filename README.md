@@ -36,7 +36,6 @@ Events sent from market role to other domains
 
 ![image](https://user-images.githubusercontent.com/72008816/182849372-8fae47d9-3561-4e5a-99dc-1a8681874977.png)
 
-
 ## Market Participants
 
 The market roles domain introduces the following roles into the Green Energy Hub ecosystem:
