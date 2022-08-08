@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text.Json.Serialization;
 using Messaging.Application.Common.Commands;
 
 namespace Messaging.Application.Transactions.MoveIn;
 
 public class CompleteMoveInTransaction : InternalCommand
 {
+    [JsonConstructor]
     public CompleteMoveInTransaction(string processId)
     {
         ProcessId = processId;
