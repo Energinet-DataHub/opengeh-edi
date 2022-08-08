@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using Messaging.Domain.SeedWork;
 using Xunit;
 
@@ -33,6 +34,16 @@ public class CimFormatParserTests
 
         Assert.Equal(expectedFormat, parsedFormat);
     }
+
+    [Theory]
+    [InlineData("application/text")]
+    [InlineData("text")]
+    public void Return_null_if_content_type_is_unknown(string contentType)
+    {
+        var parsedFormat = CimFormat.ParseFromContentHeaderValue(contentType);
+
+        Assert.Null(parsedFormat);
+    }
 }
 
 #pragma warning disable
@@ -41,7 +52,6 @@ public class CimFormat : EnumerationType
 {
     public static readonly CimFormat Xml = new CimFormat(0, nameof(Xml));
     public static readonly CimFormat Json = new CimFormat(1, nameof(Json));
-    public static readonly CimFormat Unknown = new CimFormat(100, nameof(Unknown));
     private CimFormat(int id, string name)
         : base(id, name)
     {
@@ -53,6 +63,8 @@ public class CimFormat : EnumerationType
         var contentTypeValue = contentTypeValues[0].Trim();
         var contentType = contentTypeValue.Substring(contentTypeValue.IndexOf("/", StringComparison.OrdinalIgnoreCase) + 1);
 
-        return FromName<CimFormat>(contentType);
+        return GetAll
+                <CimFormat>()
+            .FirstOrDefault(v => v.Name.Equals(contentType, StringComparison.OrdinalIgnoreCase));
     }
 }
