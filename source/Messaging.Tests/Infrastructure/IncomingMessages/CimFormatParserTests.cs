@@ -23,6 +23,9 @@ public class CimFormatParserTests
     [Theory]
     [InlineData("application/json", nameof(CimFormat.Json))]
     [InlineData("application/json; charset=utf-8", nameof(CimFormat.Json))]
+    [InlineData("application/xml; charset=utf-8", nameof(CimFormat.Xml))]
+    [InlineData("application/xml", nameof(CimFormat.Xml))]
+    [InlineData("application/xml ", nameof(CimFormat.Xml))]
     public void Can_parse_from_content_header_value(string contentHeaderValue, string expectedCimFormat)
     {
         var expectedFormat = EnumerationType.FromName<CimFormat>(expectedCimFormat);
@@ -47,9 +50,15 @@ public class CimFormat : EnumerationType
     public static CimFormat ParseFromContentHeaderValue(string value)
     {
         var contentTypeValues = value.Split(";");
-        if (contentTypeValues[0].Equals("application/json", StringComparison.OrdinalIgnoreCase))
+        var contentType = contentTypeValues[0].Trim();
+        if (contentType.Equals("application/json", StringComparison.OrdinalIgnoreCase))
         {
             return Json;
+        }
+
+        if (contentType.Equals("application/xml", StringComparison.OrdinalIgnoreCase))
+        {
+            return Xml;
         }
 
         return Unknown;
