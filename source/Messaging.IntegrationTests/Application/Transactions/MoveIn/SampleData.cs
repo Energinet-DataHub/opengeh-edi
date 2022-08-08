@@ -33,4 +33,8 @@ internal static class SampleData
     internal static string ConsumerName => "John Doe";
 
     internal static string ConsumerIdType => "ARR";
+
+    internal static string ReceiverId => "5790001330552";
+
+    internal static string SenderId => "123456";
 }

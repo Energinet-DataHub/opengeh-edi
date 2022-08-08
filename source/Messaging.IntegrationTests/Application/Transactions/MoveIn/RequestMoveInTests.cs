@@ -90,8 +90,8 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
             var incomingMessage = MessageBuilder()
                 .WithProcessType(ProcessType.MoveIn.Code)
-                .WithReceiver("5790001330552")
-                .WithSenderId("123456")
+                .WithReceiver(SampleData.ReceiverId)
+                .WithSenderId(SampleData.SenderId)
                 .WithConsumerName(null)
                 .Build();
 
@@ -135,9 +135,9 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         {
             var incomingMessage = MessageBuilder()
                 .WithProcessType(ProcessType.MoveIn.Code)
-                .WithReceiver("5790001330552")
-                .WithSenderId("123456")
-                .WithConsumerName("John Doe")
+                .WithReceiver(SampleData.ReceiverId)
+                .WithSenderId(SampleData.SenderId)
+                .WithConsumerName(SampleData.ConsumerName)
                 .Build();
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
