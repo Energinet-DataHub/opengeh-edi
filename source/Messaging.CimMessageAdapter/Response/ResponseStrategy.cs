@@ -15,7 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Mime;
+using Messaging.CimMessageAdapter.Messages;
 
 namespace Messaging.CimMessageAdapter.Response;
 
@@ -23,14 +23,14 @@ public static class ResponseStrategy
 {
     private static readonly IDictionary<string, Func<ResponseFactory>> _strategies = new Dictionary<string, Func<ResponseFactory>>()
     {
-        { MediaTypeNames.Application.Xml, () => new XmlResponseFactory() },
-        { MediaTypeNames.Application.Json, () => new JsonResponseFactory() },
+        { CimFormat.Xml.Name, () => new XmlResponseFactory() },
+        { CimFormat.Json.Name, () => new JsonResponseFactory() },
     };
 
-    public static ResponseFactory GetResponseFactory(string contentType)
+    public static ResponseFactory GetResponseFactory(string cimFormat)
     {
-        var strategy = _strategies.FirstOrDefault(s => string.Equals(s.Key, contentType, StringComparison.OrdinalIgnoreCase));
-        if (strategy.Key is null) throw new InvalidOperationException($"No response strategy found for content type {contentType}");
+        var strategy = _strategies.FirstOrDefault(s => string.Equals(s.Key, cimFormat, StringComparison.OrdinalIgnoreCase));
+        if (strategy.Key is null) throw new InvalidOperationException($"No response strategy found for CIM format {cimFormat}");
         return strategy.Value();
     }
 }

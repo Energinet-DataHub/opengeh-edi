@@ -14,6 +14,7 @@
 
 using System.Net.Mime;
 using Messaging.CimMessageAdapter.Errors;
+using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Response;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -24,13 +25,19 @@ namespace Messaging.CimMessageAdapter.Tests;
 [UnitTest]
 public class JsonResponseFactoryTests
 {
+    private readonly ResponseFactory _responseFactory;
+
+    public JsonResponseFactoryTests()
+    {
+        _responseFactory = ResponseStrategy.GetResponseFactory(CimFormat.Json.Name);
+    }
+
     [Fact]
     public void Generate_empty_response_when_no_validation_errors_has_occurred()
     {
         var result = Result.Succeeded();
-        var responseFactory = ResponseStrategy.GetResponseFactory(MediaTypeNames.Application.Json);
 
-        var response = responseFactory.From(result);
+        var response = _responseFactory.From(result);
 
         Assert.False(response.IsErrorResponse);
         Assert.Empty(response.MessageBody);
@@ -41,9 +48,8 @@ public class JsonResponseFactoryTests
     {
         var duplicateMessageIdError = new DuplicateMessageIdDetected("Duplicate message id");
         var result = Result.Failure(duplicateMessageIdError);
-        var responseFactory = ResponseStrategy.GetResponseFactory(MediaTypeNames.Application.Json);
 
-        var response = responseFactory.From(result);
+        var response = _responseFactory.From(result);
 
         Assert.True(response.IsErrorResponse);
         AssertHasValue(response, "Error.Code", duplicateMessageIdError.Code);
@@ -56,9 +62,8 @@ public class JsonResponseFactoryTests
         var duplicateMessageIdError = new DuplicateMessageIdDetected("Duplicate message id");
         var duplicateTransactionIdError = new DuplicateTransactionIdDetected("Fake transaction id");
         var result = Result.Failure(duplicateMessageIdError, duplicateTransactionIdError);
-        var responseFactory = ResponseStrategy.GetResponseFactory(MediaTypeNames.Application.Json);
 
-        var response = responseFactory.From(result);
+        var response = _responseFactory.From(result);
 
         Assert.True(response.IsErrorResponse);
         AssertHasValue(response, "Error.Code", "BadRequest");
