@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Linq;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.Domain.SeedWork;
+using Messaging.Infrastructure.IncomingMessages;
 using Xunit;
 
 namespace Messaging.Tests.Infrastructure.IncomingMessages;
@@ -44,21 +43,5 @@ public class CimFormatParserTests
         var parsedFormat = CimFormatParser.ParseFromContentHeaderValue(contentType);
 
         Assert.Null(parsedFormat);
-    }
-}
-
-#pragma warning disable
-
-public static class CimFormatParser
-{
-    public static CimFormat ParseFromContentHeaderValue(string value)
-    {
-        var contentTypeValues = value.Split(";");
-        var contentTypeValue = contentTypeValues[0].Trim();
-        var contentType = contentTypeValue.Substring(contentTypeValue.IndexOf("/", StringComparison.OrdinalIgnoreCase) + 1);
-
-        return EnumerationType.GetAll
-                <CimFormat>()
-            .FirstOrDefault(v => v.Name.Equals(contentType, StringComparison.OrdinalIgnoreCase));
     }
 }
