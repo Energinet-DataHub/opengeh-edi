@@ -24,12 +24,18 @@ public static class CimFormatParser
     public static CimFormat? ParseFromContentTypeHeaderValue(string value)
     {
         if (value == null) throw new ArgumentNullException(nameof(value));
-        var contentTypeValues = value.Split(";");
-        var contentTypeValue = contentTypeValues[0].Trim();
-        var contentType = contentTypeValue.Substring(contentTypeValue.IndexOf("/", StringComparison.OrdinalIgnoreCase) + 1);
+        var contentType = ParseContentTypeName(value);
 
         return EnumerationType.GetAll
                 <CimFormat>()
             .FirstOrDefault(v => v.Name.Equals(contentType, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static string ParseContentTypeName(string value)
+    {
+        var contentTypeValues = value.Split(";");
+        var contentTypeValue = contentTypeValues[0].Trim();
+        var contentType = contentTypeValue.Substring(contentTypeValue.IndexOf("/", StringComparison.OrdinalIgnoreCase) + 1);
+        return contentType;
     }
 }
