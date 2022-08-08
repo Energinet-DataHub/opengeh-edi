@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
 using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.IncomingMessages;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.SchemaStore;
 using Messaging.Application.Transactions.MoveIn;
@@ -65,15 +66,9 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         [Fact]
         public async Task A_confirm_message_created_when_the_transaction_is_accepted()
         {
-            var incomingMessage = MessageBuilder()
-                .WithProcessType(ProcessType.MoveIn.Code)
-                .WithReceiver("5790001330552")
-                .WithSenderId("123456")
-                .WithConsumerName("John Doe")
-                .Build();
+            await GivenRequestHasBeenAccepted().ConfigureAwait(false);
 
-            await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
-            var confirmMessage = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage.Message.MessageId)!;
+            var confirmMessage = _outgoingMessageStore.GetByOriginalMessageId(SampleData.OriginalMessageId)!;
             await RequestMessage(confirmMessage.Id.ToString()).ConfigureAwait(false);
 
             await AsserConfirmMessage(confirmMessage).ConfigureAwait(false);
@@ -82,15 +77,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         [Fact]
         public async Task Fetch_metering_point_master_data_when_the_transaction_is_accepted()
         {
-            var incomingMessage = MessageBuilder()
-                .WithProcessType(ProcessType.MoveIn.Code)
-                .WithReceiver("5790001330552")
-                .WithSenderId("123456")
-                .WithConsumerName("John Doe")
-                .WithMarketEvaluationPointId(SampleData.MeteringPointNumber)
-                .Build();
-
-            await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
+            await GivenRequestHasBeenAccepted().ConfigureAwait(false);
 
             AssertQueuedCommand.QueuedCommand<FetchMeteringPointMasterData>(GetService<IDbConnectionFactory>());
         }
@@ -142,6 +129,18 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             return new IncomingMessageBuilder()
                 .WithMessageId(SampleData.OriginalMessageId)
                 .WithTransactionId(SampleData.TransactionId);
+        }
+
+        private async Task GivenRequestHasBeenAccepted()
+        {
+            var incomingMessage = MessageBuilder()
+                .WithProcessType(ProcessType.MoveIn.Code)
+                .WithReceiver("5790001330552")
+                .WithSenderId("123456")
+                .WithConsumerName("John Doe")
+                .Build();
+
+            await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
         }
 
         private async Task RequestMessage(string id)
