@@ -83,6 +83,14 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         }
 
         [Fact]
+        public async Task Customer_master_data_is_retrieved_when_the_transaction_is_accepted()
+        {
+            await GivenRequestHasBeenAccepted().ConfigureAwait(false);
+
+            AssertQueuedCommand.QueuedCommand<FetchCustomerMasterData>(GetService<IDbConnectionFactory>());
+        }
+
+        [Fact]
         public async Task A_reject_message_is_created_when_the_transaction_is_rejected()
         {
             var httpClientMock = GetHttpClientMock();
