@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Net.Mime;
 using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Response;

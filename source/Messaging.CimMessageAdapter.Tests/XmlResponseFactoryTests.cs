@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using System.Linq;
-using System.Net.Mime;
 using System.Xml.Linq;
 using Messaging.CimMessageAdapter.Errors;
+using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Response;
 using Xunit;
 using Xunit.Categories;
@@ -25,13 +25,19 @@ namespace Messaging.CimMessageAdapter.Tests
     [UnitTest]
     public class XmlResponseFactoryTests
     {
+        private readonly ResponseFactory _responseFactory;
+
+        public XmlResponseFactoryTests()
+        {
+            _responseFactory = ResponseStrategy.GetResponseFactory(CimFormat.Xml.Name);
+        }
+
         [Fact]
         public void Generate_empty_response_when_no_validation_errors_has_occurred()
         {
             var result = Result.Succeeded();
-            var responseFactory = ResponseStrategy.GetResponseFactory(MediaTypeNames.Application.Xml);
 
-            var response = responseFactory.From(result);
+            var response = _responseFactory.From(result);
 
             Assert.False(response.IsErrorResponse);
             Assert.Empty(response.MessageBody);
@@ -42,9 +48,8 @@ namespace Messaging.CimMessageAdapter.Tests
         {
             var duplicateMessageIdError = new DuplicateMessageIdDetected("Duplicate message id");
             var result = Result.Failure(duplicateMessageIdError);
-            var responseFactory = ResponseStrategy.GetResponseFactory(MediaTypeNames.Application.Xml);
 
-            var response = responseFactory.From(result);
+            var response = _responseFactory.From(result);
 
             Assert.True(response.IsErrorResponse);
             AssertHasValue(response, "Code", duplicateMessageIdError.Code);
@@ -57,9 +62,8 @@ namespace Messaging.CimMessageAdapter.Tests
             var duplicateMessageIdError = new DuplicateMessageIdDetected("Duplicate message id");
             var duplicateTransactionIdError = new DuplicateTransactionIdDetected("Fake transaction id");
             var result = Result.Failure(duplicateMessageIdError, duplicateTransactionIdError);
-            var responseFactory = ResponseStrategy.GetResponseFactory(MediaTypeNames.Application.Xml);
 
-            var response = responseFactory.From(result);
+            var response = _responseFactory.From(result);
 
             Assert.True(response.IsErrorResponse);
             AssertHasValue(response, "Code", "BadRequest");
