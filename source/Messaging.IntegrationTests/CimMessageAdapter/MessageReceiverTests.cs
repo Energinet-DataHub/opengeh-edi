@@ -267,7 +267,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
 
         private Task<Result> ReceiveRequestChangeOfSupplierMessage(Stream message)
         {
-            return CreateMessageReceiver().ReceiveAsync(message, CimFormat.Xml.Name);
+            return CreateMessageReceiver().ReceiveAsync(message, CimFormat.Xml);
         }
 
         private MessageReceiver CreateMessageReceiver()
@@ -289,11 +289,11 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
             var messageBuilder = BusinessMessageBuilder.RequestChangeOfSupplier();
 
             using var originalMessage = messageBuilder.Message();
-            await CreateMessageReceiver(messageIds).ReceiveAsync(originalMessage, CimFormat.Xml.Name)
+            await CreateMessageReceiver(messageIds).ReceiveAsync(originalMessage, CimFormat.Xml)
                 .ConfigureAwait(false);
 
             using var duplicateMessage = messageBuilder.Message();
-            await CreateMessageReceiver(messageIds).ReceiveAsync(duplicateMessage, CimFormat.Xml.Name)
+            await CreateMessageReceiver(messageIds).ReceiveAsync(duplicateMessage, CimFormat.Xml)
                 .ConfigureAwait(false);
         }
 

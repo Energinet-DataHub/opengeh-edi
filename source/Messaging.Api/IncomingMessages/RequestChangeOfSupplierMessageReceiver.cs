@@ -62,7 +62,7 @@ namespace Messaging.Api.IncomingMessages
 
             var responseFactory = ResponseStrategy.GetResponseFactory(cimFormat);
 
-            var result = await _messageReceiver.ReceiveAsync(request.Body, cimFormat.Name)
+            var result = await _messageReceiver.ReceiveAsync(request.Body, cimFormat)
                 .ConfigureAwait(false);
 
             var httpStatusCode = result.Success ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;

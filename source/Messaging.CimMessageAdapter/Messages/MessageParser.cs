@@ -23,23 +23,23 @@ public class MessageParser
     private readonly XmlMessageParserStrategy _xmlMessageParserStrategy;
     private readonly JsonMessageParserStrategy _jsonMessageParserStrategy;
 
-    private readonly IDictionary<string, MessageParserStrategy> _strategies;
+    private readonly IDictionary<CimFormat, MessageParserStrategy> _strategies;
 
     public MessageParser(XmlMessageParserStrategy xmlMessageParserStrategy, JsonMessageParserStrategy jsonMessageParserStrategy)
     {
         _xmlMessageParserStrategy = xmlMessageParserStrategy;
         _jsonMessageParserStrategy = jsonMessageParserStrategy;
 
-        _strategies = new Dictionary<string, MessageParserStrategy>()
+        _strategies = new Dictionary<CimFormat, MessageParserStrategy>()
         {
-            { CimFormat.Xml.Name, _xmlMessageParserStrategy },
-            { CimFormat.Json.Name, _jsonMessageParserStrategy },
+            { CimFormat.Xml, _xmlMessageParserStrategy },
+            { CimFormat.Json, _jsonMessageParserStrategy },
         };
     }
 
-    public MessageParserStrategy GetMessageParserStrategy(string cimFormat)
+    public MessageParserStrategy GetMessageParserStrategy(CimFormat cimFormat)
     {
-        var strategy = _strategies.FirstOrDefault(s => string.Equals(s.Key, cimFormat, StringComparison.OrdinalIgnoreCase));
+        var strategy = _strategies.FirstOrDefault(s => s.Key.Equals(cimFormat));
         if (strategy.Key is null) throw new InvalidOperationException($"No message parser strategy found for content type {cimFormat}");
         return strategy.Value;
     }
