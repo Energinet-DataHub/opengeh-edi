@@ -21,7 +21,7 @@ namespace Messaging.Infrastructure.IncomingMessages;
 
 public static class CimFormatParser
 {
-    public static CimFormat? ParseFromContentHeaderValue(string value)
+    public static CimFormat? ParseFromContentTypeHeaderValue(string value)
     {
         if (value == null) throw new ArgumentNullException(nameof(value));
         var contentTypeValues = value.Split(";");
