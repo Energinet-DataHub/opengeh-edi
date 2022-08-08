@@ -26,7 +26,7 @@ public class CimFormatParserTests
     [InlineData("application/xml; charset=utf-8", nameof(CimFormat.Xml))]
     [InlineData("application/xml", nameof(CimFormat.Xml))]
     [InlineData("application/xml ", nameof(CimFormat.Xml))]
-    public void Can_parse_from_content_header_value(string contentHeaderValue, string expectedCimFormat)
+    public void Can_parse_from_known_content_header_value(string contentHeaderValue, string expectedCimFormat)
     {
         var expectedFormat = EnumerationType.FromName<CimFormat>(expectedCimFormat);
         var parsedFormat = CimFormat.ParseFromContentHeaderValue(contentHeaderValue);
@@ -50,17 +50,9 @@ public class CimFormat : EnumerationType
     public static CimFormat ParseFromContentHeaderValue(string value)
     {
         var contentTypeValues = value.Split(";");
-        var contentType = contentTypeValues[0].Trim();
-        if (contentType.Equals("application/json", StringComparison.OrdinalIgnoreCase))
-        {
-            return Json;
-        }
+        var contentTypeValue = contentTypeValues[0].Trim();
+        var contentType = contentTypeValue.Substring(contentTypeValue.IndexOf("/", StringComparison.OrdinalIgnoreCase) + 1);
 
-        if (contentType.Equals("application/xml", StringComparison.OrdinalIgnoreCase))
-        {
-            return Xml;
-        }
-
-        return Unknown;
+        return FromName<CimFormat>(contentType);
     }
 }
