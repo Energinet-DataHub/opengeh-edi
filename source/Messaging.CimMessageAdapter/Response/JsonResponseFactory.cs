@@ -28,7 +28,7 @@ public class JsonResponseFactory : IResponseFactory
         return result.Success ? new ResponseMessage() : new ResponseMessage(CreateMessageBodyFrom(result));
     }
 
-    protected static string CreateMessageBodyFrom(Result result)
+    private static string CreateMessageBodyFrom(Result result)
     {
         if (result == null) throw new ArgumentNullException(nameof(result));
         var messageBody = new StringBuilder();
