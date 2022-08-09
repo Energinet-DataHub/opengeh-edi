@@ -13,8 +13,16 @@
 // limitations under the License.
 
 namespace Messaging.CimMessageAdapter.Response;
-#pragma warning disable
+
+/// <summary>
+/// Factory responsible for creating B2B response messages
+/// </summary>
 public interface IResponseFactory
 {
+    /// <summary>
+    /// Create response message
+    /// </summary>
+    /// <param name="result"></param>
+    /// <returns><see cref="ResponseMessage"/></returns>
     public ResponseMessage From(Result result);
 }
