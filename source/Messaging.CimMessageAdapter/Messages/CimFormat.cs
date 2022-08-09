@@ -12,19 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Messaging.CimMessageAdapter.Response;
-using Xunit;
-using Xunit.Categories;
+using Messaging.Domain.SeedWork;
 
-namespace Messaging.CimMessageAdapter.Tests;
+namespace Messaging.CimMessageAdapter.Messages;
 
-[UnitTest]
-public class ResponseFactoryErrorTests
+public class CimFormat : EnumerationType
 {
-    [Fact]
-    public void Throws_if_content_type_is_unknown()
+    public static readonly CimFormat Xml = new(0, nameof(Xml));
+    public static readonly CimFormat Json = new(1, nameof(Json));
+
+    private CimFormat(int id, string name)
+        : base(id, name)
     {
-        Assert.Throws<InvalidOperationException>(() => ResponseStrategy.GetResponseFactory("unknown content type"));
     }
 }
