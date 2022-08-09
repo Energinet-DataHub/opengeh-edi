@@ -12,23 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
 using Messaging.CimMessageAdapter.Messages;
+using Messaging.CimMessageAdapter.Response;
+using Messaging.Domain.SeedWork;
+using Xunit;
+using Xunit.Categories;
 
-namespace Messaging.CimMessageAdapter.Response;
+namespace Messaging.CimMessageAdapter.Tests;
 
-public class ResponseFactory
+[UnitTest]
+public class ResponseFactoryTests
 {
-    private readonly Dictionary<CimFormat, IResponseFactory> _factories = new()
+    [Theory]
+    [InlineData(nameof(CimFormat.Xml))]
+    public void Generate_empty_response_when_no_validation_errors_has_occurred(string format)
     {
-        { CimFormat.Xml, new XmlResponseFactory() },
-    };
+        var responseFactory = new ResponseFactory();
+        var result = Result.Succeeded();
 
-    public ResponseMessage From(Result result, CimFormat format)
-    {
-        if (result == null) throw new ArgumentNullException(nameof(result));
-        var factory = _factories.GetValueOrDefault(format);
-        return factory!.From(result);
+        var response = responseFactory.From(result, EnumerationType.FromName<CimFormat>(format));
+
+        Assert.False(response.IsErrorResponse);
+        Assert.Empty(response.MessageBody);
     }
 }
