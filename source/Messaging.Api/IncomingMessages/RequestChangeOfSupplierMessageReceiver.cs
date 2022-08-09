@@ -33,15 +33,18 @@ namespace Messaging.Api.IncomingMessages
         private readonly ILogger<RequestChangeOfSupplierMessageReceiver> _logger;
         private readonly ICorrelationContext _correlationContext;
         private readonly MessageReceiver _messageReceiver;
+        private readonly ResponseFactory _responseFactory;
 
         public RequestChangeOfSupplierMessageReceiver(
             ILogger<RequestChangeOfSupplierMessageReceiver> logger,
             ICorrelationContext correlationContext,
-            MessageReceiver messageReceiver)
+            MessageReceiver messageReceiver,
+            ResponseFactory responseFactory)
         {
             _logger = logger;
             _correlationContext = correlationContext;
             _messageReceiver = messageReceiver ?? throw new ArgumentNullException(nameof(messageReceiver));
+            _responseFactory = responseFactory;
         }
 
         [Function("RequestChangeOfSupplier")]
@@ -64,9 +67,8 @@ namespace Messaging.Api.IncomingMessages
             var result = await _messageReceiver.ReceiveAsync(request.Body, cimFormat)
                 .ConfigureAwait(false);
 
-            var responseFactory = new ResponseFactory();
             var httpStatusCode = result.Success ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
-            return CreateResponse(request, httpStatusCode, responseFactory.From(result, cimFormat));
+            return CreateResponse(request, httpStatusCode, _responseFactory.From(result, cimFormat));
         }
 
         private static string GetContentType(HttpHeaders headers)
