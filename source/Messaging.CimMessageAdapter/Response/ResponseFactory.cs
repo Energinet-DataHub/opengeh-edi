@@ -23,6 +23,7 @@ public class ResponseFactory
     private readonly Dictionary<CimFormat, IResponseFactory> _factories = new()
     {
         { CimFormat.Xml, new XmlResponseFactory() },
+        { CimFormat.Json, new JsonResponseFactory() },
     };
 
     public ResponseMessage From(Result result, CimFormat format)

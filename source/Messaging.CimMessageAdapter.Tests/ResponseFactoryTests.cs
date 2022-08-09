@@ -25,6 +25,7 @@ public class ResponseFactoryTests
 {
     [Theory]
     [InlineData(nameof(CimFormat.Xml))]
+    [InlineData(nameof(CimFormat.Json))]
     public void Generate_empty_response_when_no_validation_errors_has_occurred(string format)
     {
         var responseFactory = new ResponseFactory();
