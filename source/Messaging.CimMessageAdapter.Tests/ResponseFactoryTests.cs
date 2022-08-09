@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Response;
 using Messaging.Domain.SeedWork;
@@ -23,17 +25,24 @@ namespace Messaging.CimMessageAdapter.Tests;
 [UnitTest]
 public class ResponseFactoryTests
 {
-    [Theory]
-    [InlineData(nameof(CimFormat.Xml))]
-    [InlineData(nameof(CimFormat.Json))]
-    public void Generate_empty_response_when_no_validation_errors_has_occurred(string format)
+    [Fact]
+    public void Generate_empty_response_when_no_validation_errors_has_occurred()
     {
-        var responseFactory = new ResponseFactory();
+        var responseFactory = new ResponseFactory(new[] { new XmlResponseFactory() });
         var result = Result.Succeeded();
 
-        var response = responseFactory.From(result, EnumerationType.FromName<CimFormat>(format));
+        var response = responseFactory.From(result, CimFormat.Xml);
 
         Assert.False(response.IsErrorResponse);
         Assert.Empty(response.MessageBody);
+    }
+
+    [Fact]
+    public void Throw_if_requested_format_can_not_be_parsed()
+    {
+        var responseFactory = new ResponseFactory(new List<IResponseFactory>());
+        var result = Result.Succeeded();
+
+        Assert.Throws<InvalidOperationException>(() => responseFactory.From(result, CimFormat.Json));
     }
 }

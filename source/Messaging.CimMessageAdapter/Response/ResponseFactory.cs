@@ -14,22 +14,32 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Messaging.CimMessageAdapter.Messages;
 
 namespace Messaging.CimMessageAdapter.Response;
 
 public class ResponseFactory
 {
-    private readonly Dictionary<CimFormat, IResponseFactory> _factories = new()
+    private readonly IEnumerable<IResponseFactory> _factories;
+
+    public ResponseFactory(IEnumerable<IResponseFactory> factories)
     {
-        { CimFormat.Xml, new XmlResponseFactory() },
-        { CimFormat.Json, new JsonResponseFactory() },
-    };
+        _factories = factories;
+    }
 
     public ResponseMessage From(Result result, CimFormat format)
     {
         if (result == null) throw new ArgumentNullException(nameof(result));
-        var factory = _factories.GetValueOrDefault(format);
-        return factory!.From(result);
+        if (format == null) throw new ArgumentNullException(nameof(format));
+
+        var factory = _factories.FirstOrDefault(factory => factory.HandledFormat.Equals(format));
+
+        if (factory is null)
+        {
+            throw new InvalidOperationException($"Could not generate response message in format {format.Name}");
+        }
+
+        return factory.From(result);
     }
 }

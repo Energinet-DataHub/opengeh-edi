@@ -16,11 +16,14 @@ using System;
 using System.Linq;
 using System.Text;
 using System.Xml;
+using Messaging.CimMessageAdapter.Messages;
 
 namespace Messaging.CimMessageAdapter.Response
 {
     public class XmlResponseFactory : IResponseFactory
     {
+        public CimFormat HandledFormat => CimFormat.Xml;
+
         public ResponseMessage From(Result result)
         {
             if (result == null) throw new ArgumentNullException(nameof(result));

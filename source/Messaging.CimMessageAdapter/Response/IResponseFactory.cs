@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Messaging.CimMessageAdapter.Messages;
+
 namespace Messaging.CimMessageAdapter.Response;
 
 /// <summary>
@@ -19,6 +21,11 @@ namespace Messaging.CimMessageAdapter.Response;
 /// </summary>
 public interface IResponseFactory
 {
+    /// <summary>
+    /// Specifies the handled CIM format
+    /// </summary>
+    public CimFormat HandledFormat { get; }
+
     /// <summary>
     /// Create response message
     /// </summary>

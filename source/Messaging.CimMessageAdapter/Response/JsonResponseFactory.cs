@@ -16,12 +16,15 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Messaging.CimMessageAdapter.Messages;
 using Newtonsoft.Json;
 
 namespace Messaging.CimMessageAdapter.Response;
 
 public class JsonResponseFactory : IResponseFactory
 {
+    public CimFormat HandledFormat => CimFormat.Json;
+
     public ResponseMessage From(Result result)
     {
         if (result == null) throw new ArgumentNullException(nameof(result));
