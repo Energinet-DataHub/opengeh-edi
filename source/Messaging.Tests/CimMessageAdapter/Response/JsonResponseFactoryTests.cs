@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Errors;
-using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Response;
 using Newtonsoft.Json.Linq;
 using Xunit;
 using Xunit.Categories;
 
-namespace Messaging.CimMessageAdapter.Tests;
+namespace Messaging.Tests.CimMessageAdapter.Response;
 
 [UnitTest]
 public class JsonResponseFactoryTests

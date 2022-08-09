@@ -14,12 +14,13 @@
 
 using System;
 using System.Collections.Generic;
+using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Response;
 using Xunit;
 using Xunit.Categories;
 
-namespace Messaging.CimMessageAdapter.Tests;
+namespace Messaging.Tests.CimMessageAdapter.Response;
 
 [UnitTest]
 public class ResponseFactoryTests

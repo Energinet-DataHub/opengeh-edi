@@ -14,12 +14,13 @@
 
 using System.Linq;
 using System.Xml.Linq;
+using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Response;
 using Xunit;
 using Xunit.Categories;
 
-namespace Messaging.CimMessageAdapter.Tests
+namespace Messaging.Tests.CimMessageAdapter.Response
 {
     [UnitTest]
     public class XmlResponseFactoryTests
