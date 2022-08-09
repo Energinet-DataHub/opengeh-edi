@@ -13,16 +13,28 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using Messaging.CimMessageAdapter.Messages;
 
 namespace Messaging.CimMessageAdapter.Response;
 
-public abstract class ResponseFactory
+public class ResponseFactory
 {
-    public ResponseMessage From(Result result)
+    #pragma warning disable
+    private readonly Dictionary<CimFormat, IResponseFactory> _factories = new Dictionary<CimFormat, IResponseFactory>()
+    {
+        { CimFormat.Json, new JsonResponseFactory() },
+        { CimFormat.Xml, new XmlResponseFactory() },
+    };
+
+    public ResponseMessage From(Result result, CimFormat? format)
     {
         if (result == null) throw new ArgumentNullException(nameof(result));
         return result.Success ? new ResponseMessage() : new ResponseMessage(CreateMessageBodyFrom(result));
     }
 
-    protected abstract string CreateMessageBodyFrom(Result result);
+    protected virtual string CreateMessageBodyFrom(Result result)
+    {
+        return string.Empty;
+    }
 }

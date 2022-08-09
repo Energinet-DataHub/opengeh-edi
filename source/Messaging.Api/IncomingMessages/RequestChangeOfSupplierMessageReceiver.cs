@@ -61,13 +61,12 @@ namespace Messaging.Api.IncomingMessages
                 return request.CreateResponse(HttpStatusCode.UnsupportedMediaType);
             }
 
-            var responseFactory = ResponseStrategy.GetResponseFactory(cimFormat);
-
             var result = await _messageReceiver.ReceiveAsync(request.Body, cimFormat)
                 .ConfigureAwait(false);
 
+            var responseFactory = new ResponseFactory();
             var httpStatusCode = result.Success ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
-            return CreateResponse(request, httpStatusCode, responseFactory.From(result));
+            return CreateResponse(request, httpStatusCode, responseFactory.From(result, cimFormat));
         }
 
         private static string GetContentType(HttpHeaders headers)

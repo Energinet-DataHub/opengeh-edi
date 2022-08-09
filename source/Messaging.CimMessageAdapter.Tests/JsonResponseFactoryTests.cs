@@ -24,11 +24,11 @@ namespace Messaging.CimMessageAdapter.Tests;
 [UnitTest]
 public class JsonResponseFactoryTests
 {
-    private readonly ResponseFactory _responseFactory;
+    private readonly JsonResponseFactory _responseFactory;
 
     public JsonResponseFactoryTests()
     {
-        _responseFactory = ResponseStrategy.GetResponseFactory(CimFormat.Json);
+        _responseFactory = new JsonResponseFactory();
     }
 
     [Fact]
@@ -36,7 +36,7 @@ public class JsonResponseFactoryTests
     {
         var result = Result.Succeeded();
 
-        var response = _responseFactory.From(result);
+        var response = CreateResponse(result);
 
         Assert.False(response.IsErrorResponse);
         Assert.Empty(response.MessageBody);
@@ -48,7 +48,7 @@ public class JsonResponseFactoryTests
         var duplicateMessageIdError = new DuplicateMessageIdDetected("Duplicate message id");
         var result = Result.Failure(duplicateMessageIdError);
 
-        var response = _responseFactory.From(result);
+        var response = CreateResponse(result);
 
         Assert.True(response.IsErrorResponse);
         AssertHasValue(response, "Error.Code", duplicateMessageIdError.Code);
@@ -62,7 +62,7 @@ public class JsonResponseFactoryTests
         var duplicateTransactionIdError = new DuplicateTransactionIdDetected("Fake transaction id");
         var result = Result.Failure(duplicateMessageIdError, duplicateTransactionIdError);
 
-        var response = _responseFactory.From(result);
+        var response = CreateResponse(result);
 
         Assert.True(response.IsErrorResponse);
         AssertHasValue(response, "Error.Code", "BadRequest");
@@ -86,5 +86,10 @@ public class JsonResponseFactoryTests
 
         Assert.Equal(validationError.Code, code);
         Assert.Equal(validationError.Message, message);
+    }
+
+    private ResponseMessage CreateResponse(Result result)
+    {
+        return _responseFactory.From(result);
     }
 }

@@ -25,11 +25,11 @@ namespace Messaging.CimMessageAdapter.Tests
     [UnitTest]
     public class XmlResponseFactoryTests
     {
-        private readonly ResponseFactory _responseFactory;
+        private readonly XmlResponseFactory _responseFactory;
 
         public XmlResponseFactoryTests()
         {
-            _responseFactory = ResponseStrategy.GetResponseFactory(CimFormat.Xml);
+            _responseFactory = new XmlResponseFactory();
         }
 
         [Fact]
@@ -37,7 +37,7 @@ namespace Messaging.CimMessageAdapter.Tests
         {
             var result = Result.Succeeded();
 
-            var response = _responseFactory.From(result);
+            var response = CreateResponse(result);
 
             Assert.False(response.IsErrorResponse);
             Assert.Empty(response.MessageBody);
@@ -49,7 +49,7 @@ namespace Messaging.CimMessageAdapter.Tests
             var duplicateMessageIdError = new DuplicateMessageIdDetected("Duplicate message id");
             var result = Result.Failure(duplicateMessageIdError);
 
-            var response = _responseFactory.From(result);
+            var response = CreateResponse(result);
 
             Assert.True(response.IsErrorResponse);
             AssertHasValue(response, "Code", duplicateMessageIdError.Code);
@@ -63,7 +63,7 @@ namespace Messaging.CimMessageAdapter.Tests
             var duplicateTransactionIdError = new DuplicateTransactionIdDetected("Fake transaction id");
             var result = Result.Failure(duplicateMessageIdError, duplicateTransactionIdError);
 
-            var response = _responseFactory.From(result);
+            var response = CreateResponse(result);
 
             Assert.True(response.IsErrorResponse);
             AssertHasValue(response, "Code", "BadRequest");
@@ -85,6 +85,11 @@ namespace Messaging.CimMessageAdapter.Tests
 
             Assert.Contains(errors, error => error.Element("Code")?.Value == validationError.Code);
             Assert.Contains(errors, error => error.Element("Message")?.Value == validationError.Message);
+        }
+
+        private ResponseMessage CreateResponse(Result result)
+        {
+            return _responseFactory.From(result);
         }
     }
 }

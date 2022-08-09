@@ -19,9 +19,15 @@ using System.Xml;
 
 namespace Messaging.CimMessageAdapter.Response
 {
-    public class XmlResponseFactory : ResponseFactory
+    public class XmlResponseFactory : IResponseFactory
     {
-        protected override string CreateMessageBodyFrom(Result result)
+        public ResponseMessage From(Result result)
+        {
+            if (result == null) throw new ArgumentNullException(nameof(result));
+            return result.Success ? new ResponseMessage() : new ResponseMessage(CreateMessageBodyFrom(result));
+        }
+
+        protected static string CreateMessageBodyFrom(Result result)
         {
             if (result == null) throw new ArgumentNullException(nameof(result));
             var messageBody = new StringBuilder();
