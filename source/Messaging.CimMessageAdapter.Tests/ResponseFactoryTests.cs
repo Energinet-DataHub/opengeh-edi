@@ -16,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Response;
-using Messaging.Domain.SeedWork;
 using Xunit;
 using Xunit.Categories;
 

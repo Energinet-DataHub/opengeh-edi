@@ -32,17 +32,6 @@ public class JsonResponseFactoryTests
     }
 
     [Fact]
-    public void Generate_empty_response_when_no_validation_errors_has_occurred()
-    {
-        var result = Result.Succeeded();
-
-        var response = CreateResponse(result);
-
-        Assert.False(response.IsErrorResponse);
-        Assert.Empty(response.MessageBody);
-    }
-
-    [Fact]
     public void Generates_single_error_response()
     {
         var duplicateMessageIdError = new DuplicateMessageIdDetected("Duplicate message id");

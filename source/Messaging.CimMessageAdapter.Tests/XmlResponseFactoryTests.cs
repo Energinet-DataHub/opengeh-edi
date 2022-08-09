@@ -15,7 +15,6 @@
 using System.Linq;
 using System.Xml.Linq;
 using Messaging.CimMessageAdapter.Errors;
-using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Response;
 using Xunit;
 using Xunit.Categories;
@@ -30,17 +29,6 @@ namespace Messaging.CimMessageAdapter.Tests
         public XmlResponseFactoryTests()
         {
             _responseFactory = new XmlResponseFactory();
-        }
-
-        [Fact]
-        public void Generate_empty_response_when_no_validation_errors_has_occurred()
-        {
-            var result = Result.Succeeded();
-
-            var response = CreateResponse(result);
-
-            Assert.False(response.IsErrorResponse);
-            Assert.Empty(response.MessageBody);
         }
 
         [Fact]
