@@ -17,8 +17,8 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Messages;
-using Messaging.Domain.SeedWork;
 using Messaging.IntegrationTests;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
@@ -27,12 +27,9 @@ namespace Messaging.Tests;
 
 public class MessageParserTests : TestBase
 {
-    private readonly JsonMessageParserStrategy _jsonMessageParserStrategy;
-
     public MessageParserTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _jsonMessageParserStrategy = GetService<JsonMessageParserStrategy>();
     }
 
     #pragma warning disable
@@ -46,6 +43,17 @@ public class MessageParserTests : TestBase
         Assert.True(parsedResult.Success);
     }
 
+    [Theory]
+    [MemberData(nameof(GetMessagesWithInvalidStructure))]
+    public async Task Return_error_when_structure_is_invalid(CimFormat format, Stream message)
+    {
+        var parser = new MessageParser(new XmlMessageParserStrategy(), new JsonMessageParserStrategy());
+        var parsedResult = await parser.GetMessageParserStrategy(format).ParseAsync(message).ConfigureAwait(false);
+
+        Assert.False(parsedResult.Success);
+        Assert.Contains(parsedResult.Errors, error => error is InvalidMessageStructure);
+    }
+
     public static IEnumerable<object[]> LoadValidMessages()
     {
         return new List<object[]>
@@ -55,14 +63,16 @@ public class MessageParserTests : TestBase
         };
     }
 
-    [Fact]
-    public async Task Message_parser_returns_error_when_json_is_invalid()
+    public static IEnumerable<object[]> GetMessagesWithInvalidStructure()
     {
-        using var stream = LoadInvalidJsonFileAsMemoryStream();
-        var parsedResult = await _jsonMessageParserStrategy.ParseAsync(stream).ConfigureAwait(false);
-
-        Assert.False(parsedResult.Success);
-        Assert.Equal(2, parsedResult.Errors.Count);
+        return new List<object[]>
+        {
+            new object[]
+            {
+                CimFormat.Json,
+                LoadInvalidJsonFileAsMemoryStream(),
+            },
+        };
     }
 
     private static Stream LoadXmlFileAsMemoryStream()
