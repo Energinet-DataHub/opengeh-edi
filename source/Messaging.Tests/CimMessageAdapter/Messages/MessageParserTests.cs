@@ -33,8 +33,8 @@ public class MessageParserTests
         _messageParser = new MessageParser(
             new IMessageParser[]
             {
-                new JsonMessageParserStrategy(),
-                new XmlMessageParserStrategy(),
+                new JsonMessageParser(),
+                new XmlMessageParser(),
             });
     }
 

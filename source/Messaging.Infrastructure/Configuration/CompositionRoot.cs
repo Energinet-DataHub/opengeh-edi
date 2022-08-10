@@ -228,11 +228,11 @@ namespace Messaging.Infrastructure.Configuration
         {
             _services.AddSingleton(_ => new MessageParser(new IMessageParser[]
             {
-                new JsonMessageParserStrategy(),
-                new XmlMessageParserStrategy(),
+                new JsonMessageParser(),
+                new XmlMessageParser(),
             }));
-            _services.AddSingleton<XmlMessageParserStrategy>();
-            _services.AddSingleton<JsonMessageParserStrategy>();
+            _services.AddSingleton<XmlMessageParser>();
+            _services.AddSingleton<JsonMessageParser>();
             _services.AddSingleton<XmlSchemaProvider>();
             _services.AddSingleton<JsonSchemaProvider>();
             _services.AddSingleton(_ => new ResponseFactory(new IResponseFactory[]

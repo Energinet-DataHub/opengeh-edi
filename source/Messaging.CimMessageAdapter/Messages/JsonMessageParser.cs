@@ -16,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Json.Schema;
@@ -31,14 +30,14 @@ using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
 
 namespace Messaging.CimMessageAdapter.Messages;
 
-public class JsonMessageParserStrategy : IMessageParser
+public class JsonMessageParser : IMessageParser
 {
     private const string MarketActivityRecordElementName = "MktActivityRecord";
     private const string HeaderElementName = "RequestChangeOfSupplier_MarketDocument";
     private readonly ISchemaProvider _schemaProvider;
     private readonly List<ValidationError> _errors = new();
 
-    public JsonMessageParserStrategy()
+    public JsonMessageParser()
     {
         _schemaProvider = new JsonSchemaProvider();
     }
