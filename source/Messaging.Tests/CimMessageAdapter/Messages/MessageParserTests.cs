@@ -19,19 +19,12 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Messages;
-using Messaging.IntegrationTests;
-using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 
-namespace Messaging.Tests;
+namespace Messaging.Tests.CimMessageAdapter.Messages;
 
-public class MessageParserTests : TestBase
+public class MessageParserTests
 {
-    public MessageParserTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
-    {
-    }
-
     public static IEnumerable<object[]> CreateMessages()
     {
         return new List<object[]>
