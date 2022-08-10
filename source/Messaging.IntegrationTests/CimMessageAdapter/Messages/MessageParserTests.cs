@@ -45,11 +45,8 @@ public class MessageParserTests : TestBase
     {
         return new List<object[]>
         {
-            new object[]
-            {
-                CimFormat.Json,
-                LoadInvalidJsonFileAsMemoryStream(),
-            },
+            new object[] { CimFormat.Json, LoadInvalidJsonFileAsMemoryStream() },
+            new object[] { CimFormat.Xml, CreateMessageWithInvalidXmlStructure() },
         };
     }
 
@@ -81,6 +78,18 @@ public class MessageParserTests : TestBase
         xmlDoc.Save(stream);
 
         return stream;
+    }
+
+    private static Stream CreateMessageWithInvalidXmlStructure()
+    {
+        var messageStream = new MemoryStream();
+        using var writer = new StreamWriter(messageStream);
+        writer.Write("This is not XML");
+        writer.Flush();
+        messageStream.Position = 0;
+        var returnStream = new MemoryStream();
+        messageStream.CopyTo(returnStream);
+        return returnStream;
     }
 
     private static MemoryStream LoadJsonFileAsMemoryStream()
