@@ -94,18 +94,18 @@ public class MessageParserTests : TestBase
 
     private static MemoryStream CreateJsonMessage()
     {
-        var jsonDoc = File.ReadAllText($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}json{Path.DirectorySeparatorChar}Request Change of Supplier.json");
-        var stream = new MemoryStream();
-        using var writer = new StreamWriter(stream: stream, encoding: Encoding.UTF8, bufferSize: 4096, leaveOpen: true);
-        writer.Write(jsonDoc);
-        writer.Flush();
-        stream.Position = 0;
-        return stream;
+        return ReadTextFile(
+            $"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}json{Path.DirectorySeparatorChar}Request Change of Supplier.json");
     }
 
     private static MemoryStream CreateInvalidJsonMessage()
     {
-        var jsonDoc = File.ReadAllText($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}json{Path.DirectorySeparatorChar}Invalid Request Change of Supplier.json");
+        return ReadTextFile($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}json{Path.DirectorySeparatorChar}Invalid Request Change of Supplier.json");
+    }
+
+    private static MemoryStream ReadTextFile(string path)
+    {
+        var jsonDoc = File.ReadAllText(path);
         var stream = new MemoryStream();
         using var writer = new StreamWriter(stream: stream, encoding: Encoding.UTF8, bufferSize: 4096, leaveOpen: true);
         writer.Write(jsonDoc);
