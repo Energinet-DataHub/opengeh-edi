@@ -16,14 +16,22 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Xml;
+using Messaging.CimMessageAdapter.Messages;
 using Newtonsoft.Json;
 
 namespace Messaging.CimMessageAdapter.Response;
 
-public class JsonResponseFactory : ResponseFactory
+public class JsonResponseFactory : IResponseFactory
 {
-    protected override string CreateMessageBodyFrom(Result result)
+    public CimFormat HandledFormat => CimFormat.Json;
+
+    public ResponseMessage From(Result result)
+    {
+        if (result == null) throw new ArgumentNullException(nameof(result));
+        return result.Success ? new ResponseMessage() : new ResponseMessage(CreateMessageBodyFrom(result));
+    }
+
+    private static string CreateMessageBodyFrom(Result result)
     {
         if (result == null) throw new ArgumentNullException(nameof(result));
         var messageBody = new StringBuilder();

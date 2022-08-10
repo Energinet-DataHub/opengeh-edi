@@ -42,6 +42,7 @@ using Messaging.Application.SchemaStore;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Messages;
+using Messaging.CimMessageAdapter.Response;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.Transactions.MoveIn.Events;
 using Messaging.Infrastructure.Common;
@@ -230,6 +231,11 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddSingleton<JsonMessageParserStrategy>();
             _services.AddSingleton<XmlSchemaProvider>();
             _services.AddSingleton<JsonSchemaProvider>();
+            _services.AddSingleton(_ => new ResponseFactory(new IResponseFactory[]
+            {
+                new JsonResponseFactory(),
+                new XmlResponseFactory(),
+            }));
             return this;
         }
 

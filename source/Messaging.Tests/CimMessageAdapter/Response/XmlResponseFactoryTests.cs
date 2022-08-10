@@ -14,33 +14,22 @@
 
 using System.Linq;
 using System.Xml.Linq;
+using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Errors;
-using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Response;
 using Xunit;
 using Xunit.Categories;
 
-namespace Messaging.CimMessageAdapter.Tests
+namespace Messaging.Tests.CimMessageAdapter.Response
 {
     [UnitTest]
     public class XmlResponseFactoryTests
     {
-        private readonly ResponseFactory _responseFactory;
+        private readonly XmlResponseFactory _responseFactory;
 
         public XmlResponseFactoryTests()
         {
-            _responseFactory = ResponseStrategy.GetResponseFactory(CimFormat.Xml);
-        }
-
-        [Fact]
-        public void Generate_empty_response_when_no_validation_errors_has_occurred()
-        {
-            var result = Result.Succeeded();
-
-            var response = _responseFactory.From(result);
-
-            Assert.False(response.IsErrorResponse);
-            Assert.Empty(response.MessageBody);
+            _responseFactory = new XmlResponseFactory();
         }
 
         [Fact]
@@ -49,7 +38,7 @@ namespace Messaging.CimMessageAdapter.Tests
             var duplicateMessageIdError = new DuplicateMessageIdDetected("Duplicate message id");
             var result = Result.Failure(duplicateMessageIdError);
 
-            var response = _responseFactory.From(result);
+            var response = CreateResponse(result);
 
             Assert.True(response.IsErrorResponse);
             AssertHasValue(response, "Code", duplicateMessageIdError.Code);
@@ -63,7 +52,7 @@ namespace Messaging.CimMessageAdapter.Tests
             var duplicateTransactionIdError = new DuplicateTransactionIdDetected("Fake transaction id");
             var result = Result.Failure(duplicateMessageIdError, duplicateTransactionIdError);
 
-            var response = _responseFactory.From(result);
+            var response = CreateResponse(result);
 
             Assert.True(response.IsErrorResponse);
             AssertHasValue(response, "Code", "BadRequest");
@@ -85,6 +74,11 @@ namespace Messaging.CimMessageAdapter.Tests
 
             Assert.Contains(errors, error => error.Element("Code")?.Value == validationError.Code);
             Assert.Contains(errors, error => error.Element("Message")?.Value == validationError.Message);
+        }
+
+        private ResponseMessage CreateResponse(Result result)
+        {
+            return _responseFactory.From(result);
         }
     }
 }

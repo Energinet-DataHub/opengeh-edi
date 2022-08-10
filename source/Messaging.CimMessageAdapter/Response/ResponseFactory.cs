@@ -13,16 +13,33 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using Messaging.CimMessageAdapter.Messages;
 
 namespace Messaging.CimMessageAdapter.Response;
 
-public abstract class ResponseFactory
+public class ResponseFactory
 {
-    public ResponseMessage From(Result result)
+    private readonly IEnumerable<IResponseFactory> _factories;
+
+    public ResponseFactory(IEnumerable<IResponseFactory> factories)
     {
-        if (result == null) throw new ArgumentNullException(nameof(result));
-        return result.Success ? new ResponseMessage() : new ResponseMessage(CreateMessageBodyFrom(result));
+        _factories = factories;
     }
 
-    protected abstract string CreateMessageBodyFrom(Result result);
+    public ResponseMessage From(Result result, CimFormat format)
+    {
+        if (result == null) throw new ArgumentNullException(nameof(result));
+        if (format == null) throw new ArgumentNullException(nameof(format));
+
+        var factory = _factories.FirstOrDefault(factory => factory.HandledFormat.Equals(format));
+
+        if (factory is null)
+        {
+            throw new InvalidOperationException($"Could not generate response message in format {format.Name}");
+        }
+
+        return factory.From(result);
+    }
 }

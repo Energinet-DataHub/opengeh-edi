@@ -12,34 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Errors;
-using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Response;
 using Newtonsoft.Json.Linq;
 using Xunit;
 using Xunit.Categories;
 
-namespace Messaging.CimMessageAdapter.Tests;
+namespace Messaging.Tests.CimMessageAdapter.Response;
 
 [UnitTest]
 public class JsonResponseFactoryTests
 {
-    private readonly ResponseFactory _responseFactory;
+    private readonly JsonResponseFactory _responseFactory;
 
     public JsonResponseFactoryTests()
     {
-        _responseFactory = ResponseStrategy.GetResponseFactory(CimFormat.Json);
-    }
-
-    [Fact]
-    public void Generate_empty_response_when_no_validation_errors_has_occurred()
-    {
-        var result = Result.Succeeded();
-
-        var response = _responseFactory.From(result);
-
-        Assert.False(response.IsErrorResponse);
-        Assert.Empty(response.MessageBody);
+        _responseFactory = new JsonResponseFactory();
     }
 
     [Fact]
@@ -48,7 +37,7 @@ public class JsonResponseFactoryTests
         var duplicateMessageIdError = new DuplicateMessageIdDetected("Duplicate message id");
         var result = Result.Failure(duplicateMessageIdError);
 
-        var response = _responseFactory.From(result);
+        var response = CreateResponse(result);
 
         Assert.True(response.IsErrorResponse);
         AssertHasValue(response, "Error.Code", duplicateMessageIdError.Code);
@@ -62,7 +51,7 @@ public class JsonResponseFactoryTests
         var duplicateTransactionIdError = new DuplicateTransactionIdDetected("Fake transaction id");
         var result = Result.Failure(duplicateMessageIdError, duplicateTransactionIdError);
 
-        var response = _responseFactory.From(result);
+        var response = CreateResponse(result);
 
         Assert.True(response.IsErrorResponse);
         AssertHasValue(response, "Error.Code", "BadRequest");
@@ -86,5 +75,10 @@ public class JsonResponseFactoryTests
 
         Assert.Equal(validationError.Code, code);
         Assert.Equal(validationError.Message, message);
+    }
+
+    private ResponseMessage CreateResponse(Result result)
+    {
+        return _responseFactory.From(result);
     }
 }
