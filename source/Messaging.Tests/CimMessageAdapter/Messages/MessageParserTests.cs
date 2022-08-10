@@ -31,8 +31,6 @@ public class MessageParserTests
     public MessageParserTests()
     {
         _messageParser = new MessageParser(
-            new XmlMessageParserStrategy(),
-            new JsonMessageParserStrategy(),
             new IMessageParser[]
             {
                 new JsonMessageParserStrategy(),
@@ -80,7 +78,7 @@ public class MessageParserTests
     [Fact]
     public async Task Throw_if_message_format_is_not_known()
     {
-        var parser = new MessageParser(new XmlMessageParserStrategy(), new JsonMessageParserStrategy(), new List<IMessageParser>());
+        var parser = new MessageParser(new List<IMessageParser>());
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => parser.ParseAsync(CreateXmlMessage(), CimFormat.Xml)).ConfigureAwait(false);
     }

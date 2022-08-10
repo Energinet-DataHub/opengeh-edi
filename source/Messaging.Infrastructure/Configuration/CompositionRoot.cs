@@ -226,7 +226,11 @@ namespace Messaging.Infrastructure.Configuration
 
         public CompositionRoot AddMessageParserServices()
         {
-            _services.AddSingleton<MessageParser>();
+            _services.AddSingleton(_ => new MessageParser(new IMessageParser[]
+            {
+                new JsonMessageParserStrategy(),
+                new XmlMessageParserStrategy(),
+            }));
             _services.AddSingleton<XmlMessageParserStrategy>();
             _services.AddSingleton<JsonMessageParserStrategy>();
             _services.AddSingleton<XmlSchemaProvider>();

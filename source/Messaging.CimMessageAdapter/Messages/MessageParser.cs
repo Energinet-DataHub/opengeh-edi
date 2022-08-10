@@ -22,23 +22,11 @@ namespace Messaging.CimMessageAdapter.Messages;
 
 public class MessageParser
 {
-    private readonly XmlMessageParserStrategy _xmlMessageParserStrategy;
-    private readonly JsonMessageParserStrategy _jsonMessageParserStrategy;
     private readonly IEnumerable<IMessageParser> _parsers;
 
-    private readonly IDictionary<CimFormat, MessageParserStrategy> _strategies;
-
-    public MessageParser(XmlMessageParserStrategy xmlMessageParserStrategy, JsonMessageParserStrategy jsonMessageParserStrategy, IEnumerable<IMessageParser> parsers)
+    public MessageParser(IEnumerable<IMessageParser> parsers)
     {
-        _xmlMessageParserStrategy = xmlMessageParserStrategy;
-        _jsonMessageParserStrategy = jsonMessageParserStrategy;
         _parsers = parsers;
-
-        _strategies = new Dictionary<CimFormat, MessageParserStrategy>()
-        {
-            { CimFormat.Xml, _xmlMessageParserStrategy },
-            { CimFormat.Json, _jsonMessageParserStrategy },
-        };
     }
 
     public Task<MessageParserResult> ParseAsync(Stream message, CimFormat cimFormat)
