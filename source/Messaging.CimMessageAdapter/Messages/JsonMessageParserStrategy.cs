@@ -31,7 +31,7 @@ using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
 
 namespace Messaging.CimMessageAdapter.Messages;
 
-public class JsonMessageParserStrategy : MessageParserStrategy, IMessageParser
+public class JsonMessageParserStrategy : IMessageParser
 {
     private const string MarketActivityRecordElementName = "MktActivityRecord";
     private const string HeaderElementName = "RequestChangeOfSupplier_MarketDocument";
@@ -45,7 +45,7 @@ public class JsonMessageParserStrategy : MessageParserStrategy, IMessageParser
 
     public CimFormat HandledFormat => CimFormat.Json;
 
-    public override async Task<MessageParserResult> ParseAsync(Stream message)
+    public async Task<MessageParserResult> ParseAsync(Stream message)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
 
@@ -103,7 +103,7 @@ public class JsonMessageParserStrategy : MessageParserStrategy, IMessageParser
         }
     }
 
-    protected override string[] SplitNamespace(Stream message)
+    private static string[] SplitNamespace(Stream message)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
 
@@ -121,7 +121,7 @@ public class JsonMessageParserStrategy : MessageParserStrategy, IMessageParser
         return split;
     }
 
-    protected override string GetBusinessProcessType(Stream message)
+    private static string GetBusinessProcessType(Stream message)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
         var split = SplitNamespace(message);

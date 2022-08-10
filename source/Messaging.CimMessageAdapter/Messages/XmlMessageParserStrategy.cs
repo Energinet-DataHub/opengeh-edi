@@ -25,7 +25,7 @@ using Messaging.CimMessageAdapter.Errors;
 
 namespace Messaging.CimMessageAdapter.Messages;
 
-public class XmlMessageParserStrategy : MessageParserStrategy, IMessageParser
+public class XmlMessageParserStrategy : IMessageParser
 {
     private const string MarketActivityRecordElementName = "MktActivityRecord";
     private const string HeaderElementName = "RequestChangeOfSupplier_MarketDocument";
@@ -39,7 +39,7 @@ public class XmlMessageParserStrategy : MessageParserStrategy, IMessageParser
 
     public CimFormat HandledFormat => CimFormat.Xml;
 
-    public override async Task<MessageParserResult> ParseAsync(Stream message)
+    public async Task<MessageParserResult> ParseAsync(Stream message)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
 
@@ -84,7 +84,7 @@ public class XmlMessageParserStrategy : MessageParserStrategy, IMessageParser
         }
     }
 
-    protected override string[] SplitNamespace(Stream message)
+    private static string[] SplitNamespace(Stream message)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
 
@@ -103,7 +103,7 @@ public class XmlMessageParserStrategy : MessageParserStrategy, IMessageParser
         return split;
     }
 
-    protected override string GetBusinessProcessType(Stream message)
+    private static string GetBusinessProcessType(Stream message)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
         var split = SplitNamespace(message);
@@ -266,7 +266,7 @@ public class XmlMessageParserStrategy : MessageParserStrategy, IMessageParser
             message.Position = 0;
     }
 
-    private string GetVersion(Stream message)
+    private static string GetVersion(Stream message)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
         var split = SplitNamespace(message);
