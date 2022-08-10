@@ -14,7 +14,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Messaging.CimMessageAdapter.Messages;
 
@@ -22,13 +24,15 @@ public class MessageParser
 {
     private readonly XmlMessageParserStrategy _xmlMessageParserStrategy;
     private readonly JsonMessageParserStrategy _jsonMessageParserStrategy;
+    private readonly IEnumerable<IMessageParser> _parsers;
 
     private readonly IDictionary<CimFormat, MessageParserStrategy> _strategies;
 
-    public MessageParser(XmlMessageParserStrategy xmlMessageParserStrategy, JsonMessageParserStrategy jsonMessageParserStrategy)
+    public MessageParser(XmlMessageParserStrategy xmlMessageParserStrategy, JsonMessageParserStrategy jsonMessageParserStrategy, IEnumerable<IMessageParser> parsers)
     {
         _xmlMessageParserStrategy = xmlMessageParserStrategy;
         _jsonMessageParserStrategy = jsonMessageParserStrategy;
+        _parsers = parsers;
 
         _strategies = new Dictionary<CimFormat, MessageParserStrategy>()
         {
@@ -37,10 +41,10 @@ public class MessageParser
         };
     }
 
-    public MessageParserStrategy GetMessageParserStrategy(CimFormat cimFormat)
+    public Task<MessageParserResult> ParseAsync(Stream message, CimFormat cimFormat)
     {
-        var strategy = _strategies.FirstOrDefault(s => s.Key.Equals(cimFormat));
-        if (strategy.Key is null) throw new InvalidOperationException($"No message parser strategy found for content type {cimFormat}");
-        return strategy.Value;
+        var parser = _parsers.FirstOrDefault(parser => parser.HandledFormat.Equals(cimFormat));
+        if (parser is null) throw new InvalidOperationException($"No message parser found for message format '{cimFormat}'");
+        return parser.ParseAsync(message);
     }
 }

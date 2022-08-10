@@ -48,10 +48,8 @@ namespace Messaging.CimMessageAdapter
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
 
-            var messageParserStrategy = _messageParser.GetMessageParserStrategy(cimFormat);
-
             var messageParserResult =
-                 await messageParserStrategy.ParseAsync(message).ConfigureAwait(false);
+                 await _messageParser.ParseAsync(message, cimFormat).ConfigureAwait(false);
 
             if (InvalidMessageHeader(messageParserResult))
             {

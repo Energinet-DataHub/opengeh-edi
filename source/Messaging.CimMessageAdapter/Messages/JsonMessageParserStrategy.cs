@@ -31,7 +31,7 @@ using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
 
 namespace Messaging.CimMessageAdapter.Messages;
 
-public class JsonMessageParserStrategy : MessageParserStrategy
+public class JsonMessageParserStrategy : MessageParserStrategy, IMessageParser
 {
     private const string MarketActivityRecordElementName = "MktActivityRecord";
     private const string HeaderElementName = "RequestChangeOfSupplier_MarketDocument";
@@ -42,6 +42,8 @@ public class JsonMessageParserStrategy : MessageParserStrategy
     {
         _schemaProvider = new JsonSchemaProvider();
     }
+
+    public CimFormat HandledFormat => CimFormat.Json;
 
     public override async Task<MessageParserResult> ParseAsync(Stream message)
     {

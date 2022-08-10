@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -25,6 +26,20 @@ namespace Messaging.Tests.CimMessageAdapter.Messages;
 
 public class MessageParserTests
 {
+    private readonly MessageParser _messageParser;
+
+    public MessageParserTests()
+    {
+        _messageParser = new MessageParser(
+            new XmlMessageParserStrategy(),
+            new JsonMessageParserStrategy(),
+            new IMessageParser[]
+            {
+                new JsonMessageParserStrategy(),
+                new XmlMessageParserStrategy(),
+            });
+    }
+
     public static IEnumerable<object[]> CreateMessages()
     {
         return new List<object[]>
@@ -47,21 +62,27 @@ public class MessageParserTests
     [MemberData(nameof(CreateMessages))]
     public async Task Can_parse_message(CimFormat format, Stream message)
     {
-        var parser = new MessageParser(new XmlMessageParserStrategy(), new JsonMessageParserStrategy());
-        var parsedResult = await parser.GetMessageParserStrategy(format).ParseAsync(message).ConfigureAwait(false);
+        var result = await _messageParser.ParseAsync(message, format).ConfigureAwait(false);
 
-        Assert.True(parsedResult.Success);
+        Assert.True(result.Success);
     }
 
     [Theory]
     [MemberData(nameof(CreateMessagesWithInvalidStructure))]
     public async Task Return_error_when_structure_is_invalid(CimFormat format, Stream message)
     {
-        var parser = new MessageParser(new XmlMessageParserStrategy(), new JsonMessageParserStrategy());
-        var parsedResult = await parser.GetMessageParserStrategy(format).ParseAsync(message).ConfigureAwait(false);
+        var result = await _messageParser.ParseAsync(message, format).ConfigureAwait(false);
 
-        Assert.False(parsedResult.Success);
-        Assert.Contains(parsedResult.Errors, error => error is InvalidMessageStructure);
+        Assert.False(result.Success);
+        Assert.Contains(result.Errors, error => error is InvalidMessageStructure);
+    }
+
+    [Fact]
+    public async Task Throw_if_message_format_is_not_known()
+    {
+        var parser = new MessageParser(new XmlMessageParserStrategy(), new JsonMessageParserStrategy(), new List<IMessageParser>());
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => parser.ParseAsync(CreateXmlMessage(), CimFormat.Xml)).ConfigureAwait(false);
     }
 
     private static Stream CreateXmlMessage()

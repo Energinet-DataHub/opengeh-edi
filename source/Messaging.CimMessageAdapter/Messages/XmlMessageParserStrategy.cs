@@ -25,7 +25,7 @@ using Messaging.CimMessageAdapter.Errors;
 
 namespace Messaging.CimMessageAdapter.Messages;
 
-public class XmlMessageParserStrategy : MessageParserStrategy
+public class XmlMessageParserStrategy : MessageParserStrategy, IMessageParser
 {
     private const string MarketActivityRecordElementName = "MktActivityRecord";
     private const string HeaderElementName = "RequestChangeOfSupplier_MarketDocument";
@@ -36,6 +36,8 @@ public class XmlMessageParserStrategy : MessageParserStrategy
     {
         _schemaProvider = new XmlSchemaProvider();
     }
+
+    public CimFormat HandledFormat => CimFormat.Xml;
 
     public override async Task<MessageParserResult> ParseAsync(Stream message)
     {
