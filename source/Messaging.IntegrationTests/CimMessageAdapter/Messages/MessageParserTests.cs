@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Messaging.CimMessageAdapter.Messages;
+using Messaging.Domain.SeedWork;
 using Messaging.IntegrationTests;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
@@ -25,32 +27,32 @@ namespace Messaging.Tests;
 
 public class MessageParserTests : TestBase
 {
-    private readonly XmlMessageParserStrategy _xmlMessageParserStrategy;
     private readonly JsonMessageParserStrategy _jsonMessageParserStrategy;
 
     public MessageParserTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _xmlMessageParserStrategy = GetService<XmlMessageParserStrategy>();
         _jsonMessageParserStrategy = GetService<JsonMessageParserStrategy>();
     }
 
-    [Fact]
-    public async Task Message_parser_can_parse_xml_messages()
+    #pragma warning disable
+    [Theory]
+    [MemberData(nameof(LoadValidMessages))]
+    public async Task Can_parse_message(CimFormat format, Stream message)
     {
-        using var stream = LoadXmlFileAsMemoryStream();
-        var parsedResult = await _xmlMessageParserStrategy.ParseAsync(stream).ConfigureAwait(false);
+        var parser = new MessageParser(new XmlMessageParserStrategy(), new JsonMessageParserStrategy());
+        var parsedResult = await parser.GetMessageParserStrategy(format).ParseAsync(message).ConfigureAwait(false);
 
         Assert.True(parsedResult.Success);
     }
 
-    [Fact]
-    public async Task Message_parser_can_parse_json_messages()
+    public static IEnumerable<object[]> LoadValidMessages()
     {
-        using var stream = LoadJsonFileAsMemoryStream();
-        var parsedResult = await _jsonMessageParserStrategy.ParseAsync(stream).ConfigureAwait(false);
-
-        Assert.True(parsedResult.Success);
+        return new List<object[]>
+        {
+            new object[] { CimFormat.Xml, LoadXmlFileAsMemoryStream() },
+            new object[] { CimFormat.Json, LoadJsonFileAsMemoryStream() },
+        };
     }
 
     [Fact]
