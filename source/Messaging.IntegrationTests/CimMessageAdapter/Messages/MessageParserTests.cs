@@ -32,26 +32,26 @@ public class MessageParserTests : TestBase
     {
     }
 
-    public static IEnumerable<object[]> LoadValidMessages()
+    public static IEnumerable<object[]> CreateMessages()
     {
         return new List<object[]>
         {
-            new object[] { CimFormat.Xml, LoadXmlFileAsMemoryStream() },
-            new object[] { CimFormat.Json, LoadJsonFileAsMemoryStream() },
+            new object[] { CimFormat.Xml, CreateXmlMessage() },
+            new object[] { CimFormat.Json, CreateJsonMessage() },
         };
     }
 
-    public static IEnumerable<object[]> GetMessagesWithInvalidStructure()
+    public static IEnumerable<object[]> CreateMessagesWithInvalidStructure()
     {
         return new List<object[]>
         {
-            new object[] { CimFormat.Json, LoadInvalidJsonFileAsMemoryStream() },
-            new object[] { CimFormat.Xml, CreateMessageWithInvalidXmlStructure() },
+            new object[] { CimFormat.Json, CreateInvalidJsonMessage() },
+            new object[] { CimFormat.Xml, CreateInvalidXmlMessage() },
         };
     }
 
     [Theory]
-    [MemberData(nameof(LoadValidMessages))]
+    [MemberData(nameof(CreateMessages))]
     public async Task Can_parse_message(CimFormat format, Stream message)
     {
         var parser = new MessageParser(new XmlMessageParserStrategy(), new JsonMessageParserStrategy());
@@ -61,7 +61,7 @@ public class MessageParserTests : TestBase
     }
 
     [Theory]
-    [MemberData(nameof(GetMessagesWithInvalidStructure))]
+    [MemberData(nameof(CreateMessagesWithInvalidStructure))]
     public async Task Return_error_when_structure_is_invalid(CimFormat format, Stream message)
     {
         var parser = new MessageParser(new XmlMessageParserStrategy(), new JsonMessageParserStrategy());
@@ -71,7 +71,7 @@ public class MessageParserTests : TestBase
         Assert.Contains(parsedResult.Errors, error => error is InvalidMessageStructure);
     }
 
-    private static Stream LoadXmlFileAsMemoryStream()
+    private static Stream CreateXmlMessage()
     {
         var xmlDoc = XDocument.Load($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}xml{Path.DirectorySeparatorChar}Confirm request Change of Supplier.xml");
         var stream = new MemoryStream();
@@ -80,7 +80,7 @@ public class MessageParserTests : TestBase
         return stream;
     }
 
-    private static Stream CreateMessageWithInvalidXmlStructure()
+    private static Stream CreateInvalidXmlMessage()
     {
         var messageStream = new MemoryStream();
         using var writer = new StreamWriter(messageStream);
@@ -92,7 +92,7 @@ public class MessageParserTests : TestBase
         return returnStream;
     }
 
-    private static MemoryStream LoadJsonFileAsMemoryStream()
+    private static MemoryStream CreateJsonMessage()
     {
         var jsonDoc = File.ReadAllText($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}json{Path.DirectorySeparatorChar}Request Change of Supplier.json");
         var stream = new MemoryStream();
@@ -103,7 +103,7 @@ public class MessageParserTests : TestBase
         return stream;
     }
 
-    private static MemoryStream LoadInvalidJsonFileAsMemoryStream()
+    private static MemoryStream CreateInvalidJsonMessage()
     {
         var jsonDoc = File.ReadAllText($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}json{Path.DirectorySeparatorChar}Invalid Request Change of Supplier.json");
         var stream = new MemoryStream();
