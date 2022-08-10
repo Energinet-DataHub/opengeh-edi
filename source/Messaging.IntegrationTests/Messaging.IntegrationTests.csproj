@@ -58,4 +58,13 @@ limitations under the License.
       <Compile Remove="InternalCommands\CommandScheduler.cs" />
     </ItemGroup>
 
+    <ItemGroup>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\BadRequestChangeOfSupplier.xml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\RequestChangeOfSupplier.xml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+    </ItemGroup>
+
 </Project>
