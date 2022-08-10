@@ -32,28 +32,6 @@ public class MessageParserTests : TestBase
     {
     }
 
-    #pragma warning disable
-    [Theory]
-    [MemberData(nameof(LoadValidMessages))]
-    public async Task Can_parse_message(CimFormat format, Stream message)
-    {
-        var parser = new MessageParser(new XmlMessageParserStrategy(), new JsonMessageParserStrategy());
-        var parsedResult = await parser.GetMessageParserStrategy(format).ParseAsync(message).ConfigureAwait(false);
-
-        Assert.True(parsedResult.Success);
-    }
-
-    [Theory]
-    [MemberData(nameof(GetMessagesWithInvalidStructure))]
-    public async Task Return_error_when_structure_is_invalid(CimFormat format, Stream message)
-    {
-        var parser = new MessageParser(new XmlMessageParserStrategy(), new JsonMessageParserStrategy());
-        var parsedResult = await parser.GetMessageParserStrategy(format).ParseAsync(message).ConfigureAwait(false);
-
-        Assert.False(parsedResult.Success);
-        Assert.Contains(parsedResult.Errors, error => error is InvalidMessageStructure);
-    }
-
     public static IEnumerable<object[]> LoadValidMessages()
     {
         return new List<object[]>
@@ -73,6 +51,27 @@ public class MessageParserTests : TestBase
                 LoadInvalidJsonFileAsMemoryStream(),
             },
         };
+    }
+
+    [Theory]
+    [MemberData(nameof(LoadValidMessages))]
+    public async Task Can_parse_message(CimFormat format, Stream message)
+    {
+        var parser = new MessageParser(new XmlMessageParserStrategy(), new JsonMessageParserStrategy());
+        var parsedResult = await parser.GetMessageParserStrategy(format).ParseAsync(message).ConfigureAwait(false);
+
+        Assert.True(parsedResult.Success);
+    }
+
+    [Theory]
+    [MemberData(nameof(GetMessagesWithInvalidStructure))]
+    public async Task Return_error_when_structure_is_invalid(CimFormat format, Stream message)
+    {
+        var parser = new MessageParser(new XmlMessageParserStrategy(), new JsonMessageParserStrategy());
+        var parsedResult = await parser.GetMessageParserStrategy(format).ParseAsync(message).ConfigureAwait(false);
+
+        Assert.False(parsedResult.Success);
+        Assert.Contains(parsedResult.Errors, error => error is InvalidMessageStructure);
     }
 
     private static Stream LoadXmlFileAsMemoryStream()
