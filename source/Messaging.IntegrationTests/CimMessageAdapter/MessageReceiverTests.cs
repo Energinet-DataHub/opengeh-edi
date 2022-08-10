@@ -126,17 +126,6 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
         }
 
         [Fact]
-        public async Task Message_must_be_valid_xml()
-        {
-            using var message = CreateMessageWithInvalidXmlStructure();
-
-            var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
-
-            Assert.False(result.Success);
-            AssertContainsError(result, "B2B-005");
-        }
-
-        [Fact]
         public async Task Return_error_if_a_required_element_is_missing()
         {
             using var message = BusinessMessageBuilder
@@ -246,18 +235,6 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
         private static ClaimsPrincipal CreateClaimsPrincipal(IEnumerable<Claim> claims)
         {
             return new ClaimsPrincipal(new ClaimsIdentity(claims));
-        }
-
-        private static Stream CreateMessageWithInvalidXmlStructure()
-        {
-            var messageStream = new MemoryStream();
-            using var writer = new StreamWriter(messageStream);
-            writer.Write("This is not XML");
-            writer.Flush();
-            messageStream.Position = 0;
-            var returnStream = new MemoryStream();
-            messageStream.CopyTo(returnStream);
-            return returnStream;
         }
 
         private static void AssertContainsError(Result result, string errorCode)
