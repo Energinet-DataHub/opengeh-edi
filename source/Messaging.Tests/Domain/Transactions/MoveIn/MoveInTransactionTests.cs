@@ -45,11 +45,11 @@ public class MoveInTransactionTests
     }
 
     [Fact]
-    public void Transaction_can_only_be_accepted_while_in_the_state_of_started()
+    public void Business_process_can_be_accepted_when_transaction_is_not_completed()
     {
         var transaction = CreateTransaction();
 
-        transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
+        transaction.RejectedByBusinessProcess();
 
         Assert.Throws<MoveInException>(() => transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId));
     }

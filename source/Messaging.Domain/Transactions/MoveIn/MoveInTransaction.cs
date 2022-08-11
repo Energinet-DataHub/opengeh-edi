@@ -24,6 +24,7 @@ namespace Messaging.Domain.Transactions.MoveIn
         private State _state = State.Started;
         private bool _hasForwardedMeteringPointMasterData;
         private bool _hasBusinessProcessCompleted;
+        private bool _businessProcessIsAccepted;
 
         public MoveInTransaction(string transactionId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId, string startedByMessageId, string newEnergySupplierId, string? consumerId, string? consumerName, string? consumerIdType)
         {
@@ -43,7 +44,6 @@ namespace Messaging.Domain.Transactions.MoveIn
         {
             Started,
             Completed,
-            AcceptedByBusinessProcess,
         }
 
         public string TransactionId { get; }
@@ -68,7 +68,7 @@ namespace Messaging.Domain.Transactions.MoveIn
 
         public void BusinessProcessCompleted()
         {
-            if (_state != State.AcceptedByBusinessProcess)
+            if (_businessProcessIsAccepted == false)
             {
                 throw new MoveInException(
                     "Business process can not be set to completed, when it has not been accepted.");
@@ -96,7 +96,7 @@ namespace Messaging.Domain.Transactions.MoveIn
                 throw new MoveInException($"Cannot accept transaction while in state '{_state.ToString()}'");
             }
 
-            _state = State.AcceptedByBusinessProcess;
+            _businessProcessIsAccepted = true;
             ProcessId = processId ?? throw new ArgumentNullException(nameof(processId));
             AddDomainEvent(new MoveInWasAccepted(ProcessId, marketEvaluationPointNumber, TransactionId));
         }
