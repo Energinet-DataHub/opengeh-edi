@@ -33,7 +33,7 @@ public class MoveInTransactionTests
     }
 
     [Fact]
-    public void Transaction_is_accepted()
+    public void Business_process_is_set_to_accepted()
     {
         var transaction = CreateTransaction();
 
