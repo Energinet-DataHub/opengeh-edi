@@ -80,11 +80,7 @@ namespace Messaging.Domain.Transactions.MoveIn
 
         public void Complete()
         {
-            if (_state == State.Completed)
-            {
-                throw new MoveInException($"Transaction {TransactionId} is already completed.");
-            }
-
+            EnsureNotCompleted();
             _state = State.Completed;
             AddDomainEvent(new MoveInWasCompleted());
         }
