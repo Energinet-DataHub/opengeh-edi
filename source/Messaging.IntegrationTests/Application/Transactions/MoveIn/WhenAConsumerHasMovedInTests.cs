@@ -31,12 +31,12 @@ using MarketEvaluationPoint = Messaging.Domain.MasterData.MarketEvaluationPoints
 
 namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
 
-public class CompleteMoveInTests : TestBase
+public class WhenAConsumerHasMovedInTests : TestBase
 {
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMoveInTransactionRepository _transactionRepository;
 
-    public CompleteMoveInTests(DatabaseFixture databaseFixture)
+    public WhenAConsumerHasMovedInTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
