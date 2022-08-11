@@ -12,14 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Linq;
-using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Domain.Transactions.MoveIn.Events;
 using Xunit;
 
-namespace Messaging.Tests.Transactions.MoveIn;
+namespace Messaging.Tests.Domain.Transactions.MoveIn;
 
 public class MoveInTransactionTests
 {

@@ -14,7 +14,7 @@
 
 using NodaTime;
 
-namespace Messaging.Tests.Transactions.MoveIn;
+namespace Messaging.Tests.Domain.Transactions.MoveIn;
 
 internal class SampleData
 {
