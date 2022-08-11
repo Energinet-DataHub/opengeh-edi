@@ -23,6 +23,7 @@ namespace Messaging.Application.Transactions.MoveIn
         private State _state = State.Started;
         #pragma warning disable
         private bool _forwardedMeteringPointMasterData;
+        private bool _businessProcessCompleted;
 
         public MoveInTransaction(string transactionId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId, string startedByMessageId, string newEnergySupplierId, string? consumerId, string? consumerName, string? consumerIdType)
         {
@@ -108,6 +109,21 @@ namespace Messaging.Application.Transactions.MoveIn
         public void HasForwardedMeteringPointMasterData()
         {
             _forwardedMeteringPointMasterData = true;
+            CompleteTransactionIfPossible();
+        }
+
+        private void CompleteTransactionIfPossible()
+        {
+            if (_businessProcessCompleted && _forwardedMeteringPointMasterData)
+            {
+                Complete();
+            }
+        }
+
+        public void BusinessProcessCompleted()
+        {
+            _businessProcessCompleted = true;
+            CompleteTransactionIfPossible();
         }
     }
 }
