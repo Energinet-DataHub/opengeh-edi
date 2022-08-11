@@ -67,6 +67,15 @@ public class WhenAConsumerHasMovedInTests : TestBase
                 .HasMarketEvaluationPointId(transaction.MarketEvaluationPointId);
     }
 
+    [Fact]
+    public async Task Business_process_is_marked_as_completed()
+    {
+        await ConsumerHasMovedIn().ConfigureAwait(false);
+
+        AssertTransaction()
+            .BusinessProcessCompleted();
+    }
+
     private async Task<MoveInTransaction> ConsumerHasMovedIn()
     {
         var transaction = await StartMoveInTransaction();
@@ -104,5 +113,11 @@ public class WhenAConsumerHasMovedInTests : TestBase
     private AssertOutgoingMessage AssertMessage(string transactionId, string documentType, string processType)
     {
         return AssertOutgoingMessage.OutgoingMessage(transactionId, documentType, processType, GetService<IDbConnectionFactory>());
+    }
+
+    private AssertTransaction AssertTransaction()
+    {
+        return MoveIn.AssertTransaction
+            .Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>());
     }
 }

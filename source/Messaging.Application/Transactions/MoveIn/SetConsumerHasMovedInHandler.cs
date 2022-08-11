@@ -42,6 +42,7 @@ public class SetConsumerHasMovedInHandler : IRequestHandler<SetConsumerHasMovedI
             throw new TransactionNotFoundException(request.ProcessId);
         }
 
+        transaction.BusinessProcessCompleted();
         InformSupplierIfAny(transaction);
         return Unit.Value;
     }

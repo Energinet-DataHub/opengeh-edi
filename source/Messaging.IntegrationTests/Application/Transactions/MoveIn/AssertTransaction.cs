@@ -15,7 +15,6 @@
 using System;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.Transactions.MoveIn;
 using Messaging.Domain.Transactions.MoveIn;
 using Xunit;
 
@@ -92,6 +91,12 @@ public class AssertTransaction
     public AssertTransaction HasForwardedMeteringPointMasterData(bool expected)
     {
         Assert.Equal(expected, _transaction.ForwardedMeteringPointMasterData);
+        return this;
+    }
+
+    public AssertTransaction BusinessProcessCompleted()
+    {
+        Assert.True(_transaction.HasBusinessProcessCompleted);
         return this;
     }
 }
