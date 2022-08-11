@@ -105,10 +105,4 @@ public class WhenAConsumerHasMovedInTests : TestBase
     {
         return AssertOutgoingMessage.OutgoingMessage(transactionId, documentType, processType, GetService<IDbConnectionFactory>());
     }
-
-    private AssertTransaction AssertTransaction()
-    {
-        return MoveIn.AssertTransaction
-            .Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>());
-    }
 }
