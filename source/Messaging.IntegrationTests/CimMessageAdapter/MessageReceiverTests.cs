@@ -16,11 +16,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Mime;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Messaging.Application.Configuration.Authentication;
-using Messaging.Application.SchemaStore;
 using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.IntegrationTests.CimMessageAdapter.Messages;
@@ -126,58 +124,6 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
         }
 
         [Fact]
-        public async Task Message_must_be_valid_xml()
-        {
-            using var message = CreateMessageWithInvalidXmlStructure();
-
-            var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
-
-            Assert.False(result.Success);
-            AssertContainsError(result, "B2B-005");
-        }
-
-        [Fact]
-        public async Task Return_error_if_a_required_element_is_missing()
-        {
-            using var message = BusinessMessageBuilder
-                .RequestChangeOfSupplier()
-                .RemoveElementFromMarketActivityRecord("mRID")
-                .Message();
-
-            var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
-
-            Assert.False(result.Success);
-            AssertContainsError(result, "B2B-005");
-        }
-
-        [Fact]
-        public async Task Return_error_if_a_required_value_is_missing()
-        {
-            using var message = BusinessMessageBuilder
-                .RequestChangeOfSupplier()
-                .RemoveElementFromMarketActivityRecordValue("start_DateAndOrTime.dateTime")
-                .Message();
-
-            var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
-
-            Assert.False(result.Success);
-            AssertContainsError(result, "B2B-005");
-        }
-
-        [Fact]
-        public async Task Message_must_conform_to_xml_schema()
-        {
-            await using var message = BusinessMessageBuilder
-                .RequestChangeOfSupplier()
-                .WithSenderRole("FakeRoleType")
-                .Message();
-
-            var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
-
-            AssertContainsError(result, "B2B-005");
-        }
-
-        [Fact]
         public async Task Return_failure_if_xml_schema_for_business_process_type_does_not_exist()
         {
             await using var message = BusinessMessageBuilder
@@ -246,18 +192,6 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
         private static ClaimsPrincipal CreateClaimsPrincipal(IEnumerable<Claim> claims)
         {
             return new ClaimsPrincipal(new ClaimsIdentity(claims));
-        }
-
-        private static Stream CreateMessageWithInvalidXmlStructure()
-        {
-            var messageStream = new MemoryStream();
-            using var writer = new StreamWriter(messageStream);
-            writer.Write("This is not XML");
-            writer.Flush();
-            messageStream.Position = 0;
-            var returnStream = new MemoryStream();
-            messageStream.CopyTo(returnStream);
-            return returnStream;
         }
 
         private static void AssertContainsError(Result result, string errorCode)

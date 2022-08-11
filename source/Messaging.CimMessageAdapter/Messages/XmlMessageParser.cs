@@ -25,19 +25,21 @@ using Messaging.CimMessageAdapter.Errors;
 
 namespace Messaging.CimMessageAdapter.Messages;
 
-public class XmlMessageParserStrategy : MessageParserStrategy
+public class XmlMessageParser : IMessageParser
 {
     private const string MarketActivityRecordElementName = "MktActivityRecord";
     private const string HeaderElementName = "RequestChangeOfSupplier_MarketDocument";
     private readonly List<ValidationError> _errors = new();
     private readonly ISchemaProvider _schemaProvider;
 
-    public XmlMessageParserStrategy()
+    public XmlMessageParser()
     {
         _schemaProvider = new XmlSchemaProvider();
     }
 
-    public override async Task<MessageParserResult> ParseAsync(Stream message)
+    public CimFormat HandledFormat => CimFormat.Xml;
+
+    public async Task<MessageParserResult> ParseAsync(Stream message)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
 
@@ -82,7 +84,7 @@ public class XmlMessageParserStrategy : MessageParserStrategy
         }
     }
 
-    protected override string[] SplitNamespace(Stream message)
+    private static string[] SplitNamespace(Stream message)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
 
@@ -101,7 +103,7 @@ public class XmlMessageParserStrategy : MessageParserStrategy
         return split;
     }
 
-    protected override string GetBusinessProcessType(Stream message)
+    private static string GetBusinessProcessType(Stream message)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
         var split = SplitNamespace(message);
@@ -264,7 +266,7 @@ public class XmlMessageParserStrategy : MessageParserStrategy
             message.Position = 0;
     }
 
-    private string GetVersion(Stream message)
+    private static string GetVersion(Stream message)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
         var split = SplitNamespace(message);
