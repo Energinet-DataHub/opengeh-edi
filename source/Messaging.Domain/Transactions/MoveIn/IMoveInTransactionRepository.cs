@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.Domain.Transactions.MoveIn;
-
-namespace Messaging.Application.Transactions.MoveIn
+namespace Messaging.Domain.Transactions.MoveIn
 {
     /// <summary>
     /// Storage for transactions
