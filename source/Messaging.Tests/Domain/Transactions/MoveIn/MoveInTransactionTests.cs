@@ -121,6 +121,14 @@ public class MoveInTransactionTests
         Assert.Contains(transaction.DomainEvents, e => e is MoveInWasCompleted);
     }
 
+    [Fact]
+    public void Business_process_can_not_set_to_completed_when_it_has_not_accepted()
+    {
+        var transaction = CreateTransaction();
+
+        Assert.Throws<MoveInException>(() => transaction.BusinessProcessCompleted());
+    }
+
     private static MoveInTransaction CreateTransaction()
     {
         return new MoveInTransaction(

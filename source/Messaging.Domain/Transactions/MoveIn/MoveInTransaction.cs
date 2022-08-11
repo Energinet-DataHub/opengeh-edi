@@ -68,6 +68,12 @@ namespace Messaging.Domain.Transactions.MoveIn
 
         public void BusinessProcessCompleted()
         {
+            if (_state != State.AcceptedByBusinessProcess)
+            {
+                throw new MoveInException(
+                    "Business process can not be set to completed, when it has not been accepted.");
+            }
+
             _hasBusinessProcessCompleted = true;
             CompleteTransactionIfPossible();
         }
