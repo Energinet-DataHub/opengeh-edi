@@ -54,7 +54,7 @@ public class WhenAConsumerHasMovedInTests : TestBase
     {
         var transaction = await ConsumerHasMovedIn().ConfigureAwait(false);
 
-        AssertThat(transaction.TransactionId, DocumentType.GenericNotification.ToString(), BusinessReasonCode.CustomerMoveInOrMoveOut.Code)
+        AssertMessage(transaction.TransactionId, DocumentType.GenericNotification.ToString(), BusinessReasonCode.CustomerMoveInOrMoveOut.Code)
             .HasReceiverId(transaction.CurrentEnergySupplierId!)
             .HasReceiverRole(MarketRoles.EnergySupplier)
             .HasSenderId(DataHubDetails.IdentificationNumber)
@@ -101,7 +101,7 @@ public class WhenAConsumerHasMovedInTests : TestBase
         return Task.CompletedTask;
     }
 
-    private AssertOutgoingMessage AssertThat(string transactionId, string documentType, string processType)
+    private AssertOutgoingMessage AssertMessage(string transactionId, string documentType, string processType)
     {
         return AssertOutgoingMessage.OutgoingMessage(transactionId, documentType, processType, GetService<IDbConnectionFactory>());
     }
