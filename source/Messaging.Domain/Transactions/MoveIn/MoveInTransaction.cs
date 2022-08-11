@@ -103,10 +103,7 @@ namespace Messaging.Domain.Transactions.MoveIn
 
         public void RejectedByBusinessProcess()
         {
-            if (_state != State.Started)
-            {
-                throw new MoveInException($"Cannot reject transaction while in state '{_state.ToString()}'");
-            }
+            EnsureNotCompleted();
 
             AddDomainEvent(new MoveInWasRejected(TransactionId));
             Complete();
@@ -123,6 +120,14 @@ namespace Messaging.Domain.Transactions.MoveIn
             if (_hasBusinessProcessCompleted && _hasForwardedMeteringPointMasterData)
             {
                 Complete();
+            }
+        }
+
+        private void EnsureNotCompleted()
+        {
+            if (_state != State.Started)
+            {
+                throw new MoveInException($"Cannot reject transaction while in state '{_state.ToString()}'");
             }
         }
     }
