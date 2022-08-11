@@ -41,16 +41,6 @@ public class WhenAConsumerHasMovedInTests : TestBase
     }
 
     [Fact]
-    public async Task Transaction_is_completed()
-    {
-        var transaction = await ConsumerHasMovedIn().ConfigureAwait(false);
-
-        AssertTransaction()
-            .HasState(MoveInTransaction.State.Completed)
-            .HasProcessId(transaction.ProcessId!);
-    }
-
-    [Fact]
     public async Task An_exception_is_thrown_if_transaction_cannot_be_located()
     {
         var processId = "Not existing";
