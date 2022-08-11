@@ -87,29 +87,6 @@ public class MoveInTransactionTests
     }
 
     [Fact]
-    public void Transaction_can_complete_when_started()
-    {
-        var transaction = CreateTransaction();
-        transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
-        transaction.HasForwardedMeteringPointMasterData();
-
-        transaction.Complete();
-
-        Assert.Contains(transaction.DomainEvents, e => e is MoveInWasCompleted);
-    }
-
-    [Fact]
-    public void Can_not_complete_transaction_if_already_completed()
-    {
-        var transaction = CreateTransaction();
-        transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
-        transaction.HasForwardedMeteringPointMasterData();
-        transaction.Complete();
-
-        Assert.Throws<MoveInException>(() => transaction.Complete());
-    }
-
-    [Fact]
     public void Transaction_is_completed_when_all_depending_processes_has_completed()
     {
         var transaction = CreateTransaction();
