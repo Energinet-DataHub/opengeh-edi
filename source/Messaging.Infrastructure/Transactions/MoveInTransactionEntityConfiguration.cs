@@ -36,6 +36,10 @@ namespace Messaging.Infrastructure.Transactions
             builder.Property(x => x.ConsumerName);
             builder.Property<bool>("_hasForwardedMeteringPointMasterData")
                 .HasColumnName("ForwardedMeteringPointMasterData");
+            builder.Property<bool>("_hasBusinessProcessCompleted")
+                .HasColumnName("HasBusinessProcessCompleted");
+            builder.Property<bool>("_businessProcessIsAccepted")
+                .HasColumnName("BusinessProcessIsAccepted");
             builder.Property<MoveInTransaction.State>("_state")
                 .HasConversion(toDbValue => toDbValue.ToString(), fromDbValue => Enum.Parse<MoveInTransaction.State>(fromDbValue, true))
                 .HasColumnName("State");
