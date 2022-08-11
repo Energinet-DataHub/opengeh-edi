@@ -16,13 +16,14 @@ using Messaging.Domain.SeedWork;
 using Messaging.Domain.Transactions.MoveIn.Events;
 using NodaTime;
 
-namespace Messaging.Application.Transactions.MoveIn
+namespace Messaging.Domain.Transactions.MoveIn
 {
     public class MoveInTransaction : Entity
     {
         private State _state = State.Started;
-        #pragma warning disable
-        private bool _forwardedMeteringPointMasterData;
+        private bool _hasForwardedMeteringPointMasterData;
+        private bool _hasBusinessProcessCompleted;
+        private bool _businessProcessIsAccepted;
 
         public MoveInTransaction(string transactionId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId, string startedByMessageId, string newEnergySupplierId, string? consumerId, string? consumerName, string? consumerIdType)
         {
@@ -42,7 +43,6 @@ namespace Messaging.Application.Transactions.MoveIn
         {
             Started,
             Completed,
-            AcceptedByBusinessProcess,
         }
 
         public string TransactionId { get; }
@@ -65,21 +65,16 @@ namespace Messaging.Application.Transactions.MoveIn
 
         public string? ConsumerIdType { get; }
 
-        public void Complete()
+        public void BusinessProcessCompleted()
         {
-            if (_state == State.Completed)
+            if (_businessProcessIsAccepted == false)
             {
-                throw new MoveInException($"Transaction {TransactionId} is already completed.");
+                throw new MoveInException(
+                    "Business process can not be set to completed, when it has not been accepted.");
             }
 
-            //TODO: Uncomment below when HasForwardedMeteringPointMasterData has been implemented with masterdata response from MP (remember test as well)
-            if (_state == State.AcceptedByBusinessProcess && _forwardedMeteringPointMasterData == false)
-            {
-                throw new MoveInException($"Cannot complete transaction {TransactionId} because metering point master data has not been forwarded.");
-            }
-
-            _state = State.Completed;
-            AddDomainEvent(new MoveInWasCompleted());
+            _hasBusinessProcessCompleted = true;
+            CompleteTransactionIfPossible();
         }
 
         public void AcceptedByBusinessProcess(string processId, string marketEvaluationPointNumber)
@@ -89,17 +84,14 @@ namespace Messaging.Application.Transactions.MoveIn
                 throw new MoveInException($"Cannot accept transaction while in state '{_state.ToString()}'");
             }
 
-            _state = State.AcceptedByBusinessProcess;
+            _businessProcessIsAccepted = true;
             ProcessId = processId ?? throw new ArgumentNullException(nameof(processId));
             AddDomainEvent(new MoveInWasAccepted(ProcessId, marketEvaluationPointNumber, TransactionId));
         }
 
         public void RejectedByBusinessProcess()
         {
-            if (_state != State.Started)
-            {
-                throw new MoveInException($"Cannot reject transaction while in state '{_state.ToString()}'");
-            }
+            EnsureNotCompleted();
 
             AddDomainEvent(new MoveInWasRejected(TransactionId));
             Complete();
@@ -107,7 +99,31 @@ namespace Messaging.Application.Transactions.MoveIn
 
         public void HasForwardedMeteringPointMasterData()
         {
-            _forwardedMeteringPointMasterData = true;
+            _hasForwardedMeteringPointMasterData = true;
+            CompleteTransactionIfPossible();
+        }
+
+        private void CompleteTransactionIfPossible()
+        {
+            if (_hasBusinessProcessCompleted && _hasForwardedMeteringPointMasterData)
+            {
+                Complete();
+            }
+        }
+
+        private void EnsureNotCompleted()
+        {
+            if (_state != State.Started)
+            {
+                throw new MoveInException($"Move in transaction '{TransactionId}' has completed. No further actions can be done.");
+            }
+        }
+
+        private void Complete()
+        {
+            EnsureNotCompleted();
+            _state = State.Completed;
+            AddDomainEvent(new MoveInWasCompleted());
         }
     }
 }

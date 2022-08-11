@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Mime;
 using System.Threading.Tasks;
 using System.Xml.Schema;
 using Messaging.Application.Common;
@@ -29,7 +28,7 @@ using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Xunit;
 
-namespace Messaging.Tests.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
+namespace Messaging.Tests.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
 {
     public class CharacteristicsOfACustomerAtAnApDocumentWriterTests
     {

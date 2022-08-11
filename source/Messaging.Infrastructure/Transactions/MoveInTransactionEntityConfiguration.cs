@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System;
-using Messaging.Application.Transactions.MoveIn;
+using Messaging.Domain.Transactions.MoveIn;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -33,8 +33,12 @@ namespace Messaging.Infrastructure.Transactions
             builder.Property(x => x.ConsumerId);
             builder.Property(x => x.ConsumerIdType);
             builder.Property(x => x.ConsumerName);
-            builder.Property<bool>("_forwardedMeteringPointMasterData")
+            builder.Property<bool>("_hasForwardedMeteringPointMasterData")
                 .HasColumnName("ForwardedMeteringPointMasterData");
+            builder.Property<bool>("_hasBusinessProcessCompleted")
+                .HasColumnName("HasBusinessProcessCompleted");
+            builder.Property<bool>("_businessProcessIsAccepted")
+                .HasColumnName("BusinessProcessIsAccepted");
             builder.Property<MoveInTransaction.State>("_state")
                 .HasConversion(toDbValue => toDbValue.ToString(), fromDbValue => Enum.Parse<MoveInTransaction.State>(fromDbValue, true))
                 .HasColumnName("State");

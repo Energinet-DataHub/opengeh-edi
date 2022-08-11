@@ -14,6 +14,7 @@
 
 using System.Threading.Tasks;
 using Messaging.Application.Transactions.MoveIn;
+using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 

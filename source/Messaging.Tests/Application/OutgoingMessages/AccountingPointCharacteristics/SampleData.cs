@@ -16,7 +16,7 @@ using System;
 using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
 using Messaging.Infrastructure.Configuration;
 
-namespace Messaging.Tests.OutgoingMessages.AccountingPointCharacteristics;
+namespace Messaging.Tests.Application.OutgoingMessages.AccountingPointCharacteristics;
 
 public class SampleData
 {

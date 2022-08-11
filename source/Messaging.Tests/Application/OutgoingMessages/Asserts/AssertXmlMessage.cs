@@ -19,13 +19,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
-using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Application.Xml;
 using Messaging.Domain.OutgoingMessages;
 using Xunit;
 
-namespace Messaging.Tests.OutgoingMessages.Asserts
+namespace Messaging.Tests.Application.OutgoingMessages.Asserts
 {
     internal static class AssertXmlMessage
     {

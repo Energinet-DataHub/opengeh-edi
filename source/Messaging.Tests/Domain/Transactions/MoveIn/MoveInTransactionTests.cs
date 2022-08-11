@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Linq;
-using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
+using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Domain.Transactions.MoveIn.Events;
 using Xunit;
 
-namespace Messaging.Tests.Transactions.MoveIn;
+namespace Messaging.Tests.Domain.Transactions.MoveIn;
 
 public class MoveInTransactionTests
 {
@@ -34,7 +33,7 @@ public class MoveInTransactionTests
     }
 
     [Fact]
-    public void Transaction_is_accepted()
+    public void Business_process_is_set_to_accepted()
     {
         var transaction = CreateTransaction();
 
@@ -46,17 +45,17 @@ public class MoveInTransactionTests
     }
 
     [Fact]
-    public void Transaction_can_only_be_accepted_while_in_the_state_of_started()
+    public void Business_process_can_be_accepted_when_transaction_is_not_completed()
     {
         var transaction = CreateTransaction();
 
-        transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
+        transaction.RejectedByBusinessProcess();
 
         Assert.Throws<MoveInException>(() => transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId));
     }
 
     [Fact]
-    public void Transaction_is_rejected()
+    public void Business_process_can_be_set_to_rejected()
     {
         var transaction = CreateTransaction();
 
@@ -68,7 +67,7 @@ public class MoveInTransactionTests
     }
 
     [Fact]
-    public void Transaction_can_only_be_rejected_while_in_the_state_of_started()
+    public void Business_process_can_be_set_to_rejected_when_not_transaction_has_not_completed()
     {
         var transaction = CreateTransaction();
 
@@ -78,7 +77,7 @@ public class MoveInTransactionTests
     }
 
     [Fact]
-    public void Transaction_is_completed_if_business_request_is_rejected()
+    public void Transaction_is_completed_if_business_process_request_is_rejected()
     {
         var transaction = CreateTransaction();
 
@@ -88,35 +87,23 @@ public class MoveInTransactionTests
     }
 
     [Fact]
-    public void Transaction_can_complete_when_started()
+    public void Transaction_is_completed_when_all_depending_processes_has_completed()
     {
         var transaction = CreateTransaction();
-        transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
-        transaction.HasForwardedMeteringPointMasterData();
 
-        transaction.Complete();
+        transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
+        transaction.BusinessProcessCompleted();
+        transaction.HasForwardedMeteringPointMasterData();
 
         Assert.Contains(transaction.DomainEvents, e => e is MoveInWasCompleted);
     }
 
     [Fact]
-    public void Can_not_complete_transaction_if_already_completed()
+    public void Business_process_can_not_set_to_completed_when_it_has_not_accepted()
     {
         var transaction = CreateTransaction();
-        transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
-        transaction.HasForwardedMeteringPointMasterData();
-        transaction.Complete();
 
-        Assert.Throws<MoveInException>(() => transaction.Complete());
-    }
-
-    [Fact]
-    public void Metering_point_master_data_must_have_been_forwarded_when_accepted()
-    {
-        var transaction = CreateTransaction();
-        transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
-
-        Assert.Throws<MoveInException>(() => transaction.Complete());
+        Assert.Throws<MoveInException>(() => transaction.BusinessProcessCompleted());
     }
 
     private static MoveInTransaction CreateTransaction()

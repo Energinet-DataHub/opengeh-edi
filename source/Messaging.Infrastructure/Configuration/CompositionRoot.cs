@@ -44,6 +44,7 @@ using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Response;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
+using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Domain.Transactions.MoveIn.Events;
 using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Common.Reasons;
@@ -217,7 +218,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddTransient<IRequestHandler<IncomingMessage, Unit>, MoveInRequestHandler>();
             _services.AddTransient<IRequestHandler<FetchMeteringPointMasterData, Unit>, FetchMeteringPointMasterDataHandler>();
             _services.AddTransient<IRequestHandler<FetchCustomerMasterData, Unit>, FetchCustomerMasterDataHandler>();
-            _services.AddTransient<IRequestHandler<CompleteMoveInTransaction, Unit>, CompleteMoveInTransactionHandler>();
+            _services.AddTransient<IRequestHandler<SetConsumerHasMovedIn, Unit>, SetConsumerHasMovedInHandler>();
             _services.AddTransient<IRequestHandler<ForwardMeteringPointMasterData, Unit>, ForwardMeteringPointMasterDataHandler>();
             _services.AddTransient<INotificationHandler<MoveInWasAccepted>, FetchMeteringPointMasterDataWhenAccepted>();
             _services.AddTransient<INotificationHandler<MoveInWasAccepted>, FetchCustomerMasterDataWhenAccepted>();

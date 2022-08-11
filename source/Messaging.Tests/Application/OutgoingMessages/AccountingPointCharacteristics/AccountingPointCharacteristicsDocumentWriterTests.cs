@@ -16,86 +16,81 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Mime;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
 using Messaging.Application.Common;
 using Messaging.Application.Configuration;
-using Messaging.Application.OutgoingMessages;
-using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
 using Messaging.Application.SchemaStore;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Serialization;
-using Messaging.Tests.OutgoingMessages.Asserts;
+using Messaging.Tests.Application.OutgoingMessages.Asserts;
 using Xunit;
+using MarketActivityRecord = Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.MarketActivityRecord;
 
-namespace Messaging.Tests.OutgoingMessages.RejectRequestChangeOfSupplier;
+namespace Messaging.Tests.Application.OutgoingMessages.AccountingPointCharacteristics;
 
-public class RejectRequestChangeOfSupplierDocumentWriterTests
+public class AccountingPointCharacteristicsDocumentWriterTests
 {
-    private readonly RejectRequestChangeOfSupplierDocumentWriter _documentWriter;
+    private readonly AccountingPointCharacteristicsDocumentWriter _documentWriter;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMarketActivityRecordParser _marketActivityRecordParser;
+    private readonly SampleData _sampleData;
     private ISchemaProvider? _schemaProvider;
 
-    public RejectRequestChangeOfSupplierDocumentWriterTests()
+    public AccountingPointCharacteristicsDocumentWriterTests()
     {
         _systemDateTimeProvider = new SystemDateTimeProvider();
         _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
-        _documentWriter = new RejectRequestChangeOfSupplierDocumentWriter(_marketActivityRecordParser);
+        _documentWriter = new AccountingPointCharacteristicsDocumentWriter(_marketActivityRecordParser);
+        _sampleData = new SampleData();
     }
 
     [Fact]
     public async Task Document_is_valid()
     {
-        var header = new MessageHeader("E03", "SenderId", "DDZ", "ReceiverId", "DDQ", Guid.NewGuid().ToString(), _systemDateTimeProvider.Now(), "A01");
+        var header = new MessageHeader("E03", "SenderId", "DDZ", "ReceiverId", "DDQ", Guid.NewGuid().ToString(), _systemDateTimeProvider.Now(), null);
+        var marketActivityRecord = _sampleData.CreateMarketActivityRecord();
         var marketActivityRecords = new List<MarketActivityRecord>()
         {
-            new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId", new List<Reason>()
-            {
-                new Reason("Reason1", "999"),
-                new Reason("Reason2", "999"),
-            }),
-            new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId",
-            new List<Reason>()
-            {
-                new Reason("Reason3", "999"),
-                new Reason("Reason4", "999"),
-            }),
+            marketActivityRecord,
         };
-
         var message = await _documentWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
-
         await AssertMessage(message, header, marketActivityRecords).ConfigureAwait(false);
     }
 
     private static void AssertMarketActivityRecords(List<MarketActivityRecord> marketActivityRecords, XDocument document)
     {
-        AssertXmlMessage.AssertMarketActivityRecordCount(document, 2);
+        AssertXmlMessage.AssertMarketActivityRecordCount(document, 1);
         foreach (var activityRecord in marketActivityRecords)
         {
             var marketActivityRecord = AssertXmlMessage.GetMarketActivityRecordById(document, activityRecord.Id)!;
 
             Assert.NotNull(marketActivityRecord);
-            AssertXmlMessage.AssertMarketActivityRecordValue(marketActivityRecord, "originalTransactionIDReference_MktActivityRecord.mRID", activityRecord.OriginalTransactionId);
-            AssertXmlMessage.AssertMarketActivityRecordValue(marketActivityRecord, "marketEvaluationPoint.mRID", activityRecord.MarketEvaluationPointId);
-            AssertXmlMessage.AssertReasons(marketActivityRecord, activityRecord.Reasons.ToList());
+          //  AssertXmlMessage.AssertMarketActivityRecordValue(marketActivityRecord, "originalTransactionIDReference_MktActivityRecord.mRID", activityRecord.OriginalTransactionId);
+            AssertXmlMessage.AssertMarketActivityRecordValue(marketActivityRecord, "mRID", activityRecord.Id);
+            AssertXmlMessage.AssertMarketActivityRecordValue(marketActivityRecord, "validityStart_DateAndOrTime.dateTime", activityRecord.ValidityStartDate.ToString());
         }
     }
 
     private async Task AssertMessage(Stream message, MessageHeader header, List<MarketActivityRecord> marketActivityRecords)
     {
-        _schemaProvider = new XmlSchemaProvider();
         var document = XDocument.Load(message);
         AssertXmlMessage.AssertHeader(header, document);
-        AssertXmlMessage.AssertHasHeaderValue(document, "type", "E44");
+        AssertXmlMessage.AssertHasHeaderValue(document, "type", "E07");
 
         AssertMarketActivityRecords(marketActivityRecords, document);
 
-        var schema = await _schemaProvider.GetSchemaAsync<XmlSchema>("rejectrequestchangeofsupplier", "0.1")
+        await AssertConformsToSchema(message).ConfigureAwait(false);
+    }
+
+    private async Task AssertConformsToSchema(Stream message)
+    {
+        _schemaProvider = new XmlSchemaProvider();
+        var schema = await _schemaProvider.GetSchemaAsync<XmlSchema>("accountingpointcharacteristics", "0.1")
             .ConfigureAwait(false);
         await AssertXmlMessage.AssertConformsToSchemaAsync(message, schema!).ConfigureAwait(false);
     }

@@ -27,6 +27,7 @@ using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.Transactions.MoveIn;
 using NodaTime.Text;
 
 namespace Messaging.Application.Transactions.MoveIn
