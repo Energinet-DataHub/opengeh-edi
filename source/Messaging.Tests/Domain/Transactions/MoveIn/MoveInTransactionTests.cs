@@ -109,15 +109,6 @@ public class MoveInTransactionTests
     }
 
     [Fact]
-    public void Metering_point_master_data_must_have_been_forwarded_when_accepted()
-    {
-        var transaction = CreateTransaction();
-        transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
-
-        Assert.Throws<MoveInException>(() => transaction.Complete());
-    }
-
-    [Fact]
     public void Transaction_is_completed_when_all_depending_processes_has_completed()
     {
         var transaction = CreateTransaction();
