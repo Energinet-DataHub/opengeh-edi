@@ -78,13 +78,6 @@ namespace Messaging.Domain.Transactions.MoveIn
             CompleteTransactionIfPossible();
         }
 
-        public void Complete()
-        {
-            EnsureNotCompleted();
-            _state = State.Completed;
-            AddDomainEvent(new MoveInWasCompleted());
-        }
-
         public void AcceptedByBusinessProcess(string processId, string marketEvaluationPointNumber)
         {
             if (_state != State.Started)
@@ -125,6 +118,13 @@ namespace Messaging.Domain.Transactions.MoveIn
             {
                 throw new MoveInException($"Move in transaction '{TransactionId}' has completed. No further actions can be done.");
             }
+        }
+
+        private void Complete()
+        {
+            EnsureNotCompleted();
+            _state = State.Completed;
+            AddDomainEvent(new MoveInWasCompleted());
         }
     }
 }
