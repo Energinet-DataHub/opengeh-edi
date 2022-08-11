@@ -43,7 +43,7 @@ public class WhenAConsumerHasMovedInTests : TestBase
     [Fact]
     public async Task Transaction_is_completed()
     {
-        var transaction = await CompleteMoveIn().ConfigureAwait(false);
+        var transaction = await ConsumerHasMovedIn().ConfigureAwait(false);
 
         AssertTransaction()
             .HasState(MoveInTransaction.State.Completed)
@@ -54,7 +54,7 @@ public class WhenAConsumerHasMovedInTests : TestBase
     public async Task An_exception_is_thrown_if_transaction_cannot_be_located()
     {
         var processId = "Not existing";
-        var command = new CompleteMoveInTransaction(processId);
+        var command = new SetConsumerHasMovedIn(processId);
 
         await Assert.ThrowsAsync<TransactionNotFoundException>(() => InvokeCommandAsync(command)).ConfigureAwait(false);
     }
@@ -62,7 +62,7 @@ public class WhenAConsumerHasMovedInTests : TestBase
     [Fact]
     public async Task The_current_energy_supplier_is_notified_about_end_of_supply()
     {
-        var transaction = await CompleteMoveIn().ConfigureAwait(false);
+        var transaction = await ConsumerHasMovedIn().ConfigureAwait(false);
 
         AssertThat(transaction.TransactionId, DocumentType.GenericNotification.ToString(), BusinessReasonCode.CustomerMoveInOrMoveOut.Code)
             .HasReceiverId(transaction.CurrentEnergySupplierId!)
@@ -77,10 +77,10 @@ public class WhenAConsumerHasMovedInTests : TestBase
                 .HasMarketEvaluationPointId(transaction.MarketEvaluationPointId);
     }
 
-    private async Task<MoveInTransaction> CompleteMoveIn()
+    private async Task<MoveInTransaction> ConsumerHasMovedIn()
     {
         var transaction = await StartMoveInTransaction();
-        await InvokeCommandAsync(new CompleteMoveInTransaction(transaction.ProcessId!)).ConfigureAwait(false);
+        await InvokeCommandAsync(new SetConsumerHasMovedIn(transaction.ProcessId!)).ConfigureAwait(false);
         return transaction;
     }
 

@@ -43,7 +43,7 @@ public class ConsumerMovedInListener
 
         var consumerMovedIn = ConsumerMovedIn.Parser.ParseFrom(data);
         _logger.LogInformation($"Received consumer moved in event: {consumerMovedIn}");
-        await _commandScheduler.EnqueueAsync(new CompleteMoveInTransaction(consumerMovedIn.ProcessId))
+        await _commandScheduler.EnqueueAsync(new SetConsumerHasMovedIn(consumerMovedIn.ProcessId))
             .ConfigureAwait(false);
     }
 }

@@ -22,18 +22,18 @@ using Messaging.Domain.Transactions.MoveIn;
 
 namespace Messaging.Application.Transactions.MoveIn;
 
-public class CompleteMoveInTransactionHandler : IRequestHandler<CompleteMoveInTransaction, Unit>
+public class SetConsumerHasMovedInHandler : IRequestHandler<SetConsumerHasMovedIn, Unit>
 {
     private readonly IMoveInTransactionRepository _transactionRepository;
     private readonly MoveInNotifications _notifications;
 
-    public CompleteMoveInTransactionHandler(IMoveInTransactionRepository transactionRepository, IMarketActivityRecordParser marketActivityRecordParser, IOutgoingMessageStore outgoingMessageStore, MoveInNotifications notifications)
+    public SetConsumerHasMovedInHandler(IMoveInTransactionRepository transactionRepository, IMarketActivityRecordParser marketActivityRecordParser, IOutgoingMessageStore outgoingMessageStore, MoveInNotifications notifications)
     {
         _transactionRepository = transactionRepository;
         _notifications = notifications;
     }
 
-    public async Task<Unit> Handle(CompleteMoveInTransaction request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(SetConsumerHasMovedIn request, CancellationToken cancellationToken)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
         var transaction = await _transactionRepository.GetByProcessIdAsync(request.ProcessId).ConfigureAwait(false);

@@ -17,10 +17,10 @@ using Messaging.Application.Common.Commands;
 
 namespace Messaging.Application.Transactions.MoveIn;
 
-public class CompleteMoveInTransaction : InternalCommand
+public class SetConsumerHasMovedIn : InternalCommand
 {
     [JsonConstructor]
-    public CompleteMoveInTransaction(string processId)
+    public SetConsumerHasMovedIn(string processId)
     {
         ProcessId = processId;
     }
