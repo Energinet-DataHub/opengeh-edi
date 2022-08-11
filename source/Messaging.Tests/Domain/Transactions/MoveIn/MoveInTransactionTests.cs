@@ -55,7 +55,7 @@ public class MoveInTransactionTests
     }
 
     [Fact]
-    public void Transaction_is_rejected()
+    public void Business_process_can_be_set_to_rejected()
     {
         var transaction = CreateTransaction();
 
@@ -67,7 +67,7 @@ public class MoveInTransactionTests
     }
 
     [Fact]
-    public void Transaction_can_only_be_rejected_while_in_the_state_of_started()
+    public void Business_process_can_be_set_to_rejected_when_not_transaction_has_not_completed()
     {
         var transaction = CreateTransaction();
 
