@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.Common;
 using Messaging.Application.OutgoingMessages;
+using Messaging.Domain.Transactions.MoveIn;
 
 namespace Messaging.Application.Transactions.MoveIn;
 

@@ -14,6 +14,7 @@
 
 using System.Linq;
 using Messaging.Application.Transactions.MoveIn;
+using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Domain.Transactions.MoveIn.Events;
 using Xunit;
 

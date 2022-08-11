@@ -14,6 +14,7 @@
 
 using System;
 using Messaging.Application.Transactions.MoveIn;
+using Messaging.Domain.Transactions.MoveIn;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
