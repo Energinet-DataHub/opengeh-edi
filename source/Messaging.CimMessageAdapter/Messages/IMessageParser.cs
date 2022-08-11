@@ -15,14 +15,22 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Messaging.CimMessageAdapter.Messages
+namespace Messaging.CimMessageAdapter.Messages;
+
+/// <summary>
+/// Parses CIM messages from a stream
+/// </summary>
+public interface IMessageParser
 {
-    public abstract class MessageParserStrategy
-    {
-        public abstract Task<MessageParserResult> ParseAsync(Stream message);
+    /// <summary>
+    /// The CIM format handled
+    /// </summary>
+    CimFormat HandledFormat { get; }
 
-        protected abstract string[] SplitNamespace(Stream message);
-
-        protected abstract string GetBusinessProcessType(Stream message);
-    }
+    /// <summary>
+    /// Parse from stream
+    /// </summary>
+    /// <param name="message"></param>
+    /// <returns><see cref="MessageParserResult"/></returns>
+    Task<MessageParserResult> ParseAsync(Stream message);
 }

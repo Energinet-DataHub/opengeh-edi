@@ -50,30 +50,21 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="CimMessageAdapter\Messages\json\Invalid Request Change of Supplier.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="CimMessageAdapter\Messages\json\Request Change of Supplier.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\BadRequestChangeOfSupplier.xml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\Confirm request Change of Supplier.xml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\RequestChangeOfSupplier.xml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </EmbeddedResource>
-    </ItemGroup>
-
-    <ItemGroup>
       <Compile Remove="InternalCommands\QueuedInternalCommandEntityConfiguration.cs" />
       <Compile Remove="InternalCommands\QueuedInternalCommand.cs" />
       <Compile Remove="InternalCommands\ProcessInternalCommandsOnTimeHasPassed.cs" />
       <Compile Remove="InternalCommands\InternalCommandProcessor.cs" />
       <Compile Remove="InternalCommands\InternalCommandAccessor.cs" />
       <Compile Remove="InternalCommands\CommandScheduler.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\BadRequestChangeOfSupplier.xml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\RequestChangeOfSupplier.xml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
     </ItemGroup>
 
 </Project>
