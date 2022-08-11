@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Messaging.Application.Common;
 using Messaging.Application.Configuration;
@@ -23,9 +22,7 @@ using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.Transactions.MoveIn;
-using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.IntegrationTests.Fixtures;
-using Microsoft.EntityFrameworkCore;
 using Xunit;
 using MarketEvaluationPoint = Messaging.Domain.MasterData.MarketEvaluationPoints.MarketEvaluationPoint;
 
@@ -54,7 +51,7 @@ public class WhenAConsumerHasMovedInTests : TestBase
     }
 
     [Fact]
-    public async Task Transaction_must_exist()
+    public async Task An_exception_is_thrown_if_transaction_cannot_be_located()
     {
         var processId = "Not existing";
         var command = new CompleteMoveInTransaction(processId);
@@ -63,7 +60,7 @@ public class WhenAConsumerHasMovedInTests : TestBase
     }
 
     [Fact]
-    public async Task Current_energy_supplier_is_notified_when_consumer_move_in_is_completed()
+    public async Task The_current_energy_supplier_is_notified_about_end_of_supply()
     {
         var transaction = await CompleteMoveIn().ConfigureAwait(false);
 
