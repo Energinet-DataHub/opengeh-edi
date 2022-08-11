@@ -78,12 +78,6 @@ namespace Messaging.Application.Transactions.MoveIn
                 throw new MoveInException($"Transaction {TransactionId} is already completed.");
             }
 
-            //TODO: Uncomment below when HasForwardedMeteringPointMasterData has been implemented with masterdata response from MP (remember test as well)
-            if (_state == State.AcceptedByBusinessProcess && _hasForwardedMeteringPointMasterData == false)
-            {
-                throw new MoveInException($"Cannot complete transaction {TransactionId} because metering point master data has not been forwarded.");
-            }
-
             _state = State.Completed;
             AddDomainEvent(new MoveInWasCompleted());
         }
