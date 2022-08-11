@@ -45,7 +45,7 @@ public class WhenAConsumerHasMovedInTests : TestBase
     {
         var transaction = await CompleteMoveIn().ConfigureAwait(false);
 
-        AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>())
+        AssertTransaction()
             .HasState(MoveInTransaction.State.Completed)
             .HasProcessId(transaction.ProcessId!);
     }
@@ -114,5 +114,11 @@ public class WhenAConsumerHasMovedInTests : TestBase
     private AssertOutgoingMessage AssertThat(string transactionId, string documentType, string processType)
     {
         return AssertOutgoingMessage.OutgoingMessage(transactionId, documentType, processType, GetService<IDbConnectionFactory>());
+    }
+
+    private AssertTransaction AssertTransaction()
+    {
+        return MoveIn.AssertTransaction
+            .Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>());
     }
 }
