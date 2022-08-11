@@ -21,9 +21,8 @@ namespace Messaging.Application.Transactions.MoveIn
     public class MoveInTransaction : Entity
     {
         private State _state = State.Started;
-        #pragma warning disable
-        private bool _forwardedMeteringPointMasterData;
-        private bool _businessProcessCompleted;
+        private bool _hasForwardedMeteringPointMasterData;
+        private bool _hasBusinessProcessCompleted;
 
         public MoveInTransaction(string transactionId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId, string startedByMessageId, string newEnergySupplierId, string? consumerId, string? consumerName, string? consumerIdType)
         {
@@ -66,6 +65,12 @@ namespace Messaging.Application.Transactions.MoveIn
 
         public string? ConsumerIdType { get; }
 
+        public void BusinessProcessCompleted()
+        {
+            _hasBusinessProcessCompleted = true;
+            CompleteTransactionIfPossible();
+        }
+
         public void Complete()
         {
             if (_state == State.Completed)
@@ -74,7 +79,7 @@ namespace Messaging.Application.Transactions.MoveIn
             }
 
             //TODO: Uncomment below when HasForwardedMeteringPointMasterData has been implemented with masterdata response from MP (remember test as well)
-            if (_state == State.AcceptedByBusinessProcess && _forwardedMeteringPointMasterData == false)
+            if (_state == State.AcceptedByBusinessProcess && _hasForwardedMeteringPointMasterData == false)
             {
                 throw new MoveInException($"Cannot complete transaction {TransactionId} because metering point master data has not been forwarded.");
             }
@@ -108,22 +113,16 @@ namespace Messaging.Application.Transactions.MoveIn
 
         public void HasForwardedMeteringPointMasterData()
         {
-            _forwardedMeteringPointMasterData = true;
+            _hasForwardedMeteringPointMasterData = true;
             CompleteTransactionIfPossible();
         }
 
         private void CompleteTransactionIfPossible()
         {
-            if (_businessProcessCompleted && _forwardedMeteringPointMasterData)
+            if (_hasBusinessProcessCompleted && _hasForwardedMeteringPointMasterData)
             {
                 Complete();
             }
-        }
-
-        public void BusinessProcessCompleted()
-        {
-            _businessProcessCompleted = true;
-            CompleteTransactionIfPossible();
         }
     }
 }
