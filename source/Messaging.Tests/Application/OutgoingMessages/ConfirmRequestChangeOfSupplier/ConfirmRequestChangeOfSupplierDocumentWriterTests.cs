@@ -16,23 +16,21 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Mime;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
 using Messaging.Application.Common;
 using Messaging.Application.Configuration;
-using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Application.SchemaStore;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Serialization;
-using Messaging.Tests.OutgoingMessages.Asserts;
+using Messaging.Tests.Application.OutgoingMessages.Asserts;
 using Xunit;
 
-namespace Messaging.Tests.OutgoingMessages.ConfirmRequestChangeOfSupplier
+namespace Messaging.Tests.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier
 {
     public class ConfirmRequestChangeOfSupplierDocumentWriterTests
     {
