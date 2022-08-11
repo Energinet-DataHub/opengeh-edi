@@ -77,7 +77,7 @@ public class MoveInTransactionTests
     }
 
     [Fact]
-    public void Transaction_is_completed_if_business_request_is_rejected()
+    public void Transaction_is_completed_if_business_process_request_is_rejected()
     {
         var transaction = CreateTransaction();
 
