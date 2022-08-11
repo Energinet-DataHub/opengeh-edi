@@ -127,7 +127,7 @@ namespace Messaging.Domain.Transactions.MoveIn
         {
             if (_state != State.Started)
             {
-                throw new MoveInException($"Cannot reject transaction while in state '{_state.ToString()}'");
+                throw new MoveInException($"Move in transaction '{TransactionId}' has completed. No further actions can be done.");
             }
         }
     }
