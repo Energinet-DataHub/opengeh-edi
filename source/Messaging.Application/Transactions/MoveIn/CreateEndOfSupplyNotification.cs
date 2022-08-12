@@ -12,19 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.Domain.SeedWork;
+using System.Text.Json.Serialization;
+using Messaging.Application.Common.Commands;
+using NodaTime;
 
-namespace Messaging.Domain.Transactions.MoveIn.Events;
+namespace Messaging.Application.Transactions.MoveIn;
 
-public class MoveInWasStarted : DomainEvent
+public class CreateEndOfSupplyNotification : InternalCommand
 {
-    public MoveInWasStarted(string transactionId, MoveInTransaction.EndOfSupplyNotificationState endOfSupplyNotificationState)
+    [JsonConstructor]
+    public CreateEndOfSupplyNotification(string transactionId, Instant effectiveDate, string marketEvaluationPointId, string energySupplierId)
     {
         TransactionId = transactionId;
-        EndOfSupplyNotificationState = endOfSupplyNotificationState;
+        EffectiveDate = effectiveDate;
+        MarketEvaluationPointId = marketEvaluationPointId;
+        EnergySupplierId = energySupplierId;
     }
 
     public string TransactionId { get; }
 
-    public MoveInTransaction.EndOfSupplyNotificationState EndOfSupplyNotificationState { get; }
+    public Instant EffectiveDate { get; }
+
+    public string MarketEvaluationPointId { get; }
+
+    public string EnergySupplierId { get; }
 }

@@ -16,15 +16,12 @@ using Messaging.Domain.SeedWork;
 
 namespace Messaging.Domain.Transactions.MoveIn.Events;
 
-public class MoveInWasStarted : DomainEvent
+public class BusinessProcessWasCompleted : DomainEvent
 {
-    public MoveInWasStarted(string transactionId, MoveInTransaction.EndOfSupplyNotificationState endOfSupplyNotificationState)
+    public BusinessProcessWasCompleted(string transactionId)
     {
         TransactionId = transactionId;
-        EndOfSupplyNotificationState = endOfSupplyNotificationState;
     }
 
     public string TransactionId { get; }
-
-    public MoveInTransaction.EndOfSupplyNotificationState EndOfSupplyNotificationState { get; }
 }

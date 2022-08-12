@@ -61,7 +61,8 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
                 .HasNewEnergySupplierId(incomingMessage.Message.SenderId)
                 .HasConsumerId(incomingMessage.MarketActivityRecord.ConsumerId!)
                 .HasConsumerName(incomingMessage.MarketActivityRecord.ConsumerName!)
-                .HasConsumerIdType(incomingMessage.MarketActivityRecord.ConsumerIdType!);
+                .HasConsumerIdType(incomingMessage.MarketActivityRecord.ConsumerIdType!)
+                .HasEndOfSupplyNotificationState(MoveInTransaction.EndOfSupplyNotificationState.NotNeeded);
         }
 
         [Fact]

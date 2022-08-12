@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Linq;
-using Messaging.Application.Transactions.MoveIn;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Domain.Transactions.MoveIn.Events;
 using Xunit;
@@ -30,6 +29,7 @@ public class MoveInTransactionTests
         var startedEvent = transaction.DomainEvents.FirstOrDefault(e => e is MoveInWasStarted) as MoveInWasStarted;
         Assert.NotNull(startedEvent);
         Assert.Equal(SampleData.TransactionId, startedEvent?.TransactionId);
+        Assert.Equal(MoveInTransaction.EndOfSupplyNotificationState.Required, startedEvent?.EndOfSupplyNotificationState);
     }
 
     [Fact]
@@ -94,6 +94,7 @@ public class MoveInTransactionTests
         transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
         transaction.BusinessProcessCompleted();
         transaction.HasForwardedMeteringPointMasterData();
+        transaction.MarkEndOfSupplyNotificationAsSent();
 
         Assert.Contains(transaction.DomainEvents, e => e is MoveInWasCompleted);
     }
@@ -106,6 +107,48 @@ public class MoveInTransactionTests
         Assert.Throws<MoveInException>(() => transaction.BusinessProcessCompleted());
     }
 
+    [Fact]
+    public void Business_process_is_completed()
+    {
+        var transaction = CreateTransaction();
+        transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
+
+        transaction.BusinessProcessCompleted();
+
+        Assert.Contains(transaction.DomainEvents, e => e is BusinessProcessWasCompleted);
+    }
+
+    [Fact]
+    public void End_of_supply_notification_status_is_changed_to_pending_when_business_process_is_completed()
+    {
+        var transaction = CreateTransaction();
+        transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
+
+        transaction.BusinessProcessCompleted();
+
+        Assert.Contains(transaction.DomainEvents, e => e is EndOfSupplyNotificationChangedToPending);
+    }
+
+    [Fact]
+    public void Transaction_is_not_completed_while_end_of_supply_notification_status_is_pending()
+    {
+        var transaction = CreateTransaction();
+        transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
+        transaction.HasForwardedMeteringPointMasterData();
+        transaction.BusinessProcessCompleted();
+
+        Assert.DoesNotContain(transaction.DomainEvents, e => e is MoveInWasCompleted);
+    }
+
+    [Fact]
+    public void End_of_supply_notification_is_not_needed_when_no_current_energy_supplier_is_present()
+    {
+        var transaction = CreateTransaction(currentEnergySupplierId: null);
+
+        var startedEvent = transaction.DomainEvents.FirstOrDefault(e => e is MoveInWasStarted) as MoveInWasStarted;
+        Assert.Equal(MoveInTransaction.EndOfSupplyNotificationState.NotNeeded, startedEvent?.EndOfSupplyNotificationState);
+    }
+
     private static MoveInTransaction CreateTransaction()
     {
         return new MoveInTransaction(
@@ -113,6 +156,20 @@ public class MoveInTransactionTests
             SampleData.MarketEvaluationPointId,
             SampleData.EffectiveDate,
             SampleData.CurrentEnergySupplierId,
+            SampleData.StartedByMessageId,
+            SampleData.NewEnergySupplierId,
+            SampleData.ConsumerId,
+            SampleData.ConsumerName,
+            SampleData.ConsumerIdType);
+    }
+
+    private static MoveInTransaction CreateTransaction(string? currentEnergySupplierId)
+    {
+        return new MoveInTransaction(
+            SampleData.TransactionId,
+            SampleData.MarketEvaluationPointId,
+            SampleData.EffectiveDate,
+            currentEnergySupplierId,
             SampleData.StartedByMessageId,
             SampleData.NewEnergySupplierId,
             SampleData.ConsumerId,

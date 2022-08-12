@@ -14,24 +14,24 @@
 
 using System;
 using System.Threading.Tasks;
+using Messaging.Application.Common;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.OutgoingMessages;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
-using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
-using MarketEvaluationPoint = Messaging.Domain.MasterData.MarketEvaluationPoints.MarketEvaluationPoint;
 
 namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
 
-public class WhenAConsumerHasMovedInTests : TestBase
+public class CreateEndOfSupplyNotificationTests : TestBase
 {
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMoveInTransactionRepository _transactionRepository;
 
-    public WhenAConsumerHasMovedInTests(DatabaseFixture databaseFixture)
+    public CreateEndOfSupplyNotificationTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
@@ -41,20 +41,37 @@ public class WhenAConsumerHasMovedInTests : TestBase
     [Fact]
     public async Task An_exception_is_thrown_if_transaction_cannot_be_located()
     {
-        var processId = "Not existing";
-        var command = new SetConsumerHasMovedIn(processId);
+        var transactionId = "Not existing";
+        var command = CreateCommand(transactionId);
 
         await Assert.ThrowsAsync<TransactionNotFoundException>(() => InvokeCommandAsync(command)).ConfigureAwait(false);
     }
 
     [Fact]
-    public async Task Business_process_is_marked_as_completed()
+    public async Task The_current_energy_supplier_is_notified_about_end_of_supply()
     {
-        await ConsumerHasMovedIn().ConfigureAwait(false);
+        var transaction = await ConsumerHasMovedIn().ConfigureAwait(false);
 
-        AssertQueuedCommand.QueuedCommand<CreateEndOfSupplyNotification>(GetService<IDbConnectionFactory>());
+        await InvokeCommandAsync(CreateCommand(transaction.TransactionId)).ConfigureAwait(false);
+
         AssertTransaction()
-            .BusinessProcessCompleted();
+            .HasEndOfSupplyNotificationState(MoveInTransaction.EndOfSupplyNotificationState.EnergySupplierWasNotified);
+        AssertMessage(transaction.TransactionId, DocumentType.GenericNotification.ToString(), BusinessReasonCode.CustomerMoveInOrMoveOut.Code)
+            .HasReceiverId(transaction.CurrentEnergySupplierId!)
+            .HasReceiverRole(MarketRoles.EnergySupplier)
+            .HasSenderId(DataHubDetails.IdentificationNumber)
+            .HasSenderRole(MarketRoles.MeteringPointAdministrator)
+            .HasReasonCode(null)
+            .WithMarketActivityRecord()
+                .HasId()
+                .HasValidityStart(transaction.EffectiveDate.ToDateTimeUtc())
+                .HasOriginalTransactionId(transaction.TransactionId)
+                .HasMarketEvaluationPointId(transaction.MarketEvaluationPointId);
+    }
+
+    private CreateEndOfSupplyNotification CreateCommand(string transactionId)
+    {
+        return new CreateEndOfSupplyNotification(transactionId, _systemDateTimeProvider.Now(), SampleData.MeteringPointNumber, SampleData.CurrentEnergySupplierNumber);
     }
 
     private async Task<MoveInTransaction> ConsumerHasMovedIn()
@@ -66,7 +83,6 @@ public class WhenAConsumerHasMovedInTests : TestBase
 
     private async Task<MoveInTransaction> StartMoveInTransaction()
     {
-        await SetupMasterDataDetailsAsync();
         var transaction = new MoveInTransaction(
             SampleData.TransactionId,
             SampleData.MeteringPointNumber,
@@ -79,16 +95,14 @@ public class WhenAConsumerHasMovedInTests : TestBase
             SampleData.ConsumerIdType);
 
         transaction.AcceptedByBusinessProcess(BusinessRequestResult.Succeeded(Guid.NewGuid().ToString()).ProcessId!, SampleData.MeteringPointNumber);
-        transaction.HasForwardedMeteringPointMasterData();
         _transactionRepository.Add(transaction);
         await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
         return transaction;
     }
 
-    private Task SetupMasterDataDetailsAsync()
+    private AssertOutgoingMessage AssertMessage(string transactionId, string documentType, string processType)
     {
-        GetService<IMarketEvaluationPointRepository>().Add(MarketEvaluationPoint.Create(SampleData.CurrentEnergySupplierNumber, SampleData.MeteringPointNumber));
-        return Task.CompletedTask;
+        return AssertOutgoingMessage.OutgoingMessage(transactionId, documentType, processType, GetService<IDbConnectionFactory>());
     }
 
     private AssertTransaction AssertTransaction()

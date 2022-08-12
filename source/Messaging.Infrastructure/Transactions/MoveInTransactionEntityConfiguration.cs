@@ -42,6 +42,9 @@ namespace Messaging.Infrastructure.Transactions
             builder.Property<MoveInTransaction.State>("_state")
                 .HasConversion(toDbValue => toDbValue.ToString(), fromDbValue => Enum.Parse<MoveInTransaction.State>(fromDbValue, true))
                 .HasColumnName("State");
+            builder.Property<MoveInTransaction.EndOfSupplyNotificationState>("_endOfSupplyNotificationState")
+                .HasConversion(toDbValue => toDbValue.ToString(), fromDbValue => Enum.Parse<MoveInTransaction.EndOfSupplyNotificationState>(fromDbValue, true))
+                .HasColumnName("EndOfSupplyNotificationState");
             builder.Property(x => x.StartedByMessageId);
             builder.Ignore(x => x.DomainEvents);
         }

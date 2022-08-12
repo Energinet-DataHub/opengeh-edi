@@ -99,4 +99,10 @@ public class AssertTransaction
         Assert.True(_transaction.HasBusinessProcessCompleted);
         return this;
     }
+
+    public AssertTransaction HasEndOfSupplyNotificationState(MoveInTransaction.EndOfSupplyNotificationState expectedState)
+    {
+        Assert.Equal(expectedState.ToString(), _transaction.EndOfSupplyNotificationState);
+        return this;
+    }
 }
