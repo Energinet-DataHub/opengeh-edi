@@ -60,7 +60,7 @@ namespace Messaging.Infrastructure.Configuration.InternalCommands
                 {
                     var exception = result.FinalException.ToString();
                     await MarkAsFailedAsync(queuedCommand, exception).ConfigureAwait(false);
-                    _logger?.Log(LogLevel.Error, $"Failed to process internal command {queuedCommand.Id}", exception);
+                    _logger?.Log(LogLevel.Error, result.FinalException, $"Failed to process internal command {queuedCommand.Id}");
                 }
                 else
                 {
