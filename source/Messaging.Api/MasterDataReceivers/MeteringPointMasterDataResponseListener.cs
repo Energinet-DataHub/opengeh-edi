@@ -15,33 +15,29 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MeteringPoints.RequestResponse.Response;
-using Messaging.Application.Configuration;
 using Messaging.Application.MasterData;
 using Messaging.Application.Transactions.MoveIn;
-using Messaging.Infrastructure.Configuration.DataAccess;
+using Messaging.Infrastructure.Configuration.InternalCommands;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace Messaging.Api.IncomingMessages;
+namespace Messaging.Api.MasterDataReceivers;
 
 public class MeteringPointMasterDataResponseListener
 {
     private readonly ILogger<MeteringPointMasterDataResponseListener> _logger;
     private readonly ISerializer _serializer;
-    private readonly ICommandScheduler _commandScheduler;
-    private readonly B2BContext _context;
+    private readonly CommandSchedulerFacade _commandSchedulerFacade;
 
     public MeteringPointMasterDataResponseListener(
         ILogger<MeteringPointMasterDataResponseListener> logger,
         ISerializer serializer,
-        ICommandScheduler commandScheduler,
-        B2BContext context)
+        CommandSchedulerFacade commandSchedulerFacade)
     {
         _logger = logger;
         _serializer = serializer;
-        _commandScheduler = commandScheduler;
-        _context = context;
+        _commandSchedulerFacade = commandSchedulerFacade;
     }
 
     [Function("MeteringPointMasterDataResponseListener")]
@@ -56,8 +52,8 @@ public class MeteringPointMasterDataResponseListener
         var forwardMeteringPointMasterData = new ForwardMeteringPointMasterData(
             metadata.TransactionId ?? throw new InvalidOperationException("Service bus metadata property TransactionId is missing"),
             masterDataContent);
-        await _commandScheduler.EnqueueAsync(forwardMeteringPointMasterData).ConfigureAwait(false);
-        await _context.SaveChangesAsync().ConfigureAwait(false);
+
+        await _commandSchedulerFacade.EnqueueAsync(forwardMeteringPointMasterData).ConfigureAwait(false);
         _logger.LogInformation($"Master data response received: {data}");
     }
 
