@@ -65,6 +65,7 @@ namespace Messaging.Api
                 .ConfigureFunctionsWorkerDefaults(worker =>
                 {
                     worker.UseMiddleware<CorrelationIdMiddleware>();
+                    worker.UseMiddleware<RequestResponseLoggingMiddleware>();
                     worker.UseMiddleware<BearerAuthenticationMiddleware>();
                     worker.UseMiddleware<ClaimsEnrichmentMiddleware>();
                     worker.UseMiddleware<MarketActorAuthenticatorMiddleware>();
