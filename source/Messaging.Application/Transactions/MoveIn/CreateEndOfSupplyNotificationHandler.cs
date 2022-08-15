@@ -20,25 +20,29 @@ using Messaging.Domain.Transactions.MoveIn;
 
 namespace Messaging.Application.Transactions.MoveIn;
 
-public class SetConsumerHasMovedInHandler : IRequestHandler<SetConsumerHasMovedIn, Unit>
+public class CreateEndOfSupplyNotificationHandler : IRequestHandler<CreateEndOfSupplyNotification, Unit>
 {
-    private readonly IMoveInTransactionRepository _transactionRepository;
+    private readonly IMoveInTransactionRepository _repository;
+    private readonly MoveInNotifications _notifications;
 
-    public SetConsumerHasMovedInHandler(IMoveInTransactionRepository transactionRepository)
+    public CreateEndOfSupplyNotificationHandler(IMoveInTransactionRepository repository, MoveInNotifications notifications)
     {
-        _transactionRepository = transactionRepository;
+        _repository = repository;
+        _notifications = notifications;
     }
 
-    public async Task<Unit> Handle(SetConsumerHasMovedIn request, CancellationToken cancellationToken)
+    public Task<Unit> Handle(CreateEndOfSupplyNotification request, CancellationToken cancellationToken)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
-        var transaction = await _transactionRepository.GetByProcessIdAsync(request.ProcessId).ConfigureAwait(false);
+        var transaction = _repository.GetById(request.TransactionId);
         if (transaction is null)
         {
-            throw new TransactionNotFoundException(request.ProcessId);
+            throw new TransactionNotFoundException(request.TransactionId);
         }
 
-        transaction.BusinessProcessCompleted();
-        return Unit.Value;
+        _notifications.InformCurrentEnergySupplierAboutEndOfSupply(request.TransactionId, request.EffectiveDate, request.MarketEvaluationPointId, request.EnergySupplierId);
+
+        transaction.MarkEndOfSupplyNotificationAsSent();
+        return Unit.Task;
     }
 }

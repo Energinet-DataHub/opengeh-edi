@@ -18,44 +18,34 @@ using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.GenericNotification;
 using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.Transactions.MoveIn;
+using NodaTime;
 
 namespace Messaging.Application.Transactions.MoveIn;
 
 public class MoveInNotifications
 {
-    private readonly IMoveInTransactionRepository _transactionRepository;
     private readonly IOutgoingMessageStore _outgoingMessageStore;
     private readonly IMarketActivityRecordParser _marketActivityRecordParser;
 
-    public MoveInNotifications(IOutgoingMessageStore outgoingMessageStore, IMarketActivityRecordParser marketActivityRecordParser, IMoveInTransactionRepository transactionRepository)
+    public MoveInNotifications(IOutgoingMessageStore outgoingMessageStore, IMarketActivityRecordParser marketActivityRecordParser)
     {
         _outgoingMessageStore = outgoingMessageStore;
         _marketActivityRecordParser = marketActivityRecordParser;
-        _transactionRepository = transactionRepository;
     }
 
-    public void InformCurrentEnergySupplierAboutEndOfSupply(string transactionId)
+    public void InformCurrentEnergySupplierAboutEndOfSupply(string transactionId, Instant effectiveDate, string marketEvaluationPointId, string energySupplierId)
     {
-        var transaction = _transactionRepository.GetById(transactionId);
-        if (transaction == null) throw new MoveInException($"Move in transaction {transactionId} was not found.");
-
-        if (transaction.CurrentEnergySupplierId is null)
-        {
-            throw new MoveInException("Energy supplier number cannot be empty.");
-        }
-
         var marketActivityRecord = new MarketActivityRecord(
             Guid.NewGuid().ToString(),
-            transaction.TransactionId,
-            transaction.MarketEvaluationPointId,
-            transaction.EffectiveDate);
+            transactionId,
+            marketEvaluationPointId,
+            effectiveDate);
 
         var message = new OutgoingMessage(
             DocumentType.GenericNotification.ToString(),
-            transaction.CurrentEnergySupplierId,
+            energySupplierId,
             Guid.NewGuid().ToString(),
-            transaction.TransactionId,
+            transactionId,
             BusinessReasonCode.CustomerMoveInOrMoveOut.Code,
             MarketRoles.EnergySupplier,
             DataHubDetails.IdentificationNumber,

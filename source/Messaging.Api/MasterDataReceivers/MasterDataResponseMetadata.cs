@@ -12,11 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Api.IncomingMessages;
+namespace Messaging.Api.MasterDataReceivers;
 
 public class MasterDataResponseMetadata
 {
-    public string? BusinessProcessId { get; set; }
+    public MasterDataResponseMetadata(string? transactionId)
+    {
+        TransactionId = transactionId;
+    }
 
-    public string? TransactionId { get; set; }
+    public string? TransactionId { get; }
 }
