@@ -14,6 +14,7 @@
 
 using System;
 using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
+using Messaging.Domain.MasterData;
 using Messaging.Infrastructure.Configuration;
 
 namespace Messaging.Tests.Application.OutgoingMessages.AccountingPointCharacteristics;
@@ -55,7 +56,7 @@ public class SampleData
             "D01",
             "PT1H",
             "6",
-            "--12-17",
+            ReadingDate.Create("1217"),
             new Mrid("031", "NDK"),
             new Mrid("151", "NDK"),
             new Mrid("031", "NDK"),

@@ -14,6 +14,7 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Messaging.Domain.MasterData;
 using NodaTime;
 
 namespace Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
@@ -29,7 +30,7 @@ public class MarketEvaluationPoint
         string connectionState,
         string readCycle,
         string netSettlementGroup,
-        string nextReadingDate,
+        ReadingDate nextReadingDate,
         Mrid meteringGridAreaId,
         Mrid? inMeteringGridAreaId,
         Mrid? outMeteringGridAreaId,
@@ -100,7 +101,7 @@ public class MarketEvaluationPoint
 
     public string NetSettlementGroup { get; }
 
-    public string NextReadingDate { get; }
+    public ReadingDate NextReadingDate { get; }
 
     public Mrid MeteringGridAreaId { get; }
 

@@ -34,14 +34,9 @@ public static class MasterDataTranslation
 
     public static Dictionary<string, string> Translations { get; } = new();
 
-    public static string TranslateToNextReadingDate(string scheduledMeterReadingDate)
+    public static ReadingDate TranslateToNextReadingDate(string scheduledMeterReadingDate)
     {
-        return "--" + string.Concat(
-                        scheduledMeterReadingDate
-                            .AsSpan(0, 2).ToString())
-                    + "-" +
-                    string.Concat(
-                        scheduledMeterReadingDate.AsSpan(2).ToString());
+        return ReadingDate.Create(scheduledMeterReadingDate);
     }
 
     private static void AddMeasurementUnitType()
