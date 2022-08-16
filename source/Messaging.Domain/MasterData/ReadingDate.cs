@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text.Json.Serialization;
+
 namespace Messaging.Domain.MasterData;
 
 public class ReadingDate
@@ -20,12 +22,12 @@ public class ReadingDate
     {
     }
 
-    private ReadingDate(string? readingDate)
+    private ReadingDate(string? date)
     {
-        Date = readingDate;
+        Date = date;
     }
 
-    public string? Date { get; }
+    public string? Date { get; init; }
 
     public static ReadingDate Create(string? monthDay)
     {
@@ -38,7 +40,7 @@ public class ReadingDate
     private static string FormatDateFromScheduledMeterReadingDate(string? monthDay)
     {
         return "--" + string.Concat(monthDay.AsSpan(0, 2).ToString())
-                     + "-" +
-                     string.Concat(monthDay.AsSpan(2).ToString());
+                    + "-" +
+                    string.Concat(monthDay.AsSpan(2).ToString());
     }
 }
