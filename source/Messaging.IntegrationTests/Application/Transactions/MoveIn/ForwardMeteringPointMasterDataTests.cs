@@ -77,7 +77,7 @@ public class ForwardMeteringPointMasterDataTests : TestBase
         Assert.Equal(MasterDataTranslation.Translations[masterDataContent.ConnectionState], marketEvaluationPoint.ConnectionState);
         Assert.Equal(MasterDataTranslation.Translations[masterDataContent.ReadingPeriodicity], marketEvaluationPoint.ReadCycle);
         Assert.Equal(MasterDataTranslation.Translations[masterDataContent.NetSettlementGroup], marketEvaluationPoint.NetSettlementGroup);
-        Assert.Equal(MasterDataTranslation.TranslateToNextReadingDate(masterDataContent.ScheduledMeterReadingDate), marketEvaluationPoint.NextReadingDate);
+        Assert.Equal(MasterDataTranslation.TranslateToNextReadingDate(masterDataContent.ScheduledMeterReadingDate).Date, marketEvaluationPoint.NextReadingDate.Date);
         Assert.Equal(masterDataContent.GridAreaDetails.Code, marketEvaluationPoint.MeteringGridAreaId.Id);
         Assert.Null(marketEvaluationPoint.OutMeteringGridAreaId);
         Assert.Null(marketEvaluationPoint.InMeteringGridAreaId);

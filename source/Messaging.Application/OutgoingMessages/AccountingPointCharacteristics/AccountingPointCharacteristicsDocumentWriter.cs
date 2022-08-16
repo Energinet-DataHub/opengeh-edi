@@ -127,9 +127,9 @@ public class AccountingPointCharacteristicsDocumentWriter : DocumentWriter
         await writer.WriteElementStringAsync(DocumentDetails.Prefix, "connectionState", null, marketEvaluationPoint.ConnectionState).ConfigureAwait(false);
         await writer.WriteElementStringAsync(DocumentDetails.Prefix, "readCycle", null, marketEvaluationPoint.ReadCycle).ConfigureAwait(false);
         await writer.WriteElementStringAsync(DocumentDetails.Prefix, "netSettlementGroup", null, marketEvaluationPoint.NetSettlementGroup).ConfigureAwait(false);
-        if (marketEvaluationPoint.NetSettlementGroup == "6")
+        if (marketEvaluationPoint.NextReadingDate.Date != null && marketEvaluationPoint.NetSettlementGroup == "6")
         {
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "nextReadingDate", null, marketEvaluationPoint.NextReadingDate).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "nextReadingDate", null, marketEvaluationPoint.NextReadingDate.Date).ConfigureAwait(false);
         }
 
         await WriteMridAsync("meteringGridArea_Domain.mRID", marketEvaluationPoint.MeteringGridAreaId, writer).ConfigureAwait(false);
