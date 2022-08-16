@@ -189,6 +189,20 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
             Assert.Empty(_messageQueueDispatcherSpy.CommittedItems);
         }
 
+        [Fact]
+        public async Task Energy_supplier_id_must_match_sender_id()
+        {
+            var wrongEnergySupplier = "5790001330550";
+            await using var message = BusinessMessageBuilder
+                .RequestChangeOfSupplier()
+                .WithEnergySupplierId(wrongEnergySupplier)
+                .Message();
+
+            var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
+
+            AssertContainsError(result, "code");
+        }
+
         private static ClaimsPrincipal CreateClaimsPrincipal(IEnumerable<Claim> claims)
         {
             return new ClaimsPrincipal(new ClaimsIdentity(claims));

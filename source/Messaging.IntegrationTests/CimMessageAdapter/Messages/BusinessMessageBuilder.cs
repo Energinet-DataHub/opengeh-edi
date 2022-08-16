@@ -51,6 +51,12 @@ namespace Messaging.IntegrationTests.CimMessageAdapter.Messages
             return this;
         }
 
+        public BusinessMessageBuilder WithSenderId(string senderId)
+        {
+            SetRootChildElementValue("sender_MarketParticipant.mRID", senderId);
+            return this;
+        }
+
         public Stream Message()
         {
             var message = new MemoryStream();
@@ -66,6 +72,12 @@ namespace Messaging.IntegrationTests.CimMessageAdapter.Messages
                 .Element(_xmlNamespace + "MktActivityRecord");
 
             root.Add(marketActivityRecord);
+            return this;
+        }
+
+        public BusinessMessageBuilder WithEnergySupplierId(string energySupplierId)
+        {
+            SetElementFromMarketActivityRecordValue("marketEvaluationPoint.energySupplier_MarketParticipant.mRID", energySupplierId);
             return this;
         }
 
@@ -86,6 +98,11 @@ namespace Messaging.IntegrationTests.CimMessageAdapter.Messages
         {
             _document.Root!
                 .Element(_xmlNamespace + elementName)!.Value = value;
+        }
+
+        private void SetElementFromMarketActivityRecordValue(string elementName, string value)
+        {
+            GetMarketActivityRecordChildElement(elementName).Value = value;
         }
 
         private XElement GetMarketActivityRecordChildElement(string elementName)

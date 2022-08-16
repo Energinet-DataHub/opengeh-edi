@@ -83,6 +83,11 @@ namespace Messaging.CimMessageAdapter
                     return Result.Failure(new DuplicateTransactionIdDetected(marketActivityRecord.Id));
                 }
 
+                if (!IsEnergySupplierIdAndSenderIdAMatch(marketActivityRecord.EnergySupplierId, messageHeader.SenderId))
+                {
+                    return Result.Failure(new EnergySupplierDoesNotMatchSender(marketActivityRecord.EnergySupplierId, messageHeader.SenderId));
+                }
+
                 await AddToTransactionQueueAsync(CreateTransaction(messageHeader, marketActivityRecord)).ConfigureAwait(false);
             }
 
@@ -98,6 +103,11 @@ namespace Messaging.CimMessageAdapter
         private static IncomingMessage CreateTransaction(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
         {
             return IncomingMessage.Create(messageHeader, marketActivityRecord);
+        }
+
+        private static bool IsEnergySupplierIdAndSenderIdAMatch(string? energySupplierId, string senderId)
+        {
+            return energySupplierId == senderId;
         }
 
         private Task<bool> CheckTransactionIdAsync(string transactionId)
