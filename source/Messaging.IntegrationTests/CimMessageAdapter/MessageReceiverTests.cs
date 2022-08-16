@@ -200,7 +200,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
 
             var result = await ReceiveRequestChangeOfSupplierMessage(message).ConfigureAwait(false);
 
-            AssertContainsError(result, "code");
+            AssertContainsError(result, "999");
         }
 
         private static ClaimsPrincipal CreateClaimsPrincipal(IEnumerable<Claim> claims)

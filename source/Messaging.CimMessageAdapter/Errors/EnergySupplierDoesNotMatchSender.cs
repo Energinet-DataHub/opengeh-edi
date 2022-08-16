@@ -19,7 +19,7 @@ namespace Messaging.CimMessageAdapter.Errors;
 public class EnergySupplierDoesNotMatchSender : ValidationError
 {
     public EnergySupplierDoesNotMatchSender(string? energySupplier, string sender)
-        : base($"Energy supplier id '{energySupplier}' does not match sender id '{sender}'.", "code")
+        : base($"Energy supplier id '{energySupplier}' does not match sender id '{sender}'.", "999")
     {
     }
 }
