@@ -78,6 +78,18 @@ namespace Messaging.Application.Transactions.MoveIn
                 request.MarketActivityRecord.ConsumerName,
                 request.MarketActivityRecord.ConsumerIdType);
 
+            if (!IsEnergySupplierIdAndSenderIdAMatch(
+                    request.MarketActivityRecord.EnergySupplierId,
+                    request.Message.SenderId))
+            {
+                var reasons = await CreateReasonsFromAsync(new Collection<string>() { "EnergySupplierDoesNotMatchSender" }).ConfigureAwait(false);
+                _outgoingMessageStore.Add(RejectMessageFrom(reasons, transaction));
+                transaction.RejectedByBusinessProcess();
+
+                _moveInTransactionRepository.Add(transaction);
+                return Unit.Value;
+            }
+
             var businessProcessResult = await InvokeBusinessProcessAsync(transaction).ConfigureAwait(false);
             if (businessProcessResult.Success == false)
             {
@@ -95,6 +107,11 @@ namespace Messaging.Application.Transactions.MoveIn
 
             _moveInTransactionRepository.Add(transaction);
             return Unit.Value;
+        }
+
+        private static bool IsEnergySupplierIdAndSenderIdAMatch(string? energySupplierId, string senderId)
+        {
+            return energySupplierId == senderId;
         }
 
         private static string GetConsumerIdType(string? consumerIdType)

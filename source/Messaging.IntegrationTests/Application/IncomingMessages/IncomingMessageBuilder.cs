@@ -93,7 +93,7 @@ namespace Messaging.IntegrationTests.Application.IncomingMessages
                 ConsumerId = "fake",
                 ConsumerName = _consumerName,
                 EffectiveDate = _effectiveDate.ToString(),
-                EnergySupplierId = "fake",
+                EnergySupplierId = "123456",
                 MarketEvaluationPointId = _marketEvaluationPointId,
             };
         }
