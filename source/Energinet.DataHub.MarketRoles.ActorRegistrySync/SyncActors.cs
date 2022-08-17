@@ -23,8 +23,6 @@ namespace Energinet.DataHub.MarketRoles.ActorRegistrySync;
 
 public class SyncActors : IDisposable
 {
-    // private static IEnumerable<UserActor>? _userActors;
-    // private static IEnumerable<Actor>? _actors;
     private readonly ActorSyncService _actorSyncService;
 
     public SyncActors()
@@ -57,12 +55,10 @@ public class SyncActors : IDisposable
     {
         var actors = (await _actorSyncService.GetActorsAsync().ConfigureAwait(false)).ToList();
         var energySuppliers = ActorSyncService.MapActorsToEnergySuppliers(actors).ToList();
-        var supplierRegistrations = ActorSyncService.FilterObsoleteSupplierRegistrations(await _actorSyncService.GetSupplierRegistrationsAsync().ConfigureAwait(false), energySuppliers);
 
         await _actorSyncService.DatabaseCleanUpAsync().ConfigureAwait(false);
         await _actorSyncService.InsertActorsAsync(actors).ConfigureAwait(false);
         await _actorSyncService.InsertEnergySuppliersAsync(energySuppliers).ConfigureAwait(false);
-        await _actorSyncService.InsertSupplierRegistrationsAsync(supplierRegistrations).ConfigureAwait(false);
 
         await _actorSyncService.CommitTransactionAsync().ConfigureAwait(false);
     }
