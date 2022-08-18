@@ -277,7 +277,7 @@ namespace Messaging.Infrastructure.Configuration
 
         private void AddMessageGenerationServices()
         {
-            _services.AddScoped<MessageFactory>();
+            _services.AddScoped<DocumentFactory>();
             _services.AddScoped<DocumentWriter, ConfirmChangeOfSupplierDocumentWriter>();
             _services.AddScoped<DocumentWriter, RejectRequestChangeOfSupplierDocumentWriter>();
             _services.AddScoped<DocumentWriter, GenericNotificationDocumentWriter>();

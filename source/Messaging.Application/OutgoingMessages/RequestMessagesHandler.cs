@@ -28,18 +28,18 @@ namespace Messaging.Application.OutgoingMessages
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly IMessageDispatcher _messageDispatcher;
-        private readonly MessageFactory _messageFactory;
+        private readonly DocumentFactory _documentFactory;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
         public RequestMessagesHandler(
             IOutgoingMessageStore outgoingMessageStore,
             IMessageDispatcher messageDispatcherSpy,
-            MessageFactory messageFactory,
+            DocumentFactory documentFactory,
             ISystemDateTimeProvider systemDateTimeProvider)
         {
             _outgoingMessageStore = outgoingMessageStore;
             _messageDispatcher = messageDispatcherSpy;
-            _messageFactory = messageFactory;
+            _documentFactory = documentFactory;
             _systemDateTimeProvider = systemDateTimeProvider;
         }
 
@@ -57,7 +57,7 @@ namespace Messaging.Application.OutgoingMessages
 
             var messageBundle = CreateBundleFrom(messages);
 
-            var message = await _messageFactory.CreateFromAsync(messageBundle.CreateMessage()).ConfigureAwait(false);
+            var message = await _documentFactory.CreateFromAsync(messageBundle.CreateMessage(), CimFormat.Xml).ConfigureAwait(false);
             await _messageDispatcher.DispatchAsync(message).ConfigureAwait(false);
 
             return Unit.Value;
