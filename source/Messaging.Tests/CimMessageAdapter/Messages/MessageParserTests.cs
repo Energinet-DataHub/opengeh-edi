@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Messages;
+using Messaging.Domain.OutgoingMessages;
 using Xunit;
 
 namespace Messaging.Tests.CimMessageAdapter.Messages;

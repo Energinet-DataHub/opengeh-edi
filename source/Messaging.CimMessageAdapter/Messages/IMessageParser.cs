@@ -14,6 +14,7 @@
 
 using System.IO;
 using System.Threading.Tasks;
+using Messaging.Domain.OutgoingMessages;
 
 namespace Messaging.CimMessageAdapter.Messages;
 
