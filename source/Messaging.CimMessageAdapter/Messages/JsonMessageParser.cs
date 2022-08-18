@@ -22,6 +22,7 @@ using Json.Schema;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.SchemaStore;
 using Messaging.CimMessageAdapter.Errors;
+using Messaging.Domain.OutgoingMessages;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using JsonException = Newtonsoft.Json.JsonException;

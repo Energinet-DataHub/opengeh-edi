@@ -12,17 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.Domain.SeedWork;
+namespace Messaging.Domain.OutgoingMessages;
 
-namespace Messaging.CimMessageAdapter.Messages;
-
-public class CimFormat : EnumerationType
+public class OutgoingMessageException : Exception
 {
-    public static readonly CimFormat Xml = new(0, nameof(Xml));
-    public static readonly CimFormat Json = new(1, nameof(Json));
+    public OutgoingMessageException(string message)
+        : base(message)
+    {
+    }
 
-    private CimFormat(int id, string name)
-        : base(id, name)
+    public OutgoingMessageException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
+
+    private OutgoingMessageException()
     {
     }
 }

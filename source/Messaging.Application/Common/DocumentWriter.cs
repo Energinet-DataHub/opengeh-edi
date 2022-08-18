@@ -22,7 +22,7 @@ using Messaging.Domain.OutgoingMessages;
 
 namespace Messaging.Application.Common;
 
-public abstract class DocumentWriter
+public abstract class DocumentWriter : IDocumentWriter
 {
     private readonly DocumentDetails _documentDetails;
     private readonly IMarketActivityRecordParser _parser;
@@ -51,6 +51,11 @@ public abstract class DocumentWriter
     {
         if (documentType == null) throw new ArgumentNullException(nameof(documentType));
         return _documentDetails.Type[..documentType.Length].Equals(documentType, StringComparison.OrdinalIgnoreCase);
+    }
+
+    public bool HandlesDocumentFormat(CimFormat format)
+    {
+        return format == CimFormat.Xml;
     }
 
     protected abstract Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer);

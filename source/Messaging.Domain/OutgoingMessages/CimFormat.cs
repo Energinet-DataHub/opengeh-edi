@@ -12,25 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.CimMessageAdapter.Messages;
-using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.SeedWork;
 
-namespace Messaging.CimMessageAdapter.Response;
+namespace Messaging.Domain.OutgoingMessages;
 
-/// <summary>
-/// Factory responsible for creating B2B response messages
-/// </summary>
-public interface IResponseFactory
+public class CimFormat : EnumerationType
 {
-    /// <summary>
-    /// Specifies the handled CIM format
-    /// </summary>
-    public CimFormat HandledFormat { get; }
+    public static readonly CimFormat Xml = new(0, nameof(Xml));
+    public static readonly CimFormat Json = new(1, nameof(Json));
 
-    /// <summary>
-    /// Create response message
-    /// </summary>
-    /// <param name="result"></param>
-    /// <returns><see cref="ResponseMessage"/></returns>
-    public ResponseMessage From(Result result);
+    private CimFormat(int id, string name)
+        : base(id, name)
+    {
+    }
 }

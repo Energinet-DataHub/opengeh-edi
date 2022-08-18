@@ -18,10 +18,11 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
-using Messaging.Application.IncomingMessages;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.SchemaStore;
 using Messaging.CimMessageAdapter.Errors;
+using Messaging.Domain.OutgoingMessages;
+using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
 
 namespace Messaging.CimMessageAdapter.Messages;
 

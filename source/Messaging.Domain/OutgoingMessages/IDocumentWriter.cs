@@ -12,25 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.CimMessageAdapter.Messages;
-using Messaging.Domain.OutgoingMessages;
-
-namespace Messaging.CimMessageAdapter.Response;
+namespace Messaging.Domain.OutgoingMessages;
 
 /// <summary>
-/// Factory responsible for creating B2B response messages
+/// Writes CIM documents
 /// </summary>
-public interface IResponseFactory
+public interface IDocumentWriter
 {
     /// <summary>
-    /// Specifies the handled CIM format
+    /// Determine if specificed CIM format can be handled by document writer
     /// </summary>
-    public CimFormat HandledFormat { get; }
-
-    /// <summary>
-    /// Create response message
-    /// </summary>
-    /// <param name="result"></param>
-    /// <returns><see cref="ResponseMessage"/></returns>
-    public ResponseMessage From(Result result);
+    /// <param name="format"></param>
+    bool HandlesDocumentFormat(CimFormat format);
 }
