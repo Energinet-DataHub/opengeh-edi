@@ -14,7 +14,7 @@
 
 using Messaging.Domain.SeedWork;
 
-namespace Messaging.CimMessageAdapter.Messages;
+namespace Messaging.Domain.OutgoingMessages;
 
 public class CimFormat : EnumerationType
 {
