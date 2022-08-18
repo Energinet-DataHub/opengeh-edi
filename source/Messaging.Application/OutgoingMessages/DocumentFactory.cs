@@ -36,7 +36,9 @@ public class DocumentFactory
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
         var documentWriter =
-            _documentWriters.FirstOrDefault(writer => writer.HandlesDocumentType(message.DocumentType));
+            _documentWriters.FirstOrDefault(writer =>
+                writer.HandlesDocumentType(message.DocumentType) &&
+                writer.HandlesDocumentFormat(CimFormat.Xml));
 
         if (documentWriter is null)
         {
