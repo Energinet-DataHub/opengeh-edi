@@ -73,21 +73,22 @@ namespace Messaging.Application.Transactions.MoveIn
                 InstantPattern.General.Parse(request.MarketActivityRecord.EffectiveDate).GetValueOrThrow(),
                 marketEvaluationPoint?.EnergySupplierNumber,
                 request.Message.MessageId,
-                request.Message.SenderId,
+                request.MarketActivityRecord.EnergySupplierId ?? string.Empty,
                 request.MarketActivityRecord.ConsumerId,
                 request.MarketActivityRecord.ConsumerName,
                 request.MarketActivityRecord.ConsumerIdType);
+
+            if (string.IsNullOrEmpty(request.MarketActivityRecord.EnergySupplierId))
+            {
+                return await RejectInvalidRequestMessageAsync(transaction, request, "EnergySupplierIsEmpty")
+                    .ConfigureAwait(false);
+            }
 
             if (!IsEnergySupplierIdAndSenderIdAMatch(
                     request.MarketActivityRecord.EnergySupplierId,
                     request.Message.SenderId))
             {
-                var reasons = await CreateReasonsFromAsync(new Collection<string>() { "EnergySupplierDoesNotMatchSender" }).ConfigureAwait(false);
-                _outgoingMessageStore.Add(RejectMessageFrom(reasons, transaction, request));
-                transaction.RejectedByBusinessProcess();
-
-                _moveInTransactionRepository.Add(transaction);
-                return Unit.Value;
+               return await RejectInvalidRequestMessageAsync(transaction, request, "EnergySupplierDoesNotMatchSender").ConfigureAwait(false);
             }
 
             var businessProcessResult = await InvokeBusinessProcessAsync(transaction).ConfigureAwait(false);
@@ -127,6 +128,16 @@ namespace Messaging.Application.Transactions.MoveIn
             }
 
             return consumerType;
+        }
+
+        private async Task<Unit> RejectInvalidRequestMessageAsync(MoveInTransaction transaction, IncomingMessage request, string error)
+        {
+            var reasons = await CreateReasonsFromAsync(new Collection<string>() { error }).ConfigureAwait(false);
+            _outgoingMessageStore.Add(RejectMessageFrom(reasons, transaction, request));
+            transaction.RejectedByBusinessProcess();
+
+            _moveInTransactionRepository.Add(transaction);
+            return Unit.Value;
         }
 
         private Task<BusinessRequestResult> InvokeBusinessProcessAsync(MoveInTransaction transaction)
