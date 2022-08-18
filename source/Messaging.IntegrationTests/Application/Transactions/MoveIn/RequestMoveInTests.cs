@@ -130,6 +130,23 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             await AssertRejectMessage(rejectMessage).ConfigureAwait(false);
         }
 
+        [Fact]
+        public async Task A_reject_message_is_created_when_the_energy_supplier_id_is_empty()
+        {
+            var incomingMessage = MessageBuilder()
+                .WithProcessType(ProcessType.MoveIn.Code)
+                .WithReceiver(SampleData.ReceiverId)
+                .WithEnergySupplierId(null)
+                .WithConsumerName(null)
+                .Build();
+
+            await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
+            var rejectMessage = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage.Message.MessageId)!;
+            await RequestMessage(rejectMessage.Id.ToString()).ConfigureAwait(false);
+
+            await AssertRejectMessage(rejectMessage).ConfigureAwait(false);
+        }
+
         private static void AssertHeader(XDocument document, OutgoingMessage message, string expectedReasonCode)
         {
             Assert.NotEmpty(AssertXmlMessage.GetMessageHeaderValue(document, "mRID")!);
