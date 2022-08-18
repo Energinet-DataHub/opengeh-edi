@@ -51,6 +51,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         public async Task Transaction_is_started()
         {
             var incomingMessage = MessageBuilder()
+                .WithSenderId(SampleData.SenderId)
                 .Build();
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
@@ -102,6 +103,40 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
                 .WithProcessType(ProcessType.MoveIn.Code)
                 .WithReceiver(SampleData.ReceiverId)
                 .WithSenderId(SampleData.SenderId)
+                .WithConsumerName(null)
+                .Build();
+
+            await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
+            var rejectMessage = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage.Message.MessageId)!;
+            await RequestMessage(rejectMessage.Id.ToString()).ConfigureAwait(false);
+
+            await AssertRejectMessage(rejectMessage).ConfigureAwait(false);
+        }
+
+        [Fact]
+        public async Task A_reject_message_is_created_when_the_sender_id_does_not_match_energy_supplier_id()
+        {
+            var incomingMessage = MessageBuilder()
+                .WithProcessType(ProcessType.MoveIn.Code)
+                .WithReceiver(SampleData.ReceiverId)
+                .WithSenderId("Fake")
+                .WithConsumerName(null)
+                .Build();
+
+            await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
+            var rejectMessage = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage.Message.MessageId)!;
+            await RequestMessage(rejectMessage.Id.ToString()).ConfigureAwait(false);
+
+            await AssertRejectMessage(rejectMessage).ConfigureAwait(false);
+        }
+
+        [Fact]
+        public async Task A_reject_message_is_created_when_the_energy_supplier_id_is_empty()
+        {
+            var incomingMessage = MessageBuilder()
+                .WithProcessType(ProcessType.MoveIn.Code)
+                .WithReceiver(SampleData.ReceiverId)
+                .WithEnergySupplierId(null)
                 .WithConsumerName(null)
                 .Build();
 

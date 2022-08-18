@@ -85,11 +85,6 @@ namespace Messaging.CimMessageAdapter
                     return Result.Failure(new DuplicateTransactionIdDetected(marketActivityRecord.Id));
                 }
 
-                if (!IsEnergySupplierIdAndSenderIdAMatch(marketActivityRecord.EnergySupplierId, messageHeader.SenderId))
-                {
-                    return Result.Failure(new EnergySupplierDoesNotMatchSender(marketActivityRecord.EnergySupplierId, messageHeader.SenderId));
-                }
-
                 await AddToTransactionQueueAsync(CreateTransaction(messageHeader, marketActivityRecord)).ConfigureAwait(false);
             }
 

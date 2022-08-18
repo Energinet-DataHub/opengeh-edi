@@ -73,21 +73,34 @@ namespace Messaging.Application.Transactions.MoveIn
                 InstantPattern.General.Parse(request.MarketActivityRecord.EffectiveDate).GetValueOrThrow(),
                 marketEvaluationPoint?.EnergySupplierNumber,
                 request.Message.MessageId,
-                request.Message.SenderId,
+                request.MarketActivityRecord.EnergySupplierId ?? string.Empty,
                 request.MarketActivityRecord.ConsumerId,
                 request.MarketActivityRecord.ConsumerName,
                 request.MarketActivityRecord.ConsumerIdType);
+
+            if (string.IsNullOrEmpty(request.MarketActivityRecord.EnergySupplierId))
+            {
+                return await RejectInvalidRequestMessageAsync(transaction, request, "EnergySupplierIdIsEmpty")
+                    .ConfigureAwait(false);
+            }
+
+            if (!IsEnergySupplierIdAndSenderIdAMatch(
+                    request.MarketActivityRecord.EnergySupplierId,
+                    request.Message.SenderId))
+            {
+               return await RejectInvalidRequestMessageAsync(transaction, request, "EnergySupplierDoesNotMatchSender").ConfigureAwait(false);
+            }
 
             var businessProcessResult = await InvokeBusinessProcessAsync(transaction).ConfigureAwait(false);
             if (businessProcessResult.Success == false)
             {
                 var reasons = await CreateReasonsFromAsync(businessProcessResult.ValidationErrors).ConfigureAwait(false);
-                _outgoingMessageStore.Add(RejectMessageFrom(reasons, transaction));
+                _outgoingMessageStore.Add(RejectMessageFrom(reasons, transaction, request));
                 transaction.RejectedByBusinessProcess();
             }
             else
             {
-                _outgoingMessageStore.Add(ConfirmMessageFrom(transaction));
+                _outgoingMessageStore.Add(ConfirmMessageFrom(transaction, request));
                 transaction.AcceptedByBusinessProcess(
                     businessProcessResult.ProcessId ?? throw new MoveInException("Business process id cannot be empty."),
                     request.MarketActivityRecord.MarketEvaluationPointId ?? throw new MoveInException("Market evaluation point number cannot be empty."));
@@ -95,6 +108,11 @@ namespace Messaging.Application.Transactions.MoveIn
 
             _moveInTransactionRepository.Add(transaction);
             return Unit.Value;
+        }
+
+        private static bool IsEnergySupplierIdAndSenderIdAMatch(string? energySupplierId, string senderId)
+        {
+            return energySupplierId == senderId;
         }
 
         private static string GetConsumerIdType(string? consumerIdType)
@@ -112,6 +130,16 @@ namespace Messaging.Application.Transactions.MoveIn
             return consumerType;
         }
 
+        private async Task<Unit> RejectInvalidRequestMessageAsync(MoveInTransaction transaction, IncomingMessage request, string error)
+        {
+            var reasons = await CreateReasonsFromAsync(new Collection<string>() { error }).ConfigureAwait(false);
+            _outgoingMessageStore.Add(RejectMessageFrom(reasons, transaction, request));
+            transaction.RejectedByBusinessProcess();
+
+            _moveInTransactionRepository.Add(transaction);
+            return Unit.Value;
+        }
+
         private Task<BusinessRequestResult> InvokeBusinessProcessAsync(MoveInTransaction transaction)
         {
             var businessProcess = new MoveInRequest(
@@ -124,7 +152,7 @@ namespace Messaging.Application.Transactions.MoveIn
             return _moveInRequester.InvokeAsync(businessProcess);
         }
 
-        private OutgoingMessage ConfirmMessageFrom(MoveInTransaction transaction)
+        private OutgoingMessage ConfirmMessageFrom(MoveInTransaction transaction, IncomingMessage incomingMessage)
         {
             var marketActivityRecord = new OutgoingMessages.ConfirmRequestChangeOfSupplier.MarketActivityRecord(
                 Guid.NewGuid().ToString(),
@@ -135,12 +163,12 @@ namespace Messaging.Application.Transactions.MoveIn
                 transaction.StartedByMessageId,
                 ProcessType.MoveIn.Confirm.DocumentType,
                 ProcessType.MoveIn.Code,
-                transaction.NewEnergySupplierId,
+                incomingMessage.Message.SenderId,
                 _marketActivityRecordParser.From(marketActivityRecord),
                 ProcessType.MoveIn.Confirm.BusinessReasonCode);
         }
 
-        private OutgoingMessage RejectMessageFrom(IReadOnlyCollection<Reason> reasons, MoveInTransaction transaction)
+        private OutgoingMessage RejectMessageFrom(IReadOnlyCollection<Reason> reasons, MoveInTransaction transaction, IncomingMessage incomingMessage)
         {
             var marketActivityRecord = new OutgoingMessages.RejectRequestChangeOfSupplier.MarketActivityRecord(
                 Guid.NewGuid().ToString(),
@@ -152,7 +180,7 @@ namespace Messaging.Application.Transactions.MoveIn
                 transaction.StartedByMessageId,
                 ProcessType.MoveIn.Reject.DocumentType,
                 ProcessType.MoveIn.Code,
-                transaction.NewEnergySupplierId,
+                incomingMessage.Message.SenderId,
                 _marketActivityRecordParser.From(marketActivityRecord),
                 ProcessType.MoveIn.Reject.BusinessReasonCode);
         }
