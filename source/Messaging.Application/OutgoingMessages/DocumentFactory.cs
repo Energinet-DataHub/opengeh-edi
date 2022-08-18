@@ -24,9 +24,9 @@ namespace Messaging.Application.OutgoingMessages;
 
 public class DocumentFactory
 {
-    private readonly IReadOnlyCollection<DocumentWriter> _documentWriters;
+    private readonly IReadOnlyCollection<IDocumentWriter> _documentWriters;
 
-    public DocumentFactory(IEnumerable<DocumentWriter> documentWriters)
+    public DocumentFactory(IEnumerable<IDocumentWriter> documentWriters)
     {
         _documentWriters = documentWriters.ToList();
     }
