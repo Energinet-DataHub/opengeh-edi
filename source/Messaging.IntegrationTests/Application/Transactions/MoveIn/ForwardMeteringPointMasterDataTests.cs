@@ -67,16 +67,29 @@ public class ForwardMeteringPointMasterDataTests : TestBase
         AssertMarketEvaluationPoint(masterData, marketActivityRecord.MarketEvaluationPt);
     }
 
+    [Fact]
+    public async Task Correct_metering_point_master_data_message_is_added_to_outgoing_message_store_when_masterdata_contains_null_values()
+    {
+        await SetupAnAcceptedMoveInTransaction().ConfigureAwait(false);
+        var masterData = CreateMasterDataContentWithNullValues();
+
+        var forwardMeteringPointMasterData = new ForwardMeteringPointMasterData(SampleData.TransactionId, masterData);
+        await InvokeCommandAsync(forwardMeteringPointMasterData).ConfigureAwait(false);
+
+        var marketActivityRecord = await GetMarketActivityRecordAsync("AccountingPointCharacteristics").ConfigureAwait(false);
+        AssertMarketEvaluationPoint(masterData, marketActivityRecord.MarketEvaluationPt);
+    }
+
     private static void AssertMarketEvaluationPoint(MasterDataContent masterDataContent, MarketEvaluationPoint marketEvaluationPoint)
     {
         Assert.Equal(SampleData.MarketEvaluationPointId, marketEvaluationPoint.MRID.Id);
         Assert.Null(marketEvaluationPoint.MeteringPointResponsible);
-        Assert.Equal(MasterDataTranslation.Translations[masterDataContent.Type], marketEvaluationPoint.Type);
-        Assert.Equal(MasterDataTranslation.Translations[masterDataContent.SettlementMethod], marketEvaluationPoint.SettlementMethod);
-        Assert.Equal(MasterDataTranslation.Translations[masterDataContent.MeteringMethod], marketEvaluationPoint.MeteringMethod);
-        Assert.Equal(MasterDataTranslation.Translations[masterDataContent.ConnectionState], marketEvaluationPoint.ConnectionState);
-        Assert.Equal(MasterDataTranslation.Translations[masterDataContent.ReadingPeriodicity], marketEvaluationPoint.ReadCycle);
-        Assert.Equal(MasterDataTranslation.Translations[masterDataContent.NetSettlementGroup], marketEvaluationPoint.NetSettlementGroup);
+        Assert.Equal(MasterDataTranslation.GetTranslationFrom(masterDataContent.Type), marketEvaluationPoint.Type);
+        Assert.Equal(MasterDataTranslation.GetTranslationFrom(masterDataContent.SettlementMethod), marketEvaluationPoint.SettlementMethod);
+        Assert.Equal(MasterDataTranslation.GetTranslationFrom(masterDataContent.MeteringMethod), marketEvaluationPoint.MeteringMethod);
+        Assert.Equal(MasterDataTranslation.GetTranslationFrom(masterDataContent.ConnectionState), marketEvaluationPoint.ConnectionState);
+        Assert.Equal(MasterDataTranslation.GetTranslationFrom(masterDataContent.ReadingPeriodicity), marketEvaluationPoint.ReadCycle);
+        Assert.Equal(MasterDataTranslation.GetTranslationFrom(masterDataContent.NetSettlementGroup), marketEvaluationPoint.NetSettlementGroup);
         Assert.Equal(MasterDataTranslation.TranslateToNextReadingDate(masterDataContent.ScheduledMeterReadingDate).Date, marketEvaluationPoint.NextReadingDate.Date);
         Assert.Equal(masterDataContent.GridAreaDetails.Code, marketEvaluationPoint.MeteringGridAreaId.Id);
         Assert.Null(marketEvaluationPoint.OutMeteringGridAreaId);
@@ -85,9 +98,9 @@ public class ForwardMeteringPointMasterDataTests : TestBase
         Assert.Equal(
             masterDataContent.Capacity.ToString(CultureInfo.InvariantCulture),
             marketEvaluationPoint.PhysicalConnectionCapacity.Value);
-        Assert.Equal(MasterDataTranslation.Translations[masterDataContent.ConnectionType], marketEvaluationPoint.ConnectionType);
-        Assert.Equal(MasterDataTranslation.Translations[masterDataContent.DisconnectionType], marketEvaluationPoint.DisconnectionMethod);
-        Assert.Equal(MasterDataTranslation.Translations[masterDataContent.AssetType], marketEvaluationPoint.PsrType);
+        Assert.Equal(MasterDataTranslation.GetTranslationFrom(masterDataContent.ConnectionType), marketEvaluationPoint.ConnectionType);
+        Assert.Equal(MasterDataTranslation.GetTranslationFrom(masterDataContent.DisconnectionType), marketEvaluationPoint.DisconnectionMethod);
+        Assert.Equal(MasterDataTranslation.GetTranslationFrom(masterDataContent.AssetType), marketEvaluationPoint.PsrType);
         Assert.Equal(
             masterDataContent.ProductionObligation.ToString(CultureInfo.InvariantCulture),
             marketEvaluationPoint.ProductionObligation);
@@ -98,8 +111,8 @@ public class ForwardMeteringPointMasterDataTests : TestBase
             masterDataContent.MaximumCurrent.ToString(CultureInfo.InvariantCulture),
             marketEvaluationPoint.RatedCurrent.Value);
         Assert.Equal(masterDataContent.MeterNumber, marketEvaluationPoint.MeterId);
-        Assert.Equal(MasterDataTranslation.Translations[masterDataContent.Series.Product], marketEvaluationPoint.Series.Product);
-        Assert.Equal(MasterDataTranslation.Translations[masterDataContent.Series.UnitType], marketEvaluationPoint.Series.QuantityMeasureUnit);
+        Assert.Equal(MasterDataTranslation.GetTranslationFrom(masterDataContent.Series.Product), marketEvaluationPoint.Series.Product);
+        Assert.Equal(MasterDataTranslation.GetTranslationFrom(masterDataContent.Series.UnitType), marketEvaluationPoint.Series.QuantityMeasureUnit);
         Assert.Equal(masterDataContent.EffectiveDate.ToUniversalTime().ToInstant(), marketEvaluationPoint.SupplyStart);
         Assert.Equal(masterDataContent.Address.LocationDescription, marketEvaluationPoint.Description);
         Assert.Equal(masterDataContent.Address.GeoInfoReference.ToString(), marketEvaluationPoint.GeoInfoReference);
@@ -182,6 +195,52 @@ public class ForwardMeteringPointMasterDataTests : TestBase
             MasterDataSampleData.NetSettlementGroup,
             MasterDataSampleData.DisconnectionType,
             MasterDataSampleData.ConnectionType,
+            MasterDataSampleData.ParentRelatedMeteringPoint,
+            null);
+    }
+
+    private static MasterDataContent CreateMasterDataContentWithNullValues()
+    {
+        return new MasterDataContent(
+            SampleData.MeteringPointNumber,
+            new Address(
+                MasterDataSampleData.StreetName,
+                MasterDataSampleData.StreetCode,
+                MasterDataSampleData.PostCode,
+                MasterDataSampleData.CityName,
+                MasterDataSampleData.CountryCode,
+                MasterDataSampleData.CitySubdivision,
+                MasterDataSampleData.Floor,
+                MasterDataSampleData.Room,
+                MasterDataSampleData.BuildingNumber,
+                MasterDataSampleData.MunicipalityCode,
+                MasterDataSampleData.IsActualAddress,
+                Guid.Parse(MasterDataSampleData.GeoInfoReference),
+                MasterDataSampleData.LocationDescription),
+            new Series(
+                MasterDataSampleData.ProductType,
+                MasterDataSampleData.UnitType),
+            new GridAreaDetails(
+                "some string code",
+                "some string to code",
+                "some string from code"),
+            string.Empty,
+            string.Empty,
+            string.Empty,
+            MasterDataSampleData.TypeName,
+            MasterDataSampleData.MaximumCurrent,
+            MasterDataSampleData.MaximumPower,
+            MasterDataSampleData.PowerPlant,
+            DateTime.Parse(MasterDataSampleData.EffectiveDate, CultureInfo.InvariantCulture),
+            MasterDataSampleData.MeterNumber,
+            double.Parse(MasterDataSampleData.Capacity, CultureInfo.InvariantCulture),
+            MasterDataSampleData.AssetType,
+            null!,
+            MasterDataSampleData.ScheduledMeterReadingDate,
+            false,
+            MasterDataSampleData.NetSettlementGroup,
+            MasterDataSampleData.DisconnectionType,
+            null!,
             MasterDataSampleData.ParentRelatedMeteringPoint,
             null);
     }
