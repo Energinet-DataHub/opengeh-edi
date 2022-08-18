@@ -22,11 +22,11 @@ using Messaging.Domain.OutgoingMessages;
 
 namespace Messaging.Application.OutgoingMessages;
 
-public class MessageFactory
+public class DocumentFactory
 {
     private readonly IReadOnlyCollection<DocumentWriter> _documentWriters;
 
-    public MessageFactory(
+    public DocumentFactory(
         DocumentWriter[] documentWriters)
     {
         _documentWriters = documentWriters.ToList();

@@ -26,7 +26,7 @@ public class DocumentFactoryTests
     [Fact]
     public async Task Throw_if_document_format_can_not_be_handled()
     {
-        var factory = new MessageFactory(System.Array.Empty<DocumentWriter>());
+        var factory = new DocumentFactory(System.Array.Empty<DocumentWriter>());
         var header = new MessageHeader(
             "ProcessType",
             "SenderId",
