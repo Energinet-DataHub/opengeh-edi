@@ -26,19 +26,18 @@ public class DocumentFactory
 {
     private readonly IReadOnlyCollection<DocumentWriter> _documentWriters;
 
-    public DocumentFactory(
-        DocumentWriter[] documentWriters)
+    public DocumentFactory(IEnumerable<DocumentWriter> documentWriters)
     {
         _documentWriters = documentWriters.ToList();
     }
 
-    public Task<Stream> CreateFromAsync(CimMessage message)
+    public Task<Stream> CreateFromAsync(CimMessage message, CimFormat documentFormat)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
         var documentWriter =
             _documentWriters.FirstOrDefault(writer =>
                 writer.HandlesDocumentType(message.DocumentType) &&
-                writer.HandlesDocumentFormat(CimFormat.Xml));
+                writer.HandlesDocumentFormat(documentFormat));
 
         if (documentWriter is null)
         {

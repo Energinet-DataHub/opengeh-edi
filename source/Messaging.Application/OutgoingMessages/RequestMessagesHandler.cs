@@ -57,7 +57,7 @@ namespace Messaging.Application.OutgoingMessages
 
             var messageBundle = CreateBundleFrom(messages);
 
-            var message = await _documentFactory.CreateFromAsync(messageBundle.CreateMessage()).ConfigureAwait(false);
+            var message = await _documentFactory.CreateFromAsync(messageBundle.CreateMessage(), CimFormat.Xml).ConfigureAwait(false);
             await _messageDispatcher.DispatchAsync(message).ConfigureAwait(false);
 
             return Unit.Value;
