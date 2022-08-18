@@ -27,7 +27,7 @@ public class MessageFactory
     private readonly IReadOnlyCollection<DocumentWriter> _documentWriters;
 
     public MessageFactory(
-        IEnumerable<DocumentWriter> documentWriters)
+        DocumentWriter[] documentWriters)
     {
         _documentWriters = documentWriters.ToList();
     }
@@ -36,7 +36,12 @@ public class MessageFactory
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
         var documentWriter =
-            _documentWriters.First(writer => writer.HandlesDocumentType(message.DocumentType));
+            _documentWriters.FirstOrDefault(writer => writer.HandlesDocumentType(message.DocumentType));
+
+        if (documentWriter is null)
+        {
+            throw new OutgoingMessageException($"Could handle document type {message.DocumentType}");
+        }
 
         return documentWriter.WriteAsync(
             message.Header,
