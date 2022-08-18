@@ -34,6 +34,7 @@ namespace Messaging.IntegrationTests.Application.IncomingMessages
         private string? _consumerName = NotSet;
         private string _marketEvaluationPointId = NotSet;
         private string? _transactionId;
+        private string? _energySupplierId = "123456";
 
         internal IncomingMessageBuilder WithMarketEvaluationPointId(string marketEvaluationPointId)
         {
@@ -77,6 +78,12 @@ namespace Messaging.IntegrationTests.Application.IncomingMessages
             return this;
         }
 
+        internal IncomingMessageBuilder WithEnergySupplierId(string? energySupplierId)
+        {
+            _energySupplierId = energySupplierId;
+            return this;
+        }
+
         internal IncomingMessage Build()
         {
             return IncomingMessage.Create(
@@ -93,7 +100,7 @@ namespace Messaging.IntegrationTests.Application.IncomingMessages
                 ConsumerId = "fake",
                 ConsumerName = _consumerName,
                 EffectiveDate = _effectiveDate.ToString(),
-                EnergySupplierId = "123456",
+                EnergySupplierId = _energySupplierId,
                 MarketEvaluationPointId = _marketEvaluationPointId,
             };
         }
