@@ -20,10 +20,13 @@ namespace Messaging.Application.OutgoingMessages;
 
 public class RequestMessages : ICommand<Unit>
 {
-    public RequestMessages(IEnumerable<string> messageIds)
+    public RequestMessages(IEnumerable<string> messageIds, string requestedDocumentFormat)
     {
         MessageIds = messageIds;
+        RequestedDocumentFormat = requestedDocumentFormat;
     }
 
     public IEnumerable<string> MessageIds { get; }
+
+    public string RequestedDocumentFormat { get; }
 }

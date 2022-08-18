@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.IncomingMessages;
 using Messaging.Application.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.TestDoubles;
@@ -77,7 +78,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
 
         private Task RequestMessages(IEnumerable<string> messageIds)
         {
-            return GetService<IMediator>().Send(new RequestMessages(messageIds.ToList()));
+            return GetService<IMediator>().Send(new RequestMessages(messageIds.ToList(), CimFormat.Xml.Name));
         }
     }
 }
