@@ -24,7 +24,7 @@ public class ConfirmChangeOfSupplierJsonDocumentWriter : IDocumentWriter
 {
     public bool HandlesDocumentFormat(CimFormat format)
     {
-        throw new System.NotImplementedException();
+        return format == CimFormat.Json;
     }
 
     public bool HandlesDocumentType(string documentType)
