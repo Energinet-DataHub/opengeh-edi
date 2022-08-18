@@ -80,7 +80,7 @@ namespace Messaging.Application.Transactions.MoveIn
 
             if (string.IsNullOrEmpty(request.MarketActivityRecord.EnergySupplierId))
             {
-                return await RejectInvalidRequestMessageAsync(transaction, request, "EnergySupplierIsEmpty")
+                return await RejectInvalidRequestMessageAsync(transaction, request, "EnergySupplierIdIsEmpty")
                     .ConfigureAwait(false);
             }
 
