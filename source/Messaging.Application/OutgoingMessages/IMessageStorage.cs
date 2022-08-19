@@ -12,21 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using MediatR;
-using Messaging.Application.Common.Commands;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace Messaging.Application.OutgoingMessages;
 
-public class RequestMessages : ICommand<Unit>
+/// <summary>
+/// Storage of physical bundled CIM messages
+/// </summary>
+public interface IMessageStorage
 {
-    public RequestMessages(IEnumerable<string> messageIds, string requestedDocumentFormat)
-    {
-        MessageIds = messageIds;
-        RequestedDocumentFormat = requestedDocumentFormat;
-    }
-
-    public IEnumerable<string> MessageIds { get; }
-
-    public string RequestedDocumentFormat { get; }
+    /// <summary>
+    /// Saves the message in storage location
+    /// </summary>
+    /// <param name="bundledMessage"></param>
+    /// <returns>Location of stored file</returns>
+    Task<Uri> SaveAsync(Stream bundledMessage);
 }

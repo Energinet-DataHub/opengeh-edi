@@ -190,7 +190,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
         private async Task RequestMessage(string id)
         {
-            await InvokeCommandAsync(new RequestMessages(new[] { id })).ConfigureAwait(false);
+            await InvokeCommandAsync(new RequestMessages(new[] { id }, CimFormat.Xml.Name)).ConfigureAwait(false);
         }
 
         private async Task AssertRejectMessage(OutgoingMessage rejectMessage)
@@ -214,8 +214,8 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
         private Stream GetDispatchedDocument()
         {
-            var messageDispatcher = GetService<IMessageDispatcher>() as MessageDispatcherSpy;
-            return messageDispatcher!.DispatchedMessage!;
+            var messageDispatcher = (MessageStorageSpy)GetService<IMessageStorage>();
+            return messageDispatcher.SavedMessage!;
         }
 
         private HttpClientSpy GetHttpClientMock()

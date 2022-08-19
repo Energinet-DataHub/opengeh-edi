@@ -12,26 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Messaging.Application.OutgoingMessages;
 
-namespace Messaging.Application.OutgoingMessages
+namespace Messaging.IntegrationTests.TestDoubles
 {
-    /// <summary>
-    /// Interface for dispatching messages
-    /// </summary>
-    public interface IMessageDispatcher
+    public class MessageRequestNotificationsSpy : IMessageRequestNotifications
     {
-        /// <summary>
-        /// Dispatches the message
-        /// </summary>
-        /// <param name="message"></param>
-        Task DispatchAsync(Stream message);
+        public Stream? DispatchedMessage { get; private set; }
 
-        /// <summary>
-        /// Dispatches the message
-        /// </summary>
-        Task DispatchAsync(IReadOnlyList<string> messageIds);
+        public bool Error { get; private set; }
+
+        #pragma warning disable
+        public Task SavedMessageSuccessfullyAsync(Uri storedMessageLocation)
+        {
+            return Task.CompletedTask;
+        }
+
+        public async Task RequestedMessagesWasNotFoundAsync(IReadOnlyList<string> messageIds)
+        {
+            Error = true;
+            await Task.CompletedTask.ConfigureAwait(false);
+        }
     }
 }
