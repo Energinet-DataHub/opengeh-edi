@@ -19,9 +19,9 @@ using System.Threading.Tasks;
 namespace Messaging.Application.OutgoingMessages
 {
     /// <summary>
-    /// Interface for dispatching messages
+    /// Generates notifications as response to message requests
     /// </summary>
-    public interface IMessageDispatcher
+    public interface IMessageRequestNotifications
     {
         /// <summary>
         /// Dispatches the message

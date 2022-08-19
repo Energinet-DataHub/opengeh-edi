@@ -28,20 +28,20 @@ namespace Messaging.Application.OutgoingMessages
     public class RequestMessagesHandler : IRequestHandler<RequestMessages, Unit>
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
-        private readonly IMessageDispatcher _messageDispatcher;
+        private readonly IMessageRequestNotifications _messageRequestNotifications;
         private readonly DocumentFactory _documentFactory;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
         private readonly IMessageStorage _messageStorage;
 
         public RequestMessagesHandler(
             IOutgoingMessageStore outgoingMessageStore,
-            IMessageDispatcher messageDispatcherSpy,
+            IMessageRequestNotifications messageRequestNotificationsSpy,
             DocumentFactory documentFactory,
             ISystemDateTimeProvider systemDateTimeProvider,
             IMessageStorage messageStorage)
         {
             _outgoingMessageStore = outgoingMessageStore;
-            _messageDispatcher = messageDispatcherSpy;
+            _messageRequestNotifications = messageRequestNotificationsSpy;
             _documentFactory = documentFactory;
             _systemDateTimeProvider = systemDateTimeProvider;
             _messageStorage = messageStorage;
@@ -55,7 +55,7 @@ namespace Messaging.Application.OutgoingMessages
             var messageIdsNotFound = MessageIdsNotFound(requestedMessageIds, messages);
             if (messageIdsNotFound.Any())
             {
-                await _messageDispatcher.DispatchAsync(messageIdsNotFound).ConfigureAwait(false);
+                await _messageRequestNotifications.DispatchAsync(messageIdsNotFound).ConfigureAwait(false);
                 return Unit.Value;
             }
 
@@ -63,7 +63,7 @@ namespace Messaging.Application.OutgoingMessages
 
             var message = await _documentFactory.CreateFromAsync(messageBundle.CreateMessage(), EnumerationType.FromName<CimFormat>(request.RequestedDocumentFormat)).ConfigureAwait(false);
             var storedMessageLocation = await _messageStorage.SaveAsync(message).ConfigureAwait(false);
-            await _messageDispatcher.DispatchAsync(storedMessageLocation).ConfigureAwait(false);
+            await _messageRequestNotifications.DispatchAsync(storedMessageLocation).ConfigureAwait(false);
 
             return Unit.Value;
         }

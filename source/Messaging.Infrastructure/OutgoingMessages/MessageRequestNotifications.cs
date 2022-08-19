@@ -20,12 +20,12 @@ using Messaging.Application.OutgoingMessages;
 
 namespace Messaging.Infrastructure.OutgoingMessages
 {
-    public class MessageDispatcher : IMessageDispatcher
+    public class MessageRequestNotifications : IMessageRequestNotifications
     {
         private readonly MessageRequestContext _messageRequestContext;
         private readonly ICommandScheduler _commandScheduler;
 
-        public MessageDispatcher(
+        public MessageRequestNotifications(
             MessageRequestContext messageRequestContext,
             ICommandScheduler commandScheduler)
         {

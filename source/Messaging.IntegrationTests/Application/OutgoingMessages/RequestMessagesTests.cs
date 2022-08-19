@@ -30,14 +30,14 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
     public class RequestMessagesTests : TestBase
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
-        private readonly MessageDispatcherSpy _messageDispatcherSpy;
+        private readonly MessageRequestNotificationsSpy _messageRequestNotificationsSpy;
         private readonly MessageStorageSpy _messageStorage;
 
         public RequestMessagesTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
             _outgoingMessageStore = GetService<IOutgoingMessageStore>();
-            _messageDispatcherSpy = (MessageDispatcherSpy)GetService<IMessageDispatcher>();
+            _messageRequestNotificationsSpy = (MessageRequestNotificationsSpy)GetService<IMessageRequestNotifications>();
             _messageStorage = (MessageStorageSpy)GetService<IMessageStorage>();
         }
 
@@ -61,7 +61,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
             var nonExistingMessage = new List<string> { Guid.NewGuid().ToString() };
 
             await RequestMessages(nonExistingMessage.AsReadOnly()).ConfigureAwait(false);
-            Assert.True(_messageDispatcherSpy.Error);
+            Assert.True(_messageRequestNotificationsSpy.Error);
         }
 
         private static IncomingMessageBuilder MessageBuilder()

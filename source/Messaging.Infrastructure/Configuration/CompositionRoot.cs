@@ -83,7 +83,7 @@ namespace Messaging.Infrastructure.Configuration
             services.AddScoped<IMarketActorAuthenticator, MarketActorAuthenticator>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
-            services.AddScoped<IMessageDispatcher, MessageDispatcher>();
+            services.AddScoped<IMessageRequestNotifications, MessageRequestNotifications>();
             services.AddTransient<IRequestHandler<RequestMessages, Unit>, RequestMessagesHandler>();
             services.AddScoped<MessageRequestContext>();
             services.AddScoped<MessageReceiver>();
@@ -171,9 +171,9 @@ namespace Messaging.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddOutgoingMessageDispatcher(IMessageDispatcher messageDispatcher)
+        public CompositionRoot AddOutgoingMessageDispatcher(IMessageRequestNotifications messageRequestNotifications)
         {
-            _services.AddScoped<IMessageDispatcher>(_ => messageDispatcher);
+            _services.AddScoped<IMessageRequestNotifications>(_ => messageRequestNotifications);
             _services.AddScoped<RequestMessagesHandler>();
 
             return this;

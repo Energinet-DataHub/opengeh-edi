@@ -20,7 +20,7 @@ using Messaging.Application.OutgoingMessages;
 
 namespace Messaging.IntegrationTests.TestDoubles
 {
-    public class MessageDispatcherSpy : IMessageDispatcher
+    public class MessageRequestNotificationsSpy : IMessageRequestNotifications
     {
         public Stream? DispatchedMessage { get; private set; }
 
