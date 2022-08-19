@@ -22,6 +22,16 @@ namespace Messaging.Infrastructure.OutgoingMessages;
 public class SendSuccessNotification : InternalCommand
 {
     [JsonConstructor]
+    public SendSuccessNotification(Guid id, Guid requestId, string idempotencyId, string referenceId, string messageType, Uri messageStorageLocation)
+        : base(id)
+    {
+        RequestId = requestId;
+        IdempotencyId = idempotencyId;
+        ReferenceId = referenceId;
+        MessageType = messageType;
+        MessageStorageLocation = messageStorageLocation;
+    }
+
     public SendSuccessNotification(Guid requestId, string idempotencyId, string referenceId, string messageType, Uri messageStorageLocation)
     {
         RequestId = requestId;
