@@ -40,11 +40,6 @@ namespace Messaging.Infrastructure.OutgoingMessages
                 throw new InvalidOperationException($"Data request DTO is null.");
             }
 
-            await _commandScheduler.EnqueueAsync(
-                new SendMessageRequestNotification(
-                    _messageRequestContext.DataBundleRequestDto,
-                    storedMessageLocation)).ConfigureAwait(false);
-
             await _commandScheduler
                 .EnqueueAsync(new SendSuccessNotification(
                     _messageRequestContext.DataBundleRequestDto.RequestId,
