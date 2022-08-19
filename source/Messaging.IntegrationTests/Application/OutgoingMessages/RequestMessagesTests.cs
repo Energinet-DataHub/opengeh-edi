@@ -82,6 +82,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
             Assert.Equal(_messageRequestContext.DataBundleRequestDto?.IdempotencyId, command?.IdempotencyId);
             Assert.Equal(_messageRequestContext.DataBundleRequestDto?.DataAvailableNotificationReferenceId, command?.ReferenceId);
             Assert.Equal(_messageRequestContext.DataBundleRequestDto?.MessageType, command?.MessageType);
+            Assert.NotNull(command?.MessageStorageLocation);
         }
 
         [Fact]

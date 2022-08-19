@@ -50,7 +50,8 @@ namespace Messaging.Infrastructure.OutgoingMessages
                     _messageRequestContext.DataBundleRequestDto.RequestId,
                     _messageRequestContext.DataBundleRequestDto.IdempotencyId,
                     _messageRequestContext.DataBundleRequestDto.DataAvailableNotificationReferenceId,
-                    _messageRequestContext.DataBundleRequestDto.MessageType))
+                    _messageRequestContext.DataBundleRequestDto.MessageType,
+                    storedMessageLocation))
                 .ConfigureAwait(false);
         }
 
