@@ -28,8 +28,6 @@ public class ConfirmChangeOfSupplierJsonDocumentWriter : IDocumentWriter
     private readonly string _documentType;
     private readonly string _typeCode;
     private readonly IMarketActivityRecordParser _parser;
-    //private const string DocumentType = "ConfirmRequestChangeOfSupplier_MarketDocument";
-    /*private const string TypeCode = "E44";*/
 
     public ConfirmChangeOfSupplierJsonDocumentWriter(string documentType, string typeCode, IMarketActivityRecordParser parser)
     {
@@ -49,23 +47,24 @@ public class ConfirmChangeOfSupplierJsonDocumentWriter : IDocumentWriter
         return _documentType.Equals(documentType, StringComparison.OrdinalIgnoreCase);
     }
 
-    public Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
+    public async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
     {
         var stream = new MemoryStream();
-        var streamWriter = new StreamWriter(stream);
+        var streamWriter = new StreamWriter(stream, leaveOpen: true);
         using var writer = new JsonTextWriter(streamWriter);
 
         WriteHeader(header, writer);
         WriteMarketActivityRecords(marketActivityRecords, writer);
         WriteEnd(writer);
-        return Task.FromResult<Stream>(stream);
+        writer.Flush();
+        await streamWriter.FlushAsync().ConfigureAwait(false);
+        stream.Position = 0;
+        return stream;
     }
 
     private static void WriteEnd(JsonTextWriter writer)
     {
         writer.WriteEndObject();
-        writer.WriteEndObject();
-        writer.Close();
     }
 
     private void WriteHeader(MessageHeader header, JsonTextWriter writer)
