@@ -52,7 +52,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
             var requestedMessageIds = new List<string> { outgoingMessage1.Id.ToString(), outgoingMessage2.Id.ToString(), };
             await RequestMessages(requestedMessageIds.AsReadOnly()).ConfigureAwait(false);
 
-            _messageStorage.MessageHasBeenSaved();
+            _messageStorage.MessageHasBeenSavedInStorage();
         }
 
         [Fact]

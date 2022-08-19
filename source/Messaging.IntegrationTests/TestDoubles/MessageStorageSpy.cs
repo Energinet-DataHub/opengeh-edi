@@ -30,7 +30,7 @@ public class MessageStorageSpy : IMessageStorage
         return Task.FromResult(new Uri("http://someuri"));
     }
 
-    public void MessageHasBeenSaved()
+    public void MessageHasBeenSavedInStorage()
     {
         Assert.NotNull(SavedMessage);
     }
