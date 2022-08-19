@@ -171,14 +171,6 @@ namespace Messaging.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddOutgoingMessageDispatcher(IMessageRequestNotifications messageRequestNotifications)
-        {
-            _services.AddScoped<IMessageRequestNotifications>(_ => messageRequestNotifications);
-            _services.AddScoped<RequestMessagesHandler>();
-
-            return this;
-        }
-
         public CompositionRoot AddMessageHubServices(string storageServiceConnectionString, string storageServiceContainerName, string queueConnectionString, string dataAvailableQueue, string domainReplyQueue)
         {
             _services.AddSingleton<StorageConfig>(s => new StorageConfig(storageServiceContainerName));

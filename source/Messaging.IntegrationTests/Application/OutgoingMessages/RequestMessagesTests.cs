@@ -27,7 +27,6 @@ using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.IncomingMessages;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages;
-using Messaging.Infrastructure.Configuration.InternalCommands;
 using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Fixtures;
@@ -39,7 +38,6 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
     public class RequestMessagesTests : TestBase
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
-        //private readonly MessageRequestNotificationsSpy _messageRequestNotificationsSpy;
         private readonly MessageStorageSpy _messageStorage;
         private readonly MessageRequestContext _messageRequestContext;
 
@@ -47,7 +45,6 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
             : base(databaseFixture)
         {
             _outgoingMessageStore = GetService<IOutgoingMessageStore>();
-            //_messageRequestNotificationsSpy = (MessageRequestNotificationsSpy)GetService<IMessageRequestNotifications>();
             _messageStorage = (MessageStorageSpy)GetService<IMessageStorage>();
             _messageRequestContext = GetService<MessageRequestContext>();
         }
