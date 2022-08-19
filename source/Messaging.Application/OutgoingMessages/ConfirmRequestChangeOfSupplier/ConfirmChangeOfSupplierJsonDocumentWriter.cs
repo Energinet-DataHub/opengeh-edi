@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using Messaging.Application.Common;
 using Messaging.Domain.OutgoingMessages;
@@ -25,14 +24,12 @@ namespace Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 
 public class ConfirmChangeOfSupplierJsonDocumentWriter : IDocumentWriter
 {
-    private readonly string _documentType;
-    private readonly string _typeCode;
+    private const string DocumentType = "ConfirmRequestChangeOfSupplier_MarketDocument";
+    private const string TypeCode = "E44";
     private readonly IMarketActivityRecordParser _parser;
 
     public ConfirmChangeOfSupplierJsonDocumentWriter(string documentType, string typeCode, IMarketActivityRecordParser parser)
     {
-        _documentType = documentType;
-        _typeCode = typeCode;
         _parser = parser;
     }
 
@@ -44,7 +41,7 @@ public class ConfirmChangeOfSupplierJsonDocumentWriter : IDocumentWriter
     public bool HandlesDocumentType(string documentType)
     {
         if (documentType == null) throw new ArgumentNullException(nameof(documentType));
-        return _documentType.Equals(documentType, StringComparison.OrdinalIgnoreCase);
+        return DocumentType.Equals(documentType, StringComparison.OrdinalIgnoreCase);
     }
 
     public async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
@@ -67,9 +64,9 @@ public class ConfirmChangeOfSupplierJsonDocumentWriter : IDocumentWriter
         writer.WriteEndObject();
     }
 
-    private void WriteHeader(MessageHeader header, JsonTextWriter writer)
+    private static void WriteHeader(MessageHeader header, JsonTextWriter writer)
     {
-        JsonHeaderWriter.Write(header, _documentType, _typeCode, writer);
+        JsonHeaderWriter.Write(header, DocumentType, TypeCode, writer);
     }
 
     private void WriteMarketActivityRecords(IReadOnlyCollection<string> marketActivityRecords, JsonTextWriter writer)
