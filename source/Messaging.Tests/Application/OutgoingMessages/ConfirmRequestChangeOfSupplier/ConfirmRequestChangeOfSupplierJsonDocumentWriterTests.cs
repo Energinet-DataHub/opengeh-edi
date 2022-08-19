@@ -27,6 +27,7 @@ using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Serialization;
+using Messaging.Tests.Application.OutgoingMessages.Asserts;
 using Xunit;
 
 namespace Messaging.Tests.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
@@ -42,7 +43,7 @@ public class ConfirmRequestChangeOfSupplierJsonDocumentWriterTests
     {
         _systemDateTimeProvider = new SystemDateTimeProvider();
         _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
-        _documentWriter = new ConfirmChangeOfSupplierJsonDocumentWriter("ConfirmRequestChangeOfSupplier_MarketDocument", "E44", _marketActivityRecordParser);
+        _documentWriter = new ConfirmChangeOfSupplierJsonDocumentWriter(_marketActivityRecordParser);
         _schemaProvider = new JsonSchemaProvider();
     }
 
@@ -57,24 +58,19 @@ public class ConfirmRequestChangeOfSupplierJsonDocumentWriterTests
 
         var message = await _documentWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
 
-        await AssertConformsToSchema(message).ConfigureAwait(false);
+        await AssertMessage(message, header, marketActivityRecords).ConfigureAwait(false);
     }
 
-    private async Task AssertConformsToSchema(Stream message)
+    private async Task AssertMessage(Stream message, MessageHeader header, List<MarketActivityRecord> marketActivityRecords)
     {
         _schemaProvider = new JsonSchemaProvider();
         var schema = await _schemaProvider.GetSchemaAsync<JsonSchema>("confirmrequestchangeofsupplier", "0").ConfigureAwait(false);
-        if (schema == null) throw new InvalidOperationException("Schema not found for business process type ConfirmRequestChangeOfSupplier");
+        if (schema == null) throw new InvalidCastException("Json schema not found for process ConfirmRequestChangeOfSupplier");
+        var document = await JsonDocument.ParseAsync(message).ConfigureAwait(false);
+        AssertJsonMessage.AssertConformsToSchema(document, schema);
 
-        var jsonDocument = await JsonDocument.ParseAsync(message).ConfigureAwait(false);
-
-        var validationOptions = new ValidationOptions()
-        {
-            OutputFormat = OutputFormat.Detailed,
-        };
-
-        var validationResult = schema.Validate(jsonDocument, validationOptions);
-
-        Assert.True(validationResult.IsValid);
+        AssertJsonMessage.AssertHeader(header, document);
+        //AssertXmlMessage.AssertHasHeaderValue(document, "type", "E44");
+        //AssertMarketActivityRecords(marketActivityRecords, document);
     }
 }

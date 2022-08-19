@@ -28,7 +28,7 @@ public class ConfirmChangeOfSupplierJsonDocumentWriter : IDocumentWriter
     private const string TypeCode = "E44";
     private readonly IMarketActivityRecordParser _parser;
 
-    public ConfirmChangeOfSupplierJsonDocumentWriter(string documentType, string typeCode, IMarketActivityRecordParser parser)
+    public ConfirmChangeOfSupplierJsonDocumentWriter(IMarketActivityRecordParser parser)
     {
         _parser = parser;
     }
