@@ -39,7 +39,10 @@ public class SendSuccessNotificationHandler : IRequestHandler<SendSuccessNotific
             request.RequestId,
             request.ReferenceId,
             request.IdempotencyId,
-            request.MessageType);
+            new MessageTypeDto(request.MessageType),
+            //TODO: Fix format
+            ResponseFormat.Xml,
+            1);
 
         await _dataBundleResponseSender.SendAsync(bundleRequest.CreateResponse(request.MessageStorageLocation)).ConfigureAwait(false);
 

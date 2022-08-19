@@ -39,13 +39,14 @@ public class SendFailureNotificationHandler : IRequestHandler<SendFailureNotific
             request.RequestId,
             request.ReferenceId,
             request.IdempotencyId,
-            request.MessageType);
+            new MessageTypeDto(request.MessageType),
+            //TODO: Fix format
+            ResponseFormat.Xml,
+            1);
 
-        var error = new DataBundleResponseErrorDto()
-        {
-            Reason = Enum.Parse<DataBundleResponseErrorReason>(request.Reason),
-            FailureDescription = request.FailureDescription,
-        };
+        var error = new DataBundleResponseErrorDto(
+            Enum.Parse<DataBundleResponseErrorReason>(request.Reason),
+            request.FailureDescription);
 
         await _dataBundleResponseSender.SendAsync(bundleRequest.CreateErrorResponse(error)).ConfigureAwait(false);
         return Unit.Value;
