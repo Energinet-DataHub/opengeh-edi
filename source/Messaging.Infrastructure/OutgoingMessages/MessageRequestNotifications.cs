@@ -56,7 +56,9 @@ namespace Messaging.Infrastructure.OutgoingMessages
                         request.RequestId,
                         request.IdempotencyId,
                         $"Message(s) with the following id(s) not found {messageIds}",
-                        "DatasetNotFound"))
+                        "DatasetNotFound",
+                        request.DataAvailableNotificationReferenceId,
+                        request.MessageType))
                 .ConfigureAwait(false);
         }
 
