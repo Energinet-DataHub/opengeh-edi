@@ -79,6 +79,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
             var command = JsonSerializer.Deserialize<SendSuccessNotification>(commandData);
             Assert.NotNull(command);
             Assert.Equal(_messageRequestContext.DataBundleRequestDto?.RequestId, command?.RequestId);
+            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.IdempotencyId, command?.IdempotencyId);
         }
 
         [Fact]

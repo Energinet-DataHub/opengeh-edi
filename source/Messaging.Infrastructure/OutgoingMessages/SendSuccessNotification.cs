@@ -21,10 +21,13 @@ namespace Messaging.Infrastructure.OutgoingMessages;
 public class SendSuccessNotification : InternalCommand
 {
     [JsonConstructor]
-    public SendSuccessNotification(Guid requestId)
+    public SendSuccessNotification(Guid requestId, string idempotencyId)
     {
         RequestId = requestId;
+        IdempotencyId = idempotencyId;
     }
 
     public Guid RequestId { get; }
+
+    public string IdempotencyId { get; }
 }

@@ -46,7 +46,9 @@ namespace Messaging.Infrastructure.OutgoingMessages
                     storedMessageLocation)).ConfigureAwait(false);
 
             await _commandScheduler
-                .EnqueueAsync(new SendSuccessNotification(_messageRequestContext.DataBundleRequestDto.RequestId))
+                .EnqueueAsync(new SendSuccessNotification(
+                    _messageRequestContext.DataBundleRequestDto.RequestId,
+                    _messageRequestContext.DataBundleRequestDto.IdempotencyId))
                 .ConfigureAwait(false);
         }
 
