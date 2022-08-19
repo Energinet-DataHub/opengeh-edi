@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using Messaging.Application.Common.Commands;
 
@@ -21,20 +22,24 @@ namespace Messaging.Infrastructure.OutgoingMessages;
 public class SendFailureNotification : InternalCommand
 {
     [JsonConstructor]
-    public SendFailureNotification(Guid id, Guid requestId, string idempotencyId)
+    public SendFailureNotification(Guid id, Guid requestId, string idempotencyId, string failureDescription)
         : base(id)
     {
         RequestId = requestId;
         IdempotencyId = idempotencyId;
+        FailureDescription = failureDescription;
     }
 
-    public SendFailureNotification(Guid requestId, string idempotencyId)
+    public SendFailureNotification(Guid requestId, string idempotencyId, string failureDescription)
     {
         RequestId = requestId;
         IdempotencyId = idempotencyId;
+        FailureDescription = failureDescription;
     }
 
     public Guid RequestId { get; }
 
     public string IdempotencyId { get; }
+
+    public string FailureDescription { get; }
 }

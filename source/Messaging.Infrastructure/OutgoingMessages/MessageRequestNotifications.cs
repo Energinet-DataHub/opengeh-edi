@@ -61,7 +61,8 @@ namespace Messaging.Infrastructure.OutgoingMessages
             await _commandScheduler.EnqueueAsync(
                     new SendFailureNotification(
                         _messageRequestContext.DataBundleRequestDto.RequestId,
-                        _messageRequestContext.DataBundleRequestDto.IdempotencyId))
+                        _messageRequestContext.DataBundleRequestDto.IdempotencyId,
+                        $"Message(s) with the following id(s) not found {messageIds}"))
                 .ConfigureAwait(false);
         }
     }
