@@ -27,7 +27,7 @@ namespace Messaging.IntegrationTests.TestDoubles
         public bool Error { get; private set; }
 
         #pragma warning disable
-        public Task DispatchAsync(Uri storedMessageLocation)
+        public Task SavedMessageSuccessfullyAsync(Uri storedMessageLocation)
         {
             return Task.CompletedTask;
         }

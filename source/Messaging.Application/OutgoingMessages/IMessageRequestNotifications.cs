@@ -24,10 +24,10 @@ namespace Messaging.Application.OutgoingMessages
     public interface IMessageRequestNotifications
     {
         /// <summary>
-        /// Dispatches the message
+        /// Message was saved successfully at storage location
         /// </summary>
-        /// <param name="storedMessageLocation"></param>
-        Task DispatchAsync(Uri storedMessageLocation);
+        /// <param name="storedMessageLocation">Location of saved message</param>
+        Task SavedMessageSuccessfullyAsync(Uri storedMessageLocation);
 
         /// <summary>
         /// Dispatches the message

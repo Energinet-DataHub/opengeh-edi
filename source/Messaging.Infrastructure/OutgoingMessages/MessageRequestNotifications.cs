@@ -33,7 +33,7 @@ namespace Messaging.Infrastructure.OutgoingMessages
             _commandScheduler = commandScheduler;
         }
 
-        public async Task DispatchAsync(Uri storedMessageLocation)
+        public async Task SavedMessageSuccessfullyAsync(Uri storedMessageLocation)
         {
             if (_messageRequestContext.DataBundleRequestDto is null)
             {
