@@ -64,19 +64,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
             await RequestMessages(requestedMessageIds.AsReadOnly()).ConfigureAwait(false);
 
             _messageStorage.MessageHasBeenSavedInStorage();
-
-            var sql = "SELECT Data FROM b2b.QueuedInternalCommands WHERE Type = @CommandType";
-            var commandData = await GetService<IDbConnectionFactory>()
-                .GetOpenConnection()
-                .ExecuteScalarAsync<string>(
-                    sql,
-                    new
-                    {
-                        CommandType = typeof(SendSuccessNotification).AssemblyQualifiedName,
-                    })
-                .ConfigureAwait(false);
-
-            var command = JsonSerializer.Deserialize<SendSuccessNotification>(commandData);
+            var command = GetQueuedNotification<SendSuccessNotification>();
             Assert.NotNull(command);
             Assert.Equal(_messageRequestContext.DataBundleRequestDto?.RequestId, command?.RequestId);
             Assert.Equal(_messageRequestContext.DataBundleRequestDto?.IdempotencyId, command?.IdempotencyId);
@@ -100,6 +88,18 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
         {
             return new IncomingMessageBuilder()
                 .WithProcessType(ProcessType.MoveIn.Code);
+        }
+
+        private TNotification? GetQueuedNotification<TNotification>()
+        {
+            var sql = "SELECT Data FROM b2b.QueuedInternalCommands WHERE Type = @CommandType";
+            var commandData = GetService<IDbConnectionFactory>()
+                .GetOpenConnection()
+                .ExecuteScalar<string>(
+                    sql,
+                    new { CommandType = typeof(TNotification).AssemblyQualifiedName, });
+
+            return JsonSerializer.Deserialize<TNotification>(commandData);
         }
 
         private async Task<IncomingMessage> MessageArrived()
