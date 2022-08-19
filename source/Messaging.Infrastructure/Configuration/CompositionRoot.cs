@@ -38,6 +38,7 @@ using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages.GenericNotification;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Messaging.Application.OutgoingMessages.Requesting;
 using Messaging.Application.SchemaStore;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.CimMessageAdapter;

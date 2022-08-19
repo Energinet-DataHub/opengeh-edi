@@ -21,6 +21,7 @@ using System.Xml.Schema;
 using Energinet.DataHub.MessageHub.Model.Model;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages;
+using Messaging.Application.OutgoingMessages.Requesting;
 using Messaging.Application.SchemaStore;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Xml;

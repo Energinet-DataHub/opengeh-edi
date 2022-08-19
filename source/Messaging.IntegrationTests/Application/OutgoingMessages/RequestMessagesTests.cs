@@ -26,6 +26,7 @@ using Messaging.Application.Common.Commands;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.IncomingMessages;
 using Messaging.Application.OutgoingMessages;
+using Messaging.Application.OutgoingMessages.Requesting;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.Infrastructure.OutgoingMessages.Requesting;

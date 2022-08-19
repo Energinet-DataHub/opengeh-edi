@@ -13,25 +13,20 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
-namespace Messaging.Application.OutgoingMessages
+namespace Messaging.Application.OutgoingMessages.Requesting;
+
+/// <summary>
+/// Storage of physical bundled CIM messages
+/// </summary>
+public interface IMessageStorage
 {
     /// <summary>
-    /// Generates notifications as response to message requests
+    /// Saves the message in storage location
     /// </summary>
-    public interface IMessageRequestNotifications
-    {
-        /// <summary>
-        /// Message was saved successfully at storage location
-        /// </summary>
-        /// <param name="storedMessageLocation">Location of saved message</param>
-        Task SavedMessageSuccessfullyAsync(Uri storedMessageLocation);
-
-        /// <summary>
-        /// Requested messages was not found
-        /// </summary>
-        Task RequestedMessagesWasNotFoundAsync(IReadOnlyList<string> messageIds);
-    }
+    /// <param name="bundledMessage"></param>
+    /// <returns>Location of stored file</returns>
+    Task<Uri> SaveAsync(Stream bundledMessage);
 }

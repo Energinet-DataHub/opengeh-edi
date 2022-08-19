@@ -23,7 +23,7 @@ using Messaging.Application.Configuration;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.SeedWork;
 
-namespace Messaging.Application.OutgoingMessages
+namespace Messaging.Application.OutgoingMessages.Requesting
 {
     public class RequestMessagesHandler : IRequestHandler<RequestMessages, Unit>
     {

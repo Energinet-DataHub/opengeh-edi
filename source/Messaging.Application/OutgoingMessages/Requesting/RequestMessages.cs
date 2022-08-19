@@ -16,7 +16,7 @@ using System.Collections.Generic;
 using MediatR;
 using Messaging.Application.Common.Commands;
 
-namespace Messaging.Application.OutgoingMessages;
+namespace Messaging.Application.OutgoingMessages.Requesting;
 
 public class RequestMessages : ICommand<Unit>
 {

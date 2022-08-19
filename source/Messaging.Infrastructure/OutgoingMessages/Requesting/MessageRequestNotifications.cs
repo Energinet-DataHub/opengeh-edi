@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MessageHub.Model.Model;
 using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages;
+using Messaging.Application.OutgoingMessages.Requesting;
 
 namespace Messaging.Infrastructure.OutgoingMessages.Requesting
 {

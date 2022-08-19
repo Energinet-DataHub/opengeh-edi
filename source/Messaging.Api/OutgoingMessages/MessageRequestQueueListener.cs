@@ -20,6 +20,7 @@ using Energinet.DataHub.MessageHub.Model.Peek;
 using MediatR;
 using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages;
+using Messaging.Application.OutgoingMessages.Requesting;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.OutgoingMessages.Requesting;
 using Microsoft.Azure.Functions.Worker;
