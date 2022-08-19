@@ -12,32 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Energinet.DataHub.MessageHub.Client.Storage;
 using Energinet.DataHub.MessageHub.Model.Model;
-using Energinet.DataHub.MessageHub.Model.Peek;
 
 namespace Messaging.Infrastructure.OutgoingMessages
 {
     public class MessageRequestContext
     {
-        private readonly IRequestBundleParser _requestBundleParser;
-        private readonly IStorageHandler _storageHandler;
-
-        public MessageRequestContext(
-            IRequestBundleParser requestBundleParser,
-            IStorageHandler storageHandler)
-        {
-            _requestBundleParser = requestBundleParser;
-            _storageHandler = storageHandler;
-        }
-
         public DataBundleRequestDto? DataBundleRequestDto { get; private set; }
-
-        public IReadOnlyCollection<string>? DataAvailableIds { get; private set; }
 
         public static DataBundleResponseErrorDto CreateErrorDataNotFoundResponse(IReadOnlyList<string> messageIds)
         {
@@ -49,12 +31,9 @@ namespace Messaging.Infrastructure.OutgoingMessages
             return error;
         }
 
-        public async Task SetMessageRequestContextAsync(byte[] data)
+        public void SetMessageRequest(DataBundleRequestDto messageRequest)
         {
-            DataBundleRequestDto = _requestBundleParser.Parse(data);
-            var dataAvailableIds = await _storageHandler.GetDataAvailableNotificationIdsAsync(DataBundleRequestDto)
-                .ConfigureAwait(false);
-            DataAvailableIds = dataAvailableIds.Select(x => x.ToString()).ToList();
+            DataBundleRequestDto = messageRequest;
         }
     }
 }

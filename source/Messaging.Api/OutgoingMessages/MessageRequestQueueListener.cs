@@ -13,7 +13,10 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MessageHub.Client.Storage;
+using Energinet.DataHub.MessageHub.Model.Peek;
 using MediatR;
 using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages;
@@ -30,25 +33,35 @@ namespace Messaging.Api.OutgoingMessages
         private readonly ILogger<MessageRequestQueueListener> _logger;
         private readonly MessageRequestContext _messageRequestContext;
         private readonly IMediator _mediator;
+        private readonly IRequestBundleParser _requestBundleParser;
+        private readonly IStorageHandler _storageHandler;
 
         public MessageRequestQueueListener(
             ICorrelationContext correlationContext,
             ILogger<MessageRequestQueueListener> logger,
             MessageRequestContext messageRequestContext,
-            IMediator mediator)
+            IMediator mediator,
+            IRequestBundleParser requestBundleParser,
+            IStorageHandler storageHandler)
         {
             _correlationContext = correlationContext;
             _logger = logger;
             _messageRequestContext = messageRequestContext;
             _mediator = mediator;
+            _requestBundleParser = requestBundleParser;
+            _storageHandler = storageHandler;
         }
 
         [Function(nameof(MessageRequestQueueListener))]
         public async Task RunAsync([ServiceBusTrigger("%MESSAGE_REQUEST_QUEUE%", Connection = "MESSAGEHUB_QUEUE_CONNECTION_STRING", IsSessionsEnabled = true)] byte[] data)
         {
-            await _messageRequestContext.SetMessageRequestContextAsync(data).ConfigureAwait(false);
+            var messageRequest = _requestBundleParser.Parse(data);
+            _messageRequestContext.SetMessageRequest(messageRequest);
+            var dataAvailableIds = await _storageHandler.GetDataAvailableNotificationIdsAsync(messageRequest)
+                .ConfigureAwait(false);
+
             await _mediator.Send(new RequestMessages(
-                _messageRequestContext.DataAvailableIds ?? throw new InvalidOperationException(),
+                dataAvailableIds.Select(x => x.ToString()).ToList() ?? throw new InvalidOperationException(),
                 CimFormat.Xml.Name)).ConfigureAwait(false);
             _logger.LogInformation($"Dequeued with correlation id: {_correlationContext.Id}");
         }
