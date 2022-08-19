@@ -108,7 +108,6 @@ namespace Messaging.Api
                             runtime.MESSAGEHUB_QUEUE_CONNECTION_STRING!,
                             runtime.MESSAGEHUB_DATA_AVAILABLE_QUEUE!,
                             runtime.MESSAGEHUB_DOMAIN_REPLY_QUEUE!)
-                        .AddRequestHandler<SendMessageRequestNotificationHandler>()
                         .AddNotificationHandler<PublishNewMessagesOnTimeHasPassed, TimeHasPassed>()
                         .AddHttpClientAdapter(sp => new HttpClientAdapter(sp.GetRequiredService<HttpClient>()))
                         .AddServiceBusClient(
