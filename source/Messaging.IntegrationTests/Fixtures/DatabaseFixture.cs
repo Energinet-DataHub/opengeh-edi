@@ -58,6 +58,7 @@ namespace Messaging.IntegrationTests.Fixtures
                 $"DELETE FROM [b2b].[TransactionIds]" +
                 $"DELETE FROM [b2b].[OutgoingMessages] " +
                 $"DELETE FROM [b2b].[ReasonTranslations] " +
+                $"DELETE FROM [b2b].[QueuedInternalCommands] " +
                 $"DELETE FROM [b2b].[MarketEvaluationPoints]";
 
             _context.Database.ExecuteSqlRaw(cleanupStatement);
