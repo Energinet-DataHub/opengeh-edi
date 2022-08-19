@@ -16,6 +16,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MessageHub.Client.Peek;
+using Energinet.DataHub.MessageHub.Model.Extensions;
 using Energinet.DataHub.MessageHub.Model.Model;
 using MediatR;
 
@@ -23,14 +24,14 @@ namespace Messaging.Infrastructure.OutgoingMessages;
 
 public class SendFailureNotificationHandler : IRequestHandler<SendFailureNotification>
 {
-    private readonly IDataBundleResponseSender _bundleResponseSender;
+    private readonly IDataBundleResponseSender _dataBundleResponseSender;
 
-    public SendFailureNotificationHandler(IDataBundleResponseSender bundleResponseSender)
+    public SendFailureNotificationHandler(IDataBundleResponseSender dataBundleResponseSender)
     {
-        _bundleResponseSender = bundleResponseSender;
+        _dataBundleResponseSender = dataBundleResponseSender;
     }
 
-    public Task<Unit> Handle(SendFailureNotification request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(SendFailureNotification request, CancellationToken cancellationToken)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
 
@@ -40,8 +41,13 @@ public class SendFailureNotificationHandler : IRequestHandler<SendFailureNotific
             request.IdempotencyId,
             request.MessageType);
 
-        // if (request.DataBundleResponseErrorDto != null)
-        //     await _dataBundleResponseSender.SendAsync(request.DataBundleRequestDto.CreateErrorResponse(request.DataBundleResponseErrorDto)).ConfigureAwait(false);
-        return Unit.Task;
+        var error = new DataBundleResponseErrorDto()
+        {
+            Reason = Enum.Parse<DataBundleResponseErrorReason>(request.Reason),
+            FailureDescription = request.FailureDescription,
+        };
+
+        await _dataBundleResponseSender.SendAsync(bundleRequest.CreateErrorResponse(error)).ConfigureAwait(false);
+        return Unit.Value;
     }
 }
