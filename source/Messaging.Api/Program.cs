@@ -93,6 +93,7 @@ namespace Messaging.Api
                         .AddRequestLogging(
                             runtime.REQUEST_RESPONSE_LOGGING_CONNECTION_STRING!,
                             runtime.REQUEST_RESPONSE_LOGGING_CONTAINER_NAME!)
+                        .AddMessageStorage(sp => new MessageStorage())
                         .AddMessagePublishing(sp =>
                             new NewMessageAvailableNotifier(sp.GetRequiredService<IDataAvailableNotificationSender>()))
                         .AddMessageHubServices(

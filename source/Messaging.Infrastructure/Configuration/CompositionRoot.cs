@@ -165,6 +165,12 @@ namespace Messaging.Infrastructure.Configuration
             return this;
         }
 
+        public CompositionRoot AddMessageStorage(Func<IServiceProvider, IMessageStorage> action)
+        {
+            _services.AddSingleton(action);
+            return this;
+        }
+
         public CompositionRoot AddOutgoingMessageDispatcher(IMessageDispatcher messageDispatcher)
         {
             _services.AddScoped<IMessageDispatcher>(_ => messageDispatcher);

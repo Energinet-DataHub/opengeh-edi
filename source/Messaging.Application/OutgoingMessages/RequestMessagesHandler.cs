@@ -31,17 +31,20 @@ namespace Messaging.Application.OutgoingMessages
         private readonly IMessageDispatcher _messageDispatcher;
         private readonly DocumentFactory _documentFactory;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+        private readonly IMessageStorage _messageStorage;
 
         public RequestMessagesHandler(
             IOutgoingMessageStore outgoingMessageStore,
             IMessageDispatcher messageDispatcherSpy,
             DocumentFactory documentFactory,
-            ISystemDateTimeProvider systemDateTimeProvider)
+            ISystemDateTimeProvider systemDateTimeProvider,
+            IMessageStorage messageStorage)
         {
             _outgoingMessageStore = outgoingMessageStore;
             _messageDispatcher = messageDispatcherSpy;
             _documentFactory = documentFactory;
             _systemDateTimeProvider = systemDateTimeProvider;
+            _messageStorage = messageStorage;
         }
 
         public async Task<Unit> Handle(RequestMessages request, CancellationToken cancellationToken)

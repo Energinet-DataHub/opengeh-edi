@@ -50,6 +50,7 @@ namespace Messaging.IntegrationTests
                     return correlation;
                 })
                 .AddMessagePublishing(_ => new NewMessageAvailableNotifierSpy())
+                .AddMessageStorage(_ => new MessageStorageSpy())
                 .AddOutgoingMessageDispatcher(new MessageDispatcherSpy())
                 .AddRequestHandler<TestCommandHandler>()
                 .AddHttpClientAdapter(_ => new HttpClientSpy())
