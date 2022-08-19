@@ -44,6 +44,7 @@ using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Response;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
+using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Domain.Transactions.MoveIn.Events;
 using Messaging.Infrastructure.Common;
@@ -278,11 +279,11 @@ namespace Messaging.Infrastructure.Configuration
         private void AddMessageGenerationServices()
         {
             _services.AddScoped<DocumentFactory>();
-            _services.AddScoped<DocumentWriter, ConfirmChangeOfSupplierDocumentWriter>();
-            _services.AddScoped<DocumentWriter, RejectRequestChangeOfSupplierDocumentWriter>();
-            _services.AddScoped<DocumentWriter, GenericNotificationDocumentWriter>();
-            _services.AddScoped<DocumentWriter, AccountingPointCharacteristicsDocumentWriter>();
-            _services.AddScoped<DocumentWriter, CharacteristicsOfACustomerAtAnApDocumentWriter>();
+            _services.AddScoped<IDocumentWriter, ConfirmChangeOfSupplierDocumentWriter>();
+            _services.AddScoped<IDocumentWriter, RejectRequestChangeOfSupplierDocumentWriter>();
+            _services.AddScoped<IDocumentWriter, GenericNotificationDocumentWriter>();
+            _services.AddScoped<IDocumentWriter, AccountingPointCharacteristicsDocumentWriter>();
+            _services.AddScoped<IDocumentWriter, CharacteristicsOfACustomerAtAnApDocumentWriter>();
             _services.AddScoped<IValidationErrorTranslator, ValidationErrorTranslator>();
             _services.AddScoped<IMarketActivityRecordParser, MarketActivityRecordParser>();
         }

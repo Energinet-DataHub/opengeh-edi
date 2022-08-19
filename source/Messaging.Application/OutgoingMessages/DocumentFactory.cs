@@ -41,7 +41,7 @@ public class DocumentFactory
 
         if (documentWriter is null)
         {
-            throw new OutgoingMessageException($"Could handle document type {message.DocumentType}");
+            throw new OutgoingMessageException($"Could not handle document type {message.DocumentType}");
         }
 
         return documentWriter.WriteAsync(
