@@ -28,6 +28,7 @@ using Messaging.Application.IncomingMessages;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.OutgoingMessages;
+using Messaging.Infrastructure.OutgoingMessages.Requesting;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.TestDoubles;

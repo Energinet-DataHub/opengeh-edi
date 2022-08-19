@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MessageHub.Client.Storage;
 using Messaging.Application.OutgoingMessages;
 
-namespace Messaging.Infrastructure.OutgoingMessages;
+namespace Messaging.Infrastructure.OutgoingMessages.Requesting;
 
 public class MessageStorage : IMessageStorage
 {

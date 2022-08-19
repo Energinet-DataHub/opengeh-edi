@@ -13,41 +13,44 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using Messaging.Application.Common.Commands;
 
-namespace Messaging.Infrastructure.OutgoingMessages;
+namespace Messaging.Infrastructure.OutgoingMessages.Requesting;
 
-public class SendSuccessNotification : InternalCommand
+public class SendFailureNotification : InternalCommand
 {
     [JsonConstructor]
-    public SendSuccessNotification(Guid id, Guid requestId, string idempotencyId, string referenceId, string messageType, Uri messageStorageLocation)
+    public SendFailureNotification(Guid id, Guid requestId, string idempotencyId, string failureDescription, string reason, string referenceId, string messageType)
         : base(id)
     {
         RequestId = requestId;
         IdempotencyId = idempotencyId;
+        FailureDescription = failureDescription;
+        Reason = reason;
         ReferenceId = referenceId;
         MessageType = messageType;
-        MessageStorageLocation = messageStorageLocation;
     }
 
-    public SendSuccessNotification(Guid requestId, string idempotencyId, string referenceId, string messageType, Uri messageStorageLocation)
+    public SendFailureNotification(Guid requestId, string idempotencyId, string failureDescription, string reason, string referenceId, string messageType)
     {
         RequestId = requestId;
         IdempotencyId = idempotencyId;
+        FailureDescription = failureDescription;
+        Reason = reason;
         ReferenceId = referenceId;
         MessageType = messageType;
-        MessageStorageLocation = messageStorageLocation;
     }
 
     public Guid RequestId { get; }
 
     public string IdempotencyId { get; }
 
+    public string FailureDescription { get; }
+
+    public string Reason { get; }
+
     public string ReferenceId { get; }
 
     public string MessageType { get; }
-
-    public Uri MessageStorageLocation { get; }
 }

@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.MessageHub.Model.Model;
 
-namespace Messaging.Infrastructure.OutgoingMessages
+namespace Messaging.Infrastructure.OutgoingMessages.Requesting
 {
     public class MessageRequestContext
     {

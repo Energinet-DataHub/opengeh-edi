@@ -20,7 +20,7 @@ using Energinet.DataHub.MessageHub.Model.Extensions;
 using Energinet.DataHub.MessageHub.Model.Model;
 using MediatR;
 
-namespace Messaging.Infrastructure.OutgoingMessages;
+namespace Messaging.Infrastructure.OutgoingMessages.Requesting;
 
 public class SendSuccessNotificationHandler : IRequestHandler<SendSuccessNotification>
 {

@@ -21,7 +21,7 @@ using MediatR;
 using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages;
-using Messaging.Infrastructure.OutgoingMessages;
+using Messaging.Infrastructure.OutgoingMessages.Requesting;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 

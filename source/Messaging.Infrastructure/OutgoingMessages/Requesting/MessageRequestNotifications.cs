@@ -19,7 +19,7 @@ using Energinet.DataHub.MessageHub.Model.Model;
 using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages;
 
-namespace Messaging.Infrastructure.OutgoingMessages
+namespace Messaging.Infrastructure.OutgoingMessages.Requesting
 {
     public class MessageRequestNotifications : IMessageRequestNotifications
     {
