@@ -48,7 +48,8 @@ namespace Messaging.Infrastructure.OutgoingMessages
             await _commandScheduler
                 .EnqueueAsync(new SendSuccessNotification(
                     _messageRequestContext.DataBundleRequestDto.RequestId,
-                    _messageRequestContext.DataBundleRequestDto.IdempotencyId))
+                    _messageRequestContext.DataBundleRequestDto.IdempotencyId,
+                    _messageRequestContext.DataBundleRequestDto.DataAvailableNotificationReferenceId))
                 .ConfigureAwait(false);
         }
 
