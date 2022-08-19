@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
 using Energinet.DataHub.MessageHub.Model.Model;
 
 namespace Messaging.Infrastructure.OutgoingMessages
@@ -20,16 +19,6 @@ namespace Messaging.Infrastructure.OutgoingMessages
     public class MessageRequestContext
     {
         public DataBundleRequestDto? DataBundleRequestDto { get; private set; }
-
-        public static DataBundleResponseErrorDto CreateErrorDataNotFoundResponse(IReadOnlyList<string> messageIds)
-        {
-            var error = new DataBundleResponseErrorDto();
-
-            error.Reason = DataBundleResponseErrorReason.DatasetNotFound;
-            error.FailureDescription = $"Message(s) with the following id(s) not found {messageIds}";
-
-            return error;
-        }
 
         public void SetMessageRequest(DataBundleRequestDto messageRequest)
         {
