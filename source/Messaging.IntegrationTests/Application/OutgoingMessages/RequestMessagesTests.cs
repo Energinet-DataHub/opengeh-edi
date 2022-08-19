@@ -31,12 +31,14 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly MessageDispatcherSpy _messageDispatcherSpy;
+        private readonly MessageStorageSpy _messageStorage;
 
         public RequestMessagesTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
             _outgoingMessageStore = GetService<IOutgoingMessageStore>();
             _messageDispatcherSpy = (MessageDispatcherSpy)GetService<IMessageDispatcher>();
+            _messageStorage = (MessageStorageSpy)GetService<IMessageStorage>();
         }
 
         [Fact]
@@ -51,6 +53,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
             await RequestMessages(requestedMessageIds.AsReadOnly()).ConfigureAwait(false);
 
             Assert.NotNull(_messageDispatcherSpy.DispatchedMessage);
+            _messageStorage.MessageHasBeenSaved();
         }
 
         [Fact]

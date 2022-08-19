@@ -15,14 +15,22 @@
 using System.IO;
 using System.Threading.Tasks;
 using Messaging.Application.OutgoingMessages;
+using Xunit;
 
 namespace Messaging.IntegrationTests.TestDoubles;
 
 public class MessageStorageSpy : IMessageStorage
 {
-    #pragma warning disable
+    private Stream? _savedMessage;
+
     public Task SaveAsync(Stream bundledMessage)
     {
+        _savedMessage = bundledMessage;
         return Task.CompletedTask;
+    }
+
+    public void MessageHasBeenSaved()
+    {
+        Assert.NotNull(_savedMessage);
     }
 }
