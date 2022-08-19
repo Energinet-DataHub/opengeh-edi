@@ -102,7 +102,9 @@ namespace Messaging.Api
                             return new MessageStorage(storageHandler, messageRequestContext);
                         })
                         .AddMessagePublishing(sp =>
-                            new NewMessageAvailableNotifier(sp.GetRequiredService<IDataAvailableNotificationSender>()))
+                            new NewMessageAvailableNotifier(
+                                sp.GetRequiredService<IDataAvailableNotificationSender>(),
+                                sp.GetRequiredService<ActorLookup>()))
                         .AddMessageHubServices(
                             runtime.MESSAGEHUB_STORAGE_CONNECTION_STRING!,
                             runtime.MESSAGEHUB_STORAGE_CONTAINER_NAME!,

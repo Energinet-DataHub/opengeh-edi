@@ -161,6 +161,7 @@ namespace Messaging.Infrastructure.Configuration
         public CompositionRoot AddMessagePublishing(Func<IServiceProvider, INewMessageAvailableNotifier> action)
         {
             _services.AddScoped(action);
+            _services.AddSingleton<ActorLookup>();
             _services.AddScoped<MessageAvailabilityPublisher>();
             _services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
             _services.AddTransient<INotificationHandler<TimeHasPassed>, PublishNewMessagesOnTimeHasPassed>();
