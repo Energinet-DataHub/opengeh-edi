@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using Messaging.Application.Common.Commands;
 
@@ -21,11 +22,12 @@ namespace Messaging.Infrastructure.OutgoingMessages;
 public class SendSuccessNotification : InternalCommand
 {
     [JsonConstructor]
-    public SendSuccessNotification(Guid requestId, string idempotencyId, string referenceId)
+    public SendSuccessNotification(Guid requestId, string idempotencyId, string referenceId, string messageType)
     {
         RequestId = requestId;
         IdempotencyId = idempotencyId;
         ReferenceId = referenceId;
+        MessageType = messageType;
     }
 
     public Guid RequestId { get; }
@@ -33,4 +35,6 @@ public class SendSuccessNotification : InternalCommand
     public string IdempotencyId { get; }
 
     public string ReferenceId { get; }
+
+    public string MessageType { get; }
 }
