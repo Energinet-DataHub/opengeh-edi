@@ -15,11 +15,20 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Dapper;
+using Energinet.DataHub.MessageHub.Model.Extensions;
+using Energinet.DataHub.MessageHub.Model.Model;
 using MediatR;
+using Messaging.Application.Common.Commands;
+using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.IncomingMessages;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Infrastructure.Configuration.InternalCommands;
+using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.TestDoubles;
@@ -30,15 +39,17 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
     public class RequestMessagesTests : TestBase
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
-        private readonly MessageRequestNotificationsSpy _messageRequestNotificationsSpy;
+        //private readonly MessageRequestNotificationsSpy _messageRequestNotificationsSpy;
         private readonly MessageStorageSpy _messageStorage;
+        private readonly MessageRequestContext _messageRequestContext;
 
         public RequestMessagesTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
             _outgoingMessageStore = GetService<IOutgoingMessageStore>();
-            _messageRequestNotificationsSpy = (MessageRequestNotificationsSpy)GetService<IMessageRequestNotifications>();
+            //_messageRequestNotificationsSpy = (MessageRequestNotificationsSpy)GetService<IMessageRequestNotifications>();
             _messageStorage = (MessageStorageSpy)GetService<IMessageStorage>();
+            _messageRequestContext = GetService<MessageRequestContext>();
         }
 
         [Fact]
@@ -53,6 +64,21 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
             await RequestMessages(requestedMessageIds.AsReadOnly()).ConfigureAwait(false);
 
             _messageStorage.MessageHasBeenSavedInStorage();
+
+            var sql = "SELECT Data FROM b2b.QueuedInternalCommands WHERE Type = @CommandType";
+            var commandData = await GetService<IDbConnectionFactory>()
+                .GetOpenConnection()
+                .ExecuteScalarAsync<string>(
+                    sql,
+                    new
+                    {
+                        CommandType = typeof(SendSuccessNotification).AssemblyQualifiedName,
+                    })
+                .ConfigureAwait(false);
+
+            var command = JsonSerializer.Deserialize<SendSuccessNotification>(commandData);
+            Assert.NotNull(command);
+            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.RequestId, command?.RequestId);
         }
 
         [Fact]
@@ -61,7 +87,9 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
             var nonExistingMessage = new List<string> { Guid.NewGuid().ToString() };
 
             await RequestMessages(nonExistingMessage.AsReadOnly()).ConfigureAwait(false);
-            Assert.True(_messageRequestNotificationsSpy.Error);
+
+            Assert.Null(_messageStorage.SavedMessage);
+            //Assert.True(_messageRequestNotificationsSpy.Error);
         }
 
         private static IncomingMessageBuilder MessageBuilder()
@@ -80,6 +108,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
 
         private Task RequestMessages(IEnumerable<string> messageIds)
         {
+            _messageRequestContext.SetMessageRequest(new DataBundleRequestDto(Guid.Empty, string.Empty, string.Empty, string.Empty));
             return GetService<IMediator>().Send(new RequestMessages(messageIds.ToList(), CimFormat.Xml.Name));
         }
     }

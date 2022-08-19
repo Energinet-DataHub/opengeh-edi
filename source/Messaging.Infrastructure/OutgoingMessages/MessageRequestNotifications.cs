@@ -44,6 +44,10 @@ namespace Messaging.Infrastructure.OutgoingMessages
                 new SendMessageRequestNotification(
                     _messageRequestContext.DataBundleRequestDto,
                     storedMessageLocation)).ConfigureAwait(false);
+
+            await _commandScheduler
+                .EnqueueAsync(new SendSuccessNotification(_messageRequestContext.DataBundleRequestDto.RequestId))
+                .ConfigureAwait(false);
         }
 
         public async Task RequestedMessagesWasNotFoundAsync(IReadOnlyList<string> messageIds)
