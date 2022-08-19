@@ -214,8 +214,8 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
         private Stream GetDispatchedDocument()
         {
-            var messageDispatcher = GetService<IMessageDispatcher>() as MessageDispatcherSpy;
-            return messageDispatcher!.DispatchedMessage!;
+            var messageDispatcher = (MessageStorageSpy)GetService<IMessageStorage>();
+            return messageDispatcher.SavedMessage!;
         }
 
         private HttpClientSpy GetHttpClientMock()

@@ -12,29 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using Messaging.Application.OutgoingMessages;
+using Xunit;
 
-namespace Messaging.IntegrationTests.TestDoubles
+namespace Messaging.IntegrationTests.TestDoubles;
+
+public class MessageStorageSpy : IMessageStorage
 {
-    public class MessageDispatcherSpy : IMessageDispatcher
+    public Stream? SavedMessage { get; private set; }
+
+    public Task<Uri> SaveAsync(Stream bundledMessage)
     {
-        public Stream? DispatchedMessage { get; private set; }
+        SavedMessage = bundledMessage;
+        return Task.FromResult(new Uri("http://someuri"));
+    }
 
-        public bool Error { get; private set; }
-
-        public async Task DispatchAsync(Stream message)
-        {
-            DispatchedMessage = message;
-            await Task.CompletedTask.ConfigureAwait(false);
-        }
-
-        public async Task DispatchAsync(IReadOnlyList<string> messageIds)
-        {
-            Error = true;
-            await Task.CompletedTask.ConfigureAwait(false);
-        }
+    public void MessageHasBeenSavedInStorage()
+    {
+        Assert.NotNull(SavedMessage);
     }
 }
