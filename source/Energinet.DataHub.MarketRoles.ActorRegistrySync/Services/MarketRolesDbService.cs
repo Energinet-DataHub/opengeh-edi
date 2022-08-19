@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
@@ -44,7 +45,14 @@ public class MarketRolesDbService : IDisposable
             .ConfigureAwait(false);
     }
 
-    public async Task InsertActorsAsync(IEnumerable<Actor> actors)
+    public async Task CleanUpB2BAsync()
+    {
+        if (_transaction == null) await BeginTransactionAsync().ConfigureAwait(false);
+        await _sqlConnection.ExecuteAsync("DELETE FROM [b2b].[Actor]", transaction: _transaction)
+            .ConfigureAwait(false);
+    }
+
+    public async Task InsertActorsAsync(ReadOnlyCollection<Actor> actors)
     {
         if (actors == null) throw new ArgumentNullException(nameof(actors));
 
@@ -54,6 +62,25 @@ public class MarketRolesDbService : IDisposable
         foreach (var actor in actors)
         {
             stringBuilder.Append(@"INSERT INTO [dbo].[Actor] ([Id],[IdentificationNumber],[IdentificationType],[Roles])
+             VALUES ('" + actor.Id + "', '" + actor.IdentificationNumber + "', '" + GetType(actor.IdentificationType) + "', '" + GetRoles(actor.Roles) + "')");
+            stringBuilder.AppendLine();
+        }
+
+        await _sqlConnection.ExecuteAsync(
+            stringBuilder.ToString(),
+            transaction: _transaction).ConfigureAwait(false);
+    }
+
+    public async Task InsertActorsInB2BAsync(IEnumerable<Actor> actors)
+    {
+        if (actors == null) throw new ArgumentNullException(nameof(actors));
+
+        if (_transaction == null) await BeginTransactionAsync().ConfigureAwait(false);
+
+        var stringBuilder = new StringBuilder();
+        foreach (var actor in actors)
+        {
+            stringBuilder.Append(@"INSERT INTO [b2b].[Actor] ([Id],[IdentificationNumber],[IdentificationType],[Roles])
              VALUES ('" + actor.Id + "', '" + actor.IdentificationNumber + "', '" + GetType(actor.IdentificationType) + "', '" + GetRoles(actor.Roles) + "')");
             stringBuilder.AppendLine();
         }
