@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -23,8 +24,9 @@ namespace Messaging.Application.OutgoingMessages;
 public interface IMessageStorage
 {
     /// <summary>
-    /// Saves the bundled message
+    /// Saves the message in storage location
     /// </summary>
     /// <param name="bundledMessage"></param>
-    Task SaveAsync(Stream bundledMessage);
+    /// <returns>Location of stored file</returns>
+    Task<Uri> SaveAsync(Stream bundledMessage);
 }

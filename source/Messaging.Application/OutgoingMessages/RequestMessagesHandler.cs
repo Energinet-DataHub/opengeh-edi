@@ -62,8 +62,8 @@ namespace Messaging.Application.OutgoingMessages
             var messageBundle = CreateBundleFrom(messages);
 
             var message = await _documentFactory.CreateFromAsync(messageBundle.CreateMessage(), EnumerationType.FromName<CimFormat>(request.RequestedDocumentFormat)).ConfigureAwait(false);
-            await _messageStorage.SaveAsync(message).ConfigureAwait(false);
-            await _messageDispatcher.DispatchAsync(message).ConfigureAwait(false);
+            var storedMessageLocation = await _messageStorage.SaveAsync(message).ConfigureAwait(false);
+            await _messageDispatcher.DispatchAsync(storedMessageLocation).ConfigureAwait(false);
 
             return Unit.Value;
         }

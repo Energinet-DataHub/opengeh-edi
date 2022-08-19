@@ -12,17 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.IO;
 using System.Threading.Tasks;
+using Energinet.DataHub.MessageHub.Client.Storage;
 using Messaging.Application.OutgoingMessages;
 
 namespace Messaging.Infrastructure.OutgoingMessages;
 
 public class MessageStorage : IMessageStorage
 {
-    #pragma warning disable // This should not be marked as static
-    public Task SaveAsync(Stream bundledMessage)
+    private readonly IStorageHandler _storageHandler;
+    private readonly MessageRequestContext _requestContext;
+
+    public MessageStorage(IStorageHandler storageHandler, MessageRequestContext requestContext)
     {
-        return Task.CompletedTask;
+        _storageHandler = storageHandler;
+        _requestContext = requestContext;
+    }
+
+    public Task<Uri> SaveAsync(Stream bundledMessage)
+    {
+        if (_requestContext.DataBundleRequestDto is null)
+        {
+            throw new InvalidOperationException($"Data bundle request DTO is null");
+        }
+
+        return _storageHandler.AddStreamToStorageAsync(
+            bundledMessage,
+            _requestContext.DataBundleRequestDto);
     }
 }

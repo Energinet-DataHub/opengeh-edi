@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using Messaging.Application.OutgoingMessages;
@@ -21,16 +22,16 @@ namespace Messaging.IntegrationTests.TestDoubles;
 
 public class MessageStorageSpy : IMessageStorage
 {
-    private Stream? _savedMessage;
+    public Stream? SavedMessage { get; private set; }
 
-    public Task SaveAsync(Stream bundledMessage)
+    public Task<Uri> SaveAsync(Stream bundledMessage)
     {
-        _savedMessage = bundledMessage;
-        return Task.CompletedTask;
+        SavedMessage = bundledMessage;
+        return Task.FromResult(new Uri("http://someuri"));
     }
 
     public void MessageHasBeenSaved()
     {
-        Assert.NotNull(_savedMessage);
+        Assert.NotNull(SavedMessage);
     }
 }

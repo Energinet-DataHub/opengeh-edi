@@ -14,9 +14,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
-using Energinet.DataHub.MessageHub.Client.Storage;
 using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages;
 
@@ -24,31 +22,28 @@ namespace Messaging.Infrastructure.OutgoingMessages
 {
     public class MessageDispatcher : IMessageDispatcher
     {
-        private readonly IStorageHandler _storageHandler;
         private readonly MessageRequestContext _messageRequestContext;
         private readonly ICommandScheduler _commandScheduler;
 
         public MessageDispatcher(
-            IStorageHandler storageHandler,
             MessageRequestContext messageRequestContext,
             ICommandScheduler commandScheduler)
         {
-            _storageHandler = storageHandler;
             _messageRequestContext = messageRequestContext;
             _commandScheduler = commandScheduler;
         }
 
-        public async Task DispatchAsync(Stream message)
+        public async Task DispatchAsync(Uri storedMessageLocation)
         {
-            var uri = await _storageHandler.AddStreamToStorageAsync(
-                message,
-                _messageRequestContext.DataBundleRequestDto ?? throw new InvalidOperationException())
-                .ConfigureAwait(false);
+            if (_messageRequestContext.DataBundleRequestDto is null)
+            {
+                throw new InvalidOperationException($"Data request DTO is null.");
+            }
 
             await _commandScheduler.EnqueueAsync(
                 new NotifyMessageHub(
                     _messageRequestContext.DataBundleRequestDto,
-                    uri)).ConfigureAwait(false);
+                    storedMessageLocation)).ConfigureAwait(false);
         }
 
         public async Task DispatchAsync(IReadOnlyList<string> messageIds)

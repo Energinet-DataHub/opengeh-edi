@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -25,10 +26,10 @@ namespace Messaging.IntegrationTests.TestDoubles
 
         public bool Error { get; private set; }
 
-        public async Task DispatchAsync(Stream message)
+        #pragma warning disable
+        public Task DispatchAsync(Uri storedMessageLocation)
         {
-            DispatchedMessage = message;
-            await Task.CompletedTask.ConfigureAwait(false);
+            return Task.CompletedTask;
         }
 
         public async Task DispatchAsync(IReadOnlyList<string> messageIds)

@@ -18,6 +18,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware;
 using Energinet.DataHub.MessageHub.Client.DataAvailable;
+using Energinet.DataHub.MessageHub.Client.Storage;
 using Messaging.Api.Configuration.Middleware.Authentication.Bearer;
 using Messaging.Api.Configuration.Middleware.Authentication.MarketActors;
 using Messaging.Api.Configuration.Middleware.Correlation;
@@ -93,7 +94,12 @@ namespace Messaging.Api
                         .AddRequestLogging(
                             runtime.REQUEST_RESPONSE_LOGGING_CONNECTION_STRING!,
                             runtime.REQUEST_RESPONSE_LOGGING_CONTAINER_NAME!)
-                        .AddMessageStorage(sp => new MessageStorage())
+                        .AddMessageStorage(sp =>
+                        {
+                            var messageRequestContext = sp.GetRequiredService<MessageRequestContext>();
+                            var storageHandler = sp.GetRequiredService<IStorageHandler>();
+                            return new MessageStorage(storageHandler, messageRequestContext);
+                        })
                         .AddMessagePublishing(sp =>
                             new NewMessageAvailableNotifier(sp.GetRequiredService<IDataAvailableNotificationSender>()))
                         .AddMessageHubServices(

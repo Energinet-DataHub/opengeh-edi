@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace Messaging.Application.OutgoingMessages
@@ -26,8 +26,8 @@ namespace Messaging.Application.OutgoingMessages
         /// <summary>
         /// Dispatches the message
         /// </summary>
-        /// <param name="message"></param>
-        Task DispatchAsync(Stream message);
+        /// <param name="storedMessageLocation"></param>
+        Task DispatchAsync(Uri storedMessageLocation);
 
         /// <summary>
         /// Dispatches the message
