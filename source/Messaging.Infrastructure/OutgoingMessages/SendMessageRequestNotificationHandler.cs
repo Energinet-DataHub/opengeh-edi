@@ -21,16 +21,16 @@ using MediatR;
 
 namespace Messaging.Infrastructure.OutgoingMessages
 {
-    public class NotifyMessageHubHandler : IRequestHandler<NotifyMessageHub, Unit>
+    public class SendMessageRequestNotificationHandler : IRequestHandler<SendMessageRequestNotification, Unit>
     {
         private readonly IDataBundleResponseSender _dataBundleResponseSender;
 
-        public NotifyMessageHubHandler(IDataBundleResponseSender dataBundleResponseSender)
+        public SendMessageRequestNotificationHandler(IDataBundleResponseSender dataBundleResponseSender)
         {
             _dataBundleResponseSender = dataBundleResponseSender;
         }
 
-        public async Task<Unit> Handle(NotifyMessageHub request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(SendMessageRequestNotification request, CancellationToken cancellationToken)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 

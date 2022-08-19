@@ -19,10 +19,10 @@ using Messaging.Application.Common.Commands;
 
 namespace Messaging.Infrastructure.OutgoingMessages
 {
-    public class NotifyMessageHub : InternalCommand
+    public class SendMessageRequestNotification : InternalCommand
     {
         [JsonConstructor]
-        public NotifyMessageHub(Guid id, DataBundleRequestDto dataBundleRequestDto, Uri? uri, DataBundleResponseErrorDto? dataBundleResponseErrorDto)
+        public SendMessageRequestNotification(Guid id, DataBundleRequestDto dataBundleRequestDto, Uri? uri, DataBundleResponseErrorDto? dataBundleResponseErrorDto)
         : base(id)
         {
             DataBundleRequestDto = dataBundleRequestDto;
@@ -30,13 +30,13 @@ namespace Messaging.Infrastructure.OutgoingMessages
             DataBundleResponseErrorDto = dataBundleResponseErrorDto;
         }
 
-        public NotifyMessageHub(DataBundleRequestDto dataBundleRequestDto, Uri uri)
+        public SendMessageRequestNotification(DataBundleRequestDto dataBundleRequestDto, Uri uri)
         {
             DataBundleRequestDto = dataBundleRequestDto;
             Uri = uri;
         }
 
-        public NotifyMessageHub(DataBundleRequestDto dataBundleRequestDto, DataBundleResponseErrorDto dataBundleResponseErrorDto)
+        public SendMessageRequestNotification(DataBundleRequestDto dataBundleRequestDto, DataBundleResponseErrorDto dataBundleResponseErrorDto)
         {
             DataBundleRequestDto = dataBundleRequestDto;
             DataBundleResponseErrorDto = dataBundleResponseErrorDto;

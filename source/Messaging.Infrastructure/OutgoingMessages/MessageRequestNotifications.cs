@@ -41,7 +41,7 @@ namespace Messaging.Infrastructure.OutgoingMessages
             }
 
             await _commandScheduler.EnqueueAsync(
-                new NotifyMessageHub(
+                new SendMessageRequestNotification(
                     _messageRequestContext.DataBundleRequestDto,
                     storedMessageLocation)).ConfigureAwait(false);
         }
@@ -49,7 +49,7 @@ namespace Messaging.Infrastructure.OutgoingMessages
         public async Task RequestedMessagesWasNotFoundAsync(IReadOnlyList<string> messageIds)
         {
             await _commandScheduler.EnqueueAsync(
-                new NotifyMessageHub(
+                new SendMessageRequestNotification(
                     _messageRequestContext.DataBundleRequestDto ?? throw new InvalidOperationException(),
                     MessageRequestContext.CreateErrorDataNotFoundResponse(
                         messageIds))).ConfigureAwait(false);
