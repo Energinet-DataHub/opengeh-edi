@@ -12,16 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.MessageHub.Client.Peek;
+using Energinet.DataHub.MessageHub.Model.Extensions;
+using Energinet.DataHub.MessageHub.Model.Model;
 using MediatR;
 
 namespace Messaging.Infrastructure.OutgoingMessages;
 
 public class SendSuccessNotificationHandler : IRequestHandler<SendSuccessNotification>
 {
-    public Task<Unit> Handle(SendSuccessNotification request, CancellationToken cancellationToken)
+    private readonly IDataBundleResponseSender _dataBundleResponseSender;
+
+    public SendSuccessNotificationHandler(IDataBundleResponseSender dataBundleResponseSender)
     {
-        return Unit.Task;
+        _dataBundleResponseSender = dataBundleResponseSender;
+    }
+
+    public async Task<Unit> Handle(SendSuccessNotification request, CancellationToken cancellationToken)
+    {
+        if (request == null) throw new ArgumentNullException(nameof(request));
+
+        var bundleRequest = new DataBundleRequestDto(
+            request.RequestId,
+            request.ReferenceId,
+            request.IdempotencyId,
+            request.MessageType);
+
+        await _dataBundleResponseSender.SendAsync(bundleRequest.CreateResponse(request.MessageStorageLocation)).ConfigureAwait(false);
+
+        return Unit.Value;
     }
 }
