@@ -46,7 +46,7 @@ namespace Messaging.Infrastructure.OutgoingMessages
                     storedMessageLocation)).ConfigureAwait(false);
         }
 
-        public async Task DispatchAsync(IReadOnlyList<string> messageIds)
+        public async Task RequestedMessagesWasNotFoundAsync(IReadOnlyList<string> messageIds)
         {
             await _commandScheduler.EnqueueAsync(
                 new NotifyMessageHub(

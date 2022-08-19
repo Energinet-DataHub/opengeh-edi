@@ -30,8 +30,8 @@ namespace Messaging.Application.OutgoingMessages
         Task SavedMessageSuccessfullyAsync(Uri storedMessageLocation);
 
         /// <summary>
-        /// Dispatches the message
+        /// Requested messages was not found
         /// </summary>
-        Task DispatchAsync(IReadOnlyList<string> messageIds);
+        Task RequestedMessagesWasNotFoundAsync(IReadOnlyList<string> messageIds);
     }
 }

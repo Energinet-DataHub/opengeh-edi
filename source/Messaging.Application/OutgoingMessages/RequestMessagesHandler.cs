@@ -55,7 +55,7 @@ namespace Messaging.Application.OutgoingMessages
             var messageIdsNotFound = MessageIdsNotFound(requestedMessageIds, messages);
             if (messageIdsNotFound.Any())
             {
-                await _messageRequestNotifications.DispatchAsync(messageIdsNotFound).ConfigureAwait(false);
+                await _messageRequestNotifications.RequestedMessagesWasNotFoundAsync(messageIdsNotFound).ConfigureAwait(false);
                 return Unit.Value;
             }
 

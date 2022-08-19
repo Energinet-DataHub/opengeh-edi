@@ -32,7 +32,7 @@ namespace Messaging.IntegrationTests.TestDoubles
             return Task.CompletedTask;
         }
 
-        public async Task DispatchAsync(IReadOnlyList<string> messageIds)
+        public async Task RequestedMessagesWasNotFoundAsync(IReadOnlyList<string> messageIds)
         {
             Error = true;
             await Task.CompletedTask.ConfigureAwait(false);
