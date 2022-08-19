@@ -18,8 +18,6 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using System.Xml.Linq;
-using System.Xml.Schema;
 using Json.Schema;
 using Messaging.Application.Common;
 using Messaging.Application.Configuration;
@@ -29,7 +27,6 @@ using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Serialization;
-using Messaging.Tests.Application.OutgoingMessages.Asserts;
 using Xunit;
 
 namespace Messaging.Tests.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
