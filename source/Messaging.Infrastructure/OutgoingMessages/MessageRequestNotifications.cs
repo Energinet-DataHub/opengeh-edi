@@ -62,7 +62,8 @@ namespace Messaging.Infrastructure.OutgoingMessages
                     new SendFailureNotification(
                         _messageRequestContext.DataBundleRequestDto.RequestId,
                         _messageRequestContext.DataBundleRequestDto.IdempotencyId,
-                        $"Message(s) with the following id(s) not found {messageIds}"))
+                        $"Message(s) with the following id(s) not found {messageIds}",
+                        "DatasetNotFound"))
                 .ConfigureAwait(false);
         }
     }

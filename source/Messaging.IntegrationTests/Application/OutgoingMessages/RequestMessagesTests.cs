@@ -86,6 +86,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
             Assert.Equal(_messageRequestContext.DataBundleRequestDto?.RequestId, command?.RequestId);
             Assert.Equal(_messageRequestContext.DataBundleRequestDto?.IdempotencyId, command?.IdempotencyId);
             Assert.NotEqual(string.Empty, command?.FailureDescription);
+            Assert.Equal("DatasetNotFound", command?.Reason);
         }
 
         private static IncomingMessageBuilder MessageBuilder()
