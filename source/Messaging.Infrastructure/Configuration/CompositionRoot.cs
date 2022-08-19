@@ -194,6 +194,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddSingleton(_ => new MessageHubConfig(dataAvailableQueue, domainReplyQueue));
             _services.AddTransient<IRequestHandler<SendMessageRequestNotification, Unit>, SendMessageRequestNotificationHandler>();
             _services.AddTransient<IRequestHandler<SendSuccessNotification, Unit>, SendSuccessNotificationHandler>();
+            _services.AddTransient<IRequestHandler<SendFailureNotification, Unit>, SendFailureNotificationHandler>();
 
             return this;
         }

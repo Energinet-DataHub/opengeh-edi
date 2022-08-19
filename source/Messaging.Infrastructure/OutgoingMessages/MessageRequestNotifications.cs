@@ -57,6 +57,12 @@ namespace Messaging.Infrastructure.OutgoingMessages
                     _messageRequestContext.DataBundleRequestDto ?? throw new InvalidOperationException(),
                     MessageRequestContext.CreateErrorDataNotFoundResponse(
                         messageIds))).ConfigureAwait(false);
+
+            await _commandScheduler.EnqueueAsync(
+                    new SendFailureNotification(
+                        _messageRequestContext.DataBundleRequestDto.RequestId,
+                        _messageRequestContext.DataBundleRequestDto.IdempotencyId))
+                .ConfigureAwait(false);
         }
     }
 }

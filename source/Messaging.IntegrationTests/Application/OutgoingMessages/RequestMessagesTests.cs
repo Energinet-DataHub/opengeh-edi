@@ -81,7 +81,10 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
             await RequestMessages(nonExistingMessage.AsReadOnly()).ConfigureAwait(false);
 
             Assert.Null(_messageStorage.SavedMessage);
-            //Assert.True(_messageRequestNotificationsSpy.Error);
+            var command = GetQueuedNotification<SendFailureNotification>();
+            Assert.NotNull(command);
+            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.RequestId, command?.RequestId);
+            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.IdempotencyId, command?.IdempotencyId);
         }
 
         private static IncomingMessageBuilder MessageBuilder()
