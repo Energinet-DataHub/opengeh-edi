@@ -16,14 +16,17 @@ using System.Collections.Generic;
 using MediatR;
 using Messaging.Application.Common.Commands;
 
-namespace Messaging.Application.OutgoingMessages;
+namespace Messaging.Application.OutgoingMessages.Requesting;
 
 public class RequestMessages : ICommand<Unit>
 {
-    public RequestMessages(IEnumerable<string> messageIds)
+    public RequestMessages(IEnumerable<string> messageIds, string requestedDocumentFormat)
     {
         MessageIds = messageIds;
+        RequestedDocumentFormat = requestedDocumentFormat;
     }
 
     public IEnumerable<string> MessageIds { get; }
+
+    public string RequestedDocumentFormat { get; }
 }

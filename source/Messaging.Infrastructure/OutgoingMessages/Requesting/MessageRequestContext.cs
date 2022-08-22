@@ -12,26 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
+using Energinet.DataHub.MessageHub.Model.Model;
 
-namespace Messaging.Application.OutgoingMessages
+namespace Messaging.Infrastructure.OutgoingMessages.Requesting
 {
-    /// <summary>
-    /// Interface for dispatching messages
-    /// </summary>
-    public interface IMessageDispatcher
+    public class MessageRequestContext
     {
-        /// <summary>
-        /// Dispatches the message
-        /// </summary>
-        /// <param name="message"></param>
-        Task DispatchAsync(Stream message);
+        public DataBundleRequestDto? DataBundleRequestDto { get; private set; }
 
-        /// <summary>
-        /// Dispatches the message
-        /// </summary>
-        Task DispatchAsync(IReadOnlyList<string> messageIds);
+        public void SetMessageRequest(DataBundleRequestDto messageRequest)
+        {
+            DataBundleRequestDto = messageRequest;
+        }
     }
 }
