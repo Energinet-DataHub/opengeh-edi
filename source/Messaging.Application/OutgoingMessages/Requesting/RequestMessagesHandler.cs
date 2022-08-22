@@ -69,9 +69,7 @@ namespace Messaging.Application.OutgoingMessages.Requesting
                 return Unit.Value;
             }
 
-            var document = await _documentFactory.CreateFromAsync(message, requestedFormat).ConfigureAwait(false);
-            var storedMessageLocation = await _messageStorage.SaveAsync(document).ConfigureAwait(false);
-            await _messageRequestNotifications.SavedMessageSuccessfullyAsync(storedMessageLocation).ConfigureAwait(false);
+            await SaveDocumentAsync(message, requestedFormat).ConfigureAwait(false);
 
             return Unit.Value;
         }
@@ -92,6 +90,13 @@ namespace Messaging.Application.OutgoingMessages.Requesting
             }
 
             return bundle;
+        }
+
+        private async Task SaveDocumentAsync(CimMessage message, CimFormat requestedFormat)
+        {
+            var document = await _documentFactory.CreateFromAsync(message, requestedFormat).ConfigureAwait(false);
+            var storedMessageLocation = await _messageStorage.SaveAsync(document).ConfigureAwait(false);
+            await _messageRequestNotifications.SavedMessageSuccessfullyAsync(storedMessageLocation).ConfigureAwait(false);
         }
     }
 }
