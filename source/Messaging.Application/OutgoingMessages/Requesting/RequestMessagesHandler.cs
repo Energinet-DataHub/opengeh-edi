@@ -35,13 +35,13 @@ namespace Messaging.Application.OutgoingMessages.Requesting
 
         public RequestMessagesHandler(
             IOutgoingMessageStore outgoingMessageStore,
-            IMessageRequestNotifications messageRequestNotificationsSpy,
+            IMessageRequestNotifications messageRequestNotifications,
             DocumentFactory documentFactory,
             ISystemDateTimeProvider systemDateTimeProvider,
             IMessageStorage messageStorage)
         {
             _outgoingMessageStore = outgoingMessageStore;
-            _messageRequestNotifications = messageRequestNotificationsSpy;
+            _messageRequestNotifications = messageRequestNotifications;
             _documentFactory = documentFactory;
             _systemDateTimeProvider = systemDateTimeProvider;
             _messageStorage = messageStorage;
@@ -59,11 +59,17 @@ namespace Messaging.Application.OutgoingMessages.Requesting
                 return Unit.Value;
             }
 
+            var requestedFormat = EnumerationType.FromName<CimFormat>(request.RequestedDocumentFormat);
             var messageBundle = CreateBundleFrom(messages);
+            var message = messageBundle.CreateMessage();
 
-            var message = await _documentFactory.CreateFromAsync(messageBundle.CreateMessage(), EnumerationType.FromName<CimFormat>(request.RequestedDocumentFormat)).ConfigureAwait(false);
-            var storedMessageLocation = await _messageStorage.SaveAsync(message).ConfigureAwait(false);
-            await _messageRequestNotifications.SavedMessageSuccessfullyAsync(storedMessageLocation).ConfigureAwait(false);
+            if (_documentFactory.CanHandle(message.DocumentType, requestedFormat) == false)
+            {
+                await _messageRequestNotifications.RequestedDocumentFormatIsNotSupportedAsync(request.RequestedDocumentFormat, message.DocumentType).ConfigureAwait(false);
+                return Unit.Value;
+            }
+
+            await SaveDocumentAsync(message, requestedFormat).ConfigureAwait(false);
 
             return Unit.Value;
         }
@@ -84,6 +90,13 @@ namespace Messaging.Application.OutgoingMessages.Requesting
             }
 
             return bundle;
+        }
+
+        private async Task SaveDocumentAsync(CimMessage message, CimFormat requestedFormat)
+        {
+            var document = await _documentFactory.CreateFromAsync(message, requestedFormat).ConfigureAwait(false);
+            var storedMessageLocation = await _messageStorage.SaveAsync(document).ConfigureAwait(false);
+            await _messageRequestNotifications.SavedMessageSuccessfullyAsync(storedMessageLocation).ConfigureAwait(false);
         }
     }
 }
