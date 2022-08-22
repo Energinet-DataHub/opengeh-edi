@@ -31,7 +31,7 @@ using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.TestDoubles;
 using Xunit;
 
-namespace Messaging.IntegrationTests.Application.OutgoingMessages
+namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
 {
     public class RequestMessagesTests : TestBase
     {
