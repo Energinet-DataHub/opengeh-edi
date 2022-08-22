@@ -52,14 +52,11 @@ namespace Messaging.Infrastructure.OutgoingMessages.Requesting
         {
             var request = GetRequest();
 
-            await _commandScheduler.EnqueueAsync(new SendFailureNotification(
-                        request.RequestId,
-                        request.IdempotencyId,
+            await _commandScheduler.EnqueueAsync(
+                    CreateErrorResponse(
+                        request,
                         $"Message(s) with the following id(s) not found {messageIds}",
-                        "DatasetNotFound",
-                        request.DataAvailableNotificationReferenceId,
-                        request.MessageType.Value,
-                        request.ResponseFormat.ToString()))
+                        "DatasetNotFound"))
                 .ConfigureAwait(false);
         }
 
