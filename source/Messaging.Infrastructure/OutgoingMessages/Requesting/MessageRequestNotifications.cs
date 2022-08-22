@@ -15,10 +15,12 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Energinet.DataHub.MessageHub.Model.Model;
 using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages;
+using Messaging.Application.OutgoingMessages.Requesting;
 
-namespace Messaging.Infrastructure.OutgoingMessages
+namespace Messaging.Infrastructure.OutgoingMessages.Requesting
 {
     public class MessageRequestNotifications : IMessageRequestNotifications
     {
@@ -35,24 +37,40 @@ namespace Messaging.Infrastructure.OutgoingMessages
 
         public async Task SavedMessageSuccessfullyAsync(Uri storedMessageLocation)
         {
+            var request = GetRequest();
+
+            await _commandScheduler
+                .EnqueueAsync(new SendSuccessNotification(
+                    request.RequestId,
+                    request.IdempotencyId,
+                    request.DataAvailableNotificationReferenceId,
+                    request.MessageType,
+                    storedMessageLocation))
+                .ConfigureAwait(false);
+        }
+
+        public async Task RequestedMessagesWasNotFoundAsync(IReadOnlyList<string> messageIds)
+        {
+            var request = GetRequest();
+
+            await _commandScheduler.EnqueueAsync(new SendFailureNotification(
+                        request.RequestId,
+                        request.IdempotencyId,
+                        $"Message(s) with the following id(s) not found {messageIds}",
+                        "DatasetNotFound",
+                        request.DataAvailableNotificationReferenceId,
+                        request.MessageType))
+                .ConfigureAwait(false);
+        }
+
+        private DataBundleRequestDto GetRequest()
+        {
             if (_messageRequestContext.DataBundleRequestDto is null)
             {
                 throw new InvalidOperationException($"Data request DTO is null.");
             }
 
-            await _commandScheduler.EnqueueAsync(
-                new NotifyMessageHub(
-                    _messageRequestContext.DataBundleRequestDto,
-                    storedMessageLocation)).ConfigureAwait(false);
-        }
-
-        public async Task RequestedMessagesWasNotFoundAsync(IReadOnlyList<string> messageIds)
-        {
-            await _commandScheduler.EnqueueAsync(
-                new NotifyMessageHub(
-                    _messageRequestContext.DataBundleRequestDto ?? throw new InvalidOperationException(),
-                    MessageRequestContext.CreateErrorDataNotFoundResponse(
-                        messageIds))).ConfigureAwait(false);
+            return _messageRequestContext.DataBundleRequestDto;
         }
     }
 }

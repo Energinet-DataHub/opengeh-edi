@@ -14,28 +14,24 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
-using Messaging.Application.OutgoingMessages;
 
-namespace Messaging.IntegrationTests.TestDoubles
+namespace Messaging.Application.OutgoingMessages.Requesting
 {
-    public class MessageRequestNotificationsSpy : IMessageRequestNotifications
+    /// <summary>
+    /// Generates notifications as response to message requests
+    /// </summary>
+    public interface IMessageRequestNotifications
     {
-        public Stream? DispatchedMessage { get; private set; }
+        /// <summary>
+        /// Message was saved successfully at storage location
+        /// </summary>
+        /// <param name="storedMessageLocation">Location of saved message</param>
+        Task SavedMessageSuccessfullyAsync(Uri storedMessageLocation);
 
-        public bool Error { get; private set; }
-
-        #pragma warning disable
-        public Task SavedMessageSuccessfullyAsync(Uri storedMessageLocation)
-        {
-            return Task.CompletedTask;
-        }
-
-        public async Task RequestedMessagesWasNotFoundAsync(IReadOnlyList<string> messageIds)
-        {
-            Error = true;
-            await Task.CompletedTask.ConfigureAwait(false);
-        }
+        /// <summary>
+        /// Requested messages was not found
+        /// </summary>
+        Task RequestedMessagesWasNotFoundAsync(IReadOnlyList<string> messageIds);
     }
 }
