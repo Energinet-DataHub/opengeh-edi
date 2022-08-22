@@ -137,6 +137,12 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
 
         private Task RequestMessages(IEnumerable<string> messageIds)
         {
+            SetMessageRequestContext();
+            return GetService<IMediator>().Send(new RequestMessages(messageIds.ToList(), CimFormat.Xml.Name));
+        }
+
+        private void SetMessageRequestContext()
+        {
             _messageRequestContext = GetService<MessageRequestContext>();
             _messageRequestContext.SetMessageRequest(new DataBundleRequestDto(
                 Guid.Empty,
@@ -145,7 +151,6 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
                 new MessageTypeDto(string.Empty),
                 ResponseFormat.Xml,
                 1));
-            return GetService<IMediator>().Send(new RequestMessages(messageIds.ToList(), CimFormat.Xml.Name));
         }
 
         private void GivenTheRequestedDocumentFormatIsNotSupported()
