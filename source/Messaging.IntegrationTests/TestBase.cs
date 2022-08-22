@@ -51,7 +51,7 @@ namespace Messaging.IntegrationTests
                 })
                 .AddMessagePublishing(_ => new NewMessageAvailableNotifierSpy())
                 .AddMessageStorage(_ => new MessageStorageSpy())
-                .AddOutgoingMessageDispatcher(new MessageRequestNotificationsSpy())
+                //.AddOutgoingMessageDispatcher(new MessageRequestNotificationsSpy())
                 .AddRequestHandler<TestCommandHandler>()
                 .AddHttpClientAdapter(_ => new HttpClientSpy())
                 .AddMoveInServices(new MoveInConfiguration(new Uri("http://someuri")))

@@ -15,11 +15,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
+using Dapper;
+using Energinet.DataHub.MessageHub.Model.Model;
 using MediatR;
+using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.IncomingMessages;
 using Messaging.Application.OutgoingMessages;
+using Messaging.Application.OutgoingMessages.Requesting;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Infrastructure.OutgoingMessages.Requesting;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.TestDoubles;
@@ -30,15 +36,15 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
     public class RequestMessagesTests : TestBase
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
-        private readonly MessageRequestNotificationsSpy _messageRequestNotificationsSpy;
         private readonly MessageStorageSpy _messageStorage;
+        private readonly MessageRequestContext _messageRequestContext;
 
         public RequestMessagesTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
             _outgoingMessageStore = GetService<IOutgoingMessageStore>();
-            _messageRequestNotificationsSpy = (MessageRequestNotificationsSpy)GetService<IMessageRequestNotifications>();
             _messageStorage = (MessageStorageSpy)GetService<IMessageStorage>();
+            _messageRequestContext = GetService<MessageRequestContext>();
         }
 
         [Fact]
@@ -53,6 +59,13 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
             await RequestMessages(requestedMessageIds.AsReadOnly()).ConfigureAwait(false);
 
             _messageStorage.MessageHasBeenSavedInStorage();
+            var command = GetQueuedNotification<SendSuccessNotification>();
+            Assert.NotNull(command);
+            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.RequestId, command?.RequestId);
+            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.IdempotencyId, command?.IdempotencyId);
+            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.DataAvailableNotificationReferenceId, command?.ReferenceId);
+            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.MessageType.Value, command?.MessageType);
+            Assert.NotNull(command?.MessageStorageLocation);
         }
 
         [Fact]
@@ -61,13 +74,34 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
             var nonExistingMessage = new List<string> { Guid.NewGuid().ToString() };
 
             await RequestMessages(nonExistingMessage.AsReadOnly()).ConfigureAwait(false);
-            Assert.True(_messageRequestNotificationsSpy.Error);
+
+            Assert.Null(_messageStorage.SavedMessage);
+            var command = GetQueuedNotification<SendFailureNotification>();
+            Assert.NotNull(command);
+            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.RequestId, command?.RequestId);
+            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.DataAvailableNotificationReferenceId, command?.ReferenceId);
+            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.MessageType.Value, command?.MessageType);
+            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.IdempotencyId, command?.IdempotencyId);
+            Assert.NotEqual(string.Empty, command?.FailureDescription);
+            Assert.Equal("DatasetNotFound", command?.Reason);
         }
 
         private static IncomingMessageBuilder MessageBuilder()
         {
             return new IncomingMessageBuilder()
                 .WithProcessType(ProcessType.MoveIn.Code);
+        }
+
+        private TNotification? GetQueuedNotification<TNotification>()
+        {
+            var sql = "SELECT Data FROM b2b.QueuedInternalCommands WHERE Type = @CommandType";
+            var commandData = GetService<IDbConnectionFactory>()
+                .GetOpenConnection()
+                .ExecuteScalar<string>(
+                    sql,
+                    new { CommandType = typeof(TNotification).AssemblyQualifiedName, });
+
+            return JsonSerializer.Deserialize<TNotification>(commandData);
         }
 
         private async Task<IncomingMessage> MessageArrived()
@@ -80,6 +114,13 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
 
         private Task RequestMessages(IEnumerable<string> messageIds)
         {
+            _messageRequestContext.SetMessageRequest(new DataBundleRequestDto(
+                Guid.Empty,
+                string.Empty,
+                string.Empty,
+                new MessageTypeDto(string.Empty),
+                ResponseFormat.Xml,
+                1));
             return GetService<IMediator>().Send(new RequestMessages(messageIds.ToList(), CimFormat.Xml.Name));
         }
     }

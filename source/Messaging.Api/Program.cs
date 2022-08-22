@@ -25,6 +25,7 @@ using Messaging.Api.Configuration.Middleware.Correlation;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.SystemTime;
 using Messaging.Infrastructure.OutgoingMessages;
+using Messaging.Infrastructure.OutgoingMessages.Requesting;
 using Messaging.Infrastructure.Transactions;
 using Messaging.Infrastructure.Transactions.MoveIn;
 using Microsoft.Extensions.DependencyInjection;
@@ -101,14 +102,15 @@ namespace Messaging.Api
                             return new MessageStorage(storageHandler, messageRequestContext);
                         })
                         .AddMessagePublishing(sp =>
-                            new NewMessageAvailableNotifier(sp.GetRequiredService<IDataAvailableNotificationSender>()))
+                            new NewMessageAvailableNotifier(
+                                sp.GetRequiredService<IDataAvailableNotificationSender>(),
+                                sp.GetRequiredService<ActorLookup>()))
                         .AddMessageHubServices(
                             runtime.MESSAGEHUB_STORAGE_CONNECTION_STRING!,
                             runtime.MESSAGEHUB_STORAGE_CONTAINER_NAME!,
                             runtime.MESSAGEHUB_QUEUE_CONNECTION_STRING!,
                             runtime.MESSAGEHUB_DATA_AVAILABLE_QUEUE!,
                             runtime.MESSAGEHUB_DOMAIN_REPLY_QUEUE!)
-                        .AddRequestHandler<NotifyMessageHubHandler>()
                         .AddNotificationHandler<PublishNewMessagesOnTimeHasPassed, TimeHasPassed>()
                         .AddHttpClientAdapter(sp => new HttpClientAdapter(sp.GetRequiredService<HttpClient>()))
                         .AddServiceBusClient(

@@ -13,26 +13,27 @@
 // limitations under the License.
 
 using System;
-using System.IO;
 using System.Threading.Tasks;
-using Messaging.Application.OutgoingMessages;
-using Messaging.Application.OutgoingMessages.Requesting;
-using Xunit;
+using Dapper;
+using Messaging.Application.Configuration.DataAccess;
 
-namespace Messaging.IntegrationTests.TestDoubles;
+namespace Messaging.Infrastructure.OutgoingMessages;
 
-public class MessageStorageSpy : IMessageStorage
+public class ActorLookup
 {
-    public Stream? SavedMessage { get; private set; }
+    private readonly IDbConnectionFactory _dbConnectionFactory;
 
-    public Task<Uri> SaveAsync(Stream bundledMessage)
+    public ActorLookup(IDbConnectionFactory dbConnectionFactory)
     {
-        SavedMessage = bundledMessage;
-        return Task.FromResult(new Uri("http://someuri"));
+        _dbConnectionFactory = dbConnectionFactory;
     }
 
-    public void MessageHasBeenSavedInStorage()
+    public Task<Guid> GetIdByActorNumberAsync(string actorNumber)
     {
-        Assert.NotNull(SavedMessage);
+        return _dbConnectionFactory
+            .GetOpenConnection()
+            .ExecuteScalarAsync<Guid>(
+                "SELECT Id FROM [b2b].[Actor] WHERE IdentificationNumber = @ActorNumber",
+                new { ActorNumber = actorNumber, });
     }
 }

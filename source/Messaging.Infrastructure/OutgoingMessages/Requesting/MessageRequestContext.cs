@@ -12,21 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.IO;
-using System.Threading.Tasks;
+using Energinet.DataHub.MessageHub.Model.Model;
 
-namespace Messaging.Application.OutgoingMessages;
-
-/// <summary>
-/// Storage of physical bundled CIM messages
-/// </summary>
-public interface IMessageStorage
+namespace Messaging.Infrastructure.OutgoingMessages.Requesting
 {
-    /// <summary>
-    /// Saves the message in storage location
-    /// </summary>
-    /// <param name="bundledMessage"></param>
-    /// <returns>Location of stored file</returns>
-    Task<Uri> SaveAsync(Stream bundledMessage);
+    public class MessageRequestContext
+    {
+        public DataBundleRequestDto? DataBundleRequestDto { get; private set; }
+
+        public void SetMessageRequest(DataBundleRequestDto messageRequest)
+        {
+            DataBundleRequestDto = messageRequest;
+        }
+    }
 }

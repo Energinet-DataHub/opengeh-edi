@@ -38,6 +38,7 @@ using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages.GenericNotification;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Messaging.Application.OutgoingMessages.Requesting;
 using Messaging.Application.SchemaStore;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.CimMessageAdapter;
@@ -58,6 +59,7 @@ using Messaging.Infrastructure.Configuration.SystemTime;
 using Messaging.Infrastructure.IncomingMessages;
 using Messaging.Infrastructure.MasterData.MarketEvaluationPoints;
 using Messaging.Infrastructure.OutgoingMessages;
+using Messaging.Infrastructure.OutgoingMessages.Requesting;
 using Messaging.Infrastructure.Transactions;
 using Messaging.Infrastructure.Transactions.MoveIn;
 using Microsoft.EntityFrameworkCore;
@@ -160,6 +162,7 @@ namespace Messaging.Infrastructure.Configuration
         public CompositionRoot AddMessagePublishing(Func<IServiceProvider, INewMessageAvailableNotifier> action)
         {
             _services.AddScoped(action);
+            _services.AddSingleton<ActorLookup>();
             _services.AddScoped<MessageAvailabilityPublisher>();
             _services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
             _services.AddTransient<INotificationHandler<TimeHasPassed>, PublishNewMessagesOnTimeHasPassed>();
@@ -169,14 +172,6 @@ namespace Messaging.Infrastructure.Configuration
         public CompositionRoot AddMessageStorage(Func<IServiceProvider, IMessageStorage> action)
         {
             _services.AddSingleton(action);
-            return this;
-        }
-
-        public CompositionRoot AddOutgoingMessageDispatcher(IMessageRequestNotifications messageRequestNotifications)
-        {
-            _services.AddScoped<IMessageRequestNotifications>(_ => messageRequestNotifications);
-            _services.AddScoped<RequestMessagesHandler>();
-
             return this;
         }
 
@@ -193,7 +188,8 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddSingleton<IDataAvailableNotificationSender, DataAvailableNotificationSender>();
             _services.AddSingleton<IDataBundleResponseSender, DataBundleResponseSender>();
             _services.AddSingleton(_ => new MessageHubConfig(dataAvailableQueue, domainReplyQueue));
-            _services.AddTransient<IRequestHandler<NotifyMessageHub, Unit>, NotifyMessageHubHandler>();
+            _services.AddTransient<IRequestHandler<SendSuccessNotification, Unit>, SendSuccessNotificationHandler>();
+            _services.AddTransient<IRequestHandler<SendFailureNotification, Unit>, SendFailureNotificationHandler>();
 
             return this;
         }
