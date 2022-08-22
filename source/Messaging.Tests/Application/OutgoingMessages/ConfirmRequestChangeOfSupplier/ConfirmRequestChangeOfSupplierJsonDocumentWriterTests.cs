@@ -55,9 +55,7 @@ public class ConfirmRequestChangeOfSupplierJsonDocumentWriterTests
         {
             new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId"),
         };
-
         var message = await _documentWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
-
         await AssertMessage(message, header, marketActivityRecords).ConfigureAwait(false);
     }
 
@@ -88,7 +86,6 @@ public class ConfirmRequestChangeOfSupplierJsonDocumentWriterTests
         if (schema == null) throw new InvalidCastException("Json schema not found for process ConfirmRequestChangeOfSupplier");
         var document = await JsonDocument.ParseAsync(message).ConfigureAwait(false);
         AssertJsonMessage.AssertConformsToSchema(document, schema);
-
         AssertJsonMessage.AssertHeader(header, document);
         AssertMarketActivityRecords(document, marketActivityRecords);
         AssertMarketActivityRecords(document, marketActivityRecords);

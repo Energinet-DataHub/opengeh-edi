@@ -13,15 +13,9 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Json.Schema;
-using Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
-using Messaging.Application.SchemaStore;
 using Messaging.Domain.OutgoingMessages;
-using Namotion.Reflection;
 using Xunit;
 
 namespace Messaging.Tests.Application.OutgoingMessages.Asserts;
