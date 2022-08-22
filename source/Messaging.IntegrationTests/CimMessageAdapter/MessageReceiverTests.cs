@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Messages;
+using Messaging.Domain.OutgoingMessages;
 using Messaging.IntegrationTests.CimMessageAdapter.Messages;
 using Messaging.IntegrationTests.CimMessageAdapter.Stubs;
 using Messaging.IntegrationTests.Fixtures;

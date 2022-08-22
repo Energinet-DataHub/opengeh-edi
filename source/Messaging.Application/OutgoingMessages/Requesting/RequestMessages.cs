@@ -12,17 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.Domain.SeedWork;
+using System.Collections.Generic;
+using MediatR;
+using Messaging.Application.Common.Commands;
 
-namespace Messaging.CimMessageAdapter.Messages;
+namespace Messaging.Application.OutgoingMessages.Requesting;
 
-public class CimFormat : EnumerationType
+public class RequestMessages : ICommand<Unit>
 {
-    public static readonly CimFormat Xml = new(0, nameof(Xml));
-    public static readonly CimFormat Json = new(1, nameof(Json));
-
-    private CimFormat(int id, string name)
-        : base(id, name)
+    public RequestMessages(IEnumerable<string> messageIds, string requestedDocumentFormat)
     {
+        MessageIds = messageIds;
+        RequestedDocumentFormat = requestedDocumentFormat;
     }
+
+    public IEnumerable<string> MessageIds { get; }
+
+    public string RequestedDocumentFormat { get; }
 }

@@ -32,16 +32,16 @@ public static class MasterDataTranslation
         AddMeasurementUnitType();
     }
 
-    public static Dictionary<string, string> Translations { get; } = new();
+    private static Dictionary<string, string> Translations { get; } = new();
 
-    public static string TranslateToNextReadingDate(string scheduledMeterReadingDate)
+    public static string GetTranslationFrom(string key)
     {
-        return "--" + string.Concat(
-                        scheduledMeterReadingDate
-                            .AsSpan(0, 2).ToString())
-                    + "-" +
-                    string.Concat(
-                        scheduledMeterReadingDate.AsSpan(2).ToString());
+        return Translations.FirstOrDefault(x => x.Key == key).Value;
+    }
+
+    public static ReadingDate TranslateToNextReadingDate(string scheduledMeterReadingDate)
+    {
+        return ReadingDate.Create(scheduledMeterReadingDate);
     }
 
     private static void AddMeasurementUnitType()

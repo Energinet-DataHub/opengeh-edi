@@ -12,29 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
-using Messaging.Application.OutgoingMessages;
 
-namespace Messaging.IntegrationTests.TestDoubles
+namespace Messaging.Application.OutgoingMessages.Requesting
 {
-    public class MessageDispatcherSpy : IMessageDispatcher
+    /// <summary>
+    /// Generates notifications as response to message requests
+    /// </summary>
+    public interface IMessageRequestNotifications
     {
-        public Stream? DispatchedMessage { get; private set; }
+        /// <summary>
+        /// Message was saved successfully at storage location
+        /// </summary>
+        /// <param name="storedMessageLocation">Location of saved message</param>
+        Task SavedMessageSuccessfullyAsync(Uri storedMessageLocation);
 
-        public bool Error { get; private set; }
-
-        public async Task DispatchAsync(Stream message)
-        {
-            DispatchedMessage = message;
-            await Task.CompletedTask.ConfigureAwait(false);
-        }
-
-        public async Task DispatchAsync(IReadOnlyList<string> messageIds)
-        {
-            Error = true;
-            await Task.CompletedTask.ConfigureAwait(false);
-        }
+        /// <summary>
+        /// Requested messages was not found
+        /// </summary>
+        Task RequestedMessagesWasNotFoundAsync(IReadOnlyList<string> messageIds);
     }
 }

@@ -14,9 +14,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data.Common;
 using System.Data.SqlClient;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,26 +41,18 @@ public class MarketRolesDbService : IDisposable
         if (_transaction == null) await BeginTransactionAsync().ConfigureAwait(false);
         await _sqlConnection.ExecuteAsync("DELETE FROM [dbo].[Actor]", transaction: _transaction)
             .ConfigureAwait(false);
-
-        await _sqlConnection.ExecuteAsync("DELETE FROM [dbo].[SupplierRegistrations]", transaction: _transaction)
-            .ConfigureAwait(false);
         await _sqlConnection.ExecuteAsync("DELETE FROM [dbo].[EnergySuppliers]", transaction: _transaction)
             .ConfigureAwait(false);
     }
 
-    public async Task<IEnumerable<SupplierRegistration>> GetSupplierRegistrationsAsync()
+    public async Task CleanUpB2BAsync()
     {
-        return await _sqlConnection.QueryAsync<SupplierRegistration>(
-            @"SELECT Id,
-                        EnergySupplierId,
-                        BusinessProcessId,
-                        StartOfSupplyDate,
-                        EndOfSupplyDate,
-                        AccountingPointId
-        FROM [dbo].[SupplierRegistrations]").ConfigureAwait(false) ?? (IEnumerable<SupplierRegistration>)Array.Empty<object>();
+        if (_transaction == null) await BeginTransactionAsync().ConfigureAwait(false);
+        await _sqlConnection.ExecuteAsync("DELETE FROM [b2b].[Actor]", transaction: _transaction)
+            .ConfigureAwait(false);
     }
 
-    public async Task InsertActorsAsync(IEnumerable<Actor> actors)
+    public async Task InsertActorsAsync(ReadOnlyCollection<Actor> actors)
     {
         if (actors == null) throw new ArgumentNullException(nameof(actors));
 
@@ -70,6 +62,25 @@ public class MarketRolesDbService : IDisposable
         foreach (var actor in actors)
         {
             stringBuilder.Append(@"INSERT INTO [dbo].[Actor] ([Id],[IdentificationNumber],[IdentificationType],[Roles])
+             VALUES ('" + actor.Id + "', '" + actor.IdentificationNumber + "', '" + GetType(actor.IdentificationType) + "', '" + GetRoles(actor.Roles) + "')");
+            stringBuilder.AppendLine();
+        }
+
+        await _sqlConnection.ExecuteAsync(
+            stringBuilder.ToString(),
+            transaction: _transaction).ConfigureAwait(false);
+    }
+
+    public async Task InsertActorsInB2BAsync(IEnumerable<Actor> actors)
+    {
+        if (actors == null) throw new ArgumentNullException(nameof(actors));
+
+        if (_transaction == null) await BeginTransactionAsync().ConfigureAwait(false);
+
+        var stringBuilder = new StringBuilder();
+        foreach (var actor in actors)
+        {
+            stringBuilder.Append(@"INSERT INTO [b2b].[Actor] ([Id],[IdentificationNumber],[IdentificationType],[Roles])
              VALUES ('" + actor.Id + "', '" + actor.IdentificationNumber + "', '" + GetType(actor.IdentificationType) + "', '" + GetRoles(actor.Roles) + "')");
             stringBuilder.AppendLine();
         }
@@ -90,41 +101,6 @@ public class MarketRolesDbService : IDisposable
         {
             stringBuilder.Append(@"INSERT INTO [dbo].[EnergySuppliers] ([Id],[GlnNumber])
              VALUES ('" + energySupplier.Id + "', '" + energySupplier.IdentificationNumber + "')");
-            stringBuilder.AppendLine();
-        }
-
-        await _sqlConnection.ExecuteAsync(
-            stringBuilder.ToString(),
-            transaction: _transaction).ConfigureAwait(false);
-    }
-
-    public async Task InsertSupplierRegistrationsAsync(IEnumerable<SupplierRegistration> supplierRegistrations)
-    {
-        if (supplierRegistrations == null) throw new ArgumentNullException(nameof(supplierRegistrations));
-
-        var registrations = supplierRegistrations.ToList();
-
-        if (!registrations.Any()) return;
-
-        if (_transaction == null) await BeginTransactionAsync().ConfigureAwait(false);
-
-        var stringBuilder = new StringBuilder();
-        var culture = new CultureInfo("da-DK");
-        foreach (var supplierRegistration in registrations)
-        {
-            var startDate = supplierRegistration.StartOfSupplyDate != null ? $"'{supplierRegistration.StartOfSupplyDate.Value.ToString("o", culture)}'" : "null";
-            var endDate = supplierRegistration.EndOfSupplyDate != null ? $"'{supplierRegistration.EndOfSupplyDate.Value.ToString("o", culture)}'" : "null";
-
-            var insertSql = @$"INSERT INTO [dbo].[SupplierRegistrations] (Id, EnergySupplierId, BusinessProcessId, StartOfSupplyDate, EndOfSupplyDate, AccountingPointId)
-             VALUES (
-                 '{supplierRegistration.Id}',
-                 '{supplierRegistration.EnergySupplierId}',
-                 '{supplierRegistration.BusinessProcessId}',
-                 {startDate},
-                 {endDate},
-                 '{supplierRegistration.AccountingPointId}')";
-
-            stringBuilder.Append(insertSql);
             stringBuilder.AppendLine();
         }
 

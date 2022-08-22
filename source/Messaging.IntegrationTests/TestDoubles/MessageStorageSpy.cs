@@ -13,27 +13,26 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
-using Messaging.Domain.OutgoingMessages;
+using Messaging.Application.OutgoingMessages;
+using Messaging.Application.OutgoingMessages.Requesting;
+using Xunit;
 
-namespace Messaging.CimMessageAdapter.Messages;
+namespace Messaging.IntegrationTests.TestDoubles;
 
-public class MessageParser
+public class MessageStorageSpy : IMessageStorage
 {
-    private readonly IEnumerable<IMessageParser> _parsers;
+    public Stream? SavedMessage { get; private set; }
 
-    public MessageParser(IEnumerable<IMessageParser> parsers)
+    public Task<Uri> SaveAsync(Stream bundledMessage)
     {
-        _parsers = parsers;
+        SavedMessage = bundledMessage;
+        return Task.FromResult(new Uri("http://someuri"));
     }
 
-    public Task<MessageParserResult> ParseAsync(Stream message, CimFormat cimFormat)
+    public void MessageHasBeenSavedInStorage()
     {
-        var parser = _parsers.FirstOrDefault(parser => parser.HandledFormat.Equals(cimFormat));
-        if (parser is null) throw new InvalidOperationException($"No message parser found for message format '{cimFormat}'");
-        return parser.ParseAsync(message);
+        Assert.NotNull(SavedMessage);
     }
 }

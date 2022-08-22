@@ -15,18 +15,20 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net.Mime;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
+using Energinet.DataHub.MessageHub.Model.Model;
 using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.IncomingMessages;
 using Messaging.Application.OutgoingMessages;
+using Messaging.Application.OutgoingMessages.Requesting;
 using Messaging.Application.SchemaStore;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Xml;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
+using Messaging.Infrastructure.OutgoingMessages;
+using Messaging.Infrastructure.OutgoingMessages.Requesting;
 using Messaging.Infrastructure.Transactions;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Fixtures;
@@ -51,6 +53,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         public async Task Transaction_is_started()
         {
             var incomingMessage = MessageBuilder()
+                .WithSenderId(SampleData.SenderId)
                 .Build();
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
@@ -112,6 +115,40 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             await AssertRejectMessage(rejectMessage).ConfigureAwait(false);
         }
 
+        [Fact]
+        public async Task A_reject_message_is_created_when_the_sender_id_does_not_match_energy_supplier_id()
+        {
+            var incomingMessage = MessageBuilder()
+                .WithProcessType(ProcessType.MoveIn.Code)
+                .WithReceiver(SampleData.ReceiverId)
+                .WithSenderId("Fake")
+                .WithConsumerName(null)
+                .Build();
+
+            await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
+            var rejectMessage = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage.Message.MessageId)!;
+            await RequestMessage(rejectMessage.Id.ToString()).ConfigureAwait(false);
+
+            await AssertRejectMessage(rejectMessage).ConfigureAwait(false);
+        }
+
+        [Fact]
+        public async Task A_reject_message_is_created_when_the_energy_supplier_id_is_empty()
+        {
+            var incomingMessage = MessageBuilder()
+                .WithProcessType(ProcessType.MoveIn.Code)
+                .WithReceiver(SampleData.ReceiverId)
+                .WithEnergySupplierId(null)
+                .WithConsumerName(null)
+                .Build();
+
+            await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
+            var rejectMessage = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage.Message.MessageId)!;
+            await RequestMessage(rejectMessage.Id.ToString()).ConfigureAwait(false);
+
+            await AssertRejectMessage(rejectMessage).ConfigureAwait(false);
+        }
+
         private static void AssertHeader(XDocument document, OutgoingMessage message, string expectedReasonCode)
         {
             Assert.NotEmpty(AssertXmlMessage.GetMessageHeaderValue(document, "mRID")!);
@@ -155,7 +192,14 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
         private async Task RequestMessage(string id)
         {
-            await InvokeCommandAsync(new RequestMessages(new[] { id })).ConfigureAwait(false);
+            GetService<MessageRequestContext>().SetMessageRequest(new DataBundleRequestDto(
+                Guid.Empty,
+                string.Empty,
+                string.Empty,
+                new MessageTypeDto(string.Empty),
+                ResponseFormat.Xml,
+                1));
+            await InvokeCommandAsync(new RequestMessages(new[] { id }, CimFormat.Xml.Name)).ConfigureAwait(false);
         }
 
         private async Task AssertRejectMessage(OutgoingMessage rejectMessage)
@@ -179,8 +223,8 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
         private Stream GetDispatchedDocument()
         {
-            var messageDispatcher = GetService<IMessageDispatcher>() as MessageDispatcherSpy;
-            return messageDispatcher!.DispatchedMessage!;
+            var messageDispatcher = (MessageStorageSpy)GetService<IMessageStorage>();
+            return messageDispatcher.SavedMessage!;
         }
 
         private HttpClientSpy GetHttpClientMock()

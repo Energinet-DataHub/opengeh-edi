@@ -22,6 +22,8 @@ using Messaging.Application.IncomingMessages;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Messages;
+using Messaging.Domain.OutgoingMessages;
+using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
 
 namespace Messaging.CimMessageAdapter
 {
@@ -98,6 +100,11 @@ namespace Messaging.CimMessageAdapter
         private static IncomingMessage CreateTransaction(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
         {
             return IncomingMessage.Create(messageHeader, marketActivityRecord);
+        }
+
+        private static bool IsEnergySupplierIdAndSenderIdAMatch(string? energySupplierId, string senderId)
+        {
+            return energySupplierId == senderId;
         }
 
         private Task<bool> CheckTransactionIdAsync(string transactionId)

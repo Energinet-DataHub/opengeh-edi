@@ -12,25 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.CimMessageAdapter.Messages;
-using Messaging.Domain.OutgoingMessages;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 
-namespace Messaging.CimMessageAdapter.Response;
+namespace Messaging.Application.OutgoingMessages.Requesting;
 
 /// <summary>
-/// Factory responsible for creating B2B response messages
+/// Storage of physical bundled CIM messages
 /// </summary>
-public interface IResponseFactory
+public interface IMessageStorage
 {
     /// <summary>
-    /// Specifies the handled CIM format
+    /// Saves the message in storage location
     /// </summary>
-    public CimFormat HandledFormat { get; }
-
-    /// <summary>
-    /// Create response message
-    /// </summary>
-    /// <param name="result"></param>
-    /// <returns><see cref="ResponseMessage"/></returns>
-    public ResponseMessage From(Result result);
+    /// <param name="bundledMessage"></param>
+    /// <returns>Location of stored file</returns>
+    Task<Uri> SaveAsync(Stream bundledMessage);
 }

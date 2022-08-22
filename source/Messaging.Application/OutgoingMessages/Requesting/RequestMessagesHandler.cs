@@ -21,26 +21,30 @@ using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.Configuration;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.SeedWork;
 
-namespace Messaging.Application.OutgoingMessages
+namespace Messaging.Application.OutgoingMessages.Requesting
 {
     public class RequestMessagesHandler : IRequestHandler<RequestMessages, Unit>
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
-        private readonly IMessageDispatcher _messageDispatcher;
-        private readonly MessageFactory _messageFactory;
+        private readonly IMessageRequestNotifications _messageRequestNotifications;
+        private readonly DocumentFactory _documentFactory;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+        private readonly IMessageStorage _messageStorage;
 
         public RequestMessagesHandler(
             IOutgoingMessageStore outgoingMessageStore,
-            IMessageDispatcher messageDispatcherSpy,
-            MessageFactory messageFactory,
-            ISystemDateTimeProvider systemDateTimeProvider)
+            IMessageRequestNotifications messageRequestNotificationsSpy,
+            DocumentFactory documentFactory,
+            ISystemDateTimeProvider systemDateTimeProvider,
+            IMessageStorage messageStorage)
         {
             _outgoingMessageStore = outgoingMessageStore;
-            _messageDispatcher = messageDispatcherSpy;
-            _messageFactory = messageFactory;
+            _messageRequestNotifications = messageRequestNotificationsSpy;
+            _documentFactory = documentFactory;
             _systemDateTimeProvider = systemDateTimeProvider;
+            _messageStorage = messageStorage;
         }
 
         public async Task<Unit> Handle(RequestMessages request, CancellationToken cancellationToken)
@@ -51,14 +55,15 @@ namespace Messaging.Application.OutgoingMessages
             var messageIdsNotFound = MessageIdsNotFound(requestedMessageIds, messages);
             if (messageIdsNotFound.Any())
             {
-                await _messageDispatcher.DispatchAsync(messageIdsNotFound).ConfigureAwait(false);
+                await _messageRequestNotifications.RequestedMessagesWasNotFoundAsync(messageIdsNotFound).ConfigureAwait(false);
                 return Unit.Value;
             }
 
             var messageBundle = CreateBundleFrom(messages);
 
-            var message = await _messageFactory.CreateFromAsync(messageBundle.CreateMessage()).ConfigureAwait(false);
-            await _messageDispatcher.DispatchAsync(message).ConfigureAwait(false);
+            var message = await _documentFactory.CreateFromAsync(messageBundle.CreateMessage(), EnumerationType.FromName<CimFormat>(request.RequestedDocumentFormat)).ConfigureAwait(false);
+            var storedMessageLocation = await _messageStorage.SaveAsync(message).ConfigureAwait(false);
+            await _messageRequestNotifications.SavedMessageSuccessfullyAsync(storedMessageLocation).ConfigureAwait(false);
 
             return Unit.Value;
         }

@@ -16,7 +16,6 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MessageHub.Client.DataAvailable;
 using Energinet.DataHub.MessageHub.Model.Model;
-using Messaging.Application.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages;
 
 namespace Messaging.Infrastructure.OutgoingMessages
@@ -24,33 +23,39 @@ namespace Messaging.Infrastructure.OutgoingMessages
     public class NewMessageAvailableNotifier : INewMessageAvailableNotifier
     {
         private readonly IDataAvailableNotificationSender _dataAvailableNotificationSender;
+        private readonly ActorLookup _actorLookup;
 
         public NewMessageAvailableNotifier(
-            IDataAvailableNotificationSender dataAvailableNotificationSender)
+            IDataAvailableNotificationSender dataAvailableNotificationSender,
+            ActorLookup actorLookup)
         {
             _dataAvailableNotificationSender = dataAvailableNotificationSender;
+            _actorLookup = actorLookup;
         }
 
         public async Task NotifyAsync(OutgoingMessage message)
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
+            var actorId = await FindActorIdAsync(message.ReceiverId).ConfigureAwait(false);
 
             await _dataAvailableNotificationSender.SendAsync(
                 message.CorrelationId,
-                CreateDataAvailableNotificationFrom(message)).ConfigureAwait(false);
+                CreateDataAvailableNotificationFrom(message, actorId)).ConfigureAwait(false);
         }
 
-        private static DataAvailableNotificationDto CreateDataAvailableNotificationFrom(OutgoingMessage message)
+        private static DataAvailableNotificationDto CreateDataAvailableNotificationFrom(
+            OutgoingMessage message,
+            Guid actorId)
         {
             var documentType = ExtractDocumentType(message);
             return new DataAvailableNotificationDto(
                 message.Id,
-                new GlobalLocationNumberDto(message.ReceiverId),
+                new ActorIdDto(actorId),
                 new MessageTypeDto(ExtractMessageTypeFrom(message.ProcessType, documentType)),
+                documentType,
                 DomainOrigin.MarketRoles,
                 true,
-                1,
-                documentType);
+                1);
         }
 
         private static string ExtractMessageTypeFrom(string processType, string documentType)
@@ -61,6 +66,17 @@ namespace Messaging.Infrastructure.OutgoingMessages
         private static string ExtractDocumentType(OutgoingMessage message)
         {
             return message.DocumentType.Split('_')[0];
+        }
+
+        private async Task<Guid> FindActorIdAsync(string receiverId)
+        {
+            var actorId = await _actorLookup.GetIdByActorNumberAsync(receiverId).ConfigureAwait(false);
+            if (actorId == Guid.Empty)
+            {
+                throw new InvalidOperationException($"Could not find actor with identification number: {receiverId}.");
+            }
+
+            return actorId;
         }
     }
 }

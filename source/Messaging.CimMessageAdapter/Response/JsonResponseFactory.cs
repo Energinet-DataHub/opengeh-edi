@@ -17,6 +17,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Messaging.CimMessageAdapter.Messages;
+using Messaging.Domain.OutgoingMessages;
 using Newtonsoft.Json;
 
 namespace Messaging.CimMessageAdapter.Response;

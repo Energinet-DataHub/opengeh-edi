@@ -22,21 +22,27 @@ using Messaging.Domain.OutgoingMessages;
 
 namespace Messaging.Application.OutgoingMessages;
 
-public class MessageFactory
+public class DocumentFactory
 {
     private readonly IReadOnlyCollection<DocumentWriter> _documentWriters;
 
-    public MessageFactory(
-        IEnumerable<DocumentWriter> documentWriters)
+    public DocumentFactory(IEnumerable<DocumentWriter> documentWriters)
     {
         _documentWriters = documentWriters.ToList();
     }
 
-    public Task<Stream> CreateFromAsync(CimMessage message)
+    public Task<Stream> CreateFromAsync(CimMessage message, CimFormat documentFormat)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
         var documentWriter =
-            _documentWriters.First(writer => writer.HandlesDocumentType(message.DocumentType));
+            _documentWriters.FirstOrDefault(writer =>
+                writer.HandlesDocumentType(message.DocumentType) &&
+                writer.HandlesDocumentFormat(documentFormat));
+
+        if (documentWriter is null)
+        {
+            throw new OutgoingMessageException($"Could handle document type {message.DocumentType}");
+        }
 
         return documentWriter.WriteAsync(
             message.Header,

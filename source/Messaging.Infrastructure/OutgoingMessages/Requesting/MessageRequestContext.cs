@@ -12,18 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using MediatR;
-using Messaging.Application.Common.Commands;
+using Energinet.DataHub.MessageHub.Model.Model;
 
-namespace Messaging.Application.OutgoingMessages;
-
-public class RequestMessages : ICommand<Unit>
+namespace Messaging.Infrastructure.OutgoingMessages.Requesting
 {
-    public RequestMessages(IEnumerable<string> messageIds)
+    public class MessageRequestContext
     {
-        MessageIds = messageIds;
-    }
+        public DataBundleRequestDto? DataBundleRequestDto { get; private set; }
 
-    public IEnumerable<string> MessageIds { get; }
+        public void SetMessageRequest(DataBundleRequestDto messageRequest)
+        {
+            DataBundleRequestDto = messageRequest;
+        }
+    }
 }

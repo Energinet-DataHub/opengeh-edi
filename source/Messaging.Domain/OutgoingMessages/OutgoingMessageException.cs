@@ -12,26 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
+namespace Messaging.Domain.OutgoingMessages;
 
-namespace Messaging.Application.OutgoingMessages
+public class OutgoingMessageException : Exception
 {
-    /// <summary>
-    /// Interface for dispatching messages
-    /// </summary>
-    public interface IMessageDispatcher
+    public OutgoingMessageException(string message)
+        : base(message)
     {
-        /// <summary>
-        /// Dispatches the message
-        /// </summary>
-        /// <param name="message"></param>
-        Task DispatchAsync(Stream message);
+    }
 
-        /// <summary>
-        /// Dispatches the message
-        /// </summary>
-        Task DispatchAsync(IReadOnlyList<string> messageIds);
+    public OutgoingMessageException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
+
+    private OutgoingMessageException()
+    {
     }
 }

@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.ActorRegistrySync.Entities;
@@ -41,34 +42,21 @@ public class ActorSyncService : IDisposable
         return actors.Where(actor => actor.Roles.Contains("DDQ", StringComparison.InvariantCultureIgnoreCase)).Select(actor => new EnergySupplier(actor.Id, actor.IdentificationNumber));
     }
 
-    public static IEnumerable<SupplierRegistration> FilterObsoleteSupplierRegistrations(IEnumerable<SupplierRegistration> supplierRegistrations, IEnumerable<EnergySupplier> energySuppliers)
-    {
-        return supplierRegistrations.Where(supplierRegistration => energySuppliers.Any(energySupplier => supplierRegistration.EnergySupplierId == energySupplier.Id));
-    }
-
     public async Task DatabaseCleanUpAsync()
     {
         await _marketRolesDbService.CleanUpAsync().ConfigureAwait(false);
+        await _marketRolesDbService.CleanUpB2BAsync().ConfigureAwait(false);
     }
 
-    public async Task InsertActorsAsync(IEnumerable<Actor> actors)
+    public async Task InsertActorsAsync(ReadOnlyCollection<Actor> actors)
     {
         await _marketRolesDbService.InsertActorsAsync(actors).ConfigureAwait(false);
+        await _marketRolesDbService.InsertActorsInB2BAsync(actors).ConfigureAwait(false);
     }
 
     public async Task InsertEnergySuppliersAsync(IEnumerable<EnergySupplier> energySuppliers)
     {
         await _marketRolesDbService.InsertEnergySuppliersAsync(energySuppliers).ConfigureAwait(false);
-    }
-
-    public async Task InsertSupplierRegistrationsAsync(IEnumerable<SupplierRegistration> supplierRegistrations)
-    {
-        await _marketRolesDbService.InsertSupplierRegistrationsAsync(supplierRegistrations).ConfigureAwait(false);
-    }
-
-    public async Task<IEnumerable<SupplierRegistration>> GetSupplierRegistrationsAsync()
-    {
-        return await _marketRolesDbService.GetSupplierRegistrationsAsync().ConfigureAwait(false);
     }
 
     public async Task<IEnumerable<Actor>> GetActorsAsync()
