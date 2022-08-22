@@ -44,7 +44,7 @@ public class RejectRequestChangeOfSupplierJsonDocumentWriter : IDocumentWriter
         return DocumentType.Equals(documentType, StringComparison.OrdinalIgnoreCase);
     }
 
-    public Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
+    public async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
     {
         var stream = new MemoryStream();
         var streamWriter = new StreamWriter(stream, leaveOpen: true);
@@ -52,12 +52,20 @@ public class RejectRequestChangeOfSupplierJsonDocumentWriter : IDocumentWriter
 
         WriteHeader(header, writer);
         WriteMarketActitivyRecords(marketActivityRecords, writer);
-        return Task.FromResult<Stream>(stream);
+        WriteEnd(writer);
+        await streamWriter.FlushAsync().ConfigureAwait(false);
+        stream.Position = 0;
+        return stream;
     }
 
     private static void WriteHeader(MessageHeader header, JsonTextWriter writer)
     {
         JsonHeaderWriter.Write(header, DocumentType, TypeCode, writer);
+    }
+
+    private static void WriteEnd(JsonTextWriter writer)
+    {
+        writer.WriteEndObject();
     }
 
     private void WriteMarketActitivyRecords(IReadOnlyCollection<string> marketActivityRecords, JsonTextWriter writer)

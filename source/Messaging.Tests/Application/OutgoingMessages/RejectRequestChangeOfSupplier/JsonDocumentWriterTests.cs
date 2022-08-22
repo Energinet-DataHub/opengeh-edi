@@ -16,33 +16,37 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
+using Json.Schema;
 using Messaging.Application.Common;
 using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Messaging.Application.SchemaStore;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Serialization;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using Messaging.Tests.Application.OutgoingMessages.Asserts;
 using Xunit;
 
 namespace Messaging.Tests.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 
 public class JsonDocumentWriterTests
 {
-    private const string TypeCode = "E44";
+    // private const string TypeCode = "E44";
     private const string DocumentType = "RejectRequestChangeOfSupplier_MarketDocument";
     private readonly RejectRequestChangeOfSupplierJsonDocumentWriter _documentWriter;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMarketActivityRecordParser _marketActivityRecordParser;
+    private readonly JsonSchemaProvider _schemaProvider;
 
     public JsonDocumentWriterTests()
     {
         _systemDateTimeProvider = new SystemDateTimeProvider();
         _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
         _documentWriter = new RejectRequestChangeOfSupplierJsonDocumentWriter(_marketActivityRecordParser);
+        _schemaProvider = new JsonSchemaProvider();
     }
 
     [Fact]
@@ -68,84 +72,49 @@ public class JsonDocumentWriterTests
             header,
             marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
 
-        AssertMessage(message, header, marketActivityRecords);
+        await AssertMessage(message, header, marketActivityRecords).ConfigureAwait(false);
     }
 
-    private static JObject StreamToJson(Stream stream)
+    private static void AssertMarketActivityRecords(JsonDocument document, List<MarketActivityRecord> marketActivityRecords)
     {
-        stream.Position = 0;
-        var serializer = new JsonSerializer();
-        var sr = new StreamReader(stream);
-        using var jtr = new JsonTextReader(sr);
-        var json = serializer.Deserialize<JObject>(jtr)!;
+        if (document == null) throw new ArgumentNullException(nameof(document));
+        if (marketActivityRecords == null) throw new ArgumentNullException(nameof(marketActivityRecords));
 
-        return json;
+        var marketActivityRecordElement = document.RootElement.GetProperty(DocumentType).GetProperty("MktActivityRecord");
+
+        Assert.Equal(2, marketActivityRecordElement.EnumerateArray().Count());
+
+        foreach (var jsonElement in marketActivityRecordElement.EnumerateArray())
+        {
+            var id = jsonElement.GetProperty("mRID").ToString();
+            var marketActivityRecord = marketActivityRecords.FirstOrDefault(x => x.Id == id);
+            AssertMarketActivityRecord(jsonElement, marketActivityRecord!);
+        }
     }
 
-    private static void AssertHeader(MessageHeader header, JObject json)
+    private static void AssertMarketActivityRecord(JsonElement jsonElement, MarketActivityRecord originalMarketActivityRecord)
     {
-        var document = json.GetValue(
-            DocumentType,
-            StringComparison.OrdinalIgnoreCase)!;
-        Assert.Equal("messageID", document.Value<string>("mRID"));
-        Assert.Equal("23", GetPropertyValue(document, "businessSector.type"));
-        var headerDateTime = TruncateMilliseconds(header.TimeStamp.ToDateTimeUtc());
-        var documentDateTime = TruncateMilliseconds(document.Value<DateTime>("createdDateTime"));
-        Assert.Equal(headerDateTime, documentDateTime);
-        Assert.Equal(header.ProcessType, GetPropertyValue(document, "process.processType"));
-        Assert.Equal(header.ReasonCode, GetPropertyValue(document, "reason.code"));
-        Assert.Equal(header.ReceiverId, GetPropertyValue(document, "receiver_MarketParticipant.mRID"));
-        Assert.Equal(header.ReceiverRole, GetPropertyValue(document, "receiver_MarketParticipant.marketRole.type"));
-        Assert.Equal(header.SenderId, GetPropertyValue(document, "sender_MarketParticipant.mRID"));
-        Assert.Equal(header.SenderRole, GetPropertyValue(document, "sender_MarketParticipant.marketRole.type"));
-        Assert.Equal(TypeCode, GetPropertyValue(document, "type"));
+        Assert.Equal(originalMarketActivityRecord.MarketEvaluationPointId, jsonElement.GetProperty("marketEvaluationPoint.mRID").GetProperty("value").ToString());
+        Assert.Equal(originalMarketActivityRecord.OriginalTransactionId, jsonElement.GetProperty("originalTransactionIDReference_MktActivityRecord.mRID").ToString());
+
+        var index = 0;
+        foreach (var element in jsonElement.GetProperty("Reason").EnumerateArray())
+        {
+            var text = element.GetProperty("text");
+            Assert.Equal(originalMarketActivityRecord.Reasons.ToList()[index].Text, text.ToString());
+            var code = element.GetProperty("code");
+            Assert.Equal(originalMarketActivityRecord.Reasons.ToList()[index].Code, code.GetProperty("value").ToString());
+            index++;
+        }
     }
 
-    private static JToken GetPropertyValue(JToken document, string propertyName)
+    private async Task AssertMessage(Stream message, MessageHeader header, List<MarketActivityRecord> marketActivityRecords)
     {
-        return document.Value<JToken>(propertyName)!.Value<string>("value");
-    }
-
-    private static void AssertMarketActivityRecords(JObject json, List<MarketActivityRecord> marketActivityRecords)
-    {
-        if (json == null) throw new ArgumentNullException(nameof(json));
-        var marketActivityRecordsJson =
-            json.GetValue(
-                    DocumentType,
-                    StringComparison.OrdinalIgnoreCase)
-                ?.Value<JArray>("MktActivityRecord")?.ToList();
-
-        Assert.Equal(2, marketActivityRecordsJson!.Count);
-        AssertMarketActivityRecord(marketActivityRecordsJson![0], marketActivityRecords[0]);
-        AssertMarketActivityRecord(marketActivityRecordsJson![1], marketActivityRecords[1]);
-    }
-
-    private static void AssertMarketActivityRecord(JToken record, MarketActivityRecord originalMarketActivityRecord)
-    {
-        Assert.Equal(originalMarketActivityRecord.Id, record.Value<string>("mRID"));
-        Assert.Equal(
-            originalMarketActivityRecord.OriginalTransactionId,
-            record.Value<string>("originalTransactionIDReference_MktActivityRecord.mRID"));
-        Assert.Equal("FakeMarketEvaluationPointId", GetPropertyValue(record, "marketEvaluationPoint.mRID"));
-
-        Assert.Equal(originalMarketActivityRecord.Reasons.ToList()[0].Text, GetReasonTextFromJsonMarketActivityRecord(record, 0));
-        Assert.Equal(originalMarketActivityRecord.Reasons.ToList()[1].Text, GetReasonTextFromJsonMarketActivityRecord(record, 1));
-    }
-
-    private static JToken GetReasonTextFromJsonMarketActivityRecord(JToken record, int index)
-    {
-        return record.Children().ElementAt(3).ElementAt(0).ElementAt(index).Value<string>("text");
-    }
-
-    private static DateTime TruncateMilliseconds(DateTime time)
-    {
-        return new DateTime(time.Year, time.Month, time.Day, time.Hour, time.Minute, time.Second);
-    }
-
-    private static void AssertMessage(Stream message, MessageHeader header, List<MarketActivityRecord> marketActivityRecords)
-    {
-        var json = StreamToJson(message);
-        AssertHeader(header, json);
-        AssertMarketActivityRecords(json, marketActivityRecords);
+        var schema = await _schemaProvider.GetSchemaAsync<JsonSchema>("rejectrequestchangeofsupplier", "0").ConfigureAwait(false);
+        if (schema == null) throw new InvalidCastException("Json schema not found for process RejectRequestChangeOfSupplier");
+        var document = await JsonDocument.ParseAsync(message).ConfigureAwait(false);
+        AssertJsonMessage.AssertConformsToSchema(document, schema, DocumentType);
+        AssertJsonMessage.AssertHeader(header, document, DocumentType);
+        AssertMarketActivityRecords(document, marketActivityRecords);
     }
 }

@@ -22,9 +22,9 @@ namespace Messaging.Tests.Application.OutgoingMessages.Asserts;
 
 public static class AssertJsonMessage
 {
-    public static void AssertConformsToSchema(JsonDocument document, JsonSchema schema)
+    public static void AssertConformsToSchema(JsonDocument document, JsonSchema schema, string documentType)
     {
-        if (schema == null) throw new InvalidOperationException("Schema not found for business process type ConfirmRequestChangeOfSupplier");
+        if (schema == null) throw new InvalidOperationException($"Schema not found for business process type {documentType}");
 
         var validationOptions = new ValidationOptions()
         {
@@ -36,11 +36,11 @@ public static class AssertJsonMessage
         Assert.True(validationResult.IsValid);
     }
 
-    public static void AssertHeader(MessageHeader header, JsonDocument document)
+    public static void AssertHeader(MessageHeader header, JsonDocument document, string documentType)
     {
         if (document == null) throw new ArgumentNullException(nameof(document));
         if (header == null) throw new ArgumentNullException(nameof(header));
-        var root = document.RootElement.GetProperty("ConfirmRequestChangeOfSupplier_MarketDocument");
+        var root = document.RootElement.GetProperty(documentType);
         Assert.Equal(header.MessageId, root.GetProperty("mRID").ToString());
         Assert.Equal(header.ProcessType, root.GetProperty("process.processType").GetProperty("value").ToString());
         Assert.Equal("23", root.GetProperty("businessSector.type").GetProperty("value").ToString());
