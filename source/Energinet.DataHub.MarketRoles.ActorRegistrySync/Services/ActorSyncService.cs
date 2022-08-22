@@ -42,12 +42,6 @@ public class ActorSyncService : IDisposable
         return actors.Where(actor => actor.Roles.Contains("DDQ", StringComparison.InvariantCultureIgnoreCase)).Select(actor => new EnergySupplier(actor.Id, actor.IdentificationNumber));
     }
 
-    public async Task DatabaseCleanUpAsync()
-    {
-        await _marketRolesDbService.CleanUpAsync().ConfigureAwait(false);
-        await _marketRolesDbService.CleanUpB2BAsync().ConfigureAwait(false);
-    }
-
     public async Task InsertActorsAsync(ReadOnlyCollection<Actor> actors)
     {
         await _marketRolesDbService.InsertActorsAsync(actors).ConfigureAwait(false);

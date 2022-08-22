@@ -21,6 +21,7 @@ using System.Text;
 using MediatR;
 using Messaging.Api;
 using Messaging.Application.Common;
+using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Configuration;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.DependencyInjection;
@@ -88,7 +89,7 @@ namespace Messaging.ArchitectureTests
         {
             using var scope = _host.Services.CreateScope();
             Assert.True(scope.ServiceProvider.CanSatisfyRequirement(requirement));
-            Assert.True(scope.ServiceProvider.RequirementIsPartOfCollection<DocumentWriter>(requirement));
+            Assert.True(scope.ServiceProvider.RequirementIsPartOfCollection<IDocumentWriter>(requirement));
         }
 
         [Theory(DisplayName = nameof(All_request_handlers_are_registered))]
