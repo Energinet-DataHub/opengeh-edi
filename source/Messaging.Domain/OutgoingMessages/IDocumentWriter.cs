@@ -24,4 +24,17 @@ public interface IDocumentWriter
     /// </summary>
     /// <param name="format"></param>
     bool HandlesDocumentFormat(CimFormat format);
+
+    /// <summary>
+    /// Determine if specified document type can be handles by the writer
+    /// </summary>
+    /// <param name="documentType"></param>
+    bool HandlesDocumentType(string documentType);
+
+    /// <summary>
+    /// Writes the document
+    /// </summary>
+    /// <param name="header"></param>
+    /// <param name="marketActivityRecords"></param>
+    Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords);
 }
