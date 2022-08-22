@@ -63,7 +63,7 @@ namespace Messaging.Api.OutgoingMessages
 
             await _mediator.Send(new RequestMessages(
                 dataAvailableIds.Select(x => x.ToString()).ToList() ?? throw new InvalidOperationException(),
-                CimFormat.Xml.Name)).ConfigureAwait(false);
+                messageRequest.ResponseFormat.ToString())).ConfigureAwait(false);
             _logger.LogInformation($"Dequeued with correlation id: {_correlationContext.Id}");
         }
     }

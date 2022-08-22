@@ -21,7 +21,7 @@ namespace Messaging.Infrastructure.OutgoingMessages.Requesting;
 public class SendSuccessNotification : InternalCommand
 {
     [JsonConstructor]
-    public SendSuccessNotification(Guid id, Guid requestId, string idempotencyId, string referenceId, string messageType, Uri messageStorageLocation)
+    public SendSuccessNotification(Guid id, Guid requestId, string idempotencyId, string referenceId, string messageType, Uri messageStorageLocation, string requestedFormat)
         : base(id)
     {
         RequestId = requestId;
@@ -29,15 +29,17 @@ public class SendSuccessNotification : InternalCommand
         ReferenceId = referenceId;
         MessageType = messageType;
         MessageStorageLocation = messageStorageLocation;
+        RequestedFormat = requestedFormat;
     }
 
-    public SendSuccessNotification(Guid requestId, string idempotencyId, string referenceId, string messageType, Uri messageStorageLocation)
+    public SendSuccessNotification(Guid requestId, string idempotencyId, string referenceId, string messageType, Uri messageStorageLocation, string requestedFormat)
     {
         RequestId = requestId;
         IdempotencyId = idempotencyId;
         ReferenceId = referenceId;
         MessageType = messageType;
         MessageStorageLocation = messageStorageLocation;
+        RequestedFormat = requestedFormat;
     }
 
     public Guid RequestId { get; }
@@ -49,4 +51,6 @@ public class SendSuccessNotification : InternalCommand
     public string MessageType { get; }
 
     public Uri MessageStorageLocation { get; }
+
+    public string RequestedFormat { get; }
 }
