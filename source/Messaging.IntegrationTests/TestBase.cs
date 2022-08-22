@@ -87,16 +87,11 @@ namespace Messaging.IntegrationTests
             _disposed = true;
         }
 
-        protected void RemoveService<TService>()
+        protected void RegisterInstance<TService>(TService instance)
+        where TService : class
         {
-            _services.AddScoped(sp => new DocumentFactory(new List<DocumentWriter>()));
+            _services.AddScoped(_ => instance);
             _serviceProvider = _services.BuildServiceProvider();
-        }
-
-        protected void RegisterService<TService>(TService instance)
-        {
-            if (instance == null) throw new ArgumentNullException(nameof(instance));
-            _services.AddSingleton(new DocumentFactory(new List<DocumentWriter>()));
         }
 
         protected Task InvokeCommandAsync(object command)

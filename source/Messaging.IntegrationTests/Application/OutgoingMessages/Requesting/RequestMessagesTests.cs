@@ -150,8 +150,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
 
         private void GivenTheRequestedDocumentFormatIsNotSupported()
         {
-            RemoveService<DocumentFactory>();
-            //RegisterService(new DocumentFactory(new List<DocumentWriter>()));
+            RegisterInstance(new DocumentFactory(new List<DocumentWriter>()));
         }
     }
 }
