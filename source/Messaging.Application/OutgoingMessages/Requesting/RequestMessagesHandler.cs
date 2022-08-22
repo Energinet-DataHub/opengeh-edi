@@ -60,14 +60,16 @@ namespace Messaging.Application.OutgoingMessages.Requesting
             }
 
             var messageBundle = CreateBundleFrom(messages);
+            var message = messageBundle.CreateMessage();
+
             var requestedFormat = EnumerationType.FromName<CimFormat>(request.RequestedDocumentFormat);
-            if (_documentFactory.CanHandle(messages.First().DocumentType, requestedFormat) == false)
+            if (_documentFactory.CanHandle(message.DocumentType, requestedFormat) == false)
             {
-                await _messageRequestNotifications.RequestedDocumentFormatIsNotSupportedAsync(request.RequestedDocumentFormat, messages.First().DocumentType).ConfigureAwait(false);
+                await _messageRequestNotifications.RequestedDocumentFormatIsNotSupportedAsync(request.RequestedDocumentFormat, message.DocumentType).ConfigureAwait(false);
                 return Unit.Value;
             }
 
-            var document = await _documentFactory.CreateFromAsync(messageBundle.CreateMessage(), requestedFormat).ConfigureAwait(false);
+            var document = await _documentFactory.CreateFromAsync(message, requestedFormat).ConfigureAwait(false);
             var storedMessageLocation = await _messageStorage.SaveAsync(document).ConfigureAwait(false);
             await _messageRequestNotifications.SavedMessageSuccessfullyAsync(storedMessageLocation).ConfigureAwait(false);
 
