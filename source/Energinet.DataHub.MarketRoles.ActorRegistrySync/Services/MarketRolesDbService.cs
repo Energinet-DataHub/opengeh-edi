@@ -36,22 +36,6 @@ public class MarketRolesDbService : IDisposable
         _sqlConnection = new SqlConnection(connectionString);
     }
 
-    public async Task CleanUpAsync()
-    {
-        if (_transaction == null) await BeginTransactionAsync().ConfigureAwait(false);
-        await _sqlConnection.ExecuteAsync("DELETE FROM [dbo].[Actor]", transaction: _transaction)
-            .ConfigureAwait(false);
-        await _sqlConnection.ExecuteAsync("DELETE FROM [dbo].[EnergySuppliers]", transaction: _transaction)
-            .ConfigureAwait(false);
-    }
-
-    public async Task CleanUpB2BAsync()
-    {
-        if (_transaction == null) await BeginTransactionAsync().ConfigureAwait(false);
-        await _sqlConnection.ExecuteAsync("DELETE FROM [b2b].[Actor]", transaction: _transaction)
-            .ConfigureAwait(false);
-    }
-
     public async Task InsertActorsAsync(ReadOnlyCollection<Actor> actors)
     {
         if (actors == null) throw new ArgumentNullException(nameof(actors));
@@ -61,8 +45,16 @@ public class MarketRolesDbService : IDisposable
         var stringBuilder = new StringBuilder();
         foreach (var actor in actors)
         {
-            stringBuilder.Append(@"INSERT INTO [dbo].[Actor] ([Id],[IdentificationNumber],[IdentificationType],[Roles])
-             VALUES ('" + actor.Id + "', '" + actor.IdentificationNumber + "', '" + GetType(actor.IdentificationType) + "', '" + GetRoles(actor.Roles) + "')");
+            string sql = $@"BEGIN
+	                            IF NOT EXISTS (SELECT * FROM [dbo].[Actor]
+					                            WHERE Id = CONVERT(uniqueidentifier, '{actor.Id}'))
+                                BEGIN
+                                    INSERT INTO [dbo].[Actor] ([Id],[IdentificationNumber],[IdentificationType],[Roles])
+                                    VALUES ('{actor.Id}', '{actor.IdentificationNumber}', '{GetType(actor.IdentificationType)}', '{GetRoles(actor.Roles)}')
+                                END
+                            END";
+
+            stringBuilder.Append(sql);
             stringBuilder.AppendLine();
         }
 
@@ -80,8 +72,16 @@ public class MarketRolesDbService : IDisposable
         var stringBuilder = new StringBuilder();
         foreach (var actor in actors)
         {
-            stringBuilder.Append(@"INSERT INTO [b2b].[Actor] ([Id],[IdentificationNumber],[IdentificationType],[Roles])
-             VALUES ('" + actor.Id + "', '" + actor.IdentificationNumber + "', '" + GetType(actor.IdentificationType) + "', '" + GetRoles(actor.Roles) + "')");
+            string sql = $@"  BEGIN
+	                            IF NOT EXISTS (SELECT * FROM [b2b].[Actor]
+					                            WHERE Id = '{actor.Id}')
+	                            BEGIN
+		                            INSERT INTO [b2b].[Actor] ([Id],[IdentificationNumber],[IdentificationType],[Roles])
+		                            VALUES ('{actor.Id}', '{actor.IdentificationNumber}', '{GetType(actor.IdentificationType)}', '{GetRoles(actor.Roles)}')
+	                            END
+                               END";
+
+            stringBuilder.Append(sql);
             stringBuilder.AppendLine();
         }
 
@@ -99,8 +99,16 @@ public class MarketRolesDbService : IDisposable
         var stringBuilder = new StringBuilder();
         foreach (var energySupplier in energySuppliers)
         {
-            stringBuilder.Append(@"INSERT INTO [dbo].[EnergySuppliers] ([Id],[GlnNumber])
-             VALUES ('" + energySupplier.Id + "', '" + energySupplier.IdentificationNumber + "')");
+            string sql = $@"  BEGIN
+	                            IF NOT EXISTS (SELECT * FROM [dbo].[EnergySuppliers]
+					                            WHERE Id = '{energySupplier.Id}')
+	                            BEGIN
+		                            INSERT INTO [dbo].[EnergySuppliers] ([Id],[GlnNumber])
+		                            VALUES ('{energySupplier.Id}', '{energySupplier.IdentificationNumber}')
+	                            END
+                              END";
+
+            stringBuilder.Append(sql);
             stringBuilder.AppendLine();
         }
 
