@@ -44,7 +44,8 @@ namespace Messaging.Infrastructure.OutgoingMessages.Requesting
                     request.IdempotencyId,
                     request.DataAvailableNotificationReferenceId,
                     request.MessageType.Value,
-                    storedMessageLocation))
+                    storedMessageLocation,
+                    request.ResponseFormat.ToString()))
                 .ConfigureAwait(false);
         }
 
