@@ -44,7 +44,7 @@ namespace Messaging.Infrastructure.OutgoingMessages.Requesting
                     request.RequestId,
                     request.IdempotencyId,
                     request.DataAvailableNotificationReferenceId,
-                    request.MessageType,
+                    request.MessageType.Value,
                     storedMessageLocation))
                 .ConfigureAwait(false);
         }
@@ -59,7 +59,7 @@ namespace Messaging.Infrastructure.OutgoingMessages.Requesting
                         $"Message(s) with the following id(s) not found {messageIds}",
                         "DatasetNotFound",
                         request.DataAvailableNotificationReferenceId,
-                        request.MessageType))
+                        request.MessageType.Value))
                 .ConfigureAwait(false);
         }
 

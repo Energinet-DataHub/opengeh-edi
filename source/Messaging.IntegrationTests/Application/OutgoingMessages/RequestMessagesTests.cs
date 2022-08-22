@@ -64,7 +64,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
             Assert.Equal(_messageRequestContext.DataBundleRequestDto?.RequestId, command?.RequestId);
             Assert.Equal(_messageRequestContext.DataBundleRequestDto?.IdempotencyId, command?.IdempotencyId);
             Assert.Equal(_messageRequestContext.DataBundleRequestDto?.DataAvailableNotificationReferenceId, command?.ReferenceId);
-            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.MessageType, command?.MessageType);
+            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.MessageType.Value, command?.MessageType);
             Assert.NotNull(command?.MessageStorageLocation);
         }
 
@@ -80,7 +80,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
             Assert.NotNull(command);
             Assert.Equal(_messageRequestContext.DataBundleRequestDto?.RequestId, command?.RequestId);
             Assert.Equal(_messageRequestContext.DataBundleRequestDto?.DataAvailableNotificationReferenceId, command?.ReferenceId);
-            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.MessageType, command?.MessageType);
+            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.MessageType.Value, command?.MessageType);
             Assert.Equal(_messageRequestContext.DataBundleRequestDto?.IdempotencyId, command?.IdempotencyId);
             Assert.NotEqual(string.Empty, command?.FailureDescription);
             Assert.Equal("DatasetNotFound", command?.Reason);
@@ -114,7 +114,13 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages
 
         private Task RequestMessages(IEnumerable<string> messageIds)
         {
-            _messageRequestContext.SetMessageRequest(new DataBundleRequestDto(Guid.Empty, string.Empty, string.Empty, string.Empty));
+            _messageRequestContext.SetMessageRequest(new DataBundleRequestDto(
+                Guid.Empty,
+                string.Empty,
+                string.Empty,
+                new MessageTypeDto(string.Empty),
+                ResponseFormat.Xml,
+                1));
             return GetService<IMediator>().Send(new RequestMessages(messageIds.ToList(), CimFormat.Xml.Name));
         }
     }
