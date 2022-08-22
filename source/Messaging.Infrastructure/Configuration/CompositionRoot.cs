@@ -282,6 +282,7 @@ namespace Messaging.Infrastructure.Configuration
         {
             _services.AddScoped<DocumentFactory>();
             _services.AddScoped<IDocumentWriter, ConfirmChangeOfSupplierDocumentWriter>();
+            _services.AddScoped<IDocumentWriter, ConfirmChangeOfSupplierJsonDocumentWriter>();
             _services.AddScoped<IDocumentWriter, RejectRequestChangeOfSupplierDocumentWriter>();
             _services.AddScoped<IDocumentWriter, GenericNotificationDocumentWriter>();
             _services.AddScoped<IDocumentWriter, AccountingPointCharacteristicsDocumentWriter>();

@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using Messaging.Application.Common;
 using Messaging.Domain.OutgoingMessages;
@@ -25,16 +24,12 @@ namespace Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 
 public class ConfirmChangeOfSupplierJsonDocumentWriter : IDocumentWriter
 {
-    private readonly string _documentType;
-    private readonly string _typeCode;
+    private const string DocumentType = "ConfirmRequestChangeOfSupplier_MarketDocument";
+    private const string TypeCode = "E44";
     private readonly IMarketActivityRecordParser _parser;
-    //private const string DocumentType = "ConfirmRequestChangeOfSupplier_MarketDocument";
-    /*private const string TypeCode = "E44";*/
 
-    public ConfirmChangeOfSupplierJsonDocumentWriter(string documentType, string typeCode, IMarketActivityRecordParser parser)
+    public ConfirmChangeOfSupplierJsonDocumentWriter(IMarketActivityRecordParser parser)
     {
-        _documentType = documentType;
-        _typeCode = typeCode;
         _parser = parser;
     }
 
@@ -46,31 +41,32 @@ public class ConfirmChangeOfSupplierJsonDocumentWriter : IDocumentWriter
     public bool HandlesDocumentType(string documentType)
     {
         if (documentType == null) throw new ArgumentNullException(nameof(documentType));
-        return _documentType.Equals(documentType, StringComparison.OrdinalIgnoreCase);
+        return DocumentType.Equals(documentType, StringComparison.OrdinalIgnoreCase);
     }
 
-    public Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
+    public async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
     {
         var stream = new MemoryStream();
-        var streamWriter = new StreamWriter(stream);
+        var streamWriter = new StreamWriter(stream, leaveOpen: true);
         using var writer = new JsonTextWriter(streamWriter);
 
         WriteHeader(header, writer);
         WriteMarketActivityRecords(marketActivityRecords, writer);
         WriteEnd(writer);
-        return Task.FromResult<Stream>(stream);
+        writer.Flush();
+        await streamWriter.FlushAsync().ConfigureAwait(false);
+        stream.Position = 0;
+        return stream;
     }
 
     private static void WriteEnd(JsonTextWriter writer)
     {
         writer.WriteEndObject();
-        writer.WriteEndObject();
-        writer.Close();
     }
 
-    private void WriteHeader(MessageHeader header, JsonTextWriter writer)
+    private static void WriteHeader(MessageHeader header, JsonTextWriter writer)
     {
-        JsonHeaderWriter.Write(header, _documentType, _typeCode, writer);
+        JsonHeaderWriter.Write(header, DocumentType, TypeCode, writer);
     }
 
     private void WriteMarketActivityRecords(IReadOnlyCollection<string> marketActivityRecords, JsonTextWriter writer)
