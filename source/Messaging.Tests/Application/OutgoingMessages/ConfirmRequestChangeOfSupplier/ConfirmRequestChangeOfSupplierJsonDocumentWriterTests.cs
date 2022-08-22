@@ -61,6 +61,26 @@ public class ConfirmRequestChangeOfSupplierJsonDocumentWriterTests
         await AssertMessage(message, header, marketActivityRecords).ConfigureAwait(false);
     }
 
+    private static void AssertMarketActivityRecords(JsonDocument document, List<MarketActivityRecord> marketActivityRecords)
+    {
+        if (document == null) throw new ArgumentNullException(nameof(document));
+        if (marketActivityRecords == null) throw new ArgumentNullException(nameof(marketActivityRecords));
+        var marketActivityRecordElement = document.RootElement.GetProperty("ConfirmRequestChangeOfSupplier_MarketDocument").GetProperty("MktActivityRecord");
+        foreach (var jsonElement in marketActivityRecordElement.EnumerateArray())
+        {
+            AssertMarketActivityRecord(jsonElement, marketActivityRecords);
+        }
+    }
+
+    private static void AssertMarketActivityRecord(JsonElement jsonElement, List<MarketActivityRecord> marketActivityRecords)
+    {
+        var id = jsonElement.GetProperty("mRID").ToString();
+        var marketActivityRecord = marketActivityRecords.FirstOrDefault(x => x.Id == id);
+        Assert.NotNull(marketActivityRecord);
+        Assert.Equal(marketActivityRecord!.MarketEvaluationPointId, jsonElement.GetProperty("marketEvaluationPoint.mRID").GetProperty("value").ToString());
+        Assert.Equal(marketActivityRecord.OriginalTransactionId, jsonElement.GetProperty("originalTransactionIDReference_MktActivityRecord.mRID").ToString());
+    }
+
     private async Task AssertMessage(Stream message, MessageHeader header, List<MarketActivityRecord> marketActivityRecords)
     {
         _schemaProvider = new JsonSchemaProvider();
@@ -70,7 +90,7 @@ public class ConfirmRequestChangeOfSupplierJsonDocumentWriterTests
         AssertJsonMessage.AssertConformsToSchema(document, schema);
 
         AssertJsonMessage.AssertHeader(header, document);
-        //AssertXmlMessage.AssertHasHeaderValue(document, "type", "E44");
-        //AssertMarketActivityRecords(marketActivityRecords, document);
+        AssertMarketActivityRecords(document, marketActivityRecords);
+        AssertMarketActivityRecords(document, marketActivityRecords);
     }
 }
