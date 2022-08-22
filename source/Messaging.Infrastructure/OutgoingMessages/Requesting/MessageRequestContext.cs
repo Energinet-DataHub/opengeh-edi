@@ -18,6 +18,10 @@ namespace Messaging.Infrastructure.OutgoingMessages.Requesting
 {
     public class MessageRequestContext
     {
+        public MessageRequestContext()
+        {
+        }
+
         public DataBundleRequestDto? DataBundleRequestDto { get; private set; }
 
         public void SetMessageRequest(DataBundleRequestDto messageRequest)

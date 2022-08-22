@@ -48,4 +48,11 @@ public class DocumentFactory
             message.Header,
             message.MarketActivityRecordPayloads);
     }
+
+    public bool CanHandle(string documentType, CimFormat documentFormat)
+    {
+        return _documentWriters.Any(writer =>
+            writer.HandlesDocumentType(documentType) &&
+            writer.HandlesDocumentFormat(documentFormat));
+    }
 }

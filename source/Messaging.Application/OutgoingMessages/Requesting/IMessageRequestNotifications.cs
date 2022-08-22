@@ -33,5 +33,12 @@ namespace Messaging.Application.OutgoingMessages.Requesting
         /// Requested messages was not found
         /// </summary>
         Task RequestedMessagesWasNotFoundAsync(IReadOnlyList<string> messageIds);
+
+        /// <summary>
+        /// The requested document format is not supported
+        /// </summary>
+        /// <param name="documentFormat">Requested document format</param>
+        /// <param name="documentType">Requested document type</param>
+        Task RequestedDocumentFormatIsNotSupportedAsync(string documentFormat, string documentType);
     }
 }

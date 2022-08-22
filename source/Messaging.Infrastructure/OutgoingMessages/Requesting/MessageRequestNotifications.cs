@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MessageHub.Model.Model;
 using Messaging.Application.Configuration;
-using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Requesting;
 
 namespace Messaging.Infrastructure.OutgoingMessages.Requesting
@@ -60,6 +59,20 @@ namespace Messaging.Infrastructure.OutgoingMessages.Requesting
                         "DatasetNotFound",
                         request.DataAvailableNotificationReferenceId,
                         request.MessageType.Value))
+                .ConfigureAwait(false);
+        }
+
+        public async Task RequestedDocumentFormatIsNotSupportedAsync(string documentFormat, string documentType)
+        {
+            var request = GetRequest();
+
+            await _commandScheduler.EnqueueAsync(new SendFailureNotification(
+                    request.RequestId,
+                    request.IdempotencyId,
+                    $"Format '{documentFormat}' for document type '{documentType}' is not supported.",
+                    "InternalError",
+                    request.DataAvailableNotificationReferenceId,
+                    request.MessageType.Value))
                 .ConfigureAwait(false);
         }
 

@@ -35,13 +35,13 @@ namespace Messaging.Application.OutgoingMessages.Requesting
 
         public RequestMessagesHandler(
             IOutgoingMessageStore outgoingMessageStore,
-            IMessageRequestNotifications messageRequestNotificationsSpy,
+            IMessageRequestNotifications messageRequestNotifications,
             DocumentFactory documentFactory,
             ISystemDateTimeProvider systemDateTimeProvider,
             IMessageStorage messageStorage)
         {
             _outgoingMessageStore = outgoingMessageStore;
-            _messageRequestNotifications = messageRequestNotificationsSpy;
+            _messageRequestNotifications = messageRequestNotifications;
             _documentFactory = documentFactory;
             _systemDateTimeProvider = systemDateTimeProvider;
             _messageStorage = messageStorage;
@@ -61,7 +61,14 @@ namespace Messaging.Application.OutgoingMessages.Requesting
 
             var messageBundle = CreateBundleFrom(messages);
 
-            var message = await _documentFactory.CreateFromAsync(messageBundle.CreateMessage(), EnumerationType.FromName<CimFormat>(request.RequestedDocumentFormat)).ConfigureAwait(false);
+            var requestedFormat = EnumerationType.FromName<CimFormat>(request.RequestedDocumentFormat);
+            if (_documentFactory.CanHandle(messages.First().DocumentType, requestedFormat) == false)
+            {
+                await _messageRequestNotifications.RequestedDocumentFormatIsNotSupportedAsync(request.RequestedDocumentFormat, messages.First().DocumentType).ConfigureAwait(false);
+                return Unit.Value;
+            }
+
+            var message = await _documentFactory.CreateFromAsync(messageBundle.CreateMessage(), requestedFormat).ConfigureAwait(false);
             var storedMessageLocation = await _messageStorage.SaveAsync(message).ConfigureAwait(false);
             await _messageRequestNotifications.SavedMessageSuccessfullyAsync(storedMessageLocation).ConfigureAwait(false);
 

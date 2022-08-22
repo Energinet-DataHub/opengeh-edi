@@ -13,9 +13,14 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
 using Messaging.Api.Configuration.Middleware.Correlation;
+using Messaging.Application.Common;
+using Messaging.Application.OutgoingMessages;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Transactions.MoveIn;
 using Messaging.IntegrationTests.Fixtures;
@@ -29,8 +34,9 @@ namespace Messaging.IntegrationTests
     [Collection("IntegrationTest")]
     public class TestBase : IDisposable
     {
+        private readonly ServiceCollection _services;
         private readonly DatabaseFixture _databaseFixture;
-        private readonly IServiceProvider _serviceProvider;
+        private IServiceProvider _serviceProvider;
         private bool _disposed;
 
         protected TestBase(DatabaseFixture databaseFixture)
@@ -38,8 +44,8 @@ namespace Messaging.IntegrationTests
             _databaseFixture = databaseFixture;
             _databaseFixture.CleanupDatabase();
 
-            var services = new ServiceCollection();
-            CompositionRoot.Initialize(services)
+            _services = new ServiceCollection();
+            CompositionRoot.Initialize(_services)
                 .AddDatabaseConnectionFactory(_databaseFixture.ConnectionString)
                 .AddDatabaseContext(_databaseFixture.ConnectionString)
                 .AddSystemClock(new SystemDateTimeProviderStub())
@@ -51,12 +57,11 @@ namespace Messaging.IntegrationTests
                 })
                 .AddMessagePublishing(_ => new NewMessageAvailableNotifierSpy())
                 .AddMessageStorage(_ => new MessageStorageSpy())
-                //.AddOutgoingMessageDispatcher(new MessageRequestNotificationsSpy())
                 .AddRequestHandler<TestCommandHandler>()
                 .AddHttpClientAdapter(_ => new HttpClientSpy())
                 .AddMoveInServices(new MoveInConfiguration(new Uri("http://someuri")))
                 .AddMessageParserServices();
-            _serviceProvider = services.BuildServiceProvider();
+            _serviceProvider = _services.BuildServiceProvider();
         }
 
         public void Dispose()
@@ -80,6 +85,18 @@ namespace Messaging.IntegrationTests
 
             ((ServiceProvider)_serviceProvider).Dispose();
             _disposed = true;
+        }
+
+        protected void RemoveService<TService>()
+        {
+            _services.AddScoped(sp => new DocumentFactory(new List<DocumentWriter>()));
+            _serviceProvider = _services.BuildServiceProvider();
+        }
+
+        protected void RegisterService<TService>(TService instance)
+        {
+            if (instance == null) throw new ArgumentNullException(nameof(instance));
+            _services.AddSingleton(new DocumentFactory(new List<DocumentWriter>()));
         }
 
         protected Task InvokeCommandAsync(object command)

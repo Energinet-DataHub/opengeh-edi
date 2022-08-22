@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.MessageHub.Model.Model;
 using MediatR;
+using Messaging.Application.Common;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.IncomingMessages;
 using Messaging.Application.OutgoingMessages;
@@ -37,7 +38,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly MessageStorageSpy _messageStorage;
-        private readonly MessageRequestContext _messageRequestContext;
+        private MessageRequestContext _messageRequestContext;
 
         public RequestMessagesTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
@@ -86,6 +87,28 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
             Assert.Equal("DatasetNotFound", command?.Reason);
         }
 
+        [Fact]
+        public async Task Respond_with_error_if_requested_message_format_can_not_be_handled()
+        {
+            GivenTheRequestedDocumentFormatIsNotSupported();
+
+            var incomingMessage = await MessageArrived().ConfigureAwait(false);
+            var outgoingMessage = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage.Message.MessageId)!;
+
+            var requestedMessageIds = new List<string> { outgoingMessage.Id.ToString(), };
+            await RequestMessages(requestedMessageIds.AsReadOnly()).ConfigureAwait(false);
+
+            Assert.Null(_messageStorage.SavedMessage);
+            var command = GetQueuedNotification<SendFailureNotification>();
+            Assert.NotNull(command);
+            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.RequestId, command?.RequestId);
+            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.DataAvailableNotificationReferenceId, command?.ReferenceId);
+            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.MessageType.Value, command?.MessageType);
+            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.IdempotencyId, command?.IdempotencyId);
+            Assert.NotEqual(string.Empty, command?.FailureDescription);
+            Assert.Equal("InternalError", command?.Reason);
+        }
+
         private static IncomingMessageBuilder MessageBuilder()
         {
             return new IncomingMessageBuilder()
@@ -114,6 +137,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
 
         private Task RequestMessages(IEnumerable<string> messageIds)
         {
+            _messageRequestContext = GetService<MessageRequestContext>();
             _messageRequestContext.SetMessageRequest(new DataBundleRequestDto(
                 Guid.Empty,
                 string.Empty,
@@ -122,6 +146,12 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
                 ResponseFormat.Xml,
                 1));
             return GetService<IMediator>().Send(new RequestMessages(messageIds.ToList(), CimFormat.Xml.Name));
+        }
+
+        private void GivenTheRequestedDocumentFormatIsNotSupported()
+        {
+            RemoveService<DocumentFactory>();
+            //RegisterService(new DocumentFactory(new List<DocumentWriter>()));
         }
     }
 }
