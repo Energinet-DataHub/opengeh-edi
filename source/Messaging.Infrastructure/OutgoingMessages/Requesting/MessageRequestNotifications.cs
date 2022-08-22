@@ -88,7 +88,7 @@ namespace Messaging.Infrastructure.OutgoingMessages.Requesting
         {
             if (_messageRequestContext.DataBundleRequestDto is null)
             {
-                throw new InvalidOperationException($"Data request DTO is null.");
+                throw new InvalidOperationException($"Data bundle request DTO is null.");
             }
 
             return _messageRequestContext.DataBundleRequestDto;
