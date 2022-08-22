@@ -84,7 +84,6 @@ public class JsonDocumentWriterTests
 
     private static void AssertHeader(MessageHeader header, JObject json)
     {
-        var serializer = new Serializer();
         var document = json.GetValue(
             DocumentType,
             StringComparison.OrdinalIgnoreCase)!;
