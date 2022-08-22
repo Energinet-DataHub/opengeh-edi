@@ -88,17 +88,22 @@ public class JsonDocumentWriterTests
             DocumentType,
             StringComparison.OrdinalIgnoreCase)!;
         Assert.Equal("messageID", document.Value<string>("mRID"));
-        Assert.Equal("23", document.Value<JToken>("businessSector.type")!.First!.First);
+        Assert.Equal("23", GetPropertyValue(document, "businessSector.type"));
         var headerDateTime = TruncateMilliseconds(header.TimeStamp.ToDateTimeUtc());
         var documentDateTime = TruncateMilliseconds(document.Value<DateTime>("createdDateTime"));
         Assert.Equal(headerDateTime, documentDateTime);
-        Assert.Equal(header.ProcessType, document.Value<JToken>("process.processType")!.First!.First);
-        Assert.Equal(header.ReasonCode, document.Value<JToken>("reason.code")!.First!.First);
-        Assert.Equal(header.ReceiverId, document.Value<JToken>("receiver_MarketParticipant.mRID")!.Value<string>("value"));
-        Assert.Equal(header.ReceiverRole, document.Value<JToken>("receiver_MarketParticipant.marketRole.type")!.First!.First);
-        Assert.Equal(header.SenderId, document.Value<JToken>("sender_MarketParticipant.mRID")!.Value<string>("value"));
-        Assert.Equal(header.SenderRole, document.Value<JToken>("sender_MarketParticipant.marketRole.type")!.First!.First);
-        Assert.Equal(TypeCode, document.Value<JToken>("type")!.Value<string>("value"));
+        Assert.Equal(header.ProcessType, GetPropertyValue(document, "process.processType"));
+        Assert.Equal(header.ReasonCode, GetPropertyValue(document, "reason.code"));
+        Assert.Equal(header.ReceiverId, GetPropertyValue(document, "receiver_MarketParticipant.mRID"));
+        Assert.Equal(header.ReceiverRole, GetPropertyValue(document, "receiver_MarketParticipant.marketRole.type"));
+        Assert.Equal(header.SenderId, GetPropertyValue(document, "sender_MarketParticipant.mRID"));
+        Assert.Equal(header.SenderRole, GetPropertyValue(document, "sender_MarketParticipant.marketRole.type"));
+        Assert.Equal(TypeCode, GetPropertyValue(document, "type"));
+    }
+
+    private static JToken GetPropertyValue(JToken document, string propertyName)
+    {
+        return document.Value<JToken>(propertyName)!.Value<string>("value");
     }
 
     private static void AssertMarketActivityRecord(JObject json)
