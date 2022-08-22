@@ -60,7 +60,6 @@ namespace Messaging.Application.OutgoingMessages.Requesting
             }
 
             var messageBundle = CreateBundleFrom(messages);
-
             var requestedFormat = EnumerationType.FromName<CimFormat>(request.RequestedDocumentFormat);
             if (_documentFactory.CanHandle(messages.First().DocumentType, requestedFormat) == false)
             {
@@ -68,8 +67,8 @@ namespace Messaging.Application.OutgoingMessages.Requesting
                 return Unit.Value;
             }
 
-            var message = await _documentFactory.CreateFromAsync(messageBundle.CreateMessage(), requestedFormat).ConfigureAwait(false);
-            var storedMessageLocation = await _messageStorage.SaveAsync(message).ConfigureAwait(false);
+            var document = await _documentFactory.CreateFromAsync(messageBundle.CreateMessage(), requestedFormat).ConfigureAwait(false);
+            var storedMessageLocation = await _messageStorage.SaveAsync(document).ConfigureAwait(false);
             await _messageRequestNotifications.SavedMessageSuccessfullyAsync(storedMessageLocation).ConfigureAwait(false);
 
             return Unit.Value;
