@@ -56,7 +56,6 @@ public class SyncActors : IDisposable
         var actors = (await _actorSyncService.GetActorsAsync().ConfigureAwait(false)).ToList();
         var energySuppliers = ActorSyncService.MapActorsToEnergySuppliers(actors).ToList();
 
-        await _actorSyncService.DatabaseCleanUpAsync().ConfigureAwait(false);
         await _actorSyncService.InsertActorsAsync(actors.AsReadOnly()).ConfigureAwait(false);
         await _actorSyncService.InsertEnergySuppliersAsync(energySuppliers).ConfigureAwait(false);
 
