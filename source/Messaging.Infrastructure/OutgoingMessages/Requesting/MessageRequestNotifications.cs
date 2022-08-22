@@ -58,7 +58,8 @@ namespace Messaging.Infrastructure.OutgoingMessages.Requesting
                         $"Message(s) with the following id(s) not found {messageIds}",
                         "DatasetNotFound",
                         request.DataAvailableNotificationReferenceId,
-                        request.MessageType.Value))
+                        request.MessageType.Value,
+                        request.ResponseFormat.ToString()))
                 .ConfigureAwait(false);
         }
 
@@ -66,14 +67,24 @@ namespace Messaging.Infrastructure.OutgoingMessages.Requesting
         {
             var request = GetRequest();
 
-            await _commandScheduler.EnqueueAsync(new SendFailureNotification(
-                    request.RequestId,
-                    request.IdempotencyId,
-                    $"Format '{documentFormat}' for document type '{documentType}' is not supported.",
-                    "InternalError",
-                    request.DataAvailableNotificationReferenceId,
-                    request.MessageType.Value))
+            await _commandScheduler.EnqueueAsync(
+                    CreateErrorResponse(
+                        request,
+                        $"Format '{documentFormat}' for document type '{documentType}' is not supported.",
+                        "InternalError"))
                 .ConfigureAwait(false);
+        }
+
+        private static SendFailureNotification CreateErrorResponse(DataBundleRequestDto request, string failureDescription, string reason)
+        {
+            return new SendFailureNotification(
+                request.RequestId,
+                request.IdempotencyId,
+                failureDescription,
+                reason,
+                request.DataAvailableNotificationReferenceId,
+                request.MessageType.Value,
+                request.ResponseFormat.ToString());
         }
 
         private DataBundleRequestDto GetRequest()
