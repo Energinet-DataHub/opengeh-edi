@@ -77,15 +77,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
             await RequestMessages(nonExistingMessage.AsReadOnly()).ConfigureAwait(false);
 
             Assert.Null(_messageStorage.SavedMessage);
-            var command = GetQueuedNotification<SendFailureNotification>();
-            Assert.NotNull(command);
-            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.RequestId, command?.RequestId);
-            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.DataAvailableNotificationReferenceId, command?.ReferenceId);
-            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.MessageType.Value, command?.MessageType);
-            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.IdempotencyId, command?.IdempotencyId);
-            Assert.Equal(CimFormat.Xml.Name, command?.RequestedFormat);
-            Assert.NotEqual(string.Empty, command?.FailureDescription);
-            Assert.Equal("DatasetNotFound", command?.Reason);
+            AssertErrorResponse("DatasetNotFound");
         }
 
         [Fact]
