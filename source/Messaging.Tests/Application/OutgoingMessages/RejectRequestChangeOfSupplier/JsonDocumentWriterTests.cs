@@ -106,32 +106,35 @@ public class JsonDocumentWriterTests
         return document.Value<JToken>(propertyName)!.Value<string>("value");
     }
 
-    private static void AssertMarketActivityRecord(JObject json)
+    private static void AssertMarketActivityRecords(JObject json, List<MarketActivityRecord> marketActivityRecords)
     {
         if (json == null) throw new ArgumentNullException(nameof(json));
-        var marketActivityRecords =
+        var marketActivityRecordsJson =
             json.GetValue(
                     DocumentType,
                     StringComparison.OrdinalIgnoreCase)
                 ?.Value<JArray>("MktActivityRecord")?.ToList();
-        var firstChild = marketActivityRecords![0];
-        var secondChild = marketActivityRecords[1];
 
-        Assert.Equal(2, marketActivityRecords.Count);
-        Assert.Equal("mrid1", firstChild.Value<string>("mRID"));
+        Assert.Equal(2, marketActivityRecordsJson!.Count);
+        AssertMarketActivityRecord(marketActivityRecordsJson![0], marketActivityRecords[0]);
+        AssertMarketActivityRecord(marketActivityRecordsJson![1], marketActivityRecords[1]);
+    }
+
+    private static void AssertMarketActivityRecord(JToken record, MarketActivityRecord originalMarketActivityRecord)
+    {
+        Assert.Equal(originalMarketActivityRecord.Id, record.Value<string>("mRID"));
         Assert.Equal(
-            "OriginalTransactionId",
-            firstChild.Value<string>("originalTransactionIDReference_MktActivityRecord.mRID"));
-        Assert.Equal("FakeMarketEvaluationPointId", firstChild.First!.Next!.First!.Value<string>("value"));
+            originalMarketActivityRecord.OriginalTransactionId,
+            record.Value<string>("originalTransactionIDReference_MktActivityRecord.mRID"));
+        Assert.Equal("FakeMarketEvaluationPointId", GetPropertyValue(record, "marketEvaluationPoint.mRID"));
 
-        Assert.Equal("mrid2", secondChild.Value<string>("mRID"));
-        Assert.Equal(
-            "FakeTransactionId",
-            secondChild.Value<string>("originalTransactionIDReference_MktActivityRecord.mRID"));
-        Assert.Equal("FakeMarketEvaluationPointId", secondChild.First!.Next!.First!.Value<string>("value"));
+        Assert.Equal(originalMarketActivityRecord.Reasons.ToList()[0].Text, GetReasonTextFromJsonMarketActivityRecord(record, 0));
+        Assert.Equal(originalMarketActivityRecord.Reasons.ToList()[1].Text, GetReasonTextFromJsonMarketActivityRecord(record, 1));
+    }
 
-        var reason = firstChild.Children().ElementAt(3).ElementAt(0).ElementAt(0);
-        Assert.Equal("Reason1", reason.Value<string>("text"));
+    private static JToken GetReasonTextFromJsonMarketActivityRecord(JToken record, int index)
+    {
+        return record.Children().ElementAt(3).ElementAt(0).ElementAt(index).Value<string>("text");
     }
 
     private static DateTime TruncateMilliseconds(DateTime time)
@@ -143,6 +146,6 @@ public class JsonDocumentWriterTests
     {
         var json = StreamToJson(message);
         AssertHeader(header, json);
-        AssertMarketActivityRecord(json);
+        AssertMarketActivityRecords(json, marketActivityRecords);
     }
 }
