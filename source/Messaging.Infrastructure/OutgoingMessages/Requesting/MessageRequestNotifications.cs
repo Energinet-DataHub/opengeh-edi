@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MessageHub.Model.Model;
 using Messaging.Application.Configuration;
-using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Requesting;
 
 namespace Messaging.Infrastructure.OutgoingMessages.Requesting
@@ -45,7 +44,8 @@ namespace Messaging.Infrastructure.OutgoingMessages.Requesting
                     request.IdempotencyId,
                     request.DataAvailableNotificationReferenceId,
                     request.MessageType.Value,
-                    storedMessageLocation))
+                    storedMessageLocation,
+                    request.ResponseFormat.ToString()))
                 .ConfigureAwait(false);
         }
 
@@ -53,21 +53,43 @@ namespace Messaging.Infrastructure.OutgoingMessages.Requesting
         {
             var request = GetRequest();
 
-            await _commandScheduler.EnqueueAsync(new SendFailureNotification(
-                        request.RequestId,
-                        request.IdempotencyId,
+            await _commandScheduler.EnqueueAsync(
+                    CreateErrorResponse(
+                        request,
                         $"Message(s) with the following id(s) not found {messageIds}",
-                        "DatasetNotFound",
-                        request.DataAvailableNotificationReferenceId,
-                        request.MessageType.Value))
+                        "DatasetNotFound"))
                 .ConfigureAwait(false);
+        }
+
+        public async Task RequestedDocumentFormatIsNotSupportedAsync(string documentFormat, string documentType)
+        {
+            var request = GetRequest();
+
+            await _commandScheduler.EnqueueAsync(
+                    CreateErrorResponse(
+                        request,
+                        $"Format '{documentFormat}' for document type '{documentType}' is not supported.",
+                        "InternalError"))
+                .ConfigureAwait(false);
+        }
+
+        private static SendFailureNotification CreateErrorResponse(DataBundleRequestDto request, string failureDescription, string reason)
+        {
+            return new SendFailureNotification(
+                request.RequestId,
+                request.IdempotencyId,
+                failureDescription,
+                reason,
+                request.DataAvailableNotificationReferenceId,
+                request.MessageType.Value,
+                request.ResponseFormat.ToString());
         }
 
         private DataBundleRequestDto GetRequest()
         {
             if (_messageRequestContext.DataBundleRequestDto is null)
             {
-                throw new InvalidOperationException($"Data request DTO is null.");
+                throw new InvalidOperationException($"Data bundle request DTO is null.");
             }
 
             return _messageRequestContext.DataBundleRequestDto;
