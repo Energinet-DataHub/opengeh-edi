@@ -25,13 +25,16 @@ public class SyncActors : IDisposable
 {
     private readonly ActorSyncService _actorSyncService;
     private readonly B2BSynchronization _b2BSynchronization;
+    private readonly EnergySupplyingSynchronization _energySupplyingSynchronization;
 
     public SyncActors()
     {
         _actorSyncService = new ActorSyncService();
-        _b2BSynchronization = new B2BSynchronization(
-            Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ??
-            throw new InvalidOperationException());
+        var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ??
+                               throw new InvalidOperationException();
+
+        _b2BSynchronization = new B2BSynchronization(connectionString);
+        _energySupplyingSynchronization = new EnergySupplyingSynchronization(connectionString);
     }
 
     [FunctionName("SyncActors")]
@@ -53,6 +56,7 @@ public class SyncActors : IDisposable
         {
             _actorSyncService.Dispose();
             _b2BSynchronization.Dispose();
+            _energySupplyingSynchronization.Dispose();
         }
     }
 
@@ -64,8 +68,7 @@ public class SyncActors : IDisposable
         await _actorSyncService.InsertActorsAsync(actors.AsReadOnly()).ConfigureAwait(false);
         await _actorSyncService.InsertEnergySuppliersAsync(energySuppliers).ConfigureAwait(false);
 
-        await _actorSyncService.CommitTransactionAsync().ConfigureAwait(false);
-
+        await _energySupplyingSynchronization.SynchronizationAsync(actors).ConfigureAwait(false);
         await _b2BSynchronization.SynchronizeAsync(actors).ConfigureAwait(false);
     }
 }

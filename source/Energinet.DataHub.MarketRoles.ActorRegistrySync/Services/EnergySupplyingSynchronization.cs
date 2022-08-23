@@ -36,6 +36,11 @@ public class EnergySupplyingSynchronization : IDisposable
         _sqlConnection = new SqlConnection(connectionString);
     }
 
+    public async Task SynchronizationAsync(IReadOnlyCollection<Actor> actors)
+    {
+        await CommitTransactionAsync().ConfigureAwait(false);
+    }
+
     public async Task InsertActorsAsync(ReadOnlyCollection<Actor> actors)
     {
         if (actors == null) throw new ArgumentNullException(nameof(actors));
