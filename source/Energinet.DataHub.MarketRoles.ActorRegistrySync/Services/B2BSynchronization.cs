@@ -36,7 +36,7 @@ public class B2BSynchronization : IDisposable
 
     public async Task SynchronizeAsync(IReadOnlyCollection<Actor> actors)
     {
-        if (_transaction == null) await BeginTransactionAsync().ConfigureAwait(false);
+        await BeginTransactionAsync().ConfigureAwait(false);
         await InsertActorsAsync(actors).ConfigureAwait(false);
         await CommitAsync().ConfigureAwait(false);
     }
