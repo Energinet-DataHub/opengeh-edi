@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
@@ -41,68 +40,6 @@ public class EnergySupplyingSynchronization : IDisposable
         await InsertActorsAsync(actors).ConfigureAwait(false);
         await InsertEnergySuppliersAsync(MapActorsToEnergySuppliers(actors)).ConfigureAwait(false);
         await CommitTransactionAsync().ConfigureAwait(false);
-    }
-
-    public async Task InsertActorsAsync(IReadOnlyCollection<Actor> actors)
-    {
-        if (actors == null) throw new ArgumentNullException(nameof(actors));
-
-        if (_transaction == null) await BeginTransactionAsync().ConfigureAwait(false);
-
-        var stringBuilder = new StringBuilder();
-        foreach (var actor in actors)
-        {
-            string sql = $@"BEGIN
-	                            IF NOT EXISTS (SELECT * FROM [dbo].[Actor]
-					                            WHERE Id = CONVERT(uniqueidentifier, '{actor.Id}'))
-                                BEGIN
-                                    INSERT INTO [dbo].[Actor] ([Id],[IdentificationNumber],[IdentificationType],[Roles])
-                                    VALUES ('{actor.Id}', '{actor.IdentificationNumber}', '{GetType(actor.IdentificationType)}', '{GetRoles(actor.Roles)}')
-                                END
-                            END";
-
-            stringBuilder.Append(sql);
-            stringBuilder.AppendLine();
-        }
-
-        await _sqlConnection.ExecuteAsync(
-            stringBuilder.ToString(),
-            transaction: _transaction).ConfigureAwait(false);
-    }
-
-    public async Task InsertEnergySuppliersAsync(IEnumerable<EnergySupplier> energySuppliers)
-    {
-        if (energySuppliers == null) throw new ArgumentNullException(nameof(energySuppliers));
-
-        if (_transaction == null) await BeginTransactionAsync().ConfigureAwait(false);
-
-        var stringBuilder = new StringBuilder();
-        foreach (var energySupplier in energySuppliers)
-        {
-            string sql = $@"  BEGIN
-	                            IF NOT EXISTS (SELECT * FROM [dbo].[EnergySuppliers]
-					                            WHERE Id = '{energySupplier.Id}')
-	                            BEGIN
-		                            INSERT INTO [dbo].[EnergySuppliers] ([Id],[GlnNumber])
-		                            VALUES ('{energySupplier.Id}', '{energySupplier.IdentificationNumber}')
-	                            END
-                              END";
-
-            stringBuilder.Append(sql);
-            stringBuilder.AppendLine();
-        }
-
-        await _sqlConnection.ExecuteAsync(
-            stringBuilder.ToString(),
-            transaction: _transaction).ConfigureAwait(false);
-    }
-
-    public async Task CommitTransactionAsync()
-    {
-        if (_transaction != null)
-        {
-            await _transaction.CommitAsync().ConfigureAwait(false);
-        }
     }
 
     public void Dispose()
@@ -163,9 +100,71 @@ public class EnergySupplyingSynchronization : IDisposable
         }
     }
 
+    private async Task InsertActorsAsync(IReadOnlyCollection<Actor> actors)
+    {
+        if (actors == null) throw new ArgumentNullException(nameof(actors));
+
+        if (_transaction == null) await BeginTransactionAsync().ConfigureAwait(false);
+
+        var stringBuilder = new StringBuilder();
+        foreach (var actor in actors)
+        {
+            string sql = $@"BEGIN
+	                            IF NOT EXISTS (SELECT * FROM [dbo].[Actor]
+					                            WHERE Id = CONVERT(uniqueidentifier, '{actor.Id}'))
+                                BEGIN
+                                    INSERT INTO [dbo].[Actor] ([Id],[IdentificationNumber],[IdentificationType],[Roles])
+                                    VALUES ('{actor.Id}', '{actor.IdentificationNumber}', '{GetType(actor.IdentificationType)}', '{GetRoles(actor.Roles)}')
+                                END
+                            END";
+
+            stringBuilder.Append(sql);
+            stringBuilder.AppendLine();
+        }
+
+        await _sqlConnection.ExecuteAsync(
+            stringBuilder.ToString(),
+            transaction: _transaction).ConfigureAwait(false);
+    }
+
+    private async Task InsertEnergySuppliersAsync(IEnumerable<EnergySupplier> energySuppliers)
+    {
+        if (energySuppliers == null) throw new ArgumentNullException(nameof(energySuppliers));
+
+        if (_transaction == null) await BeginTransactionAsync().ConfigureAwait(false);
+
+        var stringBuilder = new StringBuilder();
+        foreach (var energySupplier in energySuppliers)
+        {
+            string sql = $@"  BEGIN
+	                            IF NOT EXISTS (SELECT * FROM [dbo].[EnergySuppliers]
+					                            WHERE Id = '{energySupplier.Id}')
+	                            BEGIN
+		                            INSERT INTO [dbo].[EnergySuppliers] ([Id],[GlnNumber])
+		                            VALUES ('{energySupplier.Id}', '{energySupplier.IdentificationNumber}')
+	                            END
+                              END";
+
+            stringBuilder.Append(sql);
+            stringBuilder.AppendLine();
+        }
+
+        await _sqlConnection.ExecuteAsync(
+            stringBuilder.ToString(),
+            transaction: _transaction).ConfigureAwait(false);
+    }
+
     private async Task BeginTransactionAsync()
     {
         await _sqlConnection.OpenAsync().ConfigureAwait(false);
         _transaction = await _sqlConnection.BeginTransactionAsync().ConfigureAwait(false);
+    }
+
+    private async Task CommitTransactionAsync()
+    {
+        if (_transaction != null)
+        {
+            await _transaction.CommitAsync().ConfigureAwait(false);
+        }
     }
 }
