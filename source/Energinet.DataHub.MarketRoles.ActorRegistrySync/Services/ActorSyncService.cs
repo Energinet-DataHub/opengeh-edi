@@ -45,7 +45,6 @@ public class ActorSyncService : IDisposable
     public async Task InsertActorsAsync(ReadOnlyCollection<Actor> actors)
     {
         await _marketRolesDbService.InsertActorsAsync(actors).ConfigureAwait(false);
-        await _marketRolesDbService.InsertActorsInB2BAsync(actors).ConfigureAwait(false);
     }
 
     public async Task InsertEnergySuppliersAsync(IEnumerable<EnergySupplier> energySuppliers)

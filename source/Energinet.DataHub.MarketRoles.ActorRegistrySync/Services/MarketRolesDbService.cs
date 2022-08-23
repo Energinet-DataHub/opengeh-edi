@@ -63,33 +63,6 @@ public class MarketRolesDbService : IDisposable
             transaction: _transaction).ConfigureAwait(false);
     }
 
-    public async Task InsertActorsInB2BAsync(IEnumerable<Actor> actors)
-    {
-        if (actors == null) throw new ArgumentNullException(nameof(actors));
-
-        if (_transaction == null) await BeginTransactionAsync().ConfigureAwait(false);
-
-        var stringBuilder = new StringBuilder();
-        foreach (var actor in actors)
-        {
-            string sql = $@"  BEGIN
-	                            IF NOT EXISTS (SELECT * FROM [b2b].[Actor]
-					                            WHERE Id = '{actor.Id}')
-	                            BEGIN
-		                            INSERT INTO [b2b].[Actor] ([Id],[IdentificationNumber],[IdentificationType],[Roles])
-		                            VALUES ('{actor.Id}', '{actor.IdentificationNumber}', '{GetType(actor.IdentificationType)}', '{GetRoles(actor.Roles)}')
-	                            END
-                               END";
-
-            stringBuilder.Append(sql);
-            stringBuilder.AppendLine();
-        }
-
-        await _sqlConnection.ExecuteAsync(
-            stringBuilder.ToString(),
-            transaction: _transaction).ConfigureAwait(false);
-    }
-
     public async Task InsertEnergySuppliersAsync(IEnumerable<EnergySupplier> energySuppliers)
     {
         if (energySuppliers == null) throw new ArgumentNullException(nameof(energySuppliers));
