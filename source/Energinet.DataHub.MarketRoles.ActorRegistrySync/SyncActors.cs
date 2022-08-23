@@ -42,7 +42,7 @@ public class SyncActors : IDisposable
     {
         log.LogInformation($"C# Timer trigger function executed at: {DateTime.UtcNow}");
         await SyncEnergySupplyingAsync().ConfigureAwait(false);
-        await SyncB2bAsync().ConfigureAwait(false);
+        await SyncB2BAsync().ConfigureAwait(false);
     }
 
     public void Dispose()
@@ -61,7 +61,7 @@ public class SyncActors : IDisposable
         }
     }
 
-    private async Task SyncB2bAsync()
+    private async Task SyncB2BAsync()
     {
         var actors = (await _actorRegistry.GetLegacyActorsAsync().ConfigureAwait(false)).ToList();
         await _b2BSynchronization.SynchronizeAsync(actors).ConfigureAwait(false);
