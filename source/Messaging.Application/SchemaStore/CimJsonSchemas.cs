@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Json.Schema;
 
 namespace Messaging.Application.SchemaStore;
@@ -24,6 +25,7 @@ public sealed class CimJsonSchemas : SchemaBase, ISchema
 {
     private const string SchemaBaseUri = @"file:///C:/Users/Public/Documents/iec.ch/TC57/2020/";
     private static readonly string _schemaPath = $"SchemaStore{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}Json{Path.DirectorySeparatorChar}";
+    private static readonly Mutex _mutex = new();
 
     public CimJsonSchemas()
     {
@@ -64,8 +66,16 @@ public sealed class CimJsonSchemas : SchemaBase, ISchema
 
     private static void RegisterSchema(string schemaPath)
     {
-        var schema = JsonSchema.FromFile(schemaPath);
-        var schemaName = Path.GetFileName(schemaPath);
-        SchemaRegistry.Global.Register(new Uri(SchemaBaseUri + schemaName), schema);
+        if (_mutex.WaitOne(1000))
+        {
+            var schema = JsonSchema.FromFile(schemaPath);
+            var schemaName = Path.GetFileName(schemaPath);
+            SchemaRegistry.Global.Register(new Uri(SchemaBaseUri + schemaName), schema);
+            _mutex.ReleaseMutex();
+        }
+        else
+        {
+            throw new InvalidOperationException($"Unable to add JSON schema {schemaPath} to global registry");
+        }
     }
 }
