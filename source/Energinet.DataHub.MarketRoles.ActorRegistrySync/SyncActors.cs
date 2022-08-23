@@ -23,14 +23,12 @@ namespace Energinet.DataHub.MarketRoles.ActorRegistrySync;
 
 public class SyncActors : IDisposable
 {
-    private readonly ActorSyncService _actorSyncService;
     private readonly B2BSynchronization _b2BSynchronization;
     private readonly EnergySupplyingSynchronization _energySupplyingSynchronization;
     private readonly ActorRegistryDbService _actorRegistry;
 
     public SyncActors()
     {
-        _actorSyncService = new ActorSyncService();
         _actorRegistry =
             new ActorRegistryDbService(Environment.GetEnvironmentVariable("ACTOR_REGISTRY_DB_CONNECTION_STRING") ?? throw new InvalidOperationException());
         var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ??
@@ -57,7 +55,6 @@ public class SyncActors : IDisposable
     {
         if (disposing)
         {
-            _actorSyncService.Dispose();
             _b2BSynchronization.Dispose();
             _energySupplyingSynchronization.Dispose();
             _actorRegistry.Dispose();
