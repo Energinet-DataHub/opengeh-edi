@@ -287,6 +287,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddScoped<IDocumentWriter, GenericNotificationDocumentWriter>();
             _services.AddScoped<IDocumentWriter, AccountingPointCharacteristicsDocumentWriter>();
             _services.AddScoped<IDocumentWriter, CharacteristicsOfACustomerAtAnApDocumentWriter>();
+            _services.AddScoped<IDocumentWriter, RejectRequestChangeOfSupplierJsonDocumentWriter>();
             _services.AddScoped<IValidationErrorTranslator, ValidationErrorTranslator>();
             _services.AddScoped<IMarketActivityRecordParser, MarketActivityRecordParser>();
         }

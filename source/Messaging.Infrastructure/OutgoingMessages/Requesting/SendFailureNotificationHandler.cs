@@ -40,8 +40,7 @@ public class SendFailureNotificationHandler : IRequestHandler<SendFailureNotific
             request.ReferenceId,
             request.IdempotencyId,
             new MessageTypeDto(request.MessageType),
-            //TODO: Fix format
-            ResponseFormat.Xml,
+            Enum.Parse<ResponseFormat>(request.RequestedFormat),
             1);
 
         var error = new DataBundleResponseErrorDto(

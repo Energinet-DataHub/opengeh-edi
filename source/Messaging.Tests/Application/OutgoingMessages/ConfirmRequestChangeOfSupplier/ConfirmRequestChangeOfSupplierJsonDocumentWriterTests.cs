@@ -34,6 +34,7 @@ namespace Messaging.Tests.Application.OutgoingMessages.ConfirmRequestChangeOfSup
 
 public class ConfirmRequestChangeOfSupplierJsonDocumentWriterTests
 {
+    private const string DocumentType = "ConfirmRequestChangeOfSupplier_MarketDocument";
     private readonly ConfirmChangeOfSupplierJsonDocumentWriter _documentWriter;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMarketActivityRecordParser _marketActivityRecordParser;
@@ -85,9 +86,8 @@ public class ConfirmRequestChangeOfSupplierJsonDocumentWriterTests
         var schema = await _schemaProvider.GetSchemaAsync<JsonSchema>("confirmrequestchangeofsupplier", "0").ConfigureAwait(false);
         if (schema == null) throw new InvalidCastException("Json schema not found for process ConfirmRequestChangeOfSupplier");
         var document = await JsonDocument.ParseAsync(message).ConfigureAwait(false);
-        AssertJsonMessage.AssertConformsToSchema(document, schema);
-        AssertJsonMessage.AssertHeader(header, document);
-        AssertMarketActivityRecords(document, marketActivityRecords);
+        AssertJsonMessage.AssertConformsToSchema(document, schema, DocumentType);
+        AssertJsonMessage.AssertHeader(header, document, DocumentType);
         AssertMarketActivityRecords(document, marketActivityRecords);
     }
 }

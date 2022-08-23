@@ -21,7 +21,7 @@ namespace Messaging.Infrastructure.OutgoingMessages.Requesting;
 public class SendFailureNotification : InternalCommand
 {
     [JsonConstructor]
-    public SendFailureNotification(Guid id, Guid requestId, string idempotencyId, string failureDescription, string reason, string referenceId, string messageType)
+    public SendFailureNotification(Guid id, Guid requestId, string idempotencyId, string failureDescription, string reason, string referenceId, string messageType, string requestedFormat)
         : base(id)
     {
         RequestId = requestId;
@@ -30,9 +30,10 @@ public class SendFailureNotification : InternalCommand
         Reason = reason;
         ReferenceId = referenceId;
         MessageType = messageType;
+        RequestedFormat = requestedFormat;
     }
 
-    public SendFailureNotification(Guid requestId, string idempotencyId, string failureDescription, string reason, string referenceId, string messageType)
+    public SendFailureNotification(Guid requestId, string idempotencyId, string failureDescription, string reason, string referenceId, string messageType, string requestedFormat)
     {
         RequestId = requestId;
         IdempotencyId = idempotencyId;
@@ -40,6 +41,7 @@ public class SendFailureNotification : InternalCommand
         Reason = reason;
         ReferenceId = referenceId;
         MessageType = messageType;
+        RequestedFormat = requestedFormat;
     }
 
     public Guid RequestId { get; }
@@ -53,4 +55,6 @@ public class SendFailureNotification : InternalCommand
     public string ReferenceId { get; }
 
     public string MessageType { get; }
+
+    public string RequestedFormat { get; }
 }
