@@ -39,6 +39,7 @@ public class EnergySupplyingSynchronization : IDisposable
     public async Task SynchronizationAsync(IReadOnlyCollection<Actor> actors)
     {
         await InsertActorsAsync(actors).ConfigureAwait(false);
+        await InsertEnergySuppliersAsync(MapActorsToEnergySuppliers(actors)).ConfigureAwait(false);
         await CommitTransactionAsync().ConfigureAwait(false);
     }
 
@@ -123,6 +124,11 @@ public class EnergySupplyingSynchronization : IDisposable
         }
 
         _disposed = true;
+    }
+
+    private static IEnumerable<EnergySupplier> MapActorsToEnergySuppliers(IEnumerable<Actor> actors)
+    {
+        return actors.Where(actor => actor.Roles.Contains("DDQ", StringComparison.InvariantCultureIgnoreCase)).Select(actor => new EnergySupplier(actor.Id, actor.IdentificationNumber));
     }
 
     private static string GetType(int identificationType)
