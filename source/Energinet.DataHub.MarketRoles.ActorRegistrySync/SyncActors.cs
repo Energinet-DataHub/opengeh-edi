@@ -62,9 +62,15 @@ public class SyncActors : IDisposable
 
     private async Task SyncActorsFromExternalSourceToDbAsync()
     {
-        var actors = (await _actorSyncService.GetActorsAsync().ConfigureAwait(false)).ToList();
+        await SyncEnergySupplyingAsync().ConfigureAwait(false);
 
-        await _energySupplyingSynchronization.SynchronizeAsync(actors).ConfigureAwait(false);
+        var actors = (await _actorSyncService.GetActorsAsync().ConfigureAwait(false)).ToList();
         await _b2BSynchronization.SynchronizeAsync(actors).ConfigureAwait(false);
+    }
+
+    private async Task SyncEnergySupplyingAsync()
+    {
+        var actors = (await _actorSyncService.GetActorsAsync().ConfigureAwait(false)).ToList();
+        await _energySupplyingSynchronization.SynchronizeAsync(actors).ConfigureAwait(false);
     }
 }
