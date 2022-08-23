@@ -55,7 +55,7 @@ public class ActorSyncService : IDisposable
 
     public async Task<IEnumerable<Actor>> GetActorsAsync()
     {
-        return await _actorRegistryDbService.GetActorsAsync().ConfigureAwait(false);
+        return await _actorRegistryDbService.GetLegacyActorsAsync().ConfigureAwait(false);
     }
 
     public async Task CommitTransactionAsync()

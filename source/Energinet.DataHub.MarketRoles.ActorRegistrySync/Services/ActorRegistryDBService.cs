@@ -31,7 +31,7 @@ public class ActorRegistryDbService : IDisposable
         _sqlConnection = new SqlConnection(connectionString);
     }
 
-    public async Task<IEnumerable<Actor>> GetActorsAsync()
+    public async Task<IEnumerable<Actor>> GetLegacyActorsAsync()
     {
         return await _sqlConnection.QueryAsync<Actor>(
             @"SELECT [IdentificationNumber]
