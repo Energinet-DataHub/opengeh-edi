@@ -66,7 +66,7 @@ public class SyncActors : IDisposable
 
     private async Task SyncB2bAsync()
     {
-        var actors = (await _actorSyncService.GetActorsAsync().ConfigureAwait(false)).ToList();
+        var actors = (await _actorRegistry.GetLegacyActorsAsync().ConfigureAwait(false)).ToList();
         await _b2BSynchronization.SynchronizeAsync(actors).ConfigureAwait(false);
     }
 
