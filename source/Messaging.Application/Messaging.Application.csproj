@@ -90,6 +90,10 @@ limitations under the License.
       <EmbeddedResource Include="SchemaStore\Schemas\Json\Confirm-request-Change-of-Supplier-assembly-model.schema.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
+      <None Remove="SchemaStore\Schemas\Json\Reject-request-Change-of-Supplier-assembly-model.schema.json" />
+      <EmbeddedResource Include="SchemaStore\Schemas\Json\Reject-request-Change-of-Supplier-assembly-model.schema.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
     </ItemGroup>
 
 </Project>
