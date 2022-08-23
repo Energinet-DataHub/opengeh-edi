@@ -24,7 +24,7 @@ namespace Energinet.DataHub.MarketRoles.ActorRegistrySync.Services;
 public class ActorSyncService : IDisposable
 {
     private readonly ActorRegistryDbService _actorRegistryDbService;
-    private readonly MarketRolesDbService _marketRolesDbService;
+    private readonly EnergySupplyingSynchronization _energySupplyingSynchronization;
 
     private bool _disposed;
 
@@ -32,7 +32,7 @@ public class ActorSyncService : IDisposable
     {
         _actorRegistryDbService =
             new ActorRegistryDbService(Environment.GetEnvironmentVariable("ACTOR_REGISTRY_DB_CONNECTION_STRING") ?? throw new InvalidOperationException());
-        _marketRolesDbService = new MarketRolesDbService(
+        _energySupplyingSynchronization = new EnergySupplyingSynchronization(
             Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ??
             throw new InvalidOperationException());
     }
@@ -44,12 +44,12 @@ public class ActorSyncService : IDisposable
 
     public async Task InsertActorsAsync(ReadOnlyCollection<Actor> actors)
     {
-        await _marketRolesDbService.InsertActorsAsync(actors).ConfigureAwait(false);
+        await _energySupplyingSynchronization.InsertActorsAsync(actors).ConfigureAwait(false);
     }
 
     public async Task InsertEnergySuppliersAsync(IEnumerable<EnergySupplier> energySuppliers)
     {
-        await _marketRolesDbService.InsertEnergySuppliersAsync(energySuppliers).ConfigureAwait(false);
+        await _energySupplyingSynchronization.InsertEnergySuppliersAsync(energySuppliers).ConfigureAwait(false);
     }
 
     public async Task<IEnumerable<Actor>> GetActorsAsync()
@@ -59,7 +59,7 @@ public class ActorSyncService : IDisposable
 
     public async Task CommitTransactionAsync()
     {
-        await _marketRolesDbService.CommitTransactionAsync().ConfigureAwait(false);
+        await _energySupplyingSynchronization.CommitTransactionAsync().ConfigureAwait(false);
     }
 
     public void Dispose()
@@ -78,7 +78,7 @@ public class ActorSyncService : IDisposable
         if (disposing)
         {
             _actorRegistryDbService.Dispose();
-            _marketRolesDbService.Dispose();
+            _energySupplyingSynchronization.Dispose();
         }
 
         _disposed = true;
