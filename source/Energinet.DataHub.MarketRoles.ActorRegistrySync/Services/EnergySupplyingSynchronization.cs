@@ -37,6 +37,7 @@ public class EnergySupplyingSynchronization : IDisposable
 
     public async Task SynchronizeAsync(IReadOnlyCollection<Actor> actors)
     {
+        await BeginTransactionAsync().ConfigureAwait(false);
         await InsertActorsAsync(actors).ConfigureAwait(false);
         await InsertEnergySuppliersAsync(MapActorsToEnergySuppliers(actors)).ConfigureAwait(false);
         await CommitTransactionAsync().ConfigureAwait(false);
@@ -104,8 +105,6 @@ public class EnergySupplyingSynchronization : IDisposable
     {
         if (actors == null) throw new ArgumentNullException(nameof(actors));
 
-        if (_transaction == null) await BeginTransactionAsync().ConfigureAwait(false);
-
         var stringBuilder = new StringBuilder();
         foreach (var actor in actors)
         {
@@ -130,8 +129,6 @@ public class EnergySupplyingSynchronization : IDisposable
     private async Task InsertEnergySuppliersAsync(IEnumerable<EnergySupplier> energySuppliers)
     {
         if (energySuppliers == null) throw new ArgumentNullException(nameof(energySuppliers));
-
-        if (_transaction == null) await BeginTransactionAsync().ConfigureAwait(false);
 
         var stringBuilder = new StringBuilder();
         foreach (var energySupplier in energySuppliers)
