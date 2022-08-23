@@ -24,10 +24,14 @@ namespace Energinet.DataHub.MarketRoles.ActorRegistrySync;
 public class SyncActors : IDisposable
 {
     private readonly ActorSyncService _actorSyncService;
+    private readonly B2BSynchronization _b2BSynchronization;
 
     public SyncActors()
     {
         _actorSyncService = new ActorSyncService();
+        _b2BSynchronization = new B2BSynchronization(
+            Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ??
+            throw new InvalidOperationException());
     }
 
     [FunctionName("SyncActors")]
@@ -48,6 +52,7 @@ public class SyncActors : IDisposable
         if (disposing)
         {
             _actorSyncService.Dispose();
+            _b2BSynchronization.Dispose();
         }
     }
 
@@ -60,5 +65,7 @@ public class SyncActors : IDisposable
         await _actorSyncService.InsertEnergySuppliersAsync(energySuppliers).ConfigureAwait(false);
 
         await _actorSyncService.CommitTransactionAsync().ConfigureAwait(false);
+
+        await _b2BSynchronization.SynchronizeAsync(actors).ConfigureAwait(false);
     }
 }
