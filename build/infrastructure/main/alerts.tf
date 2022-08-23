@@ -44,7 +44,8 @@ query                       = <<-QUERY
                 and (cloud_RoleName == 'func-ingestion-${lower(var.domain_name_short)}-${lower(var.environment_short)}-${lower(var.environment_instance)}'
                 or cloud_RoleName == 'func-outbox-${lower(var.domain_name_short)}-${lower(var.environment_short)}-${lower(var.environment_instance)}'
                 or cloud_RoleName == 'func-localmessagehub-${lower(var.domain_name_short)}-${lower(var.environment_short)}-${lower(var.environment_instance)}'
-                or cloud_RoleName == 'func-processing-${lower(var.domain_name_short)}-${lower(var.environment_short)}-${lower(var.environment_instance)}')
+                or cloud_RoleName == 'func-processing-${lower(var.domain_name_short)}-${lower(var.environment_short)}-${lower(var.environment_instance)}'
+                or cloud_RoleName == 'func-actorsync-${lower(var.domain_name_short)}-${lower(var.environment_short)}-${lower(var.environment_instance)}')
               ) on operation_Id
               | project exceptionType = type, failedMethod = method, requestName = name, requestDuration = duration, function = cloud_RoleName
                 QUERY
