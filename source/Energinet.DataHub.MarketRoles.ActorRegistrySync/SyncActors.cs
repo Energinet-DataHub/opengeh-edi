@@ -43,7 +43,8 @@ public class SyncActors : IDisposable
     public async Task RunAsync([TimerTrigger("%TIMER_TRIGGER%")] TimerInfo someTimer, ILogger log)
     {
         log.LogInformation($"C# Timer trigger function executed at: {DateTime.UtcNow}");
-        await SyncActorsFromExternalSourceToDbAsync().ConfigureAwait(false);
+        await SyncEnergySupplyingAsync().ConfigureAwait(false);
+        await SyncB2bAsync().ConfigureAwait(false);
     }
 
     public void Dispose()
@@ -61,12 +62,6 @@ public class SyncActors : IDisposable
             _energySupplyingSynchronization.Dispose();
             _actorRegistry.Dispose();
         }
-    }
-
-    private async Task SyncActorsFromExternalSourceToDbAsync()
-    {
-        await SyncEnergySupplyingAsync().ConfigureAwait(false);
-        await SyncB2bAsync().ConfigureAwait(false);
     }
 
     private async Task SyncB2bAsync()
