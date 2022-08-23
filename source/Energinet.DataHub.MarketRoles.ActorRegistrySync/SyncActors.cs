@@ -64,7 +64,7 @@ public class SyncActors : IDisposable
     {
         var actors = (await _actorSyncService.GetActorsAsync().ConfigureAwait(false)).ToList();
 
-        await _energySupplyingSynchronization.SynchronizationAsync(actors).ConfigureAwait(false);
+        await _energySupplyingSynchronization.SynchronizeAsync(actors).ConfigureAwait(false);
         await _b2BSynchronization.SynchronizeAsync(actors).ConfigureAwait(false);
     }
 }
