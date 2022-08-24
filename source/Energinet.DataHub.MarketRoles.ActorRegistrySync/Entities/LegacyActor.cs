@@ -15,7 +15,7 @@
 using System;
 
 namespace Energinet.DataHub.MarketRoles.ActorRegistrySync.Entities;
-public record Actor(
+public record LegacyActor(
     string IdentificationNumber,
     int IdentificationType,
     string Roles,

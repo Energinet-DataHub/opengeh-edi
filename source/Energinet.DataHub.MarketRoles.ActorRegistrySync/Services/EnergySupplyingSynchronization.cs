@@ -35,7 +35,7 @@ public class EnergySupplyingSynchronization : IDisposable
         _sqlConnection = new SqlConnection(connectionString);
     }
 
-    public async Task SynchronizeAsync(IReadOnlyCollection<Actor> actors)
+    public async Task SynchronizeAsync(IReadOnlyCollection<LegacyActor> actors)
     {
         await BeginTransactionAsync().ConfigureAwait(false);
         await InsertActorsAsync(actors).ConfigureAwait(false);
@@ -64,7 +64,7 @@ public class EnergySupplyingSynchronization : IDisposable
         _disposed = true;
     }
 
-    private static IEnumerable<EnergySupplier> MapActorsToEnergySuppliers(IEnumerable<Actor> actors)
+    private static IEnumerable<EnergySupplier> MapActorsToEnergySuppliers(IEnumerable<LegacyActor> actors)
     {
         return actors.Where(actor => actor.Roles.Contains("DDQ", StringComparison.InvariantCultureIgnoreCase)).Select(actor => new EnergySupplier(actor.Id, actor.IdentificationNumber));
     }
@@ -101,7 +101,7 @@ public class EnergySupplyingSynchronization : IDisposable
         }
     }
 
-    private async Task InsertActorsAsync(IReadOnlyCollection<Actor> actors)
+    private async Task InsertActorsAsync(IReadOnlyCollection<LegacyActor> actors)
     {
         if (actors == null) throw new ArgumentNullException(nameof(actors));
 

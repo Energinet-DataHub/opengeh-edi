@@ -31,15 +31,15 @@ public class ActorRegistryDbService : IDisposable
         _sqlConnection = new SqlConnection(connectionString);
     }
 
-    public async Task<IEnumerable<Actor>> GetLegacyActorsAsync()
+    public async Task<IEnumerable<LegacyActor>> GetLegacyActorsAsync()
     {
-        return await _sqlConnection.QueryAsync<Actor>(
+        return await _sqlConnection.QueryAsync<LegacyActor>(
             @"SELECT [IdentificationNumber]
                        ,[IdentificationType]
                        ,[Roles]
                        ,[Active]
                        ,[Id]
-        FROM [dbo].[Actor]").ConfigureAwait(false) ?? (IEnumerable<Actor>)Array.Empty<object>();
+        FROM [dbo].[Actor]").ConfigureAwait(false) ?? (IEnumerable<LegacyActor>)Array.Empty<object>();
     }
 
     public void Dispose()

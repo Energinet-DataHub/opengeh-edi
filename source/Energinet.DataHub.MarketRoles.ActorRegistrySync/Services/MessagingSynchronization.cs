@@ -34,7 +34,7 @@ public class MessagingSynchronization : IDisposable
         _sqlConnection = new SqlConnection(connectionString);
     }
 
-    public async Task SynchronizeAsync(IReadOnlyCollection<Actor> actors)
+    public async Task SynchronizeAsync(IReadOnlyCollection<LegacyActor> actors)
     {
         await BeginTransactionAsync().ConfigureAwait(false);
         await InsertActorsAsync(actors).ConfigureAwait(false);
@@ -81,7 +81,7 @@ public class MessagingSynchronization : IDisposable
         _transaction = await _sqlConnection.BeginTransactionAsync().ConfigureAwait(false);
     }
 
-    private async Task InsertActorsAsync(IEnumerable<Actor> actors)
+    private async Task InsertActorsAsync(IEnumerable<LegacyActor> actors)
     {
         if (actors == null) throw new ArgumentNullException(nameof(actors));
 
