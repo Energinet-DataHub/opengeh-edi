@@ -34,7 +34,7 @@ public class MessagingSynchronization : IDisposable
         _sqlConnection = new SqlConnection(connectionString);
     }
 
-    public async Task SynchronizeAsync(IReadOnlyCollection<LegacyActor> actors)
+    public async Task SynchronizeAsync(IReadOnlyCollection<Actor> actors)
     {
         await BeginTransactionAsync().ConfigureAwait(false);
         await InsertActorsAsync(actors).ConfigureAwait(false);
@@ -81,7 +81,7 @@ public class MessagingSynchronization : IDisposable
         _transaction = await _sqlConnection.BeginTransactionAsync().ConfigureAwait(false);
     }
 
-    private async Task InsertActorsAsync(IEnumerable<LegacyActor> actors)
+    private async Task InsertActorsAsync(IEnumerable<Actor> actors)
     {
         if (actors == null) throw new ArgumentNullException(nameof(actors));
 
@@ -94,8 +94,8 @@ public class MessagingSynchronization : IDisposable
 	                            IF NOT EXISTS (SELECT * FROM [b2b].[Actor]
 					                            WHERE Id = '{actor.Id}')
 	                            BEGIN
-		                            INSERT INTO [b2b].[Actor] ([Id],[IdentificationNumber],[IdentificationType])
-		                            VALUES ('{actor.Id}', '{actor.IdentificationNumber}', '{GetType(actor.IdentificationType)}')
+		                            INSERT INTO [b2b].[Actor] ([Id],[IdentificationNumber])
+		                            VALUES ('{actor.Id}', '{actor.IdentificationNumber}')
 	                            END
                                END";
 
