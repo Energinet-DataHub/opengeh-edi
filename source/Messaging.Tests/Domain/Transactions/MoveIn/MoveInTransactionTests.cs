@@ -78,7 +78,7 @@ public class MoveInTransactionTests
     {
         _transaction.RejectedByBusinessProcess();
 
-        Assert.Contains(_transaction.DomainEvents, e => e is MoveInWasCompleted);
+        AssertTransactionIsCompleted();
     }
 
     [Fact]
@@ -90,7 +90,7 @@ public class MoveInTransactionTests
         _transaction.CustomerMasterDataWasSent();
         _transaction.MarkEndOfSupplyNotificationAsSent();
 
-        Assert.Contains(_transaction.DomainEvents, e => e is MoveInWasCompleted);
+        AssertTransactionIsCompleted();
     }
 
     [Fact]
@@ -179,5 +179,10 @@ public class MoveInTransactionTests
     private void AssertTransactionIsNotCompleted()
     {
         Assert.DoesNotContain(_transaction.DomainEvents, e => e is MoveInWasCompleted);
+    }
+
+    private void AssertTransactionIsCompleted()
+    {
+        Assert.Contains(_transaction.DomainEvents, e => e is MoveInWasCompleted);
     }
 }
