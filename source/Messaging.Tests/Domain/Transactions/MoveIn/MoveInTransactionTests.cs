@@ -147,6 +147,14 @@ public class MoveInTransactionTests
         AssertTransactionIsNotCompleted();
     }
 
+    [Fact]
+    public void Customer_master_data_is_sent()
+    {
+        _transaction.CustomerMasterDataWasSent();
+
+        Assert.Contains(_transaction.DomainEvents, e => e is CustomerMasterDataWasSent);
+    }
+
     private static MoveInTransaction CreateTransaction()
     {
         return CreateTransaction(SampleData.CurrentEnergySupplierId);
