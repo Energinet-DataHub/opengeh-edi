@@ -137,17 +137,6 @@ public class MoveInTransactionTests
     }
 
     [Fact]
-    public void Customer_master_data_must_be_sent_to_complete_the_transaction()
-    {
-        _transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
-        _transaction.BusinessProcessCompleted();
-        _transaction.HasForwardedMeteringPointMasterData();
-        _transaction.MarkEndOfSupplyNotificationAsSent();
-
-        AssertTransactionIsNotCompleted();
-    }
-
-    [Fact]
     public void Customer_master_data_is_sent()
     {
         _transaction.CustomerMasterDataWasSent();
