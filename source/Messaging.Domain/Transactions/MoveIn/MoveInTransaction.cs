@@ -23,11 +23,13 @@ namespace Messaging.Domain.Transactions.MoveIn
         private State _state = State.Started;
         private EndOfSupplyNotificationState _endOfSupplyNotificationState;
         private bool _hasForwardedMeteringPointMasterData;
+        private bool _customerMasterDataWasSent;
         private bool _hasBusinessProcessCompleted;
         private bool _businessProcessIsAccepted;
 
         public MoveInTransaction(string transactionId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId, string startedByMessageId, string newEnergySupplierId, string? consumerId, string? consumerName, string? consumerIdType)
         {
+            _customerMasterDataWasSent = false;
             _endOfSupplyNotificationState = currentEnergySupplierId is not null
                 ? EndOfSupplyNotificationState.Required
                 : EndOfSupplyNotificationState.NotNeeded;
@@ -119,6 +121,12 @@ namespace Messaging.Domain.Transactions.MoveIn
             CompleteTransactionIfPossible();
         }
 
+        public void CustomerMasterDataWasSent()
+        {
+            _customerMasterDataWasSent = true;
+            CompleteTransactionIfPossible();
+        }
+
         public void MarkEndOfSupplyNotificationAsSent()
         {
             if (_endOfSupplyNotificationState == EndOfSupplyNotificationState.Pending)
@@ -133,6 +141,7 @@ namespace Messaging.Domain.Transactions.MoveIn
             if (
                 _hasBusinessProcessCompleted &&
                 _hasForwardedMeteringPointMasterData &&
+                _customerMasterDataWasSent &&
                 (_endOfSupplyNotificationState == EndOfSupplyNotificationState.NotNeeded || _endOfSupplyNotificationState == EndOfSupplyNotificationState.EnergySupplierWasNotified))
             {
                 Complete();

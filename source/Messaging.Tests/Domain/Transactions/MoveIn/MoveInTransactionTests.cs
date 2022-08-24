@@ -94,6 +94,7 @@ public class MoveInTransactionTests
         transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
         transaction.BusinessProcessCompleted();
         transaction.HasForwardedMeteringPointMasterData();
+        transaction.CustomerMasterDataWasSent();
         transaction.MarkEndOfSupplyNotificationAsSent();
 
         Assert.Contains(transaction.DomainEvents, e => e is MoveInWasCompleted);
@@ -147,6 +148,19 @@ public class MoveInTransactionTests
 
         var startedEvent = transaction.DomainEvents.FirstOrDefault(e => e is MoveInWasStarted) as MoveInWasStarted;
         Assert.Equal(MoveInTransaction.EndOfSupplyNotificationState.NotNeeded, startedEvent?.EndOfSupplyNotificationState);
+    }
+
+    [Fact]
+    public void Customer_master_data_must_be_sent_to_complete_the_transaction()
+    {
+        var transaction = CreateTransaction();
+
+        transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
+        transaction.BusinessProcessCompleted();
+        transaction.HasForwardedMeteringPointMasterData();
+        transaction.MarkEndOfSupplyNotificationAsSent();
+
+        Assert.DoesNotContain(transaction.DomainEvents, e => e is MoveInWasCompleted);
     }
 
     private static MoveInTransaction CreateTransaction()
