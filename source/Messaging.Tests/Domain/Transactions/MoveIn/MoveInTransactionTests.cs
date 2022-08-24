@@ -103,7 +103,6 @@ public class MoveInTransactionTests
     public void Business_process_is_completed()
     {
         _transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
-
         _transaction.BusinessProcessCompleted();
 
         Assert.Contains(_transaction.DomainEvents, e => e is BusinessProcessWasCompleted);
