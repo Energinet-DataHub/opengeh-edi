@@ -124,7 +124,7 @@ namespace Messaging.Domain.Transactions.MoveIn
         public void CustomerMasterDataWasSent()
         {
             _customerMasterDataWasSent = true;
-            AddDomainEvent(new CustomerMasterDataWasSent());
+            AddDomainEvent(new CustomerMasterDataWasSent(TransactionId));
             CompleteTransactionIfPossible();
         }
 

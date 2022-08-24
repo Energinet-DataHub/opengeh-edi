@@ -152,7 +152,9 @@ public class MoveInTransactionTests
     {
         _transaction.CustomerMasterDataWasSent();
 
-        Assert.Contains(_transaction.DomainEvents, e => e is CustomerMasterDataWasSent);
+        var domainEvent = _transaction.DomainEvents.FirstOrDefault(e => e is CustomerMasterDataWasSent) as CustomerMasterDataWasSent;
+        Assert.NotNull(domainEvent);
+        Assert.Equal(_transaction.TransactionId, domainEvent?.TransactionId);
     }
 
     private static MoveInTransaction CreateTransaction()
