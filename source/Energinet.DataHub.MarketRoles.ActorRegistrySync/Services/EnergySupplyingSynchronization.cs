@@ -110,7 +110,7 @@ public class EnergySupplyingSynchronization : IDisposable
         {
             string sql = $@"BEGIN
 	                            IF NOT EXISTS (SELECT * FROM [dbo].[Actor]
-					                            WHERE Id = CONVERT(uniqueidentifier, '{actor.Id}'))
+					                            WHERE Id = '{actor.Id}')
                                 BEGIN
                                     INSERT INTO [dbo].[Actor] ([Id],[IdentificationNumber],[IdentificationType],[Roles])
                                     VALUES ('{actor.Id}', '{actor.IdentificationNumber}', '{GetType(actor.IdentificationType)}', '{GetRoles(actor.Roles)}')

@@ -15,6 +15,5 @@
 using System;
 
 namespace Energinet.DataHub.MarketRoles.ActorRegistrySync.Entities;
-public record Actor(
-    string IdentificationNumber,
-    Guid Id);
+public record Actor(Guid Id,
+    string IdentificationNumber);
