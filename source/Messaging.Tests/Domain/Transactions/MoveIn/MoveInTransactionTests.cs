@@ -149,16 +149,7 @@ public class MoveInTransactionTests
 
     private static MoveInTransaction CreateTransaction()
     {
-        return new MoveInTransaction(
-            SampleData.TransactionId,
-            SampleData.MarketEvaluationPointId,
-            SampleData.EffectiveDate,
-            SampleData.CurrentEnergySupplierId,
-            SampleData.StartedByMessageId,
-            SampleData.NewEnergySupplierId,
-            SampleData.ConsumerId,
-            SampleData.ConsumerName,
-            SampleData.ConsumerIdType);
+        return CreateTransaction(SampleData.CurrentEnergySupplierId);
     }
 
     private static MoveInTransaction CreateTransaction(string? currentEnergySupplierId)
