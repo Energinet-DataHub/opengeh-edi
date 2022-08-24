@@ -21,12 +21,17 @@ namespace Messaging.Tests.Domain.Transactions.MoveIn;
 
 public class MoveInTransactionTests
 {
+    private readonly MoveInTransaction _transaction;
+
+    public MoveInTransactionTests()
+    {
+        _transaction = CreateTransaction();
+    }
+
     [Fact]
     public void Transaction_is_started()
     {
-        var transaction = CreateTransaction();
-
-        var startedEvent = transaction.DomainEvents.FirstOrDefault(e => e is MoveInWasStarted) as MoveInWasStarted;
+        var startedEvent = _transaction.DomainEvents.FirstOrDefault(e => e is MoveInWasStarted) as MoveInWasStarted;
         Assert.NotNull(startedEvent);
         Assert.Equal(SampleData.TransactionId, startedEvent?.TransactionId);
         Assert.Equal(MoveInTransaction.EndOfSupplyNotificationState.Required, startedEvent?.EndOfSupplyNotificationState);
@@ -35,11 +40,9 @@ public class MoveInTransactionTests
     [Fact]
     public void Business_process_is_set_to_accepted()
     {
-        var transaction = CreateTransaction();
+        _transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
 
-        transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
-
-        var acceptedEvent = transaction.DomainEvents.FirstOrDefault(e => e is MoveInWasAccepted) as MoveInWasAccepted;
+        var acceptedEvent = _transaction.DomainEvents.FirstOrDefault(e => e is MoveInWasAccepted) as MoveInWasAccepted;
         Assert.NotNull(acceptedEvent);
         Assert.Equal(SampleData.ProcessId, acceptedEvent?.BusinessProcessId);
     }
@@ -47,21 +50,17 @@ public class MoveInTransactionTests
     [Fact]
     public void Business_process_can_be_accepted_when_transaction_is_not_completed()
     {
-        var transaction = CreateTransaction();
+        _transaction.RejectedByBusinessProcess();
 
-        transaction.RejectedByBusinessProcess();
-
-        Assert.Throws<MoveInException>(() => transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId));
+        Assert.Throws<MoveInException>(() => _transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId));
     }
 
     [Fact]
     public void Business_process_can_be_set_to_rejected()
     {
-        var transaction = CreateTransaction();
+        _transaction.RejectedByBusinessProcess();
 
-        transaction.RejectedByBusinessProcess();
-
-        var rejectedEvent = transaction.DomainEvents.FirstOrDefault(e => e is MoveInWasRejected) as MoveInWasRejected;
+        var rejectedEvent = _transaction.DomainEvents.FirstOrDefault(e => e is MoveInWasRejected) as MoveInWasRejected;
         Assert.NotNull(rejectedEvent);
         Assert.Equal(SampleData.TransactionId, rejectedEvent?.TransactionId);
     }
@@ -69,76 +68,64 @@ public class MoveInTransactionTests
     [Fact]
     public void Business_process_can_be_set_to_rejected_when_not_transaction_has_not_completed()
     {
-        var transaction = CreateTransaction();
+        _transaction.RejectedByBusinessProcess();
 
-        transaction.RejectedByBusinessProcess();
-
-        Assert.Throws<MoveInException>(() => transaction.RejectedByBusinessProcess());
+        Assert.Throws<MoveInException>(() => _transaction.RejectedByBusinessProcess());
     }
 
     [Fact]
     public void Transaction_is_completed_if_business_process_request_is_rejected()
     {
-        var transaction = CreateTransaction();
+        _transaction.RejectedByBusinessProcess();
 
-        transaction.RejectedByBusinessProcess();
-
-        Assert.Contains(transaction.DomainEvents, e => e is MoveInWasCompleted);
+        Assert.Contains(_transaction.DomainEvents, e => e is MoveInWasCompleted);
     }
 
     [Fact]
     public void Transaction_is_completed_when_all_depending_processes_has_completed()
     {
-        var transaction = CreateTransaction();
+        _transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
+        _transaction.BusinessProcessCompleted();
+        _transaction.HasForwardedMeteringPointMasterData();
+        _transaction.CustomerMasterDataWasSent();
+        _transaction.MarkEndOfSupplyNotificationAsSent();
 
-        transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
-        transaction.BusinessProcessCompleted();
-        transaction.HasForwardedMeteringPointMasterData();
-        transaction.CustomerMasterDataWasSent();
-        transaction.MarkEndOfSupplyNotificationAsSent();
-
-        Assert.Contains(transaction.DomainEvents, e => e is MoveInWasCompleted);
+        Assert.Contains(_transaction.DomainEvents, e => e is MoveInWasCompleted);
     }
 
     [Fact]
     public void Business_process_can_not_set_to_completed_when_it_has_not_accepted()
     {
-        var transaction = CreateTransaction();
-
-        Assert.Throws<MoveInException>(() => transaction.BusinessProcessCompleted());
+        Assert.Throws<MoveInException>(() => _transaction.BusinessProcessCompleted());
     }
 
     [Fact]
     public void Business_process_is_completed()
     {
-        var transaction = CreateTransaction();
-        transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
+        _transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
 
-        transaction.BusinessProcessCompleted();
+        _transaction.BusinessProcessCompleted();
 
-        Assert.Contains(transaction.DomainEvents, e => e is BusinessProcessWasCompleted);
+        Assert.Contains(_transaction.DomainEvents, e => e is BusinessProcessWasCompleted);
     }
 
     [Fact]
     public void End_of_supply_notification_status_is_changed_to_pending_when_business_process_is_completed()
     {
-        var transaction = CreateTransaction();
-        transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
+        _transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
+        _transaction.BusinessProcessCompleted();
 
-        transaction.BusinessProcessCompleted();
-
-        Assert.Contains(transaction.DomainEvents, e => e is EndOfSupplyNotificationChangedToPending);
+        Assert.Contains(_transaction.DomainEvents, e => e is EndOfSupplyNotificationChangedToPending);
     }
 
     [Fact]
     public void Transaction_is_not_completed_while_end_of_supply_notification_status_is_pending()
     {
-        var transaction = CreateTransaction();
-        transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
-        transaction.HasForwardedMeteringPointMasterData();
-        transaction.BusinessProcessCompleted();
+        _transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
+        _transaction.HasForwardedMeteringPointMasterData();
+        _transaction.BusinessProcessCompleted();
 
-        Assert.DoesNotContain(transaction.DomainEvents, e => e is MoveInWasCompleted);
+        Assert.DoesNotContain(_transaction.DomainEvents, e => e is MoveInWasCompleted);
     }
 
     [Fact]
@@ -153,14 +140,12 @@ public class MoveInTransactionTests
     [Fact]
     public void Customer_master_data_must_be_sent_to_complete_the_transaction()
     {
-        var transaction = CreateTransaction();
+        _transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
+        _transaction.BusinessProcessCompleted();
+        _transaction.HasForwardedMeteringPointMasterData();
+        _transaction.MarkEndOfSupplyNotificationAsSent();
 
-        transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
-        transaction.BusinessProcessCompleted();
-        transaction.HasForwardedMeteringPointMasterData();
-        transaction.MarkEndOfSupplyNotificationAsSent();
-
-        Assert.DoesNotContain(transaction.DomainEvents, e => e is MoveInWasCompleted);
+        Assert.DoesNotContain(_transaction.DomainEvents, e => e is MoveInWasCompleted);
     }
 
     private static MoveInTransaction CreateTransaction()
