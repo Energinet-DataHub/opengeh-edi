@@ -42,6 +42,13 @@ public class ActorRegistryDbService : IDisposable
         FROM [dbo].[Actor]").ConfigureAwait(false) ?? (IEnumerable<LegacyActor>)Array.Empty<object>();
     }
 
+    public async Task<IEnumerable<Actor>> GetActorsAsync()
+    {
+        return await _sqlConnection.QueryAsync<Actor>(
+            $"SELECT ActorId AS {nameof(Actor.Id)}, ActorNumber AS {nameof(Actor.IdentificationNumber)} " +
+            "FROM [dbo].[ActorInfoNew]").ConfigureAwait(false) ?? (IEnumerable<Actor>)Array.Empty<object>();
+    }
+
     public void Dispose()
     {
         Dispose(true);
