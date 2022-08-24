@@ -22,7 +22,7 @@ using Microsoft.Extensions.Azure;
 
 namespace Messaging.Infrastructure.Transactions.MoveIn;
 
-public class RequestMeteringPointMasterDataDispatcher
+public class RequestMeteringPointMasterDataDispatcher : IRequestDispatcher<FetchMeteringPointMasterData>
 {
     private readonly Lazy<ServiceBusSender> _senderCreator;
 
