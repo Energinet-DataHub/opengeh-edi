@@ -125,7 +125,7 @@ public class MoveInTransactionTests
         _transaction.HasForwardedMeteringPointMasterData();
         _transaction.BusinessProcessCompleted();
 
-        Assert.DoesNotContain(_transaction.DomainEvents, e => e is MoveInWasCompleted);
+        AssertTransactionIsNotCompleted();
     }
 
     [Fact]
@@ -145,7 +145,7 @@ public class MoveInTransactionTests
         _transaction.HasForwardedMeteringPointMasterData();
         _transaction.MarkEndOfSupplyNotificationAsSent();
 
-        Assert.DoesNotContain(_transaction.DomainEvents, e => e is MoveInWasCompleted);
+        AssertTransactionIsNotCompleted();
     }
 
     private static MoveInTransaction CreateTransaction()
@@ -174,5 +174,10 @@ public class MoveInTransactionTests
             SampleData.ConsumerId,
             SampleData.ConsumerName,
             SampleData.ConsumerIdType);
+    }
+
+    private void AssertTransactionIsNotCompleted()
+    {
+        Assert.DoesNotContain(_transaction.DomainEvents, e => e is MoveInWasCompleted);
     }
 }
