@@ -62,11 +62,6 @@ public class MessagingSynchronization : IDisposable
         _disposed = true;
     }
 
-    private static string GetType(int identificationType)
-    {
-        return identificationType == 1 ? "GLN" : "EIC";
-    }
-
     private async Task CommitAsync()
     {
         if (_transaction != null)
