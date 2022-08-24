@@ -23,7 +23,7 @@ namespace Energinet.DataHub.MarketRoles.ActorRegistrySync;
 
 public class SyncActors : IDisposable
 {
-    private readonly B2BSynchronization _b2BSynchronization;
+    private readonly MessagingSynchronization _messagingSynchronization;
     private readonly EnergySupplyingSynchronization _energySupplyingSynchronization;
     private readonly ActorRegistryDbService _actorRegistry;
 
@@ -33,7 +33,7 @@ public class SyncActors : IDisposable
             new ActorRegistryDbService(Environment.GetEnvironmentVariable("ACTOR_REGISTRY_DB_CONNECTION_STRING") ?? throw new InvalidOperationException());
         var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ??
                                throw new InvalidOperationException();
-        _b2BSynchronization = new B2BSynchronization(connectionString);
+        _messagingSynchronization = new MessagingSynchronization(connectionString);
         _energySupplyingSynchronization = new EnergySupplyingSynchronization(connectionString);
     }
 
@@ -55,7 +55,7 @@ public class SyncActors : IDisposable
     {
         if (disposing)
         {
-            _b2BSynchronization.Dispose();
+            _messagingSynchronization.Dispose();
             _energySupplyingSynchronization.Dispose();
             _actorRegistry.Dispose();
         }
@@ -64,7 +64,7 @@ public class SyncActors : IDisposable
     private async Task SyncB2BAsync()
     {
         var actors = (await _actorRegistry.GetLegacyActorsAsync().ConfigureAwait(false)).ToList();
-        await _b2BSynchronization.SynchronizeAsync(actors).ConfigureAwait(false);
+        await _messagingSynchronization.SynchronizeAsync(actors).ConfigureAwait(false);
     }
 
     private async Task SyncEnergySupplyingAsync()
