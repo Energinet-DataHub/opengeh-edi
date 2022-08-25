@@ -20,7 +20,9 @@ namespace Messaging.Domain.Transactions.MoveIn
 {
     public class MoveInTransaction : Entity
     {
-        private State _state = State.Started;
+        #pragma warning disable CS0414 // The field will be used later on
+        private readonly State _state = State.Started;
+        private BusinessProcessState _businessProcessState;
         private EndOfSupplyNotificationState _endOfSupplyNotificationState;
         private bool _hasForwardedMeteringPointMasterData;
         private bool _customerMasterDataWasSent;
@@ -29,6 +31,7 @@ namespace Messaging.Domain.Transactions.MoveIn
 
         public MoveInTransaction(string transactionId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId, string startedByMessageId, string newEnergySupplierId, string? consumerId, string? consumerName, string? consumerIdType)
         {
+            _businessProcessState = BusinessProcessState.Pending;
             _customerMasterDataWasSent = false;
             _endOfSupplyNotificationState = currentEnergySupplierId is not null
                 ? EndOfSupplyNotificationState.Required
@@ -57,6 +60,12 @@ namespace Messaging.Domain.Transactions.MoveIn
             NotNeeded,
             Pending,
             EnergySupplierWasNotified,
+        }
+
+        public enum BusinessProcessState
+        {
+            Pending,
+            Rejected,
         }
 
         public string TransactionId { get; }
@@ -91,8 +100,6 @@ namespace Messaging.Domain.Transactions.MoveIn
             AddDomainEvent(new BusinessProcessWasCompleted(TransactionId));
 
             SetEndOfSupplyNotificationPending();
-
-            CompleteTransactionIfPossible();
         }
 
         public void AcceptedByBusinessProcess(string processId, string marketEvaluationPointNumber)
@@ -102,6 +109,9 @@ namespace Messaging.Domain.Transactions.MoveIn
                 throw new MoveInException($"Cannot accept transaction while in state '{_state.ToString()}'");
             }
 
+            if (_businessProcessIsAccepted == true)
+                return;
+
             _businessProcessIsAccepted = true;
             ProcessId = processId ?? throw new ArgumentNullException(nameof(processId));
             AddDomainEvent(new MoveInWasAccepted(ProcessId, marketEvaluationPointNumber, TransactionId));
@@ -109,23 +119,22 @@ namespace Messaging.Domain.Transactions.MoveIn
 
         public void RejectedByBusinessProcess()
         {
-            EnsureNotCompleted();
-
-            AddDomainEvent(new MoveInWasRejected(TransactionId));
-            Complete();
+            if (_businessProcessState == BusinessProcessState.Pending)
+            {
+                _businessProcessState = BusinessProcessState.Rejected;
+                AddDomainEvent(new MoveInWasRejected(TransactionId));
+            }
         }
 
         public void HasForwardedMeteringPointMasterData()
         {
             _hasForwardedMeteringPointMasterData = true;
-            CompleteTransactionIfPossible();
         }
 
         public void CustomerMasterDataWasSent()
         {
             _customerMasterDataWasSent = true;
             AddDomainEvent(new CustomerMasterDataWasSent(TransactionId));
-            CompleteTransactionIfPossible();
         }
 
         public void MarkEndOfSupplyNotificationAsSent()
@@ -133,35 +142,7 @@ namespace Messaging.Domain.Transactions.MoveIn
             if (_endOfSupplyNotificationState == EndOfSupplyNotificationState.Pending)
             {
                 _endOfSupplyNotificationState = EndOfSupplyNotificationState.EnergySupplierWasNotified;
-                CompleteTransactionIfPossible();
             }
-        }
-
-        private void CompleteTransactionIfPossible()
-        {
-            if (
-                _hasBusinessProcessCompleted &&
-                _hasForwardedMeteringPointMasterData &&
-                _customerMasterDataWasSent &&
-                (_endOfSupplyNotificationState == EndOfSupplyNotificationState.NotNeeded || _endOfSupplyNotificationState == EndOfSupplyNotificationState.EnergySupplierWasNotified))
-            {
-                Complete();
-            }
-        }
-
-        private void EnsureNotCompleted()
-        {
-            if (_state != State.Started)
-            {
-                throw new MoveInException($"Move in transaction '{TransactionId}' has completed. No further actions can be done.");
-            }
-        }
-
-        private void Complete()
-        {
-            EnsureNotCompleted();
-            _state = State.Completed;
-            AddDomainEvent(new MoveInWasCompleted());
         }
 
         private void SetEndOfSupplyNotificationPending()

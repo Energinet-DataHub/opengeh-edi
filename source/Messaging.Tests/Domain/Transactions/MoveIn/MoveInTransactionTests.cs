@@ -48,11 +48,13 @@ public class MoveInTransactionTests
     }
 
     [Fact]
-    public void Business_process_can_be_accepted_when_transaction_is_not_completed()
+    public void Business_process_can_be_marked_as_accepted_once_only()
     {
-        _transaction.RejectedByBusinessProcess();
+        _transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
 
-        Assert.Throws<MoveInException>(() => _transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId));
+        _transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
+
+        Assert.Equal(1, _transaction.DomainEvents.Count(e => e is MoveInWasAccepted));
     }
 
     [Fact]
@@ -66,31 +68,13 @@ public class MoveInTransactionTests
     }
 
     [Fact]
-    public void Business_process_can_be_set_to_rejected_when_not_transaction_has_not_completed()
+    public void Business_process_can_be_marked_as_rejected_once_only()
     {
         _transaction.RejectedByBusinessProcess();
 
-        Assert.Throws<MoveInException>(() => _transaction.RejectedByBusinessProcess());
-    }
-
-    [Fact]
-    public void Transaction_is_completed_if_business_process_request_is_rejected()
-    {
         _transaction.RejectedByBusinessProcess();
 
-        AssertTransactionIsCompleted();
-    }
-
-    [Fact]
-    public void Transaction_is_completed_when_all_depending_processes_has_completed()
-    {
-        _transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
-        _transaction.BusinessProcessCompleted();
-        _transaction.HasForwardedMeteringPointMasterData();
-        _transaction.CustomerMasterDataWasSent();
-        _transaction.MarkEndOfSupplyNotificationAsSent();
-
-        AssertTransactionIsCompleted();
+        Assert.Equal(1, _transaction.DomainEvents.Count(e => e is MoveInWasRejected));
     }
 
     [Fact]
