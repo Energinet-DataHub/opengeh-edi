@@ -130,6 +130,16 @@ public class MoveInTransactionTests
         Assert.Equal(_transaction.TransactionId, domainEvent?.TransactionId);
     }
 
+    [Fact]
+    public void Metering_master_data_is_sent_once_only()
+    {
+        _transaction.MarkMeteringPointMasterDataAsSent();
+
+        _transaction.MarkMeteringPointMasterDataAsSent();
+
+        Assert.Equal(1, _transaction.DomainEvents.Count(e => e is MeteringPointMasterDataWasSent));
+    }
+
     private static MoveInTransaction CreateTransaction()
     {
         return CreateTransaction(SampleData.CurrentEnergySupplierId);

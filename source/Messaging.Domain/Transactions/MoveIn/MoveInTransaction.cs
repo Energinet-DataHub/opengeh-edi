@@ -70,6 +70,7 @@ namespace Messaging.Domain.Transactions.MoveIn
 
         public enum MeteringPointMasterDataState
         {
+            Pending,
             Sent,
         }
 
@@ -133,6 +134,9 @@ namespace Messaging.Domain.Transactions.MoveIn
 
         public void MarkMeteringPointMasterDataAsSent()
         {
+            if (_meteringPointMasterDataState != MeteringPointMasterDataState.Pending)
+                return;
+
             _meteringPointMasterDataState = MeteringPointMasterDataState.Sent;
             AddDomainEvent(new MeteringPointMasterDataWasSent(TransactionId));
         }
