@@ -19,9 +19,9 @@ namespace Messaging.Infrastructure.Transactions.MoveIn;
 
 public class RequestMeteringPointMasterData : IRequestMeteringPointMasterData
 {
-    private readonly RequestMeteringPointMasterDataDispatcher _requestMeteringPointMasterDataDispatcher;
+    private readonly IRequestDispatcher<FetchMeteringPointMasterData> _requestMeteringPointMasterDataDispatcher;
 
-    public RequestMeteringPointMasterData(RequestMeteringPointMasterDataDispatcher requestMeteringPointMasterDataDispatcher)
+    public RequestMeteringPointMasterData(IRequestDispatcher<FetchMeteringPointMasterData> requestMeteringPointMasterDataDispatcher)
     {
         _requestMeteringPointMasterDataDispatcher = requestMeteringPointMasterDataDispatcher;
     }

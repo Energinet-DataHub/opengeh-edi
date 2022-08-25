@@ -24,20 +24,20 @@ namespace Messaging.Infrastructure.Transactions.MoveIn;
 
 public class RequestMeteringPointMasterDataDispatcher : IRequestDispatcher<FetchMeteringPointMasterData>
 {
-    private readonly Lazy<ServiceBusSender> _senderCreator;
-
-    public RequestMeteringPointMasterDataDispatcher(IAzureClientFactory<ServiceBusClient> serviceBusClientFactory, RequestMasterDataConfiguration configuration)
-    {
-        if (serviceBusClientFactory == null) throw new ArgumentNullException(nameof(serviceBusClientFactory));
-        if (configuration == null) throw new ArgumentNullException(nameof(configuration));
-        var serviceBusClient = serviceBusClientFactory.CreateClient(configuration.WithName);
-        _senderCreator = new Lazy<ServiceBusSender>(() => serviceBusClient.CreateSender(configuration.QueueName));
-    }
-
+    // private readonly Lazy<ServiceBusSender> _senderCreator;
+    //
+    // public RequestMeteringPointMasterDataDispatcher(IAzureClientFactory<ServiceBusClient> serviceBusClientFactory, RequestMasterDataConfiguration configuration)
+    // {
+    //     if (serviceBusClientFactory == null) throw new ArgumentNullException(nameof(serviceBusClientFactory));
+    //     if (configuration == null) throw new ArgumentNullException(nameof(configuration));
+    //     var serviceBusClient = serviceBusClientFactory.CreateClient(configuration.WithName);
+    //     _senderCreator = new Lazy<ServiceBusSender>(() => serviceBusClient.CreateSender(configuration.QueueName));
+    // }
     public async Task SendAsync(FetchMeteringPointMasterData fetchMeteringPointMasterData)
     {
-        if (fetchMeteringPointMasterData == null) throw new ArgumentNullException(nameof(fetchMeteringPointMasterData));
-        await _senderCreator.Value.SendMessageAsync(CreateFrom(fetchMeteringPointMasterData)).ConfigureAwait(false);
+        // if (fetchMeteringPointMasterData == null) throw new ArgumentNullException(nameof(fetchMeteringPointMasterData));
+        // await _senderCreator.Value.SendMessageAsync(CreateFrom(fetchMeteringPointMasterData)).ConfigureAwait(false);
+        await Task.Delay(1).ConfigureAwait(false);
     }
 
     private static ServiceBusMessage CreateFrom(FetchMeteringPointMasterData fetchMeteringPointMasterData)
