@@ -30,10 +30,10 @@ public class RequestCustomerMasterData : IRequestCustomerMasterData
         _dispatcher = requestDispatcher;
     }
 
-    public async Task RequestMasterDataForAsync(FetchCustomerMasterData fetchMeteringPointMasterData)
+    public async Task RequestMasterDataForAsync(FetchCustomerMasterData fetchCustomerMasterData)
     {
-        if (fetchMeteringPointMasterData == null) throw new ArgumentNullException(nameof(fetchMeteringPointMasterData));
-        var message = CreateFrom(fetchMeteringPointMasterData);
+        if (fetchCustomerMasterData == null) throw new ArgumentNullException(nameof(fetchCustomerMasterData));
+        var message = CreateFrom(fetchCustomerMasterData);
         await _dispatcher.SendAsync(message).ConfigureAwait(false);
     }
 
