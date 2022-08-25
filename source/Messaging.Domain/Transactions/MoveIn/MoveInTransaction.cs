@@ -20,7 +20,6 @@ namespace Messaging.Domain.Transactions.MoveIn
 {
     public class MoveInTransaction : Entity
     {
-        #pragma warning disable CS0414 // The field will be used later on
         private readonly State _state = State.Started;
         private BusinessProcessState _businessProcessState;
         private EndOfSupplyNotificationState _endOfSupplyNotificationState;
