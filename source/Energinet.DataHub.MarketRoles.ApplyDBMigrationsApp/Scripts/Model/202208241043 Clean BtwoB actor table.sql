@@ -1,0 +1,1 @@
+﻿DELETE FROM [b2b].[Actor]
