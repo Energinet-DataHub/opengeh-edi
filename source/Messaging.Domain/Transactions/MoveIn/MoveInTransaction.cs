@@ -26,8 +26,6 @@ namespace Messaging.Domain.Transactions.MoveIn
         private EndOfSupplyNotificationState _endOfSupplyNotificationState;
         private bool _hasForwardedMeteringPointMasterData;
         private bool _customerMasterDataWasSent;
-        private bool _hasBusinessProcessCompleted;
-        private bool _businessProcessIsAccepted;
 
         public MoveInTransaction(string transactionId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId, string startedByMessageId, string newEnergySupplierId, string? consumerId, string? consumerName, string? consumerIdType)
         {
@@ -65,7 +63,9 @@ namespace Messaging.Domain.Transactions.MoveIn
         public enum BusinessProcessState
         {
             Pending,
+            Accepted,
             Rejected,
+            Completed,
         }
 
         public string TransactionId { get; }
@@ -90,13 +90,13 @@ namespace Messaging.Domain.Transactions.MoveIn
 
         public void BusinessProcessCompleted()
         {
-            if (_businessProcessIsAccepted == false)
+            if (_businessProcessState != BusinessProcessState.Accepted)
             {
                 throw new MoveInException(
                     "Business process can not be set to completed, when it has not been accepted.");
             }
 
-            _hasBusinessProcessCompleted = true;
+            _businessProcessState = BusinessProcessState.Completed;
             AddDomainEvent(new BusinessProcessWasCompleted(TransactionId));
 
             SetEndOfSupplyNotificationPending();
@@ -109,10 +109,10 @@ namespace Messaging.Domain.Transactions.MoveIn
                 throw new MoveInException($"Cannot accept transaction while in state '{_state.ToString()}'");
             }
 
-            if (_businessProcessIsAccepted == true)
+            if (_businessProcessState == BusinessProcessState.Accepted)
                 return;
 
-            _businessProcessIsAccepted = true;
+            _businessProcessState = BusinessProcessState.Accepted;
             ProcessId = processId ?? throw new ArgumentNullException(nameof(processId));
             AddDomainEvent(new MoveInWasAccepted(ProcessId, marketEvaluationPointNumber, TransactionId));
         }
