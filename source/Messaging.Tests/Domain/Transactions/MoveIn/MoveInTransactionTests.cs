@@ -102,16 +102,6 @@ public class MoveInTransactionTests
     }
 
     [Fact]
-    public void Transaction_is_not_completed_while_end_of_supply_notification_status_is_pending()
-    {
-        _transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
-        _transaction.HasForwardedMeteringPointMasterData();
-        _transaction.BusinessProcessCompleted();
-
-        AssertTransactionIsNotCompleted();
-    }
-
-    [Fact]
     public void End_of_supply_notification_is_not_needed_when_no_current_energy_supplier_is_present()
     {
         var transaction = CreateTransaction(currentEnergySupplierId: null);
