@@ -25,8 +25,8 @@ namespace Messaging.Domain.Transactions.MoveIn
         private BusinessProcessState _businessProcessState;
         private EndOfSupplyNotificationState _endOfSupplyNotificationState;
         private bool _customerMasterDataWasSent;
-        private MeteringPointMasterDataState _meteringPointMasterDataState;
-        private MeteringPointMasterDataState _customerMasterDataState;
+        private MasterDataState _masterDataState;
+        private MasterDataState _customerMasterDataState;
 
         public MoveInTransaction(string transactionId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId, string startedByMessageId, string newEnergySupplierId, string? consumerId, string? consumerName, string? consumerIdType)
         {
@@ -69,7 +69,7 @@ namespace Messaging.Domain.Transactions.MoveIn
             Completed,
         }
 
-        public enum MeteringPointMasterDataState
+        public enum MasterDataState
         {
             Pending,
             Sent,
@@ -135,19 +135,19 @@ namespace Messaging.Domain.Transactions.MoveIn
 
         public void MarkMeteringPointMasterDataAsSent()
         {
-            if (_meteringPointMasterDataState != MeteringPointMasterDataState.Pending)
+            if (_masterDataState != MasterDataState.Pending)
                 return;
 
-            _meteringPointMasterDataState = MeteringPointMasterDataState.Sent;
+            _masterDataState = MasterDataState.Sent;
             AddDomainEvent(new MeteringPointMasterDataWasSent(TransactionId));
         }
 
         public void MarkCustomerMasterDataAsSent()
         {
-            if (_customerMasterDataState != MeteringPointMasterDataState.Pending)
+            if (_customerMasterDataState != MasterDataState.Pending)
                 return;
 
-            _customerMasterDataState = MeteringPointMasterDataState.Sent;
+            _customerMasterDataState = MasterDataState.Sent;
             _customerMasterDataWasSent = true;
             AddDomainEvent(new CustomerMasterDataWasSent(TransactionId));
         }
