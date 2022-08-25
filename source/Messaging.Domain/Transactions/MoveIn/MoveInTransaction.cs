@@ -126,7 +126,7 @@ namespace Messaging.Domain.Transactions.MoveIn
             }
         }
 
-        public void HasForwardedMeteringPointMasterData()
+        public void MarkMeteringPointMasterDataAsSent()
         {
             _hasForwardedMeteringPointMasterData = true;
         }
