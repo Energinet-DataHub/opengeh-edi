@@ -131,7 +131,7 @@ namespace Messaging.Domain.Transactions.MoveIn
             _hasForwardedMeteringPointMasterData = true;
         }
 
-        public void CustomerMasterDataWasSent()
+        public void MarkCustomerMasterDataAsSent()
         {
             _customerMasterDataWasSent = true;
             AddDomainEvent(new CustomerMasterDataWasSent(TransactionId));

@@ -113,7 +113,7 @@ public class MoveInTransactionTests
     [Fact]
     public void Customer_master_data_is_sent()
     {
-        _transaction.CustomerMasterDataWasSent();
+        _transaction.MarkCustomerMasterDataAsSent();
 
         var domainEvent = _transaction.DomainEvents.FirstOrDefault(e => e is CustomerMasterDataWasSent) as CustomerMasterDataWasSent;
         Assert.NotNull(domainEvent);
