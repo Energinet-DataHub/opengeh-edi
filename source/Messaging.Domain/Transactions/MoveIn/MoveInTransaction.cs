@@ -26,6 +26,7 @@ namespace Messaging.Domain.Transactions.MoveIn
         private EndOfSupplyNotificationState _endOfSupplyNotificationState;
         private bool _hasForwardedMeteringPointMasterData;
         private bool _customerMasterDataWasSent;
+        private MeteringPointMasterDataState _meteringPointMasterDataState;
 
         public MoveInTransaction(string transactionId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId, string startedByMessageId, string newEnergySupplierId, string? consumerId, string? consumerName, string? consumerIdType)
         {
@@ -66,6 +67,11 @@ namespace Messaging.Domain.Transactions.MoveIn
             Accepted,
             Rejected,
             Completed,
+        }
+
+        public enum MeteringPointMasterDataState
+        {
+            Sent,
         }
 
         public string TransactionId { get; }
@@ -128,6 +134,7 @@ namespace Messaging.Domain.Transactions.MoveIn
 
         public void MarkMeteringPointMasterDataAsSent()
         {
+            _meteringPointMasterDataState = MeteringPointMasterDataState.Sent;
             _hasForwardedMeteringPointMasterData = true;
         }
 
