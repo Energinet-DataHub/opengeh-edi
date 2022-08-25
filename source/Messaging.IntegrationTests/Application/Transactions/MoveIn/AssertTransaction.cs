@@ -88,15 +88,15 @@ public class AssertTransaction
         return this;
     }
 
-    public AssertTransaction HasForwardedMeteringPointMasterData(bool expected)
+    public AssertTransaction MeteringPointMasterDataWasSent()
     {
-        Assert.Equal(expected, _transaction.ForwardedMeteringPointMasterData);
+        Assert.Equal(MoveInTransaction.MasterDataState.Sent.ToString(), _transaction.MeteringPointMasterDataState);
         return this;
     }
 
     public AssertTransaction BusinessProcessCompleted()
     {
-        Assert.True(_transaction.HasBusinessProcessCompleted);
+        Assert.Equal(MoveInTransaction.BusinessProcessState.Completed.ToString(), _transaction.BusinessProcessState);
         return this;
     }
 
