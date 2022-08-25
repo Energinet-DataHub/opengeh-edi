@@ -24,14 +24,12 @@ namespace Messaging.Domain.Transactions.MoveIn
         private readonly State _state = State.Started;
         private BusinessProcessState _businessProcessState;
         private EndOfSupplyNotificationState _endOfSupplyNotificationState;
-        private bool _customerMasterDataWasSent;
         private MasterDataState _masterDataState;
         private MasterDataState _customerMasterDataState;
 
         public MoveInTransaction(string transactionId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId, string startedByMessageId, string newEnergySupplierId, string? consumerId, string? consumerName, string? consumerIdType)
         {
             _businessProcessState = BusinessProcessState.Pending;
-            _customerMasterDataWasSent = false;
             _endOfSupplyNotificationState = currentEnergySupplierId is not null
                 ? EndOfSupplyNotificationState.Required
                 : EndOfSupplyNotificationState.NotNeeded;
@@ -148,7 +146,6 @@ namespace Messaging.Domain.Transactions.MoveIn
                 return;
 
             _customerMasterDataState = MasterDataState.Sent;
-            _customerMasterDataWasSent = true;
             AddDomainEvent(new CustomerMasterDataWasSent(TransactionId));
         }
 
