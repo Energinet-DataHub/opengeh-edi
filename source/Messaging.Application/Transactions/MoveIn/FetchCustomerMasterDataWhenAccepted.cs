@@ -33,6 +33,9 @@ public class FetchCustomerMasterDataWhenAccepted : INotificationHandler<MoveInWa
     public Task Handle(MoveInWasAccepted notification, CancellationToken cancellationToken)
     {
         if (notification == null) throw new ArgumentNullException(nameof(notification));
-        return _commandScheduler.EnqueueAsync(new FetchCustomerMasterData(notification.BusinessProcessId));
+        return _commandScheduler.EnqueueAsync(new FetchCustomerMasterData(
+            notification.BusinessProcessId,
+            notification.MarketEvaluationPointNumber,
+            notification.TransactionId));
     }
 }

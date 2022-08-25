@@ -12,22 +12,44 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
+using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.MeteringPoints.RequestResponse.Requests;
+using Google.Protobuf;
 using Messaging.Application.Transactions.MoveIn;
 
 namespace Messaging.Infrastructure.Transactions.MoveIn;
 
 public class RequestCustomerMasterData : IRequestCustomerMasterData
 {
-    private readonly IRequestDispatcher<FetchCustomerMasterData> _requestDispatcher;
+    private readonly RequestDispatcher<RequestMasterDataConfiguration> _dispatcher;
 
-    public RequestCustomerMasterData(IRequestDispatcher<FetchCustomerMasterData> requestDispatcher)
+    public RequestCustomerMasterData(RequestDispatcher<RequestMasterDataConfiguration> requestDispatcher)
     {
-        _requestDispatcher = requestDispatcher;
+        _dispatcher = requestDispatcher;
     }
 
     public async Task RequestMasterDataForAsync(FetchCustomerMasterData fetchMeteringPointMasterData)
     {
-        await _requestDispatcher.SendAsync(fetchMeteringPointMasterData).ConfigureAwait(false);
+        if (fetchMeteringPointMasterData == null) throw new ArgumentNullException(nameof(fetchMeteringPointMasterData));
+        var message = CreateFrom(fetchMeteringPointMasterData);
+        await _dispatcher.SendAsync(message).ConfigureAwait(false);
+    }
+
+    private static ServiceBusMessage CreateFrom(FetchCustomerMasterData fetchMeteringPointMasterData)
+    {
+        var message = new MasterDataRequest
+        {
+        };
+        var bytes = message.ToByteArray();
+        ServiceBusMessage serviceBusMessage = new(bytes)
+        {
+            ContentType = "application/octet-stream;charset=utf-8",
+        };
+        serviceBusMessage.ApplicationProperties.Add("BusinessProcessId", fetchMeteringPointMasterData.BusinessProcessId);
+        serviceBusMessage.ApplicationProperties.Add("TransactionId", fetchMeteringPointMasterData.TransactionId);
+
+        return serviceBusMessage;
     }
 }

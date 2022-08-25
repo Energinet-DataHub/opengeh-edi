@@ -24,7 +24,7 @@ public interface IRequestCustomerMasterData
     /// <summary>
     /// Request master data for a customer
     /// </summary>
-    /// <param name="fetchMeteringPointMasterData"></param>
+    /// <param name="fetchCustomerMasterData"></param>
     /// <returns><see cref="Task"/></returns>
-    Task RequestMasterDataForAsync(FetchCustomerMasterData fetchMeteringPointMasterData);
+    Task RequestMasterDataForAsync(FetchCustomerMasterData fetchCustomerMasterData);
 }

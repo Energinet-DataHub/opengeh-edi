@@ -20,10 +20,16 @@ namespace Messaging.Application.Transactions.MoveIn;
 public class FetchCustomerMasterData : InternalCommand
 {
     [JsonConstructor]
-    public FetchCustomerMasterData(string businessProcessId)
+    public FetchCustomerMasterData(string businessProcessId, string marketEvaluationPointNumber, string transactionId)
     {
         BusinessProcessId = businessProcessId;
+        MarketEvaluationPointNumber = marketEvaluationPointNumber;
+        TransactionId = transactionId;
     }
 
     public string BusinessProcessId { get; }
+
+    public string MarketEvaluationPointNumber { get; }
+
+    public string TransactionId { get; }
 }
