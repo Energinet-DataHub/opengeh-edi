@@ -24,7 +24,6 @@ namespace Messaging.Domain.Transactions.MoveIn
         private readonly State _state = State.Started;
         private BusinessProcessState _businessProcessState;
         private EndOfSupplyNotificationState _endOfSupplyNotificationState;
-        private bool _hasForwardedMeteringPointMasterData;
         private bool _customerMasterDataWasSent;
         private MeteringPointMasterDataState _meteringPointMasterDataState;
 
@@ -135,7 +134,7 @@ namespace Messaging.Domain.Transactions.MoveIn
         public void MarkMeteringPointMasterDataAsSent()
         {
             _meteringPointMasterDataState = MeteringPointMasterDataState.Sent;
-            _hasForwardedMeteringPointMasterData = true;
+            AddDomainEvent(new MeteringPointMasterDataWasSent(TransactionId));
         }
 
         public void MarkCustomerMasterDataAsSent()
