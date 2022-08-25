@@ -24,7 +24,7 @@ namespace Messaging.Domain.Transactions.MoveIn
         private readonly State _state = State.Started;
         private BusinessProcessState _businessProcessState;
         private EndOfSupplyNotificationState _endOfSupplyNotificationState;
-        private MasterDataState _masterDataState;
+        private MasterDataState _meteringPointMasterDataState;
         private MasterDataState _customerMasterDataState;
 
         public MoveInTransaction(string transactionId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId, string startedByMessageId, string newEnergySupplierId, string? consumerId, string? consumerName, string? consumerIdType)
@@ -133,10 +133,10 @@ namespace Messaging.Domain.Transactions.MoveIn
 
         public void MarkMeteringPointMasterDataAsSent()
         {
-            if (_masterDataState != MasterDataState.Pending)
+            if (_meteringPointMasterDataState != MasterDataState.Pending)
                 return;
 
-            _masterDataState = MasterDataState.Sent;
+            _meteringPointMasterDataState = MasterDataState.Sent;
             AddDomainEvent(new MeteringPointMasterDataWasSent(TransactionId));
         }
 
