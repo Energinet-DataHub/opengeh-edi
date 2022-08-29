@@ -114,6 +114,11 @@ namespace Messaging.Api
                         .AddNotificationHandler<PublishNewMessagesOnTimeHasPassed, TimeHasPassed>()
                         .AddHttpClientAdapter(sp => new HttpClientAdapter(sp.GetRequiredService<HttpClient>()))
                         .AddServiceBusClient(
+                                runtime.SHARED_SERVICE_BUS_SEND_CONNECTION_STRING!,
+                                new RequestMasterDataConfiguration(
+                                    runtime.CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME!,
+                                    "shared-service-bus-send-permission"))
+                        .AddServiceBusClient(
                             runtime.SHARED_SERVICE_BUS_SEND_CONNECTION_STRING!,
                             new RequestMasterDataConfiguration(
                                 runtime.MASTER_DATA_REQUEST_QUEUE_NAME!,
