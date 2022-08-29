@@ -25,23 +25,8 @@ namespace Messaging.Application.Configuration
         string Id { get; }
 
         /// <summary>
-        /// Get the parent's id.
-        /// </summary>
-        string? ParentId { get; }
-
-        /// <summary>
         /// Set the current correlation/operation id.
         /// </summary>
         void SetId(string id);
-
-        /// <summary>
-        /// Set the id of the parent operation.
-        /// </summary>
-        void SetParentId(string parentId);
-
-        /// <summary>
-        /// Return the id and parent in trace context format.
-        /// </summary>
-        string AsTraceContext();
     }
 }
