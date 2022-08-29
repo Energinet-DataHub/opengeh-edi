@@ -16,12 +16,14 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MessageHub.Client.Storage;
+using Energinet.DataHub.MessageHub.Model.Model;
 using Energinet.DataHub.MessageHub.Model.Peek;
 using MediatR;
 using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Requesting;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.OutgoingMessages.Requesting;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
@@ -36,6 +38,7 @@ namespace Messaging.Api.OutgoingMessages
         private readonly IMediator _mediator;
         private readonly IRequestBundleParser _requestBundleParser;
         private readonly IStorageHandler _storageHandler;
+        private readonly ISerializer _serializer;
 
         public MessageRequestQueueListener(
             ICorrelationContext correlationContext,
@@ -43,7 +46,8 @@ namespace Messaging.Api.OutgoingMessages
             MessageRequestContext messageRequestContext,
             IMediator mediator,
             IRequestBundleParser requestBundleParser,
-            IStorageHandler storageHandler)
+            IStorageHandler storageHandler,
+            ISerializer serializer)
         {
             _correlationContext = correlationContext;
             _logger = logger;
@@ -51,6 +55,7 @@ namespace Messaging.Api.OutgoingMessages
             _mediator = mediator;
             _requestBundleParser = requestBundleParser;
             _storageHandler = storageHandler;
+            _serializer = serializer;
         }
 
         [Function(nameof(MessageRequestQueueListener))]
@@ -58,8 +63,11 @@ namespace Messaging.Api.OutgoingMessages
         {
             var messageRequest = _requestBundleParser.Parse(data);
             _messageRequestContext.SetMessageRequest(messageRequest);
+            _logger.LogInformation($"Parsed data bundle request DTO: {_serializer.Serialize(messageRequest)}");
+
             var dataAvailableIds = await _storageHandler.GetDataAvailableNotificationIdsAsync(messageRequest)
                 .ConfigureAwait(false);
+            _logger.LogInformation($"Parsed message ids: {dataAvailableIds}");
 
             await _mediator.Send(new RequestMessages(
                 dataAvailableIds.Select(x => x.ToString()).ToList() ?? throw new InvalidOperationException(),
