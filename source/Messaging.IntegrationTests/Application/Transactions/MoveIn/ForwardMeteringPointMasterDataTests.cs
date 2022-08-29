@@ -51,7 +51,7 @@ public class ForwardMeteringPointMasterDataTests : TestBase
         await InvokeCommandAsync(forwardMeteringPointMasterData).ConfigureAwait(false);
 
         AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>())
-            .HasForwardedMeteringPointMasterData(true);
+            .MeteringPointMasterDataWasSent();
     }
 
     [Fact]

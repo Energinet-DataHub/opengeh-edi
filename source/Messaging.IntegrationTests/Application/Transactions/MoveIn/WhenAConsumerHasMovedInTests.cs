@@ -79,7 +79,7 @@ public class WhenAConsumerHasMovedInTests : TestBase
             SampleData.ConsumerIdType);
 
         transaction.AcceptedByBusinessProcess(BusinessRequestResult.Succeeded(Guid.NewGuid().ToString()).ProcessId!, SampleData.MeteringPointNumber);
-        transaction.HasForwardedMeteringPointMasterData();
+        transaction.MarkMeteringPointMasterDataAsSent();
         _transactionRepository.Add(transaction);
         await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
         return transaction;

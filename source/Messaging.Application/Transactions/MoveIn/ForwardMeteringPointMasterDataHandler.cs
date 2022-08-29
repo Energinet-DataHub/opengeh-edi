@@ -58,7 +58,7 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
 
         _outgoingMessageStore.Add(AccountingPointCharacteristicsMessageFrom(request.MasterDataContent, transaction));
 
-        transaction.HasForwardedMeteringPointMasterData();
+        transaction.MarkMeteringPointMasterDataAsSent();
         return await Task.FromResult(Unit.Value).ConfigureAwait(false);
     }
 
