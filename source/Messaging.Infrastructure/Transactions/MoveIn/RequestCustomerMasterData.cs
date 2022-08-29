@@ -23,9 +23,9 @@ namespace Messaging.Infrastructure.Transactions.MoveIn;
 
 public class RequestCustomerMasterData : IRequestCustomerMasterData
 {
-    private readonly RequestDispatcher<RequestMasterDataConfiguration> _dispatcher;
+    private readonly IRequestDispatcher _dispatcher;
 
-    public RequestCustomerMasterData(RequestDispatcher<RequestMasterDataConfiguration> requestDispatcher)
+    public RequestCustomerMasterData(IRequestDispatcher requestDispatcher)
     {
         _dispatcher = requestDispatcher;
     }
@@ -49,6 +49,7 @@ public class RequestCustomerMasterData : IRequestCustomerMasterData
         };
         serviceBusMessage.ApplicationProperties.Add("BusinessProcessId", fetchMeteringPointMasterData.BusinessProcessId);
         serviceBusMessage.ApplicationProperties.Add("TransactionId", fetchMeteringPointMasterData.TransactionId);
+        serviceBusMessage.MessageId = fetchMeteringPointMasterData.TransactionId;
 
         return serviceBusMessage;
     }

@@ -116,7 +116,7 @@ namespace Messaging.Api
                         .AddServiceBusClient(
                                 runtime.SHARED_SERVICE_BUS_SEND_CONNECTION_STRING!,
                                 new RequestMasterDataConfiguration(
-                                    runtime.CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME!,
+                                    runtime.CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME!,
                                     "shared-service-bus-send-permission"))
                         .AddServiceBusClient(
                             runtime.SHARED_SERVICE_BUS_SEND_CONNECTION_STRING!,

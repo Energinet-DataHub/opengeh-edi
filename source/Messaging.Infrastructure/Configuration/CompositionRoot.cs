@@ -215,7 +215,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddScoped<MoveInNotifications>();
             _services.AddScoped(_ => configuration);
             _services.AddScoped<IMoveInRequester, MoveInRequester>();
-            _services.AddScoped<RequestDispatcher<RequestMasterDataConfiguration>>();
+            _services.AddScoped<IRequestDispatcher, RequestDispatcher<RequestMasterDataConfiguration>>();
             _services.AddScoped<IRequestMeteringPointMasterData, RequestMeteringPointMasterData>();
             _services.AddScoped<IRequestCustomerMasterData, RequestCustomerMasterData>();
             _services.AddTransient<IRequestHandler<IncomingMessage, Unit>, MoveInRequestHandler>();

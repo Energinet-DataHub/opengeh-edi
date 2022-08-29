@@ -19,7 +19,7 @@ using Microsoft.Extensions.Azure;
 
 namespace Messaging.Infrastructure.Transactions.MoveIn;
 
-public class RequestDispatcher<TConfiguration>
+public class RequestDispatcher<TConfiguration> : IRequestDispatcher
     where TConfiguration
     : IConfig
 {
@@ -38,4 +38,17 @@ public class RequestDispatcher<TConfiguration>
         if (message == null) throw new ArgumentNullException(nameof(message));
         await _senderCreator.Value.SendMessageAsync(message).ConfigureAwait(false);
     }
+}
+
+/// <summary>
+/// Request dispatcher interface
+/// </summary>
+public interface IRequestDispatcher
+{
+    /// <summary>
+    /// Async method for sending servicebus messages
+    /// </summary>
+    /// <param name="message"></param>
+    /// <returns><see cref="ServiceBusMessage"/></returns>
+    Task SendAsync(ServiceBusMessage message);
 }
