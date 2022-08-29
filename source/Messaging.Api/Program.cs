@@ -16,7 +16,6 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.Logging.RequestResponseMiddleware;
 using Energinet.DataHub.MessageHub.Client.DataAvailable;
 using Energinet.DataHub.MessageHub.Client.Storage;
 using Messaging.Api.Configuration.Middleware.Authentication.Bearer;
@@ -85,7 +84,6 @@ namespace Messaging.Api
                             var correlationContext = new CorrelationContext();
                             if (!runtime.IsRunningLocally()) return correlationContext;
                             correlationContext.SetId(Guid.NewGuid().ToString());
-                            correlationContext.SetParentId(Guid.NewGuid().ToString());
 
                             return correlationContext;
                         })
