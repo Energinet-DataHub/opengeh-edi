@@ -40,8 +40,7 @@ public class SendSuccessNotificationHandler : IRequestHandler<SendSuccessNotific
             request.ReferenceId,
             request.IdempotencyId,
             new MessageTypeDto(request.MessageType),
-            //TODO: Fix format
-            ResponseFormat.Xml,
+            Enum.Parse<ResponseFormat>(request.RequestedFormat),
             1);
 
         await _dataBundleResponseSender.SendAsync(bundleRequest.CreateResponse(request.MessageStorageLocation)).ConfigureAwait(false);
