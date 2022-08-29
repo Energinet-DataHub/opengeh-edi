@@ -13,9 +13,11 @@
 // limitations under the License.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Messaging.Application.Configuration;
+using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;
@@ -25,25 +27,56 @@ namespace Messaging.Api.Configuration.Middleware.Correlation
     public class CorrelationIdMiddleware : IFunctionsWorkerMiddleware
     {
         private readonly ILogger<CorrelationIdMiddleware> _logger;
+        private readonly ISerializer _serializer;
 
         public CorrelationIdMiddleware(
-            ILogger<CorrelationIdMiddleware> logger)
+            ILogger<CorrelationIdMiddleware> logger,
+            ISerializer serializer)
         {
             _logger = logger;
+            _serializer = serializer;
         }
 
-        public async Task Invoke(FunctionContext context, [NotNull] FunctionExecutionDelegate next)
+        public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
         {
-            if (context == null) throw new ArgumentNullException(nameof(context));
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(next);
 
-            _logger.LogInformation("Parsed TraceContext: " + context.TraceContext.TraceParent ?? string.Empty);
-            var traceContext = TraceContext.Parse(context.TraceContext.TraceParent);
+            if (context.Is(FunctionContextExtensions.TriggerType.HttpTrigger))
+            {
+                var correlationId = ParseCorrelationIdFromHeader(context);
+                if (string.IsNullOrEmpty(correlationId))
+                {
+                    throw new InvalidOperationException($"Could not parse correlation id from HTTP header.");
+                }
 
-            var correlationContext = context.GetService<ICorrelationContext>();
-            correlationContext.SetId(traceContext.TraceId);
-            correlationContext.SetParentId(traceContext.ParentId);
+                _logger.LogInformation($"Correlation id is: {correlationId}");
+                var correlationContext = context.GetService<ICorrelationContext>();
+                correlationContext.SetId(correlationId);
+            }
 
             await next(context).ConfigureAwait(false);
+        }
+
+        private string? ParseCorrelationIdFromHeader(FunctionContext context)
+        {
+            context.BindingContext.BindingData.TryGetValue("Headers", out var headersObj);
+
+            if (headersObj is not string headersStr)
+            {
+                return null;
+            }
+
+            var headers = _serializer.Deserialize<Dictionary<string, string>>(headersStr);
+
+            #pragma warning disable CA1308 // Use lower case
+            var normalizedKeyHeaders = headers
+                .ToDictionary(h => h.Key.ToLowerInvariant(), h => h.Value);
+            #pragma warning restore
+
+            normalizedKeyHeaders.TryGetValue("correlationid", out var correlationId);
+
+            return correlationId;
         }
     }
 }
