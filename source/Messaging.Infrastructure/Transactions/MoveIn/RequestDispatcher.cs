@@ -39,16 +39,3 @@ public class RequestDispatcher<TConfiguration> : IRequestDispatcher
         await _senderCreator.Value.SendMessageAsync(message).ConfigureAwait(false);
     }
 }
-
-/// <summary>
-/// Request dispatcher interface
-/// </summary>
-public interface IRequestDispatcher
-{
-    /// <summary>
-    /// Async method for sending servicebus messages
-    /// </summary>
-    /// <param name="message"></param>
-    /// <returns><see cref="ServiceBusMessage"/></returns>
-    Task SendAsync(ServiceBusMessage message);
-}
