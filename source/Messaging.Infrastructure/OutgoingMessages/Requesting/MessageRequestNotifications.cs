@@ -34,10 +34,9 @@ namespace Messaging.Infrastructure.OutgoingMessages.Requesting
             _commandScheduler = commandScheduler;
         }
 
-        #pragma warning disable
         public async Task SavedMessageSuccessfullyAsync(Uri storedMessageLocation, MessageRequest messageRequest)
         {
-            var request = GetRequest();
+            ArgumentNullException.ThrowIfNull(messageRequest);
 
             await _commandScheduler
                 .EnqueueAsync(new SendSuccessNotification(
