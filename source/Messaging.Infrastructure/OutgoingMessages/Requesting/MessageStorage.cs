@@ -16,7 +16,6 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Energinet.DataHub.MessageHub.Client.Storage;
-using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Requesting;
 
 namespace Messaging.Infrastructure.OutgoingMessages.Requesting;
@@ -32,7 +31,7 @@ public class MessageStorage : IMessageStorage
         _requestContext = requestContext;
     }
 
-    public Task<Uri> SaveAsync(Stream bundledMessage)
+    public Task<Uri> SaveAsync(Stream bundledMessage, MessageRequest messageRequest)
     {
         if (_requestContext.DataBundleRequestDto is null)
         {

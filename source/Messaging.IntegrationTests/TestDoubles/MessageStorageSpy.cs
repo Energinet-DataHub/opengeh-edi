@@ -15,7 +15,6 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Requesting;
 using Xunit;
 
@@ -25,7 +24,7 @@ public class MessageStorageSpy : IMessageStorage
 {
     public Stream? SavedMessage { get; private set; }
 
-    public Task<Uri> SaveAsync(Stream bundledMessage)
+    public Task<Uri> SaveAsync(Stream bundledMessage, MessageRequest messageRequest)
     {
         SavedMessage = bundledMessage;
         return Task.FromResult(new Uri("http://someuri"));

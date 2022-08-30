@@ -105,7 +105,7 @@ namespace Messaging.Application.OutgoingMessages.Requesting
         private async Task SaveDocumentAsync(CimMessage message, CimFormat requestedFormat, MessageRequest request)
         {
             var document = await _documentFactory.CreateFromAsync(message, requestedFormat).ConfigureAwait(false);
-            var storedMessageLocation = await _messageStorage.SaveAsync(document).ConfigureAwait(false);
+            var storedMessageLocation = await _messageStorage.SaveAsync(document, request).ConfigureAwait(false);
             await _messageRequestNotifications.SavedMessageSuccessfullyAsync(storedMessageLocation, request).ConfigureAwait(false);
         }
     }
