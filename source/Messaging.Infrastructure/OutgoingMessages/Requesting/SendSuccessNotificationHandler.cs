@@ -39,7 +39,7 @@ public class SendSuccessNotificationHandler : IRequestHandler<SendSuccessNotific
             request.RequestId,
             request.ReferenceId,
             request.IdempotencyId,
-            new MessageTypeDto(request.MessageType),
+            new MessageTypeDto(request.DocumentType),
             Enum.Parse<ResponseFormat>(request.RequestedFormat),
             1);
 
