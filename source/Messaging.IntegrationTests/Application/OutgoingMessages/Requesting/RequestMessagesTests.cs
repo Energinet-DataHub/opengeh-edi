@@ -57,11 +57,13 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
             var outgoingMessage2 = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage2.Message.MessageId)!;
 
             var requestedMessageIds = new List<string> { outgoingMessage1.Id.ToString(), outgoingMessage2.Id.ToString(), };
-            await RequestMessages(requestedMessageIds.AsReadOnly()).ConfigureAwait(false);
+            var request = CreateRequest(requestedMessageIds);
+            await RequestMessages(request).ConfigureAwait(false);
 
             _messageStorage.MessageHasBeenSavedInStorage();
             var command = GetQueuedNotification<SendSuccessNotification>();
             Assert.NotNull(command);
+            Assert.Equal(request.RequestId, command?.RequestId);
             Assert.Equal(_messageRequestContext.DataBundleRequestDto?.RequestId, command?.RequestId);
             Assert.Equal(_messageRequestContext.DataBundleRequestDto?.IdempotencyId, command?.IdempotencyId);
             Assert.Equal(_messageRequestContext.DataBundleRequestDto?.DataAvailableNotificationReferenceId, command?.ReferenceId);
@@ -96,6 +98,11 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
             AssertErrorResponse("InternalError");
         }
 
+        private static RequestMessages CreateRequest(List<string> requestedMessageIds)
+        {
+            return new RequestMessages(requestedMessageIds, CimFormat.Xml.Name, Guid.NewGuid());
+        }
+
         private static IncomingMessageBuilder MessageBuilder()
         {
             return new IncomingMessageBuilder()
@@ -124,15 +131,23 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
 
         private Task RequestMessages(IEnumerable<string> messageIds)
         {
-            SetMessageRequestContext();
-            return GetService<IMediator>().Send(new RequestMessages(messageIds.ToList(), CimFormat.Xml.Name));
+            var request = new RequestMessages(messageIds.ToList(), CimFormat.Xml.Name, Guid.NewGuid());
+            SetMessageRequestContext(request.RequestId);
+
+            return GetService<IMediator>().Send(request);
         }
 
-        private void SetMessageRequestContext()
+        private Task RequestMessages(RequestMessages request)
+        {
+            SetMessageRequestContext(request.RequestId);
+            return GetService<IMediator>().Send(request);
+        }
+
+        private void SetMessageRequestContext(Guid requestId)
         {
             _messageRequestContext = GetService<MessageRequestContext>();
             _messageRequestContext.SetMessageRequest(new DataBundleRequestDto(
-                Guid.Empty,
+                requestId,
                 string.Empty,
                 string.Empty,
                 new MessageTypeDto(string.Empty),

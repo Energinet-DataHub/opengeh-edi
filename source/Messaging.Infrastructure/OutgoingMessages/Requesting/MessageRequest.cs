@@ -13,24 +13,15 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using MediatR;
-using Messaging.Application.Common.Commands;
 
-namespace Messaging.Application.OutgoingMessages.Requesting;
+namespace Messaging.Infrastructure.OutgoingMessages.Requesting;
 
-public class RequestMessages : ICommand<Unit>
+public class MessageRequest
 {
-    public RequestMessages(IEnumerable<string> messageIds, string requestedDocumentFormat, Guid requestId)
+    public MessageRequest(Guid requestId)
     {
-        MessageIds = messageIds;
-        RequestedDocumentFormat = requestedDocumentFormat;
         RequestId = requestId;
     }
-
-    public IEnumerable<string> MessageIds { get; }
-
-    public string RequestedDocumentFormat { get; }
 
     public Guid RequestId { get; }
 }

@@ -192,14 +192,19 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
         private async Task RequestMessage(string id)
         {
+            var requestId = Guid.NewGuid();
+
             GetService<MessageRequestContext>().SetMessageRequest(new DataBundleRequestDto(
-                Guid.Empty,
+                requestId,
                 string.Empty,
                 string.Empty,
                 new MessageTypeDto(string.Empty),
                 ResponseFormat.Xml,
                 1));
-            await InvokeCommandAsync(new RequestMessages(new[] { id }, CimFormat.Xml.Name)).ConfigureAwait(false);
+            await InvokeCommandAsync(new RequestMessages(
+                new[] { id },
+                CimFormat.Xml.Name,
+                requestId)).ConfigureAwait(false);
         }
 
         private async Task AssertRejectMessage(OutgoingMessage rejectMessage)

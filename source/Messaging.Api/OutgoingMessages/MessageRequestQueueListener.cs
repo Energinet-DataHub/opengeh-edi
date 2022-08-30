@@ -71,7 +71,8 @@ namespace Messaging.Api.OutgoingMessages
 
             await _mediator.Send(new RequestMessages(
                 dataAvailableIds.Select(x => x.ToString()).ToList() ?? throw new InvalidOperationException(),
-                messageRequest.ResponseFormat.ToString())).ConfigureAwait(false);
+                messageRequest.ResponseFormat.ToString(),
+                messageRequest.RequestId)).ConfigureAwait(false);
             _logger.LogInformation($"Dequeued with correlation id: {_correlationContext.Id}");
         }
     }
