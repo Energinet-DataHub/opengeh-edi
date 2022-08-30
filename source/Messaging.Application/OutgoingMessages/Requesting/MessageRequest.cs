@@ -14,7 +14,7 @@
 
 using System;
 
-namespace Messaging.Infrastructure.OutgoingMessages.Requesting;
+namespace Messaging.Application.OutgoingMessages.Requesting;
 
 public class MessageRequest
 {

@@ -27,7 +27,8 @@ namespace Messaging.Application.OutgoingMessages.Requesting
         /// Message was saved successfully at storage location
         /// </summary>
         /// <param name="storedMessageLocation">Location of saved message</param>
-        Task SavedMessageSuccessfullyAsync(Uri storedMessageLocation);
+        /// /// <param name="messageRequest">Client provided request details</param>
+        Task SavedMessageSuccessfullyAsync(Uri storedMessageLocation, MessageRequest messageRequest);
 
         /// <summary>
         /// Requested messages was not found

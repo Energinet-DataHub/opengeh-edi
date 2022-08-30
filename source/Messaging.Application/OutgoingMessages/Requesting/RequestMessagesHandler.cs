@@ -69,9 +69,18 @@ namespace Messaging.Application.OutgoingMessages.Requesting
                 return Unit.Value;
             }
 
-            await SaveDocumentAsync(message, requestedFormat).ConfigureAwait(false);
+            await SaveDocumentAsync(message, requestedFormat, ParseRequestDetailsFrom(request)).ConfigureAwait(false);
 
             return Unit.Value;
+        }
+
+        private static MessageRequest ParseRequestDetailsFrom(RequestMessages request)
+        {
+            return new MessageRequest(
+                request.RequestId,
+                request.IdempotencyId,
+                request.ReferenceId,
+                request.DocumentType);
         }
 
         private static List<string> MessageIdsNotFound(IReadOnlyCollection<string> requestedMessageIds, ReadOnlyCollection<OutgoingMessage> messages)
@@ -92,11 +101,11 @@ namespace Messaging.Application.OutgoingMessages.Requesting
             return bundle;
         }
 
-        private async Task SaveDocumentAsync(CimMessage message, CimFormat requestedFormat)
+        private async Task SaveDocumentAsync(CimMessage message, CimFormat requestedFormat, MessageRequest request)
         {
             var document = await _documentFactory.CreateFromAsync(message, requestedFormat).ConfigureAwait(false);
             var storedMessageLocation = await _messageStorage.SaveAsync(document).ConfigureAwait(false);
-            await _messageRequestNotifications.SavedMessageSuccessfullyAsync(storedMessageLocation).ConfigureAwait(false);
+            await _messageRequestNotifications.SavedMessageSuccessfullyAsync(storedMessageLocation, request).ConfigureAwait(false);
         }
     }
 }

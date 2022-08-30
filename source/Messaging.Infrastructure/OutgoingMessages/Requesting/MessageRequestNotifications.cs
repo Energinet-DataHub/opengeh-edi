@@ -34,7 +34,8 @@ namespace Messaging.Infrastructure.OutgoingMessages.Requesting
             _commandScheduler = commandScheduler;
         }
 
-        public async Task SavedMessageSuccessfullyAsync(Uri storedMessageLocation)
+        #pragma warning disable
+        public async Task SavedMessageSuccessfullyAsync(Uri storedMessageLocation, MessageRequest zzRequest)
         {
             var request = GetRequest();
             var messageRequest = new MessageRequest(
