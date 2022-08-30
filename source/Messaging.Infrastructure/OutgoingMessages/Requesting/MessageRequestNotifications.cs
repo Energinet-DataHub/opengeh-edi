@@ -57,14 +57,14 @@ namespace Messaging.Infrastructure.OutgoingMessages.Requesting
                 .ConfigureAwait(false);
         }
 
-        public async Task RequestedDocumentFormatIsNotSupportedAsync(string documentFormat, string documentType, MessageRequest messageRequest)
+        public async Task RequestedDocumentFormatIsNotSupportedAsync(MessageRequest messageRequest)
         {
             ArgumentNullException.ThrowIfNull(messageRequest);
 
             await _commandScheduler.EnqueueAsync(
                     CreateErrorResponse(
                         messageRequest,
-                        $"Format '{documentFormat}' for document type '{documentType}' is not supported.",
+                        $"Format '{messageRequest.RequestedFormat}' for document type '{messageRequest.DocumentType}' is not supported.",
                         "InternalError"))
                 .ConfigureAwait(false);
         }

@@ -65,7 +65,7 @@ namespace Messaging.Application.OutgoingMessages.Requesting
 
             if (_documentFactory.CanHandle(message.DocumentType, requestedFormat) == false)
             {
-                await _messageRequestNotifications.RequestedDocumentFormatIsNotSupportedAsync(request.RequestedDocumentFormat, message.DocumentType, ParseRequestDetailsFrom(request)).ConfigureAwait(false);
+                await _messageRequestNotifications.RequestedDocumentFormatIsNotSupportedAsync(ParseRequestDetailsFrom(request)).ConfigureAwait(false);
                 return Unit.Value;
             }
 

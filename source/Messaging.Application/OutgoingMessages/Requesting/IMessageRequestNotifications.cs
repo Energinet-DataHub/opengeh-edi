@@ -38,9 +38,7 @@ namespace Messaging.Application.OutgoingMessages.Requesting
         /// <summary>
         /// The requested document format is not supported
         /// </summary>
-        /// <param name="documentFormat">Requested document format</param>
-        /// <param name="documentType">Requested document type</param>
         /// <param name="messageRequest">Client provided request details</param>
-        Task RequestedDocumentFormatIsNotSupportedAsync(string documentFormat, string documentType, MessageRequest messageRequest);
+        Task RequestedDocumentFormatIsNotSupportedAsync(MessageRequest messageRequest);
     }
 }
