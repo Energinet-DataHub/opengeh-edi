@@ -73,7 +73,8 @@ namespace Messaging.Api.OutgoingMessages
                 dataAvailableIds.Select(x => x.ToString()).ToList() ?? throw new InvalidOperationException(),
                 messageRequest.ResponseFormat.ToString(),
                 messageRequest.RequestId,
-                messageRequest.IdempotencyId)).ConfigureAwait(false);
+                messageRequest.IdempotencyId,
+                messageRequest.DataAvailableNotificationReferenceId)).ConfigureAwait(false);
             _logger.LogInformation($"Dequeued with correlation id: {_correlationContext.Id}");
         }
     }

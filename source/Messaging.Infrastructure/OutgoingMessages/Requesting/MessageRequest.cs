@@ -18,13 +18,16 @@ namespace Messaging.Infrastructure.OutgoingMessages.Requesting;
 
 public class MessageRequest
 {
-    public MessageRequest(Guid requestId, string idempotencyId)
+    public MessageRequest(Guid requestId, string idempotencyId, string referenceId)
     {
         RequestId = requestId;
         IdempotencyId = idempotencyId;
+        ReferenceId = referenceId;
     }
 
     public Guid RequestId { get; }
 
     public string IdempotencyId { get; }
+
+    public string ReferenceId { get; }
 }

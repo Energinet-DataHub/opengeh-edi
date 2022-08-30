@@ -39,13 +39,14 @@ namespace Messaging.Infrastructure.OutgoingMessages.Requesting
             var request = GetRequest();
             var messageRequest = new MessageRequest(
                 request.RequestId,
-                request.IdempotencyId);
+                request.IdempotencyId,
+                request.DataAvailableNotificationReferenceId);
 
             await _commandScheduler
                 .EnqueueAsync(new SendSuccessNotification(
                     messageRequest.RequestId,
                     messageRequest.IdempotencyId,
-                    request.DataAvailableNotificationReferenceId,
+                    messageRequest.ReferenceId,
                     request.MessageType.Value,
                     storedMessageLocation,
                     request.ResponseFormat.ToString()))

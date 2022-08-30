@@ -65,6 +65,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
             Assert.NotNull(command);
             Assert.Equal(request.RequestId, command?.RequestId);
             Assert.Equal(request.IdempotencyId, command?.IdempotencyId);
+            Assert.Equal(request.ReferenceId, command?.ReferenceId);
             Assert.Equal(_messageRequestContext.DataBundleRequestDto?.RequestId, command?.RequestId);
             Assert.Equal(_messageRequestContext.DataBundleRequestDto?.IdempotencyId, command?.IdempotencyId);
             Assert.Equal(_messageRequestContext.DataBundleRequestDto?.DataAvailableNotificationReferenceId, command?.ReferenceId);
@@ -105,6 +106,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
                 requestedMessageIds,
                 CimFormat.Xml.Name,
                 Guid.NewGuid(),
+                Guid.NewGuid().ToString(),
                 Guid.NewGuid().ToString());
         }
 
@@ -153,7 +155,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
             _messageRequestContext = GetService<MessageRequestContext>();
             _messageRequestContext.SetMessageRequest(new DataBundleRequestDto(
                 request.RequestId,
-                string.Empty,
+                request.ReferenceId,
                 request.IdempotencyId,
                 new MessageTypeDto(string.Empty),
                 ResponseFormat.Xml,
