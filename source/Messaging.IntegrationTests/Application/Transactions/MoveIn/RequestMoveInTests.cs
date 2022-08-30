@@ -204,7 +204,8 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             await InvokeCommandAsync(new RequestMessages(
                 new[] { id },
                 CimFormat.Xml.Name,
-                requestId)).ConfigureAwait(false);
+                requestId,
+                string.Empty)).ConfigureAwait(false);
         }
 
         private async Task AssertRejectMessage(OutgoingMessage rejectMessage)

@@ -64,6 +64,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
             var command = GetQueuedNotification<SendSuccessNotification>();
             Assert.NotNull(command);
             Assert.Equal(request.RequestId, command?.RequestId);
+            Assert.Equal(request.IdempotencyId, command?.IdempotencyId);
             Assert.Equal(_messageRequestContext.DataBundleRequestDto?.RequestId, command?.RequestId);
             Assert.Equal(_messageRequestContext.DataBundleRequestDto?.IdempotencyId, command?.IdempotencyId);
             Assert.Equal(_messageRequestContext.DataBundleRequestDto?.DataAvailableNotificationReferenceId, command?.ReferenceId);
@@ -100,7 +101,11 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
 
         private static RequestMessages CreateRequest(List<string> requestedMessageIds)
         {
-            return new RequestMessages(requestedMessageIds, CimFormat.Xml.Name, Guid.NewGuid());
+            return new RequestMessages(
+                requestedMessageIds,
+                CimFormat.Xml.Name,
+                Guid.NewGuid(),
+                Guid.NewGuid().ToString());
         }
 
         private static IncomingMessageBuilder MessageBuilder()
@@ -131,25 +136,25 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
 
         private Task RequestMessages(IEnumerable<string> messageIds)
         {
-            var request = new RequestMessages(messageIds.ToList(), CimFormat.Xml.Name, Guid.NewGuid());
-            SetMessageRequestContext(request.RequestId);
+            var request = CreateRequest(messageIds.ToList());
+            SetMessageRequestContext(request);
 
             return GetService<IMediator>().Send(request);
         }
 
         private Task RequestMessages(RequestMessages request)
         {
-            SetMessageRequestContext(request.RequestId);
+            SetMessageRequestContext(request);
             return GetService<IMediator>().Send(request);
         }
 
-        private void SetMessageRequestContext(Guid requestId)
+        private void SetMessageRequestContext(RequestMessages request)
         {
             _messageRequestContext = GetService<MessageRequestContext>();
             _messageRequestContext.SetMessageRequest(new DataBundleRequestDto(
-                requestId,
+                request.RequestId,
                 string.Empty,
-                string.Empty,
+                request.IdempotencyId,
                 new MessageTypeDto(string.Empty),
                 ResponseFormat.Xml,
                 1));

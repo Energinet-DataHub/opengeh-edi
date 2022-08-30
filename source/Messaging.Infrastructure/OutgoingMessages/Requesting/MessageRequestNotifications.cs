@@ -37,12 +37,14 @@ namespace Messaging.Infrastructure.OutgoingMessages.Requesting
         public async Task SavedMessageSuccessfullyAsync(Uri storedMessageLocation)
         {
             var request = GetRequest();
-            var messageRequest = new MessageRequest(request.RequestId);
+            var messageRequest = new MessageRequest(
+                request.RequestId,
+                request.IdempotencyId);
 
             await _commandScheduler
                 .EnqueueAsync(new SendSuccessNotification(
                     messageRequest.RequestId,
-                    request.IdempotencyId,
+                    messageRequest.IdempotencyId,
                     request.DataAvailableNotificationReferenceId,
                     request.MessageType.Value,
                     storedMessageLocation,
