@@ -55,7 +55,7 @@ namespace Messaging.Application.OutgoingMessages.Requesting
             var messageIdsNotFound = MessageIdsNotFound(requestedMessageIds, messages);
             if (messageIdsNotFound.Any())
             {
-                await _messageRequestNotifications.RequestedMessagesWasNotFoundAsync(messageIdsNotFound).ConfigureAwait(false);
+                await _messageRequestNotifications.RequestedMessagesWasNotFoundAsync(messageIdsNotFound, ParseRequestDetailsFrom(request)).ConfigureAwait(false);
                 return Unit.Value;
             }
 
@@ -65,13 +65,23 @@ namespace Messaging.Application.OutgoingMessages.Requesting
 
             if (_documentFactory.CanHandle(message.DocumentType, requestedFormat) == false)
             {
-                await _messageRequestNotifications.RequestedDocumentFormatIsNotSupportedAsync(request.RequestedDocumentFormat, message.DocumentType).ConfigureAwait(false);
+                await _messageRequestNotifications.RequestedDocumentFormatIsNotSupportedAsync(ParseRequestDetailsFrom(request)).ConfigureAwait(false);
                 return Unit.Value;
             }
 
-            await SaveDocumentAsync(message, requestedFormat).ConfigureAwait(false);
+            await SaveDocumentAsync(message, requestedFormat, ParseRequestDetailsFrom(request)).ConfigureAwait(false);
 
             return Unit.Value;
+        }
+
+        private static MessageRequest ParseRequestDetailsFrom(RequestMessages request)
+        {
+            return new MessageRequest(
+                request.RequestId,
+                request.IdempotencyId,
+                request.ReferenceId,
+                request.DocumentType,
+                request.RequestedDocumentFormat);
         }
 
         private static List<string> MessageIdsNotFound(IReadOnlyCollection<string> requestedMessageIds, ReadOnlyCollection<OutgoingMessage> messages)
@@ -92,11 +102,11 @@ namespace Messaging.Application.OutgoingMessages.Requesting
             return bundle;
         }
 
-        private async Task SaveDocumentAsync(CimMessage message, CimFormat requestedFormat)
+        private async Task SaveDocumentAsync(CimMessage message, CimFormat requestedFormat, MessageRequest request)
         {
             var document = await _documentFactory.CreateFromAsync(message, requestedFormat).ConfigureAwait(false);
-            var storedMessageLocation = await _messageStorage.SaveAsync(document).ConfigureAwait(false);
-            await _messageRequestNotifications.SavedMessageSuccessfullyAsync(storedMessageLocation).ConfigureAwait(false);
+            var storedMessageLocation = await _messageStorage.SaveAsync(document, request).ConfigureAwait(false);
+            await _messageRequestNotifications.SavedMessageSuccessfullyAsync(storedMessageLocation, request).ConfigureAwait(false);
         }
     }
 }
