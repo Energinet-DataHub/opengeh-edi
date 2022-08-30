@@ -14,6 +14,7 @@
 
 using System;
 using Energinet.DataHub.MessageHub.Model.Model;
+using Messaging.Application.OutgoingMessages.Requesting;
 
 namespace Messaging.Infrastructure.OutgoingMessages.Requesting;
 
@@ -27,6 +28,17 @@ internal class MessageHubModelFactory
             idempotencyId,
             new MessageTypeDto(documentType),
             Enum.Parse<ResponseFormat>(responseFormat),
+            1);
+    }
+
+    internal static DataBundleRequestDto CreateDataBundleRequest(MessageRequest messageRequest)
+    {
+        return new DataBundleRequestDto(
+            messageRequest.RequestId,
+            messageRequest.ReferenceId,
+            messageRequest.IdempotencyId,
+            new MessageTypeDto(messageRequest.DocumentType),
+            Enum.Parse<ResponseFormat>(messageRequest.RequestedFormat),
             1);
     }
 }

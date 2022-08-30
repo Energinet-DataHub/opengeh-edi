@@ -95,9 +95,8 @@ namespace Messaging.Api
                             runtime.REQUEST_RESPONSE_LOGGING_CONTAINER_NAME!)
                         .AddMessageStorage(sp =>
                         {
-                            var messageRequestContext = sp.GetRequiredService<MessageRequestContext>();
                             var storageHandler = sp.GetRequiredService<IStorageHandler>();
-                            return new MessageStorage(storageHandler, messageRequestContext);
+                            return new MessageStorage(storageHandler);
                         })
                         .AddMessagePublishing(sp =>
                             new NewMessageAvailableNotifier(
