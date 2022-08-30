@@ -18,12 +18,13 @@ namespace Messaging.Application.OutgoingMessages.Requesting;
 
 public class MessageRequest
 {
-    public MessageRequest(Guid requestId, string idempotencyId, string referenceId, string documentType)
+    public MessageRequest(Guid requestId, string idempotencyId, string referenceId, string documentType, string requestedFormat)
     {
         RequestId = requestId;
         IdempotencyId = idempotencyId;
         ReferenceId = referenceId;
         DocumentType = documentType;
+        RequestedFormat = requestedFormat;
     }
 
     public Guid RequestId { get; }
@@ -33,4 +34,6 @@ public class MessageRequest
     public string ReferenceId { get; }
 
     public string DocumentType { get; }
+
+    public string RequestedFormat { get; }
 }

@@ -80,7 +80,8 @@ namespace Messaging.Application.OutgoingMessages.Requesting
                 request.RequestId,
                 request.IdempotencyId,
                 request.ReferenceId,
-                request.DocumentType);
+                request.DocumentType,
+                request.RequestedDocumentFormat);
         }
 
         private static List<string> MessageIdsNotFound(IReadOnlyCollection<string> requestedMessageIds, ReadOnlyCollection<OutgoingMessage> messages)

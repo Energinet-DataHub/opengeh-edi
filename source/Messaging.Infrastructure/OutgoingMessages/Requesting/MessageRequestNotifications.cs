@@ -35,14 +35,9 @@ namespace Messaging.Infrastructure.OutgoingMessages.Requesting
         }
 
         #pragma warning disable
-        public async Task SavedMessageSuccessfullyAsync(Uri storedMessageLocation, MessageRequest zzRequest)
+        public async Task SavedMessageSuccessfullyAsync(Uri storedMessageLocation, MessageRequest messageRequest)
         {
             var request = GetRequest();
-            var messageRequest = new MessageRequest(
-                request.RequestId,
-                request.IdempotencyId,
-                request.DataAvailableNotificationReferenceId,
-                request.MessageType.Value);
 
             await _commandScheduler
                 .EnqueueAsync(new SendSuccessNotification(
@@ -51,7 +46,7 @@ namespace Messaging.Infrastructure.OutgoingMessages.Requesting
                     messageRequest.ReferenceId,
                     messageRequest.DocumentType,
                     storedMessageLocation,
-                    request.ResponseFormat.ToString()))
+                    messageRequest.RequestedFormat))
                 .ConfigureAwait(false);
         }
 
