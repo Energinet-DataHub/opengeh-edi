@@ -18,7 +18,6 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
-using Energinet.DataHub.MessageHub.Model.Model;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Requesting;
@@ -27,8 +26,6 @@ using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Xml;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
-using Messaging.Infrastructure.OutgoingMessages;
-using Messaging.Infrastructure.OutgoingMessages.Requesting;
 using Messaging.Infrastructure.Transactions;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Fixtures;
@@ -193,14 +190,6 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         private async Task RequestMessage(string id)
         {
             var requestId = Guid.NewGuid();
-
-            GetService<MessageRequestContext>().SetMessageRequest(new DataBundleRequestDto(
-                requestId,
-                string.Empty,
-                string.Empty,
-                new MessageTypeDto(string.Empty),
-                ResponseFormat.Xml,
-                1));
             await InvokeCommandAsync(new RequestMessages(
                 new[] { id },
                 CimFormat.Xml.Name,

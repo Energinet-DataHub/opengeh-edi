@@ -14,11 +14,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Dapper;
-using Energinet.DataHub.MessageHub.Model.Model;
 using MediatR;
 using Messaging.Application.Common;
 using Messaging.Application.Configuration.DataAccess;
@@ -38,14 +36,12 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly MessageStorageSpy _messageStorage;
-        private MessageRequestContext _messageRequestContext;
 
         public RequestMessagesTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
             _outgoingMessageStore = GetService<IOutgoingMessageStore>();
             _messageStorage = (MessageStorageSpy)GetService<IMessageStorage>();
-            _messageRequestContext = GetService<MessageRequestContext>();
         }
 
         [Fact]
@@ -136,30 +132,9 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
             return incomingMessage;
         }
 
-        private Task RequestMessages(IEnumerable<string> messageIds)
-        {
-            var request = CreateRequest(messageIds.ToList());
-            SetMessageRequestContext(request);
-
-            return GetService<IMediator>().Send(request);
-        }
-
         private Task RequestMessages(RequestMessages request)
         {
-            SetMessageRequestContext(request);
             return GetService<IMediator>().Send(request);
-        }
-
-        private void SetMessageRequestContext(RequestMessages request)
-        {
-            _messageRequestContext = GetService<MessageRequestContext>();
-            _messageRequestContext.SetMessageRequest(new DataBundleRequestDto(
-                request.RequestId,
-                request.ReferenceId,
-                request.IdempotencyId,
-                new MessageTypeDto(request.DocumentType),
-                ResponseFormat.Xml,
-                1));
         }
 
         private void GivenTheRequestedDocumentFormatIsNotSupported()
