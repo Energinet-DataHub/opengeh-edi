@@ -88,7 +88,6 @@ namespace Messaging.Infrastructure.Configuration
             services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
             services.AddScoped<IMessageRequestNotifications, MessageRequestNotifications>();
             services.AddTransient<IRequestHandler<RequestMessages, Unit>, RequestMessagesHandler>();
-            services.AddScoped<MessageRequestContext>();
             services.AddScoped<MessageReceiver>();
 
             AddMediatR();
