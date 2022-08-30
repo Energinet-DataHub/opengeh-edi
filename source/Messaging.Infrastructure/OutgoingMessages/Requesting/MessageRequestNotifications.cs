@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Energinet.DataHub.MessageHub.Model.Model;
 using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages.Requesting;
 
@@ -23,14 +22,11 @@ namespace Messaging.Infrastructure.OutgoingMessages.Requesting
 {
     public class MessageRequestNotifications : IMessageRequestNotifications
     {
-        private readonly MessageRequestContext _messageRequestContext;
         private readonly ICommandScheduler _commandScheduler;
 
         public MessageRequestNotifications(
-            MessageRequestContext messageRequestContext,
             ICommandScheduler commandScheduler)
         {
-            _messageRequestContext = messageRequestContext;
             _commandScheduler = commandScheduler;
         }
 
@@ -49,50 +45,40 @@ namespace Messaging.Infrastructure.OutgoingMessages.Requesting
                 .ConfigureAwait(false);
         }
 
-        public async Task RequestedMessagesWasNotFoundAsync(IReadOnlyList<string> messageIds)
+        public async Task RequestedMessagesWasNotFoundAsync(IReadOnlyList<string> messageIds, MessageRequest messageRequest)
         {
-            var request = GetRequest();
+            ArgumentNullException.ThrowIfNull(messageRequest);
 
             await _commandScheduler.EnqueueAsync(
                     CreateErrorResponse(
-                        request,
+                        messageRequest,
                         $"Message(s) with the following id(s) not found {messageIds}",
                         "DatasetNotFound"))
                 .ConfigureAwait(false);
         }
 
-        public async Task RequestedDocumentFormatIsNotSupportedAsync(string documentFormat, string documentType)
+        public async Task RequestedDocumentFormatIsNotSupportedAsync(string documentFormat, string documentType, MessageRequest messageRequest)
         {
-            var request = GetRequest();
+            ArgumentNullException.ThrowIfNull(messageRequest);
 
             await _commandScheduler.EnqueueAsync(
                     CreateErrorResponse(
-                        request,
+                        messageRequest,
                         $"Format '{documentFormat}' for document type '{documentType}' is not supported.",
                         "InternalError"))
                 .ConfigureAwait(false);
         }
 
-        private static SendFailureNotification CreateErrorResponse(DataBundleRequestDto request, string failureDescription, string reason)
+        private static SendFailureNotification CreateErrorResponse(MessageRequest request, string failureDescription, string reason)
         {
             return new SendFailureNotification(
                 request.RequestId,
                 request.IdempotencyId,
                 failureDescription,
                 reason,
-                request.DataAvailableNotificationReferenceId,
-                request.MessageType.Value,
-                request.ResponseFormat.ToString());
-        }
-
-        private DataBundleRequestDto GetRequest()
-        {
-            if (_messageRequestContext.DataBundleRequestDto is null)
-            {
-                throw new InvalidOperationException($"Data bundle request DTO is null.");
-            }
-
-            return _messageRequestContext.DataBundleRequestDto;
+                request.ReferenceId,
+                request.DocumentType,
+                request.RequestedFormat);
         }
     }
 }

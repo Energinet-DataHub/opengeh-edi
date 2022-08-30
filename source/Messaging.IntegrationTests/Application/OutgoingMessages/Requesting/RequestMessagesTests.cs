@@ -75,11 +75,12 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
         public async Task Requested_message_ids_must_exist()
         {
             var nonExistingMessage = new List<string> { Guid.NewGuid().ToString() };
+            var request = CreateRequest(nonExistingMessage);
 
-            await RequestMessages(nonExistingMessage.AsReadOnly()).ConfigureAwait(false);
+            await RequestMessages(request).ConfigureAwait(false);
 
             Assert.Null(_messageStorage.SavedMessage);
-            AssertErrorResponse("DatasetNotFound");
+            AssertErrorResponse(request, "DatasetNotFound");
         }
 
         [Fact]
@@ -91,10 +92,11 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
             var outgoingMessage = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage.Message.MessageId)!;
 
             var requestedMessageIds = new List<string> { outgoingMessage.Id.ToString(), };
-            await RequestMessages(requestedMessageIds.AsReadOnly()).ConfigureAwait(false);
+            var request = CreateRequest(requestedMessageIds);
+            await RequestMessages(request).ConfigureAwait(false);
 
             Assert.Null(_messageStorage.SavedMessage);
-            AssertErrorResponse("InternalError");
+            AssertErrorResponse(request, "InternalError");
         }
 
         private static RequestMessages CreateRequest(List<string> requestedMessageIds)
@@ -165,10 +167,14 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
             RegisterInstance(new DocumentFactory(new List<DocumentWriter>()));
         }
 
-        private void AssertErrorResponse(string reason)
+        private void AssertErrorResponse(RequestMessages request, string reason)
         {
             var command = GetQueuedNotification<SendFailureNotification>();
             Assert.NotNull(command);
+            Assert.Equal(request.RequestId, command?.RequestId);
+            Assert.Equal(request.IdempotencyId, command?.IdempotencyId);
+            Assert.Equal(request.ReferenceId, command?.ReferenceId);
+            Assert.Equal(request.DocumentType, command?.MessageType);
             Assert.Equal(_messageRequestContext.DataBundleRequestDto?.RequestId, command?.RequestId);
             Assert.Equal(_messageRequestContext.DataBundleRequestDto?.DataAvailableNotificationReferenceId, command?.ReferenceId);
             Assert.Equal(_messageRequestContext.DataBundleRequestDto?.MessageType.Value, command?.MessageType);

@@ -55,7 +55,7 @@ namespace Messaging.Application.OutgoingMessages.Requesting
             var messageIdsNotFound = MessageIdsNotFound(requestedMessageIds, messages);
             if (messageIdsNotFound.Any())
             {
-                await _messageRequestNotifications.RequestedMessagesWasNotFoundAsync(messageIdsNotFound).ConfigureAwait(false);
+                await _messageRequestNotifications.RequestedMessagesWasNotFoundAsync(messageIdsNotFound, ParseRequestDetailsFrom(request)).ConfigureAwait(false);
                 return Unit.Value;
             }
 
@@ -65,7 +65,7 @@ namespace Messaging.Application.OutgoingMessages.Requesting
 
             if (_documentFactory.CanHandle(message.DocumentType, requestedFormat) == false)
             {
-                await _messageRequestNotifications.RequestedDocumentFormatIsNotSupportedAsync(request.RequestedDocumentFormat, message.DocumentType).ConfigureAwait(false);
+                await _messageRequestNotifications.RequestedDocumentFormatIsNotSupportedAsync(request.RequestedDocumentFormat, message.DocumentType, ParseRequestDetailsFrom(request)).ConfigureAwait(false);
                 return Unit.Value;
             }
 
