@@ -206,7 +206,8 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
                 CimFormat.Xml.Name,
                 requestId,
                 string.Empty,
-                string.Empty)).ConfigureAwait(false);
+                string.Empty,
+                "FakeDocument")).ConfigureAwait(false);
         }
 
         private async Task AssertRejectMessage(OutgoingMessage rejectMessage)

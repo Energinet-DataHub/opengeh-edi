@@ -66,6 +66,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
             Assert.Equal(request.RequestId, command?.RequestId);
             Assert.Equal(request.IdempotencyId, command?.IdempotencyId);
             Assert.Equal(request.ReferenceId, command?.ReferenceId);
+            Assert.Equal(request.DocumentType, command?.MessageType);
             Assert.Equal(_messageRequestContext.DataBundleRequestDto?.RequestId, command?.RequestId);
             Assert.Equal(_messageRequestContext.DataBundleRequestDto?.IdempotencyId, command?.IdempotencyId);
             Assert.Equal(_messageRequestContext.DataBundleRequestDto?.DataAvailableNotificationReferenceId, command?.ReferenceId);
@@ -107,7 +108,8 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
                 CimFormat.Xml.Name,
                 Guid.NewGuid(),
                 Guid.NewGuid().ToString(),
-                Guid.NewGuid().ToString());
+                Guid.NewGuid().ToString(),
+                "FakeDocument");
         }
 
         private static IncomingMessageBuilder MessageBuilder()
@@ -157,7 +159,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
                 request.RequestId,
                 request.ReferenceId,
                 request.IdempotencyId,
-                new MessageTypeDto(string.Empty),
+                new MessageTypeDto(request.DocumentType),
                 ResponseFormat.Xml,
                 1));
         }

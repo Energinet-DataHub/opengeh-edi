@@ -21,13 +21,14 @@ namespace Messaging.Application.OutgoingMessages.Requesting;
 
 public class RequestMessages : ICommand<Unit>
 {
-    public RequestMessages(IEnumerable<string> messageIds, string requestedDocumentFormat, Guid requestId, string idempotencyId, string referenceId)
+    public RequestMessages(IEnumerable<string> messageIds, string requestedDocumentFormat, Guid requestId, string idempotencyId, string referenceId, string documentType)
     {
         MessageIds = messageIds;
         RequestedDocumentFormat = requestedDocumentFormat;
         RequestId = requestId;
         IdempotencyId = idempotencyId;
         ReferenceId = referenceId;
+        DocumentType = documentType;
     }
 
     public IEnumerable<string> MessageIds { get; }
@@ -39,4 +40,6 @@ public class RequestMessages : ICommand<Unit>
     public string IdempotencyId { get; }
 
     public string ReferenceId { get; }
+
+    public string DocumentType { get; }
 }

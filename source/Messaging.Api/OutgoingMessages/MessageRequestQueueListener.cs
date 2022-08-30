@@ -74,7 +74,8 @@ namespace Messaging.Api.OutgoingMessages
                 messageRequest.ResponseFormat.ToString(),
                 messageRequest.RequestId,
                 messageRequest.IdempotencyId,
-                messageRequest.DataAvailableNotificationReferenceId)).ConfigureAwait(false);
+                messageRequest.DataAvailableNotificationReferenceId,
+                messageRequest.MessageType.Value)).ConfigureAwait(false);
             _logger.LogInformation($"Dequeued with correlation id: {_correlationContext.Id}");
         }
     }

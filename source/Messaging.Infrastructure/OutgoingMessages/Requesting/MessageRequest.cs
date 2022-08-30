@@ -18,11 +18,12 @@ namespace Messaging.Infrastructure.OutgoingMessages.Requesting;
 
 public class MessageRequest
 {
-    public MessageRequest(Guid requestId, string idempotencyId, string referenceId)
+    public MessageRequest(Guid requestId, string idempotencyId, string referenceId, string documentType)
     {
         RequestId = requestId;
         IdempotencyId = idempotencyId;
         ReferenceId = referenceId;
+        DocumentType = documentType;
     }
 
     public Guid RequestId { get; }
@@ -30,4 +31,6 @@ public class MessageRequest
     public string IdempotencyId { get; }
 
     public string ReferenceId { get; }
+
+    public string DocumentType { get; }
 }
