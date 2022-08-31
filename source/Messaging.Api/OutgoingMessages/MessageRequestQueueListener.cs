@@ -55,6 +55,7 @@ namespace Messaging.Api.OutgoingMessages
         public async Task RunAsync([ServiceBusTrigger("%MESSAGE_REQUEST_QUEUE%", Connection = "MESSAGEHUB_QUEUE_CONNECTION_STRING", IsSessionsEnabled = true)] byte[] data)
         {
             var messageRequest = _requestBundleParser.Parse(data);
+            _logger.LogInformation($"Requested response format: {messageRequest.ResponseFormat.ToString()}");
             _logger.LogInformation($"Parsed data bundle request DTO: {_serializer.Serialize(messageRequest)}");
 
             var dataAvailableIds = await _storageHandler.GetDataAvailableNotificationIdsAsync(messageRequest)
