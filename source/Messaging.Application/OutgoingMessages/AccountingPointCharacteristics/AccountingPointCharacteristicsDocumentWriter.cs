@@ -143,7 +143,7 @@ public class AccountingPointCharacteristicsDocumentWriter : DocumentWriter
         }
     }
 
-    private async Task WriteMarketEvaluationPointAsync(MarketEvaluationPoint marketEvaluationPoint, XmlWriter writer)
+    private async Task WriteMarketEvaluationPointAsync(MarketEvaluationPoint.MarketEvaluationPoint marketEvaluationPoint, XmlWriter writer)
     {
         await writer.WriteStartElementAsync(DocumentDetails.Prefix, "MarketEvaluationPoint", null).ConfigureAwait(false);
         await WriteMridAsync("mRID", marketEvaluationPoint.MRID, writer).ConfigureAwait(false);

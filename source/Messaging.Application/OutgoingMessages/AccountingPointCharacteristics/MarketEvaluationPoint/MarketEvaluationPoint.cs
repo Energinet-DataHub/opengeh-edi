@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Messaging.Domain.MasterData;
 using NodaTime;
 
-namespace Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
+namespace Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPoint;
 
 public class MarketEvaluationPoint
 {

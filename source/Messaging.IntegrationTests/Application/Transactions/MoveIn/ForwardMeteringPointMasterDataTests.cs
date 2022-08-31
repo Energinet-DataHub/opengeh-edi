@@ -22,6 +22,7 @@ using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.MasterData;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
+using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPoint;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Domain.MasterData.Dictionaries;
 using Messaging.Domain.OutgoingMessages;
