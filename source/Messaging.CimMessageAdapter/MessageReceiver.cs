@@ -47,7 +47,7 @@ namespace Messaging.CimMessageAdapter
         {
             ArgumentNullException.ThrowIfNull(messageParserResult);
 
-            var messageHeader = messageParserResult.MessageHeader;
+            var messageHeader = messageParserResult.Message?.Header;
             if (InvalidMessageHeader(messageHeader))
             {
                 return Result.Failure(messageParserResult.Errors.ToArray());

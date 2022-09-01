@@ -28,19 +28,15 @@ namespace Messaging.CimMessageAdapter.Messages
         }
 
         public MessageParserResult(
-            MessageHeader messageHeader,
             IReadOnlyCollection<TMarketActivityRecordType> marketActivityRecords)
         {
-            MessageHeader = messageHeader;
             MarketActivityRecords = marketActivityRecords;
         }
 
         public MessageParserResult(
-            MessageHeader messageHeader,
             IReadOnlyCollection<TMarketActivityRecordType> marketActivityRecords,
             IParsedMessage<TMarketActivityRecordType, TMarketTransactionType> message)
         {
-            MessageHeader = messageHeader;
             MarketActivityRecords = marketActivityRecords;
             Message = message;
         }
@@ -48,8 +44,6 @@ namespace Messaging.CimMessageAdapter.Messages
         public IReadOnlyCollection<ValidationError> Errors { get; } = new List<ValidationError>();
 
         public bool Success => Errors.Count == 0;
-
-        public MessageHeader? MessageHeader { get; }
 
         public IReadOnlyCollection<TMarketActivityRecordType> MarketActivityRecords { get; } =
             new List<TMarketActivityRecordType>();
