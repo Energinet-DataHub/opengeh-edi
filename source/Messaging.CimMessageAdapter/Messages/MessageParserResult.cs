@@ -51,4 +51,24 @@ namespace Messaging.CimMessageAdapter.Messages
             return new MessageParserResult(messageHeader, marketActivityRecords);
         }
     }
+
+    #pragma warning disable
+    public class MessageParserResult<TMarketActivityRecordType>
+    {
+        private MessageParserResult(MessageHeader header, IReadOnlyCollection<TMarketActivityRecordType> marketActivityRecords)
+        {
+            Header = header;
+            MarketActivityRecords = marketActivityRecords;
+        }
+
+        public MessageHeader Header { get; }
+
+        public IReadOnlyCollection<TMarketActivityRecordType> MarketActivityRecords { get; }
+
+
+        public MessageParserResult<TMarketActivityRecordType> Succeeded(MessageHeader header, IReadOnlyCollection<TMarketActivityRecordType> marketActivityRecords)
+        {
+            return new MessageParserResult<TMarketActivityRecordType>(header, marketActivityRecords);
+        }
+    }
 }

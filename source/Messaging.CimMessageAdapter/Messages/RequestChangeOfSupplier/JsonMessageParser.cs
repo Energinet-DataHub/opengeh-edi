@@ -31,7 +31,7 @@ using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
 
 namespace Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 
-public class JsonMessageParser : IMessageParser
+public class JsonMessageParser : IMessageParser<MarketActivityRecord>
 {
     private const string MarketActivityRecordElementName = "MktActivityRecord";
     private const string HeaderElementName = "RequestChangeOfSupplier_MarketDocument";

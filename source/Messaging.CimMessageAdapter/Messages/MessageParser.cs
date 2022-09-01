@@ -17,15 +17,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Domain.OutgoingMessages;
 
 namespace Messaging.CimMessageAdapter.Messages;
 
 public class MessageParser
 {
-    private readonly IEnumerable<IMessageParser> _parsers;
+    private readonly IEnumerable<IMessageParser<MarketActivityRecord>> _parsers;
 
-    public MessageParser(IEnumerable<IMessageParser> parsers)
+    public MessageParser(IEnumerable<IMessageParser<MarketActivityRecord>> parsers)
     {
         _parsers = parsers;
     }

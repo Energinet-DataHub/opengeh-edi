@@ -26,7 +26,7 @@ using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
 
 namespace Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 
-public class XmlMessageParser : IMessageParser
+public class XmlMessageParser : IMessageParser<MarketActivityRecord>
 {
     private const string MarketActivityRecordElementName = "MktActivityRecord";
     private const string HeaderElementName = "RequestChangeOfSupplier_MarketDocument";

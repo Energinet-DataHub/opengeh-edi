@@ -21,7 +21,7 @@ namespace Messaging.CimMessageAdapter.Messages;
 /// <summary>
 /// Parses CIM messages from a stream
 /// </summary>
-public interface IMessageParser
+public interface IMessageParser<TMarketActivityRecordType>
 {
     /// <summary>
     /// The CIM format handled

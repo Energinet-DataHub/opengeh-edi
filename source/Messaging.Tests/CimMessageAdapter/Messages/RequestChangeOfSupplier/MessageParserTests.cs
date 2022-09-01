@@ -19,6 +19,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
@@ -34,7 +35,7 @@ public class MessageParserTests
     public MessageParserTests()
     {
         _messageParser = new MessageParser(
-            new IMessageParser[]
+            new IMessageParser<MarketActivityRecord>[]
             {
                 new JsonMessageParser(),
                 new XmlMessageParser(),
@@ -97,7 +98,7 @@ public class MessageParserTests
     [Fact]
     public async Task Throw_if_message_format_is_not_known()
     {
-        var parser = new MessageParser(new List<IMessageParser>());
+        var parser = new MessageParser(new List<IMessageParser<MarketActivityRecord>>());
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => parser.ParseAsync(CreateXmlMessage(), CimFormat.Xml)).ConfigureAwait(false);
     }

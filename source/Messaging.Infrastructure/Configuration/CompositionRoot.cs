@@ -69,6 +69,7 @@ using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using MarketActivityRecord = Messaging.Application.IncomingMessages.RequestChangeOfSupplier.MarketActivityRecord;
 
 namespace Messaging.Infrastructure.Configuration
 {
@@ -233,7 +234,7 @@ namespace Messaging.Infrastructure.Configuration
 
         public CompositionRoot AddMessageParserServices()
         {
-            _services.AddSingleton(_ => new MessageParser(new IMessageParser[]
+            _services.AddSingleton(_ => new MessageParser(new IMessageParser<MarketActivityRecord>[]
             {
                 new JsonMessageParser(),
                 new XmlMessageParser(),
