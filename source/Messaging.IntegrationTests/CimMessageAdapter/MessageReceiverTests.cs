@@ -188,7 +188,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
         private async Task<Result> ReceiveRequestChangeOfSupplierMessage(Stream message)
         {
             return await CreateMessageReceiver()
-                .ReceiveAsync(message, CimFormat.Xml, await ParseMessageAsync(message).ConfigureAwait(false));
+                .ReceiveAsync(await ParseMessageAsync(message).ConfigureAwait(false));
         }
 
         private MessageReceiver CreateMessageReceiver()
@@ -210,11 +210,11 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
             var messageBuilder = BusinessMessageBuilder.RequestChangeOfSupplier();
 
             using var originalMessage = messageBuilder.Message();
-            await CreateMessageReceiver(messageIds).ReceiveAsync(originalMessage, CimFormat.Xml, await ParseMessageAsync(originalMessage).ConfigureAwait(false))
+            await CreateMessageReceiver(messageIds).ReceiveAsync(await ParseMessageAsync(originalMessage).ConfigureAwait(false))
                 .ConfigureAwait(false);
 
             using var duplicateMessage = messageBuilder.Message();
-            await CreateMessageReceiver(messageIds).ReceiveAsync(duplicateMessage, CimFormat.Xml, await ParseMessageAsync(originalMessage).ConfigureAwait(false))
+            await CreateMessageReceiver(messageIds).ReceiveAsync(await ParseMessageAsync(duplicateMessage).ConfigureAwait(false))
                 .ConfigureAwait(false);
         }
 

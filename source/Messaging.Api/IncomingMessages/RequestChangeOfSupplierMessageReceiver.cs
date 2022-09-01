@@ -69,7 +69,7 @@ namespace Messaging.Api.IncomingMessages
             }
 
             var messageParserResult = await _messageParser.ParseAsync(request.Body, cimFormat).ConfigureAwait(false);
-            var result = await _messageReceiver.ReceiveAsync(request.Body, cimFormat, messageParserResult)
+            var result = await _messageReceiver.ReceiveAsync(messageParserResult)
                 .ConfigureAwait(false);
 
             var httpStatusCode = result.Success ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
