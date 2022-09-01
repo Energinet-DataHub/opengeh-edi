@@ -42,16 +42,16 @@ namespace Messaging.CimMessageAdapter
             _marketActorAuthenticator = marketActorAuthenticator ?? throw new ArgumentNullException(nameof(marketActorAuthenticator));
         }
 
-        public async Task<Result> ReceiveAsync(MessageParserResult<MarketActivityRecord> messageParserResult)
+        public async Task<Result> ReceiveAsync<TMarketActivityRecordType>(MessageParserResult<TMarketActivityRecordType> messageParserResult)
+            where TMarketActivityRecordType : IMarketActivityRecord
         {
             ArgumentNullException.ThrowIfNull(messageParserResult);
 
-            if (InvalidMessageHeader(messageParserResult))
+            var messageHeader = messageParserResult.MessageHeader;
+            if (InvalidMessageHeader(messageHeader))
             {
                 return Result.Failure(messageParserResult.Errors.ToArray());
             }
-
-            var messageHeader = messageParserResult.MessageHeader;
 
             await AuthorizeSenderAsync(messageHeader!).ConfigureAwait(false);
             await VerifyReceiverAsync(messageHeader!).ConfigureAwait(false);
@@ -85,14 +85,14 @@ namespace Messaging.CimMessageAdapter
             return Result.Succeeded();
         }
 
-        private static bool InvalidMessageHeader(MessageParserResult<MarketActivityRecord> messageParserResult)
+        private static bool InvalidMessageHeader(MessageHeader? header)
         {
-            return messageParserResult.MessageHeader is null || messageParserResult.Success == false;
+            return header is null;
         }
 
-        private static IncomingMessage CreateTransaction(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
+        private static IncomingMessage CreateTransaction(MessageHeader messageHeader, IMarketActivityRecord marketActivityRecord)
         {
-            return IncomingMessage.Create(messageHeader, marketActivityRecord);
+            return IncomingMessage.Create(messageHeader, (MarketActivityRecord)marketActivityRecord);
         }
 
         private Task<bool> CheckTransactionIdAsync(string transactionId)
