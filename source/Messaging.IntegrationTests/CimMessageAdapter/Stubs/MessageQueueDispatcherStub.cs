@@ -16,19 +16,18 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Messaging.Application.IncomingMessages;
-using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.CimMessageAdapter.Messages;
 
 namespace Messaging.IntegrationTests.CimMessageAdapter.Stubs
 {
     public class MessageQueueDispatcherStub : IMessageQueueDispatcher
     {
-        private readonly List<IncomingMessage> _uncommittedItems = new();
-        private readonly List<IncomingMessage> _committedItems = new();
+        private readonly List<IIncomingMessage> _uncommittedItems = new();
+        private readonly List<IIncomingMessage> _committedItems = new();
 
-        public IReadOnlyCollection<IncomingMessage> CommittedItems => _committedItems.AsReadOnly();
+        public IReadOnlyCollection<IIncomingMessage> CommittedItems => _committedItems.AsReadOnly();
 
-        public Task AddAsync(IncomingMessage message)
+        public Task AddAsync(IIncomingMessage message)
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
             _committedItems.Clear();

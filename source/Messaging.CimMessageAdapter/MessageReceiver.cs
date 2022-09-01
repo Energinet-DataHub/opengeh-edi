@@ -101,7 +101,7 @@ namespace Messaging.CimMessageAdapter
             return _transactionIds.TryStoreAsync(transactionId);
         }
 
-        private Task AddToTransactionQueueAsync(IncomingMessage transaction)
+        private Task AddToTransactionQueueAsync(IIncomingMessage transaction)
         {
             return _messageQueueDispatcher.AddAsync(transaction);
         }
