@@ -17,14 +17,27 @@ using System.Collections.ObjectModel;
 
 namespace Messaging.Application.IncomingMessages;
 
-#pragma warning disable
-public interface IParsedMessage<out TMarketActivityRecordType, TMarketTransactionType>
+/// <summary>
+/// Incoming EDI market document
+/// </summary>
+/// <typeparam name="TMarketActivityRecordType">Type of market activity record</typeparam>
+/// <typeparam name="TMarketTransactionType">Type that represent a single market transaction. Contains the header and a single market activity record</typeparam>
+public interface IMarketDocument<out TMarketActivityRecordType, TMarketTransactionType>
     where TMarketActivityRecordType : IMarketActivityRecord
     where TMarketTransactionType : IMarketTransaction<TMarketActivityRecordType>
 {
+    /// <summary>
+    /// Contains message metadata
+    /// </summary>
     MessageHeader Header { get; }
 
+    /// <summary>
+    /// List of market activity records (market transaction)
+    /// </summary>
     IReadOnlyCollection<TMarketActivityRecordType> MarketActivityRecords { get; }
 
+    /// <summary>
+    /// Return a list of market transactions
+    /// </summary>
     ReadOnlyCollection<TMarketTransactionType> ToTransactions();
 }

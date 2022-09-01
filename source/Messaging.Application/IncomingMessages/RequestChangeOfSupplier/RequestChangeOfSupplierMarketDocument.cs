@@ -17,9 +17,9 @@ using System.Collections.ObjectModel;
 
 namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 
-public class RequestChangeOfSupplierParsedMessage : IParsedMessage<MarketActivityRecord, RequestChangeOfSupplierTransaction>
+public class RequestChangeOfSupplierMarketDocument : IMarketDocument<MarketActivityRecord, RequestChangeOfSupplierTransaction>
 {
-    public RequestChangeOfSupplierParsedMessage(MessageHeader header, IReadOnlyCollection<MarketActivityRecord> marketActivityRecords)
+    public RequestChangeOfSupplierMarketDocument(MessageHeader header, IReadOnlyCollection<MarketActivityRecord> marketActivityRecords)
     {
         Header = header;
         MarketActivityRecords = marketActivityRecords;
