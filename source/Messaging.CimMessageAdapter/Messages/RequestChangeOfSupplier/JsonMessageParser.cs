@@ -29,7 +29,7 @@ using JsonException = Newtonsoft.Json.JsonException;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
 
-namespace Messaging.CimMessageAdapter.Messages;
+namespace Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 
 public class JsonMessageParser : IMessageParser
 {
