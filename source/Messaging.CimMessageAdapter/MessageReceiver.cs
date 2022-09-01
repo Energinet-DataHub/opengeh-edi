@@ -18,7 +18,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.IncomingMessages;
-using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Messages;
 using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
@@ -78,8 +77,11 @@ namespace Messaging.CimMessageAdapter
                 {
                     return Result.Failure(new DuplicateTransactionIdDetected(marketActivityRecord.Id));
                 }
+            }
 
-                await AddToTransactionQueueAsync(CreateTransaction(messageHeader, marketActivityRecord)).ConfigureAwait(false);
+            foreach (var transaction in messageParserResult.Message!.ToTransactions())
+            {
+                await AddToTransactionQueueAsync(transaction).ConfigureAwait(false);
             }
 
             await _messageQueueDispatcher.CommitAsync().ConfigureAwait(false);
@@ -91,11 +93,10 @@ namespace Messaging.CimMessageAdapter
             return header is null;
         }
 
-        private static RequestChangeOfSupplierTransaction CreateTransaction(MessageHeader messageHeader, IMarketActivityRecord marketActivityRecord)
-        {
-            return RequestChangeOfSupplierTransaction.Create(messageHeader, (MarketActivityRecord)marketActivityRecord);
-        }
-
+        // private static RequestChangeOfSupplierTransaction CreateTransaction(MessageHeader messageHeader, IMarketActivityRecord marketActivityRecord)
+        // {
+        //     return RequestChangeOfSupplierTransaction.Create(messageHeader, (MarketActivityRecord)marketActivityRecord);
+        // }
         private Task<bool> CheckTransactionIdAsync(string transactionId)
         {
             if (transactionId == null) throw new ArgumentNullException(nameof(transactionId));
