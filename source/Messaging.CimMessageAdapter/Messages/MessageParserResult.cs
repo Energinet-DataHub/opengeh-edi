@@ -28,15 +28,15 @@ namespace Messaging.CimMessageAdapter.Messages
         }
 
         public MessageParserResult(
-            IMarketDocument<TMarketActivityRecordType, TMarketTransactionType> marketDocument)
+            IIncomingMarketDocument<TMarketActivityRecordType, TMarketTransactionType> incomingMarketDocument)
         {
-            MarketDocument = marketDocument;
+            IncomingMarketDocument = incomingMarketDocument;
         }
 
         public IReadOnlyCollection<ValidationError> Errors { get; } = new List<ValidationError>();
 
         public bool Success => Errors.Count == 0;
 
-        public IMarketDocument<TMarketActivityRecordType, TMarketTransactionType>? MarketDocument { get; }
+        public IIncomingMarketDocument<TMarketActivityRecordType, TMarketTransactionType>? IncomingMarketDocument { get; }
     }
 }

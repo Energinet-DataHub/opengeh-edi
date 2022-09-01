@@ -138,7 +138,7 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
         var messageHeader = MessageHeaderFrom(headerToken);
         marketActivityRecords.AddRange(headerToken[MarketActivityRecordElementName].Select(MarketActivityRecordFrom));
 
-        return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(new RequestChangeOfSupplierMarketDocument(messageHeader, marketActivityRecords));
+        return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(new RequestChangeOfSupplierIncomingMarketDocument(messageHeader, marketActivityRecords));
     }
 
     private static void ResetMessagePosition(Stream message)

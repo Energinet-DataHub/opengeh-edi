@@ -47,7 +47,7 @@ namespace Messaging.CimMessageAdapter
         {
             ArgumentNullException.ThrowIfNull(messageParserResult);
 
-            var messageHeader = messageParserResult.MarketDocument?.Header;
+            var messageHeader = messageParserResult.IncomingMarketDocument?.Header;
             if (InvalidMessageHeader(messageHeader))
             {
                 return Result.Failure(messageParserResult.Errors.ToArray());
@@ -66,7 +66,7 @@ namespace Messaging.CimMessageAdapter
                 return Result.Failure(_errors.ToArray());
             }
 
-            foreach (var transaction in messageParserResult.MarketDocument!.ToTransactions())
+            foreach (var transaction in messageParserResult.IncomingMarketDocument!.ToTransactions())
             {
                 if (string.IsNullOrEmpty(transaction.MarketActivityRecord.Id))
                 {

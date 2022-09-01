@@ -22,7 +22,7 @@ namespace Messaging.Application.IncomingMessages;
 /// </summary>
 /// <typeparam name="TMarketActivityRecordType">Type of market activity record</typeparam>
 /// <typeparam name="TMarketTransactionType">Type that represent a single market transaction. Contains the header and a single market activity record</typeparam>
-public interface IMarketDocument<out TMarketActivityRecordType, TMarketTransactionType>
+public interface IIncomingMarketDocument<out TMarketActivityRecordType, TMarketTransactionType>
     where TMarketActivityRecordType : IMarketActivityRecord
     where TMarketTransactionType : IMarketTransaction<TMarketActivityRecordType>
 {

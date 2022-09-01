@@ -67,7 +67,7 @@ public class MessageParserTests
         var result = await _messageParser.ParseAsync(message, format).ConfigureAwait(false);
 
         Assert.True(result.Success);
-        var header = result.MarketDocument?.Header;
+        var header = result.IncomingMarketDocument?.Header;
         Assert.Equal("78954612", header?.MessageId);
         Assert.Equal("E65", header?.ProcessType);
         Assert.Equal("5799999933318", header?.SenderId);
@@ -75,7 +75,7 @@ public class MessageParserTests
         Assert.Equal("5790001330552", header?.ReceiverId);
         Assert.Equal("DDZ", header?.ReceiverRole);
         Assert.Equal("2022-09-07T09:30:47Z", header?.CreatedAt);
-        var marketActivityRecord = result.MarketDocument?.MarketActivityRecords.First();
+        var marketActivityRecord = result.IncomingMarketDocument?.MarketActivityRecords.First();
         Assert.Equal("12345689", marketActivityRecord?.Id);
         Assert.Equal("579999993331812345", marketActivityRecord?.MarketEvaluationPointId);
         Assert.Equal("5799999933318", marketActivityRecord?.EnergySupplierId);
