@@ -48,25 +48,30 @@ namespace Messaging.CimMessageAdapter
             ArgumentNullException.ThrowIfNull(messageParserResult);
 
             var messageHeader = messageParserResult.IncomingMarketDocument?.Header;
+            var marketDocument = messageParserResult.IncomingMarketDocument;
+
             if (InvalidMessageHeader(messageHeader))
             {
                 return Result.Failure(messageParserResult.Errors.ToArray());
             }
 
-            await AuthorizeSenderAsync(messageHeader!).ConfigureAwait(false);
-            await VerifyReceiverAsync(messageHeader!).ConfigureAwait(false);
-            if (MessageIdIsEmpty(messageHeader!.MessageId))
+            ArgumentNullException.ThrowIfNull(messageHeader);
+            ArgumentNullException.ThrowIfNull(marketDocument);
+
+            await AuthorizeSenderAsync(messageHeader).ConfigureAwait(false);
+            await VerifyReceiverAsync(messageHeader).ConfigureAwait(false);
+            if (MessageIdIsEmpty(messageHeader.MessageId))
             {
                 return Result.Failure(_errors.ToArray());
             }
 
-            await CheckMessageIdAsync(messageHeader!.MessageId).ConfigureAwait(false);
+            await CheckMessageIdAsync(messageHeader.MessageId).ConfigureAwait(false);
             if (_errors.Count > 0)
             {
                 return Result.Failure(_errors.ToArray());
             }
 
-            foreach (var transaction in messageParserResult.IncomingMarketDocument!.ToTransactions())
+            foreach (var transaction in marketDocument.ToTransactions())
             {
                 if (string.IsNullOrEmpty(transaction.MarketActivityRecord.Id))
                 {
