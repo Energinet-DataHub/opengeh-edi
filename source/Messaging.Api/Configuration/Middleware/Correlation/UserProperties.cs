@@ -12,17 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MessageHub.Model.Model;
-
-namespace Messaging.Infrastructure.OutgoingMessages.Requesting
+namespace Energinet.DataHub.MeteringPoints.EntryPoints.Common
 {
-    public class MessageRequestContext
-    {
-        public DataBundleRequestDto? DataBundleRequestDto { get; private set; }
-
-        public void SetMessageRequest(DataBundleRequestDto messageRequest)
-        {
-            DataBundleRequestDto = messageRequest;
-        }
-    }
+    public record UserProperties(string OperationCorrelationId);
 }

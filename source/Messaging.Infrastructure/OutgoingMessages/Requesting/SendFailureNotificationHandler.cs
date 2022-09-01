@@ -35,13 +35,12 @@ public class SendFailureNotificationHandler : IRequestHandler<SendFailureNotific
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
 
-        var bundleRequest = new DataBundleRequestDto(
+        var bundleRequest = MessageHubModelFactory.CreateDataBundleRequest(
             request.RequestId,
             request.ReferenceId,
             request.IdempotencyId,
-            new MessageTypeDto(request.MessageType),
-            Enum.Parse<ResponseFormat>(request.RequestedFormat),
-            1);
+            request.MessageType,
+            request.RequestedFormat);
 
         var error = new DataBundleResponseErrorDto(
             Enum.Parse<DataBundleResponseErrorReason>(request.Reason),
