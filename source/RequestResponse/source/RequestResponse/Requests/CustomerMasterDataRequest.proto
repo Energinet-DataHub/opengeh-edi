@@ -17,6 +17,6 @@ syntax = "proto3";
 
 option csharp_namespace = "Energinet.DataHub.EnergySupplying.RequestResponse.Requests";
 
-message MasterDataRequest {
+message CustomerMasterDataRequest {
   string processid = 1; // Process id related to the customer master data
 }

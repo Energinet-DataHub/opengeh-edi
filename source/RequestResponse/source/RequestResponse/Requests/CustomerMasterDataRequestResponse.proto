@@ -19,7 +19,7 @@ import "google/protobuf/timestamp.proto";
 
 option csharp_namespace = "Energinet.DataHub.EnergySupplying.RequestResponse.Requests";
 
-message MasterDataRequest {
+message CustomerMasterDataRequestResponse {
   string customername = 1;
   string registeredbyprocessid = 2;
   string customerid = 3;
