@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Messaging.CimMessageAdapter.Messages;
@@ -37,12 +39,20 @@ public class MessageParserTests
             });
     }
 
-    [Fact]
-    public async Task Can_parse()
+    public static IEnumerable<object[]> CreateMessages()
     {
-        var message = CreateXmlMessage();
+        return new List<object[]>
+        {
+            new object[] { CimFormat.Xml, CreateXmlMessage() },
+            new object[] { CimFormat.Json, CreateJsonMessage() },
+        };
+    }
 
-        var result = await _messageParser.ParseAsync(message, CimFormat.Xml).ConfigureAwait(false);
+    [Theory]
+    [MemberData(nameof(CreateMessages))]
+    public async Task Can_parse(CimFormat format, Stream message)
+    {
+        var result = await _messageParser.ParseAsync(message, format).ConfigureAwait(false);
 
         Assert.True(result.Success);
         Assert.Equal("78954612", result.MessageHeader?.MessageId);
@@ -61,8 +71,6 @@ public class MessageParserTests
         Assert.Equal("ARR", marketActivityRecord.ConsumerIdType);
         Assert.Equal("Jan Hansen", marketActivityRecord.ConsumerName);
         Assert.Equal("2022-09-07T22:00:00Z", marketActivityRecord.EffectiveDate);
-
-        await message.DisposeAsync().ConfigureAwait(false);
     }
 
     private static Stream CreateXmlMessage()
@@ -71,6 +79,23 @@ public class MessageParserTests
         var stream = new MemoryStream();
         xmlDoc.Save(stream);
 
+        return stream;
+    }
+
+    private static MemoryStream CreateJsonMessage()
+    {
+        return ReadTextFile(
+            $"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}json{Path.DirectorySeparatorChar}Request Change of Supplier.json");
+    }
+
+    private static MemoryStream ReadTextFile(string path)
+    {
+        var jsonDoc = File.ReadAllText(path);
+        var stream = new MemoryStream();
+        using var writer = new StreamWriter(stream: stream, encoding: Encoding.UTF8, bufferSize: 4096, leaveOpen: true);
+        writer.Write(jsonDoc);
+        writer.Flush();
+        stream.Position = 0;
         return stream;
     }
 }
