@@ -41,7 +41,7 @@ namespace Messaging.Infrastructure.IncomingMessages
             _transactionQueue = new List<ServiceBusMessage>();
         }
 
-        public Task AddAsync(IIncomingMessage message)
+        public Task AddAsync(IMarketTransaction message)
         {
             _transactionQueue.Add(CreateMessage(message));
             return Task.CompletedTask;
@@ -56,7 +56,7 @@ namespace Messaging.Infrastructure.IncomingMessages
             }
         }
 
-        private ServiceBusMessage CreateMessage(IIncomingMessage transaction)
+        private ServiceBusMessage CreateMessage(IMarketTransaction transaction)
         {
             var json = _jsonSerializer.Serialize(transaction);
             var data = Encoding.UTF8.GetBytes(json);

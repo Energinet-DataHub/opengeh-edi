@@ -234,7 +234,7 @@ namespace Messaging.Infrastructure.Configuration
 
         public CompositionRoot AddMessageParserServices()
         {
-            _services.AddSingleton(_ => new MessageParser(new IMessageParser<MarketActivityRecord>[]
+            _services.AddSingleton(_ => new MessageParser(new IMessageParser<MarketActivityRecord, RequestChangeOfSupplierParsedMessage>[]
             {
                 new JsonMessageParser(),
                 new XmlMessageParser(),

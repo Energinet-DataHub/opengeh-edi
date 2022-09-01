@@ -22,7 +22,7 @@ namespace Messaging.CimMessageAdapter.Messages;
 /// <summary>
 /// Parses CIM messages from a stream
 /// </summary>
-public interface IMessageParser<TMarketActivityRecordType>
+public interface IMessageParser<TMarketActivityRecordType, TMessageType>
  where TMarketActivityRecordType : IMarketActivityRecord
 {
     /// <summary>
@@ -34,5 +34,5 @@ public interface IMessageParser<TMarketActivityRecordType>
     /// Parse from stream
     /// </summary>
     /// <param name="message"></param>
-    Task<MessageParserResult<TMarketActivityRecordType>> ParseAsync(Stream message);
+    Task<MessageParserResult<TMarketActivityRecordType, TMessageType>> ParseAsync(Stream message);
 }

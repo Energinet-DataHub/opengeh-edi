@@ -219,7 +219,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
                 .ConfigureAwait(false);
         }
 
-        private Task<MessageParserResult<MarketActivityRecord>> ParseMessageAsync(Stream message)
+        private Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierParsedMessage>> ParseMessageAsync(Stream message)
         {
             return _messageParser.ParseAsync(message, CimFormat.Xml);
         }

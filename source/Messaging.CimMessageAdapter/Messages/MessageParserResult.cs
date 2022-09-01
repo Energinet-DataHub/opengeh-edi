@@ -18,7 +18,7 @@ using Messaging.CimMessageAdapter.Errors;
 
 namespace Messaging.CimMessageAdapter.Messages
 {
-    public class MessageParserResult<TMarketActivityRecordType>
+    public class MessageParserResult<TMarketActivityRecordType, TMessageType>
         where TMarketActivityRecordType : IMarketActivityRecord
     {
         public MessageParserResult(params ValidationError[] errors)
@@ -29,6 +29,15 @@ namespace Messaging.CimMessageAdapter.Messages
         public MessageParserResult(
             MessageHeader messageHeader,
             IReadOnlyCollection<TMarketActivityRecordType> marketActivityRecords)
+        {
+            MessageHeader = messageHeader;
+            MarketActivityRecords = marketActivityRecords;
+        }
+
+        public MessageParserResult(
+            MessageHeader messageHeader,
+            IReadOnlyCollection<TMarketActivityRecordType> marketActivityRecords,
+            TMessageType message)
         {
             MessageHeader = messageHeader;
             MarketActivityRecords = marketActivityRecords;

@@ -19,7 +19,7 @@ using Messaging.Application.Common.Commands;
 
 namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
 {
-    public class RequestChangeOfSupplierTransaction : ICommand<Unit>, IIncomingMessage
+    public class RequestChangeOfSupplierTransaction : ICommand<Unit>, IMarketTransaction<MarketActivityRecord>
     {
         [JsonConstructor]
         public RequestChangeOfSupplierTransaction(MessageHeader message, MarketActivityRecord marketActivityRecord)

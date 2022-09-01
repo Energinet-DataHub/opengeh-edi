@@ -12,25 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Messaging.Application.IncomingMessages;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
-namespace Messaging.CimMessageAdapter.Messages
+namespace Messaging.Application.IncomingMessages;
+
+#pragma warning disable
+public interface IParsedMessage<out TMarketActivityRecordType, TMarketTransactionType>
+    where TMarketActivityRecordType : IMarketActivityRecord
 {
-    /// <summary>
-    /// Service for dispatching incoming messages to message queue
-    /// </summary>
-    public interface IMessageQueueDispatcher
-    {
-        /// <summary>
-        /// Adds a message to collection
-        /// </summary>
-        /// <param name="message"></param>
-        Task AddAsync(IMarketTransaction message);
+    MessageHeader Header { get; }
 
-        /// <summary>
-        /// Commits added transactions to queue
-        /// </summary>
-        Task CommitAsync();
-    }
+    IReadOnlyCollection<TMarketActivityRecordType> MarketActivityRecords { get; }
+
+    ReadOnlyCollection<TMarketTransactionType> ToTransactions();
 }

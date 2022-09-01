@@ -12,25 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Messaging.Application.IncomingMessages;
+using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 
-namespace Messaging.CimMessageAdapter.Messages
+namespace Messaging.Application.IncomingMessages;
+
+#pragma warning disable
+public interface IMarketTransaction
 {
     /// <summary>
-    /// Service for dispatching incoming messages to message queue
+    /// Message metadata
     /// </summary>
-    public interface IMessageQueueDispatcher
-    {
-        /// <summary>
-        /// Adds a message to collection
-        /// </summary>
-        /// <param name="message"></param>
-        Task AddAsync(IMarketTransaction message);
+    MessageHeader Message { get; }
+}
 
-        /// <summary>
-        /// Commits added transactions to queue
-        /// </summary>
-        Task CommitAsync();
-    }
+/// <summary>
+/// Incoming message representing an EDI transaction
+/// </summary>
+public interface IMarketTransaction<out TMarketActivityRecordType> : IMarketTransaction
+ where TMarketActivityRecordType : IMarketActivityRecord
+{
+    /// <summary>
+    /// Market activity details
+    /// </summary>
+    TMarketActivityRecordType MarketActivityRecord { get; }
 }
