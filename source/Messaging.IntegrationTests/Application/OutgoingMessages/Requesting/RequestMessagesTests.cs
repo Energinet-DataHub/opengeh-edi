@@ -125,7 +125,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
             return JsonSerializer.Deserialize<TNotification>(commandData);
         }
 
-        private async Task<IncomingMessage> MessageArrived()
+        private async Task<RequestChangeOfSupplierTransaction> MessageArrived()
         {
             var incomingMessage = MessageBuilder()
                 .Build();

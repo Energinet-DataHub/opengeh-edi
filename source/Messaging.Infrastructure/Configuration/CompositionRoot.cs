@@ -220,7 +220,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddScoped<IMoveInRequester, MoveInRequester>();
             _services.AddScoped<IRequestMeteringPointMasterData, RequestMeteringPointMasterData>();
             _services.AddScoped<RequestMeteringPointMasterDataDispatcher>();
-            _services.AddTransient<IRequestHandler<IncomingMessage, Unit>, MoveInRequestHandler>();
+            _services.AddTransient<IRequestHandler<RequestChangeOfSupplierTransaction, Unit>, MoveInRequestHandler>();
             _services.AddTransient<IRequestHandler<FetchMeteringPointMasterData, Unit>, FetchMeteringPointMasterDataHandler>();
             _services.AddTransient<IRequestHandler<FetchCustomerMasterData, Unit>, FetchCustomerMasterDataHandler>();
             _services.AddTransient<IRequestHandler<SetConsumerHasMovedIn, Unit>, SetConsumerHasMovedInHandler>();

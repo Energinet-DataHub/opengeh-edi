@@ -19,10 +19,10 @@ using Messaging.Application.Common.Commands;
 
 namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
 {
-    public class IncomingMessage : ICommand<Unit>, IIncomingMessage
+    public class RequestChangeOfSupplierTransaction : ICommand<Unit>, IIncomingMessage
     {
         [JsonConstructor]
-        public IncomingMessage(MessageHeader message, MarketActivityRecord marketActivityRecord)
+        public RequestChangeOfSupplierTransaction(MessageHeader message, MarketActivityRecord marketActivityRecord)
         {
             Message = message;
             MarketActivityRecord = marketActivityRecord;
@@ -32,10 +32,10 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
 
         public MarketActivityRecord MarketActivityRecord { get; }
 
-        public static IncomingMessage Create(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
+        public static RequestChangeOfSupplierTransaction Create(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
         {
             if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
-            return new IncomingMessage(messageHeader, marketActivityRecord);
+            return new RequestChangeOfSupplierTransaction(messageHeader, marketActivityRecord);
         }
     }
 }

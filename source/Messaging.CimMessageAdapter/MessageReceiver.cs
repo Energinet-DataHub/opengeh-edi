@@ -90,9 +90,9 @@ namespace Messaging.CimMessageAdapter
             return header is null;
         }
 
-        private static IncomingMessage CreateTransaction(MessageHeader messageHeader, IMarketActivityRecord marketActivityRecord)
+        private static RequestChangeOfSupplierTransaction CreateTransaction(MessageHeader messageHeader, IMarketActivityRecord marketActivityRecord)
         {
-            return IncomingMessage.Create(messageHeader, (MarketActivityRecord)marketActivityRecord);
+            return RequestChangeOfSupplierTransaction.Create(messageHeader, (MarketActivityRecord)marketActivityRecord);
         }
 
         private Task<bool> CheckTransactionIdAsync(string transactionId)
