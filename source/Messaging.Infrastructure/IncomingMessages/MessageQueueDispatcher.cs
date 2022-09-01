@@ -19,7 +19,6 @@ using System.Transactions;
 using Azure.Messaging.ServiceBus;
 using Messaging.Application.Configuration;
 using Messaging.Application.IncomingMessages;
-using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.Infrastructure.Configuration.Serialization;
 
