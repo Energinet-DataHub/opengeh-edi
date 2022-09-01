@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Messaging.Application.IncomingMessages;
+using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.CimMessageAdapter.Messages;
 
 namespace Messaging.IntegrationTests.CimMessageAdapter.Stubs

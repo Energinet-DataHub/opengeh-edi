@@ -21,6 +21,7 @@ using MediatR;
 using Messaging.Application.Common;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.IncomingMessages;
+using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Requesting;
 using Messaging.Domain.OutgoingMessages;

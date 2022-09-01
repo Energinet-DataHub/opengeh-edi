@@ -19,6 +19,7 @@ using MediatR;
 using Messaging.Api.Configuration;
 using Messaging.Application.Configuration;
 using Messaging.Application.IncomingMessages;
+using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;

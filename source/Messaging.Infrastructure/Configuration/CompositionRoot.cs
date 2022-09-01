@@ -31,6 +31,7 @@ using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.IncomingMessages;
+using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.MasterData.MarketEvaluationPoints;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;

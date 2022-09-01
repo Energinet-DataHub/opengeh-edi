@@ -16,9 +16,8 @@ using System;
 using System.Text.Json.Serialization;
 using MediatR;
 using Messaging.Application.Common.Commands;
-using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 
-namespace Messaging.Application.IncomingMessages
+namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
 {
     public class IncomingMessage : ICommand<Unit>
     {

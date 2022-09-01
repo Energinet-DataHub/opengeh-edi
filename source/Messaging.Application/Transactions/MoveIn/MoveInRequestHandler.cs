@@ -23,6 +23,7 @@ using Messaging.Application.Common.Reasons;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.IncomingMessages;
+using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
