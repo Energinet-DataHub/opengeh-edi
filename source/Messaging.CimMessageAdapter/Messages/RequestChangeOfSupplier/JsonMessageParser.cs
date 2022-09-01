@@ -45,7 +45,7 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord>
 
     public CimFormat HandledFormat => CimFormat.Json;
 
-    public async Task<MessageParserResult> ParseAsync(Stream message)
+    public async Task<MessageParserResult<MarketActivityRecord>> ParseAsync(Stream message)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
 
@@ -62,7 +62,7 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord>
         var schema = await _schemaProvider.GetSchemaAsync<JsonSchema>(processType, "0").ConfigureAwait(false);
         if (schema is null)
         {
-            return MessageParserResult.Failure(new UnknownBusinessProcessTypeOrVersion(processType, "0"));
+            return new MessageParserResult<MarketActivityRecord>(new UnknownBusinessProcessTypeOrVersion(processType, "0"));
         }
 
         ResetMessagePosition(message);
@@ -71,7 +71,7 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord>
 
         if (_errors.Count > 0)
         {
-            return MessageParserResult.Failure(_errors.ToArray());
+            return new MessageParserResult<MarketActivityRecord>(_errors.ToArray());
         }
 
         var streamReader = new StreamReader(message, leaveOpen: true);
@@ -129,7 +129,7 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord>
         return processType;
     }
 
-    private static MessageParserResult ParseJsonData(JsonTextReader jsonTextReader)
+    private static MessageParserResult<MarketActivityRecord> ParseJsonData(JsonTextReader jsonTextReader)
     {
         var marketActivityRecords = new List<MarketActivityRecord>();
         var serializer = new JsonSerializer();
@@ -138,7 +138,7 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord>
         var messageHeader = MessageHeaderFrom(headerToken);
         marketActivityRecords.AddRange(headerToken[MarketActivityRecordElementName].Select(MarketActivityRecordFrom));
 
-        return MessageParserResult.Succeeded(messageHeader, marketActivityRecords);
+        return new MessageParserResult<MarketActivityRecord>(messageHeader, marketActivityRecords);
     }
 
     private static void ResetMessagePosition(Stream message)
@@ -147,9 +147,9 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord>
             message.Position = 0;
     }
 
-    private static MessageParserResult InvalidJsonFailure(Exception exception)
+    private static MessageParserResult<MarketActivityRecord> InvalidJsonFailure(Exception exception)
     {
-        return MessageParserResult.Failure(InvalidMessageStructure.From(exception));
+        return new MessageParserResult<MarketActivityRecord>(InvalidMessageStructure.From(exception));
     }
 
     private static MessageHeader MessageHeaderFrom(JToken token)

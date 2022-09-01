@@ -42,7 +42,7 @@ namespace Messaging.CimMessageAdapter
             _marketActorAuthenticator = marketActorAuthenticator ?? throw new ArgumentNullException(nameof(marketActorAuthenticator));
         }
 
-        public async Task<Result> ReceiveAsync(MessageParserResult messageParserResult)
+        public async Task<Result> ReceiveAsync(MessageParserResult<MarketActivityRecord> messageParserResult)
         {
             ArgumentNullException.ThrowIfNull(messageParserResult);
 
@@ -85,7 +85,7 @@ namespace Messaging.CimMessageAdapter
             return Result.Succeeded();
         }
 
-        private static bool InvalidMessageHeader(MessageParserResult messageParserResult)
+        private static bool InvalidMessageHeader(MessageParserResult<MarketActivityRecord> messageParserResult)
         {
             return messageParserResult.MessageHeader is null || messageParserResult.Success == false;
         }

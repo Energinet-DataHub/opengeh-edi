@@ -19,6 +19,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Messaging.Application.Configuration.Authentication;
+using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.Domain.OutgoingMessages;
@@ -218,7 +219,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
                 .ConfigureAwait(false);
         }
 
-        private Task<MessageParserResult> ParseMessageAsync(Stream message)
+        private Task<MessageParserResult<MarketActivityRecord>> ParseMessageAsync(Stream message)
         {
             return _messageParser.ParseAsync(message, CimFormat.Xml);
         }

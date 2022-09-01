@@ -14,19 +14,19 @@
 
 using System.Collections.Generic;
 using Messaging.Application.IncomingMessages;
-using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.CimMessageAdapter.Errors;
 
 namespace Messaging.CimMessageAdapter.Messages
 {
-    public class MessageParserResult
+    public class MessageParserResult<TMarketActivityRecordType>
+     where TMarketActivityRecordType : IMarketActivityRecord
     {
-        private MessageParserResult(IReadOnlyCollection<ValidationError> errors)
+        public MessageParserResult(params ValidationError[] errors)
         {
             Errors = errors;
         }
 
-        private MessageParserResult(MessageHeader messageHeader, IReadOnlyCollection<MarketActivityRecord> marketActivityRecords)
+        public MessageParserResult(MessageHeader messageHeader, IReadOnlyCollection<TMarketActivityRecordType> marketActivityRecords)
         {
             MessageHeader = messageHeader;
             MarketActivityRecords = marketActivityRecords;
@@ -38,37 +38,36 @@ namespace Messaging.CimMessageAdapter.Messages
 
         public MessageHeader? MessageHeader { get; }
 
-        public IReadOnlyCollection<MarketActivityRecord> MarketActivityRecords { get; } =
-            new List<MarketActivityRecord>();
-
-        public static MessageParserResult Failure(params ValidationError[] errors)
-        {
-            return new MessageParserResult(errors);
-        }
-
-        public static MessageParserResult Succeeded(MessageHeader messageHeader, IReadOnlyCollection<MarketActivityRecord> marketActivityRecords)
-        {
-            return new MessageParserResult(messageHeader, marketActivityRecords);
-        }
+        public IReadOnlyCollection<TMarketActivityRecordType> MarketActivityRecords { get; } =
+            new List<TMarketActivityRecordType>();
+        // public static MessageParserResult Failure(params ValidationError[] errors)
+        // {
+        //     return new MessageParserResult(errors);
+        // }
+        //
+        // public static MessageParserResult Succeeded(MessageHeader messageHeader, IReadOnlyCollection<MarketActivityRecord> marketActivityRecords)
+        // {
+        //     return new MessageParserResult(messageHeader, marketActivityRecords);
+        // }
     }
 
-    #pragma warning disable
-    public class MessageParserResult<TMarketActivityRecordType>
-    {
-        private MessageParserResult(MessageHeader header, IReadOnlyCollection<TMarketActivityRecordType> marketActivityRecords)
-        {
-            Header = header;
-            MarketActivityRecords = marketActivityRecords;
-        }
-
-        public MessageHeader Header { get; }
-
-        public IReadOnlyCollection<TMarketActivityRecordType> MarketActivityRecords { get; }
-
-
-        public MessageParserResult<TMarketActivityRecordType> Succeeded(MessageHeader header, IReadOnlyCollection<TMarketActivityRecordType> marketActivityRecords)
-        {
-            return new MessageParserResult<TMarketActivityRecordType>(header, marketActivityRecords);
-        }
-    }
+    // #pragma warning disable
+    // public class MessageParserResult<TMarketActivityRecordType>
+    // {
+    //     private MessageParserResult(MessageHeader header, IReadOnlyCollection<TMarketActivityRecordType> marketActivityRecords)
+    //     {
+    //         Header = header;
+    //         MarketActivityRecords = marketActivityRecords;
+    //     }
+    //
+    //     public MessageHeader Header { get; }
+    //
+    //     public IReadOnlyCollection<TMarketActivityRecordType> MarketActivityRecords { get; }
+    //
+    //
+    //     public MessageParserResult<TMarketActivityRecordType> Succeeded(MessageHeader header, IReadOnlyCollection<TMarketActivityRecordType> marketActivityRecords)
+    //     {
+    //         return new MessageParserResult<TMarketActivityRecordType>(header, marketActivityRecords);
+    //     }
+    // }
 }
