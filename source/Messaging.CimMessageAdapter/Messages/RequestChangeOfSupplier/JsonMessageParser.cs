@@ -161,7 +161,7 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
             token["sender_MarketParticipant.marketRole.type"]["value"].ToString(),
             token["receiver_MarketParticipant.mRID"]["value"].ToString(),
             token["receiver_MarketParticipant.marketRole.type"]["value"].ToString(),
-            token["createdDateTime"].ToString());
+            GetJsonDateStringWithoutQuotes(token["createdDateTime"]));
     }
 
     private static MarketActivityRecord MarketActivityRecordFrom(JToken token)
@@ -170,12 +170,18 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
         {
             Id = token["mRID"].ToString(),
             ConsumerId = token["marketEvaluationPoint.customer_MarketParticipant.mRID"]["value"].ToString(),
+            ConsumerIdType = token["marketEvaluationPoint.customer_MarketParticipant.mRID"]["codingScheme"].ToString(),
             BalanceResponsibleId = token["marketEvaluationPoint.balanceResponsibleParty_MarketParticipant.mRID"]["value"].ToString(),
             EnergySupplierId = token["marketEvaluationPoint.energySupplier_MarketParticipant.mRID"]["value"].ToString(),
             MarketEvaluationPointId = token["marketEvaluationPoint.mRID"]["value"].ToString(),
             ConsumerName = token["marketEvaluationPoint.customer_MarketParticipant.name"].ToString(),
-            EffectiveDate = token["start_DateAndOrTime.dateTime"].ToString(),
+            EffectiveDate = GetJsonDateStringWithoutQuotes(token["start_DateAndOrTime.dateTime"]),
         };
+    }
+
+    private static string GetJsonDateStringWithoutQuotes(JToken token)
+    {
+        return token.ToString(Formatting.None).Trim('"');
     }
 
     private async Task ValidateMessageAsync(JsonSchema schema, Stream message)
