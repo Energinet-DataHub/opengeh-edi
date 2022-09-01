@@ -66,21 +66,18 @@ namespace Messaging.CimMessageAdapter
                 return Result.Failure(_errors.ToArray());
             }
 
-            foreach (var marketActivityRecord in messageParserResult.MarketActivityRecords)
-            {
-                if (string.IsNullOrEmpty(marketActivityRecord.Id))
-                {
-                    return Result.Failure(new EmptyTransactionId(marketActivityRecord.Id));
-                }
-
-                if (await CheckTransactionIdAsync(marketActivityRecord.Id).ConfigureAwait(false) == false)
-                {
-                    return Result.Failure(new DuplicateTransactionIdDetected(marketActivityRecord.Id));
-                }
-            }
-
             foreach (var transaction in messageParserResult.Message!.ToTransactions())
             {
+                if (string.IsNullOrEmpty(transaction.MarketActivityRecord.Id))
+                {
+                    return Result.Failure(new EmptyTransactionId(transaction.MarketActivityRecord.Id));
+                }
+
+                if (await CheckTransactionIdAsync(transaction.MarketActivityRecord.Id).ConfigureAwait(false) == false)
+                {
+                    return Result.Failure(new DuplicateTransactionIdDetected(transaction.MarketActivityRecord.Id));
+                }
+
                 await AddToTransactionQueueAsync(transaction).ConfigureAwait(false);
             }
 
