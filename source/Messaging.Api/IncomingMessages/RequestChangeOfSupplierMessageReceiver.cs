@@ -20,7 +20,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Messaging.Application.Configuration;
 using Messaging.CimMessageAdapter;
-using Messaging.CimMessageAdapter.Messages;
+using Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 using Messaging.CimMessageAdapter.Response;
 using Messaging.Infrastructure.IncomingMessages;
 using Microsoft.Azure.Functions.Worker;

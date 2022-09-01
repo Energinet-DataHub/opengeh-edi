@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Domain.OutgoingMessages;
 
-namespace Messaging.CimMessageAdapter.Messages;
+namespace Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 
 public class MessageParser
 {

@@ -22,6 +22,7 @@ using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Messages;
+using Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.IntegrationTests.CimMessageAdapter.Messages;
 using Messaging.IntegrationTests.CimMessageAdapter.Stubs;
