@@ -46,7 +46,7 @@ namespace Messaging.CimMessageAdapter
             _messageParser = messageParser;
         }
 
-        public async Task<Result> ReceiveAsync(Stream message, CimFormat cimFormat)
+        public async Task<Result> ReceiveAsync(Stream message, CimFormat cimFormat, MessageParserResult messageParserResult1)
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
 

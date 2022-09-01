@@ -185,9 +185,10 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
             Assert.Contains(result.Errors, error => error.Code.Equals(errorCode, StringComparison.OrdinalIgnoreCase));
         }
 
-        private Task<Result> ReceiveRequestChangeOfSupplierMessage(Stream message)
+        private async Task<Result> ReceiveRequestChangeOfSupplierMessage(Stream message)
         {
-            return CreateMessageReceiver().ReceiveAsync(message, CimFormat.Xml);
+            return await CreateMessageReceiver()
+                .ReceiveAsync(message, CimFormat.Xml, await ParseMessageAsync(message).ConfigureAwait(false));
         }
 
         private MessageReceiver CreateMessageReceiver()
@@ -209,12 +210,17 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
             var messageBuilder = BusinessMessageBuilder.RequestChangeOfSupplier();
 
             using var originalMessage = messageBuilder.Message();
-            await CreateMessageReceiver(messageIds).ReceiveAsync(originalMessage, CimFormat.Xml)
+            await CreateMessageReceiver(messageIds).ReceiveAsync(originalMessage, CimFormat.Xml, await ParseMessageAsync(originalMessage).ConfigureAwait(false))
                 .ConfigureAwait(false);
 
             using var duplicateMessage = messageBuilder.Message();
-            await CreateMessageReceiver(messageIds).ReceiveAsync(duplicateMessage, CimFormat.Xml)
+            await CreateMessageReceiver(messageIds).ReceiveAsync(duplicateMessage, CimFormat.Xml, await ParseMessageAsync(originalMessage).ConfigureAwait(false))
                 .ConfigureAwait(false);
+        }
+
+        private Task<MessageParserResult> ParseMessageAsync(Stream message)
+        {
+            return _messageParser.ParseAsync(message, CimFormat.Xml);
         }
 
         private ClaimsPrincipal CreateIdentity()

@@ -20,6 +20,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Messaging.Application.Configuration;
 using Messaging.CimMessageAdapter;
+using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Response;
 using Messaging.Infrastructure.IncomingMessages;
 using Microsoft.Azure.Functions.Worker;
@@ -34,17 +35,20 @@ namespace Messaging.Api.IncomingMessages
         private readonly ICorrelationContext _correlationContext;
         private readonly MessageReceiver _messageReceiver;
         private readonly ResponseFactory _responseFactory;
+        private readonly MessageParser _messageParser;
 
         public RequestChangeOfSupplierMessageReceiver(
             ILogger<RequestChangeOfSupplierMessageReceiver> logger,
             ICorrelationContext correlationContext,
             MessageReceiver messageReceiver,
-            ResponseFactory responseFactory)
+            ResponseFactory responseFactory,
+            MessageParser messageParser)
         {
             _logger = logger;
             _correlationContext = correlationContext;
             _messageReceiver = messageReceiver ?? throw new ArgumentNullException(nameof(messageReceiver));
             _responseFactory = responseFactory;
+            _messageParser = messageParser;
         }
 
         [Function("RequestChangeOfSupplier")]
@@ -64,7 +68,8 @@ namespace Messaging.Api.IncomingMessages
                 return request.CreateResponse(HttpStatusCode.UnsupportedMediaType);
             }
 
-            var result = await _messageReceiver.ReceiveAsync(request.Body, cimFormat)
+            var messageParserResult = await _messageParser.ParseAsync(request.Body, cimFormat).ConfigureAwait(false);
+            var result = await _messageReceiver.ReceiveAsync(request.Body, cimFormat, messageParserResult)
                 .ConfigureAwait(false);
 
             var httpStatusCode = result.Success ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
