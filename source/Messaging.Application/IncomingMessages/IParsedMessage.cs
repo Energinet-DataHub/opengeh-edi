@@ -20,6 +20,7 @@ namespace Messaging.Application.IncomingMessages;
 #pragma warning disable
 public interface IParsedMessage<out TMarketActivityRecordType, TMarketTransactionType>
     where TMarketActivityRecordType : IMarketActivityRecord
+    where TMarketTransactionType : IMarketTransaction<TMarketActivityRecordType>
 {
     MessageHeader Header { get; }
 

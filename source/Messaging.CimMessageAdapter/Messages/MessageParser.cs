@@ -24,14 +24,14 @@ namespace Messaging.CimMessageAdapter.Messages;
 
 public class MessageParser
 {
-    private readonly IEnumerable<IMessageParser<MarketActivityRecord, RequestChangeOfSupplierParsedMessage>> _parsers;
+    private readonly IEnumerable<IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>> _parsers;
 
-    public MessageParser(IEnumerable<IMessageParser<MarketActivityRecord, RequestChangeOfSupplierParsedMessage>> parsers)
+    public MessageParser(IEnumerable<IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>> parsers)
     {
         _parsers = parsers;
     }
 
-    public Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierParsedMessage>> ParseAsync(Stream message, CimFormat cimFormat)
+    public Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>> ParseAsync(Stream message, CimFormat cimFormat)
     {
         var parser = _parsers.FirstOrDefault(parser => parser.HandledFormat.Equals(cimFormat));
         if (parser is null) throw new InvalidOperationException($"No message parser found for message format '{cimFormat}'");

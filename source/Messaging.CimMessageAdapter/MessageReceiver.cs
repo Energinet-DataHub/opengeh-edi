@@ -42,8 +42,9 @@ namespace Messaging.CimMessageAdapter
             _marketActorAuthenticator = marketActorAuthenticator ?? throw new ArgumentNullException(nameof(marketActorAuthenticator));
         }
 
-        public async Task<Result> ReceiveAsync<TMarketActivityRecordType, TMessageType>(MessageParserResult<TMarketActivityRecordType, TMessageType> messageParserResult)
+        public async Task<Result> ReceiveAsync<TMarketActivityRecordType, TMarketTransactionType>(MessageParserResult<TMarketActivityRecordType, TMarketTransactionType> messageParserResult)
             where TMarketActivityRecordType : IMarketActivityRecord
+            where TMarketTransactionType : IMarketTransaction<TMarketActivityRecordType>
         {
             ArgumentNullException.ThrowIfNull(messageParserResult);
 

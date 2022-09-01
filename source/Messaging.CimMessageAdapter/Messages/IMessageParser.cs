@@ -22,8 +22,9 @@ namespace Messaging.CimMessageAdapter.Messages;
 /// <summary>
 /// Parses CIM messages from a stream
 /// </summary>
-public interface IMessageParser<TMarketActivityRecordType, TMessageType>
- where TMarketActivityRecordType : IMarketActivityRecord
+public interface IMessageParser<TMarketActivityRecordType, TMarketTransactionType>
+    where TMarketActivityRecordType : IMarketActivityRecord
+    where TMarketTransactionType : IMarketTransaction<TMarketActivityRecordType>
 {
     /// <summary>
     /// The CIM format handled
@@ -34,5 +35,5 @@ public interface IMessageParser<TMarketActivityRecordType, TMessageType>
     /// Parse from stream
     /// </summary>
     /// <param name="message"></param>
-    Task<MessageParserResult<TMarketActivityRecordType, TMessageType>> ParseAsync(Stream message);
+    Task<MessageParserResult<TMarketActivityRecordType, TMarketTransactionType>> ParseAsync(Stream message);
 }
