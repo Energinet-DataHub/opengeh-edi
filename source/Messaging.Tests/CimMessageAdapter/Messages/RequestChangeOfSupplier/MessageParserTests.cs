@@ -75,15 +75,15 @@ public class MessageParserTests
         Assert.Equal("5790001330552", header?.ReceiverId);
         Assert.Equal("DDZ", header?.ReceiverRole);
         Assert.Equal("2022-09-07T09:30:47Z", header?.CreatedAt);
-        var marketActivityRecord = result.MarketActivityRecords.First();
-        Assert.Equal("12345689", marketActivityRecord.Id);
-        Assert.Equal("579999993331812345", marketActivityRecord.MarketEvaluationPointId);
-        Assert.Equal("5799999933318", marketActivityRecord.EnergySupplierId);
-        Assert.Equal("5799999933340", marketActivityRecord.BalanceResponsibleId);
-        Assert.Equal("0801741527", marketActivityRecord.ConsumerId);
-        Assert.Equal("ARR", marketActivityRecord.ConsumerIdType);
-        Assert.Equal("Jan Hansen", marketActivityRecord.ConsumerName);
-        Assert.Equal("2022-09-07T22:00:00Z", marketActivityRecord.EffectiveDate);
+        var marketActivityRecord = result.Message?.MarketActivityRecords.First();
+        Assert.Equal("12345689", marketActivityRecord?.Id);
+        Assert.Equal("579999993331812345", marketActivityRecord?.MarketEvaluationPointId);
+        Assert.Equal("5799999933318", marketActivityRecord?.EnergySupplierId);
+        Assert.Equal("5799999933340", marketActivityRecord?.BalanceResponsibleId);
+        Assert.Equal("0801741527", marketActivityRecord?.ConsumerId);
+        Assert.Equal("ARR", marketActivityRecord?.ConsumerIdType);
+        Assert.Equal("Jan Hansen", marketActivityRecord?.ConsumerName);
+        Assert.Equal("2022-09-07T22:00:00Z", marketActivityRecord?.EffectiveDate);
     }
 
     [Theory]

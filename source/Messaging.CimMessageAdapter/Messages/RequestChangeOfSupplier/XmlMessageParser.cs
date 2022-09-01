@@ -317,6 +317,6 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
             return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(_errors.ToArray());
         }
 
-        return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(marketActivityRecords, new RequestChangeOfSupplierParsedMessage(messageHeader, marketActivityRecords));
+        return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(new RequestChangeOfSupplierParsedMessage(messageHeader, marketActivityRecords));
     }
 }

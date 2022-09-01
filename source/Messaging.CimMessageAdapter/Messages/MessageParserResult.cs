@@ -28,25 +28,14 @@ namespace Messaging.CimMessageAdapter.Messages
         }
 
         public MessageParserResult(
-            IReadOnlyCollection<TMarketActivityRecordType> marketActivityRecords)
-        {
-            MarketActivityRecords = marketActivityRecords;
-        }
-
-        public MessageParserResult(
-            IReadOnlyCollection<TMarketActivityRecordType> marketActivityRecords,
             IParsedMessage<TMarketActivityRecordType, TMarketTransactionType> message)
         {
-            MarketActivityRecords = marketActivityRecords;
             Message = message;
         }
 
         public IReadOnlyCollection<ValidationError> Errors { get; } = new List<ValidationError>();
 
         public bool Success => Errors.Count == 0;
-
-        public IReadOnlyCollection<TMarketActivityRecordType> MarketActivityRecords { get; } =
-            new List<TMarketActivityRecordType>();
 
         public IParsedMessage<TMarketActivityRecordType, TMarketTransactionType>? Message { get; }
     }
