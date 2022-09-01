@@ -90,10 +90,6 @@ namespace Messaging.CimMessageAdapter
             return header is null;
         }
 
-        // private static RequestChangeOfSupplierTransaction CreateTransaction(MessageHeader messageHeader, IMarketActivityRecord marketActivityRecord)
-        // {
-        //     return RequestChangeOfSupplierTransaction.Create(messageHeader, (MarketActivityRecord)marketActivityRecord);
-        // }
         private Task<bool> CheckTransactionIdAsync(string transactionId)
         {
             if (transactionId == null) throw new ArgumentNullException(nameof(transactionId));
