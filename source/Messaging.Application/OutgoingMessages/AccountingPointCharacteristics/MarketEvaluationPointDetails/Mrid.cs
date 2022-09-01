@@ -12,26 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
+namespace Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails;
 
-public class StreetDetail
+public class Mrid
 {
-    public StreetDetail(string code, string name, string number, string floorIdentification, string suiteNumber)
+    public Mrid(string id, string codingScheme)
     {
-        Code = code;
-        Name = name;
-        Number = number;
-        FloorIdentification = floorIdentification;
-        SuiteNumber = suiteNumber;
+        Id = id;
+        CodingScheme = codingScheme;
     }
 
-    public string Code { get; }
+    public string Id { get; }
 
-    public string Name { get; }
-
-    public string Number { get; }
-
-    public string FloorIdentification { get; }
-
-    public string SuiteNumber { get; }
+    public string CodingScheme { get; }
 }

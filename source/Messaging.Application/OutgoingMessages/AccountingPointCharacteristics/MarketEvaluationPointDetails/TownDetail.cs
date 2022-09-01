@@ -12,20 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
+namespace Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails;
 
-public class Address
+public class TownDetail
 {
-    public Address(StreetDetail street, TownDetail town, string postalCode)
+    public TownDetail(string code, string name, string section, string country)
     {
-        Street = street;
-        Town = town;
-        PostalCode = postalCode;
+        Code = code;
+        Name = name;
+        Section = section;
+        Country = country;
     }
 
-    public StreetDetail Street { get; }
+    public string Code { get; }
 
-    public TownDetail Town { get; }
+    public string Name { get; }
 
-    public string PostalCode { get; }
+    public string Section { get; }
+
+    public string Country { get; }
 }

@@ -18,7 +18,7 @@ namespace Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
 
 public class MarketActivityRecord
 {
-    public MarketActivityRecord(string id, string? originalTransactionId, Instant validityStartDate, MarketEvaluationPoint.MarketEvaluationPoint marketEvaluationPt)
+    public MarketActivityRecord(string id, string? originalTransactionId, Instant validityStartDate, MarketEvaluationPointDetails.MarketEvaluationPoint marketEvaluationPt)
     {
         Id = id;
         OriginalTransactionId = originalTransactionId;
@@ -32,5 +32,5 @@ public class MarketActivityRecord
 
     public Instant ValidityStartDate { get; }
 
-    public MarketEvaluationPoint.MarketEvaluationPoint MarketEvaluationPt { get; }
+    public MarketEvaluationPointDetails.MarketEvaluationPoint MarketEvaluationPt { get; }
 }

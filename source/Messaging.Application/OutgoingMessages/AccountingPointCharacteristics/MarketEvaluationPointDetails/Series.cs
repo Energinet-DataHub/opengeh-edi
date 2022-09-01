@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
+namespace Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails;
 
-public class Mrid
+public class Series
 {
-    public Mrid(string id, string codingScheme)
+    public Series(string product, string quantityMeasureUnit)
     {
-        Id = id;
-        CodingScheme = codingScheme;
+        Product = product;
+        QuantityMeasureUnit = quantityMeasureUnit;
     }
 
-    public string Id { get; }
+    public string Product { get; }
 
-    public string CodingScheme { get; }
+    public string QuantityMeasureUnit { get; }
 }
