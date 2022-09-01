@@ -16,7 +16,9 @@ using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 
 namespace Messaging.Application.IncomingMessages;
 
-#pragma warning disable
+/// <summary>
+/// Represents a single market transaction
+/// </summary>
 public interface IMarketTransaction
 {
     /// <summary>
@@ -26,13 +28,13 @@ public interface IMarketTransaction
 }
 
 /// <summary>
-/// Incoming message representing an EDI transaction
+/// Represents a single market transaction
 /// </summary>
 public interface IMarketTransaction<out TMarketActivityRecordType> : IMarketTransaction
- where TMarketActivityRecordType : IMarketActivityRecord
+    where TMarketActivityRecordType : IMarketActivityRecord
 {
     /// <summary>
-    /// Market activity details
+    /// Market activity record
     /// </summary>
     TMarketActivityRecordType MarketActivityRecord { get; }
 }
