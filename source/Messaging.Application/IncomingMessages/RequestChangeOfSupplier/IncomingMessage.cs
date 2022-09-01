@@ -22,25 +22,15 @@ namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
     public class IncomingMessage : ICommand<Unit>
     {
         [JsonConstructor]
-        public IncomingMessage(MessageHeader message, MarketActivityRecord marketActivityRecord, string id)
+        public IncomingMessage(MessageHeader message, MarketActivityRecord marketActivityRecord)
         {
             Message = message;
-            MarketActivityRecord = marketActivityRecord;
-            Id = id;
-        }
-
-        private IncomingMessage(MessageHeader message, MarketActivityRecord marketActivityRecord)
-        {
-            Id = Guid.NewGuid().ToString();
-            Message = message ?? throw new ArgumentNullException(nameof(message));
             MarketActivityRecord = marketActivityRecord;
         }
 
         public MessageHeader Message { get; }
 
         public MarketActivityRecord MarketActivityRecord { get; }
-
-        public string Id { get; }
 
         public static IncomingMessage Create(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
         {
