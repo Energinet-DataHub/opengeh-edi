@@ -31,8 +31,6 @@ public class RequestMessages : ICommand<Unit>
 
     public ClientProvidedDetails ClientProvidedDetails { get; }
 
-    public string RequestedDocumentFormat => ClientProvidedDetails.RequestedFormat;
-
     public Guid RequestId => ClientProvidedDetails.RequestId;
 
     public string IdempotencyId => ClientProvidedDetails.IdempotencyId;
