@@ -21,6 +21,7 @@ using MediatR;
 using Messaging.Application.Common;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.IncomingMessages;
+using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Requesting;
 using Messaging.Domain.OutgoingMessages;
@@ -141,7 +142,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
             return JsonSerializer.Deserialize<TNotification>(commandData);
         }
 
-        private async Task<IncomingMessage> MessageArrived()
+        private async Task<RequestChangeOfSupplierTransaction> MessageArrived()
         {
             var incomingMessage = MessageBuilder()
                 .Build();

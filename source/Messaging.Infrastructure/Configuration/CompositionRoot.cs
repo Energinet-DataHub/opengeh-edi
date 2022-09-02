@@ -29,7 +29,7 @@ using Messaging.Application.Common.Reasons;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.IncomingMessages;
+using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.MasterData.MarketEvaluationPoints;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
@@ -67,6 +67,7 @@ using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using MarketActivityRecord = Messaging.Application.IncomingMessages.RequestChangeOfSupplier.MarketActivityRecord;
 
 namespace Messaging.Infrastructure.Configuration
 {
@@ -218,7 +219,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddScoped<IRequestDispatcher, RequestDispatcher<RequestMasterDataConfiguration>>();
             _services.AddScoped<IRequestMeteringPointMasterData, RequestMeteringPointMasterData>();
             _services.AddScoped<IRequestCustomerMasterData, RequestCustomerMasterData>();
-            _services.AddTransient<IRequestHandler<IncomingMessage, Unit>, MoveInRequestHandler>();
+            _services.AddTransient<IRequestHandler<RequestChangeOfSupplierTransaction, Unit>, MoveInRequestHandler>();
             _services.AddTransient<IRequestHandler<FetchCustomerMasterData, Unit>, FetchCustomerMasterDataHandler>();
             _services.AddTransient<IRequestHandler<FetchMeteringPointMasterData, Unit>, FetchMeteringPointMasterDataHandler>();
             _services.AddTransient<IRequestHandler<SetConsumerHasMovedIn, Unit>, SetConsumerHasMovedInHandler>();
@@ -232,7 +233,7 @@ namespace Messaging.Infrastructure.Configuration
 
         public CompositionRoot AddMessageParserServices()
         {
-            _services.AddSingleton(_ => new MessageParser(new IMessageParser[]
+            _services.AddSingleton(_ => new MessageParser(new IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>[]
             {
                 new JsonMessageParser(),
                 new XmlMessageParser(),

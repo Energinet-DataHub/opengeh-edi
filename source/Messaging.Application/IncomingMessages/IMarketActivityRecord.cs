@@ -12,25 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Messaging.Application.IncomingMessages;
+namespace Messaging.Application.IncomingMessages;
 
-namespace Messaging.CimMessageAdapter.Messages
+/// <summary>
+/// Market activity record
+/// </summary>
+public interface IMarketActivityRecord
 {
     /// <summary>
-    /// Service for dispatching incoming messages to message queue
+    /// Unique identifier (transaction id) of market activity record
     /// </summary>
-    public interface IMessageQueueDispatcher
-    {
-        /// <summary>
-        /// Adds a message to collection
-        /// </summary>
-        /// <param name="message"></param>
-        Task AddAsync(IMarketTransaction message);
-
-        /// <summary>
-        /// Commits added transactions to queue
-        /// </summary>
-        Task CommitAsync();
-    }
+    string Id { get; }
 }

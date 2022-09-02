@@ -16,24 +16,15 @@ using System;
 using System.Text.Json.Serialization;
 using MediatR;
 using Messaging.Application.Common.Commands;
-using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 
-namespace Messaging.Application.IncomingMessages
+namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
 {
-    public class IncomingMessage : ICommand<Unit>
+    public class RequestChangeOfSupplierTransaction : ICommand<Unit>, IMarketTransaction<MarketActivityRecord>
     {
         [JsonConstructor]
-        public IncomingMessage(MessageHeader message, MarketActivityRecord marketActivityRecord, string id)
+        public RequestChangeOfSupplierTransaction(MessageHeader message, MarketActivityRecord marketActivityRecord)
         {
             Message = message;
-            MarketActivityRecord = marketActivityRecord;
-            Id = id;
-        }
-
-        private IncomingMessage(MessageHeader message, MarketActivityRecord marketActivityRecord)
-        {
-            Id = Guid.NewGuid().ToString();
-            Message = message ?? throw new ArgumentNullException(nameof(message));
             MarketActivityRecord = marketActivityRecord;
         }
 
@@ -41,12 +32,10 @@ namespace Messaging.Application.IncomingMessages
 
         public MarketActivityRecord MarketActivityRecord { get; }
 
-        public string Id { get; }
-
-        public static IncomingMessage Create(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
+        public static RequestChangeOfSupplierTransaction Create(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
         {
             if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
-            return new IncomingMessage(messageHeader, marketActivityRecord);
+            return new RequestChangeOfSupplierTransaction(messageHeader, marketActivityRecord);
         }
     }
 }

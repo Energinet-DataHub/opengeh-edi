@@ -14,7 +14,7 @@
 
 namespace Messaging.Application.IncomingMessages.RequestChangeOfSupplier
 {
-    public class MarketActivityRecord
+    public class MarketActivityRecord : IMarketActivityRecord
     {
         public string Id { get; init; } = string.Empty;
 

@@ -12,28 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.IO;
-using System.Threading.Tasks;
-using Messaging.Application.IncomingMessages;
-using Messaging.Domain.OutgoingMessages;
-
-namespace Messaging.CimMessageAdapter.Messages;
+namespace Messaging.Application.IncomingMessages;
 
 /// <summary>
-/// Parses CIM messages from a stream
+/// Represents a single market transaction
 /// </summary>
-public interface IMessageParser<TMarketActivityRecordType, TMarketTransactionType>
-    where TMarketActivityRecordType : IMarketActivityRecord
-    where TMarketTransactionType : IMarketTransaction<TMarketActivityRecordType>
+public interface IMarketTransaction
 {
     /// <summary>
-    /// The CIM format handled
+    /// Message metadata
     /// </summary>
-    CimFormat HandledFormat { get; }
+    MessageHeader Message { get; }
+}
 
+/// <summary>
+/// Represents a single market transaction
+/// </summary>
+public interface IMarketTransaction<out TMarketActivityRecordType> : IMarketTransaction
+    where TMarketActivityRecordType : IMarketActivityRecord
+{
     /// <summary>
-    /// Parse from stream
+    /// Market activity record
     /// </summary>
-    /// <param name="message"></param>
-    Task<MessageParserResult<TMarketActivityRecordType, TMarketTransactionType>> ParseAsync(Stream message);
+    TMarketActivityRecordType MarketActivityRecord { get; }
 }

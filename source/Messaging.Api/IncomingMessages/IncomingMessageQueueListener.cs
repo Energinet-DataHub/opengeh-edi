@@ -19,6 +19,7 @@ using MediatR;
 using Messaging.Api.Configuration;
 using Messaging.Application.Configuration;
 using Messaging.Application.IncomingMessages;
+using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
@@ -58,7 +59,7 @@ namespace Messaging.Api.IncomingMessages
             _logger.LogInformation($"Received incoming message: {byteAsString}");
 
             await _mediator.Send(
-                    _jsonSerializer.Deserialize<IncomingMessage>(byteAsString))
+                    _jsonSerializer.Deserialize<RequestChangeOfSupplierTransaction>(byteAsString))
                 .ConfigureAwait(false);
 
             _logger.LogInformation("B2B transaction dequeued with correlation id: {CorrelationId}", _correlationContext.Id);
