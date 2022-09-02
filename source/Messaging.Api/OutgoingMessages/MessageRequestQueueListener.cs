@@ -71,11 +71,11 @@ namespace Messaging.Api.OutgoingMessages
 
             await _mediator.Send(new RequestMessages(
                 dataAvailableIds.Select(x => x.ToString()).ToList() ?? throw new InvalidOperationException(),
-                messageRequest.ResponseFormat.ToString(),
-                messageRequest.RequestId,
-                messageRequest.IdempotencyId,
-                messageRequest.DataAvailableNotificationReferenceId,
-                messageRequest.MessageType.Value,
+                clientProvidedDetails.RequestedFormat,
+                clientProvidedDetails.RequestId,
+                clientProvidedDetails.IdempotencyId,
+                clientProvidedDetails.ReferenceId,
+                clientProvidedDetails.DocumentType,
                 clientProvidedDetails)).ConfigureAwait(false);
             _logger.LogInformation($"Dequeued with correlation id: {_correlationContext.Id}");
         }
