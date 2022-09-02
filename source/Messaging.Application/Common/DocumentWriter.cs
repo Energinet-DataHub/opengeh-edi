@@ -52,11 +52,7 @@ public abstract class DocumentWriter : IDocumentWriter
     public bool HandlesDocumentType(DocumentType documentType)
     {
         if (documentType == null) throw new ArgumentNullException(nameof(documentType));
-        var parsedDocumentType = EnumerationType
-            .GetAll<DocumentType>()
-            .FirstOrDefault(t =>
-                t.Name.Equals(_documentDetails.Type.Split("_")[0], StringComparison.OrdinalIgnoreCase));
-        return documentType.Equals(parsedDocumentType);
+        return documentType.Name.Equals(_documentDetails.Type.Split("_")[0], StringComparison.OrdinalIgnoreCase);
     }
 
     public bool HandlesDocumentFormat(CimFormat format)

@@ -12,22 +12,45 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
+using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.MeteringPoints.RequestResponse.Requests;
+using Google.Protobuf;
 using Messaging.Application.Transactions.MoveIn;
 
 namespace Messaging.Infrastructure.Transactions.MoveIn;
 
 public class RequestMeteringPointMasterData : IRequestMeteringPointMasterData
 {
-    private readonly RequestMeteringPointMasterDataDispatcher _requestMeteringPointMasterDataDispatcher;
+    private readonly IRequestDispatcher _dispatcher;
 
-    public RequestMeteringPointMasterData(RequestMeteringPointMasterDataDispatcher requestMeteringPointMasterDataDispatcher)
+    public RequestMeteringPointMasterData(IRequestDispatcher dispatcher)
     {
-        _requestMeteringPointMasterDataDispatcher = requestMeteringPointMasterDataDispatcher;
+        _dispatcher = dispatcher;
     }
 
     public async Task RequestMasterDataForAsync(FetchMeteringPointMasterData fetchMeteringPointMasterData)
     {
-        await _requestMeteringPointMasterDataDispatcher.SendAsync(fetchMeteringPointMasterData).ConfigureAwait(false);
+        if (fetchMeteringPointMasterData == null) throw new ArgumentNullException(nameof(fetchMeteringPointMasterData));
+        var message = CreateFrom(fetchMeteringPointMasterData);
+        await _dispatcher.SendAsync(message).ConfigureAwait(false);
+    }
+
+    private static ServiceBusMessage CreateFrom(FetchMeteringPointMasterData fetchMeteringPointMasterData)
+    {
+        var message = new MasterDataRequest
+        {
+            GsrnNumber = fetchMeteringPointMasterData.MarketEvaluationPointNumber,
+        };
+        var bytes = message.ToByteArray();
+        ServiceBusMessage serviceBusMessage = new(bytes)
+        {
+            ContentType = "application/octet-stream;charset=utf-8",
+        };
+        serviceBusMessage.ApplicationProperties.Add("BusinessProcessId", fetchMeteringPointMasterData.BusinessProcessId);
+        serviceBusMessage.ApplicationProperties.Add("TransactionId", fetchMeteringPointMasterData.TransactionId);
+
+        return serviceBusMessage;
     }
 }
