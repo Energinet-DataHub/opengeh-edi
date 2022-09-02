@@ -59,7 +59,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
             _messageStorage.MessageHasBeenSavedInStorage();
             var command = GetQueuedNotification<SendSuccessNotification>();
             Assert.NotNull(command);
-            Assert.Equal(request.RequestId, command?.RequestId);
+            Assert.Equal(request.ClientProvidedDetails.RequestId, command?.RequestId);
             Assert.Equal(request.IdempotencyId, command?.IdempotencyId);
             Assert.Equal(request.ReferenceId, command?.ReferenceId);
             Assert.Equal(request.DocumentType, command?.DocumentType);
@@ -149,7 +149,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
         {
             var command = GetQueuedNotification<SendFailureNotification>();
             Assert.NotNull(command);
-            Assert.Equal(request.RequestId, command?.RequestId);
+            Assert.Equal(request.ClientProvidedDetails.RequestId, command?.RequestId);
             Assert.Equal(request.IdempotencyId, command?.IdempotencyId);
             Assert.Equal(request.ReferenceId, command?.ReferenceId);
             Assert.Equal(request.DocumentType, command?.MessageType);
