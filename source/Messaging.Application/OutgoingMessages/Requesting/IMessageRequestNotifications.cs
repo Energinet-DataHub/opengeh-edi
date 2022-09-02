@@ -40,5 +40,11 @@ namespace Messaging.Application.OutgoingMessages.Requesting
         /// </summary>
         /// <param name="clientProvidedDetails">Client provided request details</param>
         Task RequestedDocumentFormatIsNotSupportedAsync(ClientProvidedDetails clientProvidedDetails);
+
+        /// <summary>
+        /// The specified document type is unknown
+        /// </summary>
+        /// <param name="clientProvidedDetails"></param>
+        Task UnknownDocumentTypeAsync(ClientProvidedDetails clientProvidedDetails);
     }
 }

@@ -95,6 +95,20 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
             AssertErrorResponse(request, "InternalError");
         }
 
+        [Fact]
+        public async Task Respond_with_error_if_requested_document_type_is_unknown()
+        {
+            var incomingMessage = await MessageArrived().ConfigureAwait(false);
+            var outgoingMessage = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage.Message.MessageId)!;
+
+            var requestedMessageIds = new List<string> { outgoingMessage.Id.ToString(), };
+            var request = CreateRequest(requestedMessageIds);
+            await RequestMessages(request).ConfigureAwait(false);
+
+            Assert.Null(_messageStorage.SavedMessage);
+            AssertErrorResponse(request, "InternalError");
+        }
+
         private static RequestMessages CreateRequest(List<string> requestedMessageIds)
         {
             var clientProvidedDetails = new ClientProvidedDetails(

@@ -61,6 +61,13 @@ namespace Messaging.Application.OutgoingMessages.Requesting
                 return Unit.Value;
             }
 
+            var documentType = ParseDocumentTypeFrom(request.ClientProvidedDetails.DocumentType);
+            if (documentType is null)
+            {
+                await _messageRequestNotifications.UnknownDocumentTypeAsync(request.ClientProvidedDetails).ConfigureAwait(false);
+                return Unit.Value;
+            }
+
             var requestedFormat = EnumerationType.FromName<CimFormat>(request.ClientProvidedDetails.RequestedFormat);
             var messageBundle = CreateBundleFrom(messages);
             var message = messageBundle.CreateMessage();
@@ -75,6 +82,12 @@ namespace Messaging.Application.OutgoingMessages.Requesting
             await SaveDocumentAsync(message, requestedFormat, request.ClientProvidedDetails).ConfigureAwait(false);
 
             return Unit.Value;
+        }
+
+        private static DocumentType? ParseDocumentTypeFrom(string documentType)
+        {
+            return EnumerationType.GetAll<DocumentType>()
+                .FirstOrDefault(t => t.Name.Equals(documentType.Split("_")[0], StringComparison.OrdinalIgnoreCase));
         }
 
         private static List<string> MessageIdsNotFound(IReadOnlyCollection<string> requestedMessageIds, ReadOnlyCollection<OutgoingMessage> messages)

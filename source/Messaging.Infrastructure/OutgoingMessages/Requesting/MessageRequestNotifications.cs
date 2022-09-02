@@ -69,6 +69,17 @@ namespace Messaging.Infrastructure.OutgoingMessages.Requesting
                 .ConfigureAwait(false);
         }
 
+        public Task UnknownDocumentTypeAsync(ClientProvidedDetails clientProvidedDetails)
+        {
+            ArgumentNullException.ThrowIfNull(clientProvidedDetails);
+
+            return _commandScheduler.EnqueueAsync(
+                CreateErrorResponse(
+                    clientProvidedDetails,
+                    $"Unknown document type: '{clientProvidedDetails.DocumentType}'.",
+                    "InternalError"));
+        }
+
         private static SendFailureNotification CreateErrorResponse(ClientProvidedDetails request, string failureDescription, string reason)
         {
             return new SendFailureNotification(
