@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
@@ -43,6 +42,7 @@ using Messaging.Application.SchemaStore;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Messages;
+using Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 using Messaging.CimMessageAdapter.Response;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.OutgoingMessages;
@@ -88,7 +88,6 @@ namespace Messaging.Infrastructure.Configuration
             services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
             services.AddScoped<IMessageRequestNotifications, MessageRequestNotifications>();
             services.AddTransient<IRequestHandler<RequestMessages, Unit>, RequestMessagesHandler>();
-            services.AddScoped<MessageRequestContext>();
             services.AddScoped<MessageReceiver>();
 
             AddMediatR();
@@ -216,11 +215,12 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddScoped<MoveInNotifications>();
             _services.AddScoped(_ => configuration);
             _services.AddScoped<IMoveInRequester, MoveInRequester>();
+            _services.AddScoped<IRequestDispatcher, RequestDispatcher<RequestMasterDataConfiguration>>();
             _services.AddScoped<IRequestMeteringPointMasterData, RequestMeteringPointMasterData>();
-            _services.AddScoped<RequestMeteringPointMasterDataDispatcher>();
+            _services.AddScoped<IRequestCustomerMasterData, RequestCustomerMasterData>();
             _services.AddTransient<IRequestHandler<IncomingMessage, Unit>, MoveInRequestHandler>();
-            _services.AddTransient<IRequestHandler<FetchMeteringPointMasterData, Unit>, FetchMeteringPointMasterDataHandler>();
             _services.AddTransient<IRequestHandler<FetchCustomerMasterData, Unit>, FetchCustomerMasterDataHandler>();
+            _services.AddTransient<IRequestHandler<FetchMeteringPointMasterData, Unit>, FetchMeteringPointMasterDataHandler>();
             _services.AddTransient<IRequestHandler<SetConsumerHasMovedIn, Unit>, SetConsumerHasMovedInHandler>();
             _services.AddTransient<IRequestHandler<ForwardMeteringPointMasterData, Unit>, ForwardMeteringPointMasterDataHandler>();
             _services.AddTransient<IRequestHandler<ForwardCustomerMasterData, Unit>, ForwardCustomerMasterDataHandler>();

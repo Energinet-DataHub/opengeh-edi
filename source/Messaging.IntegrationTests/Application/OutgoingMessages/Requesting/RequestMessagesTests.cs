@@ -14,11 +14,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Dapper;
-using Energinet.DataHub.MessageHub.Model.Model;
 using MediatR;
 using Messaging.Application.Common;
 using Messaging.Application.Configuration.DataAccess;
@@ -38,14 +36,12 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
     {
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly MessageStorageSpy _messageStorage;
-        private MessageRequestContext _messageRequestContext;
 
         public RequestMessagesTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
             _outgoingMessageStore = GetService<IOutgoingMessageStore>();
             _messageStorage = (MessageStorageSpy)GetService<IMessageStorage>();
-            _messageRequestContext = GetService<MessageRequestContext>();
         }
 
         [Fact]
@@ -57,15 +53,16 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
             var outgoingMessage2 = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage2.Message.MessageId)!;
 
             var requestedMessageIds = new List<string> { outgoingMessage1.Id.ToString(), outgoingMessage2.Id.ToString(), };
-            await RequestMessages(requestedMessageIds.AsReadOnly()).ConfigureAwait(false);
+            var request = CreateRequest(requestedMessageIds);
+            await RequestMessages(request).ConfigureAwait(false);
 
             _messageStorage.MessageHasBeenSavedInStorage();
             var command = GetQueuedNotification<SendSuccessNotification>();
             Assert.NotNull(command);
-            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.RequestId, command?.RequestId);
-            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.IdempotencyId, command?.IdempotencyId);
-            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.DataAvailableNotificationReferenceId, command?.ReferenceId);
-            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.MessageType.Value, command?.MessageType);
+            Assert.Equal(request.RequestId, command?.RequestId);
+            Assert.Equal(request.IdempotencyId, command?.IdempotencyId);
+            Assert.Equal(request.ReferenceId, command?.ReferenceId);
+            Assert.Equal(request.DocumentType, command?.DocumentType);
             Assert.Equal(CimFormat.Xml.Name, command?.RequestedFormat);
             Assert.NotNull(command?.MessageStorageLocation);
         }
@@ -74,11 +71,12 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
         public async Task Requested_message_ids_must_exist()
         {
             var nonExistingMessage = new List<string> { Guid.NewGuid().ToString() };
+            var request = CreateRequest(nonExistingMessage);
 
-            await RequestMessages(nonExistingMessage.AsReadOnly()).ConfigureAwait(false);
+            await RequestMessages(request).ConfigureAwait(false);
 
             Assert.Null(_messageStorage.SavedMessage);
-            AssertErrorResponse("DatasetNotFound");
+            AssertErrorResponse(request, "DatasetNotFound");
         }
 
         [Fact]
@@ -90,10 +88,22 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
             var outgoingMessage = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage.Message.MessageId)!;
 
             var requestedMessageIds = new List<string> { outgoingMessage.Id.ToString(), };
-            await RequestMessages(requestedMessageIds.AsReadOnly()).ConfigureAwait(false);
+            var request = CreateRequest(requestedMessageIds);
+            await RequestMessages(request).ConfigureAwait(false);
 
             Assert.Null(_messageStorage.SavedMessage);
-            AssertErrorResponse("InternalError");
+            AssertErrorResponse(request, "InternalError");
+        }
+
+        private static RequestMessages CreateRequest(List<string> requestedMessageIds)
+        {
+            return new RequestMessages(
+                requestedMessageIds,
+                CimFormat.Xml.Name,
+                Guid.NewGuid(),
+                Guid.NewGuid().ToString(),
+                Guid.NewGuid().ToString(),
+                "FakeDocument");
         }
 
         private static IncomingMessageBuilder MessageBuilder()
@@ -122,22 +132,9 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
             return incomingMessage;
         }
 
-        private Task RequestMessages(IEnumerable<string> messageIds)
+        private Task RequestMessages(RequestMessages request)
         {
-            SetMessageRequestContext();
-            return GetService<IMediator>().Send(new RequestMessages(messageIds.ToList(), CimFormat.Xml.Name));
-        }
-
-        private void SetMessageRequestContext()
-        {
-            _messageRequestContext = GetService<MessageRequestContext>();
-            _messageRequestContext.SetMessageRequest(new DataBundleRequestDto(
-                Guid.Empty,
-                string.Empty,
-                string.Empty,
-                new MessageTypeDto(string.Empty),
-                ResponseFormat.Xml,
-                1));
+            return GetService<IMediator>().Send(request);
         }
 
         private void GivenTheRequestedDocumentFormatIsNotSupported()
@@ -145,14 +142,14 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
             RegisterInstance(new DocumentFactory(new List<DocumentWriter>()));
         }
 
-        private void AssertErrorResponse(string reason)
+        private void AssertErrorResponse(RequestMessages request, string reason)
         {
             var command = GetQueuedNotification<SendFailureNotification>();
             Assert.NotNull(command);
-            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.RequestId, command?.RequestId);
-            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.DataAvailableNotificationReferenceId, command?.ReferenceId);
-            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.MessageType.Value, command?.MessageType);
-            Assert.Equal(_messageRequestContext.DataBundleRequestDto?.IdempotencyId, command?.IdempotencyId);
+            Assert.Equal(request.RequestId, command?.RequestId);
+            Assert.Equal(request.IdempotencyId, command?.IdempotencyId);
+            Assert.Equal(request.ReferenceId, command?.ReferenceId);
+            Assert.Equal(request.DocumentType, command?.MessageType);
             Assert.Equal(CimFormat.Xml.Name, command?.RequestedFormat);
             Assert.NotEqual(string.Empty, command?.FailureDescription);
             Assert.Equal(reason, command?.Reason);

@@ -13,25 +13,27 @@
 // limitations under the License.
 
 using System;
-using System.IO;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Messaging.Application.OutgoingMessages.Requesting;
-using Xunit;
+using Azure.Messaging.ServiceBus;
+using Messaging.Infrastructure.Transactions.MoveIn;
 
 namespace Messaging.IntegrationTests.TestDoubles;
 
-public class MessageStorageSpy : IMessageStorage
+public class RequestDispatcherSpy : IRequestDispatcher
 {
-    public Stream? SavedMessage { get; private set; }
+    private readonly Dictionary<string, ServiceBusMessage> _dispatchedRequests = new();
 
-    public Task<Uri> SaveAsync(Stream bundledMessage, MessageRequest messageRequest)
+    public ServiceBusMessage? GetRequest(string correlationId)
     {
-        SavedMessage = bundledMessage;
-        return Task.FromResult(new Uri("http://someuri"));
+        _dispatchedRequests.TryGetValue(correlationId, out var message);
+        return message;
     }
 
-    public void MessageHasBeenSavedInStorage()
+    public Task SendAsync(ServiceBusMessage message)
     {
-        Assert.NotNull(SavedMessage);
+        if (message == null) throw new ArgumentNullException(nameof(message));
+        _dispatchedRequests.Add(message.MessageId, message);
+        return Task.CompletedTask;
     }
 }
