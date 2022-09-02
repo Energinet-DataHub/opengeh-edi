@@ -15,11 +15,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Messaging.Application.Common;
 using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.SeedWork;
 using Newtonsoft.Json;
 
 namespace Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
@@ -43,11 +41,7 @@ public class ConfirmChangeOfSupplierJsonDocumentWriter : IDocumentWriter
     public bool HandlesDocumentType(DocumentType documentType)
     {
         if (documentType == null) throw new ArgumentNullException(nameof(documentType));
-        var parsedDocumentType = EnumerationType
-            .GetAll<DocumentType>()
-            .FirstOrDefault(t =>
-                t.Name.Equals(DocumentType.Split("_")[0], StringComparison.OrdinalIgnoreCase));
-        return documentType.Equals(parsedDocumentType);
+        return documentType.Name.Equals(DocumentType.Split("_")[0], StringComparison.OrdinalIgnoreCase);
     }
 
     public async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)

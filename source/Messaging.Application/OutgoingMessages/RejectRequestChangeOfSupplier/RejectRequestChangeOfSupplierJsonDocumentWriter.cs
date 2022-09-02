@@ -43,11 +43,7 @@ public class RejectRequestChangeOfSupplierJsonDocumentWriter : IDocumentWriter
     public bool HandlesDocumentType(DocumentType documentType)
     {
         if (documentType == null) throw new ArgumentNullException(nameof(documentType));
-        var parsedDocumentType = EnumerationType
-            .GetAll<DocumentType>()
-            .FirstOrDefault(t =>
-                t.Name.Equals(DocumentType.Split("_")[0], StringComparison.OrdinalIgnoreCase));
-        return documentType.Equals(parsedDocumentType);
+        return documentType.Name.Equals(DocumentType.Split("_")[0], StringComparison.OrdinalIgnoreCase);
     }
 
     public async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
