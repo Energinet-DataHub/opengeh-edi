@@ -190,13 +190,21 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         private async Task RequestMessage(string id)
         {
             var requestId = Guid.NewGuid();
+            var clientProvidedDetails = new ClientProvidedDetails(
+                requestId,
+                string.Empty,
+                string.Empty,
+                "FakeDocument",
+                CimFormat.Xml.Name);
+
             await InvokeCommandAsync(new RequestMessages(
                 new[] { id },
                 CimFormat.Xml.Name,
                 requestId,
                 string.Empty,
                 string.Empty,
-                "FakeDocument")).ConfigureAwait(false);
+                "FakeDocument",
+                clientProvidedDetails)).ConfigureAwait(false);
         }
 
         private async Task AssertRejectMessage(OutgoingMessage rejectMessage)

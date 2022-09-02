@@ -97,13 +97,21 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
 
         private static RequestMessages CreateRequest(List<string> requestedMessageIds)
         {
+            var clientProvidedDetails = new ClientProvidedDetails(
+                Guid.NewGuid(),
+                Guid.NewGuid().ToString(),
+                Guid.NewGuid().ToString(),
+                "FakeDocument",
+                CimFormat.Xml.Name);
+
             return new RequestMessages(
                 requestedMessageIds,
                 CimFormat.Xml.Name,
                 Guid.NewGuid(),
                 Guid.NewGuid().ToString(),
                 Guid.NewGuid().ToString(),
-                "FakeDocument");
+                "FakeDocument",
+                clientProvidedDetails);
         }
 
         private static IncomingMessageBuilder MessageBuilder()
