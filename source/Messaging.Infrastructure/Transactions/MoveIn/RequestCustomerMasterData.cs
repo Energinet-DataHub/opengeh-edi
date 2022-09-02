@@ -18,33 +18,29 @@ using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MeteringPoints.RequestResponse.Requests;
 using Google.Protobuf;
 using Messaging.Application.Transactions.MoveIn;
-using Microsoft.Extensions.Azure;
 
 namespace Messaging.Infrastructure.Transactions.MoveIn;
 
-public class RequestMeteringPointMasterDataDispatcher
+public class RequestCustomerMasterData : IRequestCustomerMasterData
 {
-    private readonly Lazy<ServiceBusSender> _senderCreator;
+    private readonly IRequestDispatcher _dispatcher;
 
-    public RequestMeteringPointMasterDataDispatcher(IAzureClientFactory<ServiceBusClient> serviceBusClientFactory, RequestMasterDataConfiguration configuration)
+    public RequestCustomerMasterData(IRequestDispatcher requestDispatcher)
     {
-        if (serviceBusClientFactory == null) throw new ArgumentNullException(nameof(serviceBusClientFactory));
-        if (configuration == null) throw new ArgumentNullException(nameof(configuration));
-        var serviceBusClient = serviceBusClientFactory.CreateClient(configuration.WithName);
-        _senderCreator = new Lazy<ServiceBusSender>(() => serviceBusClient.CreateSender(configuration.QueueName));
+        _dispatcher = requestDispatcher;
     }
 
-    public async Task SendAsync(FetchMeteringPointMasterData fetchMeteringPointMasterData)
+    public async Task RequestMasterDataForAsync(FetchCustomerMasterData fetchCustomerMasterData)
     {
-        if (fetchMeteringPointMasterData == null) throw new ArgumentNullException(nameof(fetchMeteringPointMasterData));
-        await _senderCreator.Value.SendMessageAsync(CreateFrom(fetchMeteringPointMasterData)).ConfigureAwait(false);
+        if (fetchCustomerMasterData == null) throw new ArgumentNullException(nameof(fetchCustomerMasterData));
+        var message = CreateFrom(fetchCustomerMasterData);
+        await _dispatcher.SendAsync(message).ConfigureAwait(false);
     }
 
-    private static ServiceBusMessage CreateFrom(FetchMeteringPointMasterData fetchMeteringPointMasterData)
+    private static ServiceBusMessage CreateFrom(FetchCustomerMasterData fetchMeteringPointMasterData)
     {
         var message = new MasterDataRequest
         {
-            GsrnNumber = fetchMeteringPointMasterData.MarketEvaluationPointNumber,
         };
         var bytes = message.ToByteArray();
         ServiceBusMessage serviceBusMessage = new(bytes)
@@ -53,6 +49,7 @@ public class RequestMeteringPointMasterDataDispatcher
         };
         serviceBusMessage.ApplicationProperties.Add("BusinessProcessId", fetchMeteringPointMasterData.BusinessProcessId);
         serviceBusMessage.ApplicationProperties.Add("TransactionId", fetchMeteringPointMasterData.TransactionId);
+        serviceBusMessage.MessageId = fetchMeteringPointMasterData.TransactionId;
 
         return serviceBusMessage;
     }

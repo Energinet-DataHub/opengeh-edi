@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using MediatR;
 using Messaging.Application.Common.Commands;
@@ -20,13 +21,13 @@ namespace Messaging.Application.OutgoingMessages.Requesting;
 
 public class RequestMessages : ICommand<Unit>
 {
-    public RequestMessages(IEnumerable<string> messageIds, string requestedDocumentFormat)
+    public RequestMessages(IEnumerable<string> messageIds, ClientProvidedDetails clientProvidedDetails)
     {
+        ClientProvidedDetails = clientProvidedDetails;
         MessageIds = messageIds;
-        RequestedDocumentFormat = requestedDocumentFormat;
     }
 
     public IEnumerable<string> MessageIds { get; }
 
-    public string RequestedDocumentFormat { get; }
+    public ClientProvidedDetails ClientProvidedDetails { get; }
 }

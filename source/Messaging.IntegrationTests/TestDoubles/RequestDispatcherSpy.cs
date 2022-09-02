@@ -14,26 +14,26 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
-using Messaging.Domain.OutgoingMessages;
+using Azure.Messaging.ServiceBus;
+using Messaging.Infrastructure.Transactions.MoveIn;
 
-namespace Messaging.CimMessageAdapter.Messages;
+namespace Messaging.IntegrationTests.TestDoubles;
 
-public class MessageParser
+public class RequestDispatcherSpy : IRequestDispatcher
 {
-    private readonly IEnumerable<IMessageParser> _parsers;
+    private readonly Dictionary<string, ServiceBusMessage> _dispatchedRequests = new();
 
-    public MessageParser(IEnumerable<IMessageParser> parsers)
+    public ServiceBusMessage? GetRequest(string correlationId)
     {
-        _parsers = parsers;
+        _dispatchedRequests.TryGetValue(correlationId, out var message);
+        return message;
     }
 
-    public Task<MessageParserResult> ParseAsync(Stream message, CimFormat cimFormat)
+    public Task SendAsync(ServiceBusMessage message)
     {
-        var parser = _parsers.FirstOrDefault(parser => parser.HandledFormat.Equals(cimFormat));
-        if (parser is null) throw new InvalidOperationException($"No message parser found for message format '{cimFormat}'");
-        return parser.ParseAsync(message);
+        if (message == null) throw new ArgumentNullException(nameof(message));
+        _dispatchedRequests.Add(message.MessageId, message);
+        return Task.CompletedTask;
     }
 }

@@ -12,21 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Api.Configuration.Middleware.Correlation
+namespace Messaging.Application.IncomingMessages;
+
+/// <summary>
+/// Market activity record
+/// </summary>
+public interface IMarketActivityRecord
 {
     /// <summary>
-    /// Context for the session.
+    /// Unique identifier (transaction id) of market activity record
     /// </summary>
-    public interface ISessionContext
-    {
-        /// <summary>
-        /// Get the current session id.
-        /// </summary>
-        string Id { get; }
-
-        /// <summary>
-        /// Set the current session id.
-        /// </summary>
-        void SetId(string id);
-    }
+    string Id { get; }
 }

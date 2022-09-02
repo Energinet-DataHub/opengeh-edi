@@ -13,4 +13,4 @@
 // limitations under the License.
 
 namespace Messaging.Domain.OutgoingMessages;
-public record CimMessage(string DocumentType, MessageHeader Header, IReadOnlyList<string> MarketActivityRecordPayloads);
+public record CimMessage(DocumentType DocumentType, MessageHeader Header, IReadOnlyList<string> MarketActivityRecordPayloads);

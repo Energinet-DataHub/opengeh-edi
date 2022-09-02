@@ -14,15 +14,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.IncomingMessages;
-using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Messages;
-using Messaging.Domain.OutgoingMessages;
 using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
 
 namespace Messaging.CimMessageAdapter
@@ -34,77 +31,68 @@ namespace Messaging.CimMessageAdapter
         private readonly IMessageQueueDispatcher _messageQueueDispatcher;
         private readonly ITransactionIds _transactionIds;
         private readonly IMarketActorAuthenticator _marketActorAuthenticator;
-        private readonly MessageParser _messageParser;
 
-        public MessageReceiver(IMessageIds messageIds, IMessageQueueDispatcher messageQueueDispatcher, ITransactionIds transactionIds, IMarketActorAuthenticator marketActorAuthenticator, MessageParser messageParser)
+        public MessageReceiver(IMessageIds messageIds, IMessageQueueDispatcher messageQueueDispatcher, ITransactionIds transactionIds, IMarketActorAuthenticator marketActorAuthenticator)
         {
             _messageIds = messageIds ?? throw new ArgumentNullException(nameof(messageIds));
             _messageQueueDispatcher = messageQueueDispatcher ??
                                              throw new ArgumentNullException(nameof(messageQueueDispatcher));
             _transactionIds = transactionIds;
             _marketActorAuthenticator = marketActorAuthenticator ?? throw new ArgumentNullException(nameof(marketActorAuthenticator));
-            _messageParser = messageParser;
         }
 
-        public async Task<Result> ReceiveAsync(Stream message, CimFormat cimFormat)
+        public async Task<Result> ReceiveAsync<TMarketActivityRecordType, TMarketTransactionType>(MessageParserResult<TMarketActivityRecordType, TMarketTransactionType> messageParserResult)
+            where TMarketActivityRecordType : IMarketActivityRecord
+            where TMarketTransactionType : IMarketTransaction<TMarketActivityRecordType>
         {
-            if (message == null) throw new ArgumentNullException(nameof(message));
+            ArgumentNullException.ThrowIfNull(messageParserResult);
 
-            var messageParserResult =
-                 await _messageParser.ParseAsync(message, cimFormat).ConfigureAwait(false);
+            var messageHeader = messageParserResult.IncomingMarketDocument?.Header;
+            var marketDocument = messageParserResult.IncomingMarketDocument;
 
-            if (InvalidMessageHeader(messageParserResult))
+            if (InvalidMessageHeader(messageHeader))
             {
                 return Result.Failure(messageParserResult.Errors.ToArray());
             }
 
-            var messageHeader = messageParserResult.MessageHeader;
+            ArgumentNullException.ThrowIfNull(messageHeader);
+            ArgumentNullException.ThrowIfNull(marketDocument);
 
-            await AuthorizeSenderAsync(messageHeader!).ConfigureAwait(false);
-            await VerifyReceiverAsync(messageHeader!).ConfigureAwait(false);
-            if (MessageIdIsEmpty(messageHeader!.MessageId))
+            await AuthorizeSenderAsync(messageHeader).ConfigureAwait(false);
+            await VerifyReceiverAsync(messageHeader).ConfigureAwait(false);
+            if (MessageIdIsEmpty(messageHeader.MessageId))
             {
                 return Result.Failure(_errors.ToArray());
             }
 
-            await CheckMessageIdAsync(messageHeader!.MessageId).ConfigureAwait(false);
+            await CheckMessageIdAsync(messageHeader.MessageId).ConfigureAwait(false);
             if (_errors.Count > 0)
             {
                 return Result.Failure(_errors.ToArray());
             }
 
-            foreach (var marketActivityRecord in messageParserResult.MarketActivityRecords)
+            foreach (var transaction in marketDocument.ToTransactions())
             {
-                if (string.IsNullOrEmpty(marketActivityRecord.Id))
+                if (string.IsNullOrEmpty(transaction.MarketActivityRecord.Id))
                 {
-                    return Result.Failure(new EmptyTransactionId(marketActivityRecord.Id));
+                    return Result.Failure(new EmptyTransactionId(transaction.MarketActivityRecord.Id));
                 }
 
-                if (await CheckTransactionIdAsync(marketActivityRecord.Id).ConfigureAwait(false) == false)
+                if (await CheckTransactionIdAsync(transaction.MarketActivityRecord.Id).ConfigureAwait(false) == false)
                 {
-                    return Result.Failure(new DuplicateTransactionIdDetected(marketActivityRecord.Id));
+                    return Result.Failure(new DuplicateTransactionIdDetected(transaction.MarketActivityRecord.Id));
                 }
 
-                await AddToTransactionQueueAsync(CreateTransaction(messageHeader, marketActivityRecord)).ConfigureAwait(false);
+                await AddToTransactionQueueAsync(transaction).ConfigureAwait(false);
             }
 
             await _messageQueueDispatcher.CommitAsync().ConfigureAwait(false);
             return Result.Succeeded();
         }
 
-        private static bool InvalidMessageHeader(MessageParserResult messageParserResult)
+        private static bool InvalidMessageHeader(MessageHeader? header)
         {
-            return messageParserResult.MessageHeader is null || messageParserResult.Success == false;
-        }
-
-        private static IncomingMessage CreateTransaction(MessageHeader messageHeader, MarketActivityRecord marketActivityRecord)
-        {
-            return IncomingMessage.Create(messageHeader, marketActivityRecord);
-        }
-
-        private static bool IsEnergySupplierIdAndSenderIdAMatch(string? energySupplierId, string senderId)
-        {
-            return energySupplierId == senderId;
+            return header is null;
         }
 
         private Task<bool> CheckTransactionIdAsync(string transactionId)
@@ -113,7 +101,7 @@ namespace Messaging.CimMessageAdapter
             return _transactionIds.TryStoreAsync(transactionId);
         }
 
-        private Task AddToTransactionQueueAsync(IncomingMessage transaction)
+        private Task AddToTransactionQueueAsync(IMarketTransaction transaction)
         {
             return _messageQueueDispatcher.AddAsync(transaction);
         }

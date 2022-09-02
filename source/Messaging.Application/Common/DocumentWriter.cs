@@ -15,10 +15,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.SeedWork;
 
 namespace Messaging.Application.Common;
 
@@ -47,10 +49,10 @@ public abstract class DocumentWriter : IDocumentWriter
         return stream;
     }
 
-    public bool HandlesDocumentType(string documentType)
+    public bool HandlesDocumentType(DocumentType documentType)
     {
         if (documentType == null) throw new ArgumentNullException(nameof(documentType));
-        return _documentDetails.Type[..documentType.Length].Equals(documentType, StringComparison.OrdinalIgnoreCase);
+        return documentType.Name.Equals(_documentDetails.Type.Split("_")[0], StringComparison.OrdinalIgnoreCase);
     }
 
     public bool HandlesDocumentFormat(CimFormat format)

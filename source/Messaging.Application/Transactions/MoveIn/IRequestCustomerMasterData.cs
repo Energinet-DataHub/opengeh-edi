@@ -12,28 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.IO;
 using System.Threading.Tasks;
-using Messaging.Application.IncomingMessages;
-using Messaging.Domain.OutgoingMessages;
 
-namespace Messaging.CimMessageAdapter.Messages;
+namespace Messaging.Application.Transactions.MoveIn;
 
 /// <summary>
-/// Parses CIM messages from a stream
+/// Interface for fetching customer master data
 /// </summary>
-public interface IMessageParser<TMarketActivityRecordType, TMarketTransactionType>
-    where TMarketActivityRecordType : IMarketActivityRecord
-    where TMarketTransactionType : IMarketTransaction<TMarketActivityRecordType>
+public interface IRequestCustomerMasterData
 {
     /// <summary>
-    /// The CIM format handled
+    /// Request master data for a customer
     /// </summary>
-    CimFormat HandledFormat { get; }
-
-    /// <summary>
-    /// Parse from stream
-    /// </summary>
-    /// <param name="message"></param>
-    Task<MessageParserResult<TMarketActivityRecordType, TMarketTransactionType>> ParseAsync(Stream message);
+    /// <param name="fetchCustomerMasterData"></param>
+    /// <returns><see cref="Task"/></returns>
+    Task RequestMasterDataForAsync(FetchCustomerMasterData fetchCustomerMasterData);
 }

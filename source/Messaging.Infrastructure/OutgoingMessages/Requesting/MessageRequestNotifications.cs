@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Energinet.DataHub.MessageHub.Model.Model;
 using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages.Requesting;
 
@@ -23,76 +22,74 @@ namespace Messaging.Infrastructure.OutgoingMessages.Requesting
 {
     public class MessageRequestNotifications : IMessageRequestNotifications
     {
-        private readonly MessageRequestContext _messageRequestContext;
         private readonly ICommandScheduler _commandScheduler;
 
         public MessageRequestNotifications(
-            MessageRequestContext messageRequestContext,
             ICommandScheduler commandScheduler)
         {
-            _messageRequestContext = messageRequestContext;
             _commandScheduler = commandScheduler;
         }
 
-        public async Task SavedMessageSuccessfullyAsync(Uri storedMessageLocation)
+        public async Task SavedMessageSuccessfullyAsync(Uri storedMessageLocation, ClientProvidedDetails clientProvidedDetails)
         {
-            var request = GetRequest();
+            ArgumentNullException.ThrowIfNull(clientProvidedDetails);
 
             await _commandScheduler
                 .EnqueueAsync(new SendSuccessNotification(
-                    request.RequestId,
-                    request.IdempotencyId,
-                    request.DataAvailableNotificationReferenceId,
-                    request.MessageType.Value,
+                    clientProvidedDetails.RequestId,
+                    clientProvidedDetails.IdempotencyId,
+                    clientProvidedDetails.ReferenceId,
+                    clientProvidedDetails.DocumentType,
                     storedMessageLocation,
-                    request.ResponseFormat.ToString()))
+                    clientProvidedDetails.RequestedFormat))
                 .ConfigureAwait(false);
         }
 
-        public async Task RequestedMessagesWasNotFoundAsync(IReadOnlyList<string> messageIds)
+        public async Task RequestedMessagesWasNotFoundAsync(IReadOnlyList<string> messageIds, ClientProvidedDetails clientProvidedDetails)
         {
-            var request = GetRequest();
+            ArgumentNullException.ThrowIfNull(clientProvidedDetails);
 
             await _commandScheduler.EnqueueAsync(
                     CreateErrorResponse(
-                        request,
+                        clientProvidedDetails,
                         $"Message(s) with the following id(s) not found {messageIds}",
                         "DatasetNotFound"))
                 .ConfigureAwait(false);
         }
 
-        public async Task RequestedDocumentFormatIsNotSupportedAsync(string documentFormat, string documentType)
+        public async Task RequestedDocumentFormatIsNotSupportedAsync(ClientProvidedDetails clientProvidedDetails)
         {
-            var request = GetRequest();
+            ArgumentNullException.ThrowIfNull(clientProvidedDetails);
 
             await _commandScheduler.EnqueueAsync(
                     CreateErrorResponse(
-                        request,
-                        $"Format '{documentFormat}' for document type '{documentType}' is not supported.",
+                        clientProvidedDetails,
+                        $"Format '{clientProvidedDetails.RequestedFormat}' for document type '{clientProvidedDetails.DocumentType}' is not supported.",
                         "InternalError"))
                 .ConfigureAwait(false);
         }
 
-        private static SendFailureNotification CreateErrorResponse(DataBundleRequestDto request, string failureDescription, string reason)
+        public Task UnknownDocumentTypeAsync(ClientProvidedDetails clientProvidedDetails)
+        {
+            ArgumentNullException.ThrowIfNull(clientProvidedDetails);
+
+            return _commandScheduler.EnqueueAsync(
+                CreateErrorResponse(
+                    clientProvidedDetails,
+                    $"Unknown document type: '{clientProvidedDetails.DocumentType}'.",
+                    "InternalError"));
+        }
+
+        private static SendFailureNotification CreateErrorResponse(ClientProvidedDetails request, string failureDescription, string reason)
         {
             return new SendFailureNotification(
                 request.RequestId,
                 request.IdempotencyId,
                 failureDescription,
                 reason,
-                request.DataAvailableNotificationReferenceId,
-                request.MessageType.Value,
-                request.ResponseFormat.ToString());
-        }
-
-        private DataBundleRequestDto GetRequest()
-        {
-            if (_messageRequestContext.DataBundleRequestDto is null)
-            {
-                throw new InvalidOperationException($"Data bundle request DTO is null.");
-            }
-
-            return _messageRequestContext.DataBundleRequestDto;
+                request.ReferenceId,
+                request.DocumentType,
+                request.RequestedFormat);
         }
     }
 }

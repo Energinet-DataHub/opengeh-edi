@@ -12,17 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MessageHub.Model.Model;
+using System.Threading.Tasks;
+using Azure.Messaging.ServiceBus;
 
-namespace Messaging.Infrastructure.OutgoingMessages.Requesting
+namespace Messaging.Infrastructure.Transactions.MoveIn;
+
+/// <summary>
+/// Request dispatcher interface
+/// </summary>
+public interface IRequestDispatcher
 {
-    public class MessageRequestContext
-    {
-        public DataBundleRequestDto? DataBundleRequestDto { get; private set; }
-
-        public void SetMessageRequest(DataBundleRequestDto messageRequest)
-        {
-            DataBundleRequestDto = messageRequest;
-        }
-    }
+    /// <summary>
+    /// Async method for sending servicebus messages
+    /// </summary>
+    /// <param name="message"></param>
+    /// <returns><see cref="ServiceBusMessage"/></returns>
+    Task SendAsync(ServiceBusMessage message);
 }

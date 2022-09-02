@@ -14,17 +14,26 @@
 
 using System;
 
-namespace Messaging.Api.Configuration.Middleware.Correlation
+namespace Messaging.Application.OutgoingMessages.Requesting;
+
+public class ClientProvidedDetails
 {
-    public sealed class SessionContext : ISessionContext
+    public ClientProvidedDetails(Guid requestId, string idempotencyId, string referenceId, string documentType, string requestedFormat)
     {
-        private string? _id;
-
-        public string Id => _id ?? throw new InvalidOperationException("Session id not set");
-
-        public void SetId(string id)
-        {
-            _id = id;
-        }
+        RequestId = requestId;
+        IdempotencyId = idempotencyId;
+        ReferenceId = referenceId;
+        DocumentType = documentType;
+        RequestedFormat = requestedFormat;
     }
+
+    public Guid RequestId { get; }
+
+    public string IdempotencyId { get; }
+
+    public string ReferenceId { get; }
+
+    public string DocumentType { get; }
+
+    public string RequestedFormat { get; }
 }

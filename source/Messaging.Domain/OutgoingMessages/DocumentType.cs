@@ -14,11 +14,15 @@
 
 using Messaging.Domain.SeedWork;
 
-namespace Messaging.Application.OutgoingMessages;
+namespace Messaging.Domain.OutgoingMessages;
 
 public class DocumentType : EnumerationType
 {
     public static readonly DocumentType GenericNotification = new(0, "GenericNotification");
+    public static readonly DocumentType ConfirmRequestChangeOfSupplier = new(1, nameof(ConfirmRequestChangeOfSupplier));
+    public static readonly DocumentType RejectRequestChangeOfSupplier = new(2, nameof(RejectRequestChangeOfSupplier));
+    public static readonly DocumentType AccountingPointCharacteristics = new(3, nameof(AccountingPointCharacteristics));
+    public static readonly DocumentType CharacteristicsOfACustomerAtAnAP = new(3, nameof(CharacteristicsOfACustomerAtAnAP));
 
     private DocumentType(int id, string name)
         : base(id, name)

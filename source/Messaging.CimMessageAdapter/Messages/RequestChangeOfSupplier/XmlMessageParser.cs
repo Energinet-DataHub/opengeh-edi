@@ -24,9 +24,9 @@ using Messaging.CimMessageAdapter.Errors;
 using Messaging.Domain.OutgoingMessages;
 using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
 
-namespace Messaging.CimMessageAdapter.Messages;
+namespace Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 
-public class XmlMessageParser : IMessageParser
+public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>
 {
     private const string MarketActivityRecordElementName = "MktActivityRecord";
     private const string HeaderElementName = "RequestChangeOfSupplier_MarketDocument";
@@ -40,7 +40,7 @@ public class XmlMessageParser : IMessageParser
 
     public CimFormat HandledFormat => CimFormat.Xml;
 
-    public async Task<MessageParserResult> ParseAsync(Stream message)
+    public async Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>> ParseAsync(Stream message)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
 
@@ -64,7 +64,7 @@ public class XmlMessageParser : IMessageParser
             .ConfigureAwait(true);
         if (xmlSchema is null)
         {
-            return MessageParserResult.Failure(new UnknownBusinessProcessTypeOrVersion(businessProcessType, version));
+            return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(new UnknownBusinessProcessTypeOrVersion(businessProcessType, version));
         }
 
         ResetMessagePosition(message);
@@ -256,9 +256,9 @@ public class XmlMessageParser : IMessageParser
         return new MessageHeader(messageId, processType, senderId, senderRole, receiverId, receiverRole, createdAt);
     }
 
-    private static MessageParserResult InvalidXmlFailure(Exception exception)
+    private static MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction> InvalidXmlFailure(Exception exception)
     {
-        return MessageParserResult.Failure(InvalidMessageStructure.From(exception));
+        return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(InvalidMessageStructure.From(exception));
     }
 
     private static void ResetMessagePosition(Stream message)
@@ -297,13 +297,13 @@ public class XmlMessageParser : IMessageParser
         return settings;
     }
 
-    private async Task<MessageParserResult> ParseXmlDataAsync(XmlReader reader)
+    private async Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>> ParseXmlDataAsync(XmlReader reader)
     {
         var root = await reader.ReadRootElementAsync().ConfigureAwait(false);
         var messageHeader = await ExtractMessageHeaderAsync(reader, root).ConfigureAwait(false);
         if (_errors.Count > 0)
         {
-            return MessageParserResult.Failure(_errors.ToArray());
+            return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(_errors.ToArray());
         }
 
         var marketActivityRecords = new List<MarketActivityRecord>();
@@ -314,9 +314,9 @@ public class XmlMessageParser : IMessageParser
 
         if (_errors.Count > 0)
         {
-            return MessageParserResult.Failure(_errors.ToArray());
+            return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(_errors.ToArray());
         }
 
-        return MessageParserResult.Succeeded(messageHeader, marketActivityRecords);
+        return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(new RequestChangeOfSupplierIncomingMarketDocument(messageHeader, marketActivityRecords));
     }
 }

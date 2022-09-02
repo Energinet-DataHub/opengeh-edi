@@ -29,9 +29,9 @@ using JsonException = Newtonsoft.Json.JsonException;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
 
-namespace Messaging.CimMessageAdapter.Messages;
+namespace Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 
-public class JsonMessageParser : IMessageParser
+public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>
 {
     private const string MarketActivityRecordElementName = "MktActivityRecord";
     private const string HeaderElementName = "RequestChangeOfSupplier_MarketDocument";
@@ -45,7 +45,7 @@ public class JsonMessageParser : IMessageParser
 
     public CimFormat HandledFormat => CimFormat.Json;
 
-    public async Task<MessageParserResult> ParseAsync(Stream message)
+    public async Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>> ParseAsync(Stream message)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
 
@@ -62,7 +62,7 @@ public class JsonMessageParser : IMessageParser
         var schema = await _schemaProvider.GetSchemaAsync<JsonSchema>(processType, "0").ConfigureAwait(false);
         if (schema is null)
         {
-            return MessageParserResult.Failure(new UnknownBusinessProcessTypeOrVersion(processType, "0"));
+            return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(new UnknownBusinessProcessTypeOrVersion(processType, "0"));
         }
 
         ResetMessagePosition(message);
@@ -71,7 +71,7 @@ public class JsonMessageParser : IMessageParser
 
         if (_errors.Count > 0)
         {
-            return MessageParserResult.Failure(_errors.ToArray());
+            return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(_errors.ToArray());
         }
 
         var streamReader = new StreamReader(message, leaveOpen: true);
@@ -129,7 +129,7 @@ public class JsonMessageParser : IMessageParser
         return processType;
     }
 
-    private static MessageParserResult ParseJsonData(JsonTextReader jsonTextReader)
+    private static MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction> ParseJsonData(JsonTextReader jsonTextReader)
     {
         var marketActivityRecords = new List<MarketActivityRecord>();
         var serializer = new JsonSerializer();
@@ -138,7 +138,7 @@ public class JsonMessageParser : IMessageParser
         var messageHeader = MessageHeaderFrom(headerToken);
         marketActivityRecords.AddRange(headerToken[MarketActivityRecordElementName].Select(MarketActivityRecordFrom));
 
-        return MessageParserResult.Succeeded(messageHeader, marketActivityRecords);
+        return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(new RequestChangeOfSupplierIncomingMarketDocument(messageHeader, marketActivityRecords));
     }
 
     private static void ResetMessagePosition(Stream message)
@@ -147,9 +147,9 @@ public class JsonMessageParser : IMessageParser
             message.Position = 0;
     }
 
-    private static MessageParserResult InvalidJsonFailure(Exception exception)
+    private static MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction> InvalidJsonFailure(Exception exception)
     {
-        return MessageParserResult.Failure(InvalidMessageStructure.From(exception));
+        return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(InvalidMessageStructure.From(exception));
     }
 
     private static MessageHeader MessageHeaderFrom(JToken token)
@@ -161,7 +161,7 @@ public class JsonMessageParser : IMessageParser
             token["sender_MarketParticipant.marketRole.type"]["value"].ToString(),
             token["receiver_MarketParticipant.mRID"]["value"].ToString(),
             token["receiver_MarketParticipant.marketRole.type"]["value"].ToString(),
-            token["createdDateTime"].ToString());
+            GetJsonDateStringWithoutQuotes(token["createdDateTime"]));
     }
 
     private static MarketActivityRecord MarketActivityRecordFrom(JToken token)
@@ -170,12 +170,18 @@ public class JsonMessageParser : IMessageParser
         {
             Id = token["mRID"].ToString(),
             ConsumerId = token["marketEvaluationPoint.customer_MarketParticipant.mRID"]["value"].ToString(),
+            ConsumerIdType = token["marketEvaluationPoint.customer_MarketParticipant.mRID"]["codingScheme"].ToString(),
             BalanceResponsibleId = token["marketEvaluationPoint.balanceResponsibleParty_MarketParticipant.mRID"]["value"].ToString(),
             EnergySupplierId = token["marketEvaluationPoint.energySupplier_MarketParticipant.mRID"]["value"].ToString(),
             MarketEvaluationPointId = token["marketEvaluationPoint.mRID"]["value"].ToString(),
             ConsumerName = token["marketEvaluationPoint.customer_MarketParticipant.name"].ToString(),
-            EffectiveDate = token["start_DateAndOrTime.dateTime"].ToString(),
+            EffectiveDate = GetJsonDateStringWithoutQuotes(token["start_DateAndOrTime.dateTime"]),
         };
+    }
+
+    private static string GetJsonDateStringWithoutQuotes(JToken token)
+    {
+        return token.ToString(Formatting.None).Trim('"');
     }
 
     private async Task ValidateMessageAsync(JsonSchema schema, Stream message)

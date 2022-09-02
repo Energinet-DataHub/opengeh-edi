@@ -84,9 +84,9 @@ namespace Messaging.IntegrationTests.Application.IncomingMessages
             return this;
         }
 
-        internal IncomingMessage Build()
+        internal RequestChangeOfSupplierTransaction Build()
         {
-            return IncomingMessage.Create(
+            return RequestChangeOfSupplierTransaction.Create(
                 CreateHeader(),
                 CreateMarketActivityRecord());
         }

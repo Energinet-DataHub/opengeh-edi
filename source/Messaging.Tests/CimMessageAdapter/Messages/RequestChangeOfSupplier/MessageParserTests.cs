@@ -15,15 +15,18 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Messages;
+using Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 using Messaging.Domain.OutgoingMessages;
 using Xunit;
 
-namespace Messaging.Tests.CimMessageAdapter.Messages;
+namespace Messaging.Tests.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 
 public class MessageParserTests
 {
@@ -32,7 +35,7 @@ public class MessageParserTests
     public MessageParserTests()
     {
         _messageParser = new MessageParser(
-            new IMessageParser[]
+            new IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>[]
             {
                 new JsonMessageParser(),
                 new XmlMessageParser(),
@@ -59,11 +62,28 @@ public class MessageParserTests
 
     [Theory]
     [MemberData(nameof(CreateMessages))]
-    public async Task Can_parse_message(CimFormat format, Stream message)
+    public async Task Can_parse(CimFormat format, Stream message)
     {
         var result = await _messageParser.ParseAsync(message, format).ConfigureAwait(false);
 
         Assert.True(result.Success);
+        var header = result.IncomingMarketDocument?.Header;
+        Assert.Equal("78954612", header?.MessageId);
+        Assert.Equal("E65", header?.ProcessType);
+        Assert.Equal("5799999933318", header?.SenderId);
+        Assert.Equal("DDQ", header?.SenderRole);
+        Assert.Equal("5790001330552", header?.ReceiverId);
+        Assert.Equal("DDZ", header?.ReceiverRole);
+        Assert.Equal("2022-09-07T09:30:47Z", header?.CreatedAt);
+        var marketActivityRecord = result.IncomingMarketDocument?.MarketActivityRecords.First();
+        Assert.Equal("12345689", marketActivityRecord?.Id);
+        Assert.Equal("579999993331812345", marketActivityRecord?.MarketEvaluationPointId);
+        Assert.Equal("5799999933318", marketActivityRecord?.EnergySupplierId);
+        Assert.Equal("5799999933340", marketActivityRecord?.BalanceResponsibleId);
+        Assert.Equal("0801741527", marketActivityRecord?.ConsumerId);
+        Assert.Equal("ARR", marketActivityRecord?.ConsumerIdType);
+        Assert.Equal("Jan Hansen", marketActivityRecord?.ConsumerName);
+        Assert.Equal("2022-09-07T22:00:00Z", marketActivityRecord?.EffectiveDate);
     }
 
     [Theory]
@@ -79,18 +99,29 @@ public class MessageParserTests
     [Fact]
     public async Task Throw_if_message_format_is_not_known()
     {
-        var parser = new MessageParser(new List<IMessageParser>());
+        var parser = new MessageParser(new List<IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>>());
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => parser.ParseAsync(CreateXmlMessage(), CimFormat.Xml)).ConfigureAwait(false);
     }
 
     private static Stream CreateXmlMessage()
     {
-        var xmlDoc = XDocument.Load($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}xml{Path.DirectorySeparatorChar}Confirm request Change of Supplier.xml");
+        var xmlDoc = XDocument.Load($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}xml{Path.DirectorySeparatorChar}RequestChangeOfSupplier.xml");
         var stream = new MemoryStream();
         xmlDoc.Save(stream);
 
         return stream;
+    }
+
+    private static MemoryStream CreateJsonMessage()
+    {
+        return ReadTextFile(
+            $"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}json{Path.DirectorySeparatorChar}Request Change of Supplier.json");
+    }
+
+    private static MemoryStream CreateInvalidJsonMessage()
+    {
+        return ReadTextFile($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}json{Path.DirectorySeparatorChar}Invalid Request Change of Supplier.json");
     }
 
     private static Stream CreateInvalidXmlMessage()
@@ -103,17 +134,6 @@ public class MessageParserTests
         var returnStream = new MemoryStream();
         messageStream.CopyTo(returnStream);
         return returnStream;
-    }
-
-    private static MemoryStream CreateJsonMessage()
-    {
-        return ReadTextFile(
-            $"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}json{Path.DirectorySeparatorChar}Request Change of Supplier.json");
-    }
-
-    private static MemoryStream CreateInvalidJsonMessage()
-    {
-        return ReadTextFile($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}json{Path.DirectorySeparatorChar}Invalid Request Change of Supplier.json");
     }
 
     private static MemoryStream ReadTextFile(string path)
