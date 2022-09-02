@@ -24,7 +24,7 @@ public class MessageStorageSpy : IMessageStorage
 {
     public Stream? SavedMessage { get; private set; }
 
-    public Task<Uri> SaveAsync(Stream bundledMessage, MessageRequest messageRequest)
+    public Task<Uri> SaveAsync(Stream bundledMessage, ClientProvidedDetails clientProvidedDetails)
     {
         SavedMessage = bundledMessage;
         return Task.FromResult(new Uri("http://someuri"));

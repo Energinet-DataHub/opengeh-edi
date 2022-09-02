@@ -31,14 +31,14 @@ internal class MessageHubModelFactory
             1);
     }
 
-    internal static DataBundleRequestDto CreateDataBundleRequest(MessageRequest messageRequest)
+    internal static DataBundleRequestDto CreateDataBundleRequest(ClientProvidedDetails clientProvidedDetails)
     {
         return new DataBundleRequestDto(
-            messageRequest.RequestId,
-            messageRequest.ReferenceId,
-            messageRequest.IdempotencyId,
-            new MessageTypeDto(messageRequest.DocumentType),
-            Enum.Parse<ResponseFormat>(messageRequest.RequestedFormat),
+            clientProvidedDetails.RequestId,
+            clientProvidedDetails.ReferenceId,
+            clientProvidedDetails.IdempotencyId,
+            new MessageTypeDto(clientProvidedDetails.DocumentType),
+            Enum.Parse<ResponseFormat>(clientProvidedDetails.RequestedFormat),
             1);
     }
 }

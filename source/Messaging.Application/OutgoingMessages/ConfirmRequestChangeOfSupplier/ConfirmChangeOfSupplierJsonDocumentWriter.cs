@@ -38,10 +38,10 @@ public class ConfirmChangeOfSupplierJsonDocumentWriter : IDocumentWriter
         return format == CimFormat.Json;
     }
 
-    public bool HandlesDocumentType(string documentType)
+    public bool HandlesDocumentType(DocumentType documentType)
     {
         if (documentType == null) throw new ArgumentNullException(nameof(documentType));
-        return DocumentType.Equals(documentType, StringComparison.OrdinalIgnoreCase);
+        return documentType.Name.Equals(DocumentType.Split("_")[0], StringComparison.OrdinalIgnoreCase);
     }
 
     public async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)

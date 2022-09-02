@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Messaging.Domain.SeedWork;
 using NodaTime;
 
 namespace Messaging.Domain.OutgoingMessages;
@@ -21,7 +22,7 @@ public class Bundle
     private readonly Instant _timestamp;
     private readonly List<OutgoingMessage> _messages = new();
     private MessageHeader _header;
-    private string _documentType = string.Empty;
+    private DocumentType? _documentType;
 
     public Bundle(Instant timestamp)
     {
@@ -35,7 +36,7 @@ public class Bundle
         if (IsFirstMessageInBundle())
         {
             CreateHeaderFrom(message);
-            _documentType = message.DocumentType;
+            _documentType = EnumerationType.FromName<DocumentType>(message.DocumentType);
         }
 
         EnsureProcessType(message);
@@ -52,7 +53,7 @@ public class Bundle
         }
 
         var payloads = _messages.Select(message => message.MarketActivityRecordPayload).ToList();
-        return new CimMessage(_documentType, _header, payloads);
+        return new CimMessage(_documentType!, _header, payloads);
     }
 
     private void EnsureReceiverId(OutgoingMessage message)
