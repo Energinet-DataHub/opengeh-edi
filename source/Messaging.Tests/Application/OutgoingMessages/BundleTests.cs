@@ -37,7 +37,7 @@ public class BundleTests
 
         var bundledMessage = _bundle.CreateMessage();
 
-        Assert.Equal(outgoingMessage1.DocumentType, bundledMessage.DocumentType);
+        Assert.Equal(outgoingMessage1.DocumentType, bundledMessage.DocumentType.Name);
         Assert.Equal(outgoingMessage1.ProcessType, bundledMessage.Header.ProcessType);
         Assert.Equal(outgoingMessage1.ReasonCode, bundledMessage.Header.ReasonCode);
         Assert.Equal(outgoingMessage1.ReceiverId, bundledMessage.Header.ReceiverId);
@@ -73,7 +73,7 @@ public class BundleTests
     private static OutgoingMessage CreateOutgoingMessage(string processType, string receiverId)
     {
         return new OutgoingMessage(
-            "DocumentType1",
+            DocumentType.GenericNotification.Name,
             receiverId,
             "FakeId",
             "FakeId",

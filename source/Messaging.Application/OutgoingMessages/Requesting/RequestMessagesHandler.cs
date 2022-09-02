@@ -72,7 +72,7 @@ namespace Messaging.Application.OutgoingMessages.Requesting
             var messageBundle = CreateBundleFrom(messages);
             var message = messageBundle.CreateMessage();
 
-            if (_documentFactory.CanHandle(message.DocumentType, requestedFormat) == false)
+            if (_documentFactory.CanHandle(documentType, requestedFormat) == false)
             {
                 await _messageRequestNotifications
                     .RequestedDocumentFormatIsNotSupportedAsync(request.ClientProvidedDetails).ConfigureAwait(false);

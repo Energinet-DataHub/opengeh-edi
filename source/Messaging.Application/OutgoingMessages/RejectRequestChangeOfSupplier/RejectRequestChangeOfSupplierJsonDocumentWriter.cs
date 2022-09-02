@@ -15,9 +15,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Messaging.Application.Common;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.SeedWork;
 using Newtonsoft.Json;
 
 namespace Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
@@ -38,10 +40,14 @@ public class RejectRequestChangeOfSupplierJsonDocumentWriter : IDocumentWriter
         return format == CimFormat.Json;
     }
 
-    public bool HandlesDocumentType(string documentType)
+    public bool HandlesDocumentType(DocumentType documentType)
     {
         if (documentType == null) throw new ArgumentNullException(nameof(documentType));
-        return DocumentType.Equals(documentType, StringComparison.OrdinalIgnoreCase);
+        var parsedDocumentType = EnumerationType
+            .GetAll<DocumentType>()
+            .FirstOrDefault(t =>
+                t.Name.Equals(DocumentType.Split("_")[0], StringComparison.OrdinalIgnoreCase));
+        return documentType.Equals(parsedDocumentType);
     }
 
     public async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)

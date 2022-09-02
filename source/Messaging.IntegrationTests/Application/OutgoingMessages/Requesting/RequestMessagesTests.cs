@@ -102,20 +102,20 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
             var outgoingMessage = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage.Message.MessageId)!;
 
             var requestedMessageIds = new List<string> { outgoingMessage.Id.ToString(), };
-            var request = CreateRequest(requestedMessageIds);
+            var request = CreateRequest(requestedMessageIds, "UnknownDocumentType");
             await RequestMessages(request).ConfigureAwait(false);
 
             Assert.Null(_messageStorage.SavedMessage);
             AssertErrorResponse(request, "InternalError");
         }
 
-        private static RequestMessages CreateRequest(List<string> requestedMessageIds)
+        private static RequestMessages CreateRequest(List<string> requestedMessageIds, string documentType = "RejectRequestChangeOfSupplier")
         {
             var clientProvidedDetails = new ClientProvidedDetails(
                 Guid.NewGuid(),
                 Guid.NewGuid().ToString(),
                 Guid.NewGuid().ToString(),
-                "FakeDocument",
+                documentType,
                 CimFormat.Xml.Name);
 
             return new RequestMessages(
