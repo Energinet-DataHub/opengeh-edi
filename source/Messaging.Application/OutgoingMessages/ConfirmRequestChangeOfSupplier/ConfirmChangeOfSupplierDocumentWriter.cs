@@ -29,7 +29,7 @@ public class ConfirmChangeOfSupplierDocumentWriter : DocumentWriter
             "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1 urn-ediel-org-structure-confirmrequestchangeofsupplier-0-1.xsd",
             "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1",
             "cim",
-            "E44"),
+            "414"),
         parser)
     {
     }

@@ -34,7 +34,6 @@ namespace Messaging.Tests.Application.OutgoingMessages.RejectRequestChangeOfSupp
 
 public class JsonDocumentWriterTests
 {
-    // private const string TypeCode = "E44";
     private const string DocumentType = "RejectRequestChangeOfSupplier_MarketDocument";
     private readonly RejectRequestChangeOfSupplierJsonDocumentWriter _documentWriter;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
@@ -115,6 +114,7 @@ public class JsonDocumentWriterTests
         var document = await JsonDocument.ParseAsync(message).ConfigureAwait(false);
         AssertJsonMessage.AssertConformsToSchema(document, schema, DocumentType);
         AssertJsonMessage.AssertHeader(header, document, DocumentType);
+        AssertJsonMessage.AssertHasHeaderValue(document, DocumentType, "type", "414");
         AssertMarketActivityRecords(document, marketActivityRecords);
     }
 }

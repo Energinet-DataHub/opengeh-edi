@@ -15,11 +15,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Messaging.Application.Common;
 using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.SeedWork;
 using Newtonsoft.Json;
 
 namespace Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
@@ -27,7 +25,7 @@ namespace Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 public class RejectRequestChangeOfSupplierJsonDocumentWriter : IDocumentWriter
 {
     private const string DocumentType = "RejectRequestChangeOfSupplier_MarketDocument";
-    private const string TypeCode = "E44";
+    private const string TypeCode = "414";
     private readonly IMarketActivityRecordParser _parser;
 
     public RejectRequestChangeOfSupplierJsonDocumentWriter(IMarketActivityRecordParser parser)
