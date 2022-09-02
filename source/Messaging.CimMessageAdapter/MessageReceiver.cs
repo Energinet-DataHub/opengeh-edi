@@ -102,11 +102,6 @@ namespace Messaging.CimMessageAdapter
             return IncomingMessage.Create(messageHeader, marketActivityRecord);
         }
 
-        private static bool IsEnergySupplierIdAndSenderIdAMatch(string? energySupplierId, string senderId)
-        {
-            return energySupplierId == senderId;
-        }
-
         private Task<bool> CheckTransactionIdAsync(string transactionId)
         {
             if (transactionId == null) throw new ArgumentNullException(nameof(transactionId));
