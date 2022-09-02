@@ -55,7 +55,9 @@ namespace Messaging.Application.OutgoingMessages.Requesting
             var messageIdsNotFound = MessageIdsNotFound(requestedMessageIds, messages);
             if (messageIdsNotFound.Any())
             {
-                await _messageRequestNotifications.RequestedMessagesWasNotFoundAsync(messageIdsNotFound, ParseRequestDetailsFrom(request)).ConfigureAwait(false);
+                await _messageRequestNotifications
+                    .RequestedMessagesWasNotFoundAsync(messageIdsNotFound, request.ClientProvidedDetails)
+                    .ConfigureAwait(false);
                 return Unit.Value;
             }
 
@@ -65,23 +67,14 @@ namespace Messaging.Application.OutgoingMessages.Requesting
 
             if (_documentFactory.CanHandle(message.DocumentType, requestedFormat) == false)
             {
-                await _messageRequestNotifications.RequestedDocumentFormatIsNotSupportedAsync(ParseRequestDetailsFrom(request)).ConfigureAwait(false);
+                await _messageRequestNotifications
+                    .RequestedDocumentFormatIsNotSupportedAsync(request.ClientProvidedDetails).ConfigureAwait(false);
                 return Unit.Value;
             }
 
-            await SaveDocumentAsync(message, requestedFormat, ParseRequestDetailsFrom(request)).ConfigureAwait(false);
+            await SaveDocumentAsync(message, requestedFormat, request.ClientProvidedDetails).ConfigureAwait(false);
 
             return Unit.Value;
-        }
-
-        private static ClientProvidedDetails ParseRequestDetailsFrom(RequestMessages request)
-        {
-            return new ClientProvidedDetails(
-                request.RequestId,
-                request.IdempotencyId,
-                request.ReferenceId,
-                request.DocumentType,
-                request.RequestedDocumentFormat);
         }
 
         private static List<string> MessageIdsNotFound(IReadOnlyCollection<string> requestedMessageIds, ReadOnlyCollection<OutgoingMessage> messages)
