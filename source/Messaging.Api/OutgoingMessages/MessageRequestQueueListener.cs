@@ -62,13 +62,16 @@ namespace Messaging.Api.OutgoingMessages
                 .ConfigureAwait(false);
             _logger.LogInformation($"Parsed message ids: {dataAvailableIds}");
 
-            await _mediator.Send(new RequestMessages(
-                dataAvailableIds.Select(x => x.ToString()).ToList() ?? throw new InvalidOperationException(),
-                messageRequest.ResponseFormat.ToString(),
+            var clientProvidedDetails = new ClientProvidedDetails(
                 messageRequest.RequestId,
                 messageRequest.IdempotencyId,
                 messageRequest.DataAvailableNotificationReferenceId,
-                messageRequest.MessageType.Value)).ConfigureAwait(false);
+                messageRequest.MessageType.Value,
+                messageRequest.ResponseFormat.ToString());
+
+            await _mediator.Send(new RequestMessages(
+                dataAvailableIds.Select(x => x.ToString()).ToList() ?? throw new InvalidOperationException(),
+                clientProvidedDetails)).ConfigureAwait(false);
             _logger.LogInformation($"Dequeued with correlation id: {_correlationContext.Id}");
         }
     }

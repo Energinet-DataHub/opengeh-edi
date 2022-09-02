@@ -16,9 +16,9 @@ using System;
 
 namespace Messaging.Application.OutgoingMessages.Requesting;
 
-public class MessageRequest
+public class ClientProvidedDetails
 {
-    public MessageRequest(Guid requestId, string idempotencyId, string referenceId, string documentType, string requestedFormat)
+    public ClientProvidedDetails(Guid requestId, string idempotencyId, string referenceId, string documentType, string requestedFormat)
     {
         RequestId = requestId;
         IdempotencyId = idempotencyId;

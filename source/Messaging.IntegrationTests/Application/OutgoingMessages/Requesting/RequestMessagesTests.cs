@@ -59,10 +59,10 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
             _messageStorage.MessageHasBeenSavedInStorage();
             var command = GetQueuedNotification<SendSuccessNotification>();
             Assert.NotNull(command);
-            Assert.Equal(request.RequestId, command?.RequestId);
-            Assert.Equal(request.IdempotencyId, command?.IdempotencyId);
-            Assert.Equal(request.ReferenceId, command?.ReferenceId);
-            Assert.Equal(request.DocumentType, command?.DocumentType);
+            Assert.Equal(request.ClientProvidedDetails.RequestId, command?.RequestId);
+            Assert.Equal(request.ClientProvidedDetails.IdempotencyId, command?.IdempotencyId);
+            Assert.Equal(request.ClientProvidedDetails.ReferenceId, command?.ReferenceId);
+            Assert.Equal(request.ClientProvidedDetails.DocumentType, command?.DocumentType);
             Assert.Equal(CimFormat.Xml.Name, command?.RequestedFormat);
             Assert.NotNull(command?.MessageStorageLocation);
         }
@@ -95,15 +95,32 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
             AssertErrorResponse(request, "InternalError");
         }
 
-        private static RequestMessages CreateRequest(List<string> requestedMessageIds)
+        [Fact]
+        public async Task Respond_with_error_if_requested_document_type_is_unknown()
         {
-            return new RequestMessages(
-                requestedMessageIds,
-                CimFormat.Xml.Name,
+            var incomingMessage = await MessageArrived().ConfigureAwait(false);
+            var outgoingMessage = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage.Message.MessageId)!;
+
+            var requestedMessageIds = new List<string> { outgoingMessage.Id.ToString(), };
+            var request = CreateRequest(requestedMessageIds, "UnknownDocumentType");
+            await RequestMessages(request).ConfigureAwait(false);
+
+            Assert.Null(_messageStorage.SavedMessage);
+            AssertErrorResponse(request, "InternalError");
+        }
+
+        private static RequestMessages CreateRequest(List<string> requestedMessageIds, string documentType = "RejectRequestChangeOfSupplier")
+        {
+            var clientProvidedDetails = new ClientProvidedDetails(
                 Guid.NewGuid(),
                 Guid.NewGuid().ToString(),
                 Guid.NewGuid().ToString(),
-                "FakeDocument");
+                documentType,
+                CimFormat.Xml.Name);
+
+            return new RequestMessages(
+                requestedMessageIds,
+                clientProvidedDetails);
         }
 
         private static IncomingMessageBuilder MessageBuilder()
@@ -146,10 +163,10 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
         {
             var command = GetQueuedNotification<SendFailureNotification>();
             Assert.NotNull(command);
-            Assert.Equal(request.RequestId, command?.RequestId);
-            Assert.Equal(request.IdempotencyId, command?.IdempotencyId);
-            Assert.Equal(request.ReferenceId, command?.ReferenceId);
-            Assert.Equal(request.DocumentType, command?.MessageType);
+            Assert.Equal(request.ClientProvidedDetails.RequestId, command?.RequestId);
+            Assert.Equal(request.ClientProvidedDetails.IdempotencyId, command?.IdempotencyId);
+            Assert.Equal(request.ClientProvidedDetails.ReferenceId, command?.ReferenceId);
+            Assert.Equal(request.ClientProvidedDetails.DocumentType, command?.MessageType);
             Assert.Equal(CimFormat.Xml.Name, command?.RequestedFormat);
             Assert.NotEqual(string.Empty, command?.FailureDescription);
             Assert.Equal(reason, command?.Reason);

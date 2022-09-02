@@ -71,7 +71,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             await GivenRequestHasBeenAccepted().ConfigureAwait(false);
 
             var confirmMessage = _outgoingMessageStore.GetByOriginalMessageId(SampleData.OriginalMessageId)!;
-            await RequestMessage(confirmMessage.Id.ToString()).ConfigureAwait(false);
+            await RequestMessage(confirmMessage.Id.ToString(), DocumentType.ConfirmRequestChangeOfSupplier).ConfigureAwait(false);
 
             await AsserConfirmMessage(confirmMessage).ConfigureAwait(false);
         }
@@ -107,7 +107,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
             var rejectMessage = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage.Message.MessageId)!;
-            await RequestMessage(rejectMessage.Id.ToString()).ConfigureAwait(false);
+            await RequestMessage(rejectMessage.Id.ToString(), DocumentType.RejectRequestChangeOfSupplier).ConfigureAwait(false);
 
             await AssertRejectMessage(rejectMessage).ConfigureAwait(false);
         }
@@ -124,7 +124,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
             var rejectMessage = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage.Message.MessageId)!;
-            await RequestMessage(rejectMessage.Id.ToString()).ConfigureAwait(false);
+            await RequestMessage(rejectMessage.Id.ToString(), DocumentType.RejectRequestChangeOfSupplier).ConfigureAwait(false);
 
             await AssertRejectMessage(rejectMessage).ConfigureAwait(false);
         }
@@ -141,7 +141,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
             var rejectMessage = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage.Message.MessageId)!;
-            await RequestMessage(rejectMessage.Id.ToString()).ConfigureAwait(false);
+            await RequestMessage(rejectMessage.Id.ToString(), DocumentType.RejectRequestChangeOfSupplier).ConfigureAwait(false);
 
             await AssertRejectMessage(rejectMessage).ConfigureAwait(false);
         }
@@ -187,16 +187,19 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
         }
 
-        private async Task RequestMessage(string id)
+        private async Task RequestMessage(string id, DocumentType documentType)
         {
             var requestId = Guid.NewGuid();
-            await InvokeCommandAsync(new RequestMessages(
-                new[] { id },
-                CimFormat.Xml.Name,
+            var clientProvidedDetails = new ClientProvidedDetails(
                 requestId,
                 string.Empty,
                 string.Empty,
-                "FakeDocument")).ConfigureAwait(false);
+                documentType.Name,
+                CimFormat.Xml.Name);
+
+            await InvokeCommandAsync(new RequestMessages(
+                new[] { id },
+                clientProvidedDetails)).ConfigureAwait(false);
         }
 
         private async Task AssertRejectMessage(OutgoingMessage rejectMessage)
