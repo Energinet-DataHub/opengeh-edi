@@ -12,20 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Infrastructure.Transactions.MoveIn;
+using System.Threading.Tasks;
+
+namespace Messaging.Application.Transactions.MoveIn;
 
 /// <summary>
-/// Interface for configurations
+/// Interface for fetching customer master data
 /// </summary>
-public interface IConfig
+public interface IRequestCustomerMasterData
 {
     /// <summary>
-    /// The name to affiliate a service with
+    /// Request master data for a customer
     /// </summary>
-    string WithName { get; }
-
-    /// <summary>
-    /// Queue name for service
-    /// </summary>
-    string QueueName { get; }
+    /// <param name="fetchCustomerMasterData"></param>
+    /// <returns><see cref="Task"/></returns>
+    Task RequestMasterDataForAsync(FetchCustomerMasterData fetchCustomerMasterData);
 }
