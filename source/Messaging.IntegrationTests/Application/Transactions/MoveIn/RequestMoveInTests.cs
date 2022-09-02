@@ -149,7 +149,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         private static void AssertHeader(XDocument document, OutgoingMessage message, string expectedReasonCode)
         {
             Assert.NotEmpty(AssertXmlMessage.GetMessageHeaderValue(document, "mRID")!);
-            AssertXmlMessage.AssertHasHeaderValue(document, "type", "E44");
+            AssertXmlMessage.AssertHasHeaderValue(document, "type", "414");
             AssertXmlMessage.AssertHasHeaderValue(document, "process.processType", message.ProcessType);
             AssertXmlMessage.AssertHasHeaderValue(document, "businessSector.type", "23");
             AssertXmlMessage.AssertHasHeaderValue(document, "sender_MarketParticipant.mRID", message.SenderId);

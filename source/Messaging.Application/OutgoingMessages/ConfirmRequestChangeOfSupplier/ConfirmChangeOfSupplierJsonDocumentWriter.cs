@@ -25,7 +25,7 @@ namespace Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 public class ConfirmChangeOfSupplierJsonDocumentWriter : IDocumentWriter
 {
     private const string DocumentType = "ConfirmRequestChangeOfSupplier_MarketDocument";
-    private const string TypeCode = "E44";
+    private const string TypeCode = "414";
     private readonly IMarketActivityRecordParser _parser;
 
     public ConfirmChangeOfSupplierJsonDocumentWriter(IMarketActivityRecordParser parser)

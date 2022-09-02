@@ -89,7 +89,7 @@ public class RejectRequestChangeOfSupplierDocumentWriterTests
         _schemaProvider = new XmlSchemaProvider();
         var document = XDocument.Load(message);
         AssertXmlMessage.AssertHeader(header, document);
-        AssertXmlMessage.AssertHasHeaderValue(document, "type", "E44");
+        AssertXmlMessage.AssertHasHeaderValue(document, "type", "414");
 
         AssertMarketActivityRecords(marketActivityRecords, document);
 
