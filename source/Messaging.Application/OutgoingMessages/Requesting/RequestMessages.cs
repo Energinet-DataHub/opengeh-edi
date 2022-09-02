@@ -30,10 +30,4 @@ public class RequestMessages : ICommand<Unit>
     public IEnumerable<string> MessageIds { get; }
 
     public ClientProvidedDetails ClientProvidedDetails { get; }
-
-    public string IdempotencyId => ClientProvidedDetails.IdempotencyId;
-
-    public string ReferenceId => ClientProvidedDetails.ReferenceId;
-
-    public string DocumentType => ClientProvidedDetails.DocumentType;
 }

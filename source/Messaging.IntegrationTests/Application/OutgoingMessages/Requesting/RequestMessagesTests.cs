@@ -60,9 +60,9 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
             var command = GetQueuedNotification<SendSuccessNotification>();
             Assert.NotNull(command);
             Assert.Equal(request.ClientProvidedDetails.RequestId, command?.RequestId);
-            Assert.Equal(request.IdempotencyId, command?.IdempotencyId);
-            Assert.Equal(request.ReferenceId, command?.ReferenceId);
-            Assert.Equal(request.DocumentType, command?.DocumentType);
+            Assert.Equal(request.ClientProvidedDetails.IdempotencyId, command?.IdempotencyId);
+            Assert.Equal(request.ClientProvidedDetails.ReferenceId, command?.ReferenceId);
+            Assert.Equal(request.ClientProvidedDetails.DocumentType, command?.DocumentType);
             Assert.Equal(CimFormat.Xml.Name, command?.RequestedFormat);
             Assert.NotNull(command?.MessageStorageLocation);
         }
@@ -150,9 +150,9 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
             var command = GetQueuedNotification<SendFailureNotification>();
             Assert.NotNull(command);
             Assert.Equal(request.ClientProvidedDetails.RequestId, command?.RequestId);
-            Assert.Equal(request.IdempotencyId, command?.IdempotencyId);
-            Assert.Equal(request.ReferenceId, command?.ReferenceId);
-            Assert.Equal(request.DocumentType, command?.MessageType);
+            Assert.Equal(request.ClientProvidedDetails.IdempotencyId, command?.IdempotencyId);
+            Assert.Equal(request.ClientProvidedDetails.ReferenceId, command?.ReferenceId);
+            Assert.Equal(request.ClientProvidedDetails.DocumentType, command?.MessageType);
             Assert.Equal(CimFormat.Xml.Name, command?.RequestedFormat);
             Assert.NotEqual(string.Empty, command?.FailureDescription);
             Assert.Equal(reason, command?.Reason);
