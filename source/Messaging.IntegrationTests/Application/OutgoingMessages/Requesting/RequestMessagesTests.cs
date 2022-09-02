@@ -106,11 +106,6 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
 
             return new RequestMessages(
                 requestedMessageIds,
-                CimFormat.Xml.Name,
-                Guid.NewGuid(),
-                Guid.NewGuid().ToString(),
-                Guid.NewGuid().ToString(),
-                "FakeDocument",
                 clientProvidedDetails);
         }
 

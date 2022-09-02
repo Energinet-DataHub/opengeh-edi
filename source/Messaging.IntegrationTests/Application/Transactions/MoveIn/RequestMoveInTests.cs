@@ -199,11 +199,6 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
             await InvokeCommandAsync(new RequestMessages(
                 new[] { id },
-                CimFormat.Xml.Name,
-                requestId,
-                string.Empty,
-                string.Empty,
-                "FakeDocument",
                 clientProvidedDetails)).ConfigureAwait(false);
         }
 

@@ -23,7 +23,7 @@ public class RequestMessages : ICommand<Unit>
 {
     private readonly ClientProvidedDetails _clientProvidedDetails;
 
-    public RequestMessages(IEnumerable<string> messageIds, string requestedDocumentFormat, Guid requestId, string idempotencyId, string referenceId, string documentType, ClientProvidedDetails clientProvidedDetails)
+    public RequestMessages(IEnumerable<string> messageIds, ClientProvidedDetails clientProvidedDetails)
     {
         _clientProvidedDetails = clientProvidedDetails;
         MessageIds = messageIds;
