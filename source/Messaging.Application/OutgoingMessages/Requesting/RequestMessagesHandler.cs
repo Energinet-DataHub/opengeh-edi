@@ -74,9 +74,9 @@ namespace Messaging.Application.OutgoingMessages.Requesting
             return Unit.Value;
         }
 
-        private static MessageRequest ParseRequestDetailsFrom(RequestMessages request)
+        private static ClientProvidedDetails ParseRequestDetailsFrom(RequestMessages request)
         {
-            return new MessageRequest(
+            return new ClientProvidedDetails(
                 request.RequestId,
                 request.IdempotencyId,
                 request.ReferenceId,
@@ -102,7 +102,7 @@ namespace Messaging.Application.OutgoingMessages.Requesting
             return bundle;
         }
 
-        private async Task SaveDocumentAsync(CimMessage message, CimFormat requestedFormat, MessageRequest request)
+        private async Task SaveDocumentAsync(CimMessage message, CimFormat requestedFormat, ClientProvidedDetails request)
         {
             var document = await _documentFactory.CreateFromAsync(message, requestedFormat).ConfigureAwait(false);
             var storedMessageLocation = await _messageStorage.SaveAsync(document, request).ConfigureAwait(false);

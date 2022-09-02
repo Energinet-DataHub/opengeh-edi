@@ -27,18 +27,18 @@ namespace Messaging.Application.OutgoingMessages.Requesting
         /// Message was saved successfully at storage location
         /// </summary>
         /// <param name="storedMessageLocation">Location of saved message</param>
-        /// <param name="messageRequest">Client provided request details</param>
-        Task SavedMessageSuccessfullyAsync(Uri storedMessageLocation, MessageRequest messageRequest);
+        /// <param name="clientProvidedDetails">Client provided request details</param>
+        Task SavedMessageSuccessfullyAsync(Uri storedMessageLocation, ClientProvidedDetails clientProvidedDetails);
 
         /// <summary>
         /// Requested messages was not found
         /// </summary>
-        Task RequestedMessagesWasNotFoundAsync(IReadOnlyList<string> messageIds, MessageRequest messageRequest);
+        Task RequestedMessagesWasNotFoundAsync(IReadOnlyList<string> messageIds, ClientProvidedDetails clientProvidedDetails);
 
         /// <summary>
         /// The requested document format is not supported
         /// </summary>
-        /// <param name="messageRequest">Client provided request details</param>
-        Task RequestedDocumentFormatIsNotSupportedAsync(MessageRequest messageRequest);
+        /// <param name="clientProvidedDetails">Client provided request details</param>
+        Task RequestedDocumentFormatIsNotSupportedAsync(ClientProvidedDetails clientProvidedDetails);
     }
 }

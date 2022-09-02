@@ -30,46 +30,46 @@ namespace Messaging.Infrastructure.OutgoingMessages.Requesting
             _commandScheduler = commandScheduler;
         }
 
-        public async Task SavedMessageSuccessfullyAsync(Uri storedMessageLocation, MessageRequest messageRequest)
+        public async Task SavedMessageSuccessfullyAsync(Uri storedMessageLocation, ClientProvidedDetails clientProvidedDetails)
         {
-            ArgumentNullException.ThrowIfNull(messageRequest);
+            ArgumentNullException.ThrowIfNull(clientProvidedDetails);
 
             await _commandScheduler
                 .EnqueueAsync(new SendSuccessNotification(
-                    messageRequest.RequestId,
-                    messageRequest.IdempotencyId,
-                    messageRequest.ReferenceId,
-                    messageRequest.DocumentType,
+                    clientProvidedDetails.RequestId,
+                    clientProvidedDetails.IdempotencyId,
+                    clientProvidedDetails.ReferenceId,
+                    clientProvidedDetails.DocumentType,
                     storedMessageLocation,
-                    messageRequest.RequestedFormat))
+                    clientProvidedDetails.RequestedFormat))
                 .ConfigureAwait(false);
         }
 
-        public async Task RequestedMessagesWasNotFoundAsync(IReadOnlyList<string> messageIds, MessageRequest messageRequest)
+        public async Task RequestedMessagesWasNotFoundAsync(IReadOnlyList<string> messageIds, ClientProvidedDetails clientProvidedDetails)
         {
-            ArgumentNullException.ThrowIfNull(messageRequest);
+            ArgumentNullException.ThrowIfNull(clientProvidedDetails);
 
             await _commandScheduler.EnqueueAsync(
                     CreateErrorResponse(
-                        messageRequest,
+                        clientProvidedDetails,
                         $"Message(s) with the following id(s) not found {messageIds}",
                         "DatasetNotFound"))
                 .ConfigureAwait(false);
         }
 
-        public async Task RequestedDocumentFormatIsNotSupportedAsync(MessageRequest messageRequest)
+        public async Task RequestedDocumentFormatIsNotSupportedAsync(ClientProvidedDetails clientProvidedDetails)
         {
-            ArgumentNullException.ThrowIfNull(messageRequest);
+            ArgumentNullException.ThrowIfNull(clientProvidedDetails);
 
             await _commandScheduler.EnqueueAsync(
                     CreateErrorResponse(
-                        messageRequest,
-                        $"Format '{messageRequest.RequestedFormat}' for document type '{messageRequest.DocumentType}' is not supported.",
+                        clientProvidedDetails,
+                        $"Format '{clientProvidedDetails.RequestedFormat}' for document type '{clientProvidedDetails.DocumentType}' is not supported.",
                         "InternalError"))
                 .ConfigureAwait(false);
         }
 
-        private static SendFailureNotification CreateErrorResponse(MessageRequest request, string failureDescription, string reason)
+        private static SendFailureNotification CreateErrorResponse(ClientProvidedDetails request, string failureDescription, string reason)
         {
             return new SendFailureNotification(
                 request.RequestId,
