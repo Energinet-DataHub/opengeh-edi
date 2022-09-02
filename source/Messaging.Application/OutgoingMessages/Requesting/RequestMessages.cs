@@ -21,23 +21,23 @@ namespace Messaging.Application.OutgoingMessages.Requesting;
 
 public class RequestMessages : ICommand<Unit>
 {
-    private readonly ClientProvidedDetails _clientProvidedDetails;
-
     public RequestMessages(IEnumerable<string> messageIds, ClientProvidedDetails clientProvidedDetails)
     {
-        _clientProvidedDetails = clientProvidedDetails;
+        ClientProvidedDetails = clientProvidedDetails;
         MessageIds = messageIds;
     }
 
     public IEnumerable<string> MessageIds { get; }
 
-    public string RequestedDocumentFormat => _clientProvidedDetails.RequestedFormat;
+    public ClientProvidedDetails ClientProvidedDetails { get; }
 
-    public Guid RequestId => _clientProvidedDetails.RequestId;
+    public string RequestedDocumentFormat => ClientProvidedDetails.RequestedFormat;
 
-    public string IdempotencyId => _clientProvidedDetails.IdempotencyId;
+    public Guid RequestId => ClientProvidedDetails.RequestId;
 
-    public string ReferenceId => _clientProvidedDetails.ReferenceId;
+    public string IdempotencyId => ClientProvidedDetails.IdempotencyId;
 
-    public string DocumentType => _clientProvidedDetails.DocumentType;
+    public string ReferenceId => ClientProvidedDetails.ReferenceId;
+
+    public string DocumentType => ClientProvidedDetails.DocumentType;
 }

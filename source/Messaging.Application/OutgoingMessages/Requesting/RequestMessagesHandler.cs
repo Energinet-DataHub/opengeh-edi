@@ -59,7 +59,7 @@ namespace Messaging.Application.OutgoingMessages.Requesting
                 return Unit.Value;
             }
 
-            var requestedFormat = EnumerationType.FromName<CimFormat>(request.RequestedDocumentFormat);
+            var requestedFormat = EnumerationType.FromName<CimFormat>(request.ClientProvidedDetails.RequestedFormat);
             var messageBundle = CreateBundleFrom(messages);
             var message = messageBundle.CreateMessage();
 
