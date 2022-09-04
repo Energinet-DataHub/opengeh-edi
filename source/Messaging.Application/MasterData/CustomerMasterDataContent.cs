@@ -12,17 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
+using NodaTime;
 
 namespace Messaging.Application.MasterData;
 
 public class CustomerMasterDataContent
 {
-    public CustomerMasterDataContent(Address address, bool electricalHeating, DateTime electricalHeatingStart, string firstCustomerId, string firstCustomerName, string secondCustomerId, string secondCustomerName, bool protectedName, bool hasEnergySupplier, DateTime supplyStart, IEnumerable<UsagePointLocation> usagePoints)
+    public CustomerMasterDataContent(
+        string marketEvaluationPoint,
+        bool electricalHeating,
+        Instant electricalHeatingStart,
+        string firstCustomerId,
+        string firstCustomerName,
+        string secondCustomerId,
+        string secondCustomerName,
+        bool protectedName,
+        bool hasEnergySupplier,
+        Instant supplyStart,
+        IEnumerable<UsagePointLocation> usagePointLocations)
     {
-        Address = address;
+        MarketEvaluationPoint = marketEvaluationPoint;
         ElectricalHeating = electricalHeating;
         ElectricalHeatingStart = electricalHeatingStart;
         FirstCustomerId = firstCustomerId;
@@ -32,14 +43,14 @@ public class CustomerMasterDataContent
         ProtectedName = protectedName;
         HasEnergySupplier = hasEnergySupplier;
         SupplyStart = supplyStart;
-        UsagePoints = usagePoints;
+        UsagePointLocations = usagePointLocations;
     }
 
-    public Address Address { get; }
+    public string MarketEvaluationPoint { get; }
 
     public bool ElectricalHeating { get; }
 
-    public DateTime ElectricalHeatingStart { get; }
+    public Instant ElectricalHeatingStart { get; }
 
     public string FirstCustomerId { get; }
 
@@ -53,7 +64,7 @@ public class CustomerMasterDataContent
 
     public bool HasEnergySupplier { get; }
 
-    public DateTime SupplyStart { get; }
+    public Instant SupplyStart { get; }
 
-    public IEnumerable<UsagePointLocation> UsagePoints { get; }
+    public IEnumerable<UsagePointLocation> UsagePointLocations { get; }
 }

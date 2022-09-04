@@ -58,24 +58,6 @@ public class ForwardCustomerMasterDataHandler : IRequestHandler<ForwardCustomerM
         return await Task.FromResult(Unit.Value).ConfigureAwait(false);
     }
 
-    private static MainAddress CreateAddress(CustomerMasterDataContent masterData)
-    {
-        return new MainAddress(
-            new StreetDetail(
-                masterData.Address.StreetCode,
-                masterData.Address.StreetName,
-                masterData.Address.BuildingNumber,
-                masterData.Address.Floor,
-                masterData.Address.Room),
-            new TownDetail(
-                masterData.Address.MunicipalityCode.ToString(CultureInfo.InvariantCulture),
-                masterData.Address.City,
-                masterData.Address.CitySubDivision,
-                masterData.Address.CountryCode),
-            masterData.Address.PostCode,
-            string.Empty);
-    }
-
     private static OutgoingMessage CreateOutgoingMessage(string id, string documentType, string processType, string receiverId, string @marketActivityRecordPayload)
     {
         return new OutgoingMessage(
@@ -89,6 +71,22 @@ public class ForwardCustomerMasterDataHandler : IRequestHandler<ForwardCustomerM
             MarketRoles.MeteringPointAdministrator,
             marketActivityRecordPayload,
             null);
+    }
+
+    private static MarketEvaluationPoint CreateMarketEvaluationPoint(CustomerMasterDataContent masterData, MoveInTransaction transaction)
+    {
+        return new MarketEvaluationPoint(
+            masterData.MarketEvaluationPoint,
+            masterData.ElectricalHeating,
+            masterData.ElectricalHeatingStart,
+            new MrId(masterData.FirstCustomerId, "ARR"),
+            masterData.FirstCustomerName,
+            new MrId(masterData.SecondCustomerId, "ARR"),
+            masterData.SecondCustomerName,
+            masterData.ProtectedName,
+            masterData.HasEnergySupplier,
+            masterData.SupplyStart,
+            masterData.UsagePointLocations);
     }
 
     private OutgoingMessage CustomerCharacteristicsMessageFrom(CustomerMasterDataContent requestMasterDataContent, MoveInTransaction transaction)
@@ -106,29 +104,5 @@ public class ForwardCustomerMasterDataHandler : IRequestHandler<ForwardCustomerM
             "E03",
             transaction.NewEnergySupplierId,
             _marketActivityRecordParser.From(marketActivityRecord));
-    }
-
-    private MarketEvaluationPoint CreateMarketEvaluationPoint(CustomerMasterDataContent masterData, MoveInTransaction transaction)
-    {
-        var address = CreateAddress(masterData);
-        var usagePointLocations = CreateUsagePointLocations(masterData);
-
-        return new MarketEvaluationPoint(
-            transaction.MarketEvaluationPointId,
-            masterData.ElectricalHeating,
-            masterData.ElectricalHeatingStart.ToUniversalTime().ToInstant(),
-            new MrId(masterData.FirstCustomerId, "ARR"),
-            masterData.FirstCustomerName,
-            new MrId(masterData.SecondCustomerId, "ARR"),
-            masterData.SecondCustomerName,
-            masterData.ProtectedName,
-            masterData.HasEnergySupplier,
-            masterData.SupplyStart.ToUniversalTime().ToInstant(),
-            masterData.UsagePoints);
-    }
-
-    private UsagePointLocation CreateUsagePointLocations(CustomerMasterDataContent masterData)
-    {
-        throw new NotImplementedException();
     }
 }

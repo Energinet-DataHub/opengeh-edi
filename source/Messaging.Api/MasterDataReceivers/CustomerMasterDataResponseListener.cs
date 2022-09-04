@@ -13,14 +13,17 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.EnergySupplying.RequestResponse.Requests;
 using Messaging.Application.MasterData;
+using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.InternalCommands;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using NodaTime.Extensions;
 
 namespace Messaging.Api.MasterDataReceivers;
 
@@ -56,7 +59,18 @@ public class CustomerMasterDataResponseListener
 
     private static CustomerMasterDataContent GetMasterDataContent(CustomerMasterDataRequestResponse masterdata)
     {
-        throw new NotImplementedException();
+        return new CustomerMasterDataContent(
+            string.Empty,
+            false,
+            masterdata.Electricalheatingeffectivedate.ToDateTime().ToUniversalTime().ToInstant(),
+            masterdata.Customerid,
+            masterdata.Customername,
+            string.Empty,
+            string.Empty,
+            false,
+            false,
+            DateTime.Now.ToInstant(),
+            new List<UsagePointLocation>());
     }
 
     private MasterDataResponseMetadata GetMetaData(FunctionContext context)
