@@ -12,20 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Infrastructure.Transactions.MoveIn;
-
-/// <summary>
-/// Interface for configurations
-/// </summary>
-public interface IConfig
+namespace Energinet.DataHub.MeteringPoints.EntryPoints.Common
 {
-    /// <summary>
-    /// The name to affiliate a service with
-    /// </summary>
-    string WithName { get; }
-
-    /// <summary>
-    /// Queue name for service
-    /// </summary>
-    string QueueName { get; }
+    public record UserProperties(string OperationCorrelationId);
 }

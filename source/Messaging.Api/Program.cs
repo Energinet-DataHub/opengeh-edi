@@ -95,9 +95,8 @@ namespace Messaging.Api
                             runtime.REQUEST_RESPONSE_LOGGING_CONTAINER_NAME!)
                         .AddMessageStorage(sp =>
                         {
-                            var messageRequestContext = sp.GetRequiredService<MessageRequestContext>();
                             var storageHandler = sp.GetRequiredService<IStorageHandler>();
-                            return new MessageStorage(storageHandler, messageRequestContext);
+                            return new MessageStorage(storageHandler);
                         })
                         .AddMessagePublishing(sp =>
                             new NewMessageAvailableNotifier(
@@ -111,6 +110,11 @@ namespace Messaging.Api
                             runtime.MESSAGEHUB_DOMAIN_REPLY_QUEUE!)
                         .AddNotificationHandler<PublishNewMessagesOnTimeHasPassed, TimeHasPassed>()
                         .AddHttpClientAdapter(sp => new HttpClientAdapter(sp.GetRequiredService<HttpClient>()))
+                        .AddServiceBusClient(
+                                runtime.SHARED_SERVICE_BUS_SEND_CONNECTION_STRING!,
+                                new RequestMasterDataConfiguration(
+                                    runtime.CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME!,
+                                    "shared-service-bus-send-permission"))
                         .AddServiceBusClient(
                             runtime.SHARED_SERVICE_BUS_SEND_CONNECTION_STRING!,
                             new RequestMasterDataConfiguration(

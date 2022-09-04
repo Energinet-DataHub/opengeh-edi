@@ -13,32 +13,17 @@
 // limitations under the License.
 
 using System;
-using System.Text.Json.Serialization;
-using Messaging.Application.Common.Commands;
 
-namespace Messaging.Infrastructure.OutgoingMessages.Requesting;
+namespace Messaging.Application.OutgoingMessages.Requesting;
 
-public class SendSuccessNotification : InternalCommand
+public class MessageRequest
 {
-    [JsonConstructor]
-    public SendSuccessNotification(Guid id, Guid requestId, string idempotencyId, string referenceId, string documentType, Uri messageStorageLocation, string requestedFormat)
-        : base(id)
+    public MessageRequest(Guid requestId, string idempotencyId, string referenceId, string documentType, string requestedFormat)
     {
         RequestId = requestId;
         IdempotencyId = idempotencyId;
         ReferenceId = referenceId;
         DocumentType = documentType;
-        MessageStorageLocation = messageStorageLocation;
-        RequestedFormat = requestedFormat;
-    }
-
-    public SendSuccessNotification(Guid requestId, string idempotencyId, string referenceId, string documentType, Uri messageStorageLocation, string requestedFormat)
-    {
-        RequestId = requestId;
-        IdempotencyId = idempotencyId;
-        ReferenceId = referenceId;
-        DocumentType = documentType;
-        MessageStorageLocation = messageStorageLocation;
         RequestedFormat = requestedFormat;
     }
 
@@ -49,8 +34,6 @@ public class SendSuccessNotification : InternalCommand
     public string ReferenceId { get; }
 
     public string DocumentType { get; }
-
-    public Uri MessageStorageLocation { get; }
 
     public string RequestedFormat { get; }
 }

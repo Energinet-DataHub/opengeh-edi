@@ -24,7 +24,7 @@ using Messaging.CimMessageAdapter.Errors;
 using Messaging.Domain.OutgoingMessages;
 using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
 
-namespace Messaging.CimMessageAdapter.Messages;
+namespace Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 
 public class XmlMessageParser : IMessageParser
 {
