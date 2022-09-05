@@ -22,15 +22,15 @@ using Xunit;
 
 namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
 
-public class ForwardCustomerMasterDataTest : TestBase
+public class ForwardCustomerMasterDataTests : TestBase
 {
-    public ForwardCustomerMasterDataTest(DatabaseFixture databaseFixture)
+    public ForwardCustomerMasterDataTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
     }
 
     [Fact]
-    public async Task CustomerMasterDataIsForwardedToTheNewEnergySupplierAsync()
+    public async Task Customer_master_data_is_sent_to_the_new_energy_supplier()
     {
         await SetupAnAcceptedMoveInTransactionAsync().ConfigureAwait(false);
 
