@@ -150,21 +150,6 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
 
             var transaction = _messageQueueDispatcherSpy.CommittedItems.FirstOrDefault();
             Assert.NotNull(transaction);
-            Assert.Equal("78954612", transaction?.Message.MessageId);
-            Assert.Equal("E65", transaction?.Message.ProcessType);
-            Assert.Equal("5799999933318", transaction?.Message.SenderId);
-            Assert.Equal("DDQ", transaction?.Message.SenderRole);
-            Assert.Equal("5790001330552", transaction?.Message.ReceiverId);
-            Assert.Equal("DDZ", transaction?.Message.ReceiverRole);
-            Assert.Equal("2022-09-07T09:30:47Z", transaction?.Message.CreatedAt);
-            Assert.Equal("12345689", transaction?.MarketActivityRecord.Id);
-            Assert.Equal("579999993331812345", transaction?.MarketActivityRecord.MarketEvaluationPointId);
-            Assert.Equal("5799999933318", transaction?.MarketActivityRecord.EnergySupplierId);
-            Assert.Equal("5799999933340", transaction?.MarketActivityRecord.BalanceResponsibleId);
-            Assert.Equal("0801741527", transaction?.MarketActivityRecord.ConsumerId);
-            Assert.Equal("ARR", transaction?.MarketActivityRecord.ConsumerIdType);
-            Assert.Equal("Jan Hansen", transaction?.MarketActivityRecord.ConsumerName);
-            Assert.Equal("2022-09-07T22:00:00Z", transaction?.MarketActivityRecord.EffectiveDate.ToString());
         }
 
         [Fact]

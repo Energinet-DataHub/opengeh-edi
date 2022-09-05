@@ -12,22 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json.Serialization;
-using Messaging.Application.Common.Commands;
-using Messaging.Application.MasterData;
+using System.Threading.Tasks;
+using Azure.Messaging.ServiceBus;
 
-namespace Messaging.Application.Transactions.MoveIn;
+namespace Messaging.Infrastructure.Transactions.MoveIn;
 
-public class ForwardCustomerMasterData : InternalCommand
+/// <summary>
+/// Request dispatcher interface
+/// </summary>
+public interface IRequestDispatcher
 {
-    [JsonConstructor]
-    public ForwardCustomerMasterData(string transactionId, CustomerMasterDataContent customerMasterDataContent)
-    {
-        TransactionId = transactionId;
-        CustomerMasterDataContent = customerMasterDataContent;
-    }
-
-    public string TransactionId { get; }
-
-    public CustomerMasterDataContent CustomerMasterDataContent { get; }
+    /// <summary>
+    /// Async method for sending servicebus messages
+    /// </summary>
+    /// <param name="message"></param>
+    /// <returns><see cref="ServiceBusMessage"/></returns>
+    Task SendAsync(ServiceBusMessage message);
 }

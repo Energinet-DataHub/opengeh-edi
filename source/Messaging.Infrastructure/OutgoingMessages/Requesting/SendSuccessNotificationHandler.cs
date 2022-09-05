@@ -17,7 +17,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MessageHub.Client.Peek;
 using Energinet.DataHub.MessageHub.Model.Extensions;
-using Energinet.DataHub.MessageHub.Model.Model;
 using MediatR;
 
 namespace Messaging.Infrastructure.OutgoingMessages.Requesting;
@@ -35,14 +34,12 @@ public class SendSuccessNotificationHandler : IRequestHandler<SendSuccessNotific
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
 
-        var bundleRequest = new DataBundleRequestDto(
+        var bundleRequest = MessageHubModelFactory.CreateDataBundleRequest(
             request.RequestId,
             request.ReferenceId,
             request.IdempotencyId,
-            new MessageTypeDto(request.MessageType),
-            //TODO: Fix format
-            ResponseFormat.Xml,
-            1);
+            request.DocumentType,
+            request.RequestedFormat);
 
         await _dataBundleResponseSender.SendAsync(bundleRequest.CreateResponse(request.MessageStorageLocation)).ConfigureAwait(false);
 

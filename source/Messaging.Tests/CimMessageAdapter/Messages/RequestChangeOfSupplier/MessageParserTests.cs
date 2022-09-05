@@ -15,15 +15,17 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Messages;
+using Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 using Messaging.Domain.OutgoingMessages;
 using Xunit;
 
-namespace Messaging.Tests.CimMessageAdapter.Messages;
+namespace Messaging.Tests.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 
 public class MessageParserTests
 {
@@ -59,11 +61,27 @@ public class MessageParserTests
 
     [Theory]
     [MemberData(nameof(CreateMessages))]
-    public async Task Can_parse_message(CimFormat format, Stream message)
+    public async Task Can_parse(CimFormat format, Stream message)
     {
         var result = await _messageParser.ParseAsync(message, format).ConfigureAwait(false);
 
         Assert.True(result.Success);
+        Assert.Equal("78954612", result.MessageHeader?.MessageId);
+        Assert.Equal("E65", result.MessageHeader?.ProcessType);
+        Assert.Equal("5799999933318", result.MessageHeader?.SenderId);
+        Assert.Equal("DDQ", result.MessageHeader?.SenderRole);
+        Assert.Equal("5790001330552", result.MessageHeader?.ReceiverId);
+        Assert.Equal("DDZ", result.MessageHeader?.ReceiverRole);
+        Assert.Equal("2022-09-07T09:30:47Z", result.MessageHeader?.CreatedAt);
+        var marketActivityRecord = result.MarketActivityRecords.First();
+        Assert.Equal("12345689", marketActivityRecord.Id);
+        Assert.Equal("579999993331812345", marketActivityRecord.MarketEvaluationPointId);
+        Assert.Equal("5799999933318", marketActivityRecord.EnergySupplierId);
+        Assert.Equal("5799999933340", marketActivityRecord.BalanceResponsibleId);
+        Assert.Equal("0801741527", marketActivityRecord.ConsumerId);
+        Assert.Equal("ARR", marketActivityRecord.ConsumerIdType);
+        Assert.Equal("Jan Hansen", marketActivityRecord.ConsumerName);
+        Assert.Equal("2022-09-07T22:00:00Z", marketActivityRecord.EffectiveDate);
     }
 
     [Theory]
@@ -86,11 +104,22 @@ public class MessageParserTests
 
     private static Stream CreateXmlMessage()
     {
-        var xmlDoc = XDocument.Load($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}xml{Path.DirectorySeparatorChar}Confirm request Change of Supplier.xml");
+        var xmlDoc = XDocument.Load($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}xml{Path.DirectorySeparatorChar}RequestChangeOfSupplier.xml");
         var stream = new MemoryStream();
         xmlDoc.Save(stream);
 
         return stream;
+    }
+
+    private static MemoryStream CreateJsonMessage()
+    {
+        return ReadTextFile(
+            $"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}json{Path.DirectorySeparatorChar}Request Change of Supplier.json");
+    }
+
+    private static MemoryStream CreateInvalidJsonMessage()
+    {
+        return ReadTextFile($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}json{Path.DirectorySeparatorChar}Invalid Request Change of Supplier.json");
     }
 
     private static Stream CreateInvalidXmlMessage()
@@ -103,17 +132,6 @@ public class MessageParserTests
         var returnStream = new MemoryStream();
         messageStream.CopyTo(returnStream);
         return returnStream;
-    }
-
-    private static MemoryStream CreateJsonMessage()
-    {
-        return ReadTextFile(
-            $"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}json{Path.DirectorySeparatorChar}Request Change of Supplier.json");
-    }
-
-    private static MemoryStream CreateInvalidJsonMessage()
-    {
-        return ReadTextFile($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}json{Path.DirectorySeparatorChar}Invalid Request Change of Supplier.json");
     }
 
     private static MemoryStream ReadTextFile(string path)

@@ -23,4 +23,9 @@ public interface IConfig
     /// The name to affiliate a service with
     /// </summary>
     string WithName { get; }
+
+    /// <summary>
+    /// Queue name for service
+    /// </summary>
+    string QueueName { get; }
 }

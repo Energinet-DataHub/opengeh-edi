@@ -12,17 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MessageHub.Model.Model;
+using System;
 
-namespace Messaging.Infrastructure.OutgoingMessages.Requesting
-{
-    public class MessageRequestContext
-    {
-        public DataBundleRequestDto? DataBundleRequestDto { get; private set; }
+namespace Messaging.Application.MasterData;
 
-        public void SetMessageRequest(DataBundleRequestDto messageRequest)
-        {
-            DataBundleRequestDto = messageRequest;
-        }
-    }
-}
+public record Address(
+    string StreetName,
+    string StreetCode,
+    string PostCode,
+    string City,
+    string CountryCode,
+    string CitySubDivision,
+    string Floor,
+    string Room,
+    string BuildingNumber,
+    int MunicipalityCode,
+    bool IsActualAddress,
+    Guid GeoInfoReference,
+    string LocationDescription);

@@ -12,22 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json.Serialization;
-using Messaging.Application.Common.Commands;
-using Messaging.Application.MasterData;
+using System.Threading.Tasks;
 
 namespace Messaging.Application.Transactions.MoveIn;
 
-public class ForwardCustomerMasterData : InternalCommand
+/// <summary>
+/// Interface for fetching customer master data
+/// </summary>
+public interface IRequestCustomerMasterData
 {
-    [JsonConstructor]
-    public ForwardCustomerMasterData(string transactionId, CustomerMasterDataContent customerMasterDataContent)
-    {
-        TransactionId = transactionId;
-        CustomerMasterDataContent = customerMasterDataContent;
-    }
-
-    public string TransactionId { get; }
-
-    public CustomerMasterDataContent CustomerMasterDataContent { get; }
+    /// <summary>
+    /// Request master data for a customer
+    /// </summary>
+    /// <param name="fetchCustomerMasterData"></param>
+    /// <returns><see cref="Task"/></returns>
+    Task RequestMasterDataForAsync(FetchCustomerMasterData fetchCustomerMasterData);
 }

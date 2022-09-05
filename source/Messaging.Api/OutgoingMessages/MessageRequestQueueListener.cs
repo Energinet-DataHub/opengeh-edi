@@ -16,15 +16,11 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MessageHub.Client.Storage;
-using Energinet.DataHub.MessageHub.Model.Model;
 using Energinet.DataHub.MessageHub.Model.Peek;
 using MediatR;
 using Messaging.Application.Configuration;
-using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Requesting;
-using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Configuration.Serialization;
-using Messaging.Infrastructure.OutgoingMessages.Requesting;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
@@ -34,7 +30,6 @@ namespace Messaging.Api.OutgoingMessages
     {
         private readonly ICorrelationContext _correlationContext;
         private readonly ILogger<MessageRequestQueueListener> _logger;
-        private readonly MessageRequestContext _messageRequestContext;
         private readonly IMediator _mediator;
         private readonly IRequestBundleParser _requestBundleParser;
         private readonly IStorageHandler _storageHandler;
@@ -43,7 +38,6 @@ namespace Messaging.Api.OutgoingMessages
         public MessageRequestQueueListener(
             ICorrelationContext correlationContext,
             ILogger<MessageRequestQueueListener> logger,
-            MessageRequestContext messageRequestContext,
             IMediator mediator,
             IRequestBundleParser requestBundleParser,
             IStorageHandler storageHandler,
@@ -51,7 +45,6 @@ namespace Messaging.Api.OutgoingMessages
         {
             _correlationContext = correlationContext;
             _logger = logger;
-            _messageRequestContext = messageRequestContext;
             _mediator = mediator;
             _requestBundleParser = requestBundleParser;
             _storageHandler = storageHandler;
@@ -62,7 +55,7 @@ namespace Messaging.Api.OutgoingMessages
         public async Task RunAsync([ServiceBusTrigger("%MESSAGE_REQUEST_QUEUE%", Connection = "MESSAGEHUB_QUEUE_CONNECTION_STRING", IsSessionsEnabled = true)] byte[] data)
         {
             var messageRequest = _requestBundleParser.Parse(data);
-            _messageRequestContext.SetMessageRequest(messageRequest);
+            _logger.LogInformation($"Requested response format: {messageRequest.ResponseFormat.ToString()}");
             _logger.LogInformation($"Parsed data bundle request DTO: {_serializer.Serialize(messageRequest)}");
 
             var dataAvailableIds = await _storageHandler.GetDataAvailableNotificationIdsAsync(messageRequest)
@@ -71,7 +64,11 @@ namespace Messaging.Api.OutgoingMessages
 
             await _mediator.Send(new RequestMessages(
                 dataAvailableIds.Select(x => x.ToString()).ToList() ?? throw new InvalidOperationException(),
-                messageRequest.ResponseFormat.ToString())).ConfigureAwait(false);
+                messageRequest.ResponseFormat.ToString(),
+                messageRequest.RequestId,
+                messageRequest.IdempotencyId,
+                messageRequest.DataAvailableNotificationReferenceId,
+                messageRequest.MessageType.Value)).ConfigureAwait(false);
             _logger.LogInformation($"Dequeued with correlation id: {_correlationContext.Id}");
         }
     }
