@@ -47,6 +47,7 @@ public class FetchCustomerMasterDataTests : TestBase
         var dispatchedMessage = _requestDispatcherSpy.GetRequest(command.TransactionId);
         Assert.NotNull(dispatchedMessage);
         Assert.Equal(command.TransactionId, dispatchedMessage?.ApplicationProperties["TransactionId"]);
+        Assert.Equal(command.BusinessProcessId, dispatchedMessage?.ApplicationProperties["BusinessProcessId"]);
     }
 
     private static FetchCustomerMasterData CreateRequest()
