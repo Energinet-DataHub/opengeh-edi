@@ -35,16 +35,6 @@ public class FetchCustomerMasterDataTests : TestBase
     }
 
     [Fact]
-    public async Task Request_is_dispatched()
-    {
-        var request = CreateRequest();
-        await _requestCustomerMasterData.RequestMasterDataForAsync(request).ConfigureAwait(false);
-
-        var dispatchedMessage = _requestDispatcherSpy.GetRequest(request.TransactionId);
-        Assert.NotNull(dispatchedMessage);
-    }
-
-    [Fact]
     public async Task Customer_master_data_request_is_dispatched()
     {
         var command = new FetchCustomerMasterData(
@@ -56,6 +46,7 @@ public class FetchCustomerMasterDataTests : TestBase
 
         var dispatchedMessage = _requestDispatcherSpy.GetRequest(command.TransactionId);
         Assert.NotNull(dispatchedMessage);
+        Assert.Equal(command.TransactionId, dispatchedMessage?.ApplicationProperties["TransactionId"]);
     }
 
     private static FetchCustomerMasterData CreateRequest()
