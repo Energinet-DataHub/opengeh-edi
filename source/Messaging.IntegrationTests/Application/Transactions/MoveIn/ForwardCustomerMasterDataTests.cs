@@ -38,7 +38,7 @@ public class ForwardCustomerMasterDataTests : TestBase
         await InvokeCommandAsync(forwardMeteringPointMasterData).ConfigureAwait(false);
 
         AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>())
-            .MeteringPointMasterDataWasSent();
+            .CustomerMasterDataWasSent();
     }
 
     private static IncomingMessageBuilder MessageBuilder()
