@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
+namespace Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails;
 
-public class RelatedMarketEvaluationPoint
+public class Mrid
 {
-    public RelatedMarketEvaluationPoint(Mrid id, string description)
+    public Mrid(string id, string codingScheme)
     {
         Id = id;
-        Description = description;
+        CodingScheme = codingScheme;
     }
 
-    public Mrid Id { get; }
+    public string Id { get; }
 
-    public string Description { get; }
+    public string CodingScheme { get; }
 }

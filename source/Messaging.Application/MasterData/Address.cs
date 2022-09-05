@@ -12,17 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
+using System;
 
-public class Series
-{
-    public Series(string product, string quantityMeasureUnit)
-    {
-        Product = product;
-        QuantityMeasureUnit = quantityMeasureUnit;
-    }
+namespace Messaging.Application.MasterData;
 
-    public string Product { get; }
-
-    public string QuantityMeasureUnit { get; }
-}
+public record Address(
+    string StreetName,
+    string StreetCode,
+    string PostCode,
+    string City,
+    string CountryCode,
+    string CitySubDivision,
+    string Floor,
+    string Room,
+    string BuildingNumber,
+    int MunicipalityCode,
+    bool IsActualAddress,
+    Guid GeoInfoReference,
+    string LocationDescription);

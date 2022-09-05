@@ -22,12 +22,13 @@ using Messaging.Application.Configuration;
 using Messaging.Application.MasterData;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
+using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails;
 using Messaging.Domain.MasterData.Dictionaries;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
 using NodaTime.Extensions;
-using Address = Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.Address;
-using Series = Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.Series;
+using Address = Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails.Address;
+using Series = Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails.Series;
 
 namespace Messaging.Application.Transactions.MoveIn;
 

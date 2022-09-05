@@ -12,23 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
+namespace Energinet.DataHub.EnergySupplying.RequestResponse;
 
-public class TownDetail
+internal class AssemblyInfo
 {
-    public TownDetail(string code, string name, string section, string country)
-    {
-        Code = code;
-        Name = name;
-        Section = section;
-        Country = country;
-    }
-
-    public string Code { get; }
-
-    public string Name { get; }
-
-    public string Section { get; }
-
-    public string Country { get; }
 }

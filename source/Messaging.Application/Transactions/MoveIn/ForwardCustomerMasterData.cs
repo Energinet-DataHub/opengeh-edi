@@ -12,26 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
+using System.Text.Json.Serialization;
+using Messaging.Application.Common.Commands;
+using Messaging.Application.MasterData;
 
-public class StreetDetail
+namespace Messaging.Application.Transactions.MoveIn;
+
+public class ForwardCustomerMasterData : InternalCommand
 {
-    public StreetDetail(string code, string name, string number, string floorIdentification, string suiteNumber)
+    [JsonConstructor]
+    public ForwardCustomerMasterData(string transactionId, CustomerMasterDataContent customerMasterDataContent)
     {
-        Code = code;
-        Name = name;
-        Number = number;
-        FloorIdentification = floorIdentification;
-        SuiteNumber = suiteNumber;
+        TransactionId = transactionId;
+        CustomerMasterDataContent = customerMasterDataContent;
     }
 
-    public string Code { get; }
+    public string TransactionId { get; }
 
-    public string Name { get; }
-
-    public string Number { get; }
-
-    public string FloorIdentification { get; }
-
-    public string SuiteNumber { get; }
+    public CustomerMasterDataContent CustomerMasterDataContent { get; }
 }

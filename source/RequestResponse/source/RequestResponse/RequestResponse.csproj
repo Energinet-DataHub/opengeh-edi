@@ -1,0 +1,71 @@
+<!--
+Copyright 2020 Energinet DataHub A/S
+
+Licensed under the Apache License, Version 2.0 (the "License2");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>Energinet.DataHub.EnergySupplying.RequestResponse</AssemblyName>
+        <RootNamespace>Energinet.DataHub.EnergySupplying.RequestResponse</RootNamespace>
+        <PackageId>Energinet.DataHub.EnergySupplying.RequestResponse</PackageId>
+        <Title>EnergySupplying RequestResponse library</Title>
+        <Authors>Energinet-DataHub</Authors>
+        <Description>Library to use for implementation of request/response from EnergySupplying (MarketRoles) domain.</Description>
+        <PackageProjectUrl>https://github.com/Energinet-DataHub</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/Energinet-DataHub/geh-market-roles</RepositoryUrl>
+        <PackageTags>energinet;datahub;request;response</PackageTags>
+		<PackageReleaseNotes>
+		[Release Notes](https://github.com/Energinet-DataHub/geh-metering-point/blob/master/source/RequestResponse/documents/release-notes/release-notes.md)
+		[Documentation](https://github.com/Energinet-DataHub/geh-metering-point/blob/master/source/RequestResponse/documents/development.md)
+		</PackageReleaseNotes>        
+        <Company>Energinet-DataHub</Company>
+        <Product>Energinet.DataHub.EnergySupplying.RequestResponse</Product>
+		<IsPackable>true</IsPackable>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<PackageDescription>
+        [Release Notes](https://github.com/Energinet-DataHub/geh-metering-point/blob/master/source/RequestResponse/documents/release-notes/release-notes.md)
+        [Documentation](https://github.com/Energinet-DataHub/geh-metering-point/blob/master/source/RequestResponse/documents/development.md)
+		</PackageDescription>
+		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+      <!-- Disable warning on your public types/methods for not having added full documentation tags -->
+      <NoWarn>$(NoWarn);1591</NoWarn>
+      <PublishRepositoryUrl>true</PublishRepositoryUrl>
+      <PackageVersion>1.0.0</PackageVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Google.Protobuf" Version="3.21.5" />
+      <PackageReference Include="Grpc.Tools" Version="2.49.0-pre1">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+          <Protobuf Include="**/*.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Public</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+      <Generator>MSBuild:Compile</Generator>
+    </Protobuf>
+    </ItemGroup>
+
+</Project>

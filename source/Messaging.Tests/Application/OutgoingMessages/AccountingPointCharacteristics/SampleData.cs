@@ -14,6 +14,7 @@
 
 using System;
 using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
+using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails;
 using Messaging.Domain.MasterData;
 using Messaging.Infrastructure.Configuration;
 

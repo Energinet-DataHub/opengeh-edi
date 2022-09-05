@@ -94,6 +94,12 @@ public class AssertTransaction
         return this;
     }
 
+    public AssertTransaction CustomerMasterDataWasSent()
+    {
+        Assert.Equal(MoveInTransaction.MasterDataState.Sent.ToString(), _transaction.CustomerMasterDataState);
+        return this;
+    }
+
     public AssertTransaction BusinessProcessCompleted()
     {
         Assert.Equal(MoveInTransaction.BusinessProcessState.Completed.ToString(), _transaction.BusinessProcessState);
