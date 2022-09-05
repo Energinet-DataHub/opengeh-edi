@@ -19,14 +19,14 @@ using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.TestDoubles;
 using Xunit;
 
-namespace Messaging.IntegrationTests.Infrastructure.Transactions.MoveIn;
+namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
 
-public class RequestCustomerMasterDataTests : TestBase
+public class FetchCustomerMasterDataTests : TestBase
 {
     private readonly RequestDispatcherSpy _requestDispatcherSpy;
     private readonly IRequestCustomerMasterData _requestCustomerMasterData;
 
-    public RequestCustomerMasterDataTests(DatabaseFixture databaseFixture)
+    public FetchCustomerMasterDataTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _requestDispatcherSpy = new RequestDispatcherSpy();
@@ -34,10 +34,11 @@ public class RequestCustomerMasterDataTests : TestBase
     }
 
     [Fact]
-    public async Task Requests_are_dispatched()
+    public async Task Request_is_dispatched()
     {
         var request = CreateRequest();
         await _requestCustomerMasterData.RequestMasterDataForAsync(request).ConfigureAwait(false);
+
         var dispatchedMessage = _requestDispatcherSpy.GetRequest(request.TransactionId);
         Assert.NotNull(dispatchedMessage);
     }
