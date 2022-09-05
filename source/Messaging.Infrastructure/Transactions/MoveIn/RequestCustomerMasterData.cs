@@ -41,6 +41,7 @@ public class RequestCustomerMasterData : IRequestCustomerMasterData
     {
         var message = new MasterDataRequest
         {
+            GsrnNumber = fetchMeteringPointMasterData.MarketEvaluationPointNumber,
         };
         var bytes = message.ToByteArray();
         ServiceBusMessage serviceBusMessage = new(bytes)

@@ -13,11 +13,16 @@
 // limitations under the License.
 
 using System;
+using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Energinet.DataHub.MeteringPoints.RequestResponse.Requests;
 using Messaging.Application.Transactions.MoveIn;
+using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.Transactions.MoveIn;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.TestDoubles;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
@@ -48,6 +53,8 @@ public class FetchCustomerMasterDataTests : TestBase
         Assert.NotNull(dispatchedMessage);
         Assert.Equal(command.TransactionId, dispatchedMessage?.ApplicationProperties["TransactionId"]);
         Assert.Equal(command.BusinessProcessId, dispatchedMessage?.ApplicationProperties["BusinessProcessId"]);
+        var request = MasterDataRequest.Parser.ParseFrom(dispatchedMessage?.Body);
+        Assert.Equal(command.MarketEvaluationPointNumber, request.GsrnNumber);
     }
 
     private static FetchCustomerMasterData CreateRequest()
