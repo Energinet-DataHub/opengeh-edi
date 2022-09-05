@@ -32,7 +32,7 @@ public class ForwardCustomerMasterDataTests : TestBase
     [Fact]
     public async Task Customer_master_data_is_sent_to_the_new_energy_supplier()
     {
-        await SetupAnAcceptedMoveInTransactionAsync().ConfigureAwait(false);
+        await GivenMoveInHasBeenAcceptedAsync().ConfigureAwait(false);
 
         var command = new ForwardCustomerMasterData(SampleData.TransactionId, CreateMasterDataContent());
         await InvokeCommandAsync(command).ConfigureAwait(false);
@@ -65,7 +65,7 @@ public class ForwardCustomerMasterDataTests : TestBase
             SampleData.UsagePointLocations);
     }
 
-    private async Task SetupAnAcceptedMoveInTransactionAsync()
+    private async Task GivenMoveInHasBeenAcceptedAsync()
     {
         await InvokeCommandAsync(MessageBuilder().Build()).ConfigureAwait(false);
     }
