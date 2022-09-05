@@ -22,12 +22,12 @@ namespace Messaging.IntegrationTests.CimMessageAdapter.Stubs
 {
     public class MessageQueueDispatcherStub : IMessageQueueDispatcher
     {
-        private readonly List<IncomingMessage> _uncommittedItems = new();
-        private readonly List<IncomingMessage> _committedItems = new();
+        private readonly List<IMarketTransaction> _uncommittedItems = new();
+        private readonly List<IMarketTransaction> _committedItems = new();
 
-        public IReadOnlyCollection<IncomingMessage> CommittedItems => _committedItems.AsReadOnly();
+        public IReadOnlyCollection<IMarketTransaction> CommittedItems => _committedItems.AsReadOnly();
 
-        public Task AddAsync(IncomingMessage message)
+        public Task AddAsync(IMarketTransaction message)
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
             _committedItems.Clear();

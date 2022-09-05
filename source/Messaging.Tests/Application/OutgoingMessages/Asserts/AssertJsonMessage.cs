@@ -50,4 +50,9 @@ public static class AssertJsonMessage
         Assert.Equal(header.ReceiverRole, root.GetProperty("receiver_MarketParticipant.marketRole.type").GetProperty("value").ToString());
         Assert.Equal(header.ReasonCode, root.GetProperty("reason.code").GetProperty("value").ToString());
     }
+
+    internal static void AssertHasHeaderValue(JsonDocument document, string documentType, string propertyName, string? expectedValue)
+    {
+        Assert.Equal(expectedValue, document.RootElement.GetProperty(documentType).GetProperty(propertyName).GetProperty("value").ToString());
+    }
 }

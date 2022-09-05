@@ -29,12 +29,12 @@ public class MessageStorage : IMessageStorage
         _storageHandler = storageHandler;
     }
 
-    public Task<Uri> SaveAsync(Stream bundledMessage, MessageRequest messageRequest)
+    public Task<Uri> SaveAsync(Stream bundledMessage, ClientProvidedDetails clientProvidedDetails)
     {
-        ArgumentNullException.ThrowIfNull(messageRequest);
+        ArgumentNullException.ThrowIfNull(clientProvidedDetails);
 
         return _storageHandler.AddStreamToStorageAsync(
             bundledMessage,
-            MessageHubModelFactory.CreateDataBundleRequest(messageRequest));
+            MessageHubModelFactory.CreateDataBundleRequest(clientProvidedDetails));
     }
 }

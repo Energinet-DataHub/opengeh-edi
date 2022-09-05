@@ -29,7 +29,7 @@ public interface IDocumentWriter
     /// Determine if specified document type can be handles by the writer
     /// </summary>
     /// <param name="documentType"></param>
-    bool HandlesDocumentType(string documentType);
+    bool HandlesDocumentType(DocumentType documentType);
 
     /// <summary>
     /// Writes the document

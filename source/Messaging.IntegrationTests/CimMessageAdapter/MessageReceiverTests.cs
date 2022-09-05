@@ -19,8 +19,10 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Messaging.Application.Configuration.Authentication;
+using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Messages;
+using Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.IntegrationTests.CimMessageAdapter.Messages;
 using Messaging.IntegrationTests.CimMessageAdapter.Stubs;
@@ -185,22 +187,23 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
             Assert.Contains(result.Errors, error => error.Code.Equals(errorCode, StringComparison.OrdinalIgnoreCase));
         }
 
-        private Task<Result> ReceiveRequestChangeOfSupplierMessage(Stream message)
+        private async Task<Result> ReceiveRequestChangeOfSupplierMessage(Stream message)
         {
-            return CreateMessageReceiver().ReceiveAsync(message, CimFormat.Xml);
+            return await CreateMessageReceiver()
+                .ReceiveAsync(await ParseMessageAsync(message).ConfigureAwait(false));
         }
 
         private MessageReceiver CreateMessageReceiver()
         {
             _messageQueueDispatcherSpy = new MessageQueueDispatcherStub();
-            var messageReceiver = new MessageReceiver(_messageIds, _messageQueueDispatcherSpy, _transactionIds, _marketActorAuthenticator, _messageParser);
+            var messageReceiver = new MessageReceiver(_messageIds, _messageQueueDispatcherSpy, _transactionIds, _marketActorAuthenticator);
             return messageReceiver;
         }
 
         private MessageReceiver CreateMessageReceiver(IMessageIds messageIds)
         {
             _messageQueueDispatcherSpy = new MessageQueueDispatcherStub();
-            var messageReceiver = new MessageReceiver(messageIds, _messageQueueDispatcherSpy, _transactionIds, _marketActorAuthenticator, _messageParser);
+            var messageReceiver = new MessageReceiver(messageIds, _messageQueueDispatcherSpy, _transactionIds, _marketActorAuthenticator);
             return messageReceiver;
         }
 
@@ -209,12 +212,17 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
             var messageBuilder = BusinessMessageBuilder.RequestChangeOfSupplier();
 
             using var originalMessage = messageBuilder.Message();
-            await CreateMessageReceiver(messageIds).ReceiveAsync(originalMessage, CimFormat.Xml)
+            await CreateMessageReceiver(messageIds).ReceiveAsync(await ParseMessageAsync(originalMessage).ConfigureAwait(false))
                 .ConfigureAwait(false);
 
             using var duplicateMessage = messageBuilder.Message();
-            await CreateMessageReceiver(messageIds).ReceiveAsync(duplicateMessage, CimFormat.Xml)
+            await CreateMessageReceiver(messageIds).ReceiveAsync(await ParseMessageAsync(duplicateMessage).ConfigureAwait(false))
                 .ConfigureAwait(false);
+        }
+
+        private Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>> ParseMessageAsync(Stream message)
+        {
+            return _messageParser.ParseAsync(message, CimFormat.Xml);
         }
 
         private ClaimsPrincipal CreateIdentity()

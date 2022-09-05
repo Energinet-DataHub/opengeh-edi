@@ -26,7 +26,7 @@ namespace Messaging.CimMessageAdapter.Messages
         /// Adds a message to collection
         /// </summary>
         /// <param name="message"></param>
-        Task AddAsync(IncomingMessage message);
+        Task AddAsync(IMarketTransaction message);
 
         /// <summary>
         /// Commits added transactions to queue

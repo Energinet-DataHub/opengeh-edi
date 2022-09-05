@@ -12,26 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.IO;
-using System.Threading.Tasks;
-using Messaging.Application.OutgoingMessages.Requesting;
-using Xunit;
+namespace Messaging.Application.IncomingMessages;
 
-namespace Messaging.IntegrationTests.TestDoubles;
-
-public class MessageStorageSpy : IMessageStorage
+/// <summary>
+/// Market activity record
+/// </summary>
+public interface IMarketActivityRecord
 {
-    public Stream? SavedMessage { get; private set; }
-
-    public Task<Uri> SaveAsync(Stream bundledMessage, ClientProvidedDetails clientProvidedDetails)
-    {
-        SavedMessage = bundledMessage;
-        return Task.FromResult(new Uri("http://someuri"));
-    }
-
-    public void MessageHasBeenSavedInStorage()
-    {
-        Assert.NotNull(SavedMessage);
-    }
+    /// <summary>
+    /// Unique identifier (transaction id) of market activity record
+    /// </summary>
+    string Id { get; }
 }
