@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Transactions.MoveIn;
@@ -29,7 +30,7 @@ public class FetchCustomerMasterDataTests : TestBase
     public FetchCustomerMasterDataTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _requestDispatcherSpy = new RequestDispatcherSpy();
+        _requestDispatcherSpy = (RequestDispatcherSpy)GetService<IRequestDispatcher>();
         _requestCustomerMasterData = new RequestCustomerMasterData(_requestDispatcherSpy);
     }
 
@@ -40,6 +41,20 @@ public class FetchCustomerMasterDataTests : TestBase
         await _requestCustomerMasterData.RequestMasterDataForAsync(request).ConfigureAwait(false);
 
         var dispatchedMessage = _requestDispatcherSpy.GetRequest(request.TransactionId);
+        Assert.NotNull(dispatchedMessage);
+    }
+
+    [Fact]
+    public async Task Customer_master_data_request_is_dispatched()
+    {
+        var command = new FetchCustomerMasterData(
+            Guid.NewGuid().ToString(),
+            "123445611",
+            Guid.NewGuid().ToString());
+
+        await InvokeCommandAsync(command).ConfigureAwait(false);
+
+        var dispatchedMessage = _requestDispatcherSpy.GetRequest(command.TransactionId);
         Assert.NotNull(dispatchedMessage);
     }
 
