@@ -15,11 +15,11 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.MarketRoles.ActorRegistrySync.Entities;
+using Microsoft.Data.SqlClient;
 
 namespace Energinet.DataHub.MarketRoles.ActorRegistrySync.Services;
 
