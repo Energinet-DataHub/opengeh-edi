@@ -34,8 +34,8 @@ public class ForwardCustomerMasterDataTests : TestBase
     {
         await SetupAnAcceptedMoveInTransactionAsync().ConfigureAwait(false);
 
-        var forwardMeteringPointMasterData = new ForwardCustomerMasterData(SampleData.TransactionId, CreateMasterDataContent());
-        await InvokeCommandAsync(forwardMeteringPointMasterData).ConfigureAwait(false);
+        var command = new ForwardCustomerMasterData(SampleData.TransactionId, CreateMasterDataContent());
+        await InvokeCommandAsync(command).ConfigureAwait(false);
 
         AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>())
             .CustomerMasterDataWasSent();
