@@ -13,9 +13,11 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MessageHub.Client.Storage;
+using Energinet.DataHub.MessageHub.Model.Model;
 using Energinet.DataHub.MessageHub.Model.Peek;
 using MediatR;
 using Messaging.Application.Configuration;
@@ -58,9 +60,8 @@ namespace Messaging.Api.OutgoingMessages
             _logger.LogInformation($"Requested response format: {messageRequest.ResponseFormat.ToString()}");
             _logger.LogInformation($"Parsed data bundle request DTO: {_serializer.Serialize(messageRequest)}");
 
-            var dataAvailableIds = await _storageHandler.GetDataAvailableNotificationIdsAsync(messageRequest)
-                .ConfigureAwait(false);
-            _logger.LogInformation($"Parsed message ids: {dataAvailableIds}");
+            var requestedMessageIds = await ParseRequestedMessageIdsAsync(messageRequest).ConfigureAwait(false);
+            _logger.LogInformation($"Parsed message ids: {string.Join(", ", requestedMessageIds.Select(id => id))}");
 
             var clientProvidedDetails = new ClientProvidedDetails(
                 messageRequest.RequestId,
@@ -70,9 +71,18 @@ namespace Messaging.Api.OutgoingMessages
                 messageRequest.ResponseFormat.ToString());
 
             await _mediator.Send(new RequestMessages(
-                dataAvailableIds.Select(x => x.ToString()).ToList() ?? throw new InvalidOperationException(),
+                requestedMessageIds,
                 clientProvidedDetails)).ConfigureAwait(false);
             _logger.LogInformation($"Dequeued with correlation id: {_correlationContext.Id}");
+        }
+
+        private async Task<IReadOnlyCollection<string>> ParseRequestedMessageIdsAsync(DataBundleRequestDto request)
+        {
+            var dataAvailableIds = await _storageHandler.GetDataAvailableNotificationIdsAsync(request)
+                .ConfigureAwait(false);
+            return dataAvailableIds.Select(x => x.ToString())
+                .ToList()
+                .AsReadOnly();
         }
     }
 }
