@@ -13,11 +13,9 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Dapper;
 using Messaging.Application.Common;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.MasterData;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
@@ -57,12 +55,7 @@ public class ForwardCustomerMasterDataTests : TestBase
         var command = new ForwardCustomerMasterData(SampleData.TransactionId, CreateMasterDataContent());
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
-        var assertMessage = AssertOutgoingMessage.OutgoingMessage(
-            SampleData.OriginalMessageId,
-            DocumentType.CharacteristicsOfACustomerAtAnAP.Name,
-            ProcessType.MoveIn.Code,
-            GetService<IDbConnectionFactory>());
-
+        var assertMessage = AssertOutgoingMessage();
         assertMessage.HasReceiverId(SampleData.NewEnergySupplierNumber);
         assertMessage.HasReceiverRole(MarketRoles.EnergySupplier);
         assertMessage.HasSenderId(DataHubDetails.IdentificationNumber);
@@ -112,5 +105,15 @@ public class ForwardCustomerMasterDataTests : TestBase
             .WithConsumerName(SampleData.ConsumerName)
             .Build();
         return InvokeCommandAsync(message);
+    }
+
+    private AssertOutgoingMessage AssertOutgoingMessage()
+    {
+        var assertMessage = IntegrationTests.AssertOutgoingMessage.OutgoingMessage(
+            SampleData.OriginalMessageId,
+            DocumentType.CharacteristicsOfACustomerAtAnAP.Name,
+            ProcessType.MoveIn.Code,
+            GetService<IDbConnectionFactory>());
+        return assertMessage;
     }
 }
