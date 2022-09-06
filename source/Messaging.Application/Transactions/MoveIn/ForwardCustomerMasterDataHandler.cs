@@ -94,7 +94,7 @@ public class ForwardCustomerMasterDataHandler : IRequestHandler<ForwardCustomerM
         var marketEvaluationPoint = CreateMarketEvaluationPoint(requestMasterDataContent, transaction);
         var marketActivityRecord = new MarketActivityRecord(
             Guid.NewGuid().ToString(),
-            string.Empty,
+            transaction.TransactionId,
             transaction.EffectiveDate,
             marketEvaluationPoint);
 

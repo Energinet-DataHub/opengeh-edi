@@ -17,6 +17,7 @@ using Dapper;
 using Messaging.Application.Common;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.MasterData;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.Transactions.MoveIn;
@@ -24,6 +25,7 @@ using Messaging.Domain.OutgoingMessages;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
+using MarketActivityRecord = Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp.MarketActivityRecord;
 
 namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
 
@@ -63,6 +65,9 @@ public class ForwardCustomerMasterDataTests : TestBase
         Assert.Equal(DataHubDetails.IdentificationNumber, customerMasterDataMessage.SenderId);
         Assert.Equal(MarketRoles.MeteringPointAdministrator, customerMasterDataMessage.SenderRole);
         Assert.Equal(SampleData.OriginalMessageId, customerMasterDataMessage.OriginalMessageId);
+        var marketActivityRecord = GetService<IMarketActivityRecordParser>()
+            .From<MarketActivityRecord>(customerMasterDataMessage.MarketActivityRecordPayload);
+        Assert.Equal(SampleData.TransactionId, marketActivityRecord.OriginalTransactionId);
     }
 
     private static CustomerMasterDataContent CreateMasterDataContent()
