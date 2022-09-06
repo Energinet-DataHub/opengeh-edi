@@ -74,6 +74,7 @@ public class ForwardCustomerMasterDataTests : TestBase
         Assert.Equal(SampleData.ElectricalHeatingStart, marketActivityRecord.MarketEvaluationPoint.ElectricalHeatingStart);
         Assert.Equal(SampleData.ElectricalHeating, marketActivityRecord.MarketEvaluationPoint.ElectricalHeating);
         Assert.Equal(SampleData.HasEnergySupplier, marketActivityRecord.MarketEvaluationPoint.HasEnergySupplier);
+        Assert.Equal(SampleData.ProtectedName, marketActivityRecord.MarketEvaluationPoint.ProtectedName);
     }
 
     private static CustomerMasterDataContent CreateMasterDataContent()
