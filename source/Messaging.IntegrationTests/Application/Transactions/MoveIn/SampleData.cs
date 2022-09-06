@@ -47,7 +47,7 @@ internal static class SampleData
 
     internal static bool ElectricalHeating => false;
 
-    internal static Instant ElectricalHeatingStart => DateTime.Now.ToUniversalTime().ToInstant();
+    internal static Instant ElectricalHeatingStart => EffectiveDateFactory.InstantAsOfToday();
 
     internal static string SecondCustomerId => "78967876";
 
