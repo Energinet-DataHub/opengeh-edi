@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -24,7 +23,6 @@ using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
-using NodaTime.Extensions;
 
 namespace Messaging.Application.Transactions.MoveIn;
 
