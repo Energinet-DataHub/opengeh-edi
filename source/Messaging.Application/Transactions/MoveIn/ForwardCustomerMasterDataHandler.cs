@@ -101,7 +101,7 @@ public class ForwardCustomerMasterDataHandler : IRequestHandler<ForwardCustomerM
         return CreateOutgoingMessage(
             transaction.StartedByMessageId,
             "CharacteristicsOfACustomerAtAnAP",
-            "E03",
+            ProcessType.MoveIn.Code,
             transaction.NewEnergySupplierId,
             _marketActivityRecordParser.From(marketActivityRecord));
     }

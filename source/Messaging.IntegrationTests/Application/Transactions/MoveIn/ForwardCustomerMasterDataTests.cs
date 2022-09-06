@@ -55,6 +55,7 @@ public class ForwardCustomerMasterDataTests : TestBase
         var customerMasterDataMessage = await GetMessageAsync("CharacteristicsOfACustomerAtAnAP")
             .ConfigureAwait(false);
         Assert.NotNull(customerMasterDataMessage);
+        Assert.Equal("E65", customerMasterDataMessage.ProcessType);
     }
 
     private static IncomingMessageBuilder MessageBuilder()
