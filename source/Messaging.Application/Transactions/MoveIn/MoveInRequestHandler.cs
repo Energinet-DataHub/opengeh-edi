@@ -162,7 +162,7 @@ namespace Messaging.Application.Transactions.MoveIn
 
             return CreateOutgoingMessage(
                 transaction.StartedByMessageId,
-                ProcessType.MoveIn.Confirm.DocumentType,
+                DocumentType.ConfirmRequestChangeOfSupplier,
                 ProcessType.MoveIn.Code,
                 requestChangeOfSupplierTransaction.Message.SenderId,
                 _marketActivityRecordParser.From(marketActivityRecord),
@@ -179,7 +179,7 @@ namespace Messaging.Application.Transactions.MoveIn
 
             return CreateOutgoingMessage(
                 transaction.StartedByMessageId,
-                ProcessType.MoveIn.Reject.DocumentType,
+                DocumentType.RejectRequestChangeOfSupplier,
                 ProcessType.MoveIn.Code,
                 requestChangeOfSupplierTransaction.Message.SenderId,
                 _marketActivityRecordParser.From(marketActivityRecord),
@@ -191,7 +191,7 @@ namespace Messaging.Application.Transactions.MoveIn
             return _validationErrorTranslator.TranslateAsync(validationErrors);
         }
 
-        private OutgoingMessage CreateOutgoingMessage(string id, string documentType, string processType, string receiverId, string marketActivityRecordPayload, string reasonCode)
+        private OutgoingMessage CreateOutgoingMessage(string id, DocumentType documentType, string processType, string receiverId, string marketActivityRecordPayload, string reasonCode)
         {
             return new OutgoingMessage(
                 documentType,
