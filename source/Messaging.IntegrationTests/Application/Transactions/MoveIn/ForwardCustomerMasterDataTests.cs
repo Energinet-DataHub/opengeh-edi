@@ -62,6 +62,7 @@ public class ForwardCustomerMasterDataTests : TestBase
         Assert.Equal(MarketRoles.EnergySupplier, customerMasterDataMessage.ReceiverRole);
         Assert.Equal(DataHubDetails.IdentificationNumber, customerMasterDataMessage.SenderId);
         Assert.Equal(MarketRoles.MeteringPointAdministrator, customerMasterDataMessage.SenderRole);
+        Assert.Equal(SampleData.OriginalMessageId, customerMasterDataMessage.OriginalMessageId);
     }
 
     private static CustomerMasterDataContent CreateMasterDataContent()
