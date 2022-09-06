@@ -57,30 +57,31 @@ public class ForwardCustomerMasterDataTests : TestBase
         var command = new ForwardCustomerMasterData(SampleData.TransactionId, CreateMasterDataContent());
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
-        var customerMasterDataMessage = await GetMessageAsync("CharacteristicsOfACustomerAtAnAP")
-            .ConfigureAwait(false);
-        Assert.NotNull(customerMasterDataMessage);
-        Assert.Equal(ProcessType.MoveIn.Code, customerMasterDataMessage.ProcessType);
-        Assert.Equal(SampleData.NewEnergySupplierNumber, customerMasterDataMessage.ReceiverId);
-        Assert.Equal(MarketRoles.EnergySupplier, customerMasterDataMessage.ReceiverRole);
-        Assert.Equal(DataHubDetails.IdentificationNumber, customerMasterDataMessage.SenderId);
-        Assert.Equal(MarketRoles.MeteringPointAdministrator, customerMasterDataMessage.SenderRole);
-        Assert.Equal(SampleData.OriginalMessageId, customerMasterDataMessage.OriginalMessageId);
-        var marketActivityRecord = GetService<IMarketActivityRecordParser>()
-            .From<MarketActivityRecord>(customerMasterDataMessage.MarketActivityRecordPayload);
-        Assert.Equal(SampleData.TransactionId, marketActivityRecord.OriginalTransactionId);
-        Assert.NotEmpty(marketActivityRecord.Id);
-        Assert.Equal(SampleData.SupplyStart, marketActivityRecord.ValidityStart);
-        Assert.Equal(SampleData.SupplyStart, marketActivityRecord.MarketEvaluationPoint.SupplyStart);
-        Assert.Equal(SampleData.ElectricalHeatingStart, marketActivityRecord.MarketEvaluationPoint.ElectricalHeatingStart);
-        Assert.Equal(SampleData.ElectricalHeating, marketActivityRecord.MarketEvaluationPoint.ElectricalHeating);
-        Assert.Equal(SampleData.HasEnergySupplier, marketActivityRecord.MarketEvaluationPoint.HasEnergySupplier);
-        Assert.Equal(SampleData.ProtectedName, marketActivityRecord.MarketEvaluationPoint.ProtectedName);
-        Assert.Equal(SampleData.ConsumerId, marketActivityRecord.MarketEvaluationPoint.FirstCustomerId.Id);
-        Assert.Equal(SampleData.ConsumerIdType, marketActivityRecord.MarketEvaluationPoint.FirstCustomerId.CodingScheme);
-        Assert.Equal(SampleData.ConsumerName, marketActivityRecord.MarketEvaluationPoint.FirstCustomerName);
-        Assert.Equal(SampleData.ConsumerIdType, marketActivityRecord.MarketEvaluationPoint.SecondCustomerId.CodingScheme);
-        Assert.Equal(SampleData.ConsumerName, marketActivityRecord.MarketEvaluationPoint.SecondCustomerName);
+        var assertMessage = AssertOutgoingMessage.OutgoingMessage(
+            SampleData.OriginalMessageId,
+            DocumentType.CharacteristicsOfACustomerAtAnAP.Name,
+            ProcessType.MoveIn.Code,
+            GetService<IDbConnectionFactory>());
+
+        assertMessage.HasReceiverId(SampleData.NewEnergySupplierNumber);
+        assertMessage.HasReceiverRole(MarketRoles.EnergySupplier);
+        assertMessage.HasSenderId(DataHubDetails.IdentificationNumber);
+        assertMessage.HasSenderRole(MarketRoles.MeteringPointAdministrator);
+        assertMessage.WithMarketActivityRecord()
+            .HasOriginalTransactionId(SampleData.TransactionId)
+            .HasValidityStart(SampleData.SupplyStart)
+            .HasMarketEvaluationPointDateValue(nameof(MarketEvaluationPoint.SupplyStart), SampleData.SupplyStart)
+            .HasMarketEvaluationPointValue(nameof(MarketEvaluationPoint.ElectricalHeating), SampleData.ElectricalHeating)
+            .HasMarketEvaluationPointDateValue(nameof(MarketEvaluationPoint.ElectricalHeatingStart), SampleData.ElectricalHeatingStart)
+            .HasMarketEvaluationPointValue(nameof(MarketEvaluationPoint.HasEnergySupplier), SampleData.HasEnergySupplier)
+            .HasMarketEvaluationPointValue(nameof(MarketEvaluationPoint.ProtectedName), SampleData.ProtectedName)
+            .HasMarketEvaluationPointValue($"{nameof(MarketEvaluationPoint.FirstCustomerId)}.{nameof(MarketEvaluationPoint.FirstCustomerId.Id)}", SampleData.ConsumerId)
+            .HasMarketEvaluationPointValue($"{nameof(MarketEvaluationPoint.FirstCustomerId)}.{nameof(MarketEvaluationPoint.FirstCustomerId.CodingScheme)}", SampleData.ConsumerIdType)
+            .HasMarketEvaluationPointValue(nameof(MarketEvaluationPoint.FirstCustomerName), SampleData.ConsumerName)
+            .HasMarketEvaluationPointValue($"{nameof(MarketEvaluationPoint.SecondCustomerId)}.{nameof(MarketEvaluationPoint.SecondCustomerId.Id)}", SampleData.ConsumerId)
+            .HasMarketEvaluationPointValue($"{nameof(MarketEvaluationPoint.SecondCustomerId)}.{nameof(MarketEvaluationPoint.SecondCustomerId.CodingScheme)}", SampleData.ConsumerIdType)
+            .HasMarketEvaluationPointValue(nameof(MarketEvaluationPoint.SecondCustomerName), SampleData.ConsumerName)
+            .NotEmpty(nameof(MarketActivityRecord.Id));
     }
 
     private static CustomerMasterDataContent CreateMasterDataContent()
@@ -111,20 +112,5 @@ public class ForwardCustomerMasterDataTests : TestBase
             .WithConsumerName(SampleData.ConsumerName)
             .Build();
         return InvokeCommandAsync(message);
-    }
-
-    private async Task<OutgoingMessage> GetMessageAsync(string documentType)
-    {
-        var connectionFactory = GetService<IDbConnectionFactory>();
-        var outgoingMessage = await connectionFactory
-            .GetOpenConnection()
-            .QuerySingleAsync<OutgoingMessage>(
-            $"SELECT [DocumentType], [ReceiverId], [CorrelationId], [OriginalMessageId], [ProcessType], [ReceiverRole], [SenderId], [SenderRole], [MarketActivityRecordPayload],[ReasonCode] FROM b2b.OutgoingMessages WHERE DocumentType = @DocumentType",
-            new
-            {
-                DocumentType = documentType,
-            }).ConfigureAwait(false);
-
-        return outgoingMessage;
     }
 }
