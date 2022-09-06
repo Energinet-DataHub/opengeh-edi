@@ -31,6 +31,7 @@ module "func_receiver" {
   health_check_path                         = "/api/monitor/ready"
   app_settings                              = {
     # Shared resources logging
+    INTERNAL_SERVICE_BUS_LISTENER_CONNECTION_STRING	          = module.sb_marketroles.primary_connection_strings["listen"]
     REQUEST_RESPONSE_LOGGING_CONNECTION_STRING                    = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=st-marketoplogs-primary-connection-string)",
     REQUEST_RESPONSE_LOGGING_CONTAINER_NAME                       = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=st-marketoplogs-container-name)",
     B2C_TENANT_ID                                                 = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=b2c-tenant-id)",
