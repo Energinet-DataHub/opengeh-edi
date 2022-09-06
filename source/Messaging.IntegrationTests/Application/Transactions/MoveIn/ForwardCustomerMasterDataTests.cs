@@ -69,6 +69,7 @@ public class ForwardCustomerMasterDataTests : TestBase
             .From<MarketActivityRecord>(customerMasterDataMessage.MarketActivityRecordPayload);
         Assert.Equal(SampleData.TransactionId, marketActivityRecord.OriginalTransactionId);
         Assert.NotEmpty(marketActivityRecord.Id);
+        Assert.Equal(SampleData.SupplyStart, marketActivityRecord.ValidityStart);
     }
 
     private static CustomerMasterDataContent CreateMasterDataContent()
@@ -94,6 +95,7 @@ public class ForwardCustomerMasterDataTests : TestBase
             .WithTransactionId(SampleData.TransactionId)
             .WithMarketEvaluationPointId(SampleData.MarketEvaluationPointId)
             .WithEnergySupplierId(SampleData.NewEnergySupplierNumber)
+            .WithEffectiveDate(SampleData.SupplyStart)
             .Build();
         return InvokeCommandAsync(message);
     }
