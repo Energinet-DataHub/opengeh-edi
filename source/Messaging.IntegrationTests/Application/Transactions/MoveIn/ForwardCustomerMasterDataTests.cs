@@ -12,10 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
+using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.MasterData;
 using Messaging.Application.Transactions.MoveIn;
+using Messaging.Domain.OutgoingMessages;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
@@ -30,7 +33,7 @@ public class ForwardCustomerMasterDataTests : TestBase
     }
 
     [Fact]
-    public async Task Customer_master_data_is_sent_to_the_new_energy_supplier()
+    public async Task Customer_master_data_is_marked_as_sent_on_transaction()
     {
         await GivenMoveInHasBeenAcceptedAsync().ConfigureAwait(false);
 
@@ -39,6 +42,19 @@ public class ForwardCustomerMasterDataTests : TestBase
 
         AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>())
             .CustomerMasterDataWasSent();
+    }
+
+    [Fact]
+    public async Task Outgoing_message_is_created()
+    {
+        await GivenMoveInHasBeenAcceptedAsync().ConfigureAwait(false);
+
+        var command = new ForwardCustomerMasterData(SampleData.TransactionId, CreateMasterDataContent());
+        await InvokeCommandAsync(command).ConfigureAwait(false);
+
+        var customerMasterDataMessage = await GetMessageAsync("CharacteristicsOfACustomerAtAnAP")
+            .ConfigureAwait(false);
+        Assert.NotNull(customerMasterDataMessage);
     }
 
     private static IncomingMessageBuilder MessageBuilder()
@@ -68,5 +84,20 @@ public class ForwardCustomerMasterDataTests : TestBase
     private async Task GivenMoveInHasBeenAcceptedAsync()
     {
         await InvokeCommandAsync(MessageBuilder().Build()).ConfigureAwait(false);
+    }
+
+    private async Task<OutgoingMessage> GetMessageAsync(string documentType)
+    {
+        var connectionFactory = GetService<IDbConnectionFactory>();
+        var outgoingMessage = await connectionFactory
+            .GetOpenConnection()
+            .QuerySingleAsync<OutgoingMessage>(
+            $"SELECT [DocumentType], [ReceiverId], [CorrelationId], [OriginalMessageId], [ProcessType], [ReceiverRole], [SenderId], [SenderRole], [MarketActivityRecordPayload],[ReasonCode] FROM b2b.OutgoingMessages WHERE DocumentType = @DocumentType",
+            new
+            {
+                DocumentType = documentType,
+            }).ConfigureAwait(false);
+
+        return outgoingMessage;
     }
 }
