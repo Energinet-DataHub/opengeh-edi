@@ -20,6 +20,7 @@ using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.MasterData;
 using Messaging.Application.OutgoingMessages;
+using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.IntegrationTests.Application.IncomingMessages;
@@ -78,6 +79,8 @@ public class ForwardCustomerMasterDataTests : TestBase
         Assert.Equal(SampleData.ConsumerId, marketActivityRecord.MarketEvaluationPoint.FirstCustomerId.Id);
         Assert.Equal(SampleData.ConsumerIdType, marketActivityRecord.MarketEvaluationPoint.FirstCustomerId.CodingScheme);
         Assert.Equal(SampleData.ConsumerName, marketActivityRecord.MarketEvaluationPoint.FirstCustomerName);
+        Assert.Equal(SampleData.ConsumerIdType, marketActivityRecord.MarketEvaluationPoint.SecondCustomerId.CodingScheme);
+        Assert.Equal(SampleData.ConsumerName, marketActivityRecord.MarketEvaluationPoint.SecondCustomerName);
     }
 
     private static CustomerMasterDataContent CreateMasterDataContent()
@@ -88,8 +91,8 @@ public class ForwardCustomerMasterDataTests : TestBase
             SampleData.ElectricalHeatingStart,
             SampleData.ConsumerId,
             SampleData.ConsumerName,
-            SampleData.SecondCustomerId,
-            SampleData.SecondCustomerName,
+            SampleData.ConsumerId,
+            SampleData.ConsumerName,
             SampleData.ProtectedName,
             SampleData.HasEnergySupplier,
             SampleData.SupplyStart,
