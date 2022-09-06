@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Common;
@@ -23,6 +24,7 @@ using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
@@ -57,8 +59,7 @@ public class ForwardCustomerMasterDataTests : TestBase
         var command = new ForwardCustomerMasterData(SampleData.TransactionId, CreateMasterDataContent());
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
-        var customerMasterDataMessage = await GetMessageAsync("CharacteristicsOfACustomerAtAnAP")
-            .ConfigureAwait(false);
+        var customerMasterDataMessage = GetMessageAsync();
         Assert.NotNull(customerMasterDataMessage);
         Assert.Equal(ProcessType.MoveIn.Code, customerMasterDataMessage.ProcessType);
         Assert.Equal(SampleData.NewEnergySupplierNumber, customerMasterDataMessage.ReceiverId);
@@ -113,18 +114,9 @@ public class ForwardCustomerMasterDataTests : TestBase
         return InvokeCommandAsync(message);
     }
 
-    private async Task<OutgoingMessage> GetMessageAsync(string documentType)
+    private OutgoingMessage GetMessageAsync()
     {
-        var connectionFactory = GetService<IDbConnectionFactory>();
-        var outgoingMessage = await connectionFactory
-            .GetOpenConnection()
-            .QuerySingleAsync<OutgoingMessage>(
-            $"SELECT [DocumentType], [ReceiverId], [CorrelationId], [OriginalMessageId], [ProcessType], [ReceiverRole], [SenderId], [SenderRole], [MarketActivityRecordPayload],[ReasonCode] FROM b2b.OutgoingMessages WHERE DocumentType = @DocumentType",
-            new
-            {
-                DocumentType = documentType,
-            }).ConfigureAwait(false);
-
-        return outgoingMessage;
+        return GetService<B2BContext>().OutgoingMessages
+            .First(m => m.DocumentType == DocumentType.CharacteristicsOfACustomerAtAnAP);
     }
 }

@@ -16,7 +16,7 @@ namespace Messaging.Domain.OutgoingMessages
 {
     public class OutgoingMessage
     {
-        public OutgoingMessage(string documentType, string receiverId, string correlationId, string originalMessageId, string processType, string receiverRole, string senderId, string senderRole, string marketActivityRecordPayload, string? reasonCode)
+        public OutgoingMessage(DocumentType documentType, string receiverId, string correlationId, string originalMessageId, string processType, string receiverRole, string senderId, string senderRole, string marketActivityRecordPayload, string? reasonCode)
         {
             DocumentType = documentType;
             ReceiverId = receiverId;
@@ -31,7 +31,7 @@ namespace Messaging.Domain.OutgoingMessages
             Id = Guid.NewGuid();
         }
 
-        private OutgoingMessage(Guid id, string documentType, string receiverId, string correlationId, string originalMessageId, string processType, string receiverRole, string senderId, string senderRole, string marketActivityRecordPayload, string? reasonCode)
+        private OutgoingMessage(Guid id, DocumentType documentType, string receiverId, string correlationId, string originalMessageId, string processType, string receiverRole, string senderId, string senderRole, string marketActivityRecordPayload, string? reasonCode)
         {
             DocumentType = documentType;
             ReceiverId = receiverId;
@@ -52,7 +52,7 @@ namespace Messaging.Domain.OutgoingMessages
 
         public string ReceiverId { get; }
 
-        public string DocumentType { get; }
+        public DocumentType DocumentType { get; }
 
         public string? ReasonCode { get; }
 

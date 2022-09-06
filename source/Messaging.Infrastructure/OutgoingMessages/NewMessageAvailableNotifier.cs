@@ -67,7 +67,7 @@ namespace Messaging.Infrastructure.OutgoingMessages
 
         private static string ExtractDocumentType(OutgoingMessage message)
         {
-            return message.DocumentType.Split('_')[0];
+            return message.DocumentType.Name;
         }
 
         private async Task<Guid> FindActorIdAsync(string receiverId)

@@ -42,7 +42,7 @@ public class MoveInNotifications
             effectiveDate);
 
         var message = new OutgoingMessage(
-            DocumentType.GenericNotification.ToString(),
+            DocumentType.GenericNotification,
             energySupplierId,
             Guid.NewGuid().ToString(),
             transactionId,

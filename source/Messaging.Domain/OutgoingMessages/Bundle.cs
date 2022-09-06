@@ -36,7 +36,7 @@ public class Bundle
         if (IsFirstMessageInBundle())
         {
             CreateHeaderFrom(message);
-            _documentType = EnumerationType.FromName<DocumentType>(message.DocumentType);
+            _documentType = message.DocumentType;
         }
 
         EnsureProcessType(message);

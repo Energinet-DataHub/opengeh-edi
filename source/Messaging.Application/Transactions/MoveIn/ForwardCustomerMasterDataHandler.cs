@@ -56,10 +56,10 @@ public class ForwardCustomerMasterDataHandler : IRequestHandler<ForwardCustomerM
         return await Task.FromResult(Unit.Value).ConfigureAwait(false);
     }
 
-    private static OutgoingMessage CreateOutgoingMessage(string id, string documentType, string processType, string receiverId, string @marketActivityRecordPayload)
+    private static OutgoingMessage CreateOutgoingMessage(string id, string processType, string receiverId, string @marketActivityRecordPayload)
     {
         return new OutgoingMessage(
-            documentType,
+            DocumentType.CharacteristicsOfACustomerAtAnAP,
             receiverId,
             Guid.NewGuid().ToString(),
             id,
@@ -98,7 +98,6 @@ public class ForwardCustomerMasterDataHandler : IRequestHandler<ForwardCustomerM
 
         return CreateOutgoingMessage(
             transaction.StartedByMessageId,
-            "CharacteristicsOfACustomerAtAnAP",
             ProcessType.MoveIn.Code,
             transaction.NewEnergySupplierId,
             _marketActivityRecordParser.From(marketActivityRecord));
