@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System;
-using Messaging.Application.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.SeedWork;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -28,7 +28,10 @@ namespace Messaging.Infrastructure.Configuration.DataAccess.Outgoing
 
             builder.ToTable("OutgoingMessages", "b2b");
             builder.HasKey(x => x.Id);
-            builder.Property(x => x.DocumentType);
+            builder.Property(x => x.DocumentType)
+                .HasConversion(
+                    toDbValue => toDbValue.Name,
+                    fromDbValue => EnumerationType.FromName<DocumentType>(fromDbValue));
             builder.Property(x => x.ReasonCode);
             builder.Property(x => x.IsPublished);
             builder.Property(x => x.ReceiverId);
