@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
@@ -57,14 +56,7 @@ public class ForwardCustomerMasterDataTests : TestBase
             .ConfigureAwait(false);
         Assert.NotNull(customerMasterDataMessage);
         Assert.Equal(ProcessType.MoveIn.Code, customerMasterDataMessage.ProcessType);
-    }
-
-    private static IncomingMessageBuilder MessageBuilder()
-    {
-        return new IncomingMessageBuilder()
-            .WithMessageId(SampleData.OriginalMessageId)
-            .WithTransactionId(SampleData.TransactionId)
-            .WithMarketEvaluationPointId(SampleData.MarketEvaluationPointId);
+        Assert.Equal(SampleData.NewEnergySupplierNumber, customerMasterDataMessage.ReceiverId);
     }
 
     private static CustomerMasterDataContent CreateMasterDataContent()
@@ -83,9 +75,15 @@ public class ForwardCustomerMasterDataTests : TestBase
             SampleData.UsagePointLocations);
     }
 
-    private async Task GivenMoveInHasBeenAcceptedAsync()
+    private Task GivenMoveInHasBeenAcceptedAsync()
     {
-        await InvokeCommandAsync(MessageBuilder().Build()).ConfigureAwait(false);
+        var message = new IncomingMessageBuilder()
+            .WithMessageId(SampleData.OriginalMessageId)
+            .WithTransactionId(SampleData.TransactionId)
+            .WithMarketEvaluationPointId(SampleData.MarketEvaluationPointId)
+            .WithEnergySupplierId(SampleData.NewEnergySupplierNumber)
+            .Build();
+        return InvokeCommandAsync(message);
     }
 
     private async Task<OutgoingMessage> GetMessageAsync(string documentType)
