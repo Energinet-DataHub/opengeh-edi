@@ -47,7 +47,7 @@ internal static class SampleData
 
     internal static bool ElectricalHeating => false;
 
-    internal static Instant ElectricalHeatingStart => DateTime.Now.ToUniversalTime().ToInstant();
+    internal static Instant ElectricalHeatingStart => EffectiveDateFactory.InstantAsOfToday();
 
     internal static string SecondCustomerId => "78967876";
 
@@ -57,7 +57,7 @@ internal static class SampleData
 
     internal static bool HasEnergySupplier => true;
 
-    internal static Instant SupplyStart => DateTime.Now.AddDays(10).ToUniversalTime().ToInstant();
+    internal static Instant SupplyStart => EffectiveDateFactory.InstantAsOfToday();
 
     internal static IEnumerable<UsagePointLocation> UsagePointLocations => new List<UsagePointLocation>();
 }

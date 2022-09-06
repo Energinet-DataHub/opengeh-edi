@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -24,7 +23,6 @@ using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
-using NodaTime.Extensions;
 
 namespace Messaging.Application.Transactions.MoveIn;
 
@@ -94,14 +92,14 @@ public class ForwardCustomerMasterDataHandler : IRequestHandler<ForwardCustomerM
         var marketEvaluationPoint = CreateMarketEvaluationPoint(requestMasterDataContent, transaction);
         var marketActivityRecord = new MarketActivityRecord(
             Guid.NewGuid().ToString(),
-            string.Empty,
+            transaction.TransactionId,
             transaction.EffectiveDate,
             marketEvaluationPoint);
 
         return CreateOutgoingMessage(
             transaction.StartedByMessageId,
             "CharacteristicsOfACustomerAtAnAP",
-            "E03",
+            ProcessType.MoveIn.Code,
             transaction.NewEnergySupplierId,
             _marketActivityRecordParser.From(marketActivityRecord));
     }

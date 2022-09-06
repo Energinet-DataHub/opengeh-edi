@@ -59,7 +59,9 @@ namespace Messaging.IntegrationTests
                 .AddMessageStorage(_ => new MessageStorageSpy())
                 .AddRequestHandler<TestCommandHandler>()
                 .AddHttpClientAdapter(_ => new HttpClientSpy())
-                .AddMoveInServices(new MoveInConfiguration(new Uri("http://someuri")))
+                .AddMoveInServices(
+                    new MoveInConfiguration(new Uri("http://someuri")),
+                    sp => new RequestDispatcherSpy())
                 .AddMessageParserServices();
             _serviceProvider = _services.BuildServiceProvider();
         }
