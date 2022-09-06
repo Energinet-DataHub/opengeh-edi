@@ -68,6 +68,7 @@ public class ForwardCustomerMasterDataTests : TestBase
         var marketActivityRecord = GetService<IMarketActivityRecordParser>()
             .From<MarketActivityRecord>(customerMasterDataMessage.MarketActivityRecordPayload);
         Assert.Equal(SampleData.TransactionId, marketActivityRecord.OriginalTransactionId);
+        Assert.NotEmpty(marketActivityRecord.Id);
     }
 
     private static CustomerMasterDataContent CreateMasterDataContent()
