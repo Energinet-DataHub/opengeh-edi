@@ -26,7 +26,7 @@ namespace Messaging.IntegrationTests.Application.IncomingMessages
         private readonly string _createdAt = SystemClock.Instance.GetCurrentInstant().ToString();
         private readonly string _receiverRole = "DDQ";
         private readonly string _senderRole = "DDZ";
-        private readonly Instant _effectiveDate = SystemClock.Instance.GetCurrentInstant();
+        private Instant _effectiveDate = SystemClock.Instance.GetCurrentInstant();
         private string? _messageId;
         private string _processType = NotSet;
         private string _senderId = NotSet;
@@ -35,6 +35,19 @@ namespace Messaging.IntegrationTests.Application.IncomingMessages
         private string _marketEvaluationPointId = NotSet;
         private string? _transactionId;
         private string? _energySupplierId = "123456";
+        private string _consumerId = "NotSet";
+
+        internal IncomingMessageBuilder WithConsumerId(string id)
+        {
+            _consumerId = id;
+            return this;
+        }
+
+        internal IncomingMessageBuilder WithEffectiveDate(Instant effectiveDate)
+        {
+            _effectiveDate = effectiveDate;
+            return this;
+        }
 
         internal IncomingMessageBuilder WithMarketEvaluationPointId(string marketEvaluationPointId)
         {
@@ -97,7 +110,7 @@ namespace Messaging.IntegrationTests.Application.IncomingMessages
             {
                 BalanceResponsibleId = "fake",
                 Id = _transactionId ?? Guid.NewGuid().ToString(),
-                ConsumerId = "fake",
+                ConsumerId = _consumerId,
                 ConsumerName = _consumerName,
                 EffectiveDate = _effectiveDate.ToString(),
                 EnergySupplierId = _energySupplierId,

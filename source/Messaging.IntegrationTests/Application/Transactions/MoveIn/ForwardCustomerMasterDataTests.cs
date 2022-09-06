@@ -13,12 +13,20 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
+using Dapper;
+using Messaging.Application.Common;
+using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.MasterData;
+using Messaging.Application.OutgoingMessages;
+using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Application.Transactions.MoveIn;
+using Messaging.Domain.OutgoingMessages;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
+using MarketActivityRecord = Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp.MarketActivityRecord;
 
 namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
 
@@ -30,7 +38,7 @@ public class ForwardCustomerMasterDataTests : TestBase
     }
 
     [Fact]
-    public async Task Customer_master_data_is_sent_to_the_new_energy_supplier()
+    public async Task Customer_master_data_is_marked_as_sent_on_transaction()
     {
         await GivenMoveInHasBeenAcceptedAsync().ConfigureAwait(false);
 
@@ -41,12 +49,38 @@ public class ForwardCustomerMasterDataTests : TestBase
             .CustomerMasterDataWasSent();
     }
 
-    private static IncomingMessageBuilder MessageBuilder()
+    [Fact]
+    public async Task Outgoing_message_is_created()
     {
-        return new IncomingMessageBuilder()
-            .WithMessageId(SampleData.OriginalMessageId)
-            .WithTransactionId(SampleData.TransactionId)
-            .WithMarketEvaluationPointId(SampleData.MarketEvaluationPointId);
+        await GivenMoveInHasBeenAcceptedAsync().ConfigureAwait(false);
+
+        var command = new ForwardCustomerMasterData(SampleData.TransactionId, CreateMasterDataContent());
+        await InvokeCommandAsync(command).ConfigureAwait(false);
+
+        var customerMasterDataMessage = await GetMessageAsync("CharacteristicsOfACustomerAtAnAP")
+            .ConfigureAwait(false);
+        Assert.NotNull(customerMasterDataMessage);
+        Assert.Equal(ProcessType.MoveIn.Code, customerMasterDataMessage.ProcessType);
+        Assert.Equal(SampleData.NewEnergySupplierNumber, customerMasterDataMessage.ReceiverId);
+        Assert.Equal(MarketRoles.EnergySupplier, customerMasterDataMessage.ReceiverRole);
+        Assert.Equal(DataHubDetails.IdentificationNumber, customerMasterDataMessage.SenderId);
+        Assert.Equal(MarketRoles.MeteringPointAdministrator, customerMasterDataMessage.SenderRole);
+        Assert.Equal(SampleData.OriginalMessageId, customerMasterDataMessage.OriginalMessageId);
+        var marketActivityRecord = GetService<IMarketActivityRecordParser>()
+            .From<MarketActivityRecord>(customerMasterDataMessage.MarketActivityRecordPayload);
+        Assert.Equal(SampleData.TransactionId, marketActivityRecord.OriginalTransactionId);
+        Assert.NotEmpty(marketActivityRecord.Id);
+        Assert.Equal(SampleData.SupplyStart, marketActivityRecord.ValidityStart);
+        Assert.Equal(SampleData.SupplyStart, marketActivityRecord.MarketEvaluationPoint.SupplyStart);
+        Assert.Equal(SampleData.ElectricalHeatingStart, marketActivityRecord.MarketEvaluationPoint.ElectricalHeatingStart);
+        Assert.Equal(SampleData.ElectricalHeating, marketActivityRecord.MarketEvaluationPoint.ElectricalHeating);
+        Assert.Equal(SampleData.HasEnergySupplier, marketActivityRecord.MarketEvaluationPoint.HasEnergySupplier);
+        Assert.Equal(SampleData.ProtectedName, marketActivityRecord.MarketEvaluationPoint.ProtectedName);
+        Assert.Equal(SampleData.ConsumerId, marketActivityRecord.MarketEvaluationPoint.FirstCustomerId.Id);
+        Assert.Equal(SampleData.ConsumerIdType, marketActivityRecord.MarketEvaluationPoint.FirstCustomerId.CodingScheme);
+        Assert.Equal(SampleData.ConsumerName, marketActivityRecord.MarketEvaluationPoint.FirstCustomerName);
+        Assert.Equal(SampleData.ConsumerIdType, marketActivityRecord.MarketEvaluationPoint.SecondCustomerId.CodingScheme);
+        Assert.Equal(SampleData.ConsumerName, marketActivityRecord.MarketEvaluationPoint.SecondCustomerName);
     }
 
     private static CustomerMasterDataContent CreateMasterDataContent()
@@ -55,18 +89,42 @@ public class ForwardCustomerMasterDataTests : TestBase
             SampleData.MarketEvaluationPointId,
             SampleData.ElectricalHeating,
             SampleData.ElectricalHeatingStart,
-            SampleData.SecondCustomerId,
-            SampleData.SecondCustomerName,
-            SampleData.SecondCustomerId,
-            SampleData.SecondCustomerName,
+            SampleData.ConsumerId,
+            SampleData.ConsumerName,
+            SampleData.ConsumerId,
+            SampleData.ConsumerName,
             SampleData.ProtectedName,
             SampleData.HasEnergySupplier,
             SampleData.SupplyStart,
             SampleData.UsagePointLocations);
     }
 
-    private async Task GivenMoveInHasBeenAcceptedAsync()
+    private Task GivenMoveInHasBeenAcceptedAsync()
     {
-        await InvokeCommandAsync(MessageBuilder().Build()).ConfigureAwait(false);
+        var message = new IncomingMessageBuilder()
+            .WithMessageId(SampleData.OriginalMessageId)
+            .WithTransactionId(SampleData.TransactionId)
+            .WithMarketEvaluationPointId(SampleData.MarketEvaluationPointId)
+            .WithEnergySupplierId(SampleData.NewEnergySupplierNumber)
+            .WithEffectiveDate(SampleData.SupplyStart)
+            .WithConsumerId(SampleData.ConsumerId)
+            .WithConsumerName(SampleData.ConsumerName)
+            .Build();
+        return InvokeCommandAsync(message);
+    }
+
+    private async Task<OutgoingMessage> GetMessageAsync(string documentType)
+    {
+        var connectionFactory = GetService<IDbConnectionFactory>();
+        var outgoingMessage = await connectionFactory
+            .GetOpenConnection()
+            .QuerySingleAsync<OutgoingMessage>(
+            $"SELECT [DocumentType], [ReceiverId], [CorrelationId], [OriginalMessageId], [ProcessType], [ReceiverRole], [SenderId], [SenderRole], [MarketActivityRecordPayload],[ReasonCode] FROM b2b.OutgoingMessages WHERE DocumentType = @DocumentType",
+            new
+            {
+                DocumentType = documentType,
+            }).ConfigureAwait(false);
+
+        return outgoingMessage;
     }
 }

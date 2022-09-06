@@ -16,6 +16,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MessageHub.Client.DataAvailable;
 using Energinet.DataHub.MessageHub.Client.Storage;
 using Messaging.Api.Configuration.Middleware.Authentication.Bearer;
@@ -27,6 +28,7 @@ using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.Infrastructure.OutgoingMessages.Requesting;
 using Messaging.Infrastructure.Transactions;
 using Messaging.Infrastructure.Transactions.MoveIn;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Protocols;
@@ -120,7 +122,11 @@ namespace Messaging.Api
                             new RequestMasterDataConfiguration(
                                 runtime.MASTER_DATA_REQUEST_QUEUE_NAME!,
                                 "shared-service-bus-send-permission"))
-                        .AddMoveInServices(new MoveInConfiguration(new Uri(runtime.MOVE_IN_REQUEST_ENDPOINT ?? throw new ArgumentException(nameof(runtime.MOVE_IN_REQUEST_ENDPOINT)))))
+                        .AddMoveInServices(
+                            new MoveInConfiguration(new Uri(runtime.MOVE_IN_REQUEST_ENDPOINT ?? throw new ArgumentException(nameof(runtime.MOVE_IN_REQUEST_ENDPOINT)))),
+                            sp => new RequestDispatcher<RequestMasterDataConfiguration>(
+                                sp.GetRequiredService<IAzureClientFactory<ServiceBusClient>>(),
+                                sp.GetRequiredService<RequestMasterDataConfiguration>()))
                         .AddMessageParserServices();
 
                     services.AddLiveHealthCheck();

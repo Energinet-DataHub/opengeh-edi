@@ -211,12 +211,12 @@ namespace Messaging.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddMoveInServices(MoveInConfiguration configuration)
+        public CompositionRoot AddMoveInServices(MoveInConfiguration configuration, Func<IServiceProvider, IRequestDispatcher> requestDispatcherBuilder)
         {
             _services.AddScoped<MoveInNotifications>();
             _services.AddScoped(_ => configuration);
             _services.AddScoped<IMoveInRequester, MoveInRequester>();
-            _services.AddScoped<IRequestDispatcher, RequestDispatcher<RequestMasterDataConfiguration>>();
+            _services.AddScoped(requestDispatcherBuilder);
             _services.AddScoped<IRequestMeteringPointMasterData, RequestMeteringPointMasterData>();
             _services.AddScoped<IRequestCustomerMasterData, RequestCustomerMasterData>();
             _services.AddTransient<IRequestHandler<RequestChangeOfSupplierTransaction, Unit>, MoveInRequestHandler>();
