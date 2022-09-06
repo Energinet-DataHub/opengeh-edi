@@ -75,6 +75,7 @@ public class ForwardCustomerMasterDataTests : TestBase
         Assert.Equal(SampleData.ElectricalHeating, marketActivityRecord.MarketEvaluationPoint.ElectricalHeating);
         Assert.Equal(SampleData.HasEnergySupplier, marketActivityRecord.MarketEvaluationPoint.HasEnergySupplier);
         Assert.Equal(SampleData.ProtectedName, marketActivityRecord.MarketEvaluationPoint.ProtectedName);
+        Assert.Equal(SampleData.ConsumerId, marketActivityRecord.MarketEvaluationPoint.FirstCustomerId.Id);
     }
 
     private static CustomerMasterDataContent CreateMasterDataContent()
@@ -83,7 +84,7 @@ public class ForwardCustomerMasterDataTests : TestBase
             SampleData.MarketEvaluationPointId,
             SampleData.ElectricalHeating,
             SampleData.ElectricalHeatingStart,
-            SampleData.SecondCustomerId,
+            SampleData.ConsumerId,
             SampleData.SecondCustomerName,
             SampleData.SecondCustomerId,
             SampleData.SecondCustomerName,
@@ -101,6 +102,7 @@ public class ForwardCustomerMasterDataTests : TestBase
             .WithMarketEvaluationPointId(SampleData.MarketEvaluationPointId)
             .WithEnergySupplierId(SampleData.NewEnergySupplierNumber)
             .WithEffectiveDate(SampleData.SupplyStart)
+            .WithConsumerId(SampleData.ConsumerId)
             .Build();
         return InvokeCommandAsync(message);
     }

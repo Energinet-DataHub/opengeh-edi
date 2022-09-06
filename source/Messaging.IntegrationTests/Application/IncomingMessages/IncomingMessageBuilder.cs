@@ -35,6 +35,13 @@ namespace Messaging.IntegrationTests.Application.IncomingMessages
         private string _marketEvaluationPointId = NotSet;
         private string? _transactionId;
         private string? _energySupplierId = "123456";
+        private string _consumerId = "NotSet";
+
+        internal IncomingMessageBuilder WithConsumerId(string id)
+        {
+            _consumerId = id;
+            return this;
+        }
 
         internal IncomingMessageBuilder WithEffectiveDate(Instant effectiveDate)
         {
@@ -103,7 +110,7 @@ namespace Messaging.IntegrationTests.Application.IncomingMessages
             {
                 BalanceResponsibleId = "fake",
                 Id = _transactionId ?? Guid.NewGuid().ToString(),
-                ConsumerId = "fake",
+                ConsumerId = _consumerId,
                 ConsumerName = _consumerName,
                 EffectiveDate = _effectiveDate.ToString(),
                 EnergySupplierId = _energySupplierId,
