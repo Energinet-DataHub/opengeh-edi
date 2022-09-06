@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.MasterData;
+using Messaging.Application.OutgoingMessages;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.IntegrationTests.Application.IncomingMessages;
@@ -55,7 +56,7 @@ public class ForwardCustomerMasterDataTests : TestBase
         var customerMasterDataMessage = await GetMessageAsync("CharacteristicsOfACustomerAtAnAP")
             .ConfigureAwait(false);
         Assert.NotNull(customerMasterDataMessage);
-        Assert.Equal("E65", customerMasterDataMessage.ProcessType);
+        Assert.Equal(ProcessType.MoveIn.Code, customerMasterDataMessage.ProcessType);
     }
 
     private static IncomingMessageBuilder MessageBuilder()
