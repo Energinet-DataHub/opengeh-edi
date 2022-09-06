@@ -70,6 +70,7 @@ public class ForwardCustomerMasterDataTests : TestBase
         Assert.Equal(SampleData.TransactionId, marketActivityRecord.OriginalTransactionId);
         Assert.NotEmpty(marketActivityRecord.Id);
         Assert.Equal(SampleData.SupplyStart, marketActivityRecord.ValidityStart);
+        Assert.Equal(SampleData.SupplyStart, marketActivityRecord.MarketEvaluationPoint.SupplyStart);
     }
 
     private static CustomerMasterDataContent CreateMasterDataContent()
