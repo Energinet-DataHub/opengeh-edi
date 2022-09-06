@@ -15,6 +15,7 @@
 using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Common;
+using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.MasterData;
 using Messaging.Application.OutgoingMessages;
@@ -59,6 +60,7 @@ public class ForwardCustomerMasterDataTests : TestBase
         Assert.Equal(ProcessType.MoveIn.Code, customerMasterDataMessage.ProcessType);
         Assert.Equal(SampleData.NewEnergySupplierNumber, customerMasterDataMessage.ReceiverId);
         Assert.Equal(MarketRoles.EnergySupplier, customerMasterDataMessage.ReceiverRole);
+        Assert.Equal(DataHubDetails.IdentificationNumber, customerMasterDataMessage.SenderId);
     }
 
     private static CustomerMasterDataContent CreateMasterDataContent()
