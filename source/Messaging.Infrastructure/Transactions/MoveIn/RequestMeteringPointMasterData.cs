@@ -24,10 +24,10 @@ namespace Messaging.Infrastructure.Transactions.MoveIn;
 
 public class RequestMeteringPointMasterData : IRequestMeteringPointMasterData
 {
-    private readonly RequestMasterDataConfiguration _configuration;
+    private readonly MeteringPointServiceBusClientConfiguration _configuration;
     private readonly IServiceBusSenderFactory _serviceBusSenderFactory;
 
-    public RequestMeteringPointMasterData(RequestMasterDataConfiguration configuration, IServiceBusSenderFactory serviceBusSenderFactory)
+    public RequestMeteringPointMasterData(MeteringPointServiceBusClientConfiguration configuration, IServiceBusSenderFactory serviceBusSenderFactory)
     {
         _configuration = configuration;
         _serviceBusSenderFactory = serviceBusSenderFactory;

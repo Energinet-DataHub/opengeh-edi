@@ -124,19 +124,19 @@ namespace Messaging.Api
                         .AddHttpClientAdapter(sp => new HttpClientAdapter(sp.GetRequiredService<HttpClient>()))
                         .AddServiceBusClient(
                                 runtime.SHARED_SERVICE_BUS_SEND_CONNECTION_STRING!,
-                                new RequestMasterDataConfiguration(
+                                new MeteringPointServiceBusClientConfiguration(
                                     runtime.CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME!,
                                     "shared-service-bus-send-permission"))
                         .AddServiceBusClient(
                             runtime.SHARED_SERVICE_BUS_SEND_CONNECTION_STRING!,
-                            new RequestMasterDataConfiguration(
+                            new MeteringPointServiceBusClientConfiguration(
                                 runtime.MASTER_DATA_REQUEST_QUEUE_NAME!,
                                 "shared-service-bus-send-permission"))
                         .AddMoveInServices(
                             new MoveInConfiguration(new Uri(runtime.MOVE_IN_REQUEST_ENDPOINT ?? throw new ArgumentException(nameof(runtime.MOVE_IN_REQUEST_ENDPOINT)))),
-                            sp => new RequestDispatcher<RequestMasterDataConfiguration>(
+                            sp => new RequestDispatcher<MeteringPointServiceBusClientConfiguration>(
                                 sp.GetRequiredService<IAzureClientFactory<ServiceBusClient>>(),
-                                sp.GetRequiredService<RequestMasterDataConfiguration>()))
+                                sp.GetRequiredService<MeteringPointServiceBusClientConfiguration>()))
                         .AddMessageParserServices();
 
                     services.AddLiveHealthCheck();

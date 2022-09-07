@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
 using Messaging.Infrastructure.Configuration.MessageBus;
-using Microsoft.Extensions.Configuration;
 
 namespace Messaging.Infrastructure.Transactions.MoveIn;
 
-public class RequestMasterDataConfiguration : IServiceBusClientConfiguration
+public class MeteringPointServiceBusClientConfiguration : IServiceBusClientConfiguration
 {
-    public RequestMasterDataConfiguration(string queueName, string withName)
+    public MeteringPointServiceBusClientConfiguration(string queueName, string clientRegistrationName)
     {
         QueueName = queueName;
-        ClientRegistrationName = withName;
+        ClientRegistrationName = clientRegistrationName;
     }
 
     public string QueueName { get; }
