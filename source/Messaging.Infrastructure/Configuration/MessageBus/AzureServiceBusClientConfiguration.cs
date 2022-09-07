@@ -38,4 +38,4 @@ public static class AzureServiceBusClientConfiguration
     }
 }
 
-public record ServiceBusClientConfiguration(string ConnectionString, string ClientRegistrationName);
+public record ServiceBusClientConfiguration(string? ConnectionString, string ClientRegistrationName);

@@ -13,6 +13,7 @@
 // limitations under the License.using System;
 
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -23,6 +24,7 @@ using Messaging.Api.Configuration.Middleware.Authentication.Bearer;
 using Messaging.Api.Configuration.Middleware.Authentication.MarketActors;
 using Messaging.Api.Configuration.Middleware.Correlation;
 using Messaging.Infrastructure.Configuration;
+using Messaging.Infrastructure.Configuration.MessageBus;
 using Messaging.Infrastructure.Configuration.SystemTime;
 using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.Infrastructure.OutgoingMessages.Requesting;
@@ -76,6 +78,14 @@ namespace Messaging.Api
                 .ConfigureServices(services =>
                 {
                     var databaseConnectionString = runtime.DB_CONNECTION_STRING;
+
+                    var clientConfigurations = new List<ServiceBusClientConfiguration>()
+                    {
+                        new(runtime.SHARED_SERVICE_BUS_SEND_CONNECTION_STRING, "MeteringPointsSenderClient"),
+                        new(runtime.ENERGY_SUPPLYING_SERVICE_BUS_SEND_CONNECTION_STRING, "EnergySupplyingSenderClient"),
+                    };
+                    services.AddAzureServiceBusClients(clientConfigurations);
+
                     CompositionRoot.Initialize(services)
                         .AddBearerAuthentication(tokenValidationParameters)
                         .AddDatabaseConnectionFactory(databaseConnectionString!)
