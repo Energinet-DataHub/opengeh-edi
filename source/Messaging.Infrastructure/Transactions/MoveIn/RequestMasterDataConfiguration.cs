@@ -17,15 +17,15 @@ using Microsoft.Extensions.Configuration;
 
 namespace Messaging.Infrastructure.Transactions.MoveIn;
 
-public class RequestMasterDataConfiguration : IConfig
+public class RequestMasterDataConfiguration : IServiceBusClientConfiguration
 {
     public RequestMasterDataConfiguration(string queueName, string withName)
     {
         QueueName = queueName;
-        WithName = withName;
+        ClientRegistrationName = withName;
     }
 
     public string QueueName { get; }
 
-    public string WithName { get; }
+    public string ClientRegistrationName { get; }
 }

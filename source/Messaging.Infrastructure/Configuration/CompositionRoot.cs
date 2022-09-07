@@ -252,13 +252,13 @@ namespace Messaging.Infrastructure.Configuration
         }
 
         public CompositionRoot AddServiceBusClient<TConfiguration>(string connectionString, TConfiguration configuration)
-            where TConfiguration : class, IConfig
+            where TConfiguration : class, IServiceBusClientConfiguration
         {
             _services.AddScoped(_ => configuration);
 
             _services.AddAzureClients(builder =>
             {
-                builder.AddServiceBusClient(connectionString).WithName(configuration.WithName);
+                builder.AddServiceBusClient(connectionString).WithName(configuration.ClientRegistrationName);
             });
 
             return this;

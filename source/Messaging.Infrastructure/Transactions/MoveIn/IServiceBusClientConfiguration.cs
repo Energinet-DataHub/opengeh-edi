@@ -17,12 +17,12 @@ namespace Messaging.Infrastructure.Transactions.MoveIn;
 /// <summary>
 /// Interface for configurations
 /// </summary>
-public interface IConfig
+public interface IServiceBusClientConfiguration
 {
     /// <summary>
     /// The name to affiliate a service with
     /// </summary>
-    string WithName { get; }
+    string ClientRegistrationName { get; }
 
     /// <summary>
     /// Queue name for service

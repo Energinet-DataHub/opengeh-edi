@@ -21,7 +21,7 @@ namespace Messaging.Infrastructure.Transactions.MoveIn;
 
 public class RequestDispatcher<TConfiguration> : IRequestDispatcher
     where TConfiguration
-    : IConfig
+    : IServiceBusClientConfiguration
 {
     private readonly Lazy<ServiceBusSender> _senderCreator;
 
@@ -29,7 +29,7 @@ public class RequestDispatcher<TConfiguration> : IRequestDispatcher
     {
         if (serviceBusClientFactory == null) throw new ArgumentNullException(nameof(serviceBusClientFactory));
         if (configuration == null) throw new ArgumentNullException(nameof(configuration));
-        var serviceBusClient = serviceBusClientFactory.CreateClient(configuration.WithName);
+        var serviceBusClient = serviceBusClientFactory.CreateClient(configuration.ClientRegistrationName);
         _senderCreator = new Lazy<ServiceBusSender>(() => serviceBusClient.CreateSender(configuration.QueueName));
     }
 
