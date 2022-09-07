@@ -79,12 +79,19 @@ namespace Messaging.Api
                 {
                     var databaseConnectionString = runtime.DB_CONNECTION_STRING;
 
-                    var clientConfigurations = new List<ServiceBusClientConfiguration>()
-                    {
-                        new(runtime.SHARED_SERVICE_BUS_SEND_CONNECTION_STRING, "MeteringPointsSenderClient"),
-                        new(runtime.ENERGY_SUPPLYING_SERVICE_BUS_SEND_CONNECTION_STRING, "EnergySupplyingSenderClient"),
-                    };
-                    services.AddAzureServiceBusClients(clientConfigurations);
+                    var meteringPointServiceBusClientConfiguration =
+                        new MeteringPointServiceBusClientConfiguration(
+                            runtime.MASTER_DATA_REQUEST_QUEUE_NAME!,
+                            "MeteringPointsSenderClient");
+                    services.AddSingleton(meteringPointServiceBusClientConfiguration);
+                    services.AddAzureServiceBusClient(new ServiceBusClientConfiguration(runtime.SHARED_SERVICE_BUS_SEND_CONNECTION_STRING, meteringPointServiceBusClientConfiguration));
+
+                    var energySupplyingServiceBusClientConfiguration =
+                        new EnergySupplyingServiceBusClientConfiguration(
+                            runtime.CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME!,
+                            "EnergySupplyingSenderClient");
+                    services.AddSingleton(energySupplyingServiceBusClientConfiguration);
+                    services.AddAzureServiceBusClient(new ServiceBusClientConfiguration(runtime.ENERGY_SUPPLYING_SERVICE_BUS_SEND_CONNECTION_STRING, energySupplyingServiceBusClientConfiguration));
 
                     CompositionRoot.Initialize(services)
                         .AddBearerAuthentication(tokenValidationParameters)
