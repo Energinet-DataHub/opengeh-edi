@@ -16,6 +16,7 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MeteringPoints.RequestResponse.Requests;
 using Messaging.Application.Transactions.MoveIn;
+using Messaging.Infrastructure.Configuration.MessageBus;
 using Messaging.Infrastructure.Transactions.MoveIn;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.TestDoubles;
@@ -25,12 +26,17 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
 
 public class FetchCustomerMasterDataTests : TestBase
 {
-    private readonly RequestDispatcherSpy _requestDispatcherSpy;
+    private readonly RequestCustomerMasterDataSpy _requestCustomerMasterDataSpy;
+    private readonly ServiceBusSenderSpy _senderSpy;
+    private readonly ServiceBusSenderFactoryStub _serviceBusClientSenderFactory;
 
     public FetchCustomerMasterDataTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _requestDispatcherSpy = (RequestDispatcherSpy)GetService<IRequestDispatcher>();
+        _requestCustomerMasterDataSpy = (RequestCustomerMasterDataSpy)GetService<IRequestDispatcher>();
+        _serviceBusClientSenderFactory = (ServiceBusSenderFactoryStub)GetService<IServiceBusSenderFactory>();
+        _senderSpy = new ServiceBusSenderSpy("Fake");
+        _serviceBusClientSenderFactory.AddSenderSpy(_senderSpy);
     }
 
     [Fact]
@@ -43,7 +49,7 @@ public class FetchCustomerMasterDataTests : TestBase
 
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
-        var dispatchedMessage = _requestDispatcherSpy.GetRequest(command.TransactionId);
+        var dispatchedMessage = _senderSpy.Message;
         Assert.NotNull(dispatchedMessage);
         Assert.Equal(command.TransactionId, dispatchedMessage?.ApplicationProperties["TransactionId"]);
         Assert.Equal(command.BusinessProcessId, dispatchedMessage?.ApplicationProperties["BusinessProcessId"]);

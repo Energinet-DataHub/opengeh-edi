@@ -22,6 +22,7 @@ using Messaging.Api.Configuration.Middleware.Correlation;
 using Messaging.Application.Common;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Infrastructure.Configuration;
+using Messaging.Infrastructure.Configuration.MessageBus;
 using Messaging.Infrastructure.Transactions.MoveIn;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.Infrastructure.InternalCommands;
@@ -45,6 +46,10 @@ namespace Messaging.IntegrationTests
             _databaseFixture.CleanupDatabase();
 
             _services = new ServiceCollection();
+
+            _services.AddSingleton(new EnergySupplyingServiceBusClientConfiguration("Fake", "Fake"));
+            _services.AddSingleton<IServiceBusSenderFactory, ServiceBusSenderFactoryStub>();
+
             CompositionRoot.Initialize(_services)
                 .AddDatabaseConnectionFactory(_databaseFixture.ConnectionString)
                 .AddDatabaseContext(_databaseFixture.ConnectionString)
@@ -61,7 +66,7 @@ namespace Messaging.IntegrationTests
                 .AddHttpClientAdapter(_ => new HttpClientSpy())
                 .AddMoveInServices(
                     new MoveInConfiguration(new Uri("http://someuri")),
-                    sp => new RequestDispatcherSpy())
+                    sp => new RequestCustomerMasterDataSpy())
                 .AddMessageParserServices();
             _serviceProvider = _services.BuildServiceProvider();
         }

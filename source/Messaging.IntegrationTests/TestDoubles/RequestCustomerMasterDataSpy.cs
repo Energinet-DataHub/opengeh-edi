@@ -16,11 +16,12 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
+using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Transactions.MoveIn;
 
 namespace Messaging.IntegrationTests.TestDoubles;
 
-public class RequestDispatcherSpy : IRequestDispatcher
+public class RequestCustomerMasterDataSpy : IRequestCustomerMasterData, IRequestDispatcher
 {
     private readonly Dictionary<string, ServiceBusMessage> _dispatchedRequests = new();
 
@@ -35,5 +36,10 @@ public class RequestDispatcherSpy : IRequestDispatcher
         if (message == null) throw new ArgumentNullException(nameof(message));
         _dispatchedRequests.Add(message.MessageId, message);
         return Task.CompletedTask;
+    }
+
+    public Task RequestMasterDataForAsync(FetchCustomerMasterData fetchCustomerMasterData)
+    {
+        throw new NotImplementedException();
     }
 }
