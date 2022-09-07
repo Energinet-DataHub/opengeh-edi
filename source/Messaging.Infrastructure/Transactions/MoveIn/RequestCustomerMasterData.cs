@@ -24,16 +24,13 @@ namespace Messaging.Infrastructure.Transactions.MoveIn;
 
 public class RequestCustomerMasterData : IRequestCustomerMasterData
 {
-    private readonly IRequestDispatcher _dispatcher;
     private readonly EnergySupplyingServiceBusClientConfiguration _configuration;
     private readonly IServiceBusSenderFactory _clientSenderFactory;
 
     public RequestCustomerMasterData(
-        IRequestDispatcher requestDispatcher,
         EnergySupplyingServiceBusClientConfiguration configuration,
         IServiceBusSenderFactory clientSenderFactory)
     {
-        _dispatcher = requestDispatcher;
         _configuration = configuration;
         _clientSenderFactory = clientSenderFactory;
     }

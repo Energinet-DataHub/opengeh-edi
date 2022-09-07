@@ -13,14 +13,9 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
 using Messaging.Api.Configuration.Middleware.Correlation;
-using Messaging.Application.Common;
-using Messaging.Application.OutgoingMessages;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.MessageBus;
 using Messaging.Infrastructure.Transactions.MoveIn;
@@ -65,8 +60,7 @@ namespace Messaging.IntegrationTests
                 .AddRequestHandler<TestCommandHandler>()
                 .AddHttpClientAdapter(_ => new HttpClientSpy())
                 .AddMoveInServices(
-                    new MoveInConfiguration(new Uri("http://someuri")),
-                    sp => new RequestCustomerMasterDataSpy())
+                    new MoveInConfiguration(new Uri("http://someuri")))
                 .AddMessageParserServices();
             _serviceProvider = _services.BuildServiceProvider();
         }

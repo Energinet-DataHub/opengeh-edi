@@ -26,14 +26,12 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
 
 public class FetchCustomerMasterDataTests : TestBase
 {
-    private readonly RequestCustomerMasterDataSpy _requestCustomerMasterDataSpy;
     private readonly ServiceBusSenderSpy _senderSpy;
     private readonly ServiceBusSenderFactoryStub _serviceBusClientSenderFactory;
 
     public FetchCustomerMasterDataTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _requestCustomerMasterDataSpy = (RequestCustomerMasterDataSpy)GetService<IRequestDispatcher>();
         _serviceBusClientSenderFactory = (ServiceBusSenderFactoryStub)GetService<IServiceBusSenderFactory>();
         _senderSpy = new ServiceBusSenderSpy("Fake");
         _serviceBusClientSenderFactory.AddSenderSpy(_senderSpy);
