@@ -53,7 +53,6 @@ using Messaging.Infrastructure.Common.Reasons;
 using Messaging.Infrastructure.Configuration.Authentication;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.InternalCommands;
-using Messaging.Infrastructure.Configuration.MessageBus;
 using Messaging.Infrastructure.Configuration.Processing;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.Configuration.SystemTime;
@@ -64,7 +63,6 @@ using Messaging.Infrastructure.OutgoingMessages.Requesting;
 using Messaging.Infrastructure.Transactions;
 using Messaging.Infrastructure.Transactions.MoveIn;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -248,19 +246,6 @@ namespace Messaging.Infrastructure.Configuration
                 new JsonResponseFactory(),
                 new XmlResponseFactory(),
             }));
-            return this;
-        }
-
-        public CompositionRoot AddServiceBusClient<TConfiguration>(string connectionString, TConfiguration configuration)
-            where TConfiguration : class, IServiceBusClientConfiguration
-        {
-            _services.AddScoped(_ => configuration);
-
-            _services.AddAzureClients(builder =>
-            {
-                builder.AddServiceBusClient(connectionString).WithName(configuration.ClientRegistrationName);
-            });
-
             return this;
         }
 

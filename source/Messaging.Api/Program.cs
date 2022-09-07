@@ -129,16 +129,6 @@ namespace Messaging.Api
                             runtime.MESSAGEHUB_DOMAIN_REPLY_QUEUE!)
                         .AddNotificationHandler<PublishNewMessagesOnTimeHasPassed, TimeHasPassed>()
                         .AddHttpClientAdapter(sp => new HttpClientAdapter(sp.GetRequiredService<HttpClient>()))
-                        .AddServiceBusClient(
-                                runtime.SHARED_SERVICE_BUS_SEND_CONNECTION_STRING!,
-                                new MeteringPointServiceBusClientConfiguration(
-                                    runtime.CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME!,
-                                    "shared-service-bus-send-permission"))
-                        .AddServiceBusClient(
-                            runtime.SHARED_SERVICE_BUS_SEND_CONNECTION_STRING!,
-                            new MeteringPointServiceBusClientConfiguration(
-                                runtime.MASTER_DATA_REQUEST_QUEUE_NAME!,
-                                "shared-service-bus-send-permission"))
                         .AddMoveInServices(
                             new MoveInConfiguration(new Uri(runtime.MOVE_IN_REQUEST_ENDPOINT ?? throw new ArgumentException(nameof(runtime.MOVE_IN_REQUEST_ENDPOINT)))))
                         .AddMessageParserServices();
