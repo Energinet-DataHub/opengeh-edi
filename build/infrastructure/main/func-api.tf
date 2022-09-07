@@ -59,6 +59,7 @@ module "func_receiver" {
     MASTER_DATA_REQUEST_QUEUE_NAME                                = data.azurerm_key_vault_secret.sbq_metering_point_master_data_request_name.value,
     SHARED_SERVICE_BUS_SEND_CONNECTION_STRING                     = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-send-connection-string)"
     CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME                      = "customermasterdataresponsequeue"
+    CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME                       = "customermasterdatarequestqueue"
   }
 
   tags = azurerm_resource_group.this.tags
