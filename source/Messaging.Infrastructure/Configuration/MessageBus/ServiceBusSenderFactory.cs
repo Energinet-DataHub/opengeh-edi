@@ -22,7 +22,7 @@ namespace Messaging.Infrastructure.Configuration.MessageBus
 {
     public sealed class ServiceBusSenderFactory : IServiceBusSenderFactory
     {
-        private readonly Dictionary<string, IServiceBusSenderAdapter> _adapters = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<KeyValuePair<string, string>, IServiceBusSenderAdapter> _adapters = new();
         private readonly IAzureClientFactory<ServiceBusClient> _clientFactory;
 
         public ServiceBusSenderFactory(IAzureClientFactory<ServiceBusClient> clientFactory)
@@ -32,11 +32,15 @@ namespace Messaging.Infrastructure.Configuration.MessageBus
 
         public IServiceBusSenderAdapter GetSender(string topicName, string clientName)
         {
-            _adapters.TryGetValue(topicName, out var adapter);
+            ArgumentNullException.ThrowIfNull(topicName);
+            ArgumentNullException.ThrowIfNull(clientName);
+
+            var key = new KeyValuePair<string, string>(clientName.ToUpperInvariant(), topicName.ToUpperInvariant());
+            _adapters.TryGetValue(key, out var adapter);
             if (adapter is null)
             {
                 adapter = new ServiceBusSenderAdapter(_clientFactory.CreateClient(clientName), topicName);
-                _adapters.Add(topicName, adapter);
+                _adapters.Add(key, adapter);
             }
 
             return adapter;
