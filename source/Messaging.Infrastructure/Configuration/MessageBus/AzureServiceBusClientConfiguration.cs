@@ -21,16 +21,13 @@ namespace Messaging.Infrastructure.Configuration.MessageBus;
 
 public static class AzureServiceBusClientConfiguration
 {
-    public static IServiceCollection AddAzureServiceBusClients(this IServiceCollection services, IEnumerable<ServiceBusClientConfiguration> configurations)
+    public static IServiceCollection AddAzureServiceBusClient(this IServiceCollection services, ServiceBusClientConfiguration configuration)
     {
-        ArgumentNullException.ThrowIfNull(configurations);
+        ArgumentNullException.ThrowIfNull(configuration);
 
-        foreach (var configuration in configurations)
-        {
-            services.AddAzureClients(
-                builder => builder.AddServiceBusClient(configuration.ConnectionString)
-                .WithName(configuration.ClientRegistrationName));
-        }
+        services.AddAzureClients(
+            builder => builder.AddServiceBusClient(configuration.ConnectionString)
+                .WithName(configuration.Configuration.ClientRegistrationName));
 
         services.AddSingleton<IServiceBusSenderFactory, ServiceBusSenderFactory>();
 
@@ -38,4 +35,4 @@ public static class AzureServiceBusClientConfiguration
     }
 }
 
-public record ServiceBusClientConfiguration(string? ConnectionString, string ClientRegistrationName);
+public record ServiceBusClientConfiguration(string? ConnectionString, IServiceBusClientConfiguration Configuration);

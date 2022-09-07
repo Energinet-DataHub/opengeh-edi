@@ -18,23 +18,30 @@ using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MeteringPoints.RequestResponse.Requests;
 using Google.Protobuf;
 using Messaging.Application.Transactions.MoveIn;
+using Messaging.Infrastructure.Configuration.MessageBus;
 
 namespace Messaging.Infrastructure.Transactions.MoveIn;
 
 public class RequestCustomerMasterData : IRequestCustomerMasterData
 {
-    private readonly IRequestDispatcher _dispatcher;
+    private readonly EnergySupplyingServiceBusClientConfiguration _configuration;
+    private readonly IServiceBusSenderFactory _clientSenderFactory;
 
-    public RequestCustomerMasterData(IRequestDispatcher requestDispatcher)
+    public RequestCustomerMasterData(
+        EnergySupplyingServiceBusClientConfiguration configuration,
+        IServiceBusSenderFactory clientSenderFactory)
     {
-        _dispatcher = requestDispatcher;
+        _configuration = configuration;
+        _clientSenderFactory = clientSenderFactory;
     }
 
-    public async Task RequestMasterDataForAsync(FetchCustomerMasterData fetchCustomerMasterData)
+    public Task RequestMasterDataForAsync(FetchCustomerMasterData fetchCustomerMasterData)
     {
         if (fetchCustomerMasterData == null) throw new ArgumentNullException(nameof(fetchCustomerMasterData));
         var message = CreateFrom(fetchCustomerMasterData);
-        await _dispatcher.SendAsync(message).ConfigureAwait(false);
+        return _clientSenderFactory
+            .GetSender(_configuration.QueueName, _configuration.ClientRegistrationName)
+            .SendAsync(message);
     }
 
     private static ServiceBusMessage CreateFrom(FetchCustomerMasterData fetchMeteringPointMasterData)

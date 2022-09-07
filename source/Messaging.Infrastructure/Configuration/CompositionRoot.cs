@@ -63,7 +63,6 @@ using Messaging.Infrastructure.OutgoingMessages.Requesting;
 using Messaging.Infrastructure.Transactions;
 using Messaging.Infrastructure.Transactions.MoveIn;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -211,12 +210,11 @@ namespace Messaging.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddMoveInServices(MoveInConfiguration configuration, Func<IServiceProvider, IRequestDispatcher> requestDispatcherBuilder)
+        public CompositionRoot AddMoveInServices(MoveInConfiguration configuration)
         {
             _services.AddScoped<MoveInNotifications>();
             _services.AddScoped(_ => configuration);
             _services.AddScoped<IMoveInRequester, MoveInRequester>();
-            _services.AddScoped(requestDispatcherBuilder);
             _services.AddScoped<IRequestMeteringPointMasterData, RequestMeteringPointMasterData>();
             _services.AddScoped<IRequestCustomerMasterData, RequestCustomerMasterData>();
             _services.AddTransient<IRequestHandler<RequestChangeOfSupplierTransaction, Unit>, MoveInRequestHandler>();
@@ -248,19 +246,6 @@ namespace Messaging.Infrastructure.Configuration
                 new JsonResponseFactory(),
                 new XmlResponseFactory(),
             }));
-            return this;
-        }
-
-        public CompositionRoot AddServiceBusClient<TConfiguration>(string connectionString, TConfiguration configuration)
-            where TConfiguration : class, IConfig
-        {
-            _services.AddScoped(_ => configuration);
-
-            _services.AddAzureClients(builder =>
-            {
-                builder.AddServiceBusClient(connectionString).WithName(configuration.WithName);
-            });
-
             return this;
         }
 

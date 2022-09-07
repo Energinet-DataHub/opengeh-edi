@@ -12,20 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Azure.Messaging.ServiceBus;
+using Messaging.Infrastructure.Configuration.MessageBus;
 
 namespace Messaging.Infrastructure.Transactions.MoveIn;
 
-/// <summary>
-/// Request dispatcher interface
-/// </summary>
-public interface IRequestDispatcher
+public class EnergySupplyingServiceBusClientConfiguration : IServiceBusClientConfiguration
 {
-    /// <summary>
-    /// Async method for sending servicebus messages
-    /// </summary>
-    /// <param name="message"></param>
-    /// <returns><see cref="ServiceBusMessage"/></returns>
-    Task SendAsync(ServiceBusMessage message);
+    public EnergySupplyingServiceBusClientConfiguration(string queueName, string clientRegistrationName)
+    {
+        QueueName = queueName;
+        ClientRegistrationName = clientRegistrationName;
+    }
+
+    public string QueueName { get; }
+
+    public string ClientRegistrationName { get; }
 }

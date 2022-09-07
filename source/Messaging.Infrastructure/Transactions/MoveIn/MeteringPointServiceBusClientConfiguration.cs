@@ -12,20 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Messaging.Infrastructure.Configuration.MessageBus;
+
 namespace Messaging.Infrastructure.Transactions.MoveIn;
 
-/// <summary>
-/// Interface for configurations
-/// </summary>
-public interface IConfig
+public class MeteringPointServiceBusClientConfiguration : IServiceBusClientConfiguration
 {
-    /// <summary>
-    /// The name to affiliate a service with
-    /// </summary>
-    string WithName { get; }
+    public MeteringPointServiceBusClientConfiguration(string queueName, string clientRegistrationName)
+    {
+        QueueName = queueName;
+        ClientRegistrationName = clientRegistrationName;
+    }
 
-    /// <summary>
-    /// Queue name for service
-    /// </summary>
-    string QueueName { get; }
+    public string QueueName { get; }
+
+    public string ClientRegistrationName { get; }
 }

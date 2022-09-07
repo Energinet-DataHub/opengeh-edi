@@ -79,12 +79,19 @@ namespace Messaging.Api
                 {
                     var databaseConnectionString = runtime.DB_CONNECTION_STRING;
 
-                    var clientConfigurations = new List<ServiceBusClientConfiguration>()
-                    {
-                        new(runtime.SHARED_SERVICE_BUS_SEND_CONNECTION_STRING, "MeteringPointsSenderClient"),
-                        new(runtime.ENERGY_SUPPLYING_SERVICE_BUS_SEND_CONNECTION_STRING, "EnergySupplyingSenderClient"),
-                    };
-                    services.AddAzureServiceBusClients(clientConfigurations);
+                    var meteringPointServiceBusClientConfiguration =
+                        new MeteringPointServiceBusClientConfiguration(
+                            runtime.MASTER_DATA_REQUEST_QUEUE_NAME!,
+                            "MeteringPointsSenderClient");
+                    services.AddSingleton(meteringPointServiceBusClientConfiguration);
+                    services.AddAzureServiceBusClient(new ServiceBusClientConfiguration(runtime.SHARED_SERVICE_BUS_SEND_CONNECTION_STRING, meteringPointServiceBusClientConfiguration));
+
+                    var energySupplyingServiceBusClientConfiguration =
+                        new EnergySupplyingServiceBusClientConfiguration(
+                            runtime.CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME!,
+                            "EnergySupplyingSenderClient");
+                    services.AddSingleton(energySupplyingServiceBusClientConfiguration);
+                    services.AddAzureServiceBusClient(new ServiceBusClientConfiguration(runtime.ENERGY_SUPPLYING_SERVICE_BUS_SEND_CONNECTION_STRING, energySupplyingServiceBusClientConfiguration));
 
                     CompositionRoot.Initialize(services)
                         .AddBearerAuthentication(tokenValidationParameters)
@@ -122,21 +129,8 @@ namespace Messaging.Api
                             runtime.MESSAGEHUB_DOMAIN_REPLY_QUEUE!)
                         .AddNotificationHandler<PublishNewMessagesOnTimeHasPassed, TimeHasPassed>()
                         .AddHttpClientAdapter(sp => new HttpClientAdapter(sp.GetRequiredService<HttpClient>()))
-                        .AddServiceBusClient(
-                                runtime.SHARED_SERVICE_BUS_SEND_CONNECTION_STRING!,
-                                new RequestMasterDataConfiguration(
-                                    runtime.CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME!,
-                                    "shared-service-bus-send-permission"))
-                        .AddServiceBusClient(
-                            runtime.SHARED_SERVICE_BUS_SEND_CONNECTION_STRING!,
-                            new RequestMasterDataConfiguration(
-                                runtime.MASTER_DATA_REQUEST_QUEUE_NAME!,
-                                "shared-service-bus-send-permission"))
                         .AddMoveInServices(
-                            new MoveInConfiguration(new Uri(runtime.MOVE_IN_REQUEST_ENDPOINT ?? throw new ArgumentException(nameof(runtime.MOVE_IN_REQUEST_ENDPOINT)))),
-                            sp => new RequestDispatcher<RequestMasterDataConfiguration>(
-                                sp.GetRequiredService<IAzureClientFactory<ServiceBusClient>>(),
-                                sp.GetRequiredService<RequestMasterDataConfiguration>()))
+                            new MoveInConfiguration(new Uri(runtime.MOVE_IN_REQUEST_ENDPOINT ?? throw new ArgumentException(nameof(runtime.MOVE_IN_REQUEST_ENDPOINT)))))
                         .AddMessageParserServices();
 
                     services.AddLiveHealthCheck();

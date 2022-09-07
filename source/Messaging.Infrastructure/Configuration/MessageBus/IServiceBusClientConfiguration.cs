@@ -12,20 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using Microsoft.Extensions.Configuration;
+namespace Messaging.Infrastructure.Configuration.MessageBus;
 
-namespace Messaging.Infrastructure.Transactions.MoveIn;
-
-public class RequestMasterDataConfiguration : IConfig
+/// <summary>
+/// Interface for configurations
+/// </summary>
+public interface IServiceBusClientConfiguration
 {
-    public RequestMasterDataConfiguration(string queueName, string withName)
-    {
-        QueueName = queueName;
-        WithName = withName;
-    }
+    /// <summary>
+    /// The name to affiliate a service with
+    /// </summary>
+    string ClientRegistrationName { get; }
 
-    public string QueueName { get; }
-
-    public string WithName { get; }
+    /// <summary>
+    /// Queue name for service
+    /// </summary>
+    string QueueName { get; }
 }
