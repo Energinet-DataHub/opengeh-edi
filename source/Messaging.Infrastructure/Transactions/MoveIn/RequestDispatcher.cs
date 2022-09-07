@@ -15,6 +15,7 @@
 using System;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
+using Messaging.Infrastructure.Configuration.MessageBus;
 using Microsoft.Extensions.Azure;
 
 namespace Messaging.Infrastructure.Transactions.MoveIn;

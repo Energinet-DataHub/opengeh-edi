@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using Messaging.Infrastructure.Configuration.MessageBus;
 using Microsoft.Extensions.Configuration;
 
 namespace Messaging.Infrastructure.Transactions.MoveIn;
