@@ -20,12 +20,6 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 {
     internal static class MasterDataSampleData
     {
-        public static string Administrator => "38406E2F-4045-45A3-A63C-3E8CCE07FEB9";
-
-        public static string GsrnNumber => "571234567891234568";
-
-        public static string GridAreaLinkId => "10A9E0E7-3906-4DC0-8CBD-A5C042A5C484";
-
         public static string StreetName => "Test Road 1";
 
         public static string PostCode => "8000";
@@ -35,10 +29,6 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         public static string CountryCode => "DK";
 
         public static bool IsActualAddress => true;
-
-        public static string PhysicalStateName => "Connected";
-
-        public static string SubTypeName => "Physical";
 
         public static string TypeName => "Consumption";
 
@@ -53,8 +43,6 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         public static string UnitType => string.Empty;
 
         public static string MeterNumber => "123456";
-
-        public static string MeterReadingOccurence => string.Empty;
 
         public static int MaximumCurrent => 0;
 
@@ -89,8 +77,6 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         public static string GeoInfoReference => "{EB0ECFD2-97AD-48E3-8502-04C36AA7ACF8}";
 
         public static string Capacity => "1.2";
-
-        public static string GlnNumber => "3963865549824";
 
         private static string EffectiveDateNow()
         {
