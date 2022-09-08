@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.EnergySupplying.RequestResponse.Requests;
 using Energinet.DataHub.MeteringPoints.RequestResponse.Requests;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.MessageBus;
@@ -51,7 +52,7 @@ public class FetchCustomerMasterDataTests : TestBase
         Assert.NotNull(dispatchedMessage);
         Assert.Equal(command.TransactionId, dispatchedMessage?.ApplicationProperties["TransactionId"]);
         Assert.Equal(command.BusinessProcessId, dispatchedMessage?.ApplicationProperties["BusinessProcessId"]);
-        var request = MasterDataRequest.Parser.ParseFrom(dispatchedMessage?.Body);
-        Assert.Equal(command.MarketEvaluationPointNumber, request.GsrnNumber);
+        var request = CustomerMasterDataRequest.Parser.ParseFrom(dispatchedMessage?.Body);
+        Assert.Equal(command.BusinessProcessId, request.Processid);
     }
 }
