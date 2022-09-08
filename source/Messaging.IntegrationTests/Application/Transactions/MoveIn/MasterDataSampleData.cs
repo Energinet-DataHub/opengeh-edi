@@ -16,7 +16,7 @@ using System;
 using System.Globalization;
 using NodaTime;
 
-namespace Processing.IntegrationTests.Application
+namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 {
     internal static class MasterDataSampleData
     {
