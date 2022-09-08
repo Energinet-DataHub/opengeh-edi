@@ -13,17 +13,11 @@
 // limitations under the License.
 
 using NodaTime;
-using Processing.Domain.Common;
 
 namespace Messaging.IntegrationTests;
 
 internal static class EffectiveDateFactory
 {
-    internal static EffectiveDate AsOfToday()
-    {
-        return EffectiveDate.Create(InstantAsOfToday().ToDateTimeUtc());
-    }
-
     internal static Instant InstantAsOfToday()
     {
         var timeZone = DateTimeZoneProviders.Tzdb["Europe/Copenhagen"];

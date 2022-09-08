@@ -44,7 +44,7 @@ public class RequestMeteringPointMasterData : IRequestMeteringPointMasterData
 
     private static ServiceBusMessage CreateFrom(FetchMeteringPointMasterData fetchMeteringPointMasterData)
     {
-        var message = new MasterDataRequest
+        var message = new MeteringPointMasterDataRequest
         {
             GsrnNumber = fetchMeteringPointMasterData.MarketEvaluationPointNumber,
         };

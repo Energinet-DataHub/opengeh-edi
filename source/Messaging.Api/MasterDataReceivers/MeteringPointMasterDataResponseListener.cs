@@ -47,7 +47,7 @@ public class MeteringPointMasterDataResponseListener
         if (context == null) throw new ArgumentNullException(nameof(context));
 
         var metadata = GetMetaData(context);
-        var masterDataContent = GetMasterDataContent(MasterDataRequestResponse.Parser.ParseFrom(data));
+        var masterDataContent = GetMasterDataContent(MeteringPointMasterDataResponse.Parser.ParseFrom(data));
 
         var forwardMeteringPointMasterData = new ForwardMeteringPointMasterData(
             metadata.TransactionId ?? throw new InvalidOperationException("Service bus metadata property TransactionId is missing"),
@@ -57,8 +57,9 @@ public class MeteringPointMasterDataResponseListener
         _logger.LogInformation($"Master data response received: {data}");
     }
 
-    private static MasterDataContent GetMasterDataContent(MasterDataRequestResponse masterData)
+    private static MasterDataContent GetMasterDataContent(MeteringPointMasterDataResponse response)
     {
+        var masterData = response.MasterData;
         var address = new Application.MasterData.Address(
             masterData.Address.StreetName,
             StreetCode: masterData.Address.StreetCode,
