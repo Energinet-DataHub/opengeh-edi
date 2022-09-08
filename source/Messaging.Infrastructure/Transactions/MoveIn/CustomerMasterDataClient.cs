@@ -58,6 +58,7 @@ public class CustomerMasterDataClient : ICustomerMasterDataClient
         serviceBusMessage.ApplicationProperties.Add("BusinessProcessId", fetchMeteringPointMasterData.BusinessProcessId);
         serviceBusMessage.ApplicationProperties.Add("TransactionId", fetchMeteringPointMasterData.TransactionId);
         serviceBusMessage.MessageId = fetchMeteringPointMasterData.TransactionId;
+        serviceBusMessage.CorrelationId = fetchMeteringPointMasterData.TransactionId;
 
         return serviceBusMessage;
     }
