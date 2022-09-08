@@ -15,7 +15,7 @@
 using System;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.MeteringPoints.RequestResponse.Requests;
+using Energinet.DataHub.EnergySupplying.RequestResponse.Requests;
 using Google.Protobuf;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.MessageBus;
@@ -46,9 +46,9 @@ public class RequestCustomerMasterData : IRequestCustomerMasterData
 
     private static ServiceBusMessage CreateFrom(FetchCustomerMasterData fetchMeteringPointMasterData)
     {
-        var message = new MasterDataRequest
+        var message = new CustomerMasterDataRequest()
         {
-            GsrnNumber = fetchMeteringPointMasterData.MarketEvaluationPointNumber,
+            Processid = fetchMeteringPointMasterData.BusinessProcessId,
         };
         var bytes = message.ToByteArray();
         ServiceBusMessage serviceBusMessage = new(bytes)
