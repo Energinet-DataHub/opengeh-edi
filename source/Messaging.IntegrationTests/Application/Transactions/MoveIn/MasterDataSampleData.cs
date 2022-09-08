@@ -15,7 +15,6 @@
 using System;
 using System.Globalization;
 using NodaTime;
-using Processing.Domain.MeteringPoints;
 
 namespace Processing.IntegrationTests.Application
 {
@@ -37,11 +36,11 @@ namespace Processing.IntegrationTests.Application
 
         public static bool IsActualAddress => true;
 
-        public static string PhysicalStateName => PhysicalState.Connected.Name;
+        public static string PhysicalStateName => "Connected";
 
         public static string SubTypeName => "Physical";
 
-        public static string TypeName => MeteringPointType.Consumption.Name;
+        public static string TypeName => "Consumption";
 
         public static string PowerPlant => "571234567891234568";
 
