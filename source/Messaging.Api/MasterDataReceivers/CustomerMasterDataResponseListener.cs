@@ -46,12 +46,10 @@ public class CustomerMasterDataResponseListener
         if (data == null) throw new ArgumentNullException(nameof(data));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        var metaData = GetMetaData(context);
+        var correlationId = ParseCorrelationIdFromMessage(context);
         var masterDataContent = GetMasterDataContent(CustomerMasterDataRequestResponse.Parser.ParseJson(data));
 
-        var forwardedCustomerMasterData = new ForwardCustomerMasterData(
-            metaData.TransactionId ?? throw new InvalidOperationException("Service bus metadata property TransactionId is missing"),
-            masterDataContent);
+        var forwardedCustomerMasterData = new ForwardCustomerMasterData(correlationId, masterDataContent);
 
         await _commandSchedulerFacade.EnqueueAsync(forwardedCustomerMasterData).ConfigureAwait(false);
         _logger.LogInformation($"Master data response received: {data}");
@@ -73,15 +71,14 @@ public class CustomerMasterDataResponseListener
             new List<UsagePointLocation>());
     }
 
-    private MasterDataResponseMetadata GetMetaData(FunctionContext context)
+    private static string ParseCorrelationIdFromMessage(FunctionContext context)
     {
-        context.BindingContext.BindingData.TryGetValue("UserProperties", out var metadata);
-
-        if (metadata is null)
+        context.BindingContext.BindingData.TryGetValue("CorrelationId", out var correlationIdValue);
+        if (correlationIdValue is string correlationId)
         {
-            throw new InvalidOperationException($"Service bus metadata must be specified as User Properties attributes");
+            return correlationId;
         }
 
-        return _serializer.Deserialize<MasterDataResponseMetadata>(metadata.ToString() ?? throw new InvalidOperationException());
+        throw new InvalidOperationException("Correlation id is not set on customer master data request message.");
     }
 }
