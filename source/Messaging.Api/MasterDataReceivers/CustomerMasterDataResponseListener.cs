@@ -16,11 +16,11 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.EnergySupplying.RequestResponse.Requests;
+using Messaging.Api.Configuration.Middleware;
 using Messaging.Application.MasterData;
 using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.InternalCommands;
-using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using NodaTime.Extensions;
@@ -30,12 +30,10 @@ namespace Messaging.Api.MasterDataReceivers;
 public class CustomerMasterDataResponseListener
 {
     private readonly ILogger<CustomerMasterDataResponseListener> _logger;
-    private readonly ISerializer _serializer;
     private readonly CommandSchedulerFacade _commandSchedulerFacade;
 
-    public CustomerMasterDataResponseListener(ISerializer serializer, CommandSchedulerFacade commandSchedulerFacade, ILogger<CustomerMasterDataResponseListener> logger)
+    public CustomerMasterDataResponseListener(CommandSchedulerFacade commandSchedulerFacade, ILogger<CustomerMasterDataResponseListener> logger)
     {
-        _serializer = serializer;
         _commandSchedulerFacade = commandSchedulerFacade;
         _logger = logger;
     }
@@ -46,7 +44,7 @@ public class CustomerMasterDataResponseListener
         if (data == null) throw new ArgumentNullException(nameof(data));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        var correlationId = ParseCorrelationIdFromMessage(context);
+        var correlationId = context.ParseCorrelationIdFromMessage();
         var masterDataContent = GetMasterDataContent(CustomerMasterDataRequestResponse.Parser.ParseJson(data));
 
         var forwardedCustomerMasterData = new ForwardCustomerMasterData(correlationId, masterDataContent);
@@ -69,16 +67,5 @@ public class CustomerMasterDataResponseListener
             false,
             DateTime.Now.ToInstant(),
             new List<UsagePointLocation>());
-    }
-
-    private static string ParseCorrelationIdFromMessage(FunctionContext context)
-    {
-        context.BindingContext.BindingData.TryGetValue("CorrelationId", out var correlationIdValue);
-        if (correlationIdValue is string correlationId)
-        {
-            return correlationId;
-        }
-
-        throw new InvalidOperationException("Correlation id is not set on customer master data request message.");
     }
 }
