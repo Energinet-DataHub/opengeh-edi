@@ -21,7 +21,6 @@ option csharp_namespace = "Energinet.DataHub.EnergySupplying.RequestResponse.Req
 
 message CustomerMasterDataResponse {
   CustomerMasterData master_data = 1;
-  Error master_data_error = 2;
 }
 
 message CustomerMasterData {
@@ -29,8 +28,5 @@ message CustomerMasterData {
   string registered_by_process_id = 2;
   string customer_id = 3;
   google.protobuf.Timestamp electrical_heating_effective_date = 4;
-}
-
-message Error {
-  string error = 1;
+  string error = 5;
 }
