@@ -28,7 +28,6 @@ using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Fixtures;
 using NodaTime.Extensions;
-using Processing.IntegrationTests.Application;
 using Xunit;
 using Address = Messaging.Application.MasterData.Address;
 using Series = Messaging.Application.MasterData.Series;
