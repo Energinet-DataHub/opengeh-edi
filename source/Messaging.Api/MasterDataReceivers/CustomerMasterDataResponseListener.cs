@@ -45,7 +45,13 @@ public class CustomerMasterDataResponseListener
         if (context == null) throw new ArgumentNullException(nameof(context));
 
         var correlationId = context.ParseCorrelationIdFromMessage();
-        var masterDataContent = GetMasterDataContent(CustomerMasterDataRequestResponse.Parser.ParseJson(data));
+        var response = CustomerMasterDataResponse.Parser.ParseJson(data);
+        if (!string.IsNullOrEmpty(response.Error))
+        {
+            throw new InvalidOperationException($"Customer master data request failed: {response.Error}");
+        }
+
+        var masterDataContent = GetMasterDataContent(response);
 
         var forwardedCustomerMasterData = new ForwardCustomerMasterData(correlationId, masterDataContent);
 
@@ -53,14 +59,15 @@ public class CustomerMasterDataResponseListener
         _logger.LogInformation($"Master data response received: {data}");
     }
 
-    private static CustomerMasterDataContent GetMasterDataContent(CustomerMasterDataRequestResponse masterdata)
+    private static CustomerMasterDataContent GetMasterDataContent(CustomerMasterDataResponse response)
     {
+        var masterData = response.MasterData;
         return new CustomerMasterDataContent(
             string.Empty,
             false,
-            masterdata.Electricalheatingeffectivedate.ToDateTime().ToUniversalTime().ToInstant(),
-            masterdata.Customerid,
-            masterdata.Customername,
+            masterData.ElectricalHeatingEffectiveDate.ToDateTime().ToUniversalTime().ToInstant(),
+            masterData.CustomerId,
+            masterData.CustomerName,
             string.Empty,
             string.Empty,
             false,
