@@ -24,6 +24,7 @@ using Messaging.Infrastructure.Configuration.InternalCommands;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using NodaTime.Extensions;
+using NodaTime.Serialization.Protobuf;
 
 namespace Messaging.Api.MasterDataReceivers;
 
@@ -65,7 +66,7 @@ public class CustomerMasterDataResponseListener
         return new CustomerMasterDataContent(
             string.Empty,
             false,
-            masterData.ElectricalHeatingEffectiveDate.ToDateTime().ToUniversalTime().ToInstant(),
+            masterData.ElectricalHeatingEffectiveDate.ToInstant(),
             masterData.CustomerId,
             masterData.CustomerName,
             string.Empty,
