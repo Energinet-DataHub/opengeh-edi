@@ -52,7 +52,7 @@ namespace Messaging.IntegrationTests.Infrastructure.OutgoingMessages
             await _messageAvailabilityPublisher.PublishAsync().ConfigureAwait(false);
 
             var unpublishedMessages = _outgoingMessageStore.GetUnpublished();
-            var publishedMessage = _newMessageAvailableNotifierSpy.GetMessageFrom(outgoingMessage.CorrelationId);
+            var publishedMessage = _newMessageAvailableNotifierSpy.GetMessageFrom(outgoingMessage.Id);
             Assert.Empty(unpublishedMessages);
             Assert.NotNull(publishedMessage);
         }
