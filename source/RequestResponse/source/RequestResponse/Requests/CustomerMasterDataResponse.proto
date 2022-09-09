@@ -20,7 +20,8 @@ import "google/protobuf/timestamp.proto";
 option csharp_namespace = "Energinet.DataHub.EnergySupplying.RequestResponse.Requests";
 
 message CustomerMasterDataResponse {
-  CustomerMasterData master_data = 1;
+  string error = 1;
+  CustomerMasterData master_data = 2;
 }
 
 message CustomerMasterData {
@@ -28,5 +29,4 @@ message CustomerMasterData {
   string registered_by_process_id = 2;
   string customer_id = 3;
   google.protobuf.Timestamp electrical_heating_effective_date = 4;
-  string error = 5;
 }
