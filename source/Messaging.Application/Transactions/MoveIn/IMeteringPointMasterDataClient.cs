@@ -19,12 +19,12 @@ namespace Messaging.Application.Transactions.MoveIn;
 /// <summary>
 /// Interface for fetching metering point master data service
 /// </summary>
-public interface IRequestMeteringPointMasterData
+public interface IMeteringPointMasterDataClient
 {
     /// <summary>
     /// Request Master data for a market evaluation point
     /// </summary>
     /// <param name="fetchMeteringPointMasterData"></param>
     /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
-    Task RequestMasterDataForAsync(FetchMeteringPointMasterData fetchMeteringPointMasterData);
+    Task RequestAsync(FetchMeteringPointMasterData fetchMeteringPointMasterData);
 }

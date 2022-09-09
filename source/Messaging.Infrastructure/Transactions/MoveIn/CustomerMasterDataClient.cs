@@ -15,38 +15,40 @@
 using System;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.MeteringPoints.RequestResponse.Requests;
+using Energinet.DataHub.EnergySupplying.RequestResponse.Requests;
 using Google.Protobuf;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.MessageBus;
 
 namespace Messaging.Infrastructure.Transactions.MoveIn;
 
-public class RequestMeteringPointMasterData : IRequestMeteringPointMasterData
+public class CustomerMasterDataClient : ICustomerMasterDataClient
 {
-    private readonly MeteringPointServiceBusClientConfiguration _configuration;
-    private readonly IServiceBusSenderFactory _serviceBusSenderFactory;
+    private readonly EnergySupplyingServiceBusClientConfiguration _configuration;
+    private readonly IServiceBusSenderFactory _clientSenderFactory;
 
-    public RequestMeteringPointMasterData(MeteringPointServiceBusClientConfiguration configuration, IServiceBusSenderFactory serviceBusSenderFactory)
+    public CustomerMasterDataClient(
+        EnergySupplyingServiceBusClientConfiguration configuration,
+        IServiceBusSenderFactory clientSenderFactory)
     {
         _configuration = configuration;
-        _serviceBusSenderFactory = serviceBusSenderFactory;
+        _clientSenderFactory = clientSenderFactory;
     }
 
-    public Task RequestMasterDataForAsync(FetchMeteringPointMasterData fetchMeteringPointMasterData)
+    public Task RequestAsync(FetchCustomerMasterData fetchCustomerMasterData)
     {
-        if (fetchMeteringPointMasterData == null) throw new ArgumentNullException(nameof(fetchMeteringPointMasterData));
-        var message = CreateFrom(fetchMeteringPointMasterData);
-        return _serviceBusSenderFactory
+        if (fetchCustomerMasterData == null) throw new ArgumentNullException(nameof(fetchCustomerMasterData));
+        var message = CreateFrom(fetchCustomerMasterData);
+        return _clientSenderFactory
             .GetSender(_configuration.QueueName, _configuration.ClientRegistrationName)
             .SendAsync(message);
     }
 
-    private static ServiceBusMessage CreateFrom(FetchMeteringPointMasterData fetchMeteringPointMasterData)
+    private static ServiceBusMessage CreateFrom(FetchCustomerMasterData fetchMeteringPointMasterData)
     {
-        var message = new MeteringPointMasterDataRequest
+        var message = new CustomerMasterDataRequest()
         {
-            GsrnNumber = fetchMeteringPointMasterData.MarketEvaluationPointNumber,
+            Processid = fetchMeteringPointMasterData.BusinessProcessId,
         };
         var bytes = message.ToByteArray();
         ServiceBusMessage serviceBusMessage = new(bytes)
@@ -55,6 +57,7 @@ public class RequestMeteringPointMasterData : IRequestMeteringPointMasterData
         };
         serviceBusMessage.ApplicationProperties.Add("BusinessProcessId", fetchMeteringPointMasterData.BusinessProcessId);
         serviceBusMessage.ApplicationProperties.Add("TransactionId", fetchMeteringPointMasterData.TransactionId);
+        serviceBusMessage.MessageId = fetchMeteringPointMasterData.TransactionId;
 
         return serviceBusMessage;
     }
