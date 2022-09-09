@@ -44,7 +44,13 @@ public class MeteringPointMasterDataResponseListener
         if (context == null) throw new ArgumentNullException(nameof(context));
 
         var correlationId = context.ParseCorrelationIdFromMessage();
-        var masterDataContent = GetMasterDataContent(MeteringPointMasterDataResponse.Parser.ParseFrom(data));
+        var response = MeteringPointMasterDataResponse.Parser.ParseFrom(data);
+        if (!string.IsNullOrEmpty(response.Error))
+        {
+            throw new InvalidOperationException($"Metering point master data request failed: {response.Error}");
+        }
+
+        var masterDataContent = GetMasterDataContent(response);
 
         var forwardMeteringPointMasterData = new ForwardMeteringPointMasterData(
             correlationId,
