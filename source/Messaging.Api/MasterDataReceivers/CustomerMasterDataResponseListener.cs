@@ -23,6 +23,7 @@ using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.InternalCommands;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using NodaTime;
 using NodaTime.Extensions;
 using NodaTime.Serialization.Protobuf;
 
@@ -73,7 +74,7 @@ public class CustomerMasterDataResponseListener
             string.Empty,
             false,
             false,
-            DateTime.Now.ToInstant(),
+            SystemClock.Instance.GetCurrentInstant(),
             new List<UsagePointLocation>());
     }
 }
