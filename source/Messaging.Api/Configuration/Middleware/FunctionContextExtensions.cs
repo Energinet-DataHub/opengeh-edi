@@ -89,6 +89,21 @@ namespace Messaging.Api.Configuration.Middleware
         }
 
         /// <summary>
+        /// Parses correlation id from service bus message
+        /// </summary>
+        /// <param name="context"></param>
+        internal static string ParseCorrelationIdFromMessage(this FunctionContext context)
+        {
+            context.BindingContext.BindingData.TryGetValue("CorrelationId", out var correlationIdValue);
+            if (correlationIdValue is string correlationId)
+            {
+                return correlationId;
+            }
+
+            throw new InvalidOperationException("Correlation id is not set on customer master data request message.");
+        }
+
+        /// <summary>
         /// Retrieves the IFunctionBindingsFeature property from the FunctionContext.
         /// </summary>
         /// <param name="functionContext"></param>
