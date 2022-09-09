@@ -15,6 +15,7 @@
 using System;
 using System.Net.Http;
 using Azure.Messaging.ServiceBus;
+using Dapper;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Energinet.DataHub.MessageHub.Client;
 using Energinet.DataHub.MessageHub.Client.DataAvailable;
@@ -66,6 +67,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using NodaTime;
 using MarketActivityRecord = Messaging.Application.IncomingMessages.RequestChangeOfSupplier.MarketActivityRecord;
 
 namespace Messaging.Infrastructure.Configuration
