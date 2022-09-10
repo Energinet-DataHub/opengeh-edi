@@ -36,6 +36,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202208181332 Add actor table to BtwoB.sql" />
     <EmbeddedResource Include="Scripts\Model\202208241040 Alter BtwoB actor table.sql" />
     <EmbeddedResource Include="Scripts\Model\202208241043 Clean BtwoB actor table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202210091043 Remove correlation id.sql" />
     <EmbeddedResource Include="Scripts\Model\202211081048 Add business process state columns.sql" />
     <EmbeddedResource Include="Scripts\Model\202212081032 Add end of supply notification state.sql" />
     <EmbeddedResource Include="Scripts\Model\202225081325 Refactor columns.sql" />

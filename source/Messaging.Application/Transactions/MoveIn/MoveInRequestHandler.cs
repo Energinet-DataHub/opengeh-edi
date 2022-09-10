@@ -21,8 +21,6 @@ using MediatR;
 using Messaging.Application.Common;
 using Messaging.Application.Common.Reasons;
 using Messaging.Application.Configuration;
-using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.IncomingMessages;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
@@ -37,7 +35,6 @@ namespace Messaging.Application.Transactions.MoveIn
     {
         private readonly IMoveInTransactionRepository _moveInTransactionRepository;
         private readonly IOutgoingMessageStore _outgoingMessageStore;
-        private readonly ICorrelationContext _correlationContext;
         private readonly IMarketActivityRecordParser _marketActivityRecordParser;
         private readonly IMoveInRequester _moveInRequester;
         private readonly IValidationErrorTranslator _validationErrorTranslator;
@@ -46,7 +43,6 @@ namespace Messaging.Application.Transactions.MoveIn
         public MoveInRequestHandler(
             IMoveInTransactionRepository moveInTransactionRepository,
             IOutgoingMessageStore outgoingMessageStore,
-            ICorrelationContext correlationContext,
             IMarketActivityRecordParser marketActivityRecordParser,
             IMoveInRequester moveInRequester,
             IValidationErrorTranslator validationErrorTranslator,
@@ -54,7 +50,6 @@ namespace Messaging.Application.Transactions.MoveIn
         {
             _moveInTransactionRepository = moveInTransactionRepository;
             _outgoingMessageStore = outgoingMessageStore;
-            _correlationContext = correlationContext;
             _marketActivityRecordParser = marketActivityRecordParser;
             _moveInRequester = moveInRequester;
             _validationErrorTranslator = validationErrorTranslator;
@@ -131,6 +126,20 @@ namespace Messaging.Application.Transactions.MoveIn
             return consumerType;
         }
 
+        private static OutgoingMessage CreateOutgoingMessage(string id, DocumentType documentType, string processType, string receiverId, string marketActivityRecordPayload, string reasonCode)
+        {
+            return new OutgoingMessage(
+                documentType,
+                receiverId,
+                id,
+                processType,
+                MarketRoles.EnergySupplier,
+                DataHubDetails.IdentificationNumber,
+                MarketRoles.MeteringPointAdministrator,
+                marketActivityRecordPayload,
+                reasonCode);
+        }
+
         private async Task<Unit> RejectInvalidRequestMessageAsync(MoveInTransaction transaction, RequestChangeOfSupplierTransaction request, string error)
         {
             var reasons = await CreateReasonsFromAsync(new Collection<string>() { error }).ConfigureAwait(false);
@@ -189,21 +198,6 @@ namespace Messaging.Application.Transactions.MoveIn
         private Task<ReadOnlyCollection<Reason>> CreateReasonsFromAsync(IReadOnlyCollection<string> validationErrors)
         {
             return _validationErrorTranslator.TranslateAsync(validationErrors);
-        }
-
-        private OutgoingMessage CreateOutgoingMessage(string id, DocumentType documentType, string processType, string receiverId, string marketActivityRecordPayload, string reasonCode)
-        {
-            return new OutgoingMessage(
-                documentType,
-                receiverId,
-                _correlationContext.Id,
-                id,
-                processType,
-                MarketRoles.EnergySupplier,
-                DataHubDetails.IdentificationNumber,
-                MarketRoles.MeteringPointAdministrator,
-                marketActivityRecordPayload,
-                reasonCode);
         }
     }
 }

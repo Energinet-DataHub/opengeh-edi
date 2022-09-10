@@ -76,7 +76,6 @@ public class BundleTests
             DocumentType.GenericNotification,
             receiverId,
             "FakeId",
-            "FakeId",
             processType,
             "ReceiverRole1",
             "SenderId",
