@@ -26,13 +26,14 @@ limitations under the License.
     <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="2.3.3" />
     <PackageReference Include="Energinet.DataHub.Core.Logging" Version="2.2.0" />
     <PackageReference Include="Energinet.DataHub.EnergySupplying.IntegrationEvents" Version="1.0.1" />
-    <PackageReference Include="Energinet.DataHub.EnergySupplying.RequestResponse" Version="1.0.0" />
+    <PackageReference Include="Energinet.DataHub.EnergySupplying.RequestResponse" Version="1.0.2" />
     <PackageReference Include="Energinet.DataHub.MessageHub.Model" Version="3.0.2" />
     <PackageReference Include="Energinet.DataHub.MeteringPoints.RequestResponse" Version="1.0.3" />
     <PackageReference Include="Microsoft.Extensions.Azure" Version="1.2.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="10.0.1" />
     <PackageReference Include="Energinet.DataHub.MessageHub.Client" Version="3.0.2-alpha-20220823T072324" />
+    <PackageReference Include="NodaTime.Serialization.Protobuf" Version="2.0.0" />
     <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.0.0" />
     <PackageReference Include="Polly" Version="7.2.2" />
     <PackageReference Include="SimplerSoftware.EntityFrameworkCore.SqlServer.NodaTime" Version="6.0.1" />

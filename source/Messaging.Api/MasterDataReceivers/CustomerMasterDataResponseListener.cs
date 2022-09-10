@@ -23,7 +23,9 @@ using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.InternalCommands;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using NodaTime;
 using NodaTime.Extensions;
+using NodaTime.Serialization.Protobuf;
 
 namespace Messaging.Api.MasterDataReceivers;
 
@@ -39,13 +41,19 @@ public class CustomerMasterDataResponseListener
     }
 
     [Function("CustomerMasterDataResponseListener")]
-    public async Task RunAsync([ServiceBusTrigger("%CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME%", Connection = "INTERNAL_SERVICE_BUS_LISTENER_CONNECTION_STRING")] string data, FunctionContext context)
+    public async Task RunAsync([ServiceBusTrigger("%CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME%", Connection = "INTERNAL_SERVICE_BUS_LISTENER_CONNECTION_STRING")] byte[] data, FunctionContext context)
     {
         if (data == null) throw new ArgumentNullException(nameof(data));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
         var correlationId = context.ParseCorrelationIdFromMessage();
-        var masterDataContent = GetMasterDataContent(CustomerMasterDataRequestResponse.Parser.ParseJson(data));
+        var response = CustomerMasterDataResponse.Parser.ParseFrom(data);
+        if (!string.IsNullOrEmpty(response.Error))
+        {
+            throw new InvalidOperationException($"Customer master data request failed: {response.Error}");
+        }
+
+        var masterDataContent = GetMasterDataContent(response);
 
         var forwardedCustomerMasterData = new ForwardCustomerMasterData(correlationId, masterDataContent);
 
@@ -53,19 +61,20 @@ public class CustomerMasterDataResponseListener
         _logger.LogInformation($"Master data response received: {data}");
     }
 
-    private static CustomerMasterDataContent GetMasterDataContent(CustomerMasterDataRequestResponse masterdata)
+    private static CustomerMasterDataContent GetMasterDataContent(CustomerMasterDataResponse response)
     {
+        var masterData = response.MasterData;
         return new CustomerMasterDataContent(
             string.Empty,
             false,
-            masterdata.Electricalheatingeffectivedate.ToDateTime().ToUniversalTime().ToInstant(),
-            masterdata.Customerid,
-            masterdata.Customername,
+            masterData.ElectricalHeatingEffectiveDate.ToInstant(),
+            masterData.CustomerId,
+            masterData.CustomerName,
             string.Empty,
             string.Empty,
             false,
             false,
-            DateTime.Now.ToInstant(),
+            SystemClock.Instance.GetCurrentInstant(),
             new List<UsagePointLocation>());
     }
 }
