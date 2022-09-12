@@ -20,8 +20,16 @@ namespace Messaging.Application.Transactions.MoveIn;
 
 public class FetchCustomerMasterDataHandler : IRequestHandler<FetchCustomerMasterData, Unit>
 {
-    public Task<Unit> Handle(FetchCustomerMasterData request, CancellationToken cancellationToken)
+    private readonly ICustomerMasterDataClient _customerMasterDataClient;
+
+    public FetchCustomerMasterDataHandler(ICustomerMasterDataClient customerMasterDataClient)
     {
-        return Unit.Task;
+        _customerMasterDataClient = customerMasterDataClient;
+    }
+
+    public async Task<Unit> Handle(FetchCustomerMasterData request, CancellationToken cancellationToken)
+    {
+        await _customerMasterDataClient.RequestAsync(request).ConfigureAwait(false);
+        return await Task.FromResult(Unit.Value).ConfigureAwait(false);
     }
 }

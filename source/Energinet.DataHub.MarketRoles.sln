@@ -47,6 +47,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energinet.DataHub.MarketRol
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.Domain", "Messaging.Domain\Messaging.Domain.csproj", "{093FBBA9-B7CF-411E-93DA-2B743FA153AB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequestResponse", "RequestResponse\source\RequestResponse\RequestResponse.csproj", "{6A9A18B6-9445-45A0-813D-B7143DB9BC74}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -129,6 +131,10 @@ Global
 		{093FBBA9-B7CF-411E-93DA-2B743FA153AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{093FBBA9-B7CF-411E-93DA-2B743FA153AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{093FBBA9-B7CF-411E-93DA-2B743FA153AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A9A18B6-9445-45A0-813D-B7143DB9BC74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A9A18B6-9445-45A0-813D-B7143DB9BC74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A9A18B6-9445-45A0-813D-B7143DB9BC74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A9A18B6-9445-45A0-813D-B7143DB9BC74}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

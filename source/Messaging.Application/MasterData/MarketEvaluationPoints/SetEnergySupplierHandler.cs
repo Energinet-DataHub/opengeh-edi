@@ -24,12 +24,10 @@ namespace Messaging.Application.MasterData.MarketEvaluationPoints;
 public class SetEnergySupplierHandler : IRequestHandler<SetEnergySupplier, Unit>
 {
     private readonly IMarketEvaluationPointRepository _marketEvaluationPoints;
-    private readonly IUnitOfWork _unitOfWork;
 
-    public SetEnergySupplierHandler(IMarketEvaluationPointRepository marketEvaluationPoints, IUnitOfWork unitOfWork)
+    public SetEnergySupplierHandler(IMarketEvaluationPointRepository marketEvaluationPoints)
     {
         _marketEvaluationPoints = marketEvaluationPoints;
-        _unitOfWork = unitOfWork;
     }
 
     public async Task<Unit> Handle(SetEnergySupplier request, CancellationToken cancellationToken)
@@ -49,7 +47,6 @@ public class SetEnergySupplierHandler : IRequestHandler<SetEnergySupplier, Unit>
             marketEvaluationPoint.SetEnergySupplier(request.EnergySupplierNumber);
         }
 
-        await _unitOfWork.CommitAsync().ConfigureAwait(false);
         return Unit.Value;
     }
 }

@@ -88,6 +88,7 @@ public class ConfirmRequestChangeOfSupplierJsonDocumentWriterTests
         var document = await JsonDocument.ParseAsync(message).ConfigureAwait(false);
         AssertJsonMessage.AssertConformsToSchema(document, schema, DocumentType);
         AssertJsonMessage.AssertHeader(header, document, DocumentType);
+        AssertJsonMessage.AssertHasHeaderValue(document, DocumentType, "type", "414");
         AssertMarketActivityRecords(document, marketActivityRecords);
     }
 }

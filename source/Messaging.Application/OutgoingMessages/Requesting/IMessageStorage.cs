@@ -27,6 +27,7 @@ public interface IMessageStorage
     /// Saves the message in storage location
     /// </summary>
     /// <param name="bundledMessage"></param>
+    /// <param name="clientProvidedDetails">Client provided request details</param>
     /// <returns>Location of stored file</returns>
-    Task<Uri> SaveAsync(Stream bundledMessage);
+    Task<Uri> SaveAsync(Stream bundledMessage, ClientProvidedDetails clientProvidedDetails);
 }

@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using Azure.Messaging.ServiceBus;
+using Dapper;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Energinet.DataHub.MessageHub.Client;
 using Energinet.DataHub.MessageHub.Client.DataAvailable;
@@ -30,7 +30,7 @@ using Messaging.Application.Common.Reasons;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.IncomingMessages;
+using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.MasterData.MarketEvaluationPoints;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
@@ -43,6 +43,7 @@ using Messaging.Application.SchemaStore;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Messages;
+using Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 using Messaging.CimMessageAdapter.Response;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.OutgoingMessages;
@@ -63,10 +64,11 @@ using Messaging.Infrastructure.OutgoingMessages.Requesting;
 using Messaging.Infrastructure.Transactions;
 using Messaging.Infrastructure.Transactions.MoveIn;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using NodaTime;
+using MarketActivityRecord = Messaging.Application.IncomingMessages.RequestChangeOfSupplier.MarketActivityRecord;
 
 namespace Messaging.Infrastructure.Configuration
 {
@@ -88,7 +90,6 @@ namespace Messaging.Infrastructure.Configuration
             services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
             services.AddScoped<IMessageRequestNotifications, MessageRequestNotifications>();
             services.AddTransient<IRequestHandler<RequestMessages, Unit>, RequestMessagesHandler>();
-            services.AddScoped<MessageRequestContext>();
             services.AddScoped<MessageReceiver>();
 
             AddMediatR();
@@ -216,13 +217,14 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddScoped<MoveInNotifications>();
             _services.AddScoped(_ => configuration);
             _services.AddScoped<IMoveInRequester, MoveInRequester>();
-            _services.AddScoped<IRequestMeteringPointMasterData, RequestMeteringPointMasterData>();
-            _services.AddScoped<RequestMeteringPointMasterDataDispatcher>();
-            _services.AddTransient<IRequestHandler<IncomingMessage, Unit>, MoveInRequestHandler>();
-            _services.AddTransient<IRequestHandler<FetchMeteringPointMasterData, Unit>, FetchMeteringPointMasterDataHandler>();
+            _services.AddScoped<IMeteringPointMasterDataClient, MeteringPointMasterDataClient>();
+            _services.AddScoped<ICustomerMasterDataClient, CustomerMasterDataClient>();
+            _services.AddTransient<IRequestHandler<RequestChangeOfSupplierTransaction, Unit>, MoveInRequestHandler>();
             _services.AddTransient<IRequestHandler<FetchCustomerMasterData, Unit>, FetchCustomerMasterDataHandler>();
+            _services.AddTransient<IRequestHandler<FetchMeteringPointMasterData, Unit>, FetchMeteringPointMasterDataHandler>();
             _services.AddTransient<IRequestHandler<SetConsumerHasMovedIn, Unit>, SetConsumerHasMovedInHandler>();
             _services.AddTransient<IRequestHandler<ForwardMeteringPointMasterData, Unit>, ForwardMeteringPointMasterDataHandler>();
+            _services.AddTransient<IRequestHandler<ForwardCustomerMasterData, Unit>, ForwardCustomerMasterDataHandler>();
             _services.AddTransient<IRequestHandler<CreateEndOfSupplyNotification, Unit>, CreateEndOfSupplyNotificationHandler>();
             _services.AddTransient<INotificationHandler<MoveInWasAccepted>, FetchMeteringPointMasterDataWhenAccepted>();
             _services.AddTransient<INotificationHandler<MoveInWasAccepted>, FetchCustomerMasterDataWhenAccepted>();
@@ -232,7 +234,7 @@ namespace Messaging.Infrastructure.Configuration
 
         public CompositionRoot AddMessageParserServices()
         {
-            _services.AddSingleton(_ => new MessageParser(new IMessageParser[]
+            _services.AddSingleton(_ => new MessageParser(new IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>[]
             {
                 new JsonMessageParser(),
                 new XmlMessageParser(),
@@ -246,19 +248,6 @@ namespace Messaging.Infrastructure.Configuration
                 new JsonResponseFactory(),
                 new XmlResponseFactory(),
             }));
-            return this;
-        }
-
-        public CompositionRoot AddServiceBusClient<TConfiguration>(string connectionString, TConfiguration configuration)
-            where TConfiguration : class, IConfig
-        {
-            _services.AddScoped(_ => configuration);
-
-            _services.AddAzureClients(builder =>
-            {
-                builder.AddServiceBusClient(connectionString).WithName(configuration.WithName);
-            });
-
             return this;
         }
 

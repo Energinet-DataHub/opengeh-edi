@@ -14,41 +14,29 @@
 
 using System.Collections.Generic;
 using Messaging.Application.IncomingMessages;
-using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.CimMessageAdapter.Errors;
 
 namespace Messaging.CimMessageAdapter.Messages
 {
-    public class MessageParserResult
+    public class MessageParserResult<TMarketActivityRecordType, TMarketTransactionType>
+        where TMarketActivityRecordType : IMarketActivityRecord
+        where TMarketTransactionType : IMarketTransaction<TMarketActivityRecordType>
     {
-        private MessageParserResult(IReadOnlyCollection<ValidationError> errors)
+        public MessageParserResult(params ValidationError[] errors)
         {
             Errors = errors;
         }
 
-        private MessageParserResult(MessageHeader messageHeader, IReadOnlyCollection<MarketActivityRecord> marketActivityRecords)
+        public MessageParserResult(
+            IIncomingMarketDocument<TMarketActivityRecordType, TMarketTransactionType> incomingMarketDocument)
         {
-            MessageHeader = messageHeader;
-            MarketActivityRecords = marketActivityRecords;
+            IncomingMarketDocument = incomingMarketDocument;
         }
 
         public IReadOnlyCollection<ValidationError> Errors { get; } = new List<ValidationError>();
 
         public bool Success => Errors.Count == 0;
 
-        public MessageHeader? MessageHeader { get; }
-
-        public IReadOnlyCollection<MarketActivityRecord> MarketActivityRecords { get; } =
-            new List<MarketActivityRecord>();
-
-        public static MessageParserResult Failure(params ValidationError[] errors)
-        {
-            return new MessageParserResult(errors);
-        }
-
-        public static MessageParserResult Succeeded(MessageHeader messageHeader, IReadOnlyCollection<MarketActivityRecord> marketActivityRecords)
-        {
-            return new MessageParserResult(messageHeader, marketActivityRecords);
-        }
+        public IIncomingMarketDocument<TMarketActivityRecordType, TMarketTransactionType>? IncomingMarketDocument { get; }
     }
 }

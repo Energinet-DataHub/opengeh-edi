@@ -16,7 +16,6 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Energinet.DataHub.MessageHub.Client.Storage;
-using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Requesting;
 
 namespace Messaging.Infrastructure.OutgoingMessages.Requesting;
@@ -24,23 +23,18 @@ namespace Messaging.Infrastructure.OutgoingMessages.Requesting;
 public class MessageStorage : IMessageStorage
 {
     private readonly IStorageHandler _storageHandler;
-    private readonly MessageRequestContext _requestContext;
 
-    public MessageStorage(IStorageHandler storageHandler, MessageRequestContext requestContext)
+    public MessageStorage(IStorageHandler storageHandler)
     {
         _storageHandler = storageHandler;
-        _requestContext = requestContext;
     }
 
-    public Task<Uri> SaveAsync(Stream bundledMessage)
+    public Task<Uri> SaveAsync(Stream bundledMessage, ClientProvidedDetails clientProvidedDetails)
     {
-        if (_requestContext.DataBundleRequestDto is null)
-        {
-            throw new InvalidOperationException($"Data bundle request DTO is null");
-        }
+        ArgumentNullException.ThrowIfNull(clientProvidedDetails);
 
         return _storageHandler.AddStreamToStorageAsync(
             bundledMessage,
-            _requestContext.DataBundleRequestDto);
+            MessageHubModelFactory.CreateDataBundleRequest(clientProvidedDetails));
     }
 }

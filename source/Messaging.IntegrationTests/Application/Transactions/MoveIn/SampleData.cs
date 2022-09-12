@@ -12,6 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
+using NodaTime;
+using NodaTime.Extensions;
+
 namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
 
 internal static class SampleData
@@ -37,4 +44,20 @@ internal static class SampleData
     internal static string ReceiverId => "5790001330552";
 
     internal static string SenderId => "123456";
+
+    internal static bool ElectricalHeating => false;
+
+    internal static Instant ElectricalHeatingStart => EffectiveDateFactory.InstantAsOfToday();
+
+    internal static string SecondCustomerId => "78967876";
+
+    internal static string SecondCustomerName => "Jane Doe";
+
+    internal static bool ProtectedName => false;
+
+    internal static bool HasEnergySupplier => true;
+
+    internal static Instant SupplyStart => EffectiveDateFactory.InstantAsOfToday();
+
+    internal static IEnumerable<UsagePointLocation> UsagePointLocations => new List<UsagePointLocation>();
 }

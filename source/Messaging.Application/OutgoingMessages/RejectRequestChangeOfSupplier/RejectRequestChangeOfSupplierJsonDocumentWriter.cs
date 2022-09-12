@@ -25,7 +25,7 @@ namespace Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 public class RejectRequestChangeOfSupplierJsonDocumentWriter : IDocumentWriter
 {
     private const string DocumentType = "RejectRequestChangeOfSupplier_MarketDocument";
-    private const string TypeCode = "E44";
+    private const string TypeCode = "414";
     private readonly IMarketActivityRecordParser _parser;
 
     public RejectRequestChangeOfSupplierJsonDocumentWriter(IMarketActivityRecordParser parser)
@@ -38,10 +38,10 @@ public class RejectRequestChangeOfSupplierJsonDocumentWriter : IDocumentWriter
         return format == CimFormat.Json;
     }
 
-    public bool HandlesDocumentType(string documentType)
+    public bool HandlesDocumentType(DocumentType documentType)
     {
         if (documentType == null) throw new ArgumentNullException(nameof(documentType));
-        return DocumentType.Equals(documentType, StringComparison.OrdinalIgnoreCase);
+        return documentType.Name.Equals(DocumentType.Split("_")[0], StringComparison.OrdinalIgnoreCase);
     }
 
     public async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)

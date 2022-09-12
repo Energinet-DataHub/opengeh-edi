@@ -13,15 +13,11 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
 using Messaging.Api.Configuration.Middleware.Correlation;
-using Messaging.Application.Common;
-using Messaging.Application.OutgoingMessages;
 using Messaging.Infrastructure.Configuration;
+using Messaging.Infrastructure.Configuration.MessageBus;
 using Messaging.Infrastructure.Transactions.MoveIn;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.Infrastructure.InternalCommands;
@@ -45,6 +41,10 @@ namespace Messaging.IntegrationTests
             _databaseFixture.CleanupDatabase();
 
             _services = new ServiceCollection();
+
+            _services.AddSingleton(new EnergySupplyingServiceBusClientConfiguration("Fake", "Fake"));
+            _services.AddSingleton<IServiceBusSenderFactory, ServiceBusSenderFactoryStub>();
+
             CompositionRoot.Initialize(_services)
                 .AddDatabaseConnectionFactory(_databaseFixture.ConnectionString)
                 .AddDatabaseContext(_databaseFixture.ConnectionString)
@@ -59,7 +59,8 @@ namespace Messaging.IntegrationTests
                 .AddMessageStorage(_ => new MessageStorageSpy())
                 .AddRequestHandler<TestCommandHandler>()
                 .AddHttpClientAdapter(_ => new HttpClientSpy())
-                .AddMoveInServices(new MoveInConfiguration(new Uri("http://someuri")))
+                .AddMoveInServices(
+                    new MoveInConfiguration(new Uri("http://someuri")))
                 .AddMessageParserServices();
             _serviceProvider = _services.BuildServiceProvider();
         }

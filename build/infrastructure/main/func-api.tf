@@ -31,6 +31,8 @@ module "func_receiver" {
   health_check_path                         = "/api/monitor/ready"
   app_settings                              = {
     # Shared resources logging
+    INTERNAL_SERVICE_BUS_LISTENER_CONNECTION_STRING	          = module.sb_marketroles.primary_connection_strings["listen"]
+    ENERGY_SUPPLYING_SERVICE_BUS_SEND_CONNECTION_STRING		  = module.sb_marketroles.primary_connection_strings["send"]
     REQUEST_RESPONSE_LOGGING_CONNECTION_STRING                    = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=st-marketoplogs-primary-connection-string)",
     REQUEST_RESPONSE_LOGGING_CONTAINER_NAME                       = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=st-marketoplogs-container-name)",
     B2C_TENANT_ID                                                 = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=b2c-tenant-id)",
@@ -57,6 +59,7 @@ module "func_receiver" {
     MASTER_DATA_REQUEST_QUEUE_NAME                                = data.azurerm_key_vault_secret.sbq_metering_point_master_data_request_name.value,
     SHARED_SERVICE_BUS_SEND_CONNECTION_STRING                     = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-send-connection-string)"
     CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME                      = "customermasterdataresponsequeue"
+    CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME                       = "customermasterdatarequestqueue"
   }
 
   tags = azurerm_resource_group.this.tags

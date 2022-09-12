@@ -73,7 +73,7 @@ public class BundleTests
     private static OutgoingMessage CreateOutgoingMessage(string processType, string receiverId)
     {
         return new OutgoingMessage(
-            "DocumentType1",
+            DocumentType.GenericNotification,
             receiverId,
             "FakeId",
             "FakeId",

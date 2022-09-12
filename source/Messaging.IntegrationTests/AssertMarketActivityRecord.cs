@@ -14,6 +14,7 @@
 
 using System;
 using Newtonsoft.Json.Linq;
+using NodaTime;
 using Xunit;
 
 namespace Messaging.IntegrationTests;
@@ -48,6 +49,42 @@ public class AssertMarketActivityRecord
     public AssertMarketActivityRecord HasValidityStart(DateTime validityStart)
     {
         Assert.Equal(validityStart, _payload.Value<DateTime>("ValidityStart"));
+        return this;
+    }
+
+    public AssertMarketActivityRecord HasValidityStart(Instant validityStart)
+    {
+        Assert.Equal(validityStart.ToDateTimeUtc(), _payload.Value<DateTime>("ValidityStart"));
+        return this;
+    }
+
+    public AssertMarketActivityRecord NotEmpty(string property)
+    {
+        Assert.NotEmpty(_payload.Value<string>(property));
+        return this;
+    }
+
+    public AssertMarketActivityRecord HasValue<T>(string path, T expectedValue)
+    {
+        Assert.Equal(expectedValue, _payload.Value<T>(path));
+        return this;
+    }
+
+    public AssertMarketActivityRecord HasDateValue(string path, Instant expectedValue)
+    {
+        Assert.Equal(expectedValue.ToDateTimeUtc(), _payload.SelectToken(path).Value<DateTime>());
+        return this;
+    }
+
+    public AssertMarketActivityRecord HasMarketEvaluationPointDateValue(string path, Instant expectedValue)
+    {
+        Assert.Equal(expectedValue.ToDateTimeUtc(), _payload.SelectToken($"MarketEvaluationPoint.{path}").Value<DateTime>());
+        return this;
+    }
+
+    public AssertMarketActivityRecord HasMarketEvaluationPointValue<T>(string path, T expectedValue)
+    {
+        Assert.Equal(expectedValue, _payload.SelectToken($"MarketEvaluationPoint.{path}").Value<T>());
         return this;
     }
 }

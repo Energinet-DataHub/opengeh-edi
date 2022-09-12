@@ -36,11 +36,11 @@ namespace Messaging.Infrastructure.OutgoingMessages
         public async Task NotifyAsync(OutgoingMessage message)
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
-            var actorId = await FindActorIdAsync(message.ReceiverId).ConfigureAwait(false);
-
+            //TODO: Temporarly disble this step until message is ready to support new actor registry
+            //var actorId = await FindActorIdAsync(message.ReceiverId).ConfigureAwait(false);
             await _dataAvailableNotificationSender.SendAsync(
                 message.CorrelationId,
-                CreateDataAvailableNotificationFrom(message, actorId)).ConfigureAwait(false);
+                CreateDataAvailableNotificationFrom(message, Guid.Empty)).ConfigureAwait(false);
         }
 
         private static DataAvailableNotificationDto CreateDataAvailableNotificationFrom(
@@ -50,7 +50,9 @@ namespace Messaging.Infrastructure.OutgoingMessages
             var documentType = ExtractDocumentType(message);
             return new DataAvailableNotificationDto(
                 message.Id,
-                new ActorIdDto(actorId),
+                #pragma warning disable CS0618 // Use legacy model until message hub is ready
+                new LegacyActorIdDto(message.ReceiverId),
+                #pragma warning restore
                 new MessageTypeDto(ExtractMessageTypeFrom(message.ProcessType, documentType)),
                 documentType,
                 DomainOrigin.MarketRoles,
@@ -65,7 +67,7 @@ namespace Messaging.Infrastructure.OutgoingMessages
 
         private static string ExtractDocumentType(OutgoingMessage message)
         {
-            return message.DocumentType.Split('_')[0];
+            return message.DocumentType.Name;
         }
 
         private async Task<Guid> FindActorIdAsync(string receiverId)

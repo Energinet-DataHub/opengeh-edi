@@ -18,7 +18,6 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
-using Energinet.DataHub.MessageHub.Model.Model;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Requesting;
@@ -27,8 +26,6 @@ using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Xml;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
-using Messaging.Infrastructure.OutgoingMessages;
-using Messaging.Infrastructure.OutgoingMessages.Requesting;
 using Messaging.Infrastructure.Transactions;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Fixtures;
@@ -74,7 +71,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             await GivenRequestHasBeenAccepted().ConfigureAwait(false);
 
             var confirmMessage = _outgoingMessageStore.GetByOriginalMessageId(SampleData.OriginalMessageId)!;
-            await RequestMessage(confirmMessage.Id.ToString()).ConfigureAwait(false);
+            await RequestMessage(confirmMessage.Id.ToString(), DocumentType.ConfirmRequestChangeOfSupplier).ConfigureAwait(false);
 
             await AsserConfirmMessage(confirmMessage).ConfigureAwait(false);
         }
@@ -110,7 +107,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
             var rejectMessage = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage.Message.MessageId)!;
-            await RequestMessage(rejectMessage.Id.ToString()).ConfigureAwait(false);
+            await RequestMessage(rejectMessage.Id.ToString(), DocumentType.RejectRequestChangeOfSupplier).ConfigureAwait(false);
 
             await AssertRejectMessage(rejectMessage).ConfigureAwait(false);
         }
@@ -127,7 +124,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
             var rejectMessage = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage.Message.MessageId)!;
-            await RequestMessage(rejectMessage.Id.ToString()).ConfigureAwait(false);
+            await RequestMessage(rejectMessage.Id.ToString(), DocumentType.RejectRequestChangeOfSupplier).ConfigureAwait(false);
 
             await AssertRejectMessage(rejectMessage).ConfigureAwait(false);
         }
@@ -144,7 +141,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
             var rejectMessage = _outgoingMessageStore.GetByOriginalMessageId(incomingMessage.Message.MessageId)!;
-            await RequestMessage(rejectMessage.Id.ToString()).ConfigureAwait(false);
+            await RequestMessage(rejectMessage.Id.ToString(), DocumentType.RejectRequestChangeOfSupplier).ConfigureAwait(false);
 
             await AssertRejectMessage(rejectMessage).ConfigureAwait(false);
         }
@@ -152,7 +149,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         private static void AssertHeader(XDocument document, OutgoingMessage message, string expectedReasonCode)
         {
             Assert.NotEmpty(AssertXmlMessage.GetMessageHeaderValue(document, "mRID")!);
-            AssertXmlMessage.AssertHasHeaderValue(document, "type", "E44");
+            AssertXmlMessage.AssertHasHeaderValue(document, "type", "414");
             AssertXmlMessage.AssertHasHeaderValue(document, "process.processType", message.ProcessType);
             AssertXmlMessage.AssertHasHeaderValue(document, "businessSector.type", "23");
             AssertXmlMessage.AssertHasHeaderValue(document, "sender_MarketParticipant.mRID", message.SenderId);
@@ -190,16 +187,19 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
         }
 
-        private async Task RequestMessage(string id)
+        private async Task RequestMessage(string id, DocumentType documentType)
         {
-            GetService<MessageRequestContext>().SetMessageRequest(new DataBundleRequestDto(
-                Guid.Empty,
+            var requestId = Guid.NewGuid();
+            var clientProvidedDetails = new ClientProvidedDetails(
+                requestId,
                 string.Empty,
                 string.Empty,
-                new MessageTypeDto(string.Empty),
-                ResponseFormat.Xml,
-                1));
-            await InvokeCommandAsync(new RequestMessages(new[] { id }, CimFormat.Xml.Name)).ConfigureAwait(false);
+                documentType.Name,
+                CimFormat.Xml.Name);
+
+            await InvokeCommandAsync(new RequestMessages(
+                new[] { id },
+                clientProvidedDetails)).ConfigureAwait(false);
         }
 
         private async Task AssertRejectMessage(OutgoingMessage rejectMessage)

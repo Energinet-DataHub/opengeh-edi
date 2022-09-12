@@ -19,29 +19,33 @@ using Energinet.DataHub.MessageHub.Client.Peek;
 using Energinet.DataHub.MessageHub.Model.Extensions;
 using Energinet.DataHub.MessageHub.Model.Model;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Messaging.Infrastructure.OutgoingMessages.Requesting;
 
 public class SendFailureNotificationHandler : IRequestHandler<SendFailureNotification>
 {
     private readonly IDataBundleResponseSender _dataBundleResponseSender;
+    private readonly ILogger<SendFailureNotificationHandler> _logger;
 
-    public SendFailureNotificationHandler(IDataBundleResponseSender dataBundleResponseSender)
+    public SendFailureNotificationHandler(IDataBundleResponseSender dataBundleResponseSender, ILogger<SendFailureNotificationHandler> logger)
     {
         _dataBundleResponseSender = dataBundleResponseSender;
+        _logger = logger;
     }
 
     public async Task<Unit> Handle(SendFailureNotification request, CancellationToken cancellationToken)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
 
-        var bundleRequest = new DataBundleRequestDto(
+        _logger?.LogError(request.FailureDescription);
+
+        var bundleRequest = MessageHubModelFactory.CreateDataBundleRequest(
             request.RequestId,
             request.ReferenceId,
             request.IdempotencyId,
-            new MessageTypeDto(request.MessageType),
-            Enum.Parse<ResponseFormat>(request.RequestedFormat),
-            1);
+            request.MessageType,
+            request.RequestedFormat);
 
         var error = new DataBundleResponseErrorDto(
             Enum.Parse<DataBundleResponseErrorReason>(request.Reason),

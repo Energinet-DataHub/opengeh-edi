@@ -13,16 +13,16 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MessageHub.Client.Storage;
+using Energinet.DataHub.MessageHub.Model.Model;
 using Energinet.DataHub.MessageHub.Model.Peek;
 using MediatR;
 using Messaging.Application.Configuration;
-using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Requesting;
-using Messaging.Domain.OutgoingMessages;
-using Messaging.Infrastructure.OutgoingMessages.Requesting;
+using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
@@ -32,39 +32,57 @@ namespace Messaging.Api.OutgoingMessages
     {
         private readonly ICorrelationContext _correlationContext;
         private readonly ILogger<MessageRequestQueueListener> _logger;
-        private readonly MessageRequestContext _messageRequestContext;
         private readonly IMediator _mediator;
         private readonly IRequestBundleParser _requestBundleParser;
         private readonly IStorageHandler _storageHandler;
+        private readonly ISerializer _serializer;
 
         public MessageRequestQueueListener(
             ICorrelationContext correlationContext,
             ILogger<MessageRequestQueueListener> logger,
-            MessageRequestContext messageRequestContext,
             IMediator mediator,
             IRequestBundleParser requestBundleParser,
-            IStorageHandler storageHandler)
+            IStorageHandler storageHandler,
+            ISerializer serializer)
         {
             _correlationContext = correlationContext;
             _logger = logger;
-            _messageRequestContext = messageRequestContext;
             _mediator = mediator;
             _requestBundleParser = requestBundleParser;
             _storageHandler = storageHandler;
+            _serializer = serializer;
         }
 
         [Function(nameof(MessageRequestQueueListener))]
         public async Task RunAsync([ServiceBusTrigger("%MESSAGE_REQUEST_QUEUE%", Connection = "MESSAGEHUB_QUEUE_CONNECTION_STRING", IsSessionsEnabled = true)] byte[] data)
         {
             var messageRequest = _requestBundleParser.Parse(data);
-            _messageRequestContext.SetMessageRequest(messageRequest);
-            var dataAvailableIds = await _storageHandler.GetDataAvailableNotificationIdsAsync(messageRequest)
-                .ConfigureAwait(false);
+            _logger.LogInformation($"Requested response format: {messageRequest.ResponseFormat.ToString()}");
+            _logger.LogInformation($"Parsed data bundle request DTO: {_serializer.Serialize(messageRequest)}");
+
+            var requestedMessageIds = await ParseRequestedMessageIdsAsync(messageRequest).ConfigureAwait(false);
+            _logger.LogInformation($"Parsed message ids: {string.Join(", ", requestedMessageIds.Select(id => id))}");
+
+            var clientProvidedDetails = new ClientProvidedDetails(
+                messageRequest.RequestId,
+                messageRequest.IdempotencyId,
+                messageRequest.DataAvailableNotificationReferenceId,
+                messageRequest.MessageType.Value,
+                messageRequest.ResponseFormat.ToString());
 
             await _mediator.Send(new RequestMessages(
-                dataAvailableIds.Select(x => x.ToString()).ToList() ?? throw new InvalidOperationException(),
-                messageRequest.ResponseFormat.ToString())).ConfigureAwait(false);
+                requestedMessageIds,
+                clientProvidedDetails)).ConfigureAwait(false);
             _logger.LogInformation($"Dequeued with correlation id: {_correlationContext.Id}");
+        }
+
+        private async Task<IReadOnlyCollection<string>> ParseRequestedMessageIdsAsync(DataBundleRequestDto request)
+        {
+            var dataAvailableIds = await _storageHandler.GetDataAvailableNotificationIdsAsync(request)
+                .ConfigureAwait(false);
+            return dataAvailableIds.Select(x => x.ToString())
+                .ToList()
+                .AsReadOnly();
         }
     }
 }

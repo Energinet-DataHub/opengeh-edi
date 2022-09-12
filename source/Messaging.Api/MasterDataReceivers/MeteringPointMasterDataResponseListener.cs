@@ -15,10 +15,10 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MeteringPoints.RequestResponse.Response;
+using Messaging.Api.Configuration.Middleware;
 using Messaging.Application.MasterData;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.InternalCommands;
-using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
@@ -27,16 +27,13 @@ namespace Messaging.Api.MasterDataReceivers;
 public class MeteringPointMasterDataResponseListener
 {
     private readonly ILogger<MeteringPointMasterDataResponseListener> _logger;
-    private readonly ISerializer _serializer;
     private readonly CommandSchedulerFacade _commandSchedulerFacade;
 
     public MeteringPointMasterDataResponseListener(
         ILogger<MeteringPointMasterDataResponseListener> logger,
-        ISerializer serializer,
         CommandSchedulerFacade commandSchedulerFacade)
     {
         _logger = logger;
-        _serializer = serializer;
         _commandSchedulerFacade = commandSchedulerFacade;
     }
 
@@ -46,19 +43,26 @@ public class MeteringPointMasterDataResponseListener
         if (data == null) throw new ArgumentNullException(nameof(data));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        var metadata = GetMetaData(context);
-        var masterDataContent = GetMasterDataContent(MasterDataRequestResponse.Parser.ParseFrom(data));
+        var correlationId = context.ParseCorrelationIdFromMessage();
+        var response = MeteringPointMasterDataResponse.Parser.ParseFrom(data);
+        if (!string.IsNullOrEmpty(response.Error))
+        {
+            throw new InvalidOperationException($"Metering point master data request failed: {response.Error}");
+        }
+
+        var masterDataContent = GetMasterDataContent(response);
 
         var forwardMeteringPointMasterData = new ForwardMeteringPointMasterData(
-            metadata.TransactionId ?? throw new InvalidOperationException("Service bus metadata property TransactionId is missing"),
+            correlationId,
             masterDataContent);
 
         await _commandSchedulerFacade.EnqueueAsync(forwardMeteringPointMasterData).ConfigureAwait(false);
         _logger.LogInformation($"Master data response received: {data}");
     }
 
-    private static MasterDataContent GetMasterDataContent(MasterDataRequestResponse masterData)
+    private static MasterDataContent GetMasterDataContent(MeteringPointMasterDataResponse response)
     {
+        var masterData = response.MasterData;
         var address = new Application.MasterData.Address(
             masterData.Address.StreetName,
             StreetCode: masterData.Address.StreetCode,
@@ -98,17 +102,5 @@ public class MeteringPointMasterDataResponseListener
             masterData.ConnectionType,
             masterData.ParentRelatedMeteringPoint,
             masterData.GridOperatorId);
-    }
-
-    private MasterDataResponseMetadata GetMetaData(FunctionContext context)
-    {
-        context.BindingContext.BindingData.TryGetValue("UserProperties", out var metadata);
-
-        if (metadata is null)
-        {
-            throw new InvalidOperationException($"Service bus metadata must be specified as User Properties attributes");
-        }
-
-        return _serializer.Deserialize<MasterDataResponseMetadata>(metadata.ToString() ?? throw new InvalidOperationException());
     }
 }

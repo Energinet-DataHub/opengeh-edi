@@ -67,7 +67,7 @@ namespace Messaging.IntegrationTests.Infrastructure.OutgoingMessages
         {
             var transaction = new IncomingMessageBuilder().Build();
             return new OutgoingMessage(
-                "FakeDocumentType",
+                DocumentType.GenericNotification,
                 transaction.Message.ReceiverId,
                 _correlationContext.Id,
                 transaction.MarketActivityRecord.Id,
