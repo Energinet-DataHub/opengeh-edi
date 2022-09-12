@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using NodaTime;
@@ -33,7 +34,8 @@ public class CustomerMasterDataContent
         Instant supplyStart,
         IEnumerable<UsagePointLocation> usagePointLocations)
     {
-        MarketEvaluationPoint = marketEvaluationPoint;
+        MarketEvaluationPoint = string.IsNullOrEmpty(marketEvaluationPoint) ?
+            throw new ArgumentNullException(nameof(marketEvaluationPoint)) : marketEvaluationPoint;
         ElectricalHeating = electricalHeating;
         ElectricalHeatingStart = electricalHeatingStart;
         FirstCustomerId = firstCustomerId;
