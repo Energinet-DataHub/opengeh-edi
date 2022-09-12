@@ -23,6 +23,7 @@ using Energinet.DataHub.MessageHub.Client.Storage;
 using Messaging.Api.Configuration.Middleware.Authentication.Bearer;
 using Messaging.Api.Configuration.Middleware.Authentication.MarketActors;
 using Messaging.Api.Configuration.Middleware.Correlation;
+using Messaging.Application.Configuration;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.MessageBus;
 using Messaging.Infrastructure.Configuration.SystemTime;
@@ -120,7 +121,8 @@ namespace Messaging.Api
                         .AddMessagePublishing(sp =>
                             new NewMessageAvailableNotifier(
                                 sp.GetRequiredService<IDataAvailableNotificationSender>(),
-                                sp.GetRequiredService<ActorLookup>()))
+                                sp.GetRequiredService<ActorLookup>(),
+                                sp.GetRequiredService<ICorrelationContext>()))
                         .AddMessageHubServices(
                             runtime.MESSAGEHUB_STORAGE_CONNECTION_STRING!,
                             runtime.MESSAGEHUB_STORAGE_CONTAINER_NAME!,

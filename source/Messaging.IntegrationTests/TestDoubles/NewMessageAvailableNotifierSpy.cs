@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Messaging.Application.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.OutgoingMessages;
 
@@ -23,18 +22,18 @@ namespace Messaging.IntegrationTests.TestDoubles
 {
     public class NewMessageAvailableNotifierSpy : INewMessageAvailableNotifier
     {
-        private readonly Dictionary<string, OutgoingMessage> _publishedNotifications = new();
+        private readonly Dictionary<Guid, OutgoingMessage> _publishedNotifications = new();
 
         public Task NotifyAsync(OutgoingMessage message)
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
-            _publishedNotifications.Add(message.CorrelationId, message);
+            _publishedNotifications.Add(message.Id, message);
             return Task.CompletedTask;
         }
 
-        public OutgoingMessage? GetMessageFrom(string correlationId)
+        public OutgoingMessage? GetMessageFrom(Guid messageId)
         {
-            _publishedNotifications.TryGetValue(correlationId, out var notification);
+            _publishedNotifications.TryGetValue(messageId, out var notification);
             return notification;
         }
     }

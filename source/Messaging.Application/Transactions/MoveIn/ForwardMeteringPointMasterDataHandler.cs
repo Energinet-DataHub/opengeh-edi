@@ -126,7 +126,6 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
         return new OutgoingMessage(
             DocumentType.AccountingPointCharacteristics,
             receiverId,
-            Guid.NewGuid().ToString(),
             id,
             processType,
             MarketRoles.EnergySupplier,

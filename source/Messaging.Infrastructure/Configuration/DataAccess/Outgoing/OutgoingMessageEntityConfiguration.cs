@@ -36,7 +36,6 @@ namespace Messaging.Infrastructure.Configuration.DataAccess.Outgoing
             builder.Property(x => x.IsPublished);
             builder.Property(x => x.ReceiverId);
             builder.Property(x => x.ReceiverRole);
-            builder.Property(x => x.CorrelationId);
             builder.Property(x => x.OriginalMessageId);
             builder.Property(x => x.ProcessType);
             builder.Property(x => x.SenderId);

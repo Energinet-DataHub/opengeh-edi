@@ -52,24 +52,17 @@ namespace Messaging.IntegrationTests.Infrastructure.OutgoingMessages
             await _messageAvailabilityPublisher.PublishAsync().ConfigureAwait(false);
 
             var unpublishedMessages = _outgoingMessageStore.GetUnpublished();
-            var publishedMessage = _newMessageAvailableNotifierSpy.GetMessageFrom(outgoingMessage.CorrelationId);
+            var publishedMessage = _newMessageAvailableNotifierSpy.GetMessageFrom(outgoingMessage.Id);
             Assert.Empty(unpublishedMessages);
             Assert.NotNull(publishedMessage);
         }
 
-        private async Task StoreOutgoingMessage(OutgoingMessage outgoingMessage)
-        {
-            _outgoingMessageStore.Add(outgoingMessage);
-            await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
-        }
-
-        private OutgoingMessage CreateOutgoingMessage()
+        private static OutgoingMessage CreateOutgoingMessage()
         {
             var transaction = new IncomingMessageBuilder().Build();
             return new OutgoingMessage(
                 DocumentType.GenericNotification,
                 transaction.Message.ReceiverId,
-                _correlationContext.Id,
                 transaction.MarketActivityRecord.Id,
                 transaction.Message.ProcessType,
                 transaction.Message.ReceiverRole,
@@ -77,6 +70,12 @@ namespace Messaging.IntegrationTests.Infrastructure.OutgoingMessages
                 transaction.Message.SenderRole,
                 string.Empty,
                 "FakeCode");
+        }
+
+        private async Task StoreOutgoingMessage(OutgoingMessage outgoingMessage)
+        {
+            _outgoingMessageStore.Add(outgoingMessage);
+            await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
         }
     }
 }

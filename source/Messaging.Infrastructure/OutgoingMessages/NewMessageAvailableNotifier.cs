@@ -16,6 +16,7 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MessageHub.Client.DataAvailable;
 using Energinet.DataHub.MessageHub.Model.Model;
+using Messaging.Application.Configuration;
 using Messaging.Domain.OutgoingMessages;
 
 namespace Messaging.Infrastructure.OutgoingMessages
@@ -24,13 +25,16 @@ namespace Messaging.Infrastructure.OutgoingMessages
     {
         private readonly IDataAvailableNotificationSender _dataAvailableNotificationSender;
         private readonly ActorLookup _actorLookup;
+        private readonly ICorrelationContext _correlationContext;
 
         public NewMessageAvailableNotifier(
             IDataAvailableNotificationSender dataAvailableNotificationSender,
-            ActorLookup actorLookup)
+            ActorLookup actorLookup,
+            ICorrelationContext correlationContext)
         {
             _dataAvailableNotificationSender = dataAvailableNotificationSender;
             _actorLookup = actorLookup;
+            _correlationContext = correlationContext;
         }
 
         public async Task NotifyAsync(OutgoingMessage message)
@@ -39,7 +43,7 @@ namespace Messaging.Infrastructure.OutgoingMessages
             //TODO: Temporarly disble this step until message is ready to support new actor registry
             //var actorId = await FindActorIdAsync(message.ReceiverId).ConfigureAwait(false);
             await _dataAvailableNotificationSender.SendAsync(
-                message.CorrelationId,
+                _correlationContext.Id,
                 CreateDataAvailableNotificationFrom(message, Guid.Empty)).ConfigureAwait(false);
         }
 

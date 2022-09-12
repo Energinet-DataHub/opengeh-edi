@@ -61,7 +61,6 @@ public class ForwardCustomerMasterDataHandler : IRequestHandler<ForwardCustomerM
         return new OutgoingMessage(
             DocumentType.CharacteristicsOfACustomerAtAnAP,
             receiverId,
-            Guid.NewGuid().ToString(),
             id,
             processType,
             MarketRoles.EnergySupplier,
