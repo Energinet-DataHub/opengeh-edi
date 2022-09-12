@@ -12,14 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Api.MasterDataReceivers;
+using System.Threading.Tasks;
 
-public class MasterDataResponseMetadata
+namespace Messaging.Application.Transactions.MoveIn;
+
+/// <summary>
+/// Interface for fetching metering point master data service
+/// </summary>
+public interface IMeteringPointMasterDataClient
 {
-    public MasterDataResponseMetadata(string? transactionId)
-    {
-        TransactionId = transactionId;
-    }
-
-    public string? TransactionId { get; }
+    /// <summary>
+    /// Request Master data for a market evaluation point
+    /// </summary>
+    /// <param name="fetchMeteringPointMasterData"></param>
+    /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
+    Task RequestAsync(FetchMeteringPointMasterData fetchMeteringPointMasterData);
 }

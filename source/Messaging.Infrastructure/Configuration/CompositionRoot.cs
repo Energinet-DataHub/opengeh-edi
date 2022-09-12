@@ -15,6 +15,7 @@
 using System;
 using System.Net.Http;
 using Azure.Messaging.ServiceBus;
+using Dapper;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Energinet.DataHub.MessageHub.Client;
 using Energinet.DataHub.MessageHub.Client.DataAvailable;
@@ -66,6 +67,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using NodaTime;
 using MarketActivityRecord = Messaging.Application.IncomingMessages.RequestChangeOfSupplier.MarketActivityRecord;
 
 namespace Messaging.Infrastructure.Configuration
@@ -215,8 +217,8 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddScoped<MoveInNotifications>();
             _services.AddScoped(_ => configuration);
             _services.AddScoped<IMoveInRequester, MoveInRequester>();
-            _services.AddScoped<IRequestMeteringPointMasterData, RequestMeteringPointMasterData>();
-            _services.AddScoped<IRequestCustomerMasterData, RequestCustomerMasterData>();
+            _services.AddScoped<IMeteringPointMasterDataClient, MeteringPointMasterDataClient>();
+            _services.AddScoped<ICustomerMasterDataClient, CustomerMasterDataClient>();
             _services.AddTransient<IRequestHandler<RequestChangeOfSupplierTransaction, Unit>, MoveInRequestHandler>();
             _services.AddTransient<IRequestHandler<FetchCustomerMasterData, Unit>, FetchCustomerMasterDataHandler>();
             _services.AddTransient<IRequestHandler<FetchMeteringPointMasterData, Unit>, FetchMeteringPointMasterDataHandler>();

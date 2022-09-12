@@ -16,72 +16,65 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.EnergySupplying.RequestResponse.Requests;
+using Messaging.Api.Configuration.Middleware;
 using Messaging.Application.MasterData;
 using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.InternalCommands;
-using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using NodaTime;
 using NodaTime.Extensions;
+using NodaTime.Serialization.Protobuf;
 
 namespace Messaging.Api.MasterDataReceivers;
 
 public class CustomerMasterDataResponseListener
 {
     private readonly ILogger<CustomerMasterDataResponseListener> _logger;
-    private readonly ISerializer _serializer;
     private readonly CommandSchedulerFacade _commandSchedulerFacade;
 
-    public CustomerMasterDataResponseListener(ISerializer serializer, CommandSchedulerFacade commandSchedulerFacade, ILogger<CustomerMasterDataResponseListener> logger)
+    public CustomerMasterDataResponseListener(CommandSchedulerFacade commandSchedulerFacade, ILogger<CustomerMasterDataResponseListener> logger)
     {
-        _serializer = serializer;
         _commandSchedulerFacade = commandSchedulerFacade;
         _logger = logger;
     }
 
     [Function("CustomerMasterDataResponseListener")]
-    public async Task RunAsync([ServiceBusTrigger("%CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME%", Connection = "INTERNAL_SERVICE_BUS_LISTENER_CONNECTION_STRING")] string data, FunctionContext context)
+    public async Task RunAsync([ServiceBusTrigger("%CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME%", Connection = "INTERNAL_SERVICE_BUS_LISTENER_CONNECTION_STRING")] byte[] data, FunctionContext context)
     {
         if (data == null) throw new ArgumentNullException(nameof(data));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        var metaData = GetMetaData(context);
-        var masterDataContent = GetMasterDataContent(CustomerMasterDataRequestResponse.Parser.ParseJson(data));
+        var correlationId = context.ParseCorrelationIdFromMessage();
+        var response = CustomerMasterDataResponse.Parser.ParseFrom(data);
+        if (!string.IsNullOrEmpty(response.Error))
+        {
+            throw new InvalidOperationException($"Customer master data request failed: {response.Error}");
+        }
 
-        var forwardedCustomerMasterData = new ForwardCustomerMasterData(
-            metaData.TransactionId ?? throw new InvalidOperationException("Service bus metadata property TransactionId is missing"),
-            masterDataContent);
+        var masterDataContent = GetMasterDataContent(response);
+
+        var forwardedCustomerMasterData = new ForwardCustomerMasterData(correlationId, masterDataContent);
 
         await _commandSchedulerFacade.EnqueueAsync(forwardedCustomerMasterData).ConfigureAwait(false);
         _logger.LogInformation($"Master data response received: {data}");
     }
 
-    private static CustomerMasterDataContent GetMasterDataContent(CustomerMasterDataRequestResponse masterdata)
+    private static CustomerMasterDataContent GetMasterDataContent(CustomerMasterDataResponse response)
     {
+        var masterData = response.MasterData;
         return new CustomerMasterDataContent(
             string.Empty,
             false,
-            masterdata.Electricalheatingeffectivedate.ToDateTime().ToUniversalTime().ToInstant(),
-            masterdata.Customerid,
-            masterdata.Customername,
+            masterData.ElectricalHeatingEffectiveDate.ToInstant(),
+            masterData.CustomerId,
+            masterData.CustomerName,
             string.Empty,
             string.Empty,
             false,
             false,
-            DateTime.Now.ToInstant(),
+            SystemClock.Instance.GetCurrentInstant(),
             new List<UsagePointLocation>());
-    }
-
-    private MasterDataResponseMetadata GetMetaData(FunctionContext context)
-    {
-        context.BindingContext.BindingData.TryGetValue("UserProperties", out var metadata);
-
-        if (metadata is null)
-        {
-            throw new InvalidOperationException($"Service bus metadata must be specified as User Properties attributes");
-        }
-
-        return _serializer.Deserialize<MasterDataResponseMetadata>(metadata.ToString() ?? throw new InvalidOperationException());
     }
 }

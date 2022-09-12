@@ -17,14 +17,14 @@ using System.Threading.Tasks;
 namespace Messaging.Application.Transactions.MoveIn;
 
 /// <summary>
-/// Interface for fetching metering point master data service
+/// Interface for fetching customer master data
 /// </summary>
-public interface IRequestMeteringPointMasterData
+public interface ICustomerMasterDataClient
 {
     /// <summary>
-    /// Request Master data for a market evaluation point
+    /// Request master data for a customer
     /// </summary>
-    /// <param name="fetchMeteringPointMasterData"></param>
-    /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
-    Task RequestMasterDataForAsync(FetchMeteringPointMasterData fetchMeteringPointMasterData);
+    /// <param name="fetchCustomerMasterData"></param>
+    /// <returns><see cref="Task"/></returns>
+    Task RequestAsync(FetchCustomerMasterData fetchCustomerMasterData);
 }

@@ -22,12 +22,12 @@ using Messaging.Infrastructure.Configuration.MessageBus;
 
 namespace Messaging.Infrastructure.Transactions.MoveIn;
 
-public class RequestCustomerMasterData : IRequestCustomerMasterData
+public class CustomerMasterDataClient : ICustomerMasterDataClient
 {
     private readonly EnergySupplyingServiceBusClientConfiguration _configuration;
     private readonly IServiceBusSenderFactory _clientSenderFactory;
 
-    public RequestCustomerMasterData(
+    public CustomerMasterDataClient(
         EnergySupplyingServiceBusClientConfiguration configuration,
         IServiceBusSenderFactory clientSenderFactory)
     {
@@ -35,7 +35,7 @@ public class RequestCustomerMasterData : IRequestCustomerMasterData
         _clientSenderFactory = clientSenderFactory;
     }
 
-    public Task RequestMasterDataForAsync(FetchCustomerMasterData fetchCustomerMasterData)
+    public Task RequestAsync(FetchCustomerMasterData fetchCustomerMasterData)
     {
         if (fetchCustomerMasterData == null) throw new ArgumentNullException(nameof(fetchCustomerMasterData));
         var message = CreateFrom(fetchCustomerMasterData);
@@ -55,9 +55,8 @@ public class RequestCustomerMasterData : IRequestCustomerMasterData
         {
             ContentType = "application/octet-stream;charset=utf-8",
         };
-        serviceBusMessage.ApplicationProperties.Add("BusinessProcessId", fetchMeteringPointMasterData.BusinessProcessId);
-        serviceBusMessage.ApplicationProperties.Add("TransactionId", fetchMeteringPointMasterData.TransactionId);
-        serviceBusMessage.MessageId = fetchMeteringPointMasterData.TransactionId;
+
+        serviceBusMessage.CorrelationId = fetchMeteringPointMasterData.TransactionId;
 
         return serviceBusMessage;
     }

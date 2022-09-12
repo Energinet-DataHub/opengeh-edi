@@ -50,8 +50,7 @@ public class FetchCustomerMasterDataTests : TestBase
 
         var dispatchedMessage = _senderSpy.Message;
         Assert.NotNull(dispatchedMessage);
-        Assert.Equal(command.TransactionId, dispatchedMessage?.ApplicationProperties["TransactionId"]);
-        Assert.Equal(command.BusinessProcessId, dispatchedMessage?.ApplicationProperties["BusinessProcessId"]);
+        Assert.Equal(command.TransactionId, dispatchedMessage?.CorrelationId);
         var request = CustomerMasterDataRequest.Parser.ParseFrom(dispatchedMessage?.Body);
         Assert.Equal(command.BusinessProcessId, request.Processid);
     }

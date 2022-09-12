@@ -22,18 +22,18 @@ using Messaging.Infrastructure.Configuration.MessageBus;
 
 namespace Messaging.Infrastructure.Transactions.MoveIn;
 
-public class RequestMeteringPointMasterData : IRequestMeteringPointMasterData
+public class MeteringPointMasterDataClient : IMeteringPointMasterDataClient
 {
     private readonly MeteringPointServiceBusClientConfiguration _configuration;
     private readonly IServiceBusSenderFactory _serviceBusSenderFactory;
 
-    public RequestMeteringPointMasterData(MeteringPointServiceBusClientConfiguration configuration, IServiceBusSenderFactory serviceBusSenderFactory)
+    public MeteringPointMasterDataClient(MeteringPointServiceBusClientConfiguration configuration, IServiceBusSenderFactory serviceBusSenderFactory)
     {
         _configuration = configuration;
         _serviceBusSenderFactory = serviceBusSenderFactory;
     }
 
-    public Task RequestMasterDataForAsync(FetchMeteringPointMasterData fetchMeteringPointMasterData)
+    public Task RequestAsync(FetchMeteringPointMasterData fetchMeteringPointMasterData)
     {
         if (fetchMeteringPointMasterData == null) throw new ArgumentNullException(nameof(fetchMeteringPointMasterData));
         var message = CreateFrom(fetchMeteringPointMasterData);
@@ -44,7 +44,7 @@ public class RequestMeteringPointMasterData : IRequestMeteringPointMasterData
 
     private static ServiceBusMessage CreateFrom(FetchMeteringPointMasterData fetchMeteringPointMasterData)
     {
-        var message = new MasterDataRequest
+        var message = new MeteringPointMasterDataRequest
         {
             GsrnNumber = fetchMeteringPointMasterData.MarketEvaluationPointNumber,
         };
@@ -53,8 +53,7 @@ public class RequestMeteringPointMasterData : IRequestMeteringPointMasterData
         {
             ContentType = "application/octet-stream;charset=utf-8",
         };
-        serviceBusMessage.ApplicationProperties.Add("BusinessProcessId", fetchMeteringPointMasterData.BusinessProcessId);
-        serviceBusMessage.ApplicationProperties.Add("TransactionId", fetchMeteringPointMasterData.TransactionId);
+        serviceBusMessage.CorrelationId = fetchMeteringPointMasterData.TransactionId;
 
         return serviceBusMessage;
     }
