@@ -47,7 +47,7 @@ limitations under the License.
       <!-- Disable warning on your public types/methods for not having added full documentation tags -->
       <NoWarn>$(NoWarn);1591</NoWarn>
       <PublishRepositoryUrl>true</PublishRepositoryUrl>
-      <PackageVersion>1.0.2</PackageVersion>
+      <PackageVersion>1.0.3</PackageVersion>
     </PropertyGroup>
 
     <ItemGroup>
