@@ -63,6 +63,7 @@ public class ForwardCustomerMasterDataTests : TestBase
         assertMessage.WithMarketActivityRecord()
             .HasOriginalTransactionId(SampleData.TransactionId)
             .HasValidityStart(SampleData.SupplyStart)
+            .HasMarketEvaluationPointValue(nameof(MarketEvaluationPoint.MarketEvaluationPointId), SampleData.MeteringPointNumber)
             .HasMarketEvaluationPointDateValue(nameof(MarketEvaluationPoint.SupplyStart), SampleData.SupplyStart)
             .HasMarketEvaluationPointValue(nameof(MarketEvaluationPoint.ElectricalHeating), SampleData.ElectricalHeating)
             .HasMarketEvaluationPointDateValue(nameof(MarketEvaluationPoint.ElectricalHeatingStart), SampleData.ElectricalHeatingStart)
@@ -80,7 +81,7 @@ public class ForwardCustomerMasterDataTests : TestBase
     private static CustomerMasterDataContent CreateMasterDataContent()
     {
         return new CustomerMasterDataContent(
-            SampleData.MarketEvaluationPointId,
+            SampleData.MeteringPointNumber,
             SampleData.ElectricalHeating,
             SampleData.ElectricalHeatingStart,
             SampleData.ConsumerId,
