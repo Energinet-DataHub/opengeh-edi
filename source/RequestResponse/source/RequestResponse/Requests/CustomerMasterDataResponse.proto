@@ -30,4 +30,5 @@ message CustomerMasterData {
   string customer_id = 3;
   google.protobuf.Timestamp electrical_heating_effective_date = 4;
   string accounting_point_number = 5;
+  google.protobuf.Timestamp supply_start = 6;
 }
