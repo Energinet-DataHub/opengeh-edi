@@ -73,7 +73,7 @@ public class CustomerMasterDataResponseListener
             string.Empty,
             false,
             false,
-            SystemClock.Instance.GetCurrentInstant(),
+            masterData.SupplyStart.ToInstant(),
             new List<UsagePointLocation>());
     }
 }
