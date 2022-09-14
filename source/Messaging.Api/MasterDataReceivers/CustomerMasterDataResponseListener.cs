@@ -24,7 +24,6 @@ using Messaging.Infrastructure.Configuration.InternalCommands;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using NodaTime;
-using NodaTime.Extensions;
 using NodaTime.Serialization.Protobuf;
 
 namespace Messaging.Api.MasterDataReceivers;
@@ -74,7 +73,7 @@ public class CustomerMasterDataResponseListener
             string.Empty,
             false,
             false,
-            SystemClock.Instance.GetCurrentInstant(),
+            masterData.SupplyStart.ToInstant(),
             new List<UsagePointLocation>());
     }
 }
