@@ -66,7 +66,7 @@ public class CustomerMasterDataResponseListener
         return new CustomerMasterDataContent(
             masterData.AccountingPointNumber,
             false,
-            masterData.ElectricalHeatingEffectiveDate.ToInstant(),
+            masterData.ElectricalHeatingEffectiveDate?.ToInstant(),
             masterData.CustomerId,
             masterData.CustomerName,
             string.Empty,

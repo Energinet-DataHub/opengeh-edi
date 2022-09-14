@@ -24,7 +24,7 @@ public class CustomerMasterDataContent
     public CustomerMasterDataContent(
         string marketEvaluationPoint,
         bool electricalHeating,
-        Instant electricalHeatingStart,
+        Instant? electricalHeatingStart,
         string firstCustomerId,
         string firstCustomerName,
         string secondCustomerId,
@@ -52,7 +52,7 @@ public class CustomerMasterDataContent
 
     public bool ElectricalHeating { get; }
 
-    public Instant ElectricalHeatingStart { get; }
+    public Instant? ElectricalHeatingStart { get; }
 
     public string FirstCustomerId { get; }
 

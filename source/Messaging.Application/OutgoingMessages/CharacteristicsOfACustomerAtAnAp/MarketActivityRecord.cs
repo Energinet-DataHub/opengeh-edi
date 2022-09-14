@@ -22,7 +22,7 @@ public record MarketActivityRecord(string Id, string OriginalTransactionId, Inst
 public record MarketEvaluationPoint(
     string MarketEvaluationPointId,
     bool ElectricalHeating,
-    Instant ElectricalHeatingStart,
+    Instant? ElectricalHeatingStart,
     MrId FirstCustomerId,
     string FirstCustomerName,
     MrId SecondCustomerId,
