@@ -82,7 +82,7 @@ namespace Messaging.Tests.Application.OutgoingMessages.CharacteristicsOfACustome
                     .HasValue("MktActivityRecord[1]/validityStart_DateAndOrTime.dateTime", marketActivityRecord.ValidityStart.ToString())
                     .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/mRID", marketActivityRecord.MarketEvaluationPoint.MarketEvaluationPointId)
                     .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/serviceCategory.ElectricalHeating", marketActivityRecord.MarketEvaluationPoint.ElectricalHeating.ToStringValue())
-                    .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/eletricalHeating_DateAndOrTime.dateTime", marketActivityRecord.MarketEvaluationPoint.ElectricalHeatingStart.ToString())
+                    .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/eletricalHeating_DateAndOrTime.dateTime", marketActivityRecord.MarketEvaluationPoint.ElectricalHeatingStart.ToString() ?? string.Empty)
                     .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/firstCustomer_MarketParticipant.mRID", marketActivityRecord.MarketEvaluationPoint.FirstCustomerId.Id)
                     .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/firstCustomer_MarketParticipant.name", marketActivityRecord.MarketEvaluationPoint.FirstCustomerName)
                     .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/secondCustomer_MarketParticipant.mRID", marketActivityRecord.MarketEvaluationPoint.SecondCustomerId.Id)
