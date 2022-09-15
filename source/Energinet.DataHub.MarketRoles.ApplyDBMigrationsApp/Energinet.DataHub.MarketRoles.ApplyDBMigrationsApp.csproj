@@ -45,6 +45,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202205241100 Consolidated dbo model.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241101 Consolidated BtwoB model.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281102 Insert AccountPoints.sql" />
+    <EmbeddedResource Include="Scripts\Seed\202209151140 Insert Reasons.sql" />
   </ItemGroup>
 
 </Project>
