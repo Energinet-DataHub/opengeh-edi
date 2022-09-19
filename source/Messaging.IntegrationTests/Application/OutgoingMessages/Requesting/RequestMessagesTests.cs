@@ -18,7 +18,6 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Dapper;
 using MediatR;
-using Messaging.Application.Common;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.IncomingMessages;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;

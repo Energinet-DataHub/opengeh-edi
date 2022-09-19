@@ -13,10 +13,10 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Messaging.Application.Common.Commands;
+using Messaging.Application.Configuration.Commands.Commands;
 using NodaTime;
 
-namespace Messaging.Application.Configuration
+namespace Messaging.Application.Configuration.Commands
 {
     /// <summary>
     /// Service for scheduling and enqueueing internal commands for later processing

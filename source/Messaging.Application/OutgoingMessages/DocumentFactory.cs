@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Messaging.Application.Common;
 using Messaging.Domain.OutgoingMessages;
 
 namespace Messaging.Application.OutgoingMessages;

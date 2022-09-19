@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Messaging.Application.Common;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.OutgoingMessages.Common.Xml;

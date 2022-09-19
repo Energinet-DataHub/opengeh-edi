@@ -20,7 +20,6 @@ using System.Reflection;
 using System.Text;
 using MediatR;
 using Messaging.Api;
-using Messaging.Application.Common;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.OutgoingMessages.Common.Xml;

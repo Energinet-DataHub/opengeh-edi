@@ -19,7 +19,6 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Json.Schema;
-using Messaging.Application.Common;
 using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;

@@ -15,8 +15,9 @@
 using System.Data;
 using System.Threading.Tasks;
 using Dapper;
-using Messaging.Application.Common.Commands;
 using Messaging.Application.Configuration;
+using Messaging.Application.Configuration.Commands;
+using Messaging.Application.Configuration.Commands.Commands;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.InternalCommands;
 using Messaging.IntegrationTests.Fixtures;

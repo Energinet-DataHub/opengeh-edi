@@ -12,16 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using MediatR;
 
-namespace Messaging.Application.Common.Commands
+namespace Messaging.Application.Configuration.Commands.Commands
 {
-    #pragma warning disable CA1040
-    /// <summary>
-    /// CQRS command object
-    /// </summary>
-    public interface ICommand<out TResponse> : IRequest<TResponse>
+    public abstract class InternalCommand : ICommand<Unit>
     {
+        protected InternalCommand()
+        {
+            Id = Guid.NewGuid();
+        }
+
+        protected InternalCommand(Guid id)
+        {
+            Id = id;
+        }
+
+        public Guid Id { get; }
     }
-#pragma warning restore
 }

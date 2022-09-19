@@ -18,7 +18,6 @@ using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Messaging.Application.Common;
 using Messaging.Application.Configuration;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages;

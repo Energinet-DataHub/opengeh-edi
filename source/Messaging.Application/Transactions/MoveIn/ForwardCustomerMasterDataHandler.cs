@@ -16,7 +16,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Messaging.Application.Common;
 using Messaging.Application.Configuration;
 using Messaging.Application.MasterData;
 using Messaging.Application.OutgoingMessages;
