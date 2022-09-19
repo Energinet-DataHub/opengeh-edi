@@ -97,9 +97,4 @@ limitations under the License.
       </EmbeddedResource>
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Common\Reasons" />
-      <Folder Include="OutgoingMessages\Common\Xml" />
-    </ItemGroup>
-
 </Project>

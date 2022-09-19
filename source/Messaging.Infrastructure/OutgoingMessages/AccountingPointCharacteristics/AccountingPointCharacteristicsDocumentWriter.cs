@@ -20,6 +20,7 @@ using Messaging.Application.Common;
 using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
 using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails;
 using Messaging.Application.OutgoingMessages.Common;
+using Messaging.Application.OutgoingMessages.Common.Xml;
 using Messaging.Infrastructure.OutgoingMessages.Common.Xml;
 
 namespace Messaging.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
