@@ -17,7 +17,7 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 
-namespace Messaging.Application.Common.Reasons;
+namespace Messaging.Application.OutgoingMessages.Common.Reasons;
 
 /// <summary>
 /// Translates from validation errors returned from business request processing to reasons to be included in reject messages

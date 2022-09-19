@@ -98,6 +98,7 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Common\Reasons" />
       <Folder Include="OutgoingMessages\Common\Xml" />
     </ItemGroup>
 

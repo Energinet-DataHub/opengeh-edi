@@ -22,6 +22,7 @@ using System.Xml.Schema;
 using Messaging.Application.Common;
 using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
+using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.SchemaStore;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Common;

@@ -21,6 +21,7 @@ using Messaging.Application.Common;
 using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
+using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.SchemaStore;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Common;

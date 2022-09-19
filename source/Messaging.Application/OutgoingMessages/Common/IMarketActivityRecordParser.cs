@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Application.Common
+namespace Messaging.Application.OutgoingMessages.Common
 {
     /// <summary>
     /// Service for parsing a market activity record to- and from a string payload

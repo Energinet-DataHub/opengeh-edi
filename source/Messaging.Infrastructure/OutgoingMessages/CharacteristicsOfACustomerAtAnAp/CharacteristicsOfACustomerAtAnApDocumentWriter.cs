@@ -19,6 +19,7 @@ using System.Xml;
 using Messaging.Application.Common;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
+using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Infrastructure.OutgoingMessages.Common.Xml;
 
 namespace Messaging.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;

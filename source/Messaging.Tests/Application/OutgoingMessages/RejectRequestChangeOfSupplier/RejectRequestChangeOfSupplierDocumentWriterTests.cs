@@ -21,6 +21,7 @@ using System.Xml.Linq;
 using System.Xml.Schema;
 using Messaging.Application.Common;
 using Messaging.Application.Configuration;
+using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Application.SchemaStore;
 using Messaging.Domain.OutgoingMessages;

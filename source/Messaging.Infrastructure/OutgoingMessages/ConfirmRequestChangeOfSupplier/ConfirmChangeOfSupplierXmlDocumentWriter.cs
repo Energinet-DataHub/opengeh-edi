@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
 using Messaging.Application.Common;
+using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Infrastructure.OutgoingMessages.Common.Xml;
 
