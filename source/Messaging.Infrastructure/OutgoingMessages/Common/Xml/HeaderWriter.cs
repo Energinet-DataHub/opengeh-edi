@@ -20,9 +20,9 @@ using Messaging.Domain.OutgoingMessages;
 
 namespace Messaging.Infrastructure.OutgoingMessages.Common.Xml;
 
-public static class HeaderWriter
+internal static class HeaderWriter
 {
-    public static async Task WriteAsync(XmlWriter writer, MessageHeader messageHeader, DocumentDetails documentDetails)
+    internal static async Task WriteAsync(XmlWriter writer, MessageHeader messageHeader, DocumentDetails documentDetails)
     {
         if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
         if (writer == null) throw new ArgumentNullException(nameof(writer));
