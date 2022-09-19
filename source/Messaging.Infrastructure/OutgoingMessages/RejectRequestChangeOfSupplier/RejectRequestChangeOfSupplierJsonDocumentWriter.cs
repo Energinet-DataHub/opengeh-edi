@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Messaging.Application.Common;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Infrastructure.OutgoingMessages.Common.Json;
 using Newtonsoft.Json;
 
 namespace Messaging.Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;

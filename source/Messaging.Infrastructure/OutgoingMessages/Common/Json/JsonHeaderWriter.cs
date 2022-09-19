@@ -13,12 +13,10 @@
 // limitations under the License.
 
 using System;
-using System.Diagnostics;
-using System.Threading.Tasks;
 using Messaging.Domain.OutgoingMessages;
 using Newtonsoft.Json;
 
-namespace Messaging.Application.Common;
+namespace Messaging.Infrastructure.OutgoingMessages.Common.Json;
 
 public static class JsonHeaderWriter
 {
