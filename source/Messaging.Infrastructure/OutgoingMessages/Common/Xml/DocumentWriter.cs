@@ -15,14 +15,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Messaging.Application.Common;
 using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.SeedWork;
 
-namespace Messaging.Application.Common;
+namespace Messaging.Infrastructure.OutgoingMessages.Common.Xml;
 
 public abstract class DocumentWriter : IDocumentWriter
 {

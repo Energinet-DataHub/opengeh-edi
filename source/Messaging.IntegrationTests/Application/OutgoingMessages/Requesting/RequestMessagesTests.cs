@@ -25,6 +25,7 @@ using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Requesting;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Infrastructure.OutgoingMessages.Common.Xml;
 using Messaging.Infrastructure.OutgoingMessages.Requesting;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Fixtures;

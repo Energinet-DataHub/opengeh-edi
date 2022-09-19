@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Messaging.Application.Common;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Messaging.Infrastructure.OutgoingMessages.Common.Xml;
 
 namespace Messaging.Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
 

@@ -97,4 +97,8 @@ limitations under the License.
       </EmbeddedResource>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="OutgoingMessages\Common\Xml" />
+    </ItemGroup>
+
 </Project>

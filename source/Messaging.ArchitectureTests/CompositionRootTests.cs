@@ -23,6 +23,7 @@ using Messaging.Api;
 using Messaging.Application.Common;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Configuration;
+using Messaging.Infrastructure.OutgoingMessages.Common.Xml;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
