@@ -27,6 +27,7 @@ using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Serialization;
+using Messaging.Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Tests.Application.OutgoingMessages.Asserts;
 using Xunit;
 
@@ -34,7 +35,7 @@ namespace Messaging.Tests.Application.OutgoingMessages.ConfirmRequestChangeOfSup
 {
     public class ConfirmRequestChangeOfSupplierDocumentWriterTests
     {
-        private readonly ConfirmChangeOfSupplierDocumentWriter _documentWriter;
+        private readonly ConfirmChangeOfSupplierXmlDocumentWriter _xmlDocumentWriter;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
         private readonly IMarketActivityRecordParser _marketActivityRecordParser;
         private ISchemaProvider? _schemaProvider;
@@ -43,7 +44,7 @@ namespace Messaging.Tests.Application.OutgoingMessages.ConfirmRequestChangeOfSup
         {
             _systemDateTimeProvider = new SystemDateTimeProvider();
             _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
-            _documentWriter = new ConfirmChangeOfSupplierDocumentWriter(_marketActivityRecordParser);
+            _xmlDocumentWriter = new ConfirmChangeOfSupplierXmlDocumentWriter(_marketActivityRecordParser);
         }
 
         [Fact]
@@ -56,7 +57,7 @@ namespace Messaging.Tests.Application.OutgoingMessages.ConfirmRequestChangeOfSup
                 new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId"),
             };
 
-            var message = await _documentWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
+            var message = await _xmlDocumentWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
 
             await AssertMessage(message, header, marketActivityRecords).ConfigureAwait(false);
         }

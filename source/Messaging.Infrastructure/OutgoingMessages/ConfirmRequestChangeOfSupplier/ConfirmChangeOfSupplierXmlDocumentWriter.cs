@@ -17,12 +17,13 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
 using Messaging.Application.Common;
+using Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 
-namespace Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
+namespace Messaging.Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 
-public class ConfirmChangeOfSupplierDocumentWriter : DocumentWriter
+public class ConfirmChangeOfSupplierXmlDocumentWriter : DocumentWriter
 {
-    public ConfirmChangeOfSupplierDocumentWriter(IMarketActivityRecordParser parser)
+    public ConfirmChangeOfSupplierXmlDocumentWriter(IMarketActivityRecordParser parser)
     : base(
         new DocumentDetails(
             "ConfirmRequestChangeOfSupplier_MarketDocument",

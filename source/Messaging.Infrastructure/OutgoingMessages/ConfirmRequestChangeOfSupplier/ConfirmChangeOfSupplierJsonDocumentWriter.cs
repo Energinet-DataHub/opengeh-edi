@@ -17,10 +17,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Messaging.Application.Common;
+using Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Domain.OutgoingMessages;
 using Newtonsoft.Json;
 
-namespace Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
+namespace Messaging.Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 
 public class ConfirmChangeOfSupplierJsonDocumentWriter : IDocumentWriter
 {
