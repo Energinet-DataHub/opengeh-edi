@@ -17,8 +17,10 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
 using Messaging.Application.Common;
+using Messaging.Application.OutgoingMessages;
+using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 
-namespace Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
+namespace Messaging.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 
 public class CharacteristicsOfACustomerAtAnApDocumentWriter : DocumentWriter
 {

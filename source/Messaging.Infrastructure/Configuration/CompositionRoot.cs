@@ -61,6 +61,7 @@ using Messaging.Infrastructure.IncomingMessages;
 using Messaging.Infrastructure.MasterData.MarketEvaluationPoints;
 using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
+using Messaging.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Infrastructure.OutgoingMessages.Requesting;
 using Messaging.Infrastructure.Transactions;
 using Messaging.Infrastructure.Transactions.MoveIn;
