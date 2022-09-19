@@ -17,12 +17,13 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
 using Messaging.Application.Common;
+using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 
-namespace Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
+namespace Messaging.Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
 
-public class RejectRequestChangeOfSupplierDocumentWriter : DocumentWriter
+public class RejectRequestChangeOfSupplierXmlDocumentWriter : DocumentWriter
 {
-    public RejectRequestChangeOfSupplierDocumentWriter(IMarketActivityRecordParser parser)
+    public RejectRequestChangeOfSupplierXmlDocumentWriter(IMarketActivityRecordParser parser)
         : base(
             new DocumentDetails(
                 "RejectRequestChangeOfSupplier_MarketDocument",

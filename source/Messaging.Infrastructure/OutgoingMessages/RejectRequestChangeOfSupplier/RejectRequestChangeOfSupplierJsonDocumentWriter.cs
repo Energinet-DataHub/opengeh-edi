@@ -17,10 +17,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Messaging.Application.Common;
+using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Domain.OutgoingMessages;
 using Newtonsoft.Json;
 
-namespace Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
+namespace Messaging.Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
 
 public class RejectRequestChangeOfSupplierJsonDocumentWriter : IDocumentWriter
 {

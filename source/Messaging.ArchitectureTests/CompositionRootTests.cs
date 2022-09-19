@@ -45,7 +45,7 @@ namespace Messaging.ArchitectureTests
         {
             var constructorDependencies = ReflectionHelper.FindAllConstructorDependenciesForType();
 
-            return ApplicationAssemblies.Application.GetTypes()
+            return ApplicationAssemblies.Infrastructure.GetTypes()
                 .Where(t => t.IsSubclassOf(typeof(DocumentWriter)))
                 .Select(t => new object[] { new Requirement(t.Name, constructorDependencies(t), t) });
         }

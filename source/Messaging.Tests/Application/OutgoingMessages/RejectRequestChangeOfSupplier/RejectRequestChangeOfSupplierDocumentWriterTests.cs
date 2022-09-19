@@ -27,6 +27,7 @@ using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Serialization;
+using Messaging.Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Tests.Application.OutgoingMessages.Asserts;
 using Xunit;
 
@@ -34,7 +35,7 @@ namespace Messaging.Tests.Application.OutgoingMessages.RejectRequestChangeOfSupp
 
 public class RejectRequestChangeOfSupplierDocumentWriterTests
 {
-    private readonly RejectRequestChangeOfSupplierDocumentWriter _documentWriter;
+    private readonly RejectRequestChangeOfSupplierXmlDocumentWriter _xmlDocumentWriter;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMarketActivityRecordParser _marketActivityRecordParser;
     private ISchemaProvider? _schemaProvider;
@@ -43,7 +44,7 @@ public class RejectRequestChangeOfSupplierDocumentWriterTests
     {
         _systemDateTimeProvider = new SystemDateTimeProvider();
         _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
-        _documentWriter = new RejectRequestChangeOfSupplierDocumentWriter(_marketActivityRecordParser);
+        _xmlDocumentWriter = new RejectRequestChangeOfSupplierXmlDocumentWriter(_marketActivityRecordParser);
     }
 
     [Fact]
@@ -65,7 +66,7 @@ public class RejectRequestChangeOfSupplierDocumentWriterTests
             }),
         };
 
-        var message = await _documentWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
+        var message = await _xmlDocumentWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
 
         await AssertMessage(message, header, marketActivityRecords).ConfigureAwait(false);
     }

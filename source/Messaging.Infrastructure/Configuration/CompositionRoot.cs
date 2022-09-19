@@ -64,6 +64,7 @@ using Messaging.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
 using Messaging.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Infrastructure.OutgoingMessages.GenericNotification;
+using Messaging.Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Infrastructure.OutgoingMessages.Requesting;
 using Messaging.Infrastructure.Transactions;
 using Messaging.Infrastructure.Transactions.MoveIn;
@@ -276,7 +277,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddScoped<DocumentFactory>();
             _services.AddScoped<IDocumentWriter, ConfirmChangeOfSupplierXmlDocumentWriter>();
             _services.AddScoped<IDocumentWriter, ConfirmChangeOfSupplierJsonDocumentWriter>();
-            _services.AddScoped<IDocumentWriter, RejectRequestChangeOfSupplierDocumentWriter>();
+            _services.AddScoped<IDocumentWriter, RejectRequestChangeOfSupplierXmlDocumentWriter>();
             _services.AddScoped<IDocumentWriter, GenericNotificationDocumentWriter>();
             _services.AddScoped<IDocumentWriter, AccountingPointCharacteristicsDocumentWriter>();
             _services.AddScoped<IDocumentWriter, CharacteristicsOfACustomerAtAnApDocumentWriter>();
