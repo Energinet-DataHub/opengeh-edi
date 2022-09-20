@@ -28,11 +28,13 @@ public abstract class DocumentWriter : IDocumentWriter
 {
     private readonly DocumentDetails _documentDetails;
     private readonly IMarketActivityRecordParser _parser;
+    private readonly string? _reasonCode;
 
-    protected DocumentWriter(DocumentDetails documentDetails, IMarketActivityRecordParser parser)
+    protected DocumentWriter(DocumentDetails documentDetails, IMarketActivityRecordParser parser, string? reasonCode = null)
     {
         _documentDetails = documentDetails;
         _parser = parser;
+        _reasonCode = reasonCode;
     }
 
     protected DocumentDetails DocumentDetails => _documentDetails;
@@ -89,14 +91,14 @@ public abstract class DocumentWriter : IDocumentWriter
         await writer.WriteEndElementAsync().ConfigureAwait(false);
     }
 
-    private static Task WriteHeaderAsync(MessageHeader header, DocumentDetails documentDetails, XmlWriter writer)
-    {
-        return HeaderWriter.WriteAsync(writer, header, documentDetails);
-    }
-
     private static async Task WriteEndAsync(XmlWriter writer)
     {
         await writer.WriteEndElementAsync().ConfigureAwait(false);
         writer.Close();
+    }
+
+    private Task WriteHeaderAsync(MessageHeader header, DocumentDetails documentDetails, XmlWriter writer)
+    {
+        return HeaderWriter.WriteAsync(writer, header, documentDetails, _reasonCode);
     }
 }

@@ -68,7 +68,7 @@ public class ConfirmChangeOfSupplierJsonDocumentWriter : IDocumentWriter
 
     private static void WriteHeader(MessageHeader header, JsonTextWriter writer)
     {
-        JsonHeaderWriter.Write(header, DocumentType, TypeCode, writer);
+        JsonHeaderWriter.Write(header, DocumentType, TypeCode, "A01", writer);
     }
 
     private void WriteMarketActivityRecords(IReadOnlyCollection<string> marketActivityRecords, JsonTextWriter writer)

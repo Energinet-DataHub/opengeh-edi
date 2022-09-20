@@ -48,7 +48,12 @@ public static class AssertJsonMessage
         Assert.Equal(header.SenderRole, root.GetProperty("sender_MarketParticipant.marketRole.type").GetProperty("value").ToString());
         Assert.Equal(header.ReceiverId, root.GetProperty("receiver_MarketParticipant.mRID").GetProperty("value").ToString());
         Assert.Equal(header.ReceiverRole, root.GetProperty("receiver_MarketParticipant.marketRole.type").GetProperty("value").ToString());
-        Assert.Equal(header.ReasonCode, root.GetProperty("reason.code").GetProperty("value").ToString());
+    }
+
+    public static void HasReasonCode(JsonDocument document, string documentType, string expectedReasonCode)
+    {
+        if (document == null) throw new ArgumentNullException(nameof(document));
+        Assert.Equal(expectedReasonCode, document.RootElement.GetProperty(documentType).GetProperty("reason.code").GetProperty("value").ToString());
     }
 
     internal static void AssertHasHeaderValue(JsonDocument document, string documentType, string propertyName, string? expectedValue)

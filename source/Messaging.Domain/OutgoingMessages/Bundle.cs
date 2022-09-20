@@ -27,7 +27,7 @@ public class Bundle
     public Bundle(Instant timestamp)
     {
         _timestamp = timestamp;
-        _header = new MessageHeader(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, _timestamp, null);
+        _header = new MessageHeader(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, _timestamp);
     }
 
     public void Add(OutgoingMessage message)
@@ -86,7 +86,6 @@ public class Bundle
             message.ReceiverId,
             message.ReceiverRole,
             Guid.NewGuid().ToString(),
-            _timestamp,
-            message.ReasonCode);
+            _timestamp);
     }
 }

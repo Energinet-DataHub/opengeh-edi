@@ -34,8 +34,7 @@ public class DocumentFactoryTests
             "ReceiverId",
             "ReceiverRole",
             "MessageID",
-            SystemClock.Instance.GetCurrentInstant(),
-            null);
+            SystemClock.Instance.GetCurrentInstant());
         var message = new CimMessage(
             DocumentType.GenericNotification,
             header,

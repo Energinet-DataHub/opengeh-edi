@@ -49,8 +49,7 @@ public class MoveInNotifications
             MarketRoles.EnergySupplier,
             DataHubDetails.IdentificationNumber,
             MarketRoles.MeteringPointAdministrator,
-            _marketActivityRecordParser.From(marketActivityRecord),
-            null);
+            _marketActivityRecordParser.From(marketActivityRecord));
 
         _outgoingMessageStore.Add(message);
     }
