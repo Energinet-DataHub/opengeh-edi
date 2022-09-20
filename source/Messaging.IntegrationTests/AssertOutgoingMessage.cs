@@ -36,7 +36,7 @@ namespace Messaging.IntegrationTests
 
             var message = connectionFactory.GetOpenConnection().QuerySingle(
                 $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.OriginalMessageId, m.ProcessType," +
-                $"m.ReceiverRole, m.SenderId, m.SenderRole, m.ReasonCode, m.MarketActivityRecordPayload " +
+                $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MarketActivityRecordPayload " +
                 $" FROM [b2b].[OutgoingMessages] m" +
                 $" WHERE m.OriginalMessageId = '{transactionId}' AND m.DocumentType = '{documentType}' AND m.ProcessType = '{processType}'");
 
