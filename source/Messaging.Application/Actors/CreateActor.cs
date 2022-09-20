@@ -15,7 +15,7 @@
 using System.Text.Json.Serialization;
 using Messaging.Application.Configuration.Commands.Commands;
 
-namespace Messaging.Application.Actor;
+namespace Messaging.Application.Actors;
 
 public class CreateActor : InternalCommand
 {

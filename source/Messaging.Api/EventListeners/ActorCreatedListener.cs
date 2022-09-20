@@ -15,7 +15,7 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf;
-using Messaging.Application.Actor;
+using Messaging.Application.Actors;
 using Messaging.Infrastructure.Configuration.InternalCommands;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
