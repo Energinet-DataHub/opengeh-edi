@@ -16,7 +16,7 @@ using Messaging.Domain.OutgoingMessages;
 using NodaTime;
 using Xunit;
 
-namespace Messaging.Tests.Application.OutgoingMessages;
+namespace Messaging.Tests.Domain.OutgoingMessages;
 
 public class BundleTests
 {
