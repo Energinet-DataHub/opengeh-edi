@@ -18,8 +18,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using Messaging.Application.Common.Reasons;
 using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.OutgoingMessages.Common.Reasons;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 
 namespace Messaging.Infrastructure.Common.Reasons;

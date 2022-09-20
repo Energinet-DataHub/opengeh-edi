@@ -20,9 +20,9 @@ using System.Reflection;
 using System.Text;
 using MediatR;
 using Messaging.Api;
-using Messaging.Application.Common;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Configuration;
+using Messaging.Infrastructure.OutgoingMessages.Common.Xml;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -45,7 +45,7 @@ namespace Messaging.ArchitectureTests
         {
             var constructorDependencies = ReflectionHelper.FindAllConstructorDependenciesForType();
 
-            return ApplicationAssemblies.Application.GetTypes()
+            return ApplicationAssemblies.Infrastructure.GetTypes()
                 .Where(t => t.IsSubclassOf(typeof(DocumentWriter)))
                 .Select(t => new object[] { new Requirement(t.Name, constructorDependencies(t), t) });
         }
