@@ -20,7 +20,7 @@ namespace Messaging.Infrastructure.OutgoingMessages.Common.Json;
 
 internal static class JsonHeaderWriter
 {
-    internal static void Write(MessageHeader messageHeader, string documentType, string typeCode, JsonTextWriter writer)
+    internal static void Write(MessageHeader messageHeader, string documentType, string typeCode, string? reasonCode, JsonTextWriter writer)
     {
         if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
         if (documentType == null) throw new ArgumentNullException(nameof(documentType));

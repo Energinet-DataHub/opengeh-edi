@@ -62,7 +62,7 @@ public class RejectRequestChangeOfSupplierJsonDocumentWriter : IDocumentWriter
 
     private static void WriteHeader(MessageHeader header, JsonTextWriter writer)
     {
-        JsonHeaderWriter.Write(header, DocumentType, TypeCode, writer);
+        JsonHeaderWriter.Write(header, DocumentType, TypeCode, "A02", writer);
     }
 
     private static void WriteEnd(JsonTextWriter writer)
