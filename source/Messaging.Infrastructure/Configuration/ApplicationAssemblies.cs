@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Reflection;
-using Messaging.Application.Common.Commands;
+using Messaging.Application.Configuration.Commands.Commands;
 
 namespace Messaging.Infrastructure.Configuration;
 

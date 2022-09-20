@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.Application.Common;
+using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Infrastructure.Configuration.Serialization;
 
 namespace Messaging.Infrastructure.Common

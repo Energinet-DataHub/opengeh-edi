@@ -14,7 +14,7 @@
 
 using System;
 using System.Text.Json.Serialization;
-using Messaging.Application.Common.Commands;
+using Messaging.Application.Configuration.Commands.Commands;
 
 namespace Messaging.Infrastructure.OutgoingMessages.Requesting;
 

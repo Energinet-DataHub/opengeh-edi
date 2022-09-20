@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using System;
-using Messaging.Application.Common;
 using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages;
+using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.OutgoingMessages.GenericNotification;
 using Messaging.Domain.OutgoingMessages;
 using NodaTime;

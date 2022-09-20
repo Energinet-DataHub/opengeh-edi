@@ -15,7 +15,7 @@
 using System;
 using System.Collections.Generic;
 using MediatR;
-using Messaging.Application.Common.Commands;
+using Messaging.Application.Configuration.Commands.Commands;
 
 namespace Messaging.Application.OutgoingMessages.Requesting;
 
