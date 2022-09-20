@@ -14,7 +14,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.MasterData.MarketEvaluationPoints;
 using Messaging.Infrastructure.Configuration.InternalCommands;
 using Microsoft.Azure.Functions.Worker;

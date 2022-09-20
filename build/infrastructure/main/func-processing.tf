@@ -45,8 +45,6 @@ module "func_processing" {
     INTEGRATION_EVENT_RECEIVED_TOPIC_NAME                         = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sbt-sharedres-integrationevent-received-name)"
     MARKET_PARTICIPANT_CHANGED_ACTOR_CREATED_SUBSCRIPTION_NAME    = module.sbs_market_roles_actor_created.name
     METERING_POINT_CREATED_EVENT_SUBSCRIPTION_NAME                = module.sbs_metering_point_created_event.name
-    CONSUMER_MOVED_IN_EVENT_SUBSCRIPTION_NAME                     = module.sbs_consumer_moved_in.name
-    ENERGY_SUPPLIER_CHANGED_EVENT_SUBSCRIPTION_NAME               = module.sbs_energy_supplier_changed.name
   }
 
   tags                                      = azurerm_resource_group.this.tags
