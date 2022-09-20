@@ -22,7 +22,7 @@ namespace Messaging.Infrastructure.OutgoingMessages.Common.Xml;
 
 internal static class HeaderWriter
 {
-    internal static async Task WriteAsync(XmlWriter writer, MessageHeader messageHeader, DocumentDetails documentDetails)
+    internal static async Task WriteAsync(XmlWriter writer, MessageHeader messageHeader, DocumentDetails documentDetails, string? reasonCode)
     {
         if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
         if (writer == null) throw new ArgumentNullException(nameof(writer));
@@ -64,9 +64,9 @@ internal static class HeaderWriter
             .WriteElementStringAsync(documentDetails.Prefix, "receiver_MarketParticipant.marketRole.type", null, messageHeader.ReceiverRole)
             .ConfigureAwait(false);
         await writer.WriteElementStringAsync(documentDetails.Prefix, "createdDateTime", null, messageHeader.TimeStamp.ToString()).ConfigureAwait(false);
-        if (messageHeader.ReasonCode is not null)
+        if (reasonCode is not null)
         {
-            await writer.WriteElementStringAsync(documentDetails.Prefix, "reason.code", null, messageHeader.ReasonCode).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(documentDetails.Prefix, "reason.code", null, reasonCode).ConfigureAwait(false);
         }
     }
 }
