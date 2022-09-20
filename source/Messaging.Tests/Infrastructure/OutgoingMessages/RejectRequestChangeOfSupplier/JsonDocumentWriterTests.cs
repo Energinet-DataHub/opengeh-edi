@@ -52,7 +52,7 @@ public class JsonDocumentWriterTests
     [Fact]
     public async Task Document_is_valid()
     {
-        var header = new MessageHeader("E03", "SenderId", "DDZ", "ReceiverId", "DDQ", "messageID", _systemDateTimeProvider.Now(), "A01");
+        var header = new MessageHeader("E03", "SenderId", "DDZ", "ReceiverId", "DDQ", "messageID", _systemDateTimeProvider.Now());
         var marketActivityRecords = new List<MarketActivityRecord>()
         {
             new("mrid1", "OriginalTransactionId", "FakeMarketEvaluationPointId", new List<Reason>()

@@ -51,7 +51,7 @@ internal static class JsonHeaderWriter
         writer.WritePropertyName("reason.code");
         writer.WriteStartObject();
         writer.WritePropertyName("value");
-        writer.WriteValue(messageHeader.ReasonCode);
+        writer.WriteValue(reasonCode);
         writer.WriteEndObject();
 
         writer.WritePropertyName("receiver_MarketParticipant.mRID");

@@ -71,7 +71,11 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.Asserts
             AssertHasHeaderValue(document, "sender_MarketParticipant.marketRole.type", header.SenderRole);
             AssertHasHeaderValue(document, "receiver_MarketParticipant.mRID", header.ReceiverId);
             AssertHasHeaderValue(document, "receiver_MarketParticipant.marketRole.type", header.ReceiverRole);
-            AssertHasHeaderValue(document, "reason.code", header.ReasonCode);
+        }
+
+        internal static void HasReasonCode(XDocument document, string expectedReasonCode)
+        {
+            AssertHasHeaderValue(document, "reason.code", expectedReasonCode);
         }
 
         internal static async Task AssertConformsToSchemaAsync(Stream message, XmlSchema schema)

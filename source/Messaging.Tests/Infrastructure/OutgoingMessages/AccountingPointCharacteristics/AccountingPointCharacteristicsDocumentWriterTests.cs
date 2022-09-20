@@ -52,7 +52,7 @@ public class AccountingPointCharacteristicsDocumentWriterTests
     [Fact]
     public async Task Document_is_valid()
     {
-        var header = new MessageHeader("E03", "SenderId", "DDZ", "ReceiverId", "DDQ", Guid.NewGuid().ToString(), _systemDateTimeProvider.Now(), null);
+        var header = new MessageHeader("E03", "SenderId", "DDZ", "ReceiverId", "DDQ", Guid.NewGuid().ToString(), _systemDateTimeProvider.Now());
         var marketActivityRecord = _sampleData.CreateMarketActivityRecord();
         var marketActivityRecords = new List<MarketActivityRecord>()
         {
