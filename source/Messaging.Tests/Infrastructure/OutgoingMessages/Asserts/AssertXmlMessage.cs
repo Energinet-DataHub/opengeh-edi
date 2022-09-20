@@ -24,7 +24,7 @@ using Messaging.Application.Xml;
 using Messaging.Domain.OutgoingMessages;
 using Xunit;
 
-namespace Messaging.Tests.Application.OutgoingMessages.Asserts
+namespace Messaging.Tests.Infrastructure.OutgoingMessages.Asserts
 {
     internal static class AssertXmlMessage
     {

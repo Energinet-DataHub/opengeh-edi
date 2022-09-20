@@ -27,9 +27,10 @@ using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
+using Messaging.Tests.Application.OutgoingMessages;
 using Xunit;
 
-namespace Messaging.Tests.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
+namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
 {
     public class CharacteristicsOfACustomerAtAnApDocumentWriterTests
     {

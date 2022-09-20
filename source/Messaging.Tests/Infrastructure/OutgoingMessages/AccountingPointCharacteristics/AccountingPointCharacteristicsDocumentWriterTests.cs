@@ -20,7 +20,6 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
 using Messaging.Application.Configuration;
-using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.SchemaStore;
 using Messaging.Domain.OutgoingMessages;
@@ -28,11 +27,11 @@ using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
-using Messaging.Tests.Application.OutgoingMessages.Asserts;
+using Messaging.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
 using MarketActivityRecord = Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.MarketActivityRecord;
 
-namespace Messaging.Tests.Application.OutgoingMessages.AccountingPointCharacteristics;
+namespace Messaging.Tests.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
 
 public class AccountingPointCharacteristicsDocumentWriterTests
 {

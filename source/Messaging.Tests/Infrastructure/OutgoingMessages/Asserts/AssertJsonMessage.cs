@@ -18,7 +18,7 @@ using Json.Schema;
 using Messaging.Domain.OutgoingMessages;
 using Xunit;
 
-namespace Messaging.Tests.Application.OutgoingMessages.Asserts;
+namespace Messaging.Tests.Infrastructure.OutgoingMessages.Asserts;
 
 public static class AssertJsonMessage
 {

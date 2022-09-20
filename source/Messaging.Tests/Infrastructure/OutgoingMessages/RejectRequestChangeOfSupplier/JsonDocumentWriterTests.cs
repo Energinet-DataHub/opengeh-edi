@@ -28,10 +28,10 @@ using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
-using Messaging.Tests.Application.OutgoingMessages.Asserts;
+using Messaging.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
 
-namespace Messaging.Tests.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
+namespace Messaging.Tests.Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
 
 public class JsonDocumentWriterTests
 {
