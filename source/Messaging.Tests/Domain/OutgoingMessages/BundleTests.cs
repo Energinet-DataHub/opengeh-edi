@@ -79,7 +79,6 @@ public class BundleTests
             "ReceiverRole1",
             "SenderId",
             "SenderRole",
-            string.Empty,
-            "ReasonCode");
+            string.Empty);
     }
 }

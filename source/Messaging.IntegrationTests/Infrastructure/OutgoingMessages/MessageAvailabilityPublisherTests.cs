@@ -68,8 +68,7 @@ namespace Messaging.IntegrationTests.Infrastructure.OutgoingMessages
                 transaction.Message.ReceiverRole,
                 transaction.Message.SenderId,
                 transaction.Message.SenderRole,
-                string.Empty,
-                "FakeCode");
+                string.Empty);
         }
 
         private async Task StoreOutgoingMessage(OutgoingMessage outgoingMessage)

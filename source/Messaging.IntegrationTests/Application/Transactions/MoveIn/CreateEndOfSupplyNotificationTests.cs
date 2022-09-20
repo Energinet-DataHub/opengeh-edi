@@ -62,7 +62,6 @@ public class CreateEndOfSupplyNotificationTests : TestBase
             .HasReceiverRole(MarketRoles.EnergySupplier)
             .HasSenderId(DataHubDetails.IdentificationNumber)
             .HasSenderRole(MarketRoles.MeteringPointAdministrator)
-            .HasReasonCode(null)
             .WithMarketActivityRecord()
                 .HasId()
                 .HasValidityStart(transaction.EffectiveDate.ToDateTimeUtc())

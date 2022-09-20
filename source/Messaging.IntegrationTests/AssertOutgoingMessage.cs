@@ -68,12 +68,6 @@ namespace Messaging.IntegrationTests
             return this;
         }
 
-        public AssertOutgoingMessage HasReasonCode(string? reasonCode)
-        {
-            Assert.Equal(reasonCode, _message.ReasonCode);
-            return this;
-        }
-
         public AssertMarketActivityRecord WithMarketActivityRecord()
         {
             return new AssertMarketActivityRecord(_message.MarketActivityRecordPayload);
