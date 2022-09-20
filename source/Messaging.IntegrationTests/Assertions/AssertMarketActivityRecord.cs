@@ -17,7 +17,7 @@ using Newtonsoft.Json.Linq;
 using NodaTime;
 using Xunit;
 
-namespace Messaging.IntegrationTests;
+namespace Messaging.IntegrationTests.Assertions;
 
 public class AssertMarketActivityRecord
 {
