@@ -18,7 +18,7 @@ using System.Linq;
 using System.Xml.Linq;
 using Xunit;
 
-namespace Messaging.IntegrationTests
+namespace Messaging.IntegrationTests.Assertions
 {
     internal static class AssertXmlMessage
     {

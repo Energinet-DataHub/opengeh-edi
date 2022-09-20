@@ -75,6 +75,18 @@ namespace Messaging.Api
         public string? ENERGY_SUPPLYING_SERVICE_BUS_SEND_CONNECTION_STRING =>
             GetEnvironmentVariable(nameof(ENERGY_SUPPLYING_SERVICE_BUS_SEND_CONNECTION_STRING));
 
+        public string? SERVICE_BUS_CONNECTION_STRING_MANAGE_FOR_INTEGRATION_EVENTS =>
+            GetEnvironmentVariable(nameof(SERVICE_BUS_CONNECTION_STRING_MANAGE_FOR_INTEGRATION_EVENTS));
+
+        public string? INTEGRATION_EVENT_TOPIC_NAME =>
+            GetEnvironmentVariable(nameof(INTEGRATION_EVENT_TOPIC_NAME));
+
+        public string? CONSUMER_MOVED_IN_EVENT_SUBSCRIPTION_NAME =>
+            GetEnvironmentVariable(nameof(CONSUMER_MOVED_IN_EVENT_SUBSCRIPTION_NAME));
+
+        public string? ENERGY_SUPPLIER_CHANGED_EVENT_SUBSCRIPTION_NAME =>
+            GetEnvironmentVariable(nameof(ENERGY_SUPPLIER_CHANGED_EVENT_SUBSCRIPTION_NAME));
+
         public virtual bool IsRunningLocally()
         {
             return AZURE_FUNCTIONS_ENVIRONMENT == "Development";

@@ -14,7 +14,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.MasterData.MarketEvaluationPoints;
 using Messaging.Infrastructure.Configuration.InternalCommands;
 using Microsoft.Azure.Functions.Worker;
@@ -35,7 +34,7 @@ public class EnergySupplierChangedListener
 
     [Function("EnergySupplierChangedListener")]
     public async Task RunAsync(
-        [ServiceBusTrigger("%ENERGY_SUPPLIER_CHANGED_TOPIC%", "%ENERGY_SUPPLIER_CHANGED_SUBSCRIPTION%", Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS_LISTENER")] byte[] data,
+        [ServiceBusTrigger("%INTEGRATION_EVENT_TOPIC_NAME%", "%ENERGY_SUPPLIER_CHANGED_EVENT_SUBSCRIPTION_NAME%", Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS_LISTENER")] byte[] data,
         FunctionContext context)
     {
         if (data == null) throw new ArgumentNullException(nameof(data));

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
@@ -35,9 +36,26 @@ public static class HealthCheckRegistration
         {
             services.AddHealthChecks()
                 .AddAzureServiceBusQueue(
-                    name: name + "Exists",
+                    name: name + "Exists" + Guid.NewGuid(),
                     connectionString: serviceBusConnectionString,
                     queueName: name);
+        }
+    }
+
+    public static void AddExternalServiceBusSubscriptionsHealthCheck(
+        this IServiceCollection services,
+        string serviceBusConnectionString,
+        [NotNull] string topicName,
+        [NotNull] params string[] subscriptionNames)
+    {
+        foreach (var name in subscriptionNames)
+        {
+            services.AddHealthChecks()
+                .AddAzureServiceBusSubscription(
+                    name: name + "Exists" + Guid.NewGuid(),
+                    connectionString: serviceBusConnectionString,
+                    topicName: topicName,
+                    subscriptionName: name);
         }
     }
 
