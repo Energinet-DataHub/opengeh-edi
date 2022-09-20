@@ -42,7 +42,7 @@ module "func_processing" {
     MARKET_ROLES_SERVICE_BUS_LISTEN_CONNECTION_STRING             = module.sb_marketroles.primary_connection_strings["listen"]
     MARKET_ROLES_SERVICE_BUS_SENDER_CONNECTION_STRING             = module.sb_marketroles.primary_connection_strings["send"]
     MARKET_ROLES_SERVICE_BUS_MANAGE_CONNECTION_STRING             = module.sb_marketroles.primary_connection_strings["manage"]
-    MARKET_PARTICIPANT_CHANGED_TOPIC_NAME                         = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sbt-sharedres-integrationevent-received-name)"
+    INTEGRATION_EVENT_RECEIVED_TOPIC_NAME                         = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sbt-sharedres-integrationevent-received-name)"
     MARKET_PARTICIPANT_CHANGED_ACTOR_CREATED_SUBSCRIPTION_NAME    = module.sbs_market_roles_actor_created.name
   }
 
