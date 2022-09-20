@@ -17,6 +17,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Messaging.Infrastructure.Configuration.DataAccess;
+using Microsoft.EntityFrameworkCore;
 
 namespace Messaging.Infrastructure.Configuration.InternalCommands
 {
@@ -29,11 +30,15 @@ namespace Messaging.Infrastructure.Configuration.InternalCommands
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public Task<ImmutableList<QueuedInternalCommand>> GetPendingAsync()
+        public async Task<ImmutableList<QueuedInternalCommand>> GetPendingAsync()
         {
-            return Task.FromResult(_context.QueuedInternalCommands
-                .Where(queuedCommand => queuedCommand.ProcessedDate == null)
-                .ToImmutableList());
+            var commands = await _context
+                .QueuedInternalCommands
+                .Where(cmd => cmd.ProcessedDate == null)
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            return ImmutableList<QueuedInternalCommand>.Empty.AddRange(commands);
         }
     }
 }
