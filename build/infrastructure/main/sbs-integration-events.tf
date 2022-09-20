@@ -23,3 +23,29 @@ module "sbs_metering_point_created_event" {
     }  
   }
 }
+
+module "sbs_consumer_moved_in" {
+  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/service-bus-topic-subscription?ref=v9"
+  name                = "consumer-moved-in"
+  topic_id            = data.azurerm_key_vault_secret.sbt_domainrelay_integrationevent_received_name_id.value
+  project_name        = var.domain_name_short
+  max_delivery_count  = 10 
+  correlation_filter  = {
+    properties     = {
+      "MessageType" = "ConsumerMovedIn",
+    }  
+  }
+}
+
+module "sbs_energy_supplier_changed" {
+  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/service-bus-topic-subscription?ref=v9"
+  name                = "energy-supplier-changed"
+  topic_id            = data.azurerm_key_vault_secret.sbt_domainrelay_integrationevent_received_name_id.value
+  project_name        = var.domain_name_short
+  max_delivery_count  = 10 
+  correlation_filter  = {
+    properties     = {
+      "MessageType" = "EnergySupplierChanged",
+    }  
+  }
+}

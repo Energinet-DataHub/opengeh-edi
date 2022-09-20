@@ -35,7 +35,7 @@ public class ConsumerMovedInListener
 
     [Function("ConsumerMovedInListener")]
     public async Task RunAsync(
-        [ServiceBusTrigger("consumer-moved-in", "consumer-moved-in", Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS_LISTENER")] byte[] data,
+        [ServiceBusTrigger("INTEGRATION_EVENT_RECEIVED_TOPIC_NAME", "%CONSUMER_MOVED_IN_EVENT_SUBSCRIPTION_NAME%", Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS_LISTENER")] byte[] data,
         FunctionContext context)
     {
         if (data == null) throw new ArgumentNullException(nameof(data));
