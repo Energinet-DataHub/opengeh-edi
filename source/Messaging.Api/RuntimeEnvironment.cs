@@ -78,8 +78,8 @@ namespace Messaging.Api
         public string? SERVICE_BUS_CONNECTION_STRING_MANAGE_FOR_INTEGRATION_EVENTS =>
             GetEnvironmentVariable(nameof(SERVICE_BUS_CONNECTION_STRING_MANAGE_FOR_INTEGRATION_EVENTS));
 
-        public string? INTEGRATION_EVENT_RECEIVED_TOPIC_NAME =>
-            GetEnvironmentVariable(nameof(INTEGRATION_EVENT_RECEIVED_TOPIC_NAME));
+        public string? INTEGRATION_EVENT_TOPIC_NAME =>
+            GetEnvironmentVariable(nameof(INTEGRATION_EVENT_TOPIC_NAME));
 
         public string? CONSUMER_MOVED_IN_EVENT_SUBSCRIPTION_NAME =>
             GetEnvironmentVariable(nameof(CONSUMER_MOVED_IN_EVENT_SUBSCRIPTION_NAME));

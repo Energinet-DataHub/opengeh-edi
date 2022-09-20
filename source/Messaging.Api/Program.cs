@@ -144,7 +144,7 @@ namespace Messaging.Api
                         runtime.CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME!);
                     services.AddExternalServiceBusSubscriptionsHealthCheck(
                         runtime.SERVICE_BUS_CONNECTION_STRING_MANAGE_FOR_INTEGRATION_EVENTS!,
-                        runtime.INTEGRATION_EVENT_RECEIVED_TOPIC_NAME!,
+                        runtime.INTEGRATION_EVENT_TOPIC_NAME!,
                         runtime.CONSUMER_MOVED_IN_EVENT_SUBSCRIPTION_NAME!,
                         runtime.ENERGY_SUPPLIER_CHANGED_EVENT_SUBSCRIPTION_NAME!);
                     services.AddSqlServerHealthCheck(runtime.DB_CONNECTION_STRING!);

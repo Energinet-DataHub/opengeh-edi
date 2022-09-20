@@ -61,7 +61,7 @@ module "func_receiver" {
     SHARED_SERVICE_BUS_SEND_CONNECTION_STRING                     = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-send-connection-string)"
     CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME                      = "customermasterdataresponsequeue"
     CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME                       = "customermasterdatarequestqueue"
-    INTEGRATION_EVENT_RECEIVED_TOPIC_NAME                         = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sbt-sharedres-integrationevent-received-name)"
+    INTEGRATION_EVENT_TOPIC_NAME                                  = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sbt-sharedres-integrationevent-received-name)"
     CONSUMER_MOVED_IN_EVENT_SUBSCRIPTION_NAME                     = module.sbs_consumer_moved_in.name
     ENERGY_SUPPLIER_CHANGED_EVENT_SUBSCRIPTION_NAME               = module.sbs_energy_supplier_changed.name
   }
