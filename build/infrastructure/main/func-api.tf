@@ -52,7 +52,8 @@ module "func_receiver" {
     MESSAGEHUB_STORAGE_CONNECTION_STRING                          = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=st-marketres-primary-connection-string)",
     MESSAGE_REQUEST_QUEUE                                         = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sbq-marketroles-name)",
     MOVE_IN_REQUEST_ENDPOINT                                      = "https://func-processing-${lower(var.domain_name_short)}-${lower(var.environment_short)}-${lower(var.environment_instance)}.azurewebsites.net/api/MoveIn"
-    SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS_LISTENER = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-listen-connection-string)",
+    SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS_LISTENER = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-listen-connection-string)"
+    SERVICE_BUS_CONNECTION_STRING_MANAGE_FOR_INTEGRATION_EVENTS   = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-manage-connection-string)"
     METERING_POINT_MASTER_DATA_RESPONSE_QUEUE_NAME                = data.azurerm_key_vault_secret.sbq_metering_point_master_data_response_name.value,
     ENERGY_SUPPLIER_CHANGED_TOPIC                                 = data.azurerm_key_vault_secret.sbt_energy_supplier_changed_name.value,
     ENERGY_SUPPLIER_CHANGED_SUBSCRIPTION                          = data.azurerm_key_vault_secret.sbs_energy_supplier_changed_to_messaging_name.value
@@ -60,6 +61,9 @@ module "func_receiver" {
     SHARED_SERVICE_BUS_SEND_CONNECTION_STRING                     = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-send-connection-string)"
     CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME                      = "customermasterdataresponsequeue"
     CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME                       = "customermasterdatarequestqueue"
+    INTEGRATION_EVENT_TOPIC_NAME                                  = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sbt-sharedres-integrationevent-received-name)"
+    CONSUMER_MOVED_IN_EVENT_SUBSCRIPTION_NAME                     = module.sbs_consumer_moved_in.name
+    ENERGY_SUPPLIER_CHANGED_EVENT_SUBSCRIPTION_NAME               = module.sbs_energy_supplier_changed.name
   }
 
   tags = azurerm_resource_group.this.tags
