@@ -39,6 +39,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202210091043 Remove correlation id.sql" />
     <EmbeddedResource Include="Scripts\Model\202211081048 Add business process state columns.sql" />
     <EmbeddedResource Include="Scripts\Model\202212081032 Add end of supply notification state.sql" />
+    <EmbeddedResource Include="Scripts\Model\202225081326 Create index on QueuedInternalCommands.sql" />
     <EmbeddedResource Include="Scripts\Model\202225081325 Refactor columns.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281100 Seed cleanup.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281101 Insert Reasons.sql" />
