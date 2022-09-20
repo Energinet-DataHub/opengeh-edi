@@ -31,7 +31,7 @@ using Messaging.Infrastructure.OutgoingMessages.GenericNotification;
 using Messaging.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
 
-namespace Messaging.Tests.Infrastructure.OutgoingMessages
+namespace Messaging.Tests.Infrastructure.OutgoingMessages.GenericNotification
 {
     public class GenericNotificationDocumentWriterTests
     {
