@@ -25,7 +25,7 @@ using System.Xml.XPath;
 using Messaging.Application.Xml;
 using Xunit;
 
-namespace Messaging.Tests.Application.OutgoingMessages;
+namespace Messaging.Tests.Infrastructure.OutgoingMessages.Asserts;
 
 public class AssertXmlDocument
 {

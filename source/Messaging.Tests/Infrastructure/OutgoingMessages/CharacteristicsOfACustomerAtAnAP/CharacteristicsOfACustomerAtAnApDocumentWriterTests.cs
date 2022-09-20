@@ -28,6 +28,7 @@ using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Tests.Application.OutgoingMessages;
+using Messaging.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
 
 namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
