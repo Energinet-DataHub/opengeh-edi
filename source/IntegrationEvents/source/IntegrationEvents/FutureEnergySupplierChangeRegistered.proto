@@ -27,4 +27,5 @@ message FutureEnergySupplierChangeRegistered {
   string gsrn_number = 2; // Unique metering point identification
   string energy_supplier_gln = 3; // Unique Energy Supplier identifcation.
   google.protobuf.Timestamp effective_date = 4; // Date which the change of supplier goes into effect.
+  string id = 5;
 }
