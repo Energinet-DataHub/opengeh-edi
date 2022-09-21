@@ -30,7 +30,7 @@ limitations under the License.
 
 	<PropertyGroup>
 		<PackageId>Energinet.DataHub.EnergySupplying.IntegrationEvents</PackageId>
-		<PackageVersion>1.0.1$(VersionSuffix)</PackageVersion>
+		<PackageVersion>1.0.2</PackageVersion>
 		<Title>EnergySupplying IntegrationEvents library</Title>
 		<Company>Energinet-DataHub</Company>
 		<Authors>Energinet-DataHub</Authors>
