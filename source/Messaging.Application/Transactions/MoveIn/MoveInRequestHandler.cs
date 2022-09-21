@@ -126,7 +126,7 @@ namespace Messaging.Application.Transactions.MoveIn
             return consumerType;
         }
 
-        private static OutgoingMessage CreateOutgoingMessage(string id, DocumentType documentType, string processType, string receiverId, string marketActivityRecordPayload, string reasonCode)
+        private static OutgoingMessage CreateOutgoingMessage(string id, DocumentType documentType, string processType, string receiverId, string marketActivityRecordPayload)
         {
             return new OutgoingMessage(
                 documentType,
@@ -136,8 +136,7 @@ namespace Messaging.Application.Transactions.MoveIn
                 MarketRoles.EnergySupplier,
                 DataHubDetails.IdentificationNumber,
                 MarketRoles.MeteringPointAdministrator,
-                marketActivityRecordPayload,
-                reasonCode);
+                marketActivityRecordPayload);
         }
 
         private async Task<Unit> RejectInvalidRequestMessageAsync(MoveInTransaction transaction, RequestChangeOfSupplierTransaction request, string error)
@@ -174,8 +173,7 @@ namespace Messaging.Application.Transactions.MoveIn
                 DocumentType.ConfirmRequestChangeOfSupplier,
                 ProcessType.MoveIn.Code,
                 requestChangeOfSupplierTransaction.Message.SenderId,
-                _marketActivityRecordParser.From(marketActivityRecord),
-                ProcessType.MoveIn.Confirm.BusinessReasonCode);
+                _marketActivityRecordParser.From(marketActivityRecord));
         }
 
         private OutgoingMessage RejectMessageFrom(IReadOnlyCollection<Reason> reasons, MoveInTransaction transaction, RequestChangeOfSupplierTransaction requestChangeOfSupplierTransaction)
@@ -191,8 +189,7 @@ namespace Messaging.Application.Transactions.MoveIn
                 DocumentType.RejectRequestChangeOfSupplier,
                 ProcessType.MoveIn.Code,
                 requestChangeOfSupplierTransaction.Message.SenderId,
-                _marketActivityRecordParser.From(marketActivityRecord),
-                ProcessType.MoveIn.Reject.BusinessReasonCode);
+                _marketActivityRecordParser.From(marketActivityRecord));
         }
 
         private Task<ReadOnlyCollection<Reason>> CreateReasonsFromAsync(IReadOnlyCollection<string> validationErrors)

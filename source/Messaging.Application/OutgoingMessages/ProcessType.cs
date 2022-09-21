@@ -12,36 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Linq;
 using Messaging.Domain.SeedWork;
 
 namespace Messaging.Application.OutgoingMessages;
 
 public sealed class ProcessType : EnumerationType
 {
-    public static readonly ProcessType MoveIn = new(0, nameof(MoveIn), "E65", new ProcessDetails("A01", "ConfirmRequestChangeOfSupplier"), new ProcessDetails("A02", "RejectRequestChangeOfSupplier"));
-    public static readonly ProcessType Unknown = new(999, nameof(MoveIn), "Unknown", new ProcessDetails("Unknown", "Unknown"), new ProcessDetails("Unknown", "Unknown"));
+    public static readonly ProcessType MoveIn = new(0, nameof(MoveIn), "E65");
 
-    private ProcessType(int id, string name, string code, ProcessDetails confirm, ProcessDetails reject)
+    private ProcessType(int id, string name, string code)
      : base(id, name)
     {
-        Confirm = confirm;
-        Reject = reject;
         Code = code;
     }
 
     public string Code { get; }
-
-    public ProcessDetails Reject { get; }
-
-    public ProcessDetails Confirm { get; }
-
-    public static ProcessType FromCode(string code)
-    {
-        var processType = GetAll<ProcessType>().FirstOrDefault(p => p.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
-        return processType ?? Unknown;
-    }
 }
-
-public record ProcessDetails(string BusinessReasonCode, string DocumentType);

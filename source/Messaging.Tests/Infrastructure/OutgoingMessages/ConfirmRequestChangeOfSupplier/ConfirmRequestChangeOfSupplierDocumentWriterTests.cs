@@ -50,7 +50,7 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.ConfirmRequestChangeOf
         [Fact]
         public async Task Document_is_valid()
         {
-            var header = new MessageHeader("E03", "SenderId", "DDZ", "ReceiverId", "DDQ", Guid.NewGuid().ToString(), _systemDateTimeProvider.Now(), "A01");
+            var header = new MessageHeader("E03", "SenderId", "DDZ", "ReceiverId", "DDQ", Guid.NewGuid().ToString(), _systemDateTimeProvider.Now());
             var marketActivityRecords = new List<MarketActivityRecord>()
             {
                 new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId"),
@@ -79,6 +79,7 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.ConfirmRequestChangeOf
         {
             var document = XDocument.Load(message);
             AssertXmlMessage.AssertHeader(header, document);
+            AssertXmlMessage.HasReasonCode(document, "A01");
             AssertXmlMessage.AssertHasHeaderValue(document, "type", "414");
 
             AssertMarketActivityRecords(marketActivityRecords, document);

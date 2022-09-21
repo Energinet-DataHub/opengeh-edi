@@ -23,6 +23,5 @@ namespace Messaging.Domain.OutgoingMessages
         string ReceiverId,
         string ReceiverRole,
         string MessageId,
-        Instant TimeStamp,
-        string? ReasonCode = null);
+        Instant TimeStamp);
 }
