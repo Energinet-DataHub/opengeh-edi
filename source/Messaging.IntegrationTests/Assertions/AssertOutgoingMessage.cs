@@ -17,7 +17,7 @@ using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Xunit;
 
-namespace Messaging.IntegrationTests
+namespace Messaging.IntegrationTests.Assertions
 {
     public class AssertOutgoingMessage
     {
@@ -36,7 +36,7 @@ namespace Messaging.IntegrationTests
 
             var message = connectionFactory.GetOpenConnection().QuerySingle(
                 $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.OriginalMessageId, m.ProcessType," +
-                $"m.ReceiverRole, m.SenderId, m.SenderRole, m.ReasonCode, m.MarketActivityRecordPayload " +
+                $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MarketActivityRecordPayload " +
                 $" FROM [b2b].[OutgoingMessages] m" +
                 $" WHERE m.OriginalMessageId = '{transactionId}' AND m.DocumentType = '{documentType}' AND m.ProcessType = '{processType}'");
 
@@ -65,12 +65,6 @@ namespace Messaging.IntegrationTests
         public AssertOutgoingMessage HasSenderRole(string senderRole)
         {
             Assert.Equal(senderRole, _message.SenderRole);
-            return this;
-        }
-
-        public AssertOutgoingMessage HasReasonCode(string? reasonCode)
-        {
-            Assert.Equal(reasonCode, _message.ReasonCode);
             return this;
         }
 

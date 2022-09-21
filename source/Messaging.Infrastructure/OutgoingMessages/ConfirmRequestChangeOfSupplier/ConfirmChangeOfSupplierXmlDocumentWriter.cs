@@ -33,7 +33,8 @@ public class ConfirmChangeOfSupplierXmlDocumentWriter : DocumentWriter
             "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1",
             "cim",
             "414"),
-        parser)
+        parser,
+        "A01")
     {
     }
 

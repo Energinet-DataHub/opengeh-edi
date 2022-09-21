@@ -17,7 +17,7 @@ using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Xunit;
 
-namespace Messaging.IntegrationTests;
+namespace Messaging.IntegrationTests.Assertions;
 
 public class AssertQueuedCommand
 {

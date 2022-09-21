@@ -32,7 +32,6 @@ namespace Messaging.Infrastructure.Configuration.DataAccess.Outgoing
                 .HasConversion(
                     toDbValue => toDbValue.Name,
                     fromDbValue => EnumerationType.FromName<DocumentType>(fromDbValue));
-            builder.Property(x => x.ReasonCode);
             builder.Property(x => x.IsPublished);
             builder.Property(x => x.ReceiverId);
             builder.Property(x => x.ReceiverRole);

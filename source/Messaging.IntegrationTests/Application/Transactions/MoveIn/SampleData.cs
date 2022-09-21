@@ -16,6 +16,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
+using Messaging.IntegrationTests.Factories;
 using NodaTime;
 using NodaTime.Extensions;
 

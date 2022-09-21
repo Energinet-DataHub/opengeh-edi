@@ -14,7 +14,7 @@
 
 using NodaTime;
 
-namespace Messaging.IntegrationTests;
+namespace Messaging.IntegrationTests.Factories;
 
 internal static class EffectiveDateFactory
 {

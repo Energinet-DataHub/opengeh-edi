@@ -22,6 +22,7 @@ using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
+using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 
@@ -62,7 +63,6 @@ public class CreateEndOfSupplyNotificationTests : TestBase
             .HasReceiverRole(MarketRoles.EnergySupplier)
             .HasSenderId(DataHubDetails.IdentificationNumber)
             .HasSenderRole(MarketRoles.MeteringPointAdministrator)
-            .HasReasonCode(null)
             .WithMarketActivityRecord()
                 .HasId()
                 .HasValidityStart(transaction.EffectiveDate.ToDateTimeUtc())

@@ -66,8 +66,7 @@ public class ForwardCustomerMasterDataHandler : IRequestHandler<ForwardCustomerM
             MarketRoles.EnergySupplier,
             DataHubDetails.IdentificationNumber,
             MarketRoles.MeteringPointAdministrator,
-            marketActivityRecordPayload,
-            null);
+            marketActivityRecordPayload);
     }
 
     private static MarketEvaluationPoint CreateMarketEvaluationPoint(CustomerMasterDataContent masterData, MoveInTransaction transaction)

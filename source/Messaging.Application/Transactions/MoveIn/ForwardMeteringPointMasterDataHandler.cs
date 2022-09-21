@@ -131,8 +131,7 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
             MarketRoles.EnergySupplier,
             DataHubDetails.IdentificationNumber,
             MarketRoles.MeteringPointAdministrator,
-            marketActivityRecordPayload,
-            null);
+            marketActivityRecordPayload);
     }
 
     private OutgoingMessage AccountingPointCharacteristicsMessageFrom(MasterDataContent masterData, MoveInTransaction transaction)

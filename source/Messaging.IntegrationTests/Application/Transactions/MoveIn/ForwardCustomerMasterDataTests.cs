@@ -22,6 +22,7 @@ using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.IntegrationTests.Application.IncomingMessages;
+using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 using MarketActivityRecord = Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp.MarketActivityRecord;
@@ -110,7 +111,7 @@ public class ForwardCustomerMasterDataTests : TestBase
 
     private AssertOutgoingMessage AssertOutgoingMessage()
     {
-        var assertMessage = IntegrationTests.AssertOutgoingMessage.OutgoingMessage(
+        var assertMessage = Assertions.AssertOutgoingMessage.OutgoingMessage(
             SampleData.OriginalMessageId,
             DocumentType.CharacteristicsOfACustomerAtAnAP.Name,
             ProcessType.MoveIn.Code,

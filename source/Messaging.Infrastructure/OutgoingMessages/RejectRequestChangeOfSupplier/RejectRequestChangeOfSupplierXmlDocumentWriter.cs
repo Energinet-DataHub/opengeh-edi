@@ -33,7 +33,8 @@ public class RejectRequestChangeOfSupplierXmlDocumentWriter : DocumentWriter
                 "urn:ediel.org:structure:rejectrequestchangeofsupplier:0:1",
                 "cim",
                 "414"),
-            parser)
+            parser,
+            "A02")
     {
     }
 
