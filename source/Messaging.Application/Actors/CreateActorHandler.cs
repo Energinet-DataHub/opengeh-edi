@@ -20,7 +20,7 @@ using Messaging.Infrastructure.Actors;
 
 namespace Messaging.Application.Actors;
 
-public class CreateActorHandler : IRequestHandler<CreateActor>
+public class CreateActorHandler : IRequestHandler<CreateActor, Unit>
 {
     private readonly IActorRegistry _actorRegistry;
 

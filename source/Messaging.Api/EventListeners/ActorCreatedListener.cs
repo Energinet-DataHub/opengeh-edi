@@ -34,7 +34,7 @@ public class ActorCreatedListener
     }
 
     [Function("ActorCreatedListener")]
-    public async Task RunAsync([ServiceBusTrigger("mytopic", "mysubscription", Connection = "")] byte[] data, FunctionContext context)
+    public async Task RunAsync([ServiceBusTrigger("%INTEGRATION_EVENT_TOPIC_NAME%", "%MARKET_PARTICIPANT_CHANGED_ACTOR_CREATED_SUBSCRIPTION_NAME%", Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS_LISTENER")] byte[] data, FunctionContext context)
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
         var integrationEvent = ActorCreatedIntegrationEventContract.Parser.ParseFrom(data);
