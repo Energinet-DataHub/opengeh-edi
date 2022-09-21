@@ -146,7 +146,8 @@ namespace Messaging.Api
                         runtime.SERVICE_BUS_CONNECTION_STRING_MANAGE_FOR_INTEGRATION_EVENTS!,
                         runtime.INTEGRATION_EVENT_TOPIC_NAME!,
                         runtime.CONSUMER_MOVED_IN_EVENT_SUBSCRIPTION_NAME!,
-                        runtime.ENERGY_SUPPLIER_CHANGED_EVENT_SUBSCRIPTION_NAME!);
+                        runtime.ENERGY_SUPPLIER_CHANGED_EVENT_SUBSCRIPTION_NAME!,
+                        runtime.MARKET_PARTICIPANT_CHANGED_ACTOR_CREATED_SUBSCRIPTION_NAME!);
                     services.AddSqlServerHealthCheck(runtime.DB_CONNECTION_STRING!);
                 })
                 .Build();
