@@ -25,6 +25,7 @@ using Energinet.DataHub.MessageHub.Client.Storage;
 using Energinet.DataHub.MessageHub.Model.Peek;
 using MediatR;
 using MediatR.Registration;
+using Messaging.Application.Actors;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.Configuration.Commands;
@@ -50,6 +51,7 @@ using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Domain.Transactions.MoveIn.Events;
+using Messaging.Infrastructure.Actors;
 using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Common.Reasons;
 using Messaging.Infrastructure.Configuration.Authentication;
@@ -103,6 +105,7 @@ namespace Messaging.Infrastructure.Configuration
             AddInternalCommandsProcessing();
             AddMessageGenerationServices();
             AddMasterDataServices();
+            AddActorServices();
             AddProcessing();
         }
 
@@ -297,6 +300,12 @@ namespace Messaging.Infrastructure.Configuration
         {
             _services.AddScoped<IMarketEvaluationPointRepository, MarketEvaluationPointRepository>();
             _services.AddTransient<IRequestHandler<SetEnergySupplier, Unit>, SetEnergySupplierHandler>();
+        }
+
+        private void AddActorServices()
+        {
+            _services.AddTransient<IRequestHandler<CreateActor, Unit>, CreateActorHandler>();
+            _services.AddTransient<IActorRegistry, ActorRegistry>();
         }
 
         private void AddProcessing()

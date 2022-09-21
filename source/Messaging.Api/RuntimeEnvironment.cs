@@ -87,6 +87,9 @@ namespace Messaging.Api
         public string? ENERGY_SUPPLIER_CHANGED_EVENT_SUBSCRIPTION_NAME =>
             GetEnvironmentVariable(nameof(ENERGY_SUPPLIER_CHANGED_EVENT_SUBSCRIPTION_NAME));
 
+        public string? MARKET_PARTICIPANT_CHANGED_ACTOR_CREATED_SUBSCRIPTION_NAME =>
+            GetEnvironmentVariable(nameof(MARKET_PARTICIPANT_CHANGED_ACTOR_CREATED_SUBSCRIPTION_NAME));
+
         public virtual bool IsRunningLocally()
         {
             return AZURE_FUNCTIONS_ENVIRONMENT == "Development";
