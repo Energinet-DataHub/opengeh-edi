@@ -26,6 +26,7 @@ limitations under the License.
         <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="2.3.3" />
         <PackageReference Include="Energinet.DataHub.Core.Logging" Version="2.2.0" />
         <PackageReference Include="Energinet.DataHub.MarketParticipant.Integration.Model" Version="2.6.0" />
+        <PackageReference Include="Energinet.DataHub.MeteringPoints.IntegrationEvents" Version="1.0.3" />
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Abstractions" Version="1.1.0" />
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.0.13" />
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.ServiceBus" Version="4.2.1" />

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MeteringPoints.IntegrationEvents.Contracts;
 using Messaging.Infrastructure.Configuration.InternalCommands;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
@@ -36,6 +37,9 @@ public class MeteringPointCreatedListener
         FunctionContext context)
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
+        if (data == null) throw new ArgumentNullException(nameof(data));
         _logger.LogInformation($"Received MeteringPointCreated integration event in B2B");
+
+        var meteringPointCreated = MeteringPointCreated.Parser.ParseFrom(data);
     }
 }
