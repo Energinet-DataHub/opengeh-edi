@@ -42,7 +42,6 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202225081326 Create index on QueuedInternalCommands.sql" />
     <EmbeddedResource Include="Scripts\Model\202225081325 Refactor columns.sql" />
     <EmbeddedResource Include="Scripts\Model\202225081509 Remove reasoncode column.sql" />
-    <EmbeddedResource Include="Scripts\Model\202225081510 Drop actors table.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281100 Seed cleanup.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281101 Insert Reasons.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241100 Consolidated dbo model.sql" />
