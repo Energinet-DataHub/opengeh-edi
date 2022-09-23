@@ -24,6 +24,7 @@ using Messaging.Api.Configuration.Middleware.Authentication.Bearer;
 using Messaging.Api.Configuration.Middleware.Authentication.MarketActors;
 using Messaging.Api.Configuration.Middleware.Correlation;
 using Messaging.Application.Configuration;
+using Messaging.Application.OutgoingMessages;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.MessageBus;
 using Messaging.Infrastructure.Configuration.SystemTime;

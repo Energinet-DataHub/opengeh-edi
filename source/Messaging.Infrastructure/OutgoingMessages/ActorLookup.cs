@@ -16,6 +16,7 @@ using System;
 using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.OutgoingMessages;
 
 namespace Messaging.Infrastructure.OutgoingMessages;
 

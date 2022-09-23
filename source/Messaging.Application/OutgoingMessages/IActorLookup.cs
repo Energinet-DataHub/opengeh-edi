@@ -15,7 +15,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Messaging.Infrastructure.OutgoingMessages;
+namespace Messaging.Application.OutgoingMessages;
 
 /// <summary>
 /// Service for looking up actor details
