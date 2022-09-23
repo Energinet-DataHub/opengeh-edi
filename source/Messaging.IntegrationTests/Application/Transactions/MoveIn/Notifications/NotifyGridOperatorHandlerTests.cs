@@ -34,17 +34,16 @@ using Xunit;
 namespace Messaging.IntegrationTests.Application.Transactions.MoveIn.Notifications;
 
 public class NotifyGridOperatorHandlerTests
-    : TestBase
+    : TestBase, IAsyncLifetime
 {
     public NotifyGridOperatorHandlerTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
     }
 
-    [Fact]
-    public async Task Grid_operator_is_notified_about_the_move_in()
+    public Task InitializeAsync()
     {
-        await Scenario.Details(
+        return Scenario.Details(
                 SampleData.TransactionId,
                 SampleData.MeteringPointNumber,
                 SampleData.SupplyStart,
@@ -60,8 +59,17 @@ public class NotifyGridOperatorHandlerTests
             .WithGridOperatorForMeteringPoint(
                 SampleData.IdOfGridOperatorForMeteringPoint,
                 SampleData.NumberOfGridOperatorForMeteringPoint)
-            .BuildAsync().ConfigureAwait(false);
+            .BuildAsync();
+    }
 
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
+    }
+
+    [Fact]
+    public async Task Grid_operator_is_notified_about_the_move_in()
+    {
         var command = new NotifyGridOperator(SampleData.TransactionId);
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
