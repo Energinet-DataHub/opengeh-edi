@@ -36,12 +36,9 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn.Notificatio
 public class NotifyGridOperatorHandlerTests
     : TestBase
 {
-    private readonly IMoveInTransactionRepository _transactionRepository;
-
     public NotifyGridOperatorHandlerTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _transactionRepository = GetService<IMoveInTransactionRepository>();
     }
 
     [Fact]
