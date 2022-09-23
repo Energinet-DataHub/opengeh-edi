@@ -98,7 +98,8 @@ public class WhenAConsumerHasMovedInTests : TestBase
             .WithMarketActivityRecord()
             .HasValidityStart(SampleData.SupplyStart)
             .HasId()
-            .HasOriginalTransactionId(SampleData.TransactionId);
+            .HasOriginalTransactionId(SampleData.TransactionId)
+            .HasMarketEvaluationPointId(SampleData.MeteringPointNumber);
     }
 
     private static CreateEndOfSupplyNotification CreateCommand()
