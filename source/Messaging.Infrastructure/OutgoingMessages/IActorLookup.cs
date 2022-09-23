@@ -14,26 +14,17 @@
 
 using System;
 using System.Threading.Tasks;
-using Dapper;
-using Messaging.Application.Configuration.DataAccess;
 
 namespace Messaging.Infrastructure.OutgoingMessages;
 
-public class ActorLookup : IActorLookup
+/// <summary>
+/// Service for looking up actor details
+/// </summary>
+public interface IActorLookup
 {
-    private readonly IDbConnectionFactory _dbConnectionFactory;
-
-    public ActorLookup(IDbConnectionFactory dbConnectionFactory)
-    {
-        _dbConnectionFactory = dbConnectionFactory;
-    }
-
-    public Task<Guid> GetIdByActorNumberAsync(string actorNumber)
-    {
-        return _dbConnectionFactory
-            .GetOpenConnection()
-            .ExecuteScalarAsync<Guid>(
-                "SELECT Id FROM [b2b].[Actor] WHERE IdentificationNumber = @ActorNumber",
-                new { ActorNumber = actorNumber, });
-    }
+    /// <summary>
+    /// Get by actor unique id by actor number
+    /// </summary>
+    /// <param name="actorNumber"></param>
+    Task<Guid> GetIdByActorNumberAsync(string actorNumber);
 }

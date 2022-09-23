@@ -31,7 +31,6 @@ using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.Infrastructure.OutgoingMessages.Requesting;
 using Messaging.Infrastructure.Transactions;
 using Messaging.Infrastructure.Transactions.MoveIn;
-using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Protocols;
@@ -121,7 +120,7 @@ namespace Messaging.Api
                         .AddMessagePublishing(sp =>
                             new NewMessageAvailableNotifier(
                                 sp.GetRequiredService<IDataAvailableNotificationSender>(),
-                                sp.GetRequiredService<ActorLookup>(),
+                                sp.GetRequiredService<IActorLookup>(),
                                 sp.GetRequiredService<ICorrelationContext>()))
                         .AddMessageHubServices(
                             runtime.MESSAGEHUB_STORAGE_CONNECTION_STRING!,

@@ -24,12 +24,12 @@ namespace Messaging.Infrastructure.OutgoingMessages
     public class NewMessageAvailableNotifier : INewMessageAvailableNotifier
     {
         private readonly IDataAvailableNotificationSender _dataAvailableNotificationSender;
-        private readonly ActorLookup _actorLookup;
+        private readonly IActorLookup _actorLookup;
         private readonly ICorrelationContext _correlationContext;
 
         public NewMessageAvailableNotifier(
             IDataAvailableNotificationSender dataAvailableNotificationSender,
-            ActorLookup actorLookup,
+            IActorLookup actorLookup,
             ICorrelationContext correlationContext)
         {
             _dataAvailableNotificationSender = dataAvailableNotificationSender;
