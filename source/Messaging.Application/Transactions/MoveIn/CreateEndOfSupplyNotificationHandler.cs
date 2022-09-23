@@ -37,7 +37,7 @@ public class CreateEndOfSupplyNotificationHandler : IRequestHandler<CreateEndOfS
         var transaction = _repository.GetById(request.TransactionId);
         if (transaction is null)
         {
-            throw new TransactionNotFoundException(request.TransactionId);
+            throw TransactionNotFoundException.TransactionIdNotFound(request.TransactionId);
         }
 
         _notifications.InformCurrentEnergySupplierAboutEndOfSupply(request.TransactionId, request.EffectiveDate, request.MarketEvaluationPointId, request.EnergySupplierId);

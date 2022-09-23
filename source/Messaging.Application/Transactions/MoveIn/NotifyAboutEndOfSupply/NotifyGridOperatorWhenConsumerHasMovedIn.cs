@@ -52,7 +52,12 @@ public class NotifyGridOperatorWhenConsumerHasMovedIn : INotificationHandler<Bus
     {
         if (notification == null) throw new ArgumentNullException(nameof(notification));
         var transaction = _transactionRepository.GetById(notification.TransactionId);
-        var gridOperatorNumber = await GetGridOperatorNumberAsync(transaction!.MarketEvaluationPointId).ConfigureAwait(false);
+        if (transaction is null)
+        {
+            throw TransactionNotFoundException.TransactionIdNotFound(notification.TransactionId);
+        }
+
+        var gridOperatorNumber = await GetGridOperatorNumberAsync(transaction.MarketEvaluationPointId).ConfigureAwait(false);
 
         var marketActivityRecord = new OutgoingMessages.GenericNotification.MarketActivityRecord(
             Guid.NewGuid().ToString(),
