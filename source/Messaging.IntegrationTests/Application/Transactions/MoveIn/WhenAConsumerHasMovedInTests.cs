@@ -49,7 +49,7 @@ public class WhenAConsumerHasMovedInTests : TestBase
     {
         await ConsumerHasMovedIn().ConfigureAwait(false);
 
-        AssertQueuedCommand.QueuedCommand<CreateEndOfSupplyNotification>(GetService<IDbConnectionFactory>());
+        AssertQueuedCommand.QueuedCommand<NotifyCurrentEnergySupplier>(GetService<IDbConnectionFactory>());
         AssertTransaction()
             .BusinessProcessCompleted();
     }
@@ -67,7 +67,7 @@ public class WhenAConsumerHasMovedInTests : TestBase
     {
         await ConsumerHasMovedIn().ConfigureAwait(false);
 
-        AssertQueuedCommand.QueuedCommand<CreateEndOfSupplyNotification>(GetService<IDbConnectionFactory>());
+        AssertQueuedCommand.QueuedCommand<NotifyCurrentEnergySupplier>(GetService<IDbConnectionFactory>());
     }
 
     private async Task<MoveInTransaction> ConsumerHasMovedIn()

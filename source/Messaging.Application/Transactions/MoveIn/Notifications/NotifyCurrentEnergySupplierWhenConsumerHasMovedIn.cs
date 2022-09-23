@@ -21,11 +21,11 @@ using Messaging.Domain.Transactions.MoveIn.Events;
 
 namespace Messaging.Application.Transactions.MoveIn.Notifications;
 
-public class CreateEndOfSupplyNotificationWhenConsumerHasMovedIn : INotificationHandler<EndOfSupplyNotificationChangedToPending>
+public class NotifyCurrentEnergySupplierWhenConsumerHasMovedIn : INotificationHandler<EndOfSupplyNotificationChangedToPending>
 {
     private readonly ICommandScheduler _commandScheduler;
 
-    public CreateEndOfSupplyNotificationWhenConsumerHasMovedIn(ICommandScheduler commandScheduler)
+    public NotifyCurrentEnergySupplierWhenConsumerHasMovedIn(ICommandScheduler commandScheduler)
     {
         _commandScheduler = commandScheduler;
     }
@@ -34,7 +34,7 @@ public class CreateEndOfSupplyNotificationWhenConsumerHasMovedIn : INotification
     {
         if (notification == null) throw new ArgumentNullException(nameof(notification));
         return _commandScheduler.EnqueueAsync(
-            new CreateEndOfSupplyNotification(
+            new NotifyCurrentEnergySupplier(
                 notification.TransactionId,
                 notification.EffectiveDate,
                 notification.MarketEvaluationPointId,

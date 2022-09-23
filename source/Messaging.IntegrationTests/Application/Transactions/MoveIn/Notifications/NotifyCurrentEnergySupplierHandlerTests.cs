@@ -30,12 +30,12 @@ using Xunit;
 
 namespace Messaging.IntegrationTests.Application.Transactions.MoveIn.Notifications;
 
-public class CreateEndOfSupplyNotificationHandlerTests
+public class NotifyCurrentEnergySupplierHandlerTests
     : TestBase
 {
     private readonly IMoveInTransactionRepository _transactionRepository;
 
-    public CreateEndOfSupplyNotificationHandlerTests(DatabaseFixture databaseFixture)
+    public NotifyCurrentEnergySupplierHandlerTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _transactionRepository = GetService<IMoveInTransactionRepository>();
@@ -62,9 +62,9 @@ public class CreateEndOfSupplyNotificationHandlerTests
             .HasMarketEvaluationPointId(transaction.MarketEvaluationPointId);
     }
 
-    private static CreateEndOfSupplyNotification CreateCommand()
+    private static NotifyCurrentEnergySupplier CreateCommand()
     {
-        return new CreateEndOfSupplyNotification(
+        return new NotifyCurrentEnergySupplier(
             SampleData.TransactionId,
             SampleData.SupplyStart,
             SampleData.MeteringPointNumber,
