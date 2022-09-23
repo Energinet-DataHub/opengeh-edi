@@ -24,7 +24,7 @@ using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Domain.Transactions.MoveIn.Events;
 
-namespace Messaging.Application.Transactions.MoveIn.NotifyAboutEndOfSupply;
+namespace Messaging.Application.Transactions.MoveIn.Notifications;
 
 public class NotifyGridOperatorWhenConsumerHasMovedIn : INotificationHandler<BusinessProcessWasCompleted>
 {

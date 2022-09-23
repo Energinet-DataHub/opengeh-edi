@@ -43,7 +43,7 @@ using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages.Requesting;
 using Messaging.Application.SchemaStore;
 using Messaging.Application.Transactions.MoveIn;
-using Messaging.Application.Transactions.MoveIn.NotifyAboutEndOfSupply;
+using Messaging.Application.Transactions.MoveIn.Notifications;
 using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
