@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MeteringPoints.IntegrationEvents.Contracts;
+using System.Threading.Tasks;
+using Energinet.DataHub.MeteringPoints.IntegrationEvents.CreateMeteringPoint;
+using Messaging.Application.MasterData.MarketEvaluationPoints;
 using Messaging.Infrastructure.Configuration.InternalCommands;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
@@ -32,7 +34,7 @@ public class MeteringPointCreatedListener
     }
 
     [Function("MeteringPointCreatedListener")]
-    public void Run(
+    public async Task RunAsync(
         [ServiceBusTrigger("%INTEGRATION_EVENT_TOPIC_NAME%", "%METERING_POINT_CREATED_EVENT_B2B_SUBSCRIPTION_NAME%", Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS_LISTENER")] byte[] data,
         FunctionContext context)
     {
@@ -41,5 +43,7 @@ public class MeteringPointCreatedListener
         _logger.LogInformation($"Received MeteringPointCreated integration event in B2B");
 
         var meteringPointCreated = MeteringPointCreated.Parser.ParseFrom(data);
+
+        await _commandSchedulerFacade.EnqueueAsync(new CreateMarketEvalationPoint(meteringPointCreated.GsrnNumber, meteringPointCreated.GridOperatorId)).ConfigureAwait(false);
     }
 }
