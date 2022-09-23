@@ -72,7 +72,8 @@ public class WhenAConsumerHasMovedInTests : TestBase
                 ProcessType.MoveIn.Code,
                 GetService<IDbConnectionFactory>())
             .HasSenderId(DataHubDetails.IdentificationNumber)
-            .HasSenderRole(MarketRoles.MeteringPointAdministrator);
+            .HasSenderRole(MarketRoles.MeteringPointAdministrator)
+            .HasReceiverRole(MarketRoles.GridOperator);
     }
 
     private async Task<MoveInTransaction> ConsumerHasMovedIn()
