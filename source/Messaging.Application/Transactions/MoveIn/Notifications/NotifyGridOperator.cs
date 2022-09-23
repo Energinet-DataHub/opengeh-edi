@@ -12,22 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using MediatR;
-using Messaging.Domain.Transactions.MoveIn.Events;
+using System.Text.Json.Serialization;
+using Messaging.Application.Configuration.Commands.Commands;
 
 namespace Messaging.Application.Transactions.MoveIn.Notifications;
 
-public class NotifyGridOperatorWhenConsumerHasMovedIn : INotificationHandler<BusinessProcessWasCompleted>
+public class NotifyGridOperator : InternalCommand
 {
-    public NotifyGridOperatorWhenConsumerHasMovedIn()
+    [JsonConstructor]
+    public NotifyGridOperator(string transactionId)
     {
+        TransactionId = transactionId;
     }
 
-    public Task Handle(BusinessProcessWasCompleted notification, CancellationToken cancellationToken)
-    {
-        return Task.FromResult(Unit.Value);
-    }
+    public string TransactionId { get; }
 }
