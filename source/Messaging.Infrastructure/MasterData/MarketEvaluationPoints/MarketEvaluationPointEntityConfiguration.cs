@@ -28,5 +28,6 @@ public class MarketEvaluationPointEntityConfiguration : IEntityTypeConfiguration
         builder.HasKey(x => x.Id);
         builder.Property(x => x.EnergySupplierNumber);
         builder.Property(x => x.MarketEvaluationPointNumber);
+        builder.Property(x => x.GridOperatorId);
     }
 }

@@ -73,7 +73,8 @@ public class WhenAConsumerHasMovedInTests : TestBase
                 GetService<IDbConnectionFactory>())
             .HasSenderId(DataHubDetails.IdentificationNumber)
             .HasSenderRole(MarketRoles.MeteringPointAdministrator)
-            .HasReceiverRole(MarketRoles.GridOperator);
+            .HasReceiverRole(MarketRoles.GridOperator)
+            .HasReceiverId(SampleData.NumberOfGridOperatorForMeteringPoint);
     }
 
     private async Task<MoveInTransaction> ConsumerHasMovedIn()
@@ -106,7 +107,13 @@ public class WhenAConsumerHasMovedInTests : TestBase
 
     private Task SetupMasterDataDetailsAsync()
     {
-        GetService<IMarketEvaluationPointRepository>().Add(MarketEvaluationPoint.Create(SampleData.CurrentEnergySupplierNumber, SampleData.MeteringPointNumber));
+        var marketEvaluationPoint = MarketEvaluationPoint.Create(
+            SampleData.CurrentEnergySupplierNumber,
+            SampleData.MeteringPointNumber);
+        marketEvaluationPoint.SetGridOperatorId(SampleData.IdOfGridOperatorForMeteringPoint);
+
+        GetService<IMarketEvaluationPointRepository>()
+            .Add(marketEvaluationPoint);
         return Task.CompletedTask;
     }
 
