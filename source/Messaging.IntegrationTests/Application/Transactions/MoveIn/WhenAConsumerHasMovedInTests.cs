@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Messaging.Application.Actors;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages;
@@ -86,6 +87,7 @@ public class WhenAConsumerHasMovedInTests : TestBase
 
     private async Task<MoveInTransaction> StartMoveInTransaction()
     {
+        await SetupGridOperatorDetailsAsync();
         await SetupMasterDataDetailsAsync();
         var transaction = new MoveInTransaction(
             SampleData.TransactionId,
@@ -103,6 +105,13 @@ public class WhenAConsumerHasMovedInTests : TestBase
         _transactionRepository.Add(transaction);
         await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
         return transaction;
+    }
+
+    private Task SetupGridOperatorDetailsAsync()
+    {
+        return InvokeCommandAsync(new CreateActor(
+            SampleData.IdOfGridOperatorForMeteringPoint.ToString(),
+            SampleData.NumberOfGridOperatorForMeteringPoint));
     }
 
     private Task SetupMasterDataDetailsAsync()
