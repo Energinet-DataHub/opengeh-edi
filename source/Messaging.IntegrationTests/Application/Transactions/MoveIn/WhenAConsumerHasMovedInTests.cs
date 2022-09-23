@@ -33,13 +33,11 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
 
 public class WhenAConsumerHasMovedInTests : TestBase
 {
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMoveInTransactionRepository _transactionRepository;
 
     public WhenAConsumerHasMovedInTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
         _transactionRepository = GetService<IMoveInTransactionRepository>();
     }
 
@@ -78,7 +76,7 @@ public class WhenAConsumerHasMovedInTests : TestBase
             .HasSenderRole(MarketRoles.MeteringPointAdministrator)
             .WithMarketActivityRecord()
             .HasId()
-            .HasValidityStart(transaction.EffectiveDate.ToDateTimeUtc())
+            .HasValidityStart(SampleData.SupplyStart)
             .HasOriginalTransactionId(transaction.TransactionId)
             .HasMarketEvaluationPointId(transaction.MarketEvaluationPointId);
     }
@@ -96,17 +94,19 @@ public class WhenAConsumerHasMovedInTests : TestBase
             .HasSenderId(DataHubDetails.IdentificationNumber)
             .HasSenderRole(MarketRoles.MeteringPointAdministrator)
             .HasReceiverRole(MarketRoles.GridOperator)
-            .HasReceiverId(SampleData.NumberOfGridOperatorForMeteringPoint);
+            .HasReceiverId(SampleData.NumberOfGridOperatorForMeteringPoint)
+            .WithMarketActivityRecord()
+            .HasValidityStart(SampleData.SupplyStart);
+    }
+
+    private static CreateEndOfSupplyNotification CreateCommand()
+    {
+        return new CreateEndOfSupplyNotification(SampleData.TransactionId, SampleData.SupplyStart, SampleData.MeteringPointNumber, SampleData.CurrentEnergySupplierNumber);
     }
 
     private AssertOutgoingMessage AssertMessage(DocumentType documentType, string processType)
     {
         return AssertOutgoingMessage.OutgoingMessage(SampleData.TransactionId, documentType.Name, processType, GetService<IDbConnectionFactory>());
-    }
-
-    private CreateEndOfSupplyNotification CreateCommand()
-    {
-        return new CreateEndOfSupplyNotification(SampleData.TransactionId, _systemDateTimeProvider.Now(), SampleData.MeteringPointNumber, SampleData.CurrentEnergySupplierNumber);
     }
 
     private async Task<MoveInTransaction> ConsumerHasMovedIn()
@@ -123,7 +123,7 @@ public class WhenAConsumerHasMovedInTests : TestBase
         var transaction = new MoveInTransaction(
             SampleData.TransactionId,
             SampleData.MeteringPointNumber,
-            _systemDateTimeProvider.Now(),
+            SampleData.SupplyStart,
             SampleData.CurrentEnergySupplierNumber,
             SampleData.OriginalMessageId,
             SampleData.NewEnergySupplierNumber,
