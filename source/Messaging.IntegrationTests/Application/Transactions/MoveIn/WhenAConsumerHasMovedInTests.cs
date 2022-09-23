@@ -66,10 +66,11 @@ public class WhenAConsumerHasMovedInTests : TestBase
         await ConsumerHasMovedIn().ConfigureAwait(false);
 
         AssertOutgoingMessage.OutgoingMessage(
-            SampleData.TransactionId,
-            DocumentType.GenericNotification.Name,
-            ProcessType.MoveIn.Code,
-            GetService<IDbConnectionFactory>());
+                SampleData.TransactionId,
+                DocumentType.GenericNotification.Name,
+                ProcessType.MoveIn.Code,
+                GetService<IDbConnectionFactory>())
+            .HasSenderId(DataHubDetails.IdentificationNumber);
     }
 
     private async Task<MoveInTransaction> ConsumerHasMovedIn()
