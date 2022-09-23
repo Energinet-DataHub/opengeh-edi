@@ -14,60 +14,56 @@
 
 using System;
 using System.Threading.Tasks;
+using Messaging.Application.Actors;
+using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.OutgoingMessages;
+using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Transactions.MoveIn.Notifications;
+using Messaging.Domain.MasterData.MarketEvaluationPoints;
+using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 
-namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
+namespace Messaging.IntegrationTests.Application.Transactions.MoveIn.Notifications;
 
-public class WhenAConsumerHasMovedInTests : TestBase
+public class NotifyGridOperatorHandlerTests
+    : TestBase
 {
     private readonly IMoveInTransactionRepository _transactionRepository;
 
-    public WhenAConsumerHasMovedInTests(DatabaseFixture databaseFixture)
+    public NotifyGridOperatorHandlerTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _transactionRepository = GetService<IMoveInTransactionRepository>();
     }
 
     [Fact]
-    public async Task An_exception_is_thrown_if_transaction_cannot_be_located()
-    {
-        var processId = "Not existing";
-        var command = new SetConsumerHasMovedIn(processId);
-
-        await Assert.ThrowsAsync<TransactionNotFoundException>(() => InvokeCommandAsync(command)).ConfigureAwait(false);
-    }
-
-    [Fact]
-    public async Task Business_process_is_marked_as_completed()
+    public async Task Grid_operator_is_notified_about_the_move_in()
     {
         await ConsumerHasMovedIn().ConfigureAwait(false);
 
-        AssertQueuedCommand.QueuedCommand<NotifyCurrentEnergySupplier>(GetService<IDbConnectionFactory>());
-        AssertTransaction()
-            .BusinessProcessCompleted();
-    }
+        var command = new NotifyGridOperator(SampleData.TransactionId);
+        await InvokeCommandAsync(command).ConfigureAwait(false);
 
-    [Fact]
-    public async Task Notification_of_grid_operator_is_scheduled()
-    {
-        await ConsumerHasMovedIn().ConfigureAwait(false);
-
-        AssertQueuedCommand.QueuedCommand<NotifyGridOperator>(GetService<IDbConnectionFactory>());
-    }
-
-    [Fact]
-    public async Task Notification_of_current_energy_supplier_is_scheduled()
-    {
-        await ConsumerHasMovedIn().ConfigureAwait(false);
-
-        AssertQueuedCommand.QueuedCommand<NotifyCurrentEnergySupplier>(GetService<IDbConnectionFactory>());
+        AssertOutgoingMessage.OutgoingMessage(
+                SampleData.TransactionId,
+                DocumentType.GenericNotification.Name,
+                ProcessType.MoveIn.Code,
+                GetService<IDbConnectionFactory>())
+            .HasSenderId(DataHubDetails.IdentificationNumber)
+            .HasSenderRole(MarketRoles.MeteringPointAdministrator)
+            .HasReceiverRole(MarketRoles.GridOperator)
+            .HasReceiverId(SampleData.NumberOfGridOperatorForMeteringPoint)
+            .WithMarketActivityRecord()
+            .HasValidityStart(SampleData.SupplyStart)
+            .HasId()
+            .HasOriginalTransactionId(SampleData.TransactionId)
+            .HasMarketEvaluationPointId(SampleData.MeteringPointNumber);
     }
 
     private async Task<MoveInTransaction> ConsumerHasMovedIn()
@@ -79,6 +75,8 @@ public class WhenAConsumerHasMovedInTests : TestBase
 
     private async Task<MoveInTransaction> StartMoveInTransaction()
     {
+        await SetupGridOperatorDetailsAsync();
+        await SetupMasterDataDetailsAsync();
         var transaction = new MoveInTransaction(
             SampleData.TransactionId,
             SampleData.MeteringPointNumber,
@@ -97,9 +95,22 @@ public class WhenAConsumerHasMovedInTests : TestBase
         return transaction;
     }
 
-    private AssertTransaction AssertTransaction()
+    private Task SetupGridOperatorDetailsAsync()
     {
-        return MoveIn.AssertTransaction
-            .Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>());
+        return InvokeCommandAsync(new CreateActor(
+            SampleData.IdOfGridOperatorForMeteringPoint.ToString(),
+            SampleData.NumberOfGridOperatorForMeteringPoint));
+    }
+
+    private Task SetupMasterDataDetailsAsync()
+    {
+        var marketEvaluationPoint = MarketEvaluationPoint.Create(
+            SampleData.CurrentEnergySupplierNumber,
+            SampleData.MeteringPointNumber);
+        marketEvaluationPoint.SetGridOperatorId(SampleData.IdOfGridOperatorForMeteringPoint);
+
+        GetService<IMarketEvaluationPointRepository>()
+            .Add(marketEvaluationPoint);
+        return Task.CompletedTask;
     }
 }
