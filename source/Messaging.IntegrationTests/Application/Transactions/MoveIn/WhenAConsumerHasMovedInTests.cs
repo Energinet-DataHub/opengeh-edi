@@ -67,7 +67,7 @@ public class WhenAConsumerHasMovedInTests : TestBase
     {
         var transaction = await ConsumerHasMovedIn().ConfigureAwait(false);
 
-        await InvokeCommandAsync(CreateCommand(transaction.TransactionId)).ConfigureAwait(false);
+        await InvokeCommandAsync(CreateCommand()).ConfigureAwait(false);
 
         AssertTransaction()
             .HasEndOfSupplyNotificationState(MoveInTransaction.EndOfSupplyNotificationState.EnergySupplierWasNotified);
@@ -104,9 +104,9 @@ public class WhenAConsumerHasMovedInTests : TestBase
         return AssertOutgoingMessage.OutgoingMessage(SampleData.TransactionId, documentType.Name, processType, GetService<IDbConnectionFactory>());
     }
 
-    private CreateEndOfSupplyNotification CreateCommand(string transactionId)
+    private CreateEndOfSupplyNotification CreateCommand()
     {
-        return new CreateEndOfSupplyNotification(transactionId, _systemDateTimeProvider.Now(), SampleData.MeteringPointNumber, SampleData.CurrentEnergySupplierNumber);
+        return new CreateEndOfSupplyNotification(SampleData.TransactionId, _systemDateTimeProvider.Now(), SampleData.MeteringPointNumber, SampleData.CurrentEnergySupplierNumber);
     }
 
     private async Task<MoveInTransaction> ConsumerHasMovedIn()
