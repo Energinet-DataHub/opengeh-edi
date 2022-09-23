@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
+using MediatR;
 using Messaging.Application.Actors;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
@@ -25,6 +26,7 @@ using Messaging.Application.Transactions.MoveIn.Notifications;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
+using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
@@ -32,21 +34,42 @@ using Xunit;
 namespace Messaging.IntegrationTests.Application.Transactions.MoveIn.Notifications;
 
 public class NotifyGridOperatorHandlerTests
-    : TestBase
+    : TestBase, IAsyncLifetime
 {
-    private readonly IMoveInTransactionRepository _transactionRepository;
-
     public NotifyGridOperatorHandlerTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _transactionRepository = GetService<IMoveInTransactionRepository>();
+    }
+
+    public Task InitializeAsync()
+    {
+        return Scenario.Details(
+                SampleData.TransactionId,
+                SampleData.MeteringPointNumber,
+                SampleData.SupplyStart,
+                SampleData.CurrentEnergySupplierNumber,
+                SampleData.NewEnergySupplierNumber,
+                SampleData.ConsumerId,
+                SampleData.ConsumerIdType,
+                SampleData.ConsumerName,
+                SampleData.OriginalMessageId,
+                GetService<IMediator>(),
+                GetService<B2BContext>())
+            .IsEffective()
+            .WithGridOperatorForMeteringPoint(
+                SampleData.IdOfGridOperatorForMeteringPoint,
+                SampleData.NumberOfGridOperatorForMeteringPoint)
+            .BuildAsync();
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
     }
 
     [Fact]
     public async Task Grid_operator_is_notified_about_the_move_in()
     {
-        await ConsumerHasMovedIn().ConfigureAwait(false);
-
         var command = new NotifyGridOperator(SampleData.TransactionId);
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
@@ -64,53 +87,5 @@ public class NotifyGridOperatorHandlerTests
             .HasId()
             .HasOriginalTransactionId(SampleData.TransactionId)
             .HasMarketEvaluationPointId(SampleData.MeteringPointNumber);
-    }
-
-    private async Task<MoveInTransaction> ConsumerHasMovedIn()
-    {
-        var transaction = await StartMoveInTransaction();
-        await InvokeCommandAsync(new SetConsumerHasMovedIn(transaction.ProcessId!)).ConfigureAwait(false);
-        return transaction;
-    }
-
-    private async Task<MoveInTransaction> StartMoveInTransaction()
-    {
-        await SetupGridOperatorDetailsAsync();
-        await SetupMasterDataDetailsAsync();
-        var transaction = new MoveInTransaction(
-            SampleData.TransactionId,
-            SampleData.MeteringPointNumber,
-            SampleData.SupplyStart,
-            SampleData.CurrentEnergySupplierNumber,
-            SampleData.OriginalMessageId,
-            SampleData.NewEnergySupplierNumber,
-            SampleData.ConsumerId,
-            SampleData.ConsumerName,
-            SampleData.ConsumerIdType);
-
-        transaction.AcceptedByBusinessProcess(BusinessRequestResult.Succeeded(Guid.NewGuid().ToString()).ProcessId!, SampleData.MeteringPointNumber);
-        transaction.MarkMeteringPointMasterDataAsSent();
-        _transactionRepository.Add(transaction);
-        await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
-        return transaction;
-    }
-
-    private Task SetupGridOperatorDetailsAsync()
-    {
-        return InvokeCommandAsync(new CreateActor(
-            SampleData.IdOfGridOperatorForMeteringPoint.ToString(),
-            SampleData.NumberOfGridOperatorForMeteringPoint));
-    }
-
-    private Task SetupMasterDataDetailsAsync()
-    {
-        var marketEvaluationPoint = MarketEvaluationPoint.Create(
-            SampleData.CurrentEnergySupplierNumber,
-            SampleData.MeteringPointNumber);
-        marketEvaluationPoint.SetGridOperatorId(SampleData.IdOfGridOperatorForMeteringPoint);
-
-        GetService<IMarketEvaluationPointRepository>()
-            .Add(marketEvaluationPoint);
-        return Task.CompletedTask;
     }
 }
