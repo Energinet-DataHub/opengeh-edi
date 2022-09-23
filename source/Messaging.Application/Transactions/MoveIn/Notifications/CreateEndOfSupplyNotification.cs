@@ -16,7 +16,7 @@ using System.Text.Json.Serialization;
 using Messaging.Application.Configuration.Commands.Commands;
 using NodaTime;
 
-namespace Messaging.Application.Transactions.MoveIn;
+namespace Messaging.Application.Transactions.MoveIn.Notifications;
 
 public class CreateEndOfSupplyNotification : InternalCommand
 {

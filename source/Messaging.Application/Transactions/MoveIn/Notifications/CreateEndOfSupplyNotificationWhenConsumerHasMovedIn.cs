@@ -16,11 +16,10 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.Commands;
 using Messaging.Domain.Transactions.MoveIn.Events;
 
-namespace Messaging.Application.Transactions.MoveIn;
+namespace Messaging.Application.Transactions.MoveIn.Notifications;
 
 public class CreateEndOfSupplyNotificationWhenConsumerHasMovedIn : INotificationHandler<EndOfSupplyNotificationChangedToPending>
 {
