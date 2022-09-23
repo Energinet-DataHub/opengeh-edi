@@ -20,7 +20,7 @@ using Messaging.Application.OutgoingMessages.GenericNotification;
 using Messaging.Domain.OutgoingMessages;
 using NodaTime;
 
-namespace Messaging.Application.Transactions.MoveIn;
+namespace Messaging.Application.Transactions.MoveIn.Notifications;
 
 public class MoveInNotifications
 {
