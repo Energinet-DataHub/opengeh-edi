@@ -14,21 +14,14 @@
 
 using System;
 using System.Threading.Tasks;
-using Messaging.Application.Actors;
-using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.OutgoingMessages;
-using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Transactions.MoveIn.Notifications;
-using Messaging.Domain.MasterData.MarketEvaluationPoints;
-using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
-using MarketEvaluationPoint = Messaging.Domain.MasterData.MarketEvaluationPoints.MarketEvaluationPoint;
 
 namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
 
@@ -62,27 +55,6 @@ public class WhenAConsumerHasMovedInTests : TestBase
     }
 
     [Fact]
-    public async Task The_current_energy_supplier_is_notified_about_end_of_supply()
-    {
-        var transaction = await ConsumerHasMovedIn().ConfigureAwait(false);
-
-        await InvokeCommandAsync(CreateCommand()).ConfigureAwait(false);
-
-        AssertTransaction()
-            .HasEndOfSupplyNotificationState(MoveInTransaction.EndOfSupplyNotificationState.EnergySupplierWasNotified);
-        AssertMessage(DocumentType.GenericNotification, BusinessReasonCode.CustomerMoveInOrMoveOut.Code)
-            .HasReceiverId(transaction.CurrentEnergySupplierId!)
-            .HasReceiverRole(MarketRoles.EnergySupplier)
-            .HasSenderId(DataHubDetails.IdentificationNumber)
-            .HasSenderRole(MarketRoles.MeteringPointAdministrator)
-            .WithMarketActivityRecord()
-            .HasId()
-            .HasValidityStart(SampleData.SupplyStart)
-            .HasOriginalTransactionId(transaction.TransactionId)
-            .HasMarketEvaluationPointId(transaction.MarketEvaluationPointId);
-    }
-
-    [Fact]
     public async Task Grid_operator_notification_is_scheduled()
     {
         await ConsumerHasMovedIn().ConfigureAwait(false);
@@ -90,14 +62,12 @@ public class WhenAConsumerHasMovedInTests : TestBase
         AssertQueuedCommand.QueuedCommand<NotifyGridOperator>(GetService<IDbConnectionFactory>());
     }
 
-    private static CreateEndOfSupplyNotification CreateCommand()
+    [Fact]
+    public async Task Energy_supplier_notification_is_scheduled()
     {
-        return new CreateEndOfSupplyNotification(SampleData.TransactionId, SampleData.SupplyStart, SampleData.MeteringPointNumber, SampleData.CurrentEnergySupplierNumber);
-    }
+        await ConsumerHasMovedIn().ConfigureAwait(false);
 
-    private AssertOutgoingMessage AssertMessage(DocumentType documentType, string processType)
-    {
-        return AssertOutgoingMessage.OutgoingMessage(SampleData.TransactionId, documentType.Name, processType, GetService<IDbConnectionFactory>());
+        AssertQueuedCommand.QueuedCommand<CreateEndOfSupplyNotification>(GetService<IDbConnectionFactory>());
     }
 
     private async Task<MoveInTransaction> ConsumerHasMovedIn()
@@ -109,8 +79,6 @@ public class WhenAConsumerHasMovedInTests : TestBase
 
     private async Task<MoveInTransaction> StartMoveInTransaction()
     {
-        await SetupGridOperatorDetailsAsync();
-        await SetupMasterDataDetailsAsync();
         var transaction = new MoveInTransaction(
             SampleData.TransactionId,
             SampleData.MeteringPointNumber,
@@ -127,25 +95,6 @@ public class WhenAConsumerHasMovedInTests : TestBase
         _transactionRepository.Add(transaction);
         await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
         return transaction;
-    }
-
-    private Task SetupGridOperatorDetailsAsync()
-    {
-        return InvokeCommandAsync(new CreateActor(
-            SampleData.IdOfGridOperatorForMeteringPoint.ToString(),
-            SampleData.NumberOfGridOperatorForMeteringPoint));
-    }
-
-    private Task SetupMasterDataDetailsAsync()
-    {
-        var marketEvaluationPoint = MarketEvaluationPoint.Create(
-            SampleData.CurrentEnergySupplierNumber,
-            SampleData.MeteringPointNumber);
-        marketEvaluationPoint.SetGridOperatorId(SampleData.IdOfGridOperatorForMeteringPoint);
-
-        GetService<IMarketEvaluationPointRepository>()
-            .Add(marketEvaluationPoint);
-        return Task.CompletedTask;
     }
 
     private AssertTransaction AssertTransaction()
