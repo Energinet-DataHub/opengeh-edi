@@ -16,11 +16,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages;
-using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
-using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Domain.Transactions.MoveIn.Events;
 
@@ -28,24 +25,21 @@ namespace Messaging.Application.Transactions.MoveIn.Notifications;
 
 public class NotifyGridOperatorWhenConsumerHasMovedIn : INotificationHandler<BusinessProcessWasCompleted>
 {
-    private readonly IOutgoingMessageStore _outgoingMessageStore;
     private readonly IMoveInTransactionRepository _transactionRepository;
-    private readonly IMarketActivityRecordParser _marketActivityRecordParser;
     private readonly IMarketEvaluationPointRepository _marketEvaluationPointRepository;
     private readonly IActorLookup _actorLookup;
+    private readonly MoveInNotifications _notifications;
 
     public NotifyGridOperatorWhenConsumerHasMovedIn(
-        IOutgoingMessageStore outgoingMessageStore,
         IMoveInTransactionRepository transactionRepository,
-        IMarketActivityRecordParser marketActivityRecordParser,
         IMarketEvaluationPointRepository marketEvaluationPointRepository,
-        IActorLookup actorLookup)
+        IActorLookup actorLookup,
+        MoveInNotifications notifications)
     {
-        _outgoingMessageStore = outgoingMessageStore;
         _transactionRepository = transactionRepository;
-        _marketActivityRecordParser = marketActivityRecordParser;
         _marketEvaluationPointRepository = marketEvaluationPointRepository;
         _actorLookup = actorLookup;
+        _notifications = notifications;
     }
 
     public async Task Handle(BusinessProcessWasCompleted notification, CancellationToken cancellationToken)
@@ -58,24 +52,7 @@ public class NotifyGridOperatorWhenConsumerHasMovedIn : INotificationHandler<Bus
         }
 
         var gridOperatorNumber = await GetGridOperatorNumberAsync(transaction.MarketEvaluationPointId).ConfigureAwait(false);
-
-        var marketActivityRecord = new OutgoingMessages.GenericNotification.MarketActivityRecord(
-            Guid.NewGuid().ToString(),
-            notification.TransactionId,
-            transaction!.MarketEvaluationPointId,
-            transaction.EffectiveDate);
-
-        var message = new OutgoingMessage(
-            DocumentType.GenericNotification,
-            gridOperatorNumber,
-            transaction.TransactionId,
-            ProcessType.MoveIn.Code,
-            MarketRoles.GridOperator,
-            DataHubDetails.IdentificationNumber,
-            MarketRoles.MeteringPointAdministrator,
-            _marketActivityRecordParser.From(marketActivityRecord));
-
-        _outgoingMessageStore.Add(message);
+        _notifications.NotifyGridOperator(transaction, gridOperatorNumber);
     }
 
     private async Task<string> GetGridOperatorNumberAsync(string marketEvaluationPointNumber)

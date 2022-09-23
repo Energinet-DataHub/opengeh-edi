@@ -18,6 +18,7 @@ using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.OutgoingMessages.GenericNotification;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.Transactions.MoveIn;
 using NodaTime;
 
 namespace Messaging.Application.Transactions.MoveIn.Notifications;
@@ -47,6 +48,28 @@ public class MoveInNotifications
             transactionId,
             BusinessReasonCode.CustomerMoveInOrMoveOut.Code,
             MarketRoles.EnergySupplier,
+            DataHubDetails.IdentificationNumber,
+            MarketRoles.MeteringPointAdministrator,
+            _marketActivityRecordParser.From(marketActivityRecord));
+
+        _outgoingMessageStore.Add(message);
+    }
+
+    public void NotifyGridOperator(MoveInTransaction transaction, string gridOperatorNumber)
+    {
+        if (transaction == null) throw new ArgumentNullException(nameof(transaction));
+        var marketActivityRecord = new MarketActivityRecord(
+            Guid.NewGuid().ToString(),
+            transaction.TransactionId,
+            transaction.MarketEvaluationPointId,
+            transaction.EffectiveDate);
+
+        var message = new OutgoingMessage(
+            DocumentType.GenericNotification,
+            gridOperatorNumber,
+            transaction.TransactionId,
+            ProcessType.MoveIn.Code,
+            MarketRoles.GridOperator,
             DataHubDetails.IdentificationNumber,
             MarketRoles.MeteringPointAdministrator,
             _marketActivityRecordParser.From(marketActivityRecord));
