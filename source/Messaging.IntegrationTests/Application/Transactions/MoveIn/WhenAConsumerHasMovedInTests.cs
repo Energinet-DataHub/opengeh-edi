@@ -55,7 +55,7 @@ public class WhenAConsumerHasMovedInTests : TestBase
     }
 
     [Fact]
-    public async Task Grid_operator_notification_is_scheduled()
+    public async Task Notification_of_grid_operator_is_scheduled()
     {
         await ConsumerHasMovedIn().ConfigureAwait(false);
 
@@ -63,7 +63,7 @@ public class WhenAConsumerHasMovedInTests : TestBase
     }
 
     [Fact]
-    public async Task Energy_supplier_notification_is_scheduled()
+    public async Task Notification_of_current_energy_supplier_is_scheduled()
     {
         await ConsumerHasMovedIn().ConfigureAwait(false);
 
