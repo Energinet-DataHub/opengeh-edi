@@ -16,18 +16,23 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Messaging.Application.Configuration.Commands;
 using Messaging.Domain.Transactions.MoveIn.Events;
 
 namespace Messaging.Application.Transactions.MoveIn.Notifications;
 
 public class NotifyGridOperatorWhenConsumerHasMovedIn : INotificationHandler<BusinessProcessWasCompleted>
 {
-    public NotifyGridOperatorWhenConsumerHasMovedIn()
+    private readonly ICommandScheduler _commandScheduler;
+
+    public NotifyGridOperatorWhenConsumerHasMovedIn(ICommandScheduler commandScheduler)
     {
+        _commandScheduler = commandScheduler;
     }
 
     public Task Handle(BusinessProcessWasCompleted notification, CancellationToken cancellationToken)
     {
-        return Task.FromResult(Unit.Value);
+        ArgumentNullException.ThrowIfNull(notification);
+        return _commandScheduler.EnqueueAsync(new NotifyGridOperator(notification.TransactionId));
     }
 }

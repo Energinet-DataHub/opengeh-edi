@@ -21,6 +21,7 @@ using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
+using Messaging.Application.Transactions.MoveIn.Notifications;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
@@ -82,24 +83,11 @@ public class WhenAConsumerHasMovedInTests : TestBase
     }
 
     [Fact]
-    public async Task Grid_operator_is_notified_about_the_move_in()
+    public async Task Grid_operator_notification_is_scheduled()
     {
         await ConsumerHasMovedIn().ConfigureAwait(false);
 
-        AssertOutgoingMessage.OutgoingMessage(
-                SampleData.TransactionId,
-                DocumentType.GenericNotification.Name,
-                ProcessType.MoveIn.Code,
-                GetService<IDbConnectionFactory>())
-            .HasSenderId(DataHubDetails.IdentificationNumber)
-            .HasSenderRole(MarketRoles.MeteringPointAdministrator)
-            .HasReceiverRole(MarketRoles.GridOperator)
-            .HasReceiverId(SampleData.NumberOfGridOperatorForMeteringPoint)
-            .WithMarketActivityRecord()
-            .HasValidityStart(SampleData.SupplyStart)
-            .HasId()
-            .HasOriginalTransactionId(SampleData.TransactionId)
-            .HasMarketEvaluationPointId(SampleData.MeteringPointNumber);
+        AssertQueuedCommand.QueuedCommand<NotifyGridOperator>(GetService<IDbConnectionFactory>());
     }
 
     private static CreateEndOfSupplyNotification CreateCommand()
