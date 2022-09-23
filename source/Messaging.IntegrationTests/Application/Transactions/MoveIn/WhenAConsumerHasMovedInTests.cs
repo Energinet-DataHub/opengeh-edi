@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages;
+using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
@@ -70,7 +71,8 @@ public class WhenAConsumerHasMovedInTests : TestBase
                 DocumentType.GenericNotification.Name,
                 ProcessType.MoveIn.Code,
                 GetService<IDbConnectionFactory>())
-            .HasSenderId(DataHubDetails.IdentificationNumber);
+            .HasSenderId(DataHubDetails.IdentificationNumber)
+            .HasSenderRole(MarketRoles.MeteringPointAdministrator);
     }
 
     private async Task<MoveInTransaction> ConsumerHasMovedIn()
