@@ -16,10 +16,11 @@ namespace Messaging.Domain.MasterData.MarketEvaluationPoints;
 
 public class MarketEvaluationPoint
 {
-    private MarketEvaluationPoint(string marketEvaluationPointNumber, string energySupplierNumber)
+    private MarketEvaluationPoint(string marketEvaluationPointNumber, string energySupplierNumber, string gridOperatorId)
     {
         MarketEvaluationPointNumber = marketEvaluationPointNumber;
         EnergySupplierNumber = energySupplierNumber;
+        GridOperatorId = gridOperatorId;
         Id = Guid.NewGuid();
     }
 
@@ -29,13 +30,20 @@ public class MarketEvaluationPoint
 
     public string EnergySupplierNumber { get; private set; }
 
-    public static MarketEvaluationPoint Create(string energySupplierNumber, string accountingPointNumber)
+    public string GridOperatorId { get; private set; }
+
+    public static MarketEvaluationPoint Create(string energySupplierNumber, string accountingPointNumber, string gridOperatorId)
     {
-        return new MarketEvaluationPoint(accountingPointNumber, energySupplierNumber);
+        return new MarketEvaluationPoint(accountingPointNumber, energySupplierNumber, gridOperatorId);
     }
 
     public void SetEnergySupplier(string energySupplierNumber)
     {
         EnergySupplierNumber = energySupplierNumber;
+    }
+
+    public void SetGridOperator(string gridOperatorId)
+    {
+        GridOperatorId = gridOperatorId;
     }
 }

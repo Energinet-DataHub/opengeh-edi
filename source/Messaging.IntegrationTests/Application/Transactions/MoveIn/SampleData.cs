@@ -61,4 +61,6 @@ internal static class SampleData
     internal static Instant SupplyStart => EffectiveDateFactory.InstantAsOfToday();
 
     internal static IEnumerable<UsagePointLocation> UsagePointLocations => new List<UsagePointLocation>();
+
+    internal static string GridOperatorId => "";
 }
