@@ -19,6 +19,7 @@ using MediatR;
 using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Common;
+using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Domain.Transactions.MoveIn.Events;
@@ -30,21 +31,36 @@ public class NotifyGridOperatorWhenConsumerHasMovedIn : INotificationHandler<Bus
     private readonly IOutgoingMessageStore _outgoingMessageStore;
     private readonly IMoveInTransactionRepository _transactionRepository;
     private readonly IMarketActivityRecordParser _marketActivityRecordParser;
+    private readonly IMarketEvaluationPointRepository _marketEvaluationPointRepository;
+    private readonly IActorLookup _actorLookup;
 
     public NotifyGridOperatorWhenConsumerHasMovedIn(
         IOutgoingMessageStore outgoingMessageStore,
         IMoveInTransactionRepository transactionRepository,
-        IMarketActivityRecordParser marketActivityRecordParser)
+        IMarketActivityRecordParser marketActivityRecordParser,
+        IMarketEvaluationPointRepository marketEvaluationPointRepository,
+        IActorLookup actorLookup)
     {
         _outgoingMessageStore = outgoingMessageStore;
         _transactionRepository = transactionRepository;
         _marketActivityRecordParser = marketActivityRecordParser;
+        _marketEvaluationPointRepository = marketEvaluationPointRepository;
+        _actorLookup = actorLookup;
     }
 
-    public Task Handle(BusinessProcessWasCompleted notification, CancellationToken cancellationToken)
+    public async Task Handle(BusinessProcessWasCompleted notification, CancellationToken cancellationToken)
     {
         if (notification == null) throw new ArgumentNullException(nameof(notification));
         var transaction = _transactionRepository.GetById(notification.TransactionId);
+        var marketEvaluationPoint =
+            await _marketEvaluationPointRepository.GetByNumberAsync(transaction!.MarketEvaluationPointId)
+                .ConfigureAwait(false);
+        if (marketEvaluationPoint is null)
+            throw new MoveInException($"Could not find market evaluation point with number {transaction.MarketEvaluationPointId}");
+
+        var gridOperatorNumber = await _actorLookup.GetActorNumberByIdAsync(marketEvaluationPoint.GridOperatorId.GetValueOrDefault())
+            .ConfigureAwait(false);
+
         var marketActivityRecord = new OutgoingMessages.GenericNotification.MarketActivityRecord(
             Guid.NewGuid().ToString(),
             notification.TransactionId,
@@ -53,7 +69,7 @@ public class NotifyGridOperatorWhenConsumerHasMovedIn : INotificationHandler<Bus
 
         var message = new OutgoingMessage(
             DocumentType.GenericNotification,
-            "fake",
+            gridOperatorNumber,
             transaction.TransactionId,
             ProcessType.MoveIn.Code,
             MarketRoles.GridOperator,
@@ -62,6 +78,5 @@ public class NotifyGridOperatorWhenConsumerHasMovedIn : INotificationHandler<Bus
             _marketActivityRecordParser.From(marketActivityRecord));
 
         _outgoingMessageStore.Add(message);
-        return Task.CompletedTask;
     }
 }

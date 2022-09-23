@@ -37,4 +37,13 @@ public class ActorLookup : IActorLookup
                 "SELECT Id FROM [b2b].[Actor] WHERE IdentificationNumber = @ActorNumber",
                 new { ActorNumber = actorNumber, });
     }
+
+    public Task<string> GetActorNumberByIdAsync(Guid actorId)
+    {
+        return _dbConnectionFactory
+            .GetOpenConnection()
+            .ExecuteScalarAsync<string>(
+                "SELECT IdentificationNumber FROM [b2b].[Actor] WHERE Id = @ActorId",
+                new { ActorId = actorId, });
+    }
 }

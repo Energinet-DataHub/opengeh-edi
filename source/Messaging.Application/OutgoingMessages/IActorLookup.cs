@@ -23,8 +23,14 @@ namespace Messaging.Application.OutgoingMessages;
 public interface IActorLookup
 {
     /// <summary>
-    /// Get by actor unique id by actor number
+    /// Get actor unique id by actor number
     /// </summary>
     /// <param name="actorNumber"></param>
     Task<Guid> GetIdByActorNumberAsync(string actorNumber);
+
+    /// <summary>
+    /// Get actor number by id
+    /// </summary>
+    /// <param name="actorId"></param>
+    Task<string> GetActorNumberByIdAsync(Guid actorId);
 }
