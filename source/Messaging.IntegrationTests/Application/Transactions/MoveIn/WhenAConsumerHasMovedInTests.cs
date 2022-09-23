@@ -63,6 +63,27 @@ public class WhenAConsumerHasMovedInTests : TestBase
     }
 
     [Fact]
+    public async Task The_current_energy_supplier_is_notified_about_end_of_supply()
+    {
+        var transaction = await ConsumerHasMovedIn().ConfigureAwait(false);
+
+        await InvokeCommandAsync(CreateCommand(transaction.TransactionId)).ConfigureAwait(false);
+
+        AssertTransaction()
+            .HasEndOfSupplyNotificationState(MoveInTransaction.EndOfSupplyNotificationState.EnergySupplierWasNotified);
+        AssertMessage(transaction.TransactionId, DocumentType.GenericNotification.ToString(), BusinessReasonCode.CustomerMoveInOrMoveOut.Code)
+            .HasReceiverId(transaction.CurrentEnergySupplierId!)
+            .HasReceiverRole(MarketRoles.EnergySupplier)
+            .HasSenderId(DataHubDetails.IdentificationNumber)
+            .HasSenderRole(MarketRoles.MeteringPointAdministrator)
+            .WithMarketActivityRecord()
+            .HasId()
+            .HasValidityStart(transaction.EffectiveDate.ToDateTimeUtc())
+            .HasOriginalTransactionId(transaction.TransactionId)
+            .HasMarketEvaluationPointId(transaction.MarketEvaluationPointId);
+    }
+
+    [Fact]
     public async Task Grid_operator_is_notified_about_the_move_in()
     {
         await ConsumerHasMovedIn().ConfigureAwait(false);
@@ -76,6 +97,16 @@ public class WhenAConsumerHasMovedInTests : TestBase
             .HasSenderRole(MarketRoles.MeteringPointAdministrator)
             .HasReceiverRole(MarketRoles.GridOperator)
             .HasReceiverId(SampleData.NumberOfGridOperatorForMeteringPoint);
+    }
+
+    private AssertOutgoingMessage AssertMessage(string transactionId, string documentType, string processType)
+    {
+        return AssertOutgoingMessage.OutgoingMessage(transactionId, documentType, processType, GetService<IDbConnectionFactory>());
+    }
+
+    private CreateEndOfSupplyNotification CreateCommand(string transactionId)
+    {
+        return new CreateEndOfSupplyNotification(transactionId, _systemDateTimeProvider.Now(), SampleData.MeteringPointNumber, SampleData.CurrentEnergySupplierNumber);
     }
 
     private async Task<MoveInTransaction> ConsumerHasMovedIn()
