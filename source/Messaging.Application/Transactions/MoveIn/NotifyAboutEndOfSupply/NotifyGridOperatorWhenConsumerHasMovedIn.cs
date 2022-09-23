@@ -52,14 +52,7 @@ public class NotifyGridOperatorWhenConsumerHasMovedIn : INotificationHandler<Bus
     {
         if (notification == null) throw new ArgumentNullException(nameof(notification));
         var transaction = _transactionRepository.GetById(notification.TransactionId);
-        var marketEvaluationPoint =
-            await _marketEvaluationPointRepository.GetByNumberAsync(transaction!.MarketEvaluationPointId)
-                .ConfigureAwait(false);
-        if (marketEvaluationPoint is null)
-            throw new MoveInException($"Could not find market evaluation point with number {transaction.MarketEvaluationPointId}");
-
-        var gridOperatorNumber = await _actorLookup.GetActorNumberByIdAsync(marketEvaluationPoint.GridOperatorId.GetValueOrDefault())
-            .ConfigureAwait(false);
+        var gridOperatorNumber = await GetGridOperatorNumberAsync(transaction!.MarketEvaluationPointId).ConfigureAwait(false);
 
         var marketActivityRecord = new OutgoingMessages.GenericNotification.MarketActivityRecord(
             Guid.NewGuid().ToString(),
@@ -78,5 +71,19 @@ public class NotifyGridOperatorWhenConsumerHasMovedIn : INotificationHandler<Bus
             _marketActivityRecordParser.From(marketActivityRecord));
 
         _outgoingMessageStore.Add(message);
+    }
+
+    private async Task<string> GetGridOperatorNumberAsync(string marketEvaluationPointNumber)
+    {
+        var marketEvaluationPoint =
+            await _marketEvaluationPointRepository.GetByNumberAsync(marketEvaluationPointNumber)
+                .ConfigureAwait(false);
+
+        if (marketEvaluationPoint is null)
+            throw new MoveInException($"Could not find market evaluation point with number {marketEvaluationPointNumber}");
+
+        return await _actorLookup
+            .GetActorNumberByIdAsync(marketEvaluationPoint.GridOperatorId.GetValueOrDefault())
+            .ConfigureAwait(false);
     }
 }
