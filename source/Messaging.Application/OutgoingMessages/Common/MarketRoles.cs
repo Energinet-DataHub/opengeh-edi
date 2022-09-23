@@ -18,4 +18,5 @@ public static class MarketRoles
 {
     public const string MeteringPointAdministrator = "DDZ";
     public const string EnergySupplier = "DDQ";
+    public const string GridOperator = "DDM";
 }

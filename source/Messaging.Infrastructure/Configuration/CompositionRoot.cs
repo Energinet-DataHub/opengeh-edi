@@ -43,6 +43,7 @@ using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages.Requesting;
 using Messaging.Application.SchemaStore;
 using Messaging.Application.Transactions.MoveIn;
+using Messaging.Application.Transactions.MoveIn.NotifyAboutEndOfSupply;
 using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
@@ -238,6 +239,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddTransient<INotificationHandler<MoveInWasAccepted>, FetchMeteringPointMasterDataWhenAccepted>();
             _services.AddTransient<INotificationHandler<MoveInWasAccepted>, FetchCustomerMasterDataWhenAccepted>();
             _services.AddTransient<INotificationHandler<EndOfSupplyNotificationChangedToPending>, CreateEndOfSupplyNotificationWhenConsumerHasMovedIn>();
+            _services.AddTransient<INotificationHandler<BusinessProcessWasCompleted>, NotifyGridOperatorWhenConsumerHasMovedIn>();
             return this;
         }
 

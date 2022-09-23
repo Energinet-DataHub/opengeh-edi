@@ -16,9 +16,11 @@ using System;
 using System.Threading.Tasks;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.OutgoingMessages;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
+using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
@@ -56,6 +58,18 @@ public class WhenAConsumerHasMovedInTests : TestBase
         AssertQueuedCommand.QueuedCommand<CreateEndOfSupplyNotification>(GetService<IDbConnectionFactory>());
         AssertTransaction()
             .BusinessProcessCompleted();
+    }
+
+    [Fact]
+    public async Task Grid_operator_is_notified_about_the_move_in()
+    {
+        await ConsumerHasMovedIn().ConfigureAwait(false);
+
+        AssertOutgoingMessage.OutgoingMessage(
+            SampleData.TransactionId,
+            DocumentType.GenericNotification.Name,
+            ProcessType.MoveIn.Code,
+            GetService<IDbConnectionFactory>());
     }
 
     private async Task<MoveInTransaction> ConsumerHasMovedIn()
