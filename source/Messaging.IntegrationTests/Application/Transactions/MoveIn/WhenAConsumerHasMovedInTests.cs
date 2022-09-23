@@ -96,7 +96,9 @@ public class WhenAConsumerHasMovedInTests : TestBase
             .HasReceiverRole(MarketRoles.GridOperator)
             .HasReceiverId(SampleData.NumberOfGridOperatorForMeteringPoint)
             .WithMarketActivityRecord()
-            .HasValidityStart(SampleData.SupplyStart);
+            .HasValidityStart(SampleData.SupplyStart)
+            .HasId()
+            .HasOriginalTransactionId(SampleData.TransactionId);
     }
 
     private static CreateEndOfSupplyNotification CreateCommand()
