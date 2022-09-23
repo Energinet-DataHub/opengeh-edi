@@ -34,7 +34,7 @@ public class MeteringPointCreatedListener
     }
 
     [Function("MeteringPointCreatedListener")]
-    public async Task RunAsync(
+    public void Run(
         [ServiceBusTrigger("%INTEGRATION_EVENT_TOPIC_NAME%", "%METERING_POINT_CREATED_EVENT_B2B_SUBSCRIPTION_NAME%", Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS_LISTENER")] byte[] data,
         FunctionContext context)
     {
@@ -43,7 +43,5 @@ public class MeteringPointCreatedListener
         _logger.LogInformation($"Received MeteringPointCreated integration event in B2B");
 
         var meteringPointCreated = MeteringPointCreated.Parser.ParseFrom(data);
-
-        await _commandSchedulerFacade.EnqueueAsync(new CreateMarketEvalationPoint(meteringPointCreated.GsrnNumber, meteringPointCreated.GridOperatorId)).ConfigureAwait(false);
     }
 }
