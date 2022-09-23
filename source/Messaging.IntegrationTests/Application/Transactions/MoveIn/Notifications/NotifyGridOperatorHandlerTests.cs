@@ -54,8 +54,6 @@ public class NotifyGridOperatorHandlerTests
                 SampleData.ConsumerIdType,
                 SampleData.ConsumerName,
                 SampleData.OriginalMessageId,
-                GetService<IMoveInTransactionRepository>(),
-                GetService<IUnitOfWork>(),
                 GetService<IMediator>(),
                 GetService<B2BContext>())
             .IsEffective()

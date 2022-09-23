@@ -27,8 +27,6 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
 public class Scenario
 {
     private static MoveInTransaction? _transaction;
-    private readonly IMoveInTransactionRepository _repository;
-    private readonly IUnitOfWork _unitOfWork;
     private readonly IMediator _mediator;
     private readonly B2BContext _context;
     private string? _gridOperatorNumber;
@@ -36,14 +34,10 @@ public class Scenario
 
     private Scenario(
         MoveInTransaction transaction,
-        IMoveInTransactionRepository repository,
-        IUnitOfWork unitOfWork,
         IMediator mediator,
         B2BContext context)
     {
         _transaction = transaction;
-        _repository = repository;
-        _unitOfWork = unitOfWork;
         _mediator = mediator;
         _context = context;
     }
@@ -58,8 +52,6 @@ public class Scenario
         string consumerIdType,
         string consumerName,
         string startedByMessageId,
-        IMoveInTransactionRepository repository,
-        IUnitOfWork unitOfWork,
         IMediator mediator,
         B2BContext context)
     {
@@ -74,7 +66,7 @@ public class Scenario
             consumerName,
             consumerIdType);
 
-        return new Scenario(_transaction, repository, unitOfWork, mediator, context);
+        return new Scenario(_transaction, mediator, context);
     }
 
     public Scenario IsEffective()
@@ -96,8 +88,8 @@ public class Scenario
     public async Task BuildAsync()
     {
         await CreateGridOperatorDetailsAsync().ConfigureAwait(false);
-        _repository.Add(_transaction!);
-        await _unitOfWork.CommitAsync();
+        _context.Transactions.Add(_transaction!);
+        await _context.SaveChangesAsync();
     }
 
     private async Task CreateGridOperatorDetailsAsync()
