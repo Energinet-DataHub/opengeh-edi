@@ -71,7 +71,7 @@ public class WhenAConsumerHasMovedInTests : TestBase
 
         AssertTransaction()
             .HasEndOfSupplyNotificationState(MoveInTransaction.EndOfSupplyNotificationState.EnergySupplierWasNotified);
-        AssertMessage(DocumentType.GenericNotification.ToString(), BusinessReasonCode.CustomerMoveInOrMoveOut.Code)
+        AssertMessage(DocumentType.GenericNotification, BusinessReasonCode.CustomerMoveInOrMoveOut.Code)
             .HasReceiverId(transaction.CurrentEnergySupplierId!)
             .HasReceiverRole(MarketRoles.EnergySupplier)
             .HasSenderId(DataHubDetails.IdentificationNumber)
@@ -99,9 +99,9 @@ public class WhenAConsumerHasMovedInTests : TestBase
             .HasReceiverId(SampleData.NumberOfGridOperatorForMeteringPoint);
     }
 
-    private AssertOutgoingMessage AssertMessage(string documentType, string processType)
+    private AssertOutgoingMessage AssertMessage(DocumentType documentType, string processType)
     {
-        return AssertOutgoingMessage.OutgoingMessage(SampleData.TransactionId, documentType, processType, GetService<IDbConnectionFactory>());
+        return AssertOutgoingMessage.OutgoingMessage(SampleData.TransactionId, documentType.Name, processType, GetService<IDbConnectionFactory>());
     }
 
     private CreateEndOfSupplyNotification CreateCommand(string transactionId)
