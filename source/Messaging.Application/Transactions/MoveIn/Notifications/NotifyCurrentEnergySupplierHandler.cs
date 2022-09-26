@@ -18,26 +18,26 @@ using System.Threading.Tasks;
 using MediatR;
 using Messaging.Domain.Transactions.MoveIn;
 
-namespace Messaging.Application.Transactions.MoveIn;
+namespace Messaging.Application.Transactions.MoveIn.Notifications;
 
-public class CreateEndOfSupplyNotificationHandler : IRequestHandler<CreateEndOfSupplyNotification, Unit>
+public class NotifyCurrentEnergySupplierHandler : IRequestHandler<NotifyCurrentEnergySupplier, Unit>
 {
     private readonly IMoveInTransactionRepository _repository;
     private readonly MoveInNotifications _notifications;
 
-    public CreateEndOfSupplyNotificationHandler(IMoveInTransactionRepository repository, MoveInNotifications notifications)
+    public NotifyCurrentEnergySupplierHandler(IMoveInTransactionRepository repository, MoveInNotifications notifications)
     {
         _repository = repository;
         _notifications = notifications;
     }
 
-    public Task<Unit> Handle(CreateEndOfSupplyNotification request, CancellationToken cancellationToken)
+    public Task<Unit> Handle(NotifyCurrentEnergySupplier request, CancellationToken cancellationToken)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
         var transaction = _repository.GetById(request.TransactionId);
         if (transaction is null)
         {
-            throw new TransactionNotFoundException(request.TransactionId);
+            throw TransactionNotFoundException.TransactionIdNotFound(request.TransactionId);
         }
 
         _notifications.InformCurrentEnergySupplierAboutEndOfSupply(request.TransactionId, request.EffectiveDate, request.MarketEvaluationPointId, request.EnergySupplierId);

@@ -16,12 +16,12 @@ using System.Text.Json.Serialization;
 using Messaging.Application.Configuration.Commands.Commands;
 using NodaTime;
 
-namespace Messaging.Application.Transactions.MoveIn;
+namespace Messaging.Application.Transactions.MoveIn.Notifications;
 
-public class CreateEndOfSupplyNotification : InternalCommand
+public class NotifyCurrentEnergySupplier : InternalCommand
 {
     [JsonConstructor]
-    public CreateEndOfSupplyNotification(string transactionId, Instant effectiveDate, string marketEvaluationPointId, string energySupplierId)
+    public NotifyCurrentEnergySupplier(string transactionId, Instant effectiveDate, string marketEvaluationPointId, string energySupplierId)
     {
         TransactionId = transactionId;
         EffectiveDate = effectiveDate;

@@ -16,10 +16,11 @@ using System;
 using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.OutgoingMessages;
 
 namespace Messaging.Infrastructure.OutgoingMessages;
 
-public class ActorLookup
+public class ActorLookup : IActorLookup
 {
     private readonly IDbConnectionFactory _dbConnectionFactory;
 
@@ -35,5 +36,14 @@ public class ActorLookup
             .ExecuteScalarAsync<Guid>(
                 "SELECT Id FROM [b2b].[Actor] WHERE IdentificationNumber = @ActorNumber",
                 new { ActorNumber = actorNumber, });
+    }
+
+    public Task<string> GetActorNumberByIdAsync(Guid actorId)
+    {
+        return _dbConnectionFactory
+            .GetOpenConnection()
+            .ExecuteScalarAsync<string>(
+                "SELECT IdentificationNumber FROM [b2b].[Actor] WHERE Id = @ActorId",
+                new { ActorId = actorId, });
     }
 }

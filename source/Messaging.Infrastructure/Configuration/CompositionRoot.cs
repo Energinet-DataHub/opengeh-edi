@@ -43,6 +43,7 @@ using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages.Requesting;
 using Messaging.Application.SchemaStore;
 using Messaging.Application.Transactions.MoveIn;
+using Messaging.Application.Transactions.MoveIn.Notifications;
 using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
@@ -172,7 +173,7 @@ namespace Messaging.Infrastructure.Configuration
         public CompositionRoot AddMessagePublishing(Func<IServiceProvider, INewMessageAvailableNotifier> action)
         {
             _services.AddScoped(action);
-            _services.AddSingleton<ActorLookup>();
+            _services.AddSingleton<IActorLookup, ActorLookup>();
             _services.AddScoped<MessageAvailabilityPublisher>();
             _services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
             _services.AddTransient<INotificationHandler<TimeHasPassed>, PublishNewMessagesOnTimeHasPassed>();
@@ -234,11 +235,12 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddTransient<IRequestHandler<SetConsumerHasMovedIn, Unit>, SetConsumerHasMovedInHandler>();
             _services.AddTransient<IRequestHandler<ForwardMeteringPointMasterData, Unit>, ForwardMeteringPointMasterDataHandler>();
             _services.AddTransient<IRequestHandler<ForwardCustomerMasterData, Unit>, ForwardCustomerMasterDataHandler>();
-            _services.AddTransient<IRequestHandler<CreateEndOfSupplyNotification, Unit>, CreateEndOfSupplyNotificationHandler>();
-            _services.AddTransient<IRequestHandler<CreateMarketEvalationPoint, Unit>, CreateMarketEvaluationPointHandler>();
+            _services.AddTransient<IRequestHandler<NotifyCurrentEnergySupplier, Unit>, NotifyCurrentEnergySupplierHandler>();
+            _services.AddTransient<IRequestHandler<NotifyGridOperator, Unit>, NotifyGridOperatorHandler>();
             _services.AddTransient<INotificationHandler<MoveInWasAccepted>, FetchMeteringPointMasterDataWhenAccepted>();
             _services.AddTransient<INotificationHandler<MoveInWasAccepted>, FetchCustomerMasterDataWhenAccepted>();
-            _services.AddTransient<INotificationHandler<EndOfSupplyNotificationChangedToPending>, CreateEndOfSupplyNotificationWhenConsumerHasMovedIn>();
+            _services.AddTransient<INotificationHandler<EndOfSupplyNotificationChangedToPending>, NotifyCurrentEnergySupplierWhenConsumerHasMovedIn>();
+            _services.AddTransient<INotificationHandler<BusinessProcessWasCompleted>, NotifyGridOperatorWhenConsumerHasMovedIn>();
             return this;
         }
 

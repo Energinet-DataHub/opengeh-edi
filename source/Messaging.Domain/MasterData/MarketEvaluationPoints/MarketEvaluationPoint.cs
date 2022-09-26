@@ -30,9 +30,9 @@ public class MarketEvaluationPoint
 
     public string EnergySupplierNumber { get; private set; }
 
-    public string GridOperatorId { get; private set; }
+    public Guid? GridOperatorId { get; private set; }
 
-    public static MarketEvaluationPoint Create(string energySupplierNumber, string accountingPointNumber, string gridOperatorId)
+    public static MarketEvaluationPoint Create(string energySupplierNumber, string accountingPointNumber)
     {
         return new MarketEvaluationPoint(accountingPointNumber, energySupplierNumber, gridOperatorId);
     }
@@ -42,7 +42,7 @@ public class MarketEvaluationPoint
         EnergySupplierNumber = energySupplierNumber;
     }
 
-    public void SetGridOperator(string gridOperatorId)
+    public void SetGridOperatorId(Guid gridOperatorId)
     {
         GridOperatorId = gridOperatorId;
     }
