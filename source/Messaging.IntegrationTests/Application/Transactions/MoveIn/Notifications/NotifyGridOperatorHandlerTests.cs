@@ -69,7 +69,7 @@ public class NotifyGridOperatorHandlerTests
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
         AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>())
-            .HasGridOperatorNotificationState(MoveInTransaction.EndOfSupplyNotificationState.WasNotified);
+            .HasGridOperatorNotificationState(MoveInTransaction.NotificationState.WasNotified);
         AssertOutgoingMessage.OutgoingMessage(
                 SampleData.TransactionId,
                 DocumentType.GenericNotification.Name,

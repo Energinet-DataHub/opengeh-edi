@@ -63,7 +63,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
                 .HasConsumerId(incomingMessage.MarketActivityRecord.ConsumerId!)
                 .HasConsumerName(incomingMessage.MarketActivityRecord.ConsumerName!)
                 .HasConsumerIdType(incomingMessage.MarketActivityRecord.ConsumerIdType!)
-                .HasEndOfSupplyNotificationState(MoveInTransaction.EndOfSupplyNotificationState.NotNeeded);
+                .HasEndOfSupplyNotificationState(MoveInTransaction.NotificationState.NotNeeded);
         }
 
         [Fact]

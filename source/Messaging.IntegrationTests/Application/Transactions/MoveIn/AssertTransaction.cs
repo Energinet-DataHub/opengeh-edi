@@ -106,13 +106,13 @@ public class AssertTransaction
         return this;
     }
 
-    public AssertTransaction HasEndOfSupplyNotificationState(MoveInTransaction.EndOfSupplyNotificationState expectedState)
+    public AssertTransaction HasEndOfSupplyNotificationState(MoveInTransaction.NotificationState expectedState)
     {
         Assert.Equal(expectedState.ToString(), _transaction.EndOfSupplyNotificationState);
         return this;
     }
 
-    public AssertTransaction HasGridOperatorNotificationState(MoveInTransaction.EndOfSupplyNotificationState expectedState)
+    public AssertTransaction HasGridOperatorNotificationState(MoveInTransaction.NotificationState expectedState)
     {
         Assert.Equal(expectedState.ToString(), _transaction.GridOperatorNotificationState);
         return this;
