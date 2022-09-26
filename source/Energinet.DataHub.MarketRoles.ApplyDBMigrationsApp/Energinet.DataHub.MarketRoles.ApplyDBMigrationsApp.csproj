@@ -43,13 +43,16 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202225081325 Refactor columns.sql" />
     <EmbeddedResource Include="Scripts\Model\202225081509 Remove reasoncode column.sql" />
     <EmbeddedResource Include="Scripts\Model\202225081510 Drop actors table.sql" />
-    <EmbeddedResource Include="Scripts\Model\202225081511 Add grid operator id.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281100 Seed cleanup.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281101 Insert Reasons.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241100 Consolidated dbo model.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241101 Consolidated BtwoB model.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281102 Insert AccountPoints.sql" />
     <EmbeddedResource Include="Scripts\Seed\202209151140 Insert Reasons.sql" />
+    <None Remove="Scripts\Model\202226081222 Add gridoperatorid to market evaluation point.sql" />
+    <EmbeddedResource Include="Scripts\Model\202226081222 Add gridoperatorid to market evaluation point.sql" />
+    <None Remove="Scripts\Model\202226081300 Make energysupplierid nullable.sql" />
+    <EmbeddedResource Include="Scripts\Model\202226081300 Make EnergySupplierNumber nullable.sql" />
   </ItemGroup>
 
 </Project>

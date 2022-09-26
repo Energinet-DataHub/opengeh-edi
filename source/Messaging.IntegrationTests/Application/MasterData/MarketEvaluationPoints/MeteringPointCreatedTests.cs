@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Messaging.Application.MasterData.MarketEvaluationPoints;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.IntegrationTests.Fixtures;
@@ -34,9 +35,9 @@ public class MeteringPointCreatedTests
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
         var dbContext = GetService<B2BContext>();
-        var returned = await dbContext.Database.ExecuteSqlRawAsync(@$"
-        SELECT *
-        FROM [b2b].[MarketEvaluationPoints]
-        WHERE MarketEvaluationPointNumber = '{SampleData.MarketEvaluationPointNumber}'");
+        var returned = dbContext.MarketEvaluationPoints.FirstOrDefault(x
+            => x.MarketEvaluationPointNumber == SampleData.MarketEvaluationPointNumber);
+
+        Assert.Equal(returned?.GridOperatorId, Transactions.MoveIn.SampleData.IdOfGridOperatorForMeteringPoint);
     }
 }
