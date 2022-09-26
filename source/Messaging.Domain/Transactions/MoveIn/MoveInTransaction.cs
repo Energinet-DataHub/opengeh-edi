@@ -56,6 +56,7 @@ namespace Messaging.Domain.Transactions.MoveIn
             NotNeeded,
             Pending,
             EnergySupplierWasNotified,
+            WasNotified,
         }
 
         public enum BusinessProcessState
@@ -154,6 +155,12 @@ namespace Messaging.Domain.Transactions.MoveIn
             {
                 _endOfSupplyNotificationState = EndOfSupplyNotificationState.EnergySupplierWasNotified;
             }
+        }
+
+        #pragma warning disable
+        public void SetGridOperatorWasNotified()
+        {
+            AddDomainEvent(new GridOperatorWasNotified());
         }
 
         private void SetEndOfSupplyNotificationPending()

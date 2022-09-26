@@ -150,6 +150,14 @@ public class MoveInTransactionTests
         Assert.Equal(1, _transaction.DomainEvents.Count(e => e is MeteringPointMasterDataWasSent));
     }
 
+    [Fact]
+    public void Grid_operator_notification_is_marked_as_notified()
+    {
+        _transaction.SetGridOperatorWasNotified();
+
+        Assert.Equal(1, _transaction.DomainEvents.Count(e => e is GridOperatorWasNotified));
+    }
+
     private static MoveInTransaction CreateTransaction()
     {
         return CreateTransaction(SampleData.CurrentEnergySupplierId);
