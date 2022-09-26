@@ -149,7 +149,7 @@ namespace Messaging.Domain.Transactions.MoveIn
             AddDomainEvent(new CustomerMasterDataWasSent(TransactionId));
         }
 
-        public void MarkEndOfSupplyNotificationAsSent()
+        public void SetCurrentEnergySupplierWasNotified()
         {
             if (_currentEnergySupplierNotificationState == NotificationState.Pending)
             {
