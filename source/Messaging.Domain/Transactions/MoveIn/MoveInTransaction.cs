@@ -56,7 +56,6 @@ namespace Messaging.Domain.Transactions.MoveIn
             Required,
             NotNeeded,
             Pending,
-            EnergySupplierWasNotified,
             WasNotified,
         }
 
@@ -154,7 +153,7 @@ namespace Messaging.Domain.Transactions.MoveIn
         {
             if (_endOfSupplyNotificationState == NotificationState.Pending)
             {
-                _endOfSupplyNotificationState = NotificationState.EnergySupplierWasNotified;
+                _endOfSupplyNotificationState = NotificationState.WasNotified;
             }
         }
 

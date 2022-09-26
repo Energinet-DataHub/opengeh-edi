@@ -68,7 +68,7 @@ public class NotifyCurrentEnergySupplierHandlerTests
         await InvokeCommandAsync(CreateCommand()).ConfigureAwait(false);
 
         AssertTransaction()
-            .HasEndOfSupplyNotificationState(MoveInTransaction.NotificationState.EnergySupplierWasNotified);
+            .HasEndOfSupplyNotificationState(MoveInTransaction.NotificationState.WasNotified);
         AssertMessage(DocumentType.GenericNotification, BusinessReasonCode.CustomerMoveInOrMoveOut.Code)
             .HasReceiverId(SampleData.CurrentEnergySupplierNumber)
             .HasReceiverRole(MarketRoles.EnergySupplier)

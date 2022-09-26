@@ -108,7 +108,7 @@ public class AssertTransaction
 
     public AssertTransaction HasEndOfSupplyNotificationState(MoveInTransaction.NotificationState expectedState)
     {
-        Assert.Equal(expectedState.ToString(), _transaction.EndOfSupplyNotificationState);
+        Assert.Equal(expectedState.ToString(), _transaction.CurrentEnergySupplierNotificationState);
         return this;
     }
 
