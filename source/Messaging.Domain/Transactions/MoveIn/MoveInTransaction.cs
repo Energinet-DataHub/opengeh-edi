@@ -25,6 +25,7 @@ namespace Messaging.Domain.Transactions.MoveIn
         private EndOfSupplyNotificationState _endOfSupplyNotificationState;
         private MasterDataState _meteringPointMasterDataState;
         private MasterDataState _customerMasterDataState;
+        private EndOfSupplyNotificationState _gridOperatorNotificationState = EndOfSupplyNotificationState.Pending;
 
         public MoveInTransaction(string transactionId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId, string startedByMessageId, string newEnergySupplierId, string? consumerId, string? consumerName, string? consumerIdType)
         {
@@ -157,10 +158,13 @@ namespace Messaging.Domain.Transactions.MoveIn
             }
         }
 
-        #pragma warning disable
         public void SetGridOperatorWasNotified()
         {
-            AddDomainEvent(new GridOperatorWasNotified());
+            if (_gridOperatorNotificationState == EndOfSupplyNotificationState.Pending)
+            {
+                _gridOperatorNotificationState = EndOfSupplyNotificationState.WasNotified;
+                AddDomainEvent(new GridOperatorWasNotified());
+            }
         }
 
         private void SetEndOfSupplyNotificationPending()

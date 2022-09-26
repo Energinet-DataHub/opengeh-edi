@@ -111,4 +111,10 @@ public class AssertTransaction
         Assert.Equal(expectedState.ToString(), _transaction.EndOfSupplyNotificationState);
         return this;
     }
+
+    public AssertTransaction HasGridOperatorNotificationState(MoveInTransaction.EndOfSupplyNotificationState expectedState)
+    {
+        Assert.Equal(expectedState.ToString(), _transaction.GridOperatorNotificationState);
+        return this;
+    }
 }
