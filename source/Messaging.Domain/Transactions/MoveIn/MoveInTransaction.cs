@@ -104,7 +104,7 @@ namespace Messaging.Domain.Transactions.MoveIn
             _businessProcessState = BusinessProcessState.Completed;
             AddDomainEvent(new BusinessProcessWasCompleted(TransactionId));
 
-            SetEndOfSupplyNotificationPending();
+            SetCurrentEnergySupplierNotificationToPending();
         }
 
         public void AcceptedByBusinessProcess(string processId, string marketEvaluationPointNumber)
@@ -166,7 +166,7 @@ namespace Messaging.Domain.Transactions.MoveIn
             }
         }
 
-        private void SetEndOfSupplyNotificationPending()
+        private void SetCurrentEnergySupplierNotificationToPending()
         {
             if (CurrentEnergySupplierId is null)
                 throw new MoveInException("There is no current energy supplier to notify");
