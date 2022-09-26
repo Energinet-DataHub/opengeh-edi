@@ -12,24 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json.Serialization;
-using Messaging.Application.Configuration.Commands.Commands;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using MediatR;
 
 namespace Messaging.Application.MasterData.MarketEvaluationPoints;
 
-public class MarketEvaluationPoint : InternalCommand
+public class CreateMarketEvaluationPointHandler : IRequestHandler<CreateMarketEvalationPoint, Unit>
 {
-    [JsonConstructor]
-    public MarketEvaluationPoint(string marketEvaluationPointNumber, string energySupplierNumber, string gridOperatorId)
+    public Task<Unit> Handle(CreateMarketEvalationPoint request, CancellationToken cancellationToken)
     {
-        MarketEvaluationPointNumber = marketEvaluationPointNumber;
-        EnergySupplierNumber = energySupplierNumber;
-        GridOperatorId = gridOperatorId;
+        if (request == null) throw new ArgumentNullException(nameof(request));
+
+        throw new System.NotImplementedException();
     }
-
-    public string MarketEvaluationPointNumber { get; }
-
-    public string EnergySupplierNumber { get; }
-
-    public string GridOperatorId { get; }
 }

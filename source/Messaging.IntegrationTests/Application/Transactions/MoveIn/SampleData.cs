@@ -62,5 +62,5 @@ internal static class SampleData
 
     internal static IEnumerable<UsagePointLocation> UsagePointLocations => new List<UsagePointLocation>();
 
-    internal static string GridOperatorId => "";
+    internal static string GridOperatorId => "9C9FD63F-4CAA-41DE-92B6-E2C64A5FC9CA";
 }

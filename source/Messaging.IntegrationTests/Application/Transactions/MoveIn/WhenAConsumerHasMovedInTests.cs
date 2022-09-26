@@ -88,7 +88,10 @@ public class WhenAConsumerHasMovedInTests : TestBase
 
     private Task SetupMasterDataDetailsAsync()
     {
-        GetService<IMarketEvaluationPointRepository>().Add(MarketEvaluationPoint.Create(SampleData.CurrentEnergySupplierNumber, SampleData.MeteringPointNumber));
+        GetService<IMarketEvaluationPointRepository>().Add(MarketEvaluationPoint.Create(
+            SampleData.CurrentEnergySupplierNumber,
+            SampleData.MeteringPointNumber,
+            SampleData.GridOperatorId));
         return Task.CompletedTask;
     }
 
