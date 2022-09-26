@@ -11,9 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-module "sbs_mp_created_energy_supplying_event" {
+module "sbs_metering_point_created_energy_supplying_event" {
   source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/service-bus-topic-subscription?ref=v9"
-  name                = "metering-point-created-energy-supplying"
+  name                = "mp-created-energy-supplying"
   topic_id            = data.azurerm_key_vault_secret.sbt_domainrelay_integrationevent_received_name_id.value
   project_name        = var.domain_name_short
   max_delivery_count  = 10 
