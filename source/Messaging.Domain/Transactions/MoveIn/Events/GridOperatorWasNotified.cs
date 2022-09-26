@@ -16,15 +16,6 @@ using Messaging.Domain.SeedWork;
 
 namespace Messaging.Domain.Transactions.MoveIn.Events;
 
-public class MoveInWasStarted : DomainEvent
+public class GridOperatorWasNotified : DomainEvent
 {
-    public MoveInWasStarted(string transactionId, MoveInTransaction.NotificationState endOfSupplyNotificationState)
-    {
-        TransactionId = transactionId;
-        EndOfSupplyNotificationState = endOfSupplyNotificationState;
-    }
-
-    public string TransactionId { get; }
-
-    public MoveInTransaction.NotificationState EndOfSupplyNotificationState { get; }
 }

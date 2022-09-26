@@ -22,16 +22,17 @@ namespace Messaging.Domain.Transactions.MoveIn
     {
         private readonly State _state = State.Started;
         private BusinessProcessState _businessProcessState;
-        private EndOfSupplyNotificationState _endOfSupplyNotificationState;
+        private NotificationState _currentEnergySupplierNotificationState;
         private MasterDataState _meteringPointMasterDataState;
         private MasterDataState _customerMasterDataState;
+        private NotificationState _gridOperatorNotificationState = NotificationState.Pending;
 
         public MoveInTransaction(string transactionId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId, string startedByMessageId, string newEnergySupplierId, string? consumerId, string? consumerName, string? consumerIdType)
         {
             _businessProcessState = BusinessProcessState.Pending;
-            _endOfSupplyNotificationState = currentEnergySupplierId is not null
-                ? EndOfSupplyNotificationState.Required
-                : EndOfSupplyNotificationState.NotNeeded;
+            _currentEnergySupplierNotificationState = currentEnergySupplierId is not null
+                ? NotificationState.Required
+                : NotificationState.NotNeeded;
             TransactionId = transactionId;
             MarketEvaluationPointId = marketEvaluationPointId;
             EffectiveDate = effectiveDate;
@@ -41,7 +42,7 @@ namespace Messaging.Domain.Transactions.MoveIn
             ConsumerId = consumerId;
             ConsumerName = consumerName;
             ConsumerIdType = consumerIdType;
-            AddDomainEvent(new MoveInWasStarted(TransactionId, _endOfSupplyNotificationState));
+            AddDomainEvent(new MoveInWasStarted(TransactionId, _currentEnergySupplierNotificationState));
         }
 
         public enum State
@@ -50,12 +51,12 @@ namespace Messaging.Domain.Transactions.MoveIn
             Completed,
         }
 
-        public enum EndOfSupplyNotificationState
+        public enum NotificationState
         {
             Required,
             NotNeeded,
             Pending,
-            EnergySupplierWasNotified,
+            WasNotified,
         }
 
         public enum BusinessProcessState
@@ -103,7 +104,7 @@ namespace Messaging.Domain.Transactions.MoveIn
             _businessProcessState = BusinessProcessState.Completed;
             AddDomainEvent(new BusinessProcessWasCompleted(TransactionId));
 
-            SetEndOfSupplyNotificationPending();
+            SetCurrentEnergySupplierNotificationToPending();
         }
 
         public void AcceptedByBusinessProcess(string processId, string marketEvaluationPointNumber)
@@ -148,22 +149,31 @@ namespace Messaging.Domain.Transactions.MoveIn
             AddDomainEvent(new CustomerMasterDataWasSent(TransactionId));
         }
 
-        public void MarkEndOfSupplyNotificationAsSent()
+        public void SetCurrentEnergySupplierWasNotified()
         {
-            if (_endOfSupplyNotificationState == EndOfSupplyNotificationState.Pending)
+            if (_currentEnergySupplierNotificationState == NotificationState.Pending)
             {
-                _endOfSupplyNotificationState = EndOfSupplyNotificationState.EnergySupplierWasNotified;
+                _currentEnergySupplierNotificationState = NotificationState.WasNotified;
             }
         }
 
-        private void SetEndOfSupplyNotificationPending()
+        public void SetGridOperatorWasNotified()
+        {
+            if (_gridOperatorNotificationState == NotificationState.Pending)
+            {
+                _gridOperatorNotificationState = NotificationState.WasNotified;
+                AddDomainEvent(new GridOperatorWasNotified());
+            }
+        }
+
+        private void SetCurrentEnergySupplierNotificationToPending()
         {
             if (CurrentEnergySupplierId is null)
                 throw new MoveInException("There is no current energy supplier to notify");
 
-            if (_endOfSupplyNotificationState == EndOfSupplyNotificationState.Required)
+            if (_currentEnergySupplierNotificationState == NotificationState.Required)
             {
-                _endOfSupplyNotificationState = EndOfSupplyNotificationState.Pending;
+                _currentEnergySupplierNotificationState = NotificationState.Pending;
                 AddDomainEvent(new EndOfSupplyNotificationChangedToPending(TransactionId, EffectiveDate, MarketEvaluationPointId, CurrentEnergySupplierId));
             }
         }
