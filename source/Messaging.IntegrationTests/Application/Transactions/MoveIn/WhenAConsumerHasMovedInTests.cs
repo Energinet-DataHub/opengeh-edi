@@ -18,6 +18,7 @@ using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Transactions.MoveIn.Notifications;
+using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
@@ -101,8 +102,7 @@ public class WhenAConsumerHasMovedInTests : TestBase
     {
         GetService<IMarketEvaluationPointRepository>().Add(MarketEvaluationPoint.Create(
             SampleData.CurrentEnergySupplierNumber,
-            SampleData.MeteringPointNumber,
-            SampleData.GridOperatorId));
+            SampleData.MeteringPointNumber));
         return Task.CompletedTask;
     }
 

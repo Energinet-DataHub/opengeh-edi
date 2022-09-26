@@ -38,10 +38,9 @@ public class SetEnergySupplierHandler : IRequestHandler<SetEnergySupplier, Unit>
 
         if (marketEvaluationPoint is null)
         {
-            marketEvaluationPoint = Messaging.Domain.MasterData.MarketEvaluationPoints.MarketEvaluationPoint.Create(
+            marketEvaluationPoint = MarketEvaluationPoint.Create(
                 request.EnergySupplierNumber,
-                request.MarketEvaluationPointNumber,
-                string.Empty);
+                request.MarketEvaluationPointNumber);
             _marketEvaluationPoints.Add(marketEvaluationPoint);
         }
         else

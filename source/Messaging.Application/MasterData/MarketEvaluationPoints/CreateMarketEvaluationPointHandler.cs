@@ -16,15 +16,37 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Messaging.Domain.MasterData.MarketEvaluationPoints;
 
 namespace Messaging.Application.MasterData.MarketEvaluationPoints;
 
 public class CreateMarketEvaluationPointHandler : IRequestHandler<CreateMarketEvalationPoint, Unit>
 {
-    public Task<Unit> Handle(CreateMarketEvalationPoint request, CancellationToken cancellationToken)
+    private readonly IMarketEvaluationPointRepository _marketEvaluationPoints;
+
+    public CreateMarketEvaluationPointHandler(IMarketEvaluationPointRepository marketEvaluationPoints)
+    {
+        _marketEvaluationPoints = marketEvaluationPoints;
+    }
+
+    public async Task<Unit> Handle(CreateMarketEvalationPoint request, CancellationToken cancellationToken)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
 
-        throw new System.NotImplementedException();
+        var marketEvaluationPoint = await _marketEvaluationPoints
+            .GetByNumberAsync(request.MarketEvaluationPointNumber)
+            .ConfigureAwait(false);
+
+        if (marketEvaluationPoint is null)
+        {
+            marketEvaluationPoint = MarketEvaluationPoint.Create(Guid.Parse(request.GridOperatorId), request.MarketEvaluationPointNumber);
+            _marketEvaluationPoints.Add(marketEvaluationPoint);
+        }
+        else
+        {
+            marketEvaluationPoint.SetGridOperatorId(Guid.Parse(request.GridOperatorId));
+        }
+
+        return Unit.Value;
     }
 }
