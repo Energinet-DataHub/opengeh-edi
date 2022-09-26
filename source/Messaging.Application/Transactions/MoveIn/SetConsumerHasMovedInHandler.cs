@@ -35,7 +35,7 @@ public class SetConsumerHasMovedInHandler : IRequestHandler<SetConsumerHasMovedI
         var transaction = await _transactionRepository.GetByProcessIdAsync(request.ProcessId).ConfigureAwait(false);
         if (transaction is null)
         {
-            throw new TransactionNotFoundException(request.ProcessId);
+            throw TransactionNotFoundException.TransactionForProcessIdNotFound(request.ProcessId);
         }
 
         transaction.BusinessProcessCompleted();

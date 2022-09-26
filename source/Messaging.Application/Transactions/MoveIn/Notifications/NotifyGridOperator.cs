@@ -12,11 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Application.OutgoingMessages.Common;
+using System.Text.Json.Serialization;
+using Messaging.Application.Configuration.Commands.Commands;
 
-public static class MarketRoles
+namespace Messaging.Application.Transactions.MoveIn.Notifications;
+
+public class NotifyGridOperator : InternalCommand
 {
-    public const string MeteringPointAdministrator = "DDZ";
-    public const string EnergySupplier = "DDQ";
-    public const string GridOperator = "DDM";
+    [JsonConstructor]
+    public NotifyGridOperator(string transactionId)
+    {
+        TransactionId = transactionId;
+    }
+
+    public string TransactionId { get; }
 }

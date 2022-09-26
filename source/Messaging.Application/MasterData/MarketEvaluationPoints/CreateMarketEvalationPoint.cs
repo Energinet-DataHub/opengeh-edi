@@ -14,26 +14,19 @@
 
 using System.Text.Json.Serialization;
 using Messaging.Application.Configuration.Commands.Commands;
-using NodaTime;
 
-namespace Messaging.Application.Transactions.MoveIn;
+namespace Messaging.Application.MasterData.MarketEvaluationPoints;
 
-public class CreateEndOfSupplyNotification : InternalCommand
+public class CreateMarketEvalationPoint : InternalCommand
 {
     [JsonConstructor]
-    public CreateEndOfSupplyNotification(string transactionId, Instant effectiveDate, string marketEvaluationPointId, string energySupplierId)
+    public CreateMarketEvalationPoint(string marketEvaluationPointNumber, string gridOperatorId)
     {
-        TransactionId = transactionId;
-        EffectiveDate = effectiveDate;
-        MarketEvaluationPointId = marketEvaluationPointId;
-        EnergySupplierId = energySupplierId;
+        MarketEvaluationPointNumber = marketEvaluationPointNumber;
+        GridOperatorId = gridOperatorId;
     }
 
-    public string TransactionId { get; }
+    public string MarketEvaluationPointNumber { get; }
 
-    public Instant EffectiveDate { get; }
-
-    public string MarketEvaluationPointId { get; }
-
-    public string EnergySupplierId { get; }
+    public string GridOperatorId { get; }
 }

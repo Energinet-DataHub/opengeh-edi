@@ -12,11 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Application.OutgoingMessages.Common;
+using System;
+using System.Threading.Tasks;
 
-public static class MarketRoles
+namespace Messaging.Application.OutgoingMessages;
+
+/// <summary>
+/// Service for looking up actor details
+/// </summary>
+public interface IActorLookup
 {
-    public const string MeteringPointAdministrator = "DDZ";
-    public const string EnergySupplier = "DDQ";
-    public const string GridOperator = "DDM";
+    /// <summary>
+    /// Get actor unique id by actor number
+    /// </summary>
+    /// <param name="actorNumber"></param>
+    Task<Guid> GetIdByActorNumberAsync(string actorNumber);
+
+    /// <summary>
+    /// Get actor number by id
+    /// </summary>
+    /// <param name="actorId"></param>
+    Task<string> GetActorNumberByIdAsync(Guid actorId);
 }

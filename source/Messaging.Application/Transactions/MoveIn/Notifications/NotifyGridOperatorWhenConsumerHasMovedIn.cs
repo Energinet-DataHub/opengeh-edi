@@ -16,29 +16,23 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.Commands;
 using Messaging.Domain.Transactions.MoveIn.Events;
 
-namespace Messaging.Application.Transactions.MoveIn;
+namespace Messaging.Application.Transactions.MoveIn.Notifications;
 
-public class CreateEndOfSupplyNotificationWhenConsumerHasMovedIn : INotificationHandler<EndOfSupplyNotificationChangedToPending>
+public class NotifyGridOperatorWhenConsumerHasMovedIn : INotificationHandler<BusinessProcessWasCompleted>
 {
     private readonly ICommandScheduler _commandScheduler;
 
-    public CreateEndOfSupplyNotificationWhenConsumerHasMovedIn(ICommandScheduler commandScheduler)
+    public NotifyGridOperatorWhenConsumerHasMovedIn(ICommandScheduler commandScheduler)
     {
         _commandScheduler = commandScheduler;
     }
 
-    public Task Handle(EndOfSupplyNotificationChangedToPending notification, CancellationToken cancellationToken)
+    public Task Handle(BusinessProcessWasCompleted notification, CancellationToken cancellationToken)
     {
-        if (notification == null) throw new ArgumentNullException(nameof(notification));
-        return _commandScheduler.EnqueueAsync(
-            new CreateEndOfSupplyNotification(
-                notification.TransactionId,
-                notification.EffectiveDate,
-                notification.MarketEvaluationPointId,
-                notification.EnergySupplierId));
+        ArgumentNullException.ThrowIfNull(notification);
+        return _commandScheduler.EnqueueAsync(new NotifyGridOperator(notification.TransactionId));
     }
 }

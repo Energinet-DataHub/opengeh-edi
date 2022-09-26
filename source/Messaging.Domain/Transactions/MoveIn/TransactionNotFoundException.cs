@@ -16,8 +16,8 @@ namespace Messaging.Domain.Transactions.MoveIn;
 
 public class TransactionNotFoundException : Exception
 {
-    public TransactionNotFoundException(string processId)
-        : base($"Could not find a transaction for business process id {processId}")
+    private TransactionNotFoundException(string message)
+        : base(message)
     {
     }
 
@@ -28,5 +28,15 @@ public class TransactionNotFoundException : Exception
     private TransactionNotFoundException(string message, Exception innerException)
         : base(message, innerException)
     {
+    }
+
+    public static TransactionNotFoundException TransactionIdNotFound(string transactionId)
+    {
+        return new TransactionNotFoundException($"Move in transaction {transactionId} was not found");
+    }
+
+    public static TransactionNotFoundException TransactionForProcessIdNotFound(string processId)
+    {
+        return new TransactionNotFoundException($"Move in transaction for business process id {processId} was not found");
     }
 }
