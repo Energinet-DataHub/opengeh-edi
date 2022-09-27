@@ -52,7 +52,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Seed\202206281102 Insert AccountPoints.sql" />
     <EmbeddedResource Include="Scripts\Seed\202209151140 Insert Reasons.sql" />
     <EmbeddedResource Include="Scripts\Model\202226081222 Add gridoperatorid to market evaluation point.sql" />
-    <EmbeddedResource Include="Scripts\Model\202226081300 Make EnergySupplierNumber nullable.sql" />
+    <EmbeddedResource Include="Scripts\Model\202226081400 Make EnergySupplierNumber nullable.sql" />
   </ItemGroup>
 
 </Project>
