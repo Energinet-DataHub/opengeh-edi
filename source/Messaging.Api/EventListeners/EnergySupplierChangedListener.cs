@@ -43,8 +43,8 @@ public class EnergySupplierChangedListener
         var energySupplierChanged = Energinet.DataHub.EnergySupplying.IntegrationEvents.EnergySupplierChanged.Parser.ParseFrom(data);
         _logger.LogInformation($"Received EnergySupplierChanged integration event: {data}");
         await _commandScheduler.EnqueueAsync(
-            new SetEnergySupplier(
+            new CreateMarketEvalationPoint(
             energySupplierChanged.GsrnNumber,
-            energySupplierChanged.EnergySupplierGln)).ConfigureAwait(false);
+            energySupplierNumber: energySupplierChanged.EnergySupplierGln)).ConfigureAwait(false);
     }
 }

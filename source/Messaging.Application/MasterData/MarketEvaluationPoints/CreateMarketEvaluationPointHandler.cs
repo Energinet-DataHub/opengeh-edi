@@ -37,16 +37,47 @@ public class CreateMarketEvaluationPointHandler : IRequestHandler<CreateMarketEv
             .GetByNumberAsync(request.MarketEvaluationPointNumber)
             .ConfigureAwait(false);
 
+        if (string.IsNullOrEmpty(request.EnergySupplierNumber))
+        {
+            HandleGridOperatorId(request, marketEvaluationPoint);
+        }
+        else
+        {
+            HandleEnergySupplierNumber(request, marketEvaluationPoint);
+        }
+
+        return Unit.Value;
+    }
+
+    private void HandleGridOperatorId(CreateMarketEvalationPoint request, MarketEvaluationPoint? marketEvaluationPoint)
+    {
         if (marketEvaluationPoint is null)
         {
-            marketEvaluationPoint = MarketEvaluationPoint.Create(Guid.Parse(request.GridOperatorId), request.MarketEvaluationPointNumber);
+            marketEvaluationPoint = MarketEvaluationPoint.Create(
+                Guid.Parse(request.GridOperatorId),
+                request.MarketEvaluationPointNumber);
             _marketEvaluationPoints.Add(marketEvaluationPoint);
         }
         else
         {
             marketEvaluationPoint.SetGridOperatorId(Guid.Parse(request.GridOperatorId));
         }
+    }
 
-        return Unit.Value;
+    private void HandleEnergySupplierNumber(
+        CreateMarketEvalationPoint request,
+        MarketEvaluationPoint? marketEvaluationPoint)
+    {
+        if (marketEvaluationPoint is null)
+        {
+            marketEvaluationPoint = MarketEvaluationPoint.Create(
+                request.EnergySupplierNumber,
+                request.MarketEvaluationPointNumber);
+            _marketEvaluationPoints.Add(marketEvaluationPoint);
+        }
+        else
+        {
+            marketEvaluationPoint.SetEnergySupplier(request.EnergySupplierNumber);
+        }
     }
 }

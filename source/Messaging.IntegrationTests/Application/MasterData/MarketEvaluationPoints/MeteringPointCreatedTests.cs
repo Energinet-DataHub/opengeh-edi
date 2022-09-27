@@ -40,4 +40,19 @@ public class MeteringPointCreatedTests
 
         Assert.Equal(returned?.GridOperatorId, Transactions.MoveIn.SampleData.IdOfGridOperatorForMeteringPoint);
     }
+
+    [Fact]
+    public async Task Energy_supplier_number_is_persisted()
+    {
+        var command = new CreateMarketEvalationPoint(
+            SampleData.MarketEvaluationPointNumber,
+            energySupplierNumber: SampleData.EnergySupplierNumber);
+        await InvokeCommandAsync(command).ConfigureAwait(false);
+
+        var dbContext = GetService<B2BContext>();
+        var returned = dbContext.MarketEvaluationPoints.FirstOrDefault(x =>
+            x.MarketEvaluationPointNumber == SampleData.MarketEvaluationPointNumber);
+
+        Assert.Equal(returned?.EnergySupplierNumber, SampleData.EnergySupplierNumber);
+    }
 }
