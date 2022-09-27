@@ -53,7 +53,7 @@ public class CreateMarketEvaluationPointTests
         var returned = dbContext.MarketEvaluationPoints.FirstOrDefault(x
             => x.MarketEvaluationPointNumber == SampleData.MarketEvaluationPointNumber);
 
-        Assert.Equal(returned?.GridOperatorId, Transactions.MoveIn.SampleData.IdOfGridOperatorForMeteringPoint);
+        Assert.Equal(returned?.GridOperatorId, SampleData.IdOfGridOperatorForMeteringPoint);
     }
 
     [Fact]
@@ -81,7 +81,7 @@ public class CreateMarketEvaluationPointTests
         var meteringPointCreatedCommand = new CreateMarketEvaluationPoint(
             SampleData.MarketEvaluationPointNumber,
             meteringPointId,
-            gridOperatorId: Transactions.MoveIn.SampleData.IdOfGridOperatorForMeteringPoint);
+            gridOperatorId: SampleData.IdOfGridOperatorForMeteringPoint);
         await InvokeCommandAsync(meteringPointCreatedCommand).ConfigureAwait(false);
 
         var energySupplierChangedCommand = new CreateMarketEvaluationPoint(
@@ -96,6 +96,6 @@ public class CreateMarketEvaluationPointTests
             x.MarketEvaluationPointNumber == SampleData.MarketEvaluationPointNumber);
 
         Assert.Equal(returned?.EnergySupplierNumber, SampleData.EnergySupplierNumber);
-        Assert.Equal(returned?.GridOperatorId, Transactions.MoveIn.SampleData.IdOfGridOperatorForMeteringPoint);
+        Assert.Equal(returned?.GridOperatorId, SampleData.IdOfGridOperatorForMeteringPoint);
     }
 }
