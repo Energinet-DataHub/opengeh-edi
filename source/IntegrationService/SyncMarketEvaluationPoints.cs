@@ -20,7 +20,7 @@ namespace IntegrationService;
 public static class SyncMarketEvaluationPoints
 {
     [Function("SyncMarketEvaluationPoints")]
-    public static Task RunAsync([TimerTrigger("* * * * * *")] TimerInfo timerTimerInfo, FunctionContext context)
+    public static Task RunAsync([TimerTrigger("*/30 * * * *")] TimerInfo timerTimerInfo, FunctionContext context)
     {
         var logger = context.GetLogger("SyncMarketEvaluationPoints");
         return FetchMarketEvaluationPointsAsync();
