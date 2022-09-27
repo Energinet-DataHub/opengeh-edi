@@ -44,7 +44,7 @@ public class MeteringPointCreatedListener
 
         var meteringPointCreated = MeteringPointCreated.Parser.ParseFrom(data);
 
-        _logger.LogInformation($"Received consumer moved in event: {meteringPointCreated}");
+        _logger.LogInformation($"Received metering point created event: {meteringPointCreated}");
         await _commandSchedulerFacade.EnqueueAsync(
                 new CreateMarketEvalationPoint(
                     meteringPointCreated.GsrnNumber,
