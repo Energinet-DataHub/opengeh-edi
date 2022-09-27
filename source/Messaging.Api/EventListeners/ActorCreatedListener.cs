@@ -37,9 +37,9 @@ public class ActorCreatedListener
     public async Task RunAsync([ServiceBusTrigger("%INTEGRATION_EVENT_TOPIC_NAME%", "%MARKET_PARTICIPANT_CHANGED_ACTOR_CREATED_SUBSCRIPTION_NAME%", Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS_LISTENER")] byte[] data, FunctionContext context)
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
-        var integrationEvent = ActorCreatedIntegrationEventContract.Parser.ParseFrom(data);
+        var integrationEvent = SharedIntegrationEventContract.Parser.ParseFrom(data);
 
-        var command = new CreateActor(integrationEvent.ActorId, integrationEvent.ActorNumber);
+        var command = new CreateActor(integrationEvent.ActorCreatedIntegrationEvent.ActorId, integrationEvent.ActorCreatedIntegrationEvent.ActorNumber);
 
         await _commandSchedulerFacade.EnqueueAsync(command).ConfigureAwait(false);
     }
