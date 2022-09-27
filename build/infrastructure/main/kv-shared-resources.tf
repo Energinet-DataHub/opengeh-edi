@@ -106,3 +106,8 @@ data "azurerm_key_vault_secret" "sbt_domainrelay_integrationevent_received_name_
   name         = "sbt-sharedres-integrationevent-received-id"
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }
+
+data "azurerm_key_vault_secret" "metering_point_database_name" {
+  name         = "metering-point-database-name"
+  key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
+}
