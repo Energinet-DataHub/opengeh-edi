@@ -20,7 +20,7 @@ using Messaging.Domain.MasterData.MarketEvaluationPoints;
 
 namespace Messaging.Application.MasterData.MarketEvaluationPoints;
 
-public class CreateMarketEvaluationPointHandler : IRequestHandler<CreateMarketEvalationPoint, Unit>
+public class CreateMarketEvaluationPointHandler : IRequestHandler<CreateMarketEvaluationPoint, Unit>
 {
     private readonly IMarketEvaluationPointRepository _marketEvaluationPoints;
 
@@ -29,7 +29,7 @@ public class CreateMarketEvaluationPointHandler : IRequestHandler<CreateMarketEv
         _marketEvaluationPoints = marketEvaluationPoints;
     }
 
-    public async Task<Unit> Handle(CreateMarketEvalationPoint request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(CreateMarketEvaluationPoint request, CancellationToken cancellationToken)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
 
@@ -49,30 +49,32 @@ public class CreateMarketEvaluationPointHandler : IRequestHandler<CreateMarketEv
         return Unit.Value;
     }
 
-    private void HandleGridOperatorId(CreateMarketEvalationPoint request, MarketEvaluationPoint? marketEvaluationPoint)
+    private void HandleGridOperatorId(CreateMarketEvaluationPoint request, MarketEvaluationPoint? marketEvaluationPoint)
     {
         if (marketEvaluationPoint is null)
         {
             marketEvaluationPoint = MarketEvaluationPoint.Create(
-                Guid.Parse(request.GridOperatorId),
-                request.MarketEvaluationPointNumber);
+                request.GridOperatorId,
+                request.MarketEvaluationPointNumber,
+                request.MeteringPointId);
             _marketEvaluationPoints.Add(marketEvaluationPoint);
         }
         else
         {
-            marketEvaluationPoint.SetGridOperatorId(Guid.Parse(request.GridOperatorId));
+            marketEvaluationPoint.SetGridOperatorId(request.GridOperatorId);
         }
     }
 
     private void HandleEnergySupplierNumber(
-        CreateMarketEvalationPoint request,
+        CreateMarketEvaluationPoint request,
         MarketEvaluationPoint? marketEvaluationPoint)
     {
         if (marketEvaluationPoint is null)
         {
             marketEvaluationPoint = MarketEvaluationPoint.Create(
                 request.EnergySupplierNumber,
-                request.MarketEvaluationPointNumber);
+                request.MarketEvaluationPointNumber,
+                request.MeteringPointId);
             _marketEvaluationPoints.Add(marketEvaluationPoint);
         }
         else

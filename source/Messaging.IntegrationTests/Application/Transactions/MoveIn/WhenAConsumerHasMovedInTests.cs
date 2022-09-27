@@ -102,7 +102,8 @@ public class WhenAConsumerHasMovedInTests : TestBase
     {
         GetService<IMarketEvaluationPointRepository>().Add(MarketEvaluationPoint.Create(
             SampleData.CurrentEnergySupplierNumber,
-            SampleData.MeteringPointNumber));
+            SampleData.MeteringPointNumber,
+            Guid.NewGuid().ToString()));
         return Task.CompletedTask;
     }
 

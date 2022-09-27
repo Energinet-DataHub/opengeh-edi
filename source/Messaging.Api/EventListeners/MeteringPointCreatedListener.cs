@@ -46,8 +46,10 @@ public class MeteringPointCreatedListener
 
         _logger.LogInformation($"Received metering point created event: {meteringPointCreated}");
         await _commandSchedulerFacade.EnqueueAsync(
-                new CreateMarketEvalationPoint(
+                new CreateMarketEvaluationPoint(
                     meteringPointCreated.GsrnNumber,
+                    meteringPointCreated.MeteringPointId,
+                    Guid.Empty,
                     meteringPointCreated.GridOperatorId))
             .ConfigureAwait(false);
     }

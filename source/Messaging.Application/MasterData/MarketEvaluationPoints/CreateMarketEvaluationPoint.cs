@@ -12,28 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Text;
 using System.Text.Json.Serialization;
 using Messaging.Application.Configuration.Commands.Commands;
 
 namespace Messaging.Application.MasterData.MarketEvaluationPoints;
 
-public class CreateMarketEvalationPoint : InternalCommand
+public class CreateMarketEvaluationPoint : InternalCommand
 {
     [JsonConstructor]
-    public CreateMarketEvalationPoint(
+    public CreateMarketEvaluationPoint(
         string marketEvaluationPointNumber,
-        string gridOperatorId = "",
+        string meteringPointId,
+        Guid gridOperatorId,
         string energySupplierNumber = "")
     {
         MarketEvaluationPointNumber = marketEvaluationPointNumber;
+        MeteringPointId = meteringPointId;
         GridOperatorId = gridOperatorId;
         EnergySupplierNumber = energySupplierNumber;
     }
 
     public string MarketEvaluationPointNumber { get; }
 
-    public string GridOperatorId { get; }
+    public string MeteringPointId { get; }
+
+    public Guid GridOperatorId { get; }
 
     public string EnergySupplierNumber { get; }
 }

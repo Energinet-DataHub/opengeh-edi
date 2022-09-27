@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Messaging.Application.MasterData.MarketEvaluationPoints;
@@ -42,9 +43,10 @@ public class CreateMarketEvaluationPointTests
     [Fact]
     public async Task Grid_operator_id_is_persisted()
     {
-        var command = new CreateMarketEvalationPoint(
+        var command = new CreateMarketEvaluationPoint(
             SampleData.MarketEvaluationPointNumber,
-            Transactions.MoveIn.SampleData.IdOfGridOperatorForMeteringPoint.ToString());
+            Guid.NewGuid().ToString(),
+            gridOperatorId: Transactions.MoveIn.SampleData.IdOfGridOperatorForMeteringPoint);
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
         var dbContext = GetService<B2BContext>();
@@ -57,8 +59,10 @@ public class CreateMarketEvaluationPointTests
     [Fact]
     public async Task Energy_supplier_number_is_persisted()
     {
-        var command = new CreateMarketEvalationPoint(
+        var command = new CreateMarketEvaluationPoint(
             SampleData.MarketEvaluationPointNumber,
+            Guid.NewGuid().ToString(),
+            Guid.Empty,
             energySupplierNumber: SampleData.EnergySupplierNumber);
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
@@ -72,13 +76,18 @@ public class CreateMarketEvaluationPointTests
     [Fact]
     public async Task Handler_can_handle_both_requests()
     {
-        var meteringPointCreatedCommand = new CreateMarketEvalationPoint(
+        var meteringPointId = Guid.NewGuid().ToString();
+
+        var meteringPointCreatedCommand = new CreateMarketEvaluationPoint(
             SampleData.MarketEvaluationPointNumber,
-            Transactions.MoveIn.SampleData.IdOfGridOperatorForMeteringPoint.ToString());
+            meteringPointId,
+            gridOperatorId: Transactions.MoveIn.SampleData.IdOfGridOperatorForMeteringPoint);
         await InvokeCommandAsync(meteringPointCreatedCommand).ConfigureAwait(false);
 
-        var energySupplierChangedCommand = new CreateMarketEvalationPoint(
+        var energySupplierChangedCommand = new CreateMarketEvaluationPoint(
             SampleData.MarketEvaluationPointNumber,
+            meteringPointId,
+            Guid.Empty,
             energySupplierNumber: SampleData.EnergySupplierNumber);
         await InvokeCommandAsync(energySupplierChangedCommand).ConfigureAwait(false);
 
