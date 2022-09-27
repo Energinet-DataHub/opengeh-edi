@@ -303,7 +303,6 @@ namespace Messaging.Infrastructure.Configuration
         private void AddMasterDataServices()
         {
             _services.AddScoped<IMarketEvaluationPointRepository, MarketEvaluationPointRepository>();
-            _services.AddTransient<IRequestHandler<SetEnergySupplier, Unit>, SetEnergySupplierHandler>();
         }
 
         private void AddActorServices()

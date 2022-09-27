@@ -3,15 +3,14 @@ using System.Threading.Tasks;
 using Messaging.Application.MasterData.MarketEvaluationPoints;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.IntegrationTests.Fixtures;
-using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace Messaging.IntegrationTests.Application.MasterData.MarketEvaluationPoints;
 
-public class MeteringPointCreatedTests
+public class CreateMarketEvaluationPointTests
     : TestBase, IAsyncLifetime
 {
-    public MeteringPointCreatedTests(DatabaseFixture databaseFixture)
+    public CreateMarketEvaluationPointTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
     }
@@ -54,5 +53,26 @@ public class MeteringPointCreatedTests
             x.MarketEvaluationPointNumber == SampleData.MarketEvaluationPointNumber);
 
         Assert.Equal(returned?.EnergySupplierNumber, SampleData.EnergySupplierNumber);
+    }
+
+    [Fact]
+    public async Task Handler_can_handle_both_requests()
+    {
+        var meteringPointCreatedCommand = new CreateMarketEvalationPoint(
+            SampleData.MarketEvaluationPointNumber,
+            Transactions.MoveIn.SampleData.IdOfGridOperatorForMeteringPoint.ToString());
+        await InvokeCommandAsync(meteringPointCreatedCommand).ConfigureAwait(false);
+
+        var energySupplierChangedCommand = new CreateMarketEvalationPoint(
+            SampleData.MarketEvaluationPointNumber,
+            energySupplierNumber: SampleData.EnergySupplierNumber);
+        await InvokeCommandAsync(energySupplierChangedCommand).ConfigureAwait(false);
+
+        var dbContext = GetService<B2BContext>();
+        var returned = dbContext.MarketEvaluationPoints.FirstOrDefault(x =>
+            x.MarketEvaluationPointNumber == SampleData.MarketEvaluationPointNumber);
+
+        Assert.Equal(returned?.EnergySupplierNumber, SampleData.EnergySupplierNumber);
+        Assert.Equal(returned?.GridOperatorId, Transactions.MoveIn.SampleData.IdOfGridOperatorForMeteringPoint);
     }
 }
