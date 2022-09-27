@@ -52,6 +52,7 @@ public class NotifyGridOperatorHandler : IRequestHandler<NotifyGridOperator>
 
         var gridOperatorNumber = await GetGridOperatorNumberAsync(transaction.MarketEvaluationPointId).ConfigureAwait(false);
         _notifications.NotifyGridOperator(transaction, gridOperatorNumber);
+        transaction.SetGridOperatorWasNotified();
 
         return Unit.Value;
     }

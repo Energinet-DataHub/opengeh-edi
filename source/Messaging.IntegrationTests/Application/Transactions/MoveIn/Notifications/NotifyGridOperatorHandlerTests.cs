@@ -67,6 +67,8 @@ public class NotifyGridOperatorHandlerTests
         var command = new NotifyGridOperator(SampleData.TransactionId);
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
+        AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>())
+            .HasGridOperatorNotificationState(MoveInTransaction.NotificationState.WasNotified);
         AssertOutgoingMessage.OutgoingMessage(
                 SampleData.TransactionId,
                 DocumentType.GenericNotification.Name,

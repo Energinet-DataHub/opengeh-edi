@@ -19,7 +19,7 @@ module "sbs_market_roles_energy_supplying_actor_created" {
   max_delivery_count  = 10 
   correlation_filter  = {
     properties     = {
-      "MessageType" = "ActorCreated",
+      "MessageType" = "ActorCreatedIntegrationEvent",
     }  
   }
 }
@@ -32,7 +32,7 @@ module "sbs_market_roles_b2b_actor_created" {
   max_delivery_count  = 10 
   correlation_filter  = {
     properties     = {
-      "MessageType" = "ActorCreated",
+      "MessageType" = "ActorCreatedIntegrationEvent",
     }  
   }
 }

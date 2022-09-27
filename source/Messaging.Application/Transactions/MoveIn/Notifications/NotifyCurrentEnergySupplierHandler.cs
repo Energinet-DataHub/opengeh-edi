@@ -42,7 +42,7 @@ public class NotifyCurrentEnergySupplierHandler : IRequestHandler<NotifyCurrentE
 
         _notifications.InformCurrentEnergySupplierAboutEndOfSupply(request.TransactionId, request.EffectiveDate, request.MarketEvaluationPointId, request.EnergySupplierId);
 
-        transaction.MarkEndOfSupplyNotificationAsSent();
+        transaction.SetCurrentEnergySupplierWasNotified();
         return Unit.Task;
     }
 }
