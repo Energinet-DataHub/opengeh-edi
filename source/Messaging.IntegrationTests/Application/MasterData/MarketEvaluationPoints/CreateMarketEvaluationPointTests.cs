@@ -23,21 +23,11 @@ using Xunit;
 namespace Messaging.IntegrationTests.Application.MasterData.MarketEvaluationPoints;
 
 public class CreateMarketEvaluationPointTests
-    : TestBase, IAsyncLifetime
+    : TestBase
 {
     public CreateMarketEvaluationPointTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-    }
-
-    public Task InitializeAsync()
-    {
-        return Task.CompletedTask;
-    }
-
-    public Task DisposeAsync()
-    {
-        return Task.CompletedTask;
     }
 
     [Fact]

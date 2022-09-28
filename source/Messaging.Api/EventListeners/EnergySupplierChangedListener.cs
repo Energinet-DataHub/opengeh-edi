@@ -41,7 +41,7 @@ public class EnergySupplierChangedListener
         if (context == null) throw new ArgumentNullException(nameof(context));
 
         var energySupplierChanged = Energinet.DataHub.EnergySupplying.IntegrationEvents.EnergySupplierChanged.Parser.ParseFrom(data);
-        _logger.LogInformation($"Received EnergySupplierChanged integration event: {data}");
+        _logger.LogInformation($"Received EnergySupplierChanged integration event: {energySupplierChanged}");
         await _commandScheduler.EnqueueAsync(
             new CreateMarketEvaluationPoint(
             energySupplierChanged.GsrnNumber,
