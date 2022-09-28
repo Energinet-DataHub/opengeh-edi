@@ -30,7 +30,7 @@ module "func_integration_service" {
   use_dotnet_isolated_runtime               = true
   app_settings                              = {
     METERING_POINT_DB_CONNECTION_STRING     = local.MS_METERING_POINT_CONNECTION_STRING_SQL_AUTH
-    MESSAGING_DB_CONNECTION_STRING	    = local.MS_MARKETROLES_CONNECTION_STRING
+    MESSAGING_DB_CONNECTION_STRING	    = local.MS_MARKETROLES_CONNECTION_STRING_SQL_AUTH
 
   }
 
