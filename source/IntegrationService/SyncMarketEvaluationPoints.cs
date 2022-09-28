@@ -59,8 +59,8 @@ public static class SyncMarketEvaluationPoints
                                         ELSE
                                             BEGIN
                                                 UPDATE b2b.MarketEvaluationPoints
-                                                SET GridOperatorId = @GridOperatorId
-                                                WHERE Id = @Id
+                                                SET GridOperatorId = @GridOperatorId, Id = @Id
+                                                WHERE MarketEvaluationPointNumber = @MarketEvaluationPointNumber
                                             END
                                     END";
             var insertCommand = messagingConnection.CreateCommand();
