@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace Messaging.IntegrationTests.Application.MasterData.MarketEvaluationPoints;
 
 internal static class SampleData
@@ -21,4 +23,6 @@ internal static class SampleData
     internal static string EnergySupplierNumber => "5790000555550";
 
     internal static string NewEnergySupplierNumber => "5790000555551";
+
+    internal static Guid IdOfGridOperatorForMeteringPoint => Guid.Parse("E754226C-3A5C-4E04-A1D4-6FE58782FDC2");
 }

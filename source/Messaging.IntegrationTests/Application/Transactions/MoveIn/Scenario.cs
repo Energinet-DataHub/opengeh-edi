@@ -98,7 +98,8 @@ public class Scenario
         {
             var mp = MarketEvaluationPoint.Create(
                 _transaction?.CurrentEnergySupplierId!,
-                _transaction?.MarketEvaluationPointId!);
+                _transaction?.MarketEvaluationPointId!,
+                Guid.NewGuid().ToString());
             mp.SetGridOperatorId(_gridOperatorId);
             _context.MarketEvaluationPoints.Add(mp);
 
