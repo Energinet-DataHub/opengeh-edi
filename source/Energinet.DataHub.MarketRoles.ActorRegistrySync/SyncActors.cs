@@ -69,7 +69,7 @@ public class SyncActors : IDisposable
 
     private async Task SyncEnergySupplyingAsync()
     {
-        var actors = (await _actorRegistry.GetLegacyActorsAsync().ConfigureAwait(false)).ToList();
+        var actors = (await _actorRegistry.GetActorsAsync().ConfigureAwait(false)).ToList();
         await _energySupplyingSynchronization.SynchronizeAsync(actors).ConfigureAwait(false);
     }
 }

@@ -35,10 +35,9 @@ public class EnergySupplyingSynchronization : IDisposable
         _sqlConnection = new SqlConnection(connectionString);
     }
 
-    public async Task SynchronizeAsync(IReadOnlyCollection<LegacyActor> actors)
+    public async Task SynchronizeAsync(IReadOnlyCollection<Actor> actors)
     {
         await BeginTransactionAsync().ConfigureAwait(false);
-        await InsertActorsAsync(actors).ConfigureAwait(false);
         await InsertEnergySuppliersAsync(MapActorsToEnergySuppliers(actors)).ConfigureAwait(false);
         await CommitTransactionAsync().ConfigureAwait(false);
     }
@@ -64,7 +63,7 @@ public class EnergySupplyingSynchronization : IDisposable
         _disposed = true;
     }
 
-    private static IEnumerable<EnergySupplier> MapActorsToEnergySuppliers(IEnumerable<LegacyActor> actors)
+    private static IEnumerable<EnergySupplier> MapActorsToEnergySuppliers(IEnumerable<Actor> actors)
     {
         return actors.Where(actor => actor.Roles.Contains("DDQ", StringComparison.InvariantCultureIgnoreCase)).Select(actor => new EnergySupplier(actor.Id, actor.IdentificationNumber));
     }
@@ -99,31 +98,6 @@ public class EnergySupplyingSynchronization : IDisposable
             case "STS": return "DanishEnegeryAgency";
             default: throw new InvalidOperationException("Role not known: " + ediRole);
         }
-    }
-
-    private async Task InsertActorsAsync(IReadOnlyCollection<LegacyActor> actors)
-    {
-        if (actors == null) throw new ArgumentNullException(nameof(actors));
-
-        var stringBuilder = new StringBuilder();
-        foreach (var actor in actors)
-        {
-            string sql = $@"BEGIN
-	                            IF NOT EXISTS (SELECT * FROM [dbo].[Actor]
-					                            WHERE Id = '{actor.Id}')
-                                BEGIN
-                                    INSERT INTO [dbo].[Actor] ([Id],[IdentificationNumber],[IdentificationType],[Roles])
-                                    VALUES ('{actor.Id}', '{actor.IdentificationNumber}', '{GetType(actor.IdentificationType)}', '{GetRoles(actor.Roles)}')
-                                END
-                            END";
-
-            stringBuilder.Append(sql);
-            stringBuilder.AppendLine();
-        }
-
-        await _sqlConnection.ExecuteAsync(
-            stringBuilder.ToString(),
-            transaction: _transaction).ConfigureAwait(false);
     }
 
     private async Task InsertEnergySuppliersAsync(IEnumerable<EnergySupplier> energySuppliers)

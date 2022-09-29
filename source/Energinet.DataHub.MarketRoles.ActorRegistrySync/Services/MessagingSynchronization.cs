@@ -89,8 +89,8 @@ public class MessagingSynchronization : IDisposable
 	                            IF NOT EXISTS (SELECT * FROM [b2b].[Actor]
 					                            WHERE Id = '{actor.Id}')
 	                            BEGIN
-		                            INSERT INTO [b2b].[Actor] ([Id],[IdentificationNumber])
-		                            VALUES ('{actor.Id}', '{actor.IdentificationNumber}')
+		                            INSERT INTO [b2b].[Actor] ([Id],[IdentificationNumber], [B2CId])
+		                            VALUES ('{actor.Id}', '{actor.IdentificationNumber}', '{actor.B2CId}')
 	                            END
                                END";
 
