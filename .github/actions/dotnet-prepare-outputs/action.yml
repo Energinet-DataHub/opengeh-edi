@@ -31,6 +31,16 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Publish Actor sync
+      shell: bash
+      run: |
+        dotnet publish \
+          'source/Energinet.DataHub.MarketRoles.ActorRegistrySync/Energinet.DataHub.MarketRoles.ActorRegistrySync.csproj' \
+          --no-build \
+          --no-restore \
+          --configuration Release \
+          --output '${{ inputs.OUTPUT_PATH }}\functions\actorsync'
+
     - name: Publish Database migration
       shell: bash
       run: |
