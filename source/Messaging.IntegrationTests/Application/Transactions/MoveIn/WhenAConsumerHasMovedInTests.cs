@@ -18,6 +18,7 @@ using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Transactions.MoveIn.Notifications;
+using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
@@ -95,6 +96,15 @@ public class WhenAConsumerHasMovedInTests : TestBase
         _transactionRepository.Add(transaction);
         await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
         return transaction;
+    }
+
+    private Task SetupMasterDataDetailsAsync()
+    {
+        GetService<IMarketEvaluationPointRepository>().Add(MarketEvaluationPoint.Create(
+            SampleData.CurrentEnergySupplierNumber,
+            SampleData.MeteringPointNumber,
+            Guid.NewGuid().ToString()));
+        return Task.CompletedTask;
     }
 
     private AssertTransaction AssertTransaction()

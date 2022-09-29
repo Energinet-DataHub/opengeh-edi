@@ -232,6 +232,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddTransient<IRequestHandler<RequestChangeOfSupplierTransaction, Unit>, MoveInRequestHandler>();
             _services.AddTransient<IRequestHandler<FetchCustomerMasterData, Unit>, FetchCustomerMasterDataHandler>();
             _services.AddTransient<IRequestHandler<FetchMeteringPointMasterData, Unit>, FetchMeteringPointMasterDataHandler>();
+            _services.AddTransient<IRequestHandler<CreateMarketEvaluationPoint, Unit>, CreateMarketEvaluationPointHandler>();
             _services.AddTransient<IRequestHandler<SetConsumerHasMovedIn, Unit>, SetConsumerHasMovedInHandler>();
             _services.AddTransient<IRequestHandler<ForwardMeteringPointMasterData, Unit>, ForwardMeteringPointMasterDataHandler>();
             _services.AddTransient<IRequestHandler<ForwardCustomerMasterData, Unit>, ForwardCustomerMasterDataHandler>();
@@ -302,7 +303,6 @@ namespace Messaging.Infrastructure.Configuration
         private void AddMasterDataServices()
         {
             _services.AddScoped<IMarketEvaluationPointRepository, MarketEvaluationPointRepository>();
-            _services.AddTransient<IRequestHandler<SetEnergySupplier, Unit>, SetEnergySupplierHandler>();
         }
 
         private void AddActorServices()

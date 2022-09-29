@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.CimMessageAdapter.Errors;
 
-namespace Messaging.CimMessageAdapter.Messages
+namespace Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier
 {
     public class SenderAuthorizer
     {

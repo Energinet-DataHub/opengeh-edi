@@ -20,20 +20,34 @@ public class MarketEvaluationPoint
     {
         MarketEvaluationPointNumber = marketEvaluationPointNumber;
         EnergySupplierNumber = energySupplierNumber;
-        Id = Guid.NewGuid();
     }
 
-    public Guid Id { get; }
+    private MarketEvaluationPoint(string marketEvaluationPointNumber, Guid gridOperatorId)
+    {
+        MarketEvaluationPointNumber = marketEvaluationPointNumber;
+        GridOperatorId = gridOperatorId;
+    }
+
+    public Guid Id { get; private set; }
 
     public string MarketEvaluationPointNumber { get; }
 
-    public string EnergySupplierNumber { get; private set; }
+    public string? EnergySupplierNumber { get; private set; }
 
     public Guid? GridOperatorId { get; private set; }
 
-    public static MarketEvaluationPoint Create(string energySupplierNumber, string accountingPointNumber)
+    public static MarketEvaluationPoint Create(string energySupplierNumber, string accountingPointNumber, string accountingPointId)
     {
-        return new MarketEvaluationPoint(accountingPointNumber, energySupplierNumber);
+        var marketEvaluationPoint = new MarketEvaluationPoint(accountingPointNumber, energySupplierNumber);
+        marketEvaluationPoint.Id = Guid.Parse(accountingPointId);
+        return marketEvaluationPoint;
+    }
+
+    public static MarketEvaluationPoint Create(Guid gridOperatorId, string accountingPointNumber, string meteringPointId)
+    {
+        var marketEvaluationPoint = new MarketEvaluationPoint(accountingPointNumber, gridOperatorId);
+        marketEvaluationPoint.Id = Guid.Parse(meteringPointId);
+        return marketEvaluationPoint;
     }
 
     public void SetEnergySupplier(string energySupplierNumber)
