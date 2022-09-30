@@ -43,6 +43,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Contracts", "Contracts\Cont
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Processing.ArchitectureTests", "Processing.ArchitectureTests\Processing.ArchitectureTests.csproj", "{0229A857-9C48-4D36-A4DF-6576FC6692EF}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energinet.DataHub.MarketRoles.ActorRegistrySync", "Energinet.DataHub.MarketRoles.ActorRegistrySync\Energinet.DataHub.MarketRoles.ActorRegistrySync.csproj", "{C0BD6EC1-654D-490A-8274-5081798875F7}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.Domain", "Messaging.Domain\Messaging.Domain.csproj", "{093FBBA9-B7CF-411E-93DA-2B743FA153AB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequestResponse", "RequestResponse\source\RequestResponse\RequestResponse.csproj", "{6A9A18B6-9445-45A0-813D-B7143DB9BC74}"
@@ -121,6 +123,10 @@ Global
 		{0229A857-9C48-4D36-A4DF-6576FC6692EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0229A857-9C48-4D36-A4DF-6576FC6692EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0229A857-9C48-4D36-A4DF-6576FC6692EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C0BD6EC1-654D-490A-8274-5081798875F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0BD6EC1-654D-490A-8274-5081798875F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0BD6EC1-654D-490A-8274-5081798875F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0BD6EC1-654D-490A-8274-5081798875F7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{093FBBA9-B7CF-411E-93DA-2B743FA153AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{093FBBA9-B7CF-411E-93DA-2B743FA153AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{093FBBA9-B7CF-411E-93DA-2B743FA153AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
