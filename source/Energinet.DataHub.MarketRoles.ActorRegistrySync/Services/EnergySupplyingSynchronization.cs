@@ -65,7 +65,7 @@ public class EnergySupplyingSynchronization : IDisposable
 
     private static IEnumerable<EnergySupplier> MapActorsToEnergySuppliers(IEnumerable<Actor> actors)
     {
-        return actors.Where(actor => actor.Roles.Contains("12", StringComparison.InvariantCultureIgnoreCase)).Select(actor => new EnergySupplier(actor.Id, actor.IdentificationNumber));
+        return actors.Where(actor => actor.Roles != null && actor.Roles.Contains("12", StringComparison.InvariantCultureIgnoreCase)).Select(actor => new EnergySupplier(actor.Id, actor.IdentificationNumber));
     }
 
     private async Task InsertEnergySuppliersAsync(IEnumerable<EnergySupplier> energySuppliers)

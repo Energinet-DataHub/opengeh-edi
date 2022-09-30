@@ -36,9 +36,9 @@ public class ActorRegistryDbService : IDisposable
         return await _sqlConnection.QueryAsync<Actor>(
             @$"SELECT a.Id AS {nameof(Actor.Id)},
              a.ActorNumber AS {nameof(Actor.IdentificationNumber)},
-            (SELECT STRING_AGG([Function], ',') FROM MarketRole WHERE ActorInfoId = a.Id) AS {nameof(Actor.Roles)},
-             a.ActorId AS {nameof(Actor.B2CId)} " +
-            "FROM [dbo].[ActorInfoNew] a where a.ActorId is not null").ConfigureAwait(false) ?? (IEnumerable<Actor>)Array.Empty<object>();
+             a.ActorId AS {nameof(Actor.B2CId)},
+            (SELECT STRING_AGG([Function], ',') FROM MarketRole WHERE ActorInfoId = a.Id) AS {nameof(Actor.Roles)}
+            FROM [dbo].[ActorInfoNew] a where a.ActorId is not null").ConfigureAwait(false) ?? (IEnumerable<Actor>)Array.Empty<object>();
     }
 
     public void Dispose()
