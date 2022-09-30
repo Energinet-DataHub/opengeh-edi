@@ -108,7 +108,7 @@ namespace Messaging.Api.Configuration.Middleware.Authentication.Bearer
 
         private static async Task<ActorForAuthentication?> GetActorAsync(Guid actorId, B2BContext context)
         {
-            var sql = "SELECT TOP 1 [Id] AS ActorId, 'GLN' AS IdentificationType, [IdentificationNumber] AS Identifier FROM [b2b].[Actor] WHERE Id = @ActorId";
+            var sql = "SELECT TOP 1 [Id] AS ActorId, 'GLN' AS IdentificationType, [IdentificationNumber] AS Identifier FROM [b2b].[Actor] WHERE B2CId = @ActorId";
 
             var result = await context.Database.GetDbConnection()
                 .QuerySingleOrDefaultAsync<ActorForAuthentication>(sql, new { ActorId = actorId })

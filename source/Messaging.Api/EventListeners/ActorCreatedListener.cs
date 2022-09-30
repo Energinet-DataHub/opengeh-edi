@@ -39,7 +39,10 @@ public class ActorCreatedListener
         if (context == null) throw new ArgumentNullException(nameof(context));
         var integrationEvent = SharedIntegrationEventContract.Parser.ParseFrom(data);
 
-        var command = new CreateActor(integrationEvent.ActorCreatedIntegrationEvent.ActorId, integrationEvent.ActorCreatedIntegrationEvent.ActorNumber);
+        var command = new CreateActor(
+            integrationEvent.ActorCreatedIntegrationEvent.Id,
+            integrationEvent.ActorCreatedIntegrationEvent.ActorId,
+            integrationEvent.ActorCreatedIntegrationEvent.ActorNumber);
 
         await _commandSchedulerFacade.EnqueueAsync(command).ConfigureAwait(false);
     }
