@@ -30,7 +30,7 @@ module "func_actor_sync" {
   dotnet_framework_version                  = "6"
   use_dotnet_isolated_runtime               = false
   app_settings                              = {
-    DB_CONNECTION_STRING                    = local.MS_MARKETROLES_CONNECTION_STRING
+    DB_CONNECTION_STRING                    = local.MS_MARKETROLES_CONNECTION_STRING_SQL_AUTH
     ACTOR_REGISTRY_DB_CONNECTION_STRING     = local.ACTOR_REGISTRY_DB_CONNECTION_STRING
     TIMER_TRIGGER                           = "0 0 * * * *"
   }
