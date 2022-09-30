@@ -34,7 +34,10 @@ public class ActorRegistryDbService : IDisposable
     public async Task<IEnumerable<Actor>> GetActorsAsync()
     {
         return await _sqlConnection.QueryAsync<Actor>(
-            $"SELECT Id AS {nameof(Actor.Id)}, ActorNumber AS {nameof(Actor.IdentificationNumber)}, Roles AS {nameof(Actor.Roles)} , ActorId AS {nameof(Actor.B2CId)} " +
+            @$"SELECT Id AS {nameof(Actor.Id)},
+             ActorNumber AS {nameof(Actor.IdentificationNumber)},
+            (SELECT STRING_AGG([Function], ',') FROM MarketRole WHERE ActorInfoId = Id) AS {nameof(Actor.Roles)}
+             ActorId AS {nameof(Actor.B2CId)} " +
             "FROM [dbo].[ActorInfoNew]").ConfigureAwait(false) ?? (IEnumerable<Actor>)Array.Empty<object>();
     }
 

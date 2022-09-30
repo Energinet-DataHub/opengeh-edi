@@ -65,39 +65,7 @@ public class EnergySupplyingSynchronization : IDisposable
 
     private static IEnumerable<EnergySupplier> MapActorsToEnergySuppliers(IEnumerable<Actor> actors)
     {
-        return actors.Where(actor => actor.Roles.Contains("DDQ", StringComparison.InvariantCultureIgnoreCase)).Select(actor => new EnergySupplier(actor.Id, actor.IdentificationNumber));
-    }
-
-    private static string GetType(int identificationType)
-    {
-        return identificationType == 1 ? "GLN" : "EIC";
-    }
-
-    private static string GetRoles(string actorRoles)
-    {
-        return string.Join(
-            ',',
-            actorRoles.Split(
-                    ',',
-                    StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
-                .Select(MapRole));
-    }
-
-    private static string MapRole(string ediRole)
-    {
-        switch (ediRole)
-        {
-            case "DDK": return "BalanceResponsibleParty";
-            case "DDM": return "GridAccessProvider";
-            case "DDQ": return "BalancePowerSupplier";
-            case "DDX": return "ImBalanceSettlementResponsible";
-            case "DDZ": return "MeteringPointAdministrator";
-            case "DEA": return "MeteredDataAggregator";
-            case "EZ": return "SystemOperator";
-            case "MDR": return "MeteredDataResponsible";
-            case "STS": return "DanishEnegeryAgency";
-            default: throw new InvalidOperationException("Role not known: " + ediRole);
-        }
+        return actors.Where(actor => actor.Roles.Contains("12", StringComparison.InvariantCultureIgnoreCase)).Select(actor => new EnergySupplier(actor.Id, actor.IdentificationNumber));
     }
 
     private async Task InsertEnergySuppliersAsync(IEnumerable<EnergySupplier> energySuppliers)
