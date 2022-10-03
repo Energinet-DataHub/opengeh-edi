@@ -16,12 +16,11 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Contracts.BusinessRequests.MoveIn;
 using Messaging.Application.Transactions.MoveIn;
-using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.Transactions;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.TestDoubles;
-using Microsoft.Extensions.Logging;
 using NodaTime;
 using Xunit;
 
@@ -47,7 +46,12 @@ public class MoveInRequesterTests : TestBase
         await _requestService.InvokeAsync(request).ConfigureAwait(false);
 
         _httpClientSpy
-            .AssertJsonContent(request);
+            .AssertJsonContent(
+                new RequestV2(
+                    request.AccountingPointNumber,
+                    request.EnergySupplierNumber,
+                    request.EffectiveDate,
+                    new Customer(request.CustomerName, request.CustomerNumber)));
     }
 
     [Fact]
@@ -63,9 +67,8 @@ public class MoveInRequesterTests : TestBase
         return new MoveInRequest(
             "Consumer1",
             Guid.NewGuid().ToString(),
+            Guid.NewGuid().ToString(),
             SystemClock.Instance.GetCurrentInstant().ToString(),
-            Guid.NewGuid().ToString(),
-            Guid.NewGuid().ToString(),
-            "CPR");
+            Guid.NewGuid().ToString());
     }
 }
