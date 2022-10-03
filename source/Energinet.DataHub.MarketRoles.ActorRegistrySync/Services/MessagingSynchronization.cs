@@ -37,6 +37,7 @@ public class MessagingSynchronization : IDisposable
     public async Task SynchronizeAsync(IReadOnlyCollection<Actor> actors)
     {
         await BeginTransactionAsync().ConfigureAwait(false);
+        await DeleteActorsAsync().ConfigureAwait(false);
         await InsertActorsAsync(actors).ConfigureAwait(false);
         await CommitAsync().ConfigureAwait(false);
     }
@@ -74,6 +75,14 @@ public class MessagingSynchronization : IDisposable
     {
         await _sqlConnection.OpenAsync().ConfigureAwait(false);
         _transaction = await _sqlConnection.BeginTransactionAsync().ConfigureAwait(false);
+    }
+
+    private async Task DeleteActorsAsync()
+    {
+        if (_transaction == null) await BeginTransactionAsync().ConfigureAwait(false);
+
+        await _sqlConnection.ExecuteAsync("DELETE FROM [b2b].[Actor]", transaction: _transaction)
+            .ConfigureAwait(false);
     }
 
     private async Task InsertActorsAsync(IEnumerable<Actor> actors)
