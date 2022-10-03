@@ -48,20 +48,21 @@ public class CreateActorsTests : TestBase
         Assert.NotNull(actor);
         Assert.Equal(SampleData.ActorId, actor.Id.ToString());
         Assert.Equal(SampleData.IdentificationNumber, actor.IdentificationNumber);
+        Assert.Equal(SampleData.B2CId, actor.B2CId);
     }
 
     private static CreateActor CreateCommand()
     {
-        return new CreateActor(SampleData.ActorId, SampleData.IdentificationNumber);
+        return new CreateActor(SampleData.ActorId, SampleData.B2CId.ToString(), SampleData.IdentificationNumber);
     }
 
     private async Task<Actor> GetActor()
     {
-        var sql = $"SELECT Id, IdentificationNUmber FROM [b2b].[Actor] WHERE Id = '{SampleData.ActorId}'";
+        var sql = $"SELECT Id, B2CId, IdentificationNUmber FROM [b2b].[Actor] WHERE Id = '{SampleData.ActorId}'";
         return await _connectionFactory.GetOpenConnection().QuerySingleOrDefaultAsync<Actor>(sql).ConfigureAwait(false);
     }
 
 #pragma warning disable
-    public record Actor(Guid Id, string IdentificationNumber);
+    public record Actor(Guid Id, Guid B2CId, string IdentificationNumber);
 #pragma warning restore
 }

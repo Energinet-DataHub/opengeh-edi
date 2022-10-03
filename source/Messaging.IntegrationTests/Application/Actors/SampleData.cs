@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace Messaging.IntegrationTests.Application.Actors;
 
 internal static class SampleData
@@ -19,4 +21,6 @@ internal static class SampleData
     internal static string ActorId => "91207d78-9a32-4bc6-ad20-bff6c038f634";
 
     internal static string IdentificationNumber => "5148796574821";
+
+    internal static Guid B2CId => Guid.Parse("9222905B-8B02-4D8B-A2C1-3BD51B1AD8D9");
 }

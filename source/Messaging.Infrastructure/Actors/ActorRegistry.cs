@@ -33,7 +33,7 @@ public class ActorRegistry : IActorRegistry
     {
         if (createActor == null) throw new ArgumentNullException(nameof(createActor));
         var connection = _dbConnectionFactory.GetOpenConnection();
-        var sqlStatement = @$"INSERT INTO [b2b].[Actor] ([Id],[IdentificationNumber]) VALUES ('{createActor.ActorId}', '{createActor.IdentificationNumber}')";
+        var sqlStatement = @$"INSERT INTO [b2b].[Actor] ([Id], [B2CId], [IdentificationNumber]) VALUES ('{createActor.ActorId}', '{createActor.B2CId}', '{createActor.IdentificationNumber}')";
         await connection.ExecuteAsync(sqlStatement)
             .ConfigureAwait(false);
     }

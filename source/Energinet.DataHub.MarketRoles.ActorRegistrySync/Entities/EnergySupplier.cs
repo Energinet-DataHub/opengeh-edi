@@ -12,24 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json.Serialization;
-using Messaging.Application.Configuration.Commands.Commands;
+using System;
 
-namespace Messaging.Application.Actors;
+namespace Energinet.DataHub.MarketRoles.ActorRegistrySync.Entities;
 
-public class CreateActor : InternalCommand
-{
-    [JsonConstructor]
-    public CreateActor(string actorId, string b2cId, string identificationNumber)
-    {
-        ActorId = actorId;
-        IdentificationNumber = identificationNumber;
-        B2CId = b2cId;
-    }
-
-    public string B2CId { get; }
-
-    public string ActorId { get; }
-
-    public string IdentificationNumber { get; }
-}
+public record EnergySupplier(
+    Guid Id,
+    string IdentificationNumber);
