@@ -21,4 +21,12 @@ namespace Contracts.BusinessRequests.MoveIn
         string StartDate,
         string? ConsumerId,
         string? ConsumerIdType);
+
+    public record RequestV2(
+        string? AccountingPointNumber,
+        string? EnergySupplierNumber,
+        string? EffectiveDate,
+        Customer? Customer);
+
+    public record Customer(string? Name, string? Number);
 }
