@@ -48,12 +48,12 @@ public sealed class MoveInRequester : IMoveInRequester
     private static RequestV2 CreateRequestFrom(MoveInRequest request)
     {
         return new RequestV2(
-            request.AccountingPointGsrnNumber,
-            request.EnergySupplierGlnNumber,
-            request.StartDate,
+            request.AccountingPointNumber,
+            request.EnergySupplierNumber,
+            request.EffectiveDate,
             new Customer(
-                request.ConsumerName,
-                request.ConsumerId));
+                request.CustomerName,
+                request.CustomerNumber));
     }
 
     private async Task<HttpResponseMessage> TryCallAsync(RequestV2 request)

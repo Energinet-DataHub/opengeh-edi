@@ -50,10 +50,10 @@ public class MoveInRequesterTests : TestBase
         _httpClientSpy
             .AssertJsonContent(
                 new RequestV2(
-                    request.AccountingPointGsrnNumber,
-                    request.EnergySupplierGlnNumber,
-                    request.StartDate,
-                    new Customer(request.ConsumerName, request.ConsumerId)));
+                    request.AccountingPointNumber,
+                    request.EnergySupplierNumber,
+                    request.EffectiveDate,
+                    new Customer(request.CustomerName, request.CustomerNumber)));
     }
 
     [Fact]
