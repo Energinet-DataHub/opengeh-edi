@@ -18,11 +18,9 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Contracts.BusinessRequests.MoveIn;
 using Messaging.Application.Transactions.MoveIn;
-using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.Transactions;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.TestDoubles;
-using Microsoft.Extensions.Logging;
 using NodaTime;
 using Xunit;
 
@@ -71,7 +69,6 @@ public class MoveInRequesterTests : TestBase
             Guid.NewGuid().ToString(),
             Guid.NewGuid().ToString(),
             SystemClock.Instance.GetCurrentInstant().ToString(),
-            Guid.NewGuid().ToString(),
-            "CPR");
+            Guid.NewGuid().ToString());
     }
 }

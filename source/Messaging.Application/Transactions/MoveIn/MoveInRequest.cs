@@ -16,21 +16,18 @@ namespace Messaging.Application.Transactions.MoveIn;
 
 public class MoveInRequest
 {
-    public MoveInRequest(string? customerName, string? energySupplierNumber, string accountingPointNumber, string effectiveDate, string? customerNumber, string? consumerIdType)
+    public MoveInRequest(string? customerName, string? energySupplierNumber, string accountingPointNumber, string effectiveDate, string? customerNumber)
     {
         CustomerName = customerName;
         EnergySupplierNumber = energySupplierNumber;
         AccountingPointNumber = accountingPointNumber;
         EffectiveDate = effectiveDate;
         CustomerNumber = customerNumber;
-        ConsumerIdType = consumerIdType;
     }
 
     public string? CustomerName { get; }
 
     public string? CustomerNumber { get;  }
-
-    public string? ConsumerIdType { get; }
 
     public string? EnergySupplierNumber { get; }
 

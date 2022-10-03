@@ -111,21 +111,6 @@ namespace Messaging.Application.Transactions.MoveIn
             return energySupplierId == senderId;
         }
 
-        private static string GetConsumerIdType(string? consumerIdType)
-        {
-            var cprNumberTypeIdentifier = "ARR";
-            var consumerType = string.Empty;
-            if (!string.IsNullOrEmpty(consumerIdType))
-            {
-                consumerType =
-                   consumerIdType.Equals(cprNumberTypeIdentifier, StringComparison.OrdinalIgnoreCase)
-                        ? "CPR"
-                        : "CVR";
-            }
-
-            return consumerType;
-        }
-
         private static OutgoingMessage CreateOutgoingMessage(string id, DocumentType documentType, string processType, string receiverId, string marketActivityRecordPayload)
         {
             return new OutgoingMessage(
@@ -156,8 +141,7 @@ namespace Messaging.Application.Transactions.MoveIn
                 transaction.NewEnergySupplierId,
                 transaction.MarketEvaluationPointId,
                 transaction.EffectiveDate.ToString(),
-                transaction.ConsumerId,
-                GetConsumerIdType(transaction.ConsumerIdType));
+                transaction.ConsumerId);
             return _moveInRequester.InvokeAsync(businessProcess);
         }
 
