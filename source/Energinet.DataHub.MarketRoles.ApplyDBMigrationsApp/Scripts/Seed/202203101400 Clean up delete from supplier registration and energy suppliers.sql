@@ -1,2 +1,2 @@
-﻿DELETE FROM [dbo].SupplierRegistrations
-DELETE FROM [dbo].EnergySuppliers
+﻿DELETE FROM [dbo].[SupplierRegistrations]
+DELETE FROM [dbo].[EnergySuppliers]
