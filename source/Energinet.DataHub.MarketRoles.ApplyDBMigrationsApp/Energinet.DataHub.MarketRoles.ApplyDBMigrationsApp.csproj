@@ -31,6 +31,7 @@ limitations under the License.
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Scripts\Model\202203101400 Clean up delete from supplier registration and energy suppliers.sql" />
     <EmbeddedResource Include="Scripts\Model\202207041353 Re-create QueuedInternalCommands table.sql" />
     <EmbeddedResource Include="Scripts\Model\202207080938 Add effective date for electrical heating.sql" />
     <EmbeddedResource Include="Scripts\Model\202208181332 Add actor table to BtwoB.sql" />
