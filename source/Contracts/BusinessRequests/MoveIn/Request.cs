@@ -14,14 +14,6 @@
 
 namespace Contracts.BusinessRequests.MoveIn
 {
-    public record Request(
-        string? ConsumerName,
-        string? EnergySupplierGlnNumber,
-        string AccountingPointGsrnNumber,
-        string StartDate,
-        string? ConsumerId,
-        string? ConsumerIdType);
-
     public record RequestV2(
         string? AccountingPointNumber,
         string? EnergySupplierNumber,
