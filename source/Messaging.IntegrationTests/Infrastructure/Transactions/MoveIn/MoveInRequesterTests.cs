@@ -16,6 +16,7 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Contracts.BusinessRequests.MoveIn;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.Transactions;
@@ -47,7 +48,12 @@ public class MoveInRequesterTests : TestBase
         await _requestService.InvokeAsync(request).ConfigureAwait(false);
 
         _httpClientSpy
-            .AssertJsonContent(request);
+            .AssertJsonContent(
+                new RequestV2(
+                    request.AccountingPointGsrnNumber,
+                    request.EnergySupplierGlnNumber,
+                    request.StartDate,
+                    new Customer(request.ConsumerName, request.ConsumerId)));
     }
 
     [Fact]
@@ -63,8 +69,8 @@ public class MoveInRequesterTests : TestBase
         return new MoveInRequest(
             "Consumer1",
             Guid.NewGuid().ToString(),
-            SystemClock.Instance.GetCurrentInstant().ToString(),
             Guid.NewGuid().ToString(),
+            SystemClock.Instance.GetCurrentInstant().ToString(),
             Guid.NewGuid().ToString(),
             "CPR");
     }
