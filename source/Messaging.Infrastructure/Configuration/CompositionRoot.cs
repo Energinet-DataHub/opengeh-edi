@@ -95,7 +95,6 @@ namespace Messaging.Infrastructure.Configuration
             services.AddScoped<IMessageRequestNotifications, MessageRequestNotifications>();
             services.AddTransient<IRequestHandler<RequestMessages, Unit>, RequestMessagesHandler>();
             services.AddScoped<MessageReceiver>();
-            services.AddScoped<MarketEvaluationPointReadModelHandler>();
 
             AddMediatR();
             services.AddLogging();
@@ -104,6 +103,7 @@ namespace Messaging.Infrastructure.Configuration
             AddMasterDataServices();
             AddActorServices();
             AddProcessing();
+            ReadModelHandlingConfiguration.AddReadModelHandling(services);
         }
 
         public static CompositionRoot Initialize(IServiceCollection services)
