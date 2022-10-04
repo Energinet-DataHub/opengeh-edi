@@ -19,13 +19,13 @@ namespace Messaging.Tests.Domain.Actors;
 
 public class ActorNumberTests
 {
-    [Fact]
-    public void Create_test()
+    [Theory]
+    [InlineData("1234567890123")]
+    [InlineData("123456789012312345")]
+    public void Create_test(string actorNumber)
     {
-        var number = "1234567890123";
+        var sut = ActorNumber.Create(actorNumber);
 
-        var sut = ActorNumber.Create(number);
-
-        Assert.Equal(number, sut.Value);
+        Assert.Equal(actorNumber, sut.Value);
     }
 }
