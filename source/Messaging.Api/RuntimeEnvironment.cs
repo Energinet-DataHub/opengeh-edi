@@ -90,6 +90,9 @@ namespace Messaging.Api
         public string? MARKET_PARTICIPANT_CHANGED_ACTOR_CREATED_SUBSCRIPTION_NAME =>
             GetEnvironmentVariable(nameof(MARKET_PARTICIPANT_CHANGED_ACTOR_CREATED_SUBSCRIPTION_NAME));
 
+        public string? METERING_POINT_CREATED_EVENT_B2B_SUBSCRIPTION_NAME =>
+            GetEnvironmentVariable(nameof(METERING_POINT_CREATED_EVENT_B2B_SUBSCRIPTION_NAME));
+
         public virtual bool IsRunningLocally()
         {
             return AZURE_FUNCTIONS_ENVIRONMENT == "Development";
