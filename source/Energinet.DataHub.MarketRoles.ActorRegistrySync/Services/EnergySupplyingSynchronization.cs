@@ -38,6 +38,7 @@ public class EnergySupplyingSynchronization : IDisposable
     public async Task SynchronizeAsync(IReadOnlyCollection<Actor> actors)
     {
         await BeginTransactionAsync().ConfigureAwait(false);
+        await DeleteEnergySupplierAndSupplierRegistrationsAsync().ConfigureAwait(false);
         await InsertEnergySuppliersAsync(MapActorsToEnergySuppliers(actors)).ConfigureAwait(false);
         await CommitTransactionAsync().ConfigureAwait(false);
     }
@@ -66,6 +67,16 @@ public class EnergySupplyingSynchronization : IDisposable
     private static IEnumerable<EnergySupplier> MapActorsToEnergySuppliers(IEnumerable<Actor> actors)
     {
         return actors.Where(actor => actor.Roles != null && actor.Roles.Contains("12", StringComparison.InvariantCultureIgnoreCase)).Select(actor => new EnergySupplier(actor.Id, actor.IdentificationNumber));
+    }
+
+    private async Task DeleteEnergySupplierAndSupplierRegistrationsAsync()
+    {
+        if (_transaction == null) await BeginTransactionAsync().ConfigureAwait(false);
+
+        await _sqlConnection.ExecuteAsync("DELETE FROM [dbo].[SupplierRegistrations]", transaction: _transaction)
+            .ConfigureAwait(false);
+        await _sqlConnection.ExecuteAsync("DELETE FROM [dbo].[EnergySuppliers]", transaction: _transaction)
+            .ConfigureAwait(false);
     }
 
     private async Task InsertEnergySuppliersAsync(IEnumerable<EnergySupplier> energySuppliers)
