@@ -72,18 +72,21 @@ public class MarketEvaluationPointReadModelTests : TestBase
 
         await _readModelHandler.WhenAsync(@event).ConfigureAwait(false);
 
-        var exists = await GetService<IDbConnectionFactory>()
+        var sut = await GetStoredMarketEvaluationPointModelAsync().ConfigureAwait(false);
+        Assert.NotNull(sut);
+        Assert.Equal(SampleData.EnergySupplierNumber, sut?.EnergySupplierNumber);
+    }
+
+    private Task<dynamic?> GetStoredMarketEvaluationPointModelAsync()
+    {
+        return GetService<IDbConnectionFactory>()
             .GetOpenConnection()
-            .ExecuteScalarAsync<bool>(
-                "SELECT COUNT(*) FROM b2b.MarketEvaluationPoints WHERE Id = @Id AND MarketEvaluationPointNumber = @MarketEvaluationPointNumber AND EnergySupplierNumber = @EnergySupplierNumber",
+            .QuerySingleOrDefaultAsync(
+                "SELECT * FROM b2b.MarketEvaluationPoints WHERE Id = @Id AND MarketEvaluationPointNumber = @MarketEvaluationPointNumber",
                 new
                 {
                     Id = SampleData.MeteringPointId,
                     MarketEvaluationPointNumber = SampleData.MeteringPointNumber,
-                    EnergySupplierNumber = SampleData.EnergySupplierNumber,
-                })
-            .ConfigureAwait(false);
-
-        Assert.True(exists);
+                });
     }
 }
