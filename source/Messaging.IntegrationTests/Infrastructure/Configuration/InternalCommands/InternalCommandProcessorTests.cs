@@ -25,7 +25,7 @@ using NodaTime;
 using Xunit;
 using Xunit.Categories;
 
-namespace Messaging.IntegrationTests.Infrastructure.InternalCommands;
+namespace Messaging.IntegrationTests.Infrastructure.Configuration.InternalCommands;
 
 [IntegrationTest]
 public class InternalCommandProcessorTests : TestBase

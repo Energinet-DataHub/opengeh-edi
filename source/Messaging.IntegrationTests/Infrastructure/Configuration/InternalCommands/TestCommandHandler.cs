@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 
-namespace Messaging.IntegrationTests.Infrastructure.InternalCommands
+namespace Messaging.IntegrationTests.Infrastructure.Configuration.InternalCommands
 {
     public class TestCommandHandler : IRequestHandler<TestCommand, Unit>
     {

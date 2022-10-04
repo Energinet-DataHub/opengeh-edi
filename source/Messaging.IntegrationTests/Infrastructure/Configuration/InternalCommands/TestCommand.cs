@@ -15,9 +15,8 @@
 using System;
 using System.Text.Json.Serialization;
 using Messaging.Application.Configuration.Commands.Commands;
-using Messaging.Infrastructure.Configuration.InternalCommands;
 
-namespace Messaging.IntegrationTests.Infrastructure.InternalCommands
+namespace Messaging.IntegrationTests.Infrastructure.Configuration.InternalCommands
 {
     public class TestCommand : InternalCommand
     {
