@@ -52,11 +52,6 @@ data "azurerm_key_vault_secret" "appi_shared_id" {
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }
 
-data "azurerm_key_vault_secret" "sbq_marketroles_dequeue_name" {
-  name         = "sbq-marketroles-dequeue-name"
-  key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
-}
-
 data "azurerm_key_vault_secret" "plan_shared_id" {
   name         = "plan-services-id"
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
@@ -104,10 +99,5 @@ data "azurerm_key_vault_secret" "mssql_data_elastic_pool_id" {
 
 data "azurerm_key_vault_secret" "sbt_domainrelay_integrationevent_received_name_id" {
   name         = "sbt-sharedres-integrationevent-received-id"
-  key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
-}
-
-data "azurerm_key_vault_secret" "metering_point_database_name" {
-  name         = "metering-point-database-name"
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }
