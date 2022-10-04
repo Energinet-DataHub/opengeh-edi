@@ -35,7 +35,7 @@ public class ActorNumber : ValueObject
 
     private static bool IsEic(string actorNumber)
     {
-        return actorNumber.Length == 18;
+        return actorNumber.Length == 16;
     }
 
     private static bool IsGlnNumber(string actorNumber)

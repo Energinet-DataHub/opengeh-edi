@@ -21,7 +21,7 @@ public class ActorNumberTests
 {
     [Theory]
     [InlineData("1234567890123")]
-    [InlineData("123456789012312345")]
+    [InlineData("1234567890123123")]
     public void Can_create_actor_number(string actorNumber)
     {
         var sut = ActorNumber.Create(actorNumber);
