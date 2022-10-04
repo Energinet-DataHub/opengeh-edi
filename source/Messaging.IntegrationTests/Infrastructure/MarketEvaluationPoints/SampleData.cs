@@ -23,4 +23,6 @@ public static class SampleData
     public static string MeteringPointNumber => "571234567891234568";
 
     public static Guid GridOperatorId => Guid.Parse("08358C14-F1E8-4202-A98E-B1CB94576C74");
+
+    public static string EnergySupplierNumber => "5790000555551";
 }

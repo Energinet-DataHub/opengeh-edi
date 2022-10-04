@@ -14,6 +14,7 @@
 
 using System.Threading.Tasks;
 using Dapper;
+using Energinet.DataHub.EnergySupplying.IntegrationEvents;
 using Energinet.DataHub.MeteringPoints.IntegrationEvents.CreateMeteringPoint;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Infrastructure.MarketEvaluationPoints;
@@ -53,6 +54,33 @@ public class MarketEvaluationPointReadModelTests : TestBase
                     Id = SampleData.MeteringPointId,
                     MarketEvaluationPointNumber = SampleData.MeteringPointNumber,
                     GridOperatorId = SampleData.GridOperatorId,
+                })
+            .ConfigureAwait(false);
+
+        Assert.True(exists);
+    }
+
+    [Fact]
+    public async Task Energy_supplier_number_is_registered_when_energy_supplier_has_changed()
+    {
+        var @event = new EnergySupplierChanged()
+        {
+            Id = SampleData.MeteringPointId,
+            GsrnNumber = SampleData.MeteringPointNumber,
+            EnergySupplierGln = SampleData.EnergySupplierNumber,
+        };
+
+        await _readModelHandler.WhenAsync(@event).ConfigureAwait(false);
+
+        var exists = await GetService<IDbConnectionFactory>()
+            .GetOpenConnection()
+            .ExecuteScalarAsync<bool>(
+                "SELECT COUNT(*) FROM b2b.MarketEvaluationPoints WHERE Id = @Id AND MarketEvaluationPointNumber = @MarketEvaluationPointNumber AND EnergySupplierNumber = @EnergySupplierNumber",
+                new
+                {
+                    Id = SampleData.MeteringPointId,
+                    MarketEvaluationPointNumber = SampleData.MeteringPointNumber,
+                    EnergySupplierNumber = SampleData.EnergySupplierNumber,
                 })
             .ConfigureAwait(false);
 
