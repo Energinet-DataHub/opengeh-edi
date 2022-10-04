@@ -98,15 +98,6 @@ public class WhenAConsumerHasMovedInTests : TestBase
         return transaction;
     }
 
-    private Task SetupMasterDataDetailsAsync()
-    {
-        GetService<IMarketEvaluationPointRepository>().Add(MarketEvaluationPoint.Create(
-            SampleData.CurrentEnergySupplierNumber,
-            SampleData.MeteringPointNumber,
-            Guid.NewGuid().ToString()));
-        return Task.CompletedTask;
-    }
-
     private AssertTransaction AssertTransaction()
     {
         return MoveIn.AssertTransaction
