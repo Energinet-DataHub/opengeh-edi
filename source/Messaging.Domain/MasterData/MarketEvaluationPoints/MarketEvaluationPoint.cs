@@ -37,13 +37,6 @@ public class MarketEvaluationPoint
         return marketEvaluationPoint;
     }
 
-    public static MarketEvaluationPoint Create(Guid gridOperatorId, string accountingPointNumber, string meteringPointId)
-    {
-        var marketEvaluationPoint = new MarketEvaluationPoint(Guid.Parse(meteringPointId), accountingPointNumber);
-        marketEvaluationPoint.SetGridOperatorId(gridOperatorId);
-        return marketEvaluationPoint;
-    }
-
     public void SetEnergySupplier(string energySupplierNumber)
     {
         EnergySupplierNumber = energySupplierNumber;
