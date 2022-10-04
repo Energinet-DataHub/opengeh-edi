@@ -57,6 +57,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Seed\202209151140 Insert Reasons.sql" />
     <EmbeddedResource Include="Scripts\Model\202225081511 Add grid operator id.sql" />
     <EmbeddedResource Include="Scripts\Model\202226081400 Make EnergySupplierNumber nullable.sql" />
+    <EmbeddedResource Include="Scripts\Seed\202210041540 Remove failed outgoing messages.sql" />
   </ItemGroup>
 
 </Project>
