@@ -28,4 +28,12 @@ public class ActorNumberTests
 
         Assert.Equal(actorNumber, sut.Value);
     }
+
+    [Theory]
+    [InlineData("1234567890")]
+    [InlineData("1234567890123123451234")]
+    public void Throw_if_actor_number_is_invalid(string actorNumber)
+    {
+        Assert.Throws<InvalidActorNumberException>(() => ActorNumber.Create(actorNumber));
+    }
 }

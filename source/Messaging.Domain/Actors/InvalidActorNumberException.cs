@@ -12,24 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.Domain.SeedWork;
+using System.Dynamic;
 
 namespace Messaging.Domain.Actors;
 
-public class ActorNumber : ValueObject
+public class InvalidActorNumberException : Exception
 {
-    private ActorNumber(string actorNumber)
+    private InvalidActorNumberException(string message)
+        : base(message)
     {
-        Value = actorNumber;
     }
 
-    public string Value { get; }
-
-    public static ActorNumber Create(string actorNumber)
+    private InvalidActorNumberException()
     {
-        if (actorNumber == null) throw new ArgumentNullException(nameof(actorNumber));
-        return actorNumber.Length == 13 || actorNumber.Length == 18
-            ? new ActorNumber(actorNumber)
-            : throw InvalidActorNumberException.Create(actorNumber);
+    }
+
+    private InvalidActorNumberException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
+
+    public static InvalidActorNumberException Create(string invalidActorNumber)
+    {
+        return new InvalidActorNumberException($"{invalidActorNumber} is not a valid actor number");
     }
 }
