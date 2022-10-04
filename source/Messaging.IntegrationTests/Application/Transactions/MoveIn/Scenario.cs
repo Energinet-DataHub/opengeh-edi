@@ -16,7 +16,6 @@ using System;
 using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.Actors;
-using Messaging.Application.Configuration.DataAccess;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.DataAccess;
