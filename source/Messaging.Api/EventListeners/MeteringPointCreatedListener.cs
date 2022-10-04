@@ -15,8 +15,7 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MeteringPoints.IntegrationEvents.CreateMeteringPoint;
-using Messaging.Application.MasterData.MarketEvaluationPoints;
-using Messaging.Infrastructure.Configuration.InternalCommands;
+using Messaging.Infrastructure.MarketEvaluationPoints;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
@@ -24,17 +23,17 @@ namespace Messaging.Api.EventListeners;
 
 public class MeteringPointCreatedListener
 {
-    private readonly CommandSchedulerFacade _commandSchedulerFacade;
     private readonly ILogger<MeteringPointCreatedListener> _logger;
+    private readonly MarketEvaluationPointReadModelHandler _readModelHandler;
 
-    public MeteringPointCreatedListener(CommandSchedulerFacade commandSchedulerFacade, ILogger<MeteringPointCreatedListener> logger)
+    public MeteringPointCreatedListener(ILogger<MeteringPointCreatedListener> logger, MarketEvaluationPointReadModelHandler readModelHandler)
     {
-        _commandSchedulerFacade = commandSchedulerFacade;
         _logger = logger;
+        _readModelHandler = readModelHandler;
     }
 
     [Function("MeteringPointCreatedListener")]
-    public async Task RunAsync(
+    public Task RunAsync(
         [ServiceBusTrigger("%INTEGRATION_EVENT_TOPIC_NAME%", "%METERING_POINT_CREATED_EVENT_B2B_SUBSCRIPTION_NAME%", Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS_LISTENER")] byte[] data,
         FunctionContext context)
     {
@@ -43,14 +42,7 @@ public class MeteringPointCreatedListener
         _logger.LogInformation($"Received MeteringPointCreated integration event in B2B");
 
         var meteringPointCreated = MeteringPointCreated.Parser.ParseFrom(data);
-
         _logger.LogInformation($"Received metering point created event: {meteringPointCreated}");
-        await _commandSchedulerFacade.EnqueueAsync(
-                new CreateMarketEvaluationPoint(
-                    meteringPointCreated.GsrnNumber,
-                    meteringPointCreated.MeteringPointId,
-                    Guid.Empty,
-                    meteringPointCreated.GridOperatorId))
-            .ConfigureAwait(false);
+        return _readModelHandler.WhenAsync(meteringPointCreated);
     }
 }

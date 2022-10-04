@@ -13,16 +13,25 @@
 // limitations under the License.
 
 using System;
+using System.Text.Json.Serialization;
+using Messaging.Application.Configuration.Commands.Commands;
 
-namespace Messaging.IntegrationTests.Application.MasterData.MarketEvaluationPoints;
-
-internal static class SampleData
+namespace Messaging.IntegrationTests.Infrastructure.Configuration.InternalCommands
 {
-    internal static string MarketEvaluationPointNumber => "571234567891234568";
+    public class TestCommand : InternalCommand
+    {
+        [JsonConstructor]
+        public TestCommand(Guid id, bool throwException)
+            : base(id)
+        {
+            ThrowException = throwException;
+        }
 
-    internal static string EnergySupplierNumber => "5790000555550";
+        public TestCommand(bool throwException = false)
+        {
+            ThrowException = throwException;
+        }
 
-    internal static string NewEnergySupplierNumber => "5790000555551";
-
-    internal static Guid IdOfGridOperatorForMeteringPoint => Guid.Parse("E754226C-3A5C-4E04-A1D4-6FE58782FDC2");
+        public bool ThrowException { get; }
+    }
 }

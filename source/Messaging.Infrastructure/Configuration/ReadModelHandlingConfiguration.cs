@@ -12,24 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using MediatR;
+using Messaging.Infrastructure.MarketEvaluationPoints;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Messaging.IntegrationTests.Infrastructure.InternalCommands
+namespace Messaging.Infrastructure.Configuration;
+
+public static class ReadModelHandlingConfiguration
 {
-    public class TestCommandHandler : IRequestHandler<TestCommand, Unit>
+    public static void AddReadModelHandling(IServiceCollection services)
     {
-        public Task<Unit> Handle(TestCommand request, CancellationToken cancellationToken)
-        {
-            if (request == null) throw new ArgumentNullException(nameof(request));
-            if (request.ThrowException)
-            {
-                throw new InvalidOperationException("This is a test exception");
-            }
-
-            return Unit.Task;
-        }
+        services.AddScoped<MarketEvaluationPointReadModelHandler>();
     }
 }

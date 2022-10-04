@@ -14,8 +14,8 @@
 
 using System;
 using System.Threading.Tasks;
-using Messaging.Application.MasterData.MarketEvaluationPoints;
 using Messaging.Infrastructure.Configuration.InternalCommands;
+using Messaging.Infrastructure.MarketEvaluationPoints;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
@@ -24,16 +24,16 @@ namespace Messaging.Api.EventListeners;
 public class EnergySupplierChangedListener
 {
     private readonly ILogger<EnergySupplierChangedListener> _logger;
-    private readonly CommandSchedulerFacade _commandScheduler;
+    private readonly MarketEvaluationPointReadModelHandler _readModelHandler;
 
-    public EnergySupplierChangedListener(ILogger<EnergySupplierChangedListener> logger, CommandSchedulerFacade commandScheduler)
+    public EnergySupplierChangedListener(ILogger<EnergySupplierChangedListener> logger, MarketEvaluationPointReadModelHandler readModelHandler)
     {
         _logger = logger;
-        _commandScheduler = commandScheduler;
+        _readModelHandler = readModelHandler;
     }
 
     [Function("EnergySupplierChangedListener")]
-    public async Task RunAsync(
+    public Task RunAsync(
         [ServiceBusTrigger("%INTEGRATION_EVENT_TOPIC_NAME%", "%ENERGY_SUPPLIER_CHANGED_EVENT_SUBSCRIPTION_NAME%", Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS_LISTENER")] byte[] data,
         FunctionContext context)
     {
@@ -42,11 +42,6 @@ public class EnergySupplierChangedListener
 
         var energySupplierChanged = Energinet.DataHub.EnergySupplying.IntegrationEvents.EnergySupplierChanged.Parser.ParseFrom(data);
         _logger.LogInformation($"Received EnergySupplierChanged integration event: {energySupplierChanged}");
-        await _commandScheduler.EnqueueAsync(
-            new CreateMarketEvaluationPoint(
-            energySupplierChanged.GsrnNumber,
-            energySupplierChanged.AccountingpointId,
-            Guid.NewGuid(),
-            energySupplierNumber: energySupplierChanged.EnergySupplierGln)).ConfigureAwait(false);
+        return _readModelHandler.WhenAsync(energySupplierChanged);
     }
 }
