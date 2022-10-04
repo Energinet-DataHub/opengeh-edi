@@ -20,7 +20,7 @@ using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.MessageBus;
 using Messaging.Infrastructure.Transactions.MoveIn;
 using Messaging.IntegrationTests.Fixtures;
-using Messaging.IntegrationTests.Infrastructure.InternalCommands;
+using Messaging.IntegrationTests.Infrastructure.Configuration.InternalCommands;
 using Messaging.IntegrationTests.TestDoubles;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;

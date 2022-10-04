@@ -31,15 +31,9 @@ using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.Configuration.Commands;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
-using Messaging.Application.MasterData.MarketEvaluationPoints;
 using Messaging.Application.OutgoingMessages;
-using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
-using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.OutgoingMessages.Common.Reasons;
-using Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier;
-using Messaging.Application.OutgoingMessages.GenericNotification;
-using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages.Requesting;
 using Messaging.Application.SchemaStore;
 using Messaging.Application.Transactions.MoveIn;
@@ -62,6 +56,7 @@ using Messaging.Infrastructure.Configuration.Processing;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.Configuration.SystemTime;
 using Messaging.Infrastructure.IncomingMessages;
+using Messaging.Infrastructure.MarketEvaluationPoints;
 using Messaging.Infrastructure.MasterData.MarketEvaluationPoints;
 using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
@@ -108,6 +103,7 @@ namespace Messaging.Infrastructure.Configuration
             AddMasterDataServices();
             AddActorServices();
             AddProcessing();
+            ReadModelHandlingConfiguration.AddReadModelHandling(services);
         }
 
         public static CompositionRoot Initialize(IServiceCollection services)
@@ -232,7 +228,6 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddTransient<IRequestHandler<RequestChangeOfSupplierTransaction, Unit>, MoveInRequestHandler>();
             _services.AddTransient<IRequestHandler<FetchCustomerMasterData, Unit>, FetchCustomerMasterDataHandler>();
             _services.AddTransient<IRequestHandler<FetchMeteringPointMasterData, Unit>, FetchMeteringPointMasterDataHandler>();
-            _services.AddTransient<IRequestHandler<CreateMarketEvaluationPoint, Unit>, CreateMarketEvaluationPointHandler>();
             _services.AddTransient<IRequestHandler<SetConsumerHasMovedIn, Unit>, SetConsumerHasMovedInHandler>();
             _services.AddTransient<IRequestHandler<ForwardMeteringPointMasterData, Unit>, ForwardMeteringPointMasterDataHandler>();
             _services.AddTransient<IRequestHandler<ForwardCustomerMasterData, Unit>, ForwardCustomerMasterDataHandler>();

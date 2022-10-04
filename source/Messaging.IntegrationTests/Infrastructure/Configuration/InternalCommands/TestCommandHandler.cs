@@ -13,26 +13,23 @@
 // limitations under the License.
 
 using System;
-using System.Text.Json.Serialization;
-using Messaging.Application.Configuration.Commands.Commands;
-using Messaging.Infrastructure.Configuration.InternalCommands;
+using System.Threading;
+using System.Threading.Tasks;
+using MediatR;
 
-namespace Messaging.IntegrationTests.Infrastructure.InternalCommands
+namespace Messaging.IntegrationTests.Infrastructure.Configuration.InternalCommands
 {
-    public class TestCommand : InternalCommand
+    public class TestCommandHandler : IRequestHandler<TestCommand, Unit>
     {
-        [JsonConstructor]
-        public TestCommand(Guid id, bool throwException)
-            : base(id)
+        public Task<Unit> Handle(TestCommand request, CancellationToken cancellationToken)
         {
-            ThrowException = throwException;
-        }
+            if (request == null) throw new ArgumentNullException(nameof(request));
+            if (request.ThrowException)
+            {
+                throw new InvalidOperationException("This is a test exception");
+            }
 
-        public TestCommand(bool throwException = false)
-        {
-            ThrowException = throwException;
+            return Unit.Task;
         }
-
-        public bool ThrowException { get; }
     }
 }
