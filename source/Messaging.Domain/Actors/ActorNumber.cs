@@ -28,8 +28,13 @@ public class ActorNumber : ValueObject
     public static ActorNumber Create(string actorNumber)
     {
         if (actorNumber == null) throw new ArgumentNullException(nameof(actorNumber));
-        return actorNumber.Length == 13 || actorNumber.Length == 18
+        return IsGlnNumber(actorNumber) || actorNumber.Length == 18
             ? new ActorNumber(actorNumber)
             : throw InvalidActorNumberException.Create(actorNumber);
+    }
+
+    private static bool IsGlnNumber(string actorNumber)
+    {
+        return actorNumber.Length == 13;
     }
 }
