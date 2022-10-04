@@ -45,18 +45,18 @@ public sealed class MoveInRequester : IMoveInRequester
         return await ParseResultFromAsync(response).ConfigureAwait(false);
     }
 
-    private static Request CreateRequestFrom(MoveInRequest request)
+    private static RequestV2 CreateRequestFrom(MoveInRequest request)
     {
-        return new Request(
-            request.ConsumerName,
-            request.EnergySupplierGlnNumber,
-            request.AccountingPointGsrnNumber,
-            request.StartDate,
-            request.ConsumerId,
-            request.ConsumerIdType);
+        return new RequestV2(
+            request.AccountingPointNumber,
+            request.EnergySupplierNumber,
+            request.EffectiveDate,
+            new Customer(
+                request.CustomerName,
+                request.CustomerNumber));
     }
 
-    private async Task<HttpResponseMessage> TryCallAsync(Request request)
+    private async Task<HttpResponseMessage> TryCallAsync(RequestV2 request)
     {
         using var content = new StringContent(_serializer.Serialize(request));
         var response = await _httpClientAdapter.PostAsync(_configuration.RequestUri, content).ConfigureAwait(false);
