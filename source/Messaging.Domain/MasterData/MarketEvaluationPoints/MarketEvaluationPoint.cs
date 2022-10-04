@@ -22,7 +22,7 @@ public class MarketEvaluationPoint
         MarketEvaluationPointNumber = marketEvaluationPointNumber;
     }
 
-    public Guid Id { get; private set; }
+    public Guid Id { get; }
 
     public string MarketEvaluationPointNumber { get; }
 
