@@ -35,22 +35,13 @@ public class MarketEvaluationPointReadModelHandler
     {
         ArgumentNullException.ThrowIfNull(@event);
 
-        var marketEvaluationPoint = await _context
-            .MarketEvaluationPoints
-            .FirstOrDefaultAsync(e => e.Id.Equals(@event.MeteringPointId))
-            .ConfigureAwait(false);
-
-        if (marketEvaluationPoint == null)
-        {
-            marketEvaluationPoint = new MarketEvaluationPoint(Guid.Parse(@event.Id), @event.GsrnNumber);
-            _context.MarketEvaluationPoints.Add(marketEvaluationPoint);
-        }
+        var marketEvaluationPoint =
+            await GetOrCreateAsync(Guid.Parse(@event.Id), @event.GsrnNumber).ConfigureAwait(false);
 
         marketEvaluationPoint.SetGridOperatorId(Guid.Parse(@event.GridOperatorId));
         await _context.SaveChangesAsync().ConfigureAwait(false);
     }
 
-    #pragma warning disable
     public async Task WhenAsync(EnergySupplierChanged @event)
     {
         ArgumentNullException.ThrowIfNull(@event);
@@ -68,5 +59,21 @@ public class MarketEvaluationPointReadModelHandler
 
         marketEvaluationPoint.SetEnergySupplier(@event.EnergySupplierGln);
         await _context.SaveChangesAsync().ConfigureAwait(false);
+    }
+
+    private async Task<MarketEvaluationPoint> GetOrCreateAsync(Guid id, string marketEvaluationPointNumber)
+    {
+        var marketEvaluationPoint = await _context
+            .MarketEvaluationPoints
+            .FirstOrDefaultAsync(e => e.Id.Equals(id))
+            .ConfigureAwait(false);
+
+        if (marketEvaluationPoint == null)
+        {
+            marketEvaluationPoint = new MarketEvaluationPoint(id, marketEvaluationPointNumber);
+            _context.MarketEvaluationPoints.Add(marketEvaluationPoint);
+        }
+
+        return marketEvaluationPoint;
     }
 }
