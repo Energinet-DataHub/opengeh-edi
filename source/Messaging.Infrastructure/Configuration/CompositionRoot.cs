@@ -62,6 +62,7 @@ using Messaging.Infrastructure.Configuration.Processing;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.Configuration.SystemTime;
 using Messaging.Infrastructure.IncomingMessages;
+using Messaging.Infrastructure.MarketEvaluationPoints;
 using Messaging.Infrastructure.MasterData.MarketEvaluationPoints;
 using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
@@ -100,6 +101,7 @@ namespace Messaging.Infrastructure.Configuration
             services.AddScoped<IMessageRequestNotifications, MessageRequestNotifications>();
             services.AddTransient<IRequestHandler<RequestMessages, Unit>, RequestMessagesHandler>();
             services.AddScoped<MessageReceiver>();
+            services.AddScoped<MarketEvaluationPointReadModelHandler>();
 
             AddMediatR();
             services.AddLogging();
