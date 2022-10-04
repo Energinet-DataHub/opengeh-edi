@@ -96,12 +96,11 @@ public class Scenario
     {
         if (_gridOperatorId != Guid.Empty && !string.IsNullOrEmpty(_gridOperatorNumber))
         {
-            var mp = MarketEvaluationPoint.Create(
-                _transaction?.CurrentEnergySupplierId!,
-                _transaction?.MarketEvaluationPointId!,
-                Guid.NewGuid().ToString());
-            mp.SetGridOperatorId(_gridOperatorId);
-            _context.MarketEvaluationPoints.Add(mp);
+            var marketEvaluationPoint = new MarketEvaluationPoint(
+                Guid.NewGuid(),
+                _transaction?.MarketEvaluationPointId!);
+            marketEvaluationPoint.SetGridOperatorId(_gridOperatorId);
+            _context.MarketEvaluationPoints.Add(marketEvaluationPoint);
 
             await _mediator.Send(new CreateActor(_gridOperatorId.ToString(), Guid.NewGuid().ToString(), _gridOperatorNumber))
                 .ConfigureAwait(false);
