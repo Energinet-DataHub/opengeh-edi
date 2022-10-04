@@ -36,7 +36,7 @@ public class MarketEvaluationPointReadModelHandler
         ArgumentNullException.ThrowIfNull(@event);
 
         var marketEvaluationPoint =
-            await GetOrCreateAsync(Guid.Parse(@event.Id), @event.GsrnNumber).ConfigureAwait(false);
+            await GetOrCreateAsync(Guid.Parse(@event.MeteringPointId), @event.GsrnNumber).ConfigureAwait(false);
 
         marketEvaluationPoint.SetGridOperatorId(Guid.Parse(@event.GridOperatorId));
         await _context.SaveChangesAsync().ConfigureAwait(false);
@@ -46,16 +46,8 @@ public class MarketEvaluationPointReadModelHandler
     {
         ArgumentNullException.ThrowIfNull(@event);
 
-        var marketEvaluationPoint = await _context
-            .MarketEvaluationPoints
-            .FirstOrDefaultAsync(e => e.Id.Equals(@event.AccountingpointId))
+        var marketEvaluationPoint = await GetOrCreateAsync(Guid.Parse(@event.AccountingpointId), @event.GsrnNumber)
             .ConfigureAwait(false);
-
-        if (marketEvaluationPoint == null)
-        {
-            marketEvaluationPoint = new MarketEvaluationPoint(Guid.Parse(@event.Id), @event.GsrnNumber);
-            _context.MarketEvaluationPoints.Add(marketEvaluationPoint);
-        }
 
         marketEvaluationPoint.SetEnergySupplier(@event.EnergySupplierGln);
         await _context.SaveChangesAsync().ConfigureAwait(false);

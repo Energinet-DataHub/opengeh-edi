@@ -38,7 +38,7 @@ public class MarketEvaluationPointReadModelTests : TestBase
     {
         var @event = new MeteringPointCreated
         {
-            Id = SampleData.MeteringPointId,
+            MeteringPointId = SampleData.MeteringPointId,
             GsrnNumber = SampleData.MeteringPointNumber,
             GridOperatorId = SampleData.GridOperatorId.ToString(),
         };
@@ -65,7 +65,7 @@ public class MarketEvaluationPointReadModelTests : TestBase
     {
         var @event = new EnergySupplierChanged()
         {
-            Id = SampleData.MeteringPointId,
+            AccountingpointId = SampleData.MeteringPointId,
             GsrnNumber = SampleData.MeteringPointNumber,
             EnergySupplierGln = SampleData.EnergySupplierNumber,
         };
