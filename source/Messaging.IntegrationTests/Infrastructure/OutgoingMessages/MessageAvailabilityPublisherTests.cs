@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages;
+using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.IntegrationTests.Application.IncomingMessages;
@@ -62,7 +63,7 @@ namespace Messaging.IntegrationTests.Infrastructure.OutgoingMessages
             var transaction = new IncomingMessageBuilder().Build();
             return new OutgoingMessage(
                 DocumentType.GenericNotification,
-                transaction.Message.ReceiverId,
+                ActorNumber.Create(transaction.Message.ReceiverId),
                 transaction.MarketActivityRecord.Id,
                 transaction.Message.ProcessType,
                 transaction.Message.ReceiverRole,
