@@ -16,6 +16,7 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.EnergySupplying.IntegrationEvents;
 using Energinet.DataHub.MeteringPoints.IntegrationEvents.CreateMeteringPoint;
+using Messaging.Domain.Actors;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
@@ -49,7 +50,7 @@ public class MarketEvaluationPointReadModelHandler
         var marketEvaluationPoint = await GetOrCreateAsync(Guid.Parse(@event.AccountingpointId), @event.GsrnNumber)
             .ConfigureAwait(false);
 
-        marketEvaluationPoint.SetEnergySupplier(@event.EnergySupplierGln);
+        marketEvaluationPoint.SetEnergySupplier(ActorNumber.Create(@event.EnergySupplierGln));
         await _context.SaveChangesAsync().ConfigureAwait(false);
     }
 

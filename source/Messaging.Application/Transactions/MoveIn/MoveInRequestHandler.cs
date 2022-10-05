@@ -67,7 +67,7 @@ namespace Messaging.Application.Transactions.MoveIn
                 request.MarketActivityRecord.Id,
                 request.MarketActivityRecord.MarketEvaluationPointId,
                 InstantPattern.General.Parse(request.MarketActivityRecord.EffectiveDate).GetValueOrThrow(),
-                marketEvaluationPoint?.EnergySupplierNumber,
+                marketEvaluationPoint?.EnergySupplierNumber?.Value,
                 request.Message.MessageId,
                 request.MarketActivityRecord.EnergySupplierId ?? string.Empty,
                 request.MarketActivityRecord.ConsumerId,
