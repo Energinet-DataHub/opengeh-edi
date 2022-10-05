@@ -23,6 +23,7 @@ using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
 using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails;
 using Messaging.Application.OutgoingMessages.Common;
+using Messaging.Domain.Actors;
 using Messaging.Domain.MasterData.Dictionaries;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
@@ -125,7 +126,7 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
     {
         return new OutgoingMessage(
             DocumentType.AccountingPointCharacteristics,
-            receiverId,
+            ActorNumber.Create(receiverId),
             id,
             processType,
             MarketRoles.EnergySupplier,
