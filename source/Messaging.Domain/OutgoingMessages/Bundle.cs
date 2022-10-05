@@ -84,7 +84,7 @@ public class Bundle
             message.SenderId.Value,
             message.SenderRole,
             message.ReceiverId.Value,
-            message.ReceiverRole,
+            message.ReceiverRole.ToString(),
             Guid.NewGuid().ToString(),
             _timestamp);
     }
