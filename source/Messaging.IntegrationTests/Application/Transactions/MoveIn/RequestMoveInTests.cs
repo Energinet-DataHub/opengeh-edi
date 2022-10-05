@@ -119,7 +119,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             var incomingMessage = MessageBuilder()
                 .WithProcessType(ProcessType.MoveIn.Code)
                 .WithReceiver(SampleData.ReceiverId)
-                .WithSenderId("Fake")
+                .WithSenderId("1234567890123")
                 .WithConsumerName(null)
                 .Build();
 
@@ -136,6 +136,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             var incomingMessage = MessageBuilder()
                 .WithProcessType(ProcessType.MoveIn.Code)
                 .WithReceiver(SampleData.ReceiverId)
+                .WithSenderId(SampleData.SenderId)
                 .WithEnergySupplierId(null)
                 .WithConsumerName(null)
                 .Build();
@@ -155,7 +156,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             AssertXmlMessage.AssertHasHeaderValue(document, "businessSector.type", "23");
             AssertXmlMessage.AssertHasHeaderValue(document, "sender_MarketParticipant.mRID", message.SenderId);
             AssertXmlMessage.AssertHasHeaderValue(document, "sender_MarketParticipant.marketRole.type", message.SenderRole);
-            AssertXmlMessage.AssertHasHeaderValue(document, "receiver_MarketParticipant.mRID", message.ReceiverId);
+            AssertXmlMessage.AssertHasHeaderValue(document, "receiver_MarketParticipant.mRID", message.ReceiverId.Value);
             AssertXmlMessage.AssertHasHeaderValue(document, "receiver_MarketParticipant.marketRole.type", message.ReceiverRole);
             AssertXmlMessage.AssertHasHeaderValue(document, "reason.code", expectedReasonCode);
         }
@@ -172,6 +173,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         private static IncomingMessageBuilder MessageBuilder()
         {
             return new IncomingMessageBuilder()
+                .WithEnergySupplierId(SampleData.NewEnergySupplierNumber)
                 .WithMessageId(SampleData.OriginalMessageId)
                 .WithTransactionId(SampleData.TransactionId);
         }

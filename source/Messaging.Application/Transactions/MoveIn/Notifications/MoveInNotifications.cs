@@ -17,6 +17,7 @@ using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.OutgoingMessages.GenericNotification;
+using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
 using NodaTime;
@@ -44,7 +45,7 @@ public class MoveInNotifications
 
         var message = new OutgoingMessage(
             DocumentType.GenericNotification,
-            energySupplierId,
+            ActorNumber.Create(energySupplierId),
             transactionId,
             BusinessReasonCode.CustomerMoveInOrMoveOut.Code,
             MarketRoles.EnergySupplier,
@@ -66,7 +67,7 @@ public class MoveInNotifications
 
         var message = new OutgoingMessage(
             DocumentType.GenericNotification,
-            gridOperatorNumber,
+            ActorNumber.Create(gridOperatorNumber),
             transaction.TransactionId,
             ProcessType.MoveIn.Code,
             MarketRoles.GridOperator,

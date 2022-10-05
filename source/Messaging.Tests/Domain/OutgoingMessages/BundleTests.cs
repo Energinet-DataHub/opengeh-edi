@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using NodaTime;
 using Xunit;
@@ -30,16 +31,16 @@ public class BundleTests
     [Fact]
     public void Can_create_message()
     {
-        var outgoingMessage1 = CreateOutgoingMessage("ProcessType1", "SenderId");
+        var outgoingMessage1 = CreateOutgoingMessage("ProcessType1");
         _bundle.Add(outgoingMessage1);
-        var outgoingMessage2 = CreateOutgoingMessage("ProcessType1", "SenderId");
+        var outgoingMessage2 = CreateOutgoingMessage("ProcessType1");
         _bundle.Add(outgoingMessage2);
 
         var bundledMessage = _bundle.CreateMessage();
 
         Assert.Equal(outgoingMessage1.DocumentType, bundledMessage.DocumentType);
         Assert.Equal(outgoingMessage1.ProcessType, bundledMessage.Header.ProcessType);
-        Assert.Equal(outgoingMessage1.ReceiverId, bundledMessage.Header.ReceiverId);
+        Assert.Equal(outgoingMessage1.ReceiverId.Value, bundledMessage.Header.ReceiverId);
         Assert.Equal(outgoingMessage1.ReceiverRole, bundledMessage.Header.ReceiverRole);
         Assert.Equal(outgoingMessage1.SenderId, bundledMessage.Header.SenderId);
         Assert.Equal(outgoingMessage1.SenderRole, bundledMessage.Header.SenderRole);
@@ -56,24 +57,37 @@ public class BundleTests
     [Fact]
     public void Messages_must_originate_from_the_same_type_of_business_process()
     {
-        _bundle.Add(CreateOutgoingMessage("ProcessType1", "SenderId"));
+        _bundle.Add(CreateOutgoingMessage("ProcessType1"));
 
-        Assert.Throws<ProcessTypesDoesNotMatchException>(() => _bundle.Add(CreateOutgoingMessage("ProcessType2", "SenderId")));
+        Assert.Throws<ProcessTypesDoesNotMatchException>(() => _bundle.Add(CreateOutgoingMessage("ProcessType2")));
     }
 
     [Fact]
     public void Messages_must_same_receiver()
     {
-        _bundle.Add(CreateOutgoingMessage("ProcessType1", "Sender1"));
+        _bundle.Add(CreateOutgoingMessage("ProcessType1", "1234567890123"));
 
-        Assert.Throws<ReceiverIdsDoesNotMatchException>(() => _bundle.Add(CreateOutgoingMessage("ProcessType1", "Sender2")));
+        Assert.Throws<ReceiverIdsDoesNotMatchException>(() => _bundle.Add(CreateOutgoingMessage("ProcessType1", "1234567890124")));
     }
 
     private static OutgoingMessage CreateOutgoingMessage(string processType, string receiverId)
     {
         return new OutgoingMessage(
             DocumentType.GenericNotification,
-            receiverId,
+            ActorNumber.Create(receiverId),
+            "FakeId",
+            processType,
+            "ReceiverRole1",
+            "SenderId",
+            "SenderRole",
+            string.Empty);
+    }
+
+    private static OutgoingMessage CreateOutgoingMessage(string processType)
+    {
+        return new OutgoingMessage(
+            DocumentType.GenericNotification,
+            ActorNumber.Create("1234567890123"),
             "FakeId",
             processType,
             "ReceiverRole1",

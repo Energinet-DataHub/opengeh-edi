@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.SeedWork;
 using Microsoft.EntityFrameworkCore;
@@ -33,7 +34,10 @@ namespace Messaging.Infrastructure.Configuration.DataAccess.Outgoing
                     toDbValue => toDbValue.Name,
                     fromDbValue => EnumerationType.FromName<DocumentType>(fromDbValue));
             builder.Property(x => x.IsPublished);
-            builder.Property(x => x.ReceiverId);
+            builder.Property(x => x.ReceiverId)
+                .HasConversion(
+                    toDbValue => toDbValue.Value,
+                    fromDbValue => ActorNumber.Create(fromDbValue));
             builder.Property(x => x.ReceiverRole);
             builder.Property(x => x.OriginalMessageId);
             builder.Property(x => x.ProcessType);

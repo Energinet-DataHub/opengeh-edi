@@ -21,6 +21,7 @@ using Messaging.Application.MasterData;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Application.OutgoingMessages.Common;
+using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
 
@@ -60,7 +61,7 @@ public class ForwardCustomerMasterDataHandler : IRequestHandler<ForwardCustomerM
     {
         return new OutgoingMessage(
             DocumentType.CharacteristicsOfACustomerAtAnAP,
-            receiverId,
+            ActorNumber.Create(receiverId),
             id,
             processType,
             MarketRoles.EnergySupplier,

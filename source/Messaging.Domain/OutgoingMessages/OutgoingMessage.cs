@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Messaging.Domain.Actors;
+
 namespace Messaging.Domain.OutgoingMessages
 {
     public class OutgoingMessage
     {
-        public OutgoingMessage(DocumentType documentType, string receiverId, string originalMessageId, string processType, string receiverRole, string senderId, string senderRole, string marketActivityRecordPayload)
+        public OutgoingMessage(DocumentType documentType, ActorNumber receiverId, string originalMessageId, string processType, string receiverRole, string senderId, string senderRole, string marketActivityRecordPayload)
         {
             DocumentType = documentType;
             ReceiverId = receiverId;
@@ -33,7 +35,7 @@ namespace Messaging.Domain.OutgoingMessages
 
         public bool IsPublished { get; private set; }
 
-        public string ReceiverId { get; }
+        public ActorNumber ReceiverId { get; }
 
         public DocumentType DocumentType { get; }
 

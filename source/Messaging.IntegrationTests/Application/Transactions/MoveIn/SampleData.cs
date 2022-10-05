@@ -44,15 +44,11 @@ internal static class SampleData
 
     internal static string ReceiverId => "5790001330552";
 
-    internal static string SenderId => "123456";
+    internal static string SenderId => "5790000555551";
 
     internal static bool ElectricalHeating => false;
 
     internal static Instant ElectricalHeatingStart => EffectiveDateFactory.InstantAsOfToday();
-
-    internal static string SecondCustomerId => "78967876";
-
-    internal static string SecondCustomerName => "Jane Doe";
 
     internal static bool ProtectedName => false;
 
@@ -64,5 +60,5 @@ internal static class SampleData
 
     internal static Guid IdOfGridOperatorForMeteringPoint => Guid.Parse("E754226C-3A5C-4E04-A1D4-6FE58782FDC2");
 
-    internal static string NumberOfGridOperatorForMeteringPoint => "Gridoperator01";
+    internal static string NumberOfGridOperatorForMeteringPoint => "1234567890123";
 }

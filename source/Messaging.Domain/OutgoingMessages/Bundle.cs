@@ -58,7 +58,7 @@ public class Bundle
 
     private void EnsureReceiverId(OutgoingMessage message)
     {
-        if (message.ReceiverId.Equals(_header.ReceiverId, StringComparison.OrdinalIgnoreCase) == false)
+        if (message.ReceiverId.Value.Equals(_header.ReceiverId, StringComparison.OrdinalIgnoreCase) == false)
         {
             throw new ReceiverIdsDoesNotMatchException(message.Id.ToString());
         }
@@ -83,7 +83,7 @@ public class Bundle
             message.ProcessType,
             message.SenderId,
             message.SenderRole,
-            message.ReceiverId,
+            message.ReceiverId.Value,
             message.ReceiverRole,
             Guid.NewGuid().ToString(),
             _timestamp);
