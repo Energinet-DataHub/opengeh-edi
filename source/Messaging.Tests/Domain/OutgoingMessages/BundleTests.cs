@@ -74,7 +74,7 @@ public class BundleTests
     {
         return new OutgoingMessage(
             DocumentType.GenericNotification,
-            receiverId,
+            ActorNumber.Create(receiverId),
             "FakeId",
             processType,
             "ReceiverRole1",
