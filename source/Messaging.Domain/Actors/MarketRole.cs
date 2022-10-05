@@ -16,13 +16,13 @@ using Messaging.Domain.SeedWork;
 
 namespace Messaging.Domain.Actors;
 
-public class MarketRoles : EnumerationType
+public class MarketRole : EnumerationType
 {
-    public static readonly MarketRoles MeteringPointAdministrator = new(0, "DDZ");
-    public static readonly MarketRoles EnergySupplier = new(1, "DDQ");
-    public static readonly MarketRoles GridOperator = new(2, "DDM");
+    public static readonly MarketRole MeteringPointAdministrator = new(0, "DDZ");
+    public static readonly MarketRole EnergySupplier = new(1, "DDQ");
+    public static readonly MarketRole GridOperator = new(2, "DDM");
 
-    private MarketRoles(int id, string name)
+    private MarketRole(int id, string name)
         : base(id, name)
     {
     }

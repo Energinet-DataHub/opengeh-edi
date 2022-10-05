@@ -77,8 +77,8 @@ public class NotifyGridOperatorHandlerTests
                 ProcessType.MoveIn.Code,
                 GetService<IDbConnectionFactory>())
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
-            .HasSenderRole(MarketRoles.MeteringPointAdministrator.ToString())
-            .HasReceiverRole(MarketRoles.GridOperator.ToString())
+            .HasSenderRole(MarketRole.MeteringPointAdministrator.ToString())
+            .HasReceiverRole(MarketRole.GridOperator.ToString())
             .HasReceiverId(SampleData.NumberOfGridOperatorForMeteringPoint)
             .WithMarketActivityRecord()
             .HasValidityStart(SampleData.SupplyStart)

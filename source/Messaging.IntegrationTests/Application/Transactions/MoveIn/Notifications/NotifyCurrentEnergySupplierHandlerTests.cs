@@ -72,9 +72,9 @@ public class NotifyCurrentEnergySupplierHandlerTests
             .HasEndOfSupplyNotificationState(MoveInTransaction.NotificationState.WasNotified);
         AssertMessage(DocumentType.GenericNotification, BusinessReasonCode.CustomerMoveInOrMoveOut.Code)
             .HasReceiverId(SampleData.CurrentEnergySupplierNumber)
-            .HasReceiverRole(MarketRoles.EnergySupplier.ToString())
+            .HasReceiverRole(MarketRole.EnergySupplier.ToString())
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
-            .HasSenderRole(MarketRoles.MeteringPointAdministrator.ToString())
+            .HasSenderRole(MarketRole.MeteringPointAdministrator.ToString())
             .WithMarketActivityRecord()
             .HasId()
             .HasValidityStart(SampleData.SupplyStart)
