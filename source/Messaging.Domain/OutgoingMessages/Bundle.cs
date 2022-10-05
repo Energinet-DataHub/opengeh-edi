@@ -81,7 +81,7 @@ public class Bundle
     {
         _header = new MessageHeader(
             message.ProcessType,
-            message.SenderId,
+            message.SenderId.Value,
             message.SenderRole,
             message.ReceiverId.Value,
             message.ReceiverRole,

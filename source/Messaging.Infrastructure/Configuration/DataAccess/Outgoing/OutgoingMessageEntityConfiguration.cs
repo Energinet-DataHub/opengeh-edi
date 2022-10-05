@@ -41,7 +41,10 @@ namespace Messaging.Infrastructure.Configuration.DataAccess.Outgoing
             builder.Property(x => x.ReceiverRole);
             builder.Property(x => x.OriginalMessageId);
             builder.Property(x => x.ProcessType);
-            builder.Property(x => x.SenderId);
+            builder.Property(x => x.SenderId)
+                .HasConversion(
+                    toDbValue => toDbValue.Value,
+                    fromDbValue => ActorNumber.Create(fromDbValue));
             builder.Property(x => x.SenderRole);
             builder.Property(x => x.MarketActivityRecordPayload);
         }

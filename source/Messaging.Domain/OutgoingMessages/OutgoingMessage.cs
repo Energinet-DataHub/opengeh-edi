@@ -18,7 +18,7 @@ namespace Messaging.Domain.OutgoingMessages
 {
     public class OutgoingMessage
     {
-        public OutgoingMessage(DocumentType documentType, ActorNumber receiverId, string originalMessageId, string processType, string receiverRole, string senderId, string senderRole, string marketActivityRecordPayload)
+        public OutgoingMessage(DocumentType documentType, ActorNumber receiverId, string originalMessageId, string processType, string receiverRole, ActorNumber senderId, string senderRole, string marketActivityRecordPayload)
         {
             DocumentType = documentType;
             ReceiverId = receiverId;
@@ -45,7 +45,7 @@ namespace Messaging.Domain.OutgoingMessages
 
         public string ReceiverRole { get; }
 
-        public string SenderId { get; }
+        public ActorNumber SenderId { get; }
 
         public string SenderRole { get; }
 

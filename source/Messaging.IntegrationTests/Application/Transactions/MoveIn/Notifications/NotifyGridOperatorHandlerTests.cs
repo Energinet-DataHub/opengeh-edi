@@ -75,7 +75,7 @@ public class NotifyGridOperatorHandlerTests
                 DocumentType.GenericNotification.Name,
                 ProcessType.MoveIn.Code,
                 GetService<IDbConnectionFactory>())
-            .HasSenderId(DataHubDetails.IdentificationNumber)
+            .HasSenderId(DataHubDetails.IdentificationNumber.Value)
             .HasSenderRole(MarketRoles.MeteringPointAdministrator)
             .HasReceiverRole(MarketRoles.GridOperator)
             .HasReceiverId(SampleData.NumberOfGridOperatorForMeteringPoint)
