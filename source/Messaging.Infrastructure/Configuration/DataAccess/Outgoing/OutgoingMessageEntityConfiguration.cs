@@ -48,7 +48,10 @@ namespace Messaging.Infrastructure.Configuration.DataAccess.Outgoing
                 .HasConversion(
                     toDbValue => toDbValue.Value,
                     fromDbValue => ActorNumber.Create(fromDbValue));
-            builder.Property(x => x.SenderRole);
+            builder.Property(x => x.SenderRole)
+                .HasConversion(
+                    toDbValue => toDbValue.ToString(),
+                    fromDbValue => EnumerationType.FromName<MarketRole>(fromDbValue));
             builder.Property(x => x.MarketActivityRecordPayload);
         }
     }
