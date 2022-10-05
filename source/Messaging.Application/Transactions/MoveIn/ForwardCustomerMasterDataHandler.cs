@@ -66,7 +66,7 @@ public class ForwardCustomerMasterDataHandler : IRequestHandler<ForwardCustomerM
             processType,
             MarketRole.EnergySupplier,
             DataHubDetails.IdentificationNumber,
-            MarketRole.MeteringPointAdministrator.ToString(),
+            MarketRole.MeteringPointAdministrator,
             marketActivityRecordPayload);
     }
 

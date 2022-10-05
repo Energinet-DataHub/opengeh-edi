@@ -50,7 +50,7 @@ public class MoveInNotifications
             BusinessReasonCode.CustomerMoveInOrMoveOut.Code,
             MarketRole.EnergySupplier,
             DataHubDetails.IdentificationNumber,
-            MarketRole.MeteringPointAdministrator.ToString(),
+            MarketRole.MeteringPointAdministrator,
             _marketActivityRecordParser.From(marketActivityRecord));
 
         _outgoingMessageStore.Add(message);
@@ -72,7 +72,7 @@ public class MoveInNotifications
             ProcessType.MoveIn.Code,
             MarketRole.GridOperator,
             DataHubDetails.IdentificationNumber,
-            MarketRole.MeteringPointAdministrator.ToString(),
+            MarketRole.MeteringPointAdministrator,
             _marketActivityRecordParser.From(marketActivityRecord));
 
         _outgoingMessageStore.Add(message);

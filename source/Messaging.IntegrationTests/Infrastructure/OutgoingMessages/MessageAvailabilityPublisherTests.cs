@@ -70,7 +70,7 @@ namespace Messaging.IntegrationTests.Infrastructure.OutgoingMessages
                 transaction.Message.ProcessType,
                 EnumerationType.FromName<MarketRole>(transaction.Message.ReceiverRole),
                 ActorNumber.Create(transaction.Message.SenderId),
-                transaction.Message.SenderRole,
+                EnumerationType.FromName<MarketRole>(transaction.Message.SenderRole),
                 string.Empty);
         }
 

@@ -121,7 +121,7 @@ namespace Messaging.Application.Transactions.MoveIn
                 processType,
                 MarketRole.EnergySupplier,
                 DataHubDetails.IdentificationNumber,
-                MarketRole.MeteringPointAdministrator.ToString(),
+                MarketRole.MeteringPointAdministrator,
                 marketActivityRecordPayload);
         }
 
