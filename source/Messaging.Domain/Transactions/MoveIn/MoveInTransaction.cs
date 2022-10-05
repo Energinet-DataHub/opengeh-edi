@@ -168,10 +168,7 @@ namespace Messaging.Domain.Transactions.MoveIn
 
         private void SetCurrentEnergySupplierNotificationToPending()
         {
-            if (CurrentEnergySupplierId is null)
-                throw new MoveInException("There is no current energy supplier to notify");
-
-            if (_currentEnergySupplierNotificationState == NotificationState.Required)
+            if (_currentEnergySupplierNotificationState == NotificationState.Required && CurrentEnergySupplierId is not null)
             {
                 _currentEnergySupplierNotificationState = NotificationState.Pending;
                 AddDomainEvent(new EndOfSupplyNotificationChangedToPending(TransactionId, EffectiveDate, MarketEvaluationPointId, CurrentEnergySupplierId));
