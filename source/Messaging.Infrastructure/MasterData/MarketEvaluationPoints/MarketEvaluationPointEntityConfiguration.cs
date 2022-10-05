@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using Messaging.Domain.Actors;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -26,7 +27,10 @@ public class MarketEvaluationPointEntityConfiguration : IEntityTypeConfiguration
         if (builder == null) throw new ArgumentNullException(nameof(builder));
         builder.ToTable("MarketEvaluationPoints", "b2b");
         builder.HasKey(x => x.Id);
-        builder.Property(x => x.EnergySupplierNumber);
+        builder.Property(x => x.EnergySupplierNumber)
+            .HasConversion(
+                toDbValue => toDbValue!.Value,
+                fromDbValue => ActorNumber.Create(fromDbValue));
         builder.Property(x => x.MarketEvaluationPointNumber);
         builder.Property(x => x.GridOperatorId);
     }
