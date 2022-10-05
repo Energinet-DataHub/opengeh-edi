@@ -24,6 +24,7 @@ using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.OutgoingMessages.Common.Reasons;
 using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Messaging.Domain.Actors;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
@@ -111,7 +112,7 @@ namespace Messaging.Application.Transactions.MoveIn
             return energySupplierId == senderId;
         }
 
-        private static OutgoingMessage CreateOutgoingMessage(string id, DocumentType documentType, string processType, string receiverId, string marketActivityRecordPayload)
+        private static OutgoingMessage CreateOutgoingMessage(string id, DocumentType documentType, string processType, ActorNumber receiverId, string marketActivityRecordPayload)
         {
             return new OutgoingMessage(
                 documentType,
@@ -156,7 +157,7 @@ namespace Messaging.Application.Transactions.MoveIn
                 transaction.StartedByMessageId,
                 DocumentType.ConfirmRequestChangeOfSupplier,
                 ProcessType.MoveIn.Code,
-                requestChangeOfSupplierTransaction.Message.SenderId,
+                ActorNumber.Create(requestChangeOfSupplierTransaction.Message.SenderId),
                 _marketActivityRecordParser.From(marketActivityRecord));
         }
 
@@ -172,7 +173,7 @@ namespace Messaging.Application.Transactions.MoveIn
                 transaction.StartedByMessageId,
                 DocumentType.RejectRequestChangeOfSupplier,
                 ProcessType.MoveIn.Code,
-                requestChangeOfSupplierTransaction.Message.SenderId,
+                ActorNumber.Create(requestChangeOfSupplierTransaction.Message.SenderId),
                 _marketActivityRecordParser.From(marketActivityRecord));
         }
 
