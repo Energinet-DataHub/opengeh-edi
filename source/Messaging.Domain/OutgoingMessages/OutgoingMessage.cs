@@ -18,19 +18,6 @@ namespace Messaging.Domain.OutgoingMessages
 {
     public class OutgoingMessage
     {
-        public OutgoingMessage(DocumentType documentType, string receiverId, string originalMessageId, string processType, string receiverRole, string senderId, string senderRole, string marketActivityRecordPayload)
-        {
-            DocumentType = documentType;
-            ReceiverId = ActorNumber.Create(receiverId);
-            OriginalMessageId = originalMessageId;
-            ProcessType = processType;
-            ReceiverRole = receiverRole;
-            SenderId = senderId;
-            SenderRole = senderRole;
-            MarketActivityRecordPayload = marketActivityRecordPayload;
-            Id = Guid.NewGuid();
-        }
-
         public OutgoingMessage(DocumentType documentType, ActorNumber receiverId, string originalMessageId, string processType, string receiverRole, string senderId, string senderRole, string marketActivityRecordPayload)
         {
             DocumentType = documentType;
