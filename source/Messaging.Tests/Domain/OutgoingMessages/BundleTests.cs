@@ -42,7 +42,7 @@ public class BundleTests
         Assert.Equal(outgoingMessage1.ProcessType, bundledMessage.Header.ProcessType);
         Assert.Equal(outgoingMessage1.ReceiverId.Value, bundledMessage.Header.ReceiverId);
         Assert.Equal(outgoingMessage1.ReceiverRole, bundledMessage.Header.ReceiverRole);
-        Assert.Equal(outgoingMessage1.SenderId, bundledMessage.Header.SenderId);
+        Assert.Equal(outgoingMessage1.SenderId.Value, bundledMessage.Header.SenderId);
         Assert.Equal(outgoingMessage1.SenderRole, bundledMessage.Header.SenderRole);
         Assert.Equal(2, bundledMessage.MarketActivityRecordPayloads.Count);
         Assert.NotNull(bundledMessage.Header.MessageId);
@@ -78,7 +78,7 @@ public class BundleTests
             "FakeId",
             processType,
             "ReceiverRole1",
-            "SenderId",
+            ActorNumber.Create("1234567890124"),
             "SenderRole",
             string.Empty);
     }
@@ -91,7 +91,7 @@ public class BundleTests
             "FakeId",
             processType,
             "ReceiverRole1",
-            "SenderId",
+            ActorNumber.Create("1234567890124"),
             "SenderRole",
             string.Empty);
     }

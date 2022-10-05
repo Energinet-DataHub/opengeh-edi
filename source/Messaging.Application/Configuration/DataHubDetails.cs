@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Messaging.Domain.Actors;
+
 namespace Messaging.Application.Configuration
 {
     public static class DataHubDetails
     {
-        public static string IdentificationNumber => "5790001330552";
+        public static ActorNumber IdentificationNumber => ActorNumber.Create("5790001330552");
     }
 }

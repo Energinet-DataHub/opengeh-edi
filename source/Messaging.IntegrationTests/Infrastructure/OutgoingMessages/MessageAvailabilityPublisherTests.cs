@@ -30,7 +30,6 @@ namespace Messaging.IntegrationTests.Infrastructure.OutgoingMessages
     [IntegrationTest]
     public class MessageAvailabilityPublisherTests : TestBase
     {
-        private readonly ICorrelationContext _correlationContext;
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly MessageAvailabilityPublisher _messageAvailabilityPublisher;
         private readonly NewMessageAvailableNotifierSpy _newMessageAvailableNotifierSpy;
@@ -38,7 +37,6 @@ namespace Messaging.IntegrationTests.Infrastructure.OutgoingMessages
         public MessageAvailabilityPublisherTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
-            _correlationContext = GetService<ICorrelationContext>();
             _outgoingMessageStore = GetService<IOutgoingMessageStore>();
             _messageAvailabilityPublisher = GetService<MessageAvailabilityPublisher>();
             _newMessageAvailableNotifierSpy = (NewMessageAvailableNotifierSpy)GetService<INewMessageAvailableNotifier>();
@@ -60,14 +58,17 @@ namespace Messaging.IntegrationTests.Infrastructure.OutgoingMessages
 
         private static OutgoingMessage CreateOutgoingMessage()
         {
-            var transaction = new IncomingMessageBuilder().Build();
+            var transaction = new IncomingMessageBuilder()
+                .WithSenderId("1234567890123")
+                .WithReceiver("1234567890124")
+                .Build();
             return new OutgoingMessage(
                 DocumentType.GenericNotification,
                 ActorNumber.Create(transaction.Message.ReceiverId),
                 transaction.MarketActivityRecord.Id,
                 transaction.Message.ProcessType,
                 transaction.Message.ReceiverRole,
-                transaction.Message.SenderId,
+                ActorNumber.Create(transaction.Message.SenderId),
                 transaction.Message.SenderRole,
                 string.Empty);
         }

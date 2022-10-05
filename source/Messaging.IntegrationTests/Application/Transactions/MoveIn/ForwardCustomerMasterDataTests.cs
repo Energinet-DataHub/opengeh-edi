@@ -59,7 +59,7 @@ public class ForwardCustomerMasterDataTests : TestBase
         var assertMessage = AssertOutgoingMessage();
         assertMessage.HasReceiverId(SampleData.NewEnergySupplierNumber);
         assertMessage.HasReceiverRole(MarketRoles.EnergySupplier);
-        assertMessage.HasSenderId(DataHubDetails.IdentificationNumber);
+        assertMessage.HasSenderId(DataHubDetails.IdentificationNumber.Value);
         assertMessage.HasSenderRole(MarketRoles.MeteringPointAdministrator);
         assertMessage.WithMarketActivityRecord()
             .HasOriginalTransactionId(SampleData.TransactionId)

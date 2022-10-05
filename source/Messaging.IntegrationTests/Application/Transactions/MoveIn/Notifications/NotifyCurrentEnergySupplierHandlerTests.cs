@@ -72,7 +72,7 @@ public class NotifyCurrentEnergySupplierHandlerTests
         AssertMessage(DocumentType.GenericNotification, BusinessReasonCode.CustomerMoveInOrMoveOut.Code)
             .HasReceiverId(SampleData.CurrentEnergySupplierNumber)
             .HasReceiverRole(MarketRoles.EnergySupplier)
-            .HasSenderId(DataHubDetails.IdentificationNumber)
+            .HasSenderId(DataHubDetails.IdentificationNumber.Value)
             .HasSenderRole(MarketRoles.MeteringPointAdministrator)
             .WithMarketActivityRecord()
             .HasId()
