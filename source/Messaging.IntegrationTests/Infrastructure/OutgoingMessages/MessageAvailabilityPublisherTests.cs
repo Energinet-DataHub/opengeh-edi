@@ -18,6 +18,7 @@ using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.SeedWork;
 using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Fixtures;
@@ -67,7 +68,7 @@ namespace Messaging.IntegrationTests.Infrastructure.OutgoingMessages
                 ActorNumber.Create(transaction.Message.ReceiverId),
                 transaction.MarketActivityRecord.Id,
                 transaction.Message.ProcessType,
-                transaction.Message.ReceiverRole,
+                EnumerationType.FromName<MarketRole>(transaction.Message.ReceiverRole),
                 ActorNumber.Create(transaction.Message.SenderId),
                 transaction.Message.SenderRole,
                 string.Empty);

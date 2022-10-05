@@ -48,7 +48,7 @@ public class MoveInNotifications
             ActorNumber.Create(energySupplierId),
             transactionId,
             BusinessReasonCode.CustomerMoveInOrMoveOut.Code,
-            MarketRole.EnergySupplier.ToString(),
+            MarketRole.EnergySupplier,
             DataHubDetails.IdentificationNumber,
             MarketRole.MeteringPointAdministrator.ToString(),
             _marketActivityRecordParser.From(marketActivityRecord));
@@ -70,7 +70,7 @@ public class MoveInNotifications
             ActorNumber.Create(gridOperatorNumber),
             transaction.TransactionId,
             ProcessType.MoveIn.Code,
-            MarketRole.GridOperator.ToString(),
+            MarketRole.GridOperator,
             DataHubDetails.IdentificationNumber,
             MarketRole.MeteringPointAdministrator.ToString(),
             _marketActivityRecordParser.From(marketActivityRecord));
