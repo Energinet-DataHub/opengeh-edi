@@ -41,7 +41,7 @@ namespace Messaging.Infrastructure.OutgoingMessages
         public async Task NotifyAsync(OutgoingMessage message)
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
-            var actorId = await FindActorIdAsync(message.ReceiverId).ConfigureAwait(false);
+            var actorId = await FindActorIdAsync(message.ReceiverId.Value).ConfigureAwait(false);
             await _dataAvailableNotificationSender.SendAsync(
                 _correlationContext.Id,
                 CreateDataAvailableNotificationFrom(message, actorId)).ConfigureAwait(false);

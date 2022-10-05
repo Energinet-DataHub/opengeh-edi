@@ -145,6 +145,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
         private async Task<RequestChangeOfSupplierTransaction> MessageArrived()
         {
             var incomingMessage = MessageBuilder()
+                .WithSenderId(SampleData.SenderId)
                 .Build();
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
             return incomingMessage;

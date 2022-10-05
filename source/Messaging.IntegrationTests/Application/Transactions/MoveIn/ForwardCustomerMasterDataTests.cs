@@ -98,6 +98,7 @@ public class ForwardCustomerMasterDataTests : TestBase
     private Task GivenMoveInHasBeenAcceptedAsync()
     {
         var message = new IncomingMessageBuilder()
+            .WithSenderId(SampleData.SenderId)
             .WithMessageId(SampleData.OriginalMessageId)
             .WithTransactionId(SampleData.TransactionId)
             .WithMarketEvaluationPointId(SampleData.MarketEvaluationPointId)
