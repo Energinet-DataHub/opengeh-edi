@@ -176,14 +176,4 @@ public class MoveInTransactionTests
             SampleData.ConsumerName,
             SampleData.ConsumerIdType);
     }
-
-    private void AssertTransactionIsNotCompleted()
-    {
-        Assert.DoesNotContain(_transaction.DomainEvents, e => e is MoveInWasCompleted);
-    }
-
-    private void AssertTransactionIsCompleted()
-    {
-        Assert.Contains(_transaction.DomainEvents, e => e is MoveInWasCompleted);
-    }
 }
