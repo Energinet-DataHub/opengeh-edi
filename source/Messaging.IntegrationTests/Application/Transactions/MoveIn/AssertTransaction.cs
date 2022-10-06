@@ -44,11 +44,7 @@ public class AssertTransaction
     public static AssertTransaction Transaction(string transactionId, IDbConnectionFactory connectionFactory)
     {
         if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
-
-        var transaction = GetTransaction(transactionId, connectionFactory);
-
-        Assert.NotNull(transaction);
-        return new AssertTransaction(transaction);
+        return new AssertTransaction(GetTransaction(transactionId, connectionFactory));
     }
 
     public static AssertTransaction Transaction(string transactionId, IDbConnectionFactory connectionFactory, ISerializer serializer)
@@ -151,7 +147,7 @@ public class AssertTransaction
         return this;
     }
 
-    private static dynamic GetTransaction(string transactionId, IDbConnectionFactory connectionFactory)
+    private static dynamic? GetTransaction(string transactionId, IDbConnectionFactory connectionFactory)
     {
         return connectionFactory.GetOpenConnection().QuerySingle(
             $"SELECT * FROM b2b.MoveInTransactions WHERE TransactionId = @TransactionId",
