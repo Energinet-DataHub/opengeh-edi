@@ -16,7 +16,7 @@ using System.Text.Json.Serialization;
 using Messaging.Application.Configuration.Commands.Commands;
 using Messaging.Application.MasterData;
 
-namespace Messaging.Application.Transactions.MoveIn;
+namespace Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 
 public class ForwardMeteringPointMasterData : InternalCommand
 {

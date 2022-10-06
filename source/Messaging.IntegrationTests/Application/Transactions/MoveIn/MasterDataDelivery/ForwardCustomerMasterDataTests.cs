@@ -19,7 +19,7 @@ using Messaging.Application.MasterData;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Application.OutgoingMessages.Common;
-using Messaging.Application.Transactions.MoveIn;
+using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Assertions;
@@ -27,7 +27,7 @@ using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 using MarketActivityRecord = Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp.MarketActivityRecord;
 
-namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
+namespace Messaging.IntegrationTests.Application.Transactions.MoveIn.MasterDataDelivery;
 
 public class ForwardCustomerMasterDataTests : TestBase
 {

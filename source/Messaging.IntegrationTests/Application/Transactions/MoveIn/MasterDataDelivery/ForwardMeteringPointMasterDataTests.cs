@@ -21,7 +21,7 @@ using Messaging.Application.MasterData;
 using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
 using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails;
 using Messaging.Application.OutgoingMessages.Common;
-using Messaging.Application.Transactions.MoveIn;
+using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 using Messaging.Domain.MasterData.Dictionaries;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Configuration.DataAccess;
@@ -32,7 +32,7 @@ using Xunit;
 using Address = Messaging.Application.MasterData.Address;
 using Series = Messaging.Application.MasterData.Series;
 
-namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
+namespace Messaging.IntegrationTests.Application.Transactions.MoveIn.MasterDataDelivery;
 
 public class ForwardMeteringPointMasterDataTests : TestBase
 {
