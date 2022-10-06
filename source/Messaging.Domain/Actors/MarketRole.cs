@@ -12,11 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Application.OutgoingMessages.Common;
+using Messaging.Domain.SeedWork;
 
-public static class MarketRoles
+namespace Messaging.Domain.Actors;
+
+public class MarketRole : EnumerationType
 {
-    public const string MeteringPointAdministrator = "DDZ";
-    public const string EnergySupplier = "DDQ";
-    public const string GridOperator = "DDM";
+    public static readonly MarketRole MeteringPointAdministrator = new(0, "DDZ");
+    public static readonly MarketRole EnergySupplier = new(1, "DDQ");
+    public static readonly MarketRole GridOperator = new(2, "DDM");
+
+    private MarketRole(int id, string name)
+        : base(id, name)
+    {
+    }
+
+    public override string ToString()
+    {
+        return Name;
+    }
 }

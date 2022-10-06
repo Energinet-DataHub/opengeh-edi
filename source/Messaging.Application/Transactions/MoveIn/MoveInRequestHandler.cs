@@ -119,9 +119,9 @@ namespace Messaging.Application.Transactions.MoveIn
                 receiverId,
                 id,
                 processType,
-                MarketRoles.EnergySupplier,
+                MarketRole.EnergySupplier,
                 DataHubDetails.IdentificationNumber,
-                MarketRoles.MeteringPointAdministrator,
+                MarketRole.MeteringPointAdministrator,
                 marketActivityRecordPayload);
         }
 

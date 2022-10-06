@@ -19,8 +19,8 @@ using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.MasterData;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
-using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
+using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.IntegrationTests.Assertions;
@@ -81,9 +81,9 @@ public class ForwardCustomerMasterDataTests : TestBase, IAsyncLifetime
 
         var assertMessage = AssertOutgoingMessage();
         assertMessage.HasReceiverId(SampleData.NewEnergySupplierNumber);
-        assertMessage.HasReceiverRole(MarketRoles.EnergySupplier);
+        assertMessage.HasReceiverRole(MarketRole.EnergySupplier.ToString());
         assertMessage.HasSenderId(DataHubDetails.IdentificationNumber.Value);
-        assertMessage.HasSenderRole(MarketRoles.MeteringPointAdministrator);
+        assertMessage.HasSenderRole(MarketRole.MeteringPointAdministrator.ToString());
         assertMessage.WithMarketActivityRecord()
             .HasOriginalTransactionId(SampleData.TransactionId)
             .HasValidityStart(SampleData.SupplyStart)

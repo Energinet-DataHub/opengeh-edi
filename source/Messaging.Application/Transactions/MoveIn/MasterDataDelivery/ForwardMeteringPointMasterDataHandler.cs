@@ -128,9 +128,9 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
             ActorNumber.Create(receiverId),
             id,
             processType,
-            MarketRoles.EnergySupplier,
+            MarketRole.EnergySupplier,
             DataHubDetails.IdentificationNumber,
-            MarketRoles.MeteringPointAdministrator,
+            MarketRole.MeteringPointAdministrator,
             marketActivityRecordPayload);
     }
 

@@ -19,6 +19,7 @@ using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.Transactions.MoveIn.Notifications;
+using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.DataAccess;
@@ -76,8 +77,8 @@ public class NotifyGridOperatorHandlerTests
                 ProcessType.MoveIn.Code,
                 GetService<IDbConnectionFactory>())
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
-            .HasSenderRole(MarketRoles.MeteringPointAdministrator)
-            .HasReceiverRole(MarketRoles.GridOperator)
+            .HasSenderRole(MarketRole.MeteringPointAdministrator.ToString())
+            .HasReceiverRole(MarketRole.GridOperator.ToString())
             .HasReceiverId(SampleData.NumberOfGridOperatorForMeteringPoint)
             .WithMarketActivityRecord()
             .HasValidityStart(SampleData.SupplyStart)
