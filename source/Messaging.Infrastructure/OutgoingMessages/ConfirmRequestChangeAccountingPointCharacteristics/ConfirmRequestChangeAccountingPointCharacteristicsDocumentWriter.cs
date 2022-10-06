@@ -16,17 +16,16 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
-using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.OutgoingMessages.Common.Xml;
 using Messaging.Infrastructure.OutgoingMessages.Common.Xml;
 using MarketActivityRecord = Messaging.Application.OutgoingMessages.ConfirmChangeAccountingPointCharacteristics.MarketActivityRecord;
 
-namespace Messaging.Infrastructure.OutgoingMessages.ConfirmChangeAccountingPointCharacteristics;
+namespace Messaging.Infrastructure.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
 
-public class ConfirmChangeAccountingPointCharacteristicsDocumentWriter : DocumentWriter
+public class ConfirmRequestChangeAccountingPointCharacteristicsDocumentWriter : DocumentWriter
 {
-    public ConfirmChangeAccountingPointCharacteristicsDocumentWriter(IMarketActivityRecordParser parser)
+    public ConfirmRequestChangeAccountingPointCharacteristicsDocumentWriter(IMarketActivityRecordParser parser)
         : base(
             new DocumentDetails(
                 "ConfirmRequestChangeAccountingPointCharacteristics_MarketDocument",

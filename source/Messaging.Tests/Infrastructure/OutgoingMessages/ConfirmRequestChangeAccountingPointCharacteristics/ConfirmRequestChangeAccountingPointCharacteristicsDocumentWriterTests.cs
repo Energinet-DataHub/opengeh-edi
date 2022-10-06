@@ -26,25 +26,25 @@ using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Serialization;
-using Messaging.Infrastructure.OutgoingMessages.ConfirmChangeAccountingPointCharacteristics;
+using Messaging.Infrastructure.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
 using Messaging.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
 using MarketActivityRecord = Messaging.Application.OutgoingMessages.ConfirmChangeAccountingPointCharacteristics.MarketActivityRecord;
 
-namespace Messaging.Tests.Infrastructure.OutgoingMessages.ConfirmChangeAccountingPointCharacteristics;
+namespace Messaging.Tests.Infrastructure.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
 
-public class ConfirmChangeAccountingPointCharacteristicsDocumentWriterTests
+public class ConfirmRequestChangeAccountingPointCharacteristicsDocumentWriterTests
 {
-    private readonly ConfirmChangeAccountingPointCharacteristicsDocumentWriter _documentWriter;
+    private readonly ConfirmRequestChangeAccountingPointCharacteristicsDocumentWriter _documentWriter;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMarketActivityRecordParser _marketActivityRecordParser;
     private ISchemaProvider? _schemaProvider;
 
-    public ConfirmChangeAccountingPointCharacteristicsDocumentWriterTests()
+    public ConfirmRequestChangeAccountingPointCharacteristicsDocumentWriterTests()
     {
         _systemDateTimeProvider = new SystemDateTimeProvider();
         _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
-        _documentWriter = new ConfirmChangeAccountingPointCharacteristicsDocumentWriter(_marketActivityRecordParser);
+        _documentWriter = new ConfirmRequestChangeAccountingPointCharacteristicsDocumentWriter(_marketActivityRecordParser);
     }
 
     [Fact]
