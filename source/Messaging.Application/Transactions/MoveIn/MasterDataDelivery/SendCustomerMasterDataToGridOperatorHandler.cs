@@ -34,7 +34,12 @@ public class SendCustomerMasterDataToGridOperatorHandler : IRequestHandler<SendC
         ArgumentNullException.ThrowIfNull(request);
 
         var transaction = _transactionRepository.GetById(request.TransactionId);
-        transaction?.SetCustomerMasterDataDeliveredWasToGridOperator();
+        if (transaction is null)
+        {
+            throw TransactionNotFoundException.TransactionIdNotFound(request.TransactionId);
+        }
+
+        transaction.SetCustomerMasterDataDeliveredWasToGridOperator();
         return Task.FromResult(Unit.Value);
     }
 }
