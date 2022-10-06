@@ -26,9 +26,11 @@ namespace Messaging.Domain.Transactions.MoveIn
         private MasterDataState _meteringPointMasterDataState;
         private MasterDataState _customerMasterDataState;
         private NotificationState _gridOperatorNotificationState = NotificationState.Pending;
+        private MasterDataState _customerMasterDataForGridOperatorDeliveryState;
 
         public MoveInTransaction(string transactionId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId, string startedByMessageId, string newEnergySupplierId, string? consumerId, string? consumerName, string? consumerIdType)
         {
+            _customerMasterDataForGridOperatorDeliveryState = MasterDataState.Pending;
             _businessProcessState = BusinessProcessState.Pending;
             _currentEnergySupplierNotificationState = currentEnergySupplierId is not null
                 ? NotificationState.Required
@@ -164,6 +166,12 @@ namespace Messaging.Domain.Transactions.MoveIn
                 _gridOperatorNotificationState = NotificationState.WasNotified;
                 AddDomainEvent(new GridOperatorWasNotified());
             }
+        }
+
+        public void SetCustomerMasterDataDeliveredWasToGridOperator()
+        {
+            if (_customerMasterDataForGridOperatorDeliveryState == MasterDataState.Pending)
+                _customerMasterDataForGridOperatorDeliveryState = MasterDataState.Sent;
         }
 
         private void SetCurrentEnergySupplierNotificationToPending()
