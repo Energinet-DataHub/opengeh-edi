@@ -14,6 +14,7 @@
 
 using System;
 using Messaging.Domain.Transactions.MoveIn;
+using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -65,6 +66,14 @@ namespace Messaging.Infrastructure.Transactions
                 .HasConversion(toDbValue => toDbValue.ToString(), fromDbValue => Enum.Parse<MoveInTransaction.NotificationState>(fromDbValue, true))
                 .HasColumnName("GridOperatorNotificationState");
             builder.Property(x => x.StartedByMessageId);
+
+            var serializer = new Serializer();
+            builder.Property<CustomerMasterData>("_customerMasterData")
+                .HasColumnName("CustomerMasterData")
+                .HasConversion(
+                    toDbValue => serializer.Serialize(toDbValue),
+                    fromDbValue => serializer.Deserialize<CustomerMasterData>(fromDbValue));
+
             builder.Ignore(x => x.DomainEvents);
         }
     }

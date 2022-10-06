@@ -15,7 +15,9 @@
 using System;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Domain.Transactions.MoveIn;
+using Messaging.Infrastructure.Configuration.Serialization;
 using Xunit;
 
 namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
@@ -23,12 +25,21 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
 public class AssertTransaction
 {
     private readonly dynamic _transaction;
+    private readonly ISerializer? _serializer;
 
     private AssertTransaction(dynamic transaction)
     {
         if (transaction == null) throw new ArgumentNullException(nameof(transaction));
         Assert.NotNull(transaction);
         _transaction = transaction;
+    }
+
+    private AssertTransaction(dynamic transaction, ISerializer serializer)
+    {
+        if (transaction == null) throw new ArgumentNullException(nameof(transaction));
+        Assert.NotNull(transaction);
+        _transaction = transaction;
+        _serializer = serializer;
     }
 
     public static AssertTransaction Transaction(string transactionId, IDbConnectionFactory connectionFactory)
@@ -44,6 +55,21 @@ public class AssertTransaction
 
         Assert.NotNull(transaction);
         return new AssertTransaction(transaction);
+    }
+
+    public static AssertTransaction Transaction(string transactionId, IDbConnectionFactory connectionFactory, ISerializer serializer)
+    {
+        if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
+
+        var transaction = connectionFactory.GetOpenConnection().QuerySingle(
+            $"SELECT * FROM b2b.MoveInTransactions WHERE TransactionId = @TransactionId",
+            new
+            {
+                TransactionId = transactionId,
+            });
+
+        Assert.NotNull(transaction);
+        return new AssertTransaction(transaction, serializer);
     }
 
     public AssertTransaction HasState(MoveInTransaction.State expectedState)
@@ -121,6 +147,13 @@ public class AssertTransaction
     public AssertTransaction HasCustomerMasterDataSentToGridOperatorState(MoveInTransaction.MasterDataState expectedState)
     {
         Assert.Equal(expectedState.ToString(), _transaction.GridOperator_MessageDeliveryState_CustomerMasterData);
+        return this;
+    }
+
+    public AssertTransaction HasCustomerMasterData(CustomerMasterData expected)
+    {
+        var stored = _serializer?.Deserialize(_transaction.CustomerMasterData.ToString(), typeof(CustomerMasterData)) as CustomerMasterData;
+        Assert.Equal(expected, stored);
         return this;
     }
 }
