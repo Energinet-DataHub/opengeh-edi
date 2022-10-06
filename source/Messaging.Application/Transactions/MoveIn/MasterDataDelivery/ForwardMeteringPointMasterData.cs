@@ -16,18 +16,18 @@ using System.Text.Json.Serialization;
 using Messaging.Application.Configuration.Commands.Commands;
 using Messaging.Application.MasterData;
 
-namespace Messaging.Application.Transactions.MoveIn;
+namespace Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 
-public class ForwardCustomerMasterData : InternalCommand
+public class ForwardMeteringPointMasterData : InternalCommand
 {
     [JsonConstructor]
-    public ForwardCustomerMasterData(string transactionId, CustomerMasterDataContent customerMasterDataContent)
+    public ForwardMeteringPointMasterData(string transactionId, MasterDataContent masterDataContent)
     {
         TransactionId = transactionId;
-        CustomerMasterDataContent = customerMasterDataContent;
+        MasterDataContent = masterDataContent;
     }
 
     public string TransactionId { get; }
 
-    public CustomerMasterDataContent CustomerMasterDataContent { get; }
+    public MasterDataContent MasterDataContent { get; set; }
 }

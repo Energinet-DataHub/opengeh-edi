@@ -44,6 +44,12 @@ namespace Messaging.Infrastructure.Transactions
                     toDbValue => toDbValue.ToString(),
                     fromDbValue => Enum.Parse<MoveInTransaction.MasterDataState>(fromDbValue, true));
 
+            builder.Property<MoveInTransaction.MasterDataState>("_customerMasterDataForGridOperatorDeliveryState")
+                .HasColumnName("GridOperator_MessageDeliveryState_CustomerMasterData")
+                .HasConversion(
+                    toDbValue => toDbValue.ToString(),
+                    fromDbValue => Enum.Parse<MoveInTransaction.MasterDataState>(fromDbValue, true));
+
             builder.Property<MoveInTransaction.BusinessProcessState>("_businessProcessState")
                 .HasColumnName("BusinessProcessState")
                 .HasConversion(

@@ -16,36 +16,60 @@ using System;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using MediatR;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.MasterData;
 using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
 using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails;
 using Messaging.Application.OutgoingMessages.Common;
-using Messaging.Application.Transactions.MoveIn;
+using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 using Messaging.Domain.MasterData.Dictionaries;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Configuration.DataAccess;
-using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Fixtures;
 using NodaTime.Extensions;
 using Xunit;
 using Address = Messaging.Application.MasterData.Address;
 using Series = Messaging.Application.MasterData.Series;
 
-namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
+namespace Messaging.IntegrationTests.Application.Transactions.MoveIn.MasterDataDelivery;
 
-public class ForwardMeteringPointMasterDataTests : TestBase
+public class ForwardMeteringPointMasterDataTests : TestBase, IAsyncLifetime
 {
     public ForwardMeteringPointMasterDataTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
     }
 
+    public Task InitializeAsync()
+    {
+        return Scenario.Details(
+                SampleData.TransactionId,
+                SampleData.MarketEvaluationPointId,
+                SampleData.SupplyStart,
+                SampleData.CurrentEnergySupplierNumber,
+                SampleData.NewEnergySupplierNumber,
+                SampleData.ConsumerId,
+                SampleData.ConsumerIdType,
+                SampleData.ConsumerName,
+                SampleData.OriginalMessageId,
+                GetService<IMediator>(),
+                GetService<B2BContext>())
+            .IsEffective()
+            .WithGridOperatorForMeteringPoint(
+                SampleData.IdOfGridOperatorForMeteringPoint,
+                SampleData.NumberOfGridOperatorForMeteringPoint)
+            .BuildAsync();
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
+    }
+
     [Fact]
     public async Task Metering_point_master_data_is_forwarded_to_the_new_energy_supplier()
     {
-        await SetupAnAcceptedMoveInTransaction().ConfigureAwait(false);
-
         var forwardMeteringPointMasterData = new ForwardMeteringPointMasterData(SampleData.TransactionId, CreateMasterDataContent());
         await InvokeCommandAsync(forwardMeteringPointMasterData).ConfigureAwait(false);
 
@@ -56,7 +80,6 @@ public class ForwardMeteringPointMasterDataTests : TestBase
     [Fact]
     public async Task Correct_metering_point_master_data_message_is_added_to_outgoing_message_store()
     {
-        await SetupAnAcceptedMoveInTransaction().ConfigureAwait(false);
         var masterData = CreateMasterDataContent();
 
         var forwardMeteringPointMasterData = new ForwardMeteringPointMasterData(SampleData.TransactionId, masterData);
@@ -69,7 +92,6 @@ public class ForwardMeteringPointMasterDataTests : TestBase
     [Fact]
     public async Task Correct_metering_point_master_data_message_is_added_to_outgoing_message_store_when_masterdata_contains_null_values()
     {
-        await SetupAnAcceptedMoveInTransaction().ConfigureAwait(false);
         var masterData = CreateMasterDataContentWithNullValues();
 
         var forwardMeteringPointMasterData = new ForwardMeteringPointMasterData(SampleData.TransactionId, masterData);
@@ -230,17 +252,5 @@ public class ForwardMeteringPointMasterDataTests : TestBase
             parser.From<MarketActivityRecord>(
                 message!.MarketActivityRecordPayload);
         return Task.FromResult(marketActivityRecord);
-    }
-
-    private async Task SetupAnAcceptedMoveInTransaction()
-    {
-        var message = new IncomingMessageBuilder()
-            .WithSenderId(SampleData.SenderId)
-            .WithEnergySupplierId(SampleData.SenderId)
-            .WithMessageId(SampleData.OriginalMessageId)
-            .WithTransactionId(SampleData.TransactionId)
-            .WithMarketEvaluationPointId(SampleData.MarketEvaluationPointId)
-            .Build();
-        await InvokeCommandAsync(message).ConfigureAwait(false);
     }
 }
