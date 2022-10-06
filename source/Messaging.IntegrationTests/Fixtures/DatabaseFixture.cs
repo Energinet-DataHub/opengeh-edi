@@ -16,6 +16,7 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.Helpers;
 using Messaging.Infrastructure.Configuration.DataAccess;
+using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
@@ -32,7 +33,7 @@ namespace Messaging.IntegrationTests.Fixtures
             optionsBuilder
                 .UseSqlServer(ConnectionString, options => options.UseNodaTime());
 
-            _context = new B2BContext(optionsBuilder.Options);
+            _context = new B2BContext(optionsBuilder.Options, new Serializer());
         }
 
         public string ConnectionString { get; } = @"Data Source=(LocalDB)\MSSQLLocalDB;Initial Catalog=B2BTransactions;Integrated Security=True;";
