@@ -50,16 +50,7 @@ public class AssertTransaction
     public static AssertTransaction Transaction(string transactionId, IDbConnectionFactory connectionFactory, ISerializer serializer)
     {
         if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
-
-        var transaction = connectionFactory.GetOpenConnection().QuerySingle(
-            $"SELECT * FROM b2b.MoveInTransactions WHERE TransactionId = @TransactionId",
-            new
-            {
-                TransactionId = transactionId,
-            });
-
-        Assert.NotNull(transaction);
-        return new AssertTransaction(transaction, serializer);
+        return new AssertTransaction(GetTransaction(transactionId, connectionFactory), serializer);
     }
 
     public AssertTransaction HasState(MoveInTransaction.State expectedState)
