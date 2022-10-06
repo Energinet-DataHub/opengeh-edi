@@ -41,9 +41,9 @@ public class BundleTests
         Assert.Equal(outgoingMessage1.DocumentType, bundledMessage.DocumentType);
         Assert.Equal(outgoingMessage1.ProcessType, bundledMessage.Header.ProcessType);
         Assert.Equal(outgoingMessage1.ReceiverId.Value, bundledMessage.Header.ReceiverId);
-        Assert.Equal(outgoingMessage1.ReceiverRole, bundledMessage.Header.ReceiverRole);
-        Assert.Equal(outgoingMessage1.SenderId, bundledMessage.Header.SenderId);
-        Assert.Equal(outgoingMessage1.SenderRole, bundledMessage.Header.SenderRole);
+        Assert.Equal(outgoingMessage1.ReceiverRole.ToString(), bundledMessage.Header.ReceiverRole);
+        Assert.Equal(outgoingMessage1.SenderId.Value, bundledMessage.Header.SenderId);
+        Assert.Equal(outgoingMessage1.SenderRole.ToString(), bundledMessage.Header.SenderRole);
         Assert.Equal(2, bundledMessage.MarketActivityRecordPayloads.Count);
         Assert.NotNull(bundledMessage.Header.MessageId);
     }
@@ -77,9 +77,9 @@ public class BundleTests
             ActorNumber.Create(receiverId),
             "FakeId",
             processType,
-            "ReceiverRole1",
-            "SenderId",
-            "SenderRole",
+            MarketRole.MeteringPointAdministrator,
+            ActorNumber.Create("1234567890124"),
+            MarketRole.EnergySupplier,
             string.Empty);
     }
 
@@ -90,9 +90,9 @@ public class BundleTests
             ActorNumber.Create("1234567890123"),
             "FakeId",
             processType,
-            "ReceiverRole1",
-            "SenderId",
-            "SenderRole",
+            MarketRole.MeteringPointAdministrator,
+            ActorNumber.Create("1234567890124"),
+            MarketRole.EnergySupplier,
             string.Empty);
     }
 }

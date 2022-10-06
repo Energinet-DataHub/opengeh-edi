@@ -25,7 +25,7 @@ using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
 
-namespace Messaging.Application.Transactions.MoveIn;
+namespace Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 
 public class ForwardCustomerMasterDataHandler : IRequestHandler<ForwardCustomerMasterData, Unit>
 {
@@ -64,9 +64,9 @@ public class ForwardCustomerMasterDataHandler : IRequestHandler<ForwardCustomerM
             ActorNumber.Create(receiverId),
             id,
             processType,
-            MarketRoles.EnergySupplier,
+            MarketRole.EnergySupplier,
             DataHubDetails.IdentificationNumber,
-            MarketRoles.MeteringPointAdministrator,
+            MarketRole.MeteringPointAdministrator,
             marketActivityRecordPayload);
     }
 

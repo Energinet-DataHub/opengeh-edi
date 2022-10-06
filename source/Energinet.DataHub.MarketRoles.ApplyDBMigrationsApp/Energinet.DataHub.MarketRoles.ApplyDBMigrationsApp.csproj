@@ -49,6 +49,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202226081402 Add customer to consumerregistration.sql" />
     <EmbeddedResource Include="Scripts\Model\202226081403 Remove consumer id.sql" />
     <EmbeddedResource Include="Scripts\Model\202226081404 Drop consumers.sql" />
+    <EmbeddedResource Include="Scripts\Model\202226081405 Add grid operator message delivery state.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281100 Seed cleanup.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281101 Insert Reasons.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241100 Consolidated dbo model.sql" />

@@ -18,6 +18,7 @@ using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.SeedWork;
 using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Fixtures;
@@ -30,7 +31,6 @@ namespace Messaging.IntegrationTests.Infrastructure.OutgoingMessages
     [IntegrationTest]
     public class MessageAvailabilityPublisherTests : TestBase
     {
-        private readonly ICorrelationContext _correlationContext;
         private readonly IOutgoingMessageStore _outgoingMessageStore;
         private readonly MessageAvailabilityPublisher _messageAvailabilityPublisher;
         private readonly NewMessageAvailableNotifierSpy _newMessageAvailableNotifierSpy;
@@ -38,7 +38,6 @@ namespace Messaging.IntegrationTests.Infrastructure.OutgoingMessages
         public MessageAvailabilityPublisherTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
-            _correlationContext = GetService<ICorrelationContext>();
             _outgoingMessageStore = GetService<IOutgoingMessageStore>();
             _messageAvailabilityPublisher = GetService<MessageAvailabilityPublisher>();
             _newMessageAvailableNotifierSpy = (NewMessageAvailableNotifierSpy)GetService<INewMessageAvailableNotifier>();
@@ -60,15 +59,18 @@ namespace Messaging.IntegrationTests.Infrastructure.OutgoingMessages
 
         private static OutgoingMessage CreateOutgoingMessage()
         {
-            var transaction = new IncomingMessageBuilder().Build();
+            var transaction = new IncomingMessageBuilder()
+                .WithSenderId("1234567890123")
+                .WithReceiver("1234567890124")
+                .Build();
             return new OutgoingMessage(
                 DocumentType.GenericNotification,
                 ActorNumber.Create(transaction.Message.ReceiverId),
                 transaction.MarketActivityRecord.Id,
                 transaction.Message.ProcessType,
-                transaction.Message.ReceiverRole,
-                transaction.Message.SenderId,
-                transaction.Message.SenderRole,
+                EnumerationType.FromName<MarketRole>(transaction.Message.ReceiverRole),
+                ActorNumber.Create(transaction.Message.SenderId),
+                EnumerationType.FromName<MarketRole>(transaction.Message.SenderRole),
                 string.Empty);
         }
 

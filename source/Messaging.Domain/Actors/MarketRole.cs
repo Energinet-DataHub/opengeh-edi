@@ -12,22 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json.Serialization;
-using Messaging.Application.Configuration.Commands.Commands;
-using Messaging.Application.MasterData;
+using Messaging.Domain.SeedWork;
 
-namespace Messaging.Application.Transactions.MoveIn;
+namespace Messaging.Domain.Actors;
 
-public class ForwardMeteringPointMasterData : InternalCommand
+public class MarketRole : EnumerationType
 {
-    [JsonConstructor]
-    public ForwardMeteringPointMasterData(string transactionId, MasterDataContent masterDataContent)
+    public static readonly MarketRole MeteringPointAdministrator = new(0, "DDZ");
+    public static readonly MarketRole EnergySupplier = new(1, "DDQ");
+    public static readonly MarketRole GridOperator = new(2, "DDM");
+
+    private MarketRole(int id, string name)
+        : base(id, name)
     {
-        TransactionId = transactionId;
-        MasterDataContent = masterDataContent;
     }
 
-    public string TransactionId { get; }
-
-    public MasterDataContent MasterDataContent { get; set; }
+    public override string ToString()
+    {
+        return Name;
+    }
 }

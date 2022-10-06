@@ -16,6 +16,7 @@ using System;
 using Messaging.Application.Configuration;
 using Messaging.Application.IncomingMessages;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
+using Messaging.Domain.Actors;
 using NodaTime;
 
 namespace Messaging.IntegrationTests.Application.IncomingMessages
@@ -30,7 +31,7 @@ namespace Messaging.IntegrationTests.Application.IncomingMessages
         private string? _messageId;
         private string _processType = NotSet;
         private string _senderId = NotSet;
-        private string _receiverId = DataHubDetails.IdentificationNumber;
+        private ActorNumber _receiverId = DataHubDetails.IdentificationNumber;
         private string? _consumerName = NotSet;
         private string _marketEvaluationPointId = NotSet;
         private string? _transactionId;
@@ -75,7 +76,7 @@ namespace Messaging.IntegrationTests.Application.IncomingMessages
 
         internal IncomingMessageBuilder WithReceiver(string receiverId)
         {
-            _receiverId = receiverId;
+            _receiverId = ActorNumber.Create(receiverId);
             return this;
         }
 
@@ -125,7 +126,7 @@ namespace Messaging.IntegrationTests.Application.IncomingMessages
                 _processType,
                 _senderId,
                 _senderRole,
-                _receiverId,
+                _receiverId.Value,
                 _receiverRole,
                 _createdAt);
         }

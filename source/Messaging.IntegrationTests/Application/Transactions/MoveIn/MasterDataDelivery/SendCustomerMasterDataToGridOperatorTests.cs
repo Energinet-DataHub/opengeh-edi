@@ -14,25 +14,20 @@
 
 using System.Threading.Tasks;
 using MediatR;
-using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.OutgoingMessages;
-using Messaging.Application.OutgoingMessages.Common;
-using Messaging.Application.Transactions.MoveIn.Notifications;
-using Messaging.Domain.Actors;
-using Messaging.Domain.OutgoingMessages;
+using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.DataAccess;
-using Messaging.IntegrationTests.Assertions;
+using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 
-namespace Messaging.IntegrationTests.Application.Transactions.MoveIn.Notifications;
+namespace Messaging.IntegrationTests.Application.Transactions.MoveIn.MasterDataDelivery;
 
-public class NotifyGridOperatorHandlerTests
+public class SendCustomerMasterDataToGridOperatorTests
     : TestBase, IAsyncLifetime
 {
-    public NotifyGridOperatorHandlerTests(DatabaseFixture databaseFixture)
+    public SendCustomerMasterDataToGridOperatorTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
     }
@@ -64,26 +59,11 @@ public class NotifyGridOperatorHandlerTests
     }
 
     [Fact]
-    public async Task Grid_operator_is_notified_about_the_move_in()
+    public async Task Message_is_delivered()
     {
-        var command = new NotifyGridOperator(SampleData.TransactionId);
-        await InvokeCommandAsync(command).ConfigureAwait(false);
+        await InvokeCommandAsync(new SendCustomerMasterDataToGridOperator(SampleData.TransactionId)).ConfigureAwait(false);
 
         AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>())
-            .HasGridOperatorNotificationState(MoveInTransaction.NotificationState.WasNotified);
-        AssertOutgoingMessage.OutgoingMessage(
-                SampleData.TransactionId,
-                DocumentType.GenericNotification.Name,
-                ProcessType.MoveIn.Code,
-                GetService<IDbConnectionFactory>())
-            .HasSenderId(DataHubDetails.IdentificationNumber.Value)
-            .HasSenderRole(MarketRole.MeteringPointAdministrator.ToString())
-            .HasReceiverRole(MarketRole.GridOperator.ToString())
-            .HasReceiverId(SampleData.NumberOfGridOperatorForMeteringPoint)
-            .WithMarketActivityRecord()
-            .HasValidityStart(SampleData.SupplyStart)
-            .HasId()
-            .HasOriginalTransactionId(SampleData.TransactionId)
-            .HasMarketEvaluationPointId(SampleData.MeteringPointNumber);
+            .HasCustomerMasterDataSentToGridOperatorState(MoveInTransaction.MasterDataState.Sent);
     }
 }

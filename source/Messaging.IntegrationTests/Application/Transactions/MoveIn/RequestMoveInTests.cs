@@ -63,7 +63,9 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
                 .HasConsumerId(incomingMessage.MarketActivityRecord.ConsumerId!)
                 .HasConsumerName(incomingMessage.MarketActivityRecord.ConsumerName!)
                 .HasConsumerIdType(incomingMessage.MarketActivityRecord.ConsumerIdType!)
-                .HasEndOfSupplyNotificationState(MoveInTransaction.NotificationState.NotNeeded);
+                .HasEndOfSupplyNotificationState(MoveInTransaction.NotificationState.NotNeeded)
+                .HasGridOperatorNotificationState(MoveInTransaction.NotificationState.Pending)
+                .HasCustomerMasterDataSentToGridOperatorState(MoveInTransaction.MasterDataState.Pending);
         }
 
         [Fact]
@@ -154,10 +156,10 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             AssertXmlMessage.AssertHasHeaderValue(document, "type", "414");
             AssertXmlMessage.AssertHasHeaderValue(document, "process.processType", message.ProcessType);
             AssertXmlMessage.AssertHasHeaderValue(document, "businessSector.type", "23");
-            AssertXmlMessage.AssertHasHeaderValue(document, "sender_MarketParticipant.mRID", message.SenderId);
-            AssertXmlMessage.AssertHasHeaderValue(document, "sender_MarketParticipant.marketRole.type", message.SenderRole);
+            AssertXmlMessage.AssertHasHeaderValue(document, "sender_MarketParticipant.mRID", message.SenderId.Value);
+            AssertXmlMessage.AssertHasHeaderValue(document, "sender_MarketParticipant.marketRole.type", message.SenderRole.ToString());
             AssertXmlMessage.AssertHasHeaderValue(document, "receiver_MarketParticipant.mRID", message.ReceiverId.Value);
-            AssertXmlMessage.AssertHasHeaderValue(document, "receiver_MarketParticipant.marketRole.type", message.ReceiverRole);
+            AssertXmlMessage.AssertHasHeaderValue(document, "receiver_MarketParticipant.marketRole.type", message.ReceiverRole.ToString());
             AssertXmlMessage.AssertHasHeaderValue(document, "reason.code", expectedReasonCode);
         }
 

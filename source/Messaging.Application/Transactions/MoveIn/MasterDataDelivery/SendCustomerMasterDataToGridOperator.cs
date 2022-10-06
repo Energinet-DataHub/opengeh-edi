@@ -12,11 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Application.OutgoingMessages.Common;
+using System;
+using System.Text.Json.Serialization;
+using Messaging.Application.Configuration.Commands.Commands;
 
-public static class MarketRoles
+namespace Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
+
+public class SendCustomerMasterDataToGridOperator : InternalCommand
 {
-    public const string MeteringPointAdministrator = "DDZ";
-    public const string EnergySupplier = "DDQ";
-    public const string GridOperator = "DDM";
+    public SendCustomerMasterDataToGridOperator(string transactionId)
+    {
+        TransactionId = transactionId;
+    }
+
+    [JsonConstructor]
+    public SendCustomerMasterDataToGridOperator(Guid id, string transactionId)
+        : base(id)
+    {
+        TransactionId = transactionId;
+    }
+
+    public string TransactionId { get; }
 }

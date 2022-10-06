@@ -19,6 +19,7 @@ using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.Transactions.MoveIn.Notifications;
+using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.DataAccess;
@@ -71,9 +72,9 @@ public class NotifyCurrentEnergySupplierHandlerTests
             .HasEndOfSupplyNotificationState(MoveInTransaction.NotificationState.WasNotified);
         AssertMessage(DocumentType.GenericNotification, BusinessReasonCode.CustomerMoveInOrMoveOut.Code)
             .HasReceiverId(SampleData.CurrentEnergySupplierNumber)
-            .HasReceiverRole(MarketRoles.EnergySupplier)
-            .HasSenderId(DataHubDetails.IdentificationNumber)
-            .HasSenderRole(MarketRoles.MeteringPointAdministrator)
+            .HasReceiverRole(MarketRole.EnergySupplier.ToString())
+            .HasSenderId(DataHubDetails.IdentificationNumber.Value)
+            .HasSenderRole(MarketRole.MeteringPointAdministrator.ToString())
             .WithMarketActivityRecord()
             .HasId()
             .HasValidityStart(SampleData.SupplyStart)

@@ -117,4 +117,10 @@ public class AssertTransaction
         Assert.Equal(expectedState.ToString(), _transaction.GridOperatorNotificationState);
         return this;
     }
+
+    public AssertTransaction HasCustomerMasterDataSentToGridOperatorState(MoveInTransaction.MasterDataState expectedState)
+    {
+        Assert.Equal(expectedState.ToString(), _transaction.GridOperator_MessageDeliveryState_CustomerMasterData);
+        return this;
+    }
 }
