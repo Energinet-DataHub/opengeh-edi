@@ -34,7 +34,12 @@ public class SetCustomerMasterDataHandler : IRequestHandler<SetCustomerMasterDat
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
         var transaction = _transactionRepository.GetById(request.TransactionId);
-        transaction?.SetCustomerMasterData(ParseFrom(request.Data));
+        if (transaction is null)
+        {
+            throw TransactionNotFoundException.TransactionIdNotFound(request.TransactionId);
+        }
+
+        transaction.SetCustomerMasterData(ParseFrom(request.Data));
         return Task.FromResult(Unit.Value);
     }
 
