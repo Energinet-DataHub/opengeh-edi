@@ -15,7 +15,6 @@
 using System;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Xunit;
