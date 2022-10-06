@@ -45,12 +45,7 @@ public class AssertTransaction
     {
         if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
 
-        var transaction = connectionFactory.GetOpenConnection().QuerySingle(
-            $"SELECT * FROM b2b.MoveInTransactions WHERE TransactionId = @TransactionId",
-            new
-            {
-                TransactionId = transactionId,
-            });
+        var transaction = GetTransaction(transactionId, connectionFactory);
 
         Assert.NotNull(transaction);
         return new AssertTransaction(transaction);
@@ -154,5 +149,15 @@ public class AssertTransaction
         var stored = _serializer?.Deserialize(_transaction.CustomerMasterData.ToString(), typeof(CustomerMasterData)) as CustomerMasterData;
         Assert.Equal(expected, stored);
         return this;
+    }
+
+    private static dynamic GetTransaction(string transactionId, IDbConnectionFactory connectionFactory)
+    {
+        return connectionFactory.GetOpenConnection().QuerySingle(
+            $"SELECT * FROM b2b.MoveInTransactions WHERE TransactionId = @TransactionId",
+            new
+            {
+                TransactionId = transactionId,
+            });
     }
 }
