@@ -64,7 +64,8 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
                 .HasConsumerName(incomingMessage.MarketActivityRecord.ConsumerName!)
                 .HasConsumerIdType(incomingMessage.MarketActivityRecord.ConsumerIdType!)
                 .HasEndOfSupplyNotificationState(MoveInTransaction.NotificationState.NotNeeded)
-                .HasGridOperatorNotificationState(MoveInTransaction.NotificationState.Pending);
+                .HasGridOperatorNotificationState(MoveInTransaction.NotificationState.Pending)
+                .HasCustomerMasterDataSentToGridOperatorState(MoveInTransaction.MasterDataState.Pending);
         }
 
         [Fact]
