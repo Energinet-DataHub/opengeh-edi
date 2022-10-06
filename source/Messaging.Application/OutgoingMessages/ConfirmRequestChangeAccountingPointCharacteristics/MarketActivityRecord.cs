@@ -12,6 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Application.OutgoingMessages.ConfirmChangeAccountingPointCharacteristics;
+namespace Messaging.Application.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
 
 public record MarketActivityRecord(string Id, string OriginalTransactionId, string MarketEvaluationPointId);
