@@ -13,9 +13,11 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
+using MediatR;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 using Messaging.Domain.Transactions.MoveIn;
+using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
@@ -23,36 +25,45 @@ using Xunit;
 namespace Messaging.IntegrationTests.Application.Transactions.MoveIn.MasterDataDelivery;
 
 public class SendCustomerMasterDataToGridOperatorTests
-    : TestBase
+    : TestBase, IAsyncLifetime
 {
     public SendCustomerMasterDataToGridOperatorTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
     }
 
+    public Task InitializeAsync()
+    {
+        return Scenario.Details(
+                SampleData.TransactionId,
+                SampleData.MeteringPointNumber,
+                SampleData.SupplyStart,
+                SampleData.CurrentEnergySupplierNumber,
+                SampleData.NewEnergySupplierNumber,
+                SampleData.ConsumerId,
+                SampleData.ConsumerIdType,
+                SampleData.ConsumerName,
+                SampleData.OriginalMessageId,
+                GetService<IMediator>(),
+                GetService<B2BContext>())
+            .IsEffective()
+            .WithGridOperatorForMeteringPoint(
+                SampleData.IdOfGridOperatorForMeteringPoint,
+                SampleData.NumberOfGridOperatorForMeteringPoint)
+            .BuildAsync();
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
+    }
+
     [Fact]
     public async Task Message_is_delivered()
     {
-        await GivenMoveInHasBeenAcceptedAsync().ConfigureAwait(false);
-
         await InvokeCommandAsync(new SendCustomerMasterDataToGridOperator(SampleData.TransactionId)).ConfigureAwait(false);
 
         AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>())
             .HasCustomerMasterDataSentToGridOperatorState(MoveInTransaction.MasterDataState.Sent);
-    }
-
-    private Task GivenMoveInHasBeenAcceptedAsync()
-    {
-        var message = new IncomingMessageBuilder()
-            .WithSenderId(SampleData.SenderId)
-            .WithMessageId(SampleData.OriginalMessageId)
-            .WithTransactionId(SampleData.TransactionId)
-            .WithMarketEvaluationPointId(SampleData.MarketEvaluationPointId)
-            .WithEnergySupplierId(SampleData.NewEnergySupplierNumber)
-            .WithEffectiveDate(SampleData.SupplyStart)
-            .WithConsumerId(SampleData.ConsumerId)
-            .WithConsumerName(SampleData.ConsumerName)
-            .Build();
-        return InvokeCommandAsync(message);
     }
 }
