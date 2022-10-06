@@ -20,7 +20,6 @@ using MediatR;
 using Messaging.Application.Configuration;
 using Messaging.Application.MasterData;
 using Messaging.Application.OutgoingMessages;
-using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
 using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails;
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Domain.Actors;
@@ -31,7 +30,7 @@ using NodaTime.Extensions;
 using Address = Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails.Address;
 using Series = Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails.Series;
 
-namespace Messaging.Application.Transactions.MoveIn;
+namespace Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 
 public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMeteringPointMasterData, Unit>
 {
