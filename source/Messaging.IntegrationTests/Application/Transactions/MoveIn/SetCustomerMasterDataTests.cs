@@ -65,6 +65,15 @@ public class SetCustomerMasterDataTests
     [Fact]
     public async Task Customer_master_data_is_stored()
     {
+        var command = CreateCommand();
+        await InvokeCommandAsync(command).ConfigureAwait(false);
+
+        AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>(), GetService<ISerializer>())
+            .HasCustomerMasterData(ParseFrom(command.Data));
+    }
+
+    private static SetCustomerMasterData CreateCommand()
+    {
         var customerMasterData = new CustomerMasterDataContent(
             "1",
             false,
@@ -77,11 +86,7 @@ public class SetCustomerMasterDataTests
             false,
             SystemClock.Instance.GetCurrentInstant(),
             Array.Empty<UsagePointLocation>());
-
-        await InvokeCommandAsync(new SetCustomerMasterData(SampleData.TransactionId, customerMasterData)).ConfigureAwait(false);
-
-        AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>(), GetService<ISerializer>())
-            .HasCustomerMasterData(ParseFrom(customerMasterData));
+        return new SetCustomerMasterData(SampleData.TransactionId, customerMasterData);
     }
 
     private static CustomerMasterData ParseFrom(CustomerMasterDataContent data)
