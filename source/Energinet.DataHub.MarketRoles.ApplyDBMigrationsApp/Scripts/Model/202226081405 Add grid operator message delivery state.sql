@@ -1,0 +1,2 @@
+﻿ALTER TABLE b2b.MoveInTransactions
+    ADD [GridOperator_MessageDeliveryState_CustomerMasterData] [nvarchar](50) CONSTRAINT DF_GridOperator_MessageDeliveryState_CustomerMasterData DEFAULT 'Pending' NOT NULL
