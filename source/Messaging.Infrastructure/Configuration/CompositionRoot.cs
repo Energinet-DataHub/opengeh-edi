@@ -240,6 +240,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddTransient<INotificationHandler<MoveInWasAccepted>, FetchMeteringPointMasterDataWhenAccepted>();
             _services.AddTransient<INotificationHandler<MoveInWasAccepted>, FetchCustomerMasterDataWhenAccepted>();
             _services.AddTransient<INotificationHandler<EndOfSupplyNotificationChangedToPending>, NotifyCurrentEnergySupplierWhenConsumerHasMovedIn>();
+            _services.AddTransient<INotificationHandler<CustomerMasterDataWasReceived>, SendCustomerMasterDataToEnergySupplierWhenDataIsReceived>();
             _services.AddTransient<INotificationHandler<BusinessProcessWasCompleted>, NotifyGridOperatorWhenConsumerHasMovedIn>();
             return this;
         }
