@@ -175,7 +175,7 @@ namespace Messaging.Domain.Transactions.MoveIn
                 _customerMasterDataForGridOperatorDeliveryState = MasterDataState.Sent;
         }
 
-        public void SetCustomerMasterData(CustomerMasterData customerMasterData)
+        public void ReceiveCustomerMasterData(CustomerMasterData customerMasterData)
         {
             _customerMasterData = customerMasterData;
             AddDomainEvent(new CustomerMasterDataWasReceived(TransactionId));

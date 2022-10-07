@@ -39,7 +39,7 @@ public class SetCustomerMasterDataHandler : IRequestHandler<SetCustomerMasterDat
             throw TransactionNotFoundException.TransactionIdNotFound(request.TransactionId);
         }
 
-        transaction.SetCustomerMasterData(ParseFrom(request.Data));
+        transaction.ReceiveCustomerMasterData(ParseFrom(request.Data));
         return Task.FromResult(Unit.Value);
     }
 

@@ -125,7 +125,7 @@ public class MoveInTransactionTests
             true,
             SampleData.EffectiveDate);
 
-        _transaction.SetCustomerMasterData(customerMasterData);
+        _transaction.ReceiveCustomerMasterData(customerMasterData);
 
         var domainEvent = _transaction.DomainEvents.FirstOrDefault(e => e is CustomerMasterDataWasReceived) as CustomerMasterDataWasReceived;
         Assert.NotNull(domainEvent);
