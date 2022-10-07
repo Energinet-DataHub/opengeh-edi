@@ -70,7 +70,7 @@ public class SendCustomerMasterDataToEnergySupplierHandler : IRequestHandler<Sen
             marketActivityRecordPayload);
     }
 
-    private static MarketEvaluationPoint CreateMarketEvaluationPoint(CustomerMasterData masterData, MoveInTransaction transaction)
+    private static MarketEvaluationPoint CreateMarketEvaluationPoint(CustomerMasterData masterData)
     {
         return new MarketEvaluationPoint(
             masterData.MarketEvaluationPoint,
@@ -88,7 +88,7 @@ public class SendCustomerMasterDataToEnergySupplierHandler : IRequestHandler<Sen
 
     private OutgoingMessage CustomerCharacteristicsMessageFrom(CustomerMasterData requestMasterDataContent, MoveInTransaction transaction)
     {
-        var marketEvaluationPoint = CreateMarketEvaluationPoint(requestMasterDataContent, transaction);
+        var marketEvaluationPoint = CreateMarketEvaluationPoint(requestMasterDataContent);
         var marketActivityRecord = new MarketActivityRecord(
             Guid.NewGuid().ToString(),
             transaction.TransactionId,
