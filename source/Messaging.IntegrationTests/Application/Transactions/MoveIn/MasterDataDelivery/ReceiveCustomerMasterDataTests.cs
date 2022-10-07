@@ -18,7 +18,7 @@ using MediatR;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.MasterData;
 using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
-using Messaging.Application.Transactions.MoveIn;
+using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.Serialization;
@@ -26,12 +26,12 @@ using Messaging.IntegrationTests.Fixtures;
 using NodaTime;
 using Xunit;
 
-namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
+namespace Messaging.IntegrationTests.Application.Transactions.MoveIn.MasterDataDelivery;
 
-public class SetCustomerMasterDataTests
+public class ReceiveCustomerMasterDataTests
     : TestBase, IAsyncLifetime
 {
-    public SetCustomerMasterDataTests(DatabaseFixture databaseFixture)
+    public ReceiveCustomerMasterDataTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
     }
@@ -72,21 +72,21 @@ public class SetCustomerMasterDataTests
             .HasCustomerMasterData(ParseFrom(command.Data));
     }
 
-    private static SetCustomerMasterData CreateCommand()
+    private static ReceiveCustomerMasterData CreateCommand()
     {
         var customerMasterData = new CustomerMasterDataContent(
-            "1",
-            false,
-            SystemClock.Instance.GetCurrentInstant(),
-            "Fake",
-            "Fake",
-            "Fake",
-            "Fake",
-            true,
-            false,
-            SystemClock.Instance.GetCurrentInstant(),
+            SampleData.MarketEvaluationPointId,
+            SampleData.ElectricalHeating,
+            SampleData.ElectricalHeatingStart,
+            SampleData.ConsumerId,
+            SampleData.ConsumerName,
+            SampleData.ConsumerId,
+            SampleData.ConsumerName,
+            SampleData.ProtectedName,
+            SampleData.HasEnergySupplier,
+            SampleData.SupplyStart,
             Array.Empty<UsagePointLocation>());
-        return new SetCustomerMasterData(SampleData.TransactionId, customerMasterData);
+        return new ReceiveCustomerMasterData(SampleData.TransactionId, customerMasterData);
     }
 
     private static CustomerMasterData ParseFrom(CustomerMasterDataContent data)
