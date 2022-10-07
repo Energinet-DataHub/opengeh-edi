@@ -39,14 +39,12 @@ public class CustomerMasterDataMessageFactory
         ArgumentNullException.ThrowIfNull(transaction.CustomerMasterData);
         ArgumentNullException.ThrowIfNull(receiverNumber);
 
-        var marketActivityRecord = CreateMarketActivityRecord(transaction);
-
         return Task.FromResult(CreateOutgoingMessage(
             transaction.StartedByMessageId,
             ProcessType.MoveIn.Code,
             receiverNumber.Value,
             receiverRole,
-            _marketActivityRecordParser.From(marketActivityRecord)));
+            _marketActivityRecordParser.From(CreateMarketActivityRecord(transaction))));
     }
 
     private static MarketActivityRecord CreateMarketActivityRecord(MoveInTransaction transaction)
