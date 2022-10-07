@@ -13,18 +13,18 @@
 # limitations under the License.
 
 # Queue to request change of accounting point characteristics transactions
-module "sbq_req_change_acc_point_characteristics" {
+module "sbq_create_metering_point_transactions" {
   source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/service-bus-queue?ref=7.0.0"
 
-  name                = "req-change-of-accounting-point-characteristics"
+  name                = "create-metering-point-transactions"
   namespace_id        = data.azurerm_key_vault_secret.sb_domain_relay_namespace_id.value
 }
 
-module "kvs_sbq_req_change_acc_point_characteristics" {
+module "kvs_sbq_create_metering_point_transactions" {
   source        = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/key-vault-secret?ref=7.0.0"
 
-  name          = "sbq-req-change-of-acc-point-characteristics"
-  value         = module.sbq_req_change_acc_point_characteristics.name
+  name          = "sbq-create-metering-point-transactions"
+  value         = module.sbq_create_metering_point_transactions.name
   key_vault_id  = data.azurerm_key_vault.kv_shared_resources.id
 
   tags          = azurerm_resource_group.this.tags
