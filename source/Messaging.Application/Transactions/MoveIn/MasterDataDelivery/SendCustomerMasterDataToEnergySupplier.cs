@@ -14,20 +14,16 @@
 
 using System.Text.Json.Serialization;
 using Messaging.Application.Configuration.Commands.Commands;
-using Messaging.Application.MasterData;
 
 namespace Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 
-public class ForwardCustomerMasterData : InternalCommand
+public class SendCustomerMasterDataToEnergySupplier : InternalCommand
 {
     [JsonConstructor]
-    public ForwardCustomerMasterData(string transactionId, CustomerMasterDataContent customerMasterDataContent)
+    public SendCustomerMasterDataToEnergySupplier(string transactionId)
     {
         TransactionId = transactionId;
-        CustomerMasterDataContent = customerMasterDataContent;
     }
 
     public string TransactionId { get; }
-
-    public CustomerMasterDataContent CustomerMasterDataContent { get; }
 }
