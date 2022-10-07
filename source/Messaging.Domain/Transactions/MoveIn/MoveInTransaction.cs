@@ -177,8 +177,11 @@ namespace Messaging.Domain.Transactions.MoveIn
 
         public void ReceiveCustomerMasterData(CustomerMasterData customerMasterData)
         {
-            _customerMasterData = customerMasterData;
-            AddDomainEvent(new CustomerMasterDataWasReceived(TransactionId));
+            if (_customerMasterData is null)
+            {
+                _customerMasterData = customerMasterData;
+                AddDomainEvent(new CustomerMasterDataWasReceived(TransactionId));
+            }
         }
 
         private void SetCurrentEnergySupplierNotificationToPending()

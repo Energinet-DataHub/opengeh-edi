@@ -113,23 +113,22 @@ public class MoveInTransactionTests
     [Fact]
     public void Customer_master_data_was_received()
     {
-        var customerMasterData = new CustomerMasterData(
-            SampleData.MarketEvaluationPointId,
-            true,
-            null,
-            "Fake",
-            "Fake",
-            "Fake",
-            "Fake",
-            false,
-            true,
-            SampleData.EffectiveDate);
-
-        _transaction.ReceiveCustomerMasterData(customerMasterData);
+        _transaction.ReceiveCustomerMasterData(CreateCustomerMasterData());
 
         var domainEvent = _transaction.DomainEvents.FirstOrDefault(e => e is CustomerMasterDataWasReceived) as CustomerMasterDataWasReceived;
         Assert.NotNull(domainEvent);
         Assert.Equal(_transaction.TransactionId, domainEvent?.TransactionId);
+    }
+
+    [Fact]
+    public void Customer_master_data_can_be_received_once_only()
+    {
+        var customerMasterData = CreateCustomerMasterData();
+        _transaction.ReceiveCustomerMasterData(customerMasterData);
+
+        _transaction.ReceiveCustomerMasterData(customerMasterData);
+
+        Assert.Equal(1, _transaction.DomainEvents.Count(e => e is CustomerMasterDataWasReceived));
     }
 
     [Fact]
@@ -197,5 +196,20 @@ public class MoveInTransactionTests
             SampleData.ConsumerId,
             SampleData.ConsumerName,
             SampleData.ConsumerIdType);
+    }
+
+    private static CustomerMasterData CreateCustomerMasterData()
+    {
+        return new CustomerMasterData(
+            SampleData.MarketEvaluationPointId,
+            true,
+            null,
+            "Fake",
+            "Fake",
+            "Fake",
+            "Fake",
+            false,
+            true,
+            SampleData.EffectiveDate);
     }
 }
