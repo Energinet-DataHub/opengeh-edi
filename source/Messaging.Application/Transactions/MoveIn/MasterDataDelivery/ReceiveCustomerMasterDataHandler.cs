@@ -19,7 +19,7 @@ using MediatR;
 using Messaging.Application.MasterData;
 using Messaging.Domain.Transactions.MoveIn;
 
-namespace Messaging.Application.Transactions.MoveIn;
+namespace Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 
 public class ReceiveCustomerMasterDataHandler : IRequestHandler<ReceiveCustomerMasterData, Unit>
 {
