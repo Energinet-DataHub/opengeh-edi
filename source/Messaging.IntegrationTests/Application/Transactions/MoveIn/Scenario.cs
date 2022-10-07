@@ -30,6 +30,7 @@ public class Scenario
     private readonly B2BContext _context;
     private string? _gridOperatorNumber;
     private Guid _gridOperatorId;
+    private bool _customerMasterDataIsReceived;
 
     private Scenario(
         MoveInTransaction transaction,
@@ -84,11 +85,35 @@ public class Scenario
         return this;
     }
 
+    public Scenario CustomerMasterDataIsReceived()
+    {
+        _customerMasterDataIsReceived = true;
+        return this;
+    }
+
     public async Task BuildAsync()
     {
+        if (_customerMasterDataIsReceived)
+            SetCustomerMasterDataOnTransaction();
         await CreateGridOperatorDetailsAsync().ConfigureAwait(false);
         _context.Transactions.Add(_transaction!);
         await _context.SaveChangesAsync();
+    }
+
+    private static void SetCustomerMasterDataOnTransaction()
+    {
+        var customerMasterData = new CustomerMasterData(
+            _transaction!.MarketEvaluationPointId,
+            false,
+            null,
+            _transaction.ConsumerId!,
+            _transaction.ConsumerName!,
+            string.Empty,
+            string.Empty,
+            false,
+            false,
+            _transaction.EffectiveDate);
+        _transaction.ReceiveCustomerMasterData(customerMasterData);
     }
 
     private async Task CreateGridOperatorDetailsAsync()
