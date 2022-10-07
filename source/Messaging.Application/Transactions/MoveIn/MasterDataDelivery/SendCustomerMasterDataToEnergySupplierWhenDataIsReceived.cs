@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -31,6 +32,7 @@ public class SendCustomerMasterDataToEnergySupplierWhenDataIsReceived : INotific
 
     public Task Handle(CustomerMasterDataWasReceived notification, CancellationToken cancellationToken)
     {
-        return Task.CompletedTask;
+        ArgumentNullException.ThrowIfNull(notification);
+        return _commandScheduler.EnqueueAsync(new SendCustomerMasterDataToEnergySupplier(notification.TransactionId));
     }
 }
