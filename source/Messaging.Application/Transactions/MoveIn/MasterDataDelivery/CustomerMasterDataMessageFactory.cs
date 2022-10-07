@@ -39,12 +39,7 @@ public class CustomerMasterDataMessageFactory
         ArgumentNullException.ThrowIfNull(transaction.CustomerMasterData);
         ArgumentNullException.ThrowIfNull(receiverNumber);
 
-        var marketEvaluationPoint = CreateMarketEvaluationPoint(transaction.CustomerMasterData);
-        var marketActivityRecord = new MarketActivityRecord(
-            Guid.NewGuid().ToString(),
-            transaction.TransactionId,
-            transaction.EffectiveDate,
-            marketEvaluationPoint);
+        var marketActivityRecord = CreateMarketActivityRecord(transaction);
 
         return Task.FromResult(CreateOutgoingMessage(
             transaction.StartedByMessageId,
@@ -52,6 +47,20 @@ public class CustomerMasterDataMessageFactory
             receiverNumber.Value,
             receiverRole,
             _marketActivityRecordParser.From(marketActivityRecord)));
+    }
+
+    private static MarketActivityRecord CreateMarketActivityRecord(MoveInTransaction transaction)
+    {
+        ArgumentNullException.ThrowIfNull(transaction);
+        ArgumentNullException.ThrowIfNull(transaction.CustomerMasterData);
+
+        var marketEvaluationPoint = CreateMarketEvaluationPoint(transaction.CustomerMasterData);
+        var marketActivityRecord = new MarketActivityRecord(
+            Guid.NewGuid().ToString(),
+            transaction.TransactionId,
+            transaction.EffectiveDate,
+            marketEvaluationPoint);
+        return marketActivityRecord;
     }
 
     private static OutgoingMessage CreateOutgoingMessage(string id, string processType, string receiverId, MarketRole receiverRole, string @marketActivityRecordPayload)
