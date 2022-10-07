@@ -14,11 +14,17 @@
 
 using System.Threading.Tasks;
 using MediatR;
+using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.OutgoingMessages;
+using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
+using Messaging.Domain.Actors;
+using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.IntegrationTests.Application.IncomingMessages;
+using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 
@@ -47,6 +53,17 @@ public class SendCustomerMasterDataToGridOperatorTests
                 GetService<IMediator>(),
                 GetService<B2BContext>())
             .IsEffective()
+            .CustomerMasterDataIsReceived(
+                SampleData.MeteringPointNumber,
+                SampleData.ElectricalHeating,
+                SampleData.ElectricalHeatingStart,
+                SampleData.ConsumerId,
+                SampleData.ConsumerName,
+                SampleData.ConsumerId,
+                SampleData.ConsumerName,
+                SampleData.ProtectedName,
+                SampleData.HasEnergySupplier,
+                SampleData.SupplyStart)
             .WithGridOperatorForMeteringPoint(
                 SampleData.IdOfGridOperatorForMeteringPoint,
                 SampleData.NumberOfGridOperatorForMeteringPoint)
@@ -63,7 +80,38 @@ public class SendCustomerMasterDataToGridOperatorTests
     {
         await InvokeCommandAsync(new SendCustomerMasterDataToGridOperator(SampleData.TransactionId)).ConfigureAwait(false);
 
+        var assertMessage = AssertOutgoingMessage();
+        assertMessage.HasReceiverId(SampleData.NumberOfGridOperatorForMeteringPoint);
+        assertMessage.HasReceiverRole(MarketRole.GridOperator.ToString());
+        assertMessage.HasSenderId(DataHubDetails.IdentificationNumber.Value);
+        assertMessage.HasSenderRole(MarketRole.MeteringPointAdministrator.ToString());
+        assertMessage.WithMarketActivityRecord()
+            .HasOriginalTransactionId(SampleData.TransactionId)
+            .HasValidityStart(SampleData.SupplyStart)
+            .HasMarketEvaluationPointValue(nameof(MarketEvaluationPoint.MarketEvaluationPointId), SampleData.MeteringPointNumber)
+            .HasMarketEvaluationPointDateValue(nameof(MarketEvaluationPoint.SupplyStart), SampleData.SupplyStart)
+            .HasMarketEvaluationPointValue(nameof(MarketEvaluationPoint.ElectricalHeating), SampleData.ElectricalHeating)
+            .HasMarketEvaluationPointDateValue(nameof(MarketEvaluationPoint.ElectricalHeatingStart), SampleData.ElectricalHeatingStart)
+            .HasMarketEvaluationPointValue(nameof(MarketEvaluationPoint.HasEnergySupplier), SampleData.HasEnergySupplier)
+            .HasMarketEvaluationPointValue(nameof(MarketEvaluationPoint.ProtectedName), SampleData.ProtectedName)
+            .HasMarketEvaluationPointValue($"{nameof(MarketEvaluationPoint.FirstCustomerId)}.{nameof(MarketEvaluationPoint.FirstCustomerId.Id)}", SampleData.ConsumerId)
+            .HasMarketEvaluationPointValue($"{nameof(MarketEvaluationPoint.FirstCustomerId)}.{nameof(MarketEvaluationPoint.FirstCustomerId.CodingScheme)}", SampleData.ConsumerIdType)
+            .HasMarketEvaluationPointValue(nameof(MarketEvaluationPoint.FirstCustomerName), SampleData.ConsumerName)
+            .HasMarketEvaluationPointValue($"{nameof(MarketEvaluationPoint.SecondCustomerId)}.{nameof(MarketEvaluationPoint.SecondCustomerId.Id)}", SampleData.ConsumerId)
+            .HasMarketEvaluationPointValue($"{nameof(MarketEvaluationPoint.SecondCustomerId)}.{nameof(MarketEvaluationPoint.SecondCustomerId.CodingScheme)}", SampleData.ConsumerIdType)
+            .HasMarketEvaluationPointValue(nameof(MarketEvaluationPoint.SecondCustomerName), SampleData.ConsumerName)
+            .NotEmpty(nameof(MarketActivityRecord.Id));
         AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>())
             .HasCustomerMasterDataSentToGridOperatorState(MoveInTransaction.MasterDataState.Sent);
+    }
+
+    private AssertOutgoingMessage AssertOutgoingMessage()
+    {
+        var assertMessage = Assertions.AssertOutgoingMessage.OutgoingMessage(
+            SampleData.OriginalMessageId,
+            DocumentType.CharacteristicsOfACustomerAtAnAP.Name,
+            ProcessType.MoveIn.Code,
+            GetService<IDbConnectionFactory>());
+        return assertMessage;
     }
 }

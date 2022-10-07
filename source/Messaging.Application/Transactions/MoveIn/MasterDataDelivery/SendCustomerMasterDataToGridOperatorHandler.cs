@@ -16,6 +16,10 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Messaging.Application.OutgoingMessages;
+using Messaging.Application.OutgoingMessages.Common;
+using Messaging.Domain.Actors;
+using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.Transactions.MoveIn;
 
 namespace Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
@@ -23,13 +27,26 @@ namespace Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 public class SendCustomerMasterDataToGridOperatorHandler : IRequestHandler<SendCustomerMasterDataToGridOperator, Unit>
 {
     private readonly IMoveInTransactionRepository _transactionRepository;
+    private readonly IOutgoingMessageStore _outgoingMessageStore;
+    private readonly IMarketEvaluationPointRepository _marketEvaluationPointRepository;
+    private readonly IActorLookup _actorLookup;
+    private readonly CustomerMasterDataMessageFactory _messageFactory;
 
-    public SendCustomerMasterDataToGridOperatorHandler(IMoveInTransactionRepository transactionRepository)
+    public SendCustomerMasterDataToGridOperatorHandler(
+        IMoveInTransactionRepository transactionRepository,
+        IOutgoingMessageStore outgoingMessageStore,
+        IMarketEvaluationPointRepository marketEvaluationPointRepository,
+        IActorLookup actorLookup,
+        CustomerMasterDataMessageFactory messageFactory)
     {
         _transactionRepository = transactionRepository;
+        _outgoingMessageStore = outgoingMessageStore;
+        _marketEvaluationPointRepository = marketEvaluationPointRepository;
+        _actorLookup = actorLookup;
+        _messageFactory = messageFactory;
     }
 
-    public Task<Unit> Handle(SendCustomerMasterDataToGridOperator request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(SendCustomerMasterDataToGridOperator request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
@@ -39,7 +56,23 @@ public class SendCustomerMasterDataToGridOperatorHandler : IRequestHandler<SendC
             throw TransactionNotFoundException.TransactionIdNotFound(request.TransactionId);
         }
 
+        var gridOperatorNumber =
+            await GetGridOperatorNumberAsync(transaction.MarketEvaluationPointId)
+                .ConfigureAwait(false);
+
+        _outgoingMessageStore.Add(
+            await _messageFactory.CreateFromAsync(transaction, gridOperatorNumber, MarketRole.GridOperator)
+                .ConfigureAwait(false));
         transaction.SetCustomerMasterDataDeliveredWasToGridOperator();
-        return Task.FromResult(Unit.Value);
+
+        return Unit.Value;
+    }
+
+    private async Task<ActorNumber> GetGridOperatorNumberAsync(string marketEvaluationPointNumber)
+    {
+        var marketEvaluationPoint = await _marketEvaluationPointRepository
+            .GetByNumberAsync(marketEvaluationPointNumber).ConfigureAwait(false);
+        return ActorNumber.Create(await _actorLookup.GetActorNumberByIdAsync(marketEvaluationPoint!.GridOperatorId.GetValueOrDefault())
+            .ConfigureAwait(false));
     }
 }
