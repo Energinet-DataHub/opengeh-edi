@@ -19,7 +19,6 @@ using Energinet.DataHub.EnergySupplying.RequestResponse.Requests;
 using Messaging.Api.Configuration.Middleware;
 using Messaging.Application.MasterData;
 using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
-using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 using Messaging.Infrastructure.Configuration.InternalCommands;
 using Microsoft.Azure.Functions.Worker;
@@ -54,7 +53,7 @@ public class CustomerMasterDataResponseListener
 
         var masterDataContent = GetMasterDataContent(response);
 
-        var forwardedCustomerMasterData = new SendCustomerMasterDataToEnergySupplier(correlationId, masterDataContent);
+        var forwardedCustomerMasterData = new SendCustomerMasterDataToEnergySupplier(correlationId);
 
         await _commandSchedulerFacade.EnqueueAsync(forwardedCustomerMasterData).ConfigureAwait(false);
         await _commandSchedulerFacade.EnqueueAsync(new ReceiveCustomerMasterData(correlationId, masterDataContent))

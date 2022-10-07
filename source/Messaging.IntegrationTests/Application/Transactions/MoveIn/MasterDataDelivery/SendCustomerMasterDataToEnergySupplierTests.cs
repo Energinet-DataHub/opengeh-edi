@@ -16,7 +16,6 @@ using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.MasterData;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
@@ -77,7 +76,7 @@ public class SendCustomerMasterDataToEnergySupplierTests : TestBase, IAsyncLifet
     [Fact]
     public async Task Customer_master_data_is_marked_as_sent_on_transaction()
     {
-        var command = new SendCustomerMasterDataToEnergySupplier(SampleData.TransactionId, CreateMasterDataContent());
+        var command = new SendCustomerMasterDataToEnergySupplier(SampleData.TransactionId);
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
         AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>())
@@ -87,7 +86,7 @@ public class SendCustomerMasterDataToEnergySupplierTests : TestBase, IAsyncLifet
     [Fact]
     public async Task Outgoing_message_is_created()
     {
-        var command = new SendCustomerMasterDataToEnergySupplier(SampleData.TransactionId, CreateMasterDataContent());
+        var command = new SendCustomerMasterDataToEnergySupplier(SampleData.TransactionId);
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
         var assertMessage = AssertOutgoingMessage();
@@ -111,22 +110,6 @@ public class SendCustomerMasterDataToEnergySupplierTests : TestBase, IAsyncLifet
             .HasMarketEvaluationPointValue($"{nameof(MarketEvaluationPoint.SecondCustomerId)}.{nameof(MarketEvaluationPoint.SecondCustomerId.CodingScheme)}", SampleData.ConsumerIdType)
             .HasMarketEvaluationPointValue(nameof(MarketEvaluationPoint.SecondCustomerName), SampleData.ConsumerName)
             .NotEmpty(nameof(MarketActivityRecord.Id));
-    }
-
-    private static CustomerMasterDataContent CreateMasterDataContent()
-    {
-        return new CustomerMasterDataContent(
-            SampleData.MeteringPointNumber,
-            SampleData.ElectricalHeating,
-            SampleData.ElectricalHeatingStart,
-            SampleData.ConsumerId,
-            SampleData.ConsumerName,
-            SampleData.ConsumerId,
-            SampleData.ConsumerName,
-            SampleData.ProtectedName,
-            SampleData.HasEnergySupplier,
-            SampleData.SupplyStart,
-            SampleData.UsagePointLocations);
     }
 
     private AssertOutgoingMessage AssertOutgoingMessage()
