@@ -57,7 +57,7 @@ public class CustomerMasterDataResponseListener
         var forwardedCustomerMasterData = new ForwardCustomerMasterData(correlationId, masterDataContent);
 
         await _commandSchedulerFacade.EnqueueAsync(forwardedCustomerMasterData).ConfigureAwait(false);
-        await _commandSchedulerFacade.EnqueueAsync(new SetCustomerMasterData(correlationId, masterDataContent))
+        await _commandSchedulerFacade.EnqueueAsync(new ReceiveCustomerMasterData(correlationId, masterDataContent))
             .ConfigureAwait(false);
         _logger.LogInformation($"Master data response received: {data}");
     }

@@ -28,10 +28,10 @@ using Xunit;
 
 namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
 
-public class SetCustomerMasterDataTests
+public class ReceiveCustomerMasterDataTests
     : TestBase, IAsyncLifetime
 {
-    public SetCustomerMasterDataTests(DatabaseFixture databaseFixture)
+    public ReceiveCustomerMasterDataTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
     }
@@ -72,7 +72,7 @@ public class SetCustomerMasterDataTests
             .HasCustomerMasterData(ParseFrom(command.Data));
     }
 
-    private static SetCustomerMasterData CreateCommand()
+    private static ReceiveCustomerMasterData CreateCommand()
     {
         var customerMasterData = new CustomerMasterDataContent(
             "1",
@@ -86,7 +86,7 @@ public class SetCustomerMasterDataTests
             false,
             SystemClock.Instance.GetCurrentInstant(),
             Array.Empty<UsagePointLocation>());
-        return new SetCustomerMasterData(SampleData.TransactionId, customerMasterData);
+        return new ReceiveCustomerMasterData(SampleData.TransactionId, customerMasterData);
     }
 
     private static CustomerMasterData ParseFrom(CustomerMasterDataContent data)

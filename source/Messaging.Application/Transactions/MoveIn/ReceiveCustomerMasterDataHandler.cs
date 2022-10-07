@@ -21,16 +21,16 @@ using Messaging.Domain.Transactions.MoveIn;
 
 namespace Messaging.Application.Transactions.MoveIn;
 
-public class SetCustomerMasterDataHandler : IRequestHandler<SetCustomerMasterData, Unit>
+public class ReceiveCustomerMasterDataHandler : IRequestHandler<ReceiveCustomerMasterData, Unit>
 {
     private readonly IMoveInTransactionRepository _transactionRepository;
 
-    public SetCustomerMasterDataHandler(IMoveInTransactionRepository transactionRepository)
+    public ReceiveCustomerMasterDataHandler(IMoveInTransactionRepository transactionRepository)
     {
         _transactionRepository = transactionRepository;
     }
 
-    public Task<Unit> Handle(SetCustomerMasterData request, CancellationToken cancellationToken)
+    public Task<Unit> Handle(ReceiveCustomerMasterData request, CancellationToken cancellationToken)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
         var transaction = _transactionRepository.GetById(request.TransactionId);

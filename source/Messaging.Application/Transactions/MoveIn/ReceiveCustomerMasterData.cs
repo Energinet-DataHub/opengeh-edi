@@ -19,16 +19,16 @@ using Messaging.Application.MasterData;
 
 namespace Messaging.Application.Transactions.MoveIn;
 
-public class SetCustomerMasterData : InternalCommand
+public class ReceiveCustomerMasterData : InternalCommand
 {
-    public SetCustomerMasterData(string transactionId, CustomerMasterDataContent data)
+    public ReceiveCustomerMasterData(string transactionId, CustomerMasterDataContent data)
     {
         TransactionId = transactionId;
         Data = data;
     }
 
     [JsonConstructor]
-    public SetCustomerMasterData(Guid id, string transactionId, CustomerMasterDataContent data)
+    public ReceiveCustomerMasterData(Guid id, string transactionId, CustomerMasterDataContent data)
         : base(id)
     {
         TransactionId = transactionId;
