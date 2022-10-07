@@ -24,7 +24,6 @@ using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 using Messaging.Infrastructure.Configuration.InternalCommands;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using NodaTime;
 using NodaTime.Serialization.Protobuf;
 
 namespace Messaging.Api.MasterDataReceivers;
@@ -58,6 +57,8 @@ public class CustomerMasterDataResponseListener
         var forwardedCustomerMasterData = new ForwardCustomerMasterData(correlationId, masterDataContent);
 
         await _commandSchedulerFacade.EnqueueAsync(forwardedCustomerMasterData).ConfigureAwait(false);
+        await _commandSchedulerFacade.EnqueueAsync(new SetCustomerMasterData(correlationId, masterDataContent))
+            .ConfigureAwait(false);
         _logger.LogInformation($"Master data response received: {data}");
     }
 

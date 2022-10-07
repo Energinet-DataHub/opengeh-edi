@@ -13,13 +13,13 @@
 // limitations under the License.
 
 using System;
-using Messaging.Application.OutgoingMessages;
-using Messaging.Application.Transactions.MoveIn;
+using Contracts.BusinessRequests.MoveIn;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.DataAccess.Outgoing;
 using Messaging.Infrastructure.Configuration.InternalCommands;
+using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.MasterData.MarketEvaluationPoints;
 using Messaging.Infrastructure.Transactions;
 using Microsoft.EntityFrameworkCore;
@@ -28,10 +28,13 @@ namespace Messaging.Infrastructure.Configuration.DataAccess
 {
     public class B2BContext : DbContext
     {
+        private readonly ISerializer _serializer;
+
         #nullable disable
-        public B2BContext(DbContextOptions<B2BContext> options)
+        public B2BContext(DbContextOptions<B2BContext> options, ISerializer serializer)
             : base(options)
         {
+            _serializer = serializer;
         }
 
         public B2BContext()
@@ -50,7 +53,7 @@ namespace Messaging.Infrastructure.Configuration.DataAccess
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
 
-            modelBuilder.ApplyConfiguration(new MoveInTransactionEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new MoveInTransactionEntityConfiguration(_serializer));
             modelBuilder.ApplyConfiguration(new OutgoingMessageEntityConfiguration());
             modelBuilder.ApplyConfiguration(new QueuedInternalCommandEntityConfiguration());
             modelBuilder.ApplyConfiguration(new MarketEvaluationPointEntityConfiguration());

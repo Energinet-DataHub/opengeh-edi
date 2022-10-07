@@ -14,6 +14,7 @@
 
 using System;
 using Messaging.Domain.Transactions.MoveIn;
+using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -21,6 +22,13 @@ namespace Messaging.Infrastructure.Transactions
 {
     internal class MoveInTransactionEntityConfiguration : IEntityTypeConfiguration<MoveInTransaction>
     {
+        private readonly ISerializer _serializer;
+
+        public MoveInTransactionEntityConfiguration(ISerializer serializer)
+        {
+            _serializer = serializer;
+        }
+
         public void Configure(EntityTypeBuilder<MoveInTransaction> builder)
         {
             builder.ToTable("MoveInTransactions", "b2b");
@@ -65,6 +73,13 @@ namespace Messaging.Infrastructure.Transactions
                 .HasConversion(toDbValue => toDbValue.ToString(), fromDbValue => Enum.Parse<MoveInTransaction.NotificationState>(fromDbValue, true))
                 .HasColumnName("GridOperatorNotificationState");
             builder.Property(x => x.StartedByMessageId);
+
+            builder.Property<CustomerMasterData>("_customerMasterData")
+                .HasColumnName("CustomerMasterData")
+                .HasConversion(
+                    toDbValue => _serializer.Serialize(toDbValue),
+                    fromDbValue => _serializer.Deserialize<CustomerMasterData>(fromDbValue));
+
             builder.Ignore(x => x.DomainEvents);
         }
     }
