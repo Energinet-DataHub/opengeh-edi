@@ -65,6 +65,7 @@ using Messaging.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAp
 using Messaging.Infrastructure.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
 using Messaging.Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Infrastructure.OutgoingMessages.GenericNotification;
+using Messaging.Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 using Messaging.Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Infrastructure.OutgoingMessages.Requesting;
 using Messaging.Infrastructure.Transactions;
@@ -242,6 +243,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddTransient<INotificationHandler<EndOfSupplyNotificationChangedToPending>, NotifyCurrentEnergySupplierWhenConsumerHasMovedIn>();
             _services.AddTransient<INotificationHandler<CustomerMasterDataWasReceived>, SendCustomerMasterDataToEnergySupplierWhenDataIsReceived>();
             _services.AddTransient<INotificationHandler<BusinessProcessWasCompleted>, NotifyGridOperatorWhenConsumerHasMovedIn>();
+            _services.AddTransient<CustomerMasterDataMessageFactory>();
             return this;
         }
 
@@ -289,6 +291,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddScoped<IDocumentWriter, GenericNotificationDocumentWriter>();
             _services.AddScoped<IDocumentWriter, AccountingPointCharacteristicsDocumentWriter>();
             _services.AddScoped<IDocumentWriter, ConfirmRequestChangeAccountingPointCharacteristicsDocumentWriter>();
+            _services.AddScoped<IDocumentWriter, RejectRequestChangeAccountingPointCharacteristicsDocumentWriter>();
             _services.AddScoped<IDocumentWriter, CharacteristicsOfACustomerAtAnApDocumentWriter>();
             _services.AddScoped<IDocumentWriter, RejectRequestChangeOfSupplierJsonDocumentWriter>();
             _services.AddScoped<IValidationErrorTranslator, ValidationErrorTranslator>();
