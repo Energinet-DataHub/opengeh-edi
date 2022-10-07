@@ -16,13 +16,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Messaging.Application.Configuration;
-using Messaging.Application.MasterData;
 using Messaging.Application.OutgoingMessages;
-using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
-using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Domain.Actors;
-using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
 
 namespace Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
@@ -31,16 +26,16 @@ public class SendCustomerMasterDataToEnergySupplierHandler : IRequestHandler<Sen
 {
     private readonly IMoveInTransactionRepository _transactionRepository;
     private readonly IOutgoingMessageStore _outgoingMessageStore;
-    private readonly IMarketActivityRecordParser _marketActivityRecordParser;
+    private readonly CustomerMasterDataMessageFactory _messageFactory;
 
     public SendCustomerMasterDataToEnergySupplierHandler(
         IMoveInTransactionRepository transactionRepository,
         IOutgoingMessageStore outgoingMessageStore,
-        IMarketActivityRecordParser marketActivityRecordParser)
+        CustomerMasterDataMessageFactory messageFactory)
     {
         _transactionRepository = transactionRepository;
         _outgoingMessageStore = outgoingMessageStore;
-        _marketActivityRecordParser = marketActivityRecordParser;
+        _messageFactory = messageFactory;
     }
 
     public async Task<Unit> Handle(SendCustomerMasterDataToEnergySupplier request, CancellationToken cancellationToken)
@@ -52,53 +47,11 @@ public class SendCustomerMasterDataToEnergySupplierHandler : IRequestHandler<Sen
             throw new MoveInException($"Could not find move in transaction '{request.TransactionId}'");
         }
 
-        _outgoingMessageStore.Add(CustomerCharacteristicsMessageFrom(transaction.CustomerMasterData!, transaction));
+        _outgoingMessageStore.Add(
+            await _messageFactory.CreateFromAsync(transaction, ActorNumber.Create(transaction.NewEnergySupplierId), MarketRole.EnergySupplier)
+                .ConfigureAwait(false));
         transaction.MarkCustomerMasterDataAsSent();
+
         return await Task.FromResult(Unit.Value).ConfigureAwait(false);
-    }
-
-    private static OutgoingMessage CreateOutgoingMessage(string id, string processType, string receiverId, string @marketActivityRecordPayload)
-    {
-        return new OutgoingMessage(
-            DocumentType.CharacteristicsOfACustomerAtAnAP,
-            ActorNumber.Create(receiverId),
-            id,
-            processType,
-            MarketRole.EnergySupplier,
-            DataHubDetails.IdentificationNumber,
-            MarketRole.MeteringPointAdministrator,
-            marketActivityRecordPayload);
-    }
-
-    private static MarketEvaluationPoint CreateMarketEvaluationPoint(CustomerMasterData masterData)
-    {
-        return new MarketEvaluationPoint(
-            masterData.MarketEvaluationPoint,
-            masterData.ElectricalHeating,
-            masterData.ElectricalHeatingStart,
-            new MrId(masterData.FirstCustomerId, "ARR"),
-            masterData.FirstCustomerName,
-            new MrId(masterData.SecondCustomerId, "ARR"),
-            masterData.SecondCustomerName,
-            masterData.ProtectedName,
-            masterData.HasEnergySupplier,
-            masterData.SupplyStart,
-            Array.Empty<UsagePointLocation>());
-    }
-
-    private OutgoingMessage CustomerCharacteristicsMessageFrom(CustomerMasterData requestMasterDataContent, MoveInTransaction transaction)
-    {
-        var marketEvaluationPoint = CreateMarketEvaluationPoint(requestMasterDataContent);
-        var marketActivityRecord = new MarketActivityRecord(
-            Guid.NewGuid().ToString(),
-            transaction.TransactionId,
-            transaction.EffectiveDate,
-            marketEvaluationPoint);
-
-        return CreateOutgoingMessage(
-            transaction.StartedByMessageId,
-            ProcessType.MoveIn.Code,
-            transaction.NewEnergySupplierId,
-            _marketActivityRecordParser.From(marketActivityRecord));
     }
 }
