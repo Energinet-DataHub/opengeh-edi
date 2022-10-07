@@ -54,7 +54,7 @@ public class CustomerMasterDataResponseListener
 
         var masterDataContent = GetMasterDataContent(response);
 
-        var forwardedCustomerMasterData = new ForwardCustomerMasterData(correlationId, masterDataContent);
+        var forwardedCustomerMasterData = new SendCustomerMasterDataToEnergySupplier(correlationId, masterDataContent);
 
         await _commandSchedulerFacade.EnqueueAsync(forwardedCustomerMasterData).ConfigureAwait(false);
         await _commandSchedulerFacade.EnqueueAsync(new ReceiveCustomerMasterData(correlationId, masterDataContent))

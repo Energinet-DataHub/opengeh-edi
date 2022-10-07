@@ -30,9 +30,9 @@ using MarketActivityRecord = Messaging.Application.OutgoingMessages.Characterist
 
 namespace Messaging.IntegrationTests.Application.Transactions.MoveIn.MasterDataDelivery;
 
-public class ForwardCustomerMasterDataTests : TestBase, IAsyncLifetime
+public class SendCustomerMasterDataToEnergySupplierTests : TestBase, IAsyncLifetime
 {
-    public ForwardCustomerMasterDataTests(DatabaseFixture databaseFixture)
+    public SendCustomerMasterDataToEnergySupplierTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
     }
@@ -66,7 +66,7 @@ public class ForwardCustomerMasterDataTests : TestBase, IAsyncLifetime
     [Fact]
     public async Task Customer_master_data_is_marked_as_sent_on_transaction()
     {
-        var command = new ForwardCustomerMasterData(SampleData.TransactionId, CreateMasterDataContent());
+        var command = new SendCustomerMasterDataToEnergySupplier(SampleData.TransactionId, CreateMasterDataContent());
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
         AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>())
@@ -76,7 +76,7 @@ public class ForwardCustomerMasterDataTests : TestBase, IAsyncLifetime
     [Fact]
     public async Task Outgoing_message_is_created()
     {
-        var command = new ForwardCustomerMasterData(SampleData.TransactionId, CreateMasterDataContent());
+        var command = new SendCustomerMasterDataToEnergySupplier(SampleData.TransactionId, CreateMasterDataContent());
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
         var assertMessage = AssertOutgoingMessage();

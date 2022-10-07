@@ -18,10 +18,10 @@ using Messaging.Application.MasterData;
 
 namespace Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 
-public class ForwardCustomerMasterData : InternalCommand
+public class SendCustomerMasterDataToEnergySupplier : InternalCommand
 {
     [JsonConstructor]
-    public ForwardCustomerMasterData(string transactionId, CustomerMasterDataContent customerMasterDataContent)
+    public SendCustomerMasterDataToEnergySupplier(string transactionId, CustomerMasterDataContent customerMasterDataContent)
     {
         TransactionId = transactionId;
         CustomerMasterDataContent = customerMasterDataContent;

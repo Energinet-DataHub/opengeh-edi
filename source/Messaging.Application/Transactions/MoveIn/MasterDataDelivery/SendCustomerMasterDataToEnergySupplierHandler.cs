@@ -27,13 +27,13 @@ using Messaging.Domain.Transactions.MoveIn;
 
 namespace Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 
-public class ForwardCustomerMasterDataHandler : IRequestHandler<ForwardCustomerMasterData, Unit>
+public class SendCustomerMasterDataToEnergySupplierHandler : IRequestHandler<SendCustomerMasterDataToEnergySupplier, Unit>
 {
     private readonly IMoveInTransactionRepository _transactionRepository;
     private readonly IOutgoingMessageStore _outgoingMessageStore;
     private readonly IMarketActivityRecordParser _marketActivityRecordParser;
 
-    public ForwardCustomerMasterDataHandler(
+    public SendCustomerMasterDataToEnergySupplierHandler(
         IMoveInTransactionRepository transactionRepository,
         IOutgoingMessageStore outgoingMessageStore,
         IMarketActivityRecordParser marketActivityRecordParser)
@@ -43,7 +43,7 @@ public class ForwardCustomerMasterDataHandler : IRequestHandler<ForwardCustomerM
         _marketActivityRecordParser = marketActivityRecordParser;
     }
 
-    public async Task<Unit> Handle(ForwardCustomerMasterData request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(SendCustomerMasterDataToEnergySupplier request, CancellationToken cancellationToken)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
         var transaction = _transactionRepository.GetById(request.TransactionId);

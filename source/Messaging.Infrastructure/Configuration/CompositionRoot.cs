@@ -232,7 +232,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddTransient<IRequestHandler<FetchMeteringPointMasterData, Unit>, FetchMeteringPointMasterDataHandler>();
             _services.AddTransient<IRequestHandler<SetConsumerHasMovedIn, Unit>, SetConsumerHasMovedInHandler>();
             _services.AddTransient<IRequestHandler<ForwardMeteringPointMasterData, Unit>, ForwardMeteringPointMasterDataHandler>();
-            _services.AddTransient<IRequestHandler<ForwardCustomerMasterData, Unit>, ForwardCustomerMasterDataHandler>();
+            _services.AddTransient<IRequestHandler<SendCustomerMasterDataToEnergySupplier, Unit>, SendCustomerMasterDataToEnergySupplierHandler>();
             _services.AddTransient<IRequestHandler<NotifyCurrentEnergySupplier, Unit>, NotifyCurrentEnergySupplierHandler>();
             _services.AddTransient<IRequestHandler<NotifyGridOperator, Unit>, NotifyGridOperatorHandler>();
             _services.AddTransient<IRequestHandler<SendCustomerMasterDataToGridOperator, Unit>, SendCustomerMasterDataToGridOperatorHandler>();
