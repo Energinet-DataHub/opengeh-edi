@@ -39,10 +39,11 @@ public class CustomerMasterDataResponseListener
     }
 
     [Function("CustomerMasterDataResponseListener")]
-    public async Task RunAsync([ServiceBusTrigger("%CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME%", Connection = "INTERNAL_SERVICE_BUS_LISTENER_CONNECTION_STRING")] byte[] data, FunctionContext context)
+    public Task RunAsync([ServiceBusTrigger("%CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME%", Connection = "INTERNAL_SERVICE_BUS_LISTENER_CONNECTION_STRING")] byte[] data, FunctionContext context)
     {
         if (data == null) throw new ArgumentNullException(nameof(data));
         if (context == null) throw new ArgumentNullException(nameof(context));
+        _logger.LogInformation($"Master data response received: {data}");
 
         var correlationId = context.ParseCorrelationIdFromMessage();
         var response = CustomerMasterDataResponse.Parser.ParseFrom(data);
@@ -51,14 +52,9 @@ public class CustomerMasterDataResponseListener
             throw new InvalidOperationException($"Customer master data request failed: {response.Error}");
         }
 
-        var masterDataContent = GetMasterDataContent(response);
-
-        var forwardedCustomerMasterData = new SendCustomerMasterDataToEnergySupplier(correlationId);
-
-        await _commandSchedulerFacade.EnqueueAsync(forwardedCustomerMasterData).ConfigureAwait(false);
-        await _commandSchedulerFacade.EnqueueAsync(new ReceiveCustomerMasterData(correlationId, masterDataContent))
-            .ConfigureAwait(false);
-        _logger.LogInformation($"Master data response received: {data}");
+        return _commandSchedulerFacade.EnqueueAsync(new ReceiveCustomerMasterData(
+            correlationId,
+            GetMasterDataContent(response)));
     }
 
     private static CustomerMasterDataContent GetMasterDataContent(CustomerMasterDataResponse response)
