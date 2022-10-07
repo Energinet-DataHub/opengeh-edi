@@ -27,13 +27,13 @@ using Messaging.Domain.Transactions.MoveIn;
 
 namespace Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 
-public class ForwardCustomerMasterDataHandler : IRequestHandler<ForwardCustomerMasterData, Unit>
+public class SendCustomerMasterDataToEnergySupplierHandler : IRequestHandler<SendCustomerMasterDataToEnergySupplier, Unit>
 {
     private readonly IMoveInTransactionRepository _transactionRepository;
     private readonly IOutgoingMessageStore _outgoingMessageStore;
     private readonly IMarketActivityRecordParser _marketActivityRecordParser;
 
-    public ForwardCustomerMasterDataHandler(
+    public SendCustomerMasterDataToEnergySupplierHandler(
         IMoveInTransactionRepository transactionRepository,
         IOutgoingMessageStore outgoingMessageStore,
         IMarketActivityRecordParser marketActivityRecordParser)
@@ -43,7 +43,7 @@ public class ForwardCustomerMasterDataHandler : IRequestHandler<ForwardCustomerM
         _marketActivityRecordParser = marketActivityRecordParser;
     }
 
-    public async Task<Unit> Handle(ForwardCustomerMasterData request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(SendCustomerMasterDataToEnergySupplier request, CancellationToken cancellationToken)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
         var transaction = _transactionRepository.GetById(request.TransactionId);
@@ -52,7 +52,7 @@ public class ForwardCustomerMasterDataHandler : IRequestHandler<ForwardCustomerM
             throw new MoveInException($"Could not find move in transaction '{request.TransactionId}'");
         }
 
-        _outgoingMessageStore.Add(CustomerCharacteristicsMessageFrom(request.CustomerMasterDataContent, transaction));
+        _outgoingMessageStore.Add(CustomerCharacteristicsMessageFrom(transaction.CustomerMasterData!, transaction));
         transaction.MarkCustomerMasterDataAsSent();
         return await Task.FromResult(Unit.Value).ConfigureAwait(false);
     }
@@ -70,7 +70,7 @@ public class ForwardCustomerMasterDataHandler : IRequestHandler<ForwardCustomerM
             marketActivityRecordPayload);
     }
 
-    private static MarketEvaluationPoint CreateMarketEvaluationPoint(CustomerMasterDataContent masterData, MoveInTransaction transaction)
+    private static MarketEvaluationPoint CreateMarketEvaluationPoint(CustomerMasterData masterData)
     {
         return new MarketEvaluationPoint(
             masterData.MarketEvaluationPoint,
@@ -83,12 +83,12 @@ public class ForwardCustomerMasterDataHandler : IRequestHandler<ForwardCustomerM
             masterData.ProtectedName,
             masterData.HasEnergySupplier,
             masterData.SupplyStart,
-            masterData.UsagePointLocations);
+            Array.Empty<UsagePointLocation>());
     }
 
-    private OutgoingMessage CustomerCharacteristicsMessageFrom(CustomerMasterDataContent requestMasterDataContent, MoveInTransaction transaction)
+    private OutgoingMessage CustomerCharacteristicsMessageFrom(CustomerMasterData requestMasterDataContent, MoveInTransaction transaction)
     {
-        var marketEvaluationPoint = CreateMarketEvaluationPoint(requestMasterDataContent, transaction);
+        var marketEvaluationPoint = CreateMarketEvaluationPoint(requestMasterDataContent);
         var marketActivityRecord = new MarketActivityRecord(
             Guid.NewGuid().ToString(),
             transaction.TransactionId,

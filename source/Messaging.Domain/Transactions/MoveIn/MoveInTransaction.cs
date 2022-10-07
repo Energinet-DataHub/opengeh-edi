@@ -96,6 +96,8 @@ namespace Messaging.Domain.Transactions.MoveIn
 
         public string? ConsumerIdType { get; }
 
+        public CustomerMasterData? CustomerMasterData => _customerMasterData;
+
         public void BusinessProcessCompleted()
         {
             if (_businessProcessState != BusinessProcessState.Accepted)
@@ -175,9 +177,13 @@ namespace Messaging.Domain.Transactions.MoveIn
                 _customerMasterDataForGridOperatorDeliveryState = MasterDataState.Sent;
         }
 
-        public void SetCustomerMasterData(CustomerMasterData customerMasterData)
+        public void ReceiveCustomerMasterData(CustomerMasterData customerMasterData)
         {
-            _customerMasterData = customerMasterData;
+            if (_customerMasterData is null)
+            {
+                _customerMasterData = customerMasterData;
+                AddDomainEvent(new CustomerMasterDataWasReceived(TransactionId));
+            }
         }
 
         private void SetCurrentEnergySupplierNotificationToPending()

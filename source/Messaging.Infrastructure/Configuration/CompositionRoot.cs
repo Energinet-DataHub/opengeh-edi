@@ -232,14 +232,15 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddTransient<IRequestHandler<FetchMeteringPointMasterData, Unit>, FetchMeteringPointMasterDataHandler>();
             _services.AddTransient<IRequestHandler<SetConsumerHasMovedIn, Unit>, SetConsumerHasMovedInHandler>();
             _services.AddTransient<IRequestHandler<ForwardMeteringPointMasterData, Unit>, ForwardMeteringPointMasterDataHandler>();
-            _services.AddTransient<IRequestHandler<ForwardCustomerMasterData, Unit>, ForwardCustomerMasterDataHandler>();
+            _services.AddTransient<IRequestHandler<SendCustomerMasterDataToEnergySupplier, Unit>, SendCustomerMasterDataToEnergySupplierHandler>();
             _services.AddTransient<IRequestHandler<NotifyCurrentEnergySupplier, Unit>, NotifyCurrentEnergySupplierHandler>();
             _services.AddTransient<IRequestHandler<NotifyGridOperator, Unit>, NotifyGridOperatorHandler>();
             _services.AddTransient<IRequestHandler<SendCustomerMasterDataToGridOperator, Unit>, SendCustomerMasterDataToGridOperatorHandler>();
-            _services.AddTransient<IRequestHandler<SetCustomerMasterData, Unit>, SetCustomerMasterDataHandler>();
+            _services.AddTransient<IRequestHandler<ReceiveCustomerMasterData, Unit>, ReceiveCustomerMasterDataHandler>();
             _services.AddTransient<INotificationHandler<MoveInWasAccepted>, FetchMeteringPointMasterDataWhenAccepted>();
             _services.AddTransient<INotificationHandler<MoveInWasAccepted>, FetchCustomerMasterDataWhenAccepted>();
             _services.AddTransient<INotificationHandler<EndOfSupplyNotificationChangedToPending>, NotifyCurrentEnergySupplierWhenConsumerHasMovedIn>();
+            _services.AddTransient<INotificationHandler<CustomerMasterDataWasReceived>, SendCustomerMasterDataToEnergySupplierWhenDataIsReceived>();
             _services.AddTransient<INotificationHandler<BusinessProcessWasCompleted>, NotifyGridOperatorWhenConsumerHasMovedIn>();
             return this;
         }
