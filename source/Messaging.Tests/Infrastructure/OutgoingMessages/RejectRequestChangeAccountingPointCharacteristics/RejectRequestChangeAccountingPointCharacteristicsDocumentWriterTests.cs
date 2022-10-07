@@ -52,7 +52,7 @@ public class RejectRequestChangeAccountingPointCharacteristicsDocumentWriterTest
     public async Task Document_is_valid()
     {
         var header = new MessageHeader("A15", "SenderId", "DDZ", "ReceiverId", "DDQ", Guid.NewGuid().ToString(), _systemDateTimeProvider.Now());
-        var marketActivityRecords = new List<Messaging.Application.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics.MarketActivityRecord>()
+        var marketActivityRecords = new List<MarketActivityRecord>()
         {
             new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId", new List<Reason>()
             {
@@ -72,7 +72,7 @@ public class RejectRequestChangeAccountingPointCharacteristicsDocumentWriterTest
         await AssertMessage(message, header, marketActivityRecords).ConfigureAwait(false);
     }
 
-    private static void AssertMarketActivityRecords(List<Messaging.Application.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics.MarketActivityRecord> marketActivityRecords, XDocument document)
+    private static void AssertMarketActivityRecords(List<MarketActivityRecord> marketActivityRecords, XDocument document)
     {
         AssertXmlMessage.AssertMarketActivityRecordCount(document, 2);
         foreach (var activityRecord in marketActivityRecords)
