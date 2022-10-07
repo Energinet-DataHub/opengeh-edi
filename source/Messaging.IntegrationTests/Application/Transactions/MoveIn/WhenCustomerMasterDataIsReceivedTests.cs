@@ -73,6 +73,13 @@ public class WhenCustomerMasterDataIsReceivedTests : TestBase, IAsyncLifetime
     [Fact]
     public async Task Dispatch_of_customer_master_data_to_the_energy_supplier_is_scheduled()
     {
+        await WhenCustomerMasterDataIsReceived().ConfigureAwait(false);
+
+        AssertQueuedCommand.QueuedCommand<SendCustomerMasterDataToEnergySupplier>(GetService<IDbConnectionFactory>());
+    }
+
+    private async Task WhenCustomerMasterDataIsReceived()
+    {
         var customerMasterData = new CustomerMasterDataContent(
             SampleData.MarketEvaluationPointId,
             SampleData.ElectricalHeating,
@@ -86,7 +93,5 @@ public class WhenCustomerMasterDataIsReceivedTests : TestBase, IAsyncLifetime
             SampleData.SupplyStart,
             Array.Empty<UsagePointLocation>());
         await InvokeCommandAsync(new ReceiveCustomerMasterData(SampleData.TransactionId, customerMasterData));
-
-        AssertQueuedCommand.QueuedCommand<SendCustomerMasterDataToEnergySupplier>(GetService<IDbConnectionFactory>());
     }
 }
