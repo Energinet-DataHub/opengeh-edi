@@ -16,15 +16,11 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages;
-using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Domain.Actors;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
-using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
-using MarketEvaluationPoint = Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp.MarketEvaluationPoint;
 
 namespace Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 
@@ -32,22 +28,22 @@ public class SendCustomerMasterDataToGridOperatorHandler : IRequestHandler<SendC
 {
     private readonly IMoveInTransactionRepository _transactionRepository;
     private readonly IOutgoingMessageStore _outgoingMessageStore;
-    private readonly IMarketActivityRecordParser _marketActivityRecordParser;
     private readonly IMarketEvaluationPointRepository _marketEvaluationPointRepository;
     private readonly IActorLookup _actorLookup;
+    private readonly CustomerMasterDataMessageFactory _messageFactory;
 
     public SendCustomerMasterDataToGridOperatorHandler(
         IMoveInTransactionRepository transactionRepository,
         IOutgoingMessageStore outgoingMessageStore,
-        IMarketActivityRecordParser marketActivityRecordParser,
         IMarketEvaluationPointRepository marketEvaluationPointRepository,
-        IActorLookup actorLookup)
+        IActorLookup actorLookup,
+        CustomerMasterDataMessageFactory messageFactory)
     {
         _transactionRepository = transactionRepository;
         _outgoingMessageStore = outgoingMessageStore;
-        _marketActivityRecordParser = marketActivityRecordParser;
         _marketEvaluationPointRepository = marketEvaluationPointRepository;
         _actorLookup = actorLookup;
+        _messageFactory = messageFactory;
     }
 
     public async Task<Unit> Handle(SendCustomerMasterDataToGridOperator request, CancellationToken cancellationToken)
@@ -60,59 +56,16 @@ public class SendCustomerMasterDataToGridOperatorHandler : IRequestHandler<SendC
             throw TransactionNotFoundException.TransactionIdNotFound(request.TransactionId);
         }
 
+        var gridOperatorNumber =
+            await GetGridOperatorNumberAsync(transaction.MarketEvaluationPointId)
+                .ConfigureAwait(false);
+
         _outgoingMessageStore.Add(
-            await CustomerCharacteristicsMessageFromAsync(transaction.CustomerMasterData!, transaction).ConfigureAwait(false));
+            await _messageFactory.CreateFromAsync(transaction, gridOperatorNumber, MarketRole.GridOperator)
+                .ConfigureAwait(false));
         transaction.SetCustomerMasterDataDeliveredWasToGridOperator();
 
         return Unit.Value;
-    }
-
-    private static OutgoingMessage CreateOutgoingMessage(string id, string processType, string receiverId, string @marketActivityRecordPayload)
-    {
-        return new OutgoingMessage(
-            DocumentType.CharacteristicsOfACustomerAtAnAP,
-            ActorNumber.Create(receiverId),
-            id,
-            processType,
-            MarketRole.GridOperator,
-            DataHubDetails.IdentificationNumber,
-            MarketRole.MeteringPointAdministrator,
-            marketActivityRecordPayload);
-    }
-
-    private static MarketEvaluationPoint CreateMarketEvaluationPoint(CustomerMasterData masterData)
-    {
-        return new MarketEvaluationPoint(
-            masterData.MarketEvaluationPoint,
-            masterData.ElectricalHeating,
-            masterData.ElectricalHeatingStart,
-            new MrId(masterData.FirstCustomerId, "ARR"),
-            masterData.FirstCustomerName,
-            new MrId(masterData.SecondCustomerId, "ARR"),
-            masterData.SecondCustomerName,
-            masterData.ProtectedName,
-            masterData.HasEnergySupplier,
-            masterData.SupplyStart,
-            Array.Empty<UsagePointLocation>());
-    }
-
-    private async Task<OutgoingMessage> CustomerCharacteristicsMessageFromAsync(CustomerMasterData requestMasterDataContent, MoveInTransaction transaction)
-    {
-        var marketEvaluationPoint = CreateMarketEvaluationPoint(requestMasterDataContent);
-        var marketActivityRecord = new MarketActivityRecord(
-            Guid.NewGuid().ToString(),
-            transaction.TransactionId,
-            transaction.EffectiveDate,
-            marketEvaluationPoint);
-
-        var gridOperatorNumber =
-            await GetGridOperatorNumberAsync(transaction.MarketEvaluationPointId).ConfigureAwait(false);
-
-        return CreateOutgoingMessage(
-            transaction.StartedByMessageId,
-            ProcessType.MoveIn.Code,
-            gridOperatorNumber.Value,
-            _marketActivityRecordParser.From(marketActivityRecord));
     }
 
     private async Task<ActorNumber> GetGridOperatorNumberAsync(string marketEvaluationPointNumber)
