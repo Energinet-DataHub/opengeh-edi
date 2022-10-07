@@ -28,11 +28,11 @@ public class RejectRequestChangeAccountingPointCharacteristicsDocumentWriter : D
     public RejectRequestChangeAccountingPointCharacteristicsDocumentWriter(IMarketActivityRecordParser parser)
         : base(
             new DocumentDetails(
-                "RejectRequestAccountingPointCharacteristics_MarketDocument",
-                "urn:ediel.org:structure:rejectrequestaccountingpointcharacteristics:0:1 urn-ediel-org-structure-rejectrequestaccountingpointcharacteristics-0-1.xsd",
-                "urn:ediel.org:structure:rejectrequestaccountingpointcharacteristics:0:1",
+                "RejectRequestChangeAccountingPointCharacteristics_MarketDocument",
+                "urn:ediel.org:structure:rejectrequestchangeaccountingpointcharacteristics:0:1 urn-ediel-org-structure-rejectrequestchangeaccountingpointcharacteristics-0-1.xsd",
+                "urn:ediel.org:structure:rejectrequestchangeaccountingpointcharacteristics:0:1",
                 "cim",
-                "E59"),
+                "A80"),
             parser,
             "A02")
     {
@@ -46,6 +46,8 @@ public class RejectRequestChangeAccountingPointCharacteristicsDocumentWriter : D
         {
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "MktActivityRecord", null).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, marketActivityRecord.Id.ToString())
+                .ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "businessProcessReference_MktActivityRecord.mRID", null, marketActivityRecord.BusinessProcessReference.ToString())
                 .ConfigureAwait(false);
             await writer.WriteElementStringAsync(
                 DocumentDetails.Prefix,

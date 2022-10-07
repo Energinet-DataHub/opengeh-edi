@@ -19,15 +19,18 @@ namespace Messaging.Application.OutgoingMessages.RejectRequestChangeAccountingPo
 
 public class MarketActivityRecord
 {
-    public MarketActivityRecord(string id, string originalTransactionId, string marketEvaluationPointId, IEnumerable<Reason> reasons)
+    public MarketActivityRecord(string id, string businessProcessReference, string originalTransactionId, string marketEvaluationPointId, IEnumerable<Reason> reasons)
     {
         Id = id;
+        BusinessProcessReference = businessProcessReference;
         OriginalTransactionId = originalTransactionId;
         MarketEvaluationPointId = marketEvaluationPointId;
         Reasons = reasons;
     }
 
     public string Id { get; }
+
+    public string BusinessProcessReference { get; }
 
     public string OriginalTransactionId { get; }
 
