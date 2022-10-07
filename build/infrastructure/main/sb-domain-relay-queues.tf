@@ -17,7 +17,7 @@ module "sbq_req_change_acc_point_characteristics" {
   source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/service-bus-queue?ref=7.0.0"
 
   name                = "req-change-of-accounting-point-characteristics"
-  namespace_id        = data.azurerm_key_vault.sb_domain_relay_namespace_id.value
+  namespace_id        = data.azurerm_key_vault_secret.sb_domain_relay_namespace_id.value
 }
 
 module "kvs_sbq_req_change_acc_point_characteristics" {
