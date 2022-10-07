@@ -75,16 +75,16 @@ public class ReceiveCustomerMasterDataTests
     private static ReceiveCustomerMasterData CreateCommand()
     {
         var customerMasterData = new CustomerMasterDataContent(
-            "1",
-            false,
-            SystemClock.Instance.GetCurrentInstant(),
-            "Fake",
-            "Fake",
-            "Fake",
-            "Fake",
-            true,
-            false,
-            SystemClock.Instance.GetCurrentInstant(),
+            SampleData.MarketEvaluationPointId,
+            SampleData.ElectricalHeating,
+            SampleData.ElectricalHeatingStart,
+            SampleData.ConsumerId,
+            SampleData.ConsumerName,
+            SampleData.ConsumerId,
+            SampleData.ConsumerName,
+            SampleData.ProtectedName,
+            SampleData.HasEnergySupplier,
+            SampleData.SupplyStart,
             Array.Empty<UsagePointLocation>());
         return new ReceiveCustomerMasterData(SampleData.TransactionId, customerMasterData);
     }
