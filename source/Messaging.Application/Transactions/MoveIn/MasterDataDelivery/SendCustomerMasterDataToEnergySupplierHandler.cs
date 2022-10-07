@@ -52,7 +52,7 @@ public class SendCustomerMasterDataToEnergySupplierHandler : IRequestHandler<Sen
             throw new MoveInException($"Could not find move in transaction '{request.TransactionId}'");
         }
 
-        _outgoingMessageStore.Add(CustomerCharacteristicsMessageFrom(request.CustomerMasterDataContent, transaction));
+        _outgoingMessageStore.Add(CustomerCharacteristicsMessageFrom(transaction.CustomerMasterData!, transaction));
         transaction.MarkCustomerMasterDataAsSent();
         return await Task.FromResult(Unit.Value).ConfigureAwait(false);
     }
@@ -70,7 +70,7 @@ public class SendCustomerMasterDataToEnergySupplierHandler : IRequestHandler<Sen
             marketActivityRecordPayload);
     }
 
-    private static MarketEvaluationPoint CreateMarketEvaluationPoint(CustomerMasterDataContent masterData, MoveInTransaction transaction)
+    private static MarketEvaluationPoint CreateMarketEvaluationPoint(CustomerMasterData masterData, MoveInTransaction transaction)
     {
         return new MarketEvaluationPoint(
             masterData.MarketEvaluationPoint,
@@ -83,10 +83,10 @@ public class SendCustomerMasterDataToEnergySupplierHandler : IRequestHandler<Sen
             masterData.ProtectedName,
             masterData.HasEnergySupplier,
             masterData.SupplyStart,
-            masterData.UsagePointLocations);
+            Array.Empty<UsagePointLocation>());
     }
 
-    private OutgoingMessage CustomerCharacteristicsMessageFrom(CustomerMasterDataContent requestMasterDataContent, MoveInTransaction transaction)
+    private OutgoingMessage CustomerCharacteristicsMessageFrom(CustomerMasterData requestMasterDataContent, MoveInTransaction transaction)
     {
         var marketEvaluationPoint = CreateMarketEvaluationPoint(requestMasterDataContent, transaction);
         var marketActivityRecord = new MarketActivityRecord(

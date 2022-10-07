@@ -96,6 +96,8 @@ namespace Messaging.Domain.Transactions.MoveIn
 
         public string? ConsumerIdType { get; }
 
+        public CustomerMasterData? CustomerMasterData => _customerMasterData;
+
         public void BusinessProcessCompleted()
         {
             if (_businessProcessState != BusinessProcessState.Accepted)

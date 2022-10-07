@@ -30,7 +30,7 @@ public class Scenario
     private readonly B2BContext _context;
     private string? _gridOperatorNumber;
     private Guid _gridOperatorId;
-    private bool _customerMasterDataIsReceived;
+    private CustomerMasterData? _customerMasterData;
 
     private Scenario(
         MoveInTransaction transaction,
@@ -85,35 +85,42 @@ public class Scenario
         return this;
     }
 
-    public Scenario CustomerMasterDataIsReceived()
+    public Scenario CustomerMasterDataIsReceived(
+        string marketEvaluationPoint,
+        bool electricalHeating,
+        Instant? electricalHeatingStart,
+        string firstCustomerId,
+        string firstCustomerName,
+        string secondCustomerId,
+        string secondCustomerName,
+        bool protectedName,
+        bool hasEnergySupplier,
+        Instant supplyStart)
     {
-        _customerMasterDataIsReceived = true;
+        _customerMasterData = new CustomerMasterData(
+            marketEvaluationPoint,
+            electricalHeating,
+            electricalHeatingStart,
+            firstCustomerId,
+            firstCustomerName,
+            secondCustomerId,
+            secondCustomerName,
+            protectedName,
+            hasEnergySupplier,
+            supplyStart);
         return this;
     }
 
     public async Task BuildAsync()
     {
-        if (_customerMasterDataIsReceived)
-            SetCustomerMasterDataOnTransaction();
+        if (_customerMasterData is not null)
+        {
+            _transaction!.ReceiveCustomerMasterData(_customerMasterData);
+        }
+
         await CreateGridOperatorDetailsAsync().ConfigureAwait(false);
         _context.Transactions.Add(_transaction!);
         await _context.SaveChangesAsync();
-    }
-
-    private static void SetCustomerMasterDataOnTransaction()
-    {
-        var customerMasterData = new CustomerMasterData(
-            _transaction!.MarketEvaluationPointId,
-            false,
-            null,
-            _transaction.ConsumerId!,
-            _transaction.ConsumerName!,
-            string.Empty,
-            string.Empty,
-            false,
-            false,
-            _transaction.EffectiveDate);
-        _transaction.ReceiveCustomerMasterData(customerMasterData);
     }
 
     private async Task CreateGridOperatorDetailsAsync()

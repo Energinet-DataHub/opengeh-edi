@@ -52,6 +52,17 @@ public class SendCustomerMasterDataToEnergySupplierTests : TestBase, IAsyncLifet
                 GetService<IMediator>(),
                 GetService<B2BContext>())
             .IsEffective()
+            .CustomerMasterDataIsReceived(
+                SampleData.MeteringPointNumber,
+                SampleData.ElectricalHeating,
+                SampleData.ElectricalHeatingStart,
+                SampleData.ConsumerId,
+                SampleData.ConsumerName,
+                SampleData.ConsumerId,
+                SampleData.ConsumerName,
+                SampleData.ProtectedName,
+                SampleData.HasEnergySupplier,
+                SampleData.SupplyStart)
             .WithGridOperatorForMeteringPoint(
                 SampleData.IdOfGridOperatorForMeteringPoint,
                 SampleData.NumberOfGridOperatorForMeteringPoint)
