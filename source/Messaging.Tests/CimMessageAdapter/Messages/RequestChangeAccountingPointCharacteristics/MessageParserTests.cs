@@ -24,6 +24,7 @@ using Messaging.CimMessageAdapter.Messages.RequestChangeAccountingPointCharacter
 using Messaging.Domain.OutgoingMessages;
 using Xunit;
 using MarketActivityRecord = Messaging.Application.IncomingMessages.RequestChangeAccountPointCharacteristics.MarketActivityRecord;
+using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
 
 namespace Messaging.Tests.CimMessageAdapter.Messages.RequestChangeAccountingPointCharacteristics;
 
@@ -56,14 +57,10 @@ public class MessageParserTests
         var result = await _messageParser.ParseAsync(message, format).ConfigureAwait(false);
 
         Assert.True(result.Success);
-        var header = result.IncomingMarketDocument?.Header;
-        Assert.Equal("253698245", header?.MessageId);
-        Assert.Equal("E02", header?.ProcessType);
-        Assert.Equal("5799999933318", header?.SenderId);
-        Assert.Equal("DDM", header?.SenderRole);
-        Assert.Equal("5790001330552", header?.ReceiverId);
-        Assert.Equal("DDZ", header?.ReceiverRole);
-        Assert.Equal("2022-12-17T09:30:47Z", header?.CreatedAt);
+        AssertHeader(result.IncomingMarketDocument?.Header);
+        var marketActivityRecord = result.IncomingMarketDocument?.MarketActivityRecords.First();
+        Assert.Equal("25361487", marketActivityRecord?.Id);
+
     }
 
     private static Stream CreateXmlMessage()
@@ -73,6 +70,17 @@ public class MessageParserTests
         xmlDoc.Save(stream);
 
         return stream;
+    }
+
+    private void AssertHeader(MessageHeader header)
+    {
+        Assert.Equal("253698245", header?.MessageId);
+        Assert.Equal("E02", header?.ProcessType);
+        Assert.Equal("5799999933318", header?.SenderId);
+        Assert.Equal("DDM", header?.SenderRole);
+        Assert.Equal("5790001330552", header?.ReceiverId);
+        Assert.Equal("DDZ", header?.ReceiverRole);
+        Assert.Equal("2022-12-17T09:30:47Z", header?.CreatedAt);
     }
 }
 

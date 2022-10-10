@@ -16,5 +16,5 @@ namespace Messaging.Application.IncomingMessages.RequestChangeAccountPointCharac
 
 public class MarketActivityRecord : IMarketActivityRecord
 {
-    public string Id { get; } = string.Empty;
+    public string Id { get; init; } = string.Empty;
 }

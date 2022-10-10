@@ -137,20 +137,54 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         return processType;
     }
 
-    private static IAsyncEnumerable<MarketActivityRecord> MarketActivityRecordsFromAsync(
+    private static async IAsyncEnumerable<MarketActivityRecord> MarketActivityRecordsFromAsync(
         XmlReader reader,
         RootElement rootElement)
     {
         var id = string.Empty;
-        var marketEvaluationPointId = string.Empty;
-        var energySupplierId = string.Empty;
-        var balanceResponsibleId = string.Empty;
-        var consumerId = string.Empty;
-        var consumerIdType = string.Empty;
-        var consumerName = string.Empty;
-        var effectiveDate = string.Empty;
         var ns = rootElement.DefaultNamespace;
-        return null!;
+        bool marketEvaluationPointReached = false;
+
+        await reader.AdvanceToAsync(MarketActivityRecordElementName, ns).ConfigureAwait(false);
+
+        while (!reader.EOF)
+        {
+            if (reader.Is(MarketActivityRecordElementName, ns, XmlNodeType.EndElement))
+            {
+                var record = CreateMarketActivityRecord(
+                    ref id);
+                yield return record;
+            }
+
+            if (reader.NodeType == XmlNodeType.Element && reader.SchemaInfo?.Validity == XmlSchemaValidity.Invalid)
+                await reader.ReadToEndAsync().ConfigureAwait(false);
+
+            if (reader.Is("mRID", ns) && !marketEvaluationPointReached)
+            {
+                id = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("MarketEvaluationPoint", ns))
+            {
+                marketEvaluationPointReached = true;
+                await reader.ReadAsync().ConfigureAwait(false);
+            }
+            else
+            {
+                await reader.ReadAsync().ConfigureAwait(false);
+            }
+        }
+    }
+
+    private static MarketActivityRecord CreateMarketActivityRecord(
+        ref string id)
+    {
+        var marketActivityRecord = new MarketActivityRecord()
+        {
+            Id = id,
+        };
+
+        id = string.Empty;
+        return marketActivityRecord;
     }
 
     private static async Task<MessageHeader> ExtractMessageHeaderAsync(
@@ -229,10 +263,11 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
 
         var marketActivityRecords = new List<MarketActivityRecord>();
 
-        // await foreach (var marketActivityRecord in MarketActivityRecordsFromAsync(reader, root))
-        // {
-        //     marketActivityRecords.Add(marketActivityRecord);
-        // }
+        await foreach (var marketActivityRecord in MarketActivityRecordsFromAsync(reader, root))
+        {
+            marketActivityRecords.Add(marketActivityRecord);
+        }
+
         if (_errors.Count > 0)
         {
             return new
