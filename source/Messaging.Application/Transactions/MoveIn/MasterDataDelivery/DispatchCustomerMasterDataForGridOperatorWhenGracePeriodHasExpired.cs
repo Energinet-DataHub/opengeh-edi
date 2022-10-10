@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
@@ -40,13 +41,7 @@ public class DispatchCustomerMasterDataForGridOperatorWhenGracePeriodHasExpired 
     {
         ArgumentNullException.ThrowIfNull(notification);
 
-        var sql =
-            @"SELECT TransactionId FROM [b2b].[MoveInTransactions] WHERE GridOperator_MessageDeliveryState_CustomerMasterData = 'Pending' " +
-            "AND CustomerMasterData IS NOT NULL AND DATEDIFF(day, EffectiveDate, @Now) >= 1";
-
-        var transactionIds = await _connectionFactory.GetOpenConnection().QueryAsync<string>(
-            sql,
-            new { Now = notification.Now.ToDateTimeUtc(), })
+        var transactionIds = await TransactionsWhereCustomerMasterDataDispatchIsPendingAsync(notification)
             .ConfigureAwait(false);
 
         foreach (var transactionId in transactionIds)
@@ -54,5 +49,18 @@ public class DispatchCustomerMasterDataForGridOperatorWhenGracePeriodHasExpired 
             await _commandScheduler.EnqueueAsync(new SendCustomerMasterDataToGridOperator(transactionId))
                 .ConfigureAwait(false);
         }
+    }
+
+    private async Task<IEnumerable<string>> TransactionsWhereCustomerMasterDataDispatchIsPendingAsync(ADayHasPassed notification)
+    {
+        var sql =
+            @"SELECT TransactionId FROM [b2b].[MoveInTransactions] WHERE GridOperator_MessageDeliveryState_CustomerMasterData = 'Pending' " +
+            "AND CustomerMasterData IS NOT NULL AND DATEDIFF(day, EffectiveDate, @Now) >= 1";
+
+        var transactionIds = await _connectionFactory.GetOpenConnection().QueryAsync<string>(
+                sql,
+                new { Now = notification.Now.ToDateTimeUtc(), })
+            .ConfigureAwait(false);
+        return transactionIds;
     }
 }
