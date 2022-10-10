@@ -14,4 +14,27 @@
 
 namespace Messaging.Application.Transactions.MoveIn;
 
-public record MoveInSettings(int DaysAfterEffectiveDateToWaitUntilCustomerMasterDataIsSendToGridOperator);
+public class MoveInSettings
+{
+    public MoveInSettings(MessageDelivery messageDelivery)
+    {
+        MessageDelivery = messageDelivery;
+    }
+
+    public MessageDelivery MessageDelivery { get; set; }
+}
+
+public class MessageDelivery
+{
+    public MessageDelivery(GridOperator gridOperator)
+    {
+        GridOperator = gridOperator;
+    }
+
+    public GridOperator GridOperator { get; set; }
+}
+
+public class GridOperator
+{
+    public int DaysAfterEffectiveDateIfNotUpdated { get; set; }
+}

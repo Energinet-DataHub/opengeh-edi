@@ -65,7 +65,7 @@ public class DispatchCustomerMasterDataForGridOperatorWhenGracePeriodHasExpired 
                 new
                 {
                     Now = now.ToDateTimeUtc(),
-                    GracePeriod = _settings.DaysAfterEffectiveDateToWaitUntilCustomerMasterDataIsSendToGridOperator,
+                    GracePeriod = _settings.MessageDelivery.GridOperator.DaysAfterEffectiveDateIfNotUpdated,
                 })
             .ConfigureAwait(false);
     }
