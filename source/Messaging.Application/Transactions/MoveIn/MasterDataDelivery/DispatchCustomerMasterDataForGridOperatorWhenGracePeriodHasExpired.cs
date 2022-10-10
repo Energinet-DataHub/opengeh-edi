@@ -26,17 +26,14 @@ namespace Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 public class DispatchCustomerMasterDataForGridOperatorWhenGracePeriodHasExpired : INotificationHandler<ADayHasPassed>
 {
     private readonly IDbConnectionFactory _connectionFactory;
-    private readonly ICommandScheduler _commandScheduler;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly CommandSchedulerFacade _commandScheduler;
 
     public DispatchCustomerMasterDataForGridOperatorWhenGracePeriodHasExpired(
         IDbConnectionFactory connectionFactory,
-        ICommandScheduler commandScheduler,
-        IUnitOfWork unitOfWork)
+        CommandSchedulerFacade commandScheduler)
     {
         _connectionFactory = connectionFactory;
         _commandScheduler = commandScheduler;
-        _unitOfWork = unitOfWork;
     }
 
     public async Task Handle(ADayHasPassed notification, CancellationToken cancellationToken)
@@ -56,7 +53,6 @@ public class DispatchCustomerMasterDataForGridOperatorWhenGracePeriodHasExpired 
         {
             await _commandScheduler.EnqueueAsync(new SendCustomerMasterDataToGridOperator(transactionId))
                 .ConfigureAwait(false);
-            await _unitOfWork.CommitAsync().ConfigureAwait(false);
         }
     }
 }
