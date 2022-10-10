@@ -56,6 +56,14 @@ public class MessageParserTests
         var result = await _messageParser.ParseAsync(message, format).ConfigureAwait(false);
 
         Assert.True(result.Success);
+        var header = result.IncomingMarketDocument?.Header;
+        Assert.Equal("253698245", header?.MessageId);
+        Assert.Equal("E02", header?.ProcessType);
+        Assert.Equal("5799999933318", header?.SenderId);
+        Assert.Equal("DDM", header?.SenderRole);
+        Assert.Equal("5790001330552", header?.ReceiverId);
+        Assert.Equal("DDZ", header?.ReceiverRole);
+        Assert.Equal("2022-12-17T09:30:47Z", header?.CreatedAt);
     }
 
     private static Stream CreateXmlMessage()
