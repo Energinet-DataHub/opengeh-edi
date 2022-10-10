@@ -42,5 +42,11 @@ namespace Messaging.Api.Configuration
 
             return _mediator.Publish(new TimeHasPassed(_systemDateTimeProvider.Now()));
         }
+
+        [Function("ADayHasPassed")]
+        public Task ADayHasPassedAsync([TimerTrigger("0 0 * * *")] TimerInfo timerTimerInfo, FunctionContext context)
+        {
+            return _mediator.Publish(new ADayHasPassed(_systemDateTimeProvider.Now()));
+        }
     }
 }
