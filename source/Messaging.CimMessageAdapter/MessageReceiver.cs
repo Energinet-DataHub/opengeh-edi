@@ -32,14 +32,16 @@ namespace Messaging.CimMessageAdapter
         private readonly IMessageQueueDispatcher _messageQueueDispatcher;
         private readonly ITransactionIds _transactionIds;
         private readonly IMarketActorAuthenticator _marketActorAuthenticator;
+        private readonly ISenderAuthorizer _senderAuthorizer;
 
-        public MessageReceiver(IMessageIds messageIds, IMessageQueueDispatcher messageQueueDispatcher, ITransactionIds transactionIds, IMarketActorAuthenticator marketActorAuthenticator)
+        public MessageReceiver(IMessageIds messageIds, IMessageQueueDispatcher messageQueueDispatcher, ITransactionIds transactionIds, IMarketActorAuthenticator marketActorAuthenticator, ISenderAuthorizer senderAuthorizer)
         {
             _messageIds = messageIds ?? throw new ArgumentNullException(nameof(messageIds));
             _messageQueueDispatcher = messageQueueDispatcher ??
                                              throw new ArgumentNullException(nameof(messageQueueDispatcher));
             _transactionIds = transactionIds;
             _marketActorAuthenticator = marketActorAuthenticator ?? throw new ArgumentNullException(nameof(marketActorAuthenticator));
+            _senderAuthorizer = senderAuthorizer;
         }
 
         public async Task<Result> ReceiveAsync<TMarketActivityRecordType, TMarketTransactionType>(MessageParserResult<TMarketActivityRecordType, TMarketTransactionType> messageParserResult)

@@ -33,14 +33,14 @@ namespace Messaging.Api.IncomingMessages
     {
         private readonly ILogger<RequestChangeOfSupplierMessageReceiver> _logger;
         private readonly ICorrelationContext _correlationContext;
-        private readonly MessageReceiver _messageReceiver;
+        private readonly RequestChangeOfSupplierReceiver _messageReceiver;
         private readonly ResponseFactory _responseFactory;
         private readonly MessageParser _messageParser;
 
         public RequestChangeOfSupplierMessageReceiver(
             ILogger<RequestChangeOfSupplierMessageReceiver> logger,
             ICorrelationContext correlationContext,
-            MessageReceiver messageReceiver,
+            RequestChangeOfSupplierReceiver messageReceiver,
             ResponseFactory responseFactory,
             MessageParser messageParser)
         {

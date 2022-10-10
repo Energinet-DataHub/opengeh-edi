@@ -208,7 +208,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
         private MessageReceiver CreateMessageReceiver(IMessageIds messageIds)
         {
             _messageQueueDispatcherSpy = new MessageQueueDispatcherStub();
-            var messageReceiver = new MessageReceiver(messageIds, _messageQueueDispatcherSpy, _transactionIds, _marketActorAuthenticator);
+            var messageReceiver = new MessageReceiver(messageIds, _messageQueueDispatcherSpy, _transactionIds, _marketActorAuthenticator, new SenderAuthorizer(_marketActorAuthenticator));
             return messageReceiver;
         }
 
