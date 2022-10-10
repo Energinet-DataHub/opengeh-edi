@@ -60,6 +60,7 @@ public class MessageParserTests
         AssertHeader(result.IncomingMarketDocument?.Header);
         var marketActivityRecord = result.IncomingMarketDocument?.MarketActivityRecords.First();
         Assert.Equal("25361487", marketActivityRecord?.Id);
+        Assert.Equal("2022-12-17T23:00:00Z", marketActivityRecord.EffectiveDate);
 
     }
 

@@ -17,4 +17,6 @@ namespace Messaging.Application.IncomingMessages.RequestChangeAccountPointCharac
 public class MarketActivityRecord : IMarketActivityRecord
 {
     public string Id { get; init; } = string.Empty;
+
+    public string EffectiveDate { get; init; } = string.Empty;
 }

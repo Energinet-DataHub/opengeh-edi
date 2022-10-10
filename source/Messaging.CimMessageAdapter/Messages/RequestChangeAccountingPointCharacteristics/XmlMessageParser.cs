@@ -142,6 +142,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         RootElement rootElement)
     {
         var id = string.Empty;
+        var effectiveDate = string.Empty;
         var ns = rootElement.DefaultNamespace;
         bool marketEvaluationPointReached = false;
 
@@ -152,7 +153,8 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
             if (reader.Is(MarketActivityRecordElementName, ns, XmlNodeType.EndElement))
             {
                 var record = CreateMarketActivityRecord(
-                    ref id);
+                    ref id,
+                    ref effectiveDate);
                 yield return record;
             }
 
@@ -162,6 +164,10 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
             if (reader.Is("mRID", ns) && !marketEvaluationPointReached)
             {
                 id = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("validityStart_DateAndOrTime.dateTime", ns) && !marketEvaluationPointReached)
+            {
+                effectiveDate = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             }
             else if (reader.Is("MarketEvaluationPoint", ns))
             {
@@ -176,11 +182,13 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
     }
 
     private static MarketActivityRecord CreateMarketActivityRecord(
-        ref string id)
+        ref string id,
+        ref string effectiveDate)
     {
         var marketActivityRecord = new MarketActivityRecord()
         {
             Id = id,
+            EffectiveDate = effectiveDate,
         };
 
         id = string.Empty;
