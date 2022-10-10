@@ -16,8 +16,15 @@ using System.Threading.Tasks;
 
 namespace Messaging.CimMessageAdapter.Messages;
 
-#pragma warning disable
+/// <summary>
+/// Authorization policy used for authorizing the sender of a market document
+/// </summary>
 public interface ISenderAuthorizer
 {
+    /// <summary>
+    /// Authorize sender
+    /// </summary>
+    /// <param name="senderId"></param>
+    /// <param name="senderRole"></param>
     Task<Result> AuthorizeAsync(string senderId, string senderRole);
 }
