@@ -20,17 +20,15 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
-using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 using Messaging.Domain.OutgoingMessages;
-using Messaging.IntegrationTests.CimMessageAdapter.Messages;
 using Messaging.IntegrationTests.CimMessageAdapter.Stubs;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
 
-namespace Messaging.IntegrationTests.CimMessageAdapter
+namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
 {
     [IntegrationTest]
     public class MessageReceiverTests : TestBase
