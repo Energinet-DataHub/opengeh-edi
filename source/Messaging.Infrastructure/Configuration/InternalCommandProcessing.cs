@@ -29,8 +29,7 @@ internal static class InternalCommandProcessing
 {
     internal static void Configure(IServiceCollection services)
     {
-        var mapper = CreateInternalCommandMap();
-        services.AddSingleton(mapper);
+        services.AddSingleton(CreateInternalCommandMap());
         services.AddTransient<CommandExecutor>();
         services.AddScoped<ICommandScheduler, CommandScheduler>();
         services.AddScoped<CommandSchedulerFacade>();
