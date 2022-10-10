@@ -15,7 +15,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Messaging.Infrastructure.Configuration.SystemTime;
+using Messaging.Application.Configuration.TimeEvents;
 
 namespace Messaging.Infrastructure.OutgoingMessages
 {

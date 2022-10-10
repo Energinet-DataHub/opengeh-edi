@@ -15,7 +15,7 @@
 using MediatR;
 using NodaTime;
 
-namespace Messaging.Infrastructure.Configuration.SystemTime
+namespace Messaging.Application.Configuration.TimeEvents
 {
     public class TenSecondsHasHasPassed : INotification
     {

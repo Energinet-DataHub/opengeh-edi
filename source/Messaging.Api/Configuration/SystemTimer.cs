@@ -12,13 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.Configuration;
-using Messaging.Infrastructure.Configuration.SystemTime;
+using Messaging.Application.Configuration.TimeEvents;
 using Microsoft.Azure.Functions.Worker;
-using Microsoft.Extensions.Logging;
 
 namespace Messaging.Api.Configuration
 {
