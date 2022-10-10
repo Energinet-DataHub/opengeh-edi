@@ -31,7 +31,7 @@ using Xunit.Categories;
 namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
 {
     [IntegrationTest]
-    public class MessageReceiverTests : TestBase
+    public class RequestChangeOfSupplierReceiverTests : TestBase
     {
         private readonly List<Claim> _claims = new List<Claim>()
         {
@@ -48,7 +48,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfS
         private readonly IMessageIds _messageIds;
         private MessageQueueDispatcherStub _messageQueueDispatcherSpy = new();
 
-        public MessageReceiverTests(DatabaseFixture databaseFixture)
+        public RequestChangeOfSupplierReceiverTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
             _messageParser = GetService<MessageParser>();
