@@ -147,6 +147,8 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         var marketEvaluationPointType = string.Empty;
         var marketEvaluationPointSettlementMethod = string.Empty;
         var marketEvaluationPointMeteringMethod = string.Empty;
+        var marketEvaluationPointConnectionState = string.Empty;
+        var marketEvaluationPointReadCycle = string.Empty;
 
         var ns = rootElement.DefaultNamespace;
         bool marketEvaluationPointReached = false;
@@ -163,7 +165,9 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
                     ref marketEvaluationPointId,
                     ref marketEvaluationPointType,
                     ref marketEvaluationPointSettlementMethod,
-                    ref marketEvaluationPointMeteringMethod);
+                    ref marketEvaluationPointMeteringMethod,
+                    ref marketEvaluationPointConnectionState,
+                    ref marketEvaluationPointReadCycle);
                 yield return record;
             }
 
@@ -199,6 +203,14 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
             {
                 marketEvaluationPointMeteringMethod = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             }
+            else if (reader.Is("connectionState", ns))
+            {
+                marketEvaluationPointConnectionState = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("readCycle", ns))
+            {
+                marketEvaluationPointReadCycle = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
             else
             {
                 await reader.ReadAsync().ConfigureAwait(false);
@@ -212,7 +224,9 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         ref string marketEvaluationPointId,
         ref string marketEvaluationPointType,
         ref string marketEvaluationPointSettlementMethod,
-        ref string marketEvaluationPointMeteringMethod)
+        ref string marketEvaluationPointMeteringMethod,
+        ref string marketEvaluationPointConnectionState,
+        ref string marketEvaluationbPointReadCycle)
     {
         var marketActivityRecord = new MarketActivityRecord()
         {
@@ -224,6 +238,8 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
                 Type = marketEvaluationPointType,
                 SettlementMethod = marketEvaluationPointSettlementMethod,
                 MeteringMethod = marketEvaluationPointMeteringMethod,
+                ConnectionState = marketEvaluationPointConnectionState,
+                ReadCycle = marketEvaluationbPointReadCycle,
             },
         };
 

@@ -32,4 +32,8 @@ public class MarketEvaluationPoint
     public string SettlementMethod { get; init; } = string.Empty;
 
     public string MeteringMethod { get; init; } = string.Empty;
+
+    public string ConnectionState { get; init; } = string.Empty;
+
+    public string ReadCycle { get; init; } = string.Empty;
 }

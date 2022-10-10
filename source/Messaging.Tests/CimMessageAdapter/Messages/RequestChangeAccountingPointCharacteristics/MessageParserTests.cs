@@ -63,6 +63,8 @@ public class MessageParserTests
         Assert.Equal("E17", marketActivityRecord?.MarketEvaluationPoint.Type);
         Assert.Equal("E02", marketActivityRecord?.MarketEvaluationPoint.SettlementMethod);
         Assert.Equal("D01", marketActivityRecord?.MarketEvaluationPoint.MeteringMethod);
+        Assert.Equal("D03", marketActivityRecord?.MarketEvaluationPoint.ConnectionState);
+        Assert.Equal("PT1H", marketActivityRecord?.MarketEvaluationPoint.ReadCycle);
     }
 
     private static Stream CreateXmlMessage()
