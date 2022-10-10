@@ -12,7 +12,6 @@
     "INCOMING_MESSAGE_QUEUE_SENDER_CONNECTION_STRING": "<connection string for service bus with sender permissions>",
     "INCOMING_MESSAGE_QUEUE_LISTENER_CONNECTION_STRING": "<connection string for service bus with listener permissions>",
     "INCOMING_MESSAGE_QUEUE_NAME": "<Name of transactions service bus queue>",
-    "RAISE_TIME_HAS_PASSED_EVENT_SCHEDULE": "*/10 * * * * *",
     "MESSAGEHUB_STORAGE_CONNECTION_STRING": "<MessageHub Storage Account connection string>",
     "MESSAGEHUB_STORAGE_CONTAINER_NAME": "<MessageHub Storage Account container name>",
     "MESSAGEHUB_QUEUE_CONNECTION_STRING": "<PostOffice Service Bus connection string>",
