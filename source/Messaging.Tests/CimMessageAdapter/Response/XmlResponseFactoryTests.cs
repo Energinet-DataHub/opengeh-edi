@@ -16,6 +16,7 @@ using System.Linq;
 using System.Xml.Linq;
 using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Errors;
+using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Response;
 using Xunit;
 using Xunit.Categories;
