@@ -72,9 +72,14 @@ public class DispatchCustomerMasterDataForGridOperatorTests : TestBase, IAsyncLi
     [Fact]
     public async Task Message_is_dispatched_when_the_grace_period_has_expired()
     {
-        var dayHasPassed = new ADayHasPassed(SampleData.SupplyStart.Plus(Duration.FromDays(1)));
-        await GetService<IMediator>().Publish(dayHasPassed);
+        await GivenTheGracePeriodHasExpired();
 
         AssertQueuedCommand.QueuedCommand<SendCustomerMasterDataToGridOperator>(GetService<IDbConnectionFactory>());
+    }
+
+    private async Task GivenTheGracePeriodHasExpired()
+    {
+        var dayHasPassed = new ADayHasPassed(SampleData.SupplyStart.Plus(Duration.FromDays(1)));
+        await GetService<IMediator>().Publish(dayHasPassed);
     }
 }
