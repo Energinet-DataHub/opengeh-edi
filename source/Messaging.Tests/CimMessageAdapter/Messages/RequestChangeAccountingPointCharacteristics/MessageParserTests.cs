@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -28,7 +27,6 @@ using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
 
 namespace Messaging.Tests.CimMessageAdapter.Messages.RequestChangeAccountingPointCharacteristics;
 
-#pragma warning disable
 public class MessageParserTests
 {
     private readonly MessageParser _messageParser;
@@ -60,8 +58,7 @@ public class MessageParserTests
         AssertHeader(result.IncomingMarketDocument?.Header);
         var marketActivityRecord = result.IncomingMarketDocument?.MarketActivityRecords.First();
         Assert.Equal("25361487", marketActivityRecord?.Id);
-        Assert.Equal("2022-12-17T23:00:00Z", marketActivityRecord.EffectiveDate);
-
+        Assert.Equal("2022-12-17T23:00:00Z", marketActivityRecord?.EffectiveDate);
     }
 
     private static Stream CreateXmlMessage()
@@ -73,7 +70,7 @@ public class MessageParserTests
         return stream;
     }
 
-    private void AssertHeader(MessageHeader header)
+    private static void AssertHeader(MessageHeader? header)
     {
         Assert.Equal("253698245", header?.MessageId);
         Assert.Equal("E02", header?.ProcessType);
@@ -84,22 +81,3 @@ public class MessageParserTests
         Assert.Equal("2022-12-17T09:30:47Z", header?.CreatedAt);
     }
 }
-
-public class MessageParser
-{
-    private readonly IEnumerable<IMessageParser<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>> _parsers;
-
-    public MessageParser(IEnumerable<IMessageParser<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>> parsers)
-    {
-        _parsers = parsers;
-    }
-
-    public Task<MessageParserResult<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>> ParseAsync(Stream message, CimFormat cimFormat)
-    {
-        var parser = _parsers.FirstOrDefault(parser => parser.HandledFormat.Equals(cimFormat));
-        if (parser is null) throw new InvalidOperationException($"No message parser found for message format '{cimFormat}'");
-        return parser.ParseAsync(message);
-    }
-}
-
-#pragma warning restore
