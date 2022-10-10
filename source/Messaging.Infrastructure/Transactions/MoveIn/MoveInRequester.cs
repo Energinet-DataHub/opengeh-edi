@@ -25,12 +25,12 @@ using Microsoft.Extensions.Logging;
 namespace Messaging.Infrastructure.Transactions.MoveIn;
 public sealed class MoveInRequester : IMoveInRequester
 {
-    private readonly MoveInConfiguration _configuration;
+    private readonly MoveInSettings _configuration;
     private readonly ISerializer _serializer;
     private readonly IHttpClientAdapter _httpClientAdapter;
     private readonly ILogger<MoveInRequester> _logger;
 
-    public MoveInRequester(MoveInConfiguration configuration, IHttpClientAdapter httpClientAdapter, ISerializer serializer,  ILogger<MoveInRequester> logger)
+    public MoveInRequester(MoveInSettings configuration, IHttpClientAdapter httpClientAdapter, ISerializer serializer,  ILogger<MoveInRequester> logger)
     {
         _configuration = configuration;
         _httpClientAdapter = httpClientAdapter;
@@ -59,7 +59,7 @@ public sealed class MoveInRequester : IMoveInRequester
     private async Task<HttpResponseMessage> TryCallAsync(RequestV2 request)
     {
         using var content = new StringContent(_serializer.Serialize(request));
-        var response = await _httpClientAdapter.PostAsync(_configuration.RequestUri, content).ConfigureAwait(false);
+        var response = await _httpClientAdapter.PostAsync(_configuration.BusinessService.RequestEndPoint, content).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
         return response;
     }

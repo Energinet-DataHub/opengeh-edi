@@ -15,11 +15,11 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Messaging.Infrastructure.Configuration.SystemTime;
+using Messaging.Application.Configuration.TimeEvents;
 
 namespace Messaging.Infrastructure.OutgoingMessages
 {
-    public class PublishNewMessagesOnTimeHasPassed : INotificationHandler<TimeHasPassed>
+    public class PublishNewMessagesOnTimeHasPassed : INotificationHandler<TenSecondsHasHasPassed>
     {
         private readonly MessageAvailabilityPublisher _messageAvailabilityPublisher;
 
@@ -28,7 +28,7 @@ namespace Messaging.Infrastructure.OutgoingMessages
             _messageAvailabilityPublisher = messageAvailabilityPublisher;
         }
 
-        public Task Handle(TimeHasPassed notification, CancellationToken cancellationToken)
+        public Task Handle(TenSecondsHasHasPassed notification, CancellationToken cancellationToken)
         {
             return _messageAvailabilityPublisher.PublishAsync();
         }

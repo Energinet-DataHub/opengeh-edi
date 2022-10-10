@@ -30,6 +30,7 @@ using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.Configuration.Commands;
 using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.Configuration.TimeEvents;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Common;
@@ -55,7 +56,6 @@ using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.InternalCommands;
 using Messaging.Infrastructure.Configuration.Processing;
 using Messaging.Infrastructure.Configuration.Serialization;
-using Messaging.Infrastructure.Configuration.SystemTime;
 using Messaging.Infrastructure.IncomingMessages;
 using Messaging.Infrastructure.MarketEvaluationPoints;
 using Messaging.Infrastructure.MasterData.MarketEvaluationPoints;
@@ -175,7 +175,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddSingleton<IActorLookup, ActorLookup>();
             _services.AddScoped<MessageAvailabilityPublisher>();
             _services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
-            _services.AddTransient<INotificationHandler<TimeHasPassed>, PublishNewMessagesOnTimeHasPassed>();
+            _services.AddTransient<INotificationHandler<TenSecondsHasHasPassed>, PublishNewMessagesOnTimeHasPassed>();
             return this;
         }
 
@@ -221,10 +221,9 @@ namespace Messaging.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddMoveInServices(MoveInConfiguration configuration)
+        public CompositionRoot AddMoveInServices(MoveInSettings settings)
         {
             _services.AddScoped<MoveInNotifications>();
-            _services.AddScoped(_ => configuration);
             _services.AddScoped<IMoveInRequester, MoveInRequester>();
             _services.AddScoped<IMeteringPointMasterDataClient, MeteringPointMasterDataClient>();
             _services.AddScoped<ICustomerMasterDataClient, CustomerMasterDataClient>();
@@ -243,7 +242,9 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddTransient<INotificationHandler<EndOfSupplyNotificationChangedToPending>, NotifyCurrentEnergySupplierWhenConsumerHasMovedIn>();
             _services.AddTransient<INotificationHandler<CustomerMasterDataWasReceived>, SendCustomerMasterDataToEnergySupplierWhenDataIsReceived>();
             _services.AddTransient<INotificationHandler<BusinessProcessWasCompleted>, NotifyGridOperatorWhenConsumerHasMovedIn>();
+            _services.AddTransient<INotificationHandler<ADayHasPassed>, DispatchCustomerMasterDataForGridOperatorWhenGracePeriodHasExpired>();
             _services.AddTransient<CustomerMasterDataMessageFactory>();
+            _services.AddSingleton(settings);
             return this;
         }
 
@@ -279,7 +280,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddScoped<CommandSchedulerFacade>();
             _services.AddTransient<InternalCommandAccessor>();
             _services.AddTransient<InternalCommandProcessor>();
-            _services.AddTransient<INotificationHandler<TimeHasPassed>, ProcessInternalCommandsOnTimeHasPassed>();
+            _services.AddTransient<INotificationHandler<TenSecondsHasHasPassed>, ProcessInternalCommandsOnTimeHasPassed>();
         }
 
         private void AddMessageGenerationServices()

@@ -16,6 +16,7 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MeteringPoints.RequestResponse.Response;
 using Messaging.Api.Configuration.Middleware;
+using Messaging.Application.Configuration.Commands;
 using Messaging.Application.MasterData;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
