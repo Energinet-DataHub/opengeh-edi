@@ -101,7 +101,7 @@ namespace Messaging.Infrastructure.Configuration
 
             AddMediatR();
             services.AddLogging();
-            AddInternalCommandsProcessing();
+            InternalCommandProcessing.Configure(_services);
             AddMessageGenerationServices();
             AddMasterDataServices();
             AddActorServices();
@@ -270,30 +270,6 @@ namespace Messaging.Infrastructure.Configuration
         {
             _services.AddSingleton(action);
             return this;
-        }
-
-        private void AddInternalCommandsProcessing()
-        {
-            var mapper = new InternalCommandMapper();
-            mapper.Add("CreateActor", typeof(CreateActor));
-            mapper.Add("FetchCustomerMasterData", typeof(FetchCustomerMasterData));
-            mapper.Add("FetchMeteringPointMasterData", typeof(FetchMeteringPointMasterData));
-            mapper.Add("ForwardMeteringPointMasterData", typeof(ForwardMeteringPointMasterData));
-            mapper.Add("ReceiveCustomerMasterData", typeof(ReceiveCustomerMasterData));
-            mapper.Add("SendCustomerMasterDataToGridOperator", typeof(SendCustomerMasterDataToGridOperator));
-            mapper.Add("SendCustomerMasterDataToEnergySupplier", typeof(SendCustomerMasterDataToEnergySupplier));
-            mapper.Add("NotifyCurrentEnergySupplier", typeof(NotifyCurrentEnergySupplier));
-            mapper.Add("NotifyGridOperator", typeof(NotifyGridOperator));
-            mapper.Add("SetConsumerHasMovedIn", typeof(SetConsumerHasMovedIn));
-            mapper.Add("SendFailureNotification", typeof(SendFailureNotification));
-            mapper.Add("SendSuccessNotification", typeof(SendSuccessNotification));
-            _services.AddSingleton(mapper);
-            _services.AddTransient<CommandExecutor>();
-            _services.AddScoped<ICommandScheduler, CommandScheduler>();
-            _services.AddScoped<CommandSchedulerFacade>();
-            _services.AddTransient<InternalCommandAccessor>();
-            _services.AddTransient<InternalCommandProcessor>();
-            _services.AddTransient<INotificationHandler<TimeHasPassed>, ProcessInternalCommandsOnTimeHasPassed>();
         }
 
         private void AddMessageGenerationServices()
