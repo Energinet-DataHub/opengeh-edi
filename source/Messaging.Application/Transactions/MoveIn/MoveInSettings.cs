@@ -12,16 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace Messaging.Application.Transactions.MoveIn;
 
 public class MoveInSettings
 {
-    public MoveInSettings(MessageDelivery messageDelivery)
+    public MoveInSettings(MessageDelivery messageDelivery, BusinessService businessService)
     {
         MessageDelivery = messageDelivery;
+        BusinessService = businessService;
     }
 
+    public BusinessService BusinessService { get; set; }
+
     public MessageDelivery MessageDelivery { get; set; }
+}
+
+public class BusinessService
+{
+    public BusinessService(Uri requestEndPoint)
+    {
+        RequestEndPoint = requestEndPoint;
+    }
+
+    public Uri RequestEndPoint { get; set; }
 }
 
 public class MessageDelivery

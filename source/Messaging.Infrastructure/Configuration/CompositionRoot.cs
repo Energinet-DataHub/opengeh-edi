@@ -221,7 +221,7 @@ namespace Messaging.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddMoveInServices(MoveInConfiguration configuration)
+        public CompositionRoot AddMoveInServices(MoveInConfiguration configuration, MoveInSettings settings)
         {
             _services.AddScoped<MoveInNotifications>();
             _services.AddScoped(_ => configuration);
@@ -245,7 +245,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddTransient<INotificationHandler<BusinessProcessWasCompleted>, NotifyGridOperatorWhenConsumerHasMovedIn>();
             _services.AddTransient<INotificationHandler<ADayHasPassed>, DispatchCustomerMasterDataForGridOperatorWhenGracePeriodHasExpired>();
             _services.AddTransient<CustomerMasterDataMessageFactory>();
-            _services.AddSingleton(_ => new MoveInSettings(new MessageDelivery(new GridOperator() { GracePeriodInDaysAfterEffectiveDateIfNotUpdated = 1, })));
+            _services.AddSingleton(settings);
             return this;
         }
 

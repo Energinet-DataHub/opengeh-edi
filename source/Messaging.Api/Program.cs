@@ -25,6 +25,7 @@ using Messaging.Api.Configuration.Middleware.Authentication.MarketActors;
 using Messaging.Api.Configuration.Middleware.Correlation;
 using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages;
+using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.MessageBus;
 using Messaging.Infrastructure.Configuration.SystemTime;
@@ -132,7 +133,8 @@ namespace Messaging.Api
                         .AddNotificationHandler<PublishNewMessagesOnTimeHasPassed, TimeHasPassed>()
                         .AddHttpClientAdapter(sp => new HttpClientAdapter(sp.GetRequiredService<HttpClient>()))
                         .AddMoveInServices(
-                            new MoveInConfiguration(new Uri(runtime.MOVE_IN_REQUEST_ENDPOINT ?? throw new ArgumentException(nameof(runtime.MOVE_IN_REQUEST_ENDPOINT)))))
+                            new MoveInConfiguration(new Uri(runtime.MOVE_IN_REQUEST_ENDPOINT ?? throw new ArgumentException(nameof(runtime.MOVE_IN_REQUEST_ENDPOINT)))),
+                            new MoveInSettings(new MessageDelivery(new GridOperator() { GracePeriodInDaysAfterEffectiveDateIfNotUpdated = 15, }), new BusinessService(new Uri(runtime.MOVE_IN_REQUEST_ENDPOINT))))
                         .AddMessageParserServices();
 
                     services.AddLiveHealthCheck();
