@@ -51,8 +51,8 @@ public class AssertQueuedCommand
         return new AssertQueuedCommand(connectionFactory, commandPayload, commandMetadata);
     }
 
-    public TCommand Command<TCommand>()
+    public object Command()
     {
-        return JsonSerializer.Deserialize<TCommand>(_commandPayload)!;
+        return JsonSerializer.Deserialize(_commandPayload, _commandMetadata.CommandType)!;
     }
 }

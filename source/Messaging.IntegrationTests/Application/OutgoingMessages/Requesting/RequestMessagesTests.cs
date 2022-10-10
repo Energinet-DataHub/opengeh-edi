@@ -60,7 +60,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
             await RequestMessages(request).ConfigureAwait(false);
 
             _messageStorage.MessageHasBeenSavedInStorage();
-            var command = AssertCommand<SendSuccessNotification>().Command<SendSuccessNotification>();
+            var command = AssertCommand<SendSuccessNotification>().Command() as SendSuccessNotification;
             Assert.NotNull(command);
             Assert.Equal(request.ClientProvidedDetails.RequestId, command?.RequestId);
             Assert.Equal(request.ClientProvidedDetails.IdempotencyId, command?.IdempotencyId);
@@ -154,7 +154,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
         private void AssertErrorResponse(RequestMessages request, string reason)
         {
             var command = AssertCommand<SendFailureNotification>()
-                .Command<SendFailureNotification>();
+                .Command() as SendFailureNotification;
             Assert.NotNull(command);
             Assert.Equal(request.ClientProvidedDetails.RequestId, command?.RequestId);
             Assert.Equal(request.ClientProvidedDetails.IdempotencyId, command?.IdempotencyId);
