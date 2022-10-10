@@ -33,8 +33,8 @@ namespace Messaging.Api.Configuration
             _systemDateTimeProvider = systemDateTimeProvider;
         }
 
-        [Function("RaiseTimeHasPassedEvent")]
-        public Task RunAsync([TimerTrigger("%RAISE_TIME_HAS_PASSED_EVENT_SCHEDULE%")] TimerInfo timerTimerInfo, FunctionContext context)
+        [Function("TenSecondsHasPassed")]
+        public Task TenSecondsHasPassedAsync([TimerTrigger("%RAISE_TIME_HAS_PASSED_EVENT_SCHEDULE%")] TimerInfo timerTimerInfo, FunctionContext context)
         {
             var logger = context.GetLogger("System timer");
             logger.LogInformation($"System timer trigger at: {DateTime.Now}");
