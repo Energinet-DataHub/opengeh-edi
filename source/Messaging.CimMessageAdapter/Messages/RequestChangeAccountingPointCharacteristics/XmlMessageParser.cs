@@ -178,6 +178,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
                 var record = CreateMarketActivityRecord(
                     id,
                     effectiveDate,
+                    new MarketEvaluationPoint(
                     marketEvaluationPointId,
                     marketEvaluationPointType,
                     marketEvaluationPointSettlementMethod,
@@ -198,7 +199,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
                     marketEvaluationPointContractedConnectionCapacity,
                     marketEvaluationPointRatedCurrent,
                     marketEvaluationPointMeterId,
-                    new Series(marketEvaluationPointSeriesProduct, marketEvaluationPointSeriesQuantityMeasureUnit));
+                    new Series(marketEvaluationPointSeriesProduct, marketEvaluationPointSeriesQuantityMeasureUnit)));
                 yield return record;
             }
 
@@ -316,59 +317,13 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
     private static MarketActivityRecord CreateMarketActivityRecord(
         string id,
         string effectiveDate,
-        string marketEvaluationPointId,
-        string marketEvaluationPointType,
-        string marketEvaluationPointSettlementMethod,
-        string marketEvaluationPointMeteringMethod,
-        string marketEvaluationPointConnectionState,
-        string marketEvaluationPointReadCycle,
-        string marketEvaluationPointNetSettlementGroup,
-        string marketEvaluationPointNextReadingDate,
-        string marketEvaluationPointMeteringGridAreaDomainId,
-        string marketEvaluationPointInMeteringGridAreaDomainId,
-        string marketEvaluationPointOutMeteringGridAreaDomainId,
-        string marketEvaluationPointLinkedMarketEvaluationPointId,
-        string marketEvaluationPointPhysicalConnectionCapacity,
-        string marketEvaluationPointMpDisconnectionType,
-        string marketEvaluationPointDisconnectionMethod,
-        string marketEvaluationPointAssetMktPsrType,
-        string marketEvaluationPointProductionObligation,
-        string marketEvaluationPointContractedConnectionCapacity,
-        string marketEvaluationPointRatedCurrent,
-        string marketEvaluationPointMeterId,
-        Series marketEvaluationPointSeries)
+        MarketEvaluationPoint marketEvaluationPoint)
     {
-        var marketActivityRecord = new MarketActivityRecord()
-        {
-            Id = id,
-            EffectiveDate = effectiveDate,
-            MarketEvaluationPoint = new MarketEvaluationPoint()
-            {
-                GsrnNumber = marketEvaluationPointId,
-                TypeOfMeteringPoint = marketEvaluationPointType,
-                SettlementMethod = marketEvaluationPointSettlementMethod,
-                MeteringMethod = marketEvaluationPointMeteringMethod,
-                PhysicalStatusOfMeteringPoint = marketEvaluationPointConnectionState,
-                MeterReadingOccurence = marketEvaluationPointReadCycle,
-                NetSettlementGroup = marketEvaluationPointNetSettlementGroup,
-                ScheduledMeterReadingDate = marketEvaluationPointNextReadingDate,
-                MeteringGridArea = marketEvaluationPointMeteringGridAreaDomainId,
-                InMeteringGridArea = marketEvaluationPointInMeteringGridAreaDomainId,
-                OutMeteringGridArea = marketEvaluationPointOutMeteringGridAreaDomainId,
-                PowerPlant = marketEvaluationPointLinkedMarketEvaluationPointId,
-                PhysicalConnectionCapacity = marketEvaluationPointPhysicalConnectionCapacity,
-                ConnectionType = marketEvaluationPointMpDisconnectionType,
-                DisconnectionType = marketEvaluationPointDisconnectionMethod,
-                AssetType = marketEvaluationPointAssetMktPsrType,
-                ProductionObligation = marketEvaluationPointProductionObligation,
-                MaximumPower = marketEvaluationPointContractedConnectionCapacity,
-                MaximumCurrent = marketEvaluationPointRatedCurrent,
-                MeterNumber = marketEvaluationPointMeterId,
-                Series = marketEvaluationPointSeries,
-            },
-        };
+        var marketActivityRecord = new MarketActivityRecord(
+            id,
+            effectiveDate,
+            marketEvaluationPoint);
 
-        id = string.Empty;
         return marketActivityRecord;
     }
 

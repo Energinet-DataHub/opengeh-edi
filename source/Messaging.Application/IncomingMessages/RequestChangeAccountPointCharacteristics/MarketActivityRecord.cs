@@ -12,62 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-
 namespace Messaging.Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
+public record MarketActivityRecord(
+    string Id,
+    string EffectiveDate,
+    MarketEvaluationPoint MarketEvaluationPoint) : IMarketActivityRecord;
 
-public class MarketActivityRecord : IMarketActivityRecord
-{
-    public string Id { get; init; } = string.Empty;
-
-    public string EffectiveDate { get; init; } = string.Empty;
-
-    public MarketEvaluationPoint MarketEvaluationPoint { get; init; } = new();
-}
-
-public class MarketEvaluationPoint
-{
-    public string GsrnNumber { get; init; } = string.Empty;
-
-    public string TypeOfMeteringPoint { get; init; } = string.Empty;
-
-    public string SettlementMethod { get; init; } = string.Empty;
-
-    public string MeteringMethod { get; init; } = string.Empty;
-
-    public string PhysicalStatusOfMeteringPoint { get; init; } = string.Empty;
-
-    public string MeterReadingOccurence { get; init; } = string.Empty;
-
-    public string NetSettlementGroup { get; init; } = string.Empty;
-
-    public string ScheduledMeterReadingDate { get; init; } = string.Empty;
-
-    public string MeteringGridArea { get; init; } = string.Empty;
-
-    public string InMeteringGridArea { get; init; } = string.Empty;
-
-    public string OutMeteringGridArea { get; init; } = string.Empty;
-
-    public string PowerPlant { get; init; } = string.Empty;
-
-    public string PhysicalConnectionCapacity { get; init; } = string.Empty;
-
-    public string ConnectionType { get; init; } = string.Empty;
-
-    public string DisconnectionType { get; init; } = string.Empty;
-
-    public string AssetType { get; init; } = string.Empty;
-
-    public string ProductionObligation { get; init; } = string.Empty;
-
-    public string MaximumPower { get; init; } = string.Empty;
-
-    public string MaximumCurrent { get; init; } = string.Empty;
-
-    public string MeterNumber { get; init; } = string.Empty;
-
-    public Series Series { get; init; } = new(string.Empty, string.Empty);
-}
+public record MarketEvaluationPoint(
+    string GsrnNumber,
+    string TypeOfMeteringPoint,
+    string SettlementMethod,
+    string MeteringMethod,
+    string PhysicalStatusOfMeteringPoint,
+    string MeterReadingOccurence,
+    string NetSettlementGroup,
+    string ScheduledMeterReadingDate,
+    string MeteringGridArea,
+    string InMeteringGridArea,
+    string OutMeteringGridArea,
+    string PowerPlant,
+    string PhysicalConnectionCapacity,
+    string ConnectionType,
+    string DisconnectionType,
+    string AssetType,
+    string ProductionObligation,
+    string MaximumPower,
+    string MaximumCurrent,
+    string MeterNumber,
+    Series Series);
 
 public record Series(string ProductType, string MeasureUnitType);
