@@ -70,7 +70,7 @@ public class DispatchCustomerMasterDataForGridOperatorTests : TestBase, IAsyncLi
     }
 
     [Fact]
-    public async Task Message_is_dispatched_when_the_timout_has_been_exceeded_and_customer_master_data_has_not_been_updated()
+    public async Task Message_is_dispatched_when_the_grace_period_has_expired()
     {
         var dayHasPassed = new ADayHasPassed(SampleData.SupplyStart.Plus(Duration.FromDays(1)));
         await GetService<IMediator>().Publish(dayHasPassed);
