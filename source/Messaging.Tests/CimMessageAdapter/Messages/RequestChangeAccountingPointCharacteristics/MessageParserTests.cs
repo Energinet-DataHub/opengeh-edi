@@ -78,6 +78,9 @@ public class MessageParserTests
         Assert.Equal("false", marketActivityRecord?.MarketEvaluationPoint.ProductionObligation);
         Assert.Equal("230", marketActivityRecord?.MarketEvaluationPoint.MaximumPower);
         Assert.Equal("32", marketActivityRecord?.MarketEvaluationPoint.MaximumCurrent);
+        Assert.Equal("2536258974", marketActivityRecord?.MarketEvaluationPoint.MeterNumber);
+        Assert.Equal("8716867000030", marketActivityRecord?.MarketEvaluationPoint.Series.ProductType);
+        Assert.Equal("KWH", marketActivityRecord?.MarketEvaluationPoint.Series.MeasureUnitType);
     }
 
     private static Stream CreateXmlMessage()

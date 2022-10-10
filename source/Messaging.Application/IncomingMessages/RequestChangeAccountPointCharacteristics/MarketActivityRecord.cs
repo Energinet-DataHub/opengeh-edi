@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace Messaging.Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
 
 public class MarketActivityRecord : IMarketActivityRecord
@@ -20,7 +22,7 @@ public class MarketActivityRecord : IMarketActivityRecord
 
     public string EffectiveDate { get; init; } = string.Empty;
 
-    public MarketEvaluationPoint MarketEvaluationPoint { get; init; } = new MarketEvaluationPoint();
+    public MarketEvaluationPoint MarketEvaluationPoint { get; init; } = new();
 }
 
 public class MarketEvaluationPoint
@@ -62,4 +64,10 @@ public class MarketEvaluationPoint
     public string MaximumPower { get; init; } = string.Empty;
 
     public string MaximumCurrent { get; init; } = string.Empty;
+
+    public string MeterNumber { get; init; } = string.Empty;
+
+    public Series Series { get; init; } = new(string.Empty, string.Empty);
 }
+
+public record Series(string ProductType, string MeasureUnitType);
