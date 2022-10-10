@@ -14,7 +14,6 @@
 
 using System.Threading.Tasks;
 using Messaging.Application.Configuration.Commands.Commands;
-using NodaTime;
 
 namespace Messaging.Application.Configuration.Commands
 {
@@ -27,9 +26,8 @@ namespace Messaging.Application.Configuration.Commands
         /// Schedules or enqueues a command
         /// </summary>
         /// <param name="command"></param>
-        /// <param name="scheduleDate"></param>
         /// <typeparam name="TCommand"><see cref="InternalCommand"/></typeparam>
-        Task EnqueueAsync<TCommand>(TCommand command, Instant? scheduleDate = null)
+        Task EnqueueAsync<TCommand>(TCommand command)
             where TCommand : InternalCommand;
     }
 }

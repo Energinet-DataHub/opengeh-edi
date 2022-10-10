@@ -20,6 +20,7 @@ using Messaging.Application.MasterData;
 using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 using Messaging.Infrastructure.Configuration.DataAccess;
+using Messaging.Infrastructure.Configuration.InternalCommands;
 using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
@@ -75,7 +76,7 @@ public class WhenCustomerMasterDataIsReceivedTests : TestBase, IAsyncLifetime
     {
         await WhenCustomerMasterDataIsReceived().ConfigureAwait(false);
 
-        AssertQueuedCommand.QueuedCommand<SendCustomerMasterDataToEnergySupplier>(GetService<IDbConnectionFactory>());
+        AssertCommand<SendCustomerMasterDataToEnergySupplier>();
     }
 
     private async Task WhenCustomerMasterDataIsReceived()
@@ -93,5 +94,12 @@ public class WhenCustomerMasterDataIsReceivedTests : TestBase, IAsyncLifetime
             SampleData.SupplyStart,
             Array.Empty<UsagePointLocation>());
         await InvokeCommandAsync(new ReceiveCustomerMasterData(SampleData.TransactionId, customerMasterData));
+    }
+
+    private AssertQueuedCommand AssertCommand<TCommand>()
+    {
+        return AssertQueuedCommand.QueuedCommand<TCommand>(
+            GetService<IDbConnectionFactory>(),
+            GetService<InternalCommandMapper>());
     }
 }

@@ -20,6 +20,7 @@ using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Transactions.MoveIn.Notifications;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.Transactions.MoveIn;
+using Messaging.Infrastructure.Configuration.InternalCommands;
 using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
@@ -50,7 +51,7 @@ public class WhenAConsumerHasMovedInTests : TestBase
     {
         await ConsumerHasMovedIn().ConfigureAwait(false);
 
-        AssertQueuedCommand.QueuedCommand<NotifyCurrentEnergySupplier>(GetService<IDbConnectionFactory>());
+        AssertCommand<NotifyCurrentEnergySupplier>();
         AssertTransaction()
             .BusinessProcessCompleted();
     }
@@ -60,7 +61,7 @@ public class WhenAConsumerHasMovedInTests : TestBase
     {
         await ConsumerHasMovedIn().ConfigureAwait(false);
 
-        AssertQueuedCommand.QueuedCommand<NotifyGridOperator>(GetService<IDbConnectionFactory>());
+        AssertCommand<NotifyGridOperator>();
     }
 
     [Fact]
@@ -68,7 +69,14 @@ public class WhenAConsumerHasMovedInTests : TestBase
     {
         await ConsumerHasMovedIn().ConfigureAwait(false);
 
-        AssertQueuedCommand.QueuedCommand<NotifyCurrentEnergySupplier>(GetService<IDbConnectionFactory>());
+        AssertCommand<NotifyCurrentEnergySupplier>();
+    }
+
+    private AssertQueuedCommand AssertCommand<TCommand>()
+    {
+        return AssertQueuedCommand.QueuedCommand<TCommand>(
+            GetService<IDbConnectionFactory>(),
+            GetService<InternalCommandMapper>());
     }
 
     private async Task<MoveInTransaction> ConsumerHasMovedIn()

@@ -44,6 +44,8 @@ public class InternalCommandProcessorTests : TestBase
         _timeProvider = GetService<ISystemDateTimeProvider>();
         _scheduler = GetService<ICommandScheduler>();
         _connectionFactory = GetService<IDbConnectionFactory>();
+        var mapper = GetService<InternalCommandMapper>();
+        mapper.Add(nameof(TestCommand), typeof(TestCommand));
     }
 
     private IDbConnection Connection => _connectionFactory.GetOpenConnection();
@@ -53,7 +55,7 @@ public class InternalCommandProcessorTests : TestBase
     {
         var yesterday = _timeProvider.Now().Minus(Duration.FromDays(1));
         var command = new TestCommand();
-        await Schedule(command, yesterday).ConfigureAwait(false);
+        await Schedule(command).ConfigureAwait(false);
 
         await ProcessPendingCommands().ConfigureAwait(false);
 
@@ -86,13 +88,6 @@ public class InternalCommandProcessorTests : TestBase
         AssertSqlStatement(checkStatement);
     }
 
-    private void AssertIsNotProcessed(InternalCommand command)
-    {
-        var checkStatement =
-            $"SELECT COUNT(1) FROM [b2b].[QueuedInternalCommands] WHERE Id = '{command.Id}' AND ProcessedDate IS NULL";
-        AssertSqlStatement(checkStatement);
-    }
-
     private void AssertSqlStatement(string sqlStatement)
     {
         Assert.True(Connection.ExecuteScalar<bool>(sqlStatement));
@@ -103,9 +98,9 @@ public class InternalCommandProcessorTests : TestBase
         await _processor.ProcessPendingAsync().ConfigureAwait(false);
     }
 
-    private async Task Schedule(InternalCommand command, Instant? executeOn = null)
+    private async Task Schedule(InternalCommand command)
     {
-        await _scheduler.EnqueueAsync(command, executeOn).ConfigureAwait(false);
+        await _scheduler.EnqueueAsync(command).ConfigureAwait(false);
         await _unitOfWork.CommitAsync().ConfigureAwait(false);
     }
 }
