@@ -21,6 +21,7 @@ using MediatR;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.Commands;
 using Messaging.Application.Configuration.DataAccess;
+using NodaTime;
 
 namespace Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 
@@ -41,7 +42,7 @@ public class DispatchCustomerMasterDataForGridOperatorWhenGracePeriodHasExpired 
     {
         ArgumentNullException.ThrowIfNull(notification);
 
-        var transactionIds = await TransactionsWhereCustomerMasterDataDispatchIsPendingAsync(notification)
+        var transactionIds = await TransactionsWhereCustomerMasterDataDispatchIsPendingAsync(notification.Now)
             .ConfigureAwait(false);
 
         foreach (var transactionId in transactionIds)
@@ -51,7 +52,7 @@ public class DispatchCustomerMasterDataForGridOperatorWhenGracePeriodHasExpired 
         }
     }
 
-    private async Task<IEnumerable<string>> TransactionsWhereCustomerMasterDataDispatchIsPendingAsync(ADayHasPassed notification)
+    private async Task<IEnumerable<string>> TransactionsWhereCustomerMasterDataDispatchIsPendingAsync(Instant now)
     {
         var sql =
             @"SELECT TransactionId FROM [b2b].[MoveInTransactions] WHERE GridOperator_MessageDeliveryState_CustomerMasterData = 'Pending' " +
@@ -59,7 +60,7 @@ public class DispatchCustomerMasterDataForGridOperatorWhenGracePeriodHasExpired 
 
         var transactionIds = await _connectionFactory.GetOpenConnection().QueryAsync<string>(
                 sql,
-                new { Now = notification.Now.ToDateTimeUtc(), })
+                new { Now = now.ToDateTimeUtc(), })
             .ConfigureAwait(false);
         return transactionIds;
     }
