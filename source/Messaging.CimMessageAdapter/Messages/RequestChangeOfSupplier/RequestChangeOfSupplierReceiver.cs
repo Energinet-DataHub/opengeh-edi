@@ -18,8 +18,16 @@ namespace Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 
 public class RequestChangeOfSupplierReceiver : MessageReceiver
 {
-    public RequestChangeOfSupplierReceiver(IMessageIds messageIds, IMessageQueueDispatcher messageQueueDispatcher, ITransactionIds transactionIds, IMarketActorAuthenticator marketActorAuthenticator)
+    private readonly ISenderAuthorizer _senderAuthorizer;
+
+    public RequestChangeOfSupplierReceiver(
+        IMessageIds messageIds,
+        IMessageQueueDispatcher messageQueueDispatcher,
+        ITransactionIds transactionIds,
+        IMarketActorAuthenticator marketActorAuthenticator,
+        SenderAuthorizer senderAuthorizer)
         : base(messageIds, messageQueueDispatcher, transactionIds, marketActorAuthenticator)
     {
+        _senderAuthorizer = senderAuthorizer;
     }
 }
