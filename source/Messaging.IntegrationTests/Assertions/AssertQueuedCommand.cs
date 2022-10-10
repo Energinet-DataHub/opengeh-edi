@@ -13,8 +13,11 @@
 // limitations under the License.
 
 using System;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
+using Messaging.Infrastructure.Configuration.InternalCommands;
 using Xunit;
 
 namespace Messaging.IntegrationTests.Assertions;
@@ -22,22 +25,34 @@ namespace Messaging.IntegrationTests.Assertions;
 public class AssertQueuedCommand
 {
     private readonly IDbConnectionFactory _connectionFactory;
+    private readonly string _commandPayload;
+    private readonly CommandMetadata _commandMetadata;
 
-    private AssertQueuedCommand(IDbConnectionFactory connectionFactory)
+    private AssertQueuedCommand(IDbConnectionFactory connectionFactory, string commandPayload, CommandMetadata commandMetadata)
     {
         _connectionFactory = connectionFactory;
+        _commandPayload = commandPayload;
+        _commandMetadata = commandMetadata;
     }
 
-    public static AssertQueuedCommand QueuedCommand<TCommandType>(IDbConnectionFactory connectionFactory)
+    public static AssertQueuedCommand QueuedCommand<TCommandType>(IDbConnectionFactory connectionFactory, InternalCommandMapper mapper)
     {
+        ArgumentNullException.ThrowIfNull(mapper);
         if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
-        var sql =
-            $"SELECT COUNT(1) FROM [b2b].[QueuedInternalCommands] WHERE Type = @CommandType";
-        var found = connectionFactory.GetOpenConnection().ExecuteScalar<bool>(
-            sql,
-            new { CommandType = typeof(TCommandType).AssemblyQualifiedName, });
 
-        Assert.True(found);
-        return new AssertQueuedCommand(connectionFactory);
+        var commandMetadata = mapper.GetByType(typeof(TCommandType));
+        var sql =
+            $"SELECT Data FROM [b2b].[QueuedInternalCommands] WHERE Type = @CommandType";
+        var commandPayload = connectionFactory.GetOpenConnection().QuerySingleOrDefault<string>(
+            sql,
+            new { CommandType = commandMetadata.CommandName, });
+
+        Assert.NotNull(commandPayload);
+        return new AssertQueuedCommand(connectionFactory, commandPayload, commandMetadata);
+    }
+
+    public object Command()
+    {
+        return JsonSerializer.Deserialize(_commandPayload, _commandMetadata.CommandType)!;
     }
 }

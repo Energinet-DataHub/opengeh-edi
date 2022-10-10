@@ -26,6 +26,7 @@ using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Xml;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
+using Messaging.Infrastructure.Configuration.InternalCommands;
 using Messaging.Infrastructure.Transactions;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Assertions;
@@ -84,7 +85,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         {
             await GivenRequestHasBeenAccepted().ConfigureAwait(false);
 
-            AssertQueuedCommand.QueuedCommand<FetchMeteringPointMasterData>(GetService<IDbConnectionFactory>());
+            AssertCommand<FetchMeteringPointMasterData>();
         }
 
         [Fact]
@@ -92,7 +93,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         {
             await GivenRequestHasBeenAccepted().ConfigureAwait(false);
 
-            AssertQueuedCommand.QueuedCommand<FetchCustomerMasterData>(GetService<IDbConnectionFactory>());
+            AssertCommand<FetchCustomerMasterData>();
         }
 
         [Fact]
@@ -236,6 +237,13 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         {
             var adapter = GetService<IHttpClientAdapter>();
             return adapter as HttpClientSpy ?? throw new InvalidCastException();
+        }
+
+        private AssertQueuedCommand AssertCommand<TCommand>()
+        {
+            return AssertQueuedCommand.QueuedCommand<TCommand>(
+                GetService<IDbConnectionFactory>(),
+                GetService<InternalCommandMapper>());
         }
     }
 }

@@ -20,6 +20,7 @@ using Messaging.Application.Configuration.TimeEvents;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 using Messaging.Infrastructure.Configuration.DataAccess;
+using Messaging.Infrastructure.Configuration.InternalCommands;
 using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
 using NodaTime;
@@ -76,7 +77,7 @@ public class DispatchCustomerMasterDataForGridOperatorTests : TestBase, IAsyncLi
     {
         await GivenTheGracePeriodHasExpired();
 
-        AssertQueuedCommand.QueuedCommand<SendCustomerMasterDataToGridOperator>(GetService<IDbConnectionFactory>());
+        AssertQueuedCommand.QueuedCommand<SendCustomerMasterDataToGridOperator>(GetService<IDbConnectionFactory>(), GetService<InternalCommandMapper>());
     }
 
     private async Task GivenTheGracePeriodHasExpired()
