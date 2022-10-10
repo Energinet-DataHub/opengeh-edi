@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.Application.Configuration.Authentication;
-
 namespace Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 
 public class RequestChangeOfSupplierReceiver : MessageReceiver
@@ -22,9 +20,8 @@ public class RequestChangeOfSupplierReceiver : MessageReceiver
         IMessageIds messageIds,
         IMessageQueueDispatcher messageQueueDispatcher,
         ITransactionIds transactionIds,
-        IMarketActorAuthenticator marketActorAuthenticator,
         SenderAuthorizer senderAuthorizer)
-        : base(messageIds, messageQueueDispatcher, transactionIds, marketActorAuthenticator, senderAuthorizer)
+        : base(messageIds, messageQueueDispatcher, transactionIds, senderAuthorizer)
     {
     }
 }

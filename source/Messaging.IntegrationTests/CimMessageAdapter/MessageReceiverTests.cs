@@ -200,7 +200,6 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
                 _messageIds,
                 _messageQueueDispatcherSpy,
                 _transactionIds,
-                _marketActorAuthenticator,
                 new SenderAuthorizer(_marketActorAuthenticator));
             return messageReceiver;
         }
@@ -208,7 +207,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
         private MessageReceiver CreateMessageReceiver(IMessageIds messageIds)
         {
             _messageQueueDispatcherSpy = new MessageQueueDispatcherStub();
-            var messageReceiver = new MessageReceiver(messageIds, _messageQueueDispatcherSpy, _transactionIds, _marketActorAuthenticator, new SenderAuthorizer(_marketActorAuthenticator));
+            var messageReceiver = new MessageReceiver(messageIds, _messageQueueDispatcherSpy, _transactionIds, new SenderAuthorizer(_marketActorAuthenticator));
             return messageReceiver;
         }
 
