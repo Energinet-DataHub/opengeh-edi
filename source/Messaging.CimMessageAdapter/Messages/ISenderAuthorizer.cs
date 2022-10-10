@@ -14,7 +14,7 @@
 
 using System.Threading.Tasks;
 
-namespace Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
+namespace Messaging.CimMessageAdapter.Messages;
 
 #pragma warning disable
 public interface ISenderAuthorizer

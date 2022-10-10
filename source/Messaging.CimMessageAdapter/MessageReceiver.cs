@@ -19,7 +19,6 @@ using System.Threading.Tasks;
 using Messaging.Application.IncomingMessages;
 using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Messages;
-using Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
 
 namespace Messaging.CimMessageAdapter
@@ -137,7 +136,7 @@ namespace Messaging.CimMessageAdapter
         private async Task VerifyReceiverAsync(MessageHeader messageHeader)
         {
             if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
-            var receiverVerification = await ReceiverVerification.VerifyAsync(messageHeader!.ReceiverId, messageHeader.ReceiverRole).ConfigureAwait(false);
+            var receiverVerification = await ReceiverVerification.VerifyAsync(messageHeader.ReceiverId, messageHeader.ReceiverRole).ConfigureAwait(false);
             _errors.AddRange(receiverVerification.Errors);
         }
     }
