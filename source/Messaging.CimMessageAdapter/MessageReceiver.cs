@@ -24,7 +24,7 @@ using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
 
 namespace Messaging.CimMessageAdapter
 {
-    public class MessageReceiver
+    public abstract class MessageReceiver
     {
         private readonly List<ValidationError> _errors = new();
         private readonly IMessageIds _messageIds;
@@ -32,7 +32,7 @@ namespace Messaging.CimMessageAdapter
         private readonly ITransactionIds _transactionIds;
         private readonly ISenderAuthorizer _senderAuthorizer;
 
-        public MessageReceiver(IMessageIds messageIds, IMessageQueueDispatcher messageQueueDispatcher, ITransactionIds transactionIds, ISenderAuthorizer senderAuthorizer)
+        protected MessageReceiver(IMessageIds messageIds, IMessageQueueDispatcher messageQueueDispatcher, ITransactionIds transactionIds, ISenderAuthorizer senderAuthorizer)
         {
             _messageIds = messageIds ?? throw new ArgumentNullException(nameof(messageIds));
             _messageQueueDispatcher = messageQueueDispatcher ??
