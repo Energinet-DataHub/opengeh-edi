@@ -12,16 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using MediatR;
+using NodaTime;
 
-namespace Messaging.Infrastructure.Transactions.MoveIn;
-
-public class MoveInConfiguration
+namespace Messaging.Application.Configuration.TimeEvents
 {
-    public MoveInConfiguration(Uri requestUri)
+    public class TenSecondsHasHasPassed : INotification
     {
-        RequestUri = requestUri;
-    }
+        public TenSecondsHasHasPassed(Instant now)
+        {
+            Now = now;
+        }
 
-    public Uri RequestUri { get; }
+        public Instant Now { get; }
+    }
 }

@@ -46,4 +46,8 @@ limitations under the License.
       <ProjectReference Include="..\Messaging.Application\Messaging.Application.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Configuration\SystemTime" />
+    </ItemGroup>
+
 </Project>
