@@ -19,4 +19,11 @@ public class MarketActivityRecord : IMarketActivityRecord
     public string Id { get; init; } = string.Empty;
 
     public string EffectiveDate { get; init; } = string.Empty;
+
+    public MarketEvaluationPoint MarketEvaluationPoint { get; init; } = new MarketEvaluationPoint();
+}
+
+public class MarketEvaluationPoint
+{
+    public string Id { get; init; } = string.Empty;
 }
