@@ -17,9 +17,9 @@ using NodaTime;
 
 namespace Messaging.Infrastructure.Configuration.SystemTime
 {
-    public class TimeHasPassed : INotification
+    public class TenSecondsHasHasPassed : INotification
     {
-        public TimeHasPassed(Instant now)
+        public TenSecondsHasHasPassed(Instant now)
         {
             Now = now;
         }

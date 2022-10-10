@@ -130,7 +130,7 @@ namespace Messaging.Api
                             runtime.MESSAGEHUB_QUEUE_CONNECTION_STRING!,
                             runtime.MESSAGEHUB_DATA_AVAILABLE_QUEUE!,
                             runtime.MESSAGEHUB_DOMAIN_REPLY_QUEUE!)
-                        .AddNotificationHandler<PublishNewMessagesOnTimeHasPassed, TimeHasPassed>()
+                        .AddNotificationHandler<PublishNewMessagesOnTimeHasPassed, TenSecondsHasHasPassed>()
                         .AddHttpClientAdapter(sp => new HttpClientAdapter(sp.GetRequiredService<HttpClient>()))
                         .AddMoveInServices(
                             new MoveInSettings(

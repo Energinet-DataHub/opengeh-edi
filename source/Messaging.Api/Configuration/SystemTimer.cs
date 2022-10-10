@@ -36,7 +36,7 @@ namespace Messaging.Api.Configuration
         [Function("TenSecondsHasPassed")]
         public Task TenSecondsHasPassedAsync([TimerTrigger("*/10 * * * * *")] TimerInfo timerTimerInfo, FunctionContext context)
         {
-            return _mediator.Publish(new TimeHasPassed(_systemDateTimeProvider.Now()));
+            return _mediator.Publish(new TenSecondsHasHasPassed(_systemDateTimeProvider.Now()));
         }
 
         [Function("ADayHasPassed")]

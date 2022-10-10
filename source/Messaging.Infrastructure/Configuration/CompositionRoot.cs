@@ -175,7 +175,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddSingleton<IActorLookup, ActorLookup>();
             _services.AddScoped<MessageAvailabilityPublisher>();
             _services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
-            _services.AddTransient<INotificationHandler<TimeHasPassed>, PublishNewMessagesOnTimeHasPassed>();
+            _services.AddTransient<INotificationHandler<TenSecondsHasHasPassed>, PublishNewMessagesOnTimeHasPassed>();
             return this;
         }
 
@@ -280,7 +280,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddScoped<CommandSchedulerFacade>();
             _services.AddTransient<InternalCommandAccessor>();
             _services.AddTransient<InternalCommandProcessor>();
-            _services.AddTransient<INotificationHandler<TimeHasPassed>, ProcessInternalCommandsOnTimeHasPassed>();
+            _services.AddTransient<INotificationHandler<TenSecondsHasHasPassed>, ProcessInternalCommandsOnTimeHasPassed>();
         }
 
         private void AddMessageGenerationServices()
