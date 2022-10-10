@@ -25,9 +25,21 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Messaging.Infrastructure.Configuration;
 
-internal class InternalCommandProcessing
+internal static class InternalCommandProcessing
 {
     internal static void Configure(IServiceCollection services)
+    {
+        var mapper = CreateInternalCommandMap();
+        services.AddSingleton(mapper);
+        services.AddTransient<CommandExecutor>();
+        services.AddScoped<ICommandScheduler, CommandScheduler>();
+        services.AddScoped<CommandSchedulerFacade>();
+        services.AddTransient<InternalCommandAccessor>();
+        services.AddTransient<InternalCommandProcessor>();
+        services.AddTransient<INotificationHandler<TimeHasPassed>, ProcessInternalCommandsOnTimeHasPassed>();
+    }
+
+    private static InternalCommandMapper CreateInternalCommandMap()
     {
         var mapper = new InternalCommandMapper();
         mapper.Add("CreateActor", typeof(CreateActor));
@@ -42,12 +54,7 @@ internal class InternalCommandProcessing
         mapper.Add("SetConsumerHasMovedIn", typeof(SetConsumerHasMovedIn));
         mapper.Add("SendFailureNotification", typeof(SendFailureNotification));
         mapper.Add("SendSuccessNotification", typeof(SendSuccessNotification));
-        services.AddSingleton(mapper);
-        services.AddTransient<CommandExecutor>();
-        services.AddScoped<ICommandScheduler, CommandScheduler>();
-        services.AddScoped<CommandSchedulerFacade>();
-        services.AddTransient<InternalCommandAccessor>();
-        services.AddTransient<InternalCommandProcessor>();
-        services.AddTransient<INotificationHandler<TimeHasPassed>, ProcessInternalCommandsOnTimeHasPassed>();
+
+        return mapper;
     }
 }
