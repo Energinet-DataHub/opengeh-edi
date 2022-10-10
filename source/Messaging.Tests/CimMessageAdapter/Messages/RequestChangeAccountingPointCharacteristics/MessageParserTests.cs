@@ -28,11 +28,11 @@ using MarketActivityRecord = Messaging.Application.IncomingMessages.RequestChang
 namespace Messaging.Tests.CimMessageAdapter.Messages.RequestChangeAccountingPointCharacteristics;
 
 #pragma warning disable
-public class MessageParserTests1
+public class MessageParserTests
 {
     private readonly MessageParser _messageParser;
 
-    public MessageParserTests1()
+    public MessageParserTests()
     {
         _messageParser = new MessageParser(
             new IMessageParser<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>[]
