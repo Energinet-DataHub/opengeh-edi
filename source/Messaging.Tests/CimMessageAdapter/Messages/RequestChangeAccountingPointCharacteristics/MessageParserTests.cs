@@ -60,6 +60,9 @@ public class MessageParserTests
         Assert.Equal("25361487", marketActivityRecord?.Id);
         Assert.Equal("2022-12-17T23:00:00Z", marketActivityRecord?.EffectiveDate);
         Assert.Equal("579999993331812345", marketActivityRecord?.MarketEvaluationPoint.Id);
+        Assert.Equal("E17", marketActivityRecord?.MarketEvaluationPoint.Type);
+        Assert.Equal("E02", marketActivityRecord?.MarketEvaluationPoint.SettlementMethod);
+        Assert.Equal("D01", marketActivityRecord?.MarketEvaluationPoint.MeteringMethod);
     }
 
     private static Stream CreateXmlMessage()

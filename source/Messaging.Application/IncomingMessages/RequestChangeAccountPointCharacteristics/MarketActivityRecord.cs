@@ -26,4 +26,10 @@ public class MarketActivityRecord : IMarketActivityRecord
 public class MarketEvaluationPoint
 {
     public string Id { get; init; } = string.Empty;
+
+    public string Type { get; init; } = string.Empty;
+
+    public string SettlementMethod { get; init; } = string.Empty;
+
+    public string MeteringMethod { get; init; } = string.Empty;
 }
