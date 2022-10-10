@@ -15,11 +15,11 @@
 using MediatR;
 using Messaging.Application.Actors;
 using Messaging.Application.Configuration.Commands;
+using Messaging.Application.Configuration.TimeEvents;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 using Messaging.Application.Transactions.MoveIn.Notifications;
 using Messaging.Infrastructure.Configuration.InternalCommands;
-using Messaging.Infrastructure.Configuration.SystemTime;
 using Messaging.Infrastructure.OutgoingMessages.Requesting;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -35,7 +35,7 @@ internal static class InternalCommandProcessing
         services.AddScoped<CommandSchedulerFacade>();
         services.AddTransient<InternalCommandAccessor>();
         services.AddTransient<InternalCommandProcessor>();
-        services.AddTransient<INotificationHandler<TimeHasPassed>, ProcessInternalCommandsOnTimeHasPassed>();
+        services.AddTransient<INotificationHandler<TenSecondsHasHasPassed>, ProcessInternalCommandsOnTimeHasPassed>();
     }
 
     private static InternalCommandMapper CreateInternalCommandMap()
