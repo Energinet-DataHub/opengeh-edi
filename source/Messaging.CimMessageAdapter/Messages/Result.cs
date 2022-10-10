@@ -15,7 +15,7 @@
 using System.Collections.Generic;
 using Messaging.CimMessageAdapter.Errors;
 
-namespace Messaging.CimMessageAdapter
+namespace Messaging.CimMessageAdapter.Messages
 {
     public class Result
     {

@@ -18,10 +18,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Messaging.Application.IncomingMessages;
 using Messaging.CimMessageAdapter.Errors;
-using Messaging.CimMessageAdapter.Messages;
 using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
 
-namespace Messaging.CimMessageAdapter
+namespace Messaging.CimMessageAdapter.Messages
 {
     public abstract class MessageReceiver
     {
