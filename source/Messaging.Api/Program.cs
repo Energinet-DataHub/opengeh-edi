@@ -133,7 +133,13 @@ namespace Messaging.Api
                         .AddNotificationHandler<PublishNewMessagesOnTimeHasPassed, TimeHasPassed>()
                         .AddHttpClientAdapter(sp => new HttpClientAdapter(sp.GetRequiredService<HttpClient>()))
                         .AddMoveInServices(
-                            new MoveInSettings(new MessageDelivery(new GridOperator() { GracePeriodInDaysAfterEffectiveDateIfNotUpdated = 15, }), new BusinessService(new Uri(runtime.MOVE_IN_REQUEST_ENDPOINT!))))
+                            new MoveInSettings(
+                                new MessageDelivery(
+                                    new GridOperator()
+                                    {
+                                        GracePeriodInDaysAfterEffectiveDateIfNotUpdated = 15,
+                                    }),
+                                new BusinessService(new Uri(runtime.MOVE_IN_REQUEST_ENDPOINT!))))
                         .AddMessageParserServices();
 
                     services.AddLiveHealthCheck();
