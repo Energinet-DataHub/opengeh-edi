@@ -221,10 +221,9 @@ namespace Messaging.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddMoveInServices(MoveInConfiguration configuration, MoveInSettings settings)
+        public CompositionRoot AddMoveInServices(MoveInSettings settings)
         {
             _services.AddScoped<MoveInNotifications>();
-            _services.AddScoped(_ => configuration);
             _services.AddScoped<IMoveInRequester, MoveInRequester>();
             _services.AddScoped<IMeteringPointMasterDataClient, MeteringPointMasterDataClient>();
             _services.AddScoped<ICustomerMasterDataClient, CustomerMasterDataClient>();
