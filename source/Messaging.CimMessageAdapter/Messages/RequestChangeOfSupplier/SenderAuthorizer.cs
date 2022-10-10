@@ -20,7 +20,7 @@ using Messaging.CimMessageAdapter.Errors;
 
 namespace Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier
 {
-    public class SenderAuthorizer
+    public class SenderAuthorizer : ISenderAuthorizer
     {
         private const string EnergySupplierRole = "DDQ";
         private readonly IMarketActorAuthenticator _marketActorAuthenticator;

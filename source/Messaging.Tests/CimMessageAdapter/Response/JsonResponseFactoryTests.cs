@@ -14,6 +14,7 @@
 
 using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Errors;
+using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Response;
 using Newtonsoft.Json.Linq;
 using Xunit;

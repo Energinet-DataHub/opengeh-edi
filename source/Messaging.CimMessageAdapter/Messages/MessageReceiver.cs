@@ -16,30 +16,27 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.IncomingMessages;
 using Messaging.CimMessageAdapter.Errors;
-using Messaging.CimMessageAdapter.Messages;
-using Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
 
-namespace Messaging.CimMessageAdapter
+namespace Messaging.CimMessageAdapter.Messages
 {
-    public class MessageReceiver
+    public abstract class MessageReceiver
     {
         private readonly List<ValidationError> _errors = new();
         private readonly IMessageIds _messageIds;
         private readonly IMessageQueueDispatcher _messageQueueDispatcher;
         private readonly ITransactionIds _transactionIds;
-        private readonly IMarketActorAuthenticator _marketActorAuthenticator;
+        private readonly ISenderAuthorizer _senderAuthorizer;
 
-        public MessageReceiver(IMessageIds messageIds, IMessageQueueDispatcher messageQueueDispatcher, ITransactionIds transactionIds, IMarketActorAuthenticator marketActorAuthenticator)
+        protected MessageReceiver(IMessageIds messageIds, IMessageQueueDispatcher messageQueueDispatcher, ITransactionIds transactionIds, ISenderAuthorizer senderAuthorizer)
         {
             _messageIds = messageIds ?? throw new ArgumentNullException(nameof(messageIds));
             _messageQueueDispatcher = messageQueueDispatcher ??
                                              throw new ArgumentNullException(nameof(messageQueueDispatcher));
             _transactionIds = transactionIds;
-            _marketActorAuthenticator = marketActorAuthenticator ?? throw new ArgumentNullException(nameof(marketActorAuthenticator));
+            _senderAuthorizer = senderAuthorizer;
         }
 
         public async Task<Result> ReceiveAsync<TMarketActivityRecordType, TMarketTransactionType>(MessageParserResult<TMarketActivityRecordType, TMarketTransactionType> messageParserResult)
@@ -131,15 +128,14 @@ namespace Messaging.CimMessageAdapter
         private async Task AuthorizeSenderAsync(MessageHeader messageHeader)
         {
             if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
-            var authorizer = new SenderAuthorizer(_marketActorAuthenticator);
-            var result = await authorizer.AuthorizeAsync(messageHeader.SenderId, messageHeader.SenderRole).ConfigureAwait(false);
+            var result = await _senderAuthorizer.AuthorizeAsync(messageHeader.SenderId, messageHeader.SenderRole).ConfigureAwait(false);
             _errors.AddRange(result.Errors);
         }
 
         private async Task VerifyReceiverAsync(MessageHeader messageHeader)
         {
             if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
-            var receiverVerification = await ReceiverVerification.VerifyAsync(messageHeader!.ReceiverId, messageHeader.ReceiverRole).ConfigureAwait(false);
+            var receiverVerification = await ReceiverVerification.VerifyAsync(messageHeader.ReceiverId, messageHeader.ReceiverRole).ConfigureAwait(false);
             _errors.AddRange(receiverVerification.Errors);
         }
     }

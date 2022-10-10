@@ -20,20 +20,18 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
-using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 using Messaging.Domain.OutgoingMessages;
-using Messaging.IntegrationTests.CimMessageAdapter.Messages;
 using Messaging.IntegrationTests.CimMessageAdapter.Stubs;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
 
-namespace Messaging.IntegrationTests.CimMessageAdapter
+namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
 {
     [IntegrationTest]
-    public class MessageReceiverTests : TestBase
+    public class RequestChangeOfSupplierReceiverTests : TestBase
     {
         private readonly List<Claim> _claims = new List<Claim>()
         {
@@ -50,7 +48,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
         private readonly IMessageIds _messageIds;
         private MessageQueueDispatcherStub _messageQueueDispatcherSpy = new();
 
-        public MessageReceiverTests(DatabaseFixture databaseFixture)
+        public RequestChangeOfSupplierReceiverTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
             _messageParser = GetService<MessageParser>();
@@ -196,14 +194,18 @@ namespace Messaging.IntegrationTests.CimMessageAdapter
         private MessageReceiver CreateMessageReceiver()
         {
             _messageQueueDispatcherSpy = new MessageQueueDispatcherStub();
-            var messageReceiver = new MessageReceiver(_messageIds, _messageQueueDispatcherSpy, _transactionIds, _marketActorAuthenticator);
+            var messageReceiver = new RequestChangeOfSupplierReceiver(
+                _messageIds,
+                _messageQueueDispatcherSpy,
+                _transactionIds,
+                new SenderAuthorizer(_marketActorAuthenticator));
             return messageReceiver;
         }
 
         private MessageReceiver CreateMessageReceiver(IMessageIds messageIds)
         {
             _messageQueueDispatcherSpy = new MessageQueueDispatcherStub();
-            var messageReceiver = new MessageReceiver(messageIds, _messageQueueDispatcherSpy, _transactionIds, _marketActorAuthenticator);
+            var messageReceiver = new RequestChangeOfSupplierReceiver(messageIds, _messageQueueDispatcherSpy, _transactionIds, new SenderAuthorizer(_marketActorAuthenticator));
             return messageReceiver;
         }
 
