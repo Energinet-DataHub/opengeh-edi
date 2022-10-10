@@ -36,5 +36,5 @@ public class MessageDelivery
 
 public class GridOperator
 {
-    public int DaysAfterEffectiveDateIfNotUpdated { get; set; }
+    public int GracePeriodInDaysAfterEffectiveDateIfNotUpdated { get; set; }
 }

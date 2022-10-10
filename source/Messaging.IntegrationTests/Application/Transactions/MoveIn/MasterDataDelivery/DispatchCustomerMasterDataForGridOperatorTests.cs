@@ -81,7 +81,7 @@ public class DispatchCustomerMasterDataForGridOperatorTests : TestBase, IAsyncLi
     private async Task GivenTheGracePeriodHasExpired()
     {
         var settings = GetService<MoveInSettings>();
-        var dayHasPassed = new ADayHasPassed(SampleData.SupplyStart.Plus(Duration.FromDays(settings.MessageDelivery.GridOperator.DaysAfterEffectiveDateIfNotUpdated)));
+        var dayHasPassed = new ADayHasPassed(SampleData.SupplyStart.Plus(Duration.FromDays(settings.MessageDelivery.GridOperator.GracePeriodInDaysAfterEffectiveDateIfNotUpdated)));
         await GetService<IMediator>().Publish(dayHasPassed);
     }
 }
