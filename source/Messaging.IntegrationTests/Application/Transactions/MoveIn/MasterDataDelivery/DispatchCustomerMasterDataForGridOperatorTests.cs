@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.Configuration.TimeEvents;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 using Messaging.Infrastructure.Configuration.DataAccess;

@@ -15,7 +15,7 @@
 using MediatR;
 using NodaTime;
 
-namespace Messaging.Application.Configuration;
+namespace Messaging.Application.Configuration.TimeEvents;
 
 public class ADayHasPassed : INotification
 {

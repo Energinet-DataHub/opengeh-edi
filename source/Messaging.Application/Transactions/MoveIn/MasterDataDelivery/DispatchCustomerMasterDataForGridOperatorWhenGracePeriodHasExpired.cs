@@ -21,6 +21,7 @@ using MediatR;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.Commands;
 using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.Configuration.TimeEvents;
 using Messaging.Domain.Transactions.MoveIn;
 using NodaTime;
 
