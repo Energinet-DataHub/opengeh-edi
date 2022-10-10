@@ -59,12 +59,25 @@ public class MessageParserTests
         var marketActivityRecord = result.IncomingMarketDocument?.MarketActivityRecords.First();
         Assert.Equal("25361487", marketActivityRecord?.Id);
         Assert.Equal("2022-12-17T23:00:00Z", marketActivityRecord?.EffectiveDate);
-        Assert.Equal("579999993331812345", marketActivityRecord?.MarketEvaluationPoint.Id);
-        Assert.Equal("E17", marketActivityRecord?.MarketEvaluationPoint.Type);
+        Assert.Equal("579999993331812345", marketActivityRecord?.MarketEvaluationPoint.GsrnNumber);
+        Assert.Equal("E17", marketActivityRecord?.MarketEvaluationPoint.TypeOfMeteringPoint);
         Assert.Equal("E02", marketActivityRecord?.MarketEvaluationPoint.SettlementMethod);
         Assert.Equal("D01", marketActivityRecord?.MarketEvaluationPoint.MeteringMethod);
-        Assert.Equal("D03", marketActivityRecord?.MarketEvaluationPoint.ConnectionState);
-        Assert.Equal("PT1H", marketActivityRecord?.MarketEvaluationPoint.ReadCycle);
+        Assert.Equal("D03", marketActivityRecord?.MarketEvaluationPoint.PhysicalStatusOfMeteringPoint);
+        Assert.Equal("PT1H", marketActivityRecord?.MarketEvaluationPoint.MeterReadingOccurence);
+        Assert.Equal("6", marketActivityRecord?.MarketEvaluationPoint.NetSettlementGroup);
+        Assert.Equal("--12-17", marketActivityRecord?.MarketEvaluationPoint.ScheduledMeterReadingDate);
+        Assert.Equal("244", marketActivityRecord?.MarketEvaluationPoint.MeteringGridArea);
+        Assert.Equal("031", marketActivityRecord?.MarketEvaluationPoint.InMeteringGridArea);
+        Assert.Equal("244", marketActivityRecord?.MarketEvaluationPoint.OutMeteringGridArea);
+        Assert.Equal("579999993331812327", marketActivityRecord?.MarketEvaluationPoint.PowerPlant);
+        Assert.Equal("6000", marketActivityRecord?.MarketEvaluationPoint.PhysicalConnectionCapacity);
+        Assert.Equal("D01", marketActivityRecord?.MarketEvaluationPoint.ConnectionType);
+        Assert.Equal("D01", marketActivityRecord?.MarketEvaluationPoint.DisconnectionType);
+        Assert.Equal("D12", marketActivityRecord?.MarketEvaluationPoint.AssetType);
+        Assert.Equal("false", marketActivityRecord?.MarketEvaluationPoint.ProductionObligation);
+        Assert.Equal("230", marketActivityRecord?.MarketEvaluationPoint.MaximumPower);
+        Assert.Equal("32", marketActivityRecord?.MarketEvaluationPoint.MaximumCurrent);
     }
 
     private static Stream CreateXmlMessage()

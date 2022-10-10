@@ -25,15 +25,41 @@ public class MarketActivityRecord : IMarketActivityRecord
 
 public class MarketEvaluationPoint
 {
-    public string Id { get; init; } = string.Empty;
+    public string GsrnNumber { get; init; } = string.Empty;
 
-    public string Type { get; init; } = string.Empty;
+    public string TypeOfMeteringPoint { get; init; } = string.Empty;
 
     public string SettlementMethod { get; init; } = string.Empty;
 
     public string MeteringMethod { get; init; } = string.Empty;
 
-    public string ConnectionState { get; init; } = string.Empty;
+    public string PhysicalStatusOfMeteringPoint { get; init; } = string.Empty;
 
-    public string ReadCycle { get; init; } = string.Empty;
+    public string MeterReadingOccurence { get; init; } = string.Empty;
+
+    public string NetSettlementGroup { get; init; } = string.Empty;
+
+    public string ScheduledMeterReadingDate { get; init; } = string.Empty;
+
+    public string MeteringGridArea { get; init; } = string.Empty;
+
+    public string InMeteringGridArea { get; init; } = string.Empty;
+
+    public string OutMeteringGridArea { get; init; } = string.Empty;
+
+    public string PowerPlant { get; init; } = string.Empty;
+
+    public string PhysicalConnectionCapacity { get; init; } = string.Empty;
+
+    public string ConnectionType { get; init; } = string.Empty;
+
+    public string DisconnectionType { get; init; } = string.Empty;
+
+    public string AssetType { get; init; } = string.Empty;
+
+    public string ProductionObligation { get; init; } = string.Empty;
+
+    public string MaximumPower { get; init; } = string.Empty;
+
+    public string MaximumCurrent { get; init; } = string.Empty;
 }

@@ -149,6 +149,19 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         var marketEvaluationPointMeteringMethod = string.Empty;
         var marketEvaluationPointConnectionState = string.Empty;
         var marketEvaluationPointReadCycle = string.Empty;
+        var marketEvaluationPointNetSettlementGroup = string.Empty;
+        var marketEvaluationPointNextReadingDate = string.Empty;
+        var marketEvaluationPointmeteringGridAreaDomainId = string.Empty;
+        var marketEvaluationPointInMeteringGridAreaDomainId = string.Empty;
+        var marketEvaluationPointOutMeteringGridAreaDomainId = string.Empty;
+        var marketEvaluationPointLinkedMarketEvaluationPointId = string.Empty;
+        var marketEvaluationPointPhysicalConnectionCapacity = string.Empty;
+        var marketEvaluationPointMpConnectionType = string.Empty;
+        var marketEvaluationPointDisconnectionMethod = string.Empty;
+        var marketEvaluationPointAssetMktPsrType = string.Empty;
+        var marketEvaluationPointProductionObligation = string.Empty;
+        var marketEvaluationPointContractedConnectionCapacity = string.Empty;
+        var marketEvaluationPointRatedCurrent = string.Empty;
 
         var ns = rootElement.DefaultNamespace;
         bool marketEvaluationPointReached = false;
@@ -167,7 +180,20 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
                     ref marketEvaluationPointSettlementMethod,
                     ref marketEvaluationPointMeteringMethod,
                     ref marketEvaluationPointConnectionState,
-                    ref marketEvaluationPointReadCycle);
+                    ref marketEvaluationPointReadCycle,
+                    ref marketEvaluationPointNetSettlementGroup,
+                    ref marketEvaluationPointNextReadingDate,
+                    ref marketEvaluationPointmeteringGridAreaDomainId,
+                    ref marketEvaluationPointInMeteringGridAreaDomainId,
+                    ref marketEvaluationPointOutMeteringGridAreaDomainId,
+                    ref marketEvaluationPointLinkedMarketEvaluationPointId,
+                    ref marketEvaluationPointPhysicalConnectionCapacity,
+                    ref marketEvaluationPointMpConnectionType,
+                    ref marketEvaluationPointDisconnectionMethod,
+                    ref marketEvaluationPointAssetMktPsrType,
+                    ref marketEvaluationPointProductionObligation,
+                    ref marketEvaluationPointContractedConnectionCapacity,
+                    ref marketEvaluationPointRatedCurrent);
                 yield return record;
             }
 
@@ -211,6 +237,58 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
             {
                 marketEvaluationPointReadCycle = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             }
+            else if (reader.Is("netSettlementGroup", ns))
+            {
+                marketEvaluationPointNetSettlementGroup = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("nextReadingDate", ns))
+            {
+                marketEvaluationPointNextReadingDate = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("meteringGridArea_Domain.mRID", ns))
+            {
+                marketEvaluationPointmeteringGridAreaDomainId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("inMeteringGridArea_Domain.mRID", ns))
+            {
+                marketEvaluationPointInMeteringGridAreaDomainId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("outMeteringGridArea_Domain.mRID", ns))
+            {
+                marketEvaluationPointOutMeteringGridAreaDomainId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("linked_MarketEvaluationPoint.mRID", ns))
+            {
+                marketEvaluationPointLinkedMarketEvaluationPointId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("physicalConnectionCapacity", ns))
+            {
+                marketEvaluationPointPhysicalConnectionCapacity = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("mPConnectionType", ns))
+            {
+                marketEvaluationPointMpConnectionType = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("disconnectionMethod", ns))
+            {
+                marketEvaluationPointDisconnectionMethod = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("asset_MktPSRType.psrType", ns))
+            {
+                marketEvaluationPointAssetMktPsrType = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("productionObligation", ns))
+            {
+                marketEvaluationPointProductionObligation = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("contractedConnectionCapacity", ns))
+            {
+                marketEvaluationPointContractedConnectionCapacity = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("ratedCurrent", ns))
+            {
+                marketEvaluationPointRatedCurrent = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
             else
             {
                 await reader.ReadAsync().ConfigureAwait(false);
@@ -226,7 +304,20 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         ref string marketEvaluationPointSettlementMethod,
         ref string marketEvaluationPointMeteringMethod,
         ref string marketEvaluationPointConnectionState,
-        ref string marketEvaluationbPointReadCycle)
+        ref string marketEvaluationPointReadCycle,
+        ref string marketEvaluationPointNetSettlementGroup,
+        ref string marketEvaluationPointNextReadingDate,
+        ref string marketEvaluationPointMeteringGridAreaDomainId,
+        ref string marketEvaluationPointInMeteringGridAreaDomainId,
+        ref string marketEvaluationPointOutMeteringGridAreaDomainId,
+        ref string marketEvaluationPointLinkedMarketEvaluationPointId,
+        ref string marketEvaluationPointPhysicalConnectionCapacity,
+        ref string marketEvaluationPointMpDisconnectionType,
+        ref string marketEvaluationPointDisconnectionMethod,
+        ref string marketEvaluationPointAssetMktPsrType,
+        ref string marketEvaluationPointProductionObligation,
+        ref string marketEvaluationPointContractedConnectionCapacity,
+        ref string marketEvaluationPointRatedCurrent)
     {
         var marketActivityRecord = new MarketActivityRecord()
         {
@@ -234,12 +325,25 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
             EffectiveDate = effectiveDate,
             MarketEvaluationPoint = new MarketEvaluationPoint()
             {
-                Id = marketEvaluationPointId,
-                Type = marketEvaluationPointType,
+                GsrnNumber = marketEvaluationPointId,
+                TypeOfMeteringPoint = marketEvaluationPointType,
                 SettlementMethod = marketEvaluationPointSettlementMethod,
                 MeteringMethod = marketEvaluationPointMeteringMethod,
-                ConnectionState = marketEvaluationPointConnectionState,
-                ReadCycle = marketEvaluationbPointReadCycle,
+                PhysicalStatusOfMeteringPoint = marketEvaluationPointConnectionState,
+                MeterReadingOccurence = marketEvaluationPointReadCycle,
+                NetSettlementGroup = marketEvaluationPointNetSettlementGroup,
+                ScheduledMeterReadingDate = marketEvaluationPointNextReadingDate,
+                MeteringGridArea = marketEvaluationPointMeteringGridAreaDomainId,
+                InMeteringGridArea = marketEvaluationPointInMeteringGridAreaDomainId,
+                OutMeteringGridArea = marketEvaluationPointOutMeteringGridAreaDomainId,
+                PowerPlant = marketEvaluationPointLinkedMarketEvaluationPointId,
+                PhysicalConnectionCapacity = marketEvaluationPointPhysicalConnectionCapacity,
+                ConnectionType = marketEvaluationPointMpDisconnectionType,
+                DisconnectionType = marketEvaluationPointDisconnectionMethod,
+                AssetType = marketEvaluationPointAssetMktPsrType,
+                ProductionObligation = marketEvaluationPointProductionObligation,
+                MaximumPower = marketEvaluationPointContractedConnectionCapacity,
+                MaximumCurrent = marketEvaluationPointRatedCurrent,
             },
         };
 
