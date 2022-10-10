@@ -15,15 +15,14 @@
 using MediatR;
 using NodaTime;
 
-namespace Messaging.Infrastructure.Configuration.SystemTime
-{
-    public class TimeHasPassed : INotification
-    {
-        public TimeHasPassed(Instant now)
-        {
-            Now = now;
-        }
+namespace Messaging.Application.Configuration.TimeEvents;
 
-        public Instant Now { get; }
+public class ADayHasPassed : INotification
+{
+    public ADayHasPassed(Instant now)
+    {
+        Now = now;
     }
+
+    public Instant Now { get; }
 }

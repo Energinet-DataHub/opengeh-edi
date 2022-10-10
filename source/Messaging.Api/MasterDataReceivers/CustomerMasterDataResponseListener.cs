@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.EnergySupplying.RequestResponse.Requests;
 using Messaging.Api.Configuration.Middleware;
+using Messaging.Application.Configuration.Commands;
 using Messaging.Application.MasterData;
 using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;

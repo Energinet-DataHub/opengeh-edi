@@ -13,12 +13,10 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Messaging.Application.Configuration;
-using Messaging.Application.Configuration.Commands;
 using Messaging.Application.Configuration.Commands.Commands;
 using Messaging.Application.Configuration.DataAccess;
 
-namespace Messaging.Infrastructure.Configuration.InternalCommands;
+namespace Messaging.Application.Configuration.Commands;
 
 public class CommandSchedulerFacade
 {

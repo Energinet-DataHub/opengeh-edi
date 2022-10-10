@@ -16,11 +16,11 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Messaging.Infrastructure.Configuration.SystemTime;
+using Messaging.Application.Configuration.TimeEvents;
 
 namespace Messaging.Infrastructure.Configuration.InternalCommands
 {
-    public class ProcessInternalCommandsOnTimeHasPassed : INotificationHandler<TimeHasPassed>
+    public class ProcessInternalCommandsOnTimeHasPassed : INotificationHandler<TenSecondsHasHasPassed>
     {
         private readonly InternalCommandProcessor _internalCommandProcessor;
 
@@ -29,7 +29,7 @@ namespace Messaging.Infrastructure.Configuration.InternalCommands
             _internalCommandProcessor = internalCommandProcessor ?? throw new ArgumentNullException(nameof(internalCommandProcessor));
         }
 
-        public Task Handle(TimeHasPassed notification, CancellationToken cancellationToken)
+        public Task Handle(TenSecondsHasHasPassed notification, CancellationToken cancellationToken)
         {
             return _internalCommandProcessor.ProcessPendingAsync();
         }

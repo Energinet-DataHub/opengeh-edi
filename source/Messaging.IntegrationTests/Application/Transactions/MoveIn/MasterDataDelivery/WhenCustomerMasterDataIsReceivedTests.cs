@@ -25,7 +25,7 @@ using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 
-namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
+namespace Messaging.IntegrationTests.Application.Transactions.MoveIn.MasterDataDelivery;
 
 public class WhenCustomerMasterDataIsReceivedTests : TestBase, IAsyncLifetime
 {
