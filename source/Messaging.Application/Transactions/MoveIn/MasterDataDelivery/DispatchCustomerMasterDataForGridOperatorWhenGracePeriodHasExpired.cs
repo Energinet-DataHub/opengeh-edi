@@ -30,13 +30,16 @@ public class DispatchCustomerMasterDataForGridOperatorWhenGracePeriodHasExpired 
 {
     private readonly IDbConnectionFactory _connectionFactory;
     private readonly CommandSchedulerFacade _commandScheduler;
+    private readonly MoveInSettings _settings;
 
     public DispatchCustomerMasterDataForGridOperatorWhenGracePeriodHasExpired(
         IDbConnectionFactory connectionFactory,
-        CommandSchedulerFacade commandScheduler)
+        CommandSchedulerFacade commandScheduler,
+        MoveInSettings settings)
     {
         _connectionFactory = connectionFactory;
         _commandScheduler = commandScheduler;
+        _settings = settings;
     }
 
     public async Task Handle(ADayHasPassed notification, CancellationToken cancellationToken)
@@ -58,8 +61,12 @@ public class DispatchCustomerMasterDataForGridOperatorWhenGracePeriodHasExpired 
         return await _connectionFactory.GetOpenConnection().QueryAsync<string>(
                 @$"SELECT TransactionId FROM [b2b].[MoveInTransactions] " +
                 $"WHERE GridOperator_MessageDeliveryState_CustomerMasterData = '{MoveInTransaction.MasterDataState.Pending}' " +
-                "AND CustomerMasterData IS NOT NULL AND DATEDIFF(day, EffectiveDate, @Now) >= 1",
-                new { Now = now.ToDateTimeUtc(), })
+                "AND CustomerMasterData IS NOT NULL AND DATEDIFF(day, EffectiveDate, @Now) >= @GracePeriod",
+                new
+                {
+                    Now = now.ToDateTimeUtc(),
+                    GracePeriod = _settings.DaysAfterEffectiveDateToWaitUntilCustomerMasterDataIsSendToGridOperator,
+                })
             .ConfigureAwait(false);
     }
 }

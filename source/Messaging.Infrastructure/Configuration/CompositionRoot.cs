@@ -245,6 +245,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddTransient<INotificationHandler<BusinessProcessWasCompleted>, NotifyGridOperatorWhenConsumerHasMovedIn>();
             _services.AddTransient<INotificationHandler<ADayHasPassed>, DispatchCustomerMasterDataForGridOperatorWhenGracePeriodHasExpired>();
             _services.AddTransient<CustomerMasterDataMessageFactory>();
+            _services.AddSingleton(_ => new MoveInSettings(1));
             return this;
         }
 

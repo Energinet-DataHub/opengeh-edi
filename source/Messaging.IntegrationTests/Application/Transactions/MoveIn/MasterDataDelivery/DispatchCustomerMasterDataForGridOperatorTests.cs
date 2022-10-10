@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.IntegrationTests.Assertions;
@@ -79,7 +80,8 @@ public class DispatchCustomerMasterDataForGridOperatorTests : TestBase, IAsyncLi
 
     private async Task GivenTheGracePeriodHasExpired()
     {
-        var dayHasPassed = new ADayHasPassed(SampleData.SupplyStart.Plus(Duration.FromDays(1)));
+        var settings = GetService<MoveInSettings>();
+        var dayHasPassed = new ADayHasPassed(SampleData.SupplyStart.Plus(Duration.FromDays(settings.DaysAfterEffectiveDateToWaitUntilCustomerMasterDataIsSendToGridOperator)));
         await GetService<IMediator>().Publish(dayHasPassed);
     }
 }
