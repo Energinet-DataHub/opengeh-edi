@@ -18,6 +18,7 @@ using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Response;
+using Messaging.Infrastructure.IncomingMessages.Response;
 using Xunit;
 using Xunit.Categories;
 

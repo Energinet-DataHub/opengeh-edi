@@ -55,6 +55,7 @@ using Messaging.Infrastructure.Configuration.Processing;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.IncomingMessages;
 using Messaging.Infrastructure.IncomingMessages.RequestChangeOfSupplier;
+using Messaging.Infrastructure.IncomingMessages.Response;
 using Messaging.Infrastructure.MasterData.MarketEvaluationPoints;
 using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
