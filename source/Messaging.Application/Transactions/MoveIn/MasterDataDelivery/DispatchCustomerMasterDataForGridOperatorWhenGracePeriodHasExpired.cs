@@ -55,11 +55,10 @@ public class DispatchCustomerMasterDataForGridOperatorWhenGracePeriodHasExpired 
 
     private async Task<IEnumerable<string>> TransactionsWhereCustomerMasterDataDispatchIsPendingAsync(Instant now)
     {
-        var transactionIds = await _connectionFactory.GetOpenConnection().QueryAsync<string>(
+        return await _connectionFactory.GetOpenConnection().QueryAsync<string>(
                 @$"SELECT TransactionId FROM [b2b].[MoveInTransactions] WHERE GridOperator_MessageDeliveryState_CustomerMasterData = '{MoveInTransaction.MasterDataState.Pending}' " +
                 "AND CustomerMasterData IS NOT NULL AND DATEDIFF(day, EffectiveDate, @Now) >= 1",
                 new { Now = now.ToDateTimeUtc(), })
             .ConfigureAwait(false);
-        return transactionIds;
     }
 }
