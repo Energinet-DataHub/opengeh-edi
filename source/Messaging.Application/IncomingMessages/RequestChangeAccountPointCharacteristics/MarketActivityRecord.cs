@@ -39,6 +39,8 @@ public record MarketEvaluationPoint(
     string MaximumPower,
     string MaximumCurrent,
     string MeterNumber,
-    Series Series);
+    Series Series,
+    string LocationDescription,
+    string GeoInfoReference);
 
 public record Series(string ProductType, string MeasureUnitType);

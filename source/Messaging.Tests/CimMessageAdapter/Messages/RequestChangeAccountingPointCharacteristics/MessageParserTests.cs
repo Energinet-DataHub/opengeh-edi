@@ -81,6 +81,8 @@ public class MessageParserTests
         Assert.Equal("2536258974", marketActivityRecord?.MarketEvaluationPoint.MeterNumber);
         Assert.Equal("8716867000030", marketActivityRecord?.MarketEvaluationPoint.Series.ProductType);
         Assert.Equal("KWH", marketActivityRecord?.MarketEvaluationPoint.Series.MeasureUnitType);
+        Assert.Equal("3. bygning til venstre", marketActivityRecord?.MarketEvaluationPoint.LocationDescription);
+        Assert.Equal("0a3f50b9-b942-32b8-e044-0003ba298018", marketActivityRecord?.MarketEvaluationPoint.GeoInfoReference);
     }
 
     private static Stream CreateXmlMessage()

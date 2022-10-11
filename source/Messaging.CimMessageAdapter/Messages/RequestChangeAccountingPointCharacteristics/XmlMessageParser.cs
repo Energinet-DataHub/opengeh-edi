@@ -165,6 +165,8 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         var marketEvaluationPointMeterId = string.Empty;
         var marketEvaluationPointSeriesProduct = string.Empty;
         var marketEvaluationPointSeriesQuantityMeasureUnit = string.Empty;
+        var marketEvaluationPointDescription = string.Empty;
+        var marketEvaluationPointGeoInfoReference = string.Empty;
 
         var ns = rootElement.DefaultNamespace;
         bool marketEvaluationPointReached = false;
@@ -199,7 +201,9 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
                     marketEvaluationPointContractedConnectionCapacity,
                     marketEvaluationPointRatedCurrent,
                     marketEvaluationPointMeterId,
-                    new Series(marketEvaluationPointSeriesProduct, marketEvaluationPointSeriesQuantityMeasureUnit)));
+                    new Series(marketEvaluationPointSeriesProduct, marketEvaluationPointSeriesQuantityMeasureUnit),
+                    marketEvaluationPointDescription,
+                    marketEvaluationPointGeoInfoReference));
                 yield return record;
             }
 
@@ -306,6 +310,14 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
             else if (reader.Is("quantity_Measure_Unit.name", ns))
             {
                 marketEvaluationPointSeriesQuantityMeasureUnit = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("description", ns))
+            {
+                marketEvaluationPointDescription = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("usagePointLocation.geoInfoReference", ns))
+            {
+                marketEvaluationPointGeoInfoReference = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             }
             else
             {
