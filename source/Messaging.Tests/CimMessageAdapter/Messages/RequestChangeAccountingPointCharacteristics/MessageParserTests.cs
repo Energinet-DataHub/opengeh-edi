@@ -57,38 +57,7 @@ public class MessageParserTests
 
         Assert.True(result.Success);
         AssertHeader(result.IncomingMarketDocument?.Header);
-        var marketActivityRecord = result.IncomingMarketDocument?.MarketActivityRecords.First();
-        Assert.Equal("25361487", marketActivityRecord?.Id);
-        Assert.Equal("2022-12-17T23:00:00Z", marketActivityRecord?.EffectiveDate);
-        Assert.Equal("579999993331812345", marketActivityRecord?.MarketEvaluationPoint.GsrnNumber);
-        Assert.Equal("E17", marketActivityRecord?.MarketEvaluationPoint.TypeOfMeteringPoint);
-        Assert.Equal("E02", marketActivityRecord?.MarketEvaluationPoint.SettlementMethod);
-        Assert.Equal("D01", marketActivityRecord?.MarketEvaluationPoint.MeteringMethod);
-        Assert.Equal("D03", marketActivityRecord?.MarketEvaluationPoint.PhysicalStatusOfMeteringPoint);
-        Assert.Equal("PT1H", marketActivityRecord?.MarketEvaluationPoint.MeterReadingOccurence);
-        Assert.Equal("6", marketActivityRecord?.MarketEvaluationPoint.NetSettlementGroup);
-        Assert.Equal("--12-17", marketActivityRecord?.MarketEvaluationPoint.ScheduledMeterReadingDate);
-        Assert.Equal("244", marketActivityRecord?.MarketEvaluationPoint.MeteringGridArea);
-        Assert.Equal("031", marketActivityRecord?.MarketEvaluationPoint.InMeteringGridArea);
-        Assert.Equal("244", marketActivityRecord?.MarketEvaluationPoint.OutMeteringGridArea);
-        Assert.Equal("579999993331812327", marketActivityRecord?.MarketEvaluationPoint.PowerPlant);
-        Assert.Equal("6000", marketActivityRecord?.MarketEvaluationPoint.PhysicalConnectionCapacity);
-        Assert.Equal("D01", marketActivityRecord?.MarketEvaluationPoint.ConnectionType);
-        Assert.Equal("D01", marketActivityRecord?.MarketEvaluationPoint.DisconnectionType);
-        Assert.Equal("D12", marketActivityRecord?.MarketEvaluationPoint.AssetType);
-        Assert.Equal("false", marketActivityRecord?.MarketEvaluationPoint.ProductionObligation);
-        Assert.Equal("230", marketActivityRecord?.MarketEvaluationPoint.MaximumPower);
-        Assert.Equal("32", marketActivityRecord?.MarketEvaluationPoint.MaximumCurrent);
-        Assert.Equal("2536258974", marketActivityRecord?.MarketEvaluationPoint.MeterNumber);
-        Assert.Equal("8716867000030", marketActivityRecord?.MarketEvaluationPoint.Series.ProductType);
-        Assert.Equal("KWH", marketActivityRecord?.MarketEvaluationPoint.Series.MeasureUnitType);
-        Assert.Equal("3. bygning til venstre", marketActivityRecord?.MarketEvaluationPoint.LocationDescription);
-        Assert.Equal("0a3f50b9-b942-32b8-e044-0003ba298018", marketActivityRecord?.MarketEvaluationPoint.GeoInfoReference);
-        Assert.Equal("0405", marketActivityRecord?.MarketEvaluationPoint.Address.StreetCode);
-        Assert.Equal("Vestergade", marketActivityRecord?.MarketEvaluationPoint.Address.StreetName);
-        Assert.Equal("10", marketActivityRecord?.MarketEvaluationPoint.Address.BuildingNumber);
-        Assert.Equal("1", marketActivityRecord?.MarketEvaluationPoint.Address.FloorIdentification);
-        Assert.Equal("12", marketActivityRecord?.MarketEvaluationPoint.Address.RoomIdentification);
+        AssertMarketActivityRecord(result.IncomingMarketDocument?.MarketActivityRecords.First());
     }
 
     private static Stream CreateXmlMessage()
@@ -98,6 +67,51 @@ public class MessageParserTests
         xmlDoc.Save(stream);
 
         return stream;
+    }
+
+    private static void AssertMarketActivityRecord(MarketActivityRecord? marketActivityRecord)
+    {
+        Assert.Equal("25361487", marketActivityRecord?.Id);
+        Assert.Equal("2022-12-17T23:00:00Z", marketActivityRecord?.EffectiveDate);
+        AssertMarketEvaluationPoint(marketActivityRecord?.MarketEvaluationPoint!);
+        AssertAddress(marketActivityRecord?.MarketEvaluationPoint.Address!);
+    }
+
+    private static void AssertMarketEvaluationPoint(MarketEvaluationPoint marketEvaluationPoint)
+    {
+        Assert.Equal("579999993331812345", marketEvaluationPoint.GsrnNumber);
+        Assert.Equal("E17", marketEvaluationPoint.TypeOfMeteringPoint);
+        Assert.Equal("E02", marketEvaluationPoint.SettlementMethod);
+        Assert.Equal("D01", marketEvaluationPoint.MeteringMethod);
+        Assert.Equal("D03", marketEvaluationPoint.PhysicalStatusOfMeteringPoint);
+        Assert.Equal("PT1H", marketEvaluationPoint.MeterReadingOccurence);
+        Assert.Equal("6", marketEvaluationPoint.NetSettlementGroup);
+        Assert.Equal("--12-17", marketEvaluationPoint.ScheduledMeterReadingDate);
+        Assert.Equal("244", marketEvaluationPoint.MeteringGridArea);
+        Assert.Equal("031", marketEvaluationPoint.InMeteringGridArea);
+        Assert.Equal("244", marketEvaluationPoint.OutMeteringGridArea);
+        Assert.Equal("579999993331812327", marketEvaluationPoint.PowerPlant);
+        Assert.Equal("6000", marketEvaluationPoint.PhysicalConnectionCapacity);
+        Assert.Equal("D01", marketEvaluationPoint.ConnectionType);
+        Assert.Equal("D01", marketEvaluationPoint.DisconnectionType);
+        Assert.Equal("D12", marketEvaluationPoint.AssetType);
+        Assert.Equal("false", marketEvaluationPoint.ProductionObligation);
+        Assert.Equal("230", marketEvaluationPoint.MaximumPower);
+        Assert.Equal("32", marketEvaluationPoint.MaximumCurrent);
+        Assert.Equal("2536258974", marketEvaluationPoint.MeterNumber);
+        Assert.Equal("8716867000030", marketEvaluationPoint.Series.ProductType);
+        Assert.Equal("KWH", marketEvaluationPoint.Series.MeasureUnitType);
+        Assert.Equal("3. bygning til venstre", marketEvaluationPoint.LocationDescription);
+        Assert.Equal("0a3f50b9-b942-32b8-e044-0003ba298018", marketEvaluationPoint.GeoInfoReference);
+    }
+
+    private static void AssertAddress(Address address)
+    {
+        Assert.Equal("0405", address.StreetCode);
+        Assert.Equal("Vestergade", address.StreetName);
+        Assert.Equal("10", address.BuildingNumber);
+        Assert.Equal("1", address.FloorIdentification);
+        Assert.Equal("12", address.RoomIdentification);
     }
 
     private static void AssertHeader(MessageHeader? header)
