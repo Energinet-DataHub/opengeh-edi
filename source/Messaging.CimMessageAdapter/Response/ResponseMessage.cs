@@ -16,13 +16,13 @@ namespace Messaging.CimMessageAdapter.Response
 {
     public class ResponseMessage
     {
-        internal ResponseMessage(string messageBody)
+        public ResponseMessage(string messageBody)
         {
             IsErrorResponse = true;
             MessageBody = messageBody;
         }
 
-        internal ResponseMessage()
+        public ResponseMessage()
         {
             IsErrorResponse = false;
         }

@@ -24,6 +24,7 @@ using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Infrastructure.IncomingMessages.RequestChangeOfSupplier;
 using Xunit;
 
 namespace Messaging.Tests.CimMessageAdapter.Messages.RequestChangeOfSupplier;
