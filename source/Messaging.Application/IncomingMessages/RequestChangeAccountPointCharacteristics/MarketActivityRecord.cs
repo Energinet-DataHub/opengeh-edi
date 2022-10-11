@@ -28,8 +28,8 @@ public record MarketEvaluationPoint(
     string NetSettlementGroup,
     string ScheduledMeterReadingDate,
     string MeteringGridArea,
-    string InMeteringGridArea,
-    string OutMeteringGridArea,
+    string FromGrid,
+    string ToGrid,
     string PowerPlant,
     string PhysicalConnectionCapacity,
     string ConnectionType,
@@ -42,7 +42,9 @@ public record MarketEvaluationPoint(
     Series Series,
     string LocationDescription,
     string GeoInfoReference,
-    Address Address);
+    Address Address,
+    string IsActualAddress,
+    string ParentRelatedMeteringPointId);
 
 public record Series(string ProductType, string MeasureUnitType);
 
@@ -51,4 +53,9 @@ public record Address(
     string StreetName,
     string BuildingNumber,
     string FloorIdentification,
-    string RoomIdentification);
+    string RoomIdentification,
+    string MunicipalityCode,
+    string CityName,
+    string CitySubDivisionName,
+    string CountryCode,
+    string PostalCode);

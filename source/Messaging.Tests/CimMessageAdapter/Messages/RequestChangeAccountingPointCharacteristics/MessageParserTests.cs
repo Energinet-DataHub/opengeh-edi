@@ -88,8 +88,8 @@ public class MessageParserTests
         Assert.Equal("6", marketEvaluationPoint.NetSettlementGroup);
         Assert.Equal("--12-17", marketEvaluationPoint.ScheduledMeterReadingDate);
         Assert.Equal("244", marketEvaluationPoint.MeteringGridArea);
-        Assert.Equal("031", marketEvaluationPoint.InMeteringGridArea);
-        Assert.Equal("244", marketEvaluationPoint.OutMeteringGridArea);
+        Assert.Equal("031", marketEvaluationPoint.FromGrid);
+        Assert.Equal("244", marketEvaluationPoint.ToGrid);
         Assert.Equal("579999993331812327", marketEvaluationPoint.PowerPlant);
         Assert.Equal("6000", marketEvaluationPoint.PhysicalConnectionCapacity);
         Assert.Equal("D01", marketEvaluationPoint.ConnectionType);
@@ -103,6 +103,8 @@ public class MessageParserTests
         Assert.Equal("KWH", marketEvaluationPoint.Series.MeasureUnitType);
         Assert.Equal("3. bygning til venstre", marketEvaluationPoint.LocationDescription);
         Assert.Equal("0a3f50b9-b942-32b8-e044-0003ba298018", marketEvaluationPoint.GeoInfoReference);
+        Assert.Equal("true", marketEvaluationPoint.IsActualAddress);
+        Assert.Equal("579999993331812345", marketEvaluationPoint.ParentRelatedMeteringPointId);
     }
 
     private static void AssertAddress(Address address)
@@ -112,6 +114,11 @@ public class MessageParserTests
         Assert.Equal("10", address.BuildingNumber);
         Assert.Equal("1", address.FloorIdentification);
         Assert.Equal("12", address.RoomIdentification);
+        Assert.Equal("0625", address.MunicipalityCode);
+        Assert.Equal("Middelfart", address.CityName);
+        Assert.Equal("Strib", address.CitySubDivisionName);
+        Assert.Equal("DK", address.CountryCode);
+        Assert.Equal("5500", address.PostalCode);
     }
 
     private static void AssertHeader(MessageHeader? header)

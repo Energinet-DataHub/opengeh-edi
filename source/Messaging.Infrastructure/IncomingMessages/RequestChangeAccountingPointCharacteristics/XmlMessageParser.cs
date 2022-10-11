@@ -173,6 +173,13 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         var marketEvaluationPointStreetNumber = string.Empty;
         var marketEvaluationPointStreetFloorIdentification = string.Empty;
         var marketEvaluationPointStreetSuiteNumber = string.Empty;
+        var marketEvaluationPointTownCode = string.Empty;
+        var marketEvaluationPointTownName = string.Empty;
+        var marketEvaluationPointTownSection = string.Empty;
+        var marketEvaluationPointTownCountry = string.Empty;
+        var marketEvaluationPointAdressPostalCode = string.Empty;
+        var marketEvaluationPointIsActualAdressIndicator = string.Empty;
+        var marketEvaluationPointParentId = string.Empty;
 
         var ns = rootElement.DefaultNamespace;
         bool marketEvaluationPointReached = false;
@@ -217,7 +224,14 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
                         marketEvaluationPointStreetName,
                         marketEvaluationPointStreetNumber,
                         marketEvaluationPointStreetFloorIdentification,
-                        marketEvaluationPointStreetSuiteNumber)));
+                        marketEvaluationPointStreetSuiteNumber,
+                        marketEvaluationPointTownCode,
+                        marketEvaluationPointTownName,
+                        marketEvaluationPointTownSection,
+                        marketEvaluationPointTownCountry,
+                        marketEvaluationPointAdressPostalCode),
+                    marketEvaluationPointIsActualAdressIndicator,
+                    marketEvaluationPointParentId));
                 yield return record;
             }
 
@@ -354,6 +368,34 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
             else if (reader.Is("suiteNumber", ns))
             {
                 marketEvaluationPointStreetSuiteNumber = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("code", ns))
+            {
+                marketEvaluationPointTownCode = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("name", ns))
+            {
+                marketEvaluationPointTownName = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("section", ns))
+            {
+                marketEvaluationPointTownSection = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("country", ns))
+            {
+                marketEvaluationPointTownCountry = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("postalCode", ns))
+            {
+                marketEvaluationPointAdressPostalCode = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("usagePointLocation.actualAddressIndicator", ns))
+            {
+                marketEvaluationPointIsActualAdressIndicator = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("parent_MarketEvaluationPoint.mRID", ns))
+            {
+                marketEvaluationPointParentId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             }
             else
             {
