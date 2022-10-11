@@ -49,6 +49,14 @@ public class MessageParserTests
         };
     }
 
+    public static IEnumerable<object[]> CreateMessagesWithMultipleRecords()
+    {
+        return new List<object[]>
+        {
+            new object[] { CimFormat.Xml, CreateXmlMessageWithMultipleRecords() },
+        };
+    }
+
     [Theory]
     [MemberData(nameof(CreateMessages))]
     public async Task Can_parse(CimFormat format, Stream message)
@@ -60,9 +68,35 @@ public class MessageParserTests
         AssertMarketActivityRecord(result.IncomingMarketDocument?.MarketActivityRecords.First());
     }
 
+    [Theory]
+    [MemberData(nameof(CreateMessagesWithMultipleRecords))]
+    public async Task Can_parse_multiple_records(CimFormat format, Stream message)
+    {
+        var result = await _messageParser.ParseAsync(message, format).ConfigureAwait(false);
+
+        var record1 = result.IncomingMarketDocument?.MarketActivityRecords.ToList()[0];
+        var record2 = result.IncomingMarketDocument?.MarketActivityRecords.ToList()[1];
+
+        Assert.Equal("25361487", record1?.Id);
+        Assert.Equal("2022-12-17T23:00:00Z", record1?.EffectiveDate);
+        Assert.Equal("14361487", record2?.Id);
+        Assert.Equal("2022-12-18T23:00:00Z", record2?.EffectiveDate);
+        Assert.Equal("579999993331812345", record1?.MarketEvaluationPoint.GsrnNumber);
+        Assert.Equal("578888883331812345", record2?.MarketEvaluationPoint.GsrnNumber);
+    }
+
     private static Stream CreateXmlMessage()
     {
         var xmlDoc = XDocument.Load($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}xml{Path.DirectorySeparatorChar}RequestChangeAccountingPointCharacteristics.xml");
+        var stream = new MemoryStream();
+        xmlDoc.Save(stream);
+
+        return stream;
+    }
+
+    private static Stream CreateXmlMessageWithMultipleRecords()
+    {
+        var xmlDoc = XDocument.Load($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}xml{Path.DirectorySeparatorChar}RequestChangeAccountingPointCharacteristicsMultipleMarketActivityRecords.xml");
         var stream = new MemoryStream();
         xmlDoc.Save(stream);
 
