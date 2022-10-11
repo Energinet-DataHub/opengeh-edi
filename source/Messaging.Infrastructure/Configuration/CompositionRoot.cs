@@ -36,16 +36,12 @@ using Messaging.Application.OutgoingMessages.Common.Reasons;
 using Messaging.Application.OutgoingMessages.Requesting;
 using Messaging.Application.SchemaStore;
 using Messaging.Application.Transactions.MoveIn;
-using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
-using Messaging.Application.Transactions.MoveIn.Notifications;
-using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 using Messaging.CimMessageAdapter.Response;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
-using Messaging.Domain.Transactions.MoveIn.Events;
 using Messaging.Infrastructure.Actors;
 using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Common.Reasons;
@@ -72,7 +68,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using NodaTime;
 using MarketActivityRecord = Messaging.Application.IncomingMessages.RequestChangeOfSupplier.MarketActivityRecord;
 
 namespace Messaging.Infrastructure.Configuration
@@ -222,28 +217,7 @@ namespace Messaging.Infrastructure.Configuration
 
         public CompositionRoot AddMoveInServices(MoveInSettings settings)
         {
-            _services.AddScoped<MoveInNotifications>();
-            _services.AddScoped<IMoveInRequester, MoveInRequester>();
-            _services.AddScoped<IMeteringPointMasterDataClient, MeteringPointMasterDataClient>();
-            _services.AddScoped<ICustomerMasterDataClient, CustomerMasterDataClient>();
-            _services.AddTransient<IRequestHandler<RequestChangeOfSupplierTransaction, Unit>, MoveInRequestHandler>();
-            _services.AddTransient<IRequestHandler<FetchCustomerMasterData, Unit>, FetchCustomerMasterDataHandler>();
-            _services.AddTransient<IRequestHandler<FetchMeteringPointMasterData, Unit>, FetchMeteringPointMasterDataHandler>();
-            _services.AddTransient<IRequestHandler<SetConsumerHasMovedIn, Unit>, SetConsumerHasMovedInHandler>();
-            _services.AddTransient<IRequestHandler<ForwardMeteringPointMasterData, Unit>, ForwardMeteringPointMasterDataHandler>();
-            _services.AddTransient<IRequestHandler<SendCustomerMasterDataToEnergySupplier, Unit>, SendCustomerMasterDataToEnergySupplierHandler>();
-            _services.AddTransient<IRequestHandler<NotifyCurrentEnergySupplier, Unit>, NotifyCurrentEnergySupplierHandler>();
-            _services.AddTransient<IRequestHandler<NotifyGridOperator, Unit>, NotifyGridOperatorHandler>();
-            _services.AddTransient<IRequestHandler<SendCustomerMasterDataToGridOperator, Unit>, SendCustomerMasterDataToGridOperatorHandler>();
-            _services.AddTransient<IRequestHandler<ReceiveCustomerMasterData, Unit>, ReceiveCustomerMasterDataHandler>();
-            _services.AddTransient<INotificationHandler<MoveInWasAccepted>, FetchMeteringPointMasterDataWhenAccepted>();
-            _services.AddTransient<INotificationHandler<MoveInWasAccepted>, FetchCustomerMasterDataWhenAccepted>();
-            _services.AddTransient<INotificationHandler<EndOfSupplyNotificationChangedToPending>, NotifyCurrentEnergySupplierWhenConsumerHasMovedIn>();
-            _services.AddTransient<INotificationHandler<CustomerMasterDataWasReceived>, SendCustomerMasterDataToEnergySupplierWhenDataIsReceived>();
-            _services.AddTransient<INotificationHandler<BusinessProcessWasCompleted>, NotifyGridOperatorWhenConsumerHasMovedIn>();
-            _services.AddTransient<INotificationHandler<ADayHasPassed>, DispatchCustomerMasterDataForGridOperatorWhenGracePeriodHasExpired>();
-            _services.AddTransient<CustomerMasterDataMessageFactory>();
-            _services.AddSingleton(settings);
+            MoveInConfiguration.Configure(_services, settings);
             return this;
         }
 

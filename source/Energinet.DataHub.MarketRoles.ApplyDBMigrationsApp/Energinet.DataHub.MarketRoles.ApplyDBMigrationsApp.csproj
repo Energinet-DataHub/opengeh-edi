@@ -62,6 +62,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Seed\202210041540 Remove failed outgoing messages.sql" />
     <EmbeddedResource Include="Scripts\Seed\202210041440 Insert Reasons.sql" />
     <EmbeddedResource Include="Scripts\Seed\202210071000 Insert Reasons.sql" />
+    <EmbeddedResource Include="Scripts\Seed\202210111000 Cancel processes.sql" />
   </ItemGroup>
 
 </Project>
