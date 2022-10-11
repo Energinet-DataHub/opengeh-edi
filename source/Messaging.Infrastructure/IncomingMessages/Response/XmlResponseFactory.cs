@@ -17,9 +17,10 @@ using System.Linq;
 using System.Text;
 using System.Xml;
 using Messaging.CimMessageAdapter.Messages;
+using Messaging.CimMessageAdapter.Response;
 using Messaging.Domain.OutgoingMessages;
 
-namespace Messaging.CimMessageAdapter.Response
+namespace Messaging.Infrastructure.IncomingMessages.Response
 {
     public class XmlResponseFactory : IResponseFactory
     {

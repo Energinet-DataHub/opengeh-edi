@@ -22,6 +22,7 @@ using Json.Schema;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.SchemaStore;
 using Messaging.CimMessageAdapter.Errors;
+using Messaging.CimMessageAdapter.Messages;
 using Messaging.Domain.OutgoingMessages;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -29,7 +30,7 @@ using JsonException = Newtonsoft.Json.JsonException;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
 
-namespace Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
+namespace Messaging.Infrastructure.IncomingMessages.RequestChangeOfSupplier;
 
 public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>
 {

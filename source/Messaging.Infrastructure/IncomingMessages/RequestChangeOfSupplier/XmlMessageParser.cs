@@ -21,10 +21,11 @@ using System.Xml.Schema;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.SchemaStore;
 using Messaging.CimMessageAdapter.Errors;
+using Messaging.CimMessageAdapter.Messages;
 using Messaging.Domain.OutgoingMessages;
 using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
 
-namespace Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
+namespace Messaging.Infrastructure.IncomingMessages.RequestChangeOfSupplier;
 
 public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>
 {
