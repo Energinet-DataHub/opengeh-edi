@@ -41,6 +41,14 @@ public record MarketEvaluationPoint(
     string MeterNumber,
     Series Series,
     string LocationDescription,
-    string GeoInfoReference);
+    string GeoInfoReference,
+    Address Address);
 
 public record Series(string ProductType, string MeasureUnitType);
+
+public record Address(
+    string StreetCode,
+    string StreetName,
+    string BuildingNumber,
+    string FloorIdentification,
+    string RoomIdentification);

@@ -21,6 +21,7 @@ using Messaging.Application.IncomingMessages.RequestChangeAccountPointCharacteri
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Messages.RequestChangeAccountingPointCharacteristics;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Infrastructure.IncomingMessages.RequestChangeAccountingPointCharacteristics;
 using Xunit;
 using MarketActivityRecord = Messaging.Application.IncomingMessages.RequestChangeAccountPointCharacteristics.MarketActivityRecord;
 using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
@@ -83,6 +84,11 @@ public class MessageParserTests
         Assert.Equal("KWH", marketActivityRecord?.MarketEvaluationPoint.Series.MeasureUnitType);
         Assert.Equal("3. bygning til venstre", marketActivityRecord?.MarketEvaluationPoint.LocationDescription);
         Assert.Equal("0a3f50b9-b942-32b8-e044-0003ba298018", marketActivityRecord?.MarketEvaluationPoint.GeoInfoReference);
+        Assert.Equal("0405", marketActivityRecord?.MarketEvaluationPoint.Address.StreetCode);
+        Assert.Equal("Vestergade", marketActivityRecord?.MarketEvaluationPoint.Address.StreetName);
+        Assert.Equal("10", marketActivityRecord?.MarketEvaluationPoint.Address.BuildingNumber);
+        Assert.Equal("1", marketActivityRecord?.MarketEvaluationPoint.Address.FloorIdentification);
+        Assert.Equal("12", marketActivityRecord?.MarketEvaluationPoint.Address.RoomIdentification);
     }
 
     private static Stream CreateXmlMessage()

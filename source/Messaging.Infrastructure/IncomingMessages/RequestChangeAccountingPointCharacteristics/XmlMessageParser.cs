@@ -21,11 +21,12 @@ using System.Xml.Schema;
 using Messaging.Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
 using Messaging.Application.SchemaStore;
 using Messaging.CimMessageAdapter.Errors;
+using Messaging.CimMessageAdapter.Messages;
 using Messaging.Domain.OutgoingMessages;
 using MarketActivityRecord = Messaging.Application.IncomingMessages.RequestChangeAccountPointCharacteristics.MarketActivityRecord;
 using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
 
-namespace Messaging.CimMessageAdapter.Messages.RequestChangeAccountingPointCharacteristics;
+namespace Messaging.Infrastructure.IncomingMessages.RequestChangeAccountingPointCharacteristics;
 
 public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>
 {
@@ -151,7 +152,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         var marketEvaluationPointReadCycle = string.Empty;
         var marketEvaluationPointNetSettlementGroup = string.Empty;
         var marketEvaluationPointNextReadingDate = string.Empty;
-        var marketEvaluationPointmeteringGridAreaDomainId = string.Empty;
+        var marketEvaluationPointMeteringGridAreaDomainId = string.Empty;
         var marketEvaluationPointInMeteringGridAreaDomainId = string.Empty;
         var marketEvaluationPointOutMeteringGridAreaDomainId = string.Empty;
         var marketEvaluationPointLinkedMarketEvaluationPointId = string.Empty;
@@ -167,9 +168,16 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         var marketEvaluationPointSeriesQuantityMeasureUnit = string.Empty;
         var marketEvaluationPointDescription = string.Empty;
         var marketEvaluationPointGeoInfoReference = string.Empty;
+        var marketEvaluationPointStreetCode = string.Empty;
+        var marketEvaluationPointStreetName = string.Empty;
+        var marketEvaluationPointStreetNumber = string.Empty;
+        var marketEvaluationPointStreetFloorIdentification = string.Empty;
+        var marketEvaluationPointStreetSuiteNumber = string.Empty;
 
         var ns = rootElement.DefaultNamespace;
         bool marketEvaluationPointReached = false;
+        bool marketEvaluationPointStreetCodeReached = false;
+        bool marketEvaluationPointStreetNameReached = false;
 
         await reader.AdvanceToAsync(MarketActivityRecordElementName, ns).ConfigureAwait(false);
 
@@ -189,7 +197,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
                     marketEvaluationPointReadCycle,
                     marketEvaluationPointNetSettlementGroup,
                     marketEvaluationPointNextReadingDate,
-                    marketEvaluationPointmeteringGridAreaDomainId,
+                    marketEvaluationPointMeteringGridAreaDomainId,
                     marketEvaluationPointInMeteringGridAreaDomainId,
                     marketEvaluationPointOutMeteringGridAreaDomainId,
                     marketEvaluationPointLinkedMarketEvaluationPointId,
@@ -203,7 +211,13 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
                     marketEvaluationPointMeterId,
                     new Series(marketEvaluationPointSeriesProduct, marketEvaluationPointSeriesQuantityMeasureUnit),
                     marketEvaluationPointDescription,
-                    marketEvaluationPointGeoInfoReference));
+                    marketEvaluationPointGeoInfoReference,
+                    new Address(
+                        marketEvaluationPointStreetCode,
+                        marketEvaluationPointStreetName,
+                        marketEvaluationPointStreetNumber,
+                        marketEvaluationPointStreetFloorIdentification,
+                        marketEvaluationPointStreetSuiteNumber)));
                 yield return record;
             }
 
@@ -257,7 +271,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
             }
             else if (reader.Is("meteringGridArea_Domain.mRID", ns))
             {
-                marketEvaluationPointmeteringGridAreaDomainId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                marketEvaluationPointMeteringGridAreaDomainId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             }
             else if (reader.Is("inMeteringGridArea_Domain.mRID", ns))
             {
@@ -318,6 +332,28 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
             else if (reader.Is("usagePointLocation.geoInfoReference", ns))
             {
                 marketEvaluationPointGeoInfoReference = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("code", ns) && !marketEvaluationPointStreetCodeReached)
+            {
+                marketEvaluationPointStreetCode = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                marketEvaluationPointStreetCodeReached = true;
+            }
+            else if (reader.Is("name", ns) && !marketEvaluationPointStreetNameReached)
+            {
+                marketEvaluationPointStreetName = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                marketEvaluationPointStreetNameReached = true;
+            }
+            else if (reader.Is("number", ns))
+            {
+                marketEvaluationPointStreetNumber = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("floorIdentification", ns))
+            {
+                marketEvaluationPointStreetFloorIdentification = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("suiteNumber", ns))
+            {
+                marketEvaluationPointStreetSuiteNumber = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             }
             else
             {
