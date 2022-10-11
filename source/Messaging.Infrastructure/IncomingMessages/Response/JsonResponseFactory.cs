@@ -17,10 +17,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Messaging.CimMessageAdapter.Messages;
+using Messaging.CimMessageAdapter.Response;
 using Messaging.Domain.OutgoingMessages;
 using Newtonsoft.Json;
 
-namespace Messaging.CimMessageAdapter.Response;
+namespace Messaging.Infrastructure.IncomingMessages.Response;
 
 public class JsonResponseFactory : IResponseFactory
 {

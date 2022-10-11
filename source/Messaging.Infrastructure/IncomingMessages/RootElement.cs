@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.CimMessageAdapter.Messages;
+namespace Messaging.Infrastructure.IncomingMessages;
 
 internal record RootElement
 {
