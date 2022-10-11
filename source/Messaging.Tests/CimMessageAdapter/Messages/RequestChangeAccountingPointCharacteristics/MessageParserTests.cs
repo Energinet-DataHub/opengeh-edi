@@ -77,10 +77,9 @@ public class MessageParserTests
         var record1 = result.IncomingMarketDocument?.MarketActivityRecords.ToList()[0];
         var record2 = result.IncomingMarketDocument?.MarketActivityRecords.ToList()[1];
 
+        Assert.True(result.Success);
         Assert.Equal("25361487", record1?.Id);
-        Assert.Equal("2022-12-17T23:00:00Z", record1?.EffectiveDate);
         Assert.Equal("14361487", record2?.Id);
-        Assert.Equal("2022-12-18T23:00:00Z", record2?.EffectiveDate);
         Assert.Equal("579999993331812345", record1?.MarketEvaluationPoint.GsrnNumber);
         Assert.Equal("578888883331812345", record2?.MarketEvaluationPoint.GsrnNumber);
     }
