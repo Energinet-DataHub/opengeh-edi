@@ -24,9 +24,11 @@ using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Requesting;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Infrastructure.Configuration.InternalCommands;
 using Messaging.Infrastructure.OutgoingMessages.Common.Xml;
 using Messaging.Infrastructure.OutgoingMessages.Requesting;
 using Messaging.IntegrationTests.Application.IncomingMessages;
+using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.TestDoubles;
 using Xunit;
@@ -58,7 +60,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
             await RequestMessages(request).ConfigureAwait(false);
 
             _messageStorage.MessageHasBeenSavedInStorage();
-            var command = GetQueuedNotification<SendSuccessNotification>();
+            var command = AssertCommand<SendSuccessNotification>().Command() as SendSuccessNotification;
             Assert.NotNull(command);
             Assert.Equal(request.ClientProvidedDetails.RequestId, command?.RequestId);
             Assert.Equal(request.ClientProvidedDetails.IdempotencyId, command?.IdempotencyId);
@@ -130,18 +132,6 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
                 .WithProcessType(ProcessType.MoveIn.Code);
         }
 
-        private TNotification? GetQueuedNotification<TNotification>()
-        {
-            var sql = "SELECT Data FROM b2b.QueuedInternalCommands WHERE Type = @CommandType";
-            var commandData = GetService<IDbConnectionFactory>()
-                .GetOpenConnection()
-                .ExecuteScalar<string>(
-                    sql,
-                    new { CommandType = typeof(TNotification).AssemblyQualifiedName, });
-
-            return JsonSerializer.Deserialize<TNotification>(commandData);
-        }
-
         private async Task<RequestChangeOfSupplierTransaction> MessageArrived()
         {
             var incomingMessage = MessageBuilder()
@@ -163,7 +153,8 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
 
         private void AssertErrorResponse(RequestMessages request, string reason)
         {
-            var command = GetQueuedNotification<SendFailureNotification>();
+            var command = AssertCommand<SendFailureNotification>()
+                .Command() as SendFailureNotification;
             Assert.NotNull(command);
             Assert.Equal(request.ClientProvidedDetails.RequestId, command?.RequestId);
             Assert.Equal(request.ClientProvidedDetails.IdempotencyId, command?.IdempotencyId);
@@ -172,6 +163,13 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
             Assert.Equal(CimFormat.Xml.Name, command?.RequestedFormat);
             Assert.NotEqual(string.Empty, command?.FailureDescription);
             Assert.Equal(reason, command?.Reason);
+        }
+
+        private AssertQueuedCommand AssertCommand<TCommand>()
+        {
+            return AssertQueuedCommand.QueuedCommand<TCommand>(
+                GetService<IDbConnectionFactory>(),
+                GetService<InternalCommandMapper>());
         }
     }
 }

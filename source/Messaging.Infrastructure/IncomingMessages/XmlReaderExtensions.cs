@@ -16,7 +16,7 @@ using System;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace Messaging.CimMessageAdapter.Messages;
+namespace Messaging.Infrastructure.IncomingMessages;
 
 internal static class XmlReaderExtensions
 {

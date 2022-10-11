@@ -12,17 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.CimMessageAdapter.Messages;
+namespace Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 
-internal record RootElement
+public class RequestChangeOfSupplierReceiver : MessageReceiver
 {
-    internal RootElement(string rootElementName, string defaultNamespace)
+    public RequestChangeOfSupplierReceiver(
+        IMessageIds messageIds,
+        IMessageQueueDispatcher messageQueueDispatcher,
+        ITransactionIds transactionIds,
+        SenderAuthorizer senderAuthorizer)
+        : base(messageIds, messageQueueDispatcher, transactionIds, senderAuthorizer)
     {
-        RootElementName = rootElementName;
-        DefaultNamespace = defaultNamespace;
     }
-
-    public string RootElementName { get; init; }
-
-    public string DefaultNamespace { get; init; }
 }

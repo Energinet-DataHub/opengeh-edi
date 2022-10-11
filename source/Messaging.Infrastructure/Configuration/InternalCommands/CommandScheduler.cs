@@ -25,29 +25,32 @@ namespace Messaging.Infrastructure.Configuration.InternalCommands
 {
     public class CommandScheduler : ICommandScheduler
     {
+        private readonly InternalCommandMapper _internalCommandMapper;
         private readonly B2BContext _context;
         private readonly ISerializer _serializer;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
         public CommandScheduler(
+            InternalCommandMapper internalCommandMapper,
             B2BContext context,
             ISerializer serializer,
             ISystemDateTimeProvider systemDateTimeProvider)
         {
+            _internalCommandMapper = internalCommandMapper;
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
             _systemDateTimeProvider =
                 systemDateTimeProvider ?? throw new ArgumentNullException(nameof(systemDateTimeProvider));
         }
 
-        public async Task EnqueueAsync<TCommand>(TCommand command, Instant? scheduleDate = null)
+        public async Task EnqueueAsync<TCommand>(TCommand command)
             where TCommand : InternalCommand
         {
             if (command == null) throw new ArgumentNullException(nameof(command));
 
             var data = _serializer.Serialize(command);
-            var type = command.GetType().AssemblyQualifiedName;
-            var queuedCommand = new QueuedInternalCommand(command.Id, type!, data, _systemDateTimeProvider.Now());
+            var commandMetadata = _internalCommandMapper.GetByType(command.GetType());
+            var queuedCommand = new QueuedInternalCommand(command.Id, commandMetadata.CommandName, data, _systemDateTimeProvider.Now());
             await _context.QueuedInternalCommands.AddAsync(queuedCommand).ConfigureAwait(false);
         }
     }

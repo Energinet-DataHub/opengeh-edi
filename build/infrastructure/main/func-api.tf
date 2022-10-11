@@ -44,7 +44,6 @@ module "func_receiver" {
     INCOMING_MESSAGE_QUEUE_LISTENER_CONNECTION_STRING             = module.sb_marketroles.primary_connection_strings["listen"]
     DB_CONNECTION_STRING                                          = local.MS_MARKETROLES_CONNECTION_STRING
     INCOMING_MESSAGE_QUEUE_NAME                                   = "incomingmessagequeue"
-    RAISE_TIME_HAS_PASSED_EVENT_SCHEDULE                          = "*/10 * * * * *"
     MESSAGEHUB_QUEUE_CONNECTION_STRING                            = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-transceiver-connection-string)",
     MESSAGEHUB_DATA_AVAILABLE_QUEUE                               = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sbq-data-available-name)",
     MESSAGEHUB_DOMAIN_REPLY_QUEUE                                 = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sbq-marketroles-reply-name)",
@@ -66,6 +65,7 @@ module "func_receiver" {
     ENERGY_SUPPLIER_CHANGED_EVENT_SUBSCRIPTION_NAME               = module.sbs_energy_supplier_changed.name
     MARKET_PARTICIPANT_CHANGED_ACTOR_CREATED_SUBSCRIPTION_NAME    = module.sbs_market_roles_b2b_actor_created.name
     METERING_POINT_CREATED_EVENT_B2B_SUBSCRIPTION_NAME            = module.sbs_metering_point_created_b2b_event.name
+    CREATE_METERING_POINT_TRANSACTIONS_QUEUE_NAME                 = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sbq-create-metering-point-transactions)"
   }
 
   tags = azurerm_resource_group.this.tags

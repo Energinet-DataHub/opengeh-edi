@@ -12,13 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.Configuration;
-using Messaging.Infrastructure.Configuration.SystemTime;
+using Messaging.Application.Configuration.TimeEvents;
 using Microsoft.Azure.Functions.Worker;
-using Microsoft.Extensions.Logging;
 
 namespace Messaging.Api.Configuration
 {
@@ -33,14 +31,16 @@ namespace Messaging.Api.Configuration
             _systemDateTimeProvider = systemDateTimeProvider;
         }
 
-        [Function("RaiseTimeHasPassedEvent")]
-        public Task RunAsync([TimerTrigger("%RAISE_TIME_HAS_PASSED_EVENT_SCHEDULE%")] TimerInfo timerTimerInfo, FunctionContext context)
+        [Function("TenSecondsHasPassed")]
+        public Task TenSecondsHasPassedAsync([TimerTrigger("*/10 * * * * *")] TimerInfo timerTimerInfo, FunctionContext context)
         {
-            var logger = context.GetLogger("System timer");
-            logger.LogInformation($"System timer trigger at: {DateTime.Now}");
-            logger.LogInformation($"Next timer schedule at: {timerTimerInfo?.ScheduleStatus?.Next}");
+            return _mediator.Publish(new TenSecondsHasHasPassed(_systemDateTimeProvider.Now()));
+        }
 
-            return _mediator.Publish(new TimeHasPassed(_systemDateTimeProvider.Now()));
+        [Function("ADayHasPassed")]
+        public Task ADayHasPassedAsync([TimerTrigger("0 0 * * *")] TimerInfo timerTimerInfo, FunctionContext context)
+        {
+            return _mediator.Publish(new ADayHasPassed(_systemDateTimeProvider.Now()));
         }
     }
 }

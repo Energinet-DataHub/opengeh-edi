@@ -15,7 +15,6 @@
 using System;
 using System.Net.Http;
 using Azure.Messaging.ServiceBus;
-using Dapper;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Energinet.DataHub.MessageHub.Client;
 using Energinet.DataHub.MessageHub.Client.DataAvailable;
@@ -28,8 +27,8 @@ using MediatR.Registration;
 using Messaging.Application.Actors;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.Authentication;
-using Messaging.Application.Configuration.Commands;
 using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.Configuration.TimeEvents;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Common;
@@ -52,12 +51,11 @@ using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Common.Reasons;
 using Messaging.Infrastructure.Configuration.Authentication;
 using Messaging.Infrastructure.Configuration.DataAccess;
-using Messaging.Infrastructure.Configuration.InternalCommands;
 using Messaging.Infrastructure.Configuration.Processing;
 using Messaging.Infrastructure.Configuration.Serialization;
-using Messaging.Infrastructure.Configuration.SystemTime;
 using Messaging.Infrastructure.IncomingMessages;
-using Messaging.Infrastructure.MarketEvaluationPoints;
+using Messaging.Infrastructure.IncomingMessages.RequestChangeOfSupplier;
+using Messaging.Infrastructure.IncomingMessages.Response;
 using Messaging.Infrastructure.MasterData.MarketEvaluationPoints;
 using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
@@ -97,11 +95,12 @@ namespace Messaging.Infrastructure.Configuration
             services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
             services.AddScoped<IMessageRequestNotifications, MessageRequestNotifications>();
             services.AddTransient<IRequestHandler<RequestMessages, Unit>, RequestMessagesHandler>();
-            services.AddScoped<MessageReceiver>();
+            services.AddScoped<SenderAuthorizer>();
+            services.AddScoped<RequestChangeOfSupplierReceiver>();
 
             AddMediatR();
             services.AddLogging();
-            AddInternalCommandsProcessing();
+            InternalCommandProcessing.Configure(_services);
             AddMessageGenerationServices();
             AddMasterDataServices();
             AddActorServices();
@@ -175,7 +174,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddSingleton<IActorLookup, ActorLookup>();
             _services.AddScoped<MessageAvailabilityPublisher>();
             _services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
-            _services.AddTransient<INotificationHandler<TimeHasPassed>, PublishNewMessagesOnTimeHasPassed>();
+            _services.AddTransient<INotificationHandler<TenSecondsHasHasPassed>, PublishNewMessagesOnTimeHasPassed>();
             return this;
         }
 
@@ -221,10 +220,9 @@ namespace Messaging.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddMoveInServices(MoveInConfiguration configuration)
+        public CompositionRoot AddMoveInServices(MoveInSettings settings)
         {
             _services.AddScoped<MoveInNotifications>();
-            _services.AddScoped(_ => configuration);
             _services.AddScoped<IMoveInRequester, MoveInRequester>();
             _services.AddScoped<IMeteringPointMasterDataClient, MeteringPointMasterDataClient>();
             _services.AddScoped<ICustomerMasterDataClient, CustomerMasterDataClient>();
@@ -243,7 +241,9 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddTransient<INotificationHandler<EndOfSupplyNotificationChangedToPending>, NotifyCurrentEnergySupplierWhenConsumerHasMovedIn>();
             _services.AddTransient<INotificationHandler<CustomerMasterDataWasReceived>, SendCustomerMasterDataToEnergySupplierWhenDataIsReceived>();
             _services.AddTransient<INotificationHandler<BusinessProcessWasCompleted>, NotifyGridOperatorWhenConsumerHasMovedIn>();
+            _services.AddTransient<INotificationHandler<ADayHasPassed>, DispatchCustomerMasterDataForGridOperatorWhenGracePeriodHasExpired>();
             _services.AddTransient<CustomerMasterDataMessageFactory>();
+            _services.AddSingleton(settings);
             return this;
         }
 
@@ -270,16 +270,6 @@ namespace Messaging.Infrastructure.Configuration
         {
             _services.AddSingleton(action);
             return this;
-        }
-
-        private void AddInternalCommandsProcessing()
-        {
-            _services.AddTransient<CommandExecutor>();
-            _services.AddScoped<ICommandScheduler, CommandScheduler>();
-            _services.AddScoped<CommandSchedulerFacade>();
-            _services.AddTransient<InternalCommandAccessor>();
-            _services.AddTransient<InternalCommandProcessor>();
-            _services.AddTransient<INotificationHandler<TimeHasPassed>, ProcessInternalCommandsOnTimeHasPassed>();
         }
 
         private void AddMessageGenerationServices()

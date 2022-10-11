@@ -12,23 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.CimMessageAdapter.Response
+using System.Threading.Tasks;
+
+namespace Messaging.CimMessageAdapter.Messages;
+
+/// <summary>
+/// Authorization policy used for authorizing the sender of a market document
+/// </summary>
+public interface ISenderAuthorizer
 {
-    public class ResponseMessage
-    {
-        public ResponseMessage(string messageBody)
-        {
-            IsErrorResponse = true;
-            MessageBody = messageBody;
-        }
-
-        public ResponseMessage()
-        {
-            IsErrorResponse = false;
-        }
-
-        public string MessageBody { get; } = string.Empty;
-
-        public bool IsErrorResponse { get; }
-    }
+    /// <summary>
+    /// Authorize sender
+    /// </summary>
+    /// <param name="senderId"></param>
+    /// <param name="senderRole"></param>
+    Task<Result> AuthorizeAsync(string senderId, string senderRole);
 }

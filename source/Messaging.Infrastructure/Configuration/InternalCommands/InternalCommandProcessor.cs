@@ -16,6 +16,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
+using Messaging.Application.Configuration.Commands.Commands;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.Extensions.Logging;
@@ -25,14 +26,22 @@ namespace Messaging.Infrastructure.Configuration.InternalCommands
 {
     public class InternalCommandProcessor
     {
+        private readonly InternalCommandMapper _mapper;
         private readonly InternalCommandAccessor _internalCommandAccessor;
         private readonly ISerializer _serializer;
         private readonly CommandExecutor _commandExecutor;
         private readonly ILogger<InternalCommandProcessor> _logger;
         private readonly IDbConnectionFactory _connectionFactory;
 
-        public InternalCommandProcessor(InternalCommandAccessor internalCommandAccessor, ISerializer serializer, CommandExecutor commandExecutor, ILogger<InternalCommandProcessor> logger, IDbConnectionFactory connectionFactory)
+        public InternalCommandProcessor(
+            InternalCommandMapper mapper,
+            InternalCommandAccessor internalCommandAccessor,
+            ISerializer serializer,
+            CommandExecutor commandExecutor,
+            ILogger<InternalCommandProcessor> logger,
+            IDbConnectionFactory connectionFactory)
         {
+            _mapper = mapper;
             _internalCommandAccessor = internalCommandAccessor ?? throw new ArgumentNullException(nameof(internalCommandAccessor));
             _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
             _commandExecutor = commandExecutor ?? throw new ArgumentNullException(nameof(commandExecutor));
@@ -71,7 +80,8 @@ namespace Messaging.Infrastructure.Configuration.InternalCommands
 
         private Task ExecuteCommandAsync(QueuedInternalCommand queuedInternalCommand)
         {
-            var command = queuedInternalCommand.ToCommand(_serializer);
+            var commandMetaData = _mapper.GetByName(queuedInternalCommand.Type);
+            var command = (InternalCommand)_serializer.Deserialize(queuedInternalCommand.Data, commandMetaData.CommandType);
             return _commandExecutor.ExecuteAsync(command, CancellationToken.None);
         }
 

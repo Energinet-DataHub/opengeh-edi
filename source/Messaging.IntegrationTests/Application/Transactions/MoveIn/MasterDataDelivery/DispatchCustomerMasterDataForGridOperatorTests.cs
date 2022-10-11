@@ -12,23 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Threading.Tasks;
 using MediatR;
+using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.MasterData;
-using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
+using Messaging.Application.Configuration.TimeEvents;
+using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 using Messaging.Infrastructure.Configuration.DataAccess;
+using Messaging.Infrastructure.Configuration.InternalCommands;
 using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
+using NodaTime;
 using Xunit;
 
-namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
+namespace Messaging.IntegrationTests.Application.Transactions.MoveIn.MasterDataDelivery;
 
-public class WhenCustomerMasterDataIsReceivedTests : TestBase, IAsyncLifetime
+public class DispatchCustomerMasterDataForGridOperatorTests : TestBase, IAsyncLifetime
 {
-    public WhenCustomerMasterDataIsReceivedTests(DatabaseFixture databaseFixture)
+    public DispatchCustomerMasterDataForGridOperatorTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
     }
@@ -37,7 +39,7 @@ public class WhenCustomerMasterDataIsReceivedTests : TestBase, IAsyncLifetime
     {
         return Scenario.Details(
                 SampleData.TransactionId,
-                SampleData.MarketEvaluationPointId,
+                SampleData.MeteringPointNumber,
                 SampleData.SupplyStart,
                 SampleData.CurrentEnergySupplierNumber,
                 SampleData.NewEnergySupplierNumber,
@@ -48,20 +50,20 @@ public class WhenCustomerMasterDataIsReceivedTests : TestBase, IAsyncLifetime
                 GetService<IMediator>(),
                 GetService<B2BContext>())
             .IsEffective()
-            .WithGridOperatorForMeteringPoint(
-                SampleData.IdOfGridOperatorForMeteringPoint,
-                SampleData.NumberOfGridOperatorForMeteringPoint)
             .CustomerMasterDataIsReceived(
                 SampleData.MeteringPointNumber,
                 SampleData.ElectricalHeating,
                 SampleData.ElectricalHeatingStart,
                 SampleData.ConsumerId,
                 SampleData.ConsumerName,
-                string.Empty,
-                string.Empty,
+                SampleData.ConsumerId,
+                SampleData.ConsumerName,
                 SampleData.ProtectedName,
                 SampleData.HasEnergySupplier,
                 SampleData.SupplyStart)
+            .WithGridOperatorForMeteringPoint(
+                SampleData.IdOfGridOperatorForMeteringPoint,
+                SampleData.NumberOfGridOperatorForMeteringPoint)
             .BuildAsync();
     }
 
@@ -71,27 +73,17 @@ public class WhenCustomerMasterDataIsReceivedTests : TestBase, IAsyncLifetime
     }
 
     [Fact]
-    public async Task Dispatch_of_customer_master_data_to_the_energy_supplier_is_scheduled()
+    public async Task Message_is_dispatched_when_the_grace_period_has_expired()
     {
-        await WhenCustomerMasterDataIsReceived().ConfigureAwait(false);
+        await GivenTheGracePeriodHasExpired();
 
-        AssertQueuedCommand.QueuedCommand<SendCustomerMasterDataToEnergySupplier>(GetService<IDbConnectionFactory>());
+        AssertQueuedCommand.QueuedCommand<SendCustomerMasterDataToGridOperator>(GetService<IDbConnectionFactory>(), GetService<InternalCommandMapper>());
     }
 
-    private async Task WhenCustomerMasterDataIsReceived()
+    private async Task GivenTheGracePeriodHasExpired()
     {
-        var customerMasterData = new CustomerMasterDataContent(
-            SampleData.MarketEvaluationPointId,
-            SampleData.ElectricalHeating,
-            SampleData.ElectricalHeatingStart,
-            SampleData.ConsumerId,
-            SampleData.ConsumerName,
-            SampleData.ConsumerId,
-            SampleData.ConsumerName,
-            SampleData.ProtectedName,
-            SampleData.HasEnergySupplier,
-            SampleData.SupplyStart,
-            Array.Empty<UsagePointLocation>());
-        await InvokeCommandAsync(new ReceiveCustomerMasterData(SampleData.TransactionId, customerMasterData));
+        var settings = GetService<MoveInSettings>();
+        var dayHasPassed = new ADayHasPassed(SampleData.SupplyStart.Plus(Duration.FromDays(settings.MessageDelivery.GridOperator.GracePeriodInDaysAfterEffectiveDateIfNotUpdated)));
+        await GetService<IMediator>().Publish(dayHasPassed);
     }
 }

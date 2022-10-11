@@ -12,23 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.CimMessageAdapter.Response
+namespace Messaging.Infrastructure.IncomingMessages;
+
+internal record RootElement
 {
-    public class ResponseMessage
+    internal RootElement(string rootElementName, string defaultNamespace)
     {
-        public ResponseMessage(string messageBody)
-        {
-            IsErrorResponse = true;
-            MessageBody = messageBody;
-        }
-
-        public ResponseMessage()
-        {
-            IsErrorResponse = false;
-        }
-
-        public string MessageBody { get; } = string.Empty;
-
-        public bool IsErrorResponse { get; }
+        RootElementName = rootElementName;
+        DefaultNamespace = defaultNamespace;
     }
+
+    public string RootElementName { get; init; }
+
+    public string DefaultNamespace { get; init; }
 }
