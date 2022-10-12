@@ -12,8 +12,55 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
+using System.Xml.Linq;
+using Messaging.Application.IncomingMessages.RequestChangeCustomerCharacteristics;
+using Messaging.CimMessageAdapter.Messages;
+using Messaging.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
+using Messaging.Domain.OutgoingMessages;
+using Messaging.Infrastructure.IncomingMessages.RequestChangeCustomerCharacteristics;
+using Xunit;
+
 namespace Messaging.Tests.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 
 public class MessageParserTests
 {
+    private readonly MessageParser _messageParser;
+
+    public MessageParserTests()
+    {
+        _messageParser = new MessageParser(
+            new IMessageParser<MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>[]
+            {
+                new XmlMessageParser(),
+            });
+    }
+
+    public static IEnumerable<object[]> CreateMessages()
+    {
+        return new List<object[]>
+        {
+            new object[] { CimFormat.Xml, CreateXmlMessage() },
+        };
+    }
+
+    [Theory]
+    [MemberData(nameof(CreateMessages))]
+    public async Task Can_parse(CimFormat format, Stream message)
+    {
+        var result = await _messageParser.ParseAsync(message, format).ConfigureAwait(false);
+
+        Assert.True(result.Success);
+    }
+
+    private static Stream CreateXmlMessage()
+    {
+        var xmlDoc = XDocument.Load($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}xml{Path.DirectorySeparatorChar}RequestChangeOfSupplier.xml");
+        var stream = new MemoryStream();
+        xmlDoc.Save(stream);
+
+        return stream;
+    }
 }
