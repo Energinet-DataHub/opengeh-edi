@@ -35,7 +35,10 @@ public record Customer(
 public record PointLocation(
     string Type,
     string GeoInfoReference,
-    Address Address);
+    Address Address,
+    bool ProtectedAddress,
+    string Name,
+    string AttnName);
 
 public record Address(
     StreetDetails StreetDetails,

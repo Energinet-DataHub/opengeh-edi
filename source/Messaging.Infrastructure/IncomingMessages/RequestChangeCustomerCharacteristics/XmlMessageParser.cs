@@ -350,6 +350,9 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         var locationPointType = string.Empty;
         var locationPointGeoInfoReference = string.Empty;
         Address? address = null;
+        var protectedAddress = false;
+        var name = string.Empty;
+        var attnName = string.Empty;
 
         while (!reader.Is("UsagePointLocation", ns, XmlNodeType.EndElement))
         {
@@ -365,6 +368,18 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
             {
                 address = await ReadAddressAsync(reader, ns).ConfigureAwait(false);
             }
+            else if (reader.Is("protectedAddress", ns))
+            {
+                protectedAddress = bool.Parse(await reader.ReadElementContentAsStringAsync().ConfigureAwait(false));
+            }
+            else if (reader.Is("name", ns))
+            {
+                name = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("attn_Names.name", ns))
+            {
+                attnName = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
             else
             {
                 await reader.ReadAsync().ConfigureAwait(false);
@@ -374,7 +389,10 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         return new PointLocation(
             locationPointType,
             locationPointGeoInfoReference,
-            address!);
+            address!,
+            protectedAddress,
+            name,
+            attnName);
     }
 
     private static async Task<Address> ReadAddressAsync(XmlReader reader, string ns)

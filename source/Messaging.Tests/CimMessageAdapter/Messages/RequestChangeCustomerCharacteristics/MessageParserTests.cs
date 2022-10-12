@@ -104,6 +104,9 @@ public class MessageParserTests
         Assert.Equal(type, pointLocation.Type);
         Assert.Equal("f26f8678-6cd3-4e12-b70e-cf96290ada94", pointLocation.GeoInfoReference);
         AssertAddress(pointLocation.Address);
+        Assert.False(pointLocation.ProtectedAddress);
+        Assert.Equal("Jytte Larsen", pointLocation.Name);
+        Assert.Equal("Hans Sørensen", pointLocation.AttnName);
     }
 
     private static void AssertAddress(Address address)
