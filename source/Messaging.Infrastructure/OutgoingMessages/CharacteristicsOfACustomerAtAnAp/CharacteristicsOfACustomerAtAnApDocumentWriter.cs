@@ -81,7 +81,11 @@ public class CharacteristicsOfACustomerAtAnApDocumentWriter : DocumentWriter
         await WriteElementAsync("secondCustomer_MarketParticipant.name", marketEvaluationPoint.SecondCustomerName, writer).ConfigureAwait(false);
         await WriteElementAsync("protectedName", marketEvaluationPoint.ProtectedName.ToStringValue(), writer).ConfigureAwait(false);
         await WriteElementAsync("hasEnergySupplier", marketEvaluationPoint.HasEnergySupplier.ToStringValue(), writer).ConfigureAwait(false);
-        await WriteElementAsync("supplyStart_DateAndOrTime.dateTime", marketEvaluationPoint.SupplyStart.ToString(), writer).ConfigureAwait(false);
+
+        if (MarketRole.GridOperator.Name.Equals(_header?.ReceiverRole, StringComparison.OrdinalIgnoreCase) == false)
+        {
+            await WriteElementAsync("supplyStart_DateAndOrTime.dateTime", marketEvaluationPoint.SupplyStart.ToString(), writer).ConfigureAwait(false);
+        }
 
         foreach (var usagePointLocation in marketEvaluationPoint.UsagePointLocation)
         {
