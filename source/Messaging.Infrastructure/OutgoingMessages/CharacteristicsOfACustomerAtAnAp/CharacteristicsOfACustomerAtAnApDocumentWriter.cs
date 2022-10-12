@@ -14,18 +14,23 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using System.Xml;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.OutgoingMessages.Common.Xml;
+using Messaging.Domain.Actors;
+using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.OutgoingMessages.Common.Xml;
 
 namespace Messaging.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 
 public class CharacteristicsOfACustomerAtAnApDocumentWriter : DocumentWriter
 {
+    private MessageHeader? _header;
+
     public CharacteristicsOfACustomerAtAnApDocumentWriter(IMarketActivityRecordParser parser)
         : base(
             new DocumentDetails(
@@ -36,6 +41,12 @@ public class CharacteristicsOfACustomerAtAnApDocumentWriter : DocumentWriter
             typeCode: "E21"),
             parser)
     {
+    }
+
+    public override Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
+    {
+        _header = header;
+        return base.WriteAsync(header, marketActivityRecords);
     }
 
     protected override async Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer)
@@ -61,7 +72,12 @@ public class CharacteristicsOfACustomerAtAnApDocumentWriter : DocumentWriter
         await WriteElementAsync("eletricalHeating_DateAndOrTime.dateTime", marketEvaluationPoint.ElectricalHeatingStart?.ToString() ?? string.Empty, writer).ConfigureAwait(false);
         await WriteMridAsync("firstCustomer_MarketParticipant.mRID", marketEvaluationPoint.FirstCustomerId.Id, marketEvaluationPoint.FirstCustomerId.CodingScheme, writer).ConfigureAwait(false);
         await WriteElementAsync("firstCustomer_MarketParticipant.name", marketEvaluationPoint.FirstCustomerName, writer).ConfigureAwait(false);
-        await WriteMridAsync("secondCustomer_MarketParticipant.mRID", marketEvaluationPoint.SecondCustomerId.Id, marketEvaluationPoint.SecondCustomerId.CodingScheme, writer).ConfigureAwait(false);
+
+        if (MarketRole.GridOperator.Name.Equals(_header?.ReceiverRole, StringComparison.OrdinalIgnoreCase) == false)
+        {
+            await WriteMridAsync("secondCustomer_MarketParticipant.mRID", marketEvaluationPoint.SecondCustomerId.Id, marketEvaluationPoint.SecondCustomerId.CodingScheme, writer).ConfigureAwait(false);
+        }
+
         await WriteElementAsync("secondCustomer_MarketParticipant.name", marketEvaluationPoint.SecondCustomerName, writer).ConfigureAwait(false);
         await WriteElementAsync("protectedName", marketEvaluationPoint.ProtectedName.ToStringValue(), writer).ConfigureAwait(false);
         await WriteElementAsync("hasEnergySupplier", marketEvaluationPoint.HasEnergySupplier.ToStringValue(), writer).ConfigureAwait(false);

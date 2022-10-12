@@ -22,6 +22,7 @@ using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.SchemaStore;
+using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Configuration;
@@ -72,6 +73,22 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
                 .NumberOfMarketActivityRecordsIs(2)
                 .HasValidStructureAsync(schema!).ConfigureAwait(false);
             AssertMarketActivityRecord(marketActivityRecords.First(), assertDocument);
+        }
+
+        [Fact]
+        public async Task Second_customer_id_is_not_allowed_when_receiver_is_a_grid_operator()
+        {
+            var header = new MessageHeader("E03", "SenderId", "DDZ", "ReceiverId", MarketRole.GridOperator.Name, Guid.NewGuid().ToString(), _systemDateTimeProvider.Now());
+            var marketActivityRecords = new List<MarketActivityRecord>()
+            {
+                CreateMarketActivityRecord(),
+            };
+
+            var message = await _documentWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
+
+            AssertXmlDocument
+                .Document(message, NamespacePrefix)
+                .IsNotPresent("MktActivityRecord[1]/MarketEvaluationPoint/secondCustomer_MarketParticipant.mRID");
         }
 
         private static void AssertMarketActivityRecord(MarketActivityRecord marketActivityRecord, AssertXmlDocument assertDocument)

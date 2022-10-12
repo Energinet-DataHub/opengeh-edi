@@ -39,7 +39,7 @@ public abstract class DocumentWriter : IDocumentWriter
 
     protected DocumentDetails DocumentDetails => _documentDetails;
 
-    public async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
+    public virtual async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
     {
         var settings = new XmlWriterSettings { OmitXmlDeclaration = false, Encoding = Encoding.UTF8, Async = true };
         var stream = new MemoryStream();
