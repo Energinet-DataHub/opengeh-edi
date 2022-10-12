@@ -83,5 +83,11 @@ public class MessageParserTests
     {
         Assert.Equal("253698254", marketActivityRecord?.Id);
         Assert.Equal("2022-12-17T23:00:00Z", marketActivityRecord?.EffectiveDate);
+        AssertMarketEvaluationPoint(marketActivityRecord?.MarketEvaluationPoint!);
+    }
+
+    private static void AssertMarketEvaluationPoint(MarketEvaluationPoint marketEvaluationPoint)
+    {
+        Assert.Equal("579999993331812345", marketEvaluationPoint.GsrnNumber);
     }
 }

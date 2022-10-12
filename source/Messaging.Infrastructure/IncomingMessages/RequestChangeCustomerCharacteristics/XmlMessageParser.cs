@@ -143,8 +143,8 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
     {
         var id = string.Empty;
         var effectiveDate = string.Empty;
+        MarketEvaluationPoint? marketEvaluationPoint = null;
         var ns = rootElement.DefaultNamespace;
-        var marketEvaluationPointReached = false;
 
         await reader.AdvanceToAsync(MarketActivityRecordElementName, ns).ConfigureAwait(false);
 
@@ -154,14 +154,15 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
             {
                 var record = CreateMarketActivityRecord(
                     id,
-                    effectiveDate);
+                    effectiveDate,
+                    marketEvaluationPoint!);
                 yield return record;
             }
 
             if (reader.NodeType == XmlNodeType.Element && reader.SchemaInfo?.Validity == XmlSchemaValidity.Invalid)
                 await reader.ReadToEndAsync().ConfigureAwait(false);
 
-            if (reader.Is("mRID", ns) && !marketEvaluationPointReached)
+            if (reader.Is("mRID", ns))
             {
                 id = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             }
@@ -171,8 +172,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
             }
             else if (reader.Is("MarketEvaluationPoint", ns))
             {
-                await reader.ReadAsync().ConfigureAwait(false);
-                marketEvaluationPointReached = true;
+                marketEvaluationPoint = await ReadMarketEvaluationPointAsync(reader, ns).ConfigureAwait(false);
             }
             else
             {
@@ -181,13 +181,35 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         }
     }
 
+    private static async Task<MarketEvaluationPoint> ReadMarketEvaluationPointAsync(XmlReader reader, string ns)
+    {
+        var marketEvaluationPointId = string.Empty;
+
+        while (!reader.Is("MarketEvaluationPoint", ns, XmlNodeType.EndElement))
+        {
+            if (reader.Is("mRID", ns))
+            {
+                marketEvaluationPointId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else
+            {
+                await reader.ReadAsync().ConfigureAwait(false);
+            }
+        }
+
+        return new MarketEvaluationPoint(
+            marketEvaluationPointId);
+    }
+
     private static MarketActivityRecord CreateMarketActivityRecord(
         string id,
-        string effectiveDate)
+        string effectiveDate,
+        MarketEvaluationPoint marketEvaluationPoint)
     {
         var marketActivityRecord = new MarketActivityRecord(
             id,
-            effectiveDate);
+            effectiveDate,
+            marketEvaluationPoint);
 
         return marketActivityRecord;
     }
