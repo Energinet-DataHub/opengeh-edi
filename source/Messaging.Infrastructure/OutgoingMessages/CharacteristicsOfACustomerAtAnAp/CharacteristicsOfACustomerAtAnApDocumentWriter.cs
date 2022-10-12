@@ -75,10 +75,10 @@ public class CharacteristicsOfACustomerAtAnApDocumentWriter : DocumentWriter
         await WriteMridAsync("firstCustomer_MarketParticipant.mRID", marketEvaluationPoint.FirstCustomerId.Id, marketEvaluationPoint.FirstCustomerId.CodingScheme, writer).ConfigureAwait(false);
         await WriteElementAsync("firstCustomer_MarketParticipant.name", marketEvaluationPoint.FirstCustomerName, writer).ConfigureAwait(false);
 
-        if (MarketRole.GridOperator.Name.Equals(_header?.ReceiverRole, StringComparison.OrdinalIgnoreCase) == false)
-        {
-            await WriteMridAsync("secondCustomer_MarketParticipant.mRID", marketEvaluationPoint.SecondCustomerId.Id, marketEvaluationPoint.SecondCustomerId.CodingScheme, writer).ConfigureAwait(false);
-        }
+        await WriteOnlyIfReceiverRoleIsAsync(
+                MarketRole.EnergySupplier,
+                () => WriteMridAsync("secondCustomer_MarketParticipant.mRID", marketEvaluationPoint.SecondCustomerId.Id, marketEvaluationPoint.SecondCustomerId.CodingScheme, writer))
+            .ConfigureAwait(false);
 
         await WriteElementAsync("secondCustomer_MarketParticipant.name", marketEvaluationPoint.SecondCustomerName, writer).ConfigureAwait(false);
         await WriteElementAsync("protectedName", marketEvaluationPoint.ProtectedName.ToStringValue(), writer).ConfigureAwait(false);
