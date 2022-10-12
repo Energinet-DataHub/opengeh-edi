@@ -59,3 +59,7 @@ public record Address(
     string CitySubDivisionName,
     string CountryCode,
     string PostalCode);
+
+public record TownDetails(string Code, string Name, string Section, string Country);
+
+public record StreetDetails(string Code, string Name, string Number, string FloorIdentification, string SuiteNumber);

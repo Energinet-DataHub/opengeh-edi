@@ -14,6 +14,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Messaging.Application.IncomingMessages.RequestChangeCustomerCharacteristics;
@@ -55,6 +56,7 @@ public class MessageParserTests
 
         Assert.True(result.Success);
         AssertHeader(result.IncomingMarketDocument?.Header);
+        AssertMarketActivityRecord(result.IncomingMarketDocument?.MarketActivityRecords.First());
     }
 
     private static Stream CreateXmlMessage()
@@ -75,5 +77,11 @@ public class MessageParserTests
         Assert.Equal("5790001330552", header?.ReceiverId);
         Assert.Equal("DDZ", header?.ReceiverRole);
         Assert.Equal("2022-12-17T09:30:47Z", header?.CreatedAt);
+    }
+
+    private static void AssertMarketActivityRecord(MarketActivityRecord? marketActivityRecord)
+    {
+        Assert.Equal("253698254", marketActivityRecord?.Id);
+        Assert.Equal("2022-12-17T23:00:00Z", marketActivityRecord?.EffectiveDate);
     }
 }
