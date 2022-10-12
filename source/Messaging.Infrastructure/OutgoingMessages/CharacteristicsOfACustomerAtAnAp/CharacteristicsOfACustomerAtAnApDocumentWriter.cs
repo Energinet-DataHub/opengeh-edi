@@ -30,7 +30,7 @@ public class CharacteristicsOfACustomerAtAnApDocumentWriter : DocumentWriter
         : base(
             new DocumentDetails(
             "CharacteristicsOfACustomerAtAnAP_MarketDocument",
-            schemaLocation: "urn:ediel.org:structure:characteristicsofacustomeratanap:0:1 urn-ediel-org-structure-characteristicsofacustomeratanap-0-1",
+            schemaLocation: "urn:ediel.org:structure:characteristicsofacustomeratanap:0:1 urn-ediel-org-structure-characteristicsofacustomeratanap-0-1.xsd",
             xmlNamespace: "urn:ediel.org:structure:characteristicsofacustomeratanap:0:1",
             prefix: "cim",
             typeCode: "E21"),
