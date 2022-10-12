@@ -95,5 +95,29 @@ public class MessageParserTests
         Assert.Equal("0403751478", marketEvaluationPoint.SecondCustomer.Id);
         Assert.Equal("Gry Hansen", marketEvaluationPoint.SecondCustomer.Name);
         Assert.False(marketEvaluationPoint.ProtectedName);
+        AssertPointLocation(marketEvaluationPoint.FirstPointLocation, "D01");
+        AssertPointLocation(marketEvaluationPoint.SecondPointLocation, "D04");
+    }
+
+    private static void AssertPointLocation(PointLocation pointLocation, string type)
+    {
+        Assert.Equal(type, pointLocation.Type);
+        Assert.Equal("f26f8678-6cd3-4e12-b70e-cf96290ada94", pointLocation.GeoInfoReference);
+        AssertAddress(pointLocation.Address);
+    }
+
+    private static void AssertAddress(Address address)
+    {
+        Assert.Equal("0403", address.StreetDetails.StreetCode);
+        Assert.Equal("Vestergade", address.StreetDetails.StreetName);
+        Assert.Equal("16", address.StreetDetails.BuildingNumber);
+        Assert.Equal("2", address.StreetDetails.FloorIdentification);
+        Assert.Equal("10", address.StreetDetails.RoomIdentification);
+        Assert.Equal("0506", address.TownDetails.MunicipalityCode);
+        Assert.Equal("Middelfart", address.TownDetails.CityName);
+        Assert.Equal("Strib", address.TownDetails.CitySubDivisionName);
+        Assert.Equal("DK", address.TownDetails.CountryCode);
+        Assert.Equal("5500", address.PostalCode);
+        Assert.Equal("Kassen", address.PoBox);
     }
 }

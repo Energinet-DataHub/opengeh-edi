@@ -24,8 +24,25 @@ public record MarketEvaluationPoint(
     bool ElectricalHeating,
     Customer FirstCustomer,
     Customer SecondCustomer,
-    bool ProtectedName);
+    bool ProtectedName,
+    PointLocation FirstPointLocation,
+    PointLocation SecondPointLocation);
 
 public record Customer(
     string Id,
     string Name);
+
+public record PointLocation(
+    string Type,
+    string GeoInfoReference,
+    Address Address);
+
+public record Address(
+    StreetDetails StreetDetails,
+    TownDetails TownDetails,
+    string PostalCode,
+    string PoBox);
+
+public record TownDetails(string MunicipalityCode, string CityName, string CitySubDivisionName, string CountryCode);
+
+public record StreetDetails(string StreetCode, string StreetName, string BuildingNumber, string FloorIdentification, string RoomIdentification);
