@@ -46,7 +46,6 @@ public class CharacteristicsOfACustomerAtAnApDocumentWriter : DocumentWriter
         {
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "MktActivityRecord", null).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, marketActivityRecord.Id).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "originalTransactionIDReference_MktActivityRecord.mRID", null, marketActivityRecord.OriginalTransactionId).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "validityStart_DateAndOrTime.dateTime", null, marketActivityRecord.ValidityStart.ToString()).ConfigureAwait(false);
             await WriteMarketEvaluationPointAsync(marketActivityRecord.MarketEvaluationPoint, writer).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);

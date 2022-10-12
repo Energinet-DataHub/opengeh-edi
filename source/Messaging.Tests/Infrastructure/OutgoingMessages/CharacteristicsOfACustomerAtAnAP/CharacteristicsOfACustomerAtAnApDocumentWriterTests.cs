@@ -80,7 +80,7 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
             var firstUsagePointLocation = usagePointLocations.First();
 
             assertDocument
-                    .HasValue("MktActivityRecord[1]/originalTransactionIDReference_MktActivityRecord.mRID", marketActivityRecord.OriginalTransactionId)
+                    .IsNotPresent("MktActivityRecord[1]/originalTransactionIDReference_MktActivityRecord.mRID")
                     .HasValue("MktActivityRecord[1]/validityStart_DateAndOrTime.dateTime", marketActivityRecord.ValidityStart.ToString())
                     .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/mRID", marketActivityRecord.MarketEvaluationPoint.MarketEvaluationPointId)
                     .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/serviceCategory.ElectricalHeating", marketActivityRecord.MarketEvaluationPoint.ElectricalHeating.ToStringValue())
