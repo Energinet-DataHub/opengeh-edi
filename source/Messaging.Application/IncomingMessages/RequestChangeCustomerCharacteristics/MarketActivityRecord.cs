@@ -20,4 +20,12 @@ public record MarketActivityRecord(
     MarketEvaluationPoint MarketEvaluationPoint) : IMarketActivityRecord;
 
 public record MarketEvaluationPoint(
-    string GsrnNumber);
+    string GsrnNumber,
+    bool ElectricalHeating,
+    Customer FirstCustomer,
+    Customer SecondCustomer,
+    bool ProtectedName);
+
+public record Customer(
+    string Id,
+    string Name);

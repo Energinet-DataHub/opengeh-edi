@@ -89,5 +89,11 @@ public class MessageParserTests
     private static void AssertMarketEvaluationPoint(MarketEvaluationPoint marketEvaluationPoint)
     {
         Assert.Equal("579999993331812345", marketEvaluationPoint.GsrnNumber);
+        Assert.True(marketEvaluationPoint.ElectricalHeating);
+        Assert.Equal("0212756369", marketEvaluationPoint.FirstCustomer.Id);
+        Assert.Equal("Jan Hansen", marketEvaluationPoint.FirstCustomer.Name);
+        Assert.Equal("0403751478", marketEvaluationPoint.SecondCustomer.Id);
+        Assert.Equal("Gry Hansen", marketEvaluationPoint.SecondCustomer.Name);
+        Assert.False(marketEvaluationPoint.ProtectedName);
     }
 }

@@ -184,12 +184,42 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
     private static async Task<MarketEvaluationPoint> ReadMarketEvaluationPointAsync(XmlReader reader, string ns)
     {
         var marketEvaluationPointId = string.Empty;
+        var marketEvalationPointElectricalHeaing = false;
+        var firstCustomerId = string.Empty;
+        var firstCustomerName = string.Empty;
+        var secondCustomerId = string.Empty;
+        var secondCustomerName = string.Empty;
+        var protectedName = false;
 
         while (!reader.Is("MarketEvaluationPoint", ns, XmlNodeType.EndElement))
         {
             if (reader.Is("mRID", ns))
             {
                 marketEvaluationPointId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("serviceCategory.ElectricalHeating", ns))
+            {
+                marketEvalationPointElectricalHeaing = bool.Parse(await reader.ReadElementContentAsStringAsync().ConfigureAwait(false));
+            }
+            else if (reader.Is("firstCustomer_MarketParticipant.mRID", ns))
+            {
+                firstCustomerId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("firstCustomer_MarketParticipant.name", ns))
+            {
+                firstCustomerName = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("secondCustomer_MarketParticipant.mRID", ns))
+            {
+                secondCustomerId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("secondCustomer_MarketParticipant.name", ns))
+            {
+                secondCustomerName = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("protectedName", ns))
+            {
+                protectedName = bool.Parse(await reader.ReadElementContentAsStringAsync().ConfigureAwait(false));
             }
             else
             {
@@ -198,7 +228,11 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         }
 
         return new MarketEvaluationPoint(
-            marketEvaluationPointId);
+            marketEvaluationPointId,
+            marketEvalationPointElectricalHeaing,
+            new Customer(firstCustomerId, firstCustomerName),
+            new Customer(secondCustomerId, secondCustomerName),
+            protectedName);
     }
 
     private static MarketActivityRecord CreateMarketActivityRecord(
