@@ -51,7 +51,7 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
         [Fact]
         public async Task Document_is_valid()
         {
-            var header = new MessageHeader("E03", "SenderId", "DDZ", "ReceiverId", "DDQ", Guid.NewGuid().ToString(), _systemDateTimeProvider.Now());
+            var header = CreateHeader(MarketRole.EnergySupplier);
             var marketActivityRecords = new List<MarketActivityRecord>()
             {
                 CreateMarketActivityRecord(),
@@ -185,6 +185,11 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
         {
             _schemaProvider = new XmlSchemaProvider();
             return _schemaProvider.GetSchemaAsync<XmlSchema>("characteristicsofacustomeratanap", "0.1");
+        }
+
+        private MessageHeader CreateHeader(MarketRole messageReceiverRole)
+        {
+            return new MessageHeader("E03", "SenderId", "DDZ", "ReceiverId", messageReceiverRole.Name, Guid.NewGuid().ToString(), _systemDateTimeProvider.Now());
         }
     }
 }
