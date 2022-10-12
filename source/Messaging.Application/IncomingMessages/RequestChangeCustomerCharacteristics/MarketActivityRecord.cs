@@ -14,4 +14,6 @@
 
 namespace Messaging.Application.IncomingMessages.RequestChangeCustomerCharacteristics;
 
-public record MarketActivityRecord(string Id) : IMarketActivityRecord;
+public record MarketActivityRecord(
+    string Id,
+    string EffectiveDate) : IMarketActivityRecord;
