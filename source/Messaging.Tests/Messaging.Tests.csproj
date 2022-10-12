@@ -62,7 +62,14 @@ limitations under the License.
       <EmbeddedResource Include="CimMessageAdapter\Messages\xml\Confirm request Change of Supplier.xml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\RequestChangeAccountingPointCharacteristicsMultipleMarketActivityRecords.xml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
       <EmbeddedResource Include="CimMessageAdapter\Messages\xml\RequestChangeOfSupplier.xml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="CimMessageAdapter\Messages\xml\RequestChangeAccountingPointCharacteristics.xml" />
+      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\RequestChangeAccountingPointCharacteristics.xml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
     </ItemGroup>
