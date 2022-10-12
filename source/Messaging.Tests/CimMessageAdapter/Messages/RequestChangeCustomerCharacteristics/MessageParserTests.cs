@@ -22,6 +22,7 @@ using Messaging.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.IncomingMessages.RequestChangeCustomerCharacteristics;
 using Xunit;
+using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
 
 namespace Messaging.Tests.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 
@@ -53,6 +54,7 @@ public class MessageParserTests
         var result = await _messageParser.ParseAsync(message, format).ConfigureAwait(false);
 
         Assert.True(result.Success);
+        AssertHeader(result.IncomingMarketDocument?.Header);
     }
 
     private static Stream CreateXmlMessage()
@@ -62,5 +64,16 @@ public class MessageParserTests
         xmlDoc.Save(stream);
 
         return stream;
+    }
+
+    private static void AssertHeader(MessageHeader? header)
+    {
+        Assert.Equal("253659974", header?.MessageId);
+        Assert.Equal("E34", header?.ProcessType);
+        Assert.Equal("5799999933318", header?.SenderId);
+        Assert.Equal("DDQ", header?.SenderRole);
+        Assert.Equal("5790001330552", header?.ReceiverId);
+        Assert.Equal("DDZ", header?.ReceiverRole);
+        Assert.Equal("2022-12-17T09:30:47Z", header?.CreatedAt);
     }
 }
