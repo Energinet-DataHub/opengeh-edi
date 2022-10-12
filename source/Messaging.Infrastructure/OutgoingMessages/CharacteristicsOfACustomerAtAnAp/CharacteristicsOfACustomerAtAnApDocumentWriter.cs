@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
 using Messaging.Application.OutgoingMessages;
@@ -23,6 +24,7 @@ using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.OutgoingMessages.Common.Xml;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.SeedWork;
 using Messaging.Infrastructure.OutgoingMessages.Common.Xml;
 
 namespace Messaging.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
@@ -82,10 +84,9 @@ public class CharacteristicsOfACustomerAtAnApDocumentWriter : DocumentWriter
         await WriteElementAsync("protectedName", marketEvaluationPoint.ProtectedName.ToStringValue(), writer).ConfigureAwait(false);
         await WriteElementAsync("hasEnergySupplier", marketEvaluationPoint.HasEnergySupplier.ToStringValue(), writer).ConfigureAwait(false);
 
-        if (MarketRole.GridOperator.Name.Equals(_header?.ReceiverRole, StringComparison.OrdinalIgnoreCase) == false)
-        {
-            await WriteElementAsync("supplyStart_DateAndOrTime.dateTime", marketEvaluationPoint.SupplyStart.ToString(), writer).ConfigureAwait(false);
-        }
+        await WriteOnlyIfReceiverRoleIsAsync(
+            MarketRole.EnergySupplier, () => WriteElementAsync("supplyStart_DateAndOrTime.dateTime", marketEvaluationPoint.SupplyStart.ToString(), writer))
+            .ConfigureAwait(false);
 
         foreach (var usagePointLocation in marketEvaluationPoint.UsagePointLocation)
         {
@@ -109,6 +110,20 @@ public class CharacteristicsOfACustomerAtAnApDocumentWriter : DocumentWriter
         }
 
         await writer.WriteEndElementAsync().ConfigureAwait(false);
+    }
+
+    private Task WriteOnlyIfReceiverRoleIsAsync(MarketRole marketRole, Func<Task> writeAction)
+    {
+        var receiverRole = EnumerationType
+            .GetAll<MarketRole>()
+            .FirstOrDefault(t => t.Name.Equals(_header?.ReceiverRole, StringComparison.OrdinalIgnoreCase));
+
+        if (marketRole == receiverRole)
+        {
+            return writeAction();
+        }
+
+        return Task.CompletedTask;
     }
 
     private async Task WriteMainAddressAsync(XmlWriter writer, MainAddress mainAddress)
