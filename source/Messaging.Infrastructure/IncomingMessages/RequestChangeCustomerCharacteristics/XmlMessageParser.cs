@@ -190,10 +190,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         var secondCustomerId = string.Empty;
         var secondCustomerName = string.Empty;
         var protectedName = false;
-        PointLocation? firstPointLocation = null;
-        PointLocation? secondPointLocation = null;
-
-        var firstLocationReached = false;
+        var pointLocations = new List<PointLocation>();
 
         while (!reader.Is("MarketEvaluationPoint", ns, XmlNodeType.EndElement))
         {
@@ -225,14 +222,9 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
             {
                 protectedName = bool.Parse(await reader.ReadElementContentAsStringAsync().ConfigureAwait(false));
             }
-            else if (reader.Is("UsagePointLocation", ns) && !firstLocationReached)
-            {
-                firstPointLocation = await ReadLocationPointAsync(reader, ns).ConfigureAwait(false);
-                firstLocationReached = true;
-            }
             else if (reader.Is("UsagePointLocation", ns))
             {
-                secondPointLocation = await ReadLocationPointAsync(reader, ns).ConfigureAwait(false);
+                pointLocations.Add(await ReadLocationPointAsync(reader, ns).ConfigureAwait(false));
             }
             else
             {
@@ -246,8 +238,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
             new Customer(firstCustomerId, firstCustomerName),
             new Customer(secondCustomerId, secondCustomerName),
             protectedName,
-            firstPointLocation!,
-            secondPointLocation!);
+            pointLocations.AsReadOnly());
     }
 
     private static MarketActivityRecord CreateMarketActivityRecord(

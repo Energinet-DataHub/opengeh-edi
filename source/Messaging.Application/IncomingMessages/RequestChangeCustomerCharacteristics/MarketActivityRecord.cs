@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.ObjectModel;
+
 namespace Messaging.Application.IncomingMessages.RequestChangeCustomerCharacteristics;
 
 public record MarketActivityRecord(
@@ -25,8 +27,7 @@ public record MarketEvaluationPoint(
     Customer FirstCustomer,
     Customer SecondCustomer,
     bool ProtectedName,
-    PointLocation FirstPointLocation,
-    PointLocation SecondPointLocation);
+    ReadOnlyCollection<PointLocation> PointLocations);
 
 public record Customer(
     string Id,

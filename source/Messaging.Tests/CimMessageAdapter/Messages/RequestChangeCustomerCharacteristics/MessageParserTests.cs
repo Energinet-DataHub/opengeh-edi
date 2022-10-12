@@ -95,8 +95,8 @@ public class MessageParserTests
         Assert.Equal("0403751478", marketEvaluationPoint.SecondCustomer.Id);
         Assert.Equal("Gry Hansen", marketEvaluationPoint.SecondCustomer.Name);
         Assert.False(marketEvaluationPoint.ProtectedName);
-        AssertPointLocation(marketEvaluationPoint.FirstPointLocation, "D01");
-        AssertPointLocation(marketEvaluationPoint.SecondPointLocation, "D04");
+        AssertPointLocation(marketEvaluationPoint.PointLocations[0], "D01");
+        AssertPointLocation(marketEvaluationPoint.PointLocations[1], "D04");
     }
 
     private static void AssertPointLocation(PointLocation pointLocation, string type)
