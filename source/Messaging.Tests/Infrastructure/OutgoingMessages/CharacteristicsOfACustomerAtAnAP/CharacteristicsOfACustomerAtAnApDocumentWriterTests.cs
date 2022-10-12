@@ -94,7 +94,7 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
         [Fact]
         public async Task Supply_start_is_not_allowed_when_receiver_is_a_grid_operator()
         {
-            var header = new MessageHeader("E03", "SenderId", "DDZ", "ReceiverId", MarketRole.GridOperator.Name, Guid.NewGuid().ToString(), _systemDateTimeProvider.Now());
+            var header = CreateHeader(MarketRole.GridOperator);
             var marketActivityRecords = new List<MarketActivityRecord>()
             {
                 CreateMarketActivityRecord(),
