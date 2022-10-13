@@ -12,17 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Messaging.Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
 using Messaging.Application.IncomingMessages.RequestChangeCustomerCharacteristics;
+using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.IncomingMessages.RequestChangeCustomerCharacteristics;
 using Xunit;
+using Address = Messaging.Application.IncomingMessages.RequestChangeCustomerCharacteristics.Address;
+using MarketActivityRecord = Messaging.Application.IncomingMessages.RequestChangeCustomerCharacteristics.MarketActivityRecord;
+using MarketEvaluationPoint = Messaging.Application.IncomingMessages.RequestChangeCustomerCharacteristics.MarketEvaluationPoint;
 using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
 
 namespace Messaging.Tests.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
@@ -48,6 +54,14 @@ public class MessageParserTests
         };
     }
 
+    public static IEnumerable<object[]> CreateMessagesWithInvalidStructure()
+    {
+        return new List<object[]>
+        {
+            new object[] { CimFormat.Xml, CreateInvalidXmlMessage() },
+        };
+    }
+
     [Theory]
     [MemberData(nameof(CreateMessages))]
     public async Task Can_parse(CimFormat format, Stream message)
@@ -59,6 +73,24 @@ public class MessageParserTests
         AssertMarketActivityRecord(result.IncomingMarketDocument?.MarketActivityRecords.First());
     }
 
+    [Theory]
+    [MemberData(nameof(CreateMessagesWithInvalidStructure))]
+    public async Task Return_error_when_structure_is_invalid(CimFormat format, Stream message)
+    {
+        var result = await _messageParser.ParseAsync(message, format).ConfigureAwait(false);
+
+        Assert.False(result.Success);
+        Assert.Contains(result.Errors, error => error is InvalidMessageStructure);
+    }
+
+    [Fact]
+    public async Task Throw_if_message_format_is_not_known()
+    {
+        var parser = new MessageParser(new List<IMessageParser<MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>>());
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => parser.ParseAsync(CreateXmlMessage(), CimFormat.Xml)).ConfigureAwait(false);
+    }
+
     private static Stream CreateXmlMessage()
     {
         var xmlDoc = XDocument.Load($"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}xml{Path.DirectorySeparatorChar}RequestChangeCustomerCharacteristics.xml");
@@ -66,6 +98,18 @@ public class MessageParserTests
         xmlDoc.Save(stream);
 
         return stream;
+    }
+
+    private static Stream CreateInvalidXmlMessage()
+    {
+        var messageStream = new MemoryStream();
+        using var writer = new StreamWriter(messageStream);
+        writer.Write("This is not XML");
+        writer.Flush();
+        messageStream.Position = 0;
+        var returnStream = new MemoryStream();
+        messageStream.CopyTo(returnStream);
+        return returnStream;
     }
 
     private static void AssertHeader(MessageHeader? header)
