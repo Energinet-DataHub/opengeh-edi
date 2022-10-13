@@ -91,6 +91,7 @@ public class CustomerMasterDataMessageFactory
             new List<UsagePointLocation>()
             {
                 CreateEmptyUsagePointLocation("D01"),
+                CreateEmptyUsagePointLocation("D04"),
             });
     }
 
