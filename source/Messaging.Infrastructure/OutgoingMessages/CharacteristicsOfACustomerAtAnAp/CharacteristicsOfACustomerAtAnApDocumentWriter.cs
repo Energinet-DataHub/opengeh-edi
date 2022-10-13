@@ -73,17 +73,7 @@ public class CharacteristicsOfACustomerAtAnApDocumentWriter : DocumentWriter
         await WriteElementAsync("serviceCategory.ElectricalHeating", marketEvaluationPoint.ElectricalHeating.ToStringValue(), writer).ConfigureAwait(false);
         await WriteElementAsync("eletricalHeating_DateAndOrTime.dateTime", marketEvaluationPoint.ElectricalHeatingStart?.ToString() ?? string.Empty, writer).ConfigureAwait(false);
 
-        if (marketEvaluationPoint.FirstCustomerId.CodingScheme.Equals("VA", StringComparison.OrdinalIgnoreCase))
-        {
-            await WriteMridAsync("firstCustomer_MarketParticipant.mRID", marketEvaluationPoint.FirstCustomerId.Id, marketEvaluationPoint.FirstCustomerId.CodingScheme, writer).ConfigureAwait(false);
-        }
-        else
-        {
-            if (ReceiverIs(MarketRole.EnergySupplier))
-            {
-                await WriteMridAsync("firstCustomer_MarketParticipant.mRID", marketEvaluationPoint.FirstCustomerId.Id, marketEvaluationPoint.FirstCustomerId.CodingScheme, writer).ConfigureAwait(false);
-            }
-        }
+        await WriteCustomerIdIfVatAsync("firstCustomer_MarketParticipant.mRID", marketEvaluationPoint.FirstCustomerId, writer).ConfigureAwait(false);
 
         await WriteElementAsync("firstCustomer_MarketParticipant.name", marketEvaluationPoint.FirstCustomerName, writer).ConfigureAwait(false);
 
@@ -122,6 +112,16 @@ public class CharacteristicsOfACustomerAtAnApDocumentWriter : DocumentWriter
         }
 
         await writer.WriteEndElementAsync().ConfigureAwait(false);
+    }
+
+    private Task WriteCustomerIdIfVatAsync(string property, MrId customerId, XmlWriter writer)
+    {
+        if (customerId.CodingScheme.Equals("VAT", StringComparison.OrdinalIgnoreCase))
+        {
+            return WriteMridAsync(property, customerId.Id, customerId.CodingScheme, writer);
+        }
+
+        return Task.CompletedTask;
     }
 
     private Task WriteIfReceiverRoleIsAsync(MarketRole marketRole, Func<Task> writeAction)

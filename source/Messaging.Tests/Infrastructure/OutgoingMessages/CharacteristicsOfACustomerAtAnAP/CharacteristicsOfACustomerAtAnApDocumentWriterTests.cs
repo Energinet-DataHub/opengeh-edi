@@ -98,10 +98,10 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
         }
 
         [Fact]
-        public async Task Customer_mrid_is_not_allowed_when_type_is_social_security_number_and_receiver_is_a_grid_operator()
+        public async Task Customer_mrid_is_not_allowed_when_type_is_social_security_number()
         {
             var document =
-                await WriteDocumentAsync(CreateHeader(MarketRole.GridOperator), CreateMarketActivityRecord())
+                await WriteDocumentAsync(CreateHeader(MarketRole.EnergySupplier), CreateMarketActivityRecord(new MrId("1", "AAR")))
                     .ConfigureAwait(false);
 
             AssertXmlDocument.Document(document, NamespacePrefix)
@@ -146,7 +146,7 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
                     .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/UsagePointLocation[1]/protectedAddress", firstUsagePointLocation.ProtectedAddress.ToStringValue());
         }
 
-        private MarketActivityRecord CreateMarketActivityRecord()
+        private MarketActivityRecord CreateMarketActivityRecord(MrId? firstCustomerId = null, MrId? secondCustomerId = null)
         {
             return new(
                 Guid.NewGuid().ToString(),
@@ -156,9 +156,9 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
                     "579999993331812345",
                     true,
                     _systemDateTimeProvider.Now(),
-                    new MrId("Consumer1Id", "ARR"),
+                    firstCustomerId ?? new MrId("Consumer1Id", "VAT"),
                     "Consumer1",
-                    new MrId("Consumer2Id", "ARR"),
+                    secondCustomerId ?? new MrId("Consumer2Id", "ARR"),
                     "Consumer2",
                     false,
                     false,
