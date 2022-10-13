@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages;
@@ -87,6 +88,33 @@ public class CustomerMasterDataMessageFactory
             masterData.ProtectedName,
             masterData.HasEnergySupplier,
             masterData.SupplyStart,
-            Array.Empty<UsagePointLocation>());
+            new List<UsagePointLocation>()
+            {
+                CreateEmptyUsagePointLocation("D01"),
+                CreateEmptyUsagePointLocation("D04"),
+            });
+    }
+
+    private static MainAddress CreateEmptyAddress()
+    {
+        return new MainAddress(
+            new StreetDetail(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty),
+            new TownDetail(string.Empty, string.Empty, string.Empty, string.Empty),
+            string.Empty,
+            string.Empty);
+    }
+
+    private static UsagePointLocation CreateEmptyUsagePointLocation(string type)
+    {
+        return new UsagePointLocation(
+            type,
+            string.Empty,
+            CreateEmptyAddress(),
+            string.Empty,
+            string.Empty,
+            string.Empty,
+            string.Empty,
+            string.Empty,
+            false);
     }
 }

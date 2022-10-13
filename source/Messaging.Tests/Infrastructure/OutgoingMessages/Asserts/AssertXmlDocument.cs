@@ -70,6 +70,13 @@ public class AssertXmlDocument
         return this;
     }
 
+    public AssertXmlDocument IsNotPresent(string xpath)
+    {
+        ArgumentNullException.ThrowIfNull(xpath);
+        Assert.Null(_document.Root?.XPathSelectElement(EnsureXPathHasPrefix(xpath), _xmlNamespaceManager));
+        return this;
+    }
+
     public async Task<AssertXmlDocument> HasValidStructureAsync(XmlSchema schema)
     {
         if (schema == null) throw new ArgumentNullException(nameof(schema));
