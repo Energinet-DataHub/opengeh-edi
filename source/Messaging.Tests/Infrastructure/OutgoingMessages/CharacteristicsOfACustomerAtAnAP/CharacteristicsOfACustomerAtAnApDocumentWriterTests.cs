@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Schema;
@@ -51,14 +52,14 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
         [Fact]
         public async Task Document_is_valid()
         {
-            var header = CreateHeader(MarketRole.EnergySupplier);
             var marketActivityRecords = new List<MarketActivityRecord>()
             {
                 CreateMarketActivityRecord(),
                 CreateMarketActivityRecord(),
             };
 
-            var message = await _documentWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
+            var header = CreateHeader(MarketRole.EnergySupplier);
+            var message = await WriteDocumentAsync(header, marketActivityRecords).ConfigureAwait(false);
 
             var schema = await GetSchema().ConfigureAwait(false);
             var assertDocument = await AssertXmlDocument
@@ -190,6 +191,11 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
         private MessageHeader CreateHeader(MarketRole messageReceiverRole)
         {
             return new MessageHeader("E03", "SenderId", "DDZ", "ReceiverId", messageReceiverRole.Name, Guid.NewGuid().ToString(), _systemDateTimeProvider.Now());
+        }
+
+        private Task<Stream> WriteDocumentAsync(MessageHeader header, IEnumerable<MarketActivityRecord> marketActivityRecords)
+        {
+            return _documentWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList());
         }
     }
 }
