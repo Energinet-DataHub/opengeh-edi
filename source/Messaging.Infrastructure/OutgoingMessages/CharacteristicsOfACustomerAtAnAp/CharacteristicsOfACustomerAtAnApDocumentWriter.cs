@@ -14,28 +14,41 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.OutgoingMessages.Common.Xml;
+using Messaging.Domain.Actors;
+using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.SeedWork;
 using Messaging.Infrastructure.OutgoingMessages.Common.Xml;
 
 namespace Messaging.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 
 public class CharacteristicsOfACustomerAtAnApDocumentWriter : DocumentWriter
 {
+    private MessageHeader? _header;
+
     public CharacteristicsOfACustomerAtAnApDocumentWriter(IMarketActivityRecordParser parser)
         : base(
             new DocumentDetails(
             "CharacteristicsOfACustomerAtAnAP_MarketDocument",
-            schemaLocation: "urn:ediel.org:structure:characteristicsofacustomeratanap:0:1 urn-ediel-org-structure-characteristicsofacustomeratanap-0-1",
+            schemaLocation: "urn:ediel.org:structure:characteristicsofacustomeratanap:0:1 urn-ediel-org-structure-characteristicsofacustomeratanap-0-1.xsd",
             xmlNamespace: "urn:ediel.org:structure:characteristicsofacustomeratanap:0:1",
             prefix: "cim",
             typeCode: "E21"),
             parser)
     {
+    }
+
+    public override Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
+    {
+        _header = header;
+        return base.WriteAsync(header, marketActivityRecords);
     }
 
     protected override async Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer)
@@ -46,7 +59,6 @@ public class CharacteristicsOfACustomerAtAnApDocumentWriter : DocumentWriter
         {
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "MktActivityRecord", null).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, marketActivityRecord.Id).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "originalTransactionIDReference_MktActivityRecord.mRID", null, marketActivityRecord.OriginalTransactionId).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "validityStart_DateAndOrTime.dateTime", null, marketActivityRecord.ValidityStart.ToString()).ConfigureAwait(false);
             await WriteMarketEvaluationPointAsync(marketActivityRecord.MarketEvaluationPoint, writer).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
@@ -59,14 +71,24 @@ public class CharacteristicsOfACustomerAtAnApDocumentWriter : DocumentWriter
 
         await WriteMridAsync("mRID", marketEvaluationPoint.MarketEvaluationPointId, "A10", writer).ConfigureAwait(false);
         await WriteElementAsync("serviceCategory.ElectricalHeating", marketEvaluationPoint.ElectricalHeating.ToStringValue(), writer).ConfigureAwait(false);
-        await WriteElementAsync("eletricalHeating_DateAndOrTime.dateTime", marketEvaluationPoint.ElectricalHeatingStart?.ToString() ?? string.Empty, writer).ConfigureAwait(false);
-        await WriteMridAsync("firstCustomer_MarketParticipant.mRID", marketEvaluationPoint.FirstCustomerId.Id, marketEvaluationPoint.FirstCustomerId.CodingScheme, writer).ConfigureAwait(false);
+        await WriteElementIfHasValueAsync("eletricalHeating_DateAndOrTime.dateTime", marketEvaluationPoint.ElectricalHeatingStart?.ToString(), writer).ConfigureAwait(false);
+
+        await WriteCustomerIdIfVatAsync("firstCustomer_MarketParticipant.mRID", marketEvaluationPoint.FirstCustomerId, writer).ConfigureAwait(false);
+
         await WriteElementAsync("firstCustomer_MarketParticipant.name", marketEvaluationPoint.FirstCustomerName, writer).ConfigureAwait(false);
-        await WriteMridAsync("secondCustomer_MarketParticipant.mRID", marketEvaluationPoint.SecondCustomerId.Id, marketEvaluationPoint.FirstCustomerId.CodingScheme, writer).ConfigureAwait(false);
+
+        await WriteIfReceiverRoleIsAsync(
+            MarketRole.EnergySupplier,
+            () =>
+                WriteCustomerIdIfVatAsync("secondCustomer_MarketParticipant.mRID", marketEvaluationPoint.SecondCustomerId, writer)).ConfigureAwait(false);
+
         await WriteElementAsync("secondCustomer_MarketParticipant.name", marketEvaluationPoint.SecondCustomerName, writer).ConfigureAwait(false);
         await WriteElementAsync("protectedName", marketEvaluationPoint.ProtectedName.ToStringValue(), writer).ConfigureAwait(false);
         await WriteElementAsync("hasEnergySupplier", marketEvaluationPoint.HasEnergySupplier.ToStringValue(), writer).ConfigureAwait(false);
-        await WriteElementAsync("supplyStart_DateAndOrTime.dateTime", marketEvaluationPoint.SupplyStart.ToString(), writer).ConfigureAwait(false);
+
+        await WriteIfReceiverRoleIsAsync(
+            MarketRole.EnergySupplier, () => WriteElementAsync("supplyStart_DateAndOrTime.dateTime", marketEvaluationPoint.SupplyStart.ToString(), writer))
+            .ConfigureAwait(false);
 
         foreach (var usagePointLocation in marketEvaluationPoint.UsagePointLocation)
         {
@@ -90,6 +112,40 @@ public class CharacteristicsOfACustomerAtAnApDocumentWriter : DocumentWriter
         }
 
         await writer.WriteEndElementAsync().ConfigureAwait(false);
+    }
+
+    private Task WriteCustomerIdIfVatAsync(string property, MrId customerId, XmlWriter writer)
+    {
+        if (customerId.CodingScheme.Equals("VAT", StringComparison.OrdinalIgnoreCase))
+        {
+            return WriteMridAsync(property, customerId.Id, customerId.CodingScheme, writer);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task WriteIfReceiverRoleIsAsync(MarketRole marketRole, Func<Task> writeAction)
+    {
+        if (ReceiverIs(marketRole))
+        {
+            return writeAction();
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private bool ReceiverIs(MarketRole marketRole)
+    {
+        var receiverRole = EnumerationType
+            .GetAll<MarketRole>()
+            .FirstOrDefault(t => t.Name.Equals(_header?.ReceiverRole, StringComparison.OrdinalIgnoreCase));
+
+        if (receiverRole is null)
+        {
+            throw new InvalidOperationException("Invalid receiver market role");
+        }
+
+        return receiverRole == marketRole;
     }
 
     private async Task WriteMainAddressAsync(XmlWriter writer, MainAddress mainAddress)
