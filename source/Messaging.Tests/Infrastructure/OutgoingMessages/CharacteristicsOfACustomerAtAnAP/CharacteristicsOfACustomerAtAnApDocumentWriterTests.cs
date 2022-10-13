@@ -101,11 +101,12 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
         public async Task Customer_mrid_is_not_allowed_when_type_is_social_security_number()
         {
             var document =
-                await WriteDocumentAsync(CreateHeader(MarketRole.EnergySupplier), CreateMarketActivityRecord(new MrId("1", "AAR")))
+                await WriteDocumentAsync(CreateHeader(MarketRole.EnergySupplier), CreateMarketActivityRecord(new MrId("1", "AAR"), new MrId("1", "AAR")))
                     .ConfigureAwait(false);
 
             AssertXmlDocument.Document(document, NamespacePrefix)
-                .IsNotPresent("MktActivityRecord[1]/MarketEvaluationPoint/firstCustomer_MarketParticipant.mRID");
+                .IsNotPresent("MktActivityRecord[1]/MarketEvaluationPoint/firstCustomer_MarketParticipant.mRID")
+                .IsNotPresent("MktActivityRecord[1]/MarketEvaluationPoint/secondCustomer_MarketParticipant.mRID");
         }
 
         private static void AssertMarketActivityRecord(MarketActivityRecord marketActivityRecord, AssertXmlDocument assertDocument)
@@ -158,7 +159,7 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
                     _systemDateTimeProvider.Now(),
                     firstCustomerId ?? new MrId("Consumer1Id", "VAT"),
                     "Consumer1",
-                    secondCustomerId ?? new MrId("Consumer2Id", "ARR"),
+                    secondCustomerId ?? new MrId("Consumer2Id", "VAT"),
                     "Consumer2",
                     false,
                     false,
