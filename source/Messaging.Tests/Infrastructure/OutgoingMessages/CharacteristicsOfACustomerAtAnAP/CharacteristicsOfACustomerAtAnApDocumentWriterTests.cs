@@ -97,6 +97,17 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
                 .IsNotPresent("MktActivityRecord[1]/MarketEvaluationPoint/supplyStart_DateAndOrTime.dateTime");
         }
 
+        [Fact]
+        public async Task Customer_mrid_is_not_allowed_when_type_is_social_security_number_and_receiver_is_a_grid_operator()
+        {
+            var document =
+                await WriteDocumentAsync(CreateHeader(MarketRole.GridOperator), CreateMarketActivityRecord())
+                    .ConfigureAwait(false);
+
+            AssertXmlDocument.Document(document, NamespacePrefix)
+                .IsNotPresent("MktActivityRecord[1]/MarketEvaluationPoint/firstCustomer_MarketParticipant.mRID");
+        }
+
         private static void AssertMarketActivityRecord(MarketActivityRecord marketActivityRecord, AssertXmlDocument assertDocument)
         {
             var usagePointLocations = marketActivityRecord.MarketEvaluationPoint.UsagePointLocation.ToList();

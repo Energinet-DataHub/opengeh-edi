@@ -72,7 +72,19 @@ public class CharacteristicsOfACustomerAtAnApDocumentWriter : DocumentWriter
         await WriteMridAsync("mRID", marketEvaluationPoint.MarketEvaluationPointId, "A10", writer).ConfigureAwait(false);
         await WriteElementAsync("serviceCategory.ElectricalHeating", marketEvaluationPoint.ElectricalHeating.ToStringValue(), writer).ConfigureAwait(false);
         await WriteElementAsync("eletricalHeating_DateAndOrTime.dateTime", marketEvaluationPoint.ElectricalHeatingStart?.ToString() ?? string.Empty, writer).ConfigureAwait(false);
-        await WriteMridAsync("firstCustomer_MarketParticipant.mRID", marketEvaluationPoint.FirstCustomerId.Id, marketEvaluationPoint.FirstCustomerId.CodingScheme, writer).ConfigureAwait(false);
+
+        if (marketEvaluationPoint.FirstCustomerId.CodingScheme.Equals("VA", StringComparison.OrdinalIgnoreCase))
+        {
+            await WriteMridAsync("firstCustomer_MarketParticipant.mRID", marketEvaluationPoint.FirstCustomerId.Id, marketEvaluationPoint.FirstCustomerId.CodingScheme, writer).ConfigureAwait(false);
+        }
+        else
+        {
+            if (ReceiverIs(MarketRole.EnergySupplier))
+            {
+                await WriteMridAsync("firstCustomer_MarketParticipant.mRID", marketEvaluationPoint.FirstCustomerId.Id, marketEvaluationPoint.FirstCustomerId.CodingScheme, writer).ConfigureAwait(false);
+            }
+        }
+
         await WriteElementAsync("firstCustomer_MarketParticipant.name", marketEvaluationPoint.FirstCustomerName, writer).ConfigureAwait(false);
 
         await WriteIfReceiverRoleIsAsync(
@@ -124,6 +136,20 @@ public class CharacteristicsOfACustomerAtAnApDocumentWriter : DocumentWriter
         }
 
         return Task.CompletedTask;
+    }
+
+    private bool ReceiverIs(MarketRole marketRole)
+    {
+        var receiverRole = EnumerationType
+            .GetAll<MarketRole>()
+            .FirstOrDefault(t => t.Name.Equals(_header?.ReceiverRole, StringComparison.OrdinalIgnoreCase));
+
+        if (receiverRole is null)
+        {
+            throw new InvalidOperationException("Invalid receiver market role");
+        }
+
+        return receiverRole == marketRole;
     }
 
     private async Task WriteMainAddressAsync(XmlWriter writer, MainAddress mainAddress)
