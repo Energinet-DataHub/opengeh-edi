@@ -27,13 +27,13 @@ public record MarketEvaluationPoint(
     Customer FirstCustomer,
     Customer SecondCustomer,
     bool ProtectedName,
-    ReadOnlyCollection<PointLocation> PointLocations);
+    ReadOnlyCollection<UsagePointLocation> PointLocations);
 
 public record Customer(
     string Id,
     string Name);
 
-public record PointLocation(
+public record UsagePointLocation(
     string Type,
     string GeoInfoReference,
     Address Address,

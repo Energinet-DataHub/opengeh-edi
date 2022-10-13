@@ -143,17 +143,17 @@ public class MessageParserTests
         AssertPointLocation(marketEvaluationPoint.PointLocations[1], "D04");
     }
 
-    private static void AssertPointLocation(PointLocation pointLocation, string type)
+    private static void AssertPointLocation(UsagePointLocation usagePointLocation, string type)
     {
-        Assert.Equal(type, pointLocation.Type);
-        Assert.Equal("f26f8678-6cd3-4e12-b70e-cf96290ada94", pointLocation.GeoInfoReference);
-        AssertAddress(pointLocation.Address);
-        Assert.False(pointLocation.ProtectedAddress);
-        Assert.Equal("Jytte Larsen", pointLocation.Name);
-        Assert.Equal("Hans Sørensen", pointLocation.AttnName);
-        Assert.Equal("25361498", pointLocation.Phone1);
-        Assert.Equal("25369814", pointLocation.Phone2);
-        Assert.Equal("hans@hop.dk", pointLocation.Email);
+        Assert.Equal(type, usagePointLocation.Type);
+        Assert.Equal("f26f8678-6cd3-4e12-b70e-cf96290ada94", usagePointLocation.GeoInfoReference);
+        AssertAddress(usagePointLocation.Address);
+        Assert.False(usagePointLocation.ProtectedAddress);
+        Assert.Equal("Jytte Larsen", usagePointLocation.Name);
+        Assert.Equal("Hans Sørensen", usagePointLocation.AttnName);
+        Assert.Equal("25361498", usagePointLocation.Phone1);
+        Assert.Equal("25369814", usagePointLocation.Phone2);
+        Assert.Equal("hans@hop.dk", usagePointLocation.Email);
     }
 
     private static void AssertAddress(Address address)

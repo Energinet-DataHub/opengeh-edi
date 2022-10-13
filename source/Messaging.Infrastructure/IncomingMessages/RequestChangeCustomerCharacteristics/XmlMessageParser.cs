@@ -189,7 +189,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         var secondCustomerId = string.Empty;
         var secondCustomerName = string.Empty;
         var protectedName = false;
-        var pointLocations = new List<PointLocation>();
+        var pointLocations = new List<UsagePointLocation>();
 
         while (!reader.Is("MarketEvaluationPoint", ns, XmlNodeType.EndElement))
         {
@@ -335,7 +335,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
             marketEvaluationPointStreetSuiteNumber);
     }
 
-    private static async Task<PointLocation> ReadLocationPointAsync(XmlReader reader, string ns)
+    private static async Task<UsagePointLocation> ReadLocationPointAsync(XmlReader reader, string ns)
     {
         var locationPointType = string.Empty;
         var locationPointGeoInfoReference = string.Empty;
@@ -394,7 +394,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
             }
         }
 
-        return new PointLocation(
+        return new UsagePointLocation(
             locationPointType,
             locationPointGeoInfoReference,
             address!,
