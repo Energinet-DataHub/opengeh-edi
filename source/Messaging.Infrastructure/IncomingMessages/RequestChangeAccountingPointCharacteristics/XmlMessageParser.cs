@@ -24,7 +24,6 @@ using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.Domain.OutgoingMessages;
 using MarketActivityRecord = Messaging.Application.IncomingMessages.RequestChangeAccountPointCharacteristics.MarketActivityRecord;
-using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
 
 namespace Messaging.Infrastructure.IncomingMessages.RequestChangeAccountingPointCharacteristics;
 
