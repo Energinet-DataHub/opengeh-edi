@@ -59,7 +59,7 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
             };
 
             var header = CreateHeader(MarketRole.EnergySupplier);
-            var message = await WriteDocumentAsync(header, marketActivityRecords).ConfigureAwait(false);
+            var message = await WriteDocumentAsync(header, marketActivityRecords.ToArray()).ConfigureAwait(false);
 
             var schema = await GetSchema().ConfigureAwait(false);
             var assertDocument = await AssertXmlDocument
@@ -79,13 +79,8 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
         [Fact]
         public async Task Second_customer_id_is_not_allowed_when_receiver_is_a_grid_operator()
         {
-            var header = CreateHeader(MarketRole.GridOperator);
-            var marketActivityRecords = new List<MarketActivityRecord>()
-            {
-                CreateMarketActivityRecord(),
-            };
-
-            var message = await _documentWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
+            var message = await WriteDocumentAsync(CreateHeader(MarketRole.GridOperator), CreateMarketActivityRecord())
+                .ConfigureAwait(false);
 
             AssertXmlDocument
                 .Document(message, NamespacePrefix)
@@ -193,7 +188,7 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
             return new MessageHeader("E03", "SenderId", "DDZ", "ReceiverId", messageReceiverRole.Name, Guid.NewGuid().ToString(), _systemDateTimeProvider.Now());
         }
 
-        private Task<Stream> WriteDocumentAsync(MessageHeader header, IEnumerable<MarketActivityRecord> marketActivityRecords)
+        private Task<Stream> WriteDocumentAsync(MessageHeader header, params MarketActivityRecord[] marketActivityRecords)
         {
             return _documentWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList());
         }
