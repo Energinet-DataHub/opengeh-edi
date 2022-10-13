@@ -75,7 +75,7 @@ public class CharacteristicsOfACustomerAtAnApDocumentWriter : DocumentWriter
         await WriteMridAsync("firstCustomer_MarketParticipant.mRID", marketEvaluationPoint.FirstCustomerId.Id, marketEvaluationPoint.FirstCustomerId.CodingScheme, writer).ConfigureAwait(false);
         await WriteElementAsync("firstCustomer_MarketParticipant.name", marketEvaluationPoint.FirstCustomerName, writer).ConfigureAwait(false);
 
-        await WriteOnlyIfReceiverRoleIsAsync(
+        await WriteIfReceiverRoleIsAsync(
                 MarketRole.EnergySupplier,
                 () => WriteMridAsync("secondCustomer_MarketParticipant.mRID", marketEvaluationPoint.SecondCustomerId.Id, marketEvaluationPoint.SecondCustomerId.CodingScheme, writer))
             .ConfigureAwait(false);
@@ -84,7 +84,7 @@ public class CharacteristicsOfACustomerAtAnApDocumentWriter : DocumentWriter
         await WriteElementAsync("protectedName", marketEvaluationPoint.ProtectedName.ToStringValue(), writer).ConfigureAwait(false);
         await WriteElementAsync("hasEnergySupplier", marketEvaluationPoint.HasEnergySupplier.ToStringValue(), writer).ConfigureAwait(false);
 
-        await WriteOnlyIfReceiverRoleIsAsync(
+        await WriteIfReceiverRoleIsAsync(
             MarketRole.EnergySupplier, () => WriteElementAsync("supplyStart_DateAndOrTime.dateTime", marketEvaluationPoint.SupplyStart.ToString(), writer))
             .ConfigureAwait(false);
 
@@ -112,7 +112,7 @@ public class CharacteristicsOfACustomerAtAnApDocumentWriter : DocumentWriter
         await writer.WriteEndElementAsync().ConfigureAwait(false);
     }
 
-    private Task WriteOnlyIfReceiverRoleIsAsync(MarketRole marketRole, Func<Task> writeAction)
+    private Task WriteIfReceiverRoleIsAsync(MarketRole marketRole, Func<Task> writeAction)
     {
         var receiverRole = EnumerationType
             .GetAll<MarketRole>()
