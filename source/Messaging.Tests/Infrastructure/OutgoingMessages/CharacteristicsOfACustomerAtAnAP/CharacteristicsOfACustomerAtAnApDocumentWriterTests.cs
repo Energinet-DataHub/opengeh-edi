@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Schema;
@@ -22,13 +23,14 @@ using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.SchemaStore;
+using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
-using Messaging.Tests.Application.OutgoingMessages;
 using Messaging.Tests.Infrastructure.OutgoingMessages.Asserts;
+using NodaTime;
 using Xunit;
 
 namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
@@ -51,14 +53,14 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
         [Fact]
         public async Task Document_is_valid()
         {
-            var header = new MessageHeader("E03", "SenderId", "DDZ", "ReceiverId", "DDQ", Guid.NewGuid().ToString(), _systemDateTimeProvider.Now());
             var marketActivityRecords = new List<MarketActivityRecord>()
             {
-                CreateMarketActivityRecord(),
-                CreateMarketActivityRecord(),
+                CreateMarketActivityRecord(null, null, _systemDateTimeProvider.Now()),
+                CreateMarketActivityRecord(null, null, _systemDateTimeProvider.Now()),
             };
 
-            var message = await _documentWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
+            var header = CreateHeader(MarketRole.EnergySupplier);
+            var message = await WriteDocumentAsync(header, marketActivityRecords.ToArray()).ConfigureAwait(false);
 
             var schema = await GetSchema().ConfigureAwait(false);
             var assertDocument = await AssertXmlDocument
@@ -75,13 +77,55 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
             AssertMarketActivityRecord(marketActivityRecords.First(), assertDocument);
         }
 
+        [Fact]
+        public async Task Eletrical_heating_date_is_excluded_when_no_date_is_specified()
+        {
+            var document = await WriteDocumentAsync(CreateHeader(MarketRole.GridOperator), CreateMarketActivityRecord(null, null, null)).ConfigureAwait(false);
+
+            AssertXmlDocument.Document(document, NamespacePrefix)
+                .IsNotPresent("MktActivityRecord[1]/MarketEvaluationPoint/eletricalHeating_DateAndOrTime.dateTime");
+        }
+
+        [Fact]
+        public async Task Second_customer_id_is_not_allowed_when_receiver_is_a_grid_operator()
+        {
+            var message = await WriteDocumentAsync(CreateHeader(MarketRole.GridOperator), CreateMarketActivityRecord())
+                .ConfigureAwait(false);
+
+            AssertXmlDocument
+                .Document(message, NamespacePrefix)
+                .IsNotPresent("MktActivityRecord[1]/MarketEvaluationPoint/secondCustomer_MarketParticipant.mRID");
+        }
+
+        [Fact]
+        public async Task Supply_start_is_not_allowed_when_receiver_is_a_grid_operator()
+        {
+            var message = await WriteDocumentAsync(CreateHeader(MarketRole.GridOperator), CreateMarketActivityRecord()).ConfigureAwait(false);
+
+            AssertXmlDocument
+                .Document(message, NamespacePrefix)
+                .IsNotPresent("MktActivityRecord[1]/MarketEvaluationPoint/supplyStart_DateAndOrTime.dateTime");
+        }
+
+        [Fact]
+        public async Task Customer_mrid_is_not_allowed_when_type_is_social_security_number()
+        {
+            var document =
+                await WriteDocumentAsync(CreateHeader(MarketRole.EnergySupplier), CreateMarketActivityRecord(new MrId("1", "AAR"), new MrId("1", "AAR")))
+                    .ConfigureAwait(false);
+
+            AssertXmlDocument.Document(document, NamespacePrefix)
+                .IsNotPresent("MktActivityRecord[1]/MarketEvaluationPoint/firstCustomer_MarketParticipant.mRID")
+                .IsNotPresent("MktActivityRecord[1]/MarketEvaluationPoint/secondCustomer_MarketParticipant.mRID");
+        }
+
         private static void AssertMarketActivityRecord(MarketActivityRecord marketActivityRecord, AssertXmlDocument assertDocument)
         {
             var usagePointLocations = marketActivityRecord.MarketEvaluationPoint.UsagePointLocation.ToList();
             var firstUsagePointLocation = usagePointLocations.First();
 
             assertDocument
-                    .HasValue("MktActivityRecord[1]/originalTransactionIDReference_MktActivityRecord.mRID", marketActivityRecord.OriginalTransactionId)
+                    .IsNotPresent("MktActivityRecord[1]/originalTransactionIDReference_MktActivityRecord.mRID")
                     .HasValue("MktActivityRecord[1]/validityStart_DateAndOrTime.dateTime", marketActivityRecord.ValidityStart.ToString())
                     .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/mRID", marketActivityRecord.MarketEvaluationPoint.MarketEvaluationPointId)
                     .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/serviceCategory.ElectricalHeating", marketActivityRecord.MarketEvaluationPoint.ElectricalHeating.ToStringValue())
@@ -113,7 +157,7 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
                     .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/UsagePointLocation[1]/protectedAddress", firstUsagePointLocation.ProtectedAddress.ToStringValue());
         }
 
-        private MarketActivityRecord CreateMarketActivityRecord()
+        private MarketActivityRecord CreateMarketActivityRecord(MrId? firstCustomerId = null, MrId? secondCustomerId = null, Instant? electricalHeatingStartDate = null)
         {
             return new(
                 Guid.NewGuid().ToString(),
@@ -122,10 +166,10 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
                 new MarketEvaluationPoint(
                     "579999993331812345",
                     true,
-                    _systemDateTimeProvider.Now(),
-                    new MrId("Consumer1Id", "ARR"),
+                    electricalHeatingStartDate,
+                    firstCustomerId ?? new MrId("Consumer1Id", "VAT"),
                     "Consumer1",
-                    new MrId("Consumer2Id", "ARR"),
+                    secondCustomerId ?? new MrId("Consumer2Id", "VAT"),
                     "Consumer2",
                     false,
                     false,
@@ -153,6 +197,16 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
         {
             _schemaProvider = new XmlSchemaProvider();
             return _schemaProvider.GetSchemaAsync<XmlSchema>("characteristicsofacustomeratanap", "0.1");
+        }
+
+        private MessageHeader CreateHeader(MarketRole messageReceiverRole)
+        {
+            return new MessageHeader("E03", "SenderId", "DDZ", "ReceiverId", messageReceiverRole.Name, Guid.NewGuid().ToString(), _systemDateTimeProvider.Now());
+        }
+
+        private Task<Stream> WriteDocumentAsync(MessageHeader header, params MarketActivityRecord[] marketActivityRecords)
+        {
+            return _documentWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList());
         }
     }
 }
