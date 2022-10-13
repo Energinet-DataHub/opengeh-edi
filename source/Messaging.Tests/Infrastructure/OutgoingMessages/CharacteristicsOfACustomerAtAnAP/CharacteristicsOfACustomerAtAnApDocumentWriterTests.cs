@@ -90,13 +90,7 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
         [Fact]
         public async Task Supply_start_is_not_allowed_when_receiver_is_a_grid_operator()
         {
-            var header = CreateHeader(MarketRole.GridOperator);
-            var marketActivityRecords = new List<MarketActivityRecord>()
-            {
-                CreateMarketActivityRecord(),
-            };
-
-            var message = await _documentWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
+            var message = await WriteDocumentAsync(CreateHeader(MarketRole.GridOperator), CreateMarketActivityRecord()).ConfigureAwait(false);
 
             AssertXmlDocument
                 .Document(message, NamespacePrefix)
