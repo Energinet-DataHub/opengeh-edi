@@ -103,6 +103,10 @@ limitations under the License.
       <EmbeddedResource Include="SchemaStore\Schemas\Xml\urn-ediel-org-structure-rejectrequestchangeaccountingpointcharacteristics-0-1.xsd">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
+      <None Remove="SchemaStore\Schemas\Xml\urn-ediel-org-structure-requestchangecustomercharacteristics-0-1.xsd" />
+      <EmbeddedResource Include="SchemaStore\Schemas\Xml\urn-ediel-org-structure-requestchangecustomercharacteristics-0-1.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
       <None Remove="SchemaStore\Schemas\Xml\urn-ediel-org-structure-requestchangeaccountingpointcharacteristics-0-1" />
       <None Include="SchemaStore\Schemas\Xml\urn-ediel-org-structure-requestchangeaccountingpointcharacteristics-0-1.xsd">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

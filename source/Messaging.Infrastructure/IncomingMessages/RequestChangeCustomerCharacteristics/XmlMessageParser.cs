@@ -18,19 +18,19 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
-using Messaging.Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
+using Messaging.Application.IncomingMessages.RequestChangeCustomerCharacteristics;
 using Messaging.Application.SchemaStore;
 using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.Domain.OutgoingMessages;
-using MarketActivityRecord = Messaging.Application.IncomingMessages.RequestChangeAccountPointCharacteristics.MarketActivityRecord;
+using MarketActivityRecord = Messaging.Application.IncomingMessages.RequestChangeCustomerCharacteristics.MarketActivityRecord;
 
-namespace Messaging.Infrastructure.IncomingMessages.RequestChangeAccountingPointCharacteristics;
+namespace Messaging.Infrastructure.IncomingMessages.RequestChangeCustomerCharacteristics;
 
-public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>
+public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>
 {
     private const string MarketActivityRecordElementName = "MktActivityRecord";
-    private const string HeaderElementName = "RequestChangeAccountingPointCharacteristics_MarketDocument";
+    private const string HeaderElementName = "RequestChangeCustomerCharacteristics_MarketDocument";
     private readonly List<ValidationError> _errors = new();
     private readonly ISchemaProvider _schemaProvider;
 
@@ -41,8 +41,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
 
     public CimFormat HandledFormat => CimFormat.Xml;
 
-    public async Task<MessageParserResult<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>>
-        ParseAsync(Stream message)
+    public async Task<MessageParserResult<MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>> ParseAsync(Stream message)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
 
@@ -67,7 +66,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         if (xmlSchema is null)
         {
             return new
-                MessageParserResult<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>(
+                MessageParserResult<MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>(
                     new UnknownBusinessProcessTypeOrVersion(businessProcessType, version));
         }
 
@@ -89,10 +88,10 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         }
     }
 
-    private static MessageParserResult<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>
+    private static MessageParserResult<MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>
         InvalidXmlFailure(Exception exception)
     {
-        return new MessageParserResult<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>(
+        return new MessageParserResult<MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>(
             InvalidMessageStructure.From(exception));
     }
 
@@ -166,7 +165,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
             {
                 id = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             }
-            else if (reader.Is("validityStart_DateAndOrTime.dateTime", ns))
+            else if (reader.Is("start_DateAndOrTime.dateTime", ns))
             {
                 effectiveDate = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             }
@@ -181,6 +180,66 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         }
     }
 
+    private static async Task<MarketEvaluationPoint> ReadMarketEvaluationPointAsync(XmlReader reader, string ns)
+    {
+        var marketEvaluationPointId = string.Empty;
+        var marketEvalationPointElectricalHeaing = false;
+        var firstCustomerId = string.Empty;
+        var firstCustomerName = string.Empty;
+        var secondCustomerId = string.Empty;
+        var secondCustomerName = string.Empty;
+        var protectedName = false;
+        var pointLocations = new List<UsagePointLocation>();
+
+        while (!reader.Is("MarketEvaluationPoint", ns, XmlNodeType.EndElement))
+        {
+            if (reader.Is("mRID", ns))
+            {
+                marketEvaluationPointId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("serviceCategory.ElectricalHeating", ns))
+            {
+                marketEvalationPointElectricalHeaing = bool.Parse(await reader.ReadElementContentAsStringAsync().ConfigureAwait(false));
+            }
+            else if (reader.Is("firstCustomer_MarketParticipant.mRID", ns))
+            {
+                firstCustomerId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("firstCustomer_MarketParticipant.name", ns))
+            {
+                firstCustomerName = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("secondCustomer_MarketParticipant.mRID", ns))
+            {
+                secondCustomerId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("secondCustomer_MarketParticipant.name", ns))
+            {
+                secondCustomerName = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("protectedName", ns))
+            {
+                protectedName = bool.Parse(await reader.ReadElementContentAsStringAsync().ConfigureAwait(false));
+            }
+            else if (reader.Is("UsagePointLocation", ns))
+            {
+                pointLocations.Add(await ReadLocationPointAsync(reader, ns).ConfigureAwait(false));
+            }
+            else
+            {
+                await reader.ReadAsync().ConfigureAwait(false);
+            }
+        }
+
+        return new MarketEvaluationPoint(
+            marketEvaluationPointId,
+            marketEvalationPointElectricalHeaing,
+            new Customer(firstCustomerId, firstCustomerName),
+            new Customer(secondCustomerId, secondCustomerName),
+            protectedName,
+            pointLocations.AsReadOnly());
+    }
+
     private static MarketActivityRecord CreateMarketActivityRecord(
         string id,
         string effectiveDate,
@@ -192,181 +251,6 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
             marketEvaluationPoint);
 
         return marketActivityRecord;
-    }
-
-    private static async Task<MarketEvaluationPoint> ReadMarketEvaluationPointAsync(XmlReader reader, string ns)
-    {
-        var marketEvaluationPointId = string.Empty;
-        var marketEvaluationPointType = string.Empty;
-        var marketEvaluationPointSettlementMethod = string.Empty;
-        var marketEvaluationPointMeteringMethod = string.Empty;
-        var marketEvaluationPointConnectionState = string.Empty;
-        var marketEvaluationPointReadCycle = string.Empty;
-        var marketEvaluationPointNetSettlementGroup = string.Empty;
-        var marketEvaluationPointNextReadingDate = string.Empty;
-        var marketEvaluationPointMeteringGridAreaDomainId = string.Empty;
-        var marketEvaluationPointInMeteringGridAreaDomainId = string.Empty;
-        var marketEvaluationPointOutMeteringGridAreaDomainId = string.Empty;
-        var marketEvaluationPointLinkedMarketEvaluationPointId = string.Empty;
-        var marketEvaluationPointPhysicalConnectionCapacity = string.Empty;
-        var marketEvaluationPointMpConnectionType = string.Empty;
-        var marketEvaluationPointDisconnectionMethod = string.Empty;
-        var marketEvaluationPointAssetMktPsrType = string.Empty;
-        var marketEvaluationPointProductionObligation = string.Empty;
-        var marketEvaluationPointContractedConnectionCapacity = string.Empty;
-        var marketEvaluationPointRatedCurrent = string.Empty;
-        var marketEvaluationPointMeterId = string.Empty;
-        var marketEvaluationPointSeriesProduct = string.Empty;
-        var marketEvaluationPointSeriesQuantityMeasureUnit = string.Empty;
-        var marketEvaluationPointDescription = string.Empty;
-        var marketEvaluationPointGeoInfoReference = string.Empty;
-        var marketEvaluationPointIsActualAdressIndicator = string.Empty;
-        var marketEvaluationPointParentId = string.Empty;
-        Address? address = null;
-
-        while (!reader.Is("MarketEvaluationPoint", ns, XmlNodeType.EndElement))
-        {
-            if (reader.Is("mRID", ns))
-            {
-                marketEvaluationPointId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("type", ns))
-            {
-                marketEvaluationPointType = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("settlementMethod", ns))
-            {
-                marketEvaluationPointSettlementMethod = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("meteringMethod", ns))
-            {
-                marketEvaluationPointMeteringMethod = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("connectionState", ns))
-            {
-                marketEvaluationPointConnectionState = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("readCycle", ns))
-            {
-                marketEvaluationPointReadCycle = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("netSettlementGroup", ns))
-            {
-                marketEvaluationPointNetSettlementGroup = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("nextReadingDate", ns))
-            {
-                marketEvaluationPointNextReadingDate = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("meteringGridArea_Domain.mRID", ns))
-            {
-                marketEvaluationPointMeteringGridAreaDomainId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("inMeteringGridArea_Domain.mRID", ns))
-            {
-                marketEvaluationPointInMeteringGridAreaDomainId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("outMeteringGridArea_Domain.mRID", ns))
-            {
-                marketEvaluationPointOutMeteringGridAreaDomainId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("linked_MarketEvaluationPoint.mRID", ns))
-            {
-                marketEvaluationPointLinkedMarketEvaluationPointId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("physicalConnectionCapacity", ns))
-            {
-                marketEvaluationPointPhysicalConnectionCapacity = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("mPConnectionType", ns))
-            {
-                marketEvaluationPointMpConnectionType = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("disconnectionMethod", ns))
-            {
-                marketEvaluationPointDisconnectionMethod = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("asset_MktPSRType.psrType", ns))
-            {
-                marketEvaluationPointAssetMktPsrType = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("productionObligation", ns))
-            {
-                marketEvaluationPointProductionObligation = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("contractedConnectionCapacity", ns))
-            {
-                marketEvaluationPointContractedConnectionCapacity = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("ratedCurrent", ns))
-            {
-                marketEvaluationPointRatedCurrent = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("meter.mRID", ns))
-            {
-                marketEvaluationPointMeterId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("product", ns))
-            {
-                marketEvaluationPointSeriesProduct = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("quantity_Measure_Unit.name", ns))
-            {
-                marketEvaluationPointSeriesQuantityMeasureUnit = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("description", ns))
-            {
-                marketEvaluationPointDescription = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("usagePointLocation.geoInfoReference", ns))
-            {
-                marketEvaluationPointGeoInfoReference = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("usagePointLocation.mainAddress", ns))
-            {
-                address = await ReadAddressAsync(reader, ns).ConfigureAwait(false);
-            }
-            else if (reader.Is("usagePointLocation.actualAddressIndicator", ns))
-            {
-                marketEvaluationPointIsActualAdressIndicator = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("parent_MarketEvaluationPoint.mRID", ns))
-            {
-                marketEvaluationPointParentId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else
-            {
-                await reader.ReadAsync().ConfigureAwait(false);
-            }
-        }
-
-        return new MarketEvaluationPoint(
-            marketEvaluationPointId,
-            marketEvaluationPointType,
-            marketEvaluationPointSettlementMethod,
-            marketEvaluationPointMeteringMethod,
-            marketEvaluationPointConnectionState,
-            marketEvaluationPointReadCycle,
-            marketEvaluationPointNetSettlementGroup,
-            marketEvaluationPointNextReadingDate,
-            marketEvaluationPointMeteringGridAreaDomainId,
-            marketEvaluationPointInMeteringGridAreaDomainId,
-            marketEvaluationPointOutMeteringGridAreaDomainId,
-            marketEvaluationPointLinkedMarketEvaluationPointId,
-            marketEvaluationPointPhysicalConnectionCapacity,
-            marketEvaluationPointMpConnectionType,
-            marketEvaluationPointDisconnectionMethod,
-            marketEvaluationPointAssetMktPsrType,
-            marketEvaluationPointProductionObligation,
-            marketEvaluationPointContractedConnectionCapacity,
-            marketEvaluationPointRatedCurrent,
-            marketEvaluationPointMeterId,
-            new Series(marketEvaluationPointSeriesProduct, marketEvaluationPointSeriesQuantityMeasureUnit),
-            marketEvaluationPointDescription,
-            marketEvaluationPointGeoInfoReference,
-            address!,
-            marketEvaluationPointIsActualAdressIndicator,
-            marketEvaluationPointParentId);
     }
 
     private static async Task<TownDetails> ReadTownDetailsAsync(XmlReader reader, string ns)
@@ -451,13 +335,85 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
             marketEvaluationPointStreetSuiteNumber);
     }
 
+    private static async Task<UsagePointLocation> ReadLocationPointAsync(XmlReader reader, string ns)
+    {
+        var locationPointType = string.Empty;
+        var locationPointGeoInfoReference = string.Empty;
+        Address? address = null;
+        var protectedAddress = false;
+        var name = string.Empty;
+        var attnName = string.Empty;
+        var phone1 = string.Empty;
+        var phone2 = string.Empty;
+        var email = string.Empty;
+
+        var phone1Reached = false;
+
+        while (!reader.Is("UsagePointLocation", ns, XmlNodeType.EndElement))
+        {
+            if (reader.Is("type", ns))
+            {
+                locationPointType = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("geoInfoReference", ns))
+            {
+                locationPointGeoInfoReference = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("mainAddress", ns))
+            {
+                address = await ReadAddressAsync(reader, ns).ConfigureAwait(false);
+            }
+            else if (reader.Is("protectedAddress", ns))
+            {
+                protectedAddress = bool.Parse(await reader.ReadElementContentAsStringAsync().ConfigureAwait(false));
+            }
+            else if (reader.Is("name", ns))
+            {
+                name = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("attn_Names.name", ns))
+            {
+                attnName = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("ituPhone", ns) && !phone1Reached)
+            {
+                phone1 = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                phone1Reached = true;
+            }
+            else if (reader.Is("ituPhone", ns))
+            {
+                phone2 = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("email1", ns))
+            {
+                email = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else
+            {
+                await reader.ReadAsync().ConfigureAwait(false);
+            }
+        }
+
+        return new UsagePointLocation(
+            locationPointType,
+            locationPointGeoInfoReference,
+            address!,
+            protectedAddress,
+            name,
+            attnName,
+            phone1,
+            phone2,
+            email);
+    }
+
     private static async Task<Address> ReadAddressAsync(XmlReader reader, string ns)
     {
         var marketEvaluationPointAdressPostalCode = string.Empty;
+        var marketEvaluationPointAdressPoBox = string.Empty;
         TownDetails? townDetails = null;
         StreetDetails? streetDetails = null;
 
-        while (!reader.Is("usagePointLocation.mainAddress", ns, XmlNodeType.EndElement))
+        while (!reader.Is("mainAddress", ns, XmlNodeType.EndElement))
         {
             if (reader.Is("townDetail", ns))
             {
@@ -471,6 +427,10 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
             {
                 marketEvaluationPointAdressPostalCode = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             }
+            else if (reader.Is("poBox", ns))
+            {
+                marketEvaluationPointAdressPoBox = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
             else
             {
                 await reader.ReadAsync().ConfigureAwait(false);
@@ -478,16 +438,10 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         }
 
         return new Address(
-            streetDetails!.Code,
-            streetDetails.Name,
-            streetDetails.Number,
-            streetDetails.FloorIdentification,
-            streetDetails.SuiteNumber,
-            townDetails!.Code,
-            townDetails.Name,
-            townDetails.Section,
-            townDetails.Country,
-            marketEvaluationPointAdressPostalCode);
+            streetDetails!,
+            townDetails!,
+            marketEvaluationPointAdressPostalCode,
+            marketEvaluationPointAdressPoBox);
     }
 
     private XmlReaderSettings CreateXmlReaderSettings(XmlSchema xmlSchema)
@@ -513,7 +467,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
     }
 
     private async
-        Task<MessageParserResult<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>>
+        Task<MessageParserResult<MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>>
         ParseXmlDataAsync(XmlReader reader)
     {
         var root = await reader.ReadRootElementAsync().ConfigureAwait(false);
@@ -521,7 +475,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         if (_errors.Count > 0)
         {
             return new
-                MessageParserResult<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>(
+                MessageParserResult<MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>(
                     _errors.ToArray());
         }
 
@@ -535,11 +489,11 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         if (_errors.Count > 0)
         {
             return new
-                MessageParserResult<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>(
+                MessageParserResult<MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>(
                     _errors.ToArray());
         }
 
-        return new MessageParserResult<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>(
-            new RequestChangeAccountingPointCharacteristicIncomingDocument(messageHeader, marketActivityRecords));
+        return new MessageParserResult<MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>(
+            new RequestChangeCustomerCharacteristicIncomingDocument(messageHeader, marketActivityRecords));
     }
 }

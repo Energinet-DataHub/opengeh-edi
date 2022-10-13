@@ -23,7 +23,6 @@ using Messaging.Application.SchemaStore;
 using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.Domain.OutgoingMessages;
-using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
 
 namespace Messaging.Infrastructure.IncomingMessages.RequestChangeOfSupplier;
 
@@ -218,45 +217,6 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         return marketActivityRecord;
     }
 
-    private static async Task<MessageHeader> ExtractMessageHeaderAsync(
-        XmlReader reader,
-        RootElement rootElement)
-    {
-        var messageId = string.Empty;
-        var processType = string.Empty;
-        var senderId = string.Empty;
-        var senderRole = string.Empty;
-        var receiverId = string.Empty;
-        var receiverRole = string.Empty;
-        var createdAt = string.Empty;
-        var ns = rootElement.DefaultNamespace;
-
-        await reader.AdvanceToAsync(HeaderElementName, rootElement.DefaultNamespace).ConfigureAwait(false);
-
-        while (!reader.EOF)
-        {
-            if (reader.Is("mRID", ns))
-                messageId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            else if (reader.Is("process.processType", ns))
-                processType = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            else if (reader.Is("sender_MarketParticipant.mRID", ns))
-                senderId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            else if (reader.Is("sender_MarketParticipant.marketRole.type", ns))
-                senderRole = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            else if (reader.Is("receiver_MarketParticipant.mRID", ns))
-                receiverId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            else if (reader.Is("receiver_MarketParticipant.marketRole.type", ns))
-                receiverRole = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            else if (reader.Is("createdDateTime", ns))
-                createdAt = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            else await reader.ReadAsync().ConfigureAwait(false);
-
-            if (reader.Is(MarketActivityRecordElementName, ns)) break;
-        }
-
-        return new MessageHeader(messageId, processType, senderId, senderRole, receiverId, receiverRole, createdAt);
-    }
-
     private static MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction> InvalidXmlFailure(Exception exception)
     {
         return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(InvalidMessageStructure.From(exception));
@@ -301,7 +261,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
     private async Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>> ParseXmlDataAsync(XmlReader reader)
     {
         var root = await reader.ReadRootElementAsync().ConfigureAwait(false);
-        var messageHeader = await ExtractMessageHeaderAsync(reader, root).ConfigureAwait(false);
+        var messageHeader = await MessageHeaderExtractor.ExtractAsync(reader, root, HeaderElementName, MarketActivityRecordElementName).ConfigureAwait(false);
         if (_errors.Count > 0)
         {
             return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(_errors.ToArray());

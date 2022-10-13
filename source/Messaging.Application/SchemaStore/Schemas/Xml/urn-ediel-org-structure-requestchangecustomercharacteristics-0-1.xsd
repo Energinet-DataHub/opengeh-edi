@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:cim="urn:ediel.org:structure:requestchangecustomercharacteristics:0:1" xmlns:ecl="urn:entsoe.eu:wgedi:codelists" xmlns:sawsdl="http://www.w3.org/ns/sawsdl" xmlns:cimp="http://www.iec.ch/cimprofile" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:ediel.org:structure:requestchangecustomercharacteristics:0:1" elementFormDefault="qualified" attributeFormDefault="unqualified">
+    <xs:import namespace="urn:entsoe.eu:wgedi:codelists" schemaLocation="urn-entsoe-eu-wgedi-codelists.xsd"/>
+    <xs:element name="RequestChangeCustomerCharacteristics_MarketDocument" type="cim:RequestChangeCustomerCharacteristics_MarketDocument"/>
+    <xs:simpleType name="MeasurementPointID_String-base" sawsdl:modelReference="http://iec.ch/TC57/CIM101#String">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="35"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:complexType name="MeasurementPointID_String" sawsdl:modelReference="http://iec.ch/TC57/CIM101#String">
+        <xs:simpleContent>
+            <xs:extension base="cim:MeasurementPointID_String-base">
+                <xs:attribute name="codingScheme" type="ecl:CodingSchemeTypeList" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:simpleType name="PartyID_String-base" sawsdl:modelReference="http://iec.ch/TC57/CIM101#String">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="16"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:complexType name="PartyID_String" sawsdl:modelReference="http://iec.ch/TC57/CIM101#String">
+        <xs:simpleContent>
+            <xs:extension base="cim:PartyID_String-base">
+                <xs:attribute name="codingScheme" type="ecl:CodingSchemeTypeList" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="MarketEvaluationPoint" sawsdl:modelReference="http://iec.ch/TC57/CIM101#MarketEvaluationPoint">
+        <xs:sequence>
+            <xs:element name="mRID" type="cim:MeasurementPointID_String" minOccurs="1" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#IdentifiedObject.mRID"/>
+            <xs:element name="serviceCategory.ElectricalHeating" type="xs:boolean" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#Ext_Customer.ElectricalHeating"/>
+            <xs:element name="eletricalHeating_DateAndOrTime.dateTime" type="xs:dateTime" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#DateAndOrTime.dateTime"/>
+            <xs:element name="firstCustomer_MarketParticipant.mRID" type="cim:PartyID_String" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#IdentifiedObject.mRID"/>
+            <xs:element name="firstCustomer_MarketParticipant.name" type="xs:string" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#IdentifiedObject.name"/>
+            <xs:element name="secondCustomer_MarketParticipant.mRID" type="cim:PartyID_String" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#IdentifiedObject.mRID"/>
+            <xs:element name="secondCustomer_MarketParticipant.name" type="xs:string" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#IdentifiedObject.name"/>
+            <xs:element name="protectedName" type="xs:boolean" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#DK_Ext_MarketEvaluationPoint.protectedName"/>
+            <xs:element name="UsagePointLocation" type="cim:UsagePointLocation" minOccurs="0" maxOccurs="unbounded" sawsdl:modelReference="http://iec.ch/TC57/CIM101#MarketEvaluationPoint.UsagePointLocation"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="MktActivityRecord" sawsdl:modelReference="http://iec.ch/TC57/CIM101#MktActivityRecord">
+        <xs:sequence>
+            <xs:element name="mRID" type="xs:string" minOccurs="1" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#IdentifiedObject.mRID"/>
+            <xs:element name="businessProcessReference_MktActivityRecord.mRID" type="xs:string" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#IdentifiedObject.mRID"/>
+            <xs:element name="start_DateAndOrTime.dateTime" type="xs:dateTime" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#DateAndOrTime.dateTime"/>
+            <xs:element name="MarketEvaluationPoint" type="cim:MarketEvaluationPoint" minOccurs="1" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#MktActivityRecord.MarketEvaluationPoint"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:simpleType name="MessageKind_String" sawsdl:modelReference="http://iec.ch/TC57/CIM101#String">
+        <xs:restriction base="ecl:MessageTypeList"/>
+    </xs:simpleType>
+    <xs:simpleType name="ProcessKind_String" sawsdl:modelReference="http://iec.ch/TC57/CIM101#String">
+        <xs:restriction base="ecl:ProcessTypeList"/>
+    </xs:simpleType>
+    <xs:simpleType name="BusinessSectorKind_String" sawsdl:modelReference="http://iec.ch/TC57/CIM101#String">
+        <xs:restriction base="ecl:BusinessSectorTypeList"/>
+    </xs:simpleType>
+    <xs:simpleType name="MarketRoleKind_String" sawsdl:modelReference="http://iec.ch/TC57/CIM101#String">
+        <xs:restriction base="ecl:RoleTypeList"/>
+    </xs:simpleType>
+    <xs:complexType name="RequestChangeCustomerCharacteristics_MarketDocument" sawsdl:modelReference="http://iec.ch/TC57/CIM101#MarketDocument">
+        <xs:sequence>
+            <xs:element name="mRID" type="xs:string" minOccurs="1" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#IdentifiedObject.mRID"/>
+            <xs:element name="type" type="cim:MessageKind_String" default="D15" minOccurs="1" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#Document.type"/>
+            <xs:element name="process.processType" type="cim:ProcessKind_String" minOccurs="1" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#Process.processType"/>
+            <xs:element name="businessSector.type" type="cim:BusinessSectorKind_String" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#BusinessSector.type"/>
+            <xs:element name="sender_MarketParticipant.mRID" type="cim:PartyID_String" minOccurs="1" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#IdentifiedObject.mRID"/>
+            <xs:element name="sender_MarketParticipant.marketRole.type" type="cim:MarketRoleKind_String" minOccurs="1" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#MarketRole.type"/>
+            <xs:element name="receiver_MarketParticipant.mRID" type="cim:PartyID_String" minOccurs="1" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#IdentifiedObject.mRID"/>
+            <xs:element name="receiver_MarketParticipant.marketRole.type" type="cim:MarketRoleKind_String" minOccurs="1" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#MarketRole.type"/>
+            <xs:element name="createdDateTime" type="xs:dateTime" minOccurs="1" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#Document.createdDateTime"/>
+            <xs:element name="MktActivityRecord" type="cim:MktActivityRecord" minOccurs="1" maxOccurs="unbounded" sawsdl:modelReference="http://iec.ch/TC57/CIM101#MarketDocument.MktActivityRecord"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:simpleType name="AddressKind_String" sawsdl:modelReference="http://iec.ch/TC57/CIM101#String">
+        <xs:restriction base="ecl:AddressTypeList"/>
+    </xs:simpleType>
+    <xs:simpleType name="Characters70_String" sawsdl:modelReference="http://iec.ch/TC57/CIM101#String">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="70"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:complexType name="ElectronicAddress" sawsdl:modelReference="http://iec.ch/TC57/CIM101#ElectronicAddress">
+        <xs:sequence>
+            <xs:element name="email1" type="cim:Characters70_String" minOccurs="1" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#ElectronicAddress.email1"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="StreetDetail" sawsdl:modelReference="http://iec.ch/TC57/CIM101#StreetDetail">
+        <xs:sequence>
+            <xs:element name="code" type="xs:string" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#StreetDetail.code"/>
+            <xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#StreetDetail.name"/>
+            <xs:element name="number" type="xs:string" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#StreetDetail.number"/>
+            <xs:element name="floorIdentification" type="xs:string" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#StreetDetail.floorIdentification"/>
+            <xs:element name="suiteNumber" type="xs:string" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#StreetDetail.suiteNumber"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:simpleType name="Characters2_String" sawsdl:modelReference="http://iec.ch/TC57/CIM101#String">
+        <xs:restriction base="xs:string">
+            <xs:length value="2"/>
+            <xs:pattern value="[A-Z]*"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:complexType name="TownDetail" sawsdl:modelReference="http://iec.ch/TC57/CIM101#TownDetail">
+        <xs:sequence>
+            <xs:element name="code" type="xs:string" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#TownDetail.code"/>
+            <xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#TownDetail.name"/>
+            <xs:element name="section" type="xs:string" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#TownDetail.section"/>
+            <xs:element name="country" type="cim:Characters2_String" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#TownDetail.country"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="StreetAddress" sawsdl:modelReference="http://iec.ch/TC57/CIM101#StreetAddress">
+        <xs:sequence>
+            <xs:element name="streetDetail" type="cim:StreetDetail" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#StreetAddress.streetDetail"/>
+            <xs:element name="townDetail" type="cim:TownDetail" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#StreetAddress.townDetail"/>
+            <xs:element name="postalCode" type="xs:string" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#StreetAddress.postalCode"/>
+            <xs:element name="poBox" type="xs:string" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#StreetAddress.poBox"/>
+            <xs:element name="language" type="xs:string" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#StreetAddress.language"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:simpleType name="Characters15_String" sawsdl:modelReference="http://iec.ch/TC57/CIM101#String">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="15"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:complexType name="TelephoneNumber" sawsdl:modelReference="http://iec.ch/TC57/CIM101#TelephoneNumber">
+        <xs:sequence>
+            <xs:element name="ituPhone" type="cim:Characters15_String" minOccurs="1" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#TelephoneNumber.ituPhone"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="UsagePointLocation" sawsdl:modelReference="http://iec.ch/TC57/CIM101#UsagePointLocation">
+        <xs:sequence>
+            <xs:element name="type" type="cim:AddressKind_String" minOccurs="1" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#Location.type"/>
+            <xs:element name="geoInfoReference" type="xs:string" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#Location.geoInfoReference"/>
+            <xs:element name="mainAddress" type="cim:StreetAddress" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#Location.mainAddress"/>
+            <xs:element name="protectedAddress" type="xs:boolean" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#DK_Ext_UsagePointLocation.protectedAddress"/>
+            <xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#IdentifiedObject.name"/>
+            <xs:element name="attn_Names.name" type="xs:string" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#Name.name"/>
+            <xs:element name="phone1" type="cim:TelephoneNumber" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#Location.phone1"/>
+            <xs:element name="phone2" type="cim:TelephoneNumber" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#Location.phone2"/>
+            <xs:element name="electronicAddress" type="cim:ElectronicAddress" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#Location.electronicAddress"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>
