@@ -71,7 +71,7 @@ public class CharacteristicsOfACustomerAtAnApDocumentWriter : DocumentWriter
 
         await WriteMridAsync("mRID", marketEvaluationPoint.MarketEvaluationPointId, "A10", writer).ConfigureAwait(false);
         await WriteElementAsync("serviceCategory.ElectricalHeating", marketEvaluationPoint.ElectricalHeating.ToStringValue(), writer).ConfigureAwait(false);
-        await WriteElementAsync("eletricalHeating_DateAndOrTime.dateTime", marketEvaluationPoint.ElectricalHeatingStart?.ToString() ?? string.Empty, writer).ConfigureAwait(false);
+        await WriteElementIfHasValueAsync("eletricalHeating_DateAndOrTime.dateTime", marketEvaluationPoint.ElectricalHeatingStart?.ToString(), writer).ConfigureAwait(false);
 
         await WriteCustomerIdIfVatAsync("firstCustomer_MarketParticipant.mRID", marketEvaluationPoint.FirstCustomerId, writer).ConfigureAwait(false);
 

@@ -30,6 +30,7 @@ using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Tests.Infrastructure.OutgoingMessages.Asserts;
+using NodaTime;
 using Xunit;
 
 namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
@@ -54,8 +55,8 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
         {
             var marketActivityRecords = new List<MarketActivityRecord>()
             {
-                CreateMarketActivityRecord(),
-                CreateMarketActivityRecord(),
+                CreateMarketActivityRecord(null, null, _systemDateTimeProvider.Now()),
+                CreateMarketActivityRecord(null, null, _systemDateTimeProvider.Now()),
             };
 
             var header = CreateHeader(MarketRole.EnergySupplier);
@@ -74,6 +75,15 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
                 .NumberOfMarketActivityRecordsIs(2)
                 .HasValidStructureAsync(schema!).ConfigureAwait(false);
             AssertMarketActivityRecord(marketActivityRecords.First(), assertDocument);
+        }
+
+        [Fact]
+        public async Task Eletrical_heating_date_is_excluded_when_no_date_is_specified()
+        {
+            var document = await WriteDocumentAsync(CreateHeader(MarketRole.GridOperator), CreateMarketActivityRecord(null, null, null)).ConfigureAwait(false);
+
+            AssertXmlDocument.Document(document, NamespacePrefix)
+                .IsNotPresent("MktActivityRecord[1]/MarketEvaluationPoint/eletricalHeating_DateAndOrTime.dateTime");
         }
 
         [Fact]
@@ -147,7 +157,7 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
                     .HasValue("MktActivityRecord[1]/MarketEvaluationPoint/UsagePointLocation[1]/protectedAddress", firstUsagePointLocation.ProtectedAddress.ToStringValue());
         }
 
-        private MarketActivityRecord CreateMarketActivityRecord(MrId? firstCustomerId = null, MrId? secondCustomerId = null)
+        private MarketActivityRecord CreateMarketActivityRecord(MrId? firstCustomerId = null, MrId? secondCustomerId = null, Instant? electricalHeatingStartDate = null)
         {
             return new(
                 Guid.NewGuid().ToString(),
@@ -156,7 +166,7 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
                 new MarketEvaluationPoint(
                     "579999993331812345",
                     true,
-                    _systemDateTimeProvider.Now(),
+                    electricalHeatingStartDate,
                     firstCustomerId ?? new MrId("Consumer1Id", "VAT"),
                     "Consumer1",
                     secondCustomerId ?? new MrId("Consumer2Id", "VAT"),

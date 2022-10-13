@@ -82,6 +82,16 @@ public abstract class DocumentWriter : IDocumentWriter
         return writer.WriteElementStringAsync(DocumentDetails.Prefix, name, null, value);
     }
 
+    protected Task WriteElementIfHasValueAsync(string name, string? value, XmlWriter writer)
+    {
+        if (!string.IsNullOrEmpty(value))
+        {
+            return WriteElementAsync(name, value, writer);
+        }
+
+        return Task.CompletedTask;
+    }
+
     protected async Task WriteMridAsync(string localName, string id, string codingScheme, XmlWriter writer)
     {
         if (writer == null) throw new ArgumentNullException(nameof(writer));
