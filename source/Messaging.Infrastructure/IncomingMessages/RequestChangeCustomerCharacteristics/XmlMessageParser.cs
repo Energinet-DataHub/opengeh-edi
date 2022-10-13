@@ -344,6 +344,11 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         var protectedAddress = false;
         var name = string.Empty;
         var attnName = string.Empty;
+        var phone1 = string.Empty;
+        var phone2 = string.Empty;
+        var email = string.Empty;
+
+        var phone1Reached = false;
 
         while (!reader.Is("UsagePointLocation", ns, XmlNodeType.EndElement))
         {
@@ -371,6 +376,19 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
             {
                 attnName = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             }
+            else if (reader.Is("ituPhone", ns) && !phone1Reached)
+            {
+                phone1 = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                phone1Reached = true;
+            }
+            else if (reader.Is("ituPhone", ns))
+            {
+                phone2 = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("email1", ns))
+            {
+                email = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
             else
             {
                 await reader.ReadAsync().ConfigureAwait(false);
@@ -383,7 +401,10 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
             address!,
             protectedAddress,
             name,
-            attnName);
+            attnName,
+            phone1,
+            phone2,
+            email);
     }
 
     private static async Task<Address> ReadAddressAsync(XmlReader reader, string ns)
@@ -439,7 +460,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
 
         await reader.AdvanceToAsync(HeaderElementName, rootElement.DefaultNamespace).ConfigureAwait(false);
 
-        while (!reader.EOF)
+        while (!reader.Is(MarketActivityRecordElementName, ns))
         {
             if (reader.Is("mRID", ns))
                 messageId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);

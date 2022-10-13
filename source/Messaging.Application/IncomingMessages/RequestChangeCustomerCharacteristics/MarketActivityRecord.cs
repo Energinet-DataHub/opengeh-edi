@@ -39,7 +39,10 @@ public record PointLocation(
     Address Address,
     bool ProtectedAddress,
     string Name,
-    string AttnName);
+    string AttnName,
+    string Phone1,
+    string Phone2,
+    string Email);
 
 public record Address(
     StreetDetails StreetDetails,

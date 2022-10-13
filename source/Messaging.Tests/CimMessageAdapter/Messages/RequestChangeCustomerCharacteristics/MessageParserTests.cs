@@ -107,6 +107,9 @@ public class MessageParserTests
         Assert.False(pointLocation.ProtectedAddress);
         Assert.Equal("Jytte Larsen", pointLocation.Name);
         Assert.Equal("Hans Sørensen", pointLocation.AttnName);
+        Assert.Equal("25361498", pointLocation.Phone1);
+        Assert.Equal("25369814", pointLocation.Phone2);
+        Assert.Equal("hans@hop.dk", pointLocation.Email);
     }
 
     private static void AssertAddress(Address address)
