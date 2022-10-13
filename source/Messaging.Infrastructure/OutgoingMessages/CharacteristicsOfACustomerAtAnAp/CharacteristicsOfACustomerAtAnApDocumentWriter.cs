@@ -126,11 +126,7 @@ public class CharacteristicsOfACustomerAtAnApDocumentWriter : DocumentWriter
 
     private Task WriteIfReceiverRoleIsAsync(MarketRole marketRole, Func<Task> writeAction)
     {
-        var receiverRole = EnumerationType
-            .GetAll<MarketRole>()
-            .FirstOrDefault(t => t.Name.Equals(_header?.ReceiverRole, StringComparison.OrdinalIgnoreCase));
-
-        if (marketRole == receiverRole)
+        if (ReceiverIs(marketRole))
         {
             return writeAction();
         }
