@@ -15,7 +15,7 @@
 using Messaging.Domain.MasterData;
 using NodaTime;
 
-namespace Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails;
+namespace Messaging.Domain.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails;
 
 public class MarketEvaluationPoint
 {

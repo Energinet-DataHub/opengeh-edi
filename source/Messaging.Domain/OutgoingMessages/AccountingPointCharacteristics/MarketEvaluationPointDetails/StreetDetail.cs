@@ -12,6 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Application.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
+namespace Messaging.Domain.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails;
 
-public record MarketActivityRecord(string Id, string OriginalTransactionId, string MarketEvaluationPointId);
+public class StreetDetail
+{
+    public StreetDetail(string code, string name, string number, string floorIdentification, string suiteNumber)
+    {
+        Code = code;
+        Name = name;
+        Number = number;
+        FloorIdentification = floorIdentification;
+        SuiteNumber = suiteNumber;
+    }
+
+    public string Code { get; }
+
+    public string Name { get; }
+
+    public string Number { get; }
+
+    public string FloorIdentification { get; }
+
+    public string SuiteNumber { get; }
+}

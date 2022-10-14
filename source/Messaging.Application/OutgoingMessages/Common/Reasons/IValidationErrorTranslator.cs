@@ -15,7 +15,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 
 namespace Messaging.Application.OutgoingMessages.Common.Reasons;
 

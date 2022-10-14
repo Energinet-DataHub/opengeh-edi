@@ -23,12 +23,13 @@ using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.OutgoingMessages.Common.Reasons;
-using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Domain.Actors;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Domain.Transactions.MoveIn;
 using NodaTime.Text;
+using MarketActivityRecord = Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier.MarketActivityRecord;
 
 namespace Messaging.Application.Transactions.MoveIn
 {
@@ -148,7 +149,7 @@ namespace Messaging.Application.Transactions.MoveIn
 
         private OutgoingMessage ConfirmMessageFrom(MoveInTransaction transaction, RequestChangeOfSupplierTransaction requestChangeOfSupplierTransaction)
         {
-            var marketActivityRecord = new OutgoingMessages.ConfirmRequestChangeOfSupplier.MarketActivityRecord(
+            var marketActivityRecord = new Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier.MarketActivityRecord(
                 Guid.NewGuid().ToString(),
                 transaction.TransactionId,
                 transaction.MarketEvaluationPointId);
@@ -163,7 +164,7 @@ namespace Messaging.Application.Transactions.MoveIn
 
         private OutgoingMessage RejectMessageFrom(IReadOnlyCollection<Reason> reasons, MoveInTransaction transaction, RequestChangeOfSupplierTransaction requestChangeOfSupplierTransaction)
         {
-            var marketActivityRecord = new OutgoingMessages.RejectRequestChangeOfSupplier.MarketActivityRecord(
+            var marketActivityRecord = new MarketActivityRecord(
                 Guid.NewGuid().ToString(),
                 transaction.TransactionId,
                 transaction.MarketEvaluationPointId,
