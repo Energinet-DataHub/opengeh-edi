@@ -60,6 +60,9 @@ limitations under the License.
       <EmbeddedResource Include="CimMessageAdapter\Messages\xml\BadRequestChangeOfSupplier.xml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\RequestChangeCustomerCharacteristics.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
       <EmbeddedResource Include="CimMessageAdapter\Messages\xml\RequestChangeOfSupplier.xml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>

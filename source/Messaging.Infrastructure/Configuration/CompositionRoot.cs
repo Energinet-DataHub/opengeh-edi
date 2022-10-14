@@ -29,6 +29,7 @@ using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.Configuration.TimeEvents;
+using Messaging.Application.IncomingMessages.RequestChangeCustomerCharacteristics;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Common;
@@ -230,6 +231,16 @@ namespace Messaging.Infrastructure.Configuration
             }));
             _services.AddSingleton<XmlMessageParser>();
             _services.AddSingleton<JsonMessageParser>();
+
+            _services.AddSingleton(_ =>
+                new CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics.MessageParser(
+                    new IMessageParser<Application.IncomingMessages.RequestChangeCustomerCharacteristics.
+                        MarketActivityRecord,
+                        RequestChangeCustomerCharacteristicsTransaction>[]
+                    {
+                        new IncomingMessages.RequestChangeCustomerCharacteristics.XmlMessageParser(),
+                    }));
+            _services.AddSingleton<IncomingMessages.RequestChangeCustomerCharacteristics.XmlMessageParser>();
             _services.AddSingleton<XmlSchemaProvider>();
             _services.AddSingleton<JsonSchemaProvider>();
             _services.AddSingleton(_ => new ResponseFactory(new IResponseFactory[]
