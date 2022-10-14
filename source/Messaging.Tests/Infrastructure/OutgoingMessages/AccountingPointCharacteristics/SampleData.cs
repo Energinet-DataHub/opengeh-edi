@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using System;
-using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
-using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails;
 using Messaging.Domain.MasterData;
+using Messaging.Domain.OutgoingMessages.AccountingPointCharacteristics;
+using Messaging.Domain.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails;
 using Messaging.Infrastructure.Configuration;
 
 namespace Messaging.Tests.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
