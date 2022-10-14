@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Messaging.Domain.Actors;
-using Messaging.Domain.SeedWork;
 
 namespace Messaging.Domain.OutgoingMessages
 {

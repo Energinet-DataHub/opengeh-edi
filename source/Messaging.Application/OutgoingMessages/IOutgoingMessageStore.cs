@@ -37,13 +37,6 @@ namespace Messaging.Application.OutgoingMessages
         ReadOnlyCollection<OutgoingMessage> GetUnpublished();
 
         /// <summary>
-        /// Gets an outgoing message from message store
-        /// </summary>
-        /// <param name="messageId"></param>
-        /// <returns><see cref="OutgoingMessage"/></returns>
-        OutgoingMessage? GetById(Guid messageId);
-
-        /// <summary>
         /// Get outgoing message by the id of the transaction that generated the message
         /// </summary>
         /// <param name="transactionId"></param>
