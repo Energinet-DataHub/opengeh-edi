@@ -44,11 +44,11 @@ namespace Messaging.Application.OutgoingMessages
         OutgoingMessage? GetById(Guid messageId);
 
         /// <summary>
-        /// Get outgoing message by id of incoming message
+        /// Get outgoing message by the id of the transaction that generated the message
         /// </summary>
-        /// <param name="incomingMessageId"></param>
+        /// <param name="transactionId"></param>
         /// <returns><see cref="OutgoingMessage"/></returns>
-        OutgoingMessage? GetByOriginalMessageId(string incomingMessageId);
+        OutgoingMessage? GetByTransactionId(string transactionId);
 
         /// <summary>
         /// Get outgoing messages by list of incoming message ids

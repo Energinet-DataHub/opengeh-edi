@@ -50,10 +50,10 @@ namespace Messaging.Infrastructure.OutgoingMessages
             return _context.OutgoingMessages.Find(messageId);
         }
 
-        public OutgoingMessage? GetByOriginalMessageId(string incomingMessageId)
+        public OutgoingMessage? GetByTransactionId(string transactionId)
         {
             return _context.OutgoingMessages
-                .FirstOrDefault(message => message.TransactionId == incomingMessageId);
+                .FirstOrDefault(message => message.TransactionId == transactionId);
         }
 
         public ReadOnlyCollection<OutgoingMessage> GetByIds(IReadOnlyCollection<string> messageIds)
