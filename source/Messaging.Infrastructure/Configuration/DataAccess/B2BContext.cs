@@ -16,6 +16,7 @@ using System;
 using Contracts.BusinessRequests.MoveIn;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages.AccountingPointCharacteristics;
 using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Domain.OutgoingMessages.GenericNotification;
 using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
@@ -66,6 +67,8 @@ namespace Messaging.Infrastructure.Configuration.DataAccess
             modelBuilder.Entity<ConfirmRequestChangeOfSupplierMessage>()
                 .Ignore(entity => entity.MarketActivityRecord);
             modelBuilder.Entity<RejectRequestChangeOfSupplierMessage>()
+                .Ignore(entity => entity.MarketActivityRecord);
+            modelBuilder.Entity<AccountingPointCharacteristicsMessage>()
                 .Ignore(entity => entity.MarketActivityRecord);
         }
     }
