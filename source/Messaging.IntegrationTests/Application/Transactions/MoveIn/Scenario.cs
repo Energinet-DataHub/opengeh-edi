@@ -16,6 +16,7 @@ using System;
 using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.Actors;
+using Messaging.Domain.Actors;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.DataAccess;
@@ -64,7 +65,8 @@ public class Scenario
             newEnergySupplierNumber,
             consumerId,
             consumerName,
-            consumerIdType);
+            consumerIdType,
+            ActorNumber.Create(newEnergySupplierNumber));
 
         return new Scenario(_transaction, mediator, context);
     }

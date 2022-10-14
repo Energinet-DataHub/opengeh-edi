@@ -37,4 +37,6 @@ internal class SampleData
     internal static string ConsumerName => "John Doe";
 
     internal static string ConsumerIdType => "ARR";
+
+    internal static string RequestedByActorNumber => "1234567890123";
 }
