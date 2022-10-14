@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 
 namespace Messaging.Application.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 

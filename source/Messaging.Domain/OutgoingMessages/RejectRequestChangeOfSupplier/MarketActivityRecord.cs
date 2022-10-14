@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-
-namespace Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier
+namespace Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier
 {
     public class MarketActivityRecord
     {

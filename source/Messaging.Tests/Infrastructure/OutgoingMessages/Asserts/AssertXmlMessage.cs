@@ -19,9 +19,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
-using Messaging.Application.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Application.Xml;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Xunit;
 
 namespace Messaging.Tests.Infrastructure.OutgoingMessages.Asserts
