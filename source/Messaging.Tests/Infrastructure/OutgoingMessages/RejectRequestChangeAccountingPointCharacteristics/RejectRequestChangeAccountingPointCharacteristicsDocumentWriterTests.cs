@@ -30,7 +30,7 @@ using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 using Messaging.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
-using MarketActivityRecord = Messaging.Application.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics.MarketActivityRecord;
+using MarketActivityRecord = Messaging.Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics.MarketActivityRecord;
 
 namespace Messaging.Tests.Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 
