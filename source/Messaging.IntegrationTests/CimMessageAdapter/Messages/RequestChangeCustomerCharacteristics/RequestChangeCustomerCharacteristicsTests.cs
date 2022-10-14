@@ -20,9 +20,8 @@ using System.Threading.Tasks;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.IncomingMessages.RequestChangeCustomerCharacteristics;
 using Messaging.CimMessageAdapter.Messages;
-using Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
+using Messaging.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 using Messaging.Domain.OutgoingMessages;
-using Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeCustomerCharcteristics;
 using Messaging.IntegrationTests.CimMessageAdapter.Stubs;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
@@ -77,7 +76,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase
     public async Task Receiver_role_must_be_metering_point_administrator()
     {
         await using var message = BusinessMessageBuilder
-            .RequestChangeOfSupplier()
+            .RequestChangeCustomerCharacteristics()
             .WithReceiverRole("DDK")
             .Message();
 
@@ -105,7 +104,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase
     private MessageReceiver CreateMessageReceiver()
     {
         _messageQueueDispatcherSpy = new MessageQueueDispatcherStub();
-        var messageReceiver = new RequestChangeOfSupplierReceiver(
+        var messageReceiver = new RequestChangeCustomerCharacteristicsReceiver(
             _messageIds,
             _messageQueueDispatcherSpy,
             _transactionIds,

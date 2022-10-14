@@ -12,10 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.CimMessageAdapter.Messages;
-using Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
-
-namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeCustomerCharcteristics;
+namespace Messaging.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 
 public class RequestChangeCustomerCharacteristicsReceiver : MessageReceiver
 {
