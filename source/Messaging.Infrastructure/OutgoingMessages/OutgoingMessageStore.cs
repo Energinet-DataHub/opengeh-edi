@@ -53,7 +53,7 @@ namespace Messaging.Infrastructure.OutgoingMessages
         public OutgoingMessage? GetByOriginalMessageId(string incomingMessageId)
         {
             return _context.OutgoingMessages
-                .FirstOrDefault(message => message.OriginalMessageId == incomingMessageId);
+                .FirstOrDefault(message => message.TransactionId == incomingMessageId);
         }
 
         public ReadOnlyCollection<OutgoingMessage> GetByIds(IReadOnlyCollection<string> messageIds)
