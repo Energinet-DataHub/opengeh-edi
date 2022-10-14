@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright 2020 Energinet DataHub A/S
+
+Licensed under the Apache License, Version 2.0 (the "License2");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<cim:RequestChangeCustomerCharacteristics_MarketDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cim="urn:ediel.org:structure:requestchangecustomercharacteristics:0:1" xsi:schemaLocation="urn:ediel.org:structure:requestchangecustomercharacteristics:0:1 urn-ediel-org-structure-requestchangecustomercharacteristics-0-1.xsd">
+    <cim:mRID>253659974</cim:mRID>
+    <cim:type>D15</cim:type>
+    <cim:process.processType>E34</cim:process.processType>
+    <cim:businessSector.type>23</cim:businessSector.type>
+    <cim:sender_MarketParticipant.mRID codingScheme="A10">5799999933318</cim:sender_MarketParticipant.mRID>
+    <cim:sender_MarketParticipant.marketRole.type>DDQ</cim:sender_MarketParticipant.marketRole.type>
+    <cim:receiver_MarketParticipant.mRID codingScheme="A10">5790001330552</cim:receiver_MarketParticipant.mRID>
+    <cim:receiver_MarketParticipant.marketRole.type>DDZ</cim:receiver_MarketParticipant.marketRole.type>
+    <cim:createdDateTime>2022-12-17T09:30:47Z</cim:createdDateTime>
+    <cim:MktActivityRecord>
+        <cim:mRID>253698254</cim:mRID>
+        <cim:start_DateAndOrTime.dateTime>2022-12-17T23:00:00Z</cim:start_DateAndOrTime.dateTime>
+        <cim:MarketEvaluationPoint>
+            <cim:mRID codingScheme="A10">579999993331812345</cim:mRID>
+            <cim:serviceCategory.ElectricalHeating>true</cim:serviceCategory.ElectricalHeating>
+            <cim:firstCustomer_MarketParticipant.mRID codingScheme="ARR">0212756369</cim:firstCustomer_MarketParticipant.mRID>
+            <cim:firstCustomer_MarketParticipant.name>Jan Hansen</cim:firstCustomer_MarketParticipant.name>
+            <cim:secondCustomer_MarketParticipant.mRID codingScheme="ARR">0403751478</cim:secondCustomer_MarketParticipant.mRID>
+            <cim:secondCustomer_MarketParticipant.name>Gry Hansen</cim:secondCustomer_MarketParticipant.name>
+            <cim:protectedName>false</cim:protectedName>
+            <cim:UsagePointLocation>
+                <cim:type>D01</cim:type>
+                <cim:geoInfoReference>f26f8678-6cd3-4e12-b70e-cf96290ada94</cim:geoInfoReference>
+                <cim:mainAddress>
+                    <cim:streetDetail>
+                        <cim:code>0403</cim:code>
+                        <cim:name>Vestergade</cim:name>
+                        <cim:number>16</cim:number>
+                        <cim:floorIdentification>2</cim:floorIdentification>
+                        <cim:suiteNumber>10</cim:suiteNumber>
+                    </cim:streetDetail>
+                    <cim:townDetail>
+                        <cim:code>0506</cim:code>
+                        <cim:name>Middelfart</cim:name>
+                        <cim:section>Strib</cim:section>
+                        <cim:country>DK</cim:country>
+                    </cim:townDetail>
+                    <cim:postalCode>5500</cim:postalCode>
+                    <cim:poBox>Kassen</cim:poBox>
+                </cim:mainAddress>
+                <cim:protectedAddress>false</cim:protectedAddress>
+                <cim:name>Jytte Larsen</cim:name>
+                <cim:attn_Names.name>Hans Sørensen</cim:attn_Names.name>
+                <cim:phone1>
+                    <cim:ituPhone>25361498</cim:ituPhone>
+                </cim:phone1>
+                <cim:phone2>
+                    <cim:ituPhone>25369814</cim:ituPhone>
+                </cim:phone2>
+                <cim:electronicAddress>
+                    <cim:email1>hans@hop.dk</cim:email1>
+                </cim:electronicAddress>
+            </cim:UsagePointLocation>
+            <cim:UsagePointLocation>
+                <cim:type>D04</cim:type>
+                <cim:geoInfoReference>f26f8678-6cd3-4e12-b70e-cf96290ada94</cim:geoInfoReference>
+                <cim:mainAddress>
+                    <cim:streetDetail>
+                        <cim:code>0403</cim:code>
+                        <cim:name>Vestergade</cim:name>
+                        <cim:number>16</cim:number>
+                        <cim:floorIdentification>2</cim:floorIdentification>
+                        <cim:suiteNumber>10</cim:suiteNumber>
+                    </cim:streetDetail>
+                    <cim:townDetail>
+                        <cim:code>0506</cim:code>
+                        <cim:name>Middelfart</cim:name>
+                        <cim:section>Strib</cim:section>
+                        <cim:country>DK</cim:country>
+                    </cim:townDetail>
+                    <cim:postalCode>5500</cim:postalCode>
+                    <cim:poBox>Kassen</cim:poBox>
+                </cim:mainAddress>
+                <cim:protectedAddress>false</cim:protectedAddress>
+                <cim:name>Jytte Larsen</cim:name>
+                <cim:attn_Names.name>Hans Sørensen</cim:attn_Names.name>
+                <cim:phone1>
+                    <cim:ituPhone>25361498</cim:ituPhone>
+                </cim:phone1>
+                <cim:phone2>
+                    <cim:ituPhone>25369814</cim:ituPhone>
+                </cim:phone2>
+                <cim:electronicAddress>
+                    <cim:email1>hans@hop.dk</cim:email1>
+                </cim:electronicAddress>
+            </cim:UsagePointLocation>
+        </cim:MarketEvaluationPoint>
+    </cim:MktActivityRecord>
+</cim:RequestChangeCustomerCharacteristics_MarketDocument>

@@ -13,17 +13,16 @@
 // limitations under the License.
 
 using Messaging.Domain.Actors;
-using Messaging.Domain.SeedWork;
 
 namespace Messaging.Domain.OutgoingMessages
 {
     public class OutgoingMessage
     {
-        public OutgoingMessage(DocumentType documentType, ActorNumber receiverId, string originalMessageId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string marketActivityRecordPayload)
+        public OutgoingMessage(DocumentType documentType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string marketActivityRecordPayload)
         {
             DocumentType = documentType;
             ReceiverId = receiverId;
-            OriginalMessageId = originalMessageId;
+            TransactionId = transactionId;
             ProcessType = processType;
             ReceiverRole = receiverRole;
             SenderId = senderId;
@@ -40,7 +39,7 @@ namespace Messaging.Domain.OutgoingMessages
 
         public DocumentType DocumentType { get; }
 
-        public string OriginalMessageId { get; }
+        public string TransactionId { get; }
 
         public string ProcessType { get; }
 

@@ -29,7 +29,7 @@ using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
 using Messaging.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
-using MarketActivityRecord = Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.MarketActivityRecord;
+using MarketActivityRecord = Messaging.Domain.OutgoingMessages.AccountingPointCharacteristics.MarketActivityRecord;
 
 namespace Messaging.Tests.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
 

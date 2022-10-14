@@ -20,15 +20,16 @@ using MediatR;
 using Messaging.Application.Configuration;
 using Messaging.Application.MasterData;
 using Messaging.Application.OutgoingMessages;
-using Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails;
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Domain.Actors;
 using Messaging.Domain.MasterData.Dictionaries;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages.AccountingPointCharacteristics;
+using Messaging.Domain.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails;
 using Messaging.Domain.Transactions.MoveIn;
 using NodaTime.Extensions;
-using Address = Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails.Address;
-using Series = Messaging.Application.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails.Series;
+using Address = Messaging.Domain.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails.Address;
+using Series = Messaging.Domain.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails.Series;
 
 namespace Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 
@@ -137,7 +138,7 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
     private OutgoingMessage AccountingPointCharacteristicsMessageFrom(MasterDataContent masterData, MoveInTransaction transaction)
     {
         var marketEvaluationPoint = CreateMarketEvaluationPointFrom(masterData, transaction);
-        var marketActivityRecord = new OutgoingMessages.AccountingPointCharacteristics.MarketActivityRecord(
+        var marketActivityRecord = new MarketActivityRecord(
             Guid.NewGuid().ToString(),
             null,
             transaction.EffectiveDate,

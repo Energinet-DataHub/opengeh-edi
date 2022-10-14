@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -45,15 +44,10 @@ namespace Messaging.Infrastructure.OutgoingMessages
                 .AsReadOnly();
         }
 
-        public OutgoingMessage? GetById(Guid messageId)
-        {
-            return _context.OutgoingMessages.Find(messageId);
-        }
-
-        public OutgoingMessage? GetByOriginalMessageId(string incomingMessageId)
+        public OutgoingMessage? GetByTransactionId(string transactionId)
         {
             return _context.OutgoingMessages
-                .FirstOrDefault(message => message.OriginalMessageId == incomingMessageId);
+                .FirstOrDefault(message => message.TransactionId == transactionId);
         }
 
         public ReadOnlyCollection<OutgoingMessage> GetByIds(IReadOnlyCollection<string> messageIds)
