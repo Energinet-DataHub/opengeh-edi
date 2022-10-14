@@ -35,10 +35,10 @@ namespace Messaging.IntegrationTests.Assertions
             if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
 
             var message = connectionFactory.GetOpenConnection().QuerySingle(
-                $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.OriginalMessageId, m.ProcessType," +
+                $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.TransactionId, m.ProcessType," +
                 $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MarketActivityRecordPayload " +
                 $" FROM [b2b].[OutgoingMessages] m" +
-                $" WHERE m.OriginalMessageId = '{transactionId}' AND m.DocumentType = '{documentType}' AND m.ProcessType = '{processType}'");
+                $" WHERE m.TransactionId = '{transactionId}' AND m.DocumentType = '{documentType}' AND m.ProcessType = '{processType}'");
 
             Assert.NotNull(message);
             return new AssertOutgoingMessage(message);
