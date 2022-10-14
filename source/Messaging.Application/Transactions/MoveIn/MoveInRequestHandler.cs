@@ -149,7 +149,7 @@ namespace Messaging.Application.Transactions.MoveIn
 
         private OutgoingMessage ConfirmMessageFrom(MoveInTransaction transaction, RequestChangeOfSupplierTransaction requestChangeOfSupplierTransaction)
         {
-            var marketActivityRecord = new OutgoingMessages.ConfirmRequestChangeOfSupplier.MarketActivityRecord(
+            var marketActivityRecord = new Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier.MarketActivityRecord(
                 Guid.NewGuid().ToString(),
                 transaction.TransactionId,
                 transaction.MarketEvaluationPointId);
