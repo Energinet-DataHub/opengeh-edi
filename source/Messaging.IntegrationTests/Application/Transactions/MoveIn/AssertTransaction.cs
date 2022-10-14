@@ -138,6 +138,12 @@ public class AssertTransaction
         return this;
     }
 
+    public AssertTransaction HasRequestedByActorNumber(string expectedActorNumber)
+    {
+        Assert.Equal(expectedActorNumber, _transaction.RequestedByActorNumber);
+        return this;
+    }
+
     private static dynamic? GetTransaction(string transactionId, IDbConnectionFactory connectionFactory)
     {
         return connectionFactory.GetOpenConnection().QuerySingle(
