@@ -15,6 +15,13 @@
 using System;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages.AccountingPointCharacteristics;
+using Messaging.Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
+using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
+using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
+using Messaging.Domain.OutgoingMessages.GenericNotification;
+using Messaging.Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
+using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Domain.SeedWork;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -53,6 +60,18 @@ namespace Messaging.Infrastructure.Configuration.DataAccess.Outgoing
                     toDbValue => toDbValue.ToString(),
                     fromDbValue => EnumerationType.FromName<MarketRole>(fromDbValue));
             builder.Property(x => x.MarketActivityRecordPayload);
+
+            builder
+                .HasDiscriminator<string>("Discriminator")
+                .HasValue<OutgoingMessage>(nameof(OutgoingMessage))
+                .HasValue<ConfirmRequestChangeOfSupplierMessage>(DocumentType.ConfirmRequestChangeOfSupplier.Name)
+                .HasValue<RejectRequestChangeOfSupplierMessage>(DocumentType.RejectRequestChangeOfSupplier.Name)
+                .HasValue<GenericNotificationMessage>(DocumentType.GenericNotification.Name)
+                .HasValue<AccountingPointCharacteristicsMessage>(DocumentType.AccountingPointCharacteristics.Name)
+                .HasValue<CharacteristicsOfACustomerAtAnApMessage>(DocumentType.CharacteristicsOfACustomerAtAnAP.Name)
+                .HasValue<ConfirmRequestChangeAccountingPointCharacteristicsMessage>(DocumentType.ConfirmRequestChangeAccountingPointCharacteristics.Name)
+                .HasValue<RejectRequestChangeAccountingPointCharacteristicsMessage>(DocumentType.RejectRequestChangeAccountingPointCharacteristics.Name)
+                .IsComplete(false);
         }
     }
 }
