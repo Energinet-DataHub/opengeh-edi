@@ -74,8 +74,7 @@ namespace Messaging.Application.Transactions.MoveIn
                 request.MarketActivityRecord.EnergySupplierId ?? string.Empty,
                 request.MarketActivityRecord.ConsumerId,
                 request.MarketActivityRecord.ConsumerName,
-                request.MarketActivityRecord.ConsumerIdType,
-                ActorNumber.Create(request.Message.SenderId));
+                request.MarketActivityRecord.ConsumerIdType);
 
             if (string.IsNullOrEmpty(request.MarketActivityRecord.EnergySupplierId))
             {

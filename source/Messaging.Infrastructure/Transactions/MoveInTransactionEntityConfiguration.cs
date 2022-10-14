@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using System;
-using Messaging.Domain.Actors;
-using Messaging.Domain.SeedWork;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.EntityFrameworkCore;
@@ -81,10 +79,6 @@ namespace Messaging.Infrastructure.Transactions
                 .HasConversion(
                     toDbValue => _serializer.Serialize(toDbValue),
                     fromDbValue => _serializer.Deserialize<CustomerMasterData>(fromDbValue));
-
-            builder.Property<ActorNumber>("_requestedBy")
-                .HasColumnName("RequestedByActorNumber")
-                .HasConversion(toDbValue => toDbValue.Value, fromDbValue => ActorNumber.Create(fromDbValue));
 
             builder.Ignore(x => x.DomainEvents);
         }

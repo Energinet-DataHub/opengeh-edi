@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.Domain.Actors;
 using Messaging.Domain.SeedWork;
 using Messaging.Domain.Transactions.MoveIn.Events;
 using NodaTime;
@@ -21,7 +20,6 @@ namespace Messaging.Domain.Transactions.MoveIn
 {
     public class MoveInTransaction : Entity
     {
-        private readonly ActorNumber _requestedBy;
         private readonly State _state = State.Started;
         private BusinessProcessState _businessProcessState;
         private NotificationState _currentEnergySupplierNotificationState;
@@ -31,9 +29,8 @@ namespace Messaging.Domain.Transactions.MoveIn
         private MasterDataState _customerMasterDataForGridOperatorDeliveryState;
         private CustomerMasterData? _customerMasterData;
 
-        public MoveInTransaction(string transactionId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId, string startedByMessageId, string newEnergySupplierId, string? consumerId, string? consumerName, string? consumerIdType, ActorNumber requestedBy)
+        public MoveInTransaction(string transactionId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId, string startedByMessageId, string newEnergySupplierId, string? consumerId, string? consumerName, string? consumerIdType)
         {
-            _requestedBy = requestedBy;
             _customerMasterDataForGridOperatorDeliveryState = MasterDataState.Pending;
             _businessProcessState = BusinessProcessState.Pending;
             _currentEnergySupplierNotificationState = currentEnergySupplierId is not null
