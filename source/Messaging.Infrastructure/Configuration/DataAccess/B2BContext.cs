@@ -18,6 +18,7 @@ using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Domain.OutgoingMessages.GenericNotification;
+using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.DataAccess.Outgoing;
 using Messaging.Infrastructure.Configuration.InternalCommands;
@@ -61,6 +62,10 @@ namespace Messaging.Infrastructure.Configuration.DataAccess
             modelBuilder.ApplyConfiguration(new MarketEvaluationPointEntityConfiguration());
 
             modelBuilder.Entity<GenericNotificationMessage>()
+                .Ignore(entity => entity.MarketActivityRecord);
+            modelBuilder.Entity<ConfirmRequestChangeOfSupplierMessage>()
+                .Ignore(entity => entity.MarketActivityRecord);
+            modelBuilder.Entity<RejectRequestChangeOfSupplierMessage>()
                 .Ignore(entity => entity.MarketActivityRecord);
         }
     }
