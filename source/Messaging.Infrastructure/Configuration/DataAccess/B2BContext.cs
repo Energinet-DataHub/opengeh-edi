@@ -20,6 +20,7 @@ using Messaging.Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
 using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Domain.OutgoingMessages.GenericNotification;
+using Messaging.Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.DataAccess.Outgoing;
@@ -75,6 +76,8 @@ namespace Messaging.Infrastructure.Configuration.DataAccess
             modelBuilder.Entity<CharacteristicsOfACustomerAtAnApMessage>()
                 .Ignore(entity => entity.MarketActivityRecord);
             modelBuilder.Entity<ConfirmRequestChangeAccountingPointCharacteristicsMessage>()
+                .Ignore(entity => entity.MarketActivityRecord);
+            modelBuilder.Entity<RejectRequestChangeAccountingPointCharacteristicsMessage>()
                 .Ignore(entity => entity.MarketActivityRecord);
         }
     }

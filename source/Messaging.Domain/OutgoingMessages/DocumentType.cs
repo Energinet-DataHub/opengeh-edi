@@ -24,6 +24,7 @@ public class DocumentType : EnumerationType
     public static readonly DocumentType AccountingPointCharacteristics = new(3, nameof(AccountingPointCharacteristics));
     public static readonly DocumentType CharacteristicsOfACustomerAtAnAP = new(4, nameof(CharacteristicsOfACustomerAtAnAP));
     public static readonly DocumentType ConfirmRequestChangeAccountingPointCharacteristics = new(5, nameof(ConfirmRequestChangeAccountingPointCharacteristics));
+    public static readonly DocumentType RejectRequestChangeAccountingPointCharacteristics = new(6, nameof(RejectRequestChangeAccountingPointCharacteristics));
 
     private DocumentType(int id, string name)
         : base(id, name)

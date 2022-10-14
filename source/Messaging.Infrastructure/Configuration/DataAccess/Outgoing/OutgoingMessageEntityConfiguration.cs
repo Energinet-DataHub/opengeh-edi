@@ -20,6 +20,7 @@ using Messaging.Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
 using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Domain.OutgoingMessages.GenericNotification;
+using Messaging.Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Domain.SeedWork;
 using Microsoft.EntityFrameworkCore;
@@ -69,6 +70,7 @@ namespace Messaging.Infrastructure.Configuration.DataAccess.Outgoing
                 .HasValue<AccountingPointCharacteristicsMessage>(DocumentType.AccountingPointCharacteristics.Name)
                 .HasValue<CharacteristicsOfACustomerAtAnApMessage>(DocumentType.CharacteristicsOfACustomerAtAnAP.Name)
                 .HasValue<ConfirmRequestChangeAccountingPointCharacteristicsMessage>(DocumentType.ConfirmRequestChangeAccountingPointCharacteristics.Name)
+                .HasValue<RejectRequestChangeAccountingPointCharacteristicsMessage>(DocumentType.RejectRequestChangeAccountingPointCharacteristics.Name)
                 .IsComplete(false);
         }
     }
