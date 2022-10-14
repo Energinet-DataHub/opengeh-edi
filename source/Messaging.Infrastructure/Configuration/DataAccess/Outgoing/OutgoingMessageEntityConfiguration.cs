@@ -16,6 +16,7 @@ using System;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
+using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Domain.SeedWork;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -59,6 +60,7 @@ namespace Messaging.Infrastructure.Configuration.DataAccess.Outgoing
                 .HasDiscriminator<string>("Discriminator")
                 .HasValue<OutgoingMessage>(nameof(OutgoingMessage))
                 .HasValue<ConfirmRequestChangeOfSupplierMessage>(DocumentType.ConfirmRequestChangeOfSupplier.Name)
+                .HasValue<RejectRequestChangeOfSupplierMessage>(DocumentType.RejectRequestChangeOfSupplier.Name)
                 .IsComplete(false);
         }
     }
