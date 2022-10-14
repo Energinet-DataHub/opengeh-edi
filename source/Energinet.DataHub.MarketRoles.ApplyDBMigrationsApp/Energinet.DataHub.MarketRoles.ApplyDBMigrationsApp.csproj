@@ -53,6 +53,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202226081406 Add customer master data.sql" />
     <EmbeddedResource Include="Scripts\Model\202226081407 Rename outgoing message column.sql" />
     <EmbeddedResource Include="Scripts\Model\202226081408 Add temp discriminator column.sql" />
+    <EmbeddedResource Include="Scripts\Model\202226081409 Add requested by actor number.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281100 Seed cleanup.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281101 Insert Reasons.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241100 Consolidated dbo model.sql" />
