@@ -58,7 +58,6 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase
         _marketActorAuthenticator = GetService<IMarketActorAuthenticator>();
         _marketActorAuthenticator.Authenticate(CreateIdentity());
     }
-#pragma warning disable
 
     [Fact]
     public async Task Receiver_id_must_be_known()
@@ -67,6 +66,19 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase
         await using var message = BusinessMessageBuilder
             .RequestChangeCustomerCharacteristics()
             .WithReceiverId(unknownReceiverId)
+            .Message();
+
+        var result = await ReceiveRequestChangeCustomerCharacteristicsMessage(message).ConfigureAwait(false);
+
+        AssertContainsError(result, "B2B-008");
+    }
+
+    [Fact]
+    public async Task Receiver_role_must_be_metering_point_administrator()
+    {
+        await using var message = BusinessMessageBuilder
+            .RequestChangeOfSupplier()
+            .WithReceiverRole("DDK")
             .Message();
 
         var result = await ReceiveRequestChangeCustomerCharacteristicsMessage(message).ConfigureAwait(false);
