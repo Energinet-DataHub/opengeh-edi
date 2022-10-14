@@ -16,6 +16,7 @@ using System;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.AccountingPointCharacteristics;
+using Messaging.Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Domain.OutgoingMessages.GenericNotification;
 using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
@@ -65,6 +66,7 @@ namespace Messaging.Infrastructure.Configuration.DataAccess.Outgoing
                 .HasValue<RejectRequestChangeOfSupplierMessage>(DocumentType.RejectRequestChangeOfSupplier.Name)
                 .HasValue<GenericNotificationMessage>(DocumentType.GenericNotification.Name)
                 .HasValue<AccountingPointCharacteristicsMessage>(DocumentType.AccountingPointCharacteristics.Name)
+                .HasValue<CharacteristicsOfACustomerAtAnApMessage>(DocumentType.CharacteristicsOfACustomerAtAnAP.Name)
                 .IsComplete(false);
         }
     }

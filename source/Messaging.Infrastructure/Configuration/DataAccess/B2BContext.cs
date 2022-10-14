@@ -14,9 +14,9 @@
 
 using System;
 using Contracts.BusinessRequests.MoveIn;
-using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.AccountingPointCharacteristics;
+using Messaging.Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Domain.OutgoingMessages.GenericNotification;
 using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
@@ -27,6 +27,7 @@ using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.MasterData.MarketEvaluationPoints;
 using Messaging.Infrastructure.Transactions;
 using Microsoft.EntityFrameworkCore;
+using MarketEvaluationPoint = Messaging.Domain.MasterData.MarketEvaluationPoints.MarketEvaluationPoint;
 
 namespace Messaging.Infrastructure.Configuration.DataAccess
 {
@@ -69,6 +70,8 @@ namespace Messaging.Infrastructure.Configuration.DataAccess
             modelBuilder.Entity<RejectRequestChangeOfSupplierMessage>()
                 .Ignore(entity => entity.MarketActivityRecord);
             modelBuilder.Entity<AccountingPointCharacteristicsMessage>()
+                .Ignore(entity => entity.MarketActivityRecord);
+            modelBuilder.Entity<CharacteristicsOfACustomerAtAnApMessage>()
                 .Ignore(entity => entity.MarketActivityRecord);
         }
     }
