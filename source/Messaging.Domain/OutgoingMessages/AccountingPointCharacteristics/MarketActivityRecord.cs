@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Messaging.Domain.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails;
 using NodaTime;
 
-namespace Messaging.Application.OutgoingMessages.AccountingPointCharacteristics;
+namespace Messaging.Domain.OutgoingMessages.AccountingPointCharacteristics;
 
 public class MarketActivityRecord
 {
-    public MarketActivityRecord(string id, string? originalTransactionId, Instant validityStartDate, MarketEvaluationPointDetails.MarketEvaluationPoint marketEvaluationPt)
+    public MarketActivityRecord(string id, string? originalTransactionId, Instant validityStartDate, MarketEvaluationPoint marketEvaluationPt)
     {
         Id = id;
         OriginalTransactionId = originalTransactionId;
@@ -32,5 +33,5 @@ public class MarketActivityRecord
 
     public Instant ValidityStartDate { get; }
 
-    public MarketEvaluationPointDetails.MarketEvaluationPoint MarketEvaluationPt { get; }
+    public MarketEvaluationPoint MarketEvaluationPt { get; }
 }

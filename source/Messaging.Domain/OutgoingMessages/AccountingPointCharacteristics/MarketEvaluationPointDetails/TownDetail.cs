@@ -12,7 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Application.OutgoingMessages.ConfirmRequestChangeOfSupplier
+namespace Messaging.Domain.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails;
+
+public class TownDetail
 {
-    public record MarketActivityRecord(string Id, string OriginalTransactionId, string MarketEvaluationPointId);
+    public TownDetail(string code, string name, string section, string country)
+    {
+        Code = code;
+        Name = name;
+        Section = section;
+        Country = country;
+    }
+
+    public string Code { get; }
+
+    public string Name { get; }
+
+    public string Section { get; }
+
+    public string Country { get; }
 }

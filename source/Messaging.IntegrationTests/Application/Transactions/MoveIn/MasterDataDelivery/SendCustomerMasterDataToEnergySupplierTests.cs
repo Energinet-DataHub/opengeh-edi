@@ -17,15 +17,15 @@ using MediatR;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages;
-using Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
-using MarketActivityRecord = Messaging.Application.OutgoingMessages.CharacteristicsOfACustomerAtAnAp.MarketActivityRecord;
+using MarketActivityRecord = Messaging.Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp.MarketActivityRecord;
 
 namespace Messaging.IntegrationTests.Application.Transactions.MoveIn.MasterDataDelivery;
 
