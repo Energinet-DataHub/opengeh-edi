@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Messaging.Application.Configuration.Authentication;
@@ -98,9 +99,27 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase
         AssertContainsError(result, "B2B-008");
     }
 
+    [Fact]
+    public async Task Authenticated_user_must_hold_the_role_type_as_specified_in_message()
+    {
+        _marketActorAuthenticator.Authenticate(CreateIdentityWithoutRoles());
+        await using var message = BusinessMessageBuilder
+            .RequestChangeCustomerCharacteristics()
+            .Message();
+
+        var result = await ReceiveRequestChangeCustomerCharacteristicsMessage(message).ConfigureAwait(false);
+
+        AssertContainsError(result, "B2B-008");
+    }
+
     private static void AssertContainsError(Result result, string errorCode)
     {
         Assert.Contains(result.Errors, error => error.Code.Equals(errorCode, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static ClaimsPrincipal CreateClaimsPrincipal(IEnumerable<Claim> claims)
+    {
+        return new ClaimsPrincipal(new ClaimsIdentity(claims));
     }
 
     private async Task<Result> ReceiveRequestChangeCustomerCharacteristicsMessage(Stream message)
@@ -135,5 +154,12 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase
     private ClaimsPrincipal CreateIdentity()
     {
         return new ClaimsPrincipal(new ClaimsIdentity(_claims));
+    }
+
+    private ClaimsPrincipal CreateIdentityWithoutRoles()
+    {
+        var claims = _claims.ToList();
+        claims.RemoveAll(claim => claim.Type.Equals(ClaimTypes.Role, StringComparison.OrdinalIgnoreCase));
+        return CreateClaimsPrincipal(claims);
     }
 }
