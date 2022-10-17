@@ -43,7 +43,7 @@ module "func_receiver" {
     INCOMING_MESSAGE_QUEUE_SENDER_CONNECTION_STRING               = module.sb_marketroles.primary_connection_strings["send"]
     INCOMING_MESSAGE_QUEUE_LISTENER_CONNECTION_STRING             = module.sb_marketroles.primary_connection_strings["listen"]
     DB_CONNECTION_STRING                                          = local.MS_MARKETROLES_CONNECTION_STRING
-    INCOMING_MESSAGE_QUEUE_NAME                                   = "incomingmessagequeue"
+    INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME                = module.sbq_incoming_change_supplier_messagequeue.name
     INCOMING_CHANGE_CUSTOMER_CHARACTERISTICS_MESSAGE_QUEUE_NAME   = module.sbq_incoming_change_customer_characteristics_message_queue.name
     MESSAGEHUB_QUEUE_CONNECTION_STRING                            = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-transceiver-connection-string)",
     MESSAGEHUB_DATA_AVAILABLE_QUEUE                               = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sbq-data-available-name)",

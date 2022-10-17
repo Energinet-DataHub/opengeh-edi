@@ -100,7 +100,7 @@ namespace Messaging.Api
                         _ => new ServiceBusClient(runtime.INCOMING_MESSAGE_QUEUE_SENDER_CONNECTION_STRING!));
 
                     services.AddSingleton(
-                        _ => new RequestChangeOfSupplierTransaction(runtime.INCOMING_MESSAGE_QUEUE_NAME!));
+                        _ => new RequestChangeOfSupplierTransaction(runtime.INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME!));
 
                     services.AddSingleton(
                         _ => new RequestChangeOfSupplierTransaction(runtime.INCOMING_CHANGE_CUSTOMER_CHARACTERISTICS_MESSAGE_QUEUE_NAME!));
@@ -152,7 +152,7 @@ namespace Messaging.Api
                     services.AddLiveHealthCheck();
                     services.AddInternalDomainServiceBusQueuesHealthCheck(
                         runtime.INCOMING_MESSAGE_QUEUE_MANAGE_CONNECTION_STRING!,
-                        runtime.INCOMING_MESSAGE_QUEUE_NAME!,
+                        runtime.INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME!,
                         runtime.MESSAGE_REQUEST_QUEUE!,
                         runtime.CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME!,
                         runtime.CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME!);
