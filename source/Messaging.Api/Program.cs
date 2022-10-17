@@ -153,6 +153,7 @@ namespace Messaging.Api
                     services.AddInternalDomainServiceBusQueuesHealthCheck(
                         runtime.INCOMING_MESSAGE_QUEUE_MANAGE_CONNECTION_STRING!,
                         runtime.INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME!,
+                        runtime.INCOMING_CHANGE_CUSTOMER_CHARACTERISTICS_MESSAGE_QUEUE_NAME!,
                         runtime.MESSAGE_REQUEST_QUEUE!,
                         runtime.CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME!,
                         runtime.CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME!);
