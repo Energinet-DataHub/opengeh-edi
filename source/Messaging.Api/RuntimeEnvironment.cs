@@ -34,6 +34,8 @@ namespace Messaging.Api
 
         public virtual string? INCOMING_MESSAGE_QUEUE_NAME => GetEnvironmentVariable(nameof(INCOMING_MESSAGE_QUEUE_NAME));
 
+        public virtual string? INCOMING_CHANGE_CUSTOMER_CHARACTERISTICS_MESSAGE_QUEUE_NAME => GetEnvironmentVariable(nameof(INCOMING_CHANGE_CUSTOMER_CHARACTERISTICS_MESSAGE_QUEUE_NAME));
+
         public virtual string? MESSAGE_REQUEST_QUEUE => GetEnvironmentVariable(nameof(MESSAGE_REQUEST_QUEUE));
 
         public virtual string? REQUEST_RESPONSE_LOGGING_CONNECTION_STRING =>

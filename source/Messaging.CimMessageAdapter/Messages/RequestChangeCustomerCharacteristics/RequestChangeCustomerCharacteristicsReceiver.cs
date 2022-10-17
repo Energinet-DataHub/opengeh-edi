@@ -12,13 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Messaging.CimMessageAdapter.Messages.Queues;
+
 namespace Messaging.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 
-public class RequestChangeCustomerCharacteristicsReceiver : MessageReceiver
+public class RequestChangeCustomerCharacteristicsReceiver : MessageReceiver<RequestChangeCustomerCharacteristicsTransaction>
 {
     public RequestChangeCustomerCharacteristicsReceiver(
         IMessageIds messageIds,
-        IMessageQueueDispatcher messageQueueDispatcher,
+        IMessageQueueDispatcher<RequestChangeCustomerCharacteristicsTransaction> messageQueueDispatcher,
         ITransactionIds transactionIds,
         SenderAuthorizer senderAuthorizer)
         : base(messageIds, messageQueueDispatcher, transactionIds, senderAuthorizer)

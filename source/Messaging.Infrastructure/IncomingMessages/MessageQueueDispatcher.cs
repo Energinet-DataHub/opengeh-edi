@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,23 +21,28 @@ using Azure.Messaging.ServiceBus;
 using Messaging.Application.Configuration;
 using Messaging.Application.IncomingMessages;
 using Messaging.CimMessageAdapter.Messages;
+using Messaging.CimMessageAdapter.Messages.Queues;
 using Messaging.Infrastructure.Configuration.Serialization;
 
 namespace Messaging.Infrastructure.IncomingMessages
 {
-    public class MessageQueueDispatcher : IMessageQueueDispatcher
+    public class MessageQueueDispatcher<TQueue> : IMessageQueueDispatcher<TQueue>
+    where TQueue : Queue
     {
         private const string CorrelationId = "CorrelationID";
         private readonly ISerializer _jsonSerializer;
         private readonly List<ServiceBusMessage> _transactionQueue;
-        private readonly ServiceBusSender? _serviceBusSender;
+        private readonly Lazy<ServiceBusSender> _senderCreator;
         private readonly ICorrelationContext _correlationContext;
 
-        public MessageQueueDispatcher(ISerializer jsonSerializer, ServiceBusSender? sender, ICorrelationContext correlationContext)
+        public MessageQueueDispatcher(ISerializer jsonSerializer, ServiceBusClient serviceBusClient, ICorrelationContext correlationContext, TQueue queue)
         {
-            _serviceBusSender = sender;
+            if (serviceBusClient == null) throw new ArgumentNullException(nameof(serviceBusClient));
+            if (queue == null) throw new ArgumentNullException(nameof(queue));
+
             _correlationContext = correlationContext;
             _jsonSerializer = jsonSerializer;
+            _senderCreator = new Lazy<ServiceBusSender>(serviceBusClient.CreateSender(queue.Name));
             _transactionQueue = new List<ServiceBusMessage>();
         }
 
@@ -50,7 +56,7 @@ namespace Messaging.Infrastructure.IncomingMessages
         {
             using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                if (_serviceBusSender != null) await _serviceBusSender.SendMessagesAsync(_transactionQueue).ConfigureAwait(false);
+                await _senderCreator.Value.SendMessagesAsync(_transactionQueue).ConfigureAwait(false);
                 scope.Complete();
             }
         }

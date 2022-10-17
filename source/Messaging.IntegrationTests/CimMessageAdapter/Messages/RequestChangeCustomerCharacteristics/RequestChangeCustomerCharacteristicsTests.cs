@@ -47,7 +47,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase
     private readonly IMarketActorAuthenticator _marketActorAuthenticator;
     private readonly ITransactionIds _transactionIds;
     private readonly IMessageIds _messageIds;
-    private MessageQueueDispatcherStub _messageQueueDispatcherSpy = new();
+    private MessageQueueDispatcherStub<Messaging.CimMessageAdapter.Messages.Queues.RequestChangeCustomerCharacteristicsTransaction> _messageQueueDispatcherSpy = new();
 
     public RequestChangeCustomerCharacteristicsTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
@@ -210,9 +210,9 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase
         return _messageParser.ParseAsync(message, CimFormat.Xml);
     }
 
-    private MessageReceiver CreateMessageReceiver()
+    private MessageReceiver<Messaging.CimMessageAdapter.Messages.Queues.RequestChangeCustomerCharacteristicsTransaction> CreateMessageReceiver()
     {
-        _messageQueueDispatcherSpy = new MessageQueueDispatcherStub();
+        _messageQueueDispatcherSpy = new MessageQueueDispatcherStub<Messaging.CimMessageAdapter.Messages.Queues.RequestChangeCustomerCharacteristicsTransaction>();
         var messageReceiver = new RequestChangeCustomerCharacteristicsReceiver(
             _messageIds,
             _messageQueueDispatcherSpy,
@@ -221,9 +221,9 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase
         return messageReceiver;
     }
 
-    private MessageReceiver CreateMessageReceiver(IMessageIds messageIds)
+    private MessageReceiver<Messaging.CimMessageAdapter.Messages.Queues.RequestChangeCustomerCharacteristicsTransaction> CreateMessageReceiver(IMessageIds messageIds)
     {
-        _messageQueueDispatcherSpy = new MessageQueueDispatcherStub();
+        _messageQueueDispatcherSpy = new MessageQueueDispatcherStub<Messaging.CimMessageAdapter.Messages.Queues.RequestChangeCustomerCharacteristicsTransaction>();
         var messageReceiver = new RequestChangeCustomerCharacteristicsReceiver(messageIds, _messageQueueDispatcherSpy, _transactionIds, new SenderAuthorizer(_marketActorAuthenticator));
         return messageReceiver;
     }

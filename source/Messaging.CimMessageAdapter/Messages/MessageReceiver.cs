@@ -18,19 +18,21 @@ using System.Linq;
 using System.Threading.Tasks;
 using Messaging.Application.IncomingMessages;
 using Messaging.CimMessageAdapter.Errors;
+using Messaging.CimMessageAdapter.Messages.Queues;
 using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
 
 namespace Messaging.CimMessageAdapter.Messages
 {
-    public abstract class MessageReceiver
+    public abstract class MessageReceiver<TQueue>
+        where TQueue : Queue
     {
         private readonly List<ValidationError> _errors = new();
         private readonly IMessageIds _messageIds;
-        private readonly IMessageQueueDispatcher _messageQueueDispatcher;
+        private readonly IMessageQueueDispatcher<TQueue> _messageQueueDispatcher;
         private readonly ITransactionIds _transactionIds;
         private readonly ISenderAuthorizer _senderAuthorizer;
 
-        protected MessageReceiver(IMessageIds messageIds, IMessageQueueDispatcher messageQueueDispatcher, ITransactionIds transactionIds, ISenderAuthorizer senderAuthorizer)
+        protected MessageReceiver(IMessageIds messageIds, IMessageQueueDispatcher<TQueue> messageQueueDispatcher, ITransactionIds transactionIds, ISenderAuthorizer senderAuthorizer)
         {
             _messageIds = messageIds ?? throw new ArgumentNullException(nameof(messageIds));
             _messageQueueDispatcher = messageQueueDispatcher ??

@@ -14,13 +14,15 @@
 
 using System.Threading.Tasks;
 using Messaging.Application.IncomingMessages;
+using Messaging.CimMessageAdapter.Messages.Queues;
 
 namespace Messaging.CimMessageAdapter.Messages
 {
     /// <summary>
     /// Service for dispatching incoming messages to message queue
     /// </summary>
-    public interface IMessageQueueDispatcher
+    public interface IMessageQueueDispatcher<TQueue>
+    where TQueue : Queue
     {
         /// <summary>
         /// Adds a message to collection
