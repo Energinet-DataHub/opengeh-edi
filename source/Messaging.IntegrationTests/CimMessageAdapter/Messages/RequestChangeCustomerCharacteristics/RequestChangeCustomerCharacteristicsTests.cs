@@ -85,6 +85,19 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase
         AssertContainsError(result, "B2B-008");
     }
 
+    [Fact]
+    public async Task Sender_role_type_must_be_the_role_of_energy_supplier()
+    {
+        await using var message = BusinessMessageBuilder
+            .RequestChangeCustomerCharacteristics()
+            .WithSenderRole("DDK")
+            .Message();
+
+        var result = await ReceiveRequestChangeCustomerCharacteristicsMessage(message).ConfigureAwait(false);
+
+        AssertContainsError(result, "B2B-008");
+    }
+
     private static void AssertContainsError(Result result, string errorCode)
     {
         Assert.Contains(result.Errors, error => error.Code.Equals(errorCode, StringComparison.OrdinalIgnoreCase));
