@@ -153,6 +153,29 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase
         Assert.NotNull(transaction);
     }
 
+    [Fact]
+    public async Task Activity_records_are_not_committed_to_queue_if_any_message_header_values_are_invalid()
+    {
+        await SimulateDuplicationOfMessageIds(_messageIds).ConfigureAwait(false);
+
+        Assert.Empty(_messageQueueDispatcherSpy.CommittedItems);
+    }
+
+    [Fact]
+    public async Task Activity_records_must_have_unique_transaction_ids()
+    {
+        await using var message = BusinessMessageBuilder
+            .RequestChangeCustomerCharacteristics()
+            .DuplicateMarketActivityRecords()
+            .Message();
+
+        var result = await ReceiveRequestChangeCustomerCharacteristicsMessage(message)
+            .ConfigureAwait(false);
+
+        AssertContainsError(result, "B2B-005");
+        Assert.Empty(_messageQueueDispatcherSpy.CommittedItems);
+    }
+
     private static void AssertContainsError(Result result, string errorCode)
     {
         Assert.Contains(result.Errors, error => error.Code.Equals(errorCode, StringComparison.OrdinalIgnoreCase));
@@ -161,6 +184,19 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase
     private static ClaimsPrincipal CreateClaimsPrincipal(IEnumerable<Claim> claims)
     {
         return new ClaimsPrincipal(new ClaimsIdentity(claims));
+    }
+
+    private async Task SimulateDuplicationOfMessageIds(IMessageIds messageIds)
+    {
+        var messageBuilder = BusinessMessageBuilder.RequestChangeCustomerCharacteristics();
+
+        using var originalMessage = messageBuilder.Message();
+        await CreateMessageReceiver(messageIds).ReceiveAsync(await ParseMessageAsync(originalMessage).ConfigureAwait(false))
+            .ConfigureAwait(false);
+
+        using var duplicateMessage = messageBuilder.Message();
+        await CreateMessageReceiver(messageIds).ReceiveAsync(await ParseMessageAsync(duplicateMessage).ConfigureAwait(false))
+            .ConfigureAwait(false);
     }
 
     private async Task<Result> ReceiveRequestChangeCustomerCharacteristicsMessage(Stream message)
