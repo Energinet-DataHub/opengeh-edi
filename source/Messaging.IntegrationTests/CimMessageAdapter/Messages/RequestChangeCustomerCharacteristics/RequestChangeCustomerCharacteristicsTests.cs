@@ -112,6 +112,33 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase
         AssertContainsError(result, "B2B-008");
     }
 
+    [Fact]
+    public async Task Sender_id_must_match_the_organization_of_the_current_authenticated_user()
+    {
+        _marketActorAuthenticator.Authenticate(CreateIdentity("Unknown_actor_identifier"));
+        await using var message = BusinessMessageBuilder
+            .RequestChangeCustomerCharacteristics()
+            .Message();
+
+        var result = await ReceiveRequestChangeCustomerCharacteristicsMessage(message).ConfigureAwait(false);
+
+        AssertContainsError(result, "B2B-008");
+    }
+
+    [Fact]
+    public async Task Return_failure_if_xml_schema_for_business_process_type_does_not_exist()
+    {
+        await using var message = BusinessMessageBuilder
+            .RequestChangeOfSupplier("CimMessageAdapter//Messages//Xml//BadRequestChangeCustomerCharacteristics.xml")
+            .Message();
+
+        var result = await ReceiveRequestChangeCustomerCharacteristicsMessage(message)
+            .ConfigureAwait(false);
+
+        Assert.False(result.Success);
+        AssertContainsError(result, "B2B-001");
+    }
+
     private static void AssertContainsError(Result result, string errorCode)
     {
         Assert.Contains(result.Errors, error => error.Code.Equals(errorCode, StringComparison.OrdinalIgnoreCase));
@@ -154,6 +181,14 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase
     private ClaimsPrincipal CreateIdentity()
     {
         return new ClaimsPrincipal(new ClaimsIdentity(_claims));
+    }
+
+    private ClaimsPrincipal CreateIdentity(string actorIdentifier)
+    {
+        var claims = _claims.ToList();
+        claims.Remove(claims.Find(claim => claim.Type.Equals("actorid", StringComparison.OrdinalIgnoreCase))!);
+        claims.Add(new Claim("actorid", actorIdentifier));
+        return new ClaimsPrincipal(new ClaimsIdentity(claims));
     }
 
     private ClaimsPrincipal CreateIdentityWithoutRoles()
