@@ -129,7 +129,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase
     public async Task Return_failure_if_xml_schema_for_business_process_type_does_not_exist()
     {
         await using var message = BusinessMessageBuilder
-            .RequestChangeOfSupplier("CimMessageAdapter//Messages//Xml//BadRequestChangeCustomerCharacteristics.xml")
+            .RequestChangeCustomerCharacteristics("CimMessageAdapter//Messages//Xml//BadRequestChangeCustomerCharacteristics.xml")
             .Message();
 
         var result = await ReceiveRequestChangeCustomerCharacteristicsMessage(message)
@@ -137,6 +137,20 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase
 
         Assert.False(result.Success);
         AssertContainsError(result, "B2B-001");
+    }
+
+    [Fact]
+    public async Task Valid_activity_records_are_extracted_and_committed_to_queue()
+    {
+        await using var message = BusinessMessageBuilder
+            .RequestChangeCustomerCharacteristics()
+            .Message();
+
+        await ReceiveRequestChangeCustomerCharacteristicsMessage(message)
+            .ConfigureAwait(false);
+
+        var transaction = _messageQueueDispatcherSpy.CommittedItems.FirstOrDefault();
+        Assert.NotNull(transaction);
     }
 
     private static void AssertContainsError(Result result, string errorCode)
