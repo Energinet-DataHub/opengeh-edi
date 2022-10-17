@@ -103,7 +103,7 @@ namespace Messaging.Api
                         _ => new RequestChangeOfSupplierTransaction(runtime.INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME!));
 
                     services.AddSingleton(
-                        _ => new RequestChangeOfSupplierTransaction(runtime.INCOMING_CHANGE_CUSTOMER_CHARACTERISTICS_MESSAGE_QUEUE_NAME!));
+                        _ => new RequestChangeCustomerCharacteristicsTransaction(runtime.INCOMING_CHANGE_CUSTOMER_CHARACTERISTICS_MESSAGE_QUEUE_NAME!));
 
                     CompositionRoot.Initialize(services)
                         .AddBearerAuthentication(tokenValidationParameters)
