@@ -39,9 +39,6 @@ module "func_processing" {
     SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE           = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-manage-connection-string)",
     CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME                         = module.sbq_customermasterdatarequestqueue.name,
     CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME                        = module.sbq_customermasterdataresponsequeue.name
-    MARKET_ROLES_SERVICE_BUS_LISTEN_CONNECTION_STRING               = module.sb_marketroles.primary_connection_strings["listen"]
-    MARKET_ROLES_SERVICE_BUS_SENDER_CONNECTION_STRING               = module.sb_marketroles.primary_connection_strings["send"]
-    MARKET_ROLES_SERVICE_BUS_MANAGE_CONNECTION_STRING               = module.sb_marketroles.primary_connection_strings["manage"]
     INTEGRATION_EVENT_TOPIC_NAME                                    = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sbt-sharedres-integrationevent-received-name)"
     MARKET_PARTICIPANT_CHANGED_ACTOR_CREATED_SUBSCRIPTION_NAME      = module.sbs_market_roles_energy_supplying_actor_created.name
     METERING_POINT_CREATED_EVENT_ENERGY_SUPPLYING_SUBSCRIPTION_NAME = module.sbs_metering_point_created_energy_supplying_event.name
