@@ -31,7 +31,6 @@ module "func_processing" {
   health_check_path                         = "/api/monitor/ready"
   app_settings                              = {
     
-    MARKET_DATA_QUEUE_URL                                           = "${module.sb_marketroles.name}.servicebus.windows.net:9093"
     MARKET_DATA_DB_CONNECTION_STRING                                = local.MS_MARKETROLES_CONNECTION_STRING
     RAISE_TIME_HAS_PASSED_EVENT_SCHEDULE                            = "*/10 * * * * *"
     SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_LISTENER         = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-listen-connection-string)",
