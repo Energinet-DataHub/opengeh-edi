@@ -36,7 +36,7 @@ module "func_processing" {
     RAISE_TIME_HAS_PASSED_EVENT_SCHEDULE                            = "*/10 * * * * *"
     SERVICE_BUS_CONNECTION_STRING_LISTENER_FOR_INTEGRATION_EVENTS   = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-listen-connection-string)",
     SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS            = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-send-connection-string)",
-    SERVICE_BUS_CONNECTION_STRING_MANAGE_FOR_INTEGRATION_EVENTS     = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-manage-connection-string)",
+    SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE     = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-manage-connection-string)",
     CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME                         = module.sbq_customermasterdatarequestqueue.name,
     CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME                        = module.sbq_customermasterdataresponsequeue.name
     MARKET_ROLES_SERVICE_BUS_LISTEN_CONNECTION_STRING               = module.sb_marketroles.primary_connection_strings["listen"]

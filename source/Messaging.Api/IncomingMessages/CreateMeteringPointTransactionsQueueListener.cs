@@ -29,7 +29,7 @@ namespace Messaging.Api.IncomingMessages
     {
         [Function(nameof(CreateMeteringPointTransactionsQueueListener))]
         public void Run(
-            [ServiceBusTrigger("%CREATE_METERING_POINT_TRANSACTIONS_QUEUE_NAME%", Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS_LISTENER")] byte[] data,
+            [ServiceBusTrigger("%CREATE_METERING_POINT_TRANSACTIONS_QUEUE_NAME%", Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_LISTENER")] byte[] data,
             FunctionContext context)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));

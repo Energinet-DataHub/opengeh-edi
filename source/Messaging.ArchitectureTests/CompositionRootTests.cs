@@ -138,19 +138,13 @@ namespace Messaging.ArchitectureTests
         {
             public override string? MOVE_IN_REQUEST_ENDPOINT => "https://test.dk";
 
-            public override string? INCOMING_MESSAGE_QUEUE_SENDER_CONNECTION_STRING =>
+            public override string? SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND =>
                 CreateFakeServiceBusConnectionString();
 
             public override string? REQUEST_RESPONSE_LOGGING_CONNECTION_STRING =>
                 CreateFakeServiceBusConnectionString();
 
-            public override string? INCOMING_MESSAGE_QUEUE_MANAGE_CONNECTION_STRING =>
-                CreateFakeServiceBusConnectionString();
-
             public override string? MESSAGEHUB_QUEUE_CONNECTION_STRING =>
-                CreateFakeServiceBusConnectionString();
-
-            public override string? SHARED_SERVICE_BUS_SEND_CONNECTION_STRING =>
                 CreateFakeServiceBusConnectionString();
 
             public override string? MASTER_DATA_REQUEST_QUEUE_NAME => "metering-point-master-data-request";
