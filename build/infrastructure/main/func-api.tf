@@ -36,7 +36,6 @@ module "func_receiver" {
     B2C_TENANT_ID                                                 = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=b2c-tenant-id)",
     BACKEND_SERVICE_APP_ID                                        = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=backend-service-app-id)",
     # Endregion: Default Values
-    MARKET_DATA_QUEUE_URL                                         = "${module.sb_marketroles.name}.servicebus.windows.net:9093",
     DB_CONNECTION_STRING                                          = local.MS_MARKETROLES_CONNECTION_STRING
     INCOMING_MESSAGE_QUEUE_NAME                                   = "incomingmessagequeue"
     MESSAGEHUB_QUEUE_CONNECTION_STRING                            = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-transceiver-connection-string)",
@@ -53,8 +52,8 @@ module "func_receiver" {
     ENERGY_SUPPLIER_CHANGED_TOPIC                                 = data.azurerm_key_vault_secret.sbt_energy_supplier_changed_name.value,
     ENERGY_SUPPLIER_CHANGED_SUBSCRIPTION                          = data.azurerm_key_vault_secret.sbs_energy_supplier_changed_to_messaging_name.value
     MASTER_DATA_REQUEST_QUEUE_NAME                                = data.azurerm_key_vault_secret.sbq_metering_point_master_data_request_name.value,
-    CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME                      = "customermasterdataresponsequeue"
-    CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME                       = "customermasterdatarequestqueue"
+    CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME                      = module.sbq_customermasterdataresponsequeue.name
+    CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME                       = module.sbq_customermasterdatarequestqueue.name
     INTEGRATION_EVENT_TOPIC_NAME                                  = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sbt-sharedres-integrationevent-received-name)"
     CONSUMER_MOVED_IN_EVENT_SUBSCRIPTION_NAME                     = module.sbs_consumer_moved_in.name
     ENERGY_SUPPLIER_CHANGED_EVENT_SUBSCRIPTION_NAME               = module.sbs_energy_supplier_changed.name
