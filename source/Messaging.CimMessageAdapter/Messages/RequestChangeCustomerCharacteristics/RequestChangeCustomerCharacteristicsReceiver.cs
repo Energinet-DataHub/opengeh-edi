@@ -12,27 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Messaging.Application.IncomingMessages;
 using Messaging.CimMessageAdapter.Messages.Queues;
 
-namespace Messaging.CimMessageAdapter.Messages
-{
-    /// <summary>
-    /// Service for dispatching incoming messages to message queue
-    /// </summary>
-    public interface IMessageQueueDispatcher<TQueue>
-    where TQueue : Queue
-    {
-        /// <summary>
-        /// Adds a message to collection
-        /// </summary>
-        /// <param name="message"></param>
-        Task AddAsync(IMarketTransaction message);
+namespace Messaging.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 
-        /// <summary>
-        /// Commits added transactions to queue
-        /// </summary>
-        Task CommitAsync();
+public class RequestChangeCustomerCharacteristicsReceiver : MessageReceiver<RequestChangeCustomerCharacteristicsTransaction>
+{
+    public RequestChangeCustomerCharacteristicsReceiver(
+        IMessageIds messageIds,
+        IMessageQueueDispatcher<RequestChangeCustomerCharacteristicsTransaction> messageQueueDispatcher,
+        ITransactionIds transactionIds,
+        SenderAuthorizer senderAuthorizer)
+        : base(messageIds, messageQueueDispatcher, transactionIds, senderAuthorizer)
+    {
     }
 }

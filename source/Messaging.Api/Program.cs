@@ -27,6 +27,7 @@ using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.TimeEvents;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.Transactions.MoveIn;
+using Messaging.CimMessageAdapter.Messages.Queues;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.MessageBus;
 using Messaging.Infrastructure.OutgoingMessages;
@@ -94,6 +95,15 @@ namespace Messaging.Api
                             "EnergySupplyingSenderClient");
                     services.AddSingleton(energySupplyingServiceBusClientConfiguration);
                     services.AddAzureServiceBusClient(new ServiceBusClientConfiguration(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND, energySupplyingServiceBusClientConfiguration));
+
+                    services.AddSingleton<ServiceBusClient>(
+                        _ => new ServiceBusClient(runtime.INCOMING_MESSAGE_QUEUE_SENDER_CONNECTION_STRING!));
+
+                    services.AddSingleton(
+                        _ => new RequestChangeOfSupplierTransaction(runtime.INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME!));
+
+                    services.AddSingleton(
+                        _ => new RequestChangeCustomerCharacteristicsTransaction(runtime.INCOMING_CHANGE_CUSTOMER_CHARACTERISTICS_MESSAGE_QUEUE_NAME!));
 
                     CompositionRoot.Initialize(services)
                         .AddBearerAuthentication(tokenValidationParameters)

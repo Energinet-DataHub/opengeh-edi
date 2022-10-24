@@ -29,7 +29,6 @@ using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.Configuration.TimeEvents;
-using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.OutgoingMessages.Common.Reasons;
@@ -37,6 +36,8 @@ using Messaging.Application.OutgoingMessages.Requesting;
 using Messaging.Application.SchemaStore;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.CimMessageAdapter.Messages;
+using Messaging.CimMessageAdapter.Messages.Queues;
+using Messaging.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 using Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 using Messaging.CimMessageAdapter.Response;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
@@ -69,6 +70,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using MarketActivityRecord = Messaging.Application.IncomingMessages.RequestChangeOfSupplier.MarketActivityRecord;
+using MessageParser = Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier.MessageParser;
+using RequestChangeCustomerCharacteristicsTransaction = Messaging.Application.IncomingMessages.RequestChangeCustomerCharacteristics.RequestChangeCustomerCharacteristicsTransaction;
+using RequestChangeOfSupplierTransaction = Messaging.Application.IncomingMessages.RequestChangeOfSupplier.RequestChangeOfSupplierTransaction;
+using SenderAuthorizer = Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier.SenderAuthorizer;
 
 namespace Messaging.Infrastructure.Configuration
 {
@@ -83,7 +88,7 @@ namespace Messaging.Infrastructure.Configuration
             services.AddSingleton<ISerializer, Serializer>();
             services.AddScoped<ITransactionIds, TransactionIdRegistry>();
             services.AddScoped<IMessageIds, MessageIdRegistry>();
-            services.AddScoped<IMessageQueueDispatcher, MessageQueueDispatcher>();
+            services.AddScoped(typeof(IMessageQueueDispatcher<>), typeof(MessageQueueDispatcher<>));
             services.AddScoped<IMoveInTransactionRepository, MoveInTransactionRepository>();
             services.AddScoped<IMarketActorAuthenticator, MarketActorAuthenticator>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -92,6 +97,8 @@ namespace Messaging.Infrastructure.Configuration
             services.AddTransient<IRequestHandler<RequestMessages, Unit>, RequestMessagesHandler>();
             services.AddScoped<SenderAuthorizer>();
             services.AddScoped<RequestChangeOfSupplierReceiver>();
+            services.AddScoped<Messaging.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics.SenderAuthorizer>();
+            services.AddScoped<RequestChangeCustomerCharacteristicsReceiver>();
 
             AddMediatR();
             services.AddLogging();
@@ -144,9 +151,12 @@ namespace Messaging.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddIncomingMessageQueue(string connectionString, string queueName)
+        public CompositionRoot AddIncomingMessageQueues(string connectionString, params string[] queueNames)
         {
-            _services.AddSingleton<ServiceBusSender>(serviceProvider => new ServiceBusClient(connectionString).CreateSender(queueName));
+            if (queueNames == null) throw new ArgumentNullException(nameof(queueNames));
+
+            _services.AddSingleton<ServiceBusClient>(
+                _ => new ServiceBusClient(connectionString));
             return this;
         }
 
@@ -230,6 +240,16 @@ namespace Messaging.Infrastructure.Configuration
             }));
             _services.AddSingleton<XmlMessageParser>();
             _services.AddSingleton<JsonMessageParser>();
+
+            _services.AddSingleton(_ =>
+                new CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics.MessageParser(
+                    new IMessageParser<Application.IncomingMessages.RequestChangeCustomerCharacteristics.
+                        MarketActivityRecord,
+                        RequestChangeCustomerCharacteristicsTransaction>[]
+                    {
+                        new IncomingMessages.RequestChangeCustomerCharacteristics.XmlMessageParser(),
+                    }));
+            _services.AddSingleton<IncomingMessages.RequestChangeCustomerCharacteristics.XmlMessageParser>();
             _services.AddSingleton<XmlSchemaProvider>();
             _services.AddSingleton<JsonSchemaProvider>();
             _services.AddSingleton(_ => new ResponseFactory(new IResponseFactory[]
