@@ -46,7 +46,7 @@ namespace Messaging.Api.IncomingMessages
 
         [Function(nameof(IncomingMessageQueueListener))]
         public async Task RunAsync(
-            [ServiceBusTrigger("%INCOMING_MESSAGE_QUEUE_NAME%", Connection = "INCOMING_MESSAGE_QUEUE_LISTENER_CONNECTION_STRING")] byte[] data,
+            [ServiceBusTrigger("%INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME%", Connection = "INCOMING_MESSAGE_QUEUE_LISTENER_CONNECTION_STRING")] byte[] data,
             FunctionContext context)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));

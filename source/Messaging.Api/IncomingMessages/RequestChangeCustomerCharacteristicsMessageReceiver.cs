@@ -16,6 +16,11 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http.Headers;
+using System.Text;
+using System.Threading.Tasks;
+using Messaging.Application.Configuration;
+using Messaging.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
+using Messaging.CimMessageAdapter.Response;
 using Messaging.Infrastructure.IncomingMessages;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -26,14 +31,27 @@ namespace Messaging.Api.IncomingMessages;
 public class RequestChangeCustomerCharacteristicsMessageReceiver
 {
     private readonly ILogger<RequestChangeCustomerCharacteristicsMessageReceiver> _logger;
+    private readonly ICorrelationContext _correlationContext;
+    private readonly RequestChangeCustomerCharacteristicsReceiver _messageReceiver;
+    private readonly ResponseFactory _responseFactory;
+    private readonly MessageParser _messageParser;
 
-    public RequestChangeCustomerCharacteristicsMessageReceiver(ILogger<RequestChangeCustomerCharacteristicsMessageReceiver> logger)
+    public RequestChangeCustomerCharacteristicsMessageReceiver(
+        ILogger<RequestChangeCustomerCharacteristicsMessageReceiver> logger,
+        ICorrelationContext correlationContext,
+        RequestChangeCustomerCharacteristicsReceiver messageReceiver,
+        ResponseFactory responseFactory,
+        MessageParser messageParser)
     {
         _logger = logger;
+        _correlationContext = correlationContext;
+        _messageReceiver = messageReceiver;
+        _responseFactory = responseFactory;
+        _messageParser = messageParser;
     }
 
     [Function("RequestChangeCustomerCharacteristics")]
-    public HttpResponseData Run(
+    public async Task<HttpResponseData> RunAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData request)
     {
         _logger.LogInformation($"Received {nameof(RequestChangeCustomerCharacteristicsMessageReceiver)} request");
@@ -49,7 +67,12 @@ public class RequestChangeCustomerCharacteristicsMessageReceiver
             return request.CreateResponse(HttpStatusCode.UnsupportedMediaType);
         }
 
-        return request.CreateResponse(HttpStatusCode.Accepted);
+        var messageParserResult = await _messageParser.ParseAsync(request.Body, cimFormat).ConfigureAwait(false);
+        var result = await _messageReceiver.ReceiveAsync(messageParserResult)
+            .ConfigureAwait(false);
+
+        var httpStatusCode = result.Success ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
+        return CreateResponse(request, httpStatusCode, _responseFactory.From(result, cimFormat));
     }
 
     private static string GetContentType(HttpHeaders headers)
@@ -57,5 +80,13 @@ public class RequestChangeCustomerCharacteristicsMessageReceiver
         var contentHeader = headers.GetValues("Content-Type").FirstOrDefault();
         if (contentHeader == null) throw new InvalidOperationException("No Content-Type found in request headers");
         return contentHeader;
+    }
+
+    private HttpResponseData CreateResponse(HttpRequestData request, HttpStatusCode statusCode, ResponseMessage responseMessage)
+    {
+        var response = request.CreateResponse(statusCode);
+        response.WriteString(responseMessage.MessageBody, Encoding.UTF8);
+        response.Headers.Add("CorrelationId", _correlationContext.Id);
+        return response;
     }
 }

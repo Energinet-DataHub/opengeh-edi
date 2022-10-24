@@ -19,7 +19,7 @@ module "sbs_metering_point_created_energy_supplying_event" {
   max_delivery_count  = 10 
   correlation_filter  = {
     properties     = {
-      "MessageType" = "MeteringPointCreated",
+      "messageType" = "MeteringPointCreated",
     }  
   }
 }
@@ -32,7 +32,7 @@ module "sbs_metering_point_created_b2b_event" {
   max_delivery_count  = 10 
   correlation_filter  = {
     properties     = {
-      "MessageType" = "MeteringPointCreated",
+      "messageType" = "MeteringPointCreated",
     }  
   }
 }
@@ -45,7 +45,7 @@ module "sbs_consumer_moved_in" {
   max_delivery_count  = 10 
   correlation_filter  = {
     properties     = {
-      "MessageType" = "ConsumerMovedIn",
+      "messageType" = "ConsumerMovedIn",
     }  
   }
 }
@@ -58,7 +58,7 @@ module "sbs_energy_supplier_changed" {
   max_delivery_count  = 10 
   correlation_filter  = {
     properties     = {
-      "MessageType" = "EnergySupplierChanged",
+      "messageType" = "EnergySupplierChanged",
     }  
   }
 }

@@ -12,18 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.CimMessageAdapter.Messages.Queues;
+namespace Messaging.CimMessageAdapter.Messages.Queues;
 
-namespace Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
-
-public class RequestChangeOfSupplierReceiver : MessageReceiver<RequestChangeOfSupplierTransaction>
-{
-    public RequestChangeOfSupplierReceiver(
-        IMessageIds messageIds,
-        IMessageQueueDispatcher<RequestChangeOfSupplierTransaction> messageQueueDispatcher,
-        ITransactionIds transactionIds,
-        SenderAuthorizer senderAuthorizer)
-        : base(messageIds, messageQueueDispatcher, transactionIds, senderAuthorizer)
-    {
-    }
-}
+public record RequestChangeCustomerCharacteristicsTransaction(string Name) : Queue;

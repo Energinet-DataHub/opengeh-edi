@@ -27,6 +27,7 @@ using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.TimeEvents;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.Transactions.MoveIn;
+using Messaging.CimMessageAdapter.Messages.Queues;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.MessageBus;
 using Messaging.Infrastructure.OutgoingMessages;
@@ -95,6 +96,15 @@ namespace Messaging.Api
                     services.AddSingleton(energySupplyingServiceBusClientConfiguration);
                     services.AddAzureServiceBusClient(new ServiceBusClientConfiguration(runtime.ENERGY_SUPPLYING_SERVICE_BUS_SEND_CONNECTION_STRING, energySupplyingServiceBusClientConfiguration));
 
+                    services.AddSingleton<ServiceBusClient>(
+                        _ => new ServiceBusClient(runtime.INCOMING_MESSAGE_QUEUE_SENDER_CONNECTION_STRING!));
+
+                    services.AddSingleton(
+                        _ => new RequestChangeOfSupplierTransaction(runtime.INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME!));
+
+                    services.AddSingleton(
+                        _ => new RequestChangeCustomerCharacteristicsTransaction(runtime.INCOMING_CHANGE_CUSTOMER_CHARACTERISTICS_MESSAGE_QUEUE_NAME!));
+
                     CompositionRoot.Initialize(services)
                         .AddBearerAuthentication(tokenValidationParameters)
                         .AddDatabaseConnectionFactory(databaseConnectionString!)
@@ -108,9 +118,6 @@ namespace Messaging.Api
 
                             return correlationContext;
                         })
-                        .AddIncomingMessageQueue(
-                            runtime.INCOMING_MESSAGE_QUEUE_SENDER_CONNECTION_STRING!,
-                            runtime.INCOMING_MESSAGE_QUEUE_NAME!)
                         .AddRequestLogging(
                             runtime.REQUEST_RESPONSE_LOGGING_CONNECTION_STRING!,
                             runtime.REQUEST_RESPONSE_LOGGING_CONTAINER_NAME!)
@@ -145,7 +152,8 @@ namespace Messaging.Api
                     services.AddLiveHealthCheck();
                     services.AddInternalDomainServiceBusQueuesHealthCheck(
                         runtime.INCOMING_MESSAGE_QUEUE_MANAGE_CONNECTION_STRING!,
-                        runtime.INCOMING_MESSAGE_QUEUE_NAME!,
+                        runtime.INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME!,
+                        runtime.INCOMING_CHANGE_CUSTOMER_CHARACTERISTICS_MESSAGE_QUEUE_NAME!,
                         runtime.MESSAGE_REQUEST_QUEUE!,
                         runtime.CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME!,
                         runtime.CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME!);

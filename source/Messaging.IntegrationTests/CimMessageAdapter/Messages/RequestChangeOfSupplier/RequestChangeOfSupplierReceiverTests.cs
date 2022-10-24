@@ -46,7 +46,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfS
         private readonly IMarketActorAuthenticator _marketActorAuthenticator;
         private readonly ITransactionIds _transactionIds;
         private readonly IMessageIds _messageIds;
-        private MessageQueueDispatcherStub _messageQueueDispatcherSpy = new();
+        private MessageQueueDispatcherStub<Messaging.CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction> _messageQueueDispatcherSpy = new();
 
         public RequestChangeOfSupplierReceiverTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
@@ -191,9 +191,9 @@ namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfS
                 .ReceiveAsync(await ParseMessageAsync(message).ConfigureAwait(false));
         }
 
-        private MessageReceiver CreateMessageReceiver()
+        private MessageReceiver<Messaging.CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction> CreateMessageReceiver()
         {
-            _messageQueueDispatcherSpy = new MessageQueueDispatcherStub();
+            _messageQueueDispatcherSpy = new MessageQueueDispatcherStub<Messaging.CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction>();
             var messageReceiver = new RequestChangeOfSupplierReceiver(
                 _messageIds,
                 _messageQueueDispatcherSpy,
@@ -202,9 +202,9 @@ namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfS
             return messageReceiver;
         }
 
-        private MessageReceiver CreateMessageReceiver(IMessageIds messageIds)
+        private MessageReceiver<Messaging.CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction> CreateMessageReceiver(IMessageIds messageIds)
         {
-            _messageQueueDispatcherSpy = new MessageQueueDispatcherStub();
+            _messageQueueDispatcherSpy = new MessageQueueDispatcherStub<Messaging.CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction>();
             var messageReceiver = new RequestChangeOfSupplierReceiver(messageIds, _messageQueueDispatcherSpy, _transactionIds, new SenderAuthorizer(_marketActorAuthenticator));
             return messageReceiver;
         }
