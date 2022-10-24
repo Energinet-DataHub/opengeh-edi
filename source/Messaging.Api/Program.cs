@@ -97,7 +97,7 @@ namespace Messaging.Api
                     services.AddAzureServiceBusClient(new ServiceBusClientConfiguration(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND, energySupplyingServiceBusClientConfiguration));
 
                     services.AddSingleton<ServiceBusClient>(
-                        _ => new ServiceBusClient(runtime.INCOMING_MESSAGE_QUEUE_SENDER_CONNECTION_STRING!));
+                        _ => new ServiceBusClient(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND!));
 
                     services.AddSingleton(
                         _ => new RequestChangeOfSupplierTransaction(runtime.INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME!));
@@ -118,9 +118,6 @@ namespace Messaging.Api
 
                             return correlationContext;
                         })
-                        .AddIncomingMessageQueue(
-                            runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND!,
-                            runtime.INCOMING_MESSAGE_QUEUE_NAME!)
                         .AddRequestLogging(
                             runtime.REQUEST_RESPONSE_LOGGING_CONNECTION_STRING!,
                             runtime.REQUEST_RESPONSE_LOGGING_CONTAINER_NAME!)
@@ -155,7 +152,8 @@ namespace Messaging.Api
                     services.AddLiveHealthCheck();
                     services.AddExternalDomainServiceBusQueuesHealthCheck(
                         runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
-                        runtime.INCOMING_MESSAGE_QUEUE_NAME!,
+                        runtime.INCOMING_CHANGE_CUSTOMER_CHARACTERISTICS_MESSAGE_QUEUE_NAME!,
+                        runtime.INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME!,
                         runtime.MESSAGE_REQUEST_QUEUE!,
                         runtime.CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME!,
                         runtime.CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME!);
