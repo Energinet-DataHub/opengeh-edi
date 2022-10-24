@@ -20,13 +20,6 @@ module "sbq_create_metering_point_transactions" {
   namespace_id        = data.azurerm_key_vault_secret.sb_domain_relay_namespace_id.value
 }
 
-module "sbq_marketroles" {
-  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/service-bus-queue?ref=7.0.0"
-
-  name                = "marketroles"
-  namespace_id        = data.azurerm_key_vault_secret.sb_domain_relay_namespace_id.value
-}
-
 module "sbq_incomingmessagequeue" {
   source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/service-bus-queue?ref=7.0.0"
 
