@@ -17,10 +17,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Messaging.Application.IncomingMessages;
 using Messaging.CimMessageAdapter.Messages;
+using Messaging.CimMessageAdapter.Messages.Queues;
 
 namespace Messaging.IntegrationTests.CimMessageAdapter.Stubs
 {
-    public class MessageQueueDispatcherStub : IMessageQueueDispatcher
+    public class MessageQueueDispatcherStub<TQueue> : IMessageQueueDispatcher<TQueue>
+    where TQueue : Queue
     {
         private readonly List<IMarketTransaction> _uncommittedItems = new();
         private readonly List<IMarketTransaction> _committedItems = new();
