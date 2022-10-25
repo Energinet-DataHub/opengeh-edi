@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Messaging.Domain.Actors;
+using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.SeedWork;
 using Messaging.Domain.Transactions.MoveIn.Events;
 using NodaTime;
@@ -21,6 +22,8 @@ namespace Messaging.Domain.Transactions.MoveIn
 {
     public class MoveInTransaction : Entity
     {
+        #pragma warning disable
+        private readonly List<OutgoingMessage> _messages = new();
         private readonly ActorNumber _requestedBy;
         private readonly State _state = State.Started;
         private BusinessProcessState _businessProcessState;
