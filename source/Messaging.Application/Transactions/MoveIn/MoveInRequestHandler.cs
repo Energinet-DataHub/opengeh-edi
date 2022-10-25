@@ -29,7 +29,6 @@ using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Domain.Transactions.MoveIn;
 using NodaTime.Text;
-using MarketActivityRecord = Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier.MarketActivityRecord;
 
 namespace Messaging.Application.Transactions.MoveIn
 {
