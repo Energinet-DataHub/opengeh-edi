@@ -66,7 +66,6 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Seed\202210041440 Insert Reasons.sql" />
     <EmbeddedResource Include="Scripts\Seed\202210071000 Insert Reasons.sql" />
     <EmbeddedResource Include="Scripts\Seed\202210111000 Cancel processes.sql" />
-    <None Remove="Scripts\Model\202226081409 Add requested by actor number.sql" />
   </ItemGroup>
 
 </Project>
