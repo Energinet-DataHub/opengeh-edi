@@ -61,7 +61,7 @@ public class MoveInTransactionTests
     }
 
     [Fact]
-    public void Business_process_can_be_set_to_rejected()
+    public void Transaction_is_rejected()
     {
         _transaction.Reject(new List<Reason>(), ActorNumber.Create(SampleData.SenderId));
 
