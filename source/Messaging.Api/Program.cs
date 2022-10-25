@@ -87,17 +87,17 @@ namespace Messaging.Api
                             runtime.MASTER_DATA_REQUEST_QUEUE_NAME!,
                             "MeteringPointsSenderClient");
                     services.AddSingleton(meteringPointServiceBusClientConfiguration);
-                    services.AddAzureServiceBusClient(new ServiceBusClientConfiguration(runtime.SHARED_SERVICE_BUS_SEND_CONNECTION_STRING, meteringPointServiceBusClientConfiguration));
+                    services.AddAzureServiceBusClient(new ServiceBusClientConfiguration(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND, meteringPointServiceBusClientConfiguration));
 
                     var energySupplyingServiceBusClientConfiguration =
                         new EnergySupplyingServiceBusClientConfiguration(
                             runtime.CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME!,
                             "EnergySupplyingSenderClient");
                     services.AddSingleton(energySupplyingServiceBusClientConfiguration);
-                    services.AddAzureServiceBusClient(new ServiceBusClientConfiguration(runtime.ENERGY_SUPPLYING_SERVICE_BUS_SEND_CONNECTION_STRING, energySupplyingServiceBusClientConfiguration));
+                    services.AddAzureServiceBusClient(new ServiceBusClientConfiguration(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND, energySupplyingServiceBusClientConfiguration));
 
                     services.AddSingleton<ServiceBusClient>(
-                        _ => new ServiceBusClient(runtime.INCOMING_MESSAGE_QUEUE_SENDER_CONNECTION_STRING!));
+                        _ => new ServiceBusClient(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND!));
 
                     services.AddSingleton(
                         _ => new RequestChangeOfSupplierTransaction(runtime.INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME!));
@@ -150,15 +150,15 @@ namespace Messaging.Api
                         .AddMessageParserServices();
 
                     services.AddLiveHealthCheck();
-                    services.AddInternalDomainServiceBusQueuesHealthCheck(
-                        runtime.INCOMING_MESSAGE_QUEUE_MANAGE_CONNECTION_STRING!,
-                        runtime.INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME!,
+                    services.AddExternalDomainServiceBusQueuesHealthCheck(
+                        runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
                         runtime.INCOMING_CHANGE_CUSTOMER_CHARACTERISTICS_MESSAGE_QUEUE_NAME!,
+                        runtime.INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME!,
                         runtime.MESSAGE_REQUEST_QUEUE!,
                         runtime.CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME!,
                         runtime.CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME!);
                     services.AddExternalServiceBusSubscriptionsHealthCheck(
-                        runtime.SERVICE_BUS_CONNECTION_STRING_MANAGE_FOR_INTEGRATION_EVENTS!,
+                        runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
                         runtime.INTEGRATION_EVENT_TOPIC_NAME!,
                         runtime.CONSUMER_MOVED_IN_EVENT_SUBSCRIPTION_NAME!,
                         runtime.ENERGY_SUPPLIER_CHANGED_EVENT_SUBSCRIPTION_NAME!,

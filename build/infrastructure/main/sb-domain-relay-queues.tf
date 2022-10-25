@@ -20,6 +20,31 @@ module "sbq_create_metering_point_transactions" {
   namespace_id        = data.azurerm_key_vault_secret.sb_domain_relay_namespace_id.value
 }
 
+module "sbq_incoming_change_supplier_messagequeue" {
+  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/service-bus-queue?ref=7.0.0"
+
+  name                = "change-supplier-transactions"
+  namespace_id        = data.azurerm_key_vault_secret.sb_domain_relay_namespace_id.value
+}
+
+module "sbq_incoming_change_customer_characteristics_message_queue" {
+  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/service-bus-queue?ref=7.0.0"
+
+  name                = "change-customer-characteristics-transactions"
+  namespace_id        = data.azurerm_key_vault_secret.sb_domain_relay_namespace_id.value
+}
+
+module "sbq_customermasterdatarequestqueue" {
+  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/service-bus-queue?ref=7.0.0"
+  name                = "customermasterdatarequestqueue"
+  namespace_id        = data.azurerm_key_vault_secret.sb_domain_relay_namespace_id.value
+}
+module "sbq_customermasterdataresponsequeue" {
+  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/service-bus-queue?ref=7.0.0"
+  name                = "customermasterdataresponsequeue"
+  namespace_id        = data.azurerm_key_vault_secret.sb_domain_relay_namespace_id.value
+}
+
 module "kvs_sbq_create_metering_point_transactions" {
   source        = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/key-vault-secret?ref=7.0.0"
 

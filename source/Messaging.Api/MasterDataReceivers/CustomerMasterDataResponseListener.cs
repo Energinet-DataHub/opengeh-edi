@@ -40,7 +40,7 @@ public class CustomerMasterDataResponseListener
     }
 
     [Function("CustomerMasterDataResponseListener")]
-    public Task RunAsync([ServiceBusTrigger("%CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME%", Connection = "INTERNAL_SERVICE_BUS_LISTENER_CONNECTION_STRING")] byte[] data, FunctionContext context)
+    public Task RunAsync([ServiceBusTrigger("%CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME%", Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_LISTENER")] byte[] data, FunctionContext context)
     {
         if (data == null) throw new ArgumentNullException(nameof(data));
         if (context == null) throw new ArgumentNullException(nameof(context));
