@@ -129,7 +129,6 @@ namespace Messaging.Application.Transactions.MoveIn
         private async Task<Unit> RejectInvalidRequestMessageAsync(MoveInTransaction transaction, RequestChangeOfSupplierTransaction request, string error)
         {
             var reasons = await CreateReasonsFromAsync(new Collection<string>() { error }).ConfigureAwait(false);
-            _outgoingMessageStore.Add(RejectMessageFrom(reasons, transaction, request));
             transaction.RejectedByBusinessProcess(reasons, DataHubDetails.IdentificationNumber);
 
             _moveInTransactionRepository.Add(transaction);
@@ -157,22 +156,6 @@ namespace Messaging.Application.Transactions.MoveIn
             return CreateOutgoingMessage(
                 transaction.StartedByMessageId,
                 DocumentType.ConfirmRequestChangeOfSupplier,
-                ProcessType.MoveIn.Code,
-                ActorNumber.Create(requestChangeOfSupplierTransaction.Message.SenderId),
-                _marketActivityRecordParser.From(marketActivityRecord));
-        }
-
-        private OutgoingMessage RejectMessageFrom(IReadOnlyCollection<Reason> reasons, MoveInTransaction transaction, RequestChangeOfSupplierTransaction requestChangeOfSupplierTransaction)
-        {
-            var marketActivityRecord = new MarketActivityRecord(
-                Guid.NewGuid().ToString(),
-                transaction.TransactionId,
-                transaction.MarketEvaluationPointId,
-                reasons);
-
-            return CreateOutgoingMessage(
-                transaction.StartedByMessageId,
-                DocumentType.RejectRequestChangeOfSupplier,
                 ProcessType.MoveIn.Code,
                 ActorNumber.Create(requestChangeOfSupplierTransaction.Message.SenderId),
                 _marketActivityRecordParser.From(marketActivityRecord));
