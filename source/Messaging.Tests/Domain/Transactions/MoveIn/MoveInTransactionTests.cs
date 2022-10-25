@@ -71,7 +71,7 @@ public class MoveInTransactionTests
     }
 
     [Fact]
-    public void Business_process_can_be_marked_as_rejected_once_only()
+    public void Transaction_can_be_rejected_once_only()
     {
         _transaction.Reject(new List<Reason>(), ActorNumber.Create(SampleData.SenderId));
 
