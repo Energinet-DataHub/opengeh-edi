@@ -135,7 +135,7 @@ namespace Messaging.Domain.Transactions.MoveIn
             AddDomainEvent(new MoveInWasAccepted(ProcessId, marketEvaluationPointNumber, TransactionId));
         }
 
-        public void RejectedByBusinessProcess(IEnumerable<Reason> reasons, ActorNumber senderId)
+        public void Reject(IEnumerable<Reason> reasons, ActorNumber senderId)
         {
             if (_businessProcessState == BusinessProcessState.Pending)
             {

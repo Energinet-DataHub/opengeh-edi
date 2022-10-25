@@ -63,7 +63,7 @@ public class MoveInTransactionTests
     [Fact]
     public void Business_process_can_be_set_to_rejected()
     {
-        _transaction.RejectedByBusinessProcess(new List<Reason>(), ActorNumber.Create(SampleData.SenderId));
+        _transaction.Reject(new List<Reason>(), ActorNumber.Create(SampleData.SenderId));
 
         var rejectedEvent = _transaction.DomainEvents.FirstOrDefault(e => e is MoveInWasRejected) as MoveInWasRejected;
         Assert.NotNull(rejectedEvent);
@@ -73,9 +73,9 @@ public class MoveInTransactionTests
     [Fact]
     public void Business_process_can_be_marked_as_rejected_once_only()
     {
-        _transaction.RejectedByBusinessProcess(new List<Reason>(), ActorNumber.Create(SampleData.SenderId));
+        _transaction.Reject(new List<Reason>(), ActorNumber.Create(SampleData.SenderId));
 
-        _transaction.RejectedByBusinessProcess(new List<Reason>(), ActorNumber.Create(SampleData.SenderId));
+        _transaction.Reject(new List<Reason>(), ActorNumber.Create(SampleData.SenderId));
 
         Assert.Equal(1, _transaction.DomainEvents.Count(e => e is MoveInWasRejected));
     }
