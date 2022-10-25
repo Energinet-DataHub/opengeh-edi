@@ -33,9 +33,9 @@ module "func_processing" {
     
     MARKET_DATA_DB_CONNECTION_STRING                                = local.MS_MARKETROLES_CONNECTION_STRING
     RAISE_TIME_HAS_PASSED_EVENT_SCHEDULE                            = "*/10 * * * * *"
-    SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_LISTENER         = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-listen-connection-string)",
-    SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND            = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-send-connection-string)",
-    SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE           = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-manage-connection-string)",
+    SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_LISTENER         = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-listen-connection-string)"
+    SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND             = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-send-connection-string)"
+    SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE           = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-manage-connection-string)"
     CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME                         = module.sbq_customermasterdatarequestqueue.name,
     CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME                        = module.sbq_customermasterdataresponsequeue.name
     INTEGRATION_EVENT_TOPIC_NAME                                    = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sbt-sharedres-integrationevent-received-name)"
