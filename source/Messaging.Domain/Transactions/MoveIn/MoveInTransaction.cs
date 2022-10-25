@@ -135,7 +135,7 @@ namespace Messaging.Domain.Transactions.MoveIn
             AddDomainEvent(new MoveInWasAccepted(ProcessId, marketEvaluationPointNumber, TransactionId));
         }
 
-        public void Reject(IEnumerable<Reason> reasons, ActorNumber senderId)
+        public void Reject(IEnumerable<Reason> reasons, ActorNumber senderOfMessage)
         {
             if (_businessProcessState == BusinessProcessState.Pending)
             {
@@ -150,7 +150,7 @@ namespace Messaging.Domain.Transactions.MoveIn
                     TransactionId,
                     ProcessType.MoveIn.Code,
                     MarketRole.EnergySupplier,
-                    senderId,
+                    senderOfMessage,
                     MarketRole.MeteringPointAdministrator,
                     marketActivityRecord);
                 _messages.Add(message);
