@@ -111,7 +111,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
                 .Build();
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
-            var rejectMessage = _outgoingMessageStore.GetByTransactionId(incomingMessage.Message.MessageId)!;
+            var rejectMessage = _outgoingMessageStore.GetByTransactionId(SampleData.TransactionId)!;
             await RequestMessage(rejectMessage.Id.ToString(), DocumentType.RejectRequestChangeOfSupplier).ConfigureAwait(false);
 
             await AssertRejectMessage(rejectMessage).ConfigureAwait(false);

@@ -14,6 +14,8 @@
 
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
+using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Domain.SeedWork;
 using Messaging.Domain.Transactions.MoveIn.Events;
 using NodaTime;
@@ -133,12 +135,25 @@ namespace Messaging.Domain.Transactions.MoveIn
             AddDomainEvent(new MoveInWasAccepted(ProcessId, marketEvaluationPointNumber, TransactionId));
         }
 
-        public void RejectedByBusinessProcess()
+        public void RejectedByBusinessProcess(IEnumerable<Reason> reasons, ActorNumber senderId)
         {
             if (_businessProcessState == BusinessProcessState.Pending)
             {
                 _businessProcessState = BusinessProcessState.Rejected;
                 AddDomainEvent(new MoveInWasRejected(TransactionId));
+
+                var marketActivityRecord = new OutgoingMessages.RejectRequestChangeOfSupplier.MarketActivityRecord(
+                    Guid.NewGuid().ToString(), TransactionId, MarketEvaluationPointId, reasons);
+                var message = new RejectRequestChangeOfSupplierMessage(
+                    DocumentType.RejectRequestChangeOfSupplier,
+                    _requestedBy,
+                    TransactionId,
+                    ProcessType.MoveIn.Code,
+                    MarketRole.EnergySupplier,
+                    senderId,
+                    MarketRole.MeteringPointAdministrator,
+                    marketActivityRecord);
+                _messages.Add(message);
             }
         }
 

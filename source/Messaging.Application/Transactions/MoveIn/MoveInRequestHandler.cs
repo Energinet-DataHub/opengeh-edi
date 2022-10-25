@@ -94,8 +94,7 @@ namespace Messaging.Application.Transactions.MoveIn
             if (businessProcessResult.Success == false)
             {
                 var reasons = await CreateReasonsFromAsync(businessProcessResult.ValidationErrors).ConfigureAwait(false);
-                _outgoingMessageStore.Add(RejectMessageFrom(reasons, transaction, request));
-                transaction.RejectedByBusinessProcess();
+                transaction.RejectedByBusinessProcess(reasons, DataHubDetails.IdentificationNumber);
             }
             else
             {
@@ -131,7 +130,7 @@ namespace Messaging.Application.Transactions.MoveIn
         {
             var reasons = await CreateReasonsFromAsync(new Collection<string>() { error }).ConfigureAwait(false);
             _outgoingMessageStore.Add(RejectMessageFrom(reasons, transaction, request));
-            transaction.RejectedByBusinessProcess();
+            transaction.RejectedByBusinessProcess(reasons, DataHubDetails.IdentificationNumber);
 
             _moveInTransactionRepository.Add(transaction);
             return Unit.Value;
