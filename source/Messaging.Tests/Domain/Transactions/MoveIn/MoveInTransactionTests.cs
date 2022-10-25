@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Linq;
+using Messaging.Domain.Actors;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Domain.Transactions.MoveIn.Events;
 using Xunit;
@@ -195,7 +196,8 @@ public class MoveInTransactionTests
             SampleData.NewEnergySupplierId,
             SampleData.ConsumerId,
             SampleData.ConsumerName,
-            SampleData.ConsumerIdType);
+            SampleData.ConsumerIdType,
+            ActorNumber.Create(SampleData.RequestedByActorNumber));
     }
 
     private static CustomerMasterData CreateCustomerMasterData()

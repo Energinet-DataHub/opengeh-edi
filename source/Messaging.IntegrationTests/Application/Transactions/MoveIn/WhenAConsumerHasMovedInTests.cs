@@ -18,6 +18,7 @@ using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.Transactions;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Transactions.MoveIn.Notifications;
+using Messaging.Domain.Actors;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.InternalCommands;
@@ -97,7 +98,8 @@ public class WhenAConsumerHasMovedInTests : TestBase
             SampleData.NewEnergySupplierNumber,
             SampleData.ConsumerId,
             SampleData.ConsumerName,
-            SampleData.ConsumerIdType);
+            SampleData.ConsumerIdType,
+            ActorNumber.Create(SampleData.SenderId));
 
         transaction.AcceptedByBusinessProcess(BusinessRequestResult.Succeeded(Guid.NewGuid().ToString()).ProcessId!, SampleData.MeteringPointNumber);
         transaction.MarkMeteringPointMasterDataAsSent();
