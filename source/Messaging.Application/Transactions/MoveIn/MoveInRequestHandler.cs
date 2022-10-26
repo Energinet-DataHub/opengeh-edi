@@ -18,14 +18,10 @@ using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Messaging.Application.Configuration;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
-using Messaging.Application.OutgoingMessages;
-using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.OutgoingMessages.Common.Reasons;
 using Messaging.Domain.Actors;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
-using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Domain.Transactions.MoveIn;
 using NodaTime.Text;
@@ -35,23 +31,17 @@ namespace Messaging.Application.Transactions.MoveIn
     public class MoveInRequestHandler : IRequestHandler<RequestChangeOfSupplierTransaction, Unit>
     {
         private readonly IMoveInTransactionRepository _moveInTransactionRepository;
-        private readonly IOutgoingMessageStore _outgoingMessageStore;
-        private readonly IMarketActivityRecordParser _marketActivityRecordParser;
         private readonly IMoveInRequester _moveInRequester;
         private readonly IValidationErrorTranslator _validationErrorTranslator;
         private readonly IMarketEvaluationPointRepository _marketEvaluationPointRepository;
 
         public MoveInRequestHandler(
             IMoveInTransactionRepository moveInTransactionRepository,
-            IOutgoingMessageStore outgoingMessageStore,
-            IMarketActivityRecordParser marketActivityRecordParser,
             IMoveInRequester moveInRequester,
             IValidationErrorTranslator validationErrorTranslator,
             IMarketEvaluationPointRepository marketEvaluationPointRepository)
         {
             _moveInTransactionRepository = moveInTransactionRepository;
-            _outgoingMessageStore = outgoingMessageStore;
-            _marketActivityRecordParser = marketActivityRecordParser;
             _moveInRequester = moveInRequester;
             _validationErrorTranslator = validationErrorTranslator;
             _marketEvaluationPointRepository = marketEvaluationPointRepository;
@@ -111,19 +101,6 @@ namespace Messaging.Application.Transactions.MoveIn
             return energySupplierId == senderId;
         }
 
-        private static OutgoingMessage CreateOutgoingMessage(string id, DocumentType documentType, string processType, ActorNumber receiverId, string marketActivityRecordPayload)
-        {
-            return new OutgoingMessage(
-                documentType,
-                receiverId,
-                id,
-                processType,
-                MarketRole.EnergySupplier,
-                DataHubDetails.IdentificationNumber,
-                MarketRole.MeteringPointAdministrator,
-                marketActivityRecordPayload);
-        }
-
         private async Task<Unit> RejectInvalidRequestMessageAsync(MoveInTransaction transaction, RequestChangeOfSupplierTransaction request, string error)
         {
             var reasons = await CreateReasonsFromAsync(new Collection<string>() { error }).ConfigureAwait(false);
@@ -142,21 +119,6 @@ namespace Messaging.Application.Transactions.MoveIn
                 transaction.EffectiveDate.ToString(),
                 transaction.ConsumerId);
             return _moveInRequester.InvokeAsync(businessProcess);
-        }
-
-        private OutgoingMessage ConfirmMessageFrom(MoveInTransaction transaction, RequestChangeOfSupplierTransaction requestChangeOfSupplierTransaction)
-        {
-            var marketActivityRecord = new Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier.MarketActivityRecord(
-                Guid.NewGuid().ToString(),
-                transaction.TransactionId,
-                transaction.MarketEvaluationPointId);
-
-            return CreateOutgoingMessage(
-                transaction.StartedByMessageId,
-                DocumentType.ConfirmRequestChangeOfSupplier,
-                ProcessType.MoveIn.Code,
-                ActorNumber.Create(requestChangeOfSupplierTransaction.Message.SenderId),
-                _marketActivityRecordParser.From(marketActivityRecord));
         }
 
         private Task<ReadOnlyCollection<Reason>> CreateReasonsFromAsync(IReadOnlyCollection<string> validationErrors)
