@@ -20,5 +20,5 @@ public record Request(
     Customer Customer);
 
 public record Customer(
-    string Id,
+    string Number,
     string Name);
