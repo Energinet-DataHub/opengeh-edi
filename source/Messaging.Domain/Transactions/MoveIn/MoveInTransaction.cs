@@ -140,24 +140,21 @@ namespace Messaging.Domain.Transactions.MoveIn
             if (_businessProcessState == BusinessProcessState.Rejected)
                 throw new MoveInException($"Transaction has already been rejected");
 
-            if (_businessProcessState == BusinessProcessState.Pending)
-            {
-                _businessProcessState = BusinessProcessState.Rejected;
-                AddDomainEvent(new MoveInWasRejected(TransactionId));
+            _businessProcessState = BusinessProcessState.Rejected;
+            AddDomainEvent(new MoveInWasRejected(TransactionId));
 
-                var marketActivityRecord = new OutgoingMessages.RejectRequestChangeOfSupplier.MarketActivityRecord(
-                    Guid.NewGuid().ToString(), TransactionId, MarketEvaluationPointId, reasons);
-                var message = new RejectRequestChangeOfSupplierMessage(
-                    DocumentType.RejectRequestChangeOfSupplier,
-                    _requestedBy,
-                    TransactionId,
-                    ProcessType.MoveIn.Code,
-                    MarketRole.EnergySupplier,
-                    senderOfMessage,
-                    MarketRole.MeteringPointAdministrator,
-                    marketActivityRecord);
-                _messages.Add(message);
-            }
+            var marketActivityRecord = new OutgoingMessages.RejectRequestChangeOfSupplier.MarketActivityRecord(
+                Guid.NewGuid().ToString(), TransactionId, MarketEvaluationPointId, reasons);
+            var message = new RejectRequestChangeOfSupplierMessage(
+                DocumentType.RejectRequestChangeOfSupplier,
+                _requestedBy,
+                TransactionId,
+                ProcessType.MoveIn.Code,
+                MarketRole.EnergySupplier,
+                senderOfMessage,
+                MarketRole.MeteringPointAdministrator,
+                marketActivityRecord);
+            _messages.Add(message);
         }
 
         public void MarkMeteringPointMasterDataAsSent()
