@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Linq;
 using System.Threading.Tasks;
-using Messaging.Application.Transactions.MoveIn;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
@@ -36,12 +36,17 @@ namespace Messaging.Infrastructure.Transactions.MoveIn
 
         public MoveInTransaction? GetById(string transactionId)
         {
-            return _b2BContext.Transactions.Find(transactionId);
+            return _b2BContext
+                .Transactions
+                .Include("_messages")
+                .FirstOrDefault(transaction => transaction.TransactionId == transactionId);
         }
 
         public Task<MoveInTransaction?> GetByProcessIdAsync(string processId)
         {
-            return _b2BContext.Transactions.FirstOrDefaultAsync(transaction => transaction.ProcessId == processId);
+            return _b2BContext.Transactions
+                .Include("_messages")
+                .FirstOrDefaultAsync(transaction => transaction.ProcessId == processId);
         }
     }
 }
