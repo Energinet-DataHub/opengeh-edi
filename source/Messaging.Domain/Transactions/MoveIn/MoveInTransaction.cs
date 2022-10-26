@@ -120,7 +120,7 @@ namespace Messaging.Domain.Transactions.MoveIn
             SetCurrentEnergySupplierNotificationToPending();
         }
 
-        public void Accept(string processId, string marketEvaluationPointNumber)
+        public void Accept(string processId)
         {
             if (_state != State.Started)
             {

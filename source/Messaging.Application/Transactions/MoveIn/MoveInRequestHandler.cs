@@ -88,8 +88,7 @@ namespace Messaging.Application.Transactions.MoveIn
             else
             {
                 transaction.Accept(
-                    businessProcessResult.ProcessId ?? throw new MoveInException("Business process id cannot be empty."),
-                    request.MarketActivityRecord.MarketEvaluationPointId ?? throw new MoveInException("Market evaluation point number cannot be empty."));
+                    businessProcessResult.ProcessId ?? throw new MoveInException("Business process id cannot be empty."));
             }
 
             _moveInTransactionRepository.Add(transaction);

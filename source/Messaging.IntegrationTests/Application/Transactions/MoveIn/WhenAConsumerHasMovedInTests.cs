@@ -101,7 +101,7 @@ public class WhenAConsumerHasMovedInTests : TestBase
             SampleData.ConsumerIdType,
             ActorNumber.Create(SampleData.SenderId));
 
-        transaction.Accept(BusinessRequestResult.Succeeded(Guid.NewGuid().ToString()).ProcessId!, SampleData.MeteringPointNumber);
+        transaction.Accept(BusinessRequestResult.Succeeded(Guid.NewGuid().ToString()).ProcessId!);
         transaction.MarkMeteringPointMasterDataAsSent();
         _transactionRepository.Add(transaction);
         await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
