@@ -19,7 +19,7 @@ namespace Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 
 public class RejectRequestChangeOfSupplierMessage : OutgoingMessage
 {
-    public RejectRequestChangeOfSupplierMessage(DocumentType documentType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string marketActivityRecordPayload)
+    private RejectRequestChangeOfSupplierMessage(DocumentType documentType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string marketActivityRecordPayload)
         : base(documentType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, marketActivityRecordPayload)
     {
         ArgumentNullException.ThrowIfNull(marketActivityRecordPayload);
