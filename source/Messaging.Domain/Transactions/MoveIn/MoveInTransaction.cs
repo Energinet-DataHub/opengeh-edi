@@ -14,6 +14,7 @@
 
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Domain.SeedWork;
 using Messaging.Domain.Transactions.MoveIn.Events;
@@ -128,6 +129,23 @@ namespace Messaging.Domain.Transactions.MoveIn
 
             if (_businessProcessState == BusinessProcessState.Accepted)
                 return;
+
+            var marketActivityRecord = new Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier.MarketActivityRecord(
+                Guid.NewGuid().ToString(),
+                TransactionId,
+                MarketEvaluationPointId);
+
+            var message = new ConfirmRequestChangeOfSupplierMessage(
+                DocumentType.ConfirmRequestChangeOfSupplier,
+                _requestedBy,
+                TransactionId,
+                ProcessType.MoveIn.Code,
+                MarketRole.EnergySupplier,
+                DataHubDetails.IdentificationNumber,
+                MarketRole.MeteringPointAdministrator,
+                marketActivityRecord);
+
+            _messages.Add(message);
 
             _businessProcessState = BusinessProcessState.Accepted;
             ProcessId = processId ?? throw new ArgumentNullException(nameof(processId));
