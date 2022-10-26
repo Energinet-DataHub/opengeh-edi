@@ -26,7 +26,7 @@ public class ConfirmRequestChangeOfSupplierMessage : OutgoingMessage
         MarketActivityRecord = JsonSerializer.Deserialize<MarketActivityRecord>(marketActivityRecordPayload)!;
     }
 
-    private ConfirmRequestChangeOfSupplierMessage(DocumentType documentType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, MarketActivityRecord marketActivityRecord)
+    private ConfirmRequestChangeOfSupplierMessage(ActorNumber receiverId, string transactionId, string processType, MarketActivityRecord marketActivityRecord)
         : base(DocumentType.ConfirmRequestChangeOfSupplier, receiverId, transactionId, processType, MarketRole.EnergySupplier, DataHubDetails.IdentificationNumber, MarketRole.MeteringPointAdministrator, JsonSerializer.Serialize(marketActivityRecord))
     {
         MarketActivityRecord = marketActivityRecord;
@@ -48,13 +48,9 @@ public class ConfirmRequestChangeOfSupplierMessage : OutgoingMessage
             marketEvaluationPointNumber);
 
         return new ConfirmRequestChangeOfSupplierMessage(
-            DocumentType.ConfirmRequestChangeOfSupplier,
             energySupplierNumber,
             transactionId,
             processType.Code,
-            MarketRole.EnergySupplier,
-            DataHubDetails.IdentificationNumber,
-            MarketRole.MeteringPointAdministrator,
             marketActivityRecord);
     }
 }
