@@ -137,6 +137,9 @@ namespace Messaging.Domain.Transactions.MoveIn
 
         public void Reject(IEnumerable<Reason> reasons, ActorNumber senderOfMessage)
         {
+            if (_businessProcessState == BusinessProcessState.Rejected)
+                throw new MoveInException($"Transaction has already been rejected");
+
             if (_businessProcessState == BusinessProcessState.Pending)
             {
                 _businessProcessState = BusinessProcessState.Rejected;
