@@ -14,7 +14,6 @@
 
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Domain.SeedWork;
 using Messaging.Domain.Transactions.MoveIn.Events;
