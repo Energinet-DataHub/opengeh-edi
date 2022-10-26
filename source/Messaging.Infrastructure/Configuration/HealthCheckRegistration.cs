@@ -30,7 +30,7 @@ public static class HealthCheckRegistration
                 connectionString: dbConnectionString);
     }
 
-    public static void AddInternalDomainServiceBusQueuesHealthCheck(this IServiceCollection services, string serviceBusConnectionString, [NotNull] params string[] queueNames)
+    public static void AddExternalDomainServiceBusQueuesHealthCheck(this IServiceCollection services, string serviceBusConnectionString, [NotNull] params string[] queueNames)
     {
         foreach (var name in queueNames)
         {

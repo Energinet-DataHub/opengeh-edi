@@ -26,11 +26,8 @@ namespace Messaging.Api
 
         public virtual string? DB_CONNECTION_STRING => GetEnvironmentVariable(nameof(DB_CONNECTION_STRING));
 
-        public virtual string? INCOMING_MESSAGE_QUEUE_MANAGE_CONNECTION_STRING =>
-            GetEnvironmentVariable(nameof(INCOMING_MESSAGE_QUEUE_MANAGE_CONNECTION_STRING));
-
-        public virtual string? INCOMING_MESSAGE_QUEUE_SENDER_CONNECTION_STRING =>
-            GetEnvironmentVariable(nameof(INCOMING_MESSAGE_QUEUE_SENDER_CONNECTION_STRING));
+        public virtual string? SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND =>
+            GetEnvironmentVariable(nameof(SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND));
 
         public virtual string? INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME => GetEnvironmentVariable(nameof(INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME));
 
@@ -65,20 +62,14 @@ namespace Messaging.Api
         public virtual string? MASTER_DATA_REQUEST_QUEUE_NAME =>
             GetEnvironmentVariable(nameof(MASTER_DATA_REQUEST_QUEUE_NAME));
 
-        public virtual string? SHARED_SERVICE_BUS_SEND_CONNECTION_STRING =>
-            GetEnvironmentVariable(nameof(SHARED_SERVICE_BUS_SEND_CONNECTION_STRING));
-
         public virtual string? CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME =>
             GetEnvironmentVariable(nameof(CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME));
 
         public virtual string? CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME =>
             GetEnvironmentVariable(nameof(CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME));
 
-        public string? ENERGY_SUPPLYING_SERVICE_BUS_SEND_CONNECTION_STRING =>
-            GetEnvironmentVariable(nameof(ENERGY_SUPPLYING_SERVICE_BUS_SEND_CONNECTION_STRING));
-
-        public string? SERVICE_BUS_CONNECTION_STRING_MANAGE_FOR_INTEGRATION_EVENTS =>
-            GetEnvironmentVariable(nameof(SERVICE_BUS_CONNECTION_STRING_MANAGE_FOR_INTEGRATION_EVENTS));
+        public string? SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE =>
+            GetEnvironmentVariable(nameof(SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE));
 
         public string? INTEGRATION_EVENT_TOPIC_NAME =>
             GetEnvironmentVariable(nameof(INTEGRATION_EVENT_TOPIC_NAME));

@@ -8,11 +8,7 @@
     "REQUEST_RESPONSE_LOGGING_CONTAINER_NAME": "<Name of storage container>",
     "REQUEST_RESPONSE_LOGGING_CONNECTION_STRING": "<connection string for logging request and response to storage>",
     "DB_CONNECTION_STRING": "<SQL database connection string>",
-    "INCOMING_MESSAGE_QUEUE_MANAGE_CONNECTION_STRING" : "<connection string for service bus with manage permissions>",
-    "INCOMING_MESSAGE_QUEUE_SENDER_CONNECTION_STRING": "<connection string for service bus with sender permissions>",
-    "INCOMING_MESSAGE_QUEUE_LISTENER_CONNECTION_STRING": "<connection string for service bus with listener permissions>",
-    "INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME": "<Name of request change of supplier transactions service bus queue>",
-    "INCOMING_CHANGE_CUSTOMER_CHARACTERISTICS_MESSAGE_QUEUE_NAME": "<Name of request change of customer characteristics transactions service bus queue>",
+    "INCOMING_MESSAGE_QUEUE_NAME": "<Name of transactions service bus queue>",
     "MESSAGEHUB_STORAGE_CONNECTION_STRING": "<MessageHub Storage Account connection string>",
     "MESSAGEHUB_STORAGE_CONTAINER_NAME": "<MessageHub Storage Account container name>",
     "MESSAGEHUB_QUEUE_CONNECTION_STRING": "<PostOffice Service Bus connection string>",
@@ -20,11 +16,12 @@
     "MESSAGEHUB_DOMAIN_REPLY_QUEUE": "<MessageHub Domain Reply Queue name>",
     "MESSAGE_REQUEST_QUEUE": "<Queue for post office to request bundle>",
     "MOVE_IN_REQUEST_ENDPOINT": "<Move in request url>",
-    "SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS_LISTENER": "<service bus connection string for integration events listener permissions>",
+    "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_LISTENER": "<service bus connection string for shared service bus with listener permissions>",
+    "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE": "<connection string for shared service bus with manage permissions>",
+    "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND": "<connection string for shared service bus with sender permissions>",
     "METERING_POINT_MASTER_DATA_RESPONSE_QUEUE_NAME": "<Master data response queue name>",
     "ENERGY_SUPPLIER_CHANGED_TOPIC": "<Energy supplier changed topic>",
     "ENERGY_SUPPLIER_CHANGED_SUBSCRIPTION": "<Energy supplier changed subscription>",
     "MASTER_DATA_REQUEST_QUEUE_NAME": "<Name of Queue to send master requests>",
-    "SHARED_SERVICE_BUS_SEND_CONNECTION_STRING" : "<Connection string for shared service bus with send permissions>"
   }
 }

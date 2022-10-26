@@ -40,7 +40,7 @@ public class MeteringPointMasterDataResponseListener
     }
 
     [Function("MeteringPointMasterDataResponseListener")]
-    public async Task RunAsync([ServiceBusTrigger("%METERING_POINT_MASTER_DATA_RESPONSE_QUEUE_NAME%", Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_INTEGRATION_EVENTS_LISTENER")] byte[] data, FunctionContext context)
+    public async Task RunAsync([ServiceBusTrigger("%METERING_POINT_MASTER_DATA_RESPONSE_QUEUE_NAME%", Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_LISTENER")] byte[] data, FunctionContext context)
     {
         if (data == null) throw new ArgumentNullException(nameof(data));
         if (context == null) throw new ArgumentNullException(nameof(context));
