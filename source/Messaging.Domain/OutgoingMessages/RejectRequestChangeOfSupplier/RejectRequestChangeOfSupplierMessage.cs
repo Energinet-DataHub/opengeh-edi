@@ -26,8 +26,8 @@ public class RejectRequestChangeOfSupplierMessage : OutgoingMessage
         MarketActivityRecord = JsonSerializer.Deserialize<MarketActivityRecord>(marketActivityRecordPayload)!;
     }
 
-    public RejectRequestChangeOfSupplierMessage(ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, MarketActivityRecord marketActivityRecord)
-        : base(DocumentType.RejectRequestChangeOfSupplier, receiverId, transactionId, processType, receiverRole, senderId, senderRole, JsonSerializer.Serialize(marketActivityRecord))
+    public RejectRequestChangeOfSupplierMessage(ActorNumber receiverId, string transactionId, string processType, ActorNumber senderId, MarketRole senderRole, MarketActivityRecord marketActivityRecord)
+        : base(DocumentType.RejectRequestChangeOfSupplier, receiverId, transactionId, processType, MarketRole.EnergySupplier, senderId, senderRole, JsonSerializer.Serialize(marketActivityRecord))
     {
         MarketActivityRecord = marketActivityRecord;
     }
@@ -59,7 +59,6 @@ public class RejectRequestChangeOfSupplierMessage : OutgoingMessage
             energySupplierNumber,
             transactionId,
             processType.Code,
-            MarketRole.EnergySupplier,
             DataHubDetails.IdentificationNumber,
             MarketRole.MeteringPointAdministrator,
             marketActivityRecord);
