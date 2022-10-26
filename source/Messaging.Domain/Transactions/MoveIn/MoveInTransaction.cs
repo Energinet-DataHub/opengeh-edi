@@ -135,23 +135,17 @@ namespace Messaging.Domain.Transactions.MoveIn
             AddDomainEvent(new MoveInWasAccepted(ProcessId, marketEvaluationPointNumber, TransactionId));
         }
 
-        public void Reject(IEnumerable<Reason> reasons, ActorNumber senderOfMessage)
+        public void Reject(IReadOnlyList<Reason> reasons, ActorNumber senderOfMessage)
         {
             if (_businessProcessState == BusinessProcessState.Rejected)
                 throw new MoveInException($"Transaction has already been rejected");
 
-            var marketActivityRecord = new OutgoingMessages.RejectRequestChangeOfSupplier.MarketActivityRecord(
-                Guid.NewGuid().ToString(), TransactionId, MarketEvaluationPointId, reasons);
-            var message = new RejectRequestChangeOfSupplierMessage(
-                DocumentType.RejectRequestChangeOfSupplier,
-                _requestedBy,
+            _messages.Add(RejectRequestChangeOfSupplierMessage.Create(
                 TransactionId,
-                ProcessType.MoveIn.Code,
-                MarketRole.EnergySupplier,
-                senderOfMessage,
-                MarketRole.MeteringPointAdministrator,
-                marketActivityRecord);
-            _messages.Add(message);
+                ProcessType.MoveIn,
+                MarketEvaluationPointId,
+                _requestedBy,
+                reasons));
 
             _businessProcessState = BusinessProcessState.Rejected;
             AddDomainEvent(new MoveInWasRejected(TransactionId));
