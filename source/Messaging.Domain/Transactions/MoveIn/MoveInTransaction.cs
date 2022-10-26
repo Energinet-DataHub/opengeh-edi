@@ -134,7 +134,7 @@ namespace Messaging.Domain.Transactions.MoveIn
 
             _businessProcessState = BusinessProcessState.Accepted;
             ProcessId = processId ?? throw new ArgumentNullException(nameof(processId));
-            AddDomainEvent(new MoveInWasAccepted(ProcessId, marketEvaluationPointNumber, TransactionId));
+            AddDomainEvent(new MoveInWasAccepted(ProcessId, MarketEvaluationPointId, TransactionId));
         }
 
         public void Reject(IReadOnlyList<Reason> reasons)
