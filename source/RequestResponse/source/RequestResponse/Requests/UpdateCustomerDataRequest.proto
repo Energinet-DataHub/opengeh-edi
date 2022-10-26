@@ -1,0 +1,72 @@
+﻿/* Copyright 2020 Energinet DataHub A/S
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License2");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+syntax = "proto3";
+
+option csharp_namespace = "Energinet.DataHub.EnergySupplying.RequestResponse.Requests";
+
+message UpdateCustomerDataRequest {
+  string processid = 1; // Process id related to the customer master data
+  string effectiveDate = 2;
+  MarketEvaluationPoint marketEvaluationPoint = 3;
+}
+
+message MarketEvaluationPoint {
+  string gsrnNumber = 1;
+  bool electricalHeating = 2;
+  Customer firstCustomer = 3;
+  Customer secondCustomer = 4;
+  bool protectedName = 5;
+  repeated UsagePointLocation usagePointLocations = 6;
+}
+
+message Customer {
+  string id = 1;
+  string name = 2;
+}
+
+message UsagePointLocation {
+  string type = 1;
+  string geoInfoReference = 2;
+  Address address = 3;
+  bool protectedAddress = 4;
+  string name = 5;
+  string attnName = 6;
+  string phone1 = 7;
+  string phone2 = 8;
+  string email = 9;
+}
+
+message Address {
+  StreetDetails streetDetails = 1;
+  TownDetails townDetails = 2;
+  string postalCode = 3;
+  string poBox = 4;
+}
+
+message TownDetails {
+  string municipalityCode = 1;
+  string cityName = 2;
+  string citySubDivisionName = 3;
+  string countryCode = 4;
+}
+
+message StreetDetails {
+  string streetCode = 1;
+  string streetName = 2;
+  string buildingNumber = 3;
+  string floorIdentification = 4;
+  string roomIdentification = 5;
+}
