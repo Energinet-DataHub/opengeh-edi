@@ -130,22 +130,7 @@ namespace Messaging.Domain.Transactions.MoveIn
             if (_businessProcessState == BusinessProcessState.Accepted)
                 return;
 
-            var marketActivityRecord = new Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier.MarketActivityRecord(
-                Guid.NewGuid().ToString(),
-                TransactionId,
-                MarketEvaluationPointId);
-
-            var message = new ConfirmRequestChangeOfSupplierMessage(
-                DocumentType.ConfirmRequestChangeOfSupplier,
-                _requestedBy,
-                TransactionId,
-                ProcessType.MoveIn.Code,
-                MarketRole.EnergySupplier,
-                DataHubDetails.IdentificationNumber,
-                MarketRole.MeteringPointAdministrator,
-                marketActivityRecord);
-
-            _messages.Add(message);
+            _messages.Add(ConfirmRequestChangeOfSupplierMessage.Create(TransactionId, ProcessType.MoveIn, MarketEvaluationPointId, _requestedBy));
 
             _businessProcessState = BusinessProcessState.Accepted;
             ProcessId = processId ?? throw new ArgumentNullException(nameof(processId));

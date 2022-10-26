@@ -33,4 +33,28 @@ public class ConfirmRequestChangeOfSupplierMessage : OutgoingMessage
     }
 
     public MarketActivityRecord MarketActivityRecord { get; }
+
+    public static OutgoingMessage Create(
+        string transactionId,
+        ProcessType processType,
+        string marketEvaluationPointNumber,
+        ActorNumber energySupplierNumber)
+    {
+        ArgumentNullException.ThrowIfNull(processType);
+
+        var marketActivityRecord = new MarketActivityRecord(
+            Guid.NewGuid().ToString(),
+            transactionId,
+            marketEvaluationPointNumber);
+
+        return new ConfirmRequestChangeOfSupplierMessage(
+            DocumentType.ConfirmRequestChangeOfSupplier,
+            energySupplierNumber,
+            transactionId,
+            processType.Code,
+            MarketRole.EnergySupplier,
+            DataHubDetails.IdentificationNumber,
+            MarketRole.MeteringPointAdministrator,
+            marketActivityRecord);
+    }
 }
