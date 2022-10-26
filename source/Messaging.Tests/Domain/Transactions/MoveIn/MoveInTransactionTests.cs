@@ -77,7 +77,6 @@ public class MoveInTransactionTests
 
         Assert.Throws<MoveInException>(() =>
             _transaction.Reject(new List<Reason>(), ActorNumber.Create(SampleData.SenderId)));
-        Assert.Equal(1, _transaction.DomainEvents.Count(e => e is MoveInWasRejected));
     }
 
     [Fact]
