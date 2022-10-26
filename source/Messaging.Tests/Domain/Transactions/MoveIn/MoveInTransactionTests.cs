@@ -43,7 +43,7 @@ public class MoveInTransactionTests
     [Fact]
     public void Business_process_is_set_to_accepted()
     {
-        _transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
+        _transaction.Accept(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
 
         var acceptedEvent = _transaction.DomainEvents.FirstOrDefault(e => e is MoveInWasAccepted) as MoveInWasAccepted;
         Assert.NotNull(acceptedEvent);
@@ -53,9 +53,9 @@ public class MoveInTransactionTests
     [Fact]
     public void Business_process_can_be_marked_as_accepted_once_only()
     {
-        _transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
+        _transaction.Accept(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
 
-        _transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
+        _transaction.Accept(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
 
         Assert.Equal(1, _transaction.DomainEvents.Count(e => e is MoveInWasAccepted));
     }
@@ -90,7 +90,7 @@ public class MoveInTransactionTests
     [Fact]
     public void Business_process_is_completed()
     {
-        _transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
+        _transaction.Accept(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
         _transaction.BusinessProcessCompleted();
 
         Assert.Contains(_transaction.DomainEvents, e => e is BusinessProcessWasCompleted);
@@ -99,7 +99,7 @@ public class MoveInTransactionTests
     [Fact]
     public void End_of_supply_notification_status_is_changed_to_pending_when_business_process_is_completed()
     {
-        _transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
+        _transaction.Accept(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
         _transaction.BusinessProcessCompleted();
 
         Assert.Contains(_transaction.DomainEvents, e => e is EndOfSupplyNotificationChangedToPending);
