@@ -63,7 +63,7 @@ public class MoveInTransactionTests
     [Fact]
     public void Transaction_is_rejected()
     {
-        _transaction.Reject(CreateListOfDummyReasons(), ActorNumber.Create(SampleData.SenderId));
+        _transaction.Reject(CreateListOfDummyReasons());
 
         var rejectedEvent = _transaction.DomainEvents.FirstOrDefault(e => e is MoveInWasRejected) as MoveInWasRejected;
         Assert.NotNull(rejectedEvent);
@@ -75,10 +75,10 @@ public class MoveInTransactionTests
     {
         var reasons = CreateListOfDummyReasons();
 
-        _transaction.Reject(reasons, ActorNumber.Create(SampleData.SenderId));
+        _transaction.Reject(reasons);
 
         Assert.Throws<MoveInException>(() =>
-            _transaction.Reject(reasons, ActorNumber.Create(SampleData.SenderId)));
+            _transaction.Reject(reasons));
     }
 
     [Fact]

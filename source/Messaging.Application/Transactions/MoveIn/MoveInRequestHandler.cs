@@ -93,7 +93,7 @@ namespace Messaging.Application.Transactions.MoveIn
             if (businessProcessResult.Success == false)
             {
                 var reasons = await CreateReasonsFromAsync(businessProcessResult.ValidationErrors).ConfigureAwait(false);
-                transaction.Reject(reasons, DataHubDetails.IdentificationNumber);
+                transaction.Reject(reasons);
             }
             else
             {
@@ -128,7 +128,7 @@ namespace Messaging.Application.Transactions.MoveIn
         private async Task<Unit> RejectInvalidRequestMessageAsync(MoveInTransaction transaction, RequestChangeOfSupplierTransaction request, string error)
         {
             var reasons = await CreateReasonsFromAsync(new Collection<string>() { error }).ConfigureAwait(false);
-            transaction.Reject(reasons, DataHubDetails.IdentificationNumber);
+            transaction.Reject(reasons);
 
             _moveInTransactionRepository.Add(transaction);
             return Unit.Value;

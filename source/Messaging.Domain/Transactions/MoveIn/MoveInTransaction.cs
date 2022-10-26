@@ -135,7 +135,7 @@ namespace Messaging.Domain.Transactions.MoveIn
             AddDomainEvent(new MoveInWasAccepted(ProcessId, marketEvaluationPointNumber, TransactionId));
         }
 
-        public void Reject(IReadOnlyList<Reason> reasons, ActorNumber senderOfMessage)
+        public void Reject(IReadOnlyList<Reason> reasons)
         {
             if (_businessProcessState == BusinessProcessState.Rejected)
                 throw new MoveInException($"Transaction has already been rejected");
