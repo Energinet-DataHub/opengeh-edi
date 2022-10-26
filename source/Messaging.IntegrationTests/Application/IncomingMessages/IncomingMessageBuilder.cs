@@ -14,10 +14,11 @@
 
 using System;
 using Messaging.Application.Configuration;
-using Messaging.Application.IncomingMessages;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Domain.Actors;
+using Messaging.Domain.OutgoingMessages;
 using NodaTime;
+using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
 
 namespace Messaging.IntegrationTests.Application.IncomingMessages
 {

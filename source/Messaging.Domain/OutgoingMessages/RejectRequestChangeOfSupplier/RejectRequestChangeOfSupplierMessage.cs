@@ -34,8 +34,15 @@ public class RejectRequestChangeOfSupplierMessage : OutgoingMessage
 
     public MarketActivityRecord MarketActivityRecord { get; }
 
-    public static RejectRequestChangeOfSupplierMessage Create(IReadOnlyList<Reason> reasons)
+    public static RejectRequestChangeOfSupplierMessage Create(
+        string transactionId,
+        ProcessType processType,
+        string marketEvaluationPointNumber,
+        ActorNumber energySupplierNumber,
+        IReadOnlyList<Reason> reasons)
     {
+        ArgumentNullException.ThrowIfNull(processType);
+        ArgumentNullException.ThrowIfNull(energySupplierNumber);
         ArgumentNullException.ThrowIfNull(reasons);
 
         if (reasons.Count == 0)
@@ -43,6 +50,19 @@ public class RejectRequestChangeOfSupplierMessage : OutgoingMessage
             throw new OutgoingMessageException($"Reject message must contain at least one reject reason");
         }
 
-        throw new NotImplementedException();
+        var marketActivityRecord = new MarketActivityRecord(
+            Guid.NewGuid().ToString(),
+            transactionId,
+            marketEvaluationPointNumber,
+            reasons);
+        return new RejectRequestChangeOfSupplierMessage(
+            DocumentType.RejectRequestChangeOfSupplier,
+            energySupplierNumber,
+            transactionId,
+            processType.Code,
+            MarketRole.EnergySupplier,
+            DataHubDetails.IdentificationNumber,
+            MarketRole.MeteringPointAdministrator,
+            marketActivityRecord);
     }
 }
