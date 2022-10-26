@@ -33,4 +33,16 @@ public class RejectRequestChangeOfSupplierMessage : OutgoingMessage
     }
 
     public MarketActivityRecord MarketActivityRecord { get; }
+
+    public static RejectRequestChangeOfSupplierMessage Create(IReadOnlyList<Reason> reasons)
+    {
+        ArgumentNullException.ThrowIfNull(reasons);
+
+        if (reasons.Count == 0)
+        {
+            throw new OutgoingMessageException($"Reject message must contain at least one reject reason");
+        }
+
+        throw new NotImplementedException();
+    }
 }
