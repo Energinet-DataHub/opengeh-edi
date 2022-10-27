@@ -55,8 +55,8 @@ module "kvs_sbq_create_metering_point_transactions" {
   tags          = azurerm_resource_group.this.tags
 }
 
-module "sbq_customermasterdataupdatequeue" {
+module "sbq_customermasterdataupdaterequestqueue" {
   source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/service-bus-queue?ref=7.0.0"
-  name                = "customermasterdataupdatequeue"
+  name                = "customermasterdataupdaterequestqueue"
   namespace_id        = data.azurerm_key_vault_secret.sb_domain_relay_namespace_id.value
 }
