@@ -16,7 +16,7 @@ using System;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace Messaging.Api.MasterDataReceivers;
+namespace Messaging.Api.ResponseReceivers;
 
 public class UpdateCustomerMasterDataResponseListener
 {
