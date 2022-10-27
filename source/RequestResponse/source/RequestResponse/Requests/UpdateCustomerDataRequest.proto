@@ -18,7 +18,7 @@ syntax = "proto3";
 option csharp_namespace = "Energinet.DataHub.EnergySupplying.RequestResponse.Requests";
 
 message UpdateCustomerDataRequest {
-  string processid = 1; // Process id related to the customer master data
+  string processId = 1;
   string effectiveDate = 2;
   MarketEvaluationPoint marketEvaluationPoint = 3;
 }
