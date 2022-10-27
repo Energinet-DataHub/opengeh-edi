@@ -156,7 +156,8 @@ namespace Messaging.Api
                         runtime.INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME!,
                         runtime.MESSAGE_REQUEST_QUEUE!,
                         runtime.CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME!,
-                        runtime.CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME!);
+                        runtime.CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME!,
+                        runtime.CUSTOMER_MASTER_DATA_UPDATE_QUEUE_NAME!);
                     services.AddExternalServiceBusSubscriptionsHealthCheck(
                         runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
                         runtime.INTEGRATION_EVENT_TOPIC_NAME!,
