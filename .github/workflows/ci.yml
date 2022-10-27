@@ -19,16 +19,90 @@ on:
       - main
 
 jobs:
+  #
+  # License and Markdown Check
+  #
+
   ci_base:
     uses: Energinet-DataHub/.github/.github/workflows/ci-base.yml@v8
 
-  dotnet_solution_ci:
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@v8
+  #
+  # Detect changes to start relevant jobs
+  #
+
+  changes:
+    uses: ./.github/workflows/detect-changes.yml
+
+  #
+  # CI Infrastructure
+  #
+
+  infrastructure_ci_build:
+    needs: changes
+    if: ${{ needs.changes.outputs.infrastructure == 'true' }}
+    uses: Energinet-DataHub/.github/.github/workflows/infrastructure-build-prerelease.yml@v8
+    with:
+      TERRAFORM_WORKING_DIRECTORY: './build/infrastructure/main'
+      TERRAFORM_VERSION: '1.2.2'
+      INFRASTRUCTURE_PATH: './build/infrastructure'
+
+  #
+  # CI .NET
+  #
+
+  # Build all projects within solution
+  dotnet_ci_build:
+    needs: changes
+    if: ${{ needs.changes.outputs.dotnet == 'true' }}
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@v8
     with:
       SOLUTION_FILE_PATH: 'source/Energinet.DataHub.MarketRoles.sln'
+
+  # Run all tests in 'Messaging.IntegrationTests.dll'
+  messaging_integration_tests:
+    needs: changes
+    if: ${{ needs.changes.outputs.dotnet == 'true' }}
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci-test.yml@v8
+    with:
+      TESTS_DLL_FILE_PATH: '\source\Messaging.IntegrationTests\bin\Release\net6.0\Messaging.IntegrationTests.dll'
+      DOWNLOAD_ATTEMPT_LIMIT: 12
+
+  # Run all tests in 'Messaging.ArchitectureTests.dll'
+  messaging_architecture_tests:
+    needs: changes
+    if: ${{ needs.changes.outputs.dotnet == 'true' }}
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci-test.yml@v8
+    with:
+      TESTS_DLL_FILE_PATH: '\source\Messaging.ArchitectureTests\bin\Release\net6.0\Messaging.ArchitectureTests.dll'
+      DOWNLOAD_ATTEMPT_LIMIT: 12
+
+  # Run all tests in 'Messaging.Tests.dll'
+  messaging_tests:
+    needs: changes
+    if: ${{ needs.changes.outputs.dotnet == 'true' }}
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci-test.yml@v8
+    with:
+      TESTS_DLL_FILE_PATH: '\source\Messaging.Tests\bin\Release\net6.0\Messaging.Tests.dll'
+      DOWNLOAD_ATTEMPT_LIMIT: 12
+
+  # Run all tests in 'Processing.ArchitectureTests.dll'
+  processing_architecture_tests:
+    needs: changes
+    if: ${{ needs.changes.outputs.dotnet == 'true' }}
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci-test.yml@v8
+    with:
+      TESTS_DLL_FILE_PATH: '\source\Processing.ArchitectureTests\bin\Release\net6.0\Processing.ArchitectureTests.dll'
+      DOWNLOAD_ATTEMPT_LIMIT: 12
+
+  # Run all tests in 'Processing.IntegrationTests.dll'
+  processing_integration_tests:
+    needs: changes
+    if: ${{ needs.changes.outputs.dotnet == 'true' }}
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci-test.yml@v8
+    with:
+      TESTS_DLL_FILE_PATH: '\source\Processing.IntegrationTests\bin\Release\net6.0\Processing.IntegrationTests.dll'
+      DOWNLOAD_ATTEMPT_LIMIT: 12
       USE_SQLLOCALDB_2019: true
-      PREPARE_OUTPUTS: true
-      DOTNET_VERSION: '6.0.300'
       ENVIRONMENT: AzureAuth
     secrets:
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
@@ -37,21 +111,37 @@ jobs:
       AZURE_KEYVAULT_URL: ${{ secrets.AZURE_KEYVAULT_URL }}
       AZURE_SECRETS_KEYVAULT_URL: ${{ secrets.AZURE_SECRETS_KEYVAULT_URL }}
 
-  terraform_validate:
-    uses: Energinet-DataHub/.github/.github/workflows/terraform-validate.yml@v8
+  # Run all tests in 'Processing.Tests.dll'
+  processing_tests:
+    needs: changes
+    if: ${{ needs.changes.outputs.dotnet == 'true' }}
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci-test.yml@v8
     with:
-      TERRAFORM_WORKING_DIR_PATH: './build/infrastructure/main'
-      TERRAFORM_VERSION: '1.2.2'
+      TESTS_DLL_FILE_PATH: '\source\Processing.Tests\bin\Release\net6.0\Processing.Tests.dll'
+      DOWNLOAD_ATTEMPT_LIMIT: 12
 
-  create_prerelease:
+  #
+  # Branch policy status check
+  #
+  
+  allow_merge:
+    runs-on: ubuntu-latest
     needs: [
       ci_base,
-      dotnet_solution_ci,
-      terraform_validate
+      # Infrastructure
+      infrastructure_ci_build,
+      # .NET
+      dotnet_ci_build,
+      messaging_integration_tests,
+      messaging_architecture_tests,
+      messaging_tests,
+      processing_architecture_tests,
+      processing_integration_tests,
+      processing_tests,
     ]
-    uses: Energinet-DataHub/.github/.github/workflows/create-prerelease.yml@v8
-    with:
-      CALLER_REPOSITORY_PATH: Energinet-DataHub/geh-market-roles
-      RELEASE_NAME_PREFIX: dotnet
-    secrets:
-      PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+    if: |
+      always() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled')
+    steps:
+      - run: echo "${{ toJSON(needs) }}"
