@@ -60,3 +60,9 @@ module "sbq_customermasterdataupdaterequestqueue" {
   name                = "customermasterdataupdaterequestqueue"
   namespace_id        = data.azurerm_key_vault_secret.sb_domain_relay_namespace_id.value
 }
+
+module "sbq_customermasterdataupdateresponsequeue" {
+  source              = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/service-bus-queue?ref=7.0.0"
+  name                = "customermasterdataupdateresponsequeue"
+  namespace_id        = data.azurerm_key_vault_secret.sb_domain_relay_namespace_id.value
+}
