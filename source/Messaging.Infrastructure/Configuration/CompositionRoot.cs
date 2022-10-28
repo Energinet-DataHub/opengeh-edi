@@ -258,20 +258,24 @@ namespace Messaging.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddRemoteBusinessService<TRequest, TReply>(Func<IServiceProvider, RemoteBusinessService<TRequest, TReply>> builder)
-            where TRequest : class
-            where TReply : class
-        {
-            _services.AddSingleton(builder);
-            return this;
-        }
-
         public CompositionRoot AddRemoteBusinessService<TRequest, TReply>(string remoteRequestQueueName, string responseQueueName)
             where TRequest : class
             where TReply : class
         {
             _services.AddSingleton<IRemoteBusinessServiceRequestSenderAdapter<TRequest>>(provider =>
                 new RemoteBusinessServiceRequestSenderAdapter<TRequest>(provider.GetRequiredService<ServiceBusClient>(), remoteRequestQueueName));
+            _services.AddSingleton(provider =>
+                new RemoteBusinessService<TRequest, TReply>(
+                    provider.GetRequiredService<IRemoteBusinessServiceRequestSenderAdapter<TRequest>>(),
+                    responseQueueName));
+            return this;
+        }
+
+        public CompositionRoot AddRemoteBusinessService<TRequest, TReply>(Func<IServiceProvider, IRemoteBusinessServiceRequestSenderAdapter<TRequest>> adapterBuilder, string responseQueueName)
+            where TRequest : class
+            where TReply : class
+        {
+            _services.AddSingleton(adapterBuilder);
             _services.AddSingleton(provider =>
                 new RemoteBusinessService<TRequest, TReply>(
                     provider.GetRequiredService<IRemoteBusinessServiceRequestSenderAdapter<TRequest>>(),
