@@ -13,6 +13,9 @@
 // limitations under the License.
 
 using Messaging.Domain.Actors;
+using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
+using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Domain.SeedWork;
 using Messaging.Domain.Transactions.MoveIn.Events;
 using NodaTime;
@@ -21,6 +24,8 @@ namespace Messaging.Domain.Transactions.MoveIn
 {
     public class MoveInTransaction : Entity
     {
+        #pragma warning disable
+        private readonly List<OutgoingMessage> _messages = new();
         private readonly ActorNumber _requestedBy;
         private readonly State _state = State.Started;
         private BusinessProcessState _businessProcessState;
@@ -115,7 +120,7 @@ namespace Messaging.Domain.Transactions.MoveIn
             SetCurrentEnergySupplierNotificationToPending();
         }
 
-        public void AcceptedByBusinessProcess(string processId, string marketEvaluationPointNumber)
+        public void Accept(string processId)
         {
             if (_state != State.Started)
             {
@@ -125,18 +130,27 @@ namespace Messaging.Domain.Transactions.MoveIn
             if (_businessProcessState == BusinessProcessState.Accepted)
                 return;
 
+            _messages.Add(ConfirmRequestChangeOfSupplierMessage.Create(TransactionId, ProcessType.MoveIn, MarketEvaluationPointId, _requestedBy));
+
             _businessProcessState = BusinessProcessState.Accepted;
             ProcessId = processId ?? throw new ArgumentNullException(nameof(processId));
-            AddDomainEvent(new MoveInWasAccepted(ProcessId, marketEvaluationPointNumber, TransactionId));
+            AddDomainEvent(new MoveInWasAccepted(ProcessId, MarketEvaluationPointId, TransactionId));
         }
 
-        public void RejectedByBusinessProcess()
+        public void Reject(IReadOnlyList<Reason> reasons)
         {
-            if (_businessProcessState == BusinessProcessState.Pending)
-            {
-                _businessProcessState = BusinessProcessState.Rejected;
-                AddDomainEvent(new MoveInWasRejected(TransactionId));
-            }
+            if (_businessProcessState == BusinessProcessState.Rejected)
+                throw new MoveInException($"Transaction has already been rejected");
+
+            _messages.Add(RejectRequestChangeOfSupplierMessage.Create(
+                TransactionId,
+                ProcessType.MoveIn,
+                MarketEvaluationPointId,
+                _requestedBy,
+                reasons));
+
+            _businessProcessState = BusinessProcessState.Rejected;
+            AddDomainEvent(new MoveInWasRejected(TransactionId));
         }
 
         public void MarkMeteringPointMasterDataAsSent()

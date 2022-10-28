@@ -14,7 +14,7 @@
 
 using Messaging.Domain.SeedWork;
 
-namespace Messaging.Application.OutgoingMessages;
+namespace Messaging.Domain.OutgoingMessages;
 
 public sealed class ProcessType : EnumerationType
 {
