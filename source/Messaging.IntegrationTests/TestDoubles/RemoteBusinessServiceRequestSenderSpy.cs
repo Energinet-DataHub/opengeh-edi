@@ -15,16 +15,15 @@
 using System;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
-using Messaging.Infrastructure.Configuration.MessageBus;
 using Messaging.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 
 namespace Messaging.IntegrationTests.TestDoubles
 {
     public sealed class RemoteBusinessServiceRequestSenderSpy<TRequest> : IRemoteBusinessServiceRequestSenderAdapter<TRequest>
     {
-        public RemoteBusinessServiceRequestSenderSpy(string topicName)
+        public RemoteBusinessServiceRequestSenderSpy(string queueName)
         {
-            QueueName = topicName;
+            QueueName = queueName;
         }
 
         public string QueueName { get; }
