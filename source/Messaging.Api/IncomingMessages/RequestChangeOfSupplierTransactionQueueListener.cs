@@ -25,15 +25,15 @@ using Microsoft.Extensions.Logging;
 
 namespace Messaging.Api.IncomingMessages
 {
-    public class IncomingMessageQueueListener
+    public class RequestChangeOfSupplierTransactionQueueListener
     {
-        private readonly ILogger<IncomingMessageQueueListener> _logger;
+        private readonly ILogger<RequestChangeOfSupplierTransactionQueueListener> _logger;
         private readonly ICorrelationContext _correlationContext;
         private readonly ISerializer _jsonSerializer;
         private readonly IMediator _mediator;
 
-        public IncomingMessageQueueListener(
-            ILogger<IncomingMessageQueueListener> logger,
+        public RequestChangeOfSupplierTransactionQueueListener(
+            ILogger<RequestChangeOfSupplierTransactionQueueListener> logger,
             ICorrelationContext correlationContext,
             ISerializer jsonSerializer,
             IMediator mediator)
@@ -44,7 +44,7 @@ namespace Messaging.Api.IncomingMessages
             _mediator = mediator;
         }
 
-        [Function(nameof(IncomingMessageQueueListener))]
+        [Function(nameof(RequestChangeOfSupplierTransactionQueueListener))]
         public async Task RunAsync(
             [ServiceBusTrigger("%INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME%", Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_LISTENER")] byte[] data,
             FunctionContext context)
