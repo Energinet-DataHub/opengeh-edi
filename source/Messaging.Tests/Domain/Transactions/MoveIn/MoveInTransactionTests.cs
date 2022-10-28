@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Linq;
 using Messaging.Domain.Actors;
+using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Domain.Transactions.MoveIn.Events;
 using Xunit;
@@ -41,7 +43,7 @@ public class MoveInTransactionTests
     [Fact]
     public void Business_process_is_set_to_accepted()
     {
-        _transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
+        _transaction.Accept(SampleData.ProcessId);
 
         var acceptedEvent = _transaction.DomainEvents.FirstOrDefault(e => e is MoveInWasAccepted) as MoveInWasAccepted;
         Assert.NotNull(acceptedEvent);
@@ -51,17 +53,17 @@ public class MoveInTransactionTests
     [Fact]
     public void Business_process_can_be_marked_as_accepted_once_only()
     {
-        _transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
+        _transaction.Accept(SampleData.ProcessId);
 
-        _transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
+        _transaction.Accept(SampleData.ProcessId);
 
         Assert.Equal(1, _transaction.DomainEvents.Count(e => e is MoveInWasAccepted));
     }
 
     [Fact]
-    public void Business_process_can_be_set_to_rejected()
+    public void Transaction_is_rejected()
     {
-        _transaction.RejectedByBusinessProcess();
+        _transaction.Reject(CreateListOfDummyReasons());
 
         var rejectedEvent = _transaction.DomainEvents.FirstOrDefault(e => e is MoveInWasRejected) as MoveInWasRejected;
         Assert.NotNull(rejectedEvent);
@@ -69,13 +71,14 @@ public class MoveInTransactionTests
     }
 
     [Fact]
-    public void Business_process_can_be_marked_as_rejected_once_only()
+    public void Transaction_can_be_rejected_once_only()
     {
-        _transaction.RejectedByBusinessProcess();
+        var reasons = CreateListOfDummyReasons();
 
-        _transaction.RejectedByBusinessProcess();
+        _transaction.Reject(reasons);
 
-        Assert.Equal(1, _transaction.DomainEvents.Count(e => e is MoveInWasRejected));
+        Assert.Throws<MoveInException>(() =>
+            _transaction.Reject(reasons));
     }
 
     [Fact]
@@ -87,7 +90,7 @@ public class MoveInTransactionTests
     [Fact]
     public void Business_process_is_completed()
     {
-        _transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
+        _transaction.Accept(SampleData.ProcessId);
         _transaction.BusinessProcessCompleted();
 
         Assert.Contains(_transaction.DomainEvents, e => e is BusinessProcessWasCompleted);
@@ -96,7 +99,7 @@ public class MoveInTransactionTests
     [Fact]
     public void End_of_supply_notification_status_is_changed_to_pending_when_business_process_is_completed()
     {
-        _transaction.AcceptedByBusinessProcess(SampleData.ProcessId, SampleData.MarketEvaluationPointId);
+        _transaction.Accept(SampleData.ProcessId);
         _transaction.BusinessProcessCompleted();
 
         Assert.Contains(_transaction.DomainEvents, e => e is EndOfSupplyNotificationChangedToPending);
@@ -213,5 +216,10 @@ public class MoveInTransactionTests
             false,
             true,
             SampleData.EffectiveDate);
+    }
+
+    private static List<Reason> CreateListOfDummyReasons()
+    {
+        return new List<Reason>() { new Reason("ErrorText", "ErrorCode"), };
     }
 }
