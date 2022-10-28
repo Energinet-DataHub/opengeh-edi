@@ -19,7 +19,7 @@ using Newtonsoft.Json;
 
 namespace Messaging.Infrastructure.Configuration.MessageBus;
 
-public class RemoteBusinessService<TRequest, TReply> : IRemoteBusinessService<TRequest, TReply>
+public class RemoteBusinessService<TRequest, TReply>
     where TRequest : class
     where TReply : class
 {
