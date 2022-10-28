@@ -12,9 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Threading.Tasks;
+using Azure.Messaging.ServiceBus;
+
 namespace Messaging.Infrastructure.Configuration.MessageBus;
 
-#pragma warning disable
-public interface IRemoteBusinessServiceRequestSenderAdapter<TRequest> : IServiceBusSenderAdapter
+/// <summary>
+/// Azure Service Bus Client sender adapter
+/// </summary>
+public interface IRemoteBusinessServiceRequestSenderAdapter<TRequest> : IAsyncDisposable, IDisposable
 {
+    /// <summary>
+    /// Topic name
+    /// </summary>
+    string QueueName { get; }
+
+    /// <summary>
+    /// Send integration event to topic
+    /// </summary>
+    /// <param name="message"></param>
+    Task SendAsync(ServiceBusMessage message);
 }

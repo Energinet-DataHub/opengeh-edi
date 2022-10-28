@@ -23,10 +23,10 @@ namespace Messaging.IntegrationTests.TestDoubles
     {
         public RemoteBusinessServiceRequestSenderSpy(string topicName)
         {
-            TopicName = topicName;
+            QueueName = topicName;
         }
 
-        public string TopicName { get; }
+        public string QueueName { get; }
 
         public ServiceBusMessage? Message { get; private set; }
 

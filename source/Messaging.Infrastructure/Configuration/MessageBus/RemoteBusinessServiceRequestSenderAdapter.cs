@@ -25,11 +25,11 @@ namespace Messaging.Infrastructure.Configuration.MessageBus
         public RemoteBusinessServiceRequestSenderAdapter(ServiceBusClient serviceBusClient, string topicName)
         {
             if (serviceBusClient == null) throw new ArgumentNullException(nameof(serviceBusClient));
-            TopicName = topicName;
+            QueueName = topicName;
             _serviceBusSender = serviceBusClient.CreateSender(topicName);
         }
 
-        public string TopicName { get; }
+        public string QueueName { get; }
 
         public Task SendAsync(ServiceBusMessage message)
         {
