@@ -105,14 +105,8 @@ namespace Messaging.Api
                     services.AddSingleton(
                         _ => new RequestChangeCustomerCharacteristicsTransaction(runtime.INCOMING_CHANGE_CUSTOMER_CHARACTERISTICS_MESSAGE_QUEUE_NAME!));
 
-                    services.AddSingleton<IRemoteBusinessServiceRequestSenderAdapter<DummyRequest>>(sp => new RemoteBusinessServiceRequestSenderAdapter<DummyRequest>(sp.GetRequiredService<ServiceBusClient>(), "Dummy"));
-
                     CompositionRoot.Initialize(services)
-                        .AddRemoteBusinessService<DummyRequest, DummyReply>(sp =>
-                        {
-                            var adapter = sp.GetRequiredService<IRemoteBusinessServiceRequestSenderAdapter<DummyRequest>>();
-                            return new RemoteBusinessService<DummyRequest, DummyReply>(adapter, "Dummy");
-                        })
+                        .AddRemoteBusinessService<DummyRequest, DummyReply>("Dummy", "Dummy")
                         .AddBearerAuthentication(tokenValidationParameters)
                         .AddDatabaseConnectionFactory(databaseConnectionString!)
                         .AddSystemClock(new SystemDateTimeProvider())
