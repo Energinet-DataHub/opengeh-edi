@@ -68,6 +68,9 @@ namespace Messaging.Api
         public virtual string? CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME =>
             GetEnvironmentVariable(nameof(CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME));
 
+        public virtual string? CUSTOMER_MASTER_DATA_UPDATE_RESPONSE_QUEUE_NAME =>
+            GetEnvironmentVariable(nameof(CUSTOMER_MASTER_DATA_UPDATE_RESPONSE_QUEUE_NAME));
+
         public string? SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE =>
             GetEnvironmentVariable(nameof(SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE));
 
