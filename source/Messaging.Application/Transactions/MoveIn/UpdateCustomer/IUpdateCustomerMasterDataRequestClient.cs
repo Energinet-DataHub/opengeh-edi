@@ -16,8 +16,13 @@ using System.Threading.Tasks;
 
 namespace Messaging.Application.Transactions.MoveIn.UpdateCustomer;
 
-#pragma warning disable
+/// <summary>
+/// Service for sending update customer master data request to energy supplying business service
+/// </summary>
 public interface IUpdateCustomerMasterDataRequestClient
 {
+    /// <summary>
+    /// Sends a request to energy supplying business service
+    /// </summary>
     Task SendRequestAsync();
 }
