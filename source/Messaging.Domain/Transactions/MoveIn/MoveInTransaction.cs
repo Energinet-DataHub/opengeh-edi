@@ -14,6 +14,7 @@
 
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Domain.SeedWork;
 using Messaging.Domain.Transactions.MoveIn.Events;
@@ -119,7 +120,7 @@ namespace Messaging.Domain.Transactions.MoveIn
             SetCurrentEnergySupplierNotificationToPending();
         }
 
-        public void AcceptedByBusinessProcess(string processId, string marketEvaluationPointNumber)
+        public void Accept(string processId)
         {
             if (_state != State.Started)
             {
@@ -129,9 +130,11 @@ namespace Messaging.Domain.Transactions.MoveIn
             if (_businessProcessState == BusinessProcessState.Accepted)
                 return;
 
+            _messages.Add(ConfirmRequestChangeOfSupplierMessage.Create(TransactionId, ProcessType.MoveIn, MarketEvaluationPointId, _requestedBy));
+
             _businessProcessState = BusinessProcessState.Accepted;
             ProcessId = processId ?? throw new ArgumentNullException(nameof(processId));
-            AddDomainEvent(new MoveInWasAccepted(ProcessId, marketEvaluationPointNumber, TransactionId));
+            AddDomainEvent(new MoveInWasAccepted(ProcessId, MarketEvaluationPointId, TransactionId));
         }
 
         public void Reject(IReadOnlyList<Reason> reasons)

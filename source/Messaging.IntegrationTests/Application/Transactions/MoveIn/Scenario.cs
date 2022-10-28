@@ -73,7 +73,7 @@ public class Scenario
 
     public Scenario IsEffective()
     {
-        _transaction?.AcceptedByBusinessProcess("FakeId", _transaction.MarketEvaluationPointId);
+        _transaction?.Accept("FakeId");
         _transaction?.BusinessProcessCompleted();
         _transaction?.MarkMeteringPointMasterDataAsSent();
         _transaction?.MarkCustomerMasterDataAsSent();

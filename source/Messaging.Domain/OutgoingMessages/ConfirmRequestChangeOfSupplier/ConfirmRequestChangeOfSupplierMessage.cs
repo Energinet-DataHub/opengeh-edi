@@ -19,18 +19,38 @@ namespace Messaging.Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 
 public class ConfirmRequestChangeOfSupplierMessage : OutgoingMessage
 {
-    public ConfirmRequestChangeOfSupplierMessage(DocumentType documentType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string marketActivityRecordPayload)
+    private ConfirmRequestChangeOfSupplierMessage(DocumentType documentType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string marketActivityRecordPayload)
         : base(documentType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, marketActivityRecordPayload)
     {
         ArgumentNullException.ThrowIfNull(marketActivityRecordPayload);
         MarketActivityRecord = JsonSerializer.Deserialize<MarketActivityRecord>(marketActivityRecordPayload)!;
     }
 
-    public ConfirmRequestChangeOfSupplierMessage(DocumentType documentType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, MarketActivityRecord marketActivityRecord)
-        : base(documentType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, JsonSerializer.Serialize(marketActivityRecord))
+    private ConfirmRequestChangeOfSupplierMessage(ActorNumber receiverId, string transactionId, string processType, MarketActivityRecord marketActivityRecord)
+        : base(DocumentType.ConfirmRequestChangeOfSupplier, receiverId, transactionId, processType, MarketRole.EnergySupplier, DataHubDetails.IdentificationNumber, MarketRole.MeteringPointAdministrator, JsonSerializer.Serialize(marketActivityRecord))
     {
         MarketActivityRecord = marketActivityRecord;
     }
 
     public MarketActivityRecord MarketActivityRecord { get; }
+
+    public static OutgoingMessage Create(
+        string transactionId,
+        ProcessType processType,
+        string marketEvaluationPointNumber,
+        ActorNumber energySupplierNumber)
+    {
+        ArgumentNullException.ThrowIfNull(processType);
+
+        var marketActivityRecord = new MarketActivityRecord(
+            Guid.NewGuid().ToString(),
+            transactionId,
+            marketEvaluationPointNumber);
+
+        return new ConfirmRequestChangeOfSupplierMessage(
+            energySupplierNumber,
+            transactionId,
+            processType.Code,
+            marketActivityRecord);
+    }
 }

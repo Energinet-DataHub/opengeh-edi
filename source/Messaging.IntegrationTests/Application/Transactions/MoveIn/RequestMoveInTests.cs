@@ -75,7 +75,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         {
             await GivenRequestHasBeenAccepted().ConfigureAwait(false);
 
-            var confirmMessage = _outgoingMessageStore.GetByTransactionId(SampleData.OriginalMessageId)!;
+            var confirmMessage = _outgoingMessageStore.GetByTransactionId(SampleData.TransactionId)!;
             await RequestMessage(confirmMessage.Id.ToString(), DocumentType.ConfirmRequestChangeOfSupplier).ConfigureAwait(false);
 
             await AsserConfirmMessage(confirmMessage).ConfigureAwait(false);
