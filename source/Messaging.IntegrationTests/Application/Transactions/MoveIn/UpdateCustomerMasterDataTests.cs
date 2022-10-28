@@ -35,7 +35,7 @@ public class UpdateCustomerMasterDataTests : TestBase
 
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
-        var remoteBusinessRequestSpy = (ServiceBusSenderSpy)GetService<IServiceBusSenderAdapter>();
+        var remoteBusinessRequestSpy = (RemoteBusinessServiceRequestSenderSpy<DummyRequest>)GetService<IRemoteBusinessServiceRequestSenderAdapter<DummyRequest>>();
         Assert.NotNull(remoteBusinessRequestSpy.Message);
     }
 }

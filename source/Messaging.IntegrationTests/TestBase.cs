@@ -48,13 +48,13 @@ namespace Messaging.IntegrationTests
 
             _services.AddSingleton(new EnergySupplyingServiceBusClientConfiguration("Fake", "Fake"));
             _services.AddSingleton<IServiceBusSenderFactory, ServiceBusSenderFactoryStub>();
-            _services.AddSingleton<IServiceBusSenderAdapter>(_ => new ServiceBusSenderSpy(CreateFakeServiceBusConnectionString()));
+            _services.AddSingleton<IRemoteBusinessServiceRequestSenderAdapter<DummyRequest>>(_ => new RemoteBusinessServiceRequestSenderSpy<DummyRequest>("Fake"));
 
             _services.AddSingleton(
                 _ => new ServiceBusClient(CreateFakeServiceBusConnectionString()));
             CompositionRoot.Initialize(_services)
                 .AddRemoteBusinessService<DummyRequest, DummyReply>(sp =>
-                    new RemoteBusinessService<DummyRequest, DummyReply>(sp.GetRequiredService<IServiceBusSenderAdapter>(), "Fake"))
+                    new RemoteBusinessService<DummyRequest, DummyReply>(sp.GetRequiredService<IRemoteBusinessServiceRequestSenderAdapter<DummyRequest>>(), "Fake"))
                 .AddDatabaseConnectionFactory(_databaseFixture.ConnectionString)
                 .AddDatabaseContext(_databaseFixture.ConnectionString)
                 .AddSystemClock(new SystemDateTimeProviderStub())

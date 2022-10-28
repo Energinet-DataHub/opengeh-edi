@@ -23,10 +23,10 @@ public class RemoteBusinessService<TRequest, TReply> : IRemoteBusinessService<TR
     where TRequest : class
     where TReply : class
 {
-    private readonly IServiceBusSenderAdapter _requestSender;
+    private readonly IRemoteBusinessServiceRequestSenderAdapter<TRequest> _requestSender;
     private readonly string _responseQueueName;
 
-    public RemoteBusinessService(IServiceBusSenderAdapter requestSender, string responseQueueName)
+    public RemoteBusinessService(IRemoteBusinessServiceRequestSenderAdapter<TRequest> requestSender, string responseQueueName)
     {
         _requestSender = requestSender;
         _responseQueueName = responseQueueName;
