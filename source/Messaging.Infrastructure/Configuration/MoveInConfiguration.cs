@@ -21,6 +21,7 @@ using Messaging.Application.Transactions.MoveIn.Notifications;
 using Messaging.Application.Transactions.MoveIn.UpdateCustomer;
 using Messaging.Domain.Transactions.MoveIn.Events;
 using Messaging.Infrastructure.Transactions.MoveIn;
+using Messaging.Infrastructure.Transactions.MoveIn.UpdateCustomer;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Messaging.Infrastructure.Configuration;
@@ -51,6 +52,7 @@ internal static class MoveInConfiguration
         services.AddTransient<INotificationHandler<BusinessProcessWasCompleted>, NotifyGridOperatorWhenConsumerHasMovedIn>();
         services.AddTransient<INotificationHandler<ADayHasPassed>, DispatchCustomerMasterDataForGridOperatorWhenGracePeriodHasExpired>();
         services.AddTransient<CustomerMasterDataMessageFactory>();
+        services.AddSingleton<IUpdateCustomerMasterDataRequestClient, UpdateCustomerMasterDataRequestClient>();
         services.AddSingleton(settings);
     }
 }

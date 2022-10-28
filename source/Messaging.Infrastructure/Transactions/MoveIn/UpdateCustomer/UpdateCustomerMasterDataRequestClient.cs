@@ -15,27 +15,20 @@
 using System.Threading.Tasks;
 using Messaging.Application.Transactions.MoveIn.UpdateCustomer;
 using Messaging.Infrastructure.Configuration.MessageBus;
-using Messaging.IntegrationTests.Fixtures;
-using Messaging.IntegrationTests.TestDoubles;
-using Xunit;
 
-namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
+namespace Messaging.Infrastructure.Transactions.MoveIn.UpdateCustomer;
 
-public class UpdateCustomerMasterDataTests : TestBase
+public class UpdateCustomerMasterDataRequestClient : IUpdateCustomerMasterDataRequestClient
 {
-    public UpdateCustomerMasterDataTests(DatabaseFixture databaseFixture)
-        : base(databaseFixture)
+    private readonly RemoteBusinessService<DummyRequest, DummyReply> _remoteBusinessService;
+
+    public UpdateCustomerMasterDataRequestClient(RemoteBusinessService<DummyRequest, DummyReply> remoteBusinessService)
     {
+        _remoteBusinessService = remoteBusinessService;
     }
 
-    [Fact]
-    public async Task Request_is_forwarded_to_business_service()
+    public Task SendRequestAsync()
     {
-        var command = new UpdateCustomerMasterData();
-
-        await InvokeCommandAsync(command).ConfigureAwait(false);
-
-        var remoteBusinessRequestSpy = (ServiceBusSenderSpy)GetService<IServiceBusSenderAdapter>();
-        Assert.NotNull(remoteBusinessRequestSpy.Message);
+        return _remoteBusinessService.SendRequestAsync(new DummyRequest(), nameof(UpdateCustomerMasterDataRequestClient));
     }
 }

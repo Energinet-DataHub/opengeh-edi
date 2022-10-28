@@ -12,24 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
 
 namespace Messaging.Application.Transactions.MoveIn.UpdateCustomer;
 
-public class UpdateCustomerMasterDataHandler : IRequestHandler<UpdateCustomerMasterData, Unit>
+#pragma warning disable
+public interface IUpdateCustomerMasterDataRequestClient
 {
-    private readonly IUpdateCustomerMasterDataRequestClient _updateCustomerMasterDataRequestClient;
-
-    public UpdateCustomerMasterDataHandler(IUpdateCustomerMasterDataRequestClient updateCustomerMasterDataRequestClient)
-    {
-        _updateCustomerMasterDataRequestClient = updateCustomerMasterDataRequestClient;
-    }
-
-    public async Task<Unit> Handle(UpdateCustomerMasterData request, CancellationToken cancellationToken)
-    {
-        await _updateCustomerMasterDataRequestClient.SendRequestAsync().ConfigureAwait(false);
-        return Unit.Value;
-    }
+    Task SendRequestAsync();
 }

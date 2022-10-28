@@ -48,6 +48,7 @@ using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Common.Reasons;
 using Messaging.Infrastructure.Configuration.Authentication;
 using Messaging.Infrastructure.Configuration.DataAccess;
+using Messaging.Infrastructure.Configuration.MessageBus;
 using Messaging.Infrastructure.Configuration.Processing;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.IncomingMessages;
@@ -254,6 +255,14 @@ namespace Messaging.Infrastructure.Configuration
         public CompositionRoot AddHttpClientAdapter(Func<IServiceProvider, IHttpClientAdapter> action)
         {
             _services.AddSingleton(action);
+            return this;
+        }
+
+        public CompositionRoot AddRemoteBusinessService<TRequest, TReply>(Func<IServiceProvider, RemoteBusinessService<TRequest, TReply>> builder)
+            where TRequest : class
+            where TReply : class
+        {
+            _services.AddSingleton(builder);
             return this;
         }
 
