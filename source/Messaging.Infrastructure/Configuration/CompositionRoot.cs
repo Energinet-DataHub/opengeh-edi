@@ -151,15 +151,6 @@ namespace Messaging.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddIncomingMessageQueues(string connectionString, params string[] queueNames)
-        {
-            if (queueNames == null) throw new ArgumentNullException(nameof(queueNames));
-
-            _services.AddSingleton<ServiceBusClient>(
-                _ => new ServiceBusClient(connectionString));
-            return this;
-        }
-
         public CompositionRoot AddRequestLogging(string blobStorageConnectionString, string storageContainerName)
         {
             if (blobStorageConnectionString == null) throw new ArgumentNullException(nameof(blobStorageConnectionString));
