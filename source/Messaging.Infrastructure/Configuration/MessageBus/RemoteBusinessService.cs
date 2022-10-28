@@ -44,4 +44,9 @@ public class RemoteBusinessService<TRequest, TReply>
 
         return _requestSender.SendAsync(serviceBusMessage);
     }
+
+    public Task StartListenAsync()
+    {
+        return Task.CompletedTask;
+    }
 }

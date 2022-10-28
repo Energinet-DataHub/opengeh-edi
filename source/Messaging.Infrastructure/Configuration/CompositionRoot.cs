@@ -14,6 +14,7 @@
 
 using System;
 using System.Net.Http;
+using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Energinet.DataHub.MessageHub.Client;
@@ -264,10 +265,7 @@ namespace Messaging.Infrastructure.Configuration
         {
             _services.AddSingleton<IRemoteBusinessServiceRequestSenderAdapter<TRequest>>(provider =>
                 new RemoteBusinessServiceRequestSenderAdapter<TRequest>(provider.GetRequiredService<ServiceBusClient>(), remoteRequestQueueName));
-            _services.AddSingleton(provider =>
-                new RemoteBusinessService<TRequest, TReply>(
-                    provider.GetRequiredService<IRemoteBusinessServiceRequestSenderAdapter<TRequest>>(),
-                    responseQueueName));
+            AddRemoteBusinessService<TRequest, TReply>(responseQueueName);
             return this;
         }
 
@@ -276,11 +274,18 @@ namespace Messaging.Infrastructure.Configuration
             where TReply : class
         {
             _services.AddSingleton(adapterBuilder);
+            AddRemoteBusinessService<TRequest, TReply>(responseQueueName);
+            return this;
+        }
+
+        private void AddRemoteBusinessService<TRequest, TReply>(string responseQueueName)
+            where TRequest : class
+            where TReply : class
+        {
             _services.AddSingleton(provider =>
                 new RemoteBusinessService<TRequest, TReply>(
                     provider.GetRequiredService<IRemoteBusinessServiceRequestSenderAdapter<TRequest>>(),
                     responseQueueName));
-            return this;
         }
 
         private void AddMessageGenerationServices()
