@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using Messaging.Domain.Actors;
+using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Domain.SeedWork;
 using Messaging.Domain.Transactions.MoveIn.Events;
 using NodaTime;
@@ -21,6 +23,8 @@ namespace Messaging.Domain.Transactions.MoveIn
 {
     public class MoveInTransaction : Entity
     {
+        #pragma warning disable
+        private readonly List<OutgoingMessage> _messages = new();
         private readonly ActorNumber _requestedBy;
         private readonly State _state = State.Started;
         private BusinessProcessState _businessProcessState;
@@ -130,13 +134,20 @@ namespace Messaging.Domain.Transactions.MoveIn
             AddDomainEvent(new MoveInWasAccepted(ProcessId, marketEvaluationPointNumber, TransactionId));
         }
 
-        public void RejectedByBusinessProcess()
+        public void Reject(IReadOnlyList<Reason> reasons)
         {
-            if (_businessProcessState == BusinessProcessState.Pending)
-            {
-                _businessProcessState = BusinessProcessState.Rejected;
-                AddDomainEvent(new MoveInWasRejected(TransactionId));
-            }
+            if (_businessProcessState == BusinessProcessState.Rejected)
+                throw new MoveInException($"Transaction has already been rejected");
+
+            _messages.Add(RejectRequestChangeOfSupplierMessage.Create(
+                TransactionId,
+                ProcessType.MoveIn,
+                MarketEvaluationPointId,
+                _requestedBy,
+                reasons));
+
+            _businessProcessState = BusinessProcessState.Rejected;
+            AddDomainEvent(new MoveInWasRejected(TransactionId));
         }
 
         public void MarkMeteringPointMasterDataAsSent()

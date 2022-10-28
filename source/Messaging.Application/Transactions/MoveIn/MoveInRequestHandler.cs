@@ -29,7 +29,6 @@ using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Domain.Transactions.MoveIn;
 using NodaTime.Text;
-using MarketActivityRecord = Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier.MarketActivityRecord;
 
 namespace Messaging.Application.Transactions.MoveIn
 {
@@ -94,8 +93,7 @@ namespace Messaging.Application.Transactions.MoveIn
             if (businessProcessResult.Success == false)
             {
                 var reasons = await CreateReasonsFromAsync(businessProcessResult.ValidationErrors).ConfigureAwait(false);
-                _outgoingMessageStore.Add(RejectMessageFrom(reasons, transaction, request));
-                transaction.RejectedByBusinessProcess();
+                transaction.Reject(reasons);
             }
             else
             {
@@ -130,8 +128,7 @@ namespace Messaging.Application.Transactions.MoveIn
         private async Task<Unit> RejectInvalidRequestMessageAsync(MoveInTransaction transaction, RequestChangeOfSupplierTransaction request, string error)
         {
             var reasons = await CreateReasonsFromAsync(new Collection<string>() { error }).ConfigureAwait(false);
-            _outgoingMessageStore.Add(RejectMessageFrom(reasons, transaction, request));
-            transaction.RejectedByBusinessProcess();
+            transaction.Reject(reasons);
 
             _moveInTransactionRepository.Add(transaction);
             return Unit.Value;
@@ -158,22 +155,6 @@ namespace Messaging.Application.Transactions.MoveIn
             return CreateOutgoingMessage(
                 transaction.StartedByMessageId,
                 DocumentType.ConfirmRequestChangeOfSupplier,
-                ProcessType.MoveIn.Code,
-                ActorNumber.Create(requestChangeOfSupplierTransaction.Message.SenderId),
-                _marketActivityRecordParser.From(marketActivityRecord));
-        }
-
-        private OutgoingMessage RejectMessageFrom(IReadOnlyCollection<Reason> reasons, MoveInTransaction transaction, RequestChangeOfSupplierTransaction requestChangeOfSupplierTransaction)
-        {
-            var marketActivityRecord = new MarketActivityRecord(
-                Guid.NewGuid().ToString(),
-                transaction.TransactionId,
-                transaction.MarketEvaluationPointId,
-                reasons);
-
-            return CreateOutgoingMessage(
-                transaction.StartedByMessageId,
-                DocumentType.RejectRequestChangeOfSupplier,
                 ProcessType.MoveIn.Code,
                 ActorNumber.Create(requestChangeOfSupplierTransaction.Message.SenderId),
                 _marketActivityRecordParser.From(marketActivityRecord));

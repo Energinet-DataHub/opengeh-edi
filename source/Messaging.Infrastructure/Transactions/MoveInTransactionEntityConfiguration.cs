@@ -14,6 +14,7 @@
 
 using System;
 using Messaging.Domain.Actors;
+using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.SeedWork;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.Serialization;
@@ -86,6 +87,9 @@ namespace Messaging.Infrastructure.Transactions
                 .HasColumnName("RequestedByActorNumber")
                 .HasConversion(toDbValue => toDbValue.Value, fromDbValue => ActorNumber.Create(fromDbValue));
 
+            builder.HasMany<OutgoingMessage>("_messages")
+                .WithOne()
+                .HasForeignKey("TransactionId");
             builder.Ignore(x => x.DomainEvents);
         }
     }

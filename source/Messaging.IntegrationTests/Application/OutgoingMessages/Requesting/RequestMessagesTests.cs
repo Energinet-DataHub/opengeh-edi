@@ -52,8 +52,8 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
         {
             var incomingMessage1 = await MessageArrived().ConfigureAwait(false);
             var incomingMessage2 = await MessageArrived().ConfigureAwait(false);
-            var outgoingMessage1 = _outgoingMessageStore.GetByTransactionId(incomingMessage1.Message.MessageId)!;
-            var outgoingMessage2 = _outgoingMessageStore.GetByTransactionId(incomingMessage2.Message.MessageId)!;
+            var outgoingMessage1 = _outgoingMessageStore.GetByTransactionId(incomingMessage1.MarketActivityRecord.Id)!;
+            var outgoingMessage2 = _outgoingMessageStore.GetByTransactionId(incomingMessage2.MarketActivityRecord.Id)!;
 
             var requestedMessageIds = new List<string> { outgoingMessage1.Id.ToString(), outgoingMessage2.Id.ToString(), };
             var request = CreateRequest(requestedMessageIds);
@@ -88,7 +88,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
             GivenTheRequestedDocumentFormatIsNotSupported();
 
             var incomingMessage = await MessageArrived().ConfigureAwait(false);
-            var outgoingMessage = _outgoingMessageStore.GetByTransactionId(incomingMessage.Message.MessageId)!;
+            var outgoingMessage = _outgoingMessageStore.GetByTransactionId(incomingMessage.MarketActivityRecord.Id)!;
 
             var requestedMessageIds = new List<string> { outgoingMessage.Id.ToString(), };
             var request = CreateRequest(requestedMessageIds);
@@ -102,7 +102,7 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages.Requesting
         public async Task Respond_with_error_if_requested_document_type_is_unknown()
         {
             var incomingMessage = await MessageArrived().ConfigureAwait(false);
-            var outgoingMessage = _outgoingMessageStore.GetByTransactionId(incomingMessage.Message.MessageId)!;
+            var outgoingMessage = _outgoingMessageStore.GetByTransactionId(incomingMessage.MarketActivityRecord.Id)!;
 
             var requestedMessageIds = new List<string> { outgoingMessage.Id.ToString(), };
             var request = CreateRequest(requestedMessageIds, "UnknownDocumentType");
