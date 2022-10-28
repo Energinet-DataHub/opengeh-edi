@@ -15,6 +15,7 @@
 using System.Threading.Tasks;
 using Messaging.Application.Transactions.MoveIn.UpdateCustomer;
 using Messaging.Infrastructure.Configuration.MessageBus;
+using Messaging.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 
 namespace Messaging.Infrastructure.Transactions.MoveIn.UpdateCustomer;
 

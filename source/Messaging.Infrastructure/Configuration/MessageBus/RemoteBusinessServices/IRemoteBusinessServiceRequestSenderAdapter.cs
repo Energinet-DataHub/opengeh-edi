@@ -16,7 +16,7 @@ using System;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 
-namespace Messaging.Infrastructure.Configuration.MessageBus;
+namespace Messaging.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 
 /// <summary>
 /// Azure Service Bus Client sender adapter

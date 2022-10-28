@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Infrastructure.Configuration.MessageBus;
+namespace Messaging.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 
 public record DummyRequest;
 

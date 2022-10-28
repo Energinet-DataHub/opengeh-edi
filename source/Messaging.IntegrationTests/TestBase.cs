@@ -22,6 +22,7 @@ using Messaging.Api.Configuration.Middleware.Correlation;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.MessageBus;
+using Messaging.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Messaging.Infrastructure.Transactions.MoveIn;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.Infrastructure.Configuration.InternalCommands;

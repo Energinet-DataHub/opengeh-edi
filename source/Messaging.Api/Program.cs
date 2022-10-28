@@ -29,6 +29,7 @@ using Messaging.Application.Transactions.MoveIn;
 using Messaging.CimMessageAdapter.Messages.Queues;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.MessageBus;
+using Messaging.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.Infrastructure.OutgoingMessages.Requesting;
 using Messaging.Infrastructure.Transactions;

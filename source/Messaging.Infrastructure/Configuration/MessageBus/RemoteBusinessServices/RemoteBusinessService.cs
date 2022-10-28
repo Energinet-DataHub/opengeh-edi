@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Newtonsoft.Json;
 
-namespace Messaging.Infrastructure.Configuration.MessageBus;
+namespace Messaging.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 
 public class RemoteBusinessService<TRequest, TReply>
     where TRequest : class

@@ -16,17 +16,17 @@ using System;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 
-namespace Messaging.Infrastructure.Configuration.MessageBus
+namespace Messaging.Infrastructure.Configuration.MessageBus.RemoteBusinessServices
 {
     public sealed class RemoteBusinessServiceRequestSenderAdapter<TRequest> : IRemoteBusinessServiceRequestSenderAdapter<TRequest>
     {
         private readonly ServiceBusSender _serviceBusSender;
 
-        public RemoteBusinessServiceRequestSenderAdapter(ServiceBusClient serviceBusClient, string topicName)
+        public RemoteBusinessServiceRequestSenderAdapter(ServiceBusClient serviceBusClient, string queueName)
         {
             if (serviceBusClient == null) throw new ArgumentNullException(nameof(serviceBusClient));
-            QueueName = topicName;
-            _serviceBusSender = serviceBusClient.CreateSender(topicName);
+            QueueName = queueName;
+            _serviceBusSender = serviceBusClient.CreateSender(queueName);
         }
 
         public string QueueName { get; }

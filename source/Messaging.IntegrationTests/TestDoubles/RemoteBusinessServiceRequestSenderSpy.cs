@@ -16,6 +16,7 @@ using System;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Messaging.Infrastructure.Configuration.MessageBus;
+using Messaging.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 
 namespace Messaging.IntegrationTests.TestDoubles
 {

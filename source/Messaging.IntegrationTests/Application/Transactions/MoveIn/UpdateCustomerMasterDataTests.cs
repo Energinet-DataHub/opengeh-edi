@@ -15,6 +15,7 @@
 using System.Threading.Tasks;
 using Messaging.Application.Transactions.MoveIn.UpdateCustomer;
 using Messaging.Infrastructure.Configuration.MessageBus;
+using Messaging.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.TestDoubles;
 using Xunit;
