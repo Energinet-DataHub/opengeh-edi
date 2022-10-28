@@ -14,7 +14,7 @@
 
 using Messaging.Domain.Actors;
 
-namespace Messaging.Application.Configuration
+namespace Messaging.Domain.OutgoingMessages
 {
     public static class DataHubDetails
     {

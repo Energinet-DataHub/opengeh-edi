@@ -19,18 +19,46 @@ namespace Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 
 public class RejectRequestChangeOfSupplierMessage : OutgoingMessage
 {
-    public RejectRequestChangeOfSupplierMessage(DocumentType documentType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string marketActivityRecordPayload)
+    private RejectRequestChangeOfSupplierMessage(DocumentType documentType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string marketActivityRecordPayload)
         : base(documentType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, marketActivityRecordPayload)
     {
         ArgumentNullException.ThrowIfNull(marketActivityRecordPayload);
         MarketActivityRecord = JsonSerializer.Deserialize<MarketActivityRecord>(marketActivityRecordPayload)!;
     }
 
-    public RejectRequestChangeOfSupplierMessage(DocumentType documentType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, MarketActivityRecord marketActivityRecord)
-        : base(documentType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, JsonSerializer.Serialize(marketActivityRecord))
+    private RejectRequestChangeOfSupplierMessage(ActorNumber receiverId, string transactionId, string processType, MarketActivityRecord marketActivityRecord)
+        : base(DocumentType.RejectRequestChangeOfSupplier, receiverId, transactionId, processType, MarketRole.EnergySupplier, DataHubDetails.IdentificationNumber, MarketRole.MeteringPointAdministrator, JsonSerializer.Serialize(marketActivityRecord))
     {
         MarketActivityRecord = marketActivityRecord;
     }
 
     public MarketActivityRecord MarketActivityRecord { get; }
+
+    public static RejectRequestChangeOfSupplierMessage Create(
+        string transactionId,
+        ProcessType processType,
+        string marketEvaluationPointNumber,
+        ActorNumber energySupplierNumber,
+        IReadOnlyList<Reason> reasons)
+    {
+        ArgumentNullException.ThrowIfNull(processType);
+        ArgumentNullException.ThrowIfNull(energySupplierNumber);
+        ArgumentNullException.ThrowIfNull(reasons);
+
+        if (reasons.Count == 0)
+        {
+            throw new OutgoingMessageException($"Reject message must contain at least one reject reason");
+        }
+
+        var marketActivityRecord = new MarketActivityRecord(
+            Guid.NewGuid().ToString(),
+            transactionId,
+            marketEvaluationPointNumber,
+            reasons);
+        return new RejectRequestChangeOfSupplierMessage(
+            energySupplierNumber,
+            transactionId,
+            processType.Code,
+            marketActivityRecord);
+    }
 }
