@@ -15,21 +15,30 @@
 
 syntax = "proto3";
 
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+
 option csharp_namespace = "Energinet.DataHub.EnergySupplying.RequestResponse.Requests";
 
 message UpdateCustomerDataRequest {
   string processId = 1;
-  string effectiveDate = 2;
+  google.protobuf.Timestamp effectiveDate = 2;
   MarketEvaluationPoint marketEvaluationPoint = 3;
 }
 
 message MarketEvaluationPoint {
   string gsrnNumber = 1;
-  bool electricalHeating = 2;
-  Customer firstCustomer = 3;
-  Customer secondCustomer = 4;
-  bool protectedName = 5;
-  repeated UsagePointLocation usagePointLocations = 6;
+  NullableCustomer firstCustomer = 2;
+  NullableCustomer secondCustomer = 3;
+  bool protectedName = 4;
+}
+
+message NullableCustomer
+{
+    oneof kind{
+      google.protobuf.NullValue null = 1;
+      Customer customer = 2;
+      }
 }
 
 message Customer {
