@@ -17,6 +17,7 @@ syntax = "proto3";
 
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
 
 option csharp_namespace = "Energinet.DataHub.EnergySupplying.RequestResponse.Requests";
 
