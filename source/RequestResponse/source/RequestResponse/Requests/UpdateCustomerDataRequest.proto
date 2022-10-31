@@ -60,10 +60,10 @@ message UsagePointLocation {
   Address address = 3;
   NullableBool protectedAddress = 4;
   google.protobuf.StringValue name = 5;
-  google.protobuf.StringValue string attnName = 6;
-  google.protobuf.StringValue string phone1 = 7;
-  google.protobuf.StringValue string phone2 = 8;
-  google.protobuf.StringValue string email = 9;
+  google.protobuf.StringValue attnName = 6;
+  google.protobuf.StringValue phone1 = 7;
+  google.protobuf.StringValue phone2 = 8;
+  google.protobuf.StringValue email = 9;
 }
 
 message Address {
