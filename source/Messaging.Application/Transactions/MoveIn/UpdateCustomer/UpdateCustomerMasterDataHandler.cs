@@ -39,7 +39,7 @@ public class UpdateCustomerMasterDataHandler : IRequestHandler<UpdateCustomerMas
         var transaction = await _transactionRepository.GetByEffectiveDateAsync(request.MeteringPointNumber, request.EffectiveDateOfRunningTransaction).ConfigureAwait(false);
         if (transaction is null)
         {
-            throw TransactionNotFoundException.TransactionIdNotFound(string.Empty);
+            throw TransactionNotFoundException.NotFound(request.MeteringPointNumber, request.EffectiveDateOfRunningTransaction);
         }
 
         await _updateCustomerMasterDataRequestClient.SendRequestAsync().ConfigureAwait(false);
