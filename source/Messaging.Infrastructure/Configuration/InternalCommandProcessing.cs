@@ -19,6 +19,7 @@ using Messaging.Application.Configuration.TimeEvents;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 using Messaging.Application.Transactions.MoveIn.Notifications;
+using Messaging.Application.Transactions.MoveIn.UpdateCustomer;
 using Messaging.Infrastructure.Configuration.InternalCommands;
 using Messaging.Infrastructure.OutgoingMessages.Requesting;
 using Microsoft.Extensions.DependencyInjection;
@@ -53,6 +54,7 @@ internal static class InternalCommandProcessing
         mapper.Add("SetConsumerHasMovedIn", typeof(SetConsumerHasMovedIn));
         mapper.Add("SendFailureNotification", typeof(SendFailureNotification));
         mapper.Add("SendSuccessNotification", typeof(SendSuccessNotification));
+        mapper.Add("UpdateCustomerMasterData", typeof(UpdateCustomerMasterData));
 
         return mapper;
     }

@@ -14,6 +14,7 @@
 
 using System;
 using System.Net.Http;
+using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Energinet.DataHub.MessageHub.Client;
@@ -48,6 +49,8 @@ using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Common.Reasons;
 using Messaging.Infrastructure.Configuration.Authentication;
 using Messaging.Infrastructure.Configuration.DataAccess;
+using Messaging.Infrastructure.Configuration.MessageBus;
+using Messaging.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Messaging.Infrastructure.Configuration.Processing;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.IncomingMessages;
@@ -148,15 +151,6 @@ namespace Messaging.Infrastructure.Configuration
         public CompositionRoot AddCorrelationContext(Func<IServiceProvider, ICorrelationContext> action)
         {
             _services.AddScoped(action);
-            return this;
-        }
-
-        public CompositionRoot AddIncomingMessageQueues(string connectionString, params string[] queueNames)
-        {
-            if (queueNames == null) throw new ArgumentNullException(nameof(queueNames));
-
-            _services.AddSingleton<ServiceBusClient>(
-                _ => new ServiceBusClient(connectionString));
             return this;
         }
 
@@ -264,6 +258,35 @@ namespace Messaging.Infrastructure.Configuration
         {
             _services.AddSingleton(action);
             return this;
+        }
+
+        public CompositionRoot AddRemoteBusinessService<TRequest, TReply>(string remoteRequestQueueName, string responseQueueName)
+            where TRequest : class
+            where TReply : class
+        {
+            _services.AddSingleton<IRemoteBusinessServiceRequestSenderAdapter<TRequest>>(provider =>
+                new RemoteBusinessServiceRequestSenderAdapter<TRequest>(provider.GetRequiredService<ServiceBusClient>(), remoteRequestQueueName));
+            AddRemoteBusinessService<TRequest, TReply>(responseQueueName);
+            return this;
+        }
+
+        public CompositionRoot AddRemoteBusinessService<TRequest, TReply>(Func<IServiceProvider, IRemoteBusinessServiceRequestSenderAdapter<TRequest>> adapterBuilder, string responseQueueName)
+            where TRequest : class
+            where TReply : class
+        {
+            _services.AddSingleton(adapterBuilder);
+            AddRemoteBusinessService<TRequest, TReply>(responseQueueName);
+            return this;
+        }
+
+        private void AddRemoteBusinessService<TRequest, TReply>(string responseQueueName)
+            where TRequest : class
+            where TReply : class
+        {
+            _services.AddSingleton(provider =>
+                new RemoteBusinessService<TRequest, TReply>(
+                    provider.GetRequiredService<IRemoteBusinessServiceRequestSenderAdapter<TRequest>>(),
+                    responseQueueName));
         }
 
         private void AddMessageGenerationServices()

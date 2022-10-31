@@ -13,7 +13,6 @@
 // limitations under the License.using System;
 
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -30,11 +29,13 @@ using Messaging.Application.Transactions.MoveIn;
 using Messaging.CimMessageAdapter.Messages.Queues;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.MessageBus;
+using Messaging.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.Infrastructure.OutgoingMessages.Requesting;
 using Messaging.Infrastructure.Transactions;
 using Messaging.Infrastructure.Transactions.MoveIn;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -48,7 +49,6 @@ namespace Messaging.Api
         {
             var runtime = RuntimeEnvironment.Default;
             var tokenValidationParameters = await GetTokenValidationParametersAsync(runtime).ConfigureAwait(false);
-
             var host = ConfigureHost(tokenValidationParameters, runtime);
 
             await host.RunAsync().ConfigureAwait(false);
@@ -67,7 +67,9 @@ namespace Messaging.Api
 #pragma warning restore CA5404 // Do not disable token validation checks
         }
 
-        public static IHost ConfigureHost(TokenValidationParameters tokenValidationParameters, RuntimeEnvironment runtime)
+        public static IHost ConfigureHost(
+            TokenValidationParameters tokenValidationParameters,
+            RuntimeEnvironment runtime)
         {
             return new HostBuilder()
                 .ConfigureFunctionsWorkerDefaults(worker =>
@@ -106,6 +108,7 @@ namespace Messaging.Api
                         _ => new RequestChangeCustomerCharacteristicsTransaction(runtime.INCOMING_CHANGE_CUSTOMER_CHARACTERISTICS_MESSAGE_QUEUE_NAME!));
 
                     CompositionRoot.Initialize(services)
+                        .AddRemoteBusinessService<DummyRequest, DummyReply>("Dummy", "Dummy")
                         .AddBearerAuthentication(tokenValidationParameters)
                         .AddDatabaseConnectionFactory(databaseConnectionString!)
                         .AddSystemClock(new SystemDateTimeProvider())

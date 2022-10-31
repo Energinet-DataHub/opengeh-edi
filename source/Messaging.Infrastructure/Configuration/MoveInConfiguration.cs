@@ -18,8 +18,10 @@ using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 using Messaging.Application.Transactions.MoveIn.Notifications;
+using Messaging.Application.Transactions.MoveIn.UpdateCustomer;
 using Messaging.Domain.Transactions.MoveIn.Events;
 using Messaging.Infrastructure.Transactions.MoveIn;
+using Messaging.Infrastructure.Transactions.MoveIn.UpdateCustomer;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Messaging.Infrastructure.Configuration;
@@ -42,6 +44,7 @@ internal static class MoveInConfiguration
         services.AddTransient<IRequestHandler<NotifyGridOperator, Unit>, NotifyGridOperatorHandler>();
         services.AddTransient<IRequestHandler<SendCustomerMasterDataToGridOperator, Unit>, SendCustomerMasterDataToGridOperatorHandler>();
         services.AddTransient<IRequestHandler<ReceiveCustomerMasterData, Unit>, ReceiveCustomerMasterDataHandler>();
+        services.AddTransient<IRequestHandler<UpdateCustomerMasterData, Unit>, UpdateCustomerMasterDataHandler>();
         services.AddTransient<INotificationHandler<MoveInWasAccepted>, FetchMeteringPointMasterDataWhenAccepted>();
         services.AddTransient<INotificationHandler<MoveInWasAccepted>, FetchCustomerMasterDataWhenAccepted>();
         services.AddTransient<INotificationHandler<EndOfSupplyNotificationChangedToPending>, NotifyCurrentEnergySupplierWhenConsumerHasMovedIn>();
@@ -49,6 +52,7 @@ internal static class MoveInConfiguration
         services.AddTransient<INotificationHandler<BusinessProcessWasCompleted>, NotifyGridOperatorWhenConsumerHasMovedIn>();
         services.AddTransient<INotificationHandler<ADayHasPassed>, DispatchCustomerMasterDataForGridOperatorWhenGracePeriodHasExpired>();
         services.AddTransient<CustomerMasterDataMessageFactory>();
+        services.AddSingleton<IUpdateCustomerMasterDataRequestClient, UpdateCustomerMasterDataRequestClient>();
         services.AddSingleton(settings);
     }
 }
