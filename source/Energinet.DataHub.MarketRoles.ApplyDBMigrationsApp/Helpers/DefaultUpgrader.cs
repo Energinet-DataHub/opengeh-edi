@@ -14,9 +14,9 @@
 
 using System;
 using System.Reflection;
-using DbUp;
-using DbUp.Engine;
-using DbUp.Helpers;
+using DbUp.Reboot;
+using DbUp.Reboot.Engine;
+using DbUp.Reboot.Helpers;
 
 namespace Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.Helpers
 {

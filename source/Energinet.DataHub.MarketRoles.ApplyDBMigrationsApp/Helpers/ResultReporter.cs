@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System;
-using DbUp.Engine;
+using DbUp.Reboot.Engine;
 
 namespace Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.Helpers
 {
