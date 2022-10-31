@@ -12,23 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Messaging.Domain.Transactions.MoveIn;
 
 namespace Messaging.Application.Transactions.MoveIn.UpdateCustomer;
 
 public class UpdateCustomerMasterDataHandler : IRequestHandler<UpdateCustomerMasterData, Unit>
 {
+    private readonly IMoveInTransactionRepository _transactionRepository;
     private readonly IUpdateCustomerMasterDataRequestClient _updateCustomerMasterDataRequestClient;
 
-    public UpdateCustomerMasterDataHandler(IUpdateCustomerMasterDataRequestClient updateCustomerMasterDataRequestClient)
+    public UpdateCustomerMasterDataHandler(IUpdateCustomerMasterDataRequestClient updateCustomerMasterDataRequestClient, IMoveInTransactionRepository transactionRepository)
     {
         _updateCustomerMasterDataRequestClient = updateCustomerMasterDataRequestClient;
+        _transactionRepository = transactionRepository;
     }
 
     public async Task<Unit> Handle(UpdateCustomerMasterData request, CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(request);
+
+        var transaction = await _transactionRepository.GetByEffectiveDateAsync(request.MeteringPointNumber, request.EffectiveDateOfRunningTransaction).ConfigureAwait(false);
+        if (transaction is null)
+        {
+            throw TransactionNotFoundException.NotFound(request.MeteringPointNumber, request.EffectiveDateOfRunningTransaction);
+        }
+
         await _updateCustomerMasterDataRequestClient.SendRequestAsync().ConfigureAwait(false);
         return Unit.Value;
     }
