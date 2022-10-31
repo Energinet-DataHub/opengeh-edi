@@ -13,12 +13,16 @@
 // limitations under the License.
 
 using System;
+using System.Globalization;
+using System.Text;
 using System.Threading.Tasks;
+using Azure.Messaging.ServiceBus;
 using MediatR;
 using Messaging.Api.Configuration.Middleware.Correlation;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.MessageBus;
+using Messaging.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Messaging.Infrastructure.Transactions.MoveIn;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.Infrastructure.Configuration.InternalCommands;
@@ -46,7 +50,10 @@ namespace Messaging.IntegrationTests
             _services.AddSingleton(new EnergySupplyingServiceBusClientConfiguration("Fake", "Fake"));
             _services.AddSingleton<IServiceBusSenderFactory, ServiceBusSenderFactoryStub>();
 
+            _services.AddSingleton(
+                _ => new ServiceBusClient(CreateFakeServiceBusConnectionString()));
             CompositionRoot.Initialize(_services)
+                .AddRemoteBusinessService<DummyRequest, DummyReply>(sp => new RemoteBusinessServiceRequestSenderSpy<DummyRequest>("Dummy"), "Dummy")
                 .AddDatabaseConnectionFactory(_databaseFixture.ConnectionString)
                 .AddDatabaseContext(_databaseFixture.ConnectionString)
                 .AddSystemClock(new SystemDateTimeProviderStub())
@@ -99,6 +106,15 @@ namespace Messaging.IntegrationTests
         protected Task InvokeCommandAsync(object command)
         {
             return GetService<IMediator>().Send(command);
+        }
+
+        private static string CreateFakeServiceBusConnectionString()
+        {
+            return new StringBuilder()
+                .Append(CultureInfo.InvariantCulture, $"Endpoint=sb://sb-{Guid.NewGuid():N}.servicebus.windows.net/;")
+                .Append("SharedAccessKeyName=send;")
+                .Append(CultureInfo.InvariantCulture, $"SharedAccessKey={Guid.NewGuid():N}")
+                .ToString();
         }
     }
 }
