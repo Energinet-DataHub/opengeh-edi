@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using NodaTime;
+
 namespace Messaging.Domain.Transactions.MoveIn;
 
 public class TransactionNotFoundException : Exception
@@ -38,5 +40,11 @@ public class TransactionNotFoundException : Exception
     public static TransactionNotFoundException TransactionForProcessIdNotFound(string processId)
     {
         return new TransactionNotFoundException($"Move in transaction for business process id {processId} was not found");
+    }
+
+    public static TransactionNotFoundException NotFound(string marketEvaluationPointNumber, Instant effectiveDate)
+    {
+        return new TransactionNotFoundException(
+            $"No move in transaction found for market evaluation point number '{marketEvaluationPointNumber}' with effective date on '{effectiveDate.ToString()}'");
     }
 }
