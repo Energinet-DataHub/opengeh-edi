@@ -77,12 +77,19 @@ public class CharacteristicsOfACustomerAtAnApDocumentWriter : DocumentWriter
 
         await WriteElementAsync("firstCustomer_MarketParticipant.name", marketEvaluationPoint.FirstCustomerName, writer).ConfigureAwait(false);
 
-        await WriteIfReceiverRoleIsAsync(
-            MarketRole.EnergySupplier,
-            () =>
-                WriteCustomerIdIfVatAsync("secondCustomer_MarketParticipant.mRID", marketEvaluationPoint.SecondCustomerId, writer)).ConfigureAwait(false);
+        if (marketEvaluationPoint.SecondCustomerId != null)
+        {
+            await WriteIfReceiverRoleIsAsync(
+                MarketRole.EnergySupplier,
+                () =>
+                    WriteCustomerIdIfVatAsync("secondCustomer_MarketParticipant.mRID", marketEvaluationPoint.SecondCustomerId, writer)).ConfigureAwait(false);
+        }
 
-        await WriteElementAsync("secondCustomer_MarketParticipant.name", marketEvaluationPoint.SecondCustomerName, writer).ConfigureAwait(false);
+        if (marketEvaluationPoint.SecondCustomerName != null)
+        {
+            await WriteElementAsync("secondCustomer_MarketParticipant.name", marketEvaluationPoint.SecondCustomerName, writer).ConfigureAwait(false);
+        }
+
         await WriteElementAsync("protectedName", marketEvaluationPoint.ProtectedName.ToStringValue(), writer).ConfigureAwait(false);
         await WriteElementAsync("hasEnergySupplier", marketEvaluationPoint.HasEnergySupplier.ToStringValue(), writer).ConfigureAwait(false);
 

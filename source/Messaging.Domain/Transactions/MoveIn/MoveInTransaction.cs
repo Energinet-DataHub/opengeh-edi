@@ -211,5 +211,10 @@ namespace Messaging.Domain.Transactions.MoveIn
                 AddDomainEvent(new EndOfSupplyNotificationChangedToPending(TransactionId, EffectiveDate, MarketEvaluationPointId, CurrentEnergySupplierId));
             }
         }
+
+        public void AcceptCustomerMasterData(CustomerMasterData customerMasterData)
+        {
+            AddDomainEvent(new CustomerMasterDataWasAccepted(TransactionId));
+        }
     }
 }
