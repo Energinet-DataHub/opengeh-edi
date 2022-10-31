@@ -6,7 +6,7 @@ The bundle contains the following packages:
 
 * `Energinet.DataHub.EnergySupplying.RequestResponse`
 
-The package contains request repsonse classes for energy supplying domain (formerly market roles)
+The package contains request response classes for energy supplying domain (formerly market roles)
 
 ## Workflows
 
