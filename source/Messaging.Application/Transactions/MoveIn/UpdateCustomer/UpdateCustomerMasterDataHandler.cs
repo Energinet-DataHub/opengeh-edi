@@ -17,7 +17,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Messaging.Domain.Transactions.MoveIn;
-using NodaTime;
 
 namespace Messaging.Application.Transactions.MoveIn.UpdateCustomer;
 
