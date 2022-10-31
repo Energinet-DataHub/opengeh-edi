@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Messaging.Application.Transactions.MoveIn.UpdateCustomer;
+using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.TestDoubles;
@@ -31,11 +33,22 @@ public class UpdateCustomerMasterDataTests : TestBase
     [Fact]
     public async Task Request_is_forwarded_to_business_service()
     {
-        var command = new UpdateCustomerMasterData();
+        var command = CreateCommand();
 
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
         var remoteBusinessRequestSpy = (RemoteBusinessServiceRequestSenderSpy<DummyRequest>)GetService<IRemoteBusinessServiceRequestSenderAdapter<DummyRequest>>();
         Assert.NotNull(remoteBusinessRequestSpy.Message);
+    }
+
+    [Fact]
+    public async Task Move_in_transaction_must_exist()
+    {
+        await Assert.ThrowsAsync<TransactionNotFoundException>(() => InvokeCommandAsync(CreateCommand())).ConfigureAwait(false);
+    }
+
+    private static UpdateCustomerMasterData CreateCommand()
+    {
+        return new UpdateCustomerMasterData(SampleData.TransactionId);
     }
 }

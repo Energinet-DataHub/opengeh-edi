@@ -20,7 +20,10 @@ namespace Messaging.Application.Transactions.MoveIn.UpdateCustomer;
 public class UpdateCustomerMasterData : InternalCommand
 {
     [JsonConstructor]
-    public UpdateCustomerMasterData()
+    public UpdateCustomerMasterData(string transactionId)
     {
+        TransactionId = transactionId;
     }
+
+    public string TransactionId { get; }
 }

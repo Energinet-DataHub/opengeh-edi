@@ -48,5 +48,11 @@ namespace Messaging.Infrastructure.Transactions.MoveIn
                 .Include("_messages")
                 .FirstOrDefaultAsync(transaction => transaction.ProcessId == processId);
         }
+
+        #pragma warning disable
+        public Task<MoveInTransaction?> GetByEffectiveDateAsync()
+        {
+            return Task.FromResult(default(MoveInTransaction));
+        }
     }
 }

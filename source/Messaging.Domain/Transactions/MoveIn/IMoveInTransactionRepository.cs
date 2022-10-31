@@ -38,5 +38,11 @@ namespace Messaging.Domain.Transactions.MoveIn
         /// <param name="processId"></param>
         /// <returns><see cref="MoveInTransaction"/></returns>
         Task<MoveInTransaction?> GetByProcessIdAsync(string processId);
+
+        /// <summary>
+        /// Find transaction id by effective date and metering point number
+        /// </summary>
+        /// <returns><see cref="MoveInTransaction"/></returns>
+        Task<MoveInTransaction?> GetByEffectiveDateAsync();
     }
 }
