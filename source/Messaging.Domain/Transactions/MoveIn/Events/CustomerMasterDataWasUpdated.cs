@@ -16,9 +16,9 @@ using Messaging.Domain.SeedWork;
 
 namespace Messaging.Domain.Transactions.MoveIn.Events;
 
-public class CustomerMasterDataWasAccepted : DomainEvent
+public class CustomerMasterDataWasUpdated : DomainEvent
 {
-    public CustomerMasterDataWasAccepted(string transactionId)
+    public CustomerMasterDataWasUpdated(string transactionId)
     {
         TransactionId = transactionId;
     }

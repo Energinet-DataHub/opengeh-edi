@@ -212,9 +212,9 @@ namespace Messaging.Domain.Transactions.MoveIn
             }
         }
 
-        public void AcceptCustomerMasterData(CustomerMasterData customerMasterData)
+        public void UpdateCustomerMasterData(CustomerMasterData customerMasterData)
         {
-            AddDomainEvent(new CustomerMasterDataWasAccepted(TransactionId));
+            AddDomainEvent(new CustomerMasterDataWasUpdated(TransactionId));
         }
     }
 }

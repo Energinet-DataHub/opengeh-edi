@@ -198,9 +198,9 @@ public class MoveInTransactionTests
             false,
             SampleData.EffectiveDate);
 
-        _transaction.AcceptCustomerMasterData(customerMasterData);
+        _transaction.UpdateCustomerMasterData(customerMasterData);
 
-        Assert.Equal(1, _transaction.DomainEvents.Count(e => e is CustomerMasterDataWasAccepted));
+        Assert.Equal(1, _transaction.DomainEvents.Count(e => e is CustomerMasterDataWasUpdated));
     }
 
     private static MoveInTransaction CreateTransaction()
