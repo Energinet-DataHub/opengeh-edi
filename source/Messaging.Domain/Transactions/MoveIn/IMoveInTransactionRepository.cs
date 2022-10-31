@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using NodaTime;
+
 namespace Messaging.Domain.Transactions.MoveIn
 {
     /// <summary>
@@ -42,7 +44,9 @@ namespace Messaging.Domain.Transactions.MoveIn
         /// <summary>
         /// Find transaction id by effective date and metering point number
         /// </summary>
+        /// <param name="meteringPointNumber">GSRN number of the metering point where transaction is invoked</param>
+        /// /// <param name="effectiveDate">Effective date of the move in transaction</param>
         /// <returns><see cref="MoveInTransaction"/></returns>
-        Task<MoveInTransaction?> GetByEffectiveDateAsync();
+        Task<MoveInTransaction?> GetByEffectiveDateAsync(string meteringPointNumber, Instant effectiveDate);
     }
 }

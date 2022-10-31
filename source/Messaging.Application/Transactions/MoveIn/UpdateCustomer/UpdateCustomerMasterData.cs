@@ -14,16 +14,20 @@
 
 using System.Text.Json.Serialization;
 using Messaging.Application.Configuration.Commands.Commands;
+using NodaTime;
 
 namespace Messaging.Application.Transactions.MoveIn.UpdateCustomer;
 
 public class UpdateCustomerMasterData : InternalCommand
 {
     [JsonConstructor]
-    public UpdateCustomerMasterData(string transactionId)
+    public UpdateCustomerMasterData(string meteringPointNumber, Instant effectiveDateOfRunningTransaction)
     {
-        TransactionId = transactionId;
+        MeteringPointNumber = meteringPointNumber;
+        EffectiveDateOfRunningTransaction = effectiveDateOfRunningTransaction;
     }
 
-    public string TransactionId { get; }
+    public string MeteringPointNumber { get; }
+
+    public Instant EffectiveDateOfRunningTransaction { get; }
 }

@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Messaging.Domain.Transactions.MoveIn;
+using NodaTime;
 
 namespace Messaging.Application.Transactions.MoveIn.UpdateCustomer;
 
@@ -35,10 +36,10 @@ public class UpdateCustomerMasterDataHandler : IRequestHandler<UpdateCustomerMas
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var transaction = await _transactionRepository.GetByEffectiveDateAsync().ConfigureAwait(false);
+        var transaction = await _transactionRepository.GetByEffectiveDateAsync(request.MeteringPointNumber, request.EffectiveDateOfRunningTransaction).ConfigureAwait(false);
         if (transaction is null)
         {
-            throw TransactionNotFoundException.TransactionIdNotFound(request.TransactionId);
+            throw TransactionNotFoundException.TransactionIdNotFound(string.Empty);
         }
 
         await _updateCustomerMasterDataRequestClient.SendRequestAsync().ConfigureAwait(false);
