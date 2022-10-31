@@ -184,7 +184,7 @@ public class MoveInTransactionTests
     }
 
     [Fact]
-    public void Accept_customer_master_data_update()
+    public void Customer_master_data_is_updated()
     {
         var customerMasterData = new CustomerMasterData(
             SampleData.MarketEvaluationPointId,
