@@ -15,58 +15,76 @@
 
 syntax = "proto3";
 
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
 option csharp_namespace = "Energinet.DataHub.EnergySupplying.RequestResponse.Requests";
 
 message UpdateCustomerDataRequest {
   string processId = 1;
-  string effectiveDate = 2;
+  google.protobuf.Timestamp effectiveDate = 2;
   MarketEvaluationPoint marketEvaluationPoint = 3;
 }
 
 message MarketEvaluationPoint {
   string gsrnNumber = 1;
-  bool electricalHeating = 2;
-  Customer firstCustomer = 3;
-  Customer secondCustomer = 4;
-  bool protectedName = 5;
-  repeated UsagePointLocation usagePointLocations = 6;
+  NullableCustomer firstCustomer = 2;
+  NullableCustomer secondCustomer = 3;
+  NullableBool protectedName = 4;
+  repeated UsagePointLocation usagePointLocations = 5;
+}
+
+message NullableBool {
+    oneof kind{
+      google.protobuf.NullValue null = 1;
+      bool value = 2;
+    }
+}
+
+message NullableCustomer
+{
+    oneof kind{
+      google.protobuf.NullValue null = 1;
+      Customer customer = 2;
+      }
 }
 
 message Customer {
   string number = 1;
-  string name = 2;
+  google.protobuf.StringValue name = 2;
 }
 
 message UsagePointLocation {
   string type = 1;
-  string geoInfoReference = 2;
+  google.protobuf.StringValue geoInfoReference = 2;
   Address address = 3;
-  bool protectedAddress = 4;
-  string name = 5;
-  string attnName = 6;
-  string phone1 = 7;
-  string phone2 = 8;
-  string email = 9;
+  NullableBool protectedAddress = 4;
+  google.protobuf.StringValue name = 5;
+  google.protobuf.StringValue attnName = 6;
+  google.protobuf.StringValue phone1 = 7;
+  google.protobuf.StringValue phone2 = 8;
+  google.protobuf.StringValue email = 9;
 }
 
 message Address {
   StreetDetails streetDetails = 1;
   TownDetails townDetails = 2;
-  string postalCode = 3;
-  string poBox = 4;
+  google.protobuf.StringValue postalCode = 3;
+  google.protobuf.StringValue poBox = 4;
 }
 
 message TownDetails {
-  string municipalityCode = 1;
-  string cityName = 2;
-  string citySubDivisionName = 3;
-  string countryCode = 4;
+  google.protobuf.StringValue municipalityCode = 1;
+  google.protobuf.StringValue cityName = 2;
+  google.protobuf.StringValue citySubDivisionName = 3;
+  google.protobuf.StringValue countryCode = 4;
 }
 
 message StreetDetails {
-  string streetCode = 1;
-  string streetName = 2;
-  string buildingNumber = 3;
-  string floorIdentification = 4;
-  string roomIdentification = 5;
+  google.protobuf.StringValue streetCode = 1;
+  google.protobuf.StringValue streetName = 2;
+  google.protobuf.StringValue buildingNumber = 3;
+  google.protobuf.StringValue floorIdentification = 4;
+  google.protobuf.StringValue roomIdentification = 5;
 }
