@@ -53,7 +53,7 @@ public class CustomerMasterDataResponseListener
             throw new InvalidOperationException($"Customer master data request failed: {response.Error}");
         }
 
-        return _commandSchedulerFacade.EnqueueAsync(new ReceiveCustomerMasterData(
+        return _commandSchedulerFacade.EnqueueAsync(new SetCurrentKnownCustomerMasterData(
             correlationId,
             GetMasterDataContent(response)));
     }

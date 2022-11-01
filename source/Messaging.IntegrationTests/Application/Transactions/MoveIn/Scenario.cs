@@ -76,7 +76,6 @@ public class Scenario
         _transaction?.Accept("FakeId");
         _transaction?.BusinessProcessCompleted();
         _transaction?.MarkMeteringPointMasterDataAsSent();
-        _transaction?.MarkCustomerMasterDataAsSent();
         return this;
     }
 
@@ -117,7 +116,7 @@ public class Scenario
     {
         if (_customerMasterData is not null)
         {
-            _transaction!.ReceiveCustomerMasterData(_customerMasterData);
+            _transaction!.SetCurrentKnownCustomerMasterData(_customerMasterData);
         }
 
         await CreateGridOperatorDetailsAsync().ConfigureAwait(false);

@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json;
 using Messaging.Domain.Actors;
+using Messaging.Domain.Transactions.MoveIn;
+using NodaTime;
 
 namespace Messaging.Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 
@@ -22,14 +23,88 @@ public class CharacteristicsOfACustomerAtAnApMessage : OutgoingMessage
     public CharacteristicsOfACustomerAtAnApMessage(DocumentType documentType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string marketActivityRecordPayload)
         : base(documentType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, marketActivityRecordPayload)
     {
-        MarketActivityRecord = JsonSerializer.Deserialize<MarketActivityRecord>(marketActivityRecordPayload)!;
+        MarketActivityRecord =
+            new Serializer().Deserialize<MarketActivityRecord>(
+                marketActivityRecordPayload);
     }
 
     public CharacteristicsOfACustomerAtAnApMessage(DocumentType documentType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, MarketActivityRecord marketActivityRecord)
-        : base(documentType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, JsonSerializer.Serialize(marketActivityRecord))
+        : base(documentType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, new Serializer().Serialize(marketActivityRecord))
     {
         MarketActivityRecord = marketActivityRecord;
     }
 
     public MarketActivityRecord MarketActivityRecord { get; }
+
+    public static CharacteristicsOfACustomerAtAnApMessage Create(
+        string transactionId,
+        ProcessType processType,
+        ActorNumber actorNumber,
+        MarketRole receivingActorRole,
+        Instant validityStart,
+        CustomerMasterData customerMasterData)
+    {
+        ArgumentNullException.ThrowIfNull(processType);
+        ArgumentNullException.ThrowIfNull(customerMasterData);
+
+        var marketEvaluationPoint = CreateMarketEvaluationPoint(customerMasterData);
+        var marketActivityRecord = new MarketActivityRecord(
+            Guid.NewGuid().ToString(),
+            transactionId,
+            validityStart,
+            marketEvaluationPoint);
+
+        return new CharacteristicsOfACustomerAtAnApMessage(
+            DocumentType.CharacteristicsOfACustomerAtAnAP,
+            actorNumber,
+            transactionId,
+            processType.Code,
+            receivingActorRole,
+            DataHubDetails.IdentificationNumber,
+            MarketRole.MeteringPointAdministrator,
+            marketActivityRecord);
+    }
+
+    private static MarketEvaluationPoint CreateMarketEvaluationPoint(CustomerMasterData masterData)
+    {
+        return new MarketEvaluationPoint(
+            masterData.MarketEvaluationPoint,
+            masterData.ElectricalHeating,
+            masterData.ElectricalHeatingStart,
+            new MrId(masterData.FirstCustomerId, "ARR"),
+            masterData.FirstCustomerName,
+            masterData.SecondCustomerId is null ? null : new MrId(masterData.SecondCustomerId, "ARR"),
+            masterData.SecondCustomerName,
+            masterData.ProtectedName,
+            masterData.HasEnergySupplier,
+            masterData.SupplyStart,
+            new List<UsagePointLocation>()
+            {
+                CreateEmptyUsagePointLocation("D01"),
+                CreateEmptyUsagePointLocation("D04"),
+            });
+    }
+
+    private static MainAddress CreateEmptyAddress()
+    {
+        return new MainAddress(
+            new StreetDetail(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty),
+            new TownDetail(string.Empty, string.Empty, string.Empty, string.Empty),
+            string.Empty,
+            string.Empty);
+    }
+
+    private static UsagePointLocation CreateEmptyUsagePointLocation(string type)
+    {
+        return new UsagePointLocation(
+            type,
+            string.Empty,
+            CreateEmptyAddress(),
+            string.Empty,
+            string.Empty,
+            string.Empty,
+            string.Empty,
+            string.Empty,
+            false);
+    }
 }

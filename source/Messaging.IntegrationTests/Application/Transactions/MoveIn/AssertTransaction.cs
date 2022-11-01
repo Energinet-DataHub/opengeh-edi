@@ -59,12 +59,6 @@ public class AssertTransaction
         return this;
     }
 
-    public AssertTransaction HasProcessId(string expectedProcessId)
-    {
-        Assert.Equal(expectedProcessId, _transaction.ProcessId);
-        return this;
-    }
-
     public AssertTransaction HasStartedByMessageId(string startedByMessageId)
     {
         Assert.Equal(startedByMessageId, _transaction.StartedByMessageId);
@@ -98,12 +92,6 @@ public class AssertTransaction
     public AssertTransaction MeteringPointMasterDataWasSent()
     {
         Assert.Equal(MoveInTransaction.MasterDataState.Sent.ToString(), _transaction.MeteringPointMasterDataState);
-        return this;
-    }
-
-    public AssertTransaction CustomerMasterDataWasSent()
-    {
-        Assert.Equal(MoveInTransaction.MasterDataState.Sent.ToString(), _transaction.CustomerMasterDataState);
         return this;
     }
 
