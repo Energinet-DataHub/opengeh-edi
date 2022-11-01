@@ -203,11 +203,7 @@ namespace Messaging.Domain.Transactions.MoveIn
 
         private void SendCustomerMasterDataToNewEnergySupplier(CustomerMasterData customerMasterData)
         {
-            if (_messages.Any(message =>
-                    message is CharacteristicsOfACustomerAtAnApMessage && message.ReceiverId.Equals(_requestedBy)))
-            {
-                throw new MoveInException($"Customer master data for the new energy supplier has already been stored.");
-            }
+            ThrowIfMessageExists<CharacteristicsOfACustomerAtAnApMessage>(_requestedBy);
 
             _messages.Add(CharacteristicsOfACustomerAtAnApMessage.Create(
                 TransactionId,
@@ -217,6 +213,15 @@ namespace Messaging.Domain.Transactions.MoveIn
                 EffectiveDate,
                 customerMasterData));
             MarkCustomerMasterDataAsSent();
+        }
+
+        private void ThrowIfMessageExists<TMessage>(ActorNumber receiverId)
+        {
+            if (_messages.Any(message =>
+                    message is TMessage && message.ReceiverId.Equals(receiverId)))
+            {
+                throw new MoveInException($"Message has already been created and stored");
+            }
         }
 
         private void SetCurrentEnergySupplierNotificationToPending()
