@@ -197,15 +197,18 @@ namespace Messaging.Domain.Transactions.MoveIn
 
         public void SetCurrentKnownCustomerMasterData(CustomerMasterData customerMasterData)
         {
-            if (_customerMasterData is null)
-            {
-                _customerMasterData = customerMasterData;
-                SendCustomerMasterDataToNewEnergySupplier(customerMasterData);
-            }
+            _customerMasterData = customerMasterData;
+            SendCustomerMasterDataToNewEnergySupplier(customerMasterData);
         }
 
         private void SendCustomerMasterDataToNewEnergySupplier(CustomerMasterData customerMasterData)
         {
+            if (_messages.Any(message =>
+                    message is CharacteristicsOfACustomerAtAnApMessage && message.ReceiverId.Equals(_requestedBy)))
+            {
+                throw new MoveInException($"Customer master data for the new energy supplier has already been stored.");
+            }
+
             _messages.Add(CharacteristicsOfACustomerAtAnApMessage.Create(
                 TransactionId,
                 ProcessType.MoveIn,

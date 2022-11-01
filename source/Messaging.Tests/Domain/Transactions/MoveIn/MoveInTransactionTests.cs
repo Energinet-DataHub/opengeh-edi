@@ -125,6 +125,15 @@ public class MoveInTransactionTests
     }
 
     [Fact]
+    public void Customer_master_data_is_sent_to_the_new_energy_supplier_once_only()
+    {
+        _transaction.SetCurrentKnownCustomerMasterData(CreateCustomerMasterData());
+
+        Assert.Throws<MoveInException>(() =>
+            _transaction.SetCurrentKnownCustomerMasterData(CreateCustomerMasterData()));
+    }
+
+    [Fact]
     public void Customer_master_data_is_sent()
     {
         _transaction.MarkCustomerMasterDataAsSent();
