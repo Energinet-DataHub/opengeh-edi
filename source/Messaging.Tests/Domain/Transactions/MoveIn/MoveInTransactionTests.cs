@@ -115,7 +115,7 @@ public class MoveInTransactionTests
     }
 
     [Fact]
-    public void Customer_master_data_is_sent_to_the_new_energy_supplier()
+    public void Customer_master_data_is_sent_to_the_new_energy_supplier_when_current_known_master_data_is_set()
     {
         _transaction.SetCurrentKnownCustomerMasterData(CreateCustomerMasterData());
 
