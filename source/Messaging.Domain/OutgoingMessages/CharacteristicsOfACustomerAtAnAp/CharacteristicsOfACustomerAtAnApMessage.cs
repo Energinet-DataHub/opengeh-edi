@@ -73,7 +73,7 @@ public class CharacteristicsOfACustomerAtAnApMessage : OutgoingMessage
             masterData.ElectricalHeatingStart,
             new MrId(masterData.FirstCustomerId, "ARR"),
             masterData.FirstCustomerName,
-            new MrId(masterData.SecondCustomerId, "ARR"),
+            masterData.SecondCustomerId is null ? null : new MrId(masterData.SecondCustomerId, "ARR"),
             masterData.SecondCustomerName,
             masterData.ProtectedName,
             masterData.HasEnergySupplier,

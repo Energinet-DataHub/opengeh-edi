@@ -190,6 +190,11 @@ namespace Messaging.Domain.Transactions.MoveIn
             SendCustomerMasterDataToNewEnergySupplier(customerMasterData);
         }
 
+        public void UpdateCustomerMasterData(CustomerMasterData customerMasterData)
+        {
+            AddDomainEvent(new CustomerMasterDataWasUpdated(TransactionId));
+        }
+
         private void SendCustomerMasterDataToNewEnergySupplier(CustomerMasterData customerMasterData)
         {
             ThrowIfMessageExists<CharacteristicsOfACustomerAtAnApMessage>(_requestedBy);
@@ -221,11 +226,6 @@ namespace Messaging.Domain.Transactions.MoveIn
                 _currentEnergySupplierNotificationState = NotificationState.Pending;
                 AddDomainEvent(new EndOfSupplyNotificationChangedToPending(TransactionId, EffectiveDate, MarketEvaluationPointId, CurrentEnergySupplierId));
             }
-        }
-
-        public void UpdateCustomerMasterData(CustomerMasterData customerMasterData)
-        {
-            AddDomainEvent(new CustomerMasterDataWasUpdated(TransactionId));
         }
     }
 }
