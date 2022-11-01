@@ -208,6 +208,7 @@ namespace Messaging.Domain.Transactions.MoveIn
                     MarketRole.EnergySupplier,
                     EffectiveDate,
                     customerMasterData));
+                MarkCustomerMasterDataAsSent();
             }
         }
 
