@@ -14,6 +14,7 @@
 
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Domain.SeedWork;
@@ -24,7 +25,6 @@ namespace Messaging.Domain.Transactions.MoveIn
 {
     public class MoveInTransaction : Entity
     {
-        #pragma warning disable
         private readonly List<OutgoingMessage> _messages = new();
         private readonly ActorNumber _requestedBy;
         private readonly State _state = State.Started;
@@ -34,6 +34,7 @@ namespace Messaging.Domain.Transactions.MoveIn
         private MasterDataState _customerMasterDataState;
         private NotificationState _gridOperatorNotificationState = NotificationState.Pending;
         private MasterDataState _customerMasterDataForGridOperatorDeliveryState;
+        #pragma warning disable
         private CustomerMasterData? _customerMasterData;
 
         public MoveInTransaction(string transactionId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId, string startedByMessageId, string newEnergySupplierId, string? consumerId, string? consumerName, string? consumerIdType, ActorNumber requestedBy)
@@ -200,6 +201,13 @@ namespace Messaging.Domain.Transactions.MoveIn
             {
                 _customerMasterData = customerMasterData;
                 AddDomainEvent(new CustomerMasterDataWasReceived(TransactionId));
+                _messages.Add(CharacteristicsOfACustomerAtAnApMessage.Create(
+                    TransactionId,
+                    ProcessType.MoveIn,
+                    _requestedBy,
+                    MarketRole.EnergySupplier,
+                    EffectiveDate,
+                    customerMasterData));
             }
         }
 

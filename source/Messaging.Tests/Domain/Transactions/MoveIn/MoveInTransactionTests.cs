@@ -115,6 +115,16 @@ public class MoveInTransactionTests
     }
 
     [Fact]
+    public void Customer_master_data_is_sent_to_the_new_energy_supplier()
+    {
+        _transaction.ReceiveCustomerMasterData(CreateCustomerMasterData());
+
+        var domainEvent = _transaction.DomainEvents.FirstOrDefault(e => e is CustomerMasterDataWasSent) as CustomerMasterDataWasSent;
+        Assert.NotNull(domainEvent);
+        Assert.Equal(_transaction.TransactionId, domainEvent?.TransactionId);
+    }
+
+    [Fact]
     public void Customer_master_data_was_received()
     {
         _transaction.ReceiveCustomerMasterData(CreateCustomerMasterData());

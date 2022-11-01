@@ -18,12 +18,14 @@ using MediatR;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.MasterData;
 using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
+using Messaging.Domain.Actors;
+using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.Serialization;
+using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
-using NodaTime;
 using Xunit;
 
 namespace Messaging.IntegrationTests.Application.Transactions.MoveIn.MasterDataDelivery;
@@ -63,7 +65,7 @@ public class ReceiveCustomerMasterDataTests
     }
 
     [Fact]
-    public async Task Customer_master_data_is_stored()
+    public async Task Customer_master_data_is_stored_in_transaction()
     {
         var command = CreateCommand();
         await InvokeCommandAsync(command).ConfigureAwait(false);
@@ -72,10 +74,39 @@ public class ReceiveCustomerMasterDataTests
             .HasCustomerMasterData(ParseFrom(command.Data));
     }
 
+    [Fact]
+    public async Task Customer_master_data_message_is_created_for_the_energy_supplier()
+    {
+        var command = CreateCommand();
+        await InvokeCommandAsync(command).ConfigureAwait(false);
+
+        var assertMessage = AssertOutgoingMessage();
+        assertMessage.HasReceiverId(SampleData.NewEnergySupplierNumber);
+        assertMessage.HasReceiverRole(MarketRole.EnergySupplier.ToString());
+        assertMessage.HasSenderId(DataHubDetails.IdentificationNumber.Value);
+        assertMessage.HasSenderRole(MarketRole.MeteringPointAdministrator.ToString());
+        assertMessage.WithMarketActivityRecord()
+            .HasOriginalTransactionId(SampleData.TransactionId)
+            .HasValidityStart(SampleData.SupplyStart)
+            .HasMarketEvaluationPointValue(nameof(MarketEvaluationPoint.MarketEvaluationPointId), SampleData.MeteringPointNumber)
+            .HasMarketEvaluationPointDateValue(nameof(MarketEvaluationPoint.SupplyStart), SampleData.SupplyStart)
+            .HasMarketEvaluationPointValue(nameof(MarketEvaluationPoint.ElectricalHeating), SampleData.ElectricalHeating)
+            .HasMarketEvaluationPointDateValue(nameof(MarketEvaluationPoint.ElectricalHeatingStart), SampleData.ElectricalHeatingStart)
+            .HasMarketEvaluationPointValue(nameof(MarketEvaluationPoint.HasEnergySupplier), SampleData.HasEnergySupplier)
+            .HasMarketEvaluationPointValue(nameof(MarketEvaluationPoint.ProtectedName), SampleData.ProtectedName)
+            .HasMarketEvaluationPointValue($"{nameof(MarketEvaluationPoint.FirstCustomerId)}.{nameof(MarketEvaluationPoint.FirstCustomerId.Id)}", SampleData.ConsumerId)
+            .HasMarketEvaluationPointValue($"{nameof(MarketEvaluationPoint.FirstCustomerId)}.{nameof(MarketEvaluationPoint.FirstCustomerId.CodingScheme)}", SampleData.ConsumerIdType)
+            .HasMarketEvaluationPointValue(nameof(MarketEvaluationPoint.FirstCustomerName), SampleData.ConsumerName)
+            .HasMarketEvaluationPointValue($"{nameof(MarketEvaluationPoint.SecondCustomerId)}.{nameof(MarketEvaluationPoint.SecondCustomerId.Id)}", SampleData.ConsumerId)
+            .HasMarketEvaluationPointValue($"{nameof(MarketEvaluationPoint.SecondCustomerId)}.{nameof(MarketEvaluationPoint.SecondCustomerId.CodingScheme)}", SampleData.ConsumerIdType)
+            .HasMarketEvaluationPointValue(nameof(MarketEvaluationPoint.SecondCustomerName), SampleData.ConsumerName)
+            .NotEmpty(nameof(MarketActivityRecord.Id));
+    }
+
     private static ReceiveCustomerMasterData CreateCommand()
     {
         var customerMasterData = new CustomerMasterDataContent(
-            SampleData.MarketEvaluationPointId,
+            SampleData.MeteringPointNumber,
             SampleData.ElectricalHeating,
             SampleData.ElectricalHeatingStart,
             SampleData.ConsumerId,
@@ -102,5 +133,15 @@ public class ReceiveCustomerMasterDataTests
             protectedName: data.ProtectedName,
             hasEnergySupplier: data.HasEnergySupplier,
             supplyStart: data.SupplyStart);
+    }
+
+    private AssertOutgoingMessage AssertOutgoingMessage()
+    {
+        var assertMessage = Assertions.AssertOutgoingMessage.OutgoingMessage(
+            SampleData.TransactionId,
+            DocumentType.CharacteristicsOfACustomerAtAnAP.Name,
+            ProcessType.MoveIn.Code,
+            GetService<IDbConnectionFactory>());
+        return assertMessage;
     }
 }
