@@ -39,7 +39,7 @@ public class ReceiveCustomerMasterDataHandler : IRequestHandler<ReceiveCustomerM
             throw TransactionNotFoundException.TransactionIdNotFound(request.TransactionId);
         }
 
-        transaction.ReceiveCustomerMasterData(ParseFrom(request.Data));
+        transaction.SetCurrentKnownCustomerMasterData(ParseFrom(request.Data));
         return Task.FromResult(Unit.Value);
     }
 

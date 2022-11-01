@@ -117,7 +117,7 @@ public class Scenario
     {
         if (_customerMasterData is not null)
         {
-            _transaction!.ReceiveCustomerMasterData(_customerMasterData);
+            _transaction!.SetCurrentKnownCustomerMasterData(_customerMasterData);
         }
 
         await CreateGridOperatorDetailsAsync().ConfigureAwait(false);
