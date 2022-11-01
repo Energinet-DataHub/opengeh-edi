@@ -25,8 +25,8 @@ public class CustomerMasterData : ValueObject
         Instant? electricalHeatingStart,
         string firstCustomerId,
         string firstCustomerName,
-        string secondCustomerId,
-        string secondCustomerName,
+        string? secondCustomerId,
+        string? secondCustomerName,
         bool protectedName,
         bool hasEnergySupplier,
         Instant supplyStart)
@@ -53,9 +53,9 @@ public class CustomerMasterData : ValueObject
 
     public string FirstCustomerName { get; }
 
-    public string SecondCustomerId { get; }
+    public string? SecondCustomerId { get; }
 
-    public string SecondCustomerName { get; }
+    public string? SecondCustomerName { get; }
 
     public bool ProtectedName { get; }
 

@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
+using NodaTime;
 
 namespace Messaging.Infrastructure.Transactions.MoveIn
 {
@@ -47,6 +48,16 @@ namespace Messaging.Infrastructure.Transactions.MoveIn
             return _b2BContext.Transactions
                 .Include("_messages")
                 .FirstOrDefaultAsync(transaction => transaction.ProcessId == processId);
+        }
+
+        public Task<MoveInTransaction?> GetByEffectiveDateAsync(string meteringPointNumber, Instant effectiveDate)
+        {
+            return _b2BContext
+                .Transactions
+                .Include("_messages")
+                .FirstOrDefaultAsync(
+                    transaction => transaction.EffectiveDate == effectiveDate &&
+                                               transaction.MarketEvaluationPointId == meteringPointNumber);
         }
     }
 }

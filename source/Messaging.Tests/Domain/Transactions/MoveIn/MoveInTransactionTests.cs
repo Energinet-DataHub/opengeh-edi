@@ -161,6 +161,26 @@ public class MoveInTransactionTests
         Assert.Equal(1, _transaction.DomainEvents.Count(e => e is GridOperatorWasNotified));
     }
 
+    [Fact]
+    public void Customer_master_data_is_updated()
+    {
+        var customerMasterData = new CustomerMasterData(
+            SampleData.MarketEvaluationPointId,
+            false,
+            null,
+            SampleData.ConsumerId,
+            SampleData.ConsumerName,
+            null,
+            null,
+            false,
+            false,
+            SampleData.EffectiveDate);
+
+        _transaction.UpdateCustomerMasterData(customerMasterData);
+
+        Assert.Equal(1, _transaction.DomainEvents.Count(e => e is CustomerMasterDataWasUpdated));
+    }
+
     private static MoveInTransaction CreateTransaction()
     {
         return CreateTransaction(SampleData.CurrentEnergySupplierId);

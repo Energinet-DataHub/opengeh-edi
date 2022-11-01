@@ -12,22 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json.Serialization;
-using Messaging.Application.Configuration.Commands.Commands;
-using NodaTime;
+using Messaging.Domain.SeedWork;
 
-namespace Messaging.Application.Transactions.MoveIn.UpdateCustomer;
+namespace Messaging.Domain.Transactions.MoveIn.Events;
 
-public class UpdateCustomerMasterData : InternalCommand
+public class CustomerMasterDataWasUpdated : DomainEvent
 {
-    [JsonConstructor]
-    public UpdateCustomerMasterData(string meteringPointNumber, Instant effectiveDateOfRunningTransaction)
+    public CustomerMasterDataWasUpdated(string transactionId)
     {
-        MeteringPointNumber = meteringPointNumber;
-        EffectiveDateOfRunningTransaction = effectiveDateOfRunningTransaction;
+        TransactionId = transactionId;
     }
 
-    public string MeteringPointNumber { get; }
-
-    public Instant EffectiveDateOfRunningTransaction { get; }
+    public string TransactionId { get; }
 }
