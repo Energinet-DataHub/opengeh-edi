@@ -125,27 +125,6 @@ public class MoveInTransactionTests
     }
 
     [Fact]
-    public void Customer_master_data_was_received()
-    {
-        _transaction.SetCurrentKnownCustomerMasterData(CreateCustomerMasterData());
-
-        var domainEvent = _transaction.DomainEvents.FirstOrDefault(e => e is CustomerMasterDataWasReceived) as CustomerMasterDataWasReceived;
-        Assert.NotNull(domainEvent);
-        Assert.Equal(_transaction.TransactionId, domainEvent?.TransactionId);
-    }
-
-    [Fact]
-    public void Customer_master_data_can_be_received_once_only()
-    {
-        var customerMasterData = CreateCustomerMasterData();
-        _transaction.SetCurrentKnownCustomerMasterData(customerMasterData);
-
-        _transaction.SetCurrentKnownCustomerMasterData(customerMasterData);
-
-        Assert.Equal(1, _transaction.DomainEvents.Count(e => e is CustomerMasterDataWasReceived));
-    }
-
-    [Fact]
     public void Customer_master_data_is_sent()
     {
         _transaction.MarkCustomerMasterDataAsSent();

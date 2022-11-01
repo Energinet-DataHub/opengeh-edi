@@ -200,7 +200,6 @@ namespace Messaging.Domain.Transactions.MoveIn
             if (_customerMasterData is null)
             {
                 _customerMasterData = customerMasterData;
-                AddDomainEvent(new CustomerMasterDataWasReceived(TransactionId));
                 SendCustomerMasterDataToNewEnergySupplier(customerMasterData);
             }
         }
