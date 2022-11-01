@@ -201,15 +201,20 @@ namespace Messaging.Domain.Transactions.MoveIn
             {
                 _customerMasterData = customerMasterData;
                 AddDomainEvent(new CustomerMasterDataWasReceived(TransactionId));
-                _messages.Add(CharacteristicsOfACustomerAtAnApMessage.Create(
-                    TransactionId,
-                    ProcessType.MoveIn,
-                    _requestedBy,
-                    MarketRole.EnergySupplier,
-                    EffectiveDate,
-                    customerMasterData));
-                MarkCustomerMasterDataAsSent();
+                SendCustomerMasterDataToNewEnergySupplier(customerMasterData);
             }
+        }
+
+        private void SendCustomerMasterDataToNewEnergySupplier(CustomerMasterData customerMasterData)
+        {
+            _messages.Add(CharacteristicsOfACustomerAtAnApMessage.Create(
+                TransactionId,
+                ProcessType.MoveIn,
+                _requestedBy,
+                MarketRole.EnergySupplier,
+                EffectiveDate,
+                customerMasterData));
+            MarkCustomerMasterDataAsSent();
         }
 
         private void SetCurrentEnergySupplierNotificationToPending()
