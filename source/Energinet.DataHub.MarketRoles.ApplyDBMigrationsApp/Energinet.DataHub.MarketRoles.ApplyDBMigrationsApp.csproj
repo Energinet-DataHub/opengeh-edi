@@ -54,6 +54,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202226081407 Rename outgoing message column.sql" />
     <EmbeddedResource Include="Scripts\Model\202226081408 Add temp discriminator column.sql" />
     <EmbeddedResource Include="Scripts\Model\202226081409 Add requesting actor number to move in transaction.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101321 Extent ConsumerRegistration with second customer.sql" />
     <EmbeddedResource Include="Scripts\Model\202226081410 Drop customer master data state coulmn.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281100 Seed cleanup.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281101 Insert Reasons.sql" />
