@@ -43,7 +43,7 @@ internal static class MoveInConfiguration
         services.AddTransient<IRequestHandler<NotifyCurrentEnergySupplier, Unit>, NotifyCurrentEnergySupplierHandler>();
         services.AddTransient<IRequestHandler<NotifyGridOperator, Unit>, NotifyGridOperatorHandler>();
         services.AddTransient<IRequestHandler<SendCustomerMasterDataToGridOperator, Unit>, SendCustomerMasterDataToGridOperatorHandler>();
-        services.AddTransient<IRequestHandler<SetCurrentKnownCustomerMasterData, Unit>, ReceiveCustomerMasterDataHandler>();
+        services.AddTransient<IRequestHandler<SetCurrentKnownCustomerMasterData, Unit>, SetCurrentKnownCustomerMasterDataHandler>();
         services.AddTransient<IRequestHandler<UpdateCustomerMasterData, Unit>, UpdateCustomerMasterDataHandler>();
         services.AddTransient<INotificationHandler<MoveInWasAccepted>, FetchMeteringPointMasterDataWhenAccepted>();
         services.AddTransient<INotificationHandler<MoveInWasAccepted>, FetchCustomerMasterDataWhenAccepted>();

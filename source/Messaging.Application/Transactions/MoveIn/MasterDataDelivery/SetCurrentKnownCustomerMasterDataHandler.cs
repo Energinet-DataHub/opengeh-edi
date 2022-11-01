@@ -21,11 +21,11 @@ using Messaging.Domain.Transactions.MoveIn;
 
 namespace Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 
-public class ReceiveCustomerMasterDataHandler : IRequestHandler<SetCurrentKnownCustomerMasterData, Unit>
+public class SetCurrentKnownCustomerMasterDataHandler : IRequestHandler<SetCurrentKnownCustomerMasterData, Unit>
 {
     private readonly IMoveInTransactionRepository _transactionRepository;
 
-    public ReceiveCustomerMasterDataHandler(IMoveInTransactionRepository transactionRepository)
+    public SetCurrentKnownCustomerMasterDataHandler(IMoveInTransactionRepository transactionRepository)
     {
         _transactionRepository = transactionRepository;
     }
