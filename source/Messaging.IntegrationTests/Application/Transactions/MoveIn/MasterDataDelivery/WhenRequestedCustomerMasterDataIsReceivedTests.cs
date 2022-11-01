@@ -30,10 +30,10 @@ using Xunit;
 
 namespace Messaging.IntegrationTests.Application.Transactions.MoveIn.MasterDataDelivery;
 
-public class ReceiveCustomerMasterDataTests
+public class WhenRequestedCustomerMasterDataIsReceivedTests
     : TestBase, IAsyncLifetime
 {
-    public ReceiveCustomerMasterDataTests(DatabaseFixture databaseFixture)
+    public WhenRequestedCustomerMasterDataIsReceivedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
     }
