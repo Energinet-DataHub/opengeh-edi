@@ -75,7 +75,7 @@ public class WhenRequestedCustomerMasterDataIsReceivedTests
     }
 
     [Fact]
-    public async Task Customer_master_data_message_is_created_for_the_energy_supplier()
+    public async Task Current_known_customer_master_data_message_is_created_for_the_energy_supplier()
     {
         var command = CreateCommand();
         await InvokeCommandAsync(command).ConfigureAwait(false);
