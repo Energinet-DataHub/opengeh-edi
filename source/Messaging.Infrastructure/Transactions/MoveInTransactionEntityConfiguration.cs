@@ -15,7 +15,6 @@
 using System;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.SeedWork;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.EntityFrameworkCore;
@@ -46,11 +45,6 @@ namespace Messaging.Infrastructure.Transactions
             builder.Property(x => x.ConsumerName);
             builder.Property<MoveInTransaction.MasterDataState>("_meteringPointMasterDataState")
                 .HasColumnName("MeteringPointMasterDataState")
-                .HasConversion(
-                    toDbValue => toDbValue.ToString(),
-                    fromDbValue => Enum.Parse<MoveInTransaction.MasterDataState>(fromDbValue, true));
-            builder.Property<MoveInTransaction.MasterDataState>("_customerMasterDataState")
-                .HasColumnName("CustomerMasterDataState")
                 .HasConversion(
                     toDbValue => toDbValue.ToString(),
                     fromDbValue => Enum.Parse<MoveInTransaction.MasterDataState>(fromDbValue, true));

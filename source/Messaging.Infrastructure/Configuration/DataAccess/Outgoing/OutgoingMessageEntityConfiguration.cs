@@ -36,6 +36,9 @@ namespace Messaging.Infrastructure.Configuration.DataAccess.Outgoing
 
             builder.ToTable("OutgoingMessages", "b2b");
             builder.HasKey(x => x.Id);
+            builder.Property(x => x.Id)
+                .ValueGeneratedNever();
+
             builder.Property(x => x.DocumentType)
                 .HasConversion(
                     toDbValue => toDbValue.Name,

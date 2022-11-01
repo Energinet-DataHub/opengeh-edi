@@ -12,18 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Text.Json.Serialization;
 using Messaging.Application.Configuration.Commands.Commands;
+using Messaging.Application.MasterData;
 
 namespace Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 
-public class SendCustomerMasterDataToEnergySupplier : InternalCommand
+public class SetCurrentKnownCustomerMasterData : InternalCommand
 {
-    [JsonConstructor]
-    public SendCustomerMasterDataToEnergySupplier(string transactionId)
+    public SetCurrentKnownCustomerMasterData(string transactionId, CustomerMasterDataContent data)
     {
         TransactionId = transactionId;
+        Data = data;
+    }
+
+    [JsonConstructor]
+    public SetCurrentKnownCustomerMasterData(Guid id, string transactionId, CustomerMasterDataContent data)
+        : base(id)
+    {
+        TransactionId = transactionId;
+        Data = data;
     }
 
     public string TransactionId { get; }
+
+    public CustomerMasterDataContent Data { get; }
 }
