@@ -93,7 +93,7 @@ public class WhenCustomerMasterDataIsReceivedTests : TestBase, IAsyncLifetime
             SampleData.HasEnergySupplier,
             SampleData.SupplyStart,
             Array.Empty<UsagePointLocation>());
-        await InvokeCommandAsync(new ReceiveCustomerMasterData(SampleData.TransactionId, customerMasterData));
+        await InvokeCommandAsync(new SetCurrentKnownCustomerMasterData(SampleData.TransactionId, customerMasterData));
     }
 
     private AssertQueuedCommand AssertCommand<TCommand>()

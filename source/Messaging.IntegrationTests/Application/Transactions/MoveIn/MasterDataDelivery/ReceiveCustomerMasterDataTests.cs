@@ -103,7 +103,7 @@ public class ReceiveCustomerMasterDataTests
             .NotEmpty(nameof(MarketActivityRecord.Id));
     }
 
-    private static ReceiveCustomerMasterData CreateCommand()
+    private static SetCurrentKnownCustomerMasterData CreateCommand()
     {
         var customerMasterData = new CustomerMasterDataContent(
             SampleData.MeteringPointNumber,
@@ -117,7 +117,7 @@ public class ReceiveCustomerMasterDataTests
             SampleData.HasEnergySupplier,
             SampleData.SupplyStart,
             Array.Empty<UsagePointLocation>());
-        return new ReceiveCustomerMasterData(SampleData.TransactionId, customerMasterData);
+        return new SetCurrentKnownCustomerMasterData(SampleData.TransactionId, customerMasterData);
     }
 
     private static CustomerMasterData ParseFrom(CustomerMasterDataContent data)
