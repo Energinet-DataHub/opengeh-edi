@@ -13,12 +13,10 @@
 // limitations under the License.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Messaging.Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.IntegrationTests.Factories;
 using NodaTime;
-using NodaTime.Extensions;
 
 namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;
 
