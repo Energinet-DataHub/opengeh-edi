@@ -65,7 +65,7 @@ public class WhenRequestedCustomerMasterDataIsReceivedTests
     }
 
     [Fact]
-    public async Task Customer_master_data_is_stored_in_transaction()
+    public async Task Current_known_customer_master_data_is_stored_in_transaction()
     {
         var command = CreateCommand();
         await InvokeCommandAsync(command).ConfigureAwait(false);
