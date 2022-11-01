@@ -31,10 +31,10 @@ namespace Messaging.Domain.Transactions.MoveIn
         private BusinessProcessState _businessProcessState;
         private NotificationState _currentEnergySupplierNotificationState;
         private MasterDataState _meteringPointMasterDataState;
+        #pragma warning disable CS0414 // This is by design
         private MasterDataState _customerMasterDataState;
         private NotificationState _gridOperatorNotificationState = NotificationState.Pending;
         private MasterDataState _customerMasterDataForGridOperatorDeliveryState;
-        #pragma warning disable
         private CustomerMasterData? _customerMasterData;
 
         public MoveInTransaction(string transactionId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId, string startedByMessageId, string newEnergySupplierId, string? consumerId, string? consumerName, string? consumerIdType, ActorNumber requestedBy)
@@ -163,15 +163,6 @@ namespace Messaging.Domain.Transactions.MoveIn
             AddDomainEvent(new MeteringPointMasterDataWasSent(TransactionId));
         }
 
-        public void MarkCustomerMasterDataAsSent()
-        {
-            if (_customerMasterDataState != MasterDataState.Pending)
-                return;
-
-            _customerMasterDataState = MasterDataState.Sent;
-            AddDomainEvent(new CustomerMasterDataWasSent(TransactionId));
-        }
-
         public void SetCurrentEnergySupplierWasNotified()
         {
             if (_currentEnergySupplierNotificationState == NotificationState.Pending)
@@ -212,7 +203,9 @@ namespace Messaging.Domain.Transactions.MoveIn
                 MarketRole.EnergySupplier,
                 EffectiveDate,
                 customerMasterData));
-            MarkCustomerMasterDataAsSent();
+
+            _customerMasterDataState = MasterDataState.Sent;
+            AddDomainEvent(new CustomerMasterDataWasSent(TransactionId));
         }
 
         private void ThrowIfMessageExists<TMessage>(ActorNumber receiverId)

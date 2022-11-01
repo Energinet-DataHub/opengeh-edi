@@ -76,7 +76,6 @@ public class Scenario
         _transaction?.Accept("FakeId");
         _transaction?.BusinessProcessCompleted();
         _transaction?.MarkMeteringPointMasterDataAsSent();
-        _transaction?.MarkCustomerMasterDataAsSent();
         return this;
     }
 

@@ -134,26 +134,6 @@ public class MoveInTransactionTests
     }
 
     [Fact]
-    public void Customer_master_data_is_sent()
-    {
-        _transaction.MarkCustomerMasterDataAsSent();
-
-        var domainEvent = _transaction.DomainEvents.FirstOrDefault(e => e is CustomerMasterDataWasSent) as CustomerMasterDataWasSent;
-        Assert.NotNull(domainEvent);
-        Assert.Equal(_transaction.TransactionId, domainEvent?.TransactionId);
-    }
-
-    [Fact]
-    public void Customer_master_data_is_sent_once_only()
-    {
-        _transaction.MarkCustomerMasterDataAsSent();
-
-        _transaction.MarkCustomerMasterDataAsSent();
-
-        Assert.Equal(1, _transaction.DomainEvents.Count(e => e is CustomerMasterDataWasSent));
-    }
-
-    [Fact]
     public void Metering_point_master_data_is_sent()
     {
         _transaction.MarkMeteringPointMasterDataAsSent();
