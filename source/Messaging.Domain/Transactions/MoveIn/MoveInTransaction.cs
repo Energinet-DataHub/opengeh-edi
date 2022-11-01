@@ -31,8 +31,6 @@ namespace Messaging.Domain.Transactions.MoveIn
         private BusinessProcessState _businessProcessState;
         private NotificationState _currentEnergySupplierNotificationState;
         private MasterDataState _meteringPointMasterDataState;
-        #pragma warning disable CS0414 // This is by design
-        private MasterDataState _customerMasterDataState;
         private NotificationState _gridOperatorNotificationState = NotificationState.Pending;
         private MasterDataState _customerMasterDataForGridOperatorDeliveryState;
         private CustomerMasterData? _customerMasterData;
@@ -204,7 +202,6 @@ namespace Messaging.Domain.Transactions.MoveIn
                 EffectiveDate,
                 customerMasterData));
 
-            _customerMasterDataState = MasterDataState.Sent;
             AddDomainEvent(new CustomerMasterDataWasSent(TransactionId));
         }
 
