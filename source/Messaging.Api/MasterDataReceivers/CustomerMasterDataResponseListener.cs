@@ -20,11 +20,10 @@ using Messaging.Api.Configuration.Middleware;
 using Messaging.Application.Configuration.Commands;
 using Messaging.Application.MasterData;
 using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
-using Messaging.Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
-using Messaging.Infrastructure.Configuration.InternalCommands;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using NodaTime.Serialization.Protobuf;
+using UsagePointLocation = Messaging.Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp.UsagePointLocation;
 
 namespace Messaging.Api.MasterDataReceivers;
 

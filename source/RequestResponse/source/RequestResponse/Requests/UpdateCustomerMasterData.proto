@@ -21,6 +21,17 @@ import "google/protobuf/wrappers.proto";
 
 option csharp_namespace = "Energinet.DataHub.EnergySupplying.RequestResponse.Requests";
 
+message UpdateCustomerMasterDataRequest {
+  string accounting_point_number = 1;
+  string process_id = 2;
+  NullableCustomer first_customer = 3;
+  NullableCustomer second_customer = 4;
+}
+
+message UpdateCustomerMasterDataResponse {
+  string error = 1;
+}
+
 message UpdateCustomerDataRequest {
   string processId = 1;
   google.protobuf.Timestamp effectiveDate = 2;
