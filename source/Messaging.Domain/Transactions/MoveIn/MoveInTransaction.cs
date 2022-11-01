@@ -14,6 +14,7 @@
 
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Domain.SeedWork;
@@ -24,14 +25,12 @@ namespace Messaging.Domain.Transactions.MoveIn
 {
     public class MoveInTransaction : Entity
     {
-        #pragma warning disable
         private readonly List<OutgoingMessage> _messages = new();
         private readonly ActorNumber _requestedBy;
         private readonly State _state = State.Started;
         private BusinessProcessState _businessProcessState;
         private NotificationState _currentEnergySupplierNotificationState;
         private MasterDataState _meteringPointMasterDataState;
-        private MasterDataState _customerMasterDataState;
         private NotificationState _gridOperatorNotificationState = NotificationState.Pending;
         private MasterDataState _customerMasterDataForGridOperatorDeliveryState;
         private CustomerMasterData? _customerMasterData;
@@ -162,15 +161,6 @@ namespace Messaging.Domain.Transactions.MoveIn
             AddDomainEvent(new MeteringPointMasterDataWasSent(TransactionId));
         }
 
-        public void MarkCustomerMasterDataAsSent()
-        {
-            if (_customerMasterDataState != MasterDataState.Pending)
-                return;
-
-            _customerMasterDataState = MasterDataState.Sent;
-            AddDomainEvent(new CustomerMasterDataWasSent(TransactionId));
-        }
-
         public void SetCurrentEnergySupplierWasNotified()
         {
             if (_currentEnergySupplierNotificationState == NotificationState.Pending)
@@ -194,12 +184,38 @@ namespace Messaging.Domain.Transactions.MoveIn
                 _customerMasterDataForGridOperatorDeliveryState = MasterDataState.Sent;
         }
 
-        public void ReceiveCustomerMasterData(CustomerMasterData customerMasterData)
+        public void SetCurrentKnownCustomerMasterData(CustomerMasterData customerMasterData)
         {
-            if (_customerMasterData is null)
+            _customerMasterData = customerMasterData;
+            SendCustomerMasterDataToNewEnergySupplier(customerMasterData);
+        }
+
+        public void UpdateCustomerMasterData(CustomerMasterData customerMasterData)
+        {
+            AddDomainEvent(new CustomerMasterDataWasUpdated(TransactionId));
+        }
+
+        private void SendCustomerMasterDataToNewEnergySupplier(CustomerMasterData customerMasterData)
+        {
+            ThrowIfMessageExists<CharacteristicsOfACustomerAtAnApMessage>(_requestedBy);
+
+            _messages.Add(CharacteristicsOfACustomerAtAnApMessage.Create(
+                TransactionId,
+                ProcessType.MoveIn,
+                _requestedBy,
+                MarketRole.EnergySupplier,
+                EffectiveDate,
+                customerMasterData));
+
+            AddDomainEvent(new CustomerMasterDataWasSent(TransactionId));
+        }
+
+        private void ThrowIfMessageExists<TMessage>(ActorNumber receiverId)
+        {
+            if (_messages.Any(message =>
+                    message is TMessage && message.ReceiverId.Equals(receiverId)))
             {
-                _customerMasterData = customerMasterData;
-                AddDomainEvent(new CustomerMasterDataWasReceived(TransactionId));
+                throw new MoveInException($"Message has already been created and stored");
             }
         }
 
@@ -210,11 +226,6 @@ namespace Messaging.Domain.Transactions.MoveIn
                 _currentEnergySupplierNotificationState = NotificationState.Pending;
                 AddDomainEvent(new EndOfSupplyNotificationChangedToPending(TransactionId, EffectiveDate, MarketEvaluationPointId, CurrentEnergySupplierId));
             }
-        }
-
-        public void UpdateCustomerMasterData(CustomerMasterData customerMasterData)
-        {
-            AddDomainEvent(new CustomerMasterDataWasUpdated(TransactionId));
         }
     }
 }

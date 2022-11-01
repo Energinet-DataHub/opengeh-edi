@@ -115,30 +115,9 @@ public class MoveInTransactionTests
     }
 
     [Fact]
-    public void Customer_master_data_was_received()
+    public void Customer_master_data_is_sent_to_the_new_energy_supplier_when_current_known_master_data_is_set()
     {
-        _transaction.ReceiveCustomerMasterData(CreateCustomerMasterData());
-
-        var domainEvent = _transaction.DomainEvents.FirstOrDefault(e => e is CustomerMasterDataWasReceived) as CustomerMasterDataWasReceived;
-        Assert.NotNull(domainEvent);
-        Assert.Equal(_transaction.TransactionId, domainEvent?.TransactionId);
-    }
-
-    [Fact]
-    public void Customer_master_data_can_be_received_once_only()
-    {
-        var customerMasterData = CreateCustomerMasterData();
-        _transaction.ReceiveCustomerMasterData(customerMasterData);
-
-        _transaction.ReceiveCustomerMasterData(customerMasterData);
-
-        Assert.Equal(1, _transaction.DomainEvents.Count(e => e is CustomerMasterDataWasReceived));
-    }
-
-    [Fact]
-    public void Customer_master_data_is_sent()
-    {
-        _transaction.MarkCustomerMasterDataAsSent();
+        _transaction.SetCurrentKnownCustomerMasterData(CreateCustomerMasterData());
 
         var domainEvent = _transaction.DomainEvents.FirstOrDefault(e => e is CustomerMasterDataWasSent) as CustomerMasterDataWasSent;
         Assert.NotNull(domainEvent);
@@ -146,13 +125,12 @@ public class MoveInTransactionTests
     }
 
     [Fact]
-    public void Customer_master_data_is_sent_once_only()
+    public void Customer_master_data_is_sent_to_the_new_energy_supplier_once_only()
     {
-        _transaction.MarkCustomerMasterDataAsSent();
+        _transaction.SetCurrentKnownCustomerMasterData(CreateCustomerMasterData());
 
-        _transaction.MarkCustomerMasterDataAsSent();
-
-        Assert.Equal(1, _transaction.DomainEvents.Count(e => e is CustomerMasterDataWasSent));
+        Assert.Throws<MoveInException>(() =>
+            _transaction.SetCurrentKnownCustomerMasterData(CreateCustomerMasterData()));
     }
 
     [Fact]

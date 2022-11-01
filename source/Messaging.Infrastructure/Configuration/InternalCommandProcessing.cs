@@ -46,9 +46,8 @@ internal static class InternalCommandProcessing
         mapper.Add("FetchCustomerMasterData", typeof(FetchCustomerMasterData));
         mapper.Add("FetchMeteringPointMasterData", typeof(FetchMeteringPointMasterData));
         mapper.Add("ForwardMeteringPointMasterData", typeof(ForwardMeteringPointMasterData));
-        mapper.Add("ReceiveCustomerMasterData", typeof(ReceiveCustomerMasterData));
+        mapper.Add("SetCurrentKnownCustomerMasterData", typeof(SetCurrentKnownCustomerMasterData));
         mapper.Add("SendCustomerMasterDataToGridOperator", typeof(SendCustomerMasterDataToGridOperator));
-        mapper.Add("SendCustomerMasterDataToEnergySupplier", typeof(SendCustomerMasterDataToEnergySupplier));
         mapper.Add("NotifyCurrentEnergySupplier", typeof(NotifyCurrentEnergySupplier));
         mapper.Add("NotifyGridOperator", typeof(NotifyGridOperator));
         mapper.Add("SetConsumerHasMovedIn", typeof(SetConsumerHasMovedIn));
