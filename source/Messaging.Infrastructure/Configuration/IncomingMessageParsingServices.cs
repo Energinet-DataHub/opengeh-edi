@@ -29,11 +29,7 @@ internal static class IncomingMessageParsingServices
 {
     internal static void AddIncomingMessageParsingServices(IServiceCollection services)
     {
-        services
-            .AddTransient<IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>, JsonMessageParser>();
-        services
-            .AddTransient<IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>, XmlMessageParser>();
-        services.AddTransient<MessageParser>();
+        RegisterRequestChangeOfSupplierParsers(services);
 
         services
             .AddTransient<IMessageParser<Application.IncomingMessages.RequestChangeCustomerCharacteristics.
@@ -47,5 +43,14 @@ internal static class IncomingMessageParsingServices
         services.AddSingleton<JsonResponseFactory>();
         services.AddSingleton<XmlResponseFactory>();
         services.AddSingleton<ResponseFactory>();
+    }
+
+    private static void RegisterRequestChangeOfSupplierParsers(IServiceCollection services)
+    {
+        services
+            .AddTransient<IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>, JsonMessageParser>();
+        services
+            .AddTransient<IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>, XmlMessageParser>();
+        services.AddTransient<MessageParser>();
     }
 }
