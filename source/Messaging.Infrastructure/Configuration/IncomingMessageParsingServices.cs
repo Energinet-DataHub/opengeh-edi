@@ -29,16 +29,20 @@ internal static class IncomingMessageParsingServices
 {
     internal static void AddIncomingMessageParsingServices(IServiceCollection services)
     {
+        RegisterSchemaProviders(services);
         RegisterRequestChangeOfSupplierParsers(services);
         RegisterRequestChangeOfCustomerCharacteristicsParsers(services);
-
-        services.AddSingleton<CimJsonSchemas>();
-        services.AddSingleton<XmlSchemaProvider>();
-        services.AddSingleton<JsonSchemaProvider>();
 
         services.AddSingleton<JsonResponseFactory>();
         services.AddSingleton<XmlResponseFactory>();
         services.AddSingleton<ResponseFactory>();
+    }
+
+    private static void RegisterSchemaProviders(IServiceCollection services)
+    {
+        services.AddSingleton<CimJsonSchemas>();
+        services.AddSingleton<XmlSchemaProvider>();
+        services.AddSingleton<JsonSchemaProvider>();
     }
 
     private static void RegisterRequestChangeOfCustomerCharacteristicsParsers(IServiceCollection services)
