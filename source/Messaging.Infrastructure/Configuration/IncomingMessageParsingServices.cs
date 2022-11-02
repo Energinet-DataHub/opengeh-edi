@@ -29,10 +29,14 @@ internal static class IncomingMessageParsingServices
 {
     internal static void AddIncomingMessageParsingServices(IServiceCollection services)
     {
+        RegisterB2BResponseServices(services);
         RegisterSchemaProviders(services);
         RegisterRequestChangeOfSupplierParsers(services);
         RegisterRequestChangeOfCustomerCharacteristicsParsers(services);
+    }
 
+    private static void RegisterB2BResponseServices(IServiceCollection services)
+    {
         services.AddSingleton<JsonResponseFactory>();
         services.AddSingleton<XmlResponseFactory>();
         services.AddSingleton<ResponseFactory>();
