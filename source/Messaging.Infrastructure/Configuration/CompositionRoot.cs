@@ -14,7 +14,6 @@
 
 using System;
 using System.Net.Http;
-using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Energinet.DataHub.MessageHub.Client;
@@ -34,13 +33,10 @@ using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.OutgoingMessages.Common.Reasons;
 using Messaging.Application.OutgoingMessages.Requesting;
-using Messaging.Application.SchemaStore;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.CimMessageAdapter.Messages;
-using Messaging.CimMessageAdapter.Messages.Queues;
 using Messaging.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 using Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
-using Messaging.CimMessageAdapter.Response;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
@@ -49,13 +45,10 @@ using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Common.Reasons;
 using Messaging.Infrastructure.Configuration.Authentication;
 using Messaging.Infrastructure.Configuration.DataAccess;
-using Messaging.Infrastructure.Configuration.MessageBus;
 using Messaging.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Messaging.Infrastructure.Configuration.Processing;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.IncomingMessages;
-using Messaging.Infrastructure.IncomingMessages.RequestChangeOfSupplier;
-using Messaging.Infrastructure.IncomingMessages.Response;
 using Messaging.Infrastructure.MasterData.MarketEvaluationPoints;
 using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
@@ -72,10 +65,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using MarketActivityRecord = Messaging.Application.IncomingMessages.RequestChangeOfSupplier.MarketActivityRecord;
-using MessageParser = Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier.MessageParser;
-using RequestChangeCustomerCharacteristicsTransaction = Messaging.Application.IncomingMessages.RequestChangeCustomerCharacteristics.RequestChangeCustomerCharacteristicsTransaction;
-using RequestChangeOfSupplierTransaction = Messaging.Application.IncomingMessages.RequestChangeOfSupplier.RequestChangeOfSupplierTransaction;
 using SenderAuthorizer = Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier.SenderAuthorizer;
 
 namespace Messaging.Infrastructure.Configuration
