@@ -31,7 +31,7 @@ internal static class IncomingMessageParsingServices
     {
         RegisterB2BResponseServices(services);
         RegisterSchemaProviders(services);
-        RegisterRequestChangeOfSupplierParsers(services);
+        RegisterRequestChangeOfSupplierMessageHandling(services);
         RegisterRequestChangeOfCustomerCharacteristicsParsers(services);
     }
 
@@ -58,8 +58,10 @@ internal static class IncomingMessageParsingServices
         services.AddTransient<CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics.MessageParser>();
     }
 
-    private static void RegisterRequestChangeOfSupplierParsers(IServiceCollection services)
+    private static void RegisterRequestChangeOfSupplierMessageHandling(IServiceCollection services)
     {
+        services.AddScoped<SenderAuthorizer>();
+        services.AddScoped<RequestChangeOfSupplierReceiver>();
         services
             .AddTransient<IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>, JsonMessageParser>();
         services

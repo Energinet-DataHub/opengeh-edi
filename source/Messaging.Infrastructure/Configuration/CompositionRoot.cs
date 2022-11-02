@@ -87,8 +87,6 @@ namespace Messaging.Infrastructure.Configuration
             services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
             services.AddScoped<IMessageRequestNotifications, MessageRequestNotifications>();
             services.AddTransient<IRequestHandler<RequestMessages, Unit>, RequestMessagesHandler>();
-            services.AddScoped<SenderAuthorizer>();
-            services.AddScoped<RequestChangeOfSupplierReceiver>();
             services.AddScoped<Messaging.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics.SenderAuthorizer>();
             services.AddScoped<RequestChangeCustomerCharacteristicsReceiver>();
 
