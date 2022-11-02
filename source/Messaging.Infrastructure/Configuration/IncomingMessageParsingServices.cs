@@ -40,8 +40,8 @@ internal static class IncomingMessageParsingServices
 
     private static void RegisterB2BResponseServices(IServiceCollection services)
     {
-        services.AddSingleton<JsonResponseFactory>();
-        services.AddSingleton<XmlResponseFactory>();
+        services.AddSingleton<IResponseFactory, JsonResponseFactory>();
+        services.AddSingleton<IResponseFactory, XmlResponseFactory>();
         services.AddSingleton<ResponseFactory>();
     }
 
