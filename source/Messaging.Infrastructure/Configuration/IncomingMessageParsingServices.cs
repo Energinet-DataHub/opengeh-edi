@@ -30,11 +30,7 @@ internal static class IncomingMessageParsingServices
     internal static void AddIncomingMessageParsingServices(IServiceCollection services)
     {
         RegisterRequestChangeOfSupplierParsers(services);
-
-        services
-            .AddTransient<IMessageParser<Application.IncomingMessages.RequestChangeCustomerCharacteristics.
-                MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>, IncomingMessages.RequestChangeCustomerCharacteristics.XmlMessageParser>();
-        services.AddTransient<CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics.MessageParser>();
+        RegisterRequestChangeOfCustomerCharacteristicsParsers(services);
 
         services.AddSingleton<CimJsonSchemas>();
         services.AddSingleton<XmlSchemaProvider>();
@@ -43,6 +39,15 @@ internal static class IncomingMessageParsingServices
         services.AddSingleton<JsonResponseFactory>();
         services.AddSingleton<XmlResponseFactory>();
         services.AddSingleton<ResponseFactory>();
+    }
+
+    private static void RegisterRequestChangeOfCustomerCharacteristicsParsers(IServiceCollection services)
+    {
+        services
+            .AddTransient<IMessageParser<Application.IncomingMessages.RequestChangeCustomerCharacteristics.
+                    MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>,
+                IncomingMessages.RequestChangeCustomerCharacteristics.XmlMessageParser>();
+        services.AddTransient<CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics.MessageParser>();
     }
 
     private static void RegisterRequestChangeOfSupplierParsers(IServiceCollection services)
