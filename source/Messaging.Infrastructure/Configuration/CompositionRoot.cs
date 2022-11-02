@@ -35,8 +35,6 @@ using Messaging.Application.OutgoingMessages.Common.Reasons;
 using Messaging.Application.OutgoingMessages.Requesting;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.CimMessageAdapter.Messages;
-using Messaging.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
-using Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
@@ -65,7 +63,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using SenderAuthorizer = Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier.SenderAuthorizer;
 
 namespace Messaging.Infrastructure.Configuration
 {
@@ -87,8 +84,6 @@ namespace Messaging.Infrastructure.Configuration
             services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
             services.AddScoped<IMessageRequestNotifications, MessageRequestNotifications>();
             services.AddTransient<IRequestHandler<RequestMessages, Unit>, RequestMessagesHandler>();
-            services.AddScoped<Messaging.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics.SenderAuthorizer>();
-            services.AddScoped<RequestChangeCustomerCharacteristicsReceiver>();
 
             AddMediatR();
             services.AddLogging();
