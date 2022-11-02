@@ -39,9 +39,9 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
     private readonly ISchemaProvider _schemaProvider;
     private readonly List<ValidationError> _errors = new();
 
-    public JsonMessageParser()
+    public JsonMessageParser(JsonSchemaProvider schemaProvider)
     {
-        _schemaProvider = new JsonSchemaProvider();
+        _schemaProvider = schemaProvider;
     }
 
     public CimFormat HandledFormat => CimFormat.Json;

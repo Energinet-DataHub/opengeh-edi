@@ -20,6 +20,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
+using Messaging.Application.SchemaStore;
 using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
@@ -38,7 +39,7 @@ public class MessageParserTests
         _messageParser = new MessageParser(
             new IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>[]
             {
-                new JsonMessageParser(),
+                new JsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())),
                 new XmlMessageParser(),
             });
     }
