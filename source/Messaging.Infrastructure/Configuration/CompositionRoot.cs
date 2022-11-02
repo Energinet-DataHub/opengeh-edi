@@ -227,25 +227,7 @@ namespace Messaging.Infrastructure.Configuration
 
         public CompositionRoot AddMessageParserServices()
         {
-            _services
-                .AddTransient<IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>, JsonMessageParser>();
-            _services
-                .AddTransient<IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>, XmlMessageParser>();
-            _services.AddTransient<MessageParser>();
-
-            _services
-                .AddTransient<IMessageParser<Application.IncomingMessages.RequestChangeCustomerCharacteristics.
-                    MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>, IncomingMessages.RequestChangeCustomerCharacteristics.XmlMessageParser>();
-            _services.AddTransient<CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics.MessageParser>();
-
-            _services.AddSingleton<CimJsonSchemas>();
-            _services.AddSingleton<XmlSchemaProvider>();
-            _services.AddSingleton<JsonSchemaProvider>();
-
-            _services.AddSingleton<JsonResponseFactory>();
-            _services.AddSingleton<XmlResponseFactory>();
-            _services.AddSingleton<ResponseFactory>();
-
+            IncomingMessageParsingServices.AddIncomingMessageParsingServices(_services);
             return this;
         }
 
