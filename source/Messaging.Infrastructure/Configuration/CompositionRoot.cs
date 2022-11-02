@@ -241,11 +241,11 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddSingleton<CimJsonSchemas>();
             _services.AddSingleton<XmlSchemaProvider>();
             _services.AddSingleton<JsonSchemaProvider>();
-            _services.AddSingleton(_ => new ResponseFactory(new IResponseFactory[]
-            {
-                new JsonResponseFactory(),
-                new XmlResponseFactory(),
-            }));
+
+            _services.AddSingleton<JsonResponseFactory>();
+            _services.AddSingleton<XmlResponseFactory>();
+            _services.AddSingleton<ResponseFactory>();
+
             return this;
         }
 
