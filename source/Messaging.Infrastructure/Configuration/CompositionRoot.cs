@@ -233,14 +233,10 @@ namespace Messaging.Infrastructure.Configuration
                 .AddTransient<IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>, XmlMessageParser>();
             _services.AddTransient<MessageParser>();
 
-            _services.AddTransient(_ =>
-                new CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics.MessageParser(
-                    new IMessageParser<Application.IncomingMessages.RequestChangeCustomerCharacteristics.
-                        MarketActivityRecord,
-                        RequestChangeCustomerCharacteristicsTransaction>[]
-                    {
-                        new IncomingMessages.RequestChangeCustomerCharacteristics.XmlMessageParser(),
-                    }));
+            _services
+                .AddTransient<IMessageParser<Application.IncomingMessages.RequestChangeCustomerCharacteristics.
+                    MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>, IncomingMessages.RequestChangeCustomerCharacteristics.XmlMessageParser>();
+            _services.AddTransient<CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics.MessageParser>();
 
             _services.AddSingleton<CimJsonSchemas>();
             _services.AddSingleton<XmlSchemaProvider>();
