@@ -180,7 +180,7 @@ namespace Messaging.Domain.Transactions.MoveIn
         public void SetCurrentKnownCustomerMasterData(CustomerMasterData customerMasterData)
         {
             _customerMasterData = customerMasterData;
-            SendCustomerMasterDataToNewEnergySupplier(customerMasterData);
+            SendCustomerMasterDataToNewEnergySupplier();
         }
 
         public void UpdateCustomerMasterData(CustomerMasterData customerMasterData)
@@ -205,18 +205,10 @@ namespace Messaging.Domain.Transactions.MoveIn
             _customerMasterDataForGridOperatorDeliveryState = MasterDataState.Sent;
         }
 
-        private void SendCustomerMasterDataToNewEnergySupplier(CustomerMasterData customerMasterData)
+        private void SendCustomerMasterDataToNewEnergySupplier()
         {
             ThrowIfMessageExists<CharacteristicsOfACustomerAtAnApMessage>(_requestedBy);
-
-            _messages.Add(CharacteristicsOfACustomerAtAnApMessage.Create(
-                TransactionId,
-                ProcessType.MoveIn,
-                _requestedBy,
-                MarketRole.EnergySupplier,
-                EffectiveDate,
-                customerMasterData));
-
+            CreateCustomerMasterDataMessage(_requestedBy, MarketRole.EnergySupplier);
             AddDomainEvent(new CustomerMasterDataWasSent(TransactionId));
         }
 
@@ -236,6 +228,17 @@ namespace Messaging.Domain.Transactions.MoveIn
                 _currentEnergySupplierNotificationState = NotificationState.Pending;
                 AddDomainEvent(new EndOfSupplyNotificationChangedToPending(TransactionId, EffectiveDate, MarketEvaluationPointId, CurrentEnergySupplierId));
             }
+        }
+
+        private void CreateCustomerMasterDataMessage(ActorNumber receiverNumber, MarketRole receiverRole)
+        {
+            _messages.Add(CharacteristicsOfACustomerAtAnApMessage.Create(
+                TransactionId,
+                ProcessType.MoveIn,
+                receiverNumber,
+                receiverRole,
+                EffectiveDate,
+                _customerMasterData!));
         }
     }
 }
