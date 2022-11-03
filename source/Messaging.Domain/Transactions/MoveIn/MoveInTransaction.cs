@@ -195,13 +195,7 @@ namespace Messaging.Domain.Transactions.MoveIn
                 throw new MoveInException($"Customer master data has already been sent to the grid operator");
             }
 
-            _messages.Add(CharacteristicsOfACustomerAtAnApMessage.Create(
-                TransactionId,
-                ProcessType.MoveIn,
-                gridOperatorNumber,
-                MarketRole.GridOperator,
-                EffectiveDate,
-                _customerMasterData!));
+            CreateCustomerMasterDataMessage(gridOperatorNumber, MarketRole.GridOperator);
             _customerMasterDataForGridOperatorDeliveryState = MasterDataState.Sent;
         }
 
