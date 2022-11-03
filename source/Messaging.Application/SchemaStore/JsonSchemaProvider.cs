@@ -22,9 +22,9 @@ public class JsonSchemaProvider : SchemaProvider
 {
     private readonly ISchema _schema;
 
-    public JsonSchemaProvider()
+    public JsonSchemaProvider(CimJsonSchemas schemas)
     {
-        _schema = new CimJsonSchemas();
+        _schema = schemas;
     }
 
     public override Task<T?> GetSchemaAsync<T>(string businessProcessType, string version)

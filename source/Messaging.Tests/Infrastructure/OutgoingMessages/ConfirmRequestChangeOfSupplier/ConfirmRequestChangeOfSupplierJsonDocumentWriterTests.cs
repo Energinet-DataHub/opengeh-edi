@@ -46,7 +46,7 @@ public class ConfirmRequestChangeOfSupplierJsonDocumentWriterTests
         _systemDateTimeProvider = new SystemDateTimeProvider();
         _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
         _documentWriter = new ConfirmChangeOfSupplierJsonDocumentWriter(_marketActivityRecordParser);
-        _schemaProvider = new JsonSchemaProvider();
+        _schemaProvider = new JsonSchemaProvider(new CimJsonSchemas());
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public class ConfirmRequestChangeOfSupplierJsonDocumentWriterTests
 
     private async Task AssertMessage(Stream message, MessageHeader header, List<MarketActivityRecord> marketActivityRecords)
     {
-        _schemaProvider = new JsonSchemaProvider();
+        _schemaProvider = new JsonSchemaProvider(new CimJsonSchemas());
         var schema = await _schemaProvider.GetSchemaAsync<JsonSchema>("confirmrequestchangeofsupplier", "0").ConfigureAwait(false);
         if (schema == null) throw new InvalidCastException("Json schema not found for process ConfirmRequestChangeOfSupplier");
         var document = await JsonDocument.ParseAsync(message).ConfigureAwait(false);

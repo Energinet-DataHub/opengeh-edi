@@ -46,7 +46,7 @@ public class JsonDocumentWriterTests
         _systemDateTimeProvider = new SystemDateTimeProvider();
         _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
         _documentWriter = new RejectRequestChangeOfSupplierJsonDocumentWriter(_marketActivityRecordParser);
-        _schemaProvider = new JsonSchemaProvider();
+        _schemaProvider = new JsonSchemaProvider(new CimJsonSchemas());
     }
 
     [Fact]
