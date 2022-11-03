@@ -195,6 +195,18 @@ namespace Messaging.Domain.Transactions.MoveIn
             AddDomainEvent(new CustomerMasterDataWasUpdated(TransactionId));
         }
 
+        public void SendCustomerMasterDataToGridOperator(ActorNumber gridOperatorNumber)
+        {
+            _messages.Add(CharacteristicsOfACustomerAtAnApMessage.Create(
+                TransactionId,
+                ProcessType.MoveIn,
+                gridOperatorNumber,
+                MarketRole.GridOperator,
+                EffectiveDate,
+                _customerMasterData!));
+            SetCustomerMasterDataDeliveredWasToGridOperator();
+        }
+
         private void SendCustomerMasterDataToNewEnergySupplier(CustomerMasterData customerMasterData)
         {
             ThrowIfMessageExists<CharacteristicsOfACustomerAtAnApMessage>(_requestedBy);

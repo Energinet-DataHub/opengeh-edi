@@ -15,6 +15,7 @@
 using System;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
+using Messaging.Domain.Actors;
 using Xunit;
 
 namespace Messaging.IntegrationTests.Assertions
@@ -33,12 +34,25 @@ namespace Messaging.IntegrationTests.Assertions
         public static AssertOutgoingMessage OutgoingMessage(string transactionId, string documentType, string processType, IDbConnectionFactory connectionFactory)
         {
             if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
-
             var message = connectionFactory.GetOpenConnection().QuerySingle(
                 $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.TransactionId, m.ProcessType," +
                 $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MarketActivityRecordPayload " +
                 $" FROM [b2b].[OutgoingMessages] m" +
                 $" WHERE m.TransactionId = '{transactionId}' AND m.DocumentType = '{documentType}' AND m.ProcessType = '{processType}'");
+
+            Assert.NotNull(message);
+            return new AssertOutgoingMessage(message);
+        }
+
+        public static AssertOutgoingMessage OutgoingMessage(string transactionId, string documentType, string processType, MarketRole receiverRole, IDbConnectionFactory connectionFactory)
+        {
+            if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
+            ArgumentNullException.ThrowIfNull(receiverRole);
+            var message = connectionFactory.GetOpenConnection().QuerySingle(
+                $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.TransactionId, m.ProcessType," +
+                $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MarketActivityRecordPayload " +
+                $" FROM [b2b].[OutgoingMessages] m" +
+                $" WHERE m.TransactionId = '{transactionId}' AND m.DocumentType = '{documentType}' AND m.ProcessType = '{processType}' AND m.ReceiverRole = '{receiverRole.Name}'");
 
             Assert.NotNull(message);
             return new AssertOutgoingMessage(message);

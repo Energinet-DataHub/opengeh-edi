@@ -60,10 +60,10 @@ public class SendCustomerMasterDataToGridOperatorHandler : IRequestHandler<SendC
             await GetGridOperatorNumberAsync(transaction.MarketEvaluationPointId)
                 .ConfigureAwait(false);
 
-        _outgoingMessageStore.Add(
-            await _messageFactory.CreateFromAsync(transaction, gridOperatorNumber, MarketRole.GridOperator)
-                .ConfigureAwait(false));
-        transaction.SetCustomerMasterDataDeliveredWasToGridOperator();
+        // _outgoingMessageStore.Add(
+        //     await _messageFactory.CreateFromAsync(transaction, gridOperatorNumber, MarketRole.GridOperator)
+        //         .ConfigureAwait(false));
+        transaction.SendCustomerMasterDataToGridOperator(gridOperatorNumber);
 
         return Unit.Value;
     }
