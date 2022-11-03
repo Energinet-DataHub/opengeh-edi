@@ -21,6 +21,7 @@ module "mssql_database_application_access" {
                               module.func_receiver.name,
                               module.func_processing.name,
                             ]
+  spn_name                = "sp-rg-kv-sp-subscr-green-DataHub-U-002-contributor-U-d252b8da-contributor"
 
   depends_on              = [
                               module.func_actor_sync.name,
