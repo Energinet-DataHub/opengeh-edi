@@ -41,4 +41,6 @@ internal class SampleData
     internal static string RequestedByActorNumber => "1234567890123";
 
     internal static string SenderId => "1234567890126";
+
+    internal static string GridOperatorNumber => "1234567890122";
 }

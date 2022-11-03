@@ -32,13 +32,12 @@ namespace Messaging.Domain.Transactions.MoveIn
         private NotificationState _currentEnergySupplierNotificationState;
         private MasterDataState _meteringPointMasterDataState;
         private NotificationState _gridOperatorNotificationState = NotificationState.Pending;
-        private MasterDataState _customerMasterDataForGridOperatorDeliveryState;
+        private MasterDataState _customerMasterDataForGridOperatorDeliveryState = MasterDataState.Pending;
         private CustomerMasterData? _customerMasterData;
 
         public MoveInTransaction(string transactionId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId, string startedByMessageId, string newEnergySupplierId, string? consumerId, string? consumerName, string? consumerIdType, ActorNumber requestedBy)
         {
             _requestedBy = requestedBy;
-            _customerMasterDataForGridOperatorDeliveryState = MasterDataState.Pending;
             _businessProcessState = BusinessProcessState.Pending;
             _currentEnergySupplierNotificationState = currentEnergySupplierId is not null
                 ? NotificationState.Required
@@ -178,12 +177,6 @@ namespace Messaging.Domain.Transactions.MoveIn
             }
         }
 
-        public void SetCustomerMasterDataDeliveredWasToGridOperator()
-        {
-            if (_customerMasterDataForGridOperatorDeliveryState == MasterDataState.Pending)
-                _customerMasterDataForGridOperatorDeliveryState = MasterDataState.Sent;
-        }
-
         public void SetCurrentKnownCustomerMasterData(CustomerMasterData customerMasterData)
         {
             _customerMasterData = customerMasterData;
@@ -197,6 +190,11 @@ namespace Messaging.Domain.Transactions.MoveIn
 
         public void SendCustomerMasterDataToGridOperator(ActorNumber gridOperatorNumber)
         {
+            if (_customerMasterDataForGridOperatorDeliveryState == MasterDataState.Sent)
+            {
+                throw new MoveInException($"Customer master data has already been sent to the grid operator");
+            }
+
             _messages.Add(CharacteristicsOfACustomerAtAnApMessage.Create(
                 TransactionId,
                 ProcessType.MoveIn,
@@ -204,7 +202,7 @@ namespace Messaging.Domain.Transactions.MoveIn
                 MarketRole.GridOperator,
                 EffectiveDate,
                 _customerMasterData!));
-            SetCustomerMasterDataDeliveredWasToGridOperator();
+            _customerMasterDataForGridOperatorDeliveryState = MasterDataState.Sent;
         }
 
         private void SendCustomerMasterDataToNewEnergySupplier(CustomerMasterData customerMasterData)
