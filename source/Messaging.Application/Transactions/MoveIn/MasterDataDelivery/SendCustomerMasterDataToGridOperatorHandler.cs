@@ -17,7 +17,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.OutgoingMessages;
-using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Domain.Actors;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.Transactions.MoveIn;
@@ -27,23 +26,18 @@ namespace Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 public class SendCustomerMasterDataToGridOperatorHandler : IRequestHandler<SendCustomerMasterDataToGridOperator, Unit>
 {
     private readonly IMoveInTransactionRepository _transactionRepository;
-    private readonly IOutgoingMessageStore _outgoingMessageStore;
     private readonly IMarketEvaluationPointRepository _marketEvaluationPointRepository;
     private readonly IActorLookup _actorLookup;
-    private readonly CustomerMasterDataMessageFactory _messageFactory;
 
     public SendCustomerMasterDataToGridOperatorHandler(
         IMoveInTransactionRepository transactionRepository,
         IOutgoingMessageStore outgoingMessageStore,
         IMarketEvaluationPointRepository marketEvaluationPointRepository,
-        IActorLookup actorLookup,
-        CustomerMasterDataMessageFactory messageFactory)
+        IActorLookup actorLookup)
     {
         _transactionRepository = transactionRepository;
-        _outgoingMessageStore = outgoingMessageStore;
         _marketEvaluationPointRepository = marketEvaluationPointRepository;
         _actorLookup = actorLookup;
-        _messageFactory = messageFactory;
     }
 
     public async Task<Unit> Handle(SendCustomerMasterDataToGridOperator request, CancellationToken cancellationToken)
@@ -60,9 +54,6 @@ public class SendCustomerMasterDataToGridOperatorHandler : IRequestHandler<SendC
             await GetGridOperatorNumberAsync(transaction.MarketEvaluationPointId)
                 .ConfigureAwait(false);
 
-        // _outgoingMessageStore.Add(
-        //     await _messageFactory.CreateFromAsync(transaction, gridOperatorNumber, MarketRole.GridOperator)
-        //         .ConfigureAwait(false));
         transaction.SendCustomerMasterDataToGridOperator(gridOperatorNumber);
 
         return Unit.Value;
