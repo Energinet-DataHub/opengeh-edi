@@ -59,6 +59,7 @@ using Messaging.Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Infrastructure.OutgoingMessages.Requesting;
 using Messaging.Infrastructure.Transactions;
 using Messaging.Infrastructure.Transactions.MoveIn;
+using Messaging.Infrastructure.Transactions.UpdateCustomer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -93,6 +94,7 @@ namespace Messaging.Infrastructure.Configuration
             AddActorServices();
             AddProcessing();
             ReadModelHandlingConfiguration.AddReadModelHandling(services);
+            UpdateCustomerMasterDataConfiguration.Configure(services);
         }
 
         public static CompositionRoot Initialize(IServiceCollection services)
