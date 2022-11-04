@@ -12,22 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json.Serialization;
-using Messaging.Application.Configuration.Commands.Commands;
+using Messaging.IntegrationTests.Factories;
 using NodaTime;
 
-namespace Messaging.Application.Transactions.MoveIn.UpdateCustomer;
+namespace Messaging.IntegrationTests.Application.Transactions.UpdateCustomer;
 
-public class UpdateCustomerMasterData : InternalCommand
+internal static class SampleData
 {
-    [JsonConstructor]
-    public UpdateCustomerMasterData(string meteringPointNumber, Instant effectiveDateOfRunningTransaction)
-    {
-        MeteringPointNumber = meteringPointNumber;
-        EffectiveDateOfRunningTransaction = effectiveDateOfRunningTransaction;
-    }
+    internal static string TransactionId => "1234567890";
 
-    public string MeteringPointNumber { get; }
+    internal static string MarketEvaluationPointNumber => "571234567891234568";
 
-    public Instant EffectiveDateOfRunningTransaction { get; }
+    internal static Instant EffectiveDate => EffectiveDateFactory.InstantAsOfToday();
 }
