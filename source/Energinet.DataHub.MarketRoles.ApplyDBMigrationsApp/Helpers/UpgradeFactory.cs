@@ -16,16 +16,23 @@ using System;
 using System.Reflection;
 using DbUp.Reboot;
 using DbUp.Reboot.Engine;
+using Microsoft.Data.SqlClient;
 
 namespace Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.Helpers
 {
     public static class UpgradeFactory
     {
-        public static UpgradeEngine GetUpgradeEngine(string connectionString, Func<string, bool> scriptFilter, bool isDryRun = false)
+        public static UpgradeEngine GetUpgradeEngine(string connectionString, Func<string, bool> scriptFilter, bool isDryRun = false, bool isManagedIdentity = false)
         {
             if (string.IsNullOrWhiteSpace(connectionString))
             {
                 throw new ArgumentException("Connection string must have a value");
+            }
+
+            // This could be refactored to check for "Authentication=Active Directory Interactive" in the connectionstring
+            if (isManagedIdentity)
+            {
+                SqlAuthenticationProvider.SetProvider(SqlAuthenticationMethod.ActiveDirectoryInteractive, new SqlAppAuthenticationProvider());
             }
 
             EnsureDatabase.For.SqlDatabase(connectionString);
