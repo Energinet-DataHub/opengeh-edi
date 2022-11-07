@@ -134,6 +134,16 @@ public class MoveInTransactionTests
     }
 
     [Fact]
+    public void Customer_master_data_is_sent_to_the_grid_operator_once_only()
+    {
+        _transaction.SetCurrentKnownCustomerMasterData(CreateCustomerMasterData());
+        _transaction.SendCustomerMasterDataToGridOperator(ActorNumber.Create(SampleData.GridOperatorNumber));
+
+        Assert.Throws<MoveInException>(() =>
+            _transaction.SendCustomerMasterDataToGridOperator(ActorNumber.Create(SampleData.GridOperatorNumber)));
+    }
+
+    [Fact]
     public void Metering_point_master_data_is_sent()
     {
         _transaction.MarkMeteringPointMasterDataAsSent();

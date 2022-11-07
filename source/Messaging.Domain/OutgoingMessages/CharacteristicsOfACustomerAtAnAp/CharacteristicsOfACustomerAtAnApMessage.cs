@@ -20,7 +20,7 @@ namespace Messaging.Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 
 public class CharacteristicsOfACustomerAtAnApMessage : OutgoingMessage
 {
-    public CharacteristicsOfACustomerAtAnApMessage(DocumentType documentType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string marketActivityRecordPayload)
+    private CharacteristicsOfACustomerAtAnApMessage(DocumentType documentType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string marketActivityRecordPayload)
         : base(documentType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, marketActivityRecordPayload)
     {
         MarketActivityRecord =
@@ -28,7 +28,7 @@ public class CharacteristicsOfACustomerAtAnApMessage : OutgoingMessage
                 marketActivityRecordPayload);
     }
 
-    public CharacteristicsOfACustomerAtAnApMessage(DocumentType documentType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, MarketActivityRecord marketActivityRecord)
+    private CharacteristicsOfACustomerAtAnApMessage(DocumentType documentType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, MarketActivityRecord marketActivityRecord)
         : base(documentType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, new Serializer().Serialize(marketActivityRecord))
     {
         MarketActivityRecord = marketActivityRecord;
