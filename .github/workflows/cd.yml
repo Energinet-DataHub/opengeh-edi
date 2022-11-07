@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 name: CD
 
 on:
@@ -33,7 +34,7 @@ jobs:
   infrastructure_promote_prerelease:
     needs: changes
     if: ${{ needs.changes.outputs.infrastructure == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/promote-prerelease.yml@v8
+    uses: Energinet-DataHub/.github/.github/workflows/promote-prerelease.yml@v9
     with:
       RELEASE_NAME_PREFIX: infrastructure
 
@@ -44,7 +45,7 @@ jobs:
   dotnet_update_coverage_report:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@v8
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@v9
     with:
       SOLUTION_FILE_PATH: 'source/Energinet.DataHub.MarketRoles.sln'
       USE_SQLLOCALDB_2019: true
@@ -59,7 +60,7 @@ jobs:
   dotnet_promote_prerelease:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/promote-prerelease.yml@v8
+    uses: Energinet-DataHub/.github/.github/workflows/promote-prerelease.yml@v9
     with:
       RELEASE_NAME_PREFIX: dotnet
 
@@ -89,7 +90,7 @@ jobs:
       - run: echo "${{ toJSON(needs) }}"
 
       - name: Find associated pull request
-        uses: Energinet-DataHub/.github/.github/actions/find-related-pr-number@v8
+        uses: Energinet-DataHub/.github/.github/actions/find-related-pr-number@v9
         id: find_pull_request
 
       - name: Repository Dispatch
