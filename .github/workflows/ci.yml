@@ -63,7 +63,7 @@ jobs:
   messaging_integration_tests:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci-test.yml@v9
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v9
     with:
       TESTS_DLL_FILE_PATH: '\source\Messaging.IntegrationTests\bin\Release\net6.0\Messaging.IntegrationTests.dll'
       DOWNLOAD_ATTEMPT_LIMIT: 12
@@ -72,7 +72,7 @@ jobs:
   messaging_architecture_tests:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci-test.yml@v9
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v9
     with:
       TESTS_DLL_FILE_PATH: '\source\Messaging.ArchitectureTests\bin\Release\net6.0\Messaging.ArchitectureTests.dll'
       DOWNLOAD_ATTEMPT_LIMIT: 12
@@ -81,7 +81,7 @@ jobs:
   messaging_tests:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci-test.yml@v9
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v9
     with:
       TESTS_DLL_FILE_PATH: '\source\Messaging.Tests\bin\Release\net6.0\Messaging.Tests.dll'
       DOWNLOAD_ATTEMPT_LIMIT: 12
@@ -90,7 +90,7 @@ jobs:
   processing_architecture_tests:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci-test.yml@v9
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v9
     with:
       TESTS_DLL_FILE_PATH: '\source\Processing.ArchitectureTests\bin\Release\net6.0\Processing.ArchitectureTests.dll'
       DOWNLOAD_ATTEMPT_LIMIT: 12
@@ -99,7 +99,7 @@ jobs:
   processing_integration_tests:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci-test.yml@v9
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v9
     with:
       TESTS_DLL_FILE_PATH: '\source\Processing.IntegrationTests\bin\Release\net6.0\Processing.IntegrationTests.dll'
       DOWNLOAD_ATTEMPT_LIMIT: 12
@@ -116,7 +116,7 @@ jobs:
   processing_tests:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci-test.yml@v9
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v9
     with:
       TESTS_DLL_FILE_PATH: '\source\Processing.Tests\bin\Release\net6.0\Processing.Tests.dll'
       DOWNLOAD_ATTEMPT_LIMIT: 12
