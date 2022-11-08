@@ -22,6 +22,7 @@ module "mssql_database_application_access" {
                               module.func_processing.name,
                             ]
   deployagent_names       = data.azurerm_virtual_machine.deployagent.*.name
+  
   depends_on              = [
                               module.func_actor_sync.name,
                               module.func_receiver.name,
