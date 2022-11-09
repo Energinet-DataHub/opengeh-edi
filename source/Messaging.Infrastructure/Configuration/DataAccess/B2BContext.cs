@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using Contracts.BusinessRequests.MoveIn;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.AccountingPointCharacteristics;
 using Messaging.Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
@@ -28,6 +27,7 @@ using Messaging.Infrastructure.Configuration.InternalCommands;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.MasterData.MarketEvaluationPoints;
 using Messaging.Infrastructure.Transactions;
+using Messaging.Infrastructure.Transactions.UpdateCustomer;
 using Microsoft.EntityFrameworkCore;
 using MarketEvaluationPoint = Messaging.Domain.MasterData.MarketEvaluationPoints.MarketEvaluationPoint;
 
@@ -61,6 +61,7 @@ namespace Messaging.Infrastructure.Configuration.DataAccess
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
 
             modelBuilder.ApplyConfiguration(new MoveInTransactionEntityConfiguration(_serializer));
+            modelBuilder.ApplyConfiguration(new EntityConfiguration());
             modelBuilder.ApplyConfiguration(new OutgoingMessageEntityConfiguration());
             modelBuilder.ApplyConfiguration(new QueuedInternalCommandEntityConfiguration());
             modelBuilder.ApplyConfiguration(new MarketEvaluationPointEntityConfiguration());

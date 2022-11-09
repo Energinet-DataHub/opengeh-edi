@@ -19,6 +19,7 @@ using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 using Messaging.Application.Transactions.MoveIn.Notifications;
 using Messaging.Application.Transactions.MoveIn.UpdateCustomer;
+using Messaging.Application.Transactions.UpdateCustomer;
 using Messaging.Domain.Transactions.MoveIn.Events;
 using Messaging.Infrastructure.Transactions.MoveIn;
 using Messaging.Infrastructure.Transactions.MoveIn.UpdateCustomer;
@@ -49,7 +50,6 @@ internal static class MoveInConfiguration
         services.AddTransient<INotificationHandler<EndOfSupplyNotificationChangedToPending>, NotifyCurrentEnergySupplierWhenConsumerHasMovedIn>();
         services.AddTransient<INotificationHandler<BusinessProcessWasCompleted>, NotifyGridOperatorWhenConsumerHasMovedIn>();
         services.AddTransient<INotificationHandler<ADayHasPassed>, DispatchCustomerMasterDataForGridOperatorWhenGracePeriodHasExpired>();
-        services.AddTransient<CustomerMasterDataMessageFactory>();
         services.AddSingleton<IUpdateCustomerMasterDataRequestClient, UpdateCustomerMasterDataRequestClient>();
         services.AddSingleton(settings);
     }
