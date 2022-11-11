@@ -36,7 +36,7 @@ namespace Messaging.IntegrationTests.Fixtures
             _context = new B2BContext(optionsBuilder.Options, new Serializer());
         }
 
-        public string ConnectionString { get; } = @"Data Source=(LocalDB)\MSSQLLocalDB;Initial Catalog=B2BTransactions;Integrated Security=True;";
+        public string ConnectionString { get; } = @"Data Source=(LocalDB)\MSSQLLocalDB;Initial Catalog=B2BTransactions;Integrated Security=True;Connection Timeout=60";
 
         public Task InitializeAsync()
         {
