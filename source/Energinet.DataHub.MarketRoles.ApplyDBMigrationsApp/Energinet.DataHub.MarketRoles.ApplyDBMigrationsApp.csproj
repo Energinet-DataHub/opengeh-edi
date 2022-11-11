@@ -28,6 +28,7 @@ limitations under the License.
 
   <ItemGroup>
     <PackageReference Include="dbup-sqlserver" Version="4.5.0" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
   </ItemGroup>
 
   <ItemGroup>
