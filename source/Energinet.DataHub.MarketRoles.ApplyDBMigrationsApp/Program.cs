@@ -25,8 +25,7 @@ namespace Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp
             var connectionString = ConnectionStringFactory.GetConnectionString(args);
             var filter = EnvironmentFilter.GetFilter(args);
             var isDryRun = args.Contains("dryRun");
-
-            Console.WriteLine($"Args have been resolved to: dryRun = ${isDryRun}");
+            
             var upgrader = UpgradeFactory.GetUpgradeEngine(connectionString, filter, isDryRun);
 
             var result = upgrader.PerformUpgrade();
