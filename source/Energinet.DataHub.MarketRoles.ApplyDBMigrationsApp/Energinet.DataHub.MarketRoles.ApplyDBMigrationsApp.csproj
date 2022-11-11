@@ -29,6 +29,7 @@ limitations under the License.
   <ItemGroup>
     <PackageReference Include="DbUp.Reboot.SqlServer" Version="1.4.0" />
     <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.2" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
   </ItemGroup>
 
   <ItemGroup>
