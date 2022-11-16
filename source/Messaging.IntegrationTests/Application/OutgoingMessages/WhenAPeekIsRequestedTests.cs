@@ -13,10 +13,14 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using JetBrains.Annotations;
+using MediatR;
 using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Domain.OutgoingMessages.Peek;
 using Messaging.Domain.SeedWork;
+using Messaging.Infrastructure.Configuration.DataAccess;
+using Messaging.IntegrationTests.Application.Transactions.MoveIn;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 
@@ -42,10 +46,23 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task A_message_bundle_is_returned()
     {
-        var command = new PeekRequest(MessageCategory.MasterData);
+        await Scenario.Details(
+            SampleData.TransactionId,
+            SampleData.MeteringPointNumber,
+            SampleData.SupplyStart,
+            SampleData.CurrentEnergySupplierNumber,
+            SampleData.NewEnergySupplierNumber,
+            SampleData.ConsumerId,
+            SampleData.ConsumerIdType,
+            SampleData.ConsumerName,
+            SampleData.OriginalMessageId,
+            GetService<IMediator>(),
+            GetService<B2BContext>()).IsEffective().BuildAsync().ConfigureAwait(false);
 
+        var command = new PeekRequest(MessageCategory.MasterData);
         var result = await InvokeCommandAsync(command).ConfigureAwait(false);
 
         Assert.NotNull(result.Bundle);
+        var bundle = XDocument.Parse(result.Bundle!);
     }
 }

@@ -13,21 +13,64 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dapper;
 using MediatR;
+using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.Commands.Commands;
+using Messaging.Application.Configuration.DataAccess;
+using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Domain.OutgoingMessages.Peek;
 
 namespace Messaging.Application.OutgoingMessages.Peek;
 
 public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
 {
-    public Task<PeekResult> Handle(PeekRequest request, CancellationToken cancellationToken)
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly DocumentFactory _documentFactory;
+    private readonly IOutgoingMessageStore _outgoingMessageStore;
+
+    public PeekRequestHandler(ISystemDateTimeProvider systemDateTimeProvider, DocumentFactory documentFactory, IOutgoingMessageStore outgoingMessageStore)
+    {
+        _systemDateTimeProvider = systemDateTimeProvider;
+        _documentFactory = documentFactory;
+        _outgoingMessageStore = outgoingMessageStore;
+    }
+
+    public async Task<PeekResult> Handle(PeekRequest request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        if (request.MessageCategory == MessageCategory.MasterData) return Task.FromResult(new PeekResult("result"));
-        return Task.FromResult(new PeekResult(null));
+
+        if (request.MessageCategory == MessageCategory.MasterData)
+        {
+            var message = _outgoingMessageStore.GetUnpublished().First();
+
+            var bundle = CreateBundleFrom(new List<OutgoingMessage>() { message });
+            var cimMessage = bundle.CreateMessage();
+            var document = await _documentFactory.CreateFromAsync(cimMessage, CimFormat.Xml).ConfigureAwait(false);
+
+            using var reader = new StreamReader(document);
+            var text = await reader.ReadToEndAsync().ConfigureAwait(false);
+            return new PeekResult(text);
+        }
+
+        return new PeekResult(null);
+    }
+
+    private Bundle CreateBundleFrom(IReadOnlyList<OutgoingMessage> messages)
+    {
+        var bundle = new Bundle(_systemDateTimeProvider.Now());
+        foreach (var outgoingMessage in messages)
+        {
+            bundle.Add(outgoingMessage);
+        }
+
+        return bundle;
     }
 }
 
