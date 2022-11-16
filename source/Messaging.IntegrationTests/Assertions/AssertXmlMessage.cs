@@ -16,13 +16,25 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+using Messaging.Domain.OutgoingMessages;
 using Xunit;
 
 namespace Messaging.IntegrationTests.Assertions
 {
-    internal static class AssertXmlMessage
+    internal class AssertXmlMessage
     {
         private const string MarketActivityRecordElementName = "MktActivityRecord";
+        private readonly XDocument _document;
+
+        private AssertXmlMessage(XDocument document)
+        {
+            _document = document;
+        }
+
+        internal static AssertXmlMessage Document(XDocument document)
+        {
+            return new AssertXmlMessage(document);
+        }
 
         internal static string? GetMessageHeaderValue(XDocument document, string elementName)
         {
@@ -60,6 +72,12 @@ namespace Messaging.IntegrationTests.Assertions
         internal static void AssertMarketActivityRecordCount(XDocument document, int expectedCount)
         {
             Assert.Equal(expectedCount, GetMarketActivityRecords(document).Count);
+        }
+
+        internal AssertXmlMessage IsDocumentType(DocumentType documentType)
+        {
+            Assert.Equal(documentType.Name + "_MarketDocument", _document.Root!.Name.LocalName);
+            return this;
         }
 
         private static XElement? GetHeaderElement(XDocument document)

@@ -17,10 +17,12 @@ using System.Xml.Linq;
 using JetBrains.Annotations;
 using MediatR;
 using Messaging.Application.OutgoingMessages.Peek;
+using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.Peek;
 using Messaging.Domain.SeedWork;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.IntegrationTests.Application.Transactions.MoveIn;
+using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 
@@ -63,6 +65,8 @@ public class WhenAPeekIsRequestedTests : TestBase
         var result = await InvokeCommandAsync(command).ConfigureAwait(false);
 
         Assert.NotNull(result.Bundle);
-        var bundle = XDocument.Parse(result.Bundle!);
+        var bundle = XDocument.Load(result.Bundle!);
+
+        AssertXmlMessage.Document(bundle).IsDocumentType(DocumentType.ConfirmRequestChangeOfSupplier);
     }
 }

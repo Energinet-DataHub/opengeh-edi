@@ -18,13 +18,10 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Dapper;
 using MediatR;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.Commands.Commands;
-using Messaging.Application.Configuration.DataAccess;
 using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Domain.OutgoingMessages.Peek;
 
 namespace Messaging.Application.OutgoingMessages.Peek;
@@ -54,9 +51,7 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
             var cimMessage = bundle.CreateMessage();
             var document = await _documentFactory.CreateFromAsync(cimMessage, CimFormat.Xml).ConfigureAwait(false);
 
-            using var reader = new StreamReader(document);
-            var text = await reader.ReadToEndAsync().ConfigureAwait(false);
-            return new PeekResult(text);
+            return new PeekResult(document);
         }
 
         return new PeekResult(null);
@@ -76,4 +71,4 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
 
 public record PeekRequest(MessageCategory MessageCategory) : ICommand<PeekResult>;
 
-public record PeekResult(string? Bundle);
+public record PeekResult(Stream? Bundle);
