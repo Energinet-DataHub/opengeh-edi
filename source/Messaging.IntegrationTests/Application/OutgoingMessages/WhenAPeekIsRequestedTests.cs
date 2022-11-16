@@ -65,8 +65,9 @@ public class WhenAPeekIsRequestedTests : TestBase
         var result = await InvokeCommandAsync(command).ConfigureAwait(false);
 
         Assert.NotNull(result.Bundle);
-        var bundle = XDocument.Load(result.Bundle!);
 
-        AssertXmlMessage.Document(bundle).IsDocumentType(DocumentType.ConfirmRequestChangeOfSupplier);
+        AssertXmlMessage.Document(XDocument.Load(result.Bundle!))
+            .IsDocumentType(DocumentType.ConfirmRequestChangeOfSupplier)
+            .IsProcesType(ProcessType.MoveIn);
     }
 }

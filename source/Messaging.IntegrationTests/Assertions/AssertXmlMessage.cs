@@ -80,6 +80,18 @@ namespace Messaging.IntegrationTests.Assertions
             return this;
         }
 
+        internal AssertXmlMessage IsProcesType(ProcessType processType)
+        {
+            Assert.Equal(processType.Code, GetMessageHeaderValue("process.processType"));
+            return this;
+        }
+
+        internal string? GetMessageHeaderValue(string elementName)
+        {
+            var header = GetHeaderElement(_document);
+            return header?.Element(header.Name.Namespace + elementName)?.Value;
+        }
+
         private static XElement? GetHeaderElement(XDocument document)
         {
             return document.Root;
