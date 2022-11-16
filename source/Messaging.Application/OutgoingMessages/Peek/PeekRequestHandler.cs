@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.Configuration.Commands.Commands;
+using Messaging.Domain.OutgoingMessages.Peek;
 
 namespace Messaging.Application.OutgoingMessages.Peek;
 
@@ -23,10 +25,12 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
 {
     public Task<PeekResult> Handle(PeekRequest request, CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(request);
+        if (request.MessageCategory == MessageCategory.MasterData) return Task.FromResult(new PeekResult("result"));
         return Task.FromResult(new PeekResult(null));
     }
 }
 
-public record PeekRequest() : ICommand<PeekResult>;
+public record PeekRequest(MessageCategory MessageCategory) : ICommand<PeekResult>;
 
 public record PeekResult(string? Bundle);

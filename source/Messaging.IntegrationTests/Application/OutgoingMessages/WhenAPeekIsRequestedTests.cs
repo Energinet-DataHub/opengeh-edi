@@ -13,7 +13,10 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Messaging.Application.OutgoingMessages.Peek;
+using Messaging.Domain.OutgoingMessages.Peek;
+using Messaging.Domain.SeedWork;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 
@@ -29,10 +32,20 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task When_no_messages_are_available_return_empty_result()
     {
-        var command = new PeekRequest();
+        var command = new PeekRequest(MessageCategory.AggregationData);
 
         var result = await InvokeCommandAsync(command).ConfigureAwait(false);
 
         Assert.Null(result.Bundle);
+    }
+
+    [Fact]
+    public async Task A_message_bundle_is_returned()
+    {
+        var command = new PeekRequest(MessageCategory.MasterData);
+
+        var result = await InvokeCommandAsync(command).ConfigureAwait(false);
+
+        Assert.NotNull(result.Bundle);
     }
 }
