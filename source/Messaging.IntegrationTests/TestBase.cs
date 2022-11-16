@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using MediatR;
 using Messaging.Api.Configuration.Middleware.Correlation;
+using Messaging.Application.Configuration.Commands.Commands;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.MessageBus;
@@ -104,6 +105,11 @@ namespace Messaging.IntegrationTests
         }
 
         protected Task InvokeCommandAsync(object command)
+        {
+            return GetService<IMediator>().Send(command);
+        }
+
+        protected Task<TResult> InvokeCommandAsync<TResult>(ICommand<TResult> command)
         {
             return GetService<IMediator>().Send(command);
         }
