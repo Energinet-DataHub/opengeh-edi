@@ -13,18 +13,39 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Messaging.Application.Configuration.Commands.Commands;
+using Messaging.Domain.OutgoingMessages;
+using Messaging.Infrastructure.Configuration.DataAccess;
 
 namespace Messaging.Infrastructure.Configuration.Processing;
 
 public class AssignOutgoingMessagesToBundlesBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : IRequest<TResponse>
+    where TRequest : ICommand<TResponse>
 {
+    private readonly B2BContext _b2BContext;
+
+    public AssignOutgoingMessagesToBundlesBehaviour(B2BContext b2BContext)
+    {
+        _b2BContext = b2BContext;
+    }
+
     public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
     {
         ArgumentNullException.ThrowIfNull(next);
+        var outgoingMessages = _b2BContext
+            .ChangeTracker
+            .Entries<OutgoingMessage>()
+            .Select(entity => entity.Entity).ToList();
+
+        foreach (var message in outgoingMessages)
+        {
+            message.SetBundleId(Guid.NewGuid());
+        }
+
         return await next().ConfigureAwait(false);
     }
 }
