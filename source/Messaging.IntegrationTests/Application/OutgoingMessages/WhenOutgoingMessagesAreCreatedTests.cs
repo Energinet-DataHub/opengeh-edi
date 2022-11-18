@@ -47,10 +47,12 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase
             GetService<IMediator>(),
             GetService<B2BContext>()).IsEffective().BuildAsync().ConfigureAwait(false);
 
-        AssertOutgoingMessage.OutgoingMessage(
+        AssertOutgoingMessage
+            .OutgoingMessage(
             SampleData.TransactionId,
             DocumentType.ConfirmRequestChangeOfSupplier.Name,
             ProcessType.MoveIn.Code,
-            GetService<IDbConnectionFactory>());
+            GetService<IDbConnectionFactory>())
+            .HasBundleId();
     }
 }

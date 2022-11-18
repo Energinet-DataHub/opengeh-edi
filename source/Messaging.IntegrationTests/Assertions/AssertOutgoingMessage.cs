@@ -36,7 +36,7 @@ namespace Messaging.IntegrationTests.Assertions
             if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
             var message = connectionFactory.GetOpenConnection().QuerySingle(
                 $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.TransactionId, m.ProcessType," +
-                $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MarketActivityRecordPayload " +
+                $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MarketActivityRecordPayload, m.BundleId " +
                 $" FROM [b2b].[OutgoingMessages] m" +
                 $" WHERE m.TransactionId = '{transactionId}' AND m.DocumentType = '{documentType}' AND m.ProcessType = '{processType}'");
 
@@ -50,7 +50,7 @@ namespace Messaging.IntegrationTests.Assertions
             ArgumentNullException.ThrowIfNull(receiverRole);
             var message = connectionFactory.GetOpenConnection().QuerySingle(
                 $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.TransactionId, m.ProcessType," +
-                $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MarketActivityRecordPayload " +
+                $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MarketActivityRecordPayload, m.BundleId " +
                 $" FROM [b2b].[OutgoingMessages] m" +
                 $" WHERE m.TransactionId = '{transactionId}' AND m.DocumentType = '{documentType}' AND m.ProcessType = '{processType}' AND m.ReceiverRole = '{receiverRole.Name}'");
 
@@ -79,6 +79,12 @@ namespace Messaging.IntegrationTests.Assertions
         public AssertOutgoingMessage HasSenderRole(string senderRole)
         {
             Assert.Equal(senderRole, _message.SenderRole);
+            return this;
+        }
+
+        public AssertOutgoingMessage HasBundleId()
+        {
+            Assert.NotNull(_message.BundleId);
             return this;
         }
 
