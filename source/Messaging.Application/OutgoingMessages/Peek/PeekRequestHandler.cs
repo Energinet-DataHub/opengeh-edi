@@ -45,9 +45,12 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
 
         if (request.MessageCategory == MessageCategory.MasterData)
         {
-            var message = _outgoingMessageStore.GetUnpublished().First();
+            var message = _outgoingMessageStore
+                .GetUnpublished()
+                .Where(message => message.DocumentType == DocumentType.RejectRequestChangeOfSupplier)
+                .ToList();
 
-            var bundle = CreateBundleFrom(new List<OutgoingMessage>() { message });
+            var bundle = CreateBundleFrom(message);
             var cimMessage = bundle.CreateMessage();
             var document = await _documentFactory.CreateFromAsync(cimMessage, CimFormat.Xml).ConfigureAwait(false);
 
