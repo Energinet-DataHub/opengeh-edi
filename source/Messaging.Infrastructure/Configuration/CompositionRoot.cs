@@ -289,7 +289,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddScoped<DomainEventsAccessor>();
             _services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehaviour<,>));
             _services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RaiseDomainEventsBehaviour<,>));
-            // _services.AddTransient(typeof(IPipelineBehavior<,>), typeof(AssignOutgoingMessagesToBundlesBehaviour<,>));
+            _services.AddTransient(typeof(IPipelineBehavior<,>), typeof(AssignOutgoingMessagesToBundlesBehaviour<,>));
         }
     }
 }

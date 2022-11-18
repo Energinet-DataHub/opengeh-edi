@@ -47,7 +47,7 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
         {
             var message = _outgoingMessageStore
                 .GetUnpublished()
-                .Where(message => message.DocumentType == DocumentType.RejectRequestChangeOfSupplier)
+                .Where(message => message.DocumentType == DocumentType.ConfirmRequestChangeOfSupplier)
                 .ToList();
 
             var bundle = CreateBundleFrom(message);

@@ -15,8 +15,11 @@
 using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
+using Messaging.Application.Transactions.MoveIn;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Configuration.DataAccess;
+using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Application.Transactions.MoveIn;
 using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
@@ -34,18 +37,7 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase
     [Fact]
     public async Task A_bundle_id_is_assigned()
     {
-        await Scenario.Details(
-            SampleData.TransactionId,
-            SampleData.MeteringPointNumber,
-            SampleData.SupplyStart,
-            SampleData.CurrentEnergySupplierNumber,
-            SampleData.NewEnergySupplierNumber,
-            SampleData.ConsumerId,
-            SampleData.ConsumerIdType,
-            SampleData.ConsumerName,
-            SampleData.OriginalMessageId,
-            GetService<IMediator>(),
-            GetService<B2BContext>()).IsEffective().BuildAsync().ConfigureAwait(false);
+        await GivenRequestHasBeenAccepted().ConfigureAwait(false);
 
         AssertOutgoingMessage
             .OutgoingMessage(
@@ -54,5 +46,25 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase
             ProcessType.MoveIn.Code,
             GetService<IDbConnectionFactory>())
             .HasBundleId();
+    }
+
+    private static IncomingMessageBuilder MessageBuilder()
+    {
+        return new IncomingMessageBuilder()
+            .WithEnergySupplierId(SampleData.NewEnergySupplierNumber)
+            .WithMessageId(SampleData.OriginalMessageId)
+            .WithTransactionId(SampleData.TransactionId);
+    }
+
+    private async Task GivenRequestHasBeenAccepted()
+    {
+        var incomingMessage = MessageBuilder()
+            .WithProcessType(ProcessType.MoveIn.Code)
+            .WithReceiver(SampleData.ReceiverId)
+            .WithSenderId(SampleData.SenderId)
+            .WithConsumerName(SampleData.ConsumerName)
+            .Build();
+
+        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
     }
 }

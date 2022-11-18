@@ -36,6 +36,8 @@ public class AssignOutgoingMessagesToBundlesBehaviour<TRequest, TResponse> : IPi
     public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
     {
         ArgumentNullException.ThrowIfNull(next);
+        var result = await next().ConfigureAwait(false);
+
         var outgoingMessages = _b2BContext
             .ChangeTracker
             .Entries<OutgoingMessage>()
@@ -46,6 +48,6 @@ public class AssignOutgoingMessagesToBundlesBehaviour<TRequest, TResponse> : IPi
             message.SetBundleId(Guid.NewGuid());
         }
 
-        return await next().ConfigureAwait(false);
+        return result;
     }
 }
