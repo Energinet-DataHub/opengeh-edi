@@ -19,7 +19,7 @@ using Messaging.Domain.OutgoingMessages.Peek;
 
 namespace Messaging.Application.OutgoingMessages.Peek;
 
-public class OutgoingMessages : IOutgoingMessages
+public class ZzOutgoingMessages : IOutgoingMessages
 {
     public Task<OutgoingMessage?> GetNextAsync(ActorNumber actorNumber, MessageCategory requestMessageCategory)
     {
