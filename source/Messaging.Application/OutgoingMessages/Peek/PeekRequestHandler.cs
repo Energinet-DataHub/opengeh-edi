@@ -32,30 +32,30 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
 {
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly DocumentFactory _documentFactory;
-    private readonly IOutgoingMessageQueue _outgoingMessageQueue;
+    private readonly IOutgoingMessages _outgoingMessages;
 
-    public PeekRequestHandler(ISystemDateTimeProvider systemDateTimeProvider, DocumentFactory documentFactory, IOutgoingMessageQueue outgoingMessageQueue)
+    public PeekRequestHandler(ISystemDateTimeProvider systemDateTimeProvider, DocumentFactory documentFactory, IOutgoingMessages outgoingMessages)
     {
         _systemDateTimeProvider = systemDateTimeProvider;
         _documentFactory = documentFactory;
-        _outgoingMessageQueue = outgoingMessageQueue;
+        _outgoingMessages = outgoingMessages;
     }
 
     public async Task<PeekResult> Handle(PeekRequest request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var nextMessage = await _outgoingMessageQueue.GetNextAsync(request.ActorNumber, request.MessageCategory).ConfigureAwait(false);
+        var nextMessage = await _outgoingMessages.GetNextAsync(request.ActorNumber, request.MessageCategory).ConfigureAwait(false);
 
         if (nextMessage is not null)
         {
             var documentTypeToBundle = nextMessage.DocumentType;
             var processTypeToBundle = nextMessage.ProcessType;
             var actorRoleTypeToBundle = nextMessage.ReceiverRole;
-            var message = await _outgoingMessageQueue.GetNextByAsync(documentTypeToBundle, processTypeToBundle, actorRoleTypeToBundle).ConfigureAwait(false);
+            var message = await _outgoingMessages.GetNextByAsync(documentTypeToBundle, processTypeToBundle, actorRoleTypeToBundle).ConfigureAwait(false);
             while (message != null)
             {
-                message = await _outgoingMessageQueue.GetNextByAsync(documentTypeToBundle, processTypeToBundle, actorRoleTypeToBundle).ConfigureAwait(false);
+                message = await _outgoingMessages.GetNextByAsync(documentTypeToBundle, processTypeToBundle, actorRoleTypeToBundle).ConfigureAwait(false);
             }
         }
 

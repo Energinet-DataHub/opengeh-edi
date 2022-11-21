@@ -20,7 +20,7 @@ using Messaging.Domain.OutgoingMessages.Peek;
 namespace Messaging.Application.OutgoingMessages.Peek;
 
 #pragma warning disable
-public interface IOutgoingMessageQueue
+public interface IOutgoingMessages
 {
     Task<OutgoingMessage?> GetNextAsync(ActorNumber actorNumber, MessageCategory requestMessageCategory);
     Task<OutgoingMessage?> GetNextByAsync(DocumentType documentTypeToBundle, string processTypeToBundle, MarketRole actorRoleTypeToBundle);
