@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -21,6 +22,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.Commands.Commands;
+using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.Peek;
 
@@ -30,33 +32,46 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
 {
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly DocumentFactory _documentFactory;
-    private readonly IOutgoingMessageStore _outgoingMessageStore;
+    private readonly IOutgoingMessageQueue _outgoingMessageQueue;
 
-    public PeekRequestHandler(ISystemDateTimeProvider systemDateTimeProvider, DocumentFactory documentFactory, IOutgoingMessageStore outgoingMessageStore)
+    public PeekRequestHandler(ISystemDateTimeProvider systemDateTimeProvider, DocumentFactory documentFactory, IOutgoingMessageQueue outgoingMessageQueue)
     {
         _systemDateTimeProvider = systemDateTimeProvider;
         _documentFactory = documentFactory;
-        _outgoingMessageStore = outgoingMessageStore;
+        _outgoingMessageQueue = outgoingMessageQueue;
     }
 
     public async Task<PeekResult> Handle(PeekRequest request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        if (request.MessageCategory == MessageCategory.MasterData)
+        var nextMessage = await _outgoingMessageQueue.GetNextAsync(request.ActorNumber, request.MessageCategory).ConfigureAwait(false);
+
+        if (nextMessage is not null)
         {
-            var message = _outgoingMessageStore
-                .GetUnpublished()
-                .Where(message => message.DocumentType == DocumentType.ConfirmRequestChangeOfSupplier)
-                .ToList();
-
-            var bundle = CreateBundleFrom(message);
-            var cimMessage = bundle.CreateMessage();
-            var document = await _documentFactory.CreateFromAsync(cimMessage, CimFormat.Xml).ConfigureAwait(false);
-
-            return new PeekResult(document);
+            var documentTypeToBundle = nextMessage.DocumentType;
+            var processTypeToBundle = nextMessage.ProcessType;
+            var actorRoleTypeToBundle = nextMessage.ReceiverRole;
+            var message = await _outgoingMessageQueue.GetNextByAsync(documentTypeToBundle, processTypeToBundle, actorRoleTypeToBundle).ConfigureAwait(false);
+            while (message != null)
+            {
+                message = await _outgoingMessageQueue.GetNextByAsync(documentTypeToBundle, processTypeToBundle, actorRoleTypeToBundle).ConfigureAwait(false);
+            }
         }
 
+        // if (request.MessageCategory == MessageCategory.MasterData)
+        // {
+        //     var message = _outgoingMessageQueue
+        //         .GetUnpublished()
+        //         .Where(message => message.DocumentType == DocumentType.ConfirmRequestChangeOfSupplier)
+        //         .ToList();
+        //
+        //     var bundle = CreateBundleFrom(message);
+        //     var cimMessage = bundle.CreateMessage();
+        //     var document = await _documentFactory.CreateFromAsync(cimMessage, CimFormat.Xml).ConfigureAwait(false);
+        //
+        //     return new PeekResult(document);
+        // }
         return new PeekResult(null);
     }
 
@@ -72,6 +87,6 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
     }
 }
 
-public record PeekRequest(MessageCategory MessageCategory) : ICommand<PeekResult>;
+public record PeekRequest(ActorNumber ActorNumber, MessageCategory MessageCategory) : ICommand<PeekResult>;
 
 public record PeekResult(Stream? Bundle);

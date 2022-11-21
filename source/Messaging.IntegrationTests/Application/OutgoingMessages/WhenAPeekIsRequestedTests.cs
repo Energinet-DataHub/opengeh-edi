@@ -17,6 +17,7 @@ using System.Xml.Linq;
 using JetBrains.Annotations;
 using MediatR;
 using Messaging.Application.OutgoingMessages.Peek;
+using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.Peek;
 using Messaging.Domain.SeedWork;
@@ -38,7 +39,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task When_no_messages_are_available_return_empty_result()
     {
-        var command = new PeekRequest(MessageCategory.AggregationData);
+        var command = new PeekRequest(ActorNumber.Create(SampleData.NewEnergySupplierNumber), MessageCategory.AggregationData);
 
         var result = await InvokeCommandAsync(command).ConfigureAwait(false);
 
@@ -61,7 +62,7 @@ public class WhenAPeekIsRequestedTests : TestBase
             GetService<IMediator>(),
             GetService<B2BContext>()).IsEffective().BuildAsync().ConfigureAwait(false);
 
-        var command = new PeekRequest(MessageCategory.MasterData);
+        var command = new PeekRequest(ActorNumber.Create(SampleData.NewEnergySupplierNumber), MessageCategory.MasterData);
         var result = await InvokeCommandAsync(command).ConfigureAwait(false);
 
         Assert.NotNull(result.Bundle);

@@ -16,6 +16,7 @@ using System.Net;
 using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.OutgoingMessages.Peek;
+using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages.Peek;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -37,7 +38,7 @@ public class PeekRequestListener
         HttpRequestData request,
         FunctionContext executionContext)
     {
-        var result = await _mediator.Send(new PeekRequest(MessageCategory.MasterData)).ConfigureAwait(false);
+        var result = await _mediator.Send(new PeekRequest(ActorNumber.Create("1234567890123"),  MessageCategory.MasterData)).ConfigureAwait(false);
         var response = HttpResponseData.CreateResponse(request);
         if (result.Bundle is null)
         {
