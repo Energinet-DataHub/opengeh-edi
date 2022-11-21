@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
+using Dapper;
 using MediatR;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
@@ -27,11 +28,31 @@ using Xunit;
 
 namespace Messaging.IntegrationTests.Application.OutgoingMessages;
 
-public class WhenOutgoingMessagesAreCreatedTests : TestBase
+public class WhenOutgoingMessagesAreCreatedTests : TestBase, IAsyncLifetime
 {
     public WhenOutgoingMessagesAreCreatedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
+    }
+
+    public async Task InitializeAsync()
+    {
+        await GetService<IDbConnectionFactory>().GetOpenConnection().ExecuteAsync(
+            $"CREATE TABLE [B2B].ActorMessageQueue_{SampleData.CurrentEnergySupplierNumber}" +
+            $@"(
+                [RecordId]                         [int] IDENTITY (1,1) NOT NULL,
+            [Id]                    [uniqueIdentifier]       NOT NULL,
+            CONSTRAINT [PK_Id] PRIMARY KEY NONCLUSTERED
+                (
+            [Id] ASC
+            ) WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF) ON [PRIMARY]
+            ) ON [PRIMARY]").ConfigureAwait(false);
+    }
+
+    public async Task DisposeAsync()
+    {
+        await GetService<IDbConnectionFactory>().GetOpenConnection().ExecuteAsync(
+            $"DROP TABLE  [B2B].ActorMessageQueue_{SampleData.CurrentEnergySupplierNumber}").ConfigureAwait(false);
     }
 
     [Fact]
@@ -46,6 +67,20 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase
             ProcessType.MoveIn.Code,
             GetService<IDbConnectionFactory>())
             .HasBundleId();
+    }
+
+    [Fact]
+    public async Task Outgoing_message_is_enqueued()
+    {
+        await GivenRequestHasBeenAccepted().ConfigureAwait(false);
+
+        var sql = $"SELECT * FROM [B2B].[ActorMessageQueue_{SampleData.CurrentEnergySupplierNumber}]";
+        var result = await GetService<IDbConnectionFactory>()
+            .GetOpenConnection()
+            .QuerySingleOrDefaultAsync(sql)
+            .ConfigureAwait(false);
+
+        Assert.NotNull(result);
     }
 
     private static IncomingMessageBuilder MessageBuilder()
