@@ -52,11 +52,24 @@ public class AssignOutgoingMessagesToBundlesBehaviour<TRequest, TResponse> : IPi
         foreach (var message in outgoingMessages)
         {
             message.SetBundleId(Guid.NewGuid());
-            var sql = $"INSERT INTO [B2B].[ActorMessageQueue_{message.ReceiverId.Value}] VALUES (@Id)";
-            await _dbConnectionFactory.GetOpenConnection()
-                .ExecuteAsync(sql, new { Id = Guid.NewGuid() }, _b2BContext.Database.CurrentTransaction?.GetDbTransaction()).ConfigureAwait(false);
+            await StoreToActorMessageQueueAsync(message).ConfigureAwait(false);
         }
 
         return result;
+    }
+
+    private async Task StoreToActorMessageQueueAsync(OutgoingMessage message)
+    {
+        var sql = $"INSERT INTO [B2B].[ActorMessageQueue_{message.ReceiverId.Value}] VALUES (@Id, @DocumentType)";
+        await _dbConnectionFactory.GetOpenConnection()
+            .ExecuteAsync(
+                sql,
+                new
+                {
+                    Id = Guid.NewGuid(),
+                    DocumentType = message.DocumentType.Name,
+                },
+                _b2BContext.Database.CurrentTransaction?.GetDbTransaction())
+            .ConfigureAwait(false);
     }
 }

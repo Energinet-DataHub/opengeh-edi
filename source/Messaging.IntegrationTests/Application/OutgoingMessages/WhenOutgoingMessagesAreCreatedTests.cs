@@ -38,10 +38,11 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase, IAsyncLifetime
     public async Task InitializeAsync()
     {
         await GetService<IDbConnectionFactory>().GetOpenConnection().ExecuteAsync(
-            $"CREATE TABLE [B2B].ActorMessageQueue_{SampleData.NewEnergySupplierNumber}" +
-            $@"(
-                [RecordId]                         [int] IDENTITY (1,1) NOT NULL,
-            [Id]                    [uniqueIdentifier]       NOT NULL,
+            $@"DROP TABLE IF EXISTS [B2B].ActorMessageQueue_{SampleData.NewEnergySupplierNumber};
+            CREATE TABLE [B2B].ActorMessageQueue_{SampleData.NewEnergySupplierNumber}(
+                [RecordId]                            [int] IDENTITY (1,1) NOT NULL,
+            [Id]                         [uniqueIdentifier]       NOT NULL,
+            [DocumentType]                    [VARCHAR](100)       NOT NULL,
             CONSTRAINT [PK_Id] PRIMARY KEY NONCLUSTERED
                 (
             [Id] ASC
@@ -81,6 +82,7 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase, IAsyncLifetime
             .ConfigureAwait(false);
 
         Assert.NotNull(result);
+        Assert.Equal(result.DocumentType, DocumentType.ConfirmRequestChangeOfSupplier.Name);
     }
 
     private static IncomingMessageBuilder MessageBuilder()
