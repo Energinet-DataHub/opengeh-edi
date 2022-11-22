@@ -24,4 +24,6 @@ public interface IOutgoingMessages
 {
     Task<OutgoingMessage?> GetNextAsync(ActorNumber actorNumber, MessageCategory requestMessageCategory);
     Task<OutgoingMessage?> GetNextByAsync(DocumentType documentTypeToBundle, string processTypeToBundle, MarketRole actorRoleTypeToBundle);
+
+    Task EnqueueAsync(OutgoingMessage message);
 }

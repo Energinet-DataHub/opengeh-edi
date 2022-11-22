@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Data;
 using System.Threading.Tasks;
 using Messaging.Application.Configuration.DataAccess;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Messaging.Infrastructure.Configuration.DataAccess
 {
@@ -25,6 +27,8 @@ namespace Messaging.Infrastructure.Configuration.DataAccess
         {
             _context = context;
         }
+
+        public IDbTransaction? CurrentTransaction => _context.Database.CurrentTransaction?.GetDbTransaction();
 
         public Task CommitAsync()
         {
