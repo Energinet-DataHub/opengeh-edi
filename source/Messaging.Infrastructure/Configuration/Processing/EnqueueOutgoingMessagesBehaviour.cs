@@ -27,13 +27,13 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Messaging.Infrastructure.Configuration.Processing;
 
-public class AssignOutgoingMessagesToBundlesBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+public class EnqueueOutgoingMessagesBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : ICommand<TResponse>
 {
     private readonly B2BContext _b2BContext;
     private readonly IDbConnectionFactory _dbConnectionFactory;
 
-    public AssignOutgoingMessagesToBundlesBehaviour(B2BContext b2BContext, IDbConnectionFactory dbConnectionFactory)
+    public EnqueueOutgoingMessagesBehaviour(B2BContext b2BContext, IDbConnectionFactory dbConnectionFactory)
     {
         _b2BContext = b2BContext;
         _dbConnectionFactory = dbConnectionFactory;
@@ -62,7 +62,7 @@ public class AssignOutgoingMessagesToBundlesBehaviour<TRequest, TResponse> : IPi
     {
         var sql = @$"IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ActorMessageQueue_{message.ReceiverId.Value}' and xtype='U')
         CREATE TABLE [B2B].ActorMessageQueue_{message.ReceiverId.Value}(
-            [RecordId]                            [int] IDENTITY (1,1) NOT NULL,
+        [RecordId]                        [int] IDENTITY (1,1) NOT NULL,
         [Id]                              [uniqueIdentifier] NOT NULL,
         [DocumentType]                    [VARCHAR](255)     NOT NULL,
         [ReceiverId]                      [VARCHAR](255)     NOT NULL,
