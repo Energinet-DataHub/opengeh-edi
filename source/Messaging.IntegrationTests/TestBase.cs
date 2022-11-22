@@ -46,6 +46,7 @@ namespace Messaging.IntegrationTests
             _databaseFixture = databaseFixture;
             _databaseFixture.CleanupDatabase();
 
+            Environment.SetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE", "true");
             _services = new ServiceCollection();
 
             _services.AddSingleton(new EnergySupplyingServiceBusClientConfiguration("Fake", "Fake"));

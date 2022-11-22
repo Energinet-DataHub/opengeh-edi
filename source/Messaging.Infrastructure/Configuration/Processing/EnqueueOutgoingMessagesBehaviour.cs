@@ -20,6 +20,7 @@ using MediatR;
 using Messaging.Application.Configuration.Commands.Commands;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Configuration.DataAccess;
+using Messaging.Infrastructure.Configuration.FeatureFlag;
 using Messaging.Infrastructure.OutgoingMessages;
 
 namespace Messaging.Infrastructure.Configuration.Processing;
@@ -29,17 +30,24 @@ public class EnqueueOutgoingMessagesBehaviour<TRequest, TResponse> : IPipelineBe
 {
     private readonly B2BContext _b2BContext;
     private readonly OutgoingMessageEnqueuer _outgoingMessageEnqueuer;
+    private readonly IFeatureFlagProvider _featureFlagProvider;
 
-    public EnqueueOutgoingMessagesBehaviour(B2BContext b2BContext, OutgoingMessageEnqueuer outgoingMessageEnqueuer)
+    public EnqueueOutgoingMessagesBehaviour(B2BContext b2BContext, OutgoingMessageEnqueuer outgoingMessageEnqueuer, IFeatureFlagProvider featureFlagProvider)
     {
         _b2BContext = b2BContext;
         _outgoingMessageEnqueuer = outgoingMessageEnqueuer;
+        _featureFlagProvider = featureFlagProvider;
     }
 
     public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
     {
         ArgumentNullException.ThrowIfNull(next);
         var result = await next().ConfigureAwait(false);
+
+        if (!_featureFlagProvider.IsActorMessageQueueEnabled)
+        {
+            return result;
+        }
 
         var outgoingMessages = _b2BContext
             .ChangeTracker
