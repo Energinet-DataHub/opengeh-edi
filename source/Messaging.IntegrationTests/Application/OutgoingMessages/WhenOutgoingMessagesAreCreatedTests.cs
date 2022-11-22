@@ -43,6 +43,7 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase, IAsyncLifetime
                 [RecordId]                            [int] IDENTITY (1,1) NOT NULL,
             [Id]                         [uniqueIdentifier]       NOT NULL,
             [DocumentType]                    [VARCHAR](100)       NOT NULL,
+            [ReceiverId]                      [VARCHAR](255)      NOT NULL,
             CONSTRAINT [PK_Id] PRIMARY KEY NONCLUSTERED
                 (
             [Id] ASC
@@ -83,6 +84,7 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase, IAsyncLifetime
 
         Assert.NotNull(result);
         Assert.Equal(result.DocumentType, DocumentType.ConfirmRequestChangeOfSupplier.Name);
+        Assert.Equal(result.ReceiverId, SampleData.NewEnergySupplierNumber);
     }
 
     private static IncomingMessageBuilder MessageBuilder()
