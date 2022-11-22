@@ -13,13 +13,17 @@
 // limitations under the License.
 
 using System;
+using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dapper;
 using MediatR;
 using Messaging.Application.Configuration.Commands.Commands;
+using Messaging.Application.Configuration.DataAccess;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Configuration.DataAccess;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Messaging.Infrastructure.Configuration.Processing;
 
@@ -27,10 +31,12 @@ public class AssignOutgoingMessagesToBundlesBehaviour<TRequest, TResponse> : IPi
     where TRequest : ICommand<TResponse>
 {
     private readonly B2BContext _b2BContext;
+    private readonly IDbConnectionFactory _dbConnectionFactory;
 
-    public AssignOutgoingMessagesToBundlesBehaviour(B2BContext b2BContext)
+    public AssignOutgoingMessagesToBundlesBehaviour(B2BContext b2BContext, IDbConnectionFactory dbConnectionFactory)
     {
         _b2BContext = b2BContext;
+        _dbConnectionFactory = dbConnectionFactory;
     }
 
     public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
@@ -46,6 +52,9 @@ public class AssignOutgoingMessagesToBundlesBehaviour<TRequest, TResponse> : IPi
         foreach (var message in outgoingMessages)
         {
             message.SetBundleId(Guid.NewGuid());
+            var sql = $"INSERT INTO [B2B].[ActorMessageQueue_{message.ReceiverId.Value}] VALUES (@Id)";
+            await _dbConnectionFactory.GetOpenConnection()
+                .ExecuteAsync(sql, new { Id = Guid.NewGuid() }, _b2BContext.Database.CurrentTransaction?.GetDbTransaction()).ConfigureAwait(false);
         }
 
         return result;

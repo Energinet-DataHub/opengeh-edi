@@ -38,7 +38,7 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase, IAsyncLifetime
     public async Task InitializeAsync()
     {
         await GetService<IDbConnectionFactory>().GetOpenConnection().ExecuteAsync(
-            $"CREATE TABLE [B2B].ActorMessageQueue_{SampleData.CurrentEnergySupplierNumber}" +
+            $"CREATE TABLE [B2B].ActorMessageQueue_{SampleData.NewEnergySupplierNumber}" +
             $@"(
                 [RecordId]                         [int] IDENTITY (1,1) NOT NULL,
             [Id]                    [uniqueIdentifier]       NOT NULL,
@@ -52,7 +52,7 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase, IAsyncLifetime
     public async Task DisposeAsync()
     {
         await GetService<IDbConnectionFactory>().GetOpenConnection().ExecuteAsync(
-            $"DROP TABLE  [B2B].ActorMessageQueue_{SampleData.CurrentEnergySupplierNumber}").ConfigureAwait(false);
+            $"DROP TABLE  [B2B].ActorMessageQueue_{SampleData.NewEnergySupplierNumber}").ConfigureAwait(false);
     }
 
     [Fact]
@@ -74,7 +74,7 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase, IAsyncLifetime
     {
         await GivenRequestHasBeenAccepted().ConfigureAwait(false);
 
-        var sql = $"SELECT * FROM [B2B].[ActorMessageQueue_{SampleData.CurrentEnergySupplierNumber}]";
+        var sql = $"SELECT * FROM [B2B].[ActorMessageQueue_{SampleData.NewEnergySupplierNumber}]";
         var result = await GetService<IDbConnectionFactory>()
             .GetOpenConnection()
             .QuerySingleOrDefaultAsync(sql)
