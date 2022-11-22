@@ -60,7 +60,7 @@ public class AssignOutgoingMessagesToBundlesBehaviour<TRequest, TResponse> : IPi
 
     private async Task StoreToActorMessageQueueAsync(OutgoingMessage message)
     {
-        var sql = $"INSERT INTO [B2B].[ActorMessageQueue_{message.ReceiverId.Value}] VALUES (@Id, @DocumentType, @ReceiverId)";
+        var sql = $"INSERT INTO [B2B].[ActorMessageQueue_{message.ReceiverId.Value}] VALUES (@Id, @DocumentType, @ReceiverId, @ProcessType)";
         await _dbConnectionFactory.GetOpenConnection()
             .ExecuteAsync(
                 sql,
@@ -69,6 +69,7 @@ public class AssignOutgoingMessagesToBundlesBehaviour<TRequest, TResponse> : IPi
                     Id = Guid.NewGuid(),
                     DocumentType = message.DocumentType.Name,
                     ReceiverId = message.ReceiverId.Value,
+                    message.ProcessType,
                 },
                 _b2BContext.Database.CurrentTransaction?.GetDbTransaction())
             .ConfigureAwait(false);

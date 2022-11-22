@@ -18,6 +18,7 @@ using MediatR;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Application.Transactions.MoveIn;
+using Messaging.CimMessageAdapter.Errors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.IntegrationTests.Application.IncomingMessages;
@@ -44,6 +45,7 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase, IAsyncLifetime
             [Id]                         [uniqueIdentifier]       NOT NULL,
             [DocumentType]                    [VARCHAR](255)       NOT NULL,
             [ReceiverId]                      [VARCHAR](255)      NOT NULL,
+            [ProcessType]                     [VARCHAR](50)      NOT NULL,
             CONSTRAINT [PK_Id] PRIMARY KEY NONCLUSTERED
                 (
             [Id] ASC
@@ -85,6 +87,7 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase, IAsyncLifetime
         Assert.NotNull(result);
         Assert.Equal(result.DocumentType, DocumentType.ConfirmRequestChangeOfSupplier.Name);
         Assert.Equal(result.ReceiverId, SampleData.NewEnergySupplierNumber);
+        Assert.Equal(result.ProcessType, ProcessType.MoveIn.Code);
     }
 
     private static IncomingMessageBuilder MessageBuilder()
