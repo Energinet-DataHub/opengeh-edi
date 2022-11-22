@@ -60,7 +60,20 @@ public class AssignOutgoingMessagesToBundlesBehaviour<TRequest, TResponse> : IPi
 
     private async Task StoreToActorMessageQueueAsync(OutgoingMessage message)
     {
-        var sql = $"INSERT INTO [B2B].[ActorMessageQueue_{message.ReceiverId.Value}] VALUES (@Id, @DocumentType, @ReceiverId, @ProcessType)";
+        var sql = @$"IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ActorMessageQueue_{message.ReceiverId.Value}' and xtype='U')
+        CREATE TABLE [B2B].ActorMessageQueue_{message.ReceiverId.Value}(
+            [RecordId]                            [int] IDENTITY (1,1) NOT NULL,
+        [Id]                         [uniqueIdentifier]       NOT NULL,
+        [DocumentType]                    [VARCHAR](255)       NOT NULL,
+        [ReceiverId]                      [VARCHAR](255)      NOT NULL,
+        [ProcessType]                     [VARCHAR](50)      NOT NULL,
+            CONSTRAINT [PK_ActorMessageQueue_{message.ReceiverId.Value}_Id] PRIMARY KEY NONCLUSTERED
+                (
+            [Id] ASC
+            ) WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF) ON [PRIMARY]
+            ) ON [PRIMARY];
+        INSERT INTO [B2B].[ActorMessageQueue_{message.ReceiverId.Value}] VALUES (@Id, @DocumentType, @ReceiverId, @ProcessType)";
+
         await _dbConnectionFactory.GetOpenConnection()
             .ExecuteAsync(
                 sql,

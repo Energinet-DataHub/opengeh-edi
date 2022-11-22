@@ -36,27 +36,16 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase, IAsyncLifetime
     {
     }
 
-    public async Task InitializeAsync()
+    public Task InitializeAsync()
     {
-        await GetService<IDbConnectionFactory>().GetOpenConnection().ExecuteAsync(
-            $@"DROP TABLE IF EXISTS [B2B].ActorMessageQueue_{SampleData.NewEnergySupplierNumber};
-            CREATE TABLE [B2B].ActorMessageQueue_{SampleData.NewEnergySupplierNumber}(
-                [RecordId]                            [int] IDENTITY (1,1) NOT NULL,
-            [Id]                         [uniqueIdentifier]       NOT NULL,
-            [DocumentType]                    [VARCHAR](255)       NOT NULL,
-            [ReceiverId]                      [VARCHAR](255)      NOT NULL,
-            [ProcessType]                     [VARCHAR](50)      NOT NULL,
-            CONSTRAINT [PK_Id] PRIMARY KEY NONCLUSTERED
-                (
-            [Id] ASC
-            ) WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF) ON [PRIMARY]
-            ) ON [PRIMARY]").ConfigureAwait(false);
+        return GetService<IDbConnectionFactory>().GetOpenConnection().ExecuteAsync(
+            $"DROP TABLE IF EXISTS  [B2B].ActorMessageQueue_{SampleData.NewEnergySupplierNumber}");
     }
 
-    public async Task DisposeAsync()
+    public Task DisposeAsync()
     {
-        await GetService<IDbConnectionFactory>().GetOpenConnection().ExecuteAsync(
-            $"DROP TABLE  [B2B].ActorMessageQueue_{SampleData.NewEnergySupplierNumber}").ConfigureAwait(false);
+        return GetService<IDbConnectionFactory>().GetOpenConnection().ExecuteAsync(
+            $"DROP TABLE IF EXISTS [B2B].ActorMessageQueue_{SampleData.NewEnergySupplierNumber}");
     }
 
     [Fact]
