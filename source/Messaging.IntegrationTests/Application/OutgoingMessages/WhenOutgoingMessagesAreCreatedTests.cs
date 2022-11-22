@@ -44,20 +44,6 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase, IAsyncLifetime
     }
 
     [Fact]
-    public async Task A_bundle_id_is_assigned()
-    {
-        await GivenRequestHasBeenAccepted().ConfigureAwait(false);
-
-        AssertOutgoingMessage
-            .OutgoingMessage(
-            SampleData.TransactionId,
-            DocumentType.ConfirmRequestChangeOfSupplier.Name,
-            ProcessType.MoveIn.Code,
-            GetService<IDbConnectionFactory>())
-            .HasBundleId();
-    }
-
-    [Fact]
     public async Task Outgoing_message_is_enqueued()
     {
         await GivenRequestHasBeenAccepted().ConfigureAwait(false);

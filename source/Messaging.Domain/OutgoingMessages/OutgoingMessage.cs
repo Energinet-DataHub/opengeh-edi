@@ -51,16 +51,9 @@ namespace Messaging.Domain.OutgoingMessages
 
         public string MarketActivityRecordPayload { get; }
 
-        public Guid? BundleId { get; private set; }
-
         public void Published()
         {
             IsPublished = true;
-        }
-
-        public void SetBundleId(Guid bundleId)
-        {
-            BundleId = bundleId;
         }
     }
 }

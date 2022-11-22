@@ -51,7 +51,6 @@ public class EnqueueOutgoingMessagesBehaviour<TRequest, TResponse> : IPipelineBe
 
         foreach (var message in outgoingMessages)
         {
-            message.SetBundleId(Guid.NewGuid());
             await StoreToActorMessageQueueAsync(message).ConfigureAwait(false);
         }
 
