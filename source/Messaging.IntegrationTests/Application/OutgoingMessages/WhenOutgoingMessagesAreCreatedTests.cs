@@ -42,7 +42,7 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase, IAsyncLifetime
             CREATE TABLE [B2B].ActorMessageQueue_{SampleData.NewEnergySupplierNumber}(
                 [RecordId]                            [int] IDENTITY (1,1) NOT NULL,
             [Id]                         [uniqueIdentifier]       NOT NULL,
-            [DocumentType]                    [VARCHAR](100)       NOT NULL,
+            [DocumentType]                    [VARCHAR](255)       NOT NULL,
             [ReceiverId]                      [VARCHAR](255)      NOT NULL,
             CONSTRAINT [PK_Id] PRIMARY KEY NONCLUSTERED
                 (
