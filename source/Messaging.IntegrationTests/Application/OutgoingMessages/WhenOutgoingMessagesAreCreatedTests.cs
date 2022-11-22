@@ -75,6 +75,7 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase, IAsyncLifetime
         Assert.Equal(result.SenderId, DataHubDetails.IdentificationNumber.Value);
         Assert.Equal(result.SenderRole, MarketRole.MeteringPointAdministrator.Name);
         Assert.Equal(result.ProcessType, ProcessType.MoveIn.Code);
+        Assert.NotNull(result.Payload);
     }
 
     private static IncomingMessageBuilder MessageBuilder()

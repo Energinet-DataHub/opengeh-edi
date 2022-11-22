@@ -70,12 +70,13 @@ public class AssignOutgoingMessagesToBundlesBehaviour<TRequest, TResponse> : IPi
         [SenderId]                        [VARCHAR](255)     NOT NULL,
         [SenderRole]                      [VARCHAR](50)      NOT NULL,
         [ProcessType]                     [VARCHAR](50)      NOT NULL,
+        [Payload]                         [NVARCHAR](MAX)    NOT NULL,
             CONSTRAINT [PK_ActorMessageQueue_{message.ReceiverId.Value}_Id] PRIMARY KEY NONCLUSTERED
                 (
             [Id] ASC
             ) WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF) ON [PRIMARY]
             ) ON [PRIMARY];
-        INSERT INTO [B2B].[ActorMessageQueue_{message.ReceiverId.Value}] VALUES (@Id, @DocumentType, @ReceiverId, @ReceiverRole, @SenderId, @SenderRole, @ProcessType)";
+        INSERT INTO [B2B].[ActorMessageQueue_{message.ReceiverId.Value}] VALUES (@Id, @DocumentType, @ReceiverId, @ReceiverRole, @SenderId, @SenderRole, @ProcessType, @Payload)";
 
         await _dbConnectionFactory.GetOpenConnection()
             .ExecuteAsync(
@@ -88,7 +89,8 @@ public class AssignOutgoingMessagesToBundlesBehaviour<TRequest, TResponse> : IPi
                     ReceiverRole = message.ReceiverRole.Name,
                     SenderId = message.SenderId.Value,
                     SenderRole = message.SenderRole.Name,
-                    message.ProcessType,
+                    ProcessType = message.ProcessType,
+                    Payload = message.MarketActivityRecordPayload,
                 },
                 _b2BContext.Database.CurrentTransaction?.GetDbTransaction())
             .ConfigureAwait(false);
