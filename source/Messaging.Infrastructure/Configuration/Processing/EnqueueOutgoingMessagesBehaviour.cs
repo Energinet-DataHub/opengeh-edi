@@ -18,9 +18,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.Configuration.Commands.Commands;
-using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Configuration.DataAccess;
+using Messaging.Infrastructure.OutgoingMessages;
 
 namespace Messaging.Infrastructure.Configuration.Processing;
 
@@ -28,12 +28,12 @@ public class EnqueueOutgoingMessagesBehaviour<TRequest, TResponse> : IPipelineBe
     where TRequest : ICommand<TResponse>
 {
     private readonly B2BContext _b2BContext;
-    private readonly IOutgoingMessages _outgoingMessages;
+    private readonly OutgoingMessageEnqueuer _outgoingMessageEnqueuer;
 
-    public EnqueueOutgoingMessagesBehaviour(B2BContext b2BContext, IOutgoingMessages outgoingMessages)
+    public EnqueueOutgoingMessagesBehaviour(B2BContext b2BContext, OutgoingMessageEnqueuer outgoingMessageEnqueuer)
     {
         _b2BContext = b2BContext;
-        _outgoingMessages = outgoingMessages;
+        _outgoingMessageEnqueuer = outgoingMessageEnqueuer;
     }
 
     public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
@@ -48,7 +48,7 @@ public class EnqueueOutgoingMessagesBehaviour<TRequest, TResponse> : IPipelineBe
 
         foreach (var message in outgoingMessages)
         {
-            await _outgoingMessages.EnqueueAsync(message).ConfigureAwait(false);
+            await _outgoingMessageEnqueuer.EnqueueAsync(message).ConfigureAwait(false);
         }
 
         return result;

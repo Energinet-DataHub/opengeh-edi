@@ -23,6 +23,5 @@ internal static class PeekConfiguration
     internal static void Configure(IServiceCollection services)
     {
         services.AddTransient<IRequestHandler<PeekRequest, PeekResult>, PeekRequestHandler>();
-        services.AddTransient<IOutgoingMessages, Application.OutgoingMessages.Peek.ZzOutgoingMessages>();
     }
 }

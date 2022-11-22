@@ -159,6 +159,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddSingleton<IActorLookup, ActorLookup>();
             _services.AddScoped<MessageAvailabilityPublisher>();
             _services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
+            _services.AddScoped<OutgoingMessageEnqueuer>();
             return this;
         }
 

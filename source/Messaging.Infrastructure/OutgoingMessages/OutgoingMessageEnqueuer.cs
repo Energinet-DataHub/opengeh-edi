@@ -16,31 +16,19 @@ using System;
 using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
-using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.OutgoingMessages.Peek;
 
-namespace Messaging.Application.OutgoingMessages.Peek;
+namespace Messaging.Infrastructure.OutgoingMessages;
 
-public class ZzOutgoingMessages : IOutgoingMessages
+public class OutgoingMessageEnqueuer
 {
     private readonly IDbConnectionFactory _dbConnectionFactory;
     private readonly IUnitOfWork _unitOfWork;
 
-    public ZzOutgoingMessages(IDbConnectionFactory dbConnectionFactory, IUnitOfWork unitOfWork)
+    public OutgoingMessageEnqueuer(IDbConnectionFactory dbConnectionFactory, IUnitOfWork unitOfWork)
     {
         _dbConnectionFactory = dbConnectionFactory;
         _unitOfWork = unitOfWork;
-    }
-
-    public Task<OutgoingMessage?> GetNextAsync(ActorNumber actorNumber, MessageCategory requestMessageCategory)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public Task<OutgoingMessage?> GetNextByAsync(DocumentType documentTypeToBundle, string processTypeToBundle, MarketRole actorRoleTypeToBundle)
-    {
-        throw new System.NotImplementedException();
     }
 
     public Task EnqueueAsync(OutgoingMessage message)
