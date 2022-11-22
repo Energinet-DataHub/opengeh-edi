@@ -14,15 +14,10 @@
 
 using System.Threading.Tasks;
 using Dapper;
-using MediatR;
 using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
-using Messaging.Application.Transactions.MoveIn;
-using Messaging.CimMessageAdapter.Errors;
+using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
-using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.IntegrationTests.Application.IncomingMessages;
-using Messaging.IntegrationTests.Application.Transactions.MoveIn;
 using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
@@ -76,6 +71,9 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase, IAsyncLifetime
         Assert.NotNull(result);
         Assert.Equal(result.DocumentType, DocumentType.ConfirmRequestChangeOfSupplier.Name);
         Assert.Equal(result.ReceiverId, SampleData.NewEnergySupplierNumber);
+        Assert.Equal(result.ReceiverRole, MarketRole.EnergySupplier.Name);
+        Assert.Equal(result.SenderId, DataHubDetails.IdentificationNumber.Value);
+        Assert.Equal(result.SenderRole, MarketRole.MeteringPointAdministrator.Name);
         Assert.Equal(result.ProcessType, ProcessType.MoveIn.Code);
     }
 

@@ -63,16 +63,19 @@ public class AssignOutgoingMessagesToBundlesBehaviour<TRequest, TResponse> : IPi
         var sql = @$"IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ActorMessageQueue_{message.ReceiverId.Value}' and xtype='U')
         CREATE TABLE [B2B].ActorMessageQueue_{message.ReceiverId.Value}(
             [RecordId]                            [int] IDENTITY (1,1) NOT NULL,
-        [Id]                         [uniqueIdentifier]       NOT NULL,
-        [DocumentType]                    [VARCHAR](255)       NOT NULL,
-        [ReceiverId]                      [VARCHAR](255)      NOT NULL,
+        [Id]                              [uniqueIdentifier] NOT NULL,
+        [DocumentType]                    [VARCHAR](255)     NOT NULL,
+        [ReceiverId]                      [VARCHAR](255)     NOT NULL,
+        [ReceiverRole]                    [VARCHAR](50)      NOT NULL,
+        [SenderId]                        [VARCHAR](255)     NOT NULL,
+        [SenderRole]                      [VARCHAR](50)      NOT NULL,
         [ProcessType]                     [VARCHAR](50)      NOT NULL,
             CONSTRAINT [PK_ActorMessageQueue_{message.ReceiverId.Value}_Id] PRIMARY KEY NONCLUSTERED
                 (
             [Id] ASC
             ) WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF) ON [PRIMARY]
             ) ON [PRIMARY];
-        INSERT INTO [B2B].[ActorMessageQueue_{message.ReceiverId.Value}] VALUES (@Id, @DocumentType, @ReceiverId, @ProcessType)";
+        INSERT INTO [B2B].[ActorMessageQueue_{message.ReceiverId.Value}] VALUES (@Id, @DocumentType, @ReceiverId, @ReceiverRole, @SenderId, @SenderRole, @ProcessType)";
 
         await _dbConnectionFactory.GetOpenConnection()
             .ExecuteAsync(
@@ -82,6 +85,9 @@ public class AssignOutgoingMessagesToBundlesBehaviour<TRequest, TResponse> : IPi
                     Id = Guid.NewGuid(),
                     DocumentType = message.DocumentType.Name,
                     ReceiverId = message.ReceiverId.Value,
+                    ReceiverRole = message.ReceiverRole.Name,
+                    SenderId = message.SenderId.Value,
+                    SenderRole = message.SenderRole.Name,
                     message.ProcessType,
                 },
                 _b2BContext.Database.CurrentTransaction?.GetDbTransaction())
