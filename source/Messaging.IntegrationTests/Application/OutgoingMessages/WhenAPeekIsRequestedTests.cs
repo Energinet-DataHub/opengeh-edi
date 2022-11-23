@@ -22,6 +22,7 @@ using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.Peek;
 using Messaging.Domain.SeedWork;
 using Messaging.Infrastructure.Configuration.DataAccess;
+using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Application.Transactions.MoveIn;
 using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
@@ -49,18 +50,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task A_message_bundle_is_returned()
     {
-        await Scenario.Details(
-            SampleData.TransactionId,
-            SampleData.MeteringPointNumber,
-            SampleData.SupplyStart,
-            SampleData.CurrentEnergySupplierNumber,
-            SampleData.NewEnergySupplierNumber,
-            SampleData.ConsumerId,
-            SampleData.ConsumerIdType,
-            SampleData.ConsumerName,
-            SampleData.OriginalMessageId,
-            GetService<IMediator>(),
-            GetService<B2BContext>()).IsEffective().BuildAsync().ConfigureAwait(false);
+        await GivenRequestHasBeenAccepted().ConfigureAwait(false);
 
         var command = new PeekRequest(ActorNumber.Create(SampleData.NewEnergySupplierNumber), MessageCategory.MasterData);
         var result = await InvokeCommandAsync(command).ConfigureAwait(false);
@@ -70,5 +60,25 @@ public class WhenAPeekIsRequestedTests : TestBase
         AssertXmlMessage.Document(XDocument.Load(result.Bundle!))
             .IsDocumentType(DocumentType.ConfirmRequestChangeOfSupplier)
             .IsProcesType(ProcessType.MoveIn);
+    }
+
+    private static IncomingMessageBuilder MessageBuilder()
+    {
+        return new IncomingMessageBuilder()
+            .WithEnergySupplierId(SampleData.NewEnergySupplierNumber)
+            .WithMessageId(SampleData.OriginalMessageId)
+            .WithTransactionId(SampleData.TransactionId);
+    }
+
+    private async Task GivenRequestHasBeenAccepted()
+    {
+        var incomingMessage = MessageBuilder()
+            .WithProcessType(ProcessType.MoveIn.Code)
+            .WithReceiver(SampleData.ReceiverId)
+            .WithSenderId(SampleData.SenderId)
+            .WithConsumerName(SampleData.ConsumerName)
+            .Build();
+
+        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
     }
 }

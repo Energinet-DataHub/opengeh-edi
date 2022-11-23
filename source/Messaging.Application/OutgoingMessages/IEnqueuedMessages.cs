@@ -12,18 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
-using Messaging.Application.OutgoingMessages;
-using Messaging.Application.OutgoingMessages.Peek;
-using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Messaging.Domain.Actors;
+using Messaging.Domain.OutgoingMessages;
 
-namespace Messaging.Infrastructure.OutgoingMessages.Peek;
+namespace Messaging.Application.OutgoingMessages;
 
-internal static class PeekConfiguration
+/// <summary>
+/// Interface to get enqueued messages
+/// </summary>
+public interface IEnqueuedMessages
 {
-    internal static void Configure(IServiceCollection services)
-    {
-        services.AddTransient<IRequestHandler<PeekRequest, PeekResult>, PeekRequestHandler>();
-        services.AddScoped<IEnqueuedMessages, EnqueuedMessages>();
-    }
+    /// <summary>
+    /// Get enqueued messages
+    /// </summary>
+    /// <param name="actorNumber"></param>
+    /// <returns>List of enqueued messages</returns>
+    Task<IEnumerable<OutgoingMessage>> GetByAsync(ActorNumber actorNumber);
 }
