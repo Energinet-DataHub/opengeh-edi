@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using JetBrains.Annotations;
@@ -25,7 +26,9 @@ using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Application.Transactions.MoveIn;
 using Messaging.IntegrationTests.Assertions;
+using Messaging.IntegrationTests.Factories;
 using Messaging.IntegrationTests.Fixtures;
+using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using Xunit;
 
 namespace Messaging.IntegrationTests.Application.OutgoingMessages;
@@ -52,6 +55,17 @@ public class WhenAPeekIsRequestedTests : TestBase
     {
         await GivenRequestHasBeenAccepted().ConfigureAwait(false);
 
+        var message = MessageBuilder()
+            .WithProcessType(ProcessType.MoveIn.Code)
+            .WithReceiver(SampleData.ReceiverId)
+            .WithSenderId(SampleData.SenderId)
+            .WithEffectiveDate(EffectiveDateFactory.OffsetDaysFromToday(1))
+            .WithConsumerId(ConsumerFactory.CreateConsumerId())
+            .WithConsumerName(ConsumerFactory.CreateConsumerName())
+            .WithTransactionId(Guid.NewGuid().ToString()).Build();
+
+        await InvokeCommandAsync(message).ConfigureAwait(false);
+
         var command = new PeekRequest(ActorNumber.Create(SampleData.NewEnergySupplierNumber), MessageCategory.MasterData);
         var result = await InvokeCommandAsync(command).ConfigureAwait(false);
 
@@ -59,7 +73,8 @@ public class WhenAPeekIsRequestedTests : TestBase
 
         AssertXmlMessage.Document(XDocument.Load(result.Bundle!))
             .IsDocumentType(DocumentType.ConfirmRequestChangeOfSupplier)
-            .IsProcesType(ProcessType.MoveIn);
+            .IsProcesType(ProcessType.MoveIn)
+            .HasMarketActivityRecordCount(2);
     }
 
     private static IncomingMessageBuilder MessageBuilder()

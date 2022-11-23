@@ -69,9 +69,10 @@ namespace Messaging.IntegrationTests.Assertions
             Assert.Equal(expectedValue, marketActivityRecord.Element(marketActivityRecord.Name.Namespace + elementName)?.Value);
         }
 
-        internal static void AssertMarketActivityRecordCount(XDocument document, int expectedCount)
+        internal AssertXmlMessage HasMarketActivityRecordCount(int expectedCount)
         {
-            Assert.Equal(expectedCount, GetMarketActivityRecords(document).Count);
+            Assert.Equal(expectedCount, GetMarketActivityRecords(_document).Count);
+            return this;
         }
 
         internal AssertXmlMessage IsDocumentType(DocumentType documentType)

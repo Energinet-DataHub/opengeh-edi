@@ -22,6 +22,7 @@ using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.FeatureFlag;
 using Messaging.Infrastructure.OutgoingMessages;
+using Microsoft.EntityFrameworkCore;
 
 namespace Messaging.Infrastructure.Configuration.Processing;
 
@@ -52,6 +53,7 @@ public class EnqueueOutgoingMessagesBehaviour<TRequest, TResponse> : IPipelineBe
         var outgoingMessages = _b2BContext
             .ChangeTracker
             .Entries<OutgoingMessage>()
+            .Where(entity => entity.State == EntityState.Added)
             .Select(entity => entity.Entity).ToList();
 
         foreach (var message in outgoingMessages)
