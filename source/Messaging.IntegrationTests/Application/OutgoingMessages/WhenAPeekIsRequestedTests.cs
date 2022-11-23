@@ -28,6 +28,7 @@ using Messaging.IntegrationTests.Application.Transactions.MoveIn;
 using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Factories;
 using Messaging.IntegrationTests.Fixtures;
+using Messaging.IntegrationTests.TestDoubles;
 using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using Xunit;
 
@@ -64,6 +65,22 @@ public class WhenAPeekIsRequestedTests : TestBase
             .IsDocumentType(DocumentType.ConfirmRequestChangeOfSupplier)
             .IsProcesType(ProcessType.MoveIn)
             .HasMarketActivityRecordCount(2);
+    }
+
+    [Fact]
+    public async Task Bundled_message_contains_maximum_number_of_payloads()
+    {
+        var bundleConfiguration = (BundleConfigurationStub)GetService<IBundleConfiguration>();
+        bundleConfiguration.MaxNumberOfPayloadsInBundle = 1;
+        await GivenTwoMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
+
+        var command = new PeekRequest(ActorNumber.Create(SampleData.NewEnergySupplierNumber), MessageCategory.MasterData);
+        var result = await InvokeCommandAsync(command).ConfigureAwait(false);
+
+        AssertXmlMessage.Document(XDocument.Load(result.Bundle!))
+            .IsDocumentType(DocumentType.ConfirmRequestChangeOfSupplier)
+            .IsProcesType(ProcessType.MoveIn)
+            .HasMarketActivityRecordCount(1);
     }
 
     private static IncomingMessageBuilder MessageBuilder()

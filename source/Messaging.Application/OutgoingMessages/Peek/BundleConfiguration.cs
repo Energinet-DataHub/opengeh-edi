@@ -12,19 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
-using Messaging.Application.OutgoingMessages;
-using Messaging.Application.OutgoingMessages.Peek;
-using Microsoft.Extensions.DependencyInjection;
+namespace Messaging.Application.OutgoingMessages.Peek;
 
-namespace Messaging.Infrastructure.OutgoingMessages.Peek;
-
-internal static class PeekConfiguration
+public class BundleConfiguration : IBundleConfiguration
 {
-    internal static void Configure(IServiceCollection services, IBundleConfiguration bundleConfiguration)
+    public BundleConfiguration(int maxNumberOfPayloadsInBundle)
     {
-        services.AddTransient<IRequestHandler<PeekRequest, PeekResult>, PeekRequestHandler>();
-        services.AddScoped<IEnqueuedMessages, EnqueuedMessages>();
-        services.AddScoped(_ => bundleConfiguration);
+        MaxNumberOfPayloadsInBundle = maxNumberOfPayloadsInBundle;
     }
+
+    public int MaxNumberOfPayloadsInBundle { get; }
 }

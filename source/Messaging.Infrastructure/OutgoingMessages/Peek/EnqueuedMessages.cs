@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages;
+using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.SeedWork;
@@ -28,16 +29,18 @@ namespace Messaging.Infrastructure.OutgoingMessages.Peek;
 public class EnqueuedMessages : IEnqueuedMessages
 {
     private readonly IDbConnectionFactory _connectionFactory;
+    private readonly IBundleConfiguration _bundleConfiguration;
 
-    public EnqueuedMessages(IDbConnectionFactory connectionFactory)
+    public EnqueuedMessages(IDbConnectionFactory connectionFactory, IBundleConfiguration bundleConfiguration)
     {
         _connectionFactory = connectionFactory;
+        _bundleConfiguration = bundleConfiguration;
     }
 
     public async Task<IEnumerable<OutgoingMessage>> GetByAsync(ActorNumber actorNumber)
     {
         ArgumentNullException.ThrowIfNull(actorNumber);
-        var sqlStatement = $"SELECT * FROM [b2b].[ActorMessageQueue_{actorNumber.Value}]";
+        var sqlStatement = $"SELECT TOP({_bundleConfiguration.MaxNumberOfPayloadsInBundle}) * FROM [b2b].[ActorMessageQueue_{actorNumber.Value}]";
         var messages = await _connectionFactory.GetOpenConnection().QueryAsync<OutgoingMessageEntity>(sqlStatement).ConfigureAwait(false);
         return messages.Select(m => new OutgoingMessage(
             EnumerationType.FromName<DocumentType>(m.DocumentType),

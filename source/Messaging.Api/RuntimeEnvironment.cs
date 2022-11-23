@@ -14,6 +14,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 
 namespace Messaging.Api
 {
@@ -88,6 +89,17 @@ namespace Messaging.Api
 
         public string? METERING_POINT_CREATED_EVENT_B2B_SUBSCRIPTION_NAME =>
             GetEnvironmentVariable(nameof(METERING_POINT_CREATED_EVENT_B2B_SUBSCRIPTION_NAME));
+
+        public int MAX_NUMBER_OF_PAYLOADS_IN_BUNDLE
+        {
+            get
+            {
+                var variable = GetEnvironmentVariable(nameof(MAX_NUMBER_OF_PAYLOADS_IN_BUNDLE));
+                return string.IsNullOrWhiteSpace(variable) || int.TryParse(variable, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out var value) == false
+                    ? 100000
+                    : value;
+            }
+        }
 
         public virtual bool IsRunningLocally()
         {
