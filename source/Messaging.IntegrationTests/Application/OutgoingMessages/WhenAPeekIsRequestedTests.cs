@@ -53,18 +53,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task A_message_bundle_is_returned()
     {
-        await GivenRequestHasBeenAccepted().ConfigureAwait(false);
-
-        var message = MessageBuilder()
-            .WithProcessType(ProcessType.MoveIn.Code)
-            .WithReceiver(SampleData.ReceiverId)
-            .WithSenderId(SampleData.SenderId)
-            .WithEffectiveDate(EffectiveDateFactory.OffsetDaysFromToday(1))
-            .WithConsumerId(ConsumerFactory.CreateConsumerId())
-            .WithConsumerName(ConsumerFactory.CreateConsumerName())
-            .WithTransactionId(Guid.NewGuid().ToString()).Build();
-
-        await InvokeCommandAsync(message).ConfigureAwait(false);
+        await GivenTwoMoveInTransactionHasBeenAccepted();
 
         var command = new PeekRequest(ActorNumber.Create(SampleData.NewEnergySupplierNumber), MessageCategory.MasterData);
         var result = await InvokeCommandAsync(command).ConfigureAwait(false);
@@ -85,7 +74,7 @@ public class WhenAPeekIsRequestedTests : TestBase
             .WithTransactionId(SampleData.TransactionId);
     }
 
-    private async Task GivenRequestHasBeenAccepted()
+    private async Task GivenAMoveInTransactionHasBeenAccepted()
     {
         var incomingMessage = MessageBuilder()
             .WithProcessType(ProcessType.MoveIn.Code)
@@ -95,5 +84,21 @@ public class WhenAPeekIsRequestedTests : TestBase
             .Build();
 
         await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
+    }
+
+    private async Task GivenTwoMoveInTransactionHasBeenAccepted()
+    {
+        await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
+
+        var message = MessageBuilder()
+            .WithProcessType(ProcessType.MoveIn.Code)
+            .WithReceiver(SampleData.ReceiverId)
+            .WithSenderId(SampleData.SenderId)
+            .WithEffectiveDate(EffectiveDateFactory.OffsetDaysFromToday(1))
+            .WithConsumerId(ConsumerFactory.CreateConsumerId())
+            .WithConsumerName(ConsumerFactory.CreateConsumerName())
+            .WithTransactionId(Guid.NewGuid().ToString()).Build();
+
+        await InvokeCommandAsync(message).ConfigureAwait(false);
     }
 }
