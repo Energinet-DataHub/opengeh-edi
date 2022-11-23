@@ -68,24 +68,7 @@ namespace Messaging.IntegrationTests.Fixtures
 
             _context.Database.ExecuteSqlRaw(cleanupStatement);
 
-            var findActorTables = "SELECT name FROM sysobjects WHERE name LIKE 'ActorMessageQueue_%' AND xtype = 'U'";
-            var tableNames = _context.Database
-                .GetDbConnection()
-                .Query<string>(findActorTables)
-                .ToList();
-
-            if (tableNames.Count > 0)
-            {
-                var dropStatement = "DROP TABLE ";
-                foreach (var tableName in tableNames)
-                {
-                    dropStatement = dropStatement + $"b2b.{tableName},";
-                }
-
-                dropStatement = dropStatement.Substring(0, dropStatement.Length - 1);
-
-                _context.Database.GetDbConnection().Execute(dropStatement);
-            }
+            RemoveOutgoingMessageQueueTables();
         }
 
         public void Dispose()
@@ -109,6 +92,26 @@ namespace Messaging.IntegrationTests.Fixtures
         private void CreateSchema()
         {
             DefaultUpgrader.Upgrade(ConnectionString);
+        }
+
+        private void RemoveOutgoingMessageQueueTables()
+        {
+            var selectStatement = "SELECT name FROM sysobjects WHERE name LIKE 'ActorMessageQueue_%' AND xtype = 'U'";
+            var tablesToDrop = _context.Database
+                .GetDbConnection()
+                .Query<string>(selectStatement)
+                .ToList();
+
+            if (tablesToDrop.Count == 0) return;
+            var dropStatement = "DROP TABLE ";
+            foreach (var tableName in tablesToDrop)
+            {
+                dropStatement += $"b2b.{tableName},";
+            }
+
+            dropStatement = dropStatement.Substring(0, dropStatement.Length - 1);
+
+            _context.Database.GetDbConnection().Execute(dropStatement);
         }
     }
 }
