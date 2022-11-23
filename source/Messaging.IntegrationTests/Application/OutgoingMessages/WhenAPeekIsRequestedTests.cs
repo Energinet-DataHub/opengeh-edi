@@ -70,8 +70,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task Bundled_message_contains_maximum_number_of_payloads()
     {
-        var bundleConfiguration = (BundleConfigurationStub)GetService<IBundleConfiguration>();
-        bundleConfiguration.MaxNumberOfPayloadsInBundle = 1;
+        SetMaximumNumberOfPayloadsInBundle(1);
         await GivenTwoMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
 
         var command = new PeekRequest(ActorNumber.Create(SampleData.NewEnergySupplierNumber), MessageCategory.MasterData);
@@ -117,5 +116,11 @@ public class WhenAPeekIsRequestedTests : TestBase
             .WithTransactionId(Guid.NewGuid().ToString()).Build();
 
         await InvokeCommandAsync(message).ConfigureAwait(false);
+    }
+
+    private void SetMaximumNumberOfPayloadsInBundle(int maxNumberOfPayloadsInBundle)
+    {
+        var bundleConfiguration = (BundleConfigurationStub)GetService<IBundleConfiguration>();
+        bundleConfiguration.MaxNumberOfPayloadsInBundle = maxNumberOfPayloadsInBundle;
     }
 }
