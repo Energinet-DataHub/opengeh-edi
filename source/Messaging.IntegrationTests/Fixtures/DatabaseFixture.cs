@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
+using Dapper;
 using Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.Helpers;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.Serialization;
@@ -65,6 +67,25 @@ namespace Messaging.IntegrationTests.Fixtures
                 $"DELETE FROM [b2b].[Actor]";
 
             _context.Database.ExecuteSqlRaw(cleanupStatement);
+
+            var findActorTables = "SELECT name FROM sysobjects WHERE name LIKE 'ActorMessageQueue_%' AND xtype = 'U'";
+            var tableNames = _context.Database
+                .GetDbConnection()
+                .Query<string>(findActorTables)
+                .ToList();
+
+            if (tableNames.Count > 0)
+            {
+                var dropStatement = "DROP TABLE ";
+                foreach (var tableName in tableNames)
+                {
+                    dropStatement = dropStatement + $"b2b.{tableName},";
+                }
+
+                dropStatement = dropStatement.Substring(0, dropStatement.Length - 1);
+
+                _context.Database.GetDbConnection().Execute(dropStatement);
+            }
         }
 
         public void Dispose()
