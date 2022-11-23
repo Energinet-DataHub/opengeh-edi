@@ -12,24 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Data;
-using System.Threading.Tasks;
+namespace Messaging.Infrastructure.Configuration.FeatureFlag;
 
-namespace Messaging.Application.Configuration.DataAccess
+#pragma warning disable
+public interface IFeatureFlagProvider
 {
-    /// <summary>
-    /// Unit of work
-    /// </summary>
-    public interface IUnitOfWork
-    {
-        /// <summary>
-        /// Gets the current transaction
-        /// </summary>
-        IDbTransaction? CurrentTransaction { get; }
-
-        /// <summary>
-        /// Commits current transaction
-        /// </summary>
-        Task CommitAsync();
-    }
+    bool IsActorMessageQueueEnabled { get; }
 }

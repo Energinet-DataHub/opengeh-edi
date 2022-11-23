@@ -12,24 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Data;
-using System.Threading.Tasks;
+using Messaging.Domain.SeedWork;
 
-namespace Messaging.Application.Configuration.DataAccess
+namespace Messaging.Domain.OutgoingMessages.Peek;
+
+public class MessageCategory : EnumerationType
 {
-    /// <summary>
-    /// Unit of work
-    /// </summary>
-    public interface IUnitOfWork
-    {
-        /// <summary>
-        /// Gets the current transaction
-        /// </summary>
-        IDbTransaction? CurrentTransaction { get; }
+    public static readonly MessageCategory MasterData = new MessageCategory(0, nameof(MasterData));
+    public static readonly MessageCategory AggregationData = new MessageCategory(1, nameof(AggregationData));
 
-        /// <summary>
-        /// Commits current transaction
-        /// </summary>
-        Task CommitAsync();
+    private MessageCategory(int id, string name)
+        : base(id, name)
+    {
     }
 }

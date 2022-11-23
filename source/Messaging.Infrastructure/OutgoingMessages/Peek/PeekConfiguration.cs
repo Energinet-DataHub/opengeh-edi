@@ -12,24 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Data;
-using System.Threading.Tasks;
+using MediatR;
+using Messaging.Application.OutgoingMessages.Peek;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Messaging.Application.Configuration.DataAccess
+namespace Messaging.Infrastructure.OutgoingMessages.Peek;
+
+internal static class PeekConfiguration
 {
-    /// <summary>
-    /// Unit of work
-    /// </summary>
-    public interface IUnitOfWork
+    internal static void Configure(IServiceCollection services)
     {
-        /// <summary>
-        /// Gets the current transaction
-        /// </summary>
-        IDbTransaction? CurrentTransaction { get; }
-
-        /// <summary>
-        /// Commits current transaction
-        /// </summary>
-        Task CommitAsync();
+        services.AddTransient<IRequestHandler<PeekRequest, PeekResult>, PeekRequestHandler>();
     }
 }

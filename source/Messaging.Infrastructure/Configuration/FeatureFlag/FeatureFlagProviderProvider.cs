@@ -12,24 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Data;
-using System.Threading.Tasks;
+using System;
 
-namespace Messaging.Application.Configuration.DataAccess
+namespace Messaging.Infrastructure.Configuration.FeatureFlag;
+
+public class FeatureFlagProviderProvider : IFeatureFlagProvider
 {
-    /// <summary>
-    /// Unit of work
-    /// </summary>
-    public interface IUnitOfWork
+    public bool IsActorMessageQueueEnabled
     {
-        /// <summary>
-        /// Gets the current transaction
-        /// </summary>
-        IDbTransaction? CurrentTransaction { get; }
+        get
+        {
+            if (bool.TryParse(Environment.GetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE"), out var enabled) == false)
+            {
+                return false;
+            }
 
-        /// <summary>
-        /// Commits current transaction
-        /// </summary>
-        Task CommitAsync();
+            return enabled;
+        }
     }
 }

@@ -59,6 +59,8 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202227101321 Extent ConsumerRegistration with second customer.sql" />
     <EmbeddedResource Include="Scripts\Model\202226081410 Drop customer master data state coulmn.sql" />
     <EmbeddedResource Include="Scripts\Model\202227101322 Add update customer transactions table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101323 Add bundle id to OutgoingMessage table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101324 Remove bundle id from OutgoingMessage table.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281100 Seed cleanup.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281101 Insert Reasons.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241100 Consolidated dbo model.sql" />
