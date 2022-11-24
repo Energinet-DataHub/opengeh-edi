@@ -14,6 +14,7 @@
 
 using System;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Energinet.DataHub.MessageHub.Client;
@@ -32,6 +33,7 @@ using Messaging.Application.Configuration.TimeEvents;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.OutgoingMessages.Common.Reasons;
+using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Application.OutgoingMessages.Requesting;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.CimMessageAdapter.Messages;
@@ -98,12 +100,17 @@ namespace Messaging.Infrastructure.Configuration
             AddProcessing();
             ReadModelHandlingConfiguration.AddReadModelHandling(services);
             UpdateCustomerMasterDataConfiguration.Configure(services);
-            PeekConfiguration.Configure(services);
         }
 
         public static CompositionRoot Initialize(IServiceCollection services)
         {
             return new CompositionRoot(services);
+        }
+
+        public CompositionRoot AddPeekConfiguration(IBundleConfiguration bundleConfiguration)
+        {
+            PeekConfiguration.Configure(_services, bundleConfiguration);
+            return this;
         }
 
         public CompositionRoot AddDatabaseContext(string connectionString)

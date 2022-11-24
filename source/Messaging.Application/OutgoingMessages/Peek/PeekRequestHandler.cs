@@ -33,12 +33,14 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly DocumentFactory _documentFactory;
     private readonly IOutgoingMessageStore _outgoingMessageStore;
+    private readonly IEnqueuedMessages _enqueuedMessages;
 
-    public PeekRequestHandler(ISystemDateTimeProvider systemDateTimeProvider, DocumentFactory documentFactory, IOutgoingMessageStore outgoingMessageStore)
+    public PeekRequestHandler(ISystemDateTimeProvider systemDateTimeProvider, DocumentFactory documentFactory, IOutgoingMessageStore outgoingMessageStore, IEnqueuedMessages enqueuedMessages)
     {
         _systemDateTimeProvider = systemDateTimeProvider;
         _documentFactory = documentFactory;
         _outgoingMessageStore = outgoingMessageStore;
+        _enqueuedMessages = enqueuedMessages;
     }
 
     public async Task<PeekResult> Handle(PeekRequest request, CancellationToken cancellationToken)
@@ -47,12 +49,9 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
 
         if (request.MessageCategory == MessageCategory.MasterData)
         {
-            var message = _outgoingMessageStore
-                .GetUnpublished()
-                .Where(message => message.DocumentType == DocumentType.ConfirmRequestChangeOfSupplier)
-                .ToList();
+            var messages = await _enqueuedMessages.GetByAsync(request.ActorNumber).ConfigureAwait(false);
 
-            var bundle = CreateBundleFrom(message);
+            var bundle = CreateBundleFrom(messages.ToList());
             var cimMessage = bundle.CreateMessage();
             var document = await _documentFactory.CreateFromAsync(cimMessage, CimFormat.Xml).ConfigureAwait(false);
 

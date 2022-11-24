@@ -20,6 +20,7 @@ using Azure.Messaging.ServiceBus;
 using MediatR;
 using Messaging.Api.Configuration.Middleware.Correlation;
 using Messaging.Application.Configuration.Commands.Commands;
+using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.MessageBus;
@@ -55,6 +56,7 @@ namespace Messaging.IntegrationTests
             _services.AddSingleton(
                 _ => new ServiceBusClient(CreateFakeServiceBusConnectionString()));
             CompositionRoot.Initialize(_services)
+                .AddPeekConfiguration(new BundleConfigurationStub())
                 .AddRemoteBusinessService<DummyRequest, DummyReply>(sp => new RemoteBusinessServiceRequestSenderSpy<DummyRequest>("Dummy"), "Dummy")
                 .AddDatabaseConnectionFactory(_databaseFixture.ConnectionString)
                 .AddDatabaseContext(_databaseFixture.ConnectionString)

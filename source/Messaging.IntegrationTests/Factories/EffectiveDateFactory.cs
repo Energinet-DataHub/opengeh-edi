@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using NodaTime;
 
 namespace Messaging.IntegrationTests.Factories;
@@ -27,5 +28,10 @@ internal static class EffectiveDateFactory
         var localDateTime = new ZonedDateTime(new LocalDateTime(now.Year, now.Month, now.Day, 0, 0, 0), timeZone, now.Offset);
         localDateTime = localDateTime.PlusHours(24);
         return localDateTime.ToInstant();
+    }
+
+    internal static Instant OffsetDaysFromToday(int days)
+    {
+        return InstantAsOfToday().PlusDays(days);
     }
 }

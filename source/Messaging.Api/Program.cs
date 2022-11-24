@@ -25,6 +25,7 @@ using Messaging.Api.Configuration.Middleware.Correlation;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.TimeEvents;
 using Messaging.Application.OutgoingMessages;
+using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.CimMessageAdapter.Messages.Queues;
 using Messaging.Infrastructure.Configuration;
@@ -108,6 +109,7 @@ namespace Messaging.Api
                         _ => new RequestChangeCustomerCharacteristicsTransaction(runtime.INCOMING_CHANGE_CUSTOMER_CHARACTERISTICS_MESSAGE_QUEUE_NAME!));
 
                     CompositionRoot.Initialize(services)
+                        .AddPeekConfiguration(new BundleConfiguration(runtime.MAX_NUMBER_OF_PAYLOADS_IN_BUNDLE))
                         .AddRemoteBusinessService<DummyRequest, DummyReply>("Dummy", "Dummy")
                         .AddBearerAuthentication(tokenValidationParameters)
                         .AddDatabaseConnectionFactory(databaseConnectionString!)

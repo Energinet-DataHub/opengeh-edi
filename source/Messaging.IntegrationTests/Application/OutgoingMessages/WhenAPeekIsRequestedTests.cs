@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using JetBrains.Annotations;
@@ -22,9 +23,13 @@ using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.Peek;
 using Messaging.Domain.SeedWork;
 using Messaging.Infrastructure.Configuration.DataAccess;
+using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Application.Transactions.MoveIn;
 using Messaging.IntegrationTests.Assertions;
+using Messaging.IntegrationTests.Factories;
 using Messaging.IntegrationTests.Fixtures;
+using Messaging.IntegrationTests.TestDoubles;
+using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using Xunit;
 
 namespace Messaging.IntegrationTests.Application.OutgoingMessages;
@@ -49,18 +54,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task A_message_bundle_is_returned()
     {
-        await Scenario.Details(
-            SampleData.TransactionId,
-            SampleData.MeteringPointNumber,
-            SampleData.SupplyStart,
-            SampleData.CurrentEnergySupplierNumber,
-            SampleData.NewEnergySupplierNumber,
-            SampleData.ConsumerId,
-            SampleData.ConsumerIdType,
-            SampleData.ConsumerName,
-            SampleData.OriginalMessageId,
-            GetService<IMediator>(),
-            GetService<B2BContext>()).IsEffective().BuildAsync().ConfigureAwait(false);
+        await GivenTwoMoveInTransactionHasBeenAccepted();
 
         var command = new PeekRequest(ActorNumber.Create(SampleData.NewEnergySupplierNumber), MessageCategory.MasterData);
         var result = await InvokeCommandAsync(command).ConfigureAwait(false);
@@ -69,6 +63,64 @@ public class WhenAPeekIsRequestedTests : TestBase
 
         AssertXmlMessage.Document(XDocument.Load(result.Bundle!))
             .IsDocumentType(DocumentType.ConfirmRequestChangeOfSupplier)
-            .IsProcesType(ProcessType.MoveIn);
+            .IsProcesType(ProcessType.MoveIn)
+            .HasMarketActivityRecordCount(2);
+    }
+
+    [Fact]
+    public async Task Bundled_message_contains_maximum_number_of_payloads()
+    {
+        SetMaximumNumberOfPayloadsInBundle(1);
+        await GivenTwoMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
+
+        var command = new PeekRequest(ActorNumber.Create(SampleData.NewEnergySupplierNumber), MessageCategory.MasterData);
+        var result = await InvokeCommandAsync(command).ConfigureAwait(false);
+
+        AssertXmlMessage.Document(XDocument.Load(result.Bundle!))
+            .IsDocumentType(DocumentType.ConfirmRequestChangeOfSupplier)
+            .IsProcesType(ProcessType.MoveIn)
+            .HasMarketActivityRecordCount(1);
+    }
+
+    private static IncomingMessageBuilder MessageBuilder()
+    {
+        return new IncomingMessageBuilder()
+            .WithEnergySupplierId(SampleData.NewEnergySupplierNumber)
+            .WithMessageId(SampleData.OriginalMessageId)
+            .WithTransactionId(SampleData.TransactionId);
+    }
+
+    private async Task GivenAMoveInTransactionHasBeenAccepted()
+    {
+        var incomingMessage = MessageBuilder()
+            .WithProcessType(ProcessType.MoveIn.Code)
+            .WithReceiver(SampleData.ReceiverId)
+            .WithSenderId(SampleData.SenderId)
+            .WithConsumerName(SampleData.ConsumerName)
+            .Build();
+
+        await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
+    }
+
+    private async Task GivenTwoMoveInTransactionHasBeenAccepted()
+    {
+        await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
+
+        var message = MessageBuilder()
+            .WithProcessType(ProcessType.MoveIn.Code)
+            .WithReceiver(SampleData.ReceiverId)
+            .WithSenderId(SampleData.SenderId)
+            .WithEffectiveDate(EffectiveDateFactory.OffsetDaysFromToday(1))
+            .WithConsumerId(ConsumerFactory.CreateConsumerId())
+            .WithConsumerName(ConsumerFactory.CreateConsumerName())
+            .WithTransactionId(Guid.NewGuid().ToString()).Build();
+
+        await InvokeCommandAsync(message).ConfigureAwait(false);
+    }
+
+    private void SetMaximumNumberOfPayloadsInBundle(int maxNumberOfPayloadsInBundle)
+    {
+        var bundleConfiguration = (BundleConfigurationStub)GetService<IBundleConfiguration>();
+        bundleConfiguration.MaxNumberOfPayloadsInBundle = maxNumberOfPayloadsInBundle;
     }
 }
