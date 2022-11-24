@@ -17,12 +17,18 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using JetBrains.Annotations;
 using MediatR;
+using Messaging.Application.Actors;
+using Messaging.Application.Configuration;
+using Messaging.Application.Configuration.TimeEvents;
 using Messaging.Application.OutgoingMessages.Peek;
+using Messaging.Application.Transactions.MoveIn;
 using Messaging.Domain.Actors;
+using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.Peek;
 using Messaging.Domain.SeedWork;
 using Messaging.Infrastructure.Configuration.DataAccess;
+using Messaging.Infrastructure.Transactions;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Application.Transactions.MoveIn;
 using Messaging.IntegrationTests.Assertions;
@@ -44,7 +50,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task When_no_messages_are_available_return_empty_result()
     {
-        var command = new PeekRequest(ActorNumber.Create(SampleData.NewEnergySupplierNumber), MessageCategory.AggregationData);
+        var command = CreatePeekRequest(MessageCategory.AggregationData);
 
         var result = await InvokeCommandAsync(command).ConfigureAwait(false);
 
@@ -56,7 +62,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     {
         await GivenTwoMoveInTransactionHasBeenAccepted();
 
-        var command = new PeekRequest(ActorNumber.Create(SampleData.NewEnergySupplierNumber), MessageCategory.MasterData);
+        var command = CreatePeekRequest(MessageCategory.MasterData);
         var result = await InvokeCommandAsync(command).ConfigureAwait(false);
 
         Assert.NotNull(result.Bundle);
@@ -73,13 +79,50 @@ public class WhenAPeekIsRequestedTests : TestBase
         SetMaximumNumberOfPayloadsInBundle(1);
         await GivenTwoMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
 
-        var command = new PeekRequest(ActorNumber.Create(SampleData.NewEnergySupplierNumber), MessageCategory.MasterData);
+        var command = CreatePeekRequest(MessageCategory.MasterData);
         var result = await InvokeCommandAsync(command).ConfigureAwait(false);
 
         AssertXmlMessage.Document(XDocument.Load(result.Bundle!))
             .IsDocumentType(DocumentType.ConfirmRequestChangeOfSupplier)
             .IsProcesType(ProcessType.MoveIn)
             .HasMarketActivityRecordCount(1);
+    }
+
+    [Fact]
+    public async Task Bundled_message_contains_payloads_for_the_requested_receiver_role()
+    {
+        var httpClientAdapter = (HttpClientSpy)GetService<IHttpClientAdapter>();
+        httpClientAdapter.RespondWithBusinessProcessId(SampleData.BusinessProcessId);
+        var gridOperatorId = Guid.NewGuid();
+        var gridOperatorNumber = SampleData.NewEnergySupplierNumber;
+        await GetService<IMediator>().Send(new CreateActor(gridOperatorId.ToString(), Guid.NewGuid().ToString(), gridOperatorNumber))
+            .ConfigureAwait(false);
+
+        var marketEvaluationPoint = new MarketEvaluationPoint(
+            Guid.Parse(SampleData.MarketEvaluationPointId),
+            SampleData.MeteringPointNumber);
+        marketEvaluationPoint.SetGridOperatorId(gridOperatorId);
+        var b2BContext = GetService<B2BContext>();
+        b2BContext.MarketEvaluationPoints.Add(marketEvaluationPoint);
+        await b2BContext.SaveChangesAsync().ConfigureAwait(false);
+
+        await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
+        await InvokeCommandAsync(new SetConsumerHasMovedIn(SampleData.BusinessProcessId.ToString()));
+        var mediator = GetService<IMediator>();
+        await mediator.Publish(new TenSecondsHasHasPassed(GetService<ISystemDateTimeProvider>().Now()));
+
+        var command = CreatePeekRequest(MessageCategory.MasterData);
+        var result = await InvokeCommandAsync(command).ConfigureAwait(false);
+
+        AssertXmlMessage.Document(XDocument.Load(result.Bundle!))
+            .IsDocumentType(DocumentType.ConfirmRequestChangeOfSupplier)
+            .IsProcesType(ProcessType.MoveIn)
+            .HasMarketActivityRecordCount(1);
+    }
+
+    private static PeekRequest CreatePeekRequest(MessageCategory messageCategory)
+    {
+        return new PeekRequest(ActorNumber.Create(SampleData.NewEnergySupplierNumber), messageCategory, MarketRole.EnergySupplier);
     }
 
     private static IncomingMessageBuilder MessageBuilder()
@@ -93,6 +136,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     private async Task GivenAMoveInTransactionHasBeenAccepted()
     {
         var incomingMessage = MessageBuilder()
+            .WithMarketEvaluationPointId(SampleData.MeteringPointNumber)
             .WithProcessType(ProcessType.MoveIn.Code)
             .WithReceiver(SampleData.ReceiverId)
             .WithSenderId(SampleData.SenderId)

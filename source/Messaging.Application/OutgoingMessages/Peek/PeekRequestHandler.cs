@@ -49,7 +49,7 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
 
         if (request.MessageCategory == MessageCategory.MasterData)
         {
-            var messages = await _enqueuedMessages.GetByAsync(request.ActorNumber).ConfigureAwait(false);
+            var messages = await _enqueuedMessages.GetByAsync(request.ActorNumber, request.MarketRole).ConfigureAwait(false);
 
             var bundle = CreateBundleFrom(messages.ToList());
             var cimMessage = bundle.CreateMessage();
@@ -73,6 +73,6 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
     }
 }
 
-public record PeekRequest(ActorNumber ActorNumber, MessageCategory MessageCategory) : ICommand<PeekResult>;
+public record PeekRequest(ActorNumber ActorNumber, MessageCategory MessageCategory, MarketRole MarketRole) : ICommand<PeekResult>;
 
 public record PeekResult(Stream? Bundle);

@@ -13,18 +13,12 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using Messaging.Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
-using Messaging.IntegrationTests.Factories;
-using NodaTime;
 
 namespace Messaging.IntegrationTests.Application.OutgoingMessages;
 
 internal static class SampleData
 {
     internal static string MeteringPointNumber => "571234567891234568";
-
-    internal static string CurrentEnergySupplierNumber => "5790000555550";
 
     internal static string NewEnergySupplierNumber => "5790000555551";
 
@@ -34,29 +28,11 @@ internal static class SampleData
 
     internal static string OriginalMessageId => "EDE97146-C592-489A-B23A-3C73C096E368";
 
-    internal static string ConsumerId => "12341234";
-
     internal static string ConsumerName => "John Doe";
-
-    internal static string ConsumerIdType => "ARR";
 
     internal static string ReceiverId => "5790001330552";
 
     internal static string SenderId => "5790000555551";
 
-    internal static bool ElectricalHeating => false;
-
-    internal static Instant ElectricalHeatingStart => EffectiveDateFactory.InstantAsOfToday();
-
-    internal static bool ProtectedName => false;
-
-    internal static bool HasEnergySupplier => true;
-
-    internal static Instant SupplyStart => EffectiveDateFactory.InstantAsOfToday();
-
-    internal static IEnumerable<UsagePointLocation> UsagePointLocations => new List<UsagePointLocation>();
-
-    internal static Guid IdOfGridOperatorForMeteringPoint => Guid.Parse("E754226C-3A5C-4E04-A1D4-6FE58782FDC2");
-
-    internal static string NumberOfGridOperatorForMeteringPoint => "1234567890123";
+    internal static Guid BusinessProcessId => Guid.Parse("F43D99F0-CE9A-4CDA-9192-4BE20C243CD5");
 }

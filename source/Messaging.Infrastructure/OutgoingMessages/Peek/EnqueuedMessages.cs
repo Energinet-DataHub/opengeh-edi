@@ -37,11 +37,21 @@ public class EnqueuedMessages : IEnqueuedMessages
         _bundleConfiguration = bundleConfiguration;
     }
 
-    public async Task<IEnumerable<OutgoingMessage>> GetByAsync(ActorNumber actorNumber)
+    public async Task<IEnumerable<OutgoingMessage>> GetByAsync(ActorNumber actorNumber, MarketRole actorRole)
     {
+        ArgumentNullException.ThrowIfNull(actorRole);
         ArgumentNullException.ThrowIfNull(actorNumber);
-        var sqlStatement = $"SELECT TOP({_bundleConfiguration.MaxNumberOfPayloadsInBundle}) * FROM [b2b].[ActorMessageQueue_{actorNumber.Value}]";
-        var messages = await _connectionFactory.GetOpenConnection().QueryAsync<OutgoingMessageEntity>(sqlStatement).ConfigureAwait(false);
+
+        var sqlStatement =
+            @$"SELECT TOP({_bundleConfiguration.MaxNumberOfPayloadsInBundle}) * FROM [b2b].[ActorMessageQueue_{actorNumber.Value}]
+            WHERE ReceiverRole = @ReceiverRole";
+
+        var messages = await _connectionFactory
+            .GetOpenConnection()
+            .QueryAsync<OutgoingMessageEntity>(sqlStatement, new
+            {
+                ReceiverRole = actorRole.Name,
+            }).ConfigureAwait(false);
         return messages.Select(m => new OutgoingMessage(
             EnumerationType.FromName<DocumentType>(m.DocumentType),
             ActorNumber.Create(m.ReceiverId),
