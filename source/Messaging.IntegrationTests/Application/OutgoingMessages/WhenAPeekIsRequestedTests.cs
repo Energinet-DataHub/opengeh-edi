@@ -13,11 +13,13 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using MediatR;
 using Messaging.Application.Actors;
 using Messaging.Application.Configuration;
+using Messaging.Application.Configuration.Commands.Commands;
 using Messaging.Application.Configuration.TimeEvents;
 using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Application.Transactions.MoveIn;
@@ -87,12 +89,14 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task Bundled_message_contains_payloads_for_the_requested_receiver_role()
     {
+        var scenario = new ScenarioSetup(this);
+
+        var gridOperatorId = Guid.NewGuid();
+        await scenario
+            .HasActor(gridOperatorId, SampleData.NewEnergySupplierNumber)
+            .BuildAsync().ConfigureAwait(false);
         var httpClientAdapter = (HttpClientSpy)GetService<IHttpClientAdapter>();
         httpClientAdapter.RespondWithBusinessProcessId(SampleData.BusinessProcessId);
-        var gridOperatorId = Guid.NewGuid();
-        var gridOperatorNumber = SampleData.NewEnergySupplierNumber;
-        await GetService<IMediator>().Send(new CreateActor(gridOperatorId.ToString(), Guid.NewGuid().ToString(), gridOperatorNumber))
-            .ConfigureAwait(false);
 
         var marketEvaluationPoint = new MarketEvaluationPoint(
             Guid.Parse(SampleData.MarketEvaluationPointId),
@@ -162,5 +166,32 @@ public class WhenAPeekIsRequestedTests : TestBase
     {
         var bundleConfiguration = (BundleConfigurationStub)GetService<IBundleConfiguration>();
         bundleConfiguration.MaxNumberOfPayloadsInBundle = maxNumberOfPayloadsInBundle;
+    }
+}
+
+#pragma warning disable
+public class ScenarioSetup
+{
+    private readonly TestBase _testBase;
+    private List<object> _commands = new List<object>();
+
+    public ScenarioSetup(TestBase testBase)
+    {
+        _testBase = testBase;
+
+    }
+
+    public ScenarioSetup HasActor(Guid actorId, string actorNumber)
+    {
+        _commands.Add(new CreateActor(actorId.ToString(), Guid.NewGuid().ToString(), actorNumber));
+        return this;
+    }
+
+    public async Task BuildAsync()
+    {
+        foreach (var command in _commands)
+        {
+            await _testBase.InvokeCommandAsync(command).ConfigureAwait(false);
+        }
     }
 }

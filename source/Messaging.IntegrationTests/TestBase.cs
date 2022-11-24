@@ -77,6 +77,11 @@ namespace Messaging.IntegrationTests
             _serviceProvider = _services.BuildServiceProvider();
         }
 
+        public Task InvokeCommandAsync(object command)
+        {
+            return GetService<IMediator>().Send(command);
+        }
+
         public void Dispose()
         {
             Dispose(true);
@@ -105,11 +110,6 @@ namespace Messaging.IntegrationTests
         {
             _services.AddScoped(_ => instance);
             _serviceProvider = _services.BuildServiceProvider();
-        }
-
-        protected Task InvokeCommandAsync(object command)
-        {
-            return GetService<IMediator>().Send(command);
         }
 
         protected Task<TResult> InvokeCommandAsync<TResult>(ICommand<TResult> command)
