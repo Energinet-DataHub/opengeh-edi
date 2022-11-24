@@ -15,7 +15,6 @@
 using System;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using JetBrains.Annotations;
 using MediatR;
 using Messaging.Application.Actors;
 using Messaging.Application.Configuration;
@@ -26,16 +25,13 @@ using Messaging.Domain.Actors;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.Peek;
-using Messaging.Domain.SeedWork;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.Infrastructure.Transactions;
 using Messaging.IntegrationTests.Application.IncomingMessages;
-using Messaging.IntegrationTests.Application.Transactions.MoveIn;
 using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Factories;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.TestDoubles;
-using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using Xunit;
 
 namespace Messaging.IntegrationTests.Application.OutgoingMessages;
