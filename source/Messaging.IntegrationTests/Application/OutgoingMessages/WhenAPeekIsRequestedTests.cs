@@ -13,21 +13,17 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using MediatR;
-using Messaging.Application.Actors;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.Commands.Commands;
 using Messaging.Application.Configuration.TimeEvents;
 using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Domain.Actors;
-using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.Peek;
-using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.Infrastructure.Transactions;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Assertions;
@@ -115,9 +111,9 @@ public class WhenAPeekIsRequestedTests : TestBase
 
     private async Task GivenMoveInHasCompleted()
     {
-        await new ScenarioSetup(this)
-            .HasActor(SampleData.GridOperatorId, SampleData.GridOperatorNumber)
-            .HasMarketEvaluationPoint(
+        await new TestDataBuilder(this)
+            .AddActor(SampleData.GridOperatorId, SampleData.GridOperatorNumber)
+            .AddMarketEvaluationPoint(
                 Guid.Parse(SampleData.MarketEvaluationPointId),
                 SampleData.GridOperatorId,
                 SampleData.MeteringPointNumber)
@@ -164,50 +160,5 @@ public class WhenAPeekIsRequestedTests : TestBase
     {
         var bundleConfiguration = (BundleConfigurationStub)GetService<IBundleConfiguration>();
         bundleConfiguration.MaxNumberOfPayloadsInBundle = maxNumberOfPayloadsInBundle;
-    }
-}
-
-#pragma warning disable
-public class ScenarioSetup
-{
-    private readonly TestBase _testBase;
-    private readonly List<object> _commands = new();
-
-    public ScenarioSetup(TestBase testBase)
-    {
-        _testBase = testBase;
-
-    }
-
-    public ScenarioSetup HasActor(Guid actorId, string actorNumber)
-    {
-        _commands.Add(new CreateActor(actorId.ToString(), Guid.NewGuid().ToString(), actorNumber));
-        return this;
-    }
-
-    public ScenarioSetup HasMarketEvaluationPoint(Guid marketEvaluationPointId, Guid gridOperatorId, string marketEvaluationPointNumber)
-    {
-        var marketEvaluationPoint = new MarketEvaluationPoint(
-            marketEvaluationPointId,
-            marketEvaluationPointNumber);
-        marketEvaluationPoint.SetGridOperatorId(gridOperatorId);
-        var b2BContext = _testBase.GetService<B2BContext>();
-        b2BContext.MarketEvaluationPoints.Add(marketEvaluationPoint);
-
-        return this;
-    }
-
-
-
-    public async Task BuildAsync()
-    {
-        foreach (var command in _commands)
-        {
-            await _testBase.InvokeCommandAsync(command).ConfigureAwait(false);
-        }
-
-        var b2BContext = _testBase.GetService<B2BContext>();
-        if(b2BContext.ChangeTracker.HasChanges())
-            await b2BContext.SaveChangesAsync().ConfigureAwait(false);
     }
 }
