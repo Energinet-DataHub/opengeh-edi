@@ -94,17 +94,13 @@ public class WhenAPeekIsRequestedTests : TestBase
         var gridOperatorId = Guid.NewGuid();
         await scenario
             .HasActor(gridOperatorId, SampleData.NewEnergySupplierNumber)
+            .HasMarketEvaluationPoint(
+                Guid.Parse(SampleData.MarketEvaluationPointId),
+                gridOperatorId,
+                SampleData.MeteringPointNumber)
             .BuildAsync().ConfigureAwait(false);
         var httpClientAdapter = (HttpClientSpy)GetService<IHttpClientAdapter>();
         httpClientAdapter.RespondWithBusinessProcessId(SampleData.BusinessProcessId);
-
-        var marketEvaluationPoint = new MarketEvaluationPoint(
-            Guid.Parse(SampleData.MarketEvaluationPointId),
-            SampleData.MeteringPointNumber);
-        marketEvaluationPoint.SetGridOperatorId(gridOperatorId);
-        var b2BContext = GetService<B2BContext>();
-        b2BContext.MarketEvaluationPoints.Add(marketEvaluationPoint);
-        await b2BContext.SaveChangesAsync().ConfigureAwait(false);
 
         await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
         await InvokeCommandAsync(new SetConsumerHasMovedIn(SampleData.BusinessProcessId.ToString()));
@@ -173,7 +169,7 @@ public class WhenAPeekIsRequestedTests : TestBase
 public class ScenarioSetup
 {
     private readonly TestBase _testBase;
-    private List<object> _commands = new List<object>();
+    private readonly List<object> _commands = new();
 
     public ScenarioSetup(TestBase testBase)
     {
@@ -187,11 +183,29 @@ public class ScenarioSetup
         return this;
     }
 
+    public ScenarioSetup HasMarketEvaluationPoint(Guid marketEvaluationPointId, Guid gridOperatorId, string marketEvaluationPointNumber)
+    {
+        var marketEvaluationPoint = new MarketEvaluationPoint(
+            marketEvaluationPointId,
+            marketEvaluationPointNumber);
+        marketEvaluationPoint.SetGridOperatorId(gridOperatorId);
+        var b2BContext = _testBase.GetService<B2BContext>();
+        b2BContext.MarketEvaluationPoints.Add(marketEvaluationPoint);
+
+        return this;
+    }
+
+
+
     public async Task BuildAsync()
     {
         foreach (var command in _commands)
         {
             await _testBase.InvokeCommandAsync(command).ConfigureAwait(false);
         }
+
+        var b2BContext = _testBase.GetService<B2BContext>();
+        if(b2BContext.ChangeTracker.HasChanges())
+            await b2BContext.SaveChangesAsync().ConfigureAwait(false);
     }
 }
