@@ -26,19 +26,26 @@ namespace Messaging.IntegrationTests.Fixtures
 {
     public class DatabaseFixture : IDisposable, IAsyncLifetime
     {
+        private static string _connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;Initial Catalog=B2BTransactions;Integrated Security=True;Connection Timeout=60";
         private readonly B2BContext _context;
         private bool _disposed;
 
         public DatabaseFixture()
         {
+            var environmentVariableConnectionString = Environment.GetEnvironmentVariable("B2B_MESSAGING_CONNECTION_STRING");
+            if (!string.IsNullOrWhiteSpace(environmentVariableConnectionString))
+            {
+                _connectionString = environmentVariableConnectionString;
+            }
+
             var optionsBuilder = new DbContextOptionsBuilder<B2BContext>();
             optionsBuilder
-                .UseSqlServer(ConnectionString, options => options.UseNodaTime());
+                .UseSqlServer(_connectionString, options => options.UseNodaTime());
 
             _context = new B2BContext(optionsBuilder.Options, new Serializer());
         }
 
-        public string ConnectionString { get; } = @"Data Source=(LocalDB)\MSSQLLocalDB;Initial Catalog=B2BTransactions;Integrated Security=True;Connection Timeout=60";
+        public static string ConnectionString => _connectionString;
 
         public Task InitializeAsync()
         {
@@ -89,7 +96,7 @@ namespace Messaging.IntegrationTests.Fixtures
             _disposed = true;
         }
 
-        private void CreateSchema()
+        private static void CreateSchema()
         {
             DefaultUpgrader.Upgrade(ConnectionString);
         }

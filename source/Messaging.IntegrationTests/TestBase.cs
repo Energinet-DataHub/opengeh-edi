@@ -58,8 +58,8 @@ namespace Messaging.IntegrationTests
             CompositionRoot.Initialize(_services)
                 .AddPeekConfiguration(new BundleConfigurationStub())
                 .AddRemoteBusinessService<DummyRequest, DummyReply>(sp => new RemoteBusinessServiceRequestSenderSpy<DummyRequest>("Dummy"), "Dummy")
-                .AddDatabaseConnectionFactory(_databaseFixture.ConnectionString)
-                .AddDatabaseContext(_databaseFixture.ConnectionString)
+                .AddDatabaseConnectionFactory(DatabaseFixture.ConnectionString)
+                .AddDatabaseContext(DatabaseFixture.ConnectionString)
                 .AddSystemClock(new SystemDateTimeProviderStub())
                 .AddCorrelationContext(_ =>
                 {
