@@ -1,0 +1,57 @@
+diff --git a/source/Messaging.IntegrationTests/Fixtures/DatabaseFixture.cs b/source/Messaging.IntegrationTests/Fixtures/DatabaseFixture.cs
+index c88b5dfc..261c887d 100644
+--- a/source/Messaging.IntegrationTests/Fixtures/DatabaseFixture.cs
++++ b/source/Messaging.IntegrationTests/Fixtures/DatabaseFixture.cs
+@@ -26,19 +26,26 @@ namespace Messaging.IntegrationTests.Fixtures
+ {
+     public class DatabaseFixture : IDisposable, IAsyncLifetime
+     {
++        private static string _connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;Initial Catalog=B2BTransactions;Integrated Security=True;Connection Timeout=60";
+         private readonly B2BContext _context;
+         private bool _disposed;
+ 
+         public DatabaseFixture()
+         {
++            var environmentVariableConnectionString = Environment.GetEnvironmentVariable("B2B_MESSAGING_CONNECTION_STRING");
++            if (!string.IsNullOrWhiteSpace(environmentVariableConnectionString))
++            {
++                _connectionString = environmentVariableConnectionString;
++            }
++
+             var optionsBuilder = new DbContextOptionsBuilder<B2BContext>();
+             optionsBuilder
+-                .UseSqlServer(ConnectionString, options => options.UseNodaTime());
++                .UseSqlServer(_connectionString, options => options.UseNodaTime());
+ 
+             _context = new B2BContext(optionsBuilder.Options, new Serializer());
+         }
+ 
+-        public string ConnectionString { get; } = @"Data Source=(LocalDB)\MSSQLLocalDB;Initial Catalog=B2BTransactions;Integrated Security=True;Connection Timeout=60";
++        public static string ConnectionString => _connectionString;
+ 
+         public Task InitializeAsync()
+         {
+@@ -89,7 +96,7 @@ namespace Messaging.IntegrationTests.Fixtures
+             _disposed = true;
+         }
+ 
+-        private void CreateSchema()
++        private static void CreateSchema()
+         {
+             DefaultUpgrader.Upgrade(ConnectionString);
+         }
+diff --git a/source/Messaging.IntegrationTests/TestBase.cs b/source/Messaging.IntegrationTests/TestBase.cs
+index 4251687f..ba814701 100644
+--- a/source/Messaging.IntegrationTests/TestBase.cs
++++ b/source/Messaging.IntegrationTests/TestBase.cs
+@@ -58,8 +58,8 @@ namespace Messaging.IntegrationTests
+             CompositionRoot.Initialize(_services)
+                 .AddPeekConfiguration(new BundleConfigurationStub())
+                 .AddRemoteBusinessService<DummyRequest, DummyReply>(sp => new RemoteBusinessServiceRequestSenderSpy<DummyRequest>("Dummy"), "Dummy")
+-                .AddDatabaseConnectionFactory(_databaseFixture.ConnectionString)
+-                .AddDatabaseContext(_databaseFixture.ConnectionString)
++                .AddDatabaseConnectionFactory(DatabaseFixture.ConnectionString)
++                .AddDatabaseContext(DatabaseFixture.ConnectionString)
+                 .AddSystemClock(new SystemDateTimeProviderStub())
+                 .AddCorrelationContext(_ =>
+                 {

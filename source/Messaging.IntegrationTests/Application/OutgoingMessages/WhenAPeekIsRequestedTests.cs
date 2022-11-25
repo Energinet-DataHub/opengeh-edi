@@ -89,22 +89,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task Bundled_message_contains_payloads_for_the_requested_receiver_role()
     {
-        var scenario = new ScenarioSetup(this);
-
-        await scenario
-            .HasActor(SampleData.GridOperatorId, SampleData.GridOperatorNumber)
-            .HasMarketEvaluationPoint(
-                Guid.Parse(SampleData.MarketEvaluationPointId),
-                SampleData.GridOperatorId,
-                SampleData.MeteringPointNumber)
-            .BuildAsync().ConfigureAwait(false);
-        var httpClientAdapter = (HttpClientSpy)GetService<IHttpClientAdapter>();
-        httpClientAdapter.RespondWithBusinessProcessId(SampleData.BusinessProcessId);
-
-        await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
-        await InvokeCommandAsync(new SetConsumerHasMovedIn(SampleData.BusinessProcessId.ToString()));
-        var mediator = GetService<IMediator>();
-        await mediator.Publish(new TenSecondsHasHasPassed(GetService<ISystemDateTimeProvider>().Now()));
+        await GivenMoveInHasCompleted().ConfigureAwait(false);
 
         var command = CreatePeekRequest(MessageCategory.MasterData);
         var result = await InvokeCommandAsync(command).ConfigureAwait(false);
@@ -126,6 +111,24 @@ public class WhenAPeekIsRequestedTests : TestBase
             .WithEnergySupplierId(SampleData.NewEnergySupplierNumber)
             .WithMessageId(SampleData.OriginalMessageId)
             .WithTransactionId(SampleData.TransactionId);
+    }
+
+    private async Task GivenMoveInHasCompleted()
+    {
+        await new ScenarioSetup(this)
+            .HasActor(SampleData.GridOperatorId, SampleData.GridOperatorNumber)
+            .HasMarketEvaluationPoint(
+                Guid.Parse(SampleData.MarketEvaluationPointId),
+                SampleData.GridOperatorId,
+                SampleData.MeteringPointNumber)
+            .BuildAsync().ConfigureAwait(false);
+
+        var httpClientAdapter = (HttpClientSpy)GetService<IHttpClientAdapter>();
+        httpClientAdapter.RespondWithBusinessProcessId(SampleData.BusinessProcessId);
+
+        await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
+        await InvokeCommandAsync(new SetConsumerHasMovedIn(SampleData.BusinessProcessId.ToString())).ConfigureAwait(false);
+        await SimulateTenSecondsHasPassedAsync().ConfigureAwait(false);
     }
 
     private async Task GivenAMoveInTransactionHasBeenAccepted()
