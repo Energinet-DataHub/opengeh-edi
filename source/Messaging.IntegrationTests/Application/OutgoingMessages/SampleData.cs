@@ -35,4 +35,8 @@ internal static class SampleData
     internal static string SenderId => "5790000555551";
 
     internal static Guid BusinessProcessId => Guid.Parse("F43D99F0-CE9A-4CDA-9192-4BE20C243CD5");
+
+    internal static Guid GridOperatorId => Guid.Parse("AC509EEB-C67E-4E64-A94F-23C0C6BC4828");
+
+    internal static string GridOperatorNumber => "5790000555551";
 }

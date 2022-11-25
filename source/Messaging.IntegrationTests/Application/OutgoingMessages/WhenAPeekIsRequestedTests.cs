@@ -91,12 +91,11 @@ public class WhenAPeekIsRequestedTests : TestBase
     {
         var scenario = new ScenarioSetup(this);
 
-        var gridOperatorId = Guid.NewGuid();
         await scenario
-            .HasActor(gridOperatorId, SampleData.NewEnergySupplierNumber)
+            .HasActor(SampleData.GridOperatorId, SampleData.GridOperatorNumber)
             .HasMarketEvaluationPoint(
                 Guid.Parse(SampleData.MarketEvaluationPointId),
-                gridOperatorId,
+                SampleData.GridOperatorId,
                 SampleData.MeteringPointNumber)
             .BuildAsync().ConfigureAwait(false);
         var httpClientAdapter = (HttpClientSpy)GetService<IHttpClientAdapter>();
