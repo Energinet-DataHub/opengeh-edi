@@ -42,11 +42,11 @@ public class EnqueuedMessages : IEnqueuedMessages
         ArgumentNullException.ThrowIfNull(actorRole);
         ArgumentNullException.ThrowIfNull(actorNumber);
 
-        var findOldestRecordQuery = @$"SELECT TOP(1) ProcessType, DocumentType FROM [b2b].[ActorMessageQueue_{actorNumber.Value}]
+        var findOldestRecordQuery = @$"SELECT TOP(1) {nameof(OldestMessage.ProcessType)}, {nameof(OldestMessage.DocumentType)} FROM [b2b].[ActorMessageQueue_{actorNumber.Value}]
                 WHERE ReceiverRole = @ReceiverRole";
         var oldestRecord = await _connectionFactory
             .GetOpenConnection()
-            .QuerySingleAsync(findOldestRecordQuery, new
+            .QuerySingleAsync<OldestMessage>(findOldestRecordQuery, new
             {
                 ReceiverRole = actorRole.Name,
             })
@@ -74,6 +74,8 @@ public class EnqueuedMessages : IEnqueuedMessages
             EnumerationType.FromName<MarketRole>(m.SenderRole),
             m.Payload));
     }
+
+    private record OldestMessage(string ProcessType, string DocumentType);
 }
 
 public record OutgoingMessageEntity(int RecordId, Guid Id, string DocumentType, string ReceiverId, string ReceiverRole, string SenderId, string SenderRole, string ProcessType, string Payload);
