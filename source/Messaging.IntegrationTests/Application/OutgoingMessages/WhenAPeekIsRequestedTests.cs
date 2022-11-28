@@ -15,6 +15,8 @@
 using System;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Dapper;
+using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Domain.Actors;
@@ -81,7 +83,12 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task Bundled_message_contains_payloads_for_the_requested_receiver_role()
     {
+        var actor = SampleData.NewEnergySupplierNumber;
+
+        await CreateActorMessageQueueTableAsync(actor).ConfigureAwait(false);
+        await InsertFakeBusinessProcessDataAsync(actor, MarketRole.EnergySupplier).ConfigureAwait(false);
         await GivenMoveInHasCompleted().ConfigureAwait(false);
+        await InsertFakeBusinessProcessDataAsync(actor, MarketRole.EnergySupplier).ConfigureAwait(false);
 
         var command = CreatePeekRequest(MessageCategory.MasterData);
         var result = await InvokeCommandAsync(command).ConfigureAwait(false);
@@ -104,6 +111,47 @@ public class WhenAPeekIsRequestedTests : TestBase
             .WithEnergySupplierId(SampleData.NewEnergySupplierNumber)
             .WithMessageId(SampleData.OriginalMessageId)
             .WithTransactionId(SampleData.TransactionId);
+    }
+
+    private Task CreateActorMessageQueueTableAsync(string actor)
+    {
+        var sql = @$"CREATE TABLE [B2B].ActorMessageQueue_{actor}(
+        [RecordId]                        [int] IDENTITY (1,1) NOT NULL,
+        [Id]                              [uniqueIdentifier] NOT NULL,
+        [DocumentType]                    [VARCHAR](255)     NOT NULL,
+        [ReceiverId]                      [VARCHAR](255)     NOT NULL,
+        [ReceiverRole]                    [VARCHAR](50)      NOT NULL,
+        [SenderId]                        [VARCHAR](255)     NOT NULL,
+        [SenderRole]                      [VARCHAR](50)      NOT NULL,
+        [ProcessType]                     [VARCHAR](50)      NOT NULL,
+        [Payload]                         [NVARCHAR](MAX)    NOT NULL,
+        CONSTRAINT [PK_ActorMessageQueue_{actor}_Id] PRIMARY KEY NONCLUSTERED
+                (
+            [Id] ASC
+            ) WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF) ON [PRIMARY]
+            ) ON [PRIMARY]";
+
+        return GetService<IDbConnectionFactory>().GetOpenConnection().ExecuteAsync(sql);
+    }
+
+    private async Task InsertFakeBusinessProcessDataAsync(string actor, MarketRole receiverRole)
+    {
+        var sql = @$"INSERT INTO [B2B].[ActorMessageQueue_{actor}] VALUES (@Id, @DocumentType, @ReceiverId, @ReceiverRole, @SenderId, @SenderRole, @ProcessType, @Payload)";
+
+        for (var i = 0; i < 3; i++)
+        {
+            await GetService<IDbConnectionFactory>().GetOpenConnection().ExecuteAsync(sql, new
+            {
+                Id = Guid.NewGuid(),
+                DocumentType = "FakeDocumentType",
+                ReceiverId = SampleData.NewEnergySupplierNumber,
+                ReceiverRole = receiverRole.Name,
+                SenderId = Guid.NewGuid().ToString(),
+                SenderRole = "FakeSenderRole",
+                ProcessType = "FakeBusinessProcess",
+                Payload = "Payload",
+            }).ConfigureAwait(false);
+        }
     }
 
     private async Task GivenMoveInHasCompleted()
