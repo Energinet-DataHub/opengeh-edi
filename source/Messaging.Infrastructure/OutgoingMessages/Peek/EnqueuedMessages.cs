@@ -42,15 +42,7 @@ public class EnqueuedMessages : IEnqueuedMessages
         ArgumentNullException.ThrowIfNull(actorRole);
         ArgumentNullException.ThrowIfNull(actorNumber);
 
-        var findOldestRecordQuery = @$"SELECT TOP(1) {nameof(OldestMessage.ProcessType)}, {nameof(OldestMessage.DocumentType)} FROM [b2b].[ActorMessageQueue_{actorNumber.Value}]
-                WHERE ReceiverRole = @ReceiverRole";
-        var oldestRecord = await _connectionFactory
-            .GetOpenConnection()
-            .QuerySingleAsync<OldestMessage>(findOldestRecordQuery, new
-            {
-                ReceiverRole = actorRole.Name,
-            })
-            .ConfigureAwait(false);
+        var oldestMessage = await FindOldestMessageAsync(actorNumber, actorRole).ConfigureAwait(false);
 
         var sqlStatement =
             @$"SELECT TOP({_bundleConfiguration.MaxNumberOfPayloadsInBundle}) * FROM [b2b].[ActorMessageQueue_{actorNumber.Value}]
@@ -61,8 +53,8 @@ public class EnqueuedMessages : IEnqueuedMessages
             .QueryAsync<OutgoingMessageEntity>(sqlStatement, new
             {
                 ReceiverRole = actorRole.Name,
-                ProcessType = oldestRecord.ProcessType,
-                DocumentType = oldestRecord.DocumentType,
+                ProcessType = oldestMessage.ProcessType,
+                DocumentType = oldestMessage.DocumentType,
             }).ConfigureAwait(false);
         return messages.Select(m => new OutgoingMessage(
             EnumerationType.FromName<DocumentType>(m.DocumentType),
@@ -73,6 +65,20 @@ public class EnqueuedMessages : IEnqueuedMessages
             ActorNumber.Create(m.SenderId),
             EnumerationType.FromName<MarketRole>(m.SenderRole),
             m.Payload));
+    }
+
+    private async Task<OldestMessage> FindOldestMessageAsync(ActorNumber actorNumber, MarketRole actorRole)
+    {
+        return await _connectionFactory
+            .GetOpenConnection()
+            .QuerySingleAsync<OldestMessage>(
+                @$"SELECT TOP(1) {nameof(OldestMessage.ProcessType)}, {nameof(OldestMessage.DocumentType)} FROM [b2b].[ActorMessageQueue_{actorNumber.Value}]
+                WHERE ReceiverRole = @ReceiverRole",
+                new
+            {
+                ReceiverRole = actorRole.Name,
+            })
+            .ConfigureAwait(false);
     }
 
     private record OldestMessage(string ProcessType, string DocumentType);
