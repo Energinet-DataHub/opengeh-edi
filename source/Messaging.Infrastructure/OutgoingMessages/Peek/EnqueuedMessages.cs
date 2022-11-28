@@ -42,11 +42,11 @@ public class EnqueuedMessages : IEnqueuedMessages
         ArgumentNullException.ThrowIfNull(actorRole);
         ArgumentNullException.ThrowIfNull(actorNumber);
 
-        var findOldestRecordQuery = @$"SELECT TOP(1) ProcessType FROM [b2b].[ActorMessageQueue_{actorNumber.Value}]
+        var findOldestRecordQuery = @$"SELECT TOP(1) ProcessType, DocumentType FROM [b2b].[ActorMessageQueue_{actorNumber.Value}]
                 WHERE ReceiverRole = @ReceiverRole";
-        var processTypeOfOldestRecord = await _connectionFactory
+        var oldestRecord = await _connectionFactory
             .GetOpenConnection()
-            .QuerySingleAsync<string>(findOldestRecordQuery, new
+            .QuerySingleAsync(findOldestRecordQuery, new
             {
                 ReceiverRole = actorRole.Name,
             })
@@ -54,14 +54,15 @@ public class EnqueuedMessages : IEnqueuedMessages
 
         var sqlStatement =
             @$"SELECT TOP({_bundleConfiguration.MaxNumberOfPayloadsInBundle}) * FROM [b2b].[ActorMessageQueue_{actorNumber.Value}]
-            WHERE ProcessType = @ProcessType AND ReceiverRole = @ReceiverRole";
+            WHERE ProcessType = @ProcessType AND ReceiverRole = @ReceiverRole AND DocumentType = @DocumentType";
 
         var messages = await _connectionFactory
             .GetOpenConnection()
             .QueryAsync<OutgoingMessageEntity>(sqlStatement, new
             {
                 ReceiverRole = actorRole.Name,
-                ProcessType = processTypeOfOldestRecord,
+                ProcessType = oldestRecord.ProcessType,
+                DocumentType = oldestRecord.DocumentType,
             }).ConfigureAwait(false);
         return messages.Select(m => new OutgoingMessage(
             EnumerationType.FromName<DocumentType>(m.DocumentType),
