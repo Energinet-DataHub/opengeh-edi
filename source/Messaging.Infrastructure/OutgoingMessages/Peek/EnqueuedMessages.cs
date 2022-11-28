@@ -42,15 +42,26 @@ public class EnqueuedMessages : IEnqueuedMessages
         ArgumentNullException.ThrowIfNull(actorRole);
         ArgumentNullException.ThrowIfNull(actorNumber);
 
+        var findOldestRecordQuery = @$"SELECT TOP(1) ProcessType FROM [b2b].[ActorMessageQueue_{actorNumber.Value}]
+                WHERE ReceiverRole = @ReceiverRole";
+        var processTypeOfOldestRecord = await _connectionFactory
+            .GetOpenConnection()
+            .QuerySingleAsync<string>(findOldestRecordQuery, new
+            {
+                ReceiverRole = actorRole.Name,
+            })
+            .ConfigureAwait(false);
+
         var sqlStatement =
             @$"SELECT TOP({_bundleConfiguration.MaxNumberOfPayloadsInBundle}) * FROM [b2b].[ActorMessageQueue_{actorNumber.Value}]
-            WHERE ReceiverRole = @ReceiverRole";
+            WHERE ProcessType = @ProcessType AND ReceiverRole = @ReceiverRole";
 
         var messages = await _connectionFactory
             .GetOpenConnection()
             .QueryAsync<OutgoingMessageEntity>(sqlStatement, new
             {
                 ReceiverRole = actorRole.Name,
+                ProcessType = processTypeOfOldestRecord,
             }).ConfigureAwait(false);
         return messages.Select(m => new OutgoingMessage(
             EnumerationType.FromName<DocumentType>(m.DocumentType),

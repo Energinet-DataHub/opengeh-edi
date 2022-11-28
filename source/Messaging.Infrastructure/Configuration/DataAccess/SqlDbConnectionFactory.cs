@@ -37,7 +37,7 @@ namespace Messaging.Infrastructure.Configuration.DataAccess
                 _connection = new SqlConnection(_connectionString);
             }
 
-            if (_connection.State != ConnectionState.Closed)
+            if (_connection.State != ConnectionState.Open)
             {
                 _connection.Open();
             }
