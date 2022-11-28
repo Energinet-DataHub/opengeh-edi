@@ -30,6 +30,7 @@ public class HttpClientSpy : IHttpClientAdapter
     private readonly List<string> _validationErrors = new();
     private string _messageBody = string.Empty;
     private HttpStatusCode _responseCode = HttpStatusCode.OK;
+    private string _businessProcessId = Guid.NewGuid().ToString();
 
     public void AssertJsonContent(object expectedContent)
     {
@@ -53,9 +54,14 @@ public class HttpClientSpy : IHttpClientAdapter
         _validationErrors.AddRange(validationErrors);
     }
 
+    public void RespondWithBusinessProcessId(Guid businessProcessId)
+    {
+        _businessProcessId = businessProcessId.ToString();
+    }
+
     private HttpResponseMessage CreateResponseFromProcessing()
     {
-        var businessProcessResponse = new Response(_validationErrors, Guid.NewGuid().ToString());
+        var businessProcessResponse = new Response(_validationErrors, _businessProcessId);
         var content = new StringContent(JsonConvert.SerializeObject(businessProcessResponse));
         var response = new HttpResponseMessage(_responseCode);
         response.Content = content;

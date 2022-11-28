@@ -38,7 +38,7 @@ public class PeekRequestListener
         HttpRequestData request,
         FunctionContext executionContext)
     {
-        var result = await _mediator.Send(new PeekRequest(ActorNumber.Create("1234567890123"),  MessageCategory.MasterData)).ConfigureAwait(false);
+        var result = await _mediator.Send(new PeekRequest(ActorNumber.Create("1234567890123"),  MessageCategory.MasterData, MarketRole.EnergySupplier)).ConfigureAwait(false);
         var response = HttpResponseData.CreateResponse(request);
         if (result.Bundle is null)
         {

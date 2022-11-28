@@ -19,7 +19,9 @@ using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using MediatR;
 using Messaging.Api.Configuration.Middleware.Correlation;
+using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.Commands.Commands;
+using Messaging.Application.Configuration.TimeEvents;
 using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration;
@@ -77,13 +79,18 @@ namespace Messaging.IntegrationTests
             _serviceProvider = _services.BuildServiceProvider();
         }
 
+        public Task InvokeCommandAsync(object command)
+        {
+            return GetService<IMediator>().Send(command);
+        }
+
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
-        protected T GetService<T>()
+        public T GetService<T>()
             where T : notnull
         {
             return _serviceProvider.GetRequiredService<T>();
@@ -107,14 +114,14 @@ namespace Messaging.IntegrationTests
             _serviceProvider = _services.BuildServiceProvider();
         }
 
-        protected Task InvokeCommandAsync(object command)
+        protected Task<TResult> InvokeCommandAsync<TResult>(ICommand<TResult> command)
         {
             return GetService<IMediator>().Send(command);
         }
 
-        protected Task<TResult> InvokeCommandAsync<TResult>(ICommand<TResult> command)
+        protected Task SimulateTenSecondsHasPassedAsync()
         {
-            return GetService<IMediator>().Send(command);
+            return GetService<IMediator>().Publish(new TenSecondsHasHasPassed(GetService<ISystemDateTimeProvider>().Now()));
         }
 
         private static string CreateFakeServiceBusConnectionString()
