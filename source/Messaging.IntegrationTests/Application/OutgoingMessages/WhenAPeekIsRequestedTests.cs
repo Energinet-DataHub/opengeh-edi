@@ -89,6 +89,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         AssertXmlMessage.Document(XDocument.Load(result.Bundle!))
             .IsDocumentType(DocumentType.ConfirmRequestChangeOfSupplier)
             .IsProcesType(ProcessType.MoveIn)
+            .HasReceiverRole(MarketRole.EnergySupplier)
             .HasMarketActivityRecordCount(1);
     }
 
