@@ -32,14 +32,12 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
 {
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly DocumentFactory _documentFactory;
-    private readonly IOutgoingMessageStore _outgoingMessageStore;
     private readonly IEnqueuedMessages _enqueuedMessages;
 
-    public PeekRequestHandler(ISystemDateTimeProvider systemDateTimeProvider, DocumentFactory documentFactory, IOutgoingMessageStore outgoingMessageStore, IEnqueuedMessages enqueuedMessages)
+    public PeekRequestHandler(ISystemDateTimeProvider systemDateTimeProvider, DocumentFactory documentFactory, IEnqueuedMessages enqueuedMessages)
     {
         _systemDateTimeProvider = systemDateTimeProvider;
         _documentFactory = documentFactory;
-        _outgoingMessageStore = outgoingMessageStore;
         _enqueuedMessages = enqueuedMessages;
     }
 
