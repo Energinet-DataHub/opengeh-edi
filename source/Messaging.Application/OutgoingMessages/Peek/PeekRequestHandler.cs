@@ -33,13 +33,15 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
     private readonly DocumentFactory _documentFactory;
     private readonly IEnqueuedMessages _enqueuedMessages;
     private readonly IPeekedMessageRepository _peekedMessageRepository;
+    private readonly IBundlingState _bundlingState;
 
-    public PeekRequestHandler(ISystemDateTimeProvider systemDateTimeProvider, DocumentFactory documentFactory, IEnqueuedMessages enqueuedMessages, IPeekedMessageRepository peekedMessageRepository)
+    public PeekRequestHandler(ISystemDateTimeProvider systemDateTimeProvider, DocumentFactory documentFactory, IEnqueuedMessages enqueuedMessages, IPeekedMessageRepository peekedMessageRepository, IBundlingState bundlingState)
     {
         _systemDateTimeProvider = systemDateTimeProvider;
         _documentFactory = documentFactory;
         _enqueuedMessages = enqueuedMessages;
         _peekedMessageRepository = peekedMessageRepository;
+        _bundlingState = bundlingState;
     }
 
     public async Task<PeekResult> Handle(PeekRequest request, CancellationToken cancellationToken)
@@ -47,9 +49,16 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
         ArgumentNullException.ThrowIfNull(request);
 
         var key = CreateKeyFrom(request);
+        if (_bundlingState.IsBundlingInProgress(key))
+        {
+            return new PeekResult(null);
+        }
+
         var document = _peekedMessageRepository.GetDocument(key);
 
         if (document is not null) return new PeekResult(document);
+
+        _bundlingState.BundlingStarted(key);
 
         var messages = (await _enqueuedMessages.GetByAsync(request.ActorNumber, request.MarketRole, request.MessageCategory)
             .ConfigureAwait(false))
@@ -57,6 +66,7 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
 
         if (messages.Count == 0)
         {
+            _bundlingState.BundlingCompleted(key);
             return new PeekResult(null);
         }
 
@@ -64,6 +74,7 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
         var cimMessage = bundle.CreateMessage();
         document = await _documentFactory.CreateFromAsync(cimMessage, CimFormat.Xml).ConfigureAwait(false);
         _peekedMessageRepository.RegisterDocument(key, document);
+        _bundlingState.BundlingCompleted(key);
         return new PeekResult(document);
     }
 

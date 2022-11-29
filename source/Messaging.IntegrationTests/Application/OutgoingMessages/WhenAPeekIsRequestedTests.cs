@@ -119,6 +119,8 @@ public class WhenAPeekIsRequestedTests : TestBase
 
         var command = CreatePeekRequest(MessageCategory.MasterData);
         await InvokeCommandAsync(command).ConfigureAwait(false);
+        var bundlingStateStub = (BundlingStateStub)GetService<IBundlingState>();
+        bundlingStateStub.AlwaysReturnBundlingInProgress();
         var secondPeekResult = await InvokeCommandAsync(command).ConfigureAwait(false);
 
         Assert.Null(secondPeekResult.Bundle);
