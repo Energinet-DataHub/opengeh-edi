@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Dapper;
@@ -97,6 +98,18 @@ public class WhenAPeekIsRequestedTests : TestBase
             .IsProcesType(ProcessType.MoveIn)
             .HasReceiverRole(MarketRole.EnergySupplier)
             .HasMarketActivityRecordCount(1);
+    }
+
+    [Fact]
+    public async Task Ensure_same_bundle_is_returned_is_not_dequeued()
+    {
+        await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
+
+        var command = CreatePeekRequest(MessageCategory.MasterData);
+        var firstPeekResult = await InvokeCommandAsync(command).ConfigureAwait(false);
+        var secondPeekResult = await InvokeCommandAsync(command).ConfigureAwait(false);
+
+        Assert.Equal(firstPeekResult.Bundle, secondPeekResult.Bundle);
     }
 
     private static PeekRequest CreatePeekRequest(MessageCategory messageCategory)
