@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Xunit;
 
@@ -84,6 +85,12 @@ namespace Messaging.IntegrationTests.Assertions
         internal AssertXmlMessage IsProcesType(ProcessType processType)
         {
             Assert.Equal(processType.Code, GetMessageHeaderValue("process.processType"));
+            return this;
+        }
+
+        internal AssertXmlMessage HasReceiverRole(MarketRole marketRole)
+        {
+            Assert.Equal(marketRole.Name, GetMessageHeaderValue("receiver_MarketParticipant.marketRole.type"));
             return this;
         }
 

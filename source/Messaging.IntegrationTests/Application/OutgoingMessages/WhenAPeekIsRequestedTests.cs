@@ -15,11 +15,14 @@
 using System;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Dapper;
+using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.Peek;
+using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.Infrastructure.Transactions;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Assertions;
@@ -40,9 +43,9 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task When_no_messages_are_available_return_empty_result()
     {
-        var command = CreatePeekRequest(MessageCategory.AggregationData);
+        await GivenTwoMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
 
-        var result = await InvokeCommandAsync(command).ConfigureAwait(false);
+        var result = await InvokeCommandAsync(CreatePeekRequest(MessageCategory.AggregationData)).ConfigureAwait(false);
 
         Assert.Null(result.Bundle);
     }
@@ -68,6 +71,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     {
         SetMaximumNumberOfPayloadsInBundle(1);
         await GivenTwoMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
+        await InsertFakeMessagesAsync(SampleData.NewEnergySupplierNumber, MarketRole.EnergySupplier, MessageCategory.MasterData, ProcessType.MoveIn, DocumentType.ConfirmRequestChangeOfSupplier).ConfigureAwait(false);
 
         var command = CreatePeekRequest(MessageCategory.MasterData);
         var result = await InvokeCommandAsync(command).ConfigureAwait(false);
@@ -81,7 +85,9 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task Bundled_message_contains_payloads_for_the_requested_receiver_role()
     {
-        await GivenMoveInHasCompleted().ConfigureAwait(false);
+        await InsertFakeMessagesAsync(SampleData.NewEnergySupplierNumber, MarketRole.GridOperator, MessageCategory.MasterData, ProcessType.MoveIn, DocumentType.ConfirmRequestChangeOfSupplier).ConfigureAwait(false);
+        await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
+        await InsertFakeMessagesAsync(SampleData.NewEnergySupplierNumber, MarketRole.GridOperator, MessageCategory.MasterData, ProcessType.MoveIn, DocumentType.ConfirmRequestChangeOfSupplier).ConfigureAwait(false);
 
         var command = CreatePeekRequest(MessageCategory.MasterData);
         var result = await InvokeCommandAsync(command).ConfigureAwait(false);
@@ -89,6 +95,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         AssertXmlMessage.Document(XDocument.Load(result.Bundle!))
             .IsDocumentType(DocumentType.ConfirmRequestChangeOfSupplier)
             .IsProcesType(ProcessType.MoveIn)
+            .HasReceiverRole(MarketRole.EnergySupplier)
             .HasMarketActivityRecordCount(1);
     }
 
@@ -105,22 +112,25 @@ public class WhenAPeekIsRequestedTests : TestBase
             .WithTransactionId(SampleData.TransactionId);
     }
 
-    private async Task GivenMoveInHasCompleted()
+    private async Task InsertFakeMessagesAsync(string receiverId, MarketRole receiverRole, MessageCategory category, ProcessType processType, DocumentType documentType)
     {
-        await new TestDataBuilder(this)
-            .AddActor(SampleData.GridOperatorId, SampleData.GridOperatorNumber)
-            .AddMarketEvaluationPoint(
-                Guid.Parse(SampleData.MarketEvaluationPointId),
-                SampleData.GridOperatorId,
-                SampleData.MeteringPointNumber)
-            .BuildAsync().ConfigureAwait(false);
+        var messageEnqueuer = GetService<OutgoingMessageEnqueuer>();
 
-        var httpClientAdapter = (HttpClientSpy)GetService<IHttpClientAdapter>();
-        httpClientAdapter.RespondWithBusinessProcessId(SampleData.BusinessProcessId);
+        for (var i = 0; i < 3; i++)
+        {
+            var message = new EnqueuedMessage(
+                Guid.NewGuid(),
+                receiverId,
+                receiverRole.Name,
+                Guid.NewGuid().ToString(),
+                "FakeSenderRole",
+                documentType.Name,
+                category.Name,
+                processType.Code,
+                "Payload");
 
-        await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
-        await InvokeCommandAsync(new SetConsumerHasMovedIn(SampleData.BusinessProcessId.ToString())).ConfigureAwait(false);
-        await SimulateTenSecondsHasPassedAsync().ConfigureAwait(false);
+            await messageEnqueuer.EnqueueAsync(message).ConfigureAwait(false);
+        }
     }
 
     private async Task GivenAMoveInTransactionHasBeenAccepted()

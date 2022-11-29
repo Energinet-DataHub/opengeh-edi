@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -32,14 +31,12 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
 {
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly DocumentFactory _documentFactory;
-    private readonly IOutgoingMessageStore _outgoingMessageStore;
     private readonly IEnqueuedMessages _enqueuedMessages;
 
-    public PeekRequestHandler(ISystemDateTimeProvider systemDateTimeProvider, DocumentFactory documentFactory, IOutgoingMessageStore outgoingMessageStore, IEnqueuedMessages enqueuedMessages)
+    public PeekRequestHandler(ISystemDateTimeProvider systemDateTimeProvider, DocumentFactory documentFactory, IEnqueuedMessages enqueuedMessages)
     {
         _systemDateTimeProvider = systemDateTimeProvider;
         _documentFactory = documentFactory;
-        _outgoingMessageStore = outgoingMessageStore;
         _enqueuedMessages = enqueuedMessages;
     }
 
@@ -47,21 +44,23 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        if (request.MessageCategory == MessageCategory.MasterData)
+        var messages = (await _enqueuedMessages.GetByAsync(request.ActorNumber, request.MarketRole, request.MessageCategory)
+            .ConfigureAwait(false))
+            .ToList();
+
+        if (messages.Count == 0)
         {
-            var messages = await _enqueuedMessages.GetByAsync(request.ActorNumber, request.MarketRole).ConfigureAwait(false);
-
-            var bundle = CreateBundleFrom(messages.ToList());
-            var cimMessage = bundle.CreateMessage();
-            var document = await _documentFactory.CreateFromAsync(cimMessage, CimFormat.Xml).ConfigureAwait(false);
-
-            return new PeekResult(document);
+            return new PeekResult(null);
         }
 
-        return new PeekResult(null);
+        var bundle = CreateBundleFrom(messages.ToList());
+        var cimMessage = bundle.CreateMessage();
+        var document = await _documentFactory.CreateFromAsync(cimMessage, CimFormat.Xml).ConfigureAwait(false);
+
+        return new PeekResult(document);
     }
 
-    private Bundle CreateBundleFrom(IReadOnlyList<OutgoingMessage> messages)
+    private Bundle CreateBundleFrom(IReadOnlyList<EnqueuedMessage> messages)
     {
         var bundle = new Bundle(_systemDateTimeProvider.Now());
         foreach (var outgoingMessage in messages)

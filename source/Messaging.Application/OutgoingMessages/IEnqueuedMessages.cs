@@ -15,7 +15,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Messaging.Domain.Actors;
-using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages.Peek;
 
 namespace Messaging.Application.OutgoingMessages;
 
@@ -29,6 +29,7 @@ public interface IEnqueuedMessages
     /// </summary>
     /// <param name="actorNumber">Actor number of requesting actor</param>
     /// /// <param name="actorRole">Market role for which the message created</param>
+    /// /// /// <param name="messageCategory">The category of messages to include in message</param>
     /// <returns>List of enqueued messages</returns>
-    Task<IEnumerable<OutgoingMessage>> GetByAsync(ActorNumber actorNumber, MarketRole actorRole);
+    Task<IEnumerable<EnqueuedMessage>> GetByAsync(ActorNumber actorNumber, MarketRole actorRole, MessageCategory messageCategory);
 }
