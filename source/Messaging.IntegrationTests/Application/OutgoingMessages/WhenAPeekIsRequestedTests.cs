@@ -112,6 +112,18 @@ public class WhenAPeekIsRequestedTests : TestBase
         Assert.Equal(firstPeekResult.Bundle, secondPeekResult.Bundle);
     }
 
+    [Fact]
+    public async Task Return_no_content_if_bundling_is_in_progress()
+    {
+        await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
+
+        var command = CreatePeekRequest(MessageCategory.MasterData);
+        await InvokeCommandAsync(command).ConfigureAwait(false);
+        var secondPeekResult = await InvokeCommandAsync(command).ConfigureAwait(false);
+
+        Assert.Null(secondPeekResult.Bundle);
+    }
+
     private static PeekRequest CreatePeekRequest(MessageCategory messageCategory)
     {
         return new PeekRequest(ActorNumber.Create(SampleData.NewEnergySupplierNumber), messageCategory, MarketRole.EnergySupplier);
