@@ -22,6 +22,7 @@ using Messaging.Application.Transactions.MoveIn;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.Peek;
+using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.Infrastructure.Transactions;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Assertions;
@@ -70,6 +71,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     {
         SetMaximumNumberOfPayloadsInBundle(1);
         await GivenTwoMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
+        await InsertFakeMessagesAsync(SampleData.NewEnergySupplierNumber, MarketRole.EnergySupplier, MessageCategory.MasterData, ProcessType.MoveIn, DocumentType.ConfirmRequestChangeOfSupplier).ConfigureAwait(false);
 
         var command = CreatePeekRequest(MessageCategory.MasterData);
         var result = await InvokeCommandAsync(command).ConfigureAwait(false);
@@ -83,12 +85,9 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task Bundled_message_contains_payloads_for_the_requested_receiver_role()
     {
-        var actor = SampleData.NewEnergySupplierNumber;
-
-        await CreateActorMessageQueueTableAsync(actor).ConfigureAwait(false);
-        await InsertFakeBusinessProcessDataAsync(actor, MarketRole.EnergySupplier).ConfigureAwait(false);
-        await GivenMoveInHasCompleted().ConfigureAwait(false);
-        await InsertFakeBusinessProcessDataAsync(actor, MarketRole.EnergySupplier).ConfigureAwait(false);
+        await InsertFakeMessagesAsync(SampleData.NewEnergySupplierNumber, MarketRole.GridOperator, MessageCategory.MasterData, ProcessType.MoveIn, DocumentType.ConfirmRequestChangeOfSupplier).ConfigureAwait(false);
+        await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
+        await InsertFakeMessagesAsync(SampleData.NewEnergySupplierNumber, MarketRole.GridOperator, MessageCategory.MasterData, ProcessType.MoveIn, DocumentType.ConfirmRequestChangeOfSupplier).ConfigureAwait(false);
 
         var command = CreatePeekRequest(MessageCategory.MasterData);
         var result = await InvokeCommandAsync(command).ConfigureAwait(false);
@@ -113,65 +112,25 @@ public class WhenAPeekIsRequestedTests : TestBase
             .WithTransactionId(SampleData.TransactionId);
     }
 
-    private Task CreateActorMessageQueueTableAsync(string actor)
+    private async Task InsertFakeMessagesAsync(string receiverId, MarketRole receiverRole, MessageCategory category, ProcessType processType, DocumentType documentType)
     {
-        var sql = @$"CREATE TABLE [B2B].ActorMessageQueue_{actor}(
-        [RecordId]                        [int] IDENTITY (1,1) NOT NULL,
-        [Id]                              [uniqueIdentifier] NOT NULL,
-        [DocumentType]                    [VARCHAR](255)     NOT NULL,
-        [MessageCategory]                 [VARCHAR](255)     NOT NULL,
-        [ReceiverId]                      [VARCHAR](255)     NOT NULL,
-        [ReceiverRole]                    [VARCHAR](50)      NOT NULL,
-        [SenderId]                        [VARCHAR](255)     NOT NULL,
-        [SenderRole]                      [VARCHAR](50)      NOT NULL,
-        [ProcessType]                     [VARCHAR](50)      NOT NULL,
-        [Payload]                         [NVARCHAR](MAX)    NOT NULL,
-        CONSTRAINT [PK_ActorMessageQueue_{actor}_Id] PRIMARY KEY NONCLUSTERED
-                (
-            [Id] ASC
-            ) WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF) ON [PRIMARY]
-            ) ON [PRIMARY]";
-
-        return GetService<IDbConnectionFactory>().GetOpenConnection().ExecuteAsync(sql);
-    }
-
-    private async Task InsertFakeBusinessProcessDataAsync(string actor, MarketRole receiverRole)
-    {
-        var sql = @$"INSERT INTO [B2B].[ActorMessageQueue_{actor}] VALUES (@Id, @DocumentType, @MessageCategory, @ReceiverId, @ReceiverRole, @SenderId, @SenderRole, @ProcessType, @Payload)";
+        var messageEnqueuer = GetService<OutgoingMessageEnqueuer>();
 
         for (var i = 0; i < 3; i++)
         {
-            await GetService<IDbConnectionFactory>().GetOpenConnection().ExecuteAsync(sql, new
-            {
-                Id = Guid.NewGuid(),
-                DocumentType = "FakeDocumentType",
-                MessageCategory = "FakeMessageCategory",
-                ReceiverId = SampleData.NewEnergySupplierNumber,
-                ReceiverRole = receiverRole.Name,
-                SenderId = Guid.NewGuid().ToString(),
-                SenderRole = "FakeSenderRole",
-                ProcessType = "FakeBusinessProcess",
-                Payload = "Payload",
-            }).ConfigureAwait(false);
+            var message = new EnqueuedMessage(
+                Guid.NewGuid(),
+                receiverId,
+                receiverRole.Name,
+                Guid.NewGuid().ToString(),
+                "FakeSenderRole",
+                documentType.Name,
+                category.Name,
+                processType.Code,
+                "Payload");
+
+            await messageEnqueuer.EnqueueAsync(message).ConfigureAwait(false);
         }
-    }
-
-    private async Task GivenMoveInHasCompleted()
-    {
-        await new TestDataBuilder(this)
-            .AddActor(SampleData.GridOperatorId, SampleData.GridOperatorNumber)
-            .AddMarketEvaluationPoint(
-                Guid.Parse(SampleData.MarketEvaluationPointId),
-                SampleData.GridOperatorId,
-                SampleData.MeteringPointNumber)
-            .BuildAsync().ConfigureAwait(false);
-
-        var httpClientAdapter = (HttpClientSpy)GetService<IHttpClientAdapter>();
-        httpClientAdapter.RespondWithBusinessProcessId(SampleData.BusinessProcessId);
-
-        await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
-        await InvokeCommandAsync(new SetConsumerHasMovedIn(SampleData.BusinessProcessId.ToString())).ConfigureAwait(false);
-        await SimulateTenSecondsHasPassedAsync().ConfigureAwait(false);
     }
 
     private async Task GivenAMoveInTransactionHasBeenAccepted()
