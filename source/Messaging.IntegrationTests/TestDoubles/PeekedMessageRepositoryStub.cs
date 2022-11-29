@@ -12,20 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
-using Messaging.Application.OutgoingMessages;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Messaging.Application.OutgoingMessages.Peek;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Messaging.Infrastructure.OutgoingMessages.Peek;
+namespace Messaging.IntegrationTests.TestDoubles;
 
-internal static class PeekConfiguration
+public class PeekedMessageRepositoryStub : IPeekedMessageRepository
 {
-    internal static void Configure(IServiceCollection services, IBundleConfiguration bundleConfiguration, IPeekedMessageRepository peekedMessageRepository)
+    private readonly Dictionary<string, Stream> _documents = new();
+
+    public Stream? GetDocument(string key)
     {
-        services.AddTransient<IRequestHandler<PeekRequest, PeekResult>, PeekRequestHandler>();
-        services.AddScoped<IEnqueuedMessages, EnqueuedMessages>();
-        services.AddScoped(_ => bundleConfiguration);
-        services.AddSingleton(_ => peekedMessageRepository);
+        return _documents.SingleOrDefault(m => m.Key == key).Value;
+    }
+
+    public void RegisterDocument(string key, Stream document)
+    {
+        _documents.Add(key, document);
     }
 }

@@ -107,9 +107,9 @@ namespace Messaging.Infrastructure.Configuration
             return new CompositionRoot(services);
         }
 
-        public CompositionRoot AddPeekConfiguration(IBundleConfiguration bundleConfiguration)
+        public CompositionRoot AddPeekConfiguration(IBundleConfiguration bundleConfiguration, IPeekedMessageRepository peekedMessageRepository)
         {
-            PeekConfiguration.Configure(_services, bundleConfiguration);
+            PeekConfiguration.Configure(_services, bundleConfiguration, peekedMessageRepository);
             return this;
         }
 

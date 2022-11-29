@@ -32,17 +32,24 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly DocumentFactory _documentFactory;
     private readonly IEnqueuedMessages _enqueuedMessages;
+    private readonly IPeekedMessageRepository _peekedMessageRepository;
 
-    public PeekRequestHandler(ISystemDateTimeProvider systemDateTimeProvider, DocumentFactory documentFactory, IEnqueuedMessages enqueuedMessages)
+    public PeekRequestHandler(ISystemDateTimeProvider systemDateTimeProvider, DocumentFactory documentFactory, IEnqueuedMessages enqueuedMessages, IPeekedMessageRepository peekedMessageRepository)
     {
         _systemDateTimeProvider = systemDateTimeProvider;
         _documentFactory = documentFactory;
         _enqueuedMessages = enqueuedMessages;
+        _peekedMessageRepository = peekedMessageRepository;
     }
 
     public async Task<PeekResult> Handle(PeekRequest request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
+
+        var key = CreateKeyFrom(request);
+        var document = _peekedMessageRepository.GetDocument(key);
+
+        if (document is not null) return new PeekResult(document);
 
         var messages = (await _enqueuedMessages.GetByAsync(request.ActorNumber, request.MarketRole, request.MessageCategory)
             .ConfigureAwait(false))
@@ -55,9 +62,14 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
 
         var bundle = CreateBundleFrom(messages.ToList());
         var cimMessage = bundle.CreateMessage();
-        var document = await _documentFactory.CreateFromAsync(cimMessage, CimFormat.Xml).ConfigureAwait(false);
-
+        document = await _documentFactory.CreateFromAsync(cimMessage, CimFormat.Xml).ConfigureAwait(false);
+        _peekedMessageRepository.RegisterDocument(key, document);
         return new PeekResult(document);
+    }
+
+    private static string CreateKeyFrom(PeekRequest request)
+    {
+        return request.ActorNumber.Value + request.MessageCategory;
     }
 
     private Bundle CreateBundleFrom(IReadOnlyList<EnqueuedMessage> messages)
