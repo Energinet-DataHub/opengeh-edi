@@ -12,24 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Messaging.Domain.OutgoingMessages.Peek;
 using Messaging.Domain.SeedWork;
 
 namespace Messaging.Domain.OutgoingMessages;
 
 public class DocumentType : EnumerationType
 {
-    public static readonly DocumentType GenericNotification = new(0, "GenericNotification");
-    public static readonly DocumentType ConfirmRequestChangeOfSupplier = new(1, nameof(ConfirmRequestChangeOfSupplier));
-    public static readonly DocumentType RejectRequestChangeOfSupplier = new(2, nameof(RejectRequestChangeOfSupplier));
-    public static readonly DocumentType AccountingPointCharacteristics = new(3, nameof(AccountingPointCharacteristics));
-    public static readonly DocumentType CharacteristicsOfACustomerAtAnAP = new(4, nameof(CharacteristicsOfACustomerAtAnAP));
-    public static readonly DocumentType ConfirmRequestChangeAccountingPointCharacteristics = new(5, nameof(ConfirmRequestChangeAccountingPointCharacteristics));
-    public static readonly DocumentType RejectRequestChangeAccountingPointCharacteristics = new(6, nameof(RejectRequestChangeAccountingPointCharacteristics));
+    public static readonly DocumentType GenericNotification = new(0, "GenericNotification", MessageCategory.MasterData);
+    public static readonly DocumentType ConfirmRequestChangeOfSupplier = new(1, nameof(ConfirmRequestChangeOfSupplier), MessageCategory.MasterData);
+    public static readonly DocumentType RejectRequestChangeOfSupplier = new(2, nameof(RejectRequestChangeOfSupplier), MessageCategory.MasterData);
+    public static readonly DocumentType AccountingPointCharacteristics = new(3, nameof(AccountingPointCharacteristics), MessageCategory.MasterData);
+    public static readonly DocumentType CharacteristicsOfACustomerAtAnAP = new(4, nameof(CharacteristicsOfACustomerAtAnAP), MessageCategory.MasterData);
+    public static readonly DocumentType ConfirmRequestChangeAccountingPointCharacteristics = new(5, nameof(ConfirmRequestChangeAccountingPointCharacteristics), MessageCategory.MasterData);
+    public static readonly DocumentType RejectRequestChangeAccountingPointCharacteristics = new(6, nameof(RejectRequestChangeAccountingPointCharacteristics), MessageCategory.MasterData);
 
-    private DocumentType(int id, string name)
+    private DocumentType(int id, string name, MessageCategory category)
         : base(id, name)
     {
+        Category = category;
     }
+
+    public MessageCategory Category { get; }
 
     public override string ToString()
     {

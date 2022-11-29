@@ -49,7 +49,7 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
 
         if (request.MessageCategory == MessageCategory.MasterData)
         {
-            var messages = await _enqueuedMessages.GetByAsync(request.ActorNumber, request.MarketRole).ConfigureAwait(false);
+            var messages = await _enqueuedMessages.GetByAsync(request.ActorNumber, request.MarketRole, request.MessageCategory).ConfigureAwait(false);
 
             var bundle = CreateBundleFrom(messages.ToList());
             var cimMessage = bundle.CreateMessage();

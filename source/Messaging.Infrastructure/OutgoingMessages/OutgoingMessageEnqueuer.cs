@@ -40,6 +40,7 @@ public class OutgoingMessageEnqueuer
         [RecordId]                        [int] IDENTITY (1,1) NOT NULL,
         [Id]                              [uniqueIdentifier] NOT NULL,
         [DocumentType]                    [VARCHAR](255)     NOT NULL,
+        [MessageCategory]                 [VARCHAR](255)     NOT NULL,
         [ReceiverId]                      [VARCHAR](255)     NOT NULL,
         [ReceiverRole]                    [VARCHAR](50)      NOT NULL,
         [SenderId]                        [VARCHAR](255)     NOT NULL,
@@ -51,7 +52,7 @@ public class OutgoingMessageEnqueuer
             [Id] ASC
             ) WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF) ON [PRIMARY]
             ) ON [PRIMARY];
-        INSERT INTO [B2B].[ActorMessageQueue_{message.ReceiverId.Value}] VALUES (@Id, @DocumentType, @ReceiverId, @ReceiverRole, @SenderId, @SenderRole, @ProcessType, @Payload)";
+        INSERT INTO [B2B].[ActorMessageQueue_{message.ReceiverId.Value}] VALUES (@Id, @DocumentType, @MessageCategory, @ReceiverId, @ReceiverRole, @SenderId, @SenderRole, @ProcessType, @Payload)";
 
         return _dbConnectionFactory.GetOpenConnection()
             .ExecuteAsync(
@@ -60,6 +61,7 @@ public class OutgoingMessageEnqueuer
                 {
                     Id = Guid.NewGuid(),
                     DocumentType = message.DocumentType.Name,
+                    MessageCategory = message.DocumentType.Category.Name,
                     ReceiverId = message.ReceiverId.Value,
                     ReceiverRole = message.ReceiverRole.Name,
                     SenderId = message.SenderId.Value,

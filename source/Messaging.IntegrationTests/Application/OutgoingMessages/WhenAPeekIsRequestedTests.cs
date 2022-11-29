@@ -119,6 +119,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         [RecordId]                        [int] IDENTITY (1,1) NOT NULL,
         [Id]                              [uniqueIdentifier] NOT NULL,
         [DocumentType]                    [VARCHAR](255)     NOT NULL,
+        [MessageCategory]                 [VARCHAR](255)     NOT NULL,
         [ReceiverId]                      [VARCHAR](255)     NOT NULL,
         [ReceiverRole]                    [VARCHAR](50)      NOT NULL,
         [SenderId]                        [VARCHAR](255)     NOT NULL,
@@ -136,7 +137,7 @@ public class WhenAPeekIsRequestedTests : TestBase
 
     private async Task InsertFakeBusinessProcessDataAsync(string actor, MarketRole receiverRole)
     {
-        var sql = @$"INSERT INTO [B2B].[ActorMessageQueue_{actor}] VALUES (@Id, @DocumentType, @ReceiverId, @ReceiverRole, @SenderId, @SenderRole, @ProcessType, @Payload)";
+        var sql = @$"INSERT INTO [B2B].[ActorMessageQueue_{actor}] VALUES (@Id, @DocumentType, @MessageCategory, @ReceiverId, @ReceiverRole, @SenderId, @SenderRole, @ProcessType, @Payload)";
 
         for (var i = 0; i < 3; i++)
         {
@@ -144,6 +145,7 @@ public class WhenAPeekIsRequestedTests : TestBase
             {
                 Id = Guid.NewGuid(),
                 DocumentType = "FakeDocumentType",
+                MessageCategory = "FakeMessageCategory",
                 ReceiverId = SampleData.NewEnergySupplierNumber,
                 ReceiverRole = receiverRole.Name,
                 SenderId = Guid.NewGuid().ToString(),

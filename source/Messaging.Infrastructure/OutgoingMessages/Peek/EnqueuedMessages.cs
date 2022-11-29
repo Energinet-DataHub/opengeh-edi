@@ -22,6 +22,7 @@ using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages.Peek;
 using Messaging.Domain.SeedWork;
 
 namespace Messaging.Infrastructure.OutgoingMessages.Peek;
@@ -37,16 +38,17 @@ public class EnqueuedMessages : IEnqueuedMessages
         _bundleConfiguration = bundleConfiguration;
     }
 
-    public async Task<IEnumerable<OutgoingMessage>> GetByAsync(ActorNumber actorNumber, MarketRole actorRole)
+    public async Task<IEnumerable<OutgoingMessage>> GetByAsync(ActorNumber actorNumber, MarketRole actorRole, MessageCategory messageCategory)
     {
+        ArgumentNullException.ThrowIfNull(messageCategory);
         ArgumentNullException.ThrowIfNull(actorRole);
         ArgumentNullException.ThrowIfNull(actorNumber);
 
-        var oldestMessage = await FindOldestMessageAsync(actorNumber, actorRole).ConfigureAwait(false);
+        var oldestMessage = await FindOldestMessageAsync(actorNumber, actorRole, messageCategory).ConfigureAwait(false);
 
         var sqlStatement =
             @$"SELECT TOP({_bundleConfiguration.MaxNumberOfPayloadsInBundle}) * FROM [b2b].[ActorMessageQueue_{actorNumber.Value}]
-            WHERE ProcessType = @ProcessType AND ReceiverRole = @ReceiverRole AND DocumentType = @DocumentType";
+            WHERE ProcessType = @ProcessType AND ReceiverRole = @ReceiverRole AND DocumentType = @DocumentType AND MessageCategory = @MessageCategory";
 
         var messages = await _connectionFactory
             .GetOpenConnection()
@@ -55,7 +57,9 @@ public class EnqueuedMessages : IEnqueuedMessages
                 ReceiverRole = actorRole.Name,
                 ProcessType = oldestMessage.ProcessType,
                 DocumentType = oldestMessage.DocumentType,
+                MessageCategory = messageCategory.Name,
             }).ConfigureAwait(false);
+
         return messages.Select(m => new OutgoingMessage(
             EnumerationType.FromName<DocumentType>(m.DocumentType),
             ActorNumber.Create(m.ReceiverId),
@@ -67,16 +71,17 @@ public class EnqueuedMessages : IEnqueuedMessages
             m.Payload));
     }
 
-    private async Task<OldestMessage> FindOldestMessageAsync(ActorNumber actorNumber, MarketRole actorRole)
+    private async Task<OldestMessage> FindOldestMessageAsync(ActorNumber actorNumber, MarketRole actorRole, MessageCategory messageCategory)
     {
         return await _connectionFactory
             .GetOpenConnection()
             .QuerySingleAsync<OldestMessage>(
                 @$"SELECT TOP(1) {nameof(OldestMessage.ProcessType)}, {nameof(OldestMessage.DocumentType)} FROM [b2b].[ActorMessageQueue_{actorNumber.Value}]
-                WHERE ReceiverRole = @ReceiverRole",
+                WHERE ReceiverRole = @ReceiverRole AND MessageCategory = @MessageCategory",
                 new
             {
                 ReceiverRole = actorRole.Name,
+                MessageCategory = messageCategory.Name,
             })
             .ConfigureAwait(false);
     }
@@ -84,4 +89,4 @@ public class EnqueuedMessages : IEnqueuedMessages
     private record OldestMessage(string ProcessType, string DocumentType);
 }
 
-public record OutgoingMessageEntity(int RecordId, Guid Id, string DocumentType, string ReceiverId, string ReceiverRole, string SenderId, string SenderRole, string ProcessType, string Payload);
+public record OutgoingMessageEntity(int RecordId, Guid Id, string DocumentType, string MessageCategory, string ReceiverId, string ReceiverRole, string SenderId, string SenderRole, string ProcessType, string Payload);
