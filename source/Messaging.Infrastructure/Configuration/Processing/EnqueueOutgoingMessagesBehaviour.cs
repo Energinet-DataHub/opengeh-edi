@@ -61,6 +61,7 @@ public class EnqueueOutgoingMessagesBehaviour<TRequest, TResponse> : IPipelineBe
         {
             await _outgoingMessageEnqueuer.EnqueueAsync(
                 new EnqueuedMessage(
+                    message.Id,
                     message.ReceiverId.Value,
                     message.ReceiverRole.Name,
                     message.SenderId.Value,

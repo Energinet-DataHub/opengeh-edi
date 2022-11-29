@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Messaging.Domain.OutgoingMessages.Peek;
 using Messaging.Domain.SeedWork;
 using NodaTime;
 
@@ -20,7 +21,7 @@ namespace Messaging.Domain.OutgoingMessages;
 public class Bundle
 {
     private readonly Instant _timestamp;
-    private readonly List<OutgoingMessage> _messages = new();
+    private readonly List<EnqueuedMessage> _messages = new();
     private MessageHeader _header;
     private DocumentType? _documentType;
 
@@ -30,19 +31,36 @@ public class Bundle
         _header = new MessageHeader(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, _timestamp);
     }
 
-    public void Add(OutgoingMessage message)
+    public void Add(EnqueuedMessage message)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
         if (IsFirstMessageInBundle())
         {
             CreateHeaderFrom(message);
-            _documentType = message.DocumentType;
+            _documentType = EnumerationType.FromName<DocumentType>(message.DocumentType);
         }
 
         EnsureProcessType(message);
         EnsureReceiverId(message);
 
         _messages.Add(message);
+    }
+
+    public void Add(OutgoingMessage message)
+    {
+        if (message == null) throw new ArgumentNullException(nameof(message));
+        var enqueuedMessage = new EnqueuedMessage(
+            message.Id,
+            message.ReceiverId.Value,
+            message.ReceiverRole.Name,
+            message.SenderId.Value,
+            message.SenderRole.Name,
+            message.DocumentType.Name,
+            message.DocumentType.Category.Name,
+            message.ProcessType,
+            message.MarketActivityRecordPayload);
+
+        Add(enqueuedMessage);
     }
 
     public CimMessage CreateMessage()
@@ -52,19 +70,19 @@ public class Bundle
             throw new NoMessagesInBundleException();
         }
 
-        var payloads = _messages.Select(message => message.MarketActivityRecordPayload).ToList();
+        var payloads = _messages.Select(message => message.Payload).ToList();
         return new CimMessage(_documentType!, _header, payloads);
     }
 
-    private void EnsureReceiverId(OutgoingMessage message)
+    private void EnsureReceiverId(EnqueuedMessage message)
     {
-        if (message.ReceiverId.Value.Equals(_header.ReceiverId, StringComparison.OrdinalIgnoreCase) == false)
+        if (message.ReceiverId.Equals(_header.ReceiverId, StringComparison.OrdinalIgnoreCase) == false)
         {
             throw new ReceiverIdsDoesNotMatchException(message.Id.ToString());
         }
     }
 
-    private void EnsureProcessType(OutgoingMessage message)
+    private void EnsureProcessType(EnqueuedMessage message)
     {
         if (message.ProcessType.Equals(_header.ProcessType, StringComparison.OrdinalIgnoreCase) == false)
         {
@@ -77,14 +95,14 @@ public class Bundle
         return _messages.Count == 0;
     }
 
-    private void CreateHeaderFrom(OutgoingMessage message)
+    private void CreateHeaderFrom(EnqueuedMessage message)
     {
         _header = new MessageHeader(
             message.ProcessType,
-            message.SenderId.Value,
-            message.SenderRole.ToString(),
-            message.ReceiverId.Value,
-            message.ReceiverRole.ToString(),
+            message.SenderId,
+            message.SenderRole,
+            message.ReceiverId,
+            message.ReceiverRole,
             Guid.NewGuid().ToString(),
             _timestamp);
     }

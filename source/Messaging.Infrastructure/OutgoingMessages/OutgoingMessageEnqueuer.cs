@@ -59,7 +59,7 @@ public class OutgoingMessageEnqueuer
                 sql,
                 new
                 {
-                    Id = Guid.NewGuid(),
+                    Id = message.Id,
                     DocumentType = message.DocumentType,
                     MessageCategory = message.Category,
                     ReceiverId = message.ReceiverId,
