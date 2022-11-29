@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.Configuration.Commands.Commands;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages.Peek;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.FeatureFlag;
 using Messaging.Infrastructure.OutgoingMessages;
@@ -58,7 +59,16 @@ public class EnqueueOutgoingMessagesBehaviour<TRequest, TResponse> : IPipelineBe
 
         foreach (var message in outgoingMessages)
         {
-            await _outgoingMessageEnqueuer.EnqueueAsync(message).ConfigureAwait(false);
+            await _outgoingMessageEnqueuer.EnqueueAsync(
+                new EnqueuedMessage(
+                    message.ReceiverId.Value,
+                    message.ReceiverRole.Name,
+                    message.SenderId.Value,
+                    message.SenderRole.Name,
+                    message.DocumentType.Name,
+                    message.DocumentType.Category.Name,
+                    message.ProcessType,
+                    message.MarketActivityRecordPayload)).ConfigureAwait(false);
         }
 
         return result;
