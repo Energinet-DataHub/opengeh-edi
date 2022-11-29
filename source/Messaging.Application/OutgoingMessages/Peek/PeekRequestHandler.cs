@@ -47,18 +47,20 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        if (request.MessageCategory == MessageCategory.MasterData)
+        var messages = (await _enqueuedMessages.GetByAsync(request.ActorNumber, request.MarketRole, request.MessageCategory)
+            .ConfigureAwait(false))
+            .ToList();
+
+        if (messages.Count == 0)
         {
-            var messages = await _enqueuedMessages.GetByAsync(request.ActorNumber, request.MarketRole, request.MessageCategory).ConfigureAwait(false);
-
-            var bundle = CreateBundleFrom(messages.ToList());
-            var cimMessage = bundle.CreateMessage();
-            var document = await _documentFactory.CreateFromAsync(cimMessage, CimFormat.Xml).ConfigureAwait(false);
-
-            return new PeekResult(document);
+            return new PeekResult(null);
         }
 
-        return new PeekResult(null);
+        var bundle = CreateBundleFrom(messages.ToList());
+        var cimMessage = bundle.CreateMessage();
+        var document = await _documentFactory.CreateFromAsync(cimMessage, CimFormat.Xml).ConfigureAwait(false);
+
+        return new PeekResult(document);
     }
 
     private Bundle CreateBundleFrom(IReadOnlyList<OutgoingMessage> messages)

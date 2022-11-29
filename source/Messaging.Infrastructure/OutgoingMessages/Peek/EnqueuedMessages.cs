@@ -46,6 +46,11 @@ public class EnqueuedMessages : IEnqueuedMessages
 
         var oldestMessage = await FindOldestMessageAsync(actorNumber, actorRole, messageCategory).ConfigureAwait(false);
 
+        if (oldestMessage is null)
+        {
+            return Array.Empty<OutgoingMessage>();
+        }
+
         var sqlStatement =
             @$"SELECT TOP({_bundleConfiguration.MaxNumberOfPayloadsInBundle}) * FROM [b2b].[ActorMessageQueue_{actorNumber.Value}]
             WHERE ProcessType = @ProcessType AND ReceiverRole = @ReceiverRole AND DocumentType = @DocumentType AND MessageCategory = @MessageCategory";
@@ -71,11 +76,11 @@ public class EnqueuedMessages : IEnqueuedMessages
             m.Payload));
     }
 
-    private async Task<OldestMessage> FindOldestMessageAsync(ActorNumber actorNumber, MarketRole actorRole, MessageCategory messageCategory)
+    private async Task<OldestMessage?> FindOldestMessageAsync(ActorNumber actorNumber, MarketRole actorRole, MessageCategory messageCategory)
     {
         return await _connectionFactory
             .GetOpenConnection()
-            .QuerySingleAsync<OldestMessage>(
+            .QuerySingleOrDefaultAsync<OldestMessage>(
                 @$"SELECT TOP(1) {nameof(OldestMessage.ProcessType)}, {nameof(OldestMessage.DocumentType)} FROM [b2b].[ActorMessageQueue_{actorNumber.Value}]
                 WHERE ReceiverRole = @ReceiverRole AND MessageCategory = @MessageCategory",
                 new

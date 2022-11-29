@@ -42,9 +42,9 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task When_no_messages_are_available_return_empty_result()
     {
-        var command = CreatePeekRequest(MessageCategory.AggregationData);
+        await GivenTwoMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
 
-        var result = await InvokeCommandAsync(command).ConfigureAwait(false);
+        var result = await InvokeCommandAsync(CreatePeekRequest(MessageCategory.AggregationData)).ConfigureAwait(false);
 
         Assert.Null(result.Bundle);
     }
