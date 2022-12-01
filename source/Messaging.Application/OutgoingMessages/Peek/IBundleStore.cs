@@ -13,13 +13,14 @@
 // limitations under the License.
 
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Messaging.Application.OutgoingMessages.Peek;
 
 /// <summary>
 /// Interface to handle already peeked messages
 /// </summary>
-public interface IPeekedMessageRepository
+public interface IBundleStore
 {
     /// <summary>
     /// Get already peeked document
@@ -34,4 +35,10 @@ public interface IPeekedMessageRepository
     /// <param name="key"></param>
     /// <param name="document"></param>
     void RegisterDocument(string key, Stream document);
+
+    /// <summary>
+    /// Register bundle key
+    /// </summary>
+    /// <param name="key"></param>
+    Task<bool> RegisterKeyAsync(string key);
 }

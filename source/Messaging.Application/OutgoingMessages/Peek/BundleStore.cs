@@ -13,10 +13,11 @@
 // limitations under the License.
 
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Messaging.Application.OutgoingMessages.Peek;
 
-public class PeekedMessageRepository : IPeekedMessageRepository
+public class BundleStore : IBundleStore
 {
     public Stream? GetDocument(string key)
     {
@@ -24,6 +25,11 @@ public class PeekedMessageRepository : IPeekedMessageRepository
     }
 
     public void RegisterDocument(string key, Stream document)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public Task<bool> RegisterKeyAsync(string key)
     {
         throw new System.NotImplementedException();
     }

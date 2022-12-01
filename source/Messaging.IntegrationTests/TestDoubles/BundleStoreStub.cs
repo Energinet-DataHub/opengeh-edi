@@ -12,16 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Messaging.Application.OutgoingMessages.Peek;
 
 namespace Messaging.IntegrationTests.TestDoubles;
 
-public class PeekedMessageRepositoryStub : IPeekedMessageRepository
+public class BundleStoreStub : IBundleStore
 {
-    private readonly Dictionary<string, Stream> _documents = new();
+    private readonly Dictionary<string, Stream?> _documents = new();
 
     public Stream? GetDocument(string key)
     {
@@ -30,6 +32,19 @@ public class PeekedMessageRepositoryStub : IPeekedMessageRepository
 
     public void RegisterDocument(string key, Stream document)
     {
-        _documents.Add(key, document);
+        _documents[key] = document;
+    }
+
+    public Task<bool> RegisterKeyAsync(string key)
+    {
+        try
+        {
+            _documents.Add(key, null);
+            return Task.FromResult(true);
+        }
+        catch (ArgumentException)
+        {
+            return Task.FromResult(false);
+        }
     }
 }

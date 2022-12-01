@@ -115,15 +115,14 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task Return_no_content_if_bundling_is_in_progress()
     {
-        await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
-
+        await GetService<IBundleStore>()
+            .RegisterKeyAsync(SampleData.NewEnergySupplierNumber + MessageCategory.MasterData.Name)
+            .ConfigureAwait(false);
         var command = CreatePeekRequest(MessageCategory.MasterData);
-        await InvokeCommandAsync(command).ConfigureAwait(false);
-        var bundlingStateStub = (BundlingStateStub)GetService<IBundlingState>();
-        bundlingStateStub.AlwaysReturnBundlingInProgress();
-        var secondPeekResult = await InvokeCommandAsync(command).ConfigureAwait(false);
 
-        Assert.Null(secondPeekResult.Bundle);
+        var peekResult = await InvokeCommandAsync(command).ConfigureAwait(false);
+
+        Assert.Null(peekResult.Bundle);
     }
 
     private static PeekRequest CreatePeekRequest(MessageCategory messageCategory)
