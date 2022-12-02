@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.IO;
 using System.Threading.Tasks;
+using Dapper;
+using Messaging.Application.Configuration.DataAccess;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages.Peek;
 
@@ -21,6 +24,17 @@ namespace Messaging.Application.OutgoingMessages.Peek;
 
 public class BundleStore : IBundleStore
 {
+    private readonly IDbConnectionFactory? _connectionFactory;
+
+    public BundleStore()
+    {
+    }
+
+    public BundleStore(IDbConnectionFactory connectionFactory)
+    {
+        _connectionFactory = connectionFactory;
+    }
+
     public Stream? GetBundleOf(
         MessageCategory messageCategory,
         ActorNumber messageReceiverNumber,
@@ -38,11 +52,34 @@ public class BundleStore : IBundleStore
         throw new System.NotImplementedException();
     }
 
-    public Task<bool> TryRegisterBundleAsync(
+    public async Task<bool> TryRegisterBundleAsync(
         MessageCategory messageCategory,
         ActorNumber messageReceiverNumber,
         MarketRole roleOfReceiver)
     {
-        throw new System.NotImplementedException();
+        ArgumentNullException.ThrowIfNull(messageCategory);
+        ArgumentNullException.ThrowIfNull(messageReceiverNumber);
+        ArgumentNullException.ThrowIfNull(roleOfReceiver);
+
+        var bundleRegistrationStatement = $"IF NOT EXISTS (SELECT * FROM b2b.BundleStore WHERE Id = @Id)" +
+                                          $"INSERT INTO b2b.BundleStore(Id) VALUES(@Id)";
+        var result = await _connectionFactory!
+            .GetOpenConnection().ExecuteAsync(
+                bundleRegistrationStatement,
+                new
+                {
+                    @Id = GenerateKey(messageCategory, messageReceiverNumber, roleOfReceiver),
+                })
+            .ConfigureAwait(false);
+
+        return result == 1;
+    }
+
+    private static string GenerateKey(
+        MessageCategory messageCategory,
+        ActorNumber messageReceiverNumber,
+        MarketRole roleOfReceiver)
+    {
+        return messageCategory.Name + messageReceiverNumber.Value + roleOfReceiver.Name;
     }
 }
