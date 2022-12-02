@@ -48,7 +48,7 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
 
         var key = CreateKeyFrom(request);
 
-        var document = _bundleStore.GetBundleOf(key, request.MessageCategory, request.ActorNumber, request.MarketRole);
+        var document = _bundleStore.GetBundleOf(request.MessageCategory, request.ActorNumber, request.MarketRole);
 
         if (document is not null) return new PeekResult(document);
 
@@ -72,7 +72,7 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
 
     private static string CreateKeyFrom(PeekRequest request)
     {
-        return request.ActorNumber.Value + request.MessageCategory;
+        return request.MessageCategory + request.ActorNumber.Value + request.MarketRole.Name;
     }
 
     private Bundle CreateBundleFrom(IReadOnlyList<EnqueuedMessage> messages)

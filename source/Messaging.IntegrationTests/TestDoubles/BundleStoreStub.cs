@@ -28,12 +28,11 @@ public class BundleStoreStub : IBundleStore
     private readonly Dictionary<string, Stream?> _documents = new();
 
     public Stream? GetBundleOf(
-        string key,
         MessageCategory messageCategory,
         ActorNumber messageReceiverNumber,
         MarketRole roleOfReceiver)
     {
-        return _documents.SingleOrDefault(m => m.Key == key).Value;
+        return _documents.SingleOrDefault(m => m.Key == GenerateKey(messageCategory, messageReceiverNumber, roleOfReceiver)).Value;
     }
 
     public void RegisterDocument(string key, Stream document)
@@ -52,5 +51,13 @@ public class BundleStoreStub : IBundleStore
         {
             return Task.FromResult(false);
         }
+    }
+
+    private static string GenerateKey(
+        MessageCategory messageCategory,
+        ActorNumber messageReceiverNumber,
+        MarketRole roleOfReceiver)
+    {
+        return messageCategory.Name + messageReceiverNumber.Value + roleOfReceiver.Name;
     }
 }

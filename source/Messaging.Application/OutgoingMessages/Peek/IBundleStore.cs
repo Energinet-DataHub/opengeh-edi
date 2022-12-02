@@ -27,12 +27,11 @@ public interface IBundleStore
     /// <summary>
     /// Get already peeked document
     /// </summary>
-    /// <param name="key"></param>
     /// <param name="messageCategory">Type of messages within message bundle</param>
     /// <param name="messageReceiverNumber">Actor number of message receiver</param>
     /// <param name="roleOfReceiver">Market role of the receiver</param>
     /// <returns>A nullable stream containing peeked document</returns>
-    Stream? GetBundleOf(string key, MessageCategory messageCategory, ActorNumber messageReceiverNumber, MarketRole roleOfReceiver);
+    Stream? GetBundleOf(MessageCategory messageCategory, ActorNumber messageReceiverNumber, MarketRole roleOfReceiver);
 
     /// <summary>
     /// Register peeked document

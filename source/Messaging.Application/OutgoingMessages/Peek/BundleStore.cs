@@ -22,7 +22,6 @@ namespace Messaging.Application.OutgoingMessages.Peek;
 public class BundleStore : IBundleStore
 {
     public Stream? GetBundleOf(
-        string key,
         MessageCategory messageCategory,
         ActorNumber messageReceiverNumber,
         MarketRole roleOfReceiver)
