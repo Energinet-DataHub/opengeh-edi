@@ -48,7 +48,7 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
 
         var key = CreateKeyFrom(request);
 
-        var document = _bundleStore.GetDocument(key);
+        var document = _bundleStore.GetBundle(key);
 
         if (document is not null) return new PeekResult(document);
 

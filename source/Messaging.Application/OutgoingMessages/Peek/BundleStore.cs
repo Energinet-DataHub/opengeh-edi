@@ -19,7 +19,7 @@ namespace Messaging.Application.OutgoingMessages.Peek;
 
 public class BundleStore : IBundleStore
 {
-    public Stream? GetDocument(string key)
+    public Stream? GetBundle(string key)
     {
         throw new System.NotImplementedException();
     }

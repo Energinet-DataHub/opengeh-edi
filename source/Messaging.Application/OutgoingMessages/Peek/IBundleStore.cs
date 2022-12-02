@@ -27,7 +27,7 @@ public interface IBundleStore
     /// </summary>
     /// <param name="key"></param>
     /// <returns>A nullable stream containing peeked document</returns>
-    Stream? GetDocument(string key);
+    Stream? GetBundle(string key);
 
     /// <summary>
     /// Register peeked document
