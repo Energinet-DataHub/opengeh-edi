@@ -18,6 +18,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Messaging.Application.OutgoingMessages.Peek;
+using Messaging.Domain.Actors;
+using Messaging.Domain.OutgoingMessages.Peek;
 
 namespace Messaging.IntegrationTests.TestDoubles;
 
@@ -25,7 +27,11 @@ public class BundleStoreStub : IBundleStore
 {
     private readonly Dictionary<string, Stream?> _documents = new();
 
-    public Stream? GetBundleOf(string key)
+    public Stream? GetBundleOf(
+        string key,
+        MessageCategory messageCategory,
+        ActorNumber messageReceiverNumber,
+        MarketRole roleOfReceiver)
     {
         return _documents.SingleOrDefault(m => m.Key == key).Value;
     }

@@ -14,12 +14,18 @@
 
 using System.IO;
 using System.Threading.Tasks;
+using Messaging.Domain.Actors;
+using Messaging.Domain.OutgoingMessages.Peek;
 
 namespace Messaging.Application.OutgoingMessages.Peek;
 
 public class BundleStore : IBundleStore
 {
-    public Stream? GetBundleOf(string key)
+    public Stream? GetBundleOf(
+        string key,
+        MessageCategory messageCategory,
+        ActorNumber messageReceiverNumber,
+        MarketRole roleOfReceiver)
     {
         throw new System.NotImplementedException();
     }
