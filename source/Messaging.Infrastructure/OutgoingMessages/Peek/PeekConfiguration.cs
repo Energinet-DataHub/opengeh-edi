@@ -26,6 +26,6 @@ internal static class PeekConfiguration
         services.AddTransient<IRequestHandler<PeekRequest, PeekResult>, PeekRequestHandler>();
         services.AddScoped<IEnqueuedMessages, EnqueuedMessages>();
         services.AddScoped(_ => bundleConfiguration);
-        services.AddSingleton<IBundleStore, BundleStore>();
+        services.AddSingleton<BundleStore>();
     }
 }

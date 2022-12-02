@@ -158,7 +158,7 @@ public class WhenAPeekIsRequestedTests : TestBase
 
     private async Task SimulateThatBundlingIsAlreadyInProgress()
     {
-        await GetService<IBundleStore>()
+        await GetService<BundleStore>()
             .TryRegisterBundleAsync(
                 MessageCategory.MasterData,
                 ActorNumber.Create(SampleData.NewEnergySupplierNumber),

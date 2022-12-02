@@ -25,7 +25,7 @@ using Microsoft.Data.SqlClient;
 
 namespace Messaging.Application.OutgoingMessages.Peek;
 
-public class BundleStore : IBundleStore
+public class BundleStore
 {
     private readonly IDbConnectionFactory? _connectionFactory;
 
