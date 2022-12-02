@@ -25,7 +25,7 @@ public class BundleStoreStub : IBundleStore
 {
     private readonly Dictionary<string, Stream?> _documents = new();
 
-    public Stream? GetBundle(string key)
+    public Stream? GetBundleOf(string key)
     {
         return _documents.SingleOrDefault(m => m.Key == key).Value;
     }
