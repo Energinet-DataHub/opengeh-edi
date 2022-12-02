@@ -38,7 +38,7 @@ public interface IBundleStore
     /// </summary>
     /// <param name="key"></param>
     /// <param name="document"></param>
-    void RegisterDocument(string key, Stream document);
+    void SetBundle(string key, Stream document);
 
     /// <summary>
     /// Register bundle key
