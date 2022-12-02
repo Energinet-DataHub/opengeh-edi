@@ -44,5 +44,5 @@ public interface IBundleStore
     /// Register bundle key
     /// </summary>
     /// <param name="key"></param>
-    Task<bool> RegisterKeyAsync(string key);
+    Task<bool> TryRegisterBundleAsync(string key);
 }

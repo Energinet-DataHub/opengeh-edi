@@ -34,7 +34,7 @@ public class BundleStore : IBundleStore
         throw new System.NotImplementedException();
     }
 
-    public Task<bool> RegisterKeyAsync(string key)
+    public Task<bool> TryRegisterBundleAsync(string key)
     {
         throw new System.NotImplementedException();
     }

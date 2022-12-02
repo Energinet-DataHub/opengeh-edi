@@ -116,7 +116,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     public async Task Return_no_content_if_bundling_is_in_progress()
     {
         await GetService<IBundleStore>()
-            .RegisterKeyAsync(MessageCategory.MasterData.Name + SampleData.NewEnergySupplierNumber + MarketRole.EnergySupplier.Name)
+            .TryRegisterBundleAsync(MessageCategory.MasterData.Name + SampleData.NewEnergySupplierNumber + MarketRole.EnergySupplier.Name)
             .ConfigureAwait(false);
         var command = CreatePeekRequest(MessageCategory.MasterData);
 
