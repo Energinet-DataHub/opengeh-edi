@@ -34,7 +34,11 @@ public class BundleStore : IBundleStore
         throw new System.NotImplementedException();
     }
 
-    public Task<bool> TryRegisterBundleAsync(string key)
+    public Task<bool> TryRegisterBundleAsync(
+        string key,
+        MessageCategory messageCategory,
+        ActorNumber messageReceiverNumber,
+        MarketRole roleOfReceiver)
     {
         throw new System.NotImplementedException();
     }

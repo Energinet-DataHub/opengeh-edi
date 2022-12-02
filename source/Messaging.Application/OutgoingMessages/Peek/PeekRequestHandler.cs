@@ -52,7 +52,7 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
 
         if (document is not null) return new PeekResult(document);
 
-        if (!await _bundleStore.TryRegisterBundleAsync(key).ConfigureAwait(false)) return new PeekResult(null);
+        if (!await _bundleStore.TryRegisterBundleAsync(key, request.MessageCategory, request.ActorNumber, request.MarketRole).ConfigureAwait(false)) return new PeekResult(null);
 
         var messages = (await _enqueuedMessages.GetByAsync(request.ActorNumber, request.MarketRole, request.MessageCategory)
             .ConfigureAwait(false))

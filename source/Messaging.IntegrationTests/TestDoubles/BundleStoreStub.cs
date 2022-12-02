@@ -40,7 +40,11 @@ public class BundleStoreStub : IBundleStore
         _documents[key] = document;
     }
 
-    public Task<bool> TryRegisterBundleAsync(string key)
+    public Task<bool> TryRegisterBundleAsync(
+        string key,
+        MessageCategory messageCategory,
+        ActorNumber messageReceiverNumber,
+        MarketRole roleOfReceiver)
     {
         try
         {
