@@ -46,9 +46,12 @@ public class BundleStoreStub : IBundleStore
         ActorNumber messageReceiverNumber,
         MarketRole roleOfReceiver)
     {
+        ArgumentNullException.ThrowIfNull(messageCategory);
+        ArgumentNullException.ThrowIfNull(messageReceiverNumber);
+        ArgumentNullException.ThrowIfNull(roleOfReceiver);
         try
         {
-            _documents.Add(key, null);
+            _documents.Add(GenerateKey(messageCategory, messageReceiverNumber, roleOfReceiver), null);
             return Task.FromResult(true);
         }
         catch (ArgumentException)
