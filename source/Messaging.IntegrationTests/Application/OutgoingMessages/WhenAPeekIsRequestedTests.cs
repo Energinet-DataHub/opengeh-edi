@@ -115,9 +115,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task Return_no_content_if_bundling_is_in_progress()
     {
-        await GetService<IBundleStore>()
-            .TryRegisterBundleAsync(MessageCategory.MasterData, ActorNumber.Create(SampleData.NewEnergySupplierNumber), MarketRole.EnergySupplier)
-            .ConfigureAwait(false);
+        await SimulateThatBundlingIsAlreadyInProgress();
 
         var peekResult = await InvokeCommandAsync(CreatePeekRequest(MessageCategory.MasterData)).ConfigureAwait(false);
 
@@ -156,6 +154,16 @@ public class WhenAPeekIsRequestedTests : TestBase
 
             await messageEnqueuer.EnqueueAsync(message).ConfigureAwait(false);
         }
+    }
+
+    private async Task SimulateThatBundlingIsAlreadyInProgress()
+    {
+        await GetService<IBundleStore>()
+            .TryRegisterBundleAsync(
+                MessageCategory.MasterData,
+                ActorNumber.Create(SampleData.NewEnergySupplierNumber),
+                MarketRole.EnergySupplier)
+            .ConfigureAwait(false);
     }
 
     private async Task GivenAMoveInTransactionHasBeenAccepted()
