@@ -35,7 +35,6 @@ public class BundleStore : IBundleStore
     }
 
     public Task<bool> TryRegisterBundleAsync(
-        string key,
         MessageCategory messageCategory,
         ActorNumber messageReceiverNumber,
         MarketRole roleOfReceiver)

@@ -43,9 +43,8 @@ public interface IBundleStore
     /// <summary>
     /// Register bundle key
     /// </summary>
-    /// <param name="key"></param>
     /// /// <param name="messageCategory">Type of messages within message bundle</param>
     /// <param name="messageReceiverNumber">Actor number of message receiver</param>
     /// <param name="roleOfReceiver">Market role of the receiver</param>
-    Task<bool> TryRegisterBundleAsync(string key, MessageCategory messageCategory, ActorNumber messageReceiverNumber, MarketRole roleOfReceiver);
+    Task<bool> TryRegisterBundleAsync(MessageCategory messageCategory, ActorNumber messageReceiverNumber, MarketRole roleOfReceiver);
 }
