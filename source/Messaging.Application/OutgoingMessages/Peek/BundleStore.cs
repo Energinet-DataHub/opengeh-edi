@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Domain.Actors;
+using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.Peek;
 
 namespace Messaging.Application.OutgoingMessages.Peek;
@@ -43,13 +44,31 @@ public class BundleStore : IBundleStore
         throw new System.NotImplementedException();
     }
 
-    public void SetBundleFor(
+    public async Task SetBundleForAsync(
         MessageCategory messageCategory,
         ActorNumber messageReceiverNumber,
         MarketRole roleOfReceiver,
         Stream document)
     {
-        throw new System.NotImplementedException();
+        ArgumentNullException.ThrowIfNull(messageCategory);
+        ArgumentNullException.ThrowIfNull(messageReceiverNumber);
+        ArgumentNullException.ThrowIfNull(roleOfReceiver);
+
+        var sql = @$"UPDATE [B2B].[BundleStore]
+                     SET Bundle = @Bundle
+                     WHERE Id = @Id
+                     AND Bundle IS NULL";
+        var result = await _connectionFactory!
+            .GetOpenConnection()
+            .ExecuteAsync(
+                sql,
+                new
+                {
+                    Bundle = document,
+                    Id = GenerateKey(messageCategory, messageReceiverNumber, roleOfReceiver),
+                }).ConfigureAwait(false);
+
+        if (result == 0) throw new BundleException("Fail to store bundle on registration: " + GenerateKey(messageCategory, messageReceiverNumber, roleOfReceiver));
     }
 
     public async Task<bool> TryRegisterBundleAsync(

@@ -64,7 +64,7 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
         var bundle = CreateBundleFrom(messages.ToList());
         var cimMessage = bundle.CreateMessage();
         document = await _documentFactory.CreateFromAsync(cimMessage, CimFormat.Xml).ConfigureAwait(false);
-        _bundleStore.SetBundleFor(request.MessageCategory, request.ActorNumber, request.MarketRole, document);
+        await _bundleStore.SetBundleForAsync(request.MessageCategory, request.ActorNumber, request.MarketRole, document).ConfigureAwait(false);
         return new PeekResult(document);
     }
 

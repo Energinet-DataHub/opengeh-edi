@@ -35,7 +35,7 @@ public class BundleStoreStub : IBundleStore
         return _documents.SingleOrDefault(m => m.Key == GenerateKey(messageCategory, messageReceiverNumber, roleOfReceiver)).Value;
     }
 
-    public void SetBundleFor(
+    public Task SetBundleForAsync(
         MessageCategory messageCategory,
         ActorNumber messageReceiverNumber,
         MarketRole roleOfReceiver,
@@ -45,6 +45,7 @@ public class BundleStoreStub : IBundleStore
         ArgumentNullException.ThrowIfNull(messageReceiverNumber);
         ArgumentNullException.ThrowIfNull(roleOfReceiver);
         _documents[GenerateKey(messageCategory, messageReceiverNumber, roleOfReceiver)] = document;
+        return Task.CompletedTask;
     }
 
     public Task<bool> TryRegisterBundleAsync(

@@ -40,7 +40,11 @@ public interface IBundleStore
     /// <param name="messageReceiverNumber">Actor number of message receiver</param>
     /// <param name="roleOfReceiver">Market role of the receiver</param>
     /// <param name="document"></param>
-    void SetBundleFor(MessageCategory messageCategory, ActorNumber messageReceiverNumber, MarketRole roleOfReceiver, Stream document);
+    Task SetBundleForAsync(
+        MessageCategory messageCategory,
+        ActorNumber messageReceiverNumber,
+        MarketRole roleOfReceiver,
+        Stream document);
 
     /// <summary>
     /// Register bundle key
