@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using Messaging.Domain.Actors;
@@ -30,6 +31,16 @@ namespace Messaging.IntegrationTests.Assertions
         private AssertXmlMessage(XDocument document)
         {
             _document = document;
+        }
+
+        internal static void IsTheSameDocument(Stream document1, Stream document2)
+        {
+            var doc1 = XDocument.Load(document1);
+            var doc2 = XDocument.Load(document2);
+
+            var doc1Id = GetMessageHeaderValue(doc1, "mRID");
+            var doc2Id = GetMessageHeaderValue(doc2, "mRID");
+            Assert.Equal(doc1Id, doc2Id);
         }
 
         internal static AssertXmlMessage Document(XDocument document)

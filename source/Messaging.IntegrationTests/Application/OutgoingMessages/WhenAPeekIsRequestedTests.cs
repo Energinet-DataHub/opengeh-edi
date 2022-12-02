@@ -109,7 +109,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         var firstPeekResult = await InvokeCommandAsync(command).ConfigureAwait(false);
         var secondPeekResult = await InvokeCommandAsync(command).ConfigureAwait(false);
 
-        Assert.Equal(firstPeekResult.Bundle, secondPeekResult.Bundle);
+        AssertXmlMessage.IsTheSameDocument(firstPeekResult.Bundle!, secondPeekResult.Bundle!);
     }
 
     [Fact]
