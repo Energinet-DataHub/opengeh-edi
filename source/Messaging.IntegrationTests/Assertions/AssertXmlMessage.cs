@@ -35,11 +35,8 @@ namespace Messaging.IntegrationTests.Assertions
 
         internal static void IsTheSameDocument(Stream document1, Stream document2)
         {
-            var doc1 = XDocument.Load(document1);
-            var doc2 = XDocument.Load(document2);
-
-            var doc1Id = GetMessageHeaderValue(doc1, "mRID");
-            var doc2Id = GetMessageHeaderValue(doc2, "mRID");
+            var doc1Id = GetMessageHeaderValue(XDocument.Load(document1), "mRID");
+            var doc2Id = GetMessageHeaderValue(XDocument.Load(document2), "mRID");
             Assert.Equal(doc1Id, doc2Id);
         }
 
