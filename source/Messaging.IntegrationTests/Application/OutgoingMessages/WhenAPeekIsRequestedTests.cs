@@ -118,9 +118,8 @@ public class WhenAPeekIsRequestedTests : TestBase
         await GetService<IBundleStore>()
             .TryRegisterBundleAsync(MessageCategory.MasterData, ActorNumber.Create(SampleData.NewEnergySupplierNumber), MarketRole.EnergySupplier)
             .ConfigureAwait(false);
-        var command = CreatePeekRequest(MessageCategory.MasterData);
 
-        var peekResult = await InvokeCommandAsync(command).ConfigureAwait(false);
+        var peekResult = await InvokeCommandAsync(CreatePeekRequest(MessageCategory.MasterData)).ConfigureAwait(false);
 
         Assert.Null(peekResult.Bundle);
     }
