@@ -42,7 +42,10 @@ public class BundleStoreStub : IBundleStore
         MarketRole roleOfReceiver,
         Stream document)
     {
-        _documents[key] = document;
+        ArgumentNullException.ThrowIfNull(messageCategory);
+        ArgumentNullException.ThrowIfNull(messageReceiverNumber);
+        ArgumentNullException.ThrowIfNull(roleOfReceiver);
+        _documents[GenerateKey(messageCategory, messageReceiverNumber, roleOfReceiver)] = document;
     }
 
     public Task<bool> TryRegisterBundleAsync(
