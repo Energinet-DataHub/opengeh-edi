@@ -115,7 +115,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task Return_no_content_if_bundling_is_in_progress()
     {
-        await SimulateThatBundlingIsAlreadyInProgress();
+        await SimulateThatBundlingIsAlreadyInProgress().ConfigureAwait(false);
 
         var peekResult = await InvokeCommandAsync(CreatePeekRequest(MessageCategory.MasterData)).ConfigureAwait(false);
 
