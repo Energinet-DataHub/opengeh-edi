@@ -36,12 +36,21 @@ public class BundleStore : IBundleStore
         _connectionFactory = connectionFactory;
     }
 
-    public Stream? GetBundleOf(
+    public Task<Stream?> GetBundleOfAsync(
         MessageCategory messageCategory,
         ActorNumber messageReceiverNumber,
         MarketRole roleOfReceiver)
     {
-        throw new System.NotImplementedException();
+        ArgumentNullException.ThrowIfNull(messageCategory);
+        ArgumentNullException.ThrowIfNull(messageReceiverNumber);
+        ArgumentNullException.ThrowIfNull(roleOfReceiver);
+
+        return _connectionFactory!
+            .GetOpenConnection()
+            .QuerySingleOrDefaultAsync<Stream?>($"SELECT Bundle FROM b2b.BundleStore WHERE Id = @Id", new
+            {
+                Id = GenerateKey(messageCategory, messageReceiverNumber, roleOfReceiver),
+            });
     }
 
     public async Task SetBundleForAsync(

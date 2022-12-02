@@ -27,12 +27,12 @@ public class BundleStoreStub : IBundleStore
 {
     private readonly Dictionary<string, Stream?> _documents = new();
 
-    public Stream? GetBundleOf(
+    public Task<Stream?> GetBundleOfAsync(
         MessageCategory messageCategory,
         ActorNumber messageReceiverNumber,
         MarketRole roleOfReceiver)
     {
-        return _documents.SingleOrDefault(m => m.Key == GenerateKey(messageCategory, messageReceiverNumber, roleOfReceiver)).Value;
+        return Task.FromResult(_documents.SingleOrDefault(m => m.Key == GenerateKey(messageCategory, messageReceiverNumber, roleOfReceiver)).Value);
     }
 
     public Task SetBundleForAsync(

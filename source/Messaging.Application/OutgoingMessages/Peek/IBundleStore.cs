@@ -31,7 +31,7 @@ public interface IBundleStore
     /// <param name="messageReceiverNumber">Actor number of message receiver</param>
     /// <param name="roleOfReceiver">Market role of the receiver</param>
     /// <returns>A nullable stream containing peeked document</returns>
-    Stream? GetBundleOf(MessageCategory messageCategory, ActorNumber messageReceiverNumber, MarketRole roleOfReceiver);
+    Task<Stream?> GetBundleOfAsync(MessageCategory messageCategory, ActorNumber messageReceiverNumber, MarketRole roleOfReceiver);
 
     /// <summary>
     /// Register peeked document

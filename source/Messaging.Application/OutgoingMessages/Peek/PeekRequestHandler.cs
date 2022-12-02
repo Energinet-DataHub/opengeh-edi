@@ -46,7 +46,9 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var document = _bundleStore.GetBundleOf(request.MessageCategory, request.ActorNumber, request.MarketRole);
+        var document = await _bundleStore
+            .GetBundleOfAsync(request.MessageCategory, request.ActorNumber, request.MarketRole)
+            .ConfigureAwait(false);
 
         if (document is not null) return new PeekResult(document);
 
