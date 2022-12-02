@@ -29,7 +29,7 @@ public class BundleStore : IBundleStore
         throw new System.NotImplementedException();
     }
 
-    public void SetBundle(string key, Stream document)
+    public void SetBundleFor(string key, Stream document)
     {
         throw new System.NotImplementedException();
     }

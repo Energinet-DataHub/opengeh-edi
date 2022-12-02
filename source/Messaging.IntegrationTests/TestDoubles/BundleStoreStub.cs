@@ -35,7 +35,7 @@ public class BundleStoreStub : IBundleStore
         return _documents.SingleOrDefault(m => m.Key == GenerateKey(messageCategory, messageReceiverNumber, roleOfReceiver)).Value;
     }
 
-    public void SetBundle(string key, Stream document)
+    public void SetBundleFor(string key, Stream document)
     {
         _documents[key] = document;
     }
