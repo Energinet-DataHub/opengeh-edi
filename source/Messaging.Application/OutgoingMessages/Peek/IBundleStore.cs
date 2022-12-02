@@ -37,8 +37,11 @@ public interface IBundleStore
     /// Register peeked document
     /// </summary>
     /// <param name="key"></param>
+    /// <param name="messageCategory">Type of messages within message bundle</param>
+    /// <param name="messageReceiverNumber">Actor number of message receiver</param>
+    /// <param name="roleOfReceiver">Market role of the receiver</param>
     /// <param name="document"></param>
-    void SetBundleFor(string key, Stream document);
+    void SetBundleFor(string key, MessageCategory messageCategory, ActorNumber messageReceiverNumber, MarketRole roleOfReceiver, Stream document);
 
     /// <summary>
     /// Register bundle key

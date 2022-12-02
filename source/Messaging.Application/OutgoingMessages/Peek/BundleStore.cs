@@ -29,7 +29,12 @@ public class BundleStore : IBundleStore
         throw new System.NotImplementedException();
     }
 
-    public void SetBundleFor(string key, Stream document)
+    public void SetBundleFor(
+        string key,
+        MessageCategory messageCategory,
+        ActorNumber messageReceiverNumber,
+        MarketRole roleOfReceiver,
+        Stream document)
     {
         throw new System.NotImplementedException();
     }
