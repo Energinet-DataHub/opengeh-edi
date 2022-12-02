@@ -36,7 +36,6 @@ public class BundleStoreStub : IBundleStore
     }
 
     public void SetBundleFor(
-        string key,
         MessageCategory messageCategory,
         ActorNumber messageReceiverNumber,
         MarketRole roleOfReceiver,

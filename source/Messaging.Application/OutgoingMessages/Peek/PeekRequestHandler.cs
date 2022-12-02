@@ -46,8 +46,6 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var key = CreateKeyFrom(request);
-
         var document = _bundleStore.GetBundleOf(request.MessageCategory, request.ActorNumber, request.MarketRole);
 
         if (document is not null) return new PeekResult(document);
@@ -66,13 +64,8 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
         var bundle = CreateBundleFrom(messages.ToList());
         var cimMessage = bundle.CreateMessage();
         document = await _documentFactory.CreateFromAsync(cimMessage, CimFormat.Xml).ConfigureAwait(false);
-        _bundleStore.SetBundleFor(key, request.MessageCategory, request.ActorNumber, request.MarketRole, document);
+        _bundleStore.SetBundleFor(request.MessageCategory, request.ActorNumber, request.MarketRole, document);
         return new PeekResult(document);
-    }
-
-    private static string CreateKeyFrom(PeekRequest request)
-    {
-        return request.MessageCategory + request.ActorNumber.Value + request.MarketRole.Name;
     }
 
     private Bundle CreateBundleFrom(IReadOnlyList<EnqueuedMessage> messages)
