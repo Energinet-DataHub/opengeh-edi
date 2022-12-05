@@ -90,7 +90,7 @@ public class BundleStore
 
         ResetBundleStream(document);
 
-        if (result == 0) throw new BundleException("Fail to store bundle on registration: " + GenerateKey(messageCategory, messageReceiverNumber, roleOfReceiver));
+        if (result == 0) throw new BundleException($"Fail to store bundle on registration: {messageCategory.Name}, {messageReceiverNumber.Value}, {roleOfReceiver.Name}");
     }
 
     public async Task<bool> TryRegisterBundleAsync(
@@ -123,14 +123,6 @@ public class BundleStore
             return false;
 
         return !await reader.IsDBNullAsync(0).ConfigureAwait(false);
-    }
-
-    private static string GenerateKey(
-        MessageCategory messageCategory,
-        ActorNumber messageReceiverNumber,
-        MarketRole roleOfReceiver)
-    {
-        return messageCategory.Name + messageReceiverNumber.Value + roleOfReceiver.Name;
     }
 
     private static void ResetBundleStream(Stream document)
