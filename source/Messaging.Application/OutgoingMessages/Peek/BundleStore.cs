@@ -99,11 +99,10 @@ public class BundleStore
         ArgumentNullException.ThrowIfNull(messageReceiverNumber);
         ArgumentNullException.ThrowIfNull(roleOfReceiver);
 
-        var bundleRegistrationStatement = $"IF NOT EXISTS (SELECT * FROM b2b.BundleStore WHERE Id = @Id)" +
-                                          $"INSERT INTO b2b.BundleStore(Id) VALUES(@Id)";
         var result = await _connectionFactory
             .GetOpenConnection().ExecuteAsync(
-                bundleRegistrationStatement,
+                $"IF NOT EXISTS (SELECT * FROM b2b.BundleStore WHERE Id = @Id)" +
+                $"INSERT INTO b2b.BundleStore(Id) VALUES(@Id)",
                 new
                 {
                     @Id = GenerateKey(messageCategory, messageReceiverNumber, roleOfReceiver),
