@@ -77,7 +77,7 @@ public class BundleStore
 
         var command = CreateCommand(
             @$"UPDATE [B2B].[BundleStore]
-                     SET Bundle = @Bundle, MessageId = @MessageId
+                     SET Bundle = @Bundle, MessageId = @MessageId, MessageIdsIncluded = @MessageIdsIncluded
                      WHERE ActorNumber = @ActorNumber
                      AND  ActorRole = @ActorRole
                      AND MessageCategory = @MessageCategory
@@ -139,7 +139,7 @@ public class BundleStore
         var statementBuilder = new StringBuilder();
         foreach (var id in messageIdIncluded.Split(","))
         {
-            var deleteMessageRowSql = $"DELETE FROM [B2B].ActorMessageQueue_{actorNumber} WHERE Id = {id};";
+            var deleteMessageRowSql = $"DELETE FROM [B2B].ActorMessageQueue_{actorNumber} WHERE Id = '{id}';";
             statementBuilder.AppendLine(deleteMessageRowSql);
         }
 
@@ -153,7 +153,7 @@ public class BundleStore
             });
         var result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
 
-        return result == 1 ? new DequeueResult(true) : new DequeueResult(false);
+        return result > 0 ? new DequeueResult(true) : new DequeueResult(false);
     }
 
     private static async Task<bool> HasBundleRegisteredAsync(SqlDataReader reader)
