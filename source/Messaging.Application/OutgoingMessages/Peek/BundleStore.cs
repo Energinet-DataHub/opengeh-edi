@@ -29,10 +29,6 @@ public class BundleStore
 {
     private readonly IDbConnectionFactory? _connectionFactory;
 
-    public BundleStore()
-    {
-    }
-
     public BundleStore(IDbConnectionFactory connectionFactory)
     {
         _connectionFactory = connectionFactory;
