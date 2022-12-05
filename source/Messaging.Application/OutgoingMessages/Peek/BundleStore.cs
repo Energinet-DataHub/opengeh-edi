@@ -43,9 +43,7 @@ public class BundleStore
         ArgumentNullException.ThrowIfNull(messageReceiverNumber);
         ArgumentNullException.ThrowIfNull(roleOfReceiver);
 
-        var command = (SqlCommand)_connectionFactory.GetOpenConnection()
-            .CreateCommand();
-        command.CommandText = $"SELECT Bundle FROM b2b.BundleStore WHERE Id = @Id";
+        var command = CreateCommand($"SELECT Bundle FROM b2b.BundleStore WHERE Id = @Id");
         command.Parameters.AddWithValue("@Id", GenerateKey(messageCategory, messageReceiverNumber, roleOfReceiver));
         using (var reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
         {
@@ -119,5 +117,16 @@ public class BundleStore
         MarketRole roleOfReceiver)
     {
         return messageCategory.Name + messageReceiverNumber.Value + roleOfReceiver.Name;
+    }
+
+    private SqlCommand CreateCommand(string sqlStatement)
+    {
+        var command = _connectionFactory
+            .GetOpenConnection()
+            .CreateCommand();
+
+        command.CommandText = sqlStatement;
+
+        return (SqlCommand)command;
     }
 }
