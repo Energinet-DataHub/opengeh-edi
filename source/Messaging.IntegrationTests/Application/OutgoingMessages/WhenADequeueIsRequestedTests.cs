@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
@@ -31,6 +32,14 @@ public class WhenADequeueIsRequestedTests : TestBase
     public WhenADequeueIsRequestedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
+    }
+
+    [Fact]
+    public async Task Dequeue_is_unsuccessful_when_bundle_does_not_exist()
+    {
+        var dequeueResult = await InvokeCommandAsync(new DequeueRequest(Guid.NewGuid())).ConfigureAwait(false);
+
+        Assert.False(dequeueResult.Success);
     }
 
     [Fact]
