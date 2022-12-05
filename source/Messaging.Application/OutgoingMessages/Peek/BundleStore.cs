@@ -27,7 +27,7 @@ namespace Messaging.Application.OutgoingMessages.Peek;
 
 public class BundleStore
 {
-    private readonly IDbConnectionFactory? _connectionFactory;
+    private readonly IDbConnectionFactory _connectionFactory;
 
     public BundleStore(IDbConnectionFactory connectionFactory)
     {
@@ -43,7 +43,7 @@ public class BundleStore
         ArgumentNullException.ThrowIfNull(messageReceiverNumber);
         ArgumentNullException.ThrowIfNull(roleOfReceiver);
 
-        var command = (SqlCommand)_connectionFactory!.GetOpenConnection()
+        var command = (SqlCommand)_connectionFactory.GetOpenConnection()
             .CreateCommand();
         command.CommandText = $"SELECT Bundle FROM b2b.BundleStore WHERE Id = @Id";
         command.Parameters.AddWithValue("@Id", GenerateKey(messageCategory, messageReceiverNumber, roleOfReceiver));
@@ -76,7 +76,7 @@ public class BundleStore
                      WHERE Id = @Id
                      AND Bundle IS NULL";
 
-        var command = _connectionFactory!.GetOpenConnection().CreateCommand();
+        var command = _connectionFactory.GetOpenConnection().CreateCommand();
         command.CommandText = sql;
         var param1 = new SqlParameter("@Id", SqlDbType.NVarChar);
         param1.Value = GenerateKey(messageCategory, messageReceiverNumber, roleOfReceiver);
@@ -101,7 +101,7 @@ public class BundleStore
 
         var bundleRegistrationStatement = $"IF NOT EXISTS (SELECT * FROM b2b.BundleStore WHERE Id = @Id)" +
                                           $"INSERT INTO b2b.BundleStore(Id) VALUES(@Id)";
-        var result = await _connectionFactory!
+        var result = await _connectionFactory
             .GetOpenConnection().ExecuteAsync(
                 bundleRegistrationStatement,
                 new
