@@ -44,9 +44,8 @@ public class WhenADequeueIsRequestedTests : TestBase
 
         var dequeueResult = await InvokeCommandAsync(new DequeueRequest(peekResult.MessageId.GetValueOrDefault())).ConfigureAwait(false);
 
-        var sql = "SELECT * FROM [B2B].BundleStore";
         var found = await GetService<IDbConnectionFactory>().GetOpenConnection()
-            .QuerySingleOrDefaultAsync(sql)
+            .QuerySingleOrDefaultAsync("SELECT * FROM [B2B].BundleStore")
             .ConfigureAwait(false);
 
         Assert.True(dequeueResult.Success);
