@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Threading.Tasks;
 using Dapper;
@@ -85,7 +84,9 @@ public class BundleStore
             });
 
         var result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
-        document.Position = 0;
+
+        ResetBundleStream(document);
+
         if (result == 0) throw new BundleException("Fail to store bundle on registration: " + GenerateKey(messageCategory, messageReceiverNumber, roleOfReceiver));
     }
 
@@ -118,6 +119,11 @@ public class BundleStore
         MarketRole roleOfReceiver)
     {
         return messageCategory.Name + messageReceiverNumber.Value + roleOfReceiver.Name;
+    }
+
+    private static void ResetBundleStream(Stream document)
+    {
+        document.Position = 0;
     }
 
     private SqlCommand CreateCommand(string sqlStatement, List<KeyValuePair<string, object>> parameters)
