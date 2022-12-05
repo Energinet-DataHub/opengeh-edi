@@ -56,6 +56,7 @@ using Messaging.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
 using Messaging.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Infrastructure.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
 using Messaging.Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier;
+using Messaging.Infrastructure.OutgoingMessages.Dequeue;
 using Messaging.Infrastructure.OutgoingMessages.GenericNotification;
 using Messaging.Infrastructure.OutgoingMessages.Peek;
 using Messaging.Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
@@ -100,6 +101,7 @@ namespace Messaging.Infrastructure.Configuration
             AddProcessing();
             ReadModelHandlingConfiguration.AddReadModelHandling(services);
             UpdateCustomerMasterDataConfiguration.Configure(services);
+            DequeueConfiguration.Configure(services);
         }
 
         public static CompositionRoot Initialize(IServiceCollection services)

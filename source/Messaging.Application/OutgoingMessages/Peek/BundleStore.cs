@@ -18,6 +18,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.OutgoingMessages.Dequeue;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.Peek;
@@ -64,7 +65,8 @@ public class BundleStore
         MessageCategory messageCategory,
         ActorNumber messageReceiverNumber,
         MarketRole roleOfReceiver,
-        Stream document)
+        Stream document,
+        Guid messageId)
     {
         ArgumentNullException.ThrowIfNull(messageCategory);
         ArgumentNullException.ThrowIfNull(messageReceiverNumber);
@@ -73,17 +75,19 @@ public class BundleStore
 
         var command = CreateCommand(
             @$"UPDATE [B2B].[BundleStore]
-                     SET Bundle = @Bundle
+                     SET Bundle = @Bundle, MessageId = @MessageId
                      WHERE ActorNumber = @ActorNumber
                      AND  ActorRole = @ActorRole
                      AND MessageCategory = @MessageCategory
-                     AND Bundle IS NULL",
+                     AND Bundle IS NULL
+                     AND MessageId IS NULL",
             new List<KeyValuePair<string, object>>()
             {
                 new("@ActorNumber", messageReceiverNumber.Value),
                 new("@ActorRole", roleOfReceiver.Name),
                 new("@MessageCategory", messageCategory.Name),
                 new("@Bundle", document),
+                new("@MessageId", messageId),
             });
 
         var result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
@@ -115,6 +119,21 @@ public class BundleStore
             .ConfigureAwait(false);
 
         return result == 1;
+    }
+
+    public async Task<DequeueResult> DequeueAsync(Guid messageId)
+    {
+        var sql = $"DELETE FROM [B2B].[BundleStore] WHERE MessageId = @MessageId";
+
+        var command = CreateCommand(
+            sql,
+            new List<KeyValuePair<string, object>>()
+            {
+                new("@MessageId", messageId),
+            });
+        var result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+
+        return result == 1 ? new DequeueResult(true) : new DequeueResult(false);
     }
 
     private static async Task<bool> HasBundleRegisteredAsync(SqlDataReader reader)

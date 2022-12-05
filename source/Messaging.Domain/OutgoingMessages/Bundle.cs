@@ -27,9 +27,12 @@ public class Bundle
 
     public Bundle(Instant timestamp)
     {
+        MessageId = Guid.NewGuid();
         _timestamp = timestamp;
         _header = new MessageHeader(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, _timestamp);
     }
+
+    public Guid MessageId { get; }
 
     public void Add(EnqueuedMessage message)
     {
@@ -103,7 +106,7 @@ public class Bundle
             message.SenderRole,
             message.ReceiverId,
             message.ReceiverRole,
-            Guid.NewGuid().ToString(),
+            MessageId.ToString(),
             _timestamp);
     }
 }
