@@ -34,6 +34,11 @@ public class Bundle
 
     public Guid MessageId { get; }
 
+    public IEnumerable<Guid> GetMessageIdsIncluded()
+    {
+        return _messages.Select(message => message.Id);
+    }
+
     public void Add(EnqueuedMessage message)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));

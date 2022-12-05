@@ -64,6 +64,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202227101325 Add BundleStore Table.sql" />
     <EmbeddedResource Include="Scripts\Model\202227101326 Add columns to bundlestore.sql" />
     <EmbeddedResource Include="Scripts\Model\202227101327 Add MessageId column to bundlestore.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101328 Add MessageIdsIncluded column to bundlestore.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281100 Seed cleanup.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281101 Insert Reasons.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241100 Consolidated dbo model.sql" />

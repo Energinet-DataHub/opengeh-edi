@@ -53,12 +53,17 @@ public class WhenADequeueIsRequestedTests : TestBase
 
         var dequeueResult = await InvokeCommandAsync(new DequeueRequest(peekResult.MessageId.GetValueOrDefault())).ConfigureAwait(false);
 
-        var found = await GetService<IDbConnectionFactory>().GetOpenConnection()
+        var connection = GetService<IDbConnectionFactory>().GetOpenConnection();
+        var found = await connection
             .QuerySingleOrDefaultAsync("SELECT * FROM [B2B].BundleStore")
             .ConfigureAwait(false);
+        var sqlCountStatement = $"SELECT COUNT(*) FROM [B2B].ActorMessageQueue_{SampleData.NewEnergySupplierNumber}";
+        var messagesInQueue = await connection
+            .ExecuteScalarAsync<int>(sqlCountStatement);
 
         Assert.True(dequeueResult.Success);
         Assert.Null(found);
+        Assert.Equal(0, messagesInQueue);
     }
 
     private async Task GivenAMoveInTransactionHasBeenAccepted()

@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
@@ -66,7 +67,8 @@ public class BundleStore
         ActorNumber messageReceiverNumber,
         MarketRole roleOfReceiver,
         Stream document,
-        Guid messageId)
+        Guid messageId,
+        IEnumerable<Guid> messageIdsIncluded)
     {
         ArgumentNullException.ThrowIfNull(messageCategory);
         ArgumentNullException.ThrowIfNull(messageReceiverNumber);
@@ -88,6 +90,7 @@ public class BundleStore
                 new("@MessageCategory", messageCategory.Name),
                 new("@Bundle", document),
                 new("@MessageId", messageId),
+                new("@MessageIdsIncluded", string.Join(",", messageIdsIncluded)),
             });
 
         var result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
@@ -123,10 +126,27 @@ public class BundleStore
 
     public async Task<DequeueResult> DequeueAsync(Guid messageId)
     {
-        var sql = $"DELETE FROM [B2B].[BundleStore] WHERE MessageId = @MessageId";
+        var bundleStoreQuery = await _connectionFactory.GetOpenConnection().QuerySingleOrDefaultAsync(
+            $"SELECT * FROM [B2B].[BundleStore] WHERE MessageId = @MessageId",
+            new
+        {
+            MessageId = messageId,
+        }).ConfigureAwait(false);
+        if (bundleStoreQuery is null)
+            return new DequeueResult(false);
+        string messageIdIncluded = bundleStoreQuery.MessageIdsIncluded;
+        string actorNumber = bundleStoreQuery.ActorNumber;
+        var statementBuilder = new StringBuilder();
+        foreach (var id in messageIdIncluded.Split(","))
+        {
+            var deleteMessageRowSql = $"DELETE FROM [B2B].ActorMessageQueue_{actorNumber} WHERE Id = {id};";
+            statementBuilder.AppendLine(deleteMessageRowSql);
+        }
 
+        var deleteBundleStoreRowSql = $"DELETE FROM [B2B].[BundleStore] WHERE MessageId = @MessageId";
+        statementBuilder.AppendLine(deleteBundleStoreRowSql);
         var command = CreateCommand(
-            sql,
+            statementBuilder.ToString(),
             new List<KeyValuePair<string, object>>()
             {
                 new("@MessageId", messageId),
