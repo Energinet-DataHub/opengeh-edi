@@ -43,9 +43,11 @@ public class BundleStore
         ArgumentNullException.ThrowIfNull(messageReceiverNumber);
         ArgumentNullException.ThrowIfNull(roleOfReceiver);
 
-        var command = CreateCommand($"SELECT Bundle FROM b2b.BundleStore WHERE Id = @Id", new List<KeyValuePair<string, object>>
+        var command = CreateCommand($"SELECT Bundle FROM b2b.BundleStore WHERE ActorNumber = @ActorNumber AND ActorRole = @ActorRole AND MessageCategory = @MessageCategory", new List<KeyValuePair<string, object>>
         {
-            new("@Id", GenerateKey(messageCategory, messageReceiverNumber, roleOfReceiver)),
+            new("@ActorNumber", messageReceiverNumber.Value),
+            new("@ActorRole", roleOfReceiver.Name),
+            new("@MessageCategory", messageCategory.Name),
         });
 
         using (var reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
@@ -72,11 +74,15 @@ public class BundleStore
         var command = CreateCommand(
             @$"UPDATE [B2B].[BundleStore]
                      SET Bundle = @Bundle
-                     WHERE Id = @Id
+                     WHERE ActorNumber = @ActorNumber
+                     AND  ActorRole = @ActorRole
+                     AND MessageCategory = @MessageCategory
                      AND Bundle IS NULL",
             new List<KeyValuePair<string, object>>()
             {
-                new("@Id", GenerateKey(messageCategory, messageReceiverNumber, roleOfReceiver)),
+                new("@ActorNumber", messageReceiverNumber.Value),
+                new("@ActorRole", roleOfReceiver.Name),
+                new("@MessageCategory", messageCategory.Name),
                 new("@Bundle", document),
             });
 
@@ -98,11 +104,13 @@ public class BundleStore
 
         var result = await _connectionFactory
             .GetOpenConnection().ExecuteAsync(
-                $"IF NOT EXISTS (SELECT * FROM b2b.BundleStore WHERE Id = @Id)" +
-                $"INSERT INTO b2b.BundleStore(Id) VALUES(@Id)",
+                $"IF NOT EXISTS (SELECT * FROM b2b.BundleStore WHERE ActorNumber = @ActorNumber AND ActorRole = @ActorRole AND MessageCategory = @MessageCategory)" +
+                $"INSERT INTO b2b.BundleStore(ActorNUmber, ActorRole, MessageCategory) VALUES(@ActorNumber, @ActorRole, @MessageCategory)",
                 new
                 {
-                    @Id = GenerateKey(messageCategory, messageReceiverNumber, roleOfReceiver),
+                    @ActorNumber = messageReceiverNumber.Value,
+                    @ActorRole = roleOfReceiver.Name,
+                    @MessageCategory = messageCategory.Name,
                 })
             .ConfigureAwait(false);
 
