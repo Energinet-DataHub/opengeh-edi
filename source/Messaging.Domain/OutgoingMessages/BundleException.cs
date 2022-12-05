@@ -12,24 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Messaging.Application.OutgoingMessages.Peek;
+namespace Messaging.Domain.OutgoingMessages;
 
-namespace Messaging.IntegrationTests.TestDoubles;
-
-public class PeekedMessageRepositoryStub : IPeekedMessageRepository
+public class BundleException : Exception
 {
-    private readonly Dictionary<string, Stream> _documents = new();
-
-    public Stream? GetDocument(string key)
+    public BundleException(string message)
+        : base(message)
     {
-        return _documents.SingleOrDefault(m => m.Key == key).Value;
     }
 
-    public void RegisterDocument(string key, Stream document)
+    public BundleException()
     {
-        _documents.Add(key, document);
+    }
+
+    public BundleException(string message, Exception innerException)
+        : base(message, innerException)
+    {
     }
 }

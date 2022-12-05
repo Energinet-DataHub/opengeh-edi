@@ -21,11 +21,11 @@ namespace Messaging.Infrastructure.OutgoingMessages.Peek;
 
 internal static class PeekConfiguration
 {
-    internal static void Configure(IServiceCollection services, IBundleConfiguration bundleConfiguration, IPeekedMessageRepository peekedMessageRepository)
+    internal static void Configure(IServiceCollection services, IBundleConfiguration bundleConfiguration)
     {
         services.AddTransient<IRequestHandler<PeekRequest, PeekResult>, PeekRequestHandler>();
         services.AddScoped<IEnqueuedMessages, EnqueuedMessages>();
         services.AddScoped(_ => bundleConfiguration);
-        services.AddSingleton(_ => peekedMessageRepository);
+        services.AddSingleton<BundleStore>();
     }
 }

@@ -109,7 +109,17 @@ public class WhenAPeekIsRequestedTests : TestBase
         var firstPeekResult = await InvokeCommandAsync(command).ConfigureAwait(false);
         var secondPeekResult = await InvokeCommandAsync(command).ConfigureAwait(false);
 
-        Assert.Equal(firstPeekResult.Bundle, secondPeekResult.Bundle);
+        AssertXmlMessage.IsTheSameDocument(firstPeekResult.Bundle!, secondPeekResult.Bundle!);
+    }
+
+    [Fact]
+    public async Task Return_no_content_if_bundling_is_in_progress()
+    {
+        await SimulateThatBundlingIsAlreadyInProgress().ConfigureAwait(false);
+
+        var peekResult = await InvokeCommandAsync(CreatePeekRequest(MessageCategory.MasterData)).ConfigureAwait(false);
+
+        Assert.Null(peekResult.Bundle);
     }
 
     private static PeekRequest CreatePeekRequest(MessageCategory messageCategory)
@@ -144,6 +154,16 @@ public class WhenAPeekIsRequestedTests : TestBase
 
             await messageEnqueuer.EnqueueAsync(message).ConfigureAwait(false);
         }
+    }
+
+    private async Task SimulateThatBundlingIsAlreadyInProgress()
+    {
+        await GetService<BundleStore>()
+            .TryRegisterBundleAsync(
+                MessageCategory.MasterData,
+                ActorNumber.Create(SampleData.NewEnergySupplierNumber),
+                MarketRole.EnergySupplier)
+            .ConfigureAwait(false);
     }
 
     private async Task GivenAMoveInTransactionHasBeenAccepted()

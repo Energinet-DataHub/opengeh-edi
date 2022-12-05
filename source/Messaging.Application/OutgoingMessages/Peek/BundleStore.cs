@@ -1,0 +1,149 @@
+﻿// Copyright 2020 Energinet DataHub A/S
+//
+// Licensed under the Apache License, Version 2.0 (the "License2");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
+using Dapper;
+using Messaging.Application.Configuration.DataAccess;
+using Messaging.Domain.Actors;
+using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages.Peek;
+using Microsoft.Data.SqlClient;
+
+namespace Messaging.Application.OutgoingMessages.Peek;
+
+public class BundleStore
+{
+    private readonly IDbConnectionFactory _connectionFactory;
+
+    public BundleStore(IDbConnectionFactory connectionFactory)
+    {
+        _connectionFactory = connectionFactory;
+    }
+
+    public async Task<Stream?> GetBundleOfAsync(
+        MessageCategory messageCategory,
+        ActorNumber messageReceiverNumber,
+        MarketRole roleOfReceiver)
+    {
+        ArgumentNullException.ThrowIfNull(messageCategory);
+        ArgumentNullException.ThrowIfNull(messageReceiverNumber);
+        ArgumentNullException.ThrowIfNull(roleOfReceiver);
+
+        var command = CreateCommand($"SELECT Bundle FROM b2b.BundleStore WHERE ActorNumber = @ActorNumber AND ActorRole = @ActorRole AND MessageCategory = @MessageCategory", new List<KeyValuePair<string, object>>
+        {
+            new("@ActorNumber", messageReceiverNumber.Value),
+            new("@ActorRole", roleOfReceiver.Name),
+            new("@MessageCategory", messageCategory.Name),
+        });
+
+        using (var reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
+        {
+            await reader.ReadAsync().ConfigureAwait(false);
+            if (await HasBundleRegisteredAsync(reader).ConfigureAwait(false) == false)
+                return null;
+
+            return reader.GetStream(0);
+        }
+    }
+
+    public async Task SetBundleForAsync(
+        MessageCategory messageCategory,
+        ActorNumber messageReceiverNumber,
+        MarketRole roleOfReceiver,
+        Stream document)
+    {
+        ArgumentNullException.ThrowIfNull(messageCategory);
+        ArgumentNullException.ThrowIfNull(messageReceiverNumber);
+        ArgumentNullException.ThrowIfNull(roleOfReceiver);
+        ArgumentNullException.ThrowIfNull(document);
+
+        var command = CreateCommand(
+            @$"UPDATE [B2B].[BundleStore]
+                     SET Bundle = @Bundle
+                     WHERE ActorNumber = @ActorNumber
+                     AND  ActorRole = @ActorRole
+                     AND MessageCategory = @MessageCategory
+                     AND Bundle IS NULL",
+            new List<KeyValuePair<string, object>>()
+            {
+                new("@ActorNumber", messageReceiverNumber.Value),
+                new("@ActorRole", roleOfReceiver.Name),
+                new("@MessageCategory", messageCategory.Name),
+                new("@Bundle", document),
+            });
+
+        var result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+
+        ResetBundleStream(document);
+
+        if (result == 0) throw new BundleException($"Fail to store bundle on registration: {messageCategory.Name}, {messageReceiverNumber.Value}, {roleOfReceiver.Name}");
+    }
+
+    public async Task<bool> TryRegisterBundleAsync(
+        MessageCategory messageCategory,
+        ActorNumber messageReceiverNumber,
+        MarketRole roleOfReceiver)
+    {
+        ArgumentNullException.ThrowIfNull(messageCategory);
+        ArgumentNullException.ThrowIfNull(messageReceiverNumber);
+        ArgumentNullException.ThrowIfNull(roleOfReceiver);
+
+        var result = await _connectionFactory
+            .GetOpenConnection().ExecuteAsync(
+                $"IF NOT EXISTS (SELECT * FROM b2b.BundleStore WHERE ActorNumber = @ActorNumber AND ActorRole = @ActorRole AND MessageCategory = @MessageCategory)" +
+                $"INSERT INTO b2b.BundleStore(ActorNUmber, ActorRole, MessageCategory) VALUES(@ActorNumber, @ActorRole, @MessageCategory)",
+                new
+                {
+                    @ActorNumber = messageReceiverNumber.Value,
+                    @ActorRole = roleOfReceiver.Name,
+                    @MessageCategory = messageCategory.Name,
+                })
+            .ConfigureAwait(false);
+
+        return result == 1;
+    }
+
+    private static async Task<bool> HasBundleRegisteredAsync(SqlDataReader reader)
+    {
+        if (!reader.HasRows)
+            return false;
+
+        return !await reader.IsDBNullAsync(0).ConfigureAwait(false);
+    }
+
+    private static void ResetBundleStream(Stream document)
+    {
+        document.Position = 0;
+    }
+
+    private SqlCommand CreateCommand(string sqlStatement, List<KeyValuePair<string, object>> parameters)
+    {
+        var command = _connectionFactory
+            .GetOpenConnection()
+            .CreateCommand();
+
+        command.CommandText = sqlStatement;
+
+        foreach (var parameter in parameters)
+        {
+            var sqlParameter = new SqlParameter(parameter.Key, parameter.Value);
+            command.Parameters.Add(sqlParameter);
+        }
+
+        return (SqlCommand)command;
+    }
+}
