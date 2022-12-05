@@ -42,13 +42,14 @@ public class WhenADequeueIsRequestedTests : TestBase
             MessageCategory.MasterData,
             MarketRole.EnergySupplier)).ConfigureAwait(false);
 
-        await InvokeCommandAsync(new DequeueRequest(peekResult.MessageId.GetValueOrDefault())).ConfigureAwait(false);
+        var dequeueResult = await InvokeCommandAsync(new DequeueRequest(peekResult.MessageId.GetValueOrDefault())).ConfigureAwait(false);
 
         var sql = "SELECT * FROM [B2B].BundleStore";
         var found = await GetService<IDbConnectionFactory>().GetOpenConnection()
             .QuerySingleOrDefaultAsync(sql)
             .ConfigureAwait(false);
 
+        Assert.True(dequeueResult.Success);
         Assert.Null(found);
     }
 
