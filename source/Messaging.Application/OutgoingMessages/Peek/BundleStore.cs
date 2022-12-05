@@ -51,10 +51,7 @@ public class BundleStore
         using (var reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
         {
             await reader.ReadAsync().ConfigureAwait(false);
-            if (!reader.HasRows)
-                return null;
-
-            if (await reader.IsDBNullAsync(0).ConfigureAwait(false))
+            if (await HasBundleRegisteredAsync(reader).ConfigureAwait(false) == false)
                 return null;
 
             return reader.GetStream(0);
@@ -110,6 +107,17 @@ public class BundleStore
             .ConfigureAwait(false);
 
         return result == 1;
+    }
+
+    private static async Task<bool> HasBundleRegisteredAsync(SqlDataReader reader)
+    {
+        if (!reader.HasRows)
+            return false;
+
+        if (await reader.IsDBNullAsync(0).ConfigureAwait(false))
+            return false;
+
+        return true;
     }
 
     private static string GenerateKey(
