@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Threading.Tasks;
@@ -43,8 +44,11 @@ public class BundleStore
         ArgumentNullException.ThrowIfNull(messageReceiverNumber);
         ArgumentNullException.ThrowIfNull(roleOfReceiver);
 
-        var command = CreateCommand($"SELECT Bundle FROM b2b.BundleStore WHERE Id = @Id");
-        command.Parameters.AddWithValue("@Id", GenerateKey(messageCategory, messageReceiverNumber, roleOfReceiver));
+        var command = CreateCommand($"SELECT Bundle FROM b2b.BundleStore WHERE Id = @Id", new List<KeyValuePair<string, object>>
+        {
+            new("@Id", GenerateKey(messageCategory, messageReceiverNumber, roleOfReceiver)),
+        });
+
         using (var reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
         {
             await reader.ReadAsync().ConfigureAwait(false);
@@ -119,13 +123,19 @@ public class BundleStore
         return messageCategory.Name + messageReceiverNumber.Value + roleOfReceiver.Name;
     }
 
-    private SqlCommand CreateCommand(string sqlStatement)
+    private SqlCommand CreateCommand(string sqlStatement, List<KeyValuePair<string, object>> parameters)
     {
         var command = _connectionFactory
             .GetOpenConnection()
             .CreateCommand();
 
         command.CommandText = sqlStatement;
+
+        foreach (var parameter in parameters)
+        {
+            var sqlParameter = new SqlParameter(parameter.Key, parameter.Value);
+            command.Parameters.Add(sqlParameter);
+        }
 
         return (SqlCommand)command;
     }
