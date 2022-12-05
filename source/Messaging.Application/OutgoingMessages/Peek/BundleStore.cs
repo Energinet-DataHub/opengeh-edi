@@ -62,7 +62,7 @@ public class BundleStore
         }
     }
 
-    public Task SetBundleForAsync(
+    public async Task SetBundleForAsync(
         MessageCategory messageCategory,
         ActorNumber messageReceiverNumber,
         MarketRole roleOfReceiver,
@@ -73,23 +73,20 @@ public class BundleStore
         ArgumentNullException.ThrowIfNull(roleOfReceiver);
         ArgumentNullException.ThrowIfNull(document);
 
-        var sql = @$"UPDATE [B2B].[BundleStore]
+        var command = CreateCommand(
+            @$"UPDATE [B2B].[BundleStore]
                      SET Bundle = @Bundle
                      WHERE Id = @Id
-                     AND Bundle IS NULL";
+                     AND Bundle IS NULL",
+            new List<KeyValuePair<string, object>>()
+            {
+                new("@Id", GenerateKey(messageCategory, messageReceiverNumber, roleOfReceiver)),
+                new("@Bundle", document),
+            });
 
-        var command = _connectionFactory.GetOpenConnection().CreateCommand();
-        command.CommandText = sql;
-        var param1 = new SqlParameter("@Id", SqlDbType.NVarChar);
-        param1.Value = GenerateKey(messageCategory, messageReceiverNumber, roleOfReceiver);
-        command.Parameters.Add(param1);
-        var param2 = new SqlParameter("@Bundle", SqlDbType.VarBinary);
-        param2.Value = document;
-        command.Parameters.Add(param2);
-        var result = command.ExecuteNonQuery();
+        var result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
         document.Position = 0;
         if (result == 0) throw new BundleException("Fail to store bundle on registration: " + GenerateKey(messageCategory, messageReceiverNumber, roleOfReceiver));
-        return Task.CompletedTask;
     }
 
     public async Task<bool> TryRegisterBundleAsync(
