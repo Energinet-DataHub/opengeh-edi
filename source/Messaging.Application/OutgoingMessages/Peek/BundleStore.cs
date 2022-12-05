@@ -114,10 +114,7 @@ public class BundleStore
         if (!reader.HasRows)
             return false;
 
-        if (await reader.IsDBNullAsync(0).ConfigureAwait(false))
-            return false;
-
-        return true;
+        return !await reader.IsDBNullAsync(0).ConfigureAwait(false);
     }
 
     private static string GenerateKey(
