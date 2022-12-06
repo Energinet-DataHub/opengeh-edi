@@ -50,7 +50,9 @@ public class PeekRequestListener
             new PeekRequest(
                 ActorNumber.Create(_authenticator.CurrentIdentity.ActorNumber),
                 EnumerationType.FromName<MessageCategory>(messageCategory),
-                MarketRole.EnergySupplier)).ConfigureAwait(false);
+                _authenticator.CurrentIdentity.Role))
+            .ConfigureAwait(false);
+
         var response = HttpResponseData.CreateResponse(request);
         if (result.Bundle is null)
         {
