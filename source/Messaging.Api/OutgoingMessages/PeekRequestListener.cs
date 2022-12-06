@@ -51,7 +51,7 @@ public class PeekRequestListener
             new PeekRequest(
                 ActorNumber.Create(_authenticator.CurrentIdentity.ActorNumber),
                 EnumerationType.FromName<MessageCategory>(messageCategory),
-                _authenticator.CurrentIdentity.Role))
+                _authenticator.CurrentIdentity.Role!))
             .ConfigureAwait(false);
 
         var response = HttpResponseData.CreateResponse(request);
