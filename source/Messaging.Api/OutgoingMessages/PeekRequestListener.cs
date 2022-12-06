@@ -46,7 +46,7 @@ public class PeekRequestListener
         string messageCategory)
     {
         var result = await _mediator.Send(
-            new PeekRequest(ActorNumber.Create(_authenticator.CurrentIdentity.ActorIdentifier),  MessageCategory.MasterData, MarketRole.EnergySupplier)).ConfigureAwait(false);
+            new PeekRequest(ActorNumber.Create(_authenticator.CurrentIdentity.ActorNumber),  MessageCategory.MasterData, MarketRole.EnergySupplier)).ConfigureAwait(false);
         var response = HttpResponseData.CreateResponse(request);
         if (result.Bundle is null)
         {

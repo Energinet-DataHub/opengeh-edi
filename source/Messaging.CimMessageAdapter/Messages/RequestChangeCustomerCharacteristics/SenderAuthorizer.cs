@@ -52,7 +52,7 @@ public class SenderAuthorizer : ISenderAuthorizer
 
     private void EnsureSenderIdMatches(string senderId)
     {
-        if (_marketActorAuthenticator.CurrentIdentity.ActorIdentifier.Equals(senderId, StringComparison.OrdinalIgnoreCase) == false)
+        if (_marketActorAuthenticator.CurrentIdentity.ActorNumber.Equals(senderId, StringComparison.OrdinalIgnoreCase) == false)
         {
             _validationErrors.Add(new SenderIdDoesNotMatchAuthenticatedUser());
         }

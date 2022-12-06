@@ -19,10 +19,10 @@ namespace Messaging.Application.Configuration.Authentication
 {
     public abstract class MarketActorIdentity
     {
-        protected MarketActorIdentity(string id, string actorIdentifier, IdentifierType actorIdentifierType, IEnumerable<string> roles)
+        protected MarketActorIdentity(string id, string actorNumber, IdentifierType actorIdentifierType, IEnumerable<string> roles)
         {
             Id = id;
-            ActorIdentifier = actorIdentifier;
+            ActorNumber = actorNumber;
             ActorIdentifierType = actorIdentifierType;
             Roles = roles;
         }
@@ -35,7 +35,7 @@ namespace Messaging.Application.Configuration.Authentication
 
         public string Id { get; }
 
-        public string ActorIdentifier { get; }
+        public string ActorNumber { get; }
 
         public IdentifierType ActorIdentifierType { get; }
 
