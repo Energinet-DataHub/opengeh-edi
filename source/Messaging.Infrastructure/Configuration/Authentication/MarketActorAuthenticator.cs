@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using Messaging.Application.Configuration.Authentication;
@@ -22,6 +23,12 @@ namespace Messaging.Infrastructure.Configuration.Authentication
 {
     public class MarketActorAuthenticator : IMarketActorAuthenticator
     {
+        private readonly Dictionary<string, MarketRole> _rolesMap = new()
+        {
+            { "electricalsupplier", MarketRole.EnergySupplier },
+            { "gridoperator", MarketRole.GridOperator },
+        };
+
         public MarketActorIdentity CurrentIdentity { get; private set; } = new NotAuthenticated();
 
         public void Authenticate(ClaimsPrincipal claimsPrincipal)
@@ -42,7 +49,7 @@ namespace Messaging.Infrastructure.Configuration.Authentication
             }
             else
             {
-                CurrentIdentity = new Authenticated(id, actorId, identifierType, roles, ParseMarketRoleFrom(claimsPrincipal));
+                CurrentIdentity = new Authenticated(id, actorId, identifierType, roles, ParseMarketRoleFrom(roles));
             }
         }
 
@@ -52,9 +59,12 @@ namespace Messaging.Infrastructure.Configuration.Authentication
                 .Value;
         }
 
-        private static MarketRole ParseMarketRoleFrom(ClaimsPrincipal claimsPrincipal)
+        private MarketRole ParseMarketRoleFrom(IEnumerable<string> roles)
         {
-            return MarketRole.EnergySupplier;
+            var role = roles.First();
+            return _rolesMap.TryGetValue(role, out var marketRole) == false
+                ? throw new InvalidOperationException($"Could not parse market role from '{role}' found in role claims.")
+                : marketRole;
         }
     }
 }
