@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using Messaging.Application.Configuration.Authentication;
+using Messaging.Domain.Actors;
 using Messaging.Infrastructure.Configuration.Authentication;
 using Xunit;
 using Xunit.Categories;
@@ -53,7 +54,15 @@ namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
         public void Current_user_is_authenticated()
         {
             var authenticator = new MarketActorAuthenticator();
-            var claimsPrincipal = CreateIdentity();
+            var claims = new List<Claim>()
+            {
+                new("azp", Guid.NewGuid().ToString()),
+                new("actorid", Guid.NewGuid().ToString()),
+                new("actoridtype", "GLN"),
+                new(ClaimTypes.Role, "electricalsupplier"),
+                new(ClaimTypes.Role, "balanceresponsibleparty"),
+            };
+            var claimsPrincipal = CreateIdentity(claims);
 
             authenticator.Authenticate(claimsPrincipal);
 
@@ -61,6 +70,7 @@ namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
             Assert.Equal(GetClaimValue(claimsPrincipal, "azp"), authenticator.CurrentIdentity.Id);
             Assert.Equal(GetClaimValue(claimsPrincipal, "actorid"), authenticator.CurrentIdentity.ActorNumber);
             Assert.Equal(Enum.Parse<MarketActorIdentity.IdentifierType>(GetClaimValue(claimsPrincipal, "actoridtype")!, true), authenticator.CurrentIdentity.ActorNumberType);
+            Assert.Equal(MarketRole.EnergySupplier, authenticator.CurrentIdentity.Role);
             Assert.True(authenticator.CurrentIdentity.HasRole("balanceresponsibleparty"));
             Assert.True(authenticator.CurrentIdentity.HasRole("electricalsupplier"));
         }

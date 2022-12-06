@@ -23,11 +23,12 @@ namespace Messaging.Application.Configuration.Authentication
     {
         private readonly IEnumerable<string> _roles;
 
-        protected MarketActorIdentity(string id, string actorNumber, IdentifierType actorNumberType, IEnumerable<string> roles)
+        protected MarketActorIdentity(string id, string actorNumber, IdentifierType actorNumberType, IEnumerable<string> roles, MarketRole role)
         {
             Id = id;
             ActorNumber = actorNumber;
             ActorNumberType = actorNumberType;
+            Role = role;
             _roles = roles;
         }
 
@@ -43,7 +44,7 @@ namespace Messaging.Application.Configuration.Authentication
 
         public IdentifierType ActorNumberType { get; }
 
-        public MarketRole Role => EnumerationType.FromName<MarketRole>(_roles.First());
+        public MarketRole Role { get; }
 
         public bool HasRole(string role)
         {

@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using System.Security.Claims;
 using Messaging.Application.Configuration.Authentication;
+using Messaging.Domain.Actors;
 
 namespace Messaging.Infrastructure.Configuration.Authentication
 {
@@ -41,7 +42,7 @@ namespace Messaging.Infrastructure.Configuration.Authentication
             }
             else
             {
-                CurrentIdentity = new Authenticated(id, actorId, identifierType, roles);
+                CurrentIdentity = new Authenticated(id, actorId, identifierType, roles, ParseMarketRoleFrom(claimsPrincipal));
             }
         }
 
@@ -49,6 +50,11 @@ namespace Messaging.Infrastructure.Configuration.Authentication
         {
             return claimsPrincipal.FindFirst(claim => claim.Type.Equals(claimName, StringComparison.OrdinalIgnoreCase))?
                 .Value;
+        }
+
+        private static MarketRole ParseMarketRoleFrom(ClaimsPrincipal claimsPrincipal)
+        {
+            return MarketRole.EnergySupplier;
         }
     }
 }
