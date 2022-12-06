@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Dapper;
@@ -37,19 +38,15 @@ public class BundleStore
     }
 
     public async Task<Stream?> GetBundleOfAsync(
-        MessageCategory messageCategory,
-        ActorNumber messageReceiverNumber,
-        MarketRole roleOfReceiver)
+        BundleId bundleId)
     {
-        ArgumentNullException.ThrowIfNull(messageCategory);
-        ArgumentNullException.ThrowIfNull(messageReceiverNumber);
-        ArgumentNullException.ThrowIfNull(roleOfReceiver);
+        ArgumentNullException.ThrowIfNull(bundleId);
 
         var command = CreateCommand($"SELECT Bundle FROM b2b.BundleStore WHERE ActorNumber = @ActorNumber AND ActorRole = @ActorRole AND MessageCategory = @MessageCategory", new List<KeyValuePair<string, object>>
         {
-            new("@ActorNumber", messageReceiverNumber.Value),
-            new("@ActorRole", roleOfReceiver.Name),
-            new("@MessageCategory", messageCategory.Name),
+            new("@ActorNumber", bundleId.ActorNumber.Value),
+            new("@ActorRole", bundleId.MarketRole.Name),
+            new("@MessageCategory", bundleId.MessageCategory.Name),
         });
 
         using (var reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
