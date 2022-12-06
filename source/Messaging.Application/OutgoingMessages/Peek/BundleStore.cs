@@ -44,8 +44,8 @@ public class BundleStore
 
         var command = CreateCommand($"SELECT Bundle FROM b2b.BundleStore WHERE ActorNumber = @ActorNumber AND ActorRole = @ActorRole AND MessageCategory = @MessageCategory", new List<KeyValuePair<string, object>>
         {
-            new("@ActorNumber", bundleId.ActorNumber.Value),
-            new("@ActorRole", bundleId.MarketRole.Name),
+            new("@ActorNumber", bundleId.ReceiverNumber.Value),
+            new("@ActorRole", bundleId.ReceiverRole.Name),
             new("@MessageCategory", bundleId.MessageCategory.Name),
         });
 
@@ -78,8 +78,8 @@ public class BundleStore
                      AND MessageId IS NULL",
             new List<KeyValuePair<string, object>>()
             {
-                new("@ActorNumber", bundleId.ActorNumber.Value),
-                new("@ActorRole", bundleId.MarketRole.Name),
+                new("@ActorNumber", bundleId.ReceiverNumber.Value),
+                new("@ActorRole", bundleId.ReceiverRole.Name),
                 new("@MessageCategory", bundleId.MessageCategory.Name),
                 new("@Bundle", document),
                 new("@MessageId", messageId),
@@ -90,7 +90,7 @@ public class BundleStore
 
         ResetBundleStream(document);
 
-        if (result == 0) throw new BundleException($"Fail to store bundle on registration: {bundleId.MessageCategory.Name}, {bundleId.ActorNumber.Value}, {bundleId.MarketRole.Name}");
+        if (result == 0) throw new BundleException($"Fail to store bundle on registration: {bundleId.MessageCategory.Name}, {bundleId.ReceiverNumber.Value}, {bundleId.ReceiverRole.Name}");
     }
 
     public async Task<bool> TryRegisterBundleAsync(
@@ -104,8 +104,8 @@ public class BundleStore
                 $"INSERT INTO b2b.BundleStore(ActorNUmber, ActorRole, MessageCategory) VALUES(@ActorNumber, @ActorRole, @MessageCategory)",
                 new
                 {
-                    @ActorNumber = bundleId.ActorNumber.Value,
-                    @ActorRole = bundleId.MarketRole.Name,
+                    @ActorNumber = bundleId.ReceiverNumber.Value,
+                    @ActorRole = bundleId.ReceiverRole.Name,
                     @MessageCategory = bundleId.MessageCategory.Name,
                 })
             .ConfigureAwait(false);
