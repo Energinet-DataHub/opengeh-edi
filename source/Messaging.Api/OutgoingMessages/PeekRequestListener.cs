@@ -19,6 +19,7 @@ using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages.Peek;
+using Messaging.Domain.SeedWork;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 
@@ -46,7 +47,10 @@ public class PeekRequestListener
         string messageCategory)
     {
         var result = await _mediator.Send(
-            new PeekRequest(ActorNumber.Create(_authenticator.CurrentIdentity.ActorNumber),  MessageCategory.MasterData, MarketRole.EnergySupplier)).ConfigureAwait(false);
+            new PeekRequest(
+                ActorNumber.Create(_authenticator.CurrentIdentity.ActorNumber),
+                EnumerationType.FromName<MessageCategory>(messageCategory),
+                MarketRole.EnergySupplier)).ConfigureAwait(false);
         var response = HttpResponseData.CreateResponse(request);
         if (result.Bundle is null)
         {
