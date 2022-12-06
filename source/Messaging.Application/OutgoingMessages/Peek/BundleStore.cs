@@ -60,16 +60,12 @@ public class BundleStore
     }
 
     public async Task SetBundleForAsync(
-        MessageCategory messageCategory,
-        ActorNumber messageReceiverNumber,
-        MarketRole roleOfReceiver,
+        BundleId bundleId,
         Stream document,
         Guid messageId,
         IEnumerable<Guid> messageIdsIncluded)
     {
-        ArgumentNullException.ThrowIfNull(messageCategory);
-        ArgumentNullException.ThrowIfNull(messageReceiverNumber);
-        ArgumentNullException.ThrowIfNull(roleOfReceiver);
+        ArgumentNullException.ThrowIfNull(bundleId);
         ArgumentNullException.ThrowIfNull(document);
 
         var command = CreateCommand(
@@ -82,9 +78,9 @@ public class BundleStore
                      AND MessageId IS NULL",
             new List<KeyValuePair<string, object>>()
             {
-                new("@ActorNumber", messageReceiverNumber.Value),
-                new("@ActorRole", roleOfReceiver.Name),
-                new("@MessageCategory", messageCategory.Name),
+                new("@ActorNumber", bundleId.ActorNumber.Value),
+                new("@ActorRole", bundleId.MarketRole.Name),
+                new("@MessageCategory", bundleId.MessageCategory.Name),
                 new("@Bundle", document),
                 new("@MessageId", messageId),
                 new("@MessageIdsIncluded", string.Join(",", messageIdsIncluded)),
@@ -94,7 +90,7 @@ public class BundleStore
 
         ResetBundleStream(document);
 
-        if (result == 0) throw new BundleException($"Fail to store bundle on registration: {messageCategory.Name}, {messageReceiverNumber.Value}, {roleOfReceiver.Name}");
+        if (result == 0) throw new BundleException($"Fail to store bundle on registration: {bundleId.MessageCategory.Name}, {bundleId.ActorNumber.Value}, {bundleId.MarketRole.Name}");
     }
 
     public async Task<bool> TryRegisterBundleAsync(
