@@ -34,9 +34,13 @@ public class PeekRequestListener
 
     [Function("PeekRequestListener")]
     public async Task<HttpResponseData> RunAsync(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get")]
+        [HttpTrigger(
+            AuthorizationLevel.Anonymous,
+            "get",
+            Route = "peek/{messageCategory}")]
         HttpRequestData request,
-        FunctionContext executionContext)
+        FunctionContext executionContext,
+        string messageCategory)
     {
         var result = await _mediator.Send(new PeekRequest(ActorNumber.Create("1234567890123"),  MessageCategory.MasterData, MarketRole.EnergySupplier)).ConfigureAwait(false);
         var response = HttpResponseData.CreateResponse(request);
