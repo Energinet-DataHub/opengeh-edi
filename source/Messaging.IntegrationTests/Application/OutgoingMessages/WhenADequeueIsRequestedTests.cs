@@ -57,7 +57,7 @@ public class WhenADequeueIsRequestedTests : TestBase
         var found = await connection
             .QuerySingleOrDefaultAsync("SELECT * FROM [B2B].BundleStore")
             .ConfigureAwait(false);
-        var sqlCountStatement = $"SELECT COUNT(*) FROM [B2B].ActorMessageQueue_{SampleData.NewEnergySupplierNumber}";
+        var sqlCountStatement = $"SELECT COUNT(*) FROM [B2B].EnqueuedMessages WHERE ReceiverId = {SampleData.NewEnergySupplierNumber}";
         var messagesInQueue = await connection
             .ExecuteScalarAsync<int>(sqlCountStatement);
 

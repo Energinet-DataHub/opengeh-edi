@@ -72,11 +72,10 @@ namespace Messaging.IntegrationTests.Fixtures
                 $"DELETE FROM [b2b].[QueuedInternalCommands] " +
                 $"DELETE FROM [b2b].[MarketEvaluationPoints]" +
                 $"DELETE FROM [b2b].[Actor]" +
-                $"DELETE FROM [b2b].[BundleStore]";
+                $"DELETE FROM [b2b].[BundleStore]" +
+                $"DELETE FROM [b2b].[EnqueuedMessages]";
 
             _context.Database.ExecuteSqlRaw(cleanupStatement);
-
-            RemoveOutgoingMessageQueueTables();
         }
 
         public void Dispose()
@@ -100,26 +99,6 @@ namespace Messaging.IntegrationTests.Fixtures
         private static void CreateSchema()
         {
             DefaultUpgrader.Upgrade(ConnectionString);
-        }
-
-        private void RemoveOutgoingMessageQueueTables()
-        {
-            var selectStatement = "SELECT name FROM sysobjects WHERE name LIKE 'ActorMessageQueue_%' AND xtype = 'U'";
-            var tablesToDrop = _context.Database
-                .GetDbConnection()
-                .Query<string>(selectStatement)
-                .ToList();
-
-            if (tablesToDrop.Count == 0) return;
-            var dropStatement = "DROP TABLE ";
-            foreach (var tableName in tablesToDrop)
-            {
-                dropStatement += $"b2b.{tableName},";
-            }
-
-            dropStatement = dropStatement.Substring(0, dropStatement.Length - 1);
-
-            _context.Database.GetDbConnection().Execute(dropStatement);
         }
     }
 }

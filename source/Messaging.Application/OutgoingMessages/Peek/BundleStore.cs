@@ -128,7 +128,7 @@ public class BundleStore
         var statementBuilder = new StringBuilder();
         foreach (var id in messageIdIncluded.Split(","))
         {
-            var deleteMessageRowSql = $"DELETE FROM [B2B].ActorMessageQueue_{actorNumber} WHERE Id = '{id}';";
+            var deleteMessageRowSql = $"DELETE FROM [B2B].EnqueuedMessages WHERE Id = '{id}';";
             statementBuilder.AppendLine(deleteMessageRowSql);
         }
 
