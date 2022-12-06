@@ -46,13 +46,14 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
     {
         ArgumentNullException.ThrowIfNull(request);
 
+        var bundleId = BundleId.Create(request.MessageCategory, request.ActorNumber, request.MarketRole);
         var document = await _bundleStore
-            .GetBundleOfAsync(request.MessageCategory, request.ActorNumber, request.MarketRole)
+            .GetBundleOfAsync(bundleId)
             .ConfigureAwait(false);
 
         if (document is not null) return new PeekResult(document);
 
-        if (!await _bundleStore.TryRegisterBundleAsync(request.MessageCategory, request.ActorNumber, request.MarketRole).ConfigureAwait(false)) return new PeekResult(null);
+        if (!await _bundleStore.TryRegisterBundleAsync(bundleId).ConfigureAwait(false)) return new PeekResult(null);
 
         var messages = (await _enqueuedMessages.GetByAsync(request.ActorNumber, request.MarketRole, request.MessageCategory)
             .ConfigureAwait(false))
@@ -66,8 +67,8 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
         var bundle = CreateBundleFrom(messages.ToList());
         var cimMessage = bundle.CreateMessage();
         document = await _documentFactory.CreateFromAsync(cimMessage, CimFormat.Xml).ConfigureAwait(false);
-        await _bundleStore.SetBundleForAsync(request.MessageCategory, request.ActorNumber, request.MarketRole, document).ConfigureAwait(false);
-        return new PeekResult(document);
+        await _bundleStore.SetBundleForAsync(bundleId, document, bundle.MessageId, bundle.GetMessageIdsIncluded()).ConfigureAwait(false);
+        return new PeekResult(document, bundle.MessageId);
     }
 
     private Bundle CreateBundleFrom(IReadOnlyList<EnqueuedMessage> messages)
@@ -84,4 +85,4 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
 
 public record PeekRequest(ActorNumber ActorNumber, MessageCategory MessageCategory, MarketRole MarketRole) : ICommand<PeekResult>;
 
-public record PeekResult(Stream? Bundle);
+public record PeekResult(Stream? Bundle, Guid? MessageId = default);

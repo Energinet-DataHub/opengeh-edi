@@ -15,9 +15,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.OutgoingMessages.Dequeue;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.Peek;
@@ -35,19 +38,15 @@ public class BundleStore
     }
 
     public async Task<Stream?> GetBundleOfAsync(
-        MessageCategory messageCategory,
-        ActorNumber messageReceiverNumber,
-        MarketRole roleOfReceiver)
+        BundleId bundleId)
     {
-        ArgumentNullException.ThrowIfNull(messageCategory);
-        ArgumentNullException.ThrowIfNull(messageReceiverNumber);
-        ArgumentNullException.ThrowIfNull(roleOfReceiver);
+        ArgumentNullException.ThrowIfNull(bundleId);
 
         var command = CreateCommand($"SELECT Bundle FROM b2b.BundleStore WHERE ActorNumber = @ActorNumber AND ActorRole = @ActorRole AND MessageCategory = @MessageCategory", new List<KeyValuePair<string, object>>
         {
-            new("@ActorNumber", messageReceiverNumber.Value),
-            new("@ActorRole", roleOfReceiver.Name),
-            new("@MessageCategory", messageCategory.Name),
+            new("@ActorNumber", bundleId.ReceiverNumber.Value),
+            new("@ActorRole", bundleId.ReceiverRole.Name),
+            new("@MessageCategory", bundleId.MessageCategory.Name),
         });
 
         using (var reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
@@ -61,46 +60,43 @@ public class BundleStore
     }
 
     public async Task SetBundleForAsync(
-        MessageCategory messageCategory,
-        ActorNumber messageReceiverNumber,
-        MarketRole roleOfReceiver,
-        Stream document)
+        BundleId bundleId,
+        Stream document,
+        Guid messageId,
+        IEnumerable<Guid> messageIdsIncluded)
     {
-        ArgumentNullException.ThrowIfNull(messageCategory);
-        ArgumentNullException.ThrowIfNull(messageReceiverNumber);
-        ArgumentNullException.ThrowIfNull(roleOfReceiver);
+        ArgumentNullException.ThrowIfNull(bundleId);
         ArgumentNullException.ThrowIfNull(document);
 
         var command = CreateCommand(
             @$"UPDATE [B2B].[BundleStore]
-                     SET Bundle = @Bundle
+                     SET Bundle = @Bundle, MessageId = @MessageId, MessageIdsIncluded = @MessageIdsIncluded
                      WHERE ActorNumber = @ActorNumber
                      AND  ActorRole = @ActorRole
                      AND MessageCategory = @MessageCategory
-                     AND Bundle IS NULL",
+                     AND Bundle IS NULL
+                     AND MessageId IS NULL",
             new List<KeyValuePair<string, object>>()
             {
-                new("@ActorNumber", messageReceiverNumber.Value),
-                new("@ActorRole", roleOfReceiver.Name),
-                new("@MessageCategory", messageCategory.Name),
+                new("@ActorNumber", bundleId.ReceiverNumber.Value),
+                new("@ActorRole", bundleId.ReceiverRole.Name),
+                new("@MessageCategory", bundleId.MessageCategory.Name),
                 new("@Bundle", document),
+                new("@MessageId", messageId),
+                new("@MessageIdsIncluded", string.Join(",", messageIdsIncluded)),
             });
 
         var result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
 
         ResetBundleStream(document);
 
-        if (result == 0) throw new BundleException($"Fail to store bundle on registration: {messageCategory.Name}, {messageReceiverNumber.Value}, {roleOfReceiver.Name}");
+        if (result == 0) throw new BundleException($"Fail to store bundle on registration: {bundleId.MessageCategory.Name}, {bundleId.ReceiverNumber.Value}, {bundleId.ReceiverRole.Name}");
     }
 
     public async Task<bool> TryRegisterBundleAsync(
-        MessageCategory messageCategory,
-        ActorNumber messageReceiverNumber,
-        MarketRole roleOfReceiver)
+        BundleId bundleId)
     {
-        ArgumentNullException.ThrowIfNull(messageCategory);
-        ArgumentNullException.ThrowIfNull(messageReceiverNumber);
-        ArgumentNullException.ThrowIfNull(roleOfReceiver);
+        ArgumentNullException.ThrowIfNull(bundleId);
 
         var result = await _connectionFactory
             .GetOpenConnection().ExecuteAsync(
@@ -108,13 +104,45 @@ public class BundleStore
                 $"INSERT INTO b2b.BundleStore(ActorNUmber, ActorRole, MessageCategory) VALUES(@ActorNumber, @ActorRole, @MessageCategory)",
                 new
                 {
-                    @ActorNumber = messageReceiverNumber.Value,
-                    @ActorRole = roleOfReceiver.Name,
-                    @MessageCategory = messageCategory.Name,
+                    @ActorNumber = bundleId.ReceiverNumber.Value,
+                    @ActorRole = bundleId.ReceiverRole.Name,
+                    @MessageCategory = bundleId.MessageCategory.Name,
                 })
             .ConfigureAwait(false);
 
         return result == 1;
+    }
+
+    public async Task<DequeueResult> DequeueAsync(Guid messageId)
+    {
+        var bundleStoreQuery = await _connectionFactory.GetOpenConnection().QuerySingleOrDefaultAsync(
+            $"SELECT * FROM [B2B].[BundleStore] WHERE MessageId = @MessageId",
+            new
+        {
+            MessageId = messageId,
+        }).ConfigureAwait(false);
+        if (bundleStoreQuery is null)
+            return new DequeueResult(false);
+        string messageIdIncluded = bundleStoreQuery.MessageIdsIncluded;
+        string actorNumber = bundleStoreQuery.ActorNumber;
+        var statementBuilder = new StringBuilder();
+        foreach (var id in messageIdIncluded.Split(","))
+        {
+            var deleteMessageRowSql = $"DELETE FROM [B2B].ActorMessageQueue_{actorNumber} WHERE Id = '{id}';";
+            statementBuilder.AppendLine(deleteMessageRowSql);
+        }
+
+        var deleteBundleStoreRowSql = $"DELETE FROM [B2B].[BundleStore] WHERE MessageId = @MessageId";
+        statementBuilder.AppendLine(deleteBundleStoreRowSql);
+        var command = CreateCommand(
+            statementBuilder.ToString(),
+            new List<KeyValuePair<string, object>>()
+            {
+                new("@MessageId", messageId),
+            });
+        var result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+
+        return result > 0 ? new DequeueResult(true) : new DequeueResult(false);
     }
 
     private static async Task<bool> HasBundleRegisteredAsync(SqlDataReader reader)
