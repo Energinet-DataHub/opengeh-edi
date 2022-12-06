@@ -60,7 +60,7 @@ namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
             Assert.IsType<Authenticated>(authenticator.CurrentIdentity);
             Assert.Equal(GetClaimValue(claimsPrincipal, "azp"), authenticator.CurrentIdentity.Id);
             Assert.Equal(GetClaimValue(claimsPrincipal, "actorid"), authenticator.CurrentIdentity.ActorNumber);
-            Assert.Equal(Enum.Parse<MarketActorIdentity.IdentifierType>(GetClaimValue(claimsPrincipal, "actoridtype")!, true), authenticator.CurrentIdentity.ActorIdentifierType);
+            Assert.Equal(Enum.Parse<MarketActorIdentity.IdentifierType>(GetClaimValue(claimsPrincipal, "actoridtype")!, true), authenticator.CurrentIdentity.ActorNumberType);
             Assert.True(authenticator.CurrentIdentity.HasRole("balanceresponsibleparty"));
             Assert.True(authenticator.CurrentIdentity.HasRole("electricalsupplier"));
         }
