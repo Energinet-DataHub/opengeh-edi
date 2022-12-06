@@ -24,23 +24,11 @@ using Xunit;
 
 namespace Messaging.IntegrationTests.Application.OutgoingMessages;
 
-public class WhenOutgoingMessagesAreCreatedTests : TestBase, IAsyncLifetime
+public class WhenOutgoingMessagesAreCreatedTests : TestBase
 {
     public WhenOutgoingMessagesAreCreatedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-    }
-
-    public Task InitializeAsync()
-    {
-        return GetService<IDbConnectionFactory>().GetOpenConnection().ExecuteAsync(
-            $"DROP TABLE IF EXISTS  [B2B].ActorMessageQueue_{SampleData.NewEnergySupplierNumber}");
-    }
-
-    public Task DisposeAsync()
-    {
-        return GetService<IDbConnectionFactory>().GetOpenConnection().ExecuteAsync(
-            $"DROP TABLE IF EXISTS [B2B].ActorMessageQueue_{SampleData.NewEnergySupplierNumber}");
     }
 
     [Fact]
@@ -48,7 +36,7 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase, IAsyncLifetime
     {
         await GivenRequestHasBeenAccepted().ConfigureAwait(false);
 
-        var sql = $"SELECT * FROM [B2B].[ActorMessageQueue_{SampleData.NewEnergySupplierNumber}]";
+        var sql = $"SELECT * FROM [B2B].[EnqueuedMessages]";
         var result = await GetService<IDbConnectionFactory>()
             .GetOpenConnection()
             .QuerySingleOrDefaultAsync(sql)
