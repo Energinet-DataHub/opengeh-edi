@@ -20,6 +20,7 @@ using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages.Peek;
 using Messaging.Domain.SeedWork;
+using Messaging.Infrastructure.IncomingMessages;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 
