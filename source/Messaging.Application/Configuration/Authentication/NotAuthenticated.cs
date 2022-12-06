@@ -13,14 +13,13 @@
 // limitations under the License.
 
 using System;
-using Messaging.Domain.Actors;
 
 namespace Messaging.Application.Configuration.Authentication
 {
     public class NotAuthenticated : MarketActorIdentity
     {
         public NotAuthenticated()
-            : base("NotSet", "NotSet", IdentifierType.Eic, Array.Empty<string>(), MarketRole.EnergySupplier)
+            : base("NotSet", "NotSet", IdentifierType.Eic, Array.Empty<string>(), null)
         {
         }
     }

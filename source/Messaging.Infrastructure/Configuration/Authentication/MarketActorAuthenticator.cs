@@ -49,7 +49,10 @@ namespace Messaging.Infrastructure.Configuration.Authentication
             }
             else
             {
-                CurrentIdentity = new Authenticated(id, actorId, identifierType, roles, ParseMarketRoleFrom(roles));
+                var marketRole = ParseMarketRoleFrom(roles);
+                CurrentIdentity = marketRole is null
+                    ? new NotAuthenticated()
+                    : new Authenticated(id, actorId, identifierType, roles, marketRole);
             }
         }
 
@@ -59,11 +62,16 @@ namespace Messaging.Infrastructure.Configuration.Authentication
                 .Value;
         }
 
-        private MarketRole ParseMarketRoleFrom(IEnumerable<string> roles)
+        private MarketRole? ParseMarketRoleFrom(IEnumerable<string> roles)
         {
-            var role = roles.First();
+            var role = roles.FirstOrDefault();
+            if (string.IsNullOrWhiteSpace(role))
+            {
+                return null;
+            }
+
             return _rolesMap.TryGetValue(role, out var marketRole) == false
-                ? throw new InvalidOperationException($"Could not parse market role from '{role}' found in role claims.")
+                ? null
                 : marketRole;
         }
     }
