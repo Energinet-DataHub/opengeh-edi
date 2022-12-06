@@ -94,13 +94,9 @@ public class BundleStore
     }
 
     public async Task<bool> TryRegisterBundleAsync(
-        MessageCategory messageCategory,
-        ActorNumber messageReceiverNumber,
-        MarketRole roleOfReceiver)
+        BundleId bundleId)
     {
-        ArgumentNullException.ThrowIfNull(messageCategory);
-        ArgumentNullException.ThrowIfNull(messageReceiverNumber);
-        ArgumentNullException.ThrowIfNull(roleOfReceiver);
+        ArgumentNullException.ThrowIfNull(bundleId);
 
         var result = await _connectionFactory
             .GetOpenConnection().ExecuteAsync(
@@ -108,9 +104,9 @@ public class BundleStore
                 $"INSERT INTO b2b.BundleStore(ActorNUmber, ActorRole, MessageCategory) VALUES(@ActorNumber, @ActorRole, @MessageCategory)",
                 new
                 {
-                    @ActorNumber = messageReceiverNumber.Value,
-                    @ActorRole = roleOfReceiver.Name,
-                    @MessageCategory = messageCategory.Name,
+                    @ActorNumber = bundleId.ActorNumber.Value,
+                    @ActorRole = bundleId.MarketRole.Name,
+                    @MessageCategory = bundleId.MessageCategory.Name,
                 })
             .ConfigureAwait(false);
 

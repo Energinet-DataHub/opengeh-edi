@@ -160,9 +160,10 @@ public class WhenAPeekIsRequestedTests : TestBase
     {
         await GetService<BundleStore>()
             .TryRegisterBundleAsync(
-                MessageCategory.MasterData,
-                ActorNumber.Create(SampleData.NewEnergySupplierNumber),
-                MarketRole.EnergySupplier)
+                BundleId.Create(
+                    MessageCategory.MasterData,
+                    ActorNumber.Create(SampleData.NewEnergySupplierNumber),
+                    MarketRole.EnergySupplier))
             .ConfigureAwait(false);
     }
 
