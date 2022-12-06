@@ -13,14 +13,12 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.OutgoingMessages.Dequeue;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
-using Microsoft.Extensions.Logging;
 
 namespace Messaging.Api.OutgoingMessages;
 
