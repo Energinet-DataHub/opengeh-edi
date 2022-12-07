@@ -44,7 +44,7 @@ namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
         }
 
         [Fact]
-        public async Task Can_not_authenticate_if_claims_principal_does_not_contain_expected_claims()
+        public async Task Can_not_authenticate_if_claims_principal_does_not_contain_user_id_claim()
         {
             var claims = new List<Claim>()
             {
