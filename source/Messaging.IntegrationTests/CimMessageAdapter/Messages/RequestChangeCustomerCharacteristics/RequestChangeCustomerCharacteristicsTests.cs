@@ -130,7 +130,6 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
     [Fact]
     public async Task Sender_id_must_match_the_organization_of_the_current_authenticated_user()
     {
-        await _marketActorAuthenticator.AuthenticateAsync(CreateIdentity("1234567890123"));
         await using var message = BusinessMessageBuilder
             .RequestChangeCustomerCharacteristics()
             .Message();
@@ -248,14 +247,6 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
     private ClaimsPrincipal CreateIdentity()
     {
         return new ClaimsPrincipal(new ClaimsIdentity(_claims));
-    }
-
-    private ClaimsPrincipal CreateIdentity(string actorIdentifier)
-    {
-        var claims = _claims.ToList();
-        claims.Remove(claims.Find(claim => claim.Type.Equals("actorid", StringComparison.OrdinalIgnoreCase))!);
-        claims.Add(new Claim("actorid", actorIdentifier));
-        return new ClaimsPrincipal(new ClaimsIdentity(claims));
     }
 
     private ClaimsPrincipal CreateIdentityWithoutRoles()
