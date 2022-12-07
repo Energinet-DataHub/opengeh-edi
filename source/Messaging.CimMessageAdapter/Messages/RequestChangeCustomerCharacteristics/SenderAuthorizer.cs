@@ -17,12 +17,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.CimMessageAdapter.Errors;
+using Messaging.Domain.Actors;
 
 namespace Messaging.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 
 public class SenderAuthorizer : ISenderAuthorizer
 {
-    private const string EnergySupplierRole = "DDQ";
     private readonly IMarketActorAuthenticator _marketActorAuthenticator;
     private readonly List<ValidationError> _validationErrors = new();
 
@@ -55,7 +55,7 @@ public class SenderAuthorizer : ISenderAuthorizer
 
     private void EnsureSenderRoleMatches(string senderRole)
     {
-        if (senderRole.Equals(EnergySupplierRole, StringComparison.OrdinalIgnoreCase) == false)
+        if (senderRole.Equals(MarketRole.EnergySupplier.Name, StringComparison.OrdinalIgnoreCase) == false)
         {
             _validationErrors.Add(new SenderRoleTypeIsNotAuthorized());
         }
