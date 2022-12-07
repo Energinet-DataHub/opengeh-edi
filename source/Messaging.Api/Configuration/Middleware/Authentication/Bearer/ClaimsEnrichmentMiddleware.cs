@@ -95,7 +95,6 @@ namespace Messaging.Api.Configuration.Middleware.Authentication.Bearer
         {
             var claims = currentClaimsPrincipal.ClaimsPrincipal!.Claims.ToList();
             claims.Add(new Claim("actorid", actorForAuthentication.Identifier));
-            claims.Add(new Claim("actoridtype", actorForAuthentication.IdentificationType));
 
             var currentIdentity = currentClaimsPrincipal.ClaimsPrincipal?.Identity as ClaimsIdentity;
             var identity = new ClaimsIdentity(
@@ -108,7 +107,7 @@ namespace Messaging.Api.Configuration.Middleware.Authentication.Bearer
 
         private static async Task<ActorForAuthentication?> GetActorAsync(Guid actorId, B2BContext context)
         {
-            var sql = "SELECT TOP 1 [Id] AS ActorId, 'GLN' AS IdentificationType, [IdentificationNumber] AS Identifier FROM [b2b].[Actor] WHERE B2CId = @ActorId";
+            var sql = "SELECT TOP 1 [Id] AS ActorId, [IdentificationNumber] AS Identifier FROM [b2b].[Actor] WHERE B2CId = @ActorId";
 
             var result = await context.Database.GetDbConnection()
                 .QuerySingleOrDefaultAsync<ActorForAuthentication>(sql, new { ActorId = actorId })
