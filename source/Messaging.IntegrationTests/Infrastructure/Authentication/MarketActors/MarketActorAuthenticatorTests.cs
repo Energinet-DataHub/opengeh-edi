@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Messaging.Application.Actors;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Domain.Actors;
+using Messaging.Infrastructure.Configuration.Authentication;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
@@ -65,7 +66,7 @@ namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
             await InvokeCommandAsync(createActorCommand).ConfigureAwait(false);
             var claims = new List<Claim>()
             {
-                new("azp", createActorCommand.B2CId),
+                new(ClaimsMap.UserId, createActorCommand.B2CId),
                 new(ClaimTypes.Role, "electricalsupplier"),
                 new(ClaimTypes.Role, "gridoperator"),
             };
@@ -74,7 +75,7 @@ namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
             await _authenticator.AuthenticateAsync(claimsPrincipal);
 
             Assert.IsType<Authenticated>(_authenticator.CurrentIdentity);
-            Assert.Equal(GetClaimValue(claimsPrincipal, "azp"), _authenticator.CurrentIdentity.Id);
+            Assert.Equal(GetClaimValue(claimsPrincipal, ClaimsMap.UserId), _authenticator.CurrentIdentity.Id);
             Assert.Equal(MarketRole.EnergySupplier, _authenticator.CurrentIdentity.Role);
             Assert.Equal(_authenticator.CurrentIdentity.Number.Value, createActorCommand.IdentificationNumber);
             Assert.True(_authenticator.CurrentIdentity.HasRole(MarketRole.GridOperator.Name));
@@ -90,7 +91,7 @@ namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
         {
             var validClaims = new List<Claim>()
             {
-                new("azp", Guid.NewGuid().ToString()),
+                new(ClaimsMap.UserId, Guid.NewGuid().ToString()),
                 new(ClaimTypes.Role, "gridoperator"),
                 new(ClaimTypes.Role, "electricalsupplier"),
             };
