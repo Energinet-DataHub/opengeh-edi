@@ -44,15 +44,13 @@ namespace Messaging.Infrastructure.Configuration.Authentication
             var canParseIdentifierType = Enum.TryParse<MarketActorIdentity.IdentifierType>(GetClaimValueFrom(claimsPrincipal, "actoridtype"), true, out var identifierType);
             var marketRole = ParseMarketRoleFrom(roles);
 
-            if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(actorId) || canParseIdentifierType == false)
+            if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(actorId) || canParseIdentifierType == false || marketRole is null)
             {
                 CurrentIdentity = new NotAuthenticated();
             }
             else
             {
-                CurrentIdentity = marketRole is null
-                    ? new NotAuthenticated()
-                    : new Authenticated(id, actorId, identifierType, roles, marketRole);
+                CurrentIdentity = new Authenticated(id, actorId, identifierType, roles, marketRole);
             }
         }
 
