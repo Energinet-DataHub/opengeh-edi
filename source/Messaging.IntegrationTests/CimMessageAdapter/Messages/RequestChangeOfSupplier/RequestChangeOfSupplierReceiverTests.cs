@@ -23,11 +23,14 @@ using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
+using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Infrastructure.Configuration.Authentication;
 using Messaging.IntegrationTests.CimMessageAdapter.Stubs;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
+using Result = Messaging.CimMessageAdapter.Messages.Result;
 
 namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
 {
@@ -55,8 +58,8 @@ namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfS
             await InvokeCommandAsync(new CreateActor(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.ActorNumber)).ConfigureAwait(false);
             _claims = new List<Claim>()
             {
-                new("azp", new CreateActor(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.ActorNumber).B2CId),
-                new(ClaimTypes.Role, "electricalsupplier"),
+                new(ClaimsMap.UserId, new CreateActor(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.ActorNumber).B2CId),
+                ClaimsMap.RoleFrom(MarketRole.EnergySupplier),
             };
 
             await _marketActorAuthenticator.AuthenticateAsync(CreateIdentity());
