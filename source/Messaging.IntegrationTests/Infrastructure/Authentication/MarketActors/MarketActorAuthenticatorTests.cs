@@ -18,9 +18,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Messaging.Application.Actors;
 using Messaging.Application.Configuration.Authentication;
-using Messaging.Application.Configuration.DataAccess;
 using Messaging.Domain.Actors;
-using Messaging.Infrastructure.Configuration.Authentication;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
@@ -68,8 +66,6 @@ namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
             var claims = new List<Claim>()
             {
                 new("azp", createActorCommand.B2CId),
-                new("actorid", createActorCommand.IdentificationNumber),
-                new("actoridtype", "GLN"),
                 new(ClaimTypes.Role, "electricalsupplier"),
                 new(ClaimTypes.Role, "gridoperator"),
             };
@@ -79,8 +75,8 @@ namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
 
             Assert.IsType<Authenticated>(_authenticator.CurrentIdentity);
             Assert.Equal(GetClaimValue(claimsPrincipal, "azp"), _authenticator.CurrentIdentity.Id);
-            Assert.Equal(GetClaimValue(claimsPrincipal, "actorid"), _authenticator.CurrentIdentity.Number.Value);
             Assert.Equal(MarketRole.EnergySupplier, _authenticator.CurrentIdentity.Role);
+            Assert.Equal(_authenticator.CurrentIdentity.Number.Value, createActorCommand.IdentificationNumber);
             Assert.True(_authenticator.CurrentIdentity.HasRole(MarketRole.GridOperator.Name));
             Assert.True(_authenticator.CurrentIdentity.HasRole(MarketRole.EnergySupplier.Name));
         }
@@ -95,9 +91,7 @@ namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
             var validClaims = new List<Claim>()
             {
                 new("azp", Guid.NewGuid().ToString()),
-                new("actorid", Guid.NewGuid().ToString()),
-                new("actoridtype", "GLN"),
-                new(ClaimTypes.Role, "balanceresponsibleparty"),
+                new(ClaimTypes.Role, "gridoperator"),
                 new(ClaimTypes.Role, "electricalsupplier"),
             };
 
