@@ -17,17 +17,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using Messaging.Application.Configuration.Authentication;
+using Messaging.Application.Configuration.DataAccess;
 using Messaging.Domain.Actors;
 
 namespace Messaging.Infrastructure.Configuration.Authentication
 {
     public class MarketActorAuthenticator : IMarketActorAuthenticator
     {
+        private readonly IDbConnectionFactory _connectionFactory;
+
         private readonly Dictionary<string, MarketRole> _rolesMap = new()
         {
             { "electricalsupplier", MarketRole.EnergySupplier },
             { "gridoperator", MarketRole.GridOperator },
         };
+
+        public MarketActorAuthenticator(IDbConnectionFactory connectionFactory)
+        {
+            _connectionFactory = connectionFactory;
+        }
 
         public MarketActorIdentity CurrentIdentity { get; private set; } = new NotAuthenticated();
 

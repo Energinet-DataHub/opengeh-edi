@@ -16,28 +16,35 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using Messaging.Application.Configuration.Authentication;
+using Messaging.Application.Configuration.DataAccess;
 using Messaging.Domain.Actors;
 using Messaging.Infrastructure.Configuration.Authentication;
+using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
 
 namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
 {
     [IntegrationTest]
-    public class MarketActorAuthenticatorTests
+    public class MarketActorAuthenticatorTests : TestBase
     {
+        private readonly MarketActorAuthenticator _authenticator;
+
+        public MarketActorAuthenticatorTests(DatabaseFixture databaseFixture)
+            : base(databaseFixture)
+        {
+            _authenticator = new MarketActorAuthenticator(GetService<IDbConnectionFactory>());
+        }
+
         [Fact]
         public void Current_user_is_not_authenticated()
         {
-            var authenticator = new MarketActorAuthenticator();
-
-            Assert.IsType<NotAuthenticated>(authenticator.CurrentIdentity);
+            Assert.IsType<NotAuthenticated>(_authenticator.CurrentIdentity);
         }
 
         [Fact]
         public void Can_not_authenticate_if_claims_principal_does_not_contain_expected_claims()
         {
-            var authenticator = new MarketActorAuthenticator();
             var claims = new List<Claim>()
             {
                 new(ClaimTypes.Role, "balanceresponsibleparty"),
@@ -45,15 +52,14 @@ namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
             };
             var claimsPrincipal = CreateIdentity(claims);
 
-            authenticator.Authenticate(claimsPrincipal);
+            _authenticator.Authenticate(claimsPrincipal);
 
-            Assert.IsType<NotAuthenticated>(authenticator.CurrentIdentity);
+            Assert.IsType<NotAuthenticated>(_authenticator.CurrentIdentity);
         }
 
         [Fact]
         public void Current_user_is_authenticated()
         {
-            var authenticator = new MarketActorAuthenticator();
             var claims = new List<Claim>()
             {
                 new("azp", Guid.NewGuid().ToString()),
@@ -64,14 +70,14 @@ namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
             };
             var claimsPrincipal = CreateIdentity(claims);
 
-            authenticator.Authenticate(claimsPrincipal);
+            _authenticator.Authenticate(claimsPrincipal);
 
-            Assert.IsType<Authenticated>(authenticator.CurrentIdentity);
-            Assert.Equal(GetClaimValue(claimsPrincipal, "azp"), authenticator.CurrentIdentity.Id);
-            Assert.Equal(GetClaimValue(claimsPrincipal, "actorid"), authenticator.CurrentIdentity.Number.Value);
-            Assert.Equal(MarketRole.EnergySupplier, authenticator.CurrentIdentity.Role);
-            Assert.True(authenticator.CurrentIdentity.HasRole("balanceresponsibleparty"));
-            Assert.True(authenticator.CurrentIdentity.HasRole("electricalsupplier"));
+            Assert.IsType<Authenticated>(_authenticator.CurrentIdentity);
+            Assert.Equal(GetClaimValue(claimsPrincipal, "azp"), _authenticator.CurrentIdentity.Id);
+            Assert.Equal(GetClaimValue(claimsPrincipal, "actorid"), _authenticator.CurrentIdentity.Number.Value);
+            Assert.Equal(MarketRole.EnergySupplier, _authenticator.CurrentIdentity.Role);
+            Assert.True(_authenticator.CurrentIdentity.HasRole("balanceresponsibleparty"));
+            Assert.True(_authenticator.CurrentIdentity.HasRole("electricalsupplier"));
         }
 
         private static string? GetClaimValue(ClaimsPrincipal claimsPrincipal, string claimName)
