@@ -207,15 +207,6 @@ namespace Messaging.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddNotificationHandler<TNotificationHandler, TNotification>()
-            where TNotificationHandler : class, INotificationHandler<TNotification>
-            where TNotification : INotification
-        {
-            _services.AddTransient<INotificationHandler<TNotification>, TNotificationHandler>();
-
-            return this;
-        }
-
         public CompositionRoot AddMoveInServices(MoveInSettings settings)
         {
             MoveInConfiguration.Configure(_services, settings);
