@@ -46,12 +46,10 @@ namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
         [Fact]
         public async Task Cannot_authenticate_when_user_has_no_roles()
         {
-            var createActorCommand =
-                new CreateActor(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "1234567890123");
-            await InvokeCommandAsync(createActorCommand).ConfigureAwait(false);
+            await CreateActorAsync().ConfigureAwait(false);
             var claims = new List<Claim>()
             {
-                new(ClaimsMap.UserId, createActorCommand.B2CId),
+                new(ClaimsMap.UserId, SampleData.StsAssignedUserId),
             };
             var claimsPrincipal = CreateIdentity(claims);
 
@@ -115,6 +113,11 @@ namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
 
             var identity = new ClaimsIdentity(claims ?? validClaims);
             return new ClaimsPrincipal(identity);
+        }
+
+        private async Task CreateActorAsync()
+        {
+            await InvokeCommandAsync(new CreateActor(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.ActorNumber)).ConfigureAwait(false);
         }
     }
 }
