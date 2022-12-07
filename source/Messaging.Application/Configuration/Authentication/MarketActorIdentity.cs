@@ -30,12 +30,6 @@ namespace Messaging.Application.Configuration.Authentication
             _roles = roles;
         }
 
-        public enum IdentifierType
-        {
-            Gln,
-            Eic,
-        }
-
         public string Id { get; }
 
         public ActorNumber Number { get; }
