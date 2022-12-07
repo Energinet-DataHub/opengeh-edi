@@ -27,12 +27,6 @@ namespace Messaging.Infrastructure.Configuration.Authentication
     {
         private readonly IActorLookup _actorLookup;
 
-        private readonly Dictionary<string, MarketRole> _rolesMap = new()
-        {
-            { "electricalsupplier", MarketRole.EnergySupplier },
-            { "gridoperator", MarketRole.GridOperator },
-        };
-
         public MarketActorAuthenticator(IActorLookup actorLookup)
         {
             _actorLookup = actorLookup;
@@ -74,7 +68,7 @@ namespace Messaging.Infrastructure.Configuration.Authentication
                 .Value;
         }
 
-        private IReadOnlyList<MarketRole> ParseRoles(ClaimsPrincipal claimsPrincipal)
+        private static IReadOnlyList<MarketRole> ParseRoles(ClaimsPrincipal claimsPrincipal)
         {
             var roleClaims = claimsPrincipal.FindAll(claim =>
                     claim.Type.Equals(ClaimTypes.Role, StringComparison.OrdinalIgnoreCase))
@@ -83,7 +77,8 @@ namespace Messaging.Infrastructure.Configuration.Authentication
             var roles = new List<MarketRole>();
             foreach (var roleClaim in roleClaims)
             {
-                if (_rolesMap.TryGetValue(roleClaim, out var marketRole))
+                var marketRole = ClaimsMap.RoleFrom(roleClaim);
+                if (marketRole is not null)
                 {
                     roles.Add(marketRole);
                 }

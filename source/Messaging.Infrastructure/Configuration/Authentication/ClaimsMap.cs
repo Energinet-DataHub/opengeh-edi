@@ -12,9 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using Messaging.Domain.Actors;
+
 namespace Messaging.Infrastructure.Configuration.Authentication;
 
 public static class ClaimsMap
 {
+    private static readonly Dictionary<string, MarketRole> _rolesMap = new()
+    {
+        { "electricalsupplier", MarketRole.EnergySupplier },
+        { "gridoperator", MarketRole.GridOperator },
+    };
+
     public static string UserId => "azp";
+
+    public static MarketRole? RoleFrom(string roleClaimValue)
+    {
+        _rolesMap.TryGetValue(roleClaimValue, out var marketRole);
+        return marketRole;
+    }
 }
