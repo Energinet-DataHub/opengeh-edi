@@ -17,16 +17,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Dapper;
 using Messaging.Application.Configuration.Authentication;
-using Messaging.Application.Configuration.DataAccess;
+using Messaging.Application.OutgoingMessages;
 using Messaging.Domain.Actors;
 
 namespace Messaging.Infrastructure.Configuration.Authentication
 {
     public class MarketActorAuthenticator : IMarketActorAuthenticator
     {
-        private readonly IDbConnectionFactory _connectionFactory;
+        private readonly IActorLookup _actorLookup;
 
         private readonly Dictionary<string, MarketRole> _rolesMap = new()
         {
@@ -34,9 +33,9 @@ namespace Messaging.Infrastructure.Configuration.Authentication
             { "gridoperator", MarketRole.GridOperator },
         };
 
-        public MarketActorAuthenticator(IDbConnectionFactory connectionFactory)
+        public MarketActorAuthenticator(IActorLookup actorLookup)
         {
-            _connectionFactory = connectionFactory;
+            _actorLookup = actorLookup;
         }
 
         public MarketActorIdentity CurrentIdentity { get; private set; } = new NotAuthenticated();
@@ -56,7 +55,7 @@ namespace Messaging.Infrastructure.Configuration.Authentication
                 return;
             }
 
-            var actorId = await GetActorNumberAsync(Guid.Parse(id)).ConfigureAwait(false);
+            var actorId = await _actorLookup.GetActorNumberByB2CIdAsync(Guid.Parse(id)).ConfigureAwait(false);
             if (actorId is null)
             {
                 ActorIsNotAuthorized();
@@ -96,23 +95,5 @@ namespace Messaging.Infrastructure.Configuration.Authentication
         {
             CurrentIdentity = new NotAuthenticated();
         }
-
-        private async Task<ActorNumber?> GetActorNumberAsync(Guid actorId)
-        {
-            var sql = "SELECT TOP 1 [Id] AS ActorId, [IdentificationNumber] AS Identifier FROM [b2b].[Actor] WHERE B2CId=@ActorId";
-
-            var result = await _connectionFactory.GetOpenConnection()
-                .QuerySingleOrDefaultAsync<ActorForAuthentication>(sql, new { ActorId = actorId })
-                .ConfigureAwait(false);
-
-            if (result is null)
-            {
-                return null;
-            }
-
-            return ActorNumber.Create(result.Identifier);
-        }
-
-        private record ActorForAuthentication(Guid ActorId, string Identifier);
     }
 }

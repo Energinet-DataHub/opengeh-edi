@@ -30,12 +30,12 @@ namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
     [IntegrationTest]
     public class MarketActorAuthenticatorTests : TestBase
     {
-        private readonly MarketActorAuthenticator _authenticator;
+        private readonly IMarketActorAuthenticator _authenticator;
 
         public MarketActorAuthenticatorTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
-            _authenticator = new MarketActorAuthenticator(GetService<IDbConnectionFactory>());
+            _authenticator = GetService<IMarketActorAuthenticator>();
         }
 
         [Fact]

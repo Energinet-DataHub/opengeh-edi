@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Messaging.Domain.Actors;
 
 namespace Messaging.Application.OutgoingMessages;
 
@@ -33,4 +34,10 @@ public interface IActorLookup
     /// </summary>
     /// <param name="actorId"></param>
     Task<string> GetActorNumberByIdAsync(Guid actorId);
+
+    /// <summary>
+    /// Get actor number by id
+    /// </summary>
+    /// <param name="actorId"></param>
+    Task<ActorNumber?> GetActorNumberByB2CIdAsync(Guid actorId);
 }
