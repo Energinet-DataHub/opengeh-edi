@@ -77,7 +77,7 @@ namespace Messaging.Api
                 {
                     worker.UseMiddleware<CorrelationIdMiddleware>();
                     /*worker.UseMiddleware<RequestResponseLoggingMiddleware>();*/
-                    ConfigureAuthenticationMiddleware(runtime, worker);
+                    ConfigureAuthenticationMiddleware(worker);
                 })
                 .ConfigureServices(services =>
                 {
@@ -172,14 +172,9 @@ namespace Messaging.Api
                 .Build();
         }
 
-        private static void ConfigureAuthenticationMiddleware(RuntimeEnvironment runtime, IFunctionsWorkerApplicationBuilder worker)
+        private static void ConfigureAuthenticationMiddleware(IFunctionsWorkerApplicationBuilder worker)
         {
             worker.UseMiddleware<BearerAuthenticationMiddleware>();
-            if (runtime.IsRunningLocally() == false)
-            {
-                worker.UseMiddleware<ClaimsEnrichmentMiddleware>();
-            }
-
             worker.UseMiddleware<MarketActorAuthenticatorMiddleware>();
         }
 
