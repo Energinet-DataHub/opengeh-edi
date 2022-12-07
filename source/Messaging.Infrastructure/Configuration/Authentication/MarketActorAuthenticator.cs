@@ -19,7 +19,6 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Messaging.Application.Actors;
 using Messaging.Application.Configuration.Authentication;
-using Messaging.Application.OutgoingMessages;
 using Messaging.Domain.Actors;
 
 namespace Messaging.Infrastructure.Configuration.Authentication
@@ -49,14 +48,14 @@ namespace Messaging.Infrastructure.Configuration.Authentication
                 .Select(claim => claim.Value)
                 .ToArray();
 
-            var id = GetClaimValueFrom(claimsPrincipal, "azp");
-            if (string.IsNullOrWhiteSpace(id))
+            var userIdFromSts = GetClaimValueFrom(claimsPrincipal, "azp");
+            if (string.IsNullOrWhiteSpace(userIdFromSts))
             {
                 ActorIsNotAuthorized();
                 return;
             }
 
-            var actorId = await _actorLookup.GetActorNumberByB2CIdAsync(Guid.Parse(id)).ConfigureAwait(false);
+            var actorId = await _actorLookup.GetActorNumberByB2CIdAsync(Guid.Parse(userIdFromSts)).ConfigureAwait(false);
             if (actorId is null)
             {
                 ActorIsNotAuthorized();
@@ -70,7 +69,7 @@ namespace Messaging.Infrastructure.Configuration.Authentication
                 return;
             }
 
-            CurrentIdentity = new Authenticated(id, actorId, roles, marketRole);
+            CurrentIdentity = new Authenticated(userIdFromSts, actorId, roles, marketRole);
         }
 
         private static string? GetClaimValueFrom(ClaimsPrincipal claimsPrincipal, string claimName)
