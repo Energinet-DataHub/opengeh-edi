@@ -23,7 +23,6 @@ using Messaging.Api.Configuration.Middleware.Authentication.Bearer;
 using Messaging.Api.Configuration.Middleware.Authentication.MarketActors;
 using Messaging.Api.Configuration.Middleware.Correlation;
 using Messaging.Application.Configuration;
-using Messaging.Application.Configuration.TimeEvents;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Application.Transactions.MoveIn;
@@ -35,8 +34,8 @@ using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.Infrastructure.OutgoingMessages.Requesting;
 using Messaging.Infrastructure.Transactions;
 using Messaging.Infrastructure.Transactions.MoveIn;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -77,13 +76,7 @@ namespace Messaging.Api
                 {
                     worker.UseMiddleware<CorrelationIdMiddleware>();
                     /*worker.UseMiddleware<RequestResponseLoggingMiddleware>();*/
-                    worker.UseMiddleware<BearerAuthenticationMiddleware>();
-                    if (runtime.IsRunningLocally() == false)
-                    {
-                        worker.UseMiddleware<ClaimsEnrichmentMiddleware>();
-                    }
-
-                    worker.UseMiddleware<MarketActorAuthenticatorMiddleware>();
+                    ConfigureAuthentication(runtime, worker);
                 })
                 .ConfigureServices(services =>
                 {
@@ -176,6 +169,17 @@ namespace Messaging.Api
                     services.AddSqlServerHealthCheck(runtime.DB_CONNECTION_STRING!);
                 })
                 .Build();
+        }
+
+        private static void ConfigureAuthentication(RuntimeEnvironment runtime, IFunctionsWorkerApplicationBuilder worker)
+        {
+            worker.UseMiddleware<BearerAuthenticationMiddleware>();
+            if (runtime.IsRunningLocally() == false)
+            {
+                worker.UseMiddleware<ClaimsEnrichmentMiddleware>();
+            }
+
+            worker.UseMiddleware<MarketActorAuthenticatorMiddleware>();
         }
 
         private static async Task<TokenValidationParameters> GetTokenValidationParametersAsync(RuntimeEnvironment runtime)
