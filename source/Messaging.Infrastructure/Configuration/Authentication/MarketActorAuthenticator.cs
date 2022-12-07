@@ -41,16 +41,15 @@ namespace Messaging.Infrastructure.Configuration.Authentication
 
             var id = GetClaimValueFrom(claimsPrincipal, "azp");
             var actorId = GetClaimValueFrom(claimsPrincipal, "actorid");
-            var canParseIdentifierType = Enum.TryParse<MarketActorIdentity.IdentifierType>(GetClaimValueFrom(claimsPrincipal, "actoridtype"), true, out var identifierType);
             var marketRole = ParseMarketRoleFrom(roles);
 
-            if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(actorId) || canParseIdentifierType == false || marketRole is null)
+            if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(actorId) || marketRole is null)
             {
                 CurrentIdentity = new NotAuthenticated();
             }
             else
             {
-                CurrentIdentity = new Authenticated(id, ActorNumber.Create(actorId), identifierType, roles, marketRole);
+                CurrentIdentity = new Authenticated(id, ActorNumber.Create(actorId), roles, marketRole);
             }
         }
 
