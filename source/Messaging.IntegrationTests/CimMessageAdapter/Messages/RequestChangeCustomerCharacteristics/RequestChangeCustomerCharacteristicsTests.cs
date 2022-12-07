@@ -23,12 +23,15 @@ using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.IncomingMessages.RequestChangeCustomerCharacteristics;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
+using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Infrastructure.Configuration.Authentication;
 using Messaging.IntegrationTests.CimMessageAdapter.Stubs;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
 using MessageParser = Messaging.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics.MessageParser;
+using Result = Messaging.CimMessageAdapter.Messages.Result;
 
 namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 
@@ -59,10 +62,8 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
 
         _claims = new List<Claim>()
         {
-            new("azp", createActorCommand.B2CId),
-            new("actorid", createActorCommand.IdentificationNumber),
-            new("actoridtype", "GLN"),
-            new(ClaimTypes.Role, "electricalsupplier"),
+            new(ClaimsMap.UserId, SampleData.StsAssignedUserId),
+            ClaimsMap.RoleFrom(MarketRole.EnergySupplier),
         };
 
         await _marketActorAuthenticator.AuthenticateAsync(CreateIdentity());
