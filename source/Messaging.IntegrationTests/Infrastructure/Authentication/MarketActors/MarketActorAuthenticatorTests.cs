@@ -76,12 +76,10 @@ namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
         [Fact]
         public async Task Current_user_is_authenticated()
         {
-            var createActorCommand =
-                new CreateActor(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "1234567890123");
-            await InvokeCommandAsync(createActorCommand).ConfigureAwait(false);
+            await CreateActorAsync().ConfigureAwait(false);
             var claims = new List<Claim>()
             {
-                new(ClaimsMap.UserId, createActorCommand.B2CId),
+                new(ClaimsMap.UserId, SampleData.StsAssignedUserId),
                 ClaimsMap.RoleFrom(MarketRole.EnergySupplier),
                 ClaimsMap.RoleFrom(MarketRole.GridOperator),
             };
@@ -92,7 +90,7 @@ namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
             Assert.IsType<Authenticated>(_authenticator.CurrentIdentity);
             Assert.Equal(GetClaimValue(claimsPrincipal, ClaimsMap.UserId), _authenticator.CurrentIdentity.Id);
             Assert.Equal(MarketRole.EnergySupplier, _authenticator.CurrentIdentity.Role);
-            Assert.Equal(_authenticator.CurrentIdentity.Number.Value, createActorCommand.IdentificationNumber);
+            Assert.Equal(_authenticator.CurrentIdentity.Number.Value, SampleData.ActorNumber);
             Assert.True(_authenticator.CurrentIdentity.HasRole(MarketRole.GridOperator.Name));
             Assert.True(_authenticator.CurrentIdentity.HasRole(MarketRole.EnergySupplier.Name));
         }
