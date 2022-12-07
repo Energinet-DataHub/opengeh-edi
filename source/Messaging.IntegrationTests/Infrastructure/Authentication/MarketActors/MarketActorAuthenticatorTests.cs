@@ -57,7 +57,7 @@ namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
             var claims = new List<Claim>()
             {
                 new("azp", Guid.NewGuid().ToString()),
-                new("actorid", Guid.NewGuid().ToString()),
+                new("actorid", "1234567890123"),
                 new("actoridtype", "GLN"),
                 new(ClaimTypes.Role, "electricalsupplier"),
                 new(ClaimTypes.Role, "balanceresponsibleparty"),
@@ -68,7 +68,7 @@ namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
 
             Assert.IsType<Authenticated>(authenticator.CurrentIdentity);
             Assert.Equal(GetClaimValue(claimsPrincipal, "azp"), authenticator.CurrentIdentity.Id);
-            Assert.Equal(GetClaimValue(claimsPrincipal, "actorid"), authenticator.CurrentIdentity.Number);
+            Assert.Equal(GetClaimValue(claimsPrincipal, "actorid"), authenticator.CurrentIdentity.Number.Value);
             Assert.Equal(Enum.Parse<MarketActorIdentity.IdentifierType>(GetClaimValue(claimsPrincipal, "actoridtype")!, true), authenticator.CurrentIdentity.ActorNumberType);
             Assert.Equal(MarketRole.EnergySupplier, authenticator.CurrentIdentity.Role);
             Assert.True(authenticator.CurrentIdentity.HasRole("balanceresponsibleparty"));

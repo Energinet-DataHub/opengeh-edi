@@ -50,7 +50,7 @@ namespace Messaging.Infrastructure.Configuration.Authentication
             }
             else
             {
-                CurrentIdentity = new Authenticated(id, actorId, identifierType, roles, marketRole);
+                CurrentIdentity = new Authenticated(id, ActorNumber.Create(actorId), identifierType, roles, marketRole);
             }
         }
 

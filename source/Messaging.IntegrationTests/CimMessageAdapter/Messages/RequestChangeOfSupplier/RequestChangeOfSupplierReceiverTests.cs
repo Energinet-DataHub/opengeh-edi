@@ -113,7 +113,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfS
         [Fact]
         public async Task Sender_id_must_match_the_organization_of_the_current_authenticated_user()
         {
-            _marketActorAuthenticator.Authenticate(CreateIdentity("Unknown_actor_identifier"));
+            _marketActorAuthenticator.Authenticate(CreateIdentity("1234567890123"));
             await using var message = BusinessMessageBuilder
                 .RequestChangeOfSupplier()
                 .Message();
