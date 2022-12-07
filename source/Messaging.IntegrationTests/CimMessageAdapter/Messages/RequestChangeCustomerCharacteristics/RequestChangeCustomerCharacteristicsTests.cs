@@ -39,7 +39,6 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase
         new("azp", Guid.NewGuid().ToString()),
         new("actorid", "5799999933318"),
         new("actoridtype", "GLN"),
-        new(ClaimTypes.Role, "balanceresponsibleparty"),
         new(ClaimTypes.Role, "electricalsupplier"),
     };
 

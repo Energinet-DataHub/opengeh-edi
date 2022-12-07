@@ -13,14 +13,22 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using Messaging.Application.Configuration.Authentication;
+using Messaging.Domain.Actors;
 
 namespace Messaging.Infrastructure.Configuration.Authentication
 {
     public class MarketActorAuthenticator : IMarketActorAuthenticator
     {
+        private readonly Dictionary<string, MarketRole> _rolesMap = new()
+        {
+            { "electricalsupplier", MarketRole.EnergySupplier },
+            { "gridoperator", MarketRole.GridOperator },
+        };
+
         public MarketActorIdentity CurrentIdentity { get; private set; } = new NotAuthenticated();
 
         public void Authenticate(ClaimsPrincipal claimsPrincipal)
@@ -41,7 +49,10 @@ namespace Messaging.Infrastructure.Configuration.Authentication
             }
             else
             {
-                CurrentIdentity = new Authenticated(id, actorId, identifierType, roles);
+                var marketRole = ParseMarketRoleFrom(roles);
+                CurrentIdentity = marketRole is null
+                    ? new NotAuthenticated()
+                    : new Authenticated(id, actorId, identifierType, roles, marketRole);
             }
         }
 
@@ -49,6 +60,19 @@ namespace Messaging.Infrastructure.Configuration.Authentication
         {
             return claimsPrincipal.FindFirst(claim => claim.Type.Equals(claimName, StringComparison.OrdinalIgnoreCase))?
                 .Value;
+        }
+
+        private MarketRole? ParseMarketRoleFrom(IEnumerable<string> roles)
+        {
+            var role = roles.FirstOrDefault();
+            if (string.IsNullOrWhiteSpace(role))
+            {
+                return null;
+            }
+
+            return _rolesMap.TryGetValue(role, out var marketRole) == false
+                ? null
+                : marketRole;
         }
     }
 }

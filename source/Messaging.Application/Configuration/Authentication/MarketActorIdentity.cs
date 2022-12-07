@@ -14,17 +14,21 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Messaging.Domain.Actors;
 
 namespace Messaging.Application.Configuration.Authentication
 {
     public abstract class MarketActorIdentity
     {
-        protected MarketActorIdentity(string id, string actorIdentifier, IdentifierType actorIdentifierType, IEnumerable<string> roles)
+        private readonly IEnumerable<string> _roles;
+
+        protected MarketActorIdentity(string id, string actorNumber, IdentifierType actorNumberType, IEnumerable<string> roles, MarketRole? role)
         {
             Id = id;
-            ActorIdentifier = actorIdentifier;
-            ActorIdentifierType = actorIdentifierType;
-            Roles = roles;
+            ActorNumber = actorNumber;
+            ActorNumberType = actorNumberType;
+            Role = role;
+            _roles = roles;
         }
 
         public enum IdentifierType
@@ -35,15 +39,15 @@ namespace Messaging.Application.Configuration.Authentication
 
         public string Id { get; }
 
-        public string ActorIdentifier { get; }
+        public string ActorNumber { get; }
 
-        public IdentifierType ActorIdentifierType { get; }
+        public IdentifierType ActorNumberType { get; }
 
-        public IEnumerable<string> Roles { get; }
+        public MarketRole? Role { get; }
 
         public bool HasRole(string role)
         {
-            return Roles.Contains(role);
+            return _roles.Contains(role);
         }
     }
 }

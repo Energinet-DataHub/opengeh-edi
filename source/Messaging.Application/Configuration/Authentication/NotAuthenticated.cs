@@ -19,7 +19,7 @@ namespace Messaging.Application.Configuration.Authentication
     public class NotAuthenticated : MarketActorIdentity
     {
         public NotAuthenticated()
-            : base("NotSet", "NotSet", IdentifierType.Eic, Array.Empty<string>())
+            : base("NotSet", "NotSet", IdentifierType.Eic, Array.Empty<string>(), null)
         {
         }
     }
