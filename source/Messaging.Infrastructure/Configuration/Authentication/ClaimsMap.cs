@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
 using Messaging.Domain.Actors;
 
 namespace Messaging.Infrastructure.Configuration.Authentication;
@@ -31,5 +33,10 @@ public static class ClaimsMap
     {
         _rolesMap.TryGetValue(roleClaimValue, out var marketRole);
         return marketRole;
+    }
+
+    public static Claim RoleFrom(MarketRole marketRole)
+    {
+        return new Claim(ClaimTypes.Role, _rolesMap.First(x => x.Value.Equals(marketRole)).Key);
     }
 }

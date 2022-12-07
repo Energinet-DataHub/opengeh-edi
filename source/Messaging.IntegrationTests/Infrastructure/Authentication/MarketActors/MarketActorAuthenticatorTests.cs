@@ -48,8 +48,8 @@ namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
         {
             var claims = new List<Claim>()
             {
-                new(ClaimTypes.Role, "balanceresponsibleparty"),
-                new(ClaimTypes.Role, "electricalsupplier"),
+                ClaimsMap.RoleFrom(MarketRole.EnergySupplier),
+                ClaimsMap.RoleFrom(MarketRole.GridOperator),
             };
             var claimsPrincipal = CreateIdentity(claims);
 
@@ -67,8 +67,8 @@ namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
             var claims = new List<Claim>()
             {
                 new(ClaimsMap.UserId, createActorCommand.B2CId),
-                new(ClaimTypes.Role, "electricalsupplier"),
-                new(ClaimTypes.Role, "gridoperator"),
+                ClaimsMap.RoleFrom(MarketRole.EnergySupplier),
+                ClaimsMap.RoleFrom(MarketRole.GridOperator),
             };
             var claimsPrincipal = CreateIdentity(claims);
 
@@ -92,8 +92,8 @@ namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
             var validClaims = new List<Claim>()
             {
                 new(ClaimsMap.UserId, Guid.NewGuid().ToString()),
-                new(ClaimTypes.Role, "gridoperator"),
-                new(ClaimTypes.Role, "electricalsupplier"),
+                ClaimsMap.RoleFrom(MarketRole.GridOperator),
+                ClaimsMap.RoleFrom(MarketRole.EnergySupplier),
             };
 
             var identity = new ClaimsIdentity(claims ?? validClaims);
