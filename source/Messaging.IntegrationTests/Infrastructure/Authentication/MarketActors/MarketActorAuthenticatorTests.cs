@@ -44,6 +44,23 @@ namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
         }
 
         [Fact]
+        public async Task Cannot_authenticate_when_user_has_no_roles()
+        {
+            var createActorCommand =
+                new CreateActor(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "1234567890123");
+            await InvokeCommandAsync(createActorCommand).ConfigureAwait(false);
+            var claims = new List<Claim>()
+            {
+                new(ClaimsMap.UserId, createActorCommand.B2CId),
+            };
+            var claimsPrincipal = CreateIdentity(claims);
+
+            await _authenticator.AuthenticateAsync(claimsPrincipal);
+
+            Assert.IsType<NotAuthenticated>(_authenticator.CurrentIdentity);
+        }
+
+        [Fact]
         public async Task Can_not_authenticate_if_claims_principal_does_not_contain_user_id_claim()
         {
             var claims = new List<Claim>()
