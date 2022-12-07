@@ -35,7 +35,6 @@ namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeCus
 [IntegrationTest]
 public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetime
 {
-    private const string SenderId = "1234567890123";
     private readonly MessageParser _messageParser;
     private readonly IMarketActorAuthenticator _marketActorAuthenticator;
     private readonly ITransactionIds _transactionIds;
@@ -55,7 +54,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
     public async Task InitializeAsync()
     {
         var createActorCommand =
-            new CreateActor(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SenderId);
+            new CreateActor(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.ActorNumber);
         await InvokeCommandAsync(createActorCommand).ConfigureAwait(false);
 
         _claims = new List<Claim>()
@@ -159,7 +158,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
     {
         await using var message = BusinessMessageBuilder
             .RequestChangeCustomerCharacteristics()
-            .WithSenderId(SenderId)
+            .WithSenderId(SampleData.ActorNumber)
             .Message();
 
         await ReceiveRequestChangeCustomerCharacteristicsMessage(message)
@@ -182,7 +181,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
     {
         await using var message = BusinessMessageBuilder
             .RequestChangeCustomerCharacteristics()
-            .WithSenderId(SenderId)
+            .WithSenderId(SampleData.ActorNumber)
             .DuplicateMarketActivityRecords()
             .Message();
 
