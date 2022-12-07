@@ -22,6 +22,7 @@ using Energinet.DataHub.MessageHub.Client.Storage;
 using Messaging.Api.Configuration.Middleware.Authentication.Bearer;
 using Messaging.Api.Configuration.Middleware.Authentication.MarketActors;
 using Messaging.Api.Configuration.Middleware.Correlation;
+using Messaging.Application.Actors;
 using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Peek;

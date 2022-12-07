@@ -15,11 +15,11 @@
 using System;
 using System.Threading.Tasks;
 using Dapper;
+using Messaging.Application.Actors;
 using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.OutgoingMessages;
 using Messaging.Domain.Actors;
 
-namespace Messaging.Infrastructure.OutgoingMessages;
+namespace Messaging.Infrastructure.Actors;
 
 public class ActorLookup : IActorLookup
 {
