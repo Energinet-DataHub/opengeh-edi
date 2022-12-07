@@ -20,7 +20,7 @@ namespace Messaging.Application.Configuration.Authentication
     public class NotAuthenticated : MarketActorIdentity
     {
         public NotAuthenticated()
-            : base("NotSet", ActorNumber.Create("0000000000000"), Array.Empty<MarketRole>(), null)
+            : base("NotSet", ActorNumber.Create("0000000000000"), Array.Empty<MarketRole>())
         {
         }
     }

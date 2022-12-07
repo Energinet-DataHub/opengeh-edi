@@ -19,8 +19,8 @@ namespace Messaging.Application.Configuration.Authentication
 {
     public class Authenticated : MarketActorIdentity
     {
-        public Authenticated(string id, ActorNumber number, IEnumerable<MarketRole> roles, MarketRole role)
-            : base(id, number, roles, role)
+        public Authenticated(string id, ActorNumber number, IEnumerable<MarketRole> roles)
+            : base(id, number, roles)
         {
         }
     }

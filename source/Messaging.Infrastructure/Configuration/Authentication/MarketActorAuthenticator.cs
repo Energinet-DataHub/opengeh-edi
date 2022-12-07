@@ -65,7 +65,7 @@ namespace Messaging.Infrastructure.Configuration.Authentication
                 return;
             }
 
-            CurrentIdentity = new Authenticated(userIdFromSts, actorNumber, roles, roles[0]);
+            CurrentIdentity = new Authenticated(userIdFromSts, actorNumber, roles);
         }
 
         private static string? GetClaimValueFrom(ClaimsPrincipal claimsPrincipal, string claimName)
@@ -90,19 +90,6 @@ namespace Messaging.Infrastructure.Configuration.Authentication
             }
 
             return roles;
-        }
-
-        private MarketRole? ParseMarketRoleFrom(IEnumerable<string> roles)
-        {
-            var role = roles.FirstOrDefault();
-            if (string.IsNullOrWhiteSpace(role))
-            {
-                return null;
-            }
-
-            return _rolesMap.TryGetValue(role, out var marketRole) == false
-                ? null
-                : marketRole;
         }
 
         private void ActorIsNotAuthorized()
