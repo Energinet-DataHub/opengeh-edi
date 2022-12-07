@@ -56,8 +56,6 @@ namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfS
             _claims = new List<Claim>()
             {
                 new("azp", new CreateActor(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.ActorNumber).B2CId),
-                new("actorid", new CreateActor(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.ActorNumber).IdentificationNumber),
-                new("actoridtype", "GLN"),
                 new(ClaimTypes.Role, "electricalsupplier"),
             };
 
