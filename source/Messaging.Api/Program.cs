@@ -78,7 +78,11 @@ namespace Messaging.Api
                     worker.UseMiddleware<CorrelationIdMiddleware>();
                     /*worker.UseMiddleware<RequestResponseLoggingMiddleware>();*/
                     worker.UseMiddleware<BearerAuthenticationMiddleware>();
-                    worker.UseMiddleware<ClaimsEnrichmentMiddleware>();
+                    if (runtime.IsRunningLocally() == false)
+                    {
+                        worker.UseMiddleware<ClaimsEnrichmentMiddleware>();
+                    }
+
                     worker.UseMiddleware<MarketActorAuthenticatorMiddleware>();
                 })
                 .ConfigureServices(services =>
