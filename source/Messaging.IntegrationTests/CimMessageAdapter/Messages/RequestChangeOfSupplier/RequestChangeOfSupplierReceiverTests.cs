@@ -31,7 +31,7 @@ using Xunit.Categories;
 namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
 {
     [IntegrationTest]
-    public class RequestChangeOfSupplierReceiverTests : TestBase
+    public class RequestChangeOfSupplierReceiverTests : TestBase, IAsyncLifetime
     {
         private readonly List<Claim> _claims = new List<Claim>()
         {
@@ -54,7 +54,16 @@ namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfS
             _transactionIds = GetService<ITransactionIds>();
             _messageIds = GetService<IMessageIds>();
             _marketActorAuthenticator = GetService<IMarketActorAuthenticator>();
-            _marketActorAuthenticator.Authenticate(CreateIdentity());
+        }
+
+        public Task InitializeAsync()
+        {
+            return _marketActorAuthenticator.AuthenticateAsync(CreateIdentity());
+        }
+
+        public Task DisposeAsync()
+        {
+            return Task.CompletedTask;
         }
 
         [Fact]
@@ -100,7 +109,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfS
         [Fact]
         public async Task Authenticated_user_must_hold_the_role_type_as_specified_in_message()
         {
-            _marketActorAuthenticator.Authenticate(CreateIdentityWithoutRoles());
+            await _marketActorAuthenticator.AuthenticateAsync(CreateIdentityWithoutRoles());
             await using var message = BusinessMessageBuilder
                 .RequestChangeOfSupplier()
                 .Message();
@@ -113,7 +122,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfS
         [Fact]
         public async Task Sender_id_must_match_the_organization_of_the_current_authenticated_user()
         {
-            _marketActorAuthenticator.Authenticate(CreateIdentity("1234567890123"));
+            await _marketActorAuthenticator.AuthenticateAsync(CreateIdentity("1234567890123"));
             await using var message = BusinessMessageBuilder
                 .RequestChangeOfSupplier()
                 .Message();

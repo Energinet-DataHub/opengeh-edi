@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Domain.Actors;
@@ -39,7 +40,7 @@ namespace Messaging.Infrastructure.Configuration.Authentication
 
         public MarketActorIdentity CurrentIdentity { get; private set; } = new NotAuthenticated();
 
-        public void Authenticate(ClaimsPrincipal claimsPrincipal)
+        public Task AuthenticateAsync(ClaimsPrincipal claimsPrincipal)
         {
             if (claimsPrincipal == null) throw new ArgumentNullException(nameof(claimsPrincipal));
             var roles = claimsPrincipal.FindAll(claim =>
@@ -59,6 +60,8 @@ namespace Messaging.Infrastructure.Configuration.Authentication
             {
                 CurrentIdentity = new Authenticated(id, ActorNumber.Create(actorId), roles, marketRole);
             }
+
+            return Task.CompletedTask;
         }
 
         private static string? GetClaimValueFrom(ClaimsPrincipal claimsPrincipal, string claimName)

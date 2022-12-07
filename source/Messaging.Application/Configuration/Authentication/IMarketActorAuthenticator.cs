@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Messaging.Application.Configuration.Authentication
 {
@@ -30,6 +31,6 @@ namespace Messaging.Application.Configuration.Authentication
         /// Authenticates a claims principal
         /// </summary>
         /// <param name="claimsPrincipal"></param>
-        void Authenticate(ClaimsPrincipal claimsPrincipal);
+        Task AuthenticateAsync(ClaimsPrincipal claimsPrincipal);
     }
 }

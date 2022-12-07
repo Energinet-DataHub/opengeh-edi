@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Domain.Actors;
@@ -43,7 +44,7 @@ namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
         }
 
         [Fact]
-        public void Can_not_authenticate_if_claims_principal_does_not_contain_expected_claims()
+        public async Task Can_not_authenticate_if_claims_principal_does_not_contain_expected_claims()
         {
             var claims = new List<Claim>()
             {
@@ -52,13 +53,13 @@ namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
             };
             var claimsPrincipal = CreateIdentity(claims);
 
-            _authenticator.Authenticate(claimsPrincipal);
+            await _authenticator.AuthenticateAsync(claimsPrincipal);
 
             Assert.IsType<NotAuthenticated>(_authenticator.CurrentIdentity);
         }
 
         [Fact]
-        public void Current_user_is_authenticated()
+        public async Task Current_user_is_authenticated()
         {
             var claims = new List<Claim>()
             {
@@ -70,7 +71,7 @@ namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
             };
             var claimsPrincipal = CreateIdentity(claims);
 
-            _authenticator.Authenticate(claimsPrincipal);
+            await _authenticator.AuthenticateAsync(claimsPrincipal);
 
             Assert.IsType<Authenticated>(_authenticator.CurrentIdentity);
             Assert.Equal(GetClaimValue(claimsPrincipal, "azp"), _authenticator.CurrentIdentity.Id);
