@@ -43,10 +43,6 @@ namespace Messaging.Infrastructure.Configuration.Authentication
         public async Task AuthenticateAsync(ClaimsPrincipal claimsPrincipal)
         {
             if (claimsPrincipal == null) throw new ArgumentNullException(nameof(claimsPrincipal));
-            var roles = claimsPrincipal.FindAll(claim =>
-                    claim.Type.Equals(ClaimTypes.Role, StringComparison.OrdinalIgnoreCase))
-                .Select(claim => claim.Value)
-                .ToArray();
 
             var userIdFromSts = GetClaimValueFrom(claimsPrincipal, "azp");
             if (string.IsNullOrWhiteSpace(userIdFromSts))
@@ -62,20 +58,38 @@ namespace Messaging.Infrastructure.Configuration.Authentication
                 return;
             }
 
-            var marketRole = ParseMarketRoleFrom(roles);
-            if (marketRole is null)
+            var roles = ParseRoles(claimsPrincipal);
+            if (roles.Count == 0)
             {
                 ActorIsNotAuthorized();
                 return;
             }
 
-            CurrentIdentity = new Authenticated(userIdFromSts, actorNumber, roles, marketRole);
+            CurrentIdentity = new Authenticated(userIdFromSts, actorNumber, roles, roles[0]);
         }
 
         private static string? GetClaimValueFrom(ClaimsPrincipal claimsPrincipal, string claimName)
         {
             return claimsPrincipal.FindFirst(claim => claim.Type.Equals(claimName, StringComparison.OrdinalIgnoreCase))?
                 .Value;
+        }
+
+        private IReadOnlyList<MarketRole> ParseRoles(ClaimsPrincipal claimsPrincipal)
+        {
+            var roleClaims = claimsPrincipal.FindAll(claim =>
+                    claim.Type.Equals(ClaimTypes.Role, StringComparison.OrdinalIgnoreCase))
+                .Select(claim => claim.Value);
+
+            var roles = new List<MarketRole>();
+            foreach (var roleClaim in roleClaims)
+            {
+                if (_rolesMap.TryGetValue(roleClaim, out var marketRole))
+                {
+                    roles.Add(marketRole);
+                }
+            }
+
+            return roles;
         }
 
         private MarketRole? ParseMarketRoleFrom(IEnumerable<string> roles)

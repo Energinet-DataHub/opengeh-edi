@@ -71,7 +71,7 @@ namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
                 new("actorid", createActorCommand.IdentificationNumber),
                 new("actoridtype", "GLN"),
                 new(ClaimTypes.Role, "electricalsupplier"),
-                new(ClaimTypes.Role, "balanceresponsibleparty"),
+                new(ClaimTypes.Role, "gridoperator"),
             };
             var claimsPrincipal = CreateIdentity(claims);
 
@@ -81,8 +81,8 @@ namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
             Assert.Equal(GetClaimValue(claimsPrincipal, "azp"), _authenticator.CurrentIdentity.Id);
             Assert.Equal(GetClaimValue(claimsPrincipal, "actorid"), _authenticator.CurrentIdentity.Number.Value);
             Assert.Equal(MarketRole.EnergySupplier, _authenticator.CurrentIdentity.Role);
-            Assert.True(_authenticator.CurrentIdentity.HasRole("balanceresponsibleparty"));
-            Assert.True(_authenticator.CurrentIdentity.HasRole("electricalsupplier"));
+            Assert.True(_authenticator.CurrentIdentity.HasRole(MarketRole.GridOperator.Name));
+            Assert.True(_authenticator.CurrentIdentity.HasRole(MarketRole.EnergySupplier.Name));
         }
 
         private static string? GetClaimValue(ClaimsPrincipal claimsPrincipal, string claimName)

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Messaging.Domain.Actors;
@@ -20,9 +21,9 @@ namespace Messaging.Application.Configuration.Authentication
 {
     public abstract class MarketActorIdentity
     {
-        private readonly IEnumerable<string> _roles;
+        private readonly IEnumerable<MarketRole> _roles;
 
-        protected MarketActorIdentity(string id, ActorNumber number, IEnumerable<string> roles, MarketRole? role)
+        protected MarketActorIdentity(string id, ActorNumber number, IEnumerable<MarketRole> roles, MarketRole? role)
         {
             Id = id;
             Number = number;
@@ -38,7 +39,7 @@ namespace Messaging.Application.Configuration.Authentication
 
         public bool HasRole(string role)
         {
-            return _roles.Contains(role);
+            return _roles.Any(marketRole => marketRole.Name.Equals(role, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

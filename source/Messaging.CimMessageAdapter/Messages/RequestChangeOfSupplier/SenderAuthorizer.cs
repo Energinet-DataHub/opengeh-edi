@@ -25,10 +25,6 @@ namespace Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier
         private const string EnergySupplierRole = "DDQ";
         private readonly IMarketActorAuthenticator _marketActorAuthenticator;
         private readonly List<ValidationError> _validationErrors = new();
-        private readonly Dictionary<string, string> _rolesMap = new(StringComparer.OrdinalIgnoreCase)
-        {
-            { "DDQ", "electricalsupplier" },
-        };
 
         public SenderAuthorizer(IMarketActorAuthenticator marketActorAuthenticator)
         {
@@ -48,14 +44,7 @@ namespace Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier
 
         private void EnsureCurrentUserHasRequiredRole(string senderRole)
         {
-            _rolesMap.TryGetValue(senderRole, out var nameOfRoleClaim);
-            if (nameOfRoleClaim is null)
-            {
-                _validationErrors.Add(new AuthenticatedUserDoesNotHoldRequiredRoleType());
-                return;
-            }
-
-            if (_marketActorAuthenticator.CurrentIdentity.HasRole(nameOfRoleClaim) == false)
+            if (_marketActorAuthenticator.CurrentIdentity.HasRole(senderRole) == false)
             {
                 _validationErrors.Add(new AuthenticatedUserDoesNotHoldRequiredRoleType());
             }
