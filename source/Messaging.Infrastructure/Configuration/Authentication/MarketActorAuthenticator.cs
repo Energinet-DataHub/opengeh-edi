@@ -55,8 +55,8 @@ namespace Messaging.Infrastructure.Configuration.Authentication
                 return;
             }
 
-            var actorId = await _actorLookup.GetActorNumberByB2CIdAsync(Guid.Parse(userIdFromSts)).ConfigureAwait(false);
-            if (actorId is null)
+            var actorNumber = await _actorLookup.GetActorNumberByB2CIdAsync(Guid.Parse(userIdFromSts)).ConfigureAwait(false);
+            if (actorNumber is null)
             {
                 ActorIsNotAuthorized();
                 return;
@@ -69,7 +69,7 @@ namespace Messaging.Infrastructure.Configuration.Authentication
                 return;
             }
 
-            CurrentIdentity = new Authenticated(userIdFromSts, actorId, roles, marketRole);
+            CurrentIdentity = new Authenticated(userIdFromSts, actorNumber, roles, marketRole);
         }
 
         private static string? GetClaimValueFrom(ClaimsPrincipal claimsPrincipal, string claimName)
