@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Dapper;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Domain.Actors;
@@ -40,7 +41,7 @@ namespace Messaging.Infrastructure.Configuration.Authentication
 
         public MarketActorIdentity CurrentIdentity { get; private set; } = new NotAuthenticated();
 
-        public Task AuthenticateAsync(ClaimsPrincipal claimsPrincipal)
+        public async Task AuthenticateAsync(ClaimsPrincipal claimsPrincipal)
         {
             if (claimsPrincipal == null) throw new ArgumentNullException(nameof(claimsPrincipal));
             var roles = claimsPrincipal.FindAll(claim =>
@@ -49,19 +50,27 @@ namespace Messaging.Infrastructure.Configuration.Authentication
                 .ToArray();
 
             var id = GetClaimValueFrom(claimsPrincipal, "azp");
-            var actorId = GetClaimValueFrom(claimsPrincipal, "actorid");
-            var marketRole = ParseMarketRoleFrom(roles);
-
-            if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(actorId) || marketRole is null)
+            if (string.IsNullOrWhiteSpace(id))
             {
                 CurrentIdentity = new NotAuthenticated();
-            }
-            else
-            {
-                CurrentIdentity = new Authenticated(id, ActorNumber.Create(actorId), roles, marketRole);
+                return;
             }
 
-            return Task.CompletedTask;
+            var actorId = await GetActorNumberAsync(Guid.Parse(id)).ConfigureAwait(false);
+            if (actorId is null)
+            {
+                CurrentIdentity = new NotAuthenticated();
+                return;
+            }
+
+            var marketRole = ParseMarketRoleFrom(roles);
+            if (marketRole is null)
+            {
+                CurrentIdentity = new NotAuthenticated();
+                return;
+            }
+
+            CurrentIdentity = new Authenticated(id, actorId, roles, marketRole);
         }
 
         private static string? GetClaimValueFrom(ClaimsPrincipal claimsPrincipal, string claimName)
@@ -82,5 +91,23 @@ namespace Messaging.Infrastructure.Configuration.Authentication
                 ? null
                 : marketRole;
         }
+
+        private async Task<ActorNumber?> GetActorNumberAsync(Guid actorId)
+        {
+            var sql = "SELECT TOP 1 [Id] AS ActorId, [IdentificationNumber] AS Identifier FROM [b2b].[Actor] WHERE B2CId=@ActorId";
+
+            var result = await _connectionFactory.GetOpenConnection()
+                .QuerySingleOrDefaultAsync<ActorForAuthentication>(sql, new { ActorId = actorId })
+                .ConfigureAwait(false);
+
+            if (result is null)
+            {
+                return null;
+            }
+
+            return ActorNumber.Create(result.Identifier);
+        }
+
+        private record ActorForAuthentication(Guid ActorId, string Identifier);
     }
 }

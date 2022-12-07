@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Messaging.Application.Actors;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Domain.Actors;
@@ -61,10 +62,13 @@ namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
         [Fact]
         public async Task Current_user_is_authenticated()
         {
+            var createActorCommand =
+                new CreateActor(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "1234567890123");
+            await InvokeCommandAsync(createActorCommand).ConfigureAwait(false);
             var claims = new List<Claim>()
             {
-                new("azp", Guid.NewGuid().ToString()),
-                new("actorid", "1234567890123"),
+                new("azp", createActorCommand.B2CId),
+                new("actorid", createActorCommand.IdentificationNumber),
                 new("actoridtype", "GLN"),
                 new(ClaimTypes.Role, "electricalsupplier"),
                 new(ClaimTypes.Role, "balanceresponsibleparty"),
