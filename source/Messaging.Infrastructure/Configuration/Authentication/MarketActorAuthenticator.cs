@@ -52,21 +52,21 @@ namespace Messaging.Infrastructure.Configuration.Authentication
             var id = GetClaimValueFrom(claimsPrincipal, "azp");
             if (string.IsNullOrWhiteSpace(id))
             {
-                CurrentIdentity = new NotAuthenticated();
+                ActorIsNotAuthorized();
                 return;
             }
 
             var actorId = await GetActorNumberAsync(Guid.Parse(id)).ConfigureAwait(false);
             if (actorId is null)
             {
-                CurrentIdentity = new NotAuthenticated();
+                ActorIsNotAuthorized();
                 return;
             }
 
             var marketRole = ParseMarketRoleFrom(roles);
             if (marketRole is null)
             {
-                CurrentIdentity = new NotAuthenticated();
+                ActorIsNotAuthorized();
                 return;
             }
 
@@ -90,6 +90,11 @@ namespace Messaging.Infrastructure.Configuration.Authentication
             return _rolesMap.TryGetValue(role, out var marketRole) == false
                 ? null
                 : marketRole;
+        }
+
+        private void ActorIsNotAuthorized()
+        {
+            CurrentIdentity = new NotAuthenticated();
         }
 
         private async Task<ActorNumber?> GetActorNumberAsync(Guid actorId)
