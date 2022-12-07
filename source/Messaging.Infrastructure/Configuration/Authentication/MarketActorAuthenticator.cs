@@ -44,7 +44,7 @@ namespace Messaging.Infrastructure.Configuration.Authentication
         {
             if (claimsPrincipal == null) throw new ArgumentNullException(nameof(claimsPrincipal));
 
-            var userIdFromSts = GetClaimValueFrom(claimsPrincipal, "azp");
+            var userIdFromSts = GetClaimValueFrom(claimsPrincipal, ClaimsMap.UserId);
             if (string.IsNullOrWhiteSpace(userIdFromSts))
             {
                 ActorIsNotAuthorized();
