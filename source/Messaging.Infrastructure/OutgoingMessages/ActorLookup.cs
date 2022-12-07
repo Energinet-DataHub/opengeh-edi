@@ -34,7 +34,7 @@ public class ActorLookup : IActorLookup
         return _dbConnectionFactory
             .GetOpenConnection()
             .ExecuteScalarAsync<Guid>(
-                "SELECT Id FROM [b2b].[Actor] WHERE IdentificationNumber = @ActorNumber",
+                "SELECT Id FROM [b2b].[Actor] WHERE IdentificationNumber = @Number",
                 new { ActorNumber = actorNumber, });
     }
 

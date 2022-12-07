@@ -49,7 +49,7 @@ public class PeekRequestListener
     {
         var result = await _mediator.Send(
             new PeekRequest(
-                ActorNumber.Create(_authenticator.CurrentIdentity.ActorNumber),
+                ActorNumber.Create(_authenticator.CurrentIdentity.Number),
                 EnumerationType.FromName<MessageCategory>(messageCategory),
                 _authenticator.CurrentIdentity.Role!))
             .ConfigureAwait(false);

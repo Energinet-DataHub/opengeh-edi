@@ -71,7 +71,7 @@ namespace Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier
 
         private void EnsureSenderIdMatches(string senderId)
         {
-            if (_marketActorAuthenticator.CurrentIdentity.ActorNumber.Equals(senderId, StringComparison.OrdinalIgnoreCase) == false)
+            if (_marketActorAuthenticator.CurrentIdentity.Number.Equals(senderId, StringComparison.OrdinalIgnoreCase) == false)
             {
                 _validationErrors.Add(new SenderIdDoesNotMatchAuthenticatedUser());
             }

@@ -22,10 +22,10 @@ namespace Messaging.Application.Configuration.Authentication
     {
         private readonly IEnumerable<string> _roles;
 
-        protected MarketActorIdentity(string id, string actorNumber, IdentifierType actorNumberType, IEnumerable<string> roles, MarketRole? role)
+        protected MarketActorIdentity(string id, string number, IdentifierType actorNumberType, IEnumerable<string> roles, MarketRole? role)
         {
             Id = id;
-            ActorNumber = actorNumber;
+            Number = number;
             ActorNumberType = actorNumberType;
             Role = role;
             _roles = roles;
@@ -39,7 +39,7 @@ namespace Messaging.Application.Configuration.Authentication
 
         public string Id { get; }
 
-        public string ActorNumber { get; }
+        public string Number { get; }
 
         public IdentifierType ActorNumberType { get; }
 
