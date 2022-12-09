@@ -34,7 +34,7 @@ namespace Messaging.Infrastructure.Configuration.Authentication
 
         public MarketActorIdentity CurrentIdentity { get; private set; } = new NotAuthenticated();
 
-        public async Task AuthenticateAsync(ClaimsPrincipal claimsPrincipal)
+        public virtual async Task AuthenticateAsync(ClaimsPrincipal claimsPrincipal)
         {
             if (claimsPrincipal == null) throw new ArgumentNullException(nameof(claimsPrincipal));
 
