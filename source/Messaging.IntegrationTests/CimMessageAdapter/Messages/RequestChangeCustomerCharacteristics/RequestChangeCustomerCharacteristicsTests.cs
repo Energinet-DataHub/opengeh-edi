@@ -18,35 +18,32 @@ using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Messaging.Application.Actors;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.IncomingMessages.RequestChangeCustomerCharacteristics;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
+using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Infrastructure.Configuration.Authentication;
 using Messaging.IntegrationTests.CimMessageAdapter.Stubs;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
 using MessageParser = Messaging.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics.MessageParser;
+using Result = Messaging.CimMessageAdapter.Messages.Result;
 
 namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 
 [IntegrationTest]
-public class RequestChangeCustomerCharacteristicsTests : TestBase
+public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetime
 {
-    private readonly List<Claim> _claims = new List<Claim>()
-    {
-        new("azp", Guid.NewGuid().ToString()),
-        new("actorid", "5799999933318"),
-        new("actoridtype", "GLN"),
-        new(ClaimTypes.Role, "electricalsupplier"),
-    };
-
     private readonly MessageParser _messageParser;
     private readonly IMarketActorAuthenticator _marketActorAuthenticator;
     private readonly ITransactionIds _transactionIds;
     private readonly IMessageIds _messageIds;
     private MessageQueueDispatcherStub<Messaging.CimMessageAdapter.Messages.Queues.RequestChangeCustomerCharacteristicsTransaction> _messageQueueDispatcherSpy = new();
+    private List<Claim> _claims = new();
 
     public RequestChangeCustomerCharacteristicsTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
@@ -55,7 +52,26 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase
         _transactionIds = GetService<ITransactionIds>();
         _messageIds = GetService<IMessageIds>();
         _marketActorAuthenticator = GetService<IMarketActorAuthenticator>();
-        _marketActorAuthenticator.Authenticate(CreateIdentity());
+    }
+
+    public async Task InitializeAsync()
+    {
+        var createActorCommand =
+            new CreateActor(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.ActorNumber);
+        await InvokeCommandAsync(createActorCommand).ConfigureAwait(false);
+
+        _claims = new List<Claim>()
+        {
+            new(ClaimsMap.UserId, SampleData.StsAssignedUserId),
+            ClaimsMap.RoleFrom(MarketRole.EnergySupplier),
+        };
+
+        await _marketActorAuthenticator.AuthenticateAsync(CreateIdentity());
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
     }
 
     [Fact]
@@ -101,7 +117,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase
     [Fact]
     public async Task Authenticated_user_must_hold_the_role_type_as_specified_in_message()
     {
-        _marketActorAuthenticator.Authenticate(CreateIdentityWithoutRoles());
+        await _marketActorAuthenticator.AuthenticateAsync(CreateIdentityWithoutRoles());
         await using var message = BusinessMessageBuilder
             .RequestChangeCustomerCharacteristics()
             .Message();
@@ -114,7 +130,6 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase
     [Fact]
     public async Task Sender_id_must_match_the_organization_of_the_current_authenticated_user()
     {
-        _marketActorAuthenticator.Authenticate(CreateIdentity("Unknown_actor_identifier"));
         await using var message = BusinessMessageBuilder
             .RequestChangeCustomerCharacteristics()
             .Message();
@@ -143,6 +158,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase
     {
         await using var message = BusinessMessageBuilder
             .RequestChangeCustomerCharacteristics()
+            .WithSenderId(SampleData.ActorNumber)
             .Message();
 
         await ReceiveRequestChangeCustomerCharacteristicsMessage(message)
@@ -165,6 +181,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase
     {
         await using var message = BusinessMessageBuilder
             .RequestChangeCustomerCharacteristics()
+            .WithSenderId(SampleData.ActorNumber)
             .DuplicateMarketActivityRecords()
             .Message();
 
@@ -230,14 +247,6 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase
     private ClaimsPrincipal CreateIdentity()
     {
         return new ClaimsPrincipal(new ClaimsIdentity(_claims));
-    }
-
-    private ClaimsPrincipal CreateIdentity(string actorIdentifier)
-    {
-        var claims = _claims.ToList();
-        claims.Remove(claims.Find(claim => claim.Type.Equals("actorid", StringComparison.OrdinalIgnoreCase))!);
-        claims.Add(new Claim("actorid", actorIdentifier));
-        return new ClaimsPrincipal(new ClaimsIdentity(claims));
     }
 
     private ClaimsPrincipal CreateIdentityWithoutRoles()

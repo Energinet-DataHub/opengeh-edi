@@ -15,10 +15,11 @@
 using System;
 using System.Threading.Tasks;
 using Dapper;
+using Messaging.Application.Actors;
 using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.OutgoingMessages;
+using Messaging.Domain.Actors;
 
-namespace Messaging.Infrastructure.OutgoingMessages;
+namespace Messaging.Infrastructure.Actors;
 
 public class ActorLookup : IActorLookup
 {
@@ -34,7 +35,7 @@ public class ActorLookup : IActorLookup
         return _dbConnectionFactory
             .GetOpenConnection()
             .ExecuteScalarAsync<Guid>(
-                "SELECT Id FROM [b2b].[Actor] WHERE IdentificationNumber = @ActorNumber",
+                "SELECT Id FROM [b2b].[Actor] WHERE IdentificationNumber = @Number",
                 new { ActorNumber = actorNumber, });
     }
 
@@ -45,5 +46,21 @@ public class ActorLookup : IActorLookup
             .ExecuteScalarAsync<string>(
                 "SELECT IdentificationNumber FROM [b2b].[Actor] WHERE Id = @ActorId",
                 new { ActorId = actorId, });
+    }
+
+    public async Task<ActorNumber?> GetActorNumberByB2CIdAsync(Guid actorId)
+    {
+        var actorNumber = await _dbConnectionFactory
+            .GetOpenConnection()
+            .ExecuteScalarAsync<string>(
+                "SELECT IdentificationNumber AS Identifier FROM [b2b].[Actor] WHERE B2CId=@ActorId",
+                new { ActorId = actorId, })
+            .ConfigureAwait(false);
+        if (string.IsNullOrWhiteSpace(actorNumber))
+        {
+            return null;
+        }
+
+        return ActorNumber.Create(actorNumber);
     }
 }

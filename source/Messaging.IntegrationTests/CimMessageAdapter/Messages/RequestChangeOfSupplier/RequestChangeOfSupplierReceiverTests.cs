@@ -18,34 +18,31 @@ using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Messaging.Application.Actors;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
+using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Infrastructure.Configuration.Authentication;
 using Messaging.IntegrationTests.CimMessageAdapter.Stubs;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
+using Result = Messaging.CimMessageAdapter.Messages.Result;
 
 namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
 {
     [IntegrationTest]
-    public class RequestChangeOfSupplierReceiverTests : TestBase
+    public class RequestChangeOfSupplierReceiverTests : TestBase, IAsyncLifetime
     {
-        private readonly List<Claim> _claims = new List<Claim>()
-        {
-            new("azp", Guid.NewGuid().ToString()),
-            new("actorid", "5799999933318"),
-            new("actoridtype", "GLN"),
-            new(ClaimTypes.Role, "electricalsupplier"),
-        };
-
         private readonly MessageParser _messageParser;
         private readonly IMarketActorAuthenticator _marketActorAuthenticator;
         private readonly ITransactionIds _transactionIds;
         private readonly IMessageIds _messageIds;
         private MessageQueueDispatcherStub<Messaging.CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction> _messageQueueDispatcherSpy = new();
+        private List<Claim> _claims = new();
 
         public RequestChangeOfSupplierReceiverTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
@@ -54,7 +51,23 @@ namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfS
             _transactionIds = GetService<ITransactionIds>();
             _messageIds = GetService<IMessageIds>();
             _marketActorAuthenticator = GetService<IMarketActorAuthenticator>();
-            _marketActorAuthenticator.Authenticate(CreateIdentity());
+        }
+
+        public async Task InitializeAsync()
+        {
+            await InvokeCommandAsync(new CreateActor(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.ActorNumber)).ConfigureAwait(false);
+            _claims = new List<Claim>()
+            {
+                new(ClaimsMap.UserId, new CreateActor(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.ActorNumber).B2CId),
+                ClaimsMap.RoleFrom(MarketRole.EnergySupplier),
+            };
+
+            await _marketActorAuthenticator.AuthenticateAsync(CreateIdentity());
+        }
+
+        public Task DisposeAsync()
+        {
+            return Task.CompletedTask;
         }
 
         [Fact]
@@ -100,7 +113,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfS
         [Fact]
         public async Task Authenticated_user_must_hold_the_role_type_as_specified_in_message()
         {
-            _marketActorAuthenticator.Authenticate(CreateIdentityWithoutRoles());
+            await _marketActorAuthenticator.AuthenticateAsync(CreateIdentityWithoutRoles());
             await using var message = BusinessMessageBuilder
                 .RequestChangeOfSupplier()
                 .Message();
@@ -113,7 +126,6 @@ namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfS
         [Fact]
         public async Task Sender_id_must_match_the_organization_of_the_current_authenticated_user()
         {
-            _marketActorAuthenticator.Authenticate(CreateIdentity("Unknown_actor_identifier"));
             await using var message = BusinessMessageBuilder
                 .RequestChangeOfSupplier()
                 .Message();
@@ -142,6 +154,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfS
         {
             await using var message = BusinessMessageBuilder
                 .RequestChangeOfSupplier()
+                .WithSenderId(SampleData.ActorNumber)
                 .Message();
 
             await ReceiveRequestChangeOfSupplierMessage(message)
@@ -164,6 +177,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfS
         {
             await using var message = BusinessMessageBuilder
                 .RequestChangeOfSupplier()
+                .WithSenderId(SampleData.ActorNumber)
                 .DuplicateMarketActivityRecords()
                 .Message();
 
@@ -229,14 +243,6 @@ namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfS
         private ClaimsPrincipal CreateIdentity()
         {
             return new ClaimsPrincipal(new ClaimsIdentity(_claims));
-        }
-
-        private ClaimsPrincipal CreateIdentity(string actorIdentifier)
-        {
-            var claims = _claims.ToList();
-            claims.Remove(claims.Find(claim => claim.Type.Equals("actorid", StringComparison.OrdinalIgnoreCase))!);
-            claims.Add(new Claim("actorid", actorIdentifier));
-            return new ClaimsPrincipal(new ClaimsIdentity(claims));
         }
 
         private ClaimsPrincipal CreateIdentityWithoutRoles()

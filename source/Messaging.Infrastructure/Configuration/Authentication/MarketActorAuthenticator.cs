@@ -16,6 +16,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
+using Messaging.Application.Actors;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Domain.Actors;
 
@@ -23,37 +25,41 @@ namespace Messaging.Infrastructure.Configuration.Authentication
 {
     public class MarketActorAuthenticator : IMarketActorAuthenticator
     {
-        private readonly Dictionary<string, MarketRole> _rolesMap = new()
+        private readonly IActorLookup _actorLookup;
+
+        public MarketActorAuthenticator(IActorLookup actorLookup)
         {
-            { "electricalsupplier", MarketRole.EnergySupplier },
-            { "gridoperator", MarketRole.GridOperator },
-        };
+            _actorLookup = actorLookup;
+        }
 
         public MarketActorIdentity CurrentIdentity { get; private set; } = new NotAuthenticated();
 
-        public void Authenticate(ClaimsPrincipal claimsPrincipal)
+        public async Task AuthenticateAsync(ClaimsPrincipal claimsPrincipal)
         {
             if (claimsPrincipal == null) throw new ArgumentNullException(nameof(claimsPrincipal));
-            var roles = claimsPrincipal.FindAll(claim =>
-                    claim.Type.Equals(ClaimTypes.Role, StringComparison.OrdinalIgnoreCase))
-                .Select(claim => claim.Value)
-                .ToArray();
 
-            var id = GetClaimValueFrom(claimsPrincipal, "azp");
-            var actorId = GetClaimValueFrom(claimsPrincipal, "actorid");
-            var canParseIdentifierType = Enum.TryParse<MarketActorIdentity.IdentifierType>(GetClaimValueFrom(claimsPrincipal, "actoridtype"), true, out var identifierType);
+            var userIdFromSts = GetClaimValueFrom(claimsPrincipal, ClaimsMap.UserId);
+            if (string.IsNullOrWhiteSpace(userIdFromSts))
+            {
+                ActorIsNotAuthorized();
+                return;
+            }
 
-            if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(actorId) || canParseIdentifierType == false)
+            var actorNumber = await _actorLookup.GetActorNumberByB2CIdAsync(Guid.Parse(userIdFromSts)).ConfigureAwait(false);
+            if (actorNumber is null)
             {
-                CurrentIdentity = new NotAuthenticated();
+                ActorIsNotAuthorized();
+                return;
             }
-            else
+
+            var roles = ParseRoles(claimsPrincipal);
+            if (roles.Count == 0)
             {
-                var marketRole = ParseMarketRoleFrom(roles);
-                CurrentIdentity = marketRole is null
-                    ? new NotAuthenticated()
-                    : new Authenticated(id, actorId, identifierType, roles, marketRole);
+                ActorIsNotAuthorized();
+                return;
             }
+
+            CurrentIdentity = new Authenticated(userIdFromSts, actorNumber, roles);
         }
 
         private static string? GetClaimValueFrom(ClaimsPrincipal claimsPrincipal, string claimName)
@@ -62,17 +68,28 @@ namespace Messaging.Infrastructure.Configuration.Authentication
                 .Value;
         }
 
-        private MarketRole? ParseMarketRoleFrom(IEnumerable<string> roles)
+        private static IReadOnlyList<MarketRole> ParseRoles(ClaimsPrincipal claimsPrincipal)
         {
-            var role = roles.FirstOrDefault();
-            if (string.IsNullOrWhiteSpace(role))
+            var roleClaims = claimsPrincipal.FindAll(claim =>
+                    claim.Type.Equals(ClaimTypes.Role, StringComparison.OrdinalIgnoreCase))
+                .Select(claim => claim.Value);
+
+            var roles = new List<MarketRole>();
+            foreach (var roleClaim in roleClaims)
             {
-                return null;
+                var marketRole = ClaimsMap.RoleFrom(roleClaim);
+                if (marketRole is not null)
+                {
+                    roles.Add(marketRole);
+                }
             }
 
-            return _rolesMap.TryGetValue(role, out var marketRole) == false
-                ? null
-                : marketRole;
+            return roles;
+        }
+
+        private void ActorIsNotAuthorized()
+        {
+            CurrentIdentity = new NotAuthenticated();
         }
     }
 }

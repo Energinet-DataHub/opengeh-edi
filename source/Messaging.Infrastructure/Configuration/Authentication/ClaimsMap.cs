@@ -12,33 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using Messaging.Domain.Actors;
 
-namespace Messaging.Application.Configuration.Authentication
+namespace Messaging.Infrastructure.Configuration.Authentication;
+
+public static class ClaimsMap
 {
-    public abstract class MarketActorIdentity
+    private static readonly Dictionary<string, MarketRole> _rolesMap = new()
     {
-        private readonly IEnumerable<MarketRole> _roles;
+        { "electricalsupplier", MarketRole.EnergySupplier },
+        { "gridoperator", MarketRole.GridOperator },
+    };
 
-        protected MarketActorIdentity(string id, ActorNumber number, IEnumerable<MarketRole> roles)
-        {
-            Id = id;
-            Number = number;
-            _roles = roles;
-        }
+    public static string UserId => "azp";
 
-        public string Id { get; }
+    public static MarketRole? RoleFrom(string roleClaimValue)
+    {
+        _rolesMap.TryGetValue(roleClaimValue, out var marketRole);
+        return marketRole;
+    }
 
-        public ActorNumber Number { get; }
-
-        public MarketRole Role => _roles.First();
-
-        public bool HasRole(string role)
-        {
-            return _roles.Any(marketRole => marketRole.Name.Equals(role, StringComparison.OrdinalIgnoreCase));
-        }
+    public static Claim RoleFrom(MarketRole marketRole)
+    {
+        return new Claim(ClaimTypes.Role, _rolesMap.First(x => x.Value.Equals(marketRole)).Key);
     }
 }

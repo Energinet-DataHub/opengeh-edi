@@ -17,19 +17,14 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.CimMessageAdapter.Errors;
+using Messaging.Domain.Actors;
 
 namespace Messaging.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 
 public class SenderAuthorizer : ISenderAuthorizer
 {
-    private const string EnergySupplierRole = "DDQ";
     private readonly IMarketActorAuthenticator _marketActorAuthenticator;
     private readonly List<ValidationError> _validationErrors = new();
-
-    private readonly Dictionary<string, string> _rolesMap = new(StringComparer.OrdinalIgnoreCase)
-    {
-        { "DDQ", "electricalsupplier" },
-    };
 
     public SenderAuthorizer(IMarketActorAuthenticator marketActorAuthenticator)
     {
@@ -52,7 +47,7 @@ public class SenderAuthorizer : ISenderAuthorizer
 
     private void EnsureSenderIdMatches(string senderId)
     {
-        if (_marketActorAuthenticator.CurrentIdentity.ActorNumber.Equals(senderId, StringComparison.OrdinalIgnoreCase) == false)
+        if (_marketActorAuthenticator.CurrentIdentity.Number.Value.Equals(senderId, StringComparison.OrdinalIgnoreCase) == false)
         {
             _validationErrors.Add(new SenderIdDoesNotMatchAuthenticatedUser());
         }
@@ -60,7 +55,7 @@ public class SenderAuthorizer : ISenderAuthorizer
 
     private void EnsureSenderRoleMatches(string senderRole)
     {
-        if (senderRole.Equals(EnergySupplierRole, StringComparison.OrdinalIgnoreCase) == false)
+        if (senderRole.Equals(MarketRole.EnergySupplier.Name, StringComparison.OrdinalIgnoreCase) == false)
         {
             _validationErrors.Add(new SenderRoleTypeIsNotAuthorized());
         }
@@ -68,14 +63,7 @@ public class SenderAuthorizer : ISenderAuthorizer
 
     private void EnsureCurrentUserHasRequiredRole(string senderRole)
     {
-        _rolesMap.TryGetValue(senderRole, out var nameOfRoleClaim);
-        if (nameOfRoleClaim is null)
-        {
-            _validationErrors.Add(new AuthenticatedUserDoesNotHoldRequiredRoleType());
-            return;
-        }
-
-        if (_marketActorAuthenticator.CurrentIdentity.HasRole(nameOfRoleClaim) == false)
+        if (_marketActorAuthenticator.CurrentIdentity.HasRole(senderRole) == false)
         {
             _validationErrors.Add(new SenderRoleTypeIsNotAuthorized());
         }

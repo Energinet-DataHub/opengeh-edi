@@ -15,64 +15,84 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
+using System.Threading.Tasks;
+using Messaging.Application.Actors;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Domain.Actors;
 using Messaging.Infrastructure.Configuration.Authentication;
+using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
 
 namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
 {
     [IntegrationTest]
-    public class MarketActorAuthenticatorTests
+    public class MarketActorAuthenticatorTests : TestBase
     {
+        private readonly IMarketActorAuthenticator _authenticator;
+
+        public MarketActorAuthenticatorTests(DatabaseFixture databaseFixture)
+            : base(databaseFixture)
+        {
+            _authenticator = GetService<IMarketActorAuthenticator>();
+        }
+
         [Fact]
         public void Current_user_is_not_authenticated()
         {
-            var authenticator = new MarketActorAuthenticator();
-
-            Assert.IsType<NotAuthenticated>(authenticator.CurrentIdentity);
+            Assert.IsType<NotAuthenticated>(_authenticator.CurrentIdentity);
         }
 
         [Fact]
-        public void Can_not_authenticate_if_claims_principal_does_not_contain_expected_claims()
+        public async Task Cannot_authenticate_when_user_has_no_roles()
         {
-            var authenticator = new MarketActorAuthenticator();
+            await CreateActorAsync().ConfigureAwait(false);
             var claims = new List<Claim>()
             {
-                new(ClaimTypes.Role, "balanceresponsibleparty"),
-                new(ClaimTypes.Role, "electricalsupplier"),
+                new(ClaimsMap.UserId, SampleData.StsAssignedUserId),
             };
             var claimsPrincipal = CreateIdentity(claims);
 
-            authenticator.Authenticate(claimsPrincipal);
+            await _authenticator.AuthenticateAsync(claimsPrincipal);
 
-            Assert.IsType<NotAuthenticated>(authenticator.CurrentIdentity);
+            Assert.IsType<NotAuthenticated>(_authenticator.CurrentIdentity);
         }
 
         [Fact]
-        public void Current_user_is_authenticated()
+        public async Task Can_not_authenticate_if_claims_principal_does_not_contain_user_id_claim()
         {
-            var authenticator = new MarketActorAuthenticator();
             var claims = new List<Claim>()
             {
-                new("azp", Guid.NewGuid().ToString()),
-                new("actorid", Guid.NewGuid().ToString()),
-                new("actoridtype", "GLN"),
-                new(ClaimTypes.Role, "electricalsupplier"),
-                new(ClaimTypes.Role, "balanceresponsibleparty"),
+                ClaimsMap.RoleFrom(MarketRole.EnergySupplier),
+                ClaimsMap.RoleFrom(MarketRole.GridOperator),
             };
             var claimsPrincipal = CreateIdentity(claims);
 
-            authenticator.Authenticate(claimsPrincipal);
+            await _authenticator.AuthenticateAsync(claimsPrincipal);
 
-            Assert.IsType<Authenticated>(authenticator.CurrentIdentity);
-            Assert.Equal(GetClaimValue(claimsPrincipal, "azp"), authenticator.CurrentIdentity.Id);
-            Assert.Equal(GetClaimValue(claimsPrincipal, "actorid"), authenticator.CurrentIdentity.ActorNumber);
-            Assert.Equal(Enum.Parse<MarketActorIdentity.IdentifierType>(GetClaimValue(claimsPrincipal, "actoridtype")!, true), authenticator.CurrentIdentity.ActorNumberType);
-            Assert.Equal(MarketRole.EnergySupplier, authenticator.CurrentIdentity.Role);
-            Assert.True(authenticator.CurrentIdentity.HasRole("balanceresponsibleparty"));
-            Assert.True(authenticator.CurrentIdentity.HasRole("electricalsupplier"));
+            Assert.IsType<NotAuthenticated>(_authenticator.CurrentIdentity);
+        }
+
+        [Fact]
+        public async Task Current_user_is_authenticated()
+        {
+            await CreateActorAsync().ConfigureAwait(false);
+            var claims = new List<Claim>()
+            {
+                new(ClaimsMap.UserId, SampleData.StsAssignedUserId),
+                ClaimsMap.RoleFrom(MarketRole.EnergySupplier),
+                ClaimsMap.RoleFrom(MarketRole.GridOperator),
+            };
+            var claimsPrincipal = CreateIdentity(claims);
+
+            await _authenticator.AuthenticateAsync(claimsPrincipal);
+
+            Assert.IsType<Authenticated>(_authenticator.CurrentIdentity);
+            Assert.Equal(GetClaimValue(claimsPrincipal, ClaimsMap.UserId), _authenticator.CurrentIdentity.Id);
+            Assert.Equal(MarketRole.EnergySupplier, _authenticator.CurrentIdentity.Role);
+            Assert.Equal(_authenticator.CurrentIdentity.Number.Value, SampleData.ActorNumber);
+            Assert.True(_authenticator.CurrentIdentity.HasRole(MarketRole.GridOperator.Name));
+            Assert.True(_authenticator.CurrentIdentity.HasRole(MarketRole.EnergySupplier.Name));
         }
 
         private static string? GetClaimValue(ClaimsPrincipal claimsPrincipal, string claimName)
@@ -84,15 +104,18 @@ namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors
         {
             var validClaims = new List<Claim>()
             {
-                new("azp", Guid.NewGuid().ToString()),
-                new("actorid", Guid.NewGuid().ToString()),
-                new("actoridtype", "GLN"),
-                new(ClaimTypes.Role, "balanceresponsibleparty"),
-                new(ClaimTypes.Role, "electricalsupplier"),
+                new(ClaimsMap.UserId, Guid.NewGuid().ToString()),
+                ClaimsMap.RoleFrom(MarketRole.GridOperator),
+                ClaimsMap.RoleFrom(MarketRole.EnergySupplier),
             };
 
             var identity = new ClaimsIdentity(claims ?? validClaims);
             return new ClaimsPrincipal(identity);
+        }
+
+        private async Task CreateActorAsync()
+        {
+            await InvokeCommandAsync(new CreateActor(Guid.NewGuid().ToString(), SampleData.StsAssignedUserId, SampleData.ActorNumber)).ConfigureAwait(false);
         }
     }
 }

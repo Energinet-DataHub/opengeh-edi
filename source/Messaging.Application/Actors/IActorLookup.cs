@@ -12,25 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Security.Claims;
+using System;
 using System.Threading.Tasks;
+using Messaging.Domain.Actors;
 
-namespace Messaging.Application.Configuration.Authentication
+namespace Messaging.Application.Actors;
+
+/// <summary>
+/// Service for looking up actor details
+/// </summary>
+public interface IActorLookup
 {
     /// <summary>
-    /// Service for authenticating an market actor
+    /// Get actor unique id by actor number
     /// </summary>
-    public interface IMarketActorAuthenticator
-    {
-        /// <summary>
-        /// Current identity
-        /// </summary>
-        MarketActorIdentity CurrentIdentity { get; }
+    /// <param name="actorNumber"></param>
+    Task<Guid> GetIdByActorNumberAsync(string actorNumber);
 
-        /// <summary>
-        /// Authenticates a claims principal
-        /// </summary>
-        /// <param name="claimsPrincipal"></param>
-        Task AuthenticateAsync(ClaimsPrincipal claimsPrincipal);
-    }
+    /// <summary>
+    /// Get actor number by id
+    /// </summary>
+    /// <param name="actorId"></param>
+    Task<string> GetActorNumberByIdAsync(Guid actorId);
+
+    /// <summary>
+    /// Get actor number by id
+    /// </summary>
+    /// <param name="actorId"></param>
+    Task<ActorNumber?> GetActorNumberByB2CIdAsync(Guid actorId);
 }

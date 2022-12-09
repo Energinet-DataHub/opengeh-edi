@@ -12,25 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading.Tasks;
+namespace Messaging.IntegrationTests.Infrastructure.Authentication.MarketActors;
 
-namespace Messaging.Application.OutgoingMessages;
-
-/// <summary>
-/// Service for looking up actor details
-/// </summary>
-public interface IActorLookup
+internal static class SampleData
 {
-    /// <summary>
-    /// Get actor unique id by actor number
-    /// </summary>
-    /// <param name="actorNumber"></param>
-    Task<Guid> GetIdByActorNumberAsync(string actorNumber);
+    internal static string ActorNumber => "1234567890123";
 
-    /// <summary>
-    /// Get actor number by id
-    /// </summary>
-    /// <param name="actorId"></param>
-    Task<string> GetActorNumberByIdAsync(Guid actorId);
+    internal static string StsAssignedUserId => "267DAC56-8CDC-43F8-BE16-91A297F37DE6";
 }
