@@ -110,6 +110,7 @@ namespace Messaging.Api
                         .AddPeekConfiguration(new BundleConfiguration(runtime.MAX_NUMBER_OF_PAYLOADS_IN_BUNDLE))
                         .AddRemoteBusinessService<DummyRequest, DummyReply>("Dummy", "Dummy")
                         .AddBearerAuthentication(tokenValidationParameters)
+                        .AddAuthentication()
                         .AddDatabaseConnectionFactory(databaseConnectionString!)
                         .AddSystemClock(new SystemDateTimeProvider())
                         .AddDatabaseContext(databaseConnectionString!)

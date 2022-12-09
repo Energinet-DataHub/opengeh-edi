@@ -85,7 +85,6 @@ namespace Messaging.Infrastructure.Configuration
             services.AddScoped<IMessageIds, MessageIdRegistry>();
             services.AddScoped(typeof(IMessageQueueDispatcher<>), typeof(MessageQueueDispatcher<>));
             services.AddScoped<IMoveInTransactionRepository, MoveInTransactionRepository>();
-            services.AddScoped<IMarketActorAuthenticator, MarketActorAuthenticator>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
             services.AddScoped<IMessageRequestNotifications, MessageRequestNotifications>();
@@ -135,6 +134,20 @@ namespace Messaging.Infrastructure.Configuration
         {
             _services.AddScoped<CurrentClaimsPrincipal>();
             _services.AddScoped(sp => new JwtTokenParser(tokenValidationParameters));
+            return this;
+        }
+
+        public CompositionRoot AddAuthentication(Func<IServiceProvider, IMarketActorAuthenticator>? authenticatorBuilder = null)
+        {
+            if (authenticatorBuilder is null)
+            {
+                _services.AddScoped<IMarketActorAuthenticator, MarketActorAuthenticator>();
+            }
+            else
+            {
+                _services.AddScoped(authenticatorBuilder);
+            }
+
             return this;
         }
 

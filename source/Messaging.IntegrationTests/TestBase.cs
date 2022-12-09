@@ -58,6 +58,7 @@ namespace Messaging.IntegrationTests
             _services.AddSingleton(
                 _ => new ServiceBusClient(CreateFakeServiceBusConnectionString()));
             CompositionRoot.Initialize(_services)
+                .AddAuthentication()
                 .AddPeekConfiguration(new BundleConfigurationStub())
                 .AddRemoteBusinessService<DummyRequest, DummyReply>(sp => new RemoteBusinessServiceRequestSenderSpy<DummyRequest>("Dummy"), "Dummy")
                 .AddDatabaseConnectionFactory(DatabaseFixture.ConnectionString)
