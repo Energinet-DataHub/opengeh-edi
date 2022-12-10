@@ -16,20 +16,28 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.Configuration.TimeEvents;
+using Messaging.Infrastructure.Configuration.FeatureFlag;
 
 namespace Messaging.Infrastructure.OutgoingMessages
 {
     public class PublishNewMessagesOnTimeHasPassed : INotificationHandler<TenSecondsHasHasPassed>
     {
         private readonly MessageAvailabilityPublisher _messageAvailabilityPublisher;
+        private readonly IFeatureFlagProvider _featureFlagProvider;
 
-        public PublishNewMessagesOnTimeHasPassed(MessageAvailabilityPublisher messageAvailabilityPublisher)
+        public PublishNewMessagesOnTimeHasPassed(MessageAvailabilityPublisher messageAvailabilityPublisher, IFeatureFlagProvider featureFlagProvider)
         {
             _messageAvailabilityPublisher = messageAvailabilityPublisher;
+            _featureFlagProvider = featureFlagProvider;
         }
 
         public Task Handle(TenSecondsHasHasPassed notification, CancellationToken cancellationToken)
         {
+            if (_featureFlagProvider.IsActorMessageQueueEnabled)
+            {
+                return Task.CompletedTask;
+            }
+
             return _messageAvailabilityPublisher.PublishAsync();
         }
     }
