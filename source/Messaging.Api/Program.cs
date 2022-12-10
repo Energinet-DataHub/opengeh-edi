@@ -24,11 +24,12 @@ using Messaging.Api.Configuration.Middleware.Authentication.MarketActors;
 using Messaging.Api.Configuration.Middleware.Correlation;
 using Messaging.Application.Actors;
 using Messaging.Application.Configuration;
-using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.CimMessageAdapter.Messages.Queues;
+using Messaging.Infrastructure.Actors;
 using Messaging.Infrastructure.Configuration;
+using Messaging.Infrastructure.Configuration.Authentication;
 using Messaging.Infrastructure.Configuration.MessageBus;
 using Messaging.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Messaging.Infrastructure.OutgoingMessages;
@@ -110,6 +111,17 @@ namespace Messaging.Api
                         .AddPeekConfiguration(new BundleConfiguration(runtime.MAX_NUMBER_OF_PAYLOADS_IN_BUNDLE))
                         .AddRemoteBusinessService<DummyRequest, DummyReply>("Dummy", "Dummy")
                         .AddBearerAuthentication(tokenValidationParameters)
+                        .AddAuthentication(sp =>
+                        {
+                            if (runtime.IsRunningLocally())
+                            {
+                                return new DevMarketActorAuthenticator(
+                                    sp.GetRequiredService<IActorLookup>(),
+                                    sp.GetRequiredService<IActorRegistry>());
+                            }
+
+                            return new MarketActorAuthenticator(sp.GetRequiredService<IActorLookup>());
+                        })
                         .AddDatabaseConnectionFactory(databaseConnectionString!)
                         .AddSystemClock(new SystemDateTimeProvider())
                         .AddDatabaseContext(databaseConnectionString!)
