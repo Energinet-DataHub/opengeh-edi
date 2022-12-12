@@ -33,7 +33,7 @@ public class DequeueRequestListener
 
     [Function("DequeueRequestListener")]
     public async Task<HttpResponseData> RunAsync(
-        [HttpTrigger(AuthorizationLevel.Function, "delete", Route = "dequeue/{messageId}"),]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "dequeue/{messageId}"),]
         HttpRequestData request,
         FunctionContext executionContext,
         Guid messageId)
