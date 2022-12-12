@@ -49,9 +49,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         var result = await InvokeCommandAsync(CreatePeekRequest(MessageCategory.AggregationData)).ConfigureAwait(false);
 
         Assert.Null(result.Bundle);
-        var hasBundleRegistered = await GetService<IDbConnectionFactory>().GetOpenConnection()
-            .ExecuteScalarAsync<int>("SELECT COUNT(*) FROM b2b.BundleStore");
-        Assert.Equal(0, hasBundleRegistered);
+        Assert.False(await BundleIsRegistered().ConfigureAwait(false));
     }
 
     [Fact]
@@ -203,5 +201,12 @@ public class WhenAPeekIsRequestedTests : TestBase
     {
         var bundleConfiguration = (BundleConfigurationStub)GetService<IBundleConfiguration>();
         bundleConfiguration.MaxNumberOfPayloadsInBundle = maxNumberOfPayloadsInBundle;
+    }
+
+    private async Task<bool> BundleIsRegistered()
+    {
+        var numberOfBundles = await GetService<IDbConnectionFactory>().GetOpenConnection()
+            .ExecuteScalarAsync<int>("SELECT COUNT(*) FROM b2b.BundleStore");
+        return numberOfBundles == 1;
     }
 }
