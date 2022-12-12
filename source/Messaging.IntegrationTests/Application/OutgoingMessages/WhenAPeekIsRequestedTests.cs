@@ -49,6 +49,9 @@ public class WhenAPeekIsRequestedTests : TestBase
         var result = await InvokeCommandAsync(CreatePeekRequest(MessageCategory.AggregationData)).ConfigureAwait(false);
 
         Assert.Null(result.Bundle);
+        var hasBundleRegistered = await GetService<IDbConnectionFactory>().GetOpenConnection()
+            .ExecuteScalarAsync<int>("SELECT COUNT(*) FROM b2b.BundleStore");
+        Assert.Equal(0, hasBundleRegistered);
     }
 
     [Fact]

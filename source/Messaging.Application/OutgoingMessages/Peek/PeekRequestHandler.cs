@@ -61,6 +61,7 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
 
         if (messages.Count == 0)
         {
+            await _bundleStore.UnregisterBundleAsync(bundleId).ConfigureAwait(false);
             return new PeekResult(null);
         }
 
