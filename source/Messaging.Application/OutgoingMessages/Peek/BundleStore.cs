@@ -113,6 +113,20 @@ public class BundleStore
         return result == 1;
     }
 
+    public Task UnregisterBundleAsync(BundleId bundleId)
+    {
+        ArgumentNullException.ThrowIfNull(bundleId);
+        return _connectionFactory
+            .GetOpenConnection().ExecuteAsync(
+                $"DELETE FROM b2b.BundleStore WHERE ActorNumber = @ActorNumber AND ActorRole = @ActorRole AND MessageCategory = @MessageCategory",
+                new
+                {
+                    @ActorNumber = bundleId.ReceiverNumber.Value,
+                    @ActorRole = bundleId.ReceiverRole.Name,
+                    @MessageCategory = bundleId.MessageCategory.Name,
+                });
+    }
+
     public async Task<DequeueResult> DequeueAsync(Guid messageId)
     {
         var bundleStoreQuery = await _connectionFactory.GetOpenConnection().QuerySingleOrDefaultAsync(
