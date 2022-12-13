@@ -5,10 +5,10 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["Messaging.PerformanceTest/Messaging.PerformanceTest.csproj", "Messaging.PerformanceTest/"]
-RUN dotnet restore "Messaging.PerformanceTest/Messaging.PerformanceTest.csproj"
+COPY ["Messaging.PerformanceTest.csproj", "."]
+RUN dotnet restore "Messaging.PerformanceTest.csproj"
 COPY . .
-WORKDIR "/src/Messaging.PerformanceTest"
+WORKDIR "/src/"
 RUN dotnet build "Messaging.PerformanceTest.csproj" -c Release -o /app/build
 
 FROM build AS publish
