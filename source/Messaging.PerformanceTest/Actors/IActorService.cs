@@ -24,5 +24,9 @@ public interface IActorService
     /// </summary>
     string? GetUniqueActorNumber();
 
+    /// <summary>
+    /// Get number of actor numbers
+    /// </summary>
+    /// <returns>Number of actor numbers available</returns>
     int GetActorCount();
 }

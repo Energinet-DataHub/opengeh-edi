@@ -1,4 +1,6 @@
 ﻿using System.Collections.Concurrent;
+using System.Xml.Linq;
+using System.Xml.XPath;
 using Messaging.PerformanceTest.Actors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -66,11 +68,21 @@ internal class MoveInService : IMoveInService, IDisposable
 
     public async Task MoveInAsync(string? uniqueActorNumber)
     {
+        ArgumentNullException.ThrowIfNull(uniqueActorNumber);
+        var moveInPayload = GetMoveInPayload(uniqueActorNumber);
         await _httpClient.PostAsync(new Uri($"http://localhost:7071/api/MoveIn/{uniqueActorNumber}"), null).ConfigureAwait(false);
     }
 
     public void Dispose()
     {
         _httpClient.Dispose();
+    }
+
+    private static string GetMoveInPayload(string uniqueActorNumber)
+    {
+        var xmlDocument = XDocument.Load($"MoveIn{Path.DirectorySeparatorChar}xml{Path.DirectorySeparatorChar}RequestChangeOfSupplier.xml");
+        var actorIdElement = xmlDocument.Descendants("receiver_MarketParticipant.mRID").FirstOrDefault();
+        if (actorIdElement is not null) actorIdElement.Value = uniqueActorNumber;
+        return xmlDocument.ToString(SaveOptions.DisableFormatting);
     }
 }
