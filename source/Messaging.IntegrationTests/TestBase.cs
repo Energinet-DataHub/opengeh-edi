@@ -22,7 +22,6 @@ using Messaging.Api.Configuration.Middleware.Correlation;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.Commands.Commands;
 using Messaging.Application.Configuration.TimeEvents;
-using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.MessageBus;
@@ -70,8 +69,7 @@ namespace Messaging.IntegrationTests
                     correlation.SetId(Guid.NewGuid().ToString());
                     return correlation;
                 })
-                .AddMessagePublishing(_ => new NewMessageAvailableNotifierSpy())
-                .AddMessageStorage(_ => new MessageStorageSpy())
+                .AddMessagePublishing()
                 .AddRequestHandler<TestCommandHandler>()
                 .AddHttpClientAdapter(_ => new HttpClientSpy())
                 .AddMoveInServices(
@@ -118,11 +116,6 @@ namespace Messaging.IntegrationTests
         protected Task<TResult> InvokeCommandAsync<TResult>(ICommand<TResult> command)
         {
             return GetService<IMediator>().Send(command);
-        }
-
-        protected Task SimulateTenSecondsHasPassedAsync()
-        {
-            return GetService<IMediator>().Publish(new TenSecondsHasHasPassed(GetService<ISystemDateTimeProvider>().Now()));
         }
 
         private static string CreateFakeServiceBusConnectionString()

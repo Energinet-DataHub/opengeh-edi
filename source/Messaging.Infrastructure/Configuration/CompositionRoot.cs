@@ -14,27 +14,18 @@
 
 using System;
 using System.Net.Http;
-using System.Runtime.CompilerServices;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
-using Energinet.DataHub.MessageHub.Client;
-using Energinet.DataHub.MessageHub.Client.DataAvailable;
-using Energinet.DataHub.MessageHub.Client.Factories;
-using Energinet.DataHub.MessageHub.Client.Peek;
-using Energinet.DataHub.MessageHub.Client.Storage;
-using Energinet.DataHub.MessageHub.Model.Peek;
 using MediatR;
 using MediatR.Registration;
 using Messaging.Application.Actors;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.Configuration.TimeEvents;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.OutgoingMessages.Common.Reasons;
 using Messaging.Application.OutgoingMessages.Peek;
-using Messaging.Application.OutgoingMessages.Requesting;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
@@ -61,7 +52,6 @@ using Messaging.Infrastructure.OutgoingMessages.GenericNotification;
 using Messaging.Infrastructure.OutgoingMessages.Peek;
 using Messaging.Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 using Messaging.Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
-using Messaging.Infrastructure.OutgoingMessages.Requesting;
 using Messaging.Infrastructure.Transactions;
 using Messaging.Infrastructure.Transactions.MoveIn;
 using Messaging.Infrastructure.Transactions.UpdateCustomer;
@@ -87,8 +77,6 @@ namespace Messaging.Infrastructure.Configuration
             services.AddScoped<IMoveInTransactionRepository, MoveInTransactionRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
-            services.AddScoped<IMessageRequestNotifications, MessageRequestNotifications>();
-            services.AddTransient<IRequestHandler<RequestMessages, Unit>, RequestMessagesHandler>();
             services.AddScoped<IFeatureFlagProvider, FeatureFlagProviderProvider>();
 
             AddMediatR();
@@ -177,46 +165,11 @@ namespace Messaging.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddMessagePublishing(Func<IServiceProvider, INewMessageAvailableNotifier> action)
+        public CompositionRoot AddMessagePublishing()
         {
-            _services.AddScoped(action);
             _services.AddSingleton<IActorLookup, ActorLookup>();
-            _services.AddScoped<MessageAvailabilityPublisher>();
             _services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
             _services.AddScoped<OutgoingMessageEnqueuer>();
-            return this;
-        }
-
-        public CompositionRoot AddMessageStorage(Func<IServiceProvider, IMessageStorage> action)
-        {
-            _services.AddSingleton(action);
-            return this;
-        }
-
-        public CompositionRoot AddMessageHubServices(string storageServiceConnectionString, string storageServiceContainerName, string queueConnectionString, string dataAvailableQueue, string domainReplyQueue)
-        {
-            _services.AddSingleton<StorageConfig>(s => new StorageConfig(storageServiceContainerName));
-            _services.AddSingleton<IRequestBundleParser, RequestBundleParser>();
-            _services.AddSingleton<IResponseBundleParser, ResponseBundleParser>();
-            _services.AddSingleton<IStorageServiceClientFactory>(s => new StorageServiceClientFactory(storageServiceConnectionString));
-            _services.AddSingleton<IStorageHandler, StorageHandler>();
-
-            _services.AddSingleton<IServiceBusClientFactory>(_ => new ServiceBusClientFactory(queueConnectionString));
-            _services.AddSingleton<IMessageBusFactory, AzureServiceBusFactory>();
-            _services.AddSingleton<IDataAvailableNotificationSender, DataAvailableNotificationSender>();
-            _services.AddSingleton<IDataBundleResponseSender, DataBundleResponseSender>();
-            _services.AddSingleton(_ => new MessageHubConfig(dataAvailableQueue, domainReplyQueue));
-            _services.AddTransient<IRequestHandler<SendSuccessNotification, Unit>, SendSuccessNotificationHandler>();
-            _services.AddTransient<IRequestHandler<SendFailureNotification, Unit>, SendFailureNotificationHandler>();
-
-            return this;
-        }
-
-        public CompositionRoot AddRequestHandler<TRequestHandler>()
-            where TRequestHandler : class
-        {
-            _services.AddTransient<TRequestHandler>();
-
             return this;
         }
 
@@ -254,6 +207,14 @@ namespace Messaging.Infrastructure.Configuration
         {
             _services.AddSingleton(adapterBuilder);
             AddRemoteBusinessService<TRequest, TReply>(responseQueueName);
+            return this;
+        }
+
+        public CompositionRoot AddRequestHandler<TRequestHandler>()
+            where TRequestHandler : class
+        {
+            _services.AddTransient<TRequestHandler>();
+
             return this;
         }
 
