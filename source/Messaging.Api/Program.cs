@@ -17,13 +17,10 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.MessageHub.Client.DataAvailable;
-using Energinet.DataHub.MessageHub.Client.Storage;
 using Messaging.Api.Configuration.Middleware.Authentication.Bearer;
 using Messaging.Api.Configuration.Middleware.Authentication.MarketActors;
 using Messaging.Api.Configuration.Middleware.Correlation;
 using Messaging.Application.Actors;
-using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.CimMessageAdapter.Messages.Queues;
@@ -32,8 +29,6 @@ using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Authentication;
 using Messaging.Infrastructure.Configuration.MessageBus;
 using Messaging.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
-using Messaging.Infrastructure.OutgoingMessages;
-using Messaging.Infrastructure.OutgoingMessages.Requesting;
 using Messaging.Infrastructure.Transactions;
 using Messaging.Infrastructure.Transactions.MoveIn;
 using Microsoft.Azure.Functions.Worker;
@@ -136,22 +131,7 @@ namespace Messaging.Api
                         .AddRequestLogging(
                             runtime.REQUEST_RESPONSE_LOGGING_CONNECTION_STRING!,
                             runtime.REQUEST_RESPONSE_LOGGING_CONTAINER_NAME!)
-                        .AddMessageStorage(sp =>
-                        {
-                            var storageHandler = sp.GetRequiredService<IStorageHandler>();
-                            return new MessageStorage(storageHandler);
-                        })
-                        .AddMessagePublishing(sp =>
-                            new NewMessageAvailableNotifier(
-                                sp.GetRequiredService<IDataAvailableNotificationSender>(),
-                                sp.GetRequiredService<IActorLookup>(),
-                                sp.GetRequiredService<ICorrelationContext>()))
-                        .AddMessageHubServices(
-                            runtime.MESSAGEHUB_STORAGE_CONNECTION_STRING!,
-                            runtime.MESSAGEHUB_STORAGE_CONTAINER_NAME!,
-                            runtime.MESSAGEHUB_QUEUE_CONNECTION_STRING!,
-                            runtime.MESSAGEHUB_DATA_AVAILABLE_QUEUE!,
-                            runtime.MESSAGEHUB_DOMAIN_REPLY_QUEUE!)
+                        .AddMessagePublishing()
                         .AddHttpClientAdapter(sp => new HttpClientAdapter(sp.GetRequiredService<HttpClient>()))
                         .AddMoveInServices(
                             new MoveInSettings(
