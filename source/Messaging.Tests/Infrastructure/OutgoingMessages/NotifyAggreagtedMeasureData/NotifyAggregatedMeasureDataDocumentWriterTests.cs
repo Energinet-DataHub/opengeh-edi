@@ -63,6 +63,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             .HasAttributeValue("sender_MarketParticipant.mRID", "codingScheme", "A10")
             .HasValue("sender_MarketParticipant.marketRole.type", header.SenderRole)
             .HasValue("receiver_MarketParticipant.mRID", header.ReceiverId)
+            .HasAttributeValue("receiver_MarketParticipant.mRID", "codingScheme", "A10")
             .HasValue("receiver_MarketParticipant.marketRole.type", header.ReceiverRole)
             .HasValue("createdDateTime", header.TimeStamp.ToString());
     }
