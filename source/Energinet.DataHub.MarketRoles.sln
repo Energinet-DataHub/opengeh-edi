@@ -47,6 +47,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.Domain", "Messagi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequestResponse", "RequestResponse\source\RequestResponse\RequestResponse.csproj", "{6A9A18B6-9445-45A0-813D-B7143DB9BC74}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Messaging.PerformanceTest", "Messaging.PerformanceTest\Messaging.PerformanceTest.csproj", "{B021EA3C-AB51-4069-AE26-B1F907A0D165}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -129,6 +131,10 @@ Global
 		{6A9A18B6-9445-45A0-813D-B7143DB9BC74}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A9A18B6-9445-45A0-813D-B7143DB9BC74}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6A9A18B6-9445-45A0-813D-B7143DB9BC74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B021EA3C-AB51-4069-AE26-B1F907A0D165}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B021EA3C-AB51-4069-AE26-B1F907A0D165}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B021EA3C-AB51-4069-AE26-B1F907A0D165}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B021EA3C-AB51-4069-AE26-B1F907A0D165}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -150,6 +156,7 @@ Global
 		{87BCDB76-76A4-46A3-9F67-571847541C90} = {1C877C68-8E3D-4371-B96A-7360850A538E}
 		{0229A857-9C48-4D36-A4DF-6576FC6692EF} = {582BFE4E-BBFB-4CBE-840D-2F97C2BA1D3C}
 		{093FBBA9-B7CF-411E-93DA-2B743FA153AB} = {1C877C68-8E3D-4371-B96A-7360850A538E}
+		{B021EA3C-AB51-4069-AE26-B1F907A0D165} = {1C877C68-8E3D-4371-B96A-7360850A538E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D7925810-FA85-4F9E-A124-72F36BAEB9F0}
