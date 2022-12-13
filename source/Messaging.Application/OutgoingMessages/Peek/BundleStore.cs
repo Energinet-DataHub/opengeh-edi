@@ -15,15 +15,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages.Dequeue;
-using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.OutgoingMessages.Peek;
 using Microsoft.Data.SqlClient;
 
 namespace Messaging.Application.OutgoingMessages.Peek;
@@ -42,10 +39,9 @@ public class BundleStore
     {
         ArgumentNullException.ThrowIfNull(bundleId);
 
-        var command = CreateCommand($"SELECT Bundle FROM b2b.BundleStore WHERE ActorNumber = @ActorNumber AND ActorRole = @ActorRole AND MessageCategory = @MessageCategory", new List<KeyValuePair<string, object>>
+        var command = CreateCommand($"SELECT Bundle FROM b2b.BundleStore WHERE ActorNumber = @ActorNumber AND MessageCategory = @MessageCategory", new List<KeyValuePair<string, object>>
         {
             new("@ActorNumber", bundleId.ReceiverNumber.Value),
-            new("@ActorRole", bundleId.ReceiverRole.Name),
             new("@MessageCategory", bundleId.MessageCategory.Name),
         });
 
@@ -72,14 +68,12 @@ public class BundleStore
             @$"UPDATE [B2B].[BundleStore]
                      SET Bundle = @Bundle, MessageId = @MessageId, MessageIdsIncluded = @MessageIdsIncluded
                      WHERE ActorNumber = @ActorNumber
-                     AND  ActorRole = @ActorRole
                      AND MessageCategory = @MessageCategory
                      AND Bundle IS NULL
                      AND MessageId IS NULL",
             new List<KeyValuePair<string, object>>()
             {
                 new("@ActorNumber", bundleId.ReceiverNumber.Value),
-                new("@ActorRole", bundleId.ReceiverRole.Name),
                 new("@MessageCategory", bundleId.MessageCategory.Name),
                 new("@Bundle", document),
                 new("@MessageId", messageId),
@@ -90,7 +84,7 @@ public class BundleStore
 
         ResetBundleStream(document);
 
-        if (result == 0) throw new BundleException($"Fail to store bundle on registration: {bundleId.MessageCategory.Name}, {bundleId.ReceiverNumber.Value}, {bundleId.ReceiverRole.Name}");
+        if (result == 0) throw new BundleException($"Fail to store bundle on registration: {bundleId.MessageCategory.Name}, {bundleId.ReceiverNumber.Value}");
     }
 
     public async Task<bool> TryRegisterBundleAsync(
@@ -100,12 +94,11 @@ public class BundleStore
 
         var result = await _connectionFactory
             .GetOpenConnection().ExecuteAsync(
-                $"IF NOT EXISTS (SELECT * FROM b2b.BundleStore WHERE ActorNumber = @ActorNumber AND ActorRole = @ActorRole AND MessageCategory = @MessageCategory)" +
-                $"INSERT INTO b2b.BundleStore(ActorNUmber, ActorRole, MessageCategory) VALUES(@ActorNumber, @ActorRole, @MessageCategory)",
+                $"IF NOT EXISTS (SELECT * FROM b2b.BundleStore WHERE ActorNumber = @ActorNumber AND MessageCategory = @MessageCategory)" +
+                $"INSERT INTO b2b.BundleStore(ActorNUmber, MessageCategory) VALUES(@ActorNumber, @MessageCategory)",
                 new
                 {
                     @ActorNumber = bundleId.ReceiverNumber.Value,
-                    @ActorRole = bundleId.ReceiverRole.Name,
                     @MessageCategory = bundleId.MessageCategory.Name,
                 })
             .ConfigureAwait(false);
@@ -118,11 +111,10 @@ public class BundleStore
         ArgumentNullException.ThrowIfNull(bundleId);
         return _connectionFactory
             .GetOpenConnection().ExecuteAsync(
-                $"DELETE FROM b2b.BundleStore WHERE ActorNumber = @ActorNumber AND ActorRole = @ActorRole AND MessageCategory = @MessageCategory",
+                $"DELETE FROM b2b.BundleStore WHERE ActorNumber = @ActorNumber AND MessageCategory = @MessageCategory",
                 new
                 {
                     @ActorNumber = bundleId.ReceiverNumber.Value,
-                    @ActorRole = bundleId.ReceiverRole.Name,
                     @MessageCategory = bundleId.MessageCategory.Name,
                 });
     }

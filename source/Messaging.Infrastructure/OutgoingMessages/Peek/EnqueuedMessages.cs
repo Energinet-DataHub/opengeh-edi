@@ -14,16 +14,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Domain.Actors;
-using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.Peek;
-using Messaging.Domain.SeedWork;
 
 namespace Messaging.Infrastructure.OutgoingMessages.Peek;
 
@@ -38,13 +35,12 @@ public class EnqueuedMessages : IEnqueuedMessages
         _bundleConfiguration = bundleConfiguration;
     }
 
-    public async Task<IEnumerable<EnqueuedMessage>> GetByAsync(ActorNumber actorNumber, MarketRole actorRole, MessageCategory messageCategory)
+    public async Task<IEnumerable<EnqueuedMessage>> GetByAsync(ActorNumber actorNumber, MessageCategory messageCategory)
     {
         ArgumentNullException.ThrowIfNull(messageCategory);
-        ArgumentNullException.ThrowIfNull(actorRole);
         ArgumentNullException.ThrowIfNull(actorNumber);
 
-        var oldestMessage = await FindOldestMessageAsync(actorNumber, actorRole, messageCategory).ConfigureAwait(false);
+        var oldestMessage = await FindOldestMessageAsync(actorNumber, messageCategory).ConfigureAwait(false);
 
         if (oldestMessage is null)
         {
@@ -67,7 +63,7 @@ public class EnqueuedMessages : IEnqueuedMessages
             .GetOpenConnection()
             .QueryAsync<EnqueuedMessage>(sqlStatement, new
             {
-                ReceiverRole = actorRole.Name,
+                ReceiverRole = oldestMessage.ReceiverRole,
                 ProcessType = oldestMessage.ProcessType,
                 DocumentType = oldestMessage.DocumentType,
                 MessageCategory = messageCategory.Name,
@@ -75,21 +71,20 @@ public class EnqueuedMessages : IEnqueuedMessages
             }).ConfigureAwait(false);
     }
 
-    private async Task<OldestMessage?> FindOldestMessageAsync(ActorNumber actorNumber, MarketRole actorRole, MessageCategory messageCategory)
+    private async Task<OldestMessage?> FindOldestMessageAsync(ActorNumber actorNumber, MessageCategory messageCategory)
     {
         return await _connectionFactory
             .GetOpenConnection()
             .QuerySingleOrDefaultAsync<OldestMessage>(
-                @$"SELECT TOP(1) {nameof(OldestMessage.ProcessType)}, {nameof(OldestMessage.DocumentType)} FROM [b2b].[EnqueuedMessages]
-                WHERE ReceiverId = @ReceiverId AND ReceiverRole = @ReceiverRole AND MessageCategory = @MessageCategory",
+                @$"SELECT TOP(1) {nameof(OldestMessage.ProcessType)}, {nameof(OldestMessage.DocumentType)}, {nameof(OldestMessage.ReceiverRole)} FROM [b2b].[EnqueuedMessages]
+                WHERE ReceiverId = @ReceiverId AND MessageCategory = @MessageCategory",
                 new
             {
-                ReceiverRole = actorRole.Name,
                 MessageCategory = messageCategory.Name,
                 ReceiverId = actorNumber.Value,
             })
             .ConfigureAwait(false);
     }
 
-    private record OldestMessage(string ProcessType, string DocumentType);
+    private record OldestMessage(string ProcessType, string DocumentType, string ReceiverRole);
 }
