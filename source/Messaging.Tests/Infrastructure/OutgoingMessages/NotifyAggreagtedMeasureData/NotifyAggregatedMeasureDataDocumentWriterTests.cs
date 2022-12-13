@@ -56,7 +56,14 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
 
         AssertXmlDocument
             .Document(message, NamespacePrefix)
-            .HasValue("type", "E31");
+            .HasValue("type", "E31")
+            .HasValue("mRID", header.MessageId)
+            .HasValue("process.processType", header.ProcessType)
+            .HasValue("sender_MarketParticipant.mRID", header.SenderId)
+            .HasValue("sender_MarketParticipant.marketRole.type", header.SenderRole)
+            .HasValue("receiver_MarketParticipant.mRID", header.ReceiverId)
+            .HasValue("receiver_MarketParticipant.marketRole.type", header.ReceiverRole)
+            .HasValue("createdDateTime", header.TimeStamp.ToString());
     }
 
     private Task<XmlSchema?> GetSchema()
