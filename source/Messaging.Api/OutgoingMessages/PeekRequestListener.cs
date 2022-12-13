@@ -17,10 +17,8 @@ using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.OutgoingMessages.Peek;
-using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages.Peek;
 using Messaging.Domain.SeedWork;
-using Messaging.Infrastructure.IncomingMessages;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 
@@ -50,8 +48,7 @@ public class PeekRequestListener
         var result = await _mediator.Send(
             new PeekRequest(
                 _authenticator.CurrentIdentity.Number,
-                EnumerationType.FromName<MessageCategory>(messageCategory),
-                _authenticator.CurrentIdentity.Role!))
+                EnumerationType.FromName<MessageCategory>(messageCategory)))
             .ConfigureAwait(false);
 
         var response = HttpResponseData.CreateResponse(request);

@@ -196,8 +196,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         {
             var peekResult = await InvokeCommandAsync(new PeekRequest(
                 rejectMessage.ReceiverId,
-                MessageCategory.MasterData,
-                rejectMessage.ReceiverRole));
+                MessageCategory.MasterData));
 
             await ValidateDocument(peekResult.Bundle!, "rejectrequestchangeofsupplier", "0.1").ConfigureAwait(false);
 
@@ -209,8 +208,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         {
             var peekResult = await InvokeCommandAsync(new PeekRequest(
                 ActorNumber.Create(SampleData.NewEnergySupplierNumber),
-                MessageCategory.MasterData,
-                MarketRole.EnergySupplier));
+                MessageCategory.MasterData));
 
             await ValidateDocument(peekResult.Bundle!, "confirmrequestchangeofsupplier", "0.1").ConfigureAwait(false);
 
