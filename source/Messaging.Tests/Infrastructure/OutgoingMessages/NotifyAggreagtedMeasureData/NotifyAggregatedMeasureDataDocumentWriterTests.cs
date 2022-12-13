@@ -14,17 +14,21 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Schema;
+using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.SchemaStore;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 using Messaging.Tests.Infrastructure.OutgoingMessages.Asserts;
 using NodaTime;
 using Xunit;
+using Period = Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData.Period;
 
 namespace Messaging.Tests.Infrastructure.OutgoingMessages.NotifyAggreagtedMeasureData;
 
@@ -32,12 +36,14 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
 {
     private const string NamespacePrefix = "cim";
     private readonly IDocumentWriter _documentWriter;
-    private ISchemaProvider _schemaProvider;
+    private readonly ISchemaProvider _schemaProvider;
+    private readonly IMarketActivityRecordParser _parser;
 
     public NotifyAggregatedMeasureDataDocumentWriterTests()
     {
+        _parser = new MarketActivityRecordParser(new Serializer());
         _schemaProvider = new XmlSchemaProvider();
-        _documentWriter = new NotifyAggregatedMeasureDataDocumentWriter(new MarketActivityRecordParser(new Serializer()));
+        _documentWriter = new NotifyAggregatedMeasureDataDocumentWriter(_parser);
     }
 
     [Fact]
@@ -52,9 +58,26 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             Guid.NewGuid().ToString(),
             SystemClock.Instance.GetCurrentInstant());
 
-        var message = await _documentWriter.WriteAsync(header, new List<string>()).ConfigureAwait(false);
+        var timeSeries = new List<TimeSeries>()
+        {
+            new(
+                Guid.NewGuid(),
+                "E18",
+                "KWH",
+                new Period(
+                    "PT1H",
+                    new TimeInterval(
+                        "2022-02-12T23:00Z",
+                        "2022-02-12T23:00Z"),
+                    new List<Point>()
+                    {
+                        new(1, 11, "A05"),
+                    })),
+        };
 
-        AssertXmlDocument
+        var message = await _documentWriter.WriteAsync(header, timeSeries.Select(record => _parser.From(record)).ToList()).ConfigureAwait(false);
+
+        await AssertXmlDocument
             .Document(message, NamespacePrefix)
             .HasValue("type", "E31")
             .HasValue("mRID", header.MessageId)
@@ -65,12 +88,12 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             .HasValue("receiver_MarketParticipant.mRID", header.ReceiverId)
             .HasAttributeValue("receiver_MarketParticipant.mRID", "codingScheme", "A10")
             .HasValue("receiver_MarketParticipant.marketRole.type", header.ReceiverRole)
-            .HasValue("createdDateTime", header.TimeStamp.ToString());
+            .HasValue("createdDateTime", header.TimeStamp.ToString())
+            .HasValidStructureAsync((await GetSchema().ConfigureAwait(false))!).ConfigureAwait(false);
     }
 
     private Task<XmlSchema?> GetSchema()
     {
-        _schemaProvider = new XmlSchemaProvider();
         return _schemaProvider.GetSchemaAsync<XmlSchema>("notifyaggregatedmeasuredata", "0.1");
     }
 }

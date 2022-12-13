@@ -111,6 +111,10 @@ limitations under the License.
       <None Include="SchemaStore\Schemas\Xml\urn-ediel-org-structure-requestchangeaccountingpointcharacteristics-0-1.xsd">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Remove="SchemaStore\Schemas\Xml\urn-ediel-org-measure-notifyaggregatedmeasuredata-0-1.xsd" />
+      <EmbeddedResource Include="SchemaStore\Schemas\Xml\urn-ediel-org-measure-notifyaggregatedmeasuredata-0-1.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
     </ItemGroup>
 
 </Project>

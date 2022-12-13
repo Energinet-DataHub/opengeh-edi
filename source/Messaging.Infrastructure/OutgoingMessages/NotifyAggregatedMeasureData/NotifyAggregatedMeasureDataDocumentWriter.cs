@@ -12,11 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading.Tasks;
 using System.Xml;
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.OutgoingMessages.Common.Xml;
+using Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Messaging.Infrastructure.OutgoingMessages.Common.Xml;
 
 namespace Messaging.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
@@ -36,8 +39,45 @@ public class NotifyAggregatedMeasureDataDocumentWriter : DocumentWriter
     {
     }
 
-    protected override Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer)
+    protected override async Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer)
     {
-        return Task.CompletedTask;
+        ArgumentNullException.ThrowIfNull(marketActivityPayloads);
+        ArgumentNullException.ThrowIfNull(writer);
+
+        foreach (var timeSeries in ParseFrom<TimeSeries>(marketActivityPayloads))
+        {
+            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Series", null).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, timeSeries.Id.ToString()).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "marketEvaluationPoint.type", null, timeSeries.MeteringPointType).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity_Measure_Unit.name", null, timeSeries.MeasureUnitType).ConfigureAwait(false);
+
+            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Period", null).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "resolution", null, timeSeries.Period.Resolution).ConfigureAwait(false);
+
+            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "timeInterval", null).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "start", null, timeSeries.Period.TimeInterval.Start.ToString()).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "end", null, timeSeries.Period.TimeInterval.End.ToString()).ConfigureAwait(false);
+            await writer.WriteEndElementAsync().ConfigureAwait(false);
+
+            foreach (var point in timeSeries.Period.Point)
+            {
+                await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Point", null).ConfigureAwait(false);
+                await writer.WriteElementStringAsync(DocumentDetails.Prefix, "position", null, point.Position.ToString(NumberFormatInfo.InvariantInfo)).ConfigureAwait(false);
+                if (point.Quantity is not null)
+                {
+                    await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity", null, point.Quantity.ToString()!).ConfigureAwait(false);
+                }
+
+                if (point.Quality is not null)
+                {
+                    await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quality", null, point.Quality).ConfigureAwait(false);
+                }
+
+                await writer.WriteEndElementAsync().ConfigureAwait(false);
+            }
+
+            await writer.WriteEndElementAsync().ConfigureAwait(false);
+            await writer.WriteEndElementAsync().ConfigureAwait(false);
+        }
     }
 }
