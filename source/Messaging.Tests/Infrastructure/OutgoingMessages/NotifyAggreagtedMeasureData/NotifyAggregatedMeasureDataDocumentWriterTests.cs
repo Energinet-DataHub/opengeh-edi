@@ -60,6 +60,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             .HasValue("mRID", header.MessageId)
             .HasValue("process.processType", header.ProcessType)
             .HasValue("sender_MarketParticipant.mRID", header.SenderId)
+            .HasAttributeValue("sender_MarketParticipant.mRID", "codingScheme", "A10")
             .HasValue("sender_MarketParticipant.marketRole.type", header.SenderRole)
             .HasValue("receiver_MarketParticipant.mRID", header.ReceiverId)
             .HasValue("receiver_MarketParticipant.marketRole.type", header.ReceiverRole)
