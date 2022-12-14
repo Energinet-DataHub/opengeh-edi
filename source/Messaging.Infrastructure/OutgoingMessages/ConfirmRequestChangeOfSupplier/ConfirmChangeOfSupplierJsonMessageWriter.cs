@@ -18,19 +18,19 @@ using System.IO;
 using System.Threading.Tasks;
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Infrastructure.OutgoingMessages.Common.Json;
 using Newtonsoft.Json;
 
-namespace Messaging.Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
+namespace Messaging.Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 
-public class RejectRequestChangeOfSupplierJsonDocumentWriter : IDocumentWriter
+public class ConfirmChangeOfSupplierJsonMessageWriter : IMessageWriter
 {
-    private const string DocumentType = "RejectRequestChangeOfSupplier_MarketDocument";
+    private const string DocumentType = "ConfirmRequestChangeOfSupplier_MarketDocument";
     private const string TypeCode = "414";
     private readonly IMarketActivityRecordParser _parser;
 
-    public RejectRequestChangeOfSupplierJsonDocumentWriter(IMarketActivityRecordParser parser)
+    public ConfirmChangeOfSupplierJsonMessageWriter(IMarketActivityRecordParser parser)
     {
         _parser = parser;
     }
@@ -53,16 +53,12 @@ public class RejectRequestChangeOfSupplierJsonDocumentWriter : IDocumentWriter
         using var writer = new JsonTextWriter(streamWriter);
 
         WriteHeader(header, writer);
-        WriteMarketActitivyRecords(marketActivityRecords, writer);
+        WriteMarketActivityRecords(marketActivityRecords, writer);
         WriteEnd(writer);
+        writer.Flush();
         await streamWriter.FlushAsync().ConfigureAwait(false);
         stream.Position = 0;
         return stream;
-    }
-
-    private static void WriteHeader(MessageHeader header, JsonTextWriter writer)
-    {
-        JsonHeaderWriter.Write(header, DocumentType, TypeCode, "A02", writer);
     }
 
     private static void WriteEnd(JsonTextWriter writer)
@@ -70,7 +66,12 @@ public class RejectRequestChangeOfSupplierJsonDocumentWriter : IDocumentWriter
         writer.WriteEndObject();
     }
 
-    private void WriteMarketActitivyRecords(IReadOnlyCollection<string> marketActivityRecords, JsonTextWriter writer)
+    private static void WriteHeader(MessageHeader header, JsonTextWriter writer)
+    {
+        JsonHeaderWriter.Write(header, DocumentType, TypeCode, "A01", writer);
+    }
+
+    private void WriteMarketActivityRecords(IReadOnlyCollection<string> marketActivityRecords, JsonTextWriter writer)
     {
         if (marketActivityRecords == null) throw new ArgumentNullException(nameof(marketActivityRecords));
         if (writer == null) throw new ArgumentNullException(nameof(writer));
@@ -83,7 +84,6 @@ public class RejectRequestChangeOfSupplierJsonDocumentWriter : IDocumentWriter
             writer.WriteStartObject();
             writer.WritePropertyName("mRID");
             writer.WriteValue(marketActivityRecord.Id);
-
             writer.WritePropertyName("marketEvaluationPoint.mRID");
             writer.WriteStartObject();
             writer.WritePropertyName("codingScheme");
@@ -91,27 +91,8 @@ public class RejectRequestChangeOfSupplierJsonDocumentWriter : IDocumentWriter
             writer.WritePropertyName("value");
             writer.WriteValue(marketActivityRecord.MarketEvaluationPointId);
             writer.WriteEndObject();
-
             writer.WritePropertyName("originalTransactionIDReference_MktActivityRecord.mRID");
             writer.WriteValue(marketActivityRecord.OriginalTransactionId);
-
-            writer.WritePropertyName("Reason");
-            writer.WriteStartArray();
-
-            foreach (var reason in marketActivityRecord.Reasons)
-            {
-                writer.WriteStartObject();
-                writer.WritePropertyName("code");
-                writer.WriteStartObject();
-                writer.WritePropertyName("value");
-                writer.WriteValue(reason.Code);
-                writer.WriteEndObject();
-                writer.WritePropertyName("text");
-                writer.WriteValue(reason.Text);
-                writer.WriteEndObject();
-            }
-
-            writer.WriteEndArray();
             writer.WriteEndObject();
         }
 

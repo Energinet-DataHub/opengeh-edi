@@ -36,7 +36,7 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.RejectRequestChangeOfS
 public class JsonDocumentWriterTests
 {
     private const string DocumentType = "RejectRequestChangeOfSupplier_MarketDocument";
-    private readonly RejectRequestChangeOfSupplierJsonDocumentWriter _documentWriter;
+    private readonly RejectRequestChangeOfSupplierJsonMessageWriter _messageWriter;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMarketActivityRecordParser _marketActivityRecordParser;
     private readonly JsonSchemaProvider _schemaProvider;
@@ -45,7 +45,7 @@ public class JsonDocumentWriterTests
     {
         _systemDateTimeProvider = new SystemDateTimeProvider();
         _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
-        _documentWriter = new RejectRequestChangeOfSupplierJsonDocumentWriter(_marketActivityRecordParser);
+        _messageWriter = new RejectRequestChangeOfSupplierJsonMessageWriter(_marketActivityRecordParser);
         _schemaProvider = new JsonSchemaProvider(new CimJsonSchemas());
     }
 
@@ -68,7 +68,7 @@ public class JsonDocumentWriterTests
             }),
         };
 
-        var message = await _documentWriter.WriteAsync(
+        var message = await _messageWriter.WriteAsync(
             header,
             marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
 

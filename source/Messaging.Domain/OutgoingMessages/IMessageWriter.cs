@@ -17,22 +17,22 @@ namespace Messaging.Domain.OutgoingMessages;
 /// <summary>
 /// Writes CIM documents
 /// </summary>
-public interface IDocumentWriter
+public interface IMessageWriter
 {
     /// <summary>
-    /// Determine if specificed CIM format can be handled by document writer
+    /// Determine if specificed CIM format can be handled by message writer
     /// </summary>
     /// <param name="format"></param>
     bool HandlesDocumentFormat(CimFormat format);
 
     /// <summary>
-    /// Determine if specified document type can be handles by the writer
+    /// Determine if specified message type can be handles by the writer
     /// </summary>
     /// <param name="messageType"></param>
     bool HandlesDocumentType(MessageType messageType);
 
     /// <summary>
-    /// Writes the document
+    /// Writes the message
     /// </summary>
     /// <param name="header"></param>
     /// <param name="marketActivityRecords"></param>

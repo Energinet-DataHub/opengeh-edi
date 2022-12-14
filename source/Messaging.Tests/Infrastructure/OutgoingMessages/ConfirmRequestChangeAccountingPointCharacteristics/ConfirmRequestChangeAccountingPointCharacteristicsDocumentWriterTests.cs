@@ -35,7 +35,7 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.ConfirmRequestChangeAc
 
 public class ConfirmRequestChangeAccountingPointCharacteristicsDocumentWriterTests
 {
-    private readonly ConfirmRequestChangeAccountingPointCharacteristicsDocumentWriter _documentWriter;
+    private readonly ConfirmRequestChangeAccountingPointCharacteristicsMessageWriter _messageWriter;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMarketActivityRecordParser _marketActivityRecordParser;
     private ISchemaProvider? _schemaProvider;
@@ -44,7 +44,7 @@ public class ConfirmRequestChangeAccountingPointCharacteristicsDocumentWriterTes
     {
         _systemDateTimeProvider = new SystemDateTimeProvider();
         _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
-        _documentWriter = new ConfirmRequestChangeAccountingPointCharacteristicsDocumentWriter(_marketActivityRecordParser);
+        _messageWriter = new ConfirmRequestChangeAccountingPointCharacteristicsMessageWriter(_marketActivityRecordParser);
     }
 
     [Fact]
@@ -56,7 +56,7 @@ public class ConfirmRequestChangeAccountingPointCharacteristicsDocumentWriterTes
             new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId"),
             new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId"),
         };
-        var message = await _documentWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
+        var message = await _messageWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
         await AssertMessage(message, header, marketActivityRecords).ConfigureAwait(false);
     }
 

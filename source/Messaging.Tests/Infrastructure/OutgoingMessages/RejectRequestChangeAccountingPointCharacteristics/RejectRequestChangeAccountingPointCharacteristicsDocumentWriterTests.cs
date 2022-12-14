@@ -36,7 +36,7 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.RejectRequestChangeAcc
 
 public class RejectRequestChangeAccountingPointCharacteristicsDocumentWriterTests
 {
-    private readonly RejectRequestChangeAccountingPointCharacteristicsDocumentWriter _xmlDocumentWriter;
+    private readonly RejectRequestChangeAccountingPointCharacteristicsMessageWriter _xmlMessageWriter;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMarketActivityRecordParser _marketActivityRecordParser;
     private ISchemaProvider? _schemaProvider;
@@ -45,7 +45,7 @@ public class RejectRequestChangeAccountingPointCharacteristicsDocumentWriterTest
     {
         _systemDateTimeProvider = new SystemDateTimeProvider();
         _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
-        _xmlDocumentWriter = new RejectRequestChangeAccountingPointCharacteristicsDocumentWriter(_marketActivityRecordParser);
+        _xmlMessageWriter = new RejectRequestChangeAccountingPointCharacteristicsMessageWriter(_marketActivityRecordParser);
     }
 
     [Fact]
@@ -67,7 +67,7 @@ public class RejectRequestChangeAccountingPointCharacteristicsDocumentWriterTest
             }),
         };
 
-        var message = await _xmlDocumentWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
+        var message = await _xmlMessageWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
 
         await AssertMessage(message, header, marketActivityRecords).ConfigureAwait(false);
     }

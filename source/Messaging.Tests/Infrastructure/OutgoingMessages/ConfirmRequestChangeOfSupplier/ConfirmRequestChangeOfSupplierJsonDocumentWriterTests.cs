@@ -36,7 +36,7 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.ConfirmRequestChangeOf
 public class ConfirmRequestChangeOfSupplierJsonDocumentWriterTests
 {
     private const string DocumentType = "ConfirmRequestChangeOfSupplier_MarketDocument";
-    private readonly ConfirmChangeOfSupplierJsonDocumentWriter _documentWriter;
+    private readonly ConfirmChangeOfSupplierJsonMessageWriter _messageWriter;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMarketActivityRecordParser _marketActivityRecordParser;
     private JsonSchemaProvider _schemaProvider;
@@ -45,7 +45,7 @@ public class ConfirmRequestChangeOfSupplierJsonDocumentWriterTests
     {
         _systemDateTimeProvider = new SystemDateTimeProvider();
         _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
-        _documentWriter = new ConfirmChangeOfSupplierJsonDocumentWriter(_marketActivityRecordParser);
+        _messageWriter = new ConfirmChangeOfSupplierJsonMessageWriter(_marketActivityRecordParser);
         _schemaProvider = new JsonSchemaProvider(new CimJsonSchemas());
     }
 
@@ -57,7 +57,7 @@ public class ConfirmRequestChangeOfSupplierJsonDocumentWriterTests
         {
             new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId"),
         };
-        var message = await _documentWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
+        var message = await _messageWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
         await AssertMessage(message, header, marketActivityRecords).ConfigureAwait(false);
     }
 

@@ -18,23 +18,23 @@ using System.Threading.Tasks;
 using System.Xml;
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.OutgoingMessages.Common.Xml;
-using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
+using Messaging.Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 using Messaging.Infrastructure.OutgoingMessages.Common.Xml;
 
-namespace Messaging.Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier;
+namespace Messaging.Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 
-public class ConfirmChangeOfSupplierXmlDocumentWriter : DocumentWriter
+public class RejectRequestChangeAccountingPointCharacteristicsMessageWriter : MessageWriter
 {
-    public ConfirmChangeOfSupplierXmlDocumentWriter(IMarketActivityRecordParser parser)
-    : base(
-        new DocumentDetails(
-            "ConfirmRequestChangeOfSupplier_MarketDocument",
-            "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1 urn-ediel-org-structure-confirmrequestchangeofsupplier-0-1.xsd",
-            "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1",
-            "cim",
-            "414"),
-        parser,
-        "A01")
+    public RejectRequestChangeAccountingPointCharacteristicsMessageWriter(IMarketActivityRecordParser parser)
+        : base(
+            new DocumentDetails(
+                "RejectRequestChangeAccountingPointCharacteristics_MarketDocument",
+                "urn:ediel.org:structure:rejectrequestchangeaccountingpointcharacteristics:0:1 urn-ediel-org-structure-rejectrequestchangeaccountingpointcharacteristics-0-1.xsd",
+                "urn:ediel.org:structure:rejectrequestchangeaccountingpointcharacteristics:0:1",
+                "cim",
+                "A80"),
+            parser,
+            "A02")
     {
     }
 
@@ -47,6 +47,8 @@ public class ConfirmChangeOfSupplierXmlDocumentWriter : DocumentWriter
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "MktActivityRecord", null).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, marketActivityRecord.Id.ToString())
                 .ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "businessProcessReference_MktActivityRecord.mRID", null, marketActivityRecord.BusinessProcessReference.ToString())
+                .ConfigureAwait(false);
             await writer.WriteElementStringAsync(
                 DocumentDetails.Prefix,
                 "originalTransactionIDReference_MktActivityRecord.mRID",
@@ -56,6 +58,14 @@ public class ConfirmChangeOfSupplierXmlDocumentWriter : DocumentWriter
             await writer.WriteAttributeStringAsync(null, "codingScheme", null, "A10").ConfigureAwait(false);
             writer.WriteValue(marketActivityRecord.MarketEvaluationPointId);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
+            foreach (var reason in marketActivityRecord.Reasons)
+            {
+                await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Reason", null).ConfigureAwait(false);
+                await writer.WriteElementStringAsync(DocumentDetails.Prefix, "code", null, reason.Code).ConfigureAwait(false);
+                await writer.WriteElementStringAsync(DocumentDetails.Prefix, "text", null, reason.Text).ConfigureAwait(false);
+                await writer.WriteEndElementAsync().ConfigureAwait(false);
+            }
+
             await writer.WriteEndElementAsync().ConfigureAwait(false);
         }
     }

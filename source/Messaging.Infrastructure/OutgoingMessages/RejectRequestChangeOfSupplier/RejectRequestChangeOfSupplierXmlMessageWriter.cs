@@ -23,9 +23,9 @@ using Messaging.Infrastructure.OutgoingMessages.Common.Xml;
 
 namespace Messaging.Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
 
-public class RejectRequestChangeOfSupplierXmlDocumentWriter : DocumentWriter
+public class RejectRequestChangeOfSupplierXmlMessageWriter : MessageWriter
 {
-    public RejectRequestChangeOfSupplierXmlDocumentWriter(IMarketActivityRecordParser parser)
+    public RejectRequestChangeOfSupplierXmlMessageWriter(IMarketActivityRecordParser parser)
         : base(
             new DocumentDetails(
                 "RejectRequestChangeOfSupplier_MarketDocument",

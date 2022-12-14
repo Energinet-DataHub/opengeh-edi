@@ -46,7 +46,7 @@ namespace Messaging.ArchitectureTests
             var constructorDependencies = ReflectionHelper.FindAllConstructorDependenciesForType();
 
             return ApplicationAssemblies.Infrastructure.GetTypes()
-                .Where(t => t.IsSubclassOf(typeof(DocumentWriter)))
+                .Where(t => t.IsSubclassOf(typeof(MessageWriter)))
                 .Select(t => new object[] { new Requirement(t.Name, constructorDependencies(t), t) });
         }
 
@@ -89,7 +89,7 @@ namespace Messaging.ArchitectureTests
         {
             using var scope = _host.Services.CreateScope();
             Assert.True(scope.ServiceProvider.CanSatisfyRequirement(requirement));
-            Assert.True(scope.ServiceProvider.RequirementIsPartOfCollection<IDocumentWriter>(requirement));
+            Assert.True(scope.ServiceProvider.RequirementIsPartOfCollection<IMessageWriter>(requirement));
         }
 
         [Theory(DisplayName = nameof(All_request_handlers_are_registered))]
