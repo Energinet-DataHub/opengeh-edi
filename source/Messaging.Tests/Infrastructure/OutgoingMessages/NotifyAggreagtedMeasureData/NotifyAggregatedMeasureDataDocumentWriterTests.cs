@@ -89,6 +89,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             .HasAttributeValue("receiver_MarketParticipant.mRID", "codingScheme", "A10")
             .HasValue("receiver_MarketParticipant.marketRole.type", header.ReceiverRole)
             .HasValue("createdDateTime", header.TimeStamp.ToString())
+            .HasValue("Series[1]/mRID", timeSeries[0].Id.ToString())
             .HasValidStructureAsync((await GetSchema().ConfigureAwait(false))!).ConfigureAwait(false);
     }
 
