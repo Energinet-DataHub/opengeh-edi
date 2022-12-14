@@ -16,12 +16,12 @@ using Messaging.Domain.SeedWork;
 
 namespace Messaging.Domain.OutgoingMessages;
 
-public class CimFormat : EnumerationType
+public class MessageFormat : EnumerationType
 {
-    public static readonly CimFormat Xml = new(0, nameof(Xml));
-    public static readonly CimFormat Json = new(1, nameof(Json));
+    public static readonly MessageFormat Xml = new(0, nameof(Xml));
+    public static readonly MessageFormat Json = new(1, nameof(Json));
 
-    private CimFormat(int id, string name)
+    private MessageFormat(int id, string name)
         : base(id, name)
     {
     }

@@ -237,7 +237,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfS
 
         private Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>> ParseMessageAsync(Stream message)
         {
-            return _messageParser.ParseAsync(message, CimFormat.Xml);
+            return _messageParser.ParseAsync(message, MessageFormat.Xml);
         }
 
         private ClaimsPrincipal CreateIdentity()

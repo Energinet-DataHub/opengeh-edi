@@ -23,7 +23,7 @@ public interface IMessageWriter
     /// Determine if specified format can be handled by message writer
     /// </summary>
     /// <param name="format"></param>
-    bool HandlesFormat(CimFormat format);
+    bool HandlesFormat(MessageFormat format);
 
     /// <summary>
     /// Determine if specified message type can be handles by the writer

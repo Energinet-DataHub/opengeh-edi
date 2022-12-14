@@ -30,7 +30,7 @@ public class DocumentFactory
         _documentWriters = documentWriters.ToList();
     }
 
-    public Task<Stream> CreateFromAsync(CimMessage message, CimFormat documentFormat)
+    public Task<Stream> CreateFromAsync(CimMessage message, MessageFormat documentFormat)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
         var documentWriter =
@@ -48,7 +48,7 @@ public class DocumentFactory
             message.MarketActivityRecordPayloads);
     }
 
-    public bool CanHandle(MessageType messageType, CimFormat documentFormat)
+    public bool CanHandle(MessageType messageType, MessageFormat documentFormat)
     {
         return _documentWriters.Any(writer =>
             writer.HandlesType(messageType) &&

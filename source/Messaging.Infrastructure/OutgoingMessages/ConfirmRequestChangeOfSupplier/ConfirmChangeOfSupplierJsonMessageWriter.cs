@@ -35,9 +35,9 @@ public class ConfirmChangeOfSupplierJsonMessageWriter : IMessageWriter
         _parser = parser;
     }
 
-    public bool HandlesFormat(CimFormat format)
+    public bool HandlesFormat(MessageFormat format)
     {
-        return format == CimFormat.Json;
+        return format == MessageFormat.Json;
     }
 
     public bool HandlesType(MessageType messageType)

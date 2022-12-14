@@ -40,6 +40,6 @@ public class DocumentFactoryTests
             header,
             System.Array.Empty<string>());
 
-        await Assert.ThrowsAsync<OutgoingMessageException>(() => factory.CreateFromAsync(message, CimFormat.Xml)).ConfigureAwait(false);
+        await Assert.ThrowsAsync<OutgoingMessageException>(() => factory.CreateFromAsync(message, MessageFormat.Xml)).ConfigureAwait(false);
     }
 }
