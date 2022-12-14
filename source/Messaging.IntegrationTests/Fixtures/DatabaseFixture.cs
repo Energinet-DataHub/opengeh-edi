@@ -64,6 +64,7 @@ namespace Messaging.IntegrationTests.Fixtures
         {
             var cleanupStatement =
                 $"DELETE FROM [b2b].[MoveInTransactions] " +
+                $"DELETE FROM [b2b].[AggregatedTimeSeriesTransactions] " +
                 $"DELETE FROM [b2b].[UpdateCustomerMasterDataTransactions] " +
                 $"DELETE FROM [b2b].[MessageIds] " +
                 $"DELETE FROM [b2b].[TransactionIds]" +
