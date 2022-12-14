@@ -25,7 +25,7 @@ namespace Messaging.Infrastructure.IncomingMessages.Response;
 
 public class JsonResponseFactory : IResponseFactory
 {
-    public CimFormat HandledFormat => CimFormat.Json;
+    public MessageFormat HandledFormat => MessageFormat.Json;
 
     public ResponseMessage From(Result result)
     {

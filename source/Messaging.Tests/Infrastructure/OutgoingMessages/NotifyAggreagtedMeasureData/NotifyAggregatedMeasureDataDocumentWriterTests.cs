@@ -36,7 +36,7 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.NotifyAggreagtedMeasur
 public class NotifyAggregatedMeasureDataDocumentWriterTests
 {
     private const string NamespacePrefix = "cim";
-    private readonly IDocumentWriter _documentWriter;
+    private readonly IMessageWriter _messageWriter;
     private readonly ISchemaProvider _schemaProvider;
     private readonly IMarketActivityRecordParser _parser;
 
@@ -44,7 +44,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
     {
         _parser = new MarketActivityRecordParser(new Serializer());
         _schemaProvider = new XmlSchemaProvider();
-        _documentWriter = new NotifyAggregatedMeasureDataDocumentWriter(_parser);
+        _messageWriter = new NotifyAggregatedMeasureDataMessageWriter(_parser);
     }
 
     [Fact]
@@ -77,7 +77,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
                     })),
         };
 
-        var message = await _documentWriter.WriteAsync(header, timeSeries.Select(record => _parser.From(record)).ToList()).ConfigureAwait(false);
+        var message = await _messageWriter.WriteAsync(header, timeSeries.Select(record => _parser.From(record)).ToList()).ConfigureAwait(false);
 
         await AssertXmlDocument
             .Document(message, NamespacePrefix)

@@ -26,7 +26,7 @@ public class DocumentFactoryTests
     [Fact]
     public async Task Throw_if_document_format_can_not_be_handled()
     {
-        var factory = new DocumentFactory(System.Array.Empty<DocumentWriter>());
+        var factory = new DocumentFactory(System.Array.Empty<MessageWriter>());
         var header = new MessageHeader(
             "ProcessType",
             "SenderId",
@@ -36,10 +36,10 @@ public class DocumentFactoryTests
             "MessageID",
             SystemClock.Instance.GetCurrentInstant());
         var message = new CimMessage(
-            DocumentType.GenericNotification,
+            MessageType.GenericNotification,
             header,
             System.Array.Empty<string>());
 
-        await Assert.ThrowsAsync<OutgoingMessageException>(() => factory.CreateFromAsync(message, CimFormat.Xml)).ConfigureAwait(false);
+        await Assert.ThrowsAsync<OutgoingMessageException>(() => factory.CreateFromAsync(message, MessageFormat.Xml)).ConfigureAwait(false);
     }
 }

@@ -85,7 +85,7 @@ public class ForwardMeteringPointMasterDataTests : TestBase, IAsyncLifetime
         var forwardMeteringPointMasterData = new ForwardMeteringPointMasterData(SampleData.TransactionId, masterData);
         await InvokeCommandAsync(forwardMeteringPointMasterData).ConfigureAwait(false);
 
-        var marketActivityRecord = await GetMarketActivityRecordAsync(DocumentType.AccountingPointCharacteristics).ConfigureAwait(false);
+        var marketActivityRecord = await GetMarketActivityRecordAsync(MessageType.AccountingPointCharacteristics).ConfigureAwait(false);
         AssertMarketEvaluationPoint(masterData, marketActivityRecord.MarketEvaluationPt);
     }
 
@@ -97,7 +97,7 @@ public class ForwardMeteringPointMasterDataTests : TestBase, IAsyncLifetime
         var forwardMeteringPointMasterData = new ForwardMeteringPointMasterData(SampleData.TransactionId, masterData);
         await InvokeCommandAsync(forwardMeteringPointMasterData).ConfigureAwait(false);
 
-        var marketActivityRecord = await GetMarketActivityRecordAsync(DocumentType.AccountingPointCharacteristics).ConfigureAwait(false);
+        var marketActivityRecord = await GetMarketActivityRecordAsync(MessageType.AccountingPointCharacteristics).ConfigureAwait(false);
         AssertMarketEvaluationPoint(masterData, marketActivityRecord.MarketEvaluationPt);
     }
 
@@ -244,10 +244,10 @@ public class ForwardMeteringPointMasterDataTests : TestBase, IAsyncLifetime
             null);
     }
 
-    private Task<MarketActivityRecord> GetMarketActivityRecordAsync(DocumentType documentType)
+    private Task<MarketActivityRecord> GetMarketActivityRecordAsync(MessageType messageType)
     {
         var parser = GetService<IMarketActivityRecordParser>();
-        var message = GetService<B2BContext>().OutgoingMessages.First(m => m.DocumentType == documentType);
+        var message = GetService<B2BContext>().OutgoingMessages.First(m => m.MessageType == messageType);
         var marketActivityRecord =
             parser.From<MarketActivityRecord>(
                 message!.MarketActivityRecordPayload);

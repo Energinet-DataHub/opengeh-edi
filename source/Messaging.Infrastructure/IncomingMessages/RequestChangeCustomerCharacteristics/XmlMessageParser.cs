@@ -39,7 +39,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         _schemaProvider = new XmlSchemaProvider();
     }
 
-    public CimFormat HandledFormat => CimFormat.Xml;
+    public MessageFormat HandledFormat => MessageFormat.Xml;
 
     public async Task<MessageParserResult<MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>> ParseAsync(Stream message)
     {

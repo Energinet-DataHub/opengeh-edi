@@ -44,7 +44,7 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
         _schemaProvider = schemaProvider;
     }
 
-    public CimFormat HandledFormat => CimFormat.Json;
+    public MessageFormat HandledFormat => MessageFormat.Json;
 
     public async Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>> ParseAsync(Stream message)
     {

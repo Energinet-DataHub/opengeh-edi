@@ -232,16 +232,16 @@ namespace Messaging.Infrastructure.Configuration
         private void AddMessageGenerationServices()
         {
             _services.AddScoped<DocumentFactory>();
-            _services.AddScoped<IDocumentWriter, ConfirmChangeOfSupplierXmlDocumentWriter>();
-            _services.AddScoped<IDocumentWriter, ConfirmChangeOfSupplierJsonDocumentWriter>();
-            _services.AddScoped<IDocumentWriter, RejectRequestChangeOfSupplierXmlDocumentWriter>();
-            _services.AddScoped<IDocumentWriter, GenericNotificationDocumentWriter>();
-            _services.AddScoped<IDocumentWriter, AccountingPointCharacteristicsDocumentWriter>();
-            _services.AddScoped<IDocumentWriter, ConfirmRequestChangeAccountingPointCharacteristicsDocumentWriter>();
-            _services.AddScoped<IDocumentWriter, RejectRequestChangeAccountingPointCharacteristicsDocumentWriter>();
-            _services.AddScoped<IDocumentWriter, CharacteristicsOfACustomerAtAnApDocumentWriter>();
-            _services.AddScoped<IDocumentWriter, RejectRequestChangeOfSupplierJsonDocumentWriter>();
-            _services.AddScoped<IDocumentWriter, NotifyAggregatedMeasureDataDocumentWriter>();
+            _services.AddScoped<IMessageWriter, ConfirmChangeOfSupplierXmlMessageWriter>();
+            _services.AddScoped<IMessageWriter, ConfirmChangeOfSupplierJsonMessageWriter>();
+            _services.AddScoped<IMessageWriter, RejectRequestChangeOfSupplierXmlMessageWriter>();
+            _services.AddScoped<IMessageWriter, GenericNotificationMessageWriter>();
+            _services.AddScoped<IMessageWriter, AccountingPointCharacteristicsMessageWriter>();
+            _services.AddScoped<IMessageWriter, ConfirmRequestChangeAccountingPointCharacteristicsMessageWriter>();
+            _services.AddScoped<IMessageWriter, RejectRequestChangeAccountingPointCharacteristicsMessageWriter>();
+            _services.AddScoped<IMessageWriter, CharacteristicsOfACustomerAtAnApMessageWriter>();
+            _services.AddScoped<IMessageWriter, RejectRequestChangeOfSupplierJsonMessageWriter>();
+            _services.AddScoped<IMessageWriter, NotifyAggregatedMeasureDataMessageWriter>();
             _services.AddScoped<IValidationErrorTranslator, ValidationErrorTranslator>();
             _services.AddScoped<IMarketActivityRecordParser, MarketActivityRecordParser>();
         }

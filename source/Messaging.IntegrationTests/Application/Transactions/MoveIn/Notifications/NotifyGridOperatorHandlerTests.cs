@@ -73,7 +73,7 @@ public class NotifyGridOperatorHandlerTests
             .HasGridOperatorNotificationState(MoveInTransaction.NotificationState.WasNotified);
         AssertOutgoingMessage.OutgoingMessage(
                 SampleData.TransactionId,
-                DocumentType.GenericNotification.Name,
+                MessageType.GenericNotification.Name,
                 ProcessType.MoveIn.Code,
                 GetService<IDbConnectionFactory>())
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)

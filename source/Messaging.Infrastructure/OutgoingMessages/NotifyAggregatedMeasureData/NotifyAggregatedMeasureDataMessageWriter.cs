@@ -24,9 +24,9 @@ using Messaging.Infrastructure.OutgoingMessages.Common.Xml;
 
 namespace Messaging.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 
-public class NotifyAggregatedMeasureDataDocumentWriter : DocumentWriter
+public class NotifyAggregatedMeasureDataMessageWriter : MessageWriter
 {
-    public NotifyAggregatedMeasureDataDocumentWriter(IMarketActivityRecordParser parser)
+    public NotifyAggregatedMeasureDataMessageWriter(IMarketActivityRecordParser parser)
         : base(
             new DocumentDetails(
             "NotifyAggregatedMeasureData_MarketDocument",

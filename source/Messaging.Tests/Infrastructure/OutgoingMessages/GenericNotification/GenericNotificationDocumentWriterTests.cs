@@ -35,7 +35,7 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.GenericNotification
 {
     public class GenericNotificationDocumentWriterTests
     {
-        private readonly GenericNotificationDocumentWriter _documentWriter;
+        private readonly GenericNotificationMessageWriter _messageWriter;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
         private readonly IMarketActivityRecordParser _marketActivityRecordParser;
         private ISchemaProvider? _schemaProvider;
@@ -44,7 +44,7 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.GenericNotification
         {
             _systemDateTimeProvider = new SystemDateTimeProvider();
             _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
-            _documentWriter = new GenericNotificationDocumentWriter(_marketActivityRecordParser);
+            _messageWriter = new GenericNotificationMessageWriter(_marketActivityRecordParser);
         }
 
         [Fact]
@@ -57,7 +57,7 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.GenericNotification
                 new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId", _systemDateTimeProvider.Now()),
             };
 
-            var message = await _documentWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
+            var message = await _messageWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
 
             await AssertMessage(message, header, marketActivityRecords).ConfigureAwait(false);
         }

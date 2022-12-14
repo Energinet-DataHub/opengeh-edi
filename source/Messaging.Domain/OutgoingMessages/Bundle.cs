@@ -23,7 +23,7 @@ public class Bundle
     private readonly Instant _timestamp;
     private readonly List<EnqueuedMessage> _messages = new();
     private MessageHeader _header;
-    private DocumentType? _documentType;
+    private MessageType? _documentType;
 
     public Bundle(Instant timestamp)
     {
@@ -45,7 +45,7 @@ public class Bundle
         if (IsFirstMessageInBundle())
         {
             CreateHeaderFrom(message);
-            _documentType = EnumerationType.FromName<DocumentType>(message.DocumentType);
+            _documentType = EnumerationType.FromName<MessageType>(message.MessageType);
         }
 
         EnsureProcessType(message);
@@ -63,8 +63,8 @@ public class Bundle
             message.ReceiverRole.Name,
             message.SenderId.Value,
             message.SenderRole.Name,
-            message.DocumentType.Name,
-            message.DocumentType.Category.Name,
+            message.MessageType.Name,
+            message.MessageType.Category.Name,
             message.ProcessType,
             message.MarketActivityRecordPayload);
 

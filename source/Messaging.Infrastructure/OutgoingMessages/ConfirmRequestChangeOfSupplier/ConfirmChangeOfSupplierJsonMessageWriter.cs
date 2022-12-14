@@ -24,26 +24,26 @@ using Newtonsoft.Json;
 
 namespace Messaging.Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 
-public class ConfirmChangeOfSupplierJsonDocumentWriter : IDocumentWriter
+public class ConfirmChangeOfSupplierJsonMessageWriter : IMessageWriter
 {
     private const string DocumentType = "ConfirmRequestChangeOfSupplier_MarketDocument";
     private const string TypeCode = "414";
     private readonly IMarketActivityRecordParser _parser;
 
-    public ConfirmChangeOfSupplierJsonDocumentWriter(IMarketActivityRecordParser parser)
+    public ConfirmChangeOfSupplierJsonMessageWriter(IMarketActivityRecordParser parser)
     {
         _parser = parser;
     }
 
-    public bool HandlesDocumentFormat(CimFormat format)
+    public bool HandlesFormat(MessageFormat format)
     {
-        return format == CimFormat.Json;
+        return format == MessageFormat.Json;
     }
 
-    public bool HandlesDocumentType(DocumentType documentType)
+    public bool HandlesType(MessageType messageType)
     {
-        if (documentType == null) throw new ArgumentNullException(nameof(documentType));
-        return documentType.Name.Equals(DocumentType.Split("_")[0], StringComparison.OrdinalIgnoreCase);
+        if (messageType == null) throw new ArgumentNullException(nameof(messageType));
+        return messageType.Name.Equals(DocumentType.Split("_")[0], StringComparison.OrdinalIgnoreCase);
     }
 
     public async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)

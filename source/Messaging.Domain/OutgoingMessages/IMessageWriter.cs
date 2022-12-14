@@ -15,24 +15,24 @@
 namespace Messaging.Domain.OutgoingMessages;
 
 /// <summary>
-/// Writes CIM documents
+/// Writes outgoing messages
 /// </summary>
-public interface IDocumentWriter
+public interface IMessageWriter
 {
     /// <summary>
-    /// Determine if specificed CIM format can be handled by document writer
+    /// Determine if specified format can be handled by message writer
     /// </summary>
     /// <param name="format"></param>
-    bool HandlesDocumentFormat(CimFormat format);
+    bool HandlesFormat(MessageFormat format);
 
     /// <summary>
-    /// Determine if specified document type can be handles by the writer
+    /// Determine if specified message type can be handles by the writer
     /// </summary>
-    /// <param name="documentType"></param>
-    bool HandlesDocumentType(DocumentType documentType);
+    /// <param name="messageType"></param>
+    bool HandlesType(MessageType messageType);
 
     /// <summary>
-    /// Writes the document
+    /// Writes the message
     /// </summary>
     /// <param name="header"></param>
     /// <param name="marketActivityRecords"></param>

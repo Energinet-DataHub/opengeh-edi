@@ -38,7 +38,7 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
     public class CharacteristicsOfACustomerAtAnApDocumentWriterTests
     {
         private const string NamespacePrefix = "cim";
-        private readonly CharacteristicsOfACustomerAtAnApDocumentWriter _documentWriter;
+        private readonly CharacteristicsOfACustomerAtAnApMessageWriter _messageWriter;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
         private readonly IMarketActivityRecordParser _marketActivityRecordParser;
         private ISchemaProvider? _schemaProvider;
@@ -47,7 +47,7 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
         {
             _systemDateTimeProvider = new SystemDateTimeProvider();
             _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
-            _documentWriter = new CharacteristicsOfACustomerAtAnApDocumentWriter(_marketActivityRecordParser);
+            _messageWriter = new CharacteristicsOfACustomerAtAnApMessageWriter(_marketActivityRecordParser);
         }
 
         [Fact]
@@ -206,7 +206,7 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
 
         private Task<Stream> WriteDocumentAsync(MessageHeader header, params MarketActivityRecord[] marketActivityRecords)
         {
-            return _documentWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList());
+            return _messageWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList());
         }
     }
 }

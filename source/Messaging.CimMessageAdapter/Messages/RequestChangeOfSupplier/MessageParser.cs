@@ -31,10 +31,10 @@ public class MessageParser
         _parsers = parsers;
     }
 
-    public Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>> ParseAsync(Stream message, CimFormat cimFormat)
+    public Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>> ParseAsync(Stream message, MessageFormat messageFormat)
     {
-        var parser = _parsers.FirstOrDefault(parser => parser.HandledFormat.Equals(cimFormat));
-        if (parser is null) throw new InvalidOperationException($"No message parser found for message format '{cimFormat}'");
+        var parser = _parsers.FirstOrDefault(parser => parser.HandledFormat.Equals(messageFormat));
+        if (parser is null) throw new InvalidOperationException($"No message parser found for message format '{messageFormat}'");
         return parser.ParseAsync(message);
     }
 }

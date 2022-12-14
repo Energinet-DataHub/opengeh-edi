@@ -35,7 +35,7 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.AccountingPointCharact
 
 public class AccountingPointCharacteristicsDocumentWriterTests
 {
-    private readonly AccountingPointCharacteristicsDocumentWriter _documentWriter;
+    private readonly AccountingPointCharacteristicsMessageWriter _messageWriter;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMarketActivityRecordParser _marketActivityRecordParser;
     private readonly SampleData _sampleData;
@@ -45,7 +45,7 @@ public class AccountingPointCharacteristicsDocumentWriterTests
     {
         _systemDateTimeProvider = new SystemDateTimeProvider();
         _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
-        _documentWriter = new AccountingPointCharacteristicsDocumentWriter(_marketActivityRecordParser);
+        _messageWriter = new AccountingPointCharacteristicsMessageWriter(_marketActivityRecordParser);
         _sampleData = new SampleData();
     }
 
@@ -58,7 +58,7 @@ public class AccountingPointCharacteristicsDocumentWriterTests
         {
             marketActivityRecord,
         };
-        var message = await _documentWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
+        var message = await _messageWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
         await AssertMessage(message, header, marketActivityRecords).ConfigureAwait(false);
     }
 

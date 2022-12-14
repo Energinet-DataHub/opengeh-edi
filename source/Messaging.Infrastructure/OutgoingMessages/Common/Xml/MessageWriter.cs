@@ -24,13 +24,13 @@ using Messaging.Domain.OutgoingMessages;
 
 namespace Messaging.Infrastructure.OutgoingMessages.Common.Xml;
 
-public abstract class DocumentWriter : IDocumentWriter
+public abstract class MessageWriter : IMessageWriter
 {
     private readonly DocumentDetails _documentDetails;
     private readonly IMarketActivityRecordParser _parser;
     private readonly string? _reasonCode;
 
-    protected DocumentWriter(DocumentDetails documentDetails, IMarketActivityRecordParser parser, string? reasonCode = null)
+    protected MessageWriter(DocumentDetails documentDetails, IMarketActivityRecordParser parser, string? reasonCode = null)
     {
         _documentDetails = documentDetails;
         _parser = parser;
@@ -51,15 +51,15 @@ public abstract class DocumentWriter : IDocumentWriter
         return stream;
     }
 
-    public bool HandlesDocumentType(DocumentType documentType)
+    public bool HandlesType(MessageType messageType)
     {
-        if (documentType == null) throw new ArgumentNullException(nameof(documentType));
-        return documentType.Name.Equals(_documentDetails.Type.Split("_")[0], StringComparison.OrdinalIgnoreCase);
+        if (messageType == null) throw new ArgumentNullException(nameof(messageType));
+        return messageType.Name.Equals(_documentDetails.Type.Split("_")[0], StringComparison.OrdinalIgnoreCase);
     }
 
-    public bool HandlesDocumentFormat(CimFormat format)
+    public bool HandlesFormat(MessageFormat format)
     {
-        return format == CimFormat.Xml;
+        return format == MessageFormat.Xml;
     }
 
     protected abstract Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer);
