@@ -12,10 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.Transactions.AggregatedTimeSeries;
+using Messaging.Domain.Actors;
+using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 
@@ -31,10 +37,35 @@ public class SendAggregatedTimeSeriesTests : TestBase
     [Fact]
     public async Task A_transaction_is_started()
     {
-        await InvokeCommandAsync(new SendAggregatedTimeSeries()).ConfigureAwait(false);
+        await InvokeCommandAsync(CreateRequest()).ConfigureAwait(false);
 
         var exists = await GetService<IDbConnectionFactory>().GetOpenConnection()
             .ExecuteScalarAsync<bool>("SELECT COUNT(*) FROM b2b.AggregatedTimeSeriesTransactions");
         Assert.True(exists);
+    }
+
+    [Fact]
+    public async Task Aggregated_time_series_result_is_send_to_the_grid_operator()
+    {
+        await InvokeCommandAsync(CreateRequest()).ConfigureAwait(false);
+
+        AssertOutgoingMessage.OutgoingMessage(
+            MessageType.AggregatedTimeSeries.Name,
+            ProcessType.BalanceFixing.Code,
+            MarketRole.GridOperator,
+            GetService<IDbConnectionFactory>());
+    }
+
+    private static SendAggregatedTimeSeries CreateRequest()
+    {
+        var timeSeries = new TimeSeries(
+            Guid.NewGuid(),
+            "E18",
+            "KWH",
+            new Period("PT1H", new TimeInterval("2022-02-12T23:00Z", "2022-02-12T23:00Z"), new List<Point>()
+            {
+                new(1, 11, null),
+            }));
+        return new SendAggregatedTimeSeries(timeSeries, SampleData.GridOperatorNumber);
     }
 }

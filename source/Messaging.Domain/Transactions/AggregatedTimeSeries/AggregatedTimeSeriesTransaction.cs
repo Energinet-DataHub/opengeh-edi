@@ -12,16 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Messaging.Domain.Actors;
+using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Messaging.Domain.SeedWork;
 
 namespace Messaging.Domain.Transactions.AggregatedTimeSeries;
 
 public class AggregatedTimeSeriesTransaction : Entity
 {
+    private readonly List<OutgoingMessage> _messages = new();
+
     public AggregatedTimeSeriesTransaction()
     {
-        Id = Guid.NewGuid();
+        Id = Guid.NewGuid().ToString();
     }
 
-    public Guid Id { get; }
+    public string Id { get; }
+
+    public void SendResultToGridOperator(TimeSeries timeSeries, ActorNumber gridOperatorNumber)
+    {
+        _messages.Add(AggregatedTimeSeriesMessage.Create(timeSeries, gridOperatorNumber, MarketRole.GridOperator, Id.ToString(), ProcessType.BalanceFixing));
+    }
 }

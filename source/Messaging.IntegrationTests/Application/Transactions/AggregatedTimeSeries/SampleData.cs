@@ -17,4 +17,6 @@ namespace Messaging.IntegrationTests.Application.Transactions.AggregatedTimeSeri
 internal class SampleData
 {
     internal static string TransactionId => "027F69E0-E634-422A-BCD4-2D41A4ECA89C";
+
+    internal static string GridOperatorNumber => "1234567890123";
 }

@@ -12,10 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.Configuration.Commands.Commands;
+using Messaging.Domain.Actors;
+using Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Messaging.Domain.Transactions.AggregatedTimeSeries;
 
 namespace Messaging.Application.Transactions.AggregatedTimeSeries;
@@ -31,10 +34,13 @@ public class SendAggregatedTimeSeriesHandler : IRequestHandler<SendAggregatedTim
 
     public Task<Unit> Handle(SendAggregatedTimeSeries request, CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(request);
+
         var transaction = new AggregatedTimeSeriesTransaction();
+        transaction.SendResultToGridOperator(request.TimeSeries, ActorNumber.Create(request.GridOperatorNumber));
         _transactions.Add(transaction);
         return Task.FromResult(Unit.Value);
     }
 }
 
-public record SendAggregatedTimeSeries() : ICommand<Unit>;
+public record SendAggregatedTimeSeries(TimeSeries TimeSeries, string GridOperatorNumber) : ICommand<Unit>;
