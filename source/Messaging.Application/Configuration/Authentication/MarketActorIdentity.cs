@@ -34,8 +34,6 @@ namespace Messaging.Application.Configuration.Authentication
 
         public ActorNumber Number { get; }
 
-        public MarketRole Role => _roles.First();
-
         public bool HasRole(string role)
         {
             return _roles.Any(marketRole => marketRole.Name.Equals(role, StringComparison.OrdinalIgnoreCase));

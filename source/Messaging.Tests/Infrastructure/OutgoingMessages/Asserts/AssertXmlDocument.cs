@@ -70,6 +70,13 @@ public class AssertXmlDocument
         return this;
     }
 
+    public AssertXmlDocument HasAttributeValue(string xpath, string attributeName, string expectedValue)
+    {
+        if (xpath == null) throw new ArgumentNullException(nameof(xpath));
+        Assert.Equal(expectedValue, _document.Root?.XPathSelectElement(EnsureXPathHasPrefix(xpath), _xmlNamespaceManager)?.Attribute(attributeName)?.Value);
+        return this;
+    }
+
     public AssertXmlDocument IsNotPresent(string xpath)
     {
         ArgumentNullException.ThrowIfNull(xpath);

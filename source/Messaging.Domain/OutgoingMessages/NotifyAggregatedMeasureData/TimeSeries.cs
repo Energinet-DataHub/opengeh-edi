@@ -12,23 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.Application.Configuration;
 using NodaTime;
 
-namespace Messaging.Tests
-{
-    public class SystemDateTimeProviderStub : ISystemDateTimeProvider
-    {
-        private Instant _now = SystemClock.Instance.GetCurrentInstant();
+namespace Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 
-        public void SetNow(Instant now)
-        {
-            _now = now;
-        }
+public record TimeSeries(Guid Id, string MeteringPointType, string MeasureUnitType, Period Period);
 
-        public Instant Now()
-        {
-            return _now;
-        }
-    }
-}
+public record Period(string Resolution, TimeInterval TimeInterval, IReadOnlyList<Point> Point);
+public record TimeInterval(string Start, string End);
+public record Point(int Position, decimal? Quantity, string? Quality);

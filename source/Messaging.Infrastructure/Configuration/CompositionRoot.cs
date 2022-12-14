@@ -49,6 +49,7 @@ using Messaging.Infrastructure.OutgoingMessages.ConfirmRequestChangeAccountingPo
 using Messaging.Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Infrastructure.OutgoingMessages.Dequeue;
 using Messaging.Infrastructure.OutgoingMessages.GenericNotification;
+using Messaging.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 using Messaging.Infrastructure.OutgoingMessages.Peek;
 using Messaging.Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 using Messaging.Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
@@ -240,6 +241,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddScoped<IDocumentWriter, RejectRequestChangeAccountingPointCharacteristicsDocumentWriter>();
             _services.AddScoped<IDocumentWriter, CharacteristicsOfACustomerAtAnApDocumentWriter>();
             _services.AddScoped<IDocumentWriter, RejectRequestChangeOfSupplierJsonDocumentWriter>();
+            _services.AddScoped<IDocumentWriter, NotifyAggregatedMeasureDataDocumentWriter>();
             _services.AddScoped<IValidationErrorTranslator, ValidationErrorTranslator>();
             _services.AddScoped<IMarketActivityRecordParser, MarketActivityRecordParser>();
         }
