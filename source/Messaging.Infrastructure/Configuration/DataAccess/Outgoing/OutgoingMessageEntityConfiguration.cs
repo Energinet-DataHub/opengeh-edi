@@ -40,7 +40,6 @@ namespace Messaging.Infrastructure.Configuration.DataAccess.Outgoing
                 .ValueGeneratedNever();
 
             builder.Property(x => x.MessageType)
-                .HasColumnName("DocumentType")
                 .HasConversion(
                     toDbValue => toDbValue.Name,
                     fromDbValue => EnumerationType.FromName<MessageType>(fromDbValue));
