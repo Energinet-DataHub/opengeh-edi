@@ -91,6 +91,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             .HasValue("createdDateTime", header.TimeStamp.ToString())
             .HasValue("Series[1]/mRID", timeSeries[0].Id.ToString())
             .HasValue("Series[1]/marketEvaluationPoint.type", timeSeries[0].MeteringPointType)
+            .HasValue("Series[1]/quantity_Measure_Unit.name", timeSeries[0].MeasureUnitType)
             .HasValidStructureAsync((await GetSchema().ConfigureAwait(false))!).ConfigureAwait(false);
     }
 
