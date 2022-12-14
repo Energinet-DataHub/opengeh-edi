@@ -19,6 +19,7 @@ namespace Messaging.Domain.OutgoingMessages;
 public sealed class ProcessType : EnumerationType
 {
     public static readonly ProcessType MoveIn = new(0, nameof(MoveIn), "E65");
+    public static readonly ProcessType BalanceFixing = new(1, nameof(BalanceFixing), "D04");
 
     private ProcessType(int id, string name, string code)
      : base(id, name)
