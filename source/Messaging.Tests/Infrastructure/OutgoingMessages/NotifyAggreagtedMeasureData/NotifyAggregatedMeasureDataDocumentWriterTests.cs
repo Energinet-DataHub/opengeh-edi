@@ -73,6 +73,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
                     new List<Point>()
                     {
                         new(1, 11, "A05"),
+                        new(2, null, null),
                     })),
         };
 
@@ -99,6 +100,9 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             .HasValue("Series[1]/Period/Point[1]/position", timeSeries[0].Period.Point[0].Position.ToString(NumberFormatInfo.InvariantInfo))
             .HasValue("Series[1]/Period/Point[1]/quantity", timeSeries[0].Period.Point[0].Quantity.ToString()!)
             .HasValue("Series[1]/Period/Point[1]/quality", timeSeries[0].Period.Point[0].Quality!)
+            .HasValue("Series[1]/Period/Point[2]/position", timeSeries[0].Period.Point[1].Position.ToString(NumberFormatInfo.InvariantInfo))
+            .IsNotPresent("Series[1]/Period/Point[2]/quantity")
+            .IsNotPresent("Series[1]/Period/Point[2]/quality")
             .HasValidStructureAsync((await GetSchema().ConfigureAwait(false))!).ConfigureAwait(false);
     }
 
