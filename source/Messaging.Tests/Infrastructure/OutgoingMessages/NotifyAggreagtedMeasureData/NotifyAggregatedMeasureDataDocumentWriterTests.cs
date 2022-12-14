@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Schema;
@@ -95,6 +96,9 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             .HasValue("Series[1]/Period/resolution", timeSeries[0].Period.Resolution)
             .HasValue("Series[1]/Period/timeInterval/start", timeSeries[0].Period.TimeInterval.Start)
             .HasValue("Series[1]/Period/timeInterval/end", timeSeries[0].Period.TimeInterval.End)
+            .HasValue("Series[1]/Period/Point[1]/position", timeSeries[0].Period.Point[0].Position.ToString(NumberFormatInfo.InvariantInfo))
+            .HasValue("Series[1]/Period/Point[1]/quantity", timeSeries[0].Period.Point[0].Quantity.ToString()!)
+            .HasValue("Series[1]/Period/Point[1]/quality", timeSeries[0].Period.Point[0].Quality!)
             .HasValidStructureAsync((await GetSchema().ConfigureAwait(false))!).ConfigureAwait(false);
     }
 
