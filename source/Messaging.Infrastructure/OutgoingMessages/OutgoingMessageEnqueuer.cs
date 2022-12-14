@@ -43,7 +43,7 @@ public class OutgoingMessageEnqueuer
                 new
                 {
                     Id = message.Id,
-                    DocumentType = message.DocumentType,
+                    DocumentType = message.MessageType,
                     MessageCategory = message.Category,
                     ReceiverId = message.ReceiverId,
                     ReceiverRole = message.ReceiverRole,

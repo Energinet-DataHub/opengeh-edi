@@ -28,8 +28,8 @@ public interface IDocumentWriter
     /// <summary>
     /// Determine if specified document type can be handles by the writer
     /// </summary>
-    /// <param name="documentType"></param>
-    bool HandlesDocumentType(DocumentType documentType);
+    /// <param name="messageType"></param>
+    bool HandlesDocumentType(MessageType messageType);
 
     /// <summary>
     /// Writes the document

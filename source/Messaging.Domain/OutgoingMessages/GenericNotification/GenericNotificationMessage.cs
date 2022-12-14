@@ -19,15 +19,15 @@ namespace Messaging.Domain.OutgoingMessages.GenericNotification;
 
 public class GenericNotificationMessage : OutgoingMessage
 {
-    public GenericNotificationMessage(DocumentType documentType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string marketActivityRecordPayload)
-        : base(documentType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, marketActivityRecordPayload)
+    public GenericNotificationMessage(MessageType messageType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string marketActivityRecordPayload)
+        : base(messageType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, marketActivityRecordPayload)
     {
         ArgumentNullException.ThrowIfNull(marketActivityRecordPayload);
         MarketActivityRecord = JsonSerializer.Deserialize<MarketActivityRecord>(marketActivityRecordPayload)!;
     }
 
-    public GenericNotificationMessage(DocumentType documentType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, MarketActivityRecord marketActivityRecord)
-        : base(documentType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, JsonSerializer.Serialize(marketActivityRecord))
+    public GenericNotificationMessage(MessageType messageType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, MarketActivityRecord marketActivityRecord)
+        : base(messageType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, JsonSerializer.Serialize(marketActivityRecord))
     {
         MarketActivityRecord = marketActivityRecord;
     }

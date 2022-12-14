@@ -51,10 +51,10 @@ public abstract class DocumentWriter : IDocumentWriter
         return stream;
     }
 
-    public bool HandlesDocumentType(DocumentType documentType)
+    public bool HandlesDocumentType(MessageType messageType)
     {
-        if (documentType == null) throw new ArgumentNullException(nameof(documentType));
-        return documentType.Name.Equals(_documentDetails.Type.Split("_")[0], StringComparison.OrdinalIgnoreCase);
+        if (messageType == null) throw new ArgumentNullException(nameof(messageType));
+        return messageType.Name.Equals(_documentDetails.Type.Split("_")[0], StringComparison.OrdinalIgnoreCase);
     }
 
     public bool HandlesDocumentFormat(CimFormat format)

@@ -54,7 +54,7 @@ public class EnqueuedMessages : IEnqueuedMessages
             ReceiverRole AS {nameof(EnqueuedMessage.ReceiverRole)},
             SenderId AS {nameof(EnqueuedMessage.SenderId)},
             SenderRole AS {nameof(EnqueuedMessage.SenderRole)},
-            DocumentType AS {nameof(EnqueuedMessage.DocumentType)},
+            DocumentType AS {nameof(EnqueuedMessage.MessageType)},
             MessageCategory AS {nameof(EnqueuedMessage.Category)},
             ProcessType AS {nameof(EnqueuedMessage.ProcessType)},
             Payload FROM [b2b].[EnqueuedMessages]

@@ -139,7 +139,7 @@ public class WhenRequestedCustomerMasterDataIsReceivedTests
     {
         var assertMessage = Assertions.AssertOutgoingMessage.OutgoingMessage(
             SampleData.TransactionId,
-            DocumentType.CharacteristicsOfACustomerAtAnAP.Name,
+            MessageType.CharacteristicsOfACustomerAtAnAP.Name,
             ProcessType.MoveIn.Code,
             GetService<IDbConnectionFactory>());
         return assertMessage;

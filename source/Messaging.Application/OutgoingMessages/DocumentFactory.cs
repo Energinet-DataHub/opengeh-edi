@@ -35,12 +35,12 @@ public class DocumentFactory
         if (message == null) throw new ArgumentNullException(nameof(message));
         var documentWriter =
             _documentWriters.FirstOrDefault(writer =>
-                writer.HandlesDocumentType(message.DocumentType) &&
+                writer.HandlesDocumentType(message.MessageType) &&
                 writer.HandlesDocumentFormat(documentFormat));
 
         if (documentWriter is null)
         {
-            throw new OutgoingMessageException($"Could not handle document type {message.DocumentType}");
+            throw new OutgoingMessageException($"Could not handle document type {message.MessageType}");
         }
 
         return documentWriter.WriteAsync(
@@ -48,10 +48,10 @@ public class DocumentFactory
             message.MarketActivityRecordPayloads);
     }
 
-    public bool CanHandle(DocumentType documentType, CimFormat documentFormat)
+    public bool CanHandle(MessageType messageType, CimFormat documentFormat)
     {
         return _documentWriters.Any(writer =>
-            writer.HandlesDocumentType(documentType) &&
+            writer.HandlesDocumentType(messageType) &&
             writer.HandlesDocumentFormat(documentFormat));
     }
 }

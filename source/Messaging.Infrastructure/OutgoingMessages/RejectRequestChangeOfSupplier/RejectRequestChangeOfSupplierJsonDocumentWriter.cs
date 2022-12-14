@@ -40,10 +40,10 @@ public class RejectRequestChangeOfSupplierJsonDocumentWriter : IDocumentWriter
         return format == CimFormat.Json;
     }
 
-    public bool HandlesDocumentType(DocumentType documentType)
+    public bool HandlesDocumentType(MessageType messageType)
     {
-        if (documentType == null) throw new ArgumentNullException(nameof(documentType));
-        return documentType.Name.Equals(DocumentType.Split("_")[0], StringComparison.OrdinalIgnoreCase);
+        if (messageType == null) throw new ArgumentNullException(nameof(messageType));
+        return messageType.Name.Equals(DocumentType.Split("_")[0], StringComparison.OrdinalIgnoreCase);
     }
 
     public async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)

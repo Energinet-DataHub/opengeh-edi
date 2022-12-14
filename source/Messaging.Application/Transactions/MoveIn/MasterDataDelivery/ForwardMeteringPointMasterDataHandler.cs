@@ -125,7 +125,7 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
     private static OutgoingMessage CreateOutgoingMessage(string id, string processType, string receiverId, string marketActivityRecordPayload)
     {
         return new OutgoingMessage(
-            DocumentType.AccountingPointCharacteristics,
+            MessageType.AccountingPointCharacteristics,
             ActorNumber.Create(receiverId),
             id,
             processType,
