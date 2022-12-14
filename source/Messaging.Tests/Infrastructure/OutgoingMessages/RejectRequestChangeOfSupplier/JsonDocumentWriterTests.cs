@@ -38,14 +38,14 @@ public class JsonDocumentWriterTests
     private const string DocumentType = "RejectRequestChangeOfSupplier_MarketDocument";
     private readonly RejectRequestChangeOfSupplierJsonMessageWriter _messageWriter;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-    private readonly IMarketActivityRecordParser _marketActivityRecordParser;
+    private readonly IMessageRecordParser _messageRecordParser;
     private readonly JsonSchemaProvider _schemaProvider;
 
     public JsonDocumentWriterTests()
     {
         _systemDateTimeProvider = new SystemDateTimeProvider();
-        _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
-        _messageWriter = new RejectRequestChangeOfSupplierJsonMessageWriter(_marketActivityRecordParser);
+        _messageRecordParser = new MessageRecordParser(new Serializer());
+        _messageWriter = new RejectRequestChangeOfSupplierJsonMessageWriter(_messageRecordParser);
         _schemaProvider = new JsonSchemaProvider(new CimJsonSchemas());
     }
 
@@ -70,7 +70,7 @@ public class JsonDocumentWriterTests
 
         var message = await _messageWriter.WriteAsync(
             header,
-            marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
+            marketActivityRecords.Select(record => _messageRecordParser.From(record)).ToList()).ConfigureAwait(false);
 
         await AssertMessage(message, header, marketActivityRecords).ConfigureAwait(false);
     }

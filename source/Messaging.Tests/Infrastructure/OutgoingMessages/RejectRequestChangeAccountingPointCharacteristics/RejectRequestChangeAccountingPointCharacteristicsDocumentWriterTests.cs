@@ -38,14 +38,14 @@ public class RejectRequestChangeAccountingPointCharacteristicsDocumentWriterTest
 {
     private readonly RejectRequestChangeAccountingPointCharacteristicsMessageWriter _xmlMessageWriter;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-    private readonly IMarketActivityRecordParser _marketActivityRecordParser;
+    private readonly IMessageRecordParser _messageRecordParser;
     private ISchemaProvider? _schemaProvider;
 
     public RejectRequestChangeAccountingPointCharacteristicsDocumentWriterTests()
     {
         _systemDateTimeProvider = new SystemDateTimeProvider();
-        _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
-        _xmlMessageWriter = new RejectRequestChangeAccountingPointCharacteristicsMessageWriter(_marketActivityRecordParser);
+        _messageRecordParser = new MessageRecordParser(new Serializer());
+        _xmlMessageWriter = new RejectRequestChangeAccountingPointCharacteristicsMessageWriter(_messageRecordParser);
     }
 
     [Fact]
@@ -67,7 +67,7 @@ public class RejectRequestChangeAccountingPointCharacteristicsDocumentWriterTest
             }),
         };
 
-        var message = await _xmlMessageWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
+        var message = await _xmlMessageWriter.WriteAsync(header, marketActivityRecords.Select(record => _messageRecordParser.From(record)).ToList()).ConfigureAwait(false);
 
         await AssertMessage(message, header, marketActivityRecords).ConfigureAwait(false);
     }

@@ -243,7 +243,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddScoped<IMessageWriter, RejectRequestChangeOfSupplierJsonMessageWriter>();
             _services.AddScoped<IMessageWriter, NotifyAggregatedMeasureDataMessageWriter>();
             _services.AddScoped<IValidationErrorTranslator, ValidationErrorTranslator>();
-            _services.AddScoped<IMarketActivityRecordParser, MarketActivityRecordParser>();
+            _services.AddScoped<IMessageRecordParser, MessageRecordParser>();
         }
 
         private void AddMediatR()
