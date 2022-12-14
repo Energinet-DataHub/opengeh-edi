@@ -1,4 +1,6 @@
 ﻿using Messaging.PerformanceTest.Actors;
+using Messaging.PerformanceTest.Controllers;
+using Messaging.PerformanceTest.MoveIn;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +13,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IActorService, ActorService>();
+
+builder.Services.AddTransient<IMoveInService, MoveInService>();
 
 var app = builder.Build();
 
