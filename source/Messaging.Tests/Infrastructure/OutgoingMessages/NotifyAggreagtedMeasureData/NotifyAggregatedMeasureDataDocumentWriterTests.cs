@@ -94,6 +94,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             .HasValue("Series[1]/quantity_Measure_Unit.name", timeSeries[0].MeasureUnitType)
             .HasValue("Series[1]/Period/resolution", timeSeries[0].Period.Resolution)
             .HasValue("Series[1]/Period/timeInterval/start", timeSeries[0].Period.TimeInterval.Start)
+            .HasValue("Series[1]/Period/timeInterval/end", timeSeries[0].Period.TimeInterval.End)
             .HasValidStructureAsync((await GetSchema().ConfigureAwait(false))!).ConfigureAwait(false);
     }
 
