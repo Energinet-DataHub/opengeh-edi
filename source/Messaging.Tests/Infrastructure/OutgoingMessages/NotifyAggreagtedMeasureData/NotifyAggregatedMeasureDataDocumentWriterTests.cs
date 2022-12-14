@@ -68,7 +68,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
                     "PT1H",
                     new TimeInterval(
                         "2022-02-12T23:00Z",
-                        "2022-02-12T23:00Z"),
+                        "2022-02-13T23:00Z"),
                     new List<Point>()
                     {
                         new(1, 11, "A05"),
@@ -93,6 +93,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             .HasValue("Series[1]/marketEvaluationPoint.type", timeSeries[0].MeteringPointType)
             .HasValue("Series[1]/quantity_Measure_Unit.name", timeSeries[0].MeasureUnitType)
             .HasValue("Series[1]/Period/resolution", timeSeries[0].Period.Resolution)
+            .HasValue("Series[1]/Period/timeInterval/start", timeSeries[0].Period.TimeInterval.Start)
             .HasValidStructureAsync((await GetSchema().ConfigureAwait(false))!).ConfigureAwait(false);
     }
 
