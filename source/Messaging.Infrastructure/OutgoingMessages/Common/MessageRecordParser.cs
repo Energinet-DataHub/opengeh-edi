@@ -15,7 +15,7 @@
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Infrastructure.Configuration.Serialization;
 
-namespace Messaging.Infrastructure.Common
+namespace Messaging.Infrastructure.OutgoingMessages.Common
 {
     public class MessageRecordParser : IMessageRecordParser
     {
