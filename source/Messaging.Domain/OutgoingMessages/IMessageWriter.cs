@@ -15,21 +15,21 @@
 namespace Messaging.Domain.OutgoingMessages;
 
 /// <summary>
-/// Writes CIM documents
+/// Writes outgoing messages
 /// </summary>
 public interface IMessageWriter
 {
     /// <summary>
-    /// Determine if specificed CIM format can be handled by message writer
+    /// Determine if specified format can be handled by message writer
     /// </summary>
     /// <param name="format"></param>
-    bool HandlesDocumentFormat(CimFormat format);
+    bool HandlesFormat(CimFormat format);
 
     /// <summary>
     /// Determine if specified message type can be handles by the writer
     /// </summary>
     /// <param name="messageType"></param>
-    bool HandlesDocumentType(MessageType messageType);
+    bool HandlesType(MessageType messageType);
 
     /// <summary>
     /// Writes the message

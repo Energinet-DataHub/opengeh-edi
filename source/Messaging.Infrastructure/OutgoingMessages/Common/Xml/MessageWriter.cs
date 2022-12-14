@@ -51,13 +51,13 @@ public abstract class MessageWriter : IMessageWriter
         return stream;
     }
 
-    public bool HandlesDocumentType(MessageType messageType)
+    public bool HandlesType(MessageType messageType)
     {
         if (messageType == null) throw new ArgumentNullException(nameof(messageType));
         return messageType.Name.Equals(_documentDetails.Type.Split("_")[0], StringComparison.OrdinalIgnoreCase);
     }
 
-    public bool HandlesDocumentFormat(CimFormat format)
+    public bool HandlesFormat(CimFormat format)
     {
         return format == CimFormat.Xml;
     }

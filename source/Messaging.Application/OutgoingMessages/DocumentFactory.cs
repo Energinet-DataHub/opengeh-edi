@@ -35,8 +35,8 @@ public class DocumentFactory
         if (message == null) throw new ArgumentNullException(nameof(message));
         var documentWriter =
             _documentWriters.FirstOrDefault(writer =>
-                writer.HandlesDocumentType(message.MessageType) &&
-                writer.HandlesDocumentFormat(documentFormat));
+                writer.HandlesType(message.MessageType) &&
+                writer.HandlesFormat(documentFormat));
 
         if (documentWriter is null)
         {
@@ -51,7 +51,7 @@ public class DocumentFactory
     public bool CanHandle(MessageType messageType, CimFormat documentFormat)
     {
         return _documentWriters.Any(writer =>
-            writer.HandlesDocumentType(messageType) &&
-            writer.HandlesDocumentFormat(documentFormat));
+            writer.HandlesType(messageType) &&
+            writer.HandlesFormat(documentFormat));
     }
 }

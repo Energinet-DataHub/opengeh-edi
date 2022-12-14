@@ -35,12 +35,12 @@ public class ConfirmChangeOfSupplierJsonMessageWriter : IMessageWriter
         _parser = parser;
     }
 
-    public bool HandlesDocumentFormat(CimFormat format)
+    public bool HandlesFormat(CimFormat format)
     {
         return format == CimFormat.Json;
     }
 
-    public bool HandlesDocumentType(MessageType messageType)
+    public bool HandlesType(MessageType messageType)
     {
         if (messageType == null) throw new ArgumentNullException(nameof(messageType));
         return messageType.Name.Equals(DocumentType.Split("_")[0], StringComparison.OrdinalIgnoreCase);
