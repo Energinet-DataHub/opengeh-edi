@@ -36,4 +36,9 @@ public interface IActorService
     /// <param name="actorNumber"></param>
     /// <returns>boolean indicating whether actor number is in use</returns>
     bool IsActorNumberInUse(string actorNumber);
+
+    /// <summary>
+    /// Reset actor dictionary
+    /// </summary>
+    void ResetActorNumbers();
 }

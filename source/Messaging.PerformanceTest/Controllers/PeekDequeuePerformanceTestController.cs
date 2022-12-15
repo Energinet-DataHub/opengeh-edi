@@ -37,14 +37,18 @@ public class PeekDequeuePerformanceTestController : ControllerBase
     [HttpPost("GenerateTestData", Name = "GenerateTestData")]
     public async Task PostAsync()
     {
-         for (var i = 0; i < _actorService.GetActorCount(); i++)
-         {
+        _actorService.ResetActorNumbers();
+
+        for (var i = 0; i < _actorService.GetActorCount(); i++)
+        {
              var uniqueActorNumber = _actorService.GetUniqueActorNumber();
 
              for (var j = 0; j < 10; j++)
              {
                  await _moveInService.MoveInAsync(uniqueActorNumber).ConfigureAwait(false);
              }
-         }
+        }
+
+        _actorService.ResetActorNumbers();
     }
 }

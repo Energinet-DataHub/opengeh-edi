@@ -21,7 +21,7 @@ public class ActorService : IActorService
 {
     private const int NumberOfActors = 100;
     private readonly object _actorNumberLock = new();
-    private readonly ConcurrentDictionary<string, bool> _actorNumberDictionary;
+    private ConcurrentDictionary<string, bool> _actorNumberDictionary;
 
     public ActorService()
     {
@@ -57,6 +57,11 @@ public class ActorService : IActorService
         }
 
         return isInUse;
+    }
+
+    public void ResetActorNumbers()
+    {
+        _actorNumberDictionary = CreateActorNumbers();
     }
 
     private static ConcurrentDictionary<string, bool> CreateActorNumbers()
