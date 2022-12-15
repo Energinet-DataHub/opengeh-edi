@@ -26,12 +26,12 @@ internal class JwtBuilder
         var claims = new List<Claim>
         {
             new("roles", "electricalsupplier"),
-            new("roles", "anotherelectricalsupplier"),
             new("test-actornumber", uniqueActorNumber),
             new("azp", Guid.NewGuid().ToString()),
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("test_not_so_secret_key"));
+        key.KeyId = "MyKeyId";
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
