@@ -13,12 +13,11 @@
 // limitations under the License.
 
 using System;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.Configuration.Commands.Commands;
-using Messaging.Domain.Actors;
-using Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Messaging.Domain.Transactions.AggregatedTimeSeries;
 
 namespace Messaging.Application.Transactions.AggregatedTimeSeries;
@@ -45,4 +44,17 @@ public class SendAggregatedTimeSeriesHandler : IRequestHandler<SendAggregatedTim
     }
 }
 
-public record SendAggregatedTimeSeries(Guid AggregatedTimeSeriesResultId) : ICommand<Unit>;
+public class SendAggregatedTimeSeries : InternalCommand
+{
+    [JsonConstructor]
+    public SendAggregatedTimeSeries(Guid id, Guid aggregatedTimeSeriesResultId)
+    {
+    }
+
+    public SendAggregatedTimeSeries(Guid aggregatedTimeSeriesResultId)
+    {
+        AggregatedTimeSeriesResultId = aggregatedTimeSeriesResultId;
+    }
+
+    public Guid AggregatedTimeSeriesResultId { get; }
+}
