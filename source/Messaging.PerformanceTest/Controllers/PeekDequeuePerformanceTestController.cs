@@ -23,15 +23,15 @@ public class PeekDequeuePerformanceTestController : ControllerBase
     }
 
     [HttpGet("ActorNumber", Name = "ActorNumber")]
-    public string? Get()
+    public string? GetActorNumber()
     {
         return _actorService.GetUniqueActorNumber();
     }
 
     [HttpGet("ActorToken/{actorNumber}", Name = "ActorToken")]
-    public string? Get(string actorNumber)
+    public string? GetToken(string actorNumber)
     {
-        return actorNumber;
+        return _actorService.IsActorNumberInUse(actorNumber) ? JwtBuilder.BuildToken(actorNumber) : null;
     }
 
     [HttpPost("GenerateTestData", Name = "GenerateTestData")]

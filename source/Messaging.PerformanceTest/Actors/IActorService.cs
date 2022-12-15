@@ -29,4 +29,11 @@ public interface IActorService
     /// </summary>
     /// <returns>Number of actor numbers available</returns>
     int GetActorCount();
+
+    /// <summary>
+    /// Check if actor number exists and is in use
+    /// </summary>
+    /// <param name="actorNumber"></param>
+    /// <returns>boolean indicating whether actor number is in use</returns>
+    bool IsActorNumberInUse(string actorNumber);
 }

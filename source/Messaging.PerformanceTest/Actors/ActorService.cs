@@ -48,10 +48,21 @@ public class ActorService : IActorService
         }
     }
 
+    public bool IsActorNumberInUse(string actorNumber)
+    {
+        bool isInUse;
+        lock (_actorNumberLock)
+        {
+            _actorNumberDictionary.TryGetValue(actorNumber, out isInUse);
+        }
+
+        return isInUse;
+    }
+
     private static ConcurrentDictionary<string, bool> CreateActorNumbers()
     {
         var actorNumberDictionary = new ConcurrentDictionary<string, bool>();
-        const long baseNumber = 7080000000000;
+        const long baseNumber = 7000000000000;
 
         for (var i = 0; i < NumberOfActors; i++)
         {
