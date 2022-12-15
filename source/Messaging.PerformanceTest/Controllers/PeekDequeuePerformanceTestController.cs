@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Messaging.PerformanceTest.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api")]
 public class PeekDequeuePerformanceTestController : ControllerBase
 {
     private readonly ILogger<PeekDequeuePerformanceTestController> _logger;
@@ -22,13 +22,19 @@ public class PeekDequeuePerformanceTestController : ControllerBase
         _moveInService = moveInService;
     }
 
-    [HttpGet(Name = "GetUniqueActorNumber")]
+    [HttpGet("ActorNumber", Name = "ActorNumber")]
     public string? Get()
     {
         return _actorService.GetUniqueActorNumber();
     }
 
-    [HttpPost(Name = "GenerateTestData")]
+    [HttpGet("ActorToken/{actorNumber}", Name = "ActorToken")]
+    public string? Get(string actorNumber)
+    {
+        return actorNumber;
+    }
+
+    [HttpPost("GenerateTestData", Name = "GenerateTestData")]
     public async Task PostAsync()
     {
          for (var i = 0; i < _actorService.GetActorCount(); i++)
