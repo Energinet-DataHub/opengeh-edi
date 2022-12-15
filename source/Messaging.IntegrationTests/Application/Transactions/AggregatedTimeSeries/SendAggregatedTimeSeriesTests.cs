@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dapper;
@@ -20,13 +19,10 @@ using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.Transactions.AggregatedTimeSeries;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
 using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
-using Point = Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
-using TimeSeries = Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData.TimeSeries;
 
 namespace Messaging.IntegrationTests.Application.Transactions.AggregatedTimeSeries;
 
@@ -66,26 +62,16 @@ public class SendAggregatedTimeSeriesTests : TestBase
 
     private static SendAggregatedTimeSeries CreateRequest()
     {
-        var timeSeries = new TimeSeries(
-            Guid.NewGuid(),
-            "870",
-            "E18",
-            "KWH",
-            new Period("PT1H", new TimeInterval("2022-02-12T23:00Z", "2022-02-12T23:00Z"), new List<Point>()
-            {
-                new(1, 11, null),
-            }));
-        return new SendAggregatedTimeSeries(timeSeries, SampleData.GridOperatorNumber, SampleData.ResultId);
+        return new SendAggregatedTimeSeries(SampleData.ResultId);
     }
 
     private void AddFakeResult()
     {
         var results = GetService<IAggregatedTimeSeriesResults>() as FakeAggregatedTimeSeriesResults;
-
-        var dto = new Messaging.Infrastructure.Transactions.AggregatedTimeSeries.TimeSeries(
+        var dto = new TimeSeries(
             SampleData.GridAreaCode,
             SampleData.GridOperatorNumber,
-            new List<Messaging.Infrastructure.Transactions.AggregatedTimeSeries.Point>()
+            new List<Point>()
             {
                 new(
                     1,

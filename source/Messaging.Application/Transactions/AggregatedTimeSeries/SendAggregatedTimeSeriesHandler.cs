@@ -45,4 +45,4 @@ public class SendAggregatedTimeSeriesHandler : IRequestHandler<SendAggregatedTim
     }
 }
 
-public record SendAggregatedTimeSeries(TimeSeries TimeSeries, string GridOperatorNumber, Guid AggregatedTimeSeriesResultId) : ICommand<Unit>;
+public record SendAggregatedTimeSeries(Guid AggregatedTimeSeriesResultId) : ICommand<Unit>;
