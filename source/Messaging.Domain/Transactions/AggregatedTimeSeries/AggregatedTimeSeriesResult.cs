@@ -12,8 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+
 namespace Messaging.Domain.Transactions.AggregatedTimeSeries;
 
 public class AggregatedTimeSeriesResult
 {
+    public AggregatedTimeSeriesResult(Guid id, IReadOnlyList<GridArea> gridAreas)
+    {
+        Id = id;
+        GridAreas = gridAreas;
+    }
+
+    public Guid Id { get; }
+
+    public IReadOnlyList<GridArea> GridAreas { get; }
+}
+
+public class GridArea
+{
+    public GridArea(IReadOnlyList<Point> points)
+    {
+        Points = points;
+    }
+
+    public IReadOnlyList<Point> Points { get; }
 }
