@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using NodaTime;
-
 namespace Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 
 public record TimeSeries(Guid Id, string MeteringPointType, string MeasureUnitType, Period Period);
