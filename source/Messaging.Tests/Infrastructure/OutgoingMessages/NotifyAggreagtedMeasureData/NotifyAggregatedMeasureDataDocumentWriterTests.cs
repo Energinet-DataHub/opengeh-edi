@@ -63,6 +63,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
         {
             new(
                 Guid.NewGuid(),
+                "870",
                 "E18",
                 "KWH",
                 new Period(
@@ -92,6 +93,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             .HasValue("receiver_MarketParticipant.marketRole.type", header.ReceiverRole)
             .HasValue("createdDateTime", header.TimeStamp.ToString())
             .HasValue("Series[1]/mRID", timeSeries[0].Id.ToString())
+            .HasValue("Series[1]/meteringGridArea_Domain.mRID", timeSeries[0].GridAreaCode)
             .HasValue("Series[1]/marketEvaluationPoint.type", timeSeries[0].MeteringPointType)
             .HasValue("Series[1]/quantity_Measure_Unit.name", timeSeries[0].MeasureUnitType)
             .HasValue("Series[1]/Period/resolution", timeSeries[0].Period.Resolution)

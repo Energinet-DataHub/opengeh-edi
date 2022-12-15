@@ -64,6 +64,7 @@ public class SendAggregatedTimeSeriesTests : TestBase
     {
         var timeSeries = new TimeSeries(
             Guid.NewGuid(),
+            "870",
             "E18",
             "KWH",
             new Period("PT1H", new TimeInterval("2022-02-12T23:00Z", "2022-02-12T23:00Z"), new List<Point>()

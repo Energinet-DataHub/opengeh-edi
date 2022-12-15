@@ -16,7 +16,7 @@ using NodaTime;
 
 namespace Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 
-public record TimeSeries(Guid Id, string MeteringPointType, string MeasureUnitType, Period Period);
+public record TimeSeries(Guid Id, string GridAreaCode, string MeteringPointType, string MeasureUnitType, Period Period);
 
 public record Period(string Resolution, TimeInterval TimeInterval, IReadOnlyList<Point> Point);
 public record TimeInterval(string Start, string End);
