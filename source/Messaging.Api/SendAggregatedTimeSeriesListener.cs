@@ -38,7 +38,7 @@ public class SendAggregatedTimeSeriesListener
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var timeSeries = await _serializer.DeserializeAsync(request.Body, typeof(TimeSeries)).ConfigureAwait(false);
+        var timeSeriesFromRequest = await _serializer.DeserializeAsync(request.Body, typeof(TimeSeries)).ConfigureAwait(false);
 
         var response = request.CreateResponse(HttpStatusCode.OK);
         response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
