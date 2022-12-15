@@ -26,7 +26,7 @@ public class AggregatedTimeSeriesMessage : OutgoingMessage
     }
 
     private AggregatedTimeSeriesMessage(ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, TimeSeries timeSeries)
-        : base(MessageType.AggregatedTimeSeries, receiverId, transactionId, processType, receiverRole, DataHubDetails.IdentificationNumber, MarketRole.MeteringPointAdministrator, JsonSerializer.Serialize(timeSeries))
+        : base(MessageType.AggregatedTimeSeries, receiverId, transactionId, processType, receiverRole, DataHubDetails.IdentificationNumber, MarketRole.MeteringDataAdministrator, JsonSerializer.Serialize(timeSeries))
     {
         TimeSeries = timeSeries;
     }
