@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 
 namespace Messaging.Domain.Transactions.AggregatedTimeSeries;
@@ -31,10 +32,22 @@ public class AggregatedTimeSeriesResult
 
 public class GridArea
 {
-    public GridArea(IReadOnlyList<Point> points)
+    public GridArea(IReadOnlyList<Point> points, string gridAreaCode, string meteringPointType, ActorNumber gridOperatorId, string measureUnitType)
     {
         Points = points;
+        GridAreaCode = gridAreaCode;
+        MeteringPointType = meteringPointType;
+        GridOperatorId = gridOperatorId;
+        MeasureUnitType = measureUnitType;
     }
 
     public IReadOnlyList<Point> Points { get; }
+
+    public string GridAreaCode { get; }
+
+    public string MeteringPointType { get; }
+
+    public string MeasureUnitType { get; }
+
+    public ActorNumber GridOperatorId { get; }
 }

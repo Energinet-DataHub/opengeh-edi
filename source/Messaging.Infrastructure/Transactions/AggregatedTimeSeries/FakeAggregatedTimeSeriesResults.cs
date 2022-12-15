@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Messaging.Application.Transactions.AggregatedTimeSeries;
+using Messaging.Domain.Actors;
 using Messaging.Domain.Transactions.AggregatedTimeSeries;
 
 namespace Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
@@ -39,7 +40,7 @@ public class FakeAggregatedTimeSeriesResults : IAggregatedTimeSeriesResults
                 point.Position,
                 point.Quantity,
                 point.Quality));
-        var gridArea = new GridArea(points.ToList());
+        var gridArea = new GridArea(points.ToList(), timeSeries.GridAreaCode, "E18", ActorNumber.Create(timeSeries.GridOperatorNumber), "KWH");
         var result = new AggregatedTimeSeriesResult(resultId, new List<GridArea>()
         {
             gridArea,
