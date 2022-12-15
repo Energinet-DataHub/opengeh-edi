@@ -13,11 +13,13 @@
 // limitations under the License.
 
 using System.Collections.Concurrent;
+using System.Globalization;
 
 namespace Messaging.PerformanceTest.Actors;
 
 public class ActorService : IActorService
 {
+    private const int NumberOfActors = 100;
     private readonly object _actorNumberLock = new();
     private readonly ConcurrentDictionary<string, bool> _actorNumberDictionary;
 
@@ -49,12 +51,14 @@ public class ActorService : IActorService
     private static ConcurrentDictionary<string, bool> CreateActorNumbers()
     {
         var actorNumberDictionary = new ConcurrentDictionary<string, bool>();
-        actorNumberDictionary.AddOrUpdate("45X000000000099K", false, (_, _) => false);
-        actorNumberDictionary.AddOrUpdate("7080010006509", false, (_, _) => false);
-        actorNumberDictionary.AddOrUpdate("5790002597695", false, (_, _) => false);
-        actorNumberDictionary.AddOrUpdate("7080005010788", false, (_, _) => false);
-        actorNumberDictionary.AddOrUpdate("5790002602245", false, (_, _) => false);
-        actorNumberDictionary.AddOrUpdate("5790001108212", false, (_, _) => false);
+        const long baseNumber = 7080000000000;
+
+        for (var i = 0; i < NumberOfActors; i++)
+        {
+            var actorNumber = baseNumber + i;
+            actorNumberDictionary.AddOrUpdate(actorNumber.ToString(CultureInfo.InvariantCulture), false, (_, _) => false);
+        }
+
         return actorNumberDictionary;
     }
 }
