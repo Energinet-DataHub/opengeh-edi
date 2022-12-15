@@ -56,7 +56,8 @@ public class SendAggregatedTimeSeriesTests : TestBase
                 GetService<IDbConnectionFactory>())
             .HasReceiverId(SampleData.GridOperatorNumber)
             .HasReceiverRole(MarketRole.GridOperator.Name)
-            .HasSenderRole(MarketRole.MeteringDataAdministrator.Name);
+            .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
+            .HasSenderId(DataHubDetails.IdentificationNumber.Value);
     }
 
     private static SendAggregatedTimeSeries CreateRequest()
