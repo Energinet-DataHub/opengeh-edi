@@ -25,7 +25,7 @@ namespace Messaging.Infrastructure.OutgoingMessages.RejectRequestChangeAccountin
 
 public class RejectRequestChangeAccountingPointCharacteristicsMessageWriter : MessageWriter
 {
-    public RejectRequestChangeAccountingPointCharacteristicsMessageWriter(IMarketActivityRecordParser parser)
+    public RejectRequestChangeAccountingPointCharacteristicsMessageWriter(IMessageRecordParser parser)
         : base(
             new DocumentDetails(
                 "RejectRequestChangeAccountingPointCharacteristics_MarketDocument",

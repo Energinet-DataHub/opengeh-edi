@@ -15,21 +15,21 @@
 namespace Messaging.Application.OutgoingMessages.Common
 {
     /// <summary>
-    /// Service for parsing a market activity record to- and from a string payload
+    /// Service for parsing a message record to- and from a string payload
     /// </summary>
-    public interface IMarketActivityRecordParser
+    public interface IMessageRecordParser
     {
         /// <summary>
-        /// Parses a market activity record to a string
+        /// Parses a message record to a string
         /// </summary>
-        /// <param name="marketActivityRecord"></param>
+        /// <param name="messageRecord"></param>
         /// <returns><see cref="string"/></returns>
-        string From<TMarketActivityRecord>(TMarketActivityRecord marketActivityRecord);
+        string From<TMessageRecord>(TMessageRecord messageRecord);
 
         /// <summary>
         /// Parses a market activity record from a string payload
         /// </summary>
         /// <param name="payload"></param>
-        TMarketActivityRecord From<TMarketActivityRecord>(string payload);
+        TMessageRecord From<TMessageRecord>(string payload);
     }
 }

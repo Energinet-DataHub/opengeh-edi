@@ -24,9 +24,9 @@ using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.SchemaStore;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.GenericNotification;
-using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Serialization;
+using Messaging.Infrastructure.OutgoingMessages.Common;
 using Messaging.Infrastructure.OutgoingMessages.GenericNotification;
 using Messaging.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
@@ -37,14 +37,14 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.GenericNotification
     {
         private readonly GenericNotificationMessageWriter _messageWriter;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-        private readonly IMarketActivityRecordParser _marketActivityRecordParser;
+        private readonly IMessageRecordParser _messageRecordParser;
         private ISchemaProvider? _schemaProvider;
 
         public GenericNotificationDocumentWriterTests()
         {
             _systemDateTimeProvider = new SystemDateTimeProvider();
-            _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
-            _messageWriter = new GenericNotificationMessageWriter(_marketActivityRecordParser);
+            _messageRecordParser = new MessageRecordParser(new Serializer());
+            _messageWriter = new GenericNotificationMessageWriter(_messageRecordParser);
         }
 
         [Fact]
@@ -57,7 +57,7 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.GenericNotification
                 new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId", _systemDateTimeProvider.Now()),
             };
 
-            var message = await _messageWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
+            var message = await _messageWriter.WriteAsync(header, marketActivityRecords.Select(record => _messageRecordParser.From(record)).ToList()).ConfigureAwait(false);
 
             await AssertMessage(message, header, marketActivityRecords).ConfigureAwait(false);
         }

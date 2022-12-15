@@ -68,6 +68,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202227101329 Add EnqueuedMessages table.sql" />
     <EmbeddedResource Include="Scripts\Model\202227101330 Remove actor role from bundle store.sql" />
     <EmbeddedResource Include="Scripts\Model\202227101331 Rename document type column.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101332 Rename marketactivityrecordpayload column.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281100 Seed cleanup.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281101 Insert Reasons.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241100 Consolidated dbo model.sql" />

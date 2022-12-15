@@ -24,9 +24,9 @@ using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.SchemaStore;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
-using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Serialization;
+using Messaging.Infrastructure.OutgoingMessages.Common;
 using Messaging.Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
@@ -37,14 +37,14 @@ public class RejectRequestChangeOfSupplierDocumentWriterTests
 {
     private readonly RejectRequestChangeOfSupplierXmlMessageWriter _xmlMessageWriter;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-    private readonly IMarketActivityRecordParser _marketActivityRecordParser;
+    private readonly IMessageRecordParser _messageRecordParser;
     private ISchemaProvider? _schemaProvider;
 
     public RejectRequestChangeOfSupplierDocumentWriterTests()
     {
         _systemDateTimeProvider = new SystemDateTimeProvider();
-        _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
-        _xmlMessageWriter = new RejectRequestChangeOfSupplierXmlMessageWriter(_marketActivityRecordParser);
+        _messageRecordParser = new MessageRecordParser(new Serializer());
+        _xmlMessageWriter = new RejectRequestChangeOfSupplierXmlMessageWriter(_messageRecordParser);
     }
 
     [Fact]
@@ -66,7 +66,7 @@ public class RejectRequestChangeOfSupplierDocumentWriterTests
             }),
         };
 
-        var message = await _xmlMessageWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList()).ConfigureAwait(false);
+        var message = await _xmlMessageWriter.WriteAsync(header, marketActivityRecords.Select(record => _messageRecordParser.From(record)).ToList()).ConfigureAwait(false);
 
         await AssertMessage(message, header, marketActivityRecords).ConfigureAwait(false);
     }

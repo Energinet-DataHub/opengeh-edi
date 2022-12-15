@@ -66,7 +66,7 @@ public class Bundle
             message.MessageType.Name,
             message.MessageType.Category.Name,
             message.ProcessType,
-            message.MarketActivityRecordPayload);
+            message.MessageRecord);
 
         Add(enqueuedMessage);
     }
@@ -78,7 +78,7 @@ public class Bundle
             throw new NoMessagesInBundleException();
         }
 
-        var payloads = _messages.Select(message => message.Payload).ToList();
+        var payloads = _messages.Select(message => message.MessageRecord).ToList();
         return new CimMessage(_documentType!, _header, payloads);
     }
 

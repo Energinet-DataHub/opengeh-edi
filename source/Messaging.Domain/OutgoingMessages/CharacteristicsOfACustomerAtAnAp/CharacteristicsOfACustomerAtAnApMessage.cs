@@ -20,12 +20,12 @@ namespace Messaging.Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 
 public class CharacteristicsOfACustomerAtAnApMessage : OutgoingMessage
 {
-    private CharacteristicsOfACustomerAtAnApMessage(MessageType messageType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string marketActivityRecordPayload)
-        : base(messageType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, marketActivityRecordPayload)
+    private CharacteristicsOfACustomerAtAnApMessage(MessageType messageType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
+        : base(messageType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, messageRecord)
     {
         MarketActivityRecord =
             new Serializer().Deserialize<MarketActivityRecord>(
-                marketActivityRecordPayload);
+                messageRecord);
     }
 
     private CharacteristicsOfACustomerAtAnApMessage(MessageType messageType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, MarketActivityRecord marketActivityRecord)
