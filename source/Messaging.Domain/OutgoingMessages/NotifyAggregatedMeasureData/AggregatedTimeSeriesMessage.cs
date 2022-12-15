@@ -19,10 +19,10 @@ namespace Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 
 public class AggregatedTimeSeriesMessage : OutgoingMessage
 {
-    private AggregatedTimeSeriesMessage(MessageType messageType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string marketActivityRecordPayload)
-        : base(messageType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, JsonSerializer.Serialize(marketActivityRecordPayload))
+    private AggregatedTimeSeriesMessage(MessageType messageType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
+        : base(messageType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, JsonSerializer.Serialize(messageRecord))
     {
-        TimeSeries = JsonSerializer.Deserialize<TimeSeries>(marketActivityRecordPayload)!;
+        TimeSeries = JsonSerializer.Deserialize<TimeSeries>(messageRecord)!;
     }
 
     private AggregatedTimeSeriesMessage(ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, TimeSeries timeSeries)

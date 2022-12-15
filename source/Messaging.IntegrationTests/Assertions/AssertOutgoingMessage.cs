@@ -64,7 +64,7 @@ namespace Messaging.IntegrationTests.Assertions
             ArgumentNullException.ThrowIfNull(receiverRole);
             var message = connectionFactory.GetOpenConnection().QuerySingle(
                 $"SELECT m.Id, m.RecordId, m.MessageType, m.ReceiverId, m.TransactionId, m.ProcessType," +
-                $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MarketActivityRecordPayload " +
+                $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MessageRecord " +
                 $" FROM [b2b].[OutgoingMessages] m" +
                 $" WHERE m.MessageType = '{messageType}' AND m.ProcessType = '{processType}' AND m.ReceiverRole = '{receiverRole.Name}'");
 
