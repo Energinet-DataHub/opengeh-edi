@@ -12,11 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace Messaging.IntegrationTests.Application.Transactions.AggregatedTimeSeries;
 
 internal class SampleData
 {
-    internal static string TransactionId => "027F69E0-E634-422A-BCD4-2D41A4ECA89C";
-
     internal static string GridOperatorNumber => "1234567890123";
+
+    internal static string GridAreaCode => "870";
+
+    internal static Guid ResultId => Guid.Parse("42AB7292-FE2E-4F33-B537-4A15FEDB9754");
 }

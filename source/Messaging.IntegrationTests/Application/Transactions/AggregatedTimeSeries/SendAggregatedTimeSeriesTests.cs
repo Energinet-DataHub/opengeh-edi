@@ -21,9 +21,12 @@ using Messaging.Application.Transactions.AggregatedTimeSeries;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
 using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
+using Point = Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
+using TimeSeries = Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData.TimeSeries;
 
 namespace Messaging.IntegrationTests.Application.Transactions.AggregatedTimeSeries;
 
@@ -32,6 +35,7 @@ public class SendAggregatedTimeSeriesTests : TestBase
     public SendAggregatedTimeSeriesTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
+        AddFakeResult();
     }
 
     [Fact]
@@ -71,6 +75,25 @@ public class SendAggregatedTimeSeriesTests : TestBase
             {
                 new(1, 11, null),
             }));
-        return new SendAggregatedTimeSeries(timeSeries, SampleData.GridOperatorNumber, Guid.NewGuid());
+        return new SendAggregatedTimeSeries(timeSeries, SampleData.GridOperatorNumber, SampleData.ResultId);
+    }
+
+    private void AddFakeResult()
+    {
+        var results = GetService<IAggregatedTimeSeriesResults>() as FakeAggregatedTimeSeriesResults;
+
+        var dto = new Messaging.Infrastructure.Transactions.AggregatedTimeSeries.TimeSeries(
+            SampleData.GridAreaCode,
+            SampleData.GridOperatorNumber,
+            new List<Messaging.Infrastructure.Transactions.AggregatedTimeSeries.Point>()
+            {
+                new(
+                    1,
+                    11,
+                    null,
+                    "2022-10-31T21:15:00.000Z"),
+            });
+
+        results?.Add(SampleData.ResultId, dto);
     }
 }
