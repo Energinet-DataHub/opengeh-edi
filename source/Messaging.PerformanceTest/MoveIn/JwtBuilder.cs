@@ -25,7 +25,8 @@ internal class JwtBuilder
     {
         var claims = new List<Claim>
         {
-            new(ClaimTypes.Role,  "electricalsupplier"),
+            new("roles", "electricalsupplier"),
+            new("roles", "anotherelectricalsupplier"),
             new("test-actornumber", uniqueActorNumber),
             new("azp", Guid.NewGuid().ToString()),
         };
@@ -34,9 +35,9 @@ internal class JwtBuilder
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
-            issuer: "https://login.microsoftonline.com/4a7411ea-ac71-4b63-9647-b8bd4c5a20e0/v2.0",
-            audience: "c7e5dc5c-2ee0-420c-b5d2-586e7527302c",
-            claims: claims,
+            "https://login.microsoftonline.com/4a7411ea-ac71-4b63-9647-b8bd4c5a20e0/v2.0",
+            "c7e5dc5c-2ee0-420c-b5d2-586e7527302c",
+            claims,
             expires: DateTime.Now.AddMinutes(30),
             signingCredentials: credentials);
 
