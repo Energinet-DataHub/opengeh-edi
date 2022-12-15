@@ -12,20 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
+using System;
+using System.Threading.Tasks;
 using Messaging.Application.Transactions.AggregatedTimeSeries;
 using Messaging.Domain.Transactions.AggregatedTimeSeries;
-using Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Messaging.Infrastructure.Configuration;
+namespace Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
 
-internal static class SendAggregatedTimeSeriesConfiguration
+public class FakeAggregatedTimeSeriesResults : IAggregatedTimeSeriesResults
 {
-    internal static void Configure(IServiceCollection services)
+    public Task<AggregatedTimeSeriesResult> GetResultAsync(Guid resultId)
     {
-        services.AddScoped<IRequestHandler<SendAggregatedTimeSeries, Unit>, SendAggregatedTimeSeriesHandler>();
-        services.AddScoped<IAggregatedTimeSeriesTransactions, AggregatedTimeSeriesTransactions>();
-        services.AddSingleton<IAggregatedTimeSeriesResults, FakeAggregatedTimeSeriesResults>();
+        return Task.FromResult(new AggregatedTimeSeriesResult());
     }
 }

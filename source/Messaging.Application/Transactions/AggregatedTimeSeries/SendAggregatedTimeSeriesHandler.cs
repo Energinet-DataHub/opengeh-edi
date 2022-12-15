@@ -26,21 +26,25 @@ namespace Messaging.Application.Transactions.AggregatedTimeSeries;
 public class SendAggregatedTimeSeriesHandler : IRequestHandler<SendAggregatedTimeSeries, Unit>
 {
     private readonly IAggregatedTimeSeriesTransactions _transactions;
+    private readonly IAggregatedTimeSeriesResults _aggregatedTimeSeriesResults;
 
-    public SendAggregatedTimeSeriesHandler(IAggregatedTimeSeriesTransactions transactions)
+    public SendAggregatedTimeSeriesHandler(IAggregatedTimeSeriesTransactions transactions, IAggregatedTimeSeriesResults aggregatedTimeSeriesResults)
     {
         _transactions = transactions;
+        _aggregatedTimeSeriesResults = aggregatedTimeSeriesResults;
     }
 
-    public Task<Unit> Handle(SendAggregatedTimeSeries request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(SendAggregatedTimeSeries request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
+
+        var aggregatedTimeSeriesResult = await _aggregatedTimeSeriesResults.GetResultAsync(request.AggregatedTimeSeriesResultId).ConfigureAwait(false);
 
         var transaction = new AggregatedTimeSeriesTransaction();
         transaction.SendResultToGridOperator(request.TimeSeries, ActorNumber.Create(request.GridOperatorNumber));
         _transactions.Add(transaction);
-        return Task.FromResult(Unit.Value);
+        return Unit.Value;
     }
 }
 
-public record SendAggregatedTimeSeries(TimeSeries TimeSeries, string GridOperatorNumber) : ICommand<Unit>;
+public record SendAggregatedTimeSeries(TimeSeries TimeSeries, string GridOperatorNumber, Guid AggregatedTimeSeriesResultId) : ICommand<Unit>;

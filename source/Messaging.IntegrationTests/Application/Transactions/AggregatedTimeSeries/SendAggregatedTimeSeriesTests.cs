@@ -71,6 +71,6 @@ public class SendAggregatedTimeSeriesTests : TestBase
             {
                 new(1, 11, null),
             }));
-        return new SendAggregatedTimeSeries(timeSeries, SampleData.GridOperatorNumber);
+        return new SendAggregatedTimeSeries(timeSeries, SampleData.GridOperatorNumber, Guid.NewGuid());
     }
 }
