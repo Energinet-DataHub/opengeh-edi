@@ -69,7 +69,7 @@ public class EnqueueOutgoingMessagesBehaviour<TRequest, TResponse> : IPipelineBe
                     message.MessageType.Name,
                     message.MessageType.Category.Name,
                     message.ProcessType,
-                    message.MarketActivityRecordPayload)).ConfigureAwait(false);
+                    message.MessageRecord)).ConfigureAwait(false);
         }
 
         return result;

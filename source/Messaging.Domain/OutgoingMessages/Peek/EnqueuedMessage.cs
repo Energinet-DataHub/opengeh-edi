@@ -14,4 +14,4 @@
 
 namespace Messaging.Domain.OutgoingMessages.Peek;
 
-public record EnqueuedMessage(Guid Id, string ReceiverId, string ReceiverRole, string SenderId, string SenderRole, string MessageType, string Category, string ProcessType, string Payload);
+public record EnqueuedMessage(Guid Id, string ReceiverId, string ReceiverRole, string SenderId, string SenderRole, string MessageType, string Category, string ProcessType, string MessageRecord);

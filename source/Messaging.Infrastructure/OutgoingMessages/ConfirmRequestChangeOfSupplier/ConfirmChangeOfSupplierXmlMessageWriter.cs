@@ -25,7 +25,7 @@ namespace Messaging.Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSuppli
 
 public class ConfirmChangeOfSupplierXmlMessageWriter : MessageWriter
 {
-    public ConfirmChangeOfSupplierXmlMessageWriter(IMarketActivityRecordParser parser)
+    public ConfirmChangeOfSupplierXmlMessageWriter(IMessageRecordParser parser)
     : base(
         new DocumentDetails(
             "ConfirmRequestChangeOfSupplier_MarketDocument",

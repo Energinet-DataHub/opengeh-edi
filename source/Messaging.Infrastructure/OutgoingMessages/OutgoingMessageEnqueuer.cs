@@ -35,7 +35,7 @@ public class OutgoingMessageEnqueuer
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
 
-        var sql = @$"INSERT INTO [B2B].[EnqueuedMessages] VALUES (@Id, @MessageType, @MessageCategory, @ReceiverId, @ReceiverRole, @SenderId, @SenderRole, @ProcessType, @Payload)";
+        var sql = @$"INSERT INTO [B2B].[EnqueuedMessages] VALUES (@Id, @MessageType, @MessageCategory, @ReceiverId, @ReceiverRole, @SenderId, @SenderRole, @ProcessType, @MessageRecord)";
 
         return _dbConnectionFactory.GetOpenConnection()
             .ExecuteAsync(
@@ -50,7 +50,7 @@ public class OutgoingMessageEnqueuer
                     SenderId = message.SenderId,
                     SenderRole = message.SenderRole,
                     ProcessType = message.ProcessType,
-                    Payload = message.Payload,
+                    MessageRecord = message.MessageRecord,
                 },
                 _unitOfWork.CurrentTransaction);
     }

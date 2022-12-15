@@ -57,7 +57,7 @@ public class EnqueuedMessages : IEnqueuedMessages
             MessageType AS {nameof(EnqueuedMessage.MessageType)},
             MessageCategory AS {nameof(EnqueuedMessage.Category)},
             ProcessType AS {nameof(EnqueuedMessage.ProcessType)},
-            Payload FROM [b2b].[EnqueuedMessages]
+            MessageRecord FROM [b2b].[EnqueuedMessages]
             WHERE ProcessType = @ProcessType AND ReceiverId = @ReceiverId AND ReceiverRole = @ReceiverRole AND MessageType = @MessageType AND MessageCategory = @MessageCategory";
         return await _connectionFactory
             .GetOpenConnection()

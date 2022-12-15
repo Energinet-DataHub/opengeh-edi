@@ -18,7 +18,6 @@ using Messaging.Application.Configuration.DataAccess;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.IntegrationTests.Application.IncomingMessages;
-using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 
@@ -49,7 +48,7 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase
         Assert.Equal(result.SenderId, DataHubDetails.IdentificationNumber.Value);
         Assert.Equal(result.SenderRole, MarketRole.MeteringPointAdministrator.Name);
         Assert.Equal(result.ProcessType, ProcessType.MoveIn.Code);
-        Assert.NotNull(result.Payload);
+        Assert.NotNull(result.MessageRecord);
     }
 
     private static IncomingMessageBuilder MessageBuilder()
