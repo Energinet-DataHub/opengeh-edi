@@ -33,8 +33,6 @@ using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Actors;
-using Messaging.Infrastructure.Common;
-using Messaging.Infrastructure.Common.Reasons;
 using Messaging.Infrastructure.Configuration.Authentication;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.FeatureFlag;
@@ -46,6 +44,8 @@ using Messaging.Infrastructure.MasterData.MarketEvaluationPoints;
 using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
 using Messaging.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
+using Messaging.Infrastructure.OutgoingMessages.Common;
+using Messaging.Infrastructure.OutgoingMessages.Common.Reasons;
 using Messaging.Infrastructure.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
 using Messaging.Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Infrastructure.OutgoingMessages.Dequeue;
@@ -245,7 +245,7 @@ namespace Messaging.Infrastructure.Configuration
             _services.AddScoped<IMessageWriter, RejectRequestChangeOfSupplierJsonMessageWriter>();
             _services.AddScoped<IMessageWriter, NotifyAggregatedMeasureDataMessageWriter>();
             _services.AddScoped<IValidationErrorTranslator, ValidationErrorTranslator>();
-            _services.AddScoped<IMarketActivityRecordParser, MarketActivityRecordParser>();
+            _services.AddScoped<IMessageRecordParser, MessageRecordParser>();
         }
 
         private void AddMediatR()

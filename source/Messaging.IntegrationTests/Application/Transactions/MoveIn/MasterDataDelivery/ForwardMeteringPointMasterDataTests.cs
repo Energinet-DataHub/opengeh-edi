@@ -246,11 +246,11 @@ public class ForwardMeteringPointMasterDataTests : TestBase, IAsyncLifetime
 
     private Task<MarketActivityRecord> GetMarketActivityRecordAsync(MessageType messageType)
     {
-        var parser = GetService<IMarketActivityRecordParser>();
+        var parser = GetService<IMessageRecordParser>();
         var message = GetService<B2BContext>().OutgoingMessages.First(m => m.MessageType == messageType);
         var marketActivityRecord =
             parser.From<MarketActivityRecord>(
-                message!.MarketActivityRecordPayload);
+                message!.MessageRecord);
         return Task.FromResult(marketActivityRecord);
     }
 }

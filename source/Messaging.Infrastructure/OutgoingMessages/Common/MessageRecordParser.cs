@@ -15,25 +15,25 @@
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Infrastructure.Configuration.Serialization;
 
-namespace Messaging.Infrastructure.Common
+namespace Messaging.Infrastructure.OutgoingMessages.Common
 {
-    public class MarketActivityRecordParser : IMarketActivityRecordParser
+    public class MessageRecordParser : IMessageRecordParser
     {
         private readonly ISerializer _serializer;
 
-        public MarketActivityRecordParser(ISerializer serializer)
+        public MessageRecordParser(ISerializer serializer)
         {
             _serializer = serializer;
         }
 
-        public string From<TMarketActivityRecord>(TMarketActivityRecord marketActivityRecord)
+        public string From<TMessageRecord>(TMessageRecord messageRecord)
         {
-            return _serializer.Serialize(marketActivityRecord);
+            return _serializer.Serialize(messageRecord);
         }
 
-        public TMarketActivityRecord From<TMarketActivityRecord>(string payload)
+        public TMessageRecord From<TMessageRecord>(string payload)
         {
-            return _serializer.Deserialize<TMarketActivityRecord>(payload);
+            return _serializer.Deserialize<TMessageRecord>(payload);
         }
     }
 }

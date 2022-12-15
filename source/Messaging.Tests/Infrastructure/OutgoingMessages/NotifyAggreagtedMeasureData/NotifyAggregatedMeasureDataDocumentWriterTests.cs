@@ -23,8 +23,8 @@ using Messaging.Application.SchemaStore;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Configuration.Serialization;
+using Messaging.Infrastructure.OutgoingMessages.Common;
 using Messaging.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 using Messaging.Tests.Infrastructure.OutgoingMessages.Asserts;
 using NodaTime;
@@ -38,11 +38,11 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
     private const string NamespacePrefix = "cim";
     private readonly IMessageWriter _messageWriter;
     private readonly ISchemaProvider _schemaProvider;
-    private readonly IMarketActivityRecordParser _parser;
+    private readonly IMessageRecordParser _parser;
 
     public NotifyAggregatedMeasureDataDocumentWriterTests()
     {
-        _parser = new MarketActivityRecordParser(new Serializer());
+        _parser = new MessageRecordParser(new Serializer());
         _schemaProvider = new XmlSchemaProvider();
         _messageWriter = new NotifyAggregatedMeasureDataMessageWriter(_parser);
     }

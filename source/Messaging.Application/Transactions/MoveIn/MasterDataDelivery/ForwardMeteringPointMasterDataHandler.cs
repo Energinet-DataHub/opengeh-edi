@@ -36,16 +36,16 @@ namespace Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMeteringPointMasterData, Unit>
 {
     private readonly IMoveInTransactionRepository _transactionRepository;
-    private readonly IMarketActivityRecordParser _marketActivityRecordParser;
+    private readonly IMessageRecordParser _messageRecordParser;
     private readonly IOutgoingMessageStore _outgoingMessageStore;
 
     public ForwardMeteringPointMasterDataHandler(
         IMoveInTransactionRepository transactionRepository,
-        IMarketActivityRecordParser marketActivityRecordParser,
+        IMessageRecordParser messageRecordParser,
         IOutgoingMessageStore outgoingMessageStore)
     {
         _transactionRepository = transactionRepository;
-        _marketActivityRecordParser = marketActivityRecordParser;
+        _messageRecordParser = messageRecordParser;
         _outgoingMessageStore = outgoingMessageStore;
     }
 
@@ -148,6 +148,6 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
             transaction.StartedByMessageId,
             "E65",
             transaction.NewEnergySupplierId,
-            _marketActivityRecordParser.From(marketActivityRecord));
+            _messageRecordParser.From(marketActivityRecord));
     }
 }

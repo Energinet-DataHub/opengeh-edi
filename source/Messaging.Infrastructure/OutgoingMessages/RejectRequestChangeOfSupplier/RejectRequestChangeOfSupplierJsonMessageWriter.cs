@@ -28,9 +28,9 @@ public class RejectRequestChangeOfSupplierJsonMessageWriter : IMessageWriter
 {
     private const string DocumentType = "RejectRequestChangeOfSupplier_MarketDocument";
     private const string TypeCode = "414";
-    private readonly IMarketActivityRecordParser _parser;
+    private readonly IMessageRecordParser _parser;
 
-    public RejectRequestChangeOfSupplierJsonMessageWriter(IMarketActivityRecordParser parser)
+    public RejectRequestChangeOfSupplierJsonMessageWriter(IMessageRecordParser parser)
     {
         _parser = parser;
     }

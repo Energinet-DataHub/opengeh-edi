@@ -27,10 +27,10 @@ namespace Messaging.Infrastructure.OutgoingMessages.Common.Xml;
 public abstract class MessageWriter : IMessageWriter
 {
     private readonly DocumentDetails _documentDetails;
-    private readonly IMarketActivityRecordParser _parser;
+    private readonly IMessageRecordParser _parser;
     private readonly string? _reasonCode;
 
-    protected MessageWriter(DocumentDetails documentDetails, IMarketActivityRecordParser parser, string? reasonCode = null)
+    protected MessageWriter(DocumentDetails documentDetails, IMessageRecordParser parser, string? reasonCode = null)
     {
         _documentDetails = documentDetails;
         _parser = parser;

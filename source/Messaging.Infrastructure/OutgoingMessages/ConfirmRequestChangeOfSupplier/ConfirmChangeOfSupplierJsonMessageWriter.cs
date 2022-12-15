@@ -28,9 +28,9 @@ public class ConfirmChangeOfSupplierJsonMessageWriter : IMessageWriter
 {
     private const string DocumentType = "ConfirmRequestChangeOfSupplier_MarketDocument";
     private const string TypeCode = "414";
-    private readonly IMarketActivityRecordParser _parser;
+    private readonly IMessageRecordParser _parser;
 
-    public ConfirmChangeOfSupplierJsonMessageWriter(IMarketActivityRecordParser parser)
+    public ConfirmChangeOfSupplierJsonMessageWriter(IMessageRecordParser parser)
     {
         _parser = parser;
     }

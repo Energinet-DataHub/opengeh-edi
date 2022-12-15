@@ -18,7 +18,7 @@ namespace Messaging.Domain.OutgoingMessages
 {
     public class OutgoingMessage
     {
-        public OutgoingMessage(MessageType messageType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string marketActivityRecordPayload)
+        public OutgoingMessage(MessageType messageType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
         {
             MessageType = messageType;
             ReceiverId = receiverId;
@@ -27,7 +27,7 @@ namespace Messaging.Domain.OutgoingMessages
             ReceiverRole = receiverRole;
             SenderId = senderId;
             SenderRole = senderRole;
-            MarketActivityRecordPayload = marketActivityRecordPayload;
+            MessageRecord = messageRecord;
             Id = Guid.NewGuid();
         }
 
@@ -49,6 +49,6 @@ namespace Messaging.Domain.OutgoingMessages
 
         public MarketRole SenderRole { get; }
 
-        public string MarketActivityRecordPayload { get; }
+        public string MessageRecord { get; }
     }
 }

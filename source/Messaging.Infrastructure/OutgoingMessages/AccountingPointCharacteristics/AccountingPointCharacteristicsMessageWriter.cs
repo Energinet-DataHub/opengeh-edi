@@ -26,7 +26,7 @@ namespace Messaging.Infrastructure.OutgoingMessages.AccountingPointCharacteristi
 
 public class AccountingPointCharacteristicsMessageWriter : MessageWriter
 {
-    public AccountingPointCharacteristicsMessageWriter(IMarketActivityRecordParser parser)
+    public AccountingPointCharacteristicsMessageWriter(IMessageRecordParser parser)
         : base(
             new DocumentDetails(
                 "AccountingPointCharacteristics_MarketDocument",

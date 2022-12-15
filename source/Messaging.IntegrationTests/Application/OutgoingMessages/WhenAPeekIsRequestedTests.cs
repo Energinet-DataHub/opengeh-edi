@@ -131,7 +131,7 @@ public class WhenAPeekIsRequestedTests : TestBase
                 messageType.Name,
                 category.Name,
                 processType.Code,
-                "Payload");
+                "MessageRecord");
 
             await messageEnqueuer.EnqueueAsync(message).ConfigureAwait(false);
         }

@@ -26,7 +26,7 @@ namespace Messaging.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 
 public class NotifyAggregatedMeasureDataMessageWriter : MessageWriter
 {
-    public NotifyAggregatedMeasureDataMessageWriter(IMarketActivityRecordParser parser)
+    public NotifyAggregatedMeasureDataMessageWriter(IMessageRecordParser parser)
         : base(
             new DocumentDetails(
             "NotifyAggregatedMeasureData_MarketDocument",

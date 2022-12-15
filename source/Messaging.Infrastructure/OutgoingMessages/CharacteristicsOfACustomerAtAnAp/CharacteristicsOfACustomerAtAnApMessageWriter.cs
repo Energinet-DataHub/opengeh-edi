@@ -33,7 +33,7 @@ public class CharacteristicsOfACustomerAtAnApMessageWriter : MessageWriter
 {
     private MessageHeader? _header;
 
-    public CharacteristicsOfACustomerAtAnApMessageWriter(IMarketActivityRecordParser parser)
+    public CharacteristicsOfACustomerAtAnApMessageWriter(IMessageRecordParser parser)
         : base(
             new DocumentDetails(
             "CharacteristicsOfACustomerAtAnAP_MarketDocument",

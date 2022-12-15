@@ -25,10 +25,10 @@ using Messaging.Application.SchemaStore;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
-using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
+using Messaging.Infrastructure.OutgoingMessages.Common;
 using Messaging.Tests.Infrastructure.OutgoingMessages.Asserts;
 using NodaTime;
 using Xunit;
@@ -40,14 +40,14 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
         private const string NamespacePrefix = "cim";
         private readonly CharacteristicsOfACustomerAtAnApMessageWriter _messageWriter;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-        private readonly IMarketActivityRecordParser _marketActivityRecordParser;
+        private readonly IMessageRecordParser _messageRecordParser;
         private ISchemaProvider? _schemaProvider;
 
         public CharacteristicsOfACustomerAtAnApDocumentWriterTests()
         {
             _systemDateTimeProvider = new SystemDateTimeProvider();
-            _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
-            _messageWriter = new CharacteristicsOfACustomerAtAnApMessageWriter(_marketActivityRecordParser);
+            _messageRecordParser = new MessageRecordParser(new Serializer());
+            _messageWriter = new CharacteristicsOfACustomerAtAnApMessageWriter(_messageRecordParser);
         }
 
         [Fact]
@@ -206,7 +206,7 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
 
         private Task<Stream> WriteDocumentAsync(MessageHeader header, params MarketActivityRecord[] marketActivityRecords)
         {
-            return _messageWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList());
+            return _messageWriter.WriteAsync(header, marketActivityRecords.Select(record => _messageRecordParser.From(record)).ToList());
         }
     }
 }

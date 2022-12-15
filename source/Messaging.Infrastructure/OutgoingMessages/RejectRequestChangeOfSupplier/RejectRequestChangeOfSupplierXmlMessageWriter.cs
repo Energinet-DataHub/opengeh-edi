@@ -25,7 +25,7 @@ namespace Messaging.Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplie
 
 public class RejectRequestChangeOfSupplierXmlMessageWriter : MessageWriter
 {
-    public RejectRequestChangeOfSupplierXmlMessageWriter(IMarketActivityRecordParser parser)
+    public RejectRequestChangeOfSupplierXmlMessageWriter(IMessageRecordParser parser)
         : base(
             new DocumentDetails(
                 "RejectRequestChangeOfSupplier_MarketDocument",

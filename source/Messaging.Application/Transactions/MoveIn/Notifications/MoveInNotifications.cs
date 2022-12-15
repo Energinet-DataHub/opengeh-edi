@@ -27,12 +27,12 @@ namespace Messaging.Application.Transactions.MoveIn.Notifications;
 public class MoveInNotifications
 {
     private readonly IOutgoingMessageStore _outgoingMessageStore;
-    private readonly IMarketActivityRecordParser _marketActivityRecordParser;
+    private readonly IMessageRecordParser _messageRecordParser;
 
-    public MoveInNotifications(IOutgoingMessageStore outgoingMessageStore, IMarketActivityRecordParser marketActivityRecordParser)
+    public MoveInNotifications(IOutgoingMessageStore outgoingMessageStore, IMessageRecordParser messageRecordParser)
     {
         _outgoingMessageStore = outgoingMessageStore;
-        _marketActivityRecordParser = marketActivityRecordParser;
+        _messageRecordParser = messageRecordParser;
     }
 
     public void InformCurrentEnergySupplierAboutEndOfSupply(string transactionId, Instant effectiveDate, string marketEvaluationPointId, string energySupplierId)
@@ -51,7 +51,7 @@ public class MoveInNotifications
             MarketRole.EnergySupplier,
             DataHubDetails.IdentificationNumber,
             MarketRole.MeteringPointAdministrator,
-            _marketActivityRecordParser.From(marketActivityRecord));
+            _messageRecordParser.From(marketActivityRecord));
 
         _outgoingMessageStore.Add(message);
     }
@@ -73,7 +73,7 @@ public class MoveInNotifications
             MarketRole.GridOperator,
             DataHubDetails.IdentificationNumber,
             MarketRole.MeteringPointAdministrator,
-            _marketActivityRecordParser.From(marketActivityRecord));
+            _messageRecordParser.From(marketActivityRecord));
 
         _outgoingMessageStore.Add(message);
     }

@@ -25,7 +25,7 @@ namespace Messaging.Infrastructure.OutgoingMessages.GenericNotification;
 
 public class GenericNotificationMessageWriter : MessageWriter
 {
-    public GenericNotificationMessageWriter(IMarketActivityRecordParser parser)
+    public GenericNotificationMessageWriter(IMessageRecordParser parser)
     : base(
         new DocumentDetails(
         "GenericNotification_MarketDocument",

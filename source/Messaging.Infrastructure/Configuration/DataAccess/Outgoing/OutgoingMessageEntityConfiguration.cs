@@ -63,7 +63,7 @@ namespace Messaging.Infrastructure.Configuration.DataAccess.Outgoing
                 .HasConversion(
                     toDbValue => toDbValue.ToString(),
                     fromDbValue => EnumerationType.FromName<MarketRole>(fromDbValue));
-            builder.Property(x => x.MarketActivityRecordPayload);
+            builder.Property(x => x.MessageRecord);
 
             builder
                 .HasDiscriminator<string>("Discriminator")

@@ -25,7 +25,7 @@ namespace Messaging.Infrastructure.OutgoingMessages.ConfirmRequestChangeAccounti
 
 public class ConfirmRequestChangeAccountingPointCharacteristicsMessageWriter : MessageWriter
 {
-    public ConfirmRequestChangeAccountingPointCharacteristicsMessageWriter(IMarketActivityRecordParser parser)
+    public ConfirmRequestChangeAccountingPointCharacteristicsMessageWriter(IMessageRecordParser parser)
         : base(
             new DocumentDetails(
                 "ConfirmRequestChangeAccountingPointCharacteristics_MarketDocument",
