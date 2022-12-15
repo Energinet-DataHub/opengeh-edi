@@ -30,8 +30,7 @@ internal class JwtBuilder
             new("azp", Guid.NewGuid().ToString()),
         };
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("test_not_so_secret_key"));
-        key.KeyId = "MyKeyId";
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("test_not_so_secret_key")) { KeyId = "MyKeyId" };
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
