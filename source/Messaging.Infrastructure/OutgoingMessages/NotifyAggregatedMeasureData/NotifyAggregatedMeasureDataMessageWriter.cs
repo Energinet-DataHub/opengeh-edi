@@ -62,8 +62,8 @@ public class NotifyAggregatedMeasureDataMessageWriter : MessageWriter
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "resolution", null, timeSeries.Resolution).ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "timeInterval", null).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "start", null, timeSeries.Start).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "end", null, timeSeries.End).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "start", null, timeSeries.StartTime).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "end", null, timeSeries.EndTime).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
 
             foreach (var point in timeSeries.Point)

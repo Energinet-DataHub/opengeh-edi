@@ -58,6 +58,6 @@ public class AggregatedTimeSeriesMessage : OutgoingMessage
     }
 }
 
-public record TimeSeries(Guid Id, string GridAreaCode, string MeteringPointType, string MeasureUnitType, string Resolution, string Start, string End, IReadOnlyList<Point> Point);
+public record TimeSeries(Guid Id, string GridAreaCode, string MeteringPointType, string MeasureUnitType, string Resolution, string StartTime, string EndTime, IReadOnlyList<Point> Point);
 
 public record Point(int Position, decimal? Quantity, string? Quality);
