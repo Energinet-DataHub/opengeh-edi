@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
@@ -66,7 +68,10 @@ public class SendAggregatedTimeSeriesTests : TestBase
             .HasMessageRecordValue<TimeSeries>(x => x.EndTime, SampleData.EndTime)
             .HasMessageRecordValue<TimeSeries>(x => x.Resolution, SampleData.Resolution)
             .HasMessageRecordValue<TimeSeries>(x => x.MeasureUnitType, SampleData.MeasureUnitType)
-            .HasMessageRecordValue<TimeSeries>(x => x.MeteringPointType, SampleData.MeteringPointType);
+            .HasMessageRecordValue<TimeSeries>(x => x.MeteringPointType, SampleData.MeteringPointType)
+            .HasMessageRecordValue<TimeSeries>(x => x.Point[0].Position, 1)
+            .HasMessageRecordValue<TimeSeries>(x => x.Point[0].Quantity!, decimal.Parse("1", NumberStyles.Any, NumberFormatInfo.InvariantInfo))
+            .HasMessageRecordValue<TimeSeries>(x => x.Point[0].Quality!, "A02");
     }
 
     private static SendAggregatedTimeSeries CreateRequest()
@@ -89,8 +94,8 @@ public class SendAggregatedTimeSeriesTests : TestBase
             {
                 new(
                     1,
-                    "11",
-                    null,
+                    "1",
+                    "A02",
                     "2022-10-31T21:15:00.000Z"),
             });
 
