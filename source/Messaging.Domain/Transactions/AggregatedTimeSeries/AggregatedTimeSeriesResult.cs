@@ -19,20 +19,20 @@ namespace Messaging.Domain.Transactions.AggregatedTimeSeries;
 
 public class AggregatedTimeSeriesResult
 {
-    public AggregatedTimeSeriesResult(Guid id, IReadOnlyList<GridArea> gridAreas)
+    public AggregatedTimeSeriesResult(Guid id, IReadOnlyList<Series> series)
     {
         Id = id;
-        GridAreas = gridAreas;
+        Series = series;
     }
 
     public Guid Id { get; }
 
-    public IReadOnlyList<GridArea> GridAreas { get; }
+    public IReadOnlyList<Series> Series { get; }
 }
 
-public class GridArea
+public class Series
 {
-    public GridArea(IReadOnlyList<Point> points, string gridAreaCode, string meteringPointType, ActorNumber gridOperatorId, string measureUnitType)
+    public Series(IReadOnlyList<Point> points, string gridAreaCode, string meteringPointType, ActorNumber gridOperatorId, string measureUnitType)
     {
         Points = points;
         GridAreaCode = gridAreaCode;

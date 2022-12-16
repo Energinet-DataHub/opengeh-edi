@@ -24,11 +24,6 @@ public class AggregatedTimeSeriesTransaction : Entity
     private readonly AggregatedTimeSeriesResult _aggregatedTimeSeriesResult;
     private readonly List<OutgoingMessage> _messages = new();
 
-    #pragma warning disable
-    private AggregatedTimeSeriesTransaction()
-    {
-    }
-
     public AggregatedTimeSeriesTransaction(AggregatedTimeSeriesResult aggregatedTimeSeriesResult)
     {
         _aggregatedTimeSeriesResult = aggregatedTimeSeriesResult;
@@ -36,24 +31,30 @@ public class AggregatedTimeSeriesTransaction : Entity
         CreateResultMessages();
     }
 
+    #pragma warning disable CS8618 // EF core need this private constructor
+    private AggregatedTimeSeriesTransaction()
+    {
+    }
+    #pragma warning restore
+
     public string Id { get; }
 
     private void CreateResultMessages()
     {
-        foreach (var gridArea in _aggregatedTimeSeriesResult.GridAreas)
+        foreach (var result in _aggregatedTimeSeriesResult.Series)
         {
-            var timeSeries = new TimeSeries(
+            var series = new TimeSeries(
                 Guid.NewGuid(),
-                gridArea.GridAreaCode,
-                gridArea.MeteringPointType,
-                gridArea.MeasureUnitType,
+                result.GridAreaCode,
+                result.MeteringPointType,
+                result.MeasureUnitType,
                 new Period(
                     "PT1H",
                     new TimeInterval(
                         "2022-02-12T23:00Z",
                         "2022-02-12T23:00Z"),
-                    gridArea.Points.Select(p => new Point(p.Position, p.Quantity, p.Quality)).ToList()));
-            _messages.Add(AggregatedTimeSeriesMessage.Create(timeSeries, gridArea.GridOperatorId, MarketRole.GridOperator, Id, ProcessType.BalanceFixing));
+                    result.Points.Select(p => new Point(p.Position, p.Quantity, p.Quality)).ToList()));
+            _messages.Add(AggregatedTimeSeriesMessage.Create(series, result.GridOperatorId, MarketRole.GridOperator, Id, ProcessType.BalanceFixing));
         }
     }
 }
