@@ -17,11 +17,11 @@ using System.Text.Json.Serialization;
 
 namespace Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
 
-public record TimeSeries(string GridAreaCode, string GridOperatorNumber, IEnumerable<Point> Points);
+public record TimeSeries(string GridAreaCode, string GridOperatorNumber, string MeteringPointType, string MeasureUnitType, IEnumerable<Point> Points);
 
 public class Point
 {
-    public Point(int position, decimal? quantity, string? quality, string quarterTime)
+    public Point(int position, string quantity, string? quality, string quarterTime)
     {
         Position = position;
         Quantity = quantity;
@@ -29,10 +29,13 @@ public class Point
         QuarterTime = quarterTime;
     }
 
+    [JsonPropertyName("position")]
     public int Position { get; }
 
-    public decimal? Quantity { get; }
+    [JsonPropertyName("quantity")]
+    public string Quantity { get; }
 
+    [JsonPropertyName("quality")]
     public string? Quality { get; }
 
     [JsonPropertyName("quarter_time")]

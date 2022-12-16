@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Messaging.Application.Transactions.AggregatedTimeSeries;
@@ -31,16 +32,15 @@ public class FakeAggregatedTimeSeriesResults : IAggregatedTimeSeriesResults
         return Task.FromResult(_results[resultId]);
     }
 
-    #pragma warning disable
     public void Add(Guid resultId, TimeSeries timeSeries)
     {
         ArgumentNullException.ThrowIfNull(timeSeries);
         var points = timeSeries.Points.Select(point =>
             new Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point(
                 point.Position,
-                point.Quantity,
+                decimal.Parse(point.Quantity, NumberStyles.Float, CultureInfo.InvariantCulture),
                 point.Quality));
-        var gridArea = new GridArea(points.ToList(), timeSeries.GridAreaCode, "E18", ActorNumber.Create(timeSeries.GridOperatorNumber), "KWH");
+        var gridArea = new GridArea(points.ToList(), timeSeries.GridAreaCode, timeSeries.MeteringPointType, ActorNumber.Create(timeSeries.GridOperatorNumber), timeSeries.MeasureUnitType);
         var result = new AggregatedTimeSeriesResult(resultId, new List<GridArea>()
         {
             gridArea,
