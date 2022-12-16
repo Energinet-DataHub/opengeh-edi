@@ -19,7 +19,7 @@ namespace Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
 
 public record AggregatedTimeSeriesResultsDto(IEnumerable<AggregatedTimeSeriesResultDto> Results);
 
-public record AggregatedTimeSeriesResultDto(string GridAreaCode, string GridOperatorNumber, string MeteringPointType, string MeasureUnitType, string Resolution, IEnumerable<Point> Points);
+public record AggregatedTimeSeriesResultDto(string GridAreaCode, string GridOperatorNumber, string MeteringPointType, string MeasureUnitType, string Resolution, string StartTime, string EndTime, IEnumerable<Point> Points);
 
 public class Point
 {

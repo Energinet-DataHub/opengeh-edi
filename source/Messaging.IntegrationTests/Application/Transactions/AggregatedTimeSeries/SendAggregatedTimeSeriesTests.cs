@@ -74,6 +74,8 @@ public class SendAggregatedTimeSeriesTests : TestBase
             SampleData.MeteringPointType,
             SampleData.MeasureUnitType,
             SampleData.Resolution,
+            SampleData.StartTime,
+            SampleData.EndTime,
             new List<Point>()
             {
                 new(

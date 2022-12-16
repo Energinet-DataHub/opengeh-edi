@@ -51,8 +51,8 @@ public class AggregatedTimeSeriesTransaction : Entity
                 new Period(
                     result.Resolution,
                     new TimeInterval(
-                        "2022-02-12T23:00Z",
-                        "2022-02-12T23:00Z"),
+                        result.StartTime,
+                        result.EndTime),
                     result.Points.Select(p => new Point(p.Position, p.Quantity, p.Quality)).ToList()));
             _messages.Add(AggregatedTimeSeriesMessage.Create(series, result.GridOperatorId, MarketRole.GridOperator, Id, ProcessType.BalanceFixing));
         }

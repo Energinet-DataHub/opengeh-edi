@@ -40,7 +40,7 @@ public class FakeAggregatedTimeSeriesResults : IAggregatedTimeSeriesResults
                 point.Position,
                 decimal.Parse(point.Quantity, NumberStyles.Float, CultureInfo.InvariantCulture),
                 point.Quality));
-        var gridArea = new Series(points.ToList(), aggregatedTimeSeriesResultDto.GridAreaCode, aggregatedTimeSeriesResultDto.MeteringPointType, ActorNumber.Create(aggregatedTimeSeriesResultDto.GridOperatorNumber), aggregatedTimeSeriesResultDto.MeasureUnitType, aggregatedTimeSeriesResultDto.Resolution);
+        var gridArea = new Series(points.ToList(), aggregatedTimeSeriesResultDto.GridAreaCode, aggregatedTimeSeriesResultDto.MeteringPointType, ActorNumber.Create(aggregatedTimeSeriesResultDto.GridOperatorNumber), aggregatedTimeSeriesResultDto.MeasureUnitType, aggregatedTimeSeriesResultDto.Resolution, aggregatedTimeSeriesResultDto.StartTime, aggregatedTimeSeriesResultDto.EndTime);
         var result = new AggregatedTimeSeriesResult(resultId, new List<Series>()
         {
             gridArea,

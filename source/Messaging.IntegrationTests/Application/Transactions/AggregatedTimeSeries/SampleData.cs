@@ -29,4 +29,8 @@ internal class SampleData
     internal static string MeasureUnitType => "KWH";
 
     internal static string Resolution => "PT1H";
+
+    internal static string StartTime => "2022-02-12T23:00Z";
+
+    internal static string EndTime => "2022-02-13T23:00Z";
 }
