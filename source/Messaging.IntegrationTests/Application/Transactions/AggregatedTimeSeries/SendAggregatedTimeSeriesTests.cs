@@ -50,7 +50,7 @@ public class SendAggregatedTimeSeriesTests : TestBase
         await InvokeCommandAsync(CreateRequest()).ConfigureAwait(false);
 
         AssertOutgoingMessage.OutgoingMessage(
-                MessageType.AggregatedTimeSeries.Name,
+                MessageType.NotifyAggregatedMeasureData.Name,
                 ProcessType.BalanceFixing.Code,
                 MarketRole.GridOperator,
                 GetService<IDbConnectionFactory>())
