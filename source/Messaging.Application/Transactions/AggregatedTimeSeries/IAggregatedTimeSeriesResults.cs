@@ -18,8 +18,14 @@ using Messaging.Domain.Transactions.AggregatedTimeSeries;
 
 namespace Messaging.Application.Transactions.AggregatedTimeSeries;
 
-#pragma warning disable
+/// <summary>
+/// Store containing results for aggregated time series
+/// </summary>
 public interface IAggregatedTimeSeriesResults
 {
+    /// <summary>
+    /// Fetch a result by id
+    /// </summary>
+    /// <param name="resultId"></param>
     Task<AggregatedTimeSeriesResult> GetResultAsync(Guid resultId);
 }
