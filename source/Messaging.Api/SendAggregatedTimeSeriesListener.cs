@@ -44,11 +44,14 @@ public class SendAggregatedTimeSeriesListener
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var timeSeriesFromRequest = await _serializer.DeserializeAsync(request.Body, typeof(AggregatedTimeSeriesResultDto)).ConfigureAwait(false);
-        var testResultId = Guid.NewGuid();
-        _aggregatedTimeSeriesResults.Add(testResultId, (AggregatedTimeSeriesResultDto)timeSeriesFromRequest);
+        var timeSeriesFromRequest = (AggregatedTimeSeriesResultsDto)await _serializer.DeserializeAsync(request.Body, typeof(AggregatedTimeSeriesResultsDto)).ConfigureAwait(false);
+        foreach (var aggregatedTimeSeriesResultDto in timeSeriesFromRequest.Results)
+        {
+            var testResultId = Guid.NewGuid();
+            _aggregatedTimeSeriesResults.Add(testResultId, aggregatedTimeSeriesResultDto);
 
-        await _mediator.Send(new SendAggregatedTimeSeries(testResultId)).ConfigureAwait(false);
+            await _mediator.Send(new SendAggregatedTimeSeries(testResultId)).ConfigureAwait(false);
+        }
 
         var response = request.CreateResponse(HttpStatusCode.OK);
         response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
