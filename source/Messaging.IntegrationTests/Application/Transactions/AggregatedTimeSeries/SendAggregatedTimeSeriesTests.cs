@@ -68,14 +68,16 @@ public class SendAggregatedTimeSeriesTests : TestBase
     private void AddFakeResult()
     {
         var results = GetService<IAggregatedTimeSeriesResults>() as FakeAggregatedTimeSeriesResults;
-        var dto = new TimeSeries(
+        var dto = new AggregatedTimeSeriesResultDto(
             SampleData.GridAreaCode,
             SampleData.GridOperatorNumber,
+            SampleData.MeteringPointType,
+            SampleData.MeasureUnitType,
             new List<Point>()
             {
                 new(
                     1,
-                    11,
+                    "11",
                     null,
                     "2022-10-31T21:15:00.000Z"),
             });

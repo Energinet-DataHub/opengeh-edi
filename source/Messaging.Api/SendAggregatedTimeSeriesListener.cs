@@ -44,9 +44,9 @@ public class SendAggregatedTimeSeriesListener
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var timeSeriesFromRequest = await _serializer.DeserializeAsync(request.Body, typeof(TimeSeries)).ConfigureAwait(false);
+        var timeSeriesFromRequest = await _serializer.DeserializeAsync(request.Body, typeof(AggregatedTimeSeriesResultDto)).ConfigureAwait(false);
         var testResultId = Guid.NewGuid();
-        _aggregatedTimeSeriesResults.Add(testResultId, (TimeSeries)timeSeriesFromRequest);
+        _aggregatedTimeSeriesResults.Add(testResultId, (AggregatedTimeSeriesResultDto)timeSeriesFromRequest);
 
         await _mediator.Send(new SendAggregatedTimeSeries(testResultId)).ConfigureAwait(false);
 

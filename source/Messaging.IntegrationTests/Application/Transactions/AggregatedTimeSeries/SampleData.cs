@@ -23,4 +23,8 @@ internal class SampleData
     internal static string GridAreaCode => "870";
 
     internal static Guid ResultId => Guid.Parse("42AB7292-FE2E-4F33-B537-4A15FEDB9754");
+
+    internal static string MeteringPointType => "E18";
+
+    internal static string MeasureUnitType => "KWH";
 }

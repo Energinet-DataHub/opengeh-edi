@@ -32,15 +32,15 @@ public class FakeAggregatedTimeSeriesResults : IAggregatedTimeSeriesResults
         return Task.FromResult(_results[resultId]);
     }
 
-    public void Add(Guid resultId, TimeSeries timeSeries)
+    public void Add(Guid resultId, AggregatedTimeSeriesResultDto aggregatedTimeSeriesResultDto)
     {
-        ArgumentNullException.ThrowIfNull(timeSeries);
-        var points = timeSeries.Points.Select(point =>
+        ArgumentNullException.ThrowIfNull(aggregatedTimeSeriesResultDto);
+        var points = aggregatedTimeSeriesResultDto.Points.Select(point =>
             new Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point(
                 point.Position,
                 decimal.Parse(point.Quantity, NumberStyles.Float, CultureInfo.InvariantCulture),
                 point.Quality));
-        var gridArea = new GridArea(points.ToList(), timeSeries.GridAreaCode, timeSeries.MeteringPointType, ActorNumber.Create(timeSeries.GridOperatorNumber), timeSeries.MeasureUnitType);
+        var gridArea = new GridArea(points.ToList(), aggregatedTimeSeriesResultDto.GridAreaCode, aggregatedTimeSeriesResultDto.MeteringPointType, ActorNumber.Create(aggregatedTimeSeriesResultDto.GridOperatorNumber), aggregatedTimeSeriesResultDto.MeasureUnitType);
         var result = new AggregatedTimeSeriesResult(resultId, new List<GridArea>()
         {
             gridArea,
