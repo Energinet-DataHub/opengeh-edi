@@ -46,11 +46,6 @@ public class EnqueueOutgoingMessagesBehaviour<TRequest, TResponse> : IPipelineBe
         ArgumentNullException.ThrowIfNull(next);
         var result = await next().ConfigureAwait(false);
 
-        if (!_featureFlagProvider.IsActorMessageQueueEnabled)
-        {
-            return result;
-        }
-
         var outgoingMessages = _b2BContext
             .ChangeTracker
             .Entries<OutgoingMessage>()
