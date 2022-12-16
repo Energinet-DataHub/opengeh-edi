@@ -15,7 +15,7 @@
 using System.Threading.Tasks;
 using System.Xml.Schema;
 
-namespace Messaging.Application.SchemaStore
+namespace Messaging.Infrastructure.IncomingMessages.SchemaStore
 {
     /// <summary>
     /// Provides XML schemas for CIM messages

@@ -19,10 +19,10 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using Messaging.Application.IncomingMessages.RequestChangeCustomerCharacteristics;
-using Messaging.Application.SchemaStore;
 using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Infrastructure.IncomingMessages.SchemaStore;
 using MarketActivityRecord = Messaging.Application.IncomingMessages.RequestChangeCustomerCharacteristics.MarketActivityRecord;
 
 namespace Messaging.Infrastructure.IncomingMessages.RequestChangeCustomerCharacteristics;

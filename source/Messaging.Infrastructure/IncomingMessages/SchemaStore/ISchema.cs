@@ -12,15 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading.Tasks;
+namespace Messaging.Infrastructure.IncomingMessages.SchemaStore;
 
-namespace Messaging.Application.SchemaStore
+/// <summary>
+/// bla
+/// </summary>
+public interface ISchema
 {
-    public abstract class SchemaProvider : ISchemaProvider
-    {
-        public abstract Task<T?> GetSchemaAsync<T>(string businessProcessType, string version);
+    /// <summary>
+    /// bla
+    /// </summary>
+    public string SchemaPath { get; }
 
-        protected abstract Task<T?> LoadSchemaWithDependentSchemasAsync<T>(string location);
-    }
+    /// <summary>
+    /// bla
+    /// </summary>
+    /// <param name="businessProcessType"></param>
+    /// <param name="version"></param>
+    /// <returns><see cref="string"/></returns>
+    public string? GetSchemaLocation(string businessProcessType, string version);
 }

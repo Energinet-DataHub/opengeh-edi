@@ -16,11 +16,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Messaging.Application.SchemaStore
+namespace Messaging.Infrastructure.IncomingMessages.SchemaStore
 {
     public sealed class CimXmlSchemas : SchemaBase, ISchema
     {
-        private static readonly string _schemaPath = $"SchemaStore{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}Xml{Path.DirectorySeparatorChar}";
+        private static readonly string _schemaPath = $"IncomingMessages{Path.DirectorySeparatorChar}SchemaStore{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}Xml{Path.DirectorySeparatorChar}";
 
         public CimXmlSchemas()
         {

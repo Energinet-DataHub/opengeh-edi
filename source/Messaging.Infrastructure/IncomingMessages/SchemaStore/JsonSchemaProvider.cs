@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Threading.Tasks;
 using Json.Schema;
 
-namespace Messaging.Application.SchemaStore;
+namespace Messaging.Infrastructure.IncomingMessages.SchemaStore;
 
 public class JsonSchemaProvider : SchemaProvider
 {
