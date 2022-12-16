@@ -15,10 +15,8 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.EnergySupplying.RequestResponse.Requests;
-using Energinet.DataHub.MeteringPoints.RequestResponse.Requests;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.MessageBus;
-using Messaging.Infrastructure.Transactions.MoveIn;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.TestDoubles;
 using Xunit;
@@ -53,5 +51,11 @@ public class FetchCustomerMasterDataTests : TestBase
         Assert.Equal(command.TransactionId, dispatchedMessage?.CorrelationId);
         var request = CustomerMasterDataRequest.Parser.ParseFrom(dispatchedMessage?.Body);
         Assert.Equal(command.BusinessProcessId, request.Processid);
+    }
+
+    private async Task DisposeAsync()
+    {
+        await _senderSpy.DisposeAsync().ConfigureAwait(false);
+        await _serviceBusClientSenderFactory.DisposeAsync().ConfigureAwait(false);
     }
 }
