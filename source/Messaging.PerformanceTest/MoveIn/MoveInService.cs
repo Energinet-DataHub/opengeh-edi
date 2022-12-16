@@ -31,7 +31,7 @@ internal class MoveInService : IMoveInService
         var jwt = JwtBuilder.BuildToken(uniqueActorNumber);
 
         using StringContent body = new(
-            JsonSerializer.Serialize(moveInPayload),
+            moveInPayload,
             Encoding.UTF8,
             "application/xml");
 
@@ -45,7 +45,7 @@ internal class MoveInService : IMoveInService
         var xmlDocument = XDocument.Load($"MoveIn{Path.DirectorySeparatorChar}xml{Path.DirectorySeparatorChar}RequestChangeOfSupplier.xml");
         //xmlDocument.DescendantNodes().OfType<XComment>().Remove();
         var actorIdElement = xmlDocument.Root?.Elements()
-            .Single(x => x.Name.LocalName.Equals("receiver_MarketParticipant.mRID", StringComparison.OrdinalIgnoreCase));
+            .Single(x => x.Name.LocalName.Equals("sender_MarketParticipant.mRID", StringComparison.OrdinalIgnoreCase));
         if (actorIdElement is not null) actorIdElement.Value = uniqueActorNumber;
         var messageIdElement = xmlDocument.Root?.Elements()
             .Single(x => x.Name.LocalName.Equals("mRID", StringComparison.OrdinalIgnoreCase));
