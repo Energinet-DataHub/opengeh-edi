@@ -43,18 +43,7 @@ public class AggregatedTimeSeriesTransaction : Entity
     {
         foreach (var result in _aggregatedTimeSeriesResult.Series)
         {
-            var series = new TimeSeries(
-                Guid.NewGuid(),
-                result.GridAreaCode,
-                result.MeteringPointType,
-                result.MeasureUnitType,
-                new Period(
-                    result.Resolution,
-                    new TimeInterval(
-                        result.StartTime,
-                        result.EndTime),
-                    result.Points.Select(p => new Point(p.Position, p.Quantity, p.Quality)).ToList()));
-            _messages.Add(AggregatedTimeSeriesMessage.Create(series, result.GridOperatorId, MarketRole.GridOperator, Id, ProcessType.BalanceFixing));
+            _messages.Add(AggregatedTimeSeriesMessage.Create(result.GridOperatorId, MarketRole.GridOperator, Id, ProcessType.BalanceFixing, result));
         }
     }
 }
