@@ -44,7 +44,7 @@ public class SendAggregatedTimeSeriesHandler : IRequestHandler<SendAggregatedTim
     }
 }
 
-public class SendAggregatedTimeSeries : InternalCommand
+public class SendAggregatedTimeSeries : ICommand<Unit>
 {
     [JsonConstructor]
     public SendAggregatedTimeSeries(Guid id, Guid aggregatedTimeSeriesResultId)
