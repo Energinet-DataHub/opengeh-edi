@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
@@ -22,7 +20,6 @@ using Messaging.Application.Transactions.AggregatedTimeSeries;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Messaging.Domain.Transactions.AggregatedTimeSeries;
 using Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
 using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
@@ -70,7 +67,7 @@ public class SendAggregatedTimeSeriesTests : TestBase
             .HasMessageRecordValue<TimeSeries>(x => x.MeasureUnitType, SampleData.MeasureUnitType)
             .HasMessageRecordValue<TimeSeries>(x => x.MeteringPointType, SampleData.MeteringPointType)
             .HasMessageRecordValue<TimeSeries>(x => x.Point[0].Position, 1)
-            .HasMessageRecordValue<TimeSeries>(x => x.Point[0].Quantity!, decimal.Parse("1", NumberStyles.Any, NumberFormatInfo.InvariantInfo))
+            .HasMessageRecordValue<TimeSeries, decimal?>(x => x.Point[0].Quantity, 1.1m)
             .HasMessageRecordValue<TimeSeries>(x => x.Point[0].Quality!, "A02");
     }
 
@@ -94,7 +91,7 @@ public class SendAggregatedTimeSeriesTests : TestBase
             {
                 new(
                     1,
-                    "1",
+                    "1.1",
                     "A02",
                     "2022-10-31T21:15:00.000Z"),
             });

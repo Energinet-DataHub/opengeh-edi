@@ -108,5 +108,12 @@ namespace Messaging.IntegrationTests.Assertions
             Assert.Equal(expectedValue, propertySelector(sut));
             return this;
         }
+
+        public AssertOutgoingMessage HasMessageRecordValue<TMessageRecord, TValueType>(Func<TMessageRecord, TValueType> propertySelector, TValueType expectedValue)
+        {
+            var sut = JsonSerializer.Deserialize<TMessageRecord>(_message.MessageRecord);
+            Assert.Equal(expectedValue, propertySelector(sut));
+            return this;
+        }
     }
 }
