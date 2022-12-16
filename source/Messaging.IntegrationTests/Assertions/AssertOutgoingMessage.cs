@@ -14,7 +14,6 @@
 
 using System;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Domain.Actors;
@@ -103,10 +102,11 @@ namespace Messaging.IntegrationTests.Assertions
             return new AssertMarketActivityRecord(_message.MessageRecord);
         }
 
-        public void HasMessageRecordValue<TMessageRecord>(Func<TMessageRecord, object> propertySelector, object expectedValue)
+        public AssertOutgoingMessage HasMessageRecordValue<TMessageRecord>(Func<TMessageRecord, object> propertySelector, object expectedValue)
         {
             var sut = JsonSerializer.Deserialize<TMessageRecord>(_message.MessageRecord);
             Assert.Equal(expectedValue, propertySelector(sut));
+            return this;
         }
     }
 }
