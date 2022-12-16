@@ -49,7 +49,7 @@ public class AggregatedTimeSeriesTransaction : Entity
                 result.MeteringPointType,
                 result.MeasureUnitType,
                 new Period(
-                    "PT1H",
+                    result.Resolution,
                     new TimeInterval(
                         "2022-02-12T23:00Z",
                         "2022-02-12T23:00Z"),

@@ -73,6 +73,7 @@ public class SendAggregatedTimeSeriesTests : TestBase
             SampleData.GridOperatorNumber,
             SampleData.MeteringPointType,
             SampleData.MeasureUnitType,
+            SampleData.Resolution,
             new List<Point>()
             {
                 new(

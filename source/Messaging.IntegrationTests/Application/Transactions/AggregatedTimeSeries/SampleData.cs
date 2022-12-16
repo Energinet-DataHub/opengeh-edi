@@ -27,4 +27,6 @@ internal class SampleData
     internal static string MeteringPointType => "E18";
 
     internal static string MeasureUnitType => "KWH";
+
+    internal static string Resolution => "PT1H";
 }
