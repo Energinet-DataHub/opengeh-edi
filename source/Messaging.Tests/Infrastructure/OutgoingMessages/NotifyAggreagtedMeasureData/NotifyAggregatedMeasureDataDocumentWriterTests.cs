@@ -29,7 +29,6 @@ using Messaging.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 using Messaging.Tests.Infrastructure.OutgoingMessages.Asserts;
 using NodaTime;
 using Xunit;
-using Period = Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData.Period;
 
 namespace Messaging.Tests.Infrastructure.OutgoingMessages.NotifyAggreagtedMeasureData;
 
@@ -66,16 +65,14 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
                 "870",
                 "E18",
                 "KWH",
-                new Period(
-                    "PT1H",
-                    new TimeInterval(
-                        "2022-02-12T23:00Z",
-                        "2022-02-13T23:00Z"),
-                    new List<Point>()
-                    {
-                        new(1, 11, "A05"),
-                        new(2, null, null),
-                    })),
+                "PT1H",
+                "2022-02-12T23:00Z",
+                "2022-02-13T23:00Z",
+                new List<Point>()
+                {
+                    new(1, 11, "A05"),
+                    new(2, null, null),
+                }),
         };
 
         var message = await _messageWriter.WriteAsync(header, timeSeries.Select(record => _parser.From(record)).ToList()).ConfigureAwait(false);
@@ -96,13 +93,13 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             .HasValue("Series[1]/meteringGridArea_Domain.mRID", timeSeries[0].GridAreaCode)
             .HasValue("Series[1]/marketEvaluationPoint.type", timeSeries[0].MeteringPointType)
             .HasValue("Series[1]/quantity_Measure_Unit.name", timeSeries[0].MeasureUnitType)
-            .HasValue("Series[1]/Period/resolution", timeSeries[0].Period.Resolution)
-            .HasValue("Series[1]/Period/timeInterval/start", timeSeries[0].Period.TimeInterval.Start)
-            .HasValue("Series[1]/Period/timeInterval/end", timeSeries[0].Period.TimeInterval.End)
-            .HasValue("Series[1]/Period/Point[1]/position", timeSeries[0].Period.Point[0].Position.ToString(NumberFormatInfo.InvariantInfo))
-            .HasValue("Series[1]/Period/Point[1]/quantity", timeSeries[0].Period.Point[0].Quantity.ToString()!)
-            .HasValue("Series[1]/Period/Point[1]/quality", timeSeries[0].Period.Point[0].Quality!)
-            .HasValue("Series[1]/Period/Point[2]/position", timeSeries[0].Period.Point[1].Position.ToString(NumberFormatInfo.InvariantInfo))
+            .HasValue("Series[1]/Period/resolution", timeSeries[0].Resolution)
+            .HasValue("Series[1]/Period/timeInterval/start", timeSeries[0].Start)
+            .HasValue("Series[1]/Period/timeInterval/end", timeSeries[0].End)
+            .HasValue("Series[1]/Period/Point[1]/position", timeSeries[0].Point[0].Position.ToString(NumberFormatInfo.InvariantInfo))
+            .HasValue("Series[1]/Period/Point[1]/quantity", timeSeries[0].Point[0].Quantity.ToString()!)
+            .HasValue("Series[1]/Period/Point[1]/quality", timeSeries[0].Point[0].Quality!)
+            .HasValue("Series[1]/Period/Point[2]/position", timeSeries[0].Point[1].Position.ToString(NumberFormatInfo.InvariantInfo))
             .IsNotPresent("Series[1]/Period/Point[2]/quantity")
             .IsNotPresent("Series[1]/Period/Point[2]/quality")
             .HasValidStructureAsync((await GetSchema().ConfigureAwait(false))!).ConfigureAwait(false);

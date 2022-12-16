@@ -44,12 +44,10 @@ public class AggregatedTimeSeriesMessage : OutgoingMessage
             result.GridAreaCode,
             result.MeteringPointType,
             result.MeasureUnitType,
-            new Period(
-                result.Resolution,
-                new TimeInterval(
-                    result.StartTime,
-                    result.EndTime),
-                result.Points.Select(p => new Point(p.Position, p.Quantity, p.Quality)).ToList()));
+            result.Resolution,
+            result.StartTime,
+            result.EndTime,
+            result.Points.Select(p => new Point(p.Position, p.Quantity, p.Quality)).ToList());
 
         return new AggregatedTimeSeriesMessage(
             receiverNumber,
@@ -60,10 +58,6 @@ public class AggregatedTimeSeriesMessage : OutgoingMessage
     }
 }
 
-public record TimeSeries(Guid Id, string GridAreaCode, string MeteringPointType, string MeasureUnitType, Period Period);
-
-public record Period(string Resolution, TimeInterval TimeInterval, IReadOnlyList<Point> Point);
-
-public record TimeInterval(string Start, string End);
+public record TimeSeries(Guid Id, string GridAreaCode, string MeteringPointType, string MeasureUnitType, string Resolution, string Start, string End, IReadOnlyList<Point> Point);
 
 public record Point(int Position, decimal? Quantity, string? Quality);
