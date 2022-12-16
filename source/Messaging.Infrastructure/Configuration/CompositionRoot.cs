@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
 using Azure.Messaging.ServiceBus;
@@ -220,9 +221,10 @@ namespace Messaging.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddMoveInServices(MoveInSettings settings)
+        public CompositionRoot AddMoveInServices(MoveInSettings settings, IFeatureFlagProvider featureFlagProvider)
         {
-            MoveInConfiguration.Configure(_services, settings);
+            ArgumentNullException.ThrowIfNull(featureFlagProvider);
+            MoveInConfiguration.Configure(_services, settings, featureFlagProvider);
             return this;
         }
 

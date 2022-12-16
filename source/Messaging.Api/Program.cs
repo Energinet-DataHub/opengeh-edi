@@ -30,6 +30,7 @@ using Messaging.CimMessageAdapter.Messages.Queues;
 using Messaging.Infrastructure.Actors;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Authentication;
+using Messaging.Infrastructure.Configuration.FeatureFlag;
 using Messaging.Infrastructure.Configuration.MessageBus;
 using Messaging.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Messaging.Infrastructure.OutgoingMessages;
@@ -160,7 +161,8 @@ namespace Messaging.Api
                                     {
                                         GracePeriodInDaysAfterEffectiveDateIfNotUpdated = 15,
                                     }),
-                                new BusinessService(new Uri(runtime.MOVE_IN_REQUEST_ENDPOINT!))))
+                                new BusinessService(new Uri(runtime.MOVE_IN_REQUEST_ENDPOINT!))),
+                            new FeatureFlagProviderProvider())
                         .AddMessageParserServices();
 
                     services.AddLiveHealthCheck();

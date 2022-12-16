@@ -30,4 +30,17 @@ public class FeatureFlagProviderProvider : IFeatureFlagProvider
             return enabled;
         }
     }
+
+    public bool IsPeekDequeuePerformanceTestEnabled
+    {
+        get
+        {
+            if (bool.TryParse(Environment.GetEnvironmentVariable("FEATUREFLAG_PEEKDEQUEUEPERFORMANCE"), out var enabled) == false)
+            {
+                return false;
+            }
+
+            return enabled;
+        }
+    }
 }

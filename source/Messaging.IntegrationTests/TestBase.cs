@@ -25,6 +25,7 @@ using Messaging.Application.Configuration.TimeEvents;
 using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration;
+using Messaging.Infrastructure.Configuration.FeatureFlag;
 using Messaging.Infrastructure.Configuration.MessageBus;
 using Messaging.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Messaging.Infrastructure.Transactions.MoveIn;
@@ -75,7 +76,7 @@ namespace Messaging.IntegrationTests
                 .AddRequestHandler<TestCommandHandler>()
                 .AddHttpClientAdapter(_ => new HttpClientSpy())
                 .AddMoveInServices(
-                    new MoveInSettings(new MessageDelivery(new GridOperator() { GracePeriodInDaysAfterEffectiveDateIfNotUpdated = 1, }), new BusinessService(new Uri("http://someuri"))))
+                    new MoveInSettings(new MessageDelivery(new GridOperator() { GracePeriodInDaysAfterEffectiveDateIfNotUpdated = 1, }), new BusinessService(new Uri("http://someuri"))), new FeatureFlagProviderProvider())
                 .AddMessageParserServices();
             _serviceProvider = _services.BuildServiceProvider();
         }

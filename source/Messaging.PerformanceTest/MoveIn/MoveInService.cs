@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Globalization;
 using System.Net.Http.Headers;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Xml.Linq;
@@ -41,10 +43,37 @@ internal class MoveInService : IMoveInService
     private static string GetMoveInPayload(string uniqueActorNumber)
     {
         var xmlDocument = XDocument.Load($"MoveIn{Path.DirectorySeparatorChar}xml{Path.DirectorySeparatorChar}RequestChangeOfSupplier.xml");
-        // xmlDocument.DescendantNodes().OfType<XComment>().Remove();
+        //xmlDocument.DescendantNodes().OfType<XComment>().Remove();
         var actorIdElement = xmlDocument.Root?.Elements()
             .Single(x => x.Name.LocalName.Equals("receiver_MarketParticipant.mRID", StringComparison.OrdinalIgnoreCase));
         if (actorIdElement is not null) actorIdElement.Value = uniqueActorNumber;
-        return $"{xmlDocument.Declaration}{xmlDocument}";
+        var messageIdElement = xmlDocument.Root?.Elements()
+            .Single(x => x.Name.LocalName.Equals("mRID", StringComparison.OrdinalIgnoreCase));
+        if (messageIdElement is not null) messageIdElement.Value = RandomNumberGenerator.GetInt32(10000000).ToString(CultureInfo.InvariantCulture);
+        var transactionIdElement = xmlDocument.Root?.Elements()
+            .Single(x => x.Name.LocalName.Equals("MktActivityRecord", StringComparison.OrdinalIgnoreCase)).Elements().Single(x => x.Name.LocalName.Equals("mRID", StringComparison.OrdinalIgnoreCase));
+        if (transactionIdElement is not null) transactionIdElement.Value = RandomNumberGenerator.GetInt32(10000000).ToString(CultureInfo.InvariantCulture);
+
+        var builder = new StringBuilder();
+        using (TextWriter writer = new Utf8StringWriter(builder))
+        {
+            xmlDocument.Save(writer);
+        }
+
+        return builder.ToString();
+    }
+}
+
+public class Utf8StringWriter : StringWriter
+{
+    public Utf8StringWriter(StringBuilder builder)
+        : base(builder, CultureInfo.InvariantCulture)
+    {
+    }
+
+    // Use UTF8 encoding but write no BOM to the wire
+    public override Encoding Encoding
+    {
+        get { return new UTF8Encoding(false); } // in real code I'll cache this encoding.
     }
 }

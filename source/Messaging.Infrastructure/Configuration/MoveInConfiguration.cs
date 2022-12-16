@@ -21,6 +21,7 @@ using Messaging.Application.Transactions.MoveIn.Notifications;
 using Messaging.Application.Transactions.MoveIn.UpdateCustomer;
 using Messaging.Application.Transactions.UpdateCustomer;
 using Messaging.Domain.Transactions.MoveIn.Events;
+using Messaging.Infrastructure.Configuration.FeatureFlag;
 using Messaging.Infrastructure.Transactions.MoveIn;
 using Messaging.Infrastructure.Transactions.MoveIn.UpdateCustomer;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,10 +30,18 @@ namespace Messaging.Infrastructure.Configuration;
 
 internal static class MoveInConfiguration
 {
-    public static void Configure(IServiceCollection services, MoveInSettings settings)
+    public static void Configure(IServiceCollection services, MoveInSettings settings, IFeatureFlagProvider featureFlagProvider)
     {
         services.AddScoped<MoveInNotifications>();
-        services.AddScoped<IMoveInRequester, MoveInRequester>();
+        if (featureFlagProvider.IsPeekDequeuePerformanceTestEnabled)
+        {
+            services.AddScoped<IMoveInRequester, MoveInRequesterDouble>();
+        }
+        else
+        {
+            services.AddScoped<IMoveInRequester, MoveInRequester>();
+        }
+
         services.AddScoped<IMeteringPointMasterDataClient, MeteringPointMasterDataClient>();
         services.AddScoped<ICustomerMasterDataClient, CustomerMasterDataClient>();
         services.AddTransient<IRequestHandler<RequestChangeOfSupplierTransaction, Unit>, MoveInRequestHandler>();

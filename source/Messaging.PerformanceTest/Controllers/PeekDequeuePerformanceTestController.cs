@@ -43,7 +43,7 @@ public class PeekDequeuePerformanceTestController : ControllerBase
         {
              var uniqueActorNumber = _actorService.GetUniqueActorNumber();
 
-             for (var j = 0; j < 10; j++)
+             for (var j = 0; j < 1; j++)
              {
                  await _moveInService.MoveInAsync(uniqueActorNumber).ConfigureAwait(false);
              }
