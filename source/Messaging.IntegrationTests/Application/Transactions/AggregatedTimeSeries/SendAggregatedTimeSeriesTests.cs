@@ -19,10 +19,13 @@ using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.Transactions.AggregatedTimeSeries;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Messaging.Domain.Transactions.AggregatedTimeSeries;
 using Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
 using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
+using Point = Messaging.Infrastructure.Transactions.AggregatedTimeSeries.Point;
 
 namespace Messaging.IntegrationTests.Application.Transactions.AggregatedTimeSeries;
 
@@ -57,7 +60,8 @@ public class SendAggregatedTimeSeriesTests : TestBase
             .HasReceiverId(SampleData.GridOperatorNumber)
             .HasReceiverRole(MarketRole.GridOperator.Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
-            .HasSenderId(DataHubDetails.IdentificationNumber.Value);
+            .HasSenderId(DataHubDetails.IdentificationNumber.Value)
+            .HasMessageRecordValue<TimeSeries>(x => x.StartTime, SampleData.StartTime);
     }
 
     private static SendAggregatedTimeSeries CreateRequest()
