@@ -45,3 +45,11 @@ public class AggregatedTimeSeriesMessage : OutgoingMessage
             timeSeries);
     }
 }
+
+public record TimeSeries(Guid Id, string GridAreaCode, string MeteringPointType, string MeasureUnitType, Period Period);
+
+public record Period(string Resolution, TimeInterval TimeInterval, IReadOnlyList<Point> Point);
+
+public record TimeInterval(string Start, string End);
+
+public record Point(int Position, decimal? Quantity, string? Quality);
