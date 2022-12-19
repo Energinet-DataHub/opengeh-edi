@@ -58,8 +58,15 @@ public class PeekRequestListener
             return response;
         }
 
+        if (result.MessageId == null)
+        {
+            response.StatusCode = HttpStatusCode.InternalServerError;
+            return response;
+        }
+
         response.Body = result.Bundle;
         response.Headers.Add("content-type", "application/xml");
+        response.Headers.Add("MessageId", result.MessageId.ToString());
         response.StatusCode = HttpStatusCode.OK;
         return response;
     }
