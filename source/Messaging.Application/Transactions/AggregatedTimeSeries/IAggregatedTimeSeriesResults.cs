@@ -12,24 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.Domain.SeedWork;
+using System;
+using System.Threading.Tasks;
+using Messaging.Domain.Transactions.AggregatedTimeSeries;
 
-namespace Messaging.Domain.Actors;
+namespace Messaging.Application.Transactions.AggregatedTimeSeries;
 
-public class MarketRole : EnumerationType
+/// <summary>
+/// Store containing results for aggregated time series
+/// </summary>
+public interface IAggregatedTimeSeriesResults
 {
-    public static readonly MarketRole MeteringPointAdministrator = new(0, "DDZ");
-    public static readonly MarketRole EnergySupplier = new(1, "DDQ");
-    public static readonly MarketRole GridOperator = new(2, "DDM");
-    public static readonly MarketRole MeteringDataAdministrator = new(2, "DGL");
-
-    private MarketRole(int id, string name)
-        : base(id, name)
-    {
-    }
-
-    public override string ToString()
-    {
-        return Name;
-    }
+    /// <summary>
+    /// Fetch a result by id
+    /// </summary>
+    /// <param name="resultId"></param>
+    Task<AggregatedTimeSeriesResult> GetResultAsync(Guid resultId);
 }

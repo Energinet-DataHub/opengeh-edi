@@ -20,6 +20,7 @@ using Messaging.Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
 using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Domain.OutgoingMessages.GenericNotification;
+using Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Messaging.Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Domain.SeedWork;
@@ -74,6 +75,7 @@ namespace Messaging.Infrastructure.OutgoingMessages
                 .HasValue<CharacteristicsOfACustomerAtAnApMessage>(MessageType.CharacteristicsOfACustomerAtAnAP.Name)
                 .HasValue<ConfirmRequestChangeAccountingPointCharacteristicsMessage>(MessageType.ConfirmRequestChangeAccountingPointCharacteristics.Name)
                 .HasValue<RejectRequestChangeAccountingPointCharacteristicsMessage>(MessageType.RejectRequestChangeAccountingPointCharacteristics.Name)
+                .HasValue<AggregatedTimeSeriesMessage>(MessageType.NotifyAggregatedMeasureData.Name)
                 .IsComplete(false);
         }
     }

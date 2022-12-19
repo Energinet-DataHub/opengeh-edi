@@ -26,6 +26,7 @@ public class MessageType : EnumerationType
     public static readonly MessageType CharacteristicsOfACustomerAtAnAP = new(4, nameof(CharacteristicsOfACustomerAtAnAP), MessageCategory.MasterData);
     public static readonly MessageType ConfirmRequestChangeAccountingPointCharacteristics = new(5, nameof(ConfirmRequestChangeAccountingPointCharacteristics), MessageCategory.MasterData);
     public static readonly MessageType RejectRequestChangeAccountingPointCharacteristics = new(6, nameof(RejectRequestChangeAccountingPointCharacteristics), MessageCategory.MasterData);
+    public static readonly MessageType NotifyAggregatedMeasureData = new(7, nameof(NotifyAggregatedMeasureData), MessageCategory.AggregationData);
 
     private MessageType(int id, string name, MessageCategory category)
         : base(id, name)

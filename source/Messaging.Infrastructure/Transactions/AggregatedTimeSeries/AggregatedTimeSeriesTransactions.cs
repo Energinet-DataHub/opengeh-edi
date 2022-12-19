@@ -12,29 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
+using System;
+using Messaging.Domain.Transactions.AggregatedTimeSeries;
+using Messaging.Infrastructure.Configuration.DataAccess;
 
 namespace Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
 
-public record TimeSeries(string GridAreaCode, string GridOperatorNumber, IEnumerable<Point> Points);
-
-public class Point
+internal class AggregatedTimeSeriesTransactions : IAggregatedTimeSeriesTransactions
 {
-    public Point(int position, decimal? quantity, string? quality, string quarterTime)
+    private readonly B2BContext _context;
+
+    public AggregatedTimeSeriesTransactions(B2BContext context)
     {
-        Position = position;
-        Quantity = quantity;
-        Quality = quality;
-        QuarterTime = quarterTime;
+        _context = context;
     }
 
-    public int Position { get; }
-
-    public decimal? Quantity { get; }
-
-    public string? Quality { get; }
-
-    [JsonPropertyName("quarter_time")]
-    public string QuarterTime { get; }
+    public void Add(AggregatedTimeSeriesTransaction transaction)
+    {
+        ArgumentNullException.ThrowIfNull(transaction);
+        _context.AggregatedTimeSeriesTransactions.Add(transaction);
+    }
 }
