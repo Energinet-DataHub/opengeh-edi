@@ -27,7 +27,8 @@ using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.OutgoingMessages.Common.Reasons;
 using Messaging.Application.OutgoingMessages.Peek;
-using Messaging.Application.OutgoingMessages.Requesting;
+
+// using Messaging.Application.OutgoingMessages.Requesting;
 using Messaging.Application.Transactions.AggregatedTimeSeries;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.CimMessageAdapter.Messages;
@@ -35,7 +36,6 @@ using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Actors;
-using Messaging.Infrastructure.Common.Reasons;
 using Messaging.Infrastructure.Configuration.Authentication;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.FeatureFlag;
@@ -57,7 +57,6 @@ using Messaging.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 using Messaging.Infrastructure.OutgoingMessages.Peek;
 using Messaging.Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 using Messaging.Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
-using Messaging.Infrastructure.OutgoingMessages.Requesting;
 using Messaging.Infrastructure.Transactions;
 using Messaging.Infrastructure.Transactions.MoveIn;
 using Messaging.Infrastructure.Transactions.UpdateCustomer;
@@ -83,8 +82,6 @@ namespace Messaging.Infrastructure.Configuration
             services.AddScoped<IMoveInTransactionRepository, MoveInTransactionRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
-            services.AddScoped<IMessageRequestNotifications, MessageRequestNotifications>();
-            services.AddTransient<IRequestHandler<RequestMessages, Unit>, RequestMessagesHandler>();
             services.AddScoped<IFeatureFlagProvider, FeatureFlagProviderProvider>();
 
             AddMediatR();
