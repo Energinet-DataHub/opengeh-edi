@@ -23,24 +23,24 @@ namespace Messaging.Application.OutgoingMessages;
 
 public class DocumentFactory
 {
-    private readonly IReadOnlyCollection<IDocumentWriter> _documentWriters;
+    private readonly IReadOnlyCollection<IMessageWriter> _documentWriters;
 
-    public DocumentFactory(IEnumerable<IDocumentWriter> documentWriters)
+    public DocumentFactory(IEnumerable<IMessageWriter> documentWriters)
     {
         _documentWriters = documentWriters.ToList();
     }
 
-    public Task<Stream> CreateFromAsync(CimMessage message, CimFormat documentFormat)
+    public Task<Stream> CreateFromAsync(CimMessage message, MessageFormat documentFormat)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
         var documentWriter =
             _documentWriters.FirstOrDefault(writer =>
-                writer.HandlesDocumentType(message.DocumentType) &&
-                writer.HandlesDocumentFormat(documentFormat));
+                writer.HandlesType(message.MessageType) &&
+                writer.HandlesFormat(documentFormat));
 
         if (documentWriter is null)
         {
-            throw new OutgoingMessageException($"Could not handle document type {message.DocumentType}");
+            throw new OutgoingMessageException($"Could not handle document type {message.MessageType}");
         }
 
         return documentWriter.WriteAsync(
@@ -48,10 +48,10 @@ public class DocumentFactory
             message.MarketActivityRecordPayloads);
     }
 
-    public bool CanHandle(DocumentType documentType, CimFormat documentFormat)
+    public bool CanHandle(MessageType messageType, MessageFormat documentFormat)
     {
         return _documentWriters.Any(writer =>
-            writer.HandlesDocumentType(documentType) &&
-            writer.HandlesDocumentFormat(documentFormat));
+            writer.HandlesType(messageType) &&
+            writer.HandlesFormat(documentFormat));
     }
 }

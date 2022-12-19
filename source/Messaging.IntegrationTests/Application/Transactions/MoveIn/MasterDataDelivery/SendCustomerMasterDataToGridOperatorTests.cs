@@ -110,7 +110,7 @@ public class SendCustomerMasterDataToGridOperatorTests
     {
         var assertMessage = Assertions.AssertOutgoingMessage.OutgoingMessage(
             SampleData.TransactionId,
-            DocumentType.CharacteristicsOfACustomerAtAnAP.Name,
+            MessageType.CharacteristicsOfACustomerAtAnAP.Name,
             ProcessType.MoveIn.Code,
             MarketRole.GridOperator,
             GetService<IDbConnectionFactory>());

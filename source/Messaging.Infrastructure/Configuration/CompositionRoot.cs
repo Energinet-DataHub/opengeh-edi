@@ -15,34 +15,26 @@
 using System;
 using System.Diagnostics;
 using System.Net.Http;
-using System.Runtime.CompilerServices;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
-using Energinet.DataHub.MessageHub.Client;
-using Energinet.DataHub.MessageHub.Client.DataAvailable;
-using Energinet.DataHub.MessageHub.Client.Factories;
-using Energinet.DataHub.MessageHub.Client.Peek;
-using Energinet.DataHub.MessageHub.Client.Storage;
-using Energinet.DataHub.MessageHub.Model.Peek;
 using MediatR;
 using MediatR.Registration;
 using Messaging.Application.Actors;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.Configuration.TimeEvents;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.OutgoingMessages.Common.Reasons;
 using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Application.OutgoingMessages.Requesting;
+using Messaging.Application.Transactions.AggregatedTimeSeries;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Actors;
-using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Common.Reasons;
 using Messaging.Infrastructure.Configuration.Authentication;
 using Messaging.Infrastructure.Configuration.DataAccess;
@@ -55,10 +47,13 @@ using Messaging.Infrastructure.MasterData.MarketEvaluationPoints;
 using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
 using Messaging.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
+using Messaging.Infrastructure.OutgoingMessages.Common;
+using Messaging.Infrastructure.OutgoingMessages.Common.Reasons;
 using Messaging.Infrastructure.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
 using Messaging.Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Infrastructure.OutgoingMessages.Dequeue;
 using Messaging.Infrastructure.OutgoingMessages.GenericNotification;
+using Messaging.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 using Messaging.Infrastructure.OutgoingMessages.Peek;
 using Messaging.Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 using Messaging.Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
@@ -102,6 +97,7 @@ namespace Messaging.Infrastructure.Configuration
             ReadModelHandlingConfiguration.AddReadModelHandling(services);
             UpdateCustomerMasterDataConfiguration.Configure(services);
             DequeueConfiguration.Configure(services);
+            SendAggregatedTimeSeriesConfiguration.Configure(services);
         }
 
         public static CompositionRoot Initialize(IServiceCollection services)
@@ -178,46 +174,11 @@ namespace Messaging.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddMessagePublishing(Func<IServiceProvider, INewMessageAvailableNotifier> action)
+        public CompositionRoot AddMessagePublishing()
         {
-            _services.AddScoped(action);
             _services.AddSingleton<IActorLookup, ActorLookup>();
-            _services.AddScoped<MessageAvailabilityPublisher>();
             _services.AddScoped<IOutgoingMessageStore, OutgoingMessageStore>();
             _services.AddScoped<OutgoingMessageEnqueuer>();
-            return this;
-        }
-
-        public CompositionRoot AddMessageStorage(Func<IServiceProvider, IMessageStorage> action)
-        {
-            _services.AddSingleton(action);
-            return this;
-        }
-
-        public CompositionRoot AddMessageHubServices(string storageServiceConnectionString, string storageServiceContainerName, string queueConnectionString, string dataAvailableQueue, string domainReplyQueue)
-        {
-            _services.AddSingleton<StorageConfig>(s => new StorageConfig(storageServiceContainerName));
-            _services.AddSingleton<IRequestBundleParser, RequestBundleParser>();
-            _services.AddSingleton<IResponseBundleParser, ResponseBundleParser>();
-            _services.AddSingleton<IStorageServiceClientFactory>(s => new StorageServiceClientFactory(storageServiceConnectionString));
-            _services.AddSingleton<IStorageHandler, StorageHandler>();
-
-            _services.AddSingleton<IServiceBusClientFactory>(_ => new ServiceBusClientFactory(queueConnectionString));
-            _services.AddSingleton<IMessageBusFactory, AzureServiceBusFactory>();
-            _services.AddSingleton<IDataAvailableNotificationSender, DataAvailableNotificationSender>();
-            _services.AddSingleton<IDataBundleResponseSender, DataBundleResponseSender>();
-            _services.AddSingleton(_ => new MessageHubConfig(dataAvailableQueue, domainReplyQueue));
-            _services.AddTransient<IRequestHandler<SendSuccessNotification, Unit>, SendSuccessNotificationHandler>();
-            _services.AddTransient<IRequestHandler<SendFailureNotification, Unit>, SendFailureNotificationHandler>();
-
-            return this;
-        }
-
-        public CompositionRoot AddRequestHandler<TRequestHandler>()
-            where TRequestHandler : class
-        {
-            _services.AddTransient<TRequestHandler>();
-
             return this;
         }
 
@@ -259,6 +220,14 @@ namespace Messaging.Infrastructure.Configuration
             return this;
         }
 
+        public CompositionRoot AddRequestHandler<TRequestHandler>()
+            where TRequestHandler : class
+        {
+            _services.AddTransient<TRequestHandler>();
+
+            return this;
+        }
+
         private void AddRemoteBusinessService<TRequest, TReply>(string responseQueueName)
             where TRequest : class
             where TReply : class
@@ -272,17 +241,18 @@ namespace Messaging.Infrastructure.Configuration
         private void AddMessageGenerationServices()
         {
             _services.AddScoped<DocumentFactory>();
-            _services.AddScoped<IDocumentWriter, ConfirmChangeOfSupplierXmlDocumentWriter>();
-            _services.AddScoped<IDocumentWriter, ConfirmChangeOfSupplierJsonDocumentWriter>();
-            _services.AddScoped<IDocumentWriter, RejectRequestChangeOfSupplierXmlDocumentWriter>();
-            _services.AddScoped<IDocumentWriter, GenericNotificationDocumentWriter>();
-            _services.AddScoped<IDocumentWriter, AccountingPointCharacteristicsDocumentWriter>();
-            _services.AddScoped<IDocumentWriter, ConfirmRequestChangeAccountingPointCharacteristicsDocumentWriter>();
-            _services.AddScoped<IDocumentWriter, RejectRequestChangeAccountingPointCharacteristicsDocumentWriter>();
-            _services.AddScoped<IDocumentWriter, CharacteristicsOfACustomerAtAnApDocumentWriter>();
-            _services.AddScoped<IDocumentWriter, RejectRequestChangeOfSupplierJsonDocumentWriter>();
+            _services.AddScoped<IMessageWriter, ConfirmChangeOfSupplierXmlMessageWriter>();
+            _services.AddScoped<IMessageWriter, ConfirmChangeOfSupplierJsonMessageWriter>();
+            _services.AddScoped<IMessageWriter, RejectRequestChangeOfSupplierXmlMessageWriter>();
+            _services.AddScoped<IMessageWriter, GenericNotificationMessageWriter>();
+            _services.AddScoped<IMessageWriter, AccountingPointCharacteristicsMessageWriter>();
+            _services.AddScoped<IMessageWriter, ConfirmRequestChangeAccountingPointCharacteristicsMessageWriter>();
+            _services.AddScoped<IMessageWriter, RejectRequestChangeAccountingPointCharacteristicsMessageWriter>();
+            _services.AddScoped<IMessageWriter, CharacteristicsOfACustomerAtAnApMessageWriter>();
+            _services.AddScoped<IMessageWriter, RejectRequestChangeOfSupplierJsonMessageWriter>();
+            _services.AddScoped<IMessageWriter, NotifyAggregatedMeasureDataMessageWriter>();
             _services.AddScoped<IValidationErrorTranslator, ValidationErrorTranslator>();
-            _services.AddScoped<IMarketActivityRecordParser, MarketActivityRecordParser>();
+            _services.AddScoped<IMessageRecordParser, MessageRecordParser>();
         }
 
         private void AddMediatR()

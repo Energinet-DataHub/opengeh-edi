@@ -223,7 +223,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
 
     private Task<MessageParserResult<MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>> ParseMessageAsync(Stream message)
     {
-        return _messageParser.ParseAsync(message, CimFormat.Xml);
+        return _messageParser.ParseAsync(message, MessageFormat.Xml);
     }
 
     private MessageReceiver<Messaging.CimMessageAdapter.Messages.Queues.RequestChangeCustomerCharacteristicsTransaction> CreateMessageReceiver()

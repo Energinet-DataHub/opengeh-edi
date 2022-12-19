@@ -23,14 +23,14 @@ namespace Messaging.Tests.Infrastructure.IncomingMessages;
 public class CimFormatParserTests
 {
     [Theory]
-    [InlineData("application/json", nameof(CimFormat.Json))]
-    [InlineData("application/json; charset=utf-8", nameof(CimFormat.Json))]
-    [InlineData("application/xml; charset=utf-8", nameof(CimFormat.Xml))]
-    [InlineData("application/xml", nameof(CimFormat.Xml))]
-    [InlineData("application/xml ", nameof(CimFormat.Xml))]
+    [InlineData("application/json", nameof(MessageFormat.Json))]
+    [InlineData("application/json; charset=utf-8", nameof(MessageFormat.Json))]
+    [InlineData("application/xml; charset=utf-8", nameof(MessageFormat.Xml))]
+    [InlineData("application/xml", nameof(MessageFormat.Xml))]
+    [InlineData("application/xml ", nameof(MessageFormat.Xml))]
     public void Can_parse_from_known_content_header_value(string contentHeaderValue, string expectedCimFormat)
     {
-        var expectedFormat = EnumerationType.FromName<CimFormat>(expectedCimFormat);
+        var expectedFormat = EnumerationType.FromName<MessageFormat>(expectedCimFormat);
         var parsedFormat = CimFormatParser.ParseFromContentTypeHeaderValue(contentHeaderValue);
 
         Assert.Equal(expectedFormat, parsedFormat);

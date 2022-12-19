@@ -13,18 +13,15 @@
 // limitations under the License.
 
 using System;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages.Peek;
-using Messaging.Application.Transactions.MoveIn;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.Peek;
 using Messaging.Infrastructure.OutgoingMessages;
-using Messaging.Infrastructure.Transactions;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Factories;
@@ -63,7 +60,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         Assert.NotNull(result.Bundle);
 
         AssertXmlMessage.Document(XDocument.Load(result.Bundle!))
-            .IsDocumentType(DocumentType.ConfirmRequestChangeOfSupplier)
+            .IsDocumentType(MessageType.ConfirmRequestChangeOfSupplier)
             .IsProcesType(ProcessType.MoveIn)
             .HasMarketActivityRecordCount(2);
     }
@@ -73,31 +70,14 @@ public class WhenAPeekIsRequestedTests : TestBase
     {
         SetMaximumNumberOfPayloadsInBundle(1);
         await GivenTwoMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
-        await InsertFakeMessagesAsync(SampleData.NewEnergySupplierNumber, MarketRole.EnergySupplier, MessageCategory.MasterData, ProcessType.MoveIn, DocumentType.ConfirmRequestChangeOfSupplier).ConfigureAwait(false);
+        await InsertFakeMessagesAsync(SampleData.NewEnergySupplierNumber, MarketRole.EnergySupplier, MessageCategory.MasterData, ProcessType.MoveIn, MessageType.ConfirmRequestChangeOfSupplier).ConfigureAwait(false);
 
         var command = CreatePeekRequest(MessageCategory.MasterData);
         var result = await InvokeCommandAsync(command).ConfigureAwait(false);
 
         AssertXmlMessage.Document(XDocument.Load(result.Bundle!))
-            .IsDocumentType(DocumentType.ConfirmRequestChangeOfSupplier)
+            .IsDocumentType(MessageType.ConfirmRequestChangeOfSupplier)
             .IsProcesType(ProcessType.MoveIn)
-            .HasMarketActivityRecordCount(1);
-    }
-
-    [Fact]
-    public async Task Bundled_message_contains_payloads_for_the_requested_receiver_role()
-    {
-        await InsertFakeMessagesAsync(SampleData.NewEnergySupplierNumber, MarketRole.GridOperator, MessageCategory.MasterData, ProcessType.MoveIn, DocumentType.ConfirmRequestChangeOfSupplier).ConfigureAwait(false);
-        await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
-        await InsertFakeMessagesAsync(SampleData.NewEnergySupplierNumber, MarketRole.GridOperator, MessageCategory.MasterData, ProcessType.MoveIn, DocumentType.ConfirmRequestChangeOfSupplier).ConfigureAwait(false);
-
-        var command = CreatePeekRequest(MessageCategory.MasterData);
-        var result = await InvokeCommandAsync(command).ConfigureAwait(false);
-
-        AssertXmlMessage.Document(XDocument.Load(result.Bundle!))
-            .IsDocumentType(DocumentType.ConfirmRequestChangeOfSupplier)
-            .IsProcesType(ProcessType.MoveIn)
-            .HasReceiverRole(MarketRole.EnergySupplier)
             .HasMarketActivityRecordCount(1);
     }
 
@@ -125,7 +105,7 @@ public class WhenAPeekIsRequestedTests : TestBase
 
     private static PeekRequest CreatePeekRequest(MessageCategory messageCategory)
     {
-        return new PeekRequest(ActorNumber.Create(SampleData.NewEnergySupplierNumber), messageCategory, MarketRole.EnergySupplier);
+        return new PeekRequest(ActorNumber.Create(SampleData.NewEnergySupplierNumber), messageCategory);
     }
 
     private static IncomingMessageBuilder MessageBuilder()
@@ -136,7 +116,7 @@ public class WhenAPeekIsRequestedTests : TestBase
             .WithTransactionId(SampleData.TransactionId);
     }
 
-    private async Task InsertFakeMessagesAsync(string receiverId, MarketRole receiverRole, MessageCategory category, ProcessType processType, DocumentType documentType)
+    private async Task InsertFakeMessagesAsync(string receiverId, MarketRole receiverRole, MessageCategory category, ProcessType processType, MessageType messageType)
     {
         var messageEnqueuer = GetService<OutgoingMessageEnqueuer>();
 
@@ -148,10 +128,10 @@ public class WhenAPeekIsRequestedTests : TestBase
                 receiverRole.Name,
                 Guid.NewGuid().ToString(),
                 "FakeSenderRole",
-                documentType.Name,
+                messageType.Name,
                 category.Name,
                 processType.Code,
-                "Payload");
+                "MessageRecord");
 
             await messageEnqueuer.EnqueueAsync(message).ConfigureAwait(false);
         }
@@ -163,8 +143,7 @@ public class WhenAPeekIsRequestedTests : TestBase
             .TryRegisterBundleAsync(
                 BundleId.Create(
                     MessageCategory.MasterData,
-                    ActorNumber.Create(SampleData.NewEnergySupplierNumber),
-                    MarketRole.EnergySupplier))
+                    ActorNumber.Create(SampleData.NewEnergySupplierNumber)))
             .ConfigureAwait(false);
     }
 

@@ -19,10 +19,10 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using Messaging.Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
-using Messaging.Application.SchemaStore;
 using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Infrastructure.IncomingMessages.SchemaStore;
 using MarketActivityRecord = Messaging.Application.IncomingMessages.RequestChangeAccountPointCharacteristics.MarketActivityRecord;
 
 namespace Messaging.Infrastructure.IncomingMessages.RequestChangeAccountingPointCharacteristics;
@@ -39,7 +39,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         _schemaProvider = new XmlSchemaProvider();
     }
 
-    public CimFormat HandledFormat => CimFormat.Xml;
+    public MessageFormat HandledFormat => MessageFormat.Xml;
 
     public async Task<MessageParserResult<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>>
         ParseAsync(Stream message)

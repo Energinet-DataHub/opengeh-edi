@@ -24,7 +24,7 @@ namespace Messaging.Infrastructure.IncomingMessages.Response
 {
     public class XmlResponseFactory : IResponseFactory
     {
-        public CimFormat HandledFormat => CimFormat.Xml;
+        public MessageFormat HandledFormat => MessageFormat.Xml;
 
         public ResponseMessage From(Result result)
         {

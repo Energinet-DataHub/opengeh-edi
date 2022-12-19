@@ -28,8 +28,7 @@ public interface IEnqueuedMessages
     /// Get enqueued messages
     /// </summary>
     /// <param name="actorNumber">Actor number of requesting actor</param>
-    /// /// <param name="actorRole">Market role for which the message created</param>
     /// /// /// <param name="messageCategory">The category of messages to include in message</param>
     /// <returns>List of enqueued messages</returns>
-    Task<IEnumerable<EnqueuedMessage>> GetByAsync(ActorNumber actorNumber, MarketRole actorRole, MessageCategory messageCategory);
+    Task<IEnumerable<EnqueuedMessage>> GetByAsync(ActorNumber actorNumber, MessageCategory messageCategory);
 }

@@ -20,13 +20,15 @@ using System.Xml.Linq;
 using System.Xml.Schema;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages;
-using Messaging.Application.OutgoingMessages.Requesting;
-using Messaging.Application.SchemaStore;
+using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Xml;
+using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages.Peek;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.InternalCommands;
+using Messaging.Infrastructure.IncomingMessages.SchemaStore;
 using Messaging.Infrastructure.Transactions;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Assertions;
@@ -76,7 +78,6 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             await GivenRequestHasBeenAccepted().ConfigureAwait(false);
 
             var confirmMessage = _outgoingMessageStore.GetByTransactionId(SampleData.TransactionId)!;
-            await RequestMessage(confirmMessage.Id.ToString(), DocumentType.ConfirmRequestChangeOfSupplier).ConfigureAwait(false);
 
             await AsserConfirmMessage(confirmMessage).ConfigureAwait(false);
         }
@@ -112,7 +113,6 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
             var rejectMessage = _outgoingMessageStore.GetByTransactionId(SampleData.TransactionId)!;
-            await RequestMessage(rejectMessage.Id.ToString(), DocumentType.RejectRequestChangeOfSupplier).ConfigureAwait(false);
 
             await AssertRejectMessage(rejectMessage).ConfigureAwait(false);
         }
@@ -129,7 +129,6 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
             var rejectMessage = _outgoingMessageStore.GetByTransactionId(SampleData.TransactionId)!;
-            await RequestMessage(rejectMessage.Id.ToString(), DocumentType.RejectRequestChangeOfSupplier).ConfigureAwait(false);
 
             await AssertRejectMessage(rejectMessage).ConfigureAwait(false);
         }
@@ -147,7 +146,6 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
             var rejectMessage = _outgoingMessageStore.GetByTransactionId(SampleData.TransactionId)!;
-            await RequestMessage(rejectMessage.Id.ToString(), DocumentType.RejectRequestChangeOfSupplier).ConfigureAwait(false);
 
             await AssertRejectMessage(rejectMessage).ConfigureAwait(false);
         }
@@ -194,44 +192,28 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
         }
 
-        private async Task RequestMessage(string id, DocumentType documentType)
-        {
-            var requestId = Guid.NewGuid();
-            var clientProvidedDetails = new ClientProvidedDetails(
-                requestId,
-                string.Empty,
-                string.Empty,
-                documentType.Name,
-                CimFormat.Xml.Name);
-
-            await InvokeCommandAsync(new RequestMessages(
-                new[] { id },
-                clientProvidedDetails)).ConfigureAwait(false);
-        }
-
         private async Task AssertRejectMessage(OutgoingMessage rejectMessage)
         {
-            var dispatchedDocument = GetDispatchedDocument();
-            await ValidateDocument(dispatchedDocument, "rejectrequestchangeofsupplier", "0.1").ConfigureAwait(false);
+            var peekResult = await InvokeCommandAsync(new PeekRequest(
+                rejectMessage.ReceiverId,
+                MessageCategory.MasterData));
 
-            var document = XDocument.Load(dispatchedDocument);
+            await ValidateDocument(peekResult.Bundle!, "rejectrequestchangeofsupplier", "0.1").ConfigureAwait(false);
+
+            var document = XDocument.Load(peekResult.Bundle!);
             AssertHeader(document, rejectMessage, "A02");
         }
 
         private async Task AsserConfirmMessage(OutgoingMessage message)
         {
-            var dispatchedDocument = GetDispatchedDocument();
+            var peekResult = await InvokeCommandAsync(new PeekRequest(
+                ActorNumber.Create(SampleData.NewEnergySupplierNumber),
+                MessageCategory.MasterData));
 
-            await ValidateDocument(dispatchedDocument, "confirmrequestchangeofsupplier", "0.1").ConfigureAwait(false);
+            await ValidateDocument(peekResult.Bundle!, "confirmrequestchangeofsupplier", "0.1").ConfigureAwait(false);
 
-            var document = XDocument.Load(dispatchedDocument);
+            var document = XDocument.Load(peekResult.Bundle!);
             AssertHeader(document, message, "A01");
-        }
-
-        private Stream GetDispatchedDocument()
-        {
-            var messageDispatcher = (MessageStorageSpy)GetService<IMessageStorage>();
-            return messageDispatcher.SavedMessage!;
         }
 
         private HttpClientSpy GetHttpClientMock()

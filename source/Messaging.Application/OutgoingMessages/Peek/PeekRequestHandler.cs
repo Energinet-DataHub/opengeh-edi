@@ -46,7 +46,7 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var bundleId = BundleId.Create(request.MessageCategory, request.ActorNumber, request.MarketRole);
+        var bundleId = BundleId.Create(request.MessageCategory, request.ActorNumber);
         var document = await _bundleStore
             .GetBundleOfAsync(bundleId)
             .ConfigureAwait(false);
@@ -55,7 +55,7 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
 
         if (!await _bundleStore.TryRegisterBundleAsync(bundleId).ConfigureAwait(false)) return new PeekResult(null);
 
-        var messages = (await _enqueuedMessages.GetByAsync(request.ActorNumber, request.MarketRole, request.MessageCategory)
+        var messages = (await _enqueuedMessages.GetByAsync(request.ActorNumber, request.MessageCategory)
             .ConfigureAwait(false))
             .ToList();
 
@@ -67,7 +67,7 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
 
         var bundle = CreateBundleFrom(messages.ToList());
         var cimMessage = bundle.CreateMessage();
-        document = await _documentFactory.CreateFromAsync(cimMessage, CimFormat.Xml).ConfigureAwait(false);
+        document = await _documentFactory.CreateFromAsync(cimMessage, MessageFormat.Xml).ConfigureAwait(false);
         await _bundleStore.SetBundleForAsync(bundleId, document, bundle.MessageId, bundle.GetMessageIdsIncluded()).ConfigureAwait(false);
         return new PeekResult(document, bundle.MessageId);
     }
@@ -84,6 +84,6 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
     }
 }
 
-public record PeekRequest(ActorNumber ActorNumber, MessageCategory MessageCategory, MarketRole MarketRole) : ICommand<PeekResult>;
+public record PeekRequest(ActorNumber ActorNumber, MessageCategory MessageCategory) : ICommand<PeekResult>;
 
 public record PeekResult(Stream? Bundle, Guid? MessageId = default);

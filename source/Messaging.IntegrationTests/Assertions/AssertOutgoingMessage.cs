@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Text.Json;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Domain.Actors;
@@ -31,28 +32,42 @@ namespace Messaging.IntegrationTests.Assertions
             _message = message;
         }
 
-        public static AssertOutgoingMessage OutgoingMessage(string transactionId, string documentType, string processType, IDbConnectionFactory connectionFactory)
+        public static AssertOutgoingMessage OutgoingMessage(string transactionId, string messageType, string processType, IDbConnectionFactory connectionFactory)
         {
             if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
             var message = connectionFactory.GetOpenConnection().QuerySingle(
-                $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.TransactionId, m.ProcessType," +
-                $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MarketActivityRecordPayload " +
+                $"SELECT m.Id, m.RecordId, m.MessageType, m.ReceiverId, m.TransactionId, m.ProcessType," +
+                $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MessageRecord " +
                 $" FROM [b2b].[OutgoingMessages] m" +
-                $" WHERE m.TransactionId = '{transactionId}' AND m.DocumentType = '{documentType}' AND m.ProcessType = '{processType}'");
+                $" WHERE m.TransactionId = '{transactionId}' AND m.MessageType = '{messageType}' AND m.ProcessType = '{processType}'");
 
             Assert.NotNull(message);
             return new AssertOutgoingMessage(message);
         }
 
-        public static AssertOutgoingMessage OutgoingMessage(string transactionId, string documentType, string processType, MarketRole receiverRole, IDbConnectionFactory connectionFactory)
+        public static AssertOutgoingMessage OutgoingMessage(string transactionId, string messageType, string processType, MarketRole receiverRole, IDbConnectionFactory connectionFactory)
         {
             if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
             ArgumentNullException.ThrowIfNull(receiverRole);
             var message = connectionFactory.GetOpenConnection().QuerySingle(
-                $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.TransactionId, m.ProcessType," +
-                $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MarketActivityRecordPayload " +
+                $"SELECT m.Id, m.RecordId, m.MessageType, m.ReceiverId, m.TransactionId, m.ProcessType," +
+                $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MessageRecord " +
                 $" FROM [b2b].[OutgoingMessages] m" +
-                $" WHERE m.TransactionId = '{transactionId}' AND m.DocumentType = '{documentType}' AND m.ProcessType = '{processType}' AND m.ReceiverRole = '{receiverRole.Name}'");
+                $" WHERE m.TransactionId = '{transactionId}' AND m.MessageType = '{messageType}' AND m.ProcessType = '{processType}' AND m.ReceiverRole = '{receiverRole.Name}'");
+
+            Assert.NotNull(message);
+            return new AssertOutgoingMessage(message);
+        }
+
+        public static AssertOutgoingMessage OutgoingMessage(string messageType, string processType, MarketRole receiverRole, IDbConnectionFactory connectionFactory)
+        {
+            if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
+            ArgumentNullException.ThrowIfNull(receiverRole);
+            var message = connectionFactory.GetOpenConnection().QuerySingle(
+                $"SELECT m.Id, m.RecordId, m.MessageType, m.ReceiverId, m.TransactionId, m.ProcessType," +
+                $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MessageRecord " +
+                $" FROM [b2b].[OutgoingMessages] m" +
+                $" WHERE m.MessageType = '{messageType}' AND m.ProcessType = '{processType}' AND m.ReceiverRole = '{receiverRole.Name}'");
 
             Assert.NotNull(message);
             return new AssertOutgoingMessage(message);
@@ -84,7 +99,21 @@ namespace Messaging.IntegrationTests.Assertions
 
         public AssertMarketActivityRecord WithMarketActivityRecord()
         {
-            return new AssertMarketActivityRecord(_message.MarketActivityRecordPayload);
+            return new AssertMarketActivityRecord(_message.MessageRecord);
+        }
+
+        public AssertOutgoingMessage HasMessageRecordValue<TMessageRecord>(Func<TMessageRecord, object> propertySelector, object expectedValue)
+        {
+            var sut = JsonSerializer.Deserialize<TMessageRecord>(_message.MessageRecord);
+            Assert.Equal(expectedValue, propertySelector(sut));
+            return this;
+        }
+
+        public AssertOutgoingMessage HasMessageRecordValue<TMessageRecord, TValueType>(Func<TMessageRecord, TValueType> propertySelector, TValueType expectedValue)
+        {
+            var sut = JsonSerializer.Deserialize<TMessageRecord>(_message.MessageRecord);
+            Assert.Equal(expectedValue, propertySelector(sut));
+            return this;
         }
     }
 }

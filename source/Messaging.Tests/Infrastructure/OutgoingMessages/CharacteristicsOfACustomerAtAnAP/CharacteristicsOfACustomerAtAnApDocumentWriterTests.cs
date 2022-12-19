@@ -21,14 +21,14 @@ using System.Xml.Schema;
 using Messaging.Application.Configuration;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Common;
-using Messaging.Application.SchemaStore;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
-using Messaging.Infrastructure.Common;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Serialization;
+using Messaging.Infrastructure.IncomingMessages.SchemaStore;
 using Messaging.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
+using Messaging.Infrastructure.OutgoingMessages.Common;
 using Messaging.Tests.Infrastructure.OutgoingMessages.Asserts;
 using NodaTime;
 using Xunit;
@@ -38,16 +38,16 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
     public class CharacteristicsOfACustomerAtAnApDocumentWriterTests
     {
         private const string NamespacePrefix = "cim";
-        private readonly CharacteristicsOfACustomerAtAnApDocumentWriter _documentWriter;
+        private readonly CharacteristicsOfACustomerAtAnApMessageWriter _messageWriter;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-        private readonly IMarketActivityRecordParser _marketActivityRecordParser;
+        private readonly IMessageRecordParser _messageRecordParser;
         private ISchemaProvider? _schemaProvider;
 
         public CharacteristicsOfACustomerAtAnApDocumentWriterTests()
         {
             _systemDateTimeProvider = new SystemDateTimeProvider();
-            _marketActivityRecordParser = new MarketActivityRecordParser(new Serializer());
-            _documentWriter = new CharacteristicsOfACustomerAtAnApDocumentWriter(_marketActivityRecordParser);
+            _messageRecordParser = new MessageRecordParser(new Serializer());
+            _messageWriter = new CharacteristicsOfACustomerAtAnApMessageWriter(_messageRecordParser);
         }
 
         [Fact]
@@ -206,7 +206,7 @@ namespace Messaging.Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACust
 
         private Task<Stream> WriteDocumentAsync(MessageHeader header, params MarketActivityRecord[] marketActivityRecords)
         {
-            return _documentWriter.WriteAsync(header, marketActivityRecords.Select(record => _marketActivityRecordParser.From(record)).ToList());
+            return _messageWriter.WriteAsync(header, marketActivityRecords.Select(record => _messageRecordParser.From(record)).ToList());
         }
     }
 }

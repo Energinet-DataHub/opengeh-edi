@@ -50,7 +50,7 @@ public class MessageParserTests
     {
         return new List<object[]>
         {
-            new object[] { CimFormat.Xml, CreateXmlMessage() },
+            new object[] { MessageFormat.Xml, CreateXmlMessage() },
         };
     }
 
@@ -58,13 +58,13 @@ public class MessageParserTests
     {
         return new List<object[]>
         {
-            new object[] { CimFormat.Xml, CreateInvalidXmlMessage() },
+            new object[] { MessageFormat.Xml, CreateInvalidXmlMessage() },
         };
     }
 
     [Theory]
     [MemberData(nameof(CreateMessages))]
-    public async Task Can_parse(CimFormat format, Stream message)
+    public async Task Can_parse(MessageFormat format, Stream message)
     {
         var result = await _messageParser.ParseAsync(message, format).ConfigureAwait(false);
 
@@ -75,7 +75,7 @@ public class MessageParserTests
 
     [Theory]
     [MemberData(nameof(CreateMessagesWithInvalidStructure))]
-    public async Task Return_error_when_structure_is_invalid(CimFormat format, Stream message)
+    public async Task Return_error_when_structure_is_invalid(MessageFormat format, Stream message)
     {
         var result = await _messageParser.ParseAsync(message, format).ConfigureAwait(false);
 
@@ -88,7 +88,7 @@ public class MessageParserTests
     {
         var parser = new MessageParser(new List<IMessageParser<MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>>());
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => parser.ParseAsync(CreateXmlMessage(), CimFormat.Xml)).ConfigureAwait(false);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => parser.ParseAsync(CreateXmlMessage(), MessageFormat.Xml)).ConfigureAwait(false);
     }
 
     private static Stream CreateXmlMessage()

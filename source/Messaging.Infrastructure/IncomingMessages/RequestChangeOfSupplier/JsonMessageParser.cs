@@ -20,10 +20,10 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Json.Schema;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
-using Messaging.Application.SchemaStore;
 using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Infrastructure.IncomingMessages.SchemaStore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using JsonException = Newtonsoft.Json.JsonException;
@@ -44,7 +44,7 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
         _schemaProvider = schemaProvider;
     }
 
-    public CimFormat HandledFormat => CimFormat.Json;
+    public MessageFormat HandledFormat => MessageFormat.Json;
 
     public async Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>> ParseAsync(Stream message)
     {

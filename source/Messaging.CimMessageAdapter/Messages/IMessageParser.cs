@@ -29,7 +29,7 @@ public interface IMessageParser<TMarketActivityRecordType, TMarketTransactionTyp
     /// <summary>
     /// The CIM format handled
     /// </summary>
-    CimFormat HandledFormat { get; }
+    MessageFormat HandledFormat { get; }
 
     /// <summary>
     /// Parse from stream

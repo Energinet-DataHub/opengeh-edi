@@ -18,16 +18,16 @@ namespace Messaging.Domain.OutgoingMessages
 {
     public class OutgoingMessage
     {
-        public OutgoingMessage(DocumentType documentType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string marketActivityRecordPayload)
+        public OutgoingMessage(MessageType messageType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
         {
-            DocumentType = documentType;
+            MessageType = messageType;
             ReceiverId = receiverId;
             TransactionId = transactionId;
             ProcessType = processType;
             ReceiverRole = receiverRole;
             SenderId = senderId;
             SenderRole = senderRole;
-            MarketActivityRecordPayload = marketActivityRecordPayload;
+            MessageRecord = messageRecord;
             Id = Guid.NewGuid();
         }
 
@@ -37,7 +37,7 @@ namespace Messaging.Domain.OutgoingMessages
 
         public ActorNumber ReceiverId { get; }
 
-        public DocumentType DocumentType { get; }
+        public MessageType MessageType { get; }
 
         public string TransactionId { get; }
 
@@ -49,11 +49,6 @@ namespace Messaging.Domain.OutgoingMessages
 
         public MarketRole SenderRole { get; }
 
-        public string MarketActivityRecordPayload { get; }
-
-        public void Published()
-        {
-            IsPublished = true;
-        }
+        public string MessageRecord { get; }
     }
 }

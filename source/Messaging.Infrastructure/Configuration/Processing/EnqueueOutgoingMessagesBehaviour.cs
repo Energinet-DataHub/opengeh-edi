@@ -46,11 +46,6 @@ public class EnqueueOutgoingMessagesBehaviour<TRequest, TResponse> : IPipelineBe
         ArgumentNullException.ThrowIfNull(next);
         var result = await next().ConfigureAwait(false);
 
-        if (!_featureFlagProvider.IsActorMessageQueueEnabled)
-        {
-            return result;
-        }
-
         var outgoingMessages = _b2BContext
             .ChangeTracker
             .Entries<OutgoingMessage>()
@@ -66,10 +61,10 @@ public class EnqueueOutgoingMessagesBehaviour<TRequest, TResponse> : IPipelineBe
                     message.ReceiverRole.Name,
                     message.SenderId.Value,
                     message.SenderRole.Name,
-                    message.DocumentType.Name,
-                    message.DocumentType.Category.Name,
+                    message.MessageType.Name,
+                    message.MessageType.Category.Name,
                     message.ProcessType,
-                    message.MarketActivityRecordPayload)).ConfigureAwait(false);
+                    message.MessageRecord)).ConfigureAwait(false);
         }
 
         return result;

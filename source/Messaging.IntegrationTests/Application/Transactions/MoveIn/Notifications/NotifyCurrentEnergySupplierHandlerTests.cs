@@ -70,7 +70,7 @@ public class NotifyCurrentEnergySupplierHandlerTests
 
         AssertTransaction()
             .HasEndOfSupplyNotificationState(MoveInTransaction.NotificationState.WasNotified);
-        AssertMessage(DocumentType.GenericNotification, BusinessReasonCode.CustomerMoveInOrMoveOut.Code)
+        AssertMessage(MessageType.GenericNotification, BusinessReasonCode.CustomerMoveInOrMoveOut.Code)
             .HasReceiverId(SampleData.CurrentEnergySupplierNumber)
             .HasReceiverRole(MarketRole.EnergySupplier.ToString())
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
@@ -91,9 +91,9 @@ public class NotifyCurrentEnergySupplierHandlerTests
             SampleData.CurrentEnergySupplierNumber);
     }
 
-    private AssertOutgoingMessage AssertMessage(DocumentType documentType, string processType)
+    private AssertOutgoingMessage AssertMessage(MessageType messageType, string processType)
     {
-        return AssertOutgoingMessage.OutgoingMessage(SampleData.TransactionId, documentType.Name, processType, GetService<IDbConnectionFactory>());
+        return AssertOutgoingMessage.OutgoingMessage(SampleData.TransactionId, messageType.Name, processType, GetService<IDbConnectionFactory>());
     }
 
     private AssertTransaction AssertTransaction()
