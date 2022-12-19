@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Actors;
 using Messaging.Application.Configuration.DataAccess;
+using Microsoft.Data.SqlClient;
 
 namespace Messaging.Infrastructure.Actors;
 
@@ -29,12 +30,30 @@ public class ActorRegistry : IActorRegistry
         _dbConnectionFactory = dbConnectionFactory;
     }
 
-    public async Task TryStoreAsync(CreateActor createActor)
+    public async Task<Guid?> IfActorExistsGetB2CIdAsync(string identificationNumber)
+    {
+        if (identificationNumber == null) throw new ArgumentNullException(nameof(identificationNumber));
+        var connection = _dbConnectionFactory.GetOpenConnection();
+        var sqlStatement = @$"SELECT B2CId FROM [b2b].[Actor]  WHERE IdentificationNumber = @IdentificationNumber";
+        var b2CId = await connection.QueryFirstOrDefaultAsync<Guid?>(sqlStatement, new { IdentificationNumber = identificationNumber }).ConfigureAwait(false);
+        return b2CId;
+    }
+
+    public async Task<bool> TryStoreAsync(CreateActor createActor)
     {
         if (createActor == null) throw new ArgumentNullException(nameof(createActor));
         var connection = _dbConnectionFactory.GetOpenConnection();
         var sqlStatement = @$"INSERT INTO [b2b].[Actor] ([Id], [B2CId], [IdentificationNumber]) VALUES ('{createActor.ActorId}', '{createActor.B2CId}', '{createActor.IdentificationNumber}')";
-        await connection.ExecuteAsync(sqlStatement)
-            .ConfigureAwait(false);
+        try
+        {
+            await connection.ExecuteAsync(sqlStatement)
+                .ConfigureAwait(false);
+        }
+        catch (SqlException)
+        {
+            return false;
+        }
+
+        return true;
     }
 }

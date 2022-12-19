@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
-using Messaging.Application.Actors;
 
-namespace Messaging.Infrastructure.Actors;
+namespace Messaging.Application.Actors;
 
 /// <summary>
 /// Add new actors to DB
@@ -23,8 +23,15 @@ namespace Messaging.Infrastructure.Actors;
 public interface IActorRegistry
 {
     /// <summary>
+    ///  Query if actor GLN number already exists
+    /// </summary>
+    /// <param name="identificationNumber"></param>
+    /// <returns>true is if actor GLN number already exists</returns>
+    Task<Guid?> IfActorExistsGetB2CIdAsync(string identificationNumber);
+
+    /// <summary>
     /// Store actors
     /// </summary>
     /// <param name="createActor"></param>
-    Task TryStoreAsync(CreateActor createActor);
+    Task<bool> TryStoreAsync(CreateActor createActor);
 }
