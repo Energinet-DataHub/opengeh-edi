@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Text.Json;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Domain.Actors;
@@ -58,6 +59,20 @@ namespace Messaging.IntegrationTests.Assertions
             return new AssertOutgoingMessage(message);
         }
 
+        public static AssertOutgoingMessage OutgoingMessage(string messageType, string processType, MarketRole receiverRole, IDbConnectionFactory connectionFactory)
+        {
+            if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
+            ArgumentNullException.ThrowIfNull(receiverRole);
+            var message = connectionFactory.GetOpenConnection().QuerySingle(
+                $"SELECT m.Id, m.RecordId, m.MessageType, m.ReceiverId, m.TransactionId, m.ProcessType," +
+                $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MessageRecord " +
+                $" FROM [b2b].[OutgoingMessages] m" +
+                $" WHERE m.MessageType = '{messageType}' AND m.ProcessType = '{processType}' AND m.ReceiverRole = '{receiverRole.Name}'");
+
+            Assert.NotNull(message);
+            return new AssertOutgoingMessage(message);
+        }
+
         public AssertOutgoingMessage HasReceiverId(string receiverId)
         {
             Assert.Equal(receiverId, _message.ReceiverId);
@@ -85,6 +100,20 @@ namespace Messaging.IntegrationTests.Assertions
         public AssertMarketActivityRecord WithMarketActivityRecord()
         {
             return new AssertMarketActivityRecord(_message.MessageRecord);
+        }
+
+        public AssertOutgoingMessage HasMessageRecordValue<TMessageRecord>(Func<TMessageRecord, object> propertySelector, object expectedValue)
+        {
+            var sut = JsonSerializer.Deserialize<TMessageRecord>(_message.MessageRecord);
+            Assert.Equal(expectedValue, propertySelector(sut));
+            return this;
+        }
+
+        public AssertOutgoingMessage HasMessageRecordValue<TMessageRecord, TValueType>(Func<TMessageRecord, TValueType> propertySelector, TValueType expectedValue)
+        {
+            var sut = JsonSerializer.Deserialize<TMessageRecord>(_message.MessageRecord);
+            Assert.Equal(expectedValue, propertySelector(sut));
+            return this;
         }
     }
 }

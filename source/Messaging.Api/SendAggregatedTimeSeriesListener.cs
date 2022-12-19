@@ -15,6 +15,8 @@
 using System;
 using System.Net;
 using System.Threading.Tasks;
+using MediatR;
+using Messaging.Application.Transactions.AggregatedTimeSeries;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
 using Microsoft.Azure.Functions.Worker;
@@ -25,10 +27,14 @@ namespace Messaging.Api;
 public class SendAggregatedTimeSeriesListener
 {
     private readonly ISerializer _serializer;
+    private readonly IMediator _mediator;
+    private readonly FakeAggregatedTimeSeriesResults _aggregatedTimeSeriesResults;
 
-    public SendAggregatedTimeSeriesListener(ISerializer serializer)
+    public SendAggregatedTimeSeriesListener(ISerializer serializer, IAggregatedTimeSeriesResults aggregatedTimeSeriesResults, IMediator mediator)
     {
         _serializer = serializer;
+        _mediator = mediator;
+        _aggregatedTimeSeriesResults = (FakeAggregatedTimeSeriesResults)aggregatedTimeSeriesResults;
     }
 
     [Function("SendAggregatedTimeSeries")]
@@ -38,7 +44,14 @@ public class SendAggregatedTimeSeriesListener
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var timeSeriesFromRequest = await _serializer.DeserializeAsync(request.Body, typeof(TimeSeries)).ConfigureAwait(false);
+        var timeSeriesFromRequest = (AggregatedTimeSeriesResultsDto)await _serializer.DeserializeAsync(request.Body, typeof(AggregatedTimeSeriesResultsDto)).ConfigureAwait(false);
+        foreach (var aggregatedTimeSeriesResultDto in timeSeriesFromRequest.Results)
+        {
+            var testResultId = Guid.NewGuid();
+            _aggregatedTimeSeriesResults.Add(testResultId, aggregatedTimeSeriesResultDto);
+
+            await _mediator.Send(new SendAggregatedTimeSeries(testResultId)).ConfigureAwait(false);
+        }
 
         var response = request.CreateResponse(HttpStatusCode.OK);
         response.Headers.Add("Content-Type", "text/plain; charset=utf-8");

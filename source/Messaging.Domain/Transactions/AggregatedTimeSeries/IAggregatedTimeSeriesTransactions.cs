@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+namespace Messaging.Domain.Transactions.AggregatedTimeSeries;
 
-public record TimeSeries(Guid Id, string MeteringPointType, string MeasureUnitType, Period Period);
-
-public record Period(string Resolution, TimeInterval TimeInterval, IReadOnlyList<Point> Point);
-public record TimeInterval(string Start, string End);
-public record Point(int Position, decimal? Quantity, string? Quality);
+#pragma warning disable
+public interface IAggregatedTimeSeriesTransactions
+{
+    void Add(AggregatedTimeSeriesTransaction transaction);
+}
