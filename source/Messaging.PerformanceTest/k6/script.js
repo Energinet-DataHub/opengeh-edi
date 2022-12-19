@@ -1,6 +1,7 @@
 // run 100 virtual users in paralle
 // k6 run --vus 100 --iterations 100 script.js
 
+import { sleep } from 'k6';
 import http from 'k6/http';
 
 const messagingApiHostDns = 'http://localhost';
@@ -19,30 +20,51 @@ export default function () {
       `${performanceTestHostDns}:${performanceTestHostPort}/api/ActorToken/${actorNumberResponse.body}`
     );
 
+    let actorGln = actorNumberResponse.body;
     let actorToken = actorTokenResponse.body;
 
     let headers = {
       authorization: `Bearer ${actorToken}`,
     };
 
-    const peekResponse = http.get(
-      `${messagingApiHostDns}:${messagingApiHostPort}/api/peek/masterdata`,
-      {
-        headers: headers,
+    let isGettingMessages = true;
+    while (isGettingMessages) {
+        const peekResponse = http.get(
+          `${messagingApiHostDns}:${messagingApiHostPort}/api/peek/masterdata`,
+          {
+            headers: headers,
+          }
+        );
+
+        console.info(`Peek response status: ${peekResponse.status}`);
+
+        if (peekResponse.status === 500) {
+          console.info(`GLN ${actorGln}: sleep for 1 second. internalError: ${peekResponse.status}`);
+          sleep(1000);
+          continue;
+        }
+
+        const noContent = peekResponse.status === 204;
+
+        if (noContent) {
+          console.info(`GLN ${actorGln}: noContent: exit loop:  ${peekResponse.status}`);
+          isGettingMessages = false;
+          break;
+        }
+
+        const MessageId = peekResponse.headers.MessageId;
+        if ( MessageId === '') {
+            console.info(`GLN ${actorGln}: Missing MessageId in peekResponse:  ${JSON.stringify(peekResponse)}`);
+        }
+
+        console.info(`GLN ${actorGln}: http delete: ${messagingApiHostDns}:${messagingApiHostPort}/api/dequeue/${MessageId}`);
+
+        http.del(
+          `${messagingApiHostDns}:${messagingApiHostPort}/api/dequeue/${MessageId}`,
+          {
+            headers: headers,
+          }
+        );
       }
-    );
-
-    const noContent =
-      peekResponse.status === 204 || peekResponse.status === 500;
-
-    if (noContent) return;
-
-    const MessageId = peekResponse.headers.MessageId;
-    http.del(
-      `${messagingApiHostDns}:${messagingApiHostPort}/api/dequeue/${MessageId}`,
-      {
-        headers: headers,
-      }
-    );
-  }
+    }
 }
