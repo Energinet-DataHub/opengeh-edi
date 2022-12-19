@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 using System.Globalization;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
@@ -43,7 +42,7 @@ internal class MoveInService : IMoveInService
     private static string GetMoveInPayload(string uniqueActorNumber)
     {
         var xmlDocument = XDocument.Load($"MoveIn{Path.DirectorySeparatorChar}xml{Path.DirectorySeparatorChar}RequestChangeOfSupplier.xml");
-        //xmlDocument.DescendantNodes().OfType<XComment>().Remove();
+        xmlDocument.DescendantNodes().OfType<XComment>().Remove();
         var actorIdElement = xmlDocument.Root?.Elements()
             .Single(x => x.Name.LocalName.Equals("sender_MarketParticipant.mRID", StringComparison.OrdinalIgnoreCase));
         if (actorIdElement is not null) actorIdElement.Value = uniqueActorNumber;
