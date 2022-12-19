@@ -23,10 +23,10 @@ using Messaging.Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharac
 using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Domain.Transactions.AggregatedTimeSeries;
 using Messaging.Domain.Transactions.MoveIn;
-using Messaging.Infrastructure.Configuration.DataAccess.Outgoing;
 using Messaging.Infrastructure.Configuration.InternalCommands;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.MasterData.MarketEvaluationPoints;
+using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.Infrastructure.Transactions;
 using Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
 using Messaging.Infrastructure.Transactions.UpdateCustomer;

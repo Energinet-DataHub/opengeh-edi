@@ -27,7 +27,7 @@ using Messaging.Domain.SeedWork;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Messaging.Infrastructure.Configuration.DataAccess.Outgoing
+namespace Messaging.Infrastructure.OutgoingMessages
 {
     public class OutgoingMessageEntityConfiguration : IEntityTypeConfiguration<OutgoingMessage>
     {

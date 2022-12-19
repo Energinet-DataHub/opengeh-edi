@@ -20,12 +20,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
-using Messaging.Application.SchemaStore;
 using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.IncomingMessages.RequestChangeOfSupplier;
+using Messaging.Infrastructure.IncomingMessages.SchemaStore;
 using Xunit;
 
 namespace Messaging.Tests.CimMessageAdapter.Messages.RequestChangeOfSupplier;

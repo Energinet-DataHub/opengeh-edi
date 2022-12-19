@@ -16,7 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Messaging.Application.SchemaStore;
+namespace Messaging.Infrastructure.IncomingMessages.SchemaStore;
 
 public abstract class SchemaBase
 {

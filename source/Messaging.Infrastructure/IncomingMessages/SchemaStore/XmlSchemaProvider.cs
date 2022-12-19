@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 
-namespace Messaging.Application.SchemaStore;
+namespace Messaging.Infrastructure.IncomingMessages.SchemaStore;
 
 public class XmlSchemaProvider : SchemaProvider
 {
