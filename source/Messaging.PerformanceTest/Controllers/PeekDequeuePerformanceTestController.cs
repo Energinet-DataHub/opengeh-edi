@@ -1,4 +1,5 @@
-﻿using Messaging.PerformanceTest.Actors;
+﻿using System.Runtime.CompilerServices;
+using Messaging.PerformanceTest.Actors;
 using Messaging.PerformanceTest.MoveIn;
 using Microsoft.AspNetCore.Mvc;
 
@@ -43,7 +44,7 @@ public class PeekDequeuePerformanceTestController : ControllerBase
         {
              var uniqueActorNumber = _actorService.GetUniqueActorNumber();
 
-             for (var j = 0; j < 1; j++)
+             for (var j = 0; j < 1000; j++)
              {
                  await _moveInService.MoveInAsync(uniqueActorNumber).ConfigureAwait(false);
              }
