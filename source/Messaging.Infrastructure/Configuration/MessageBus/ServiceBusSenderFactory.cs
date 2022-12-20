@@ -21,6 +21,7 @@ namespace Messaging.Infrastructure.Configuration.MessageBus
 {
     public sealed class ServiceBusSenderFactory : IServiceBusSenderFactory
     {
+        private readonly object _adaptersLock = new();
         private readonly Dictionary<string, IServiceBusSenderAdapter> _adapters = new();
         private readonly ServiceBusClient _serviceBusClient;
 
@@ -34,14 +35,17 @@ namespace Messaging.Infrastructure.Configuration.MessageBus
             ArgumentNullException.ThrowIfNull(topicName);
 
             var key = topicName.ToUpperInvariant();
-            _adapters.TryGetValue(key, out var adapter);
-            if (adapter is null)
+            lock (_adaptersLock)
             {
-                adapter = new ServiceBusSenderAdapter(_serviceBusClient, topicName);
-                _adapters.Add(key, adapter);
-            }
+                _adapters.TryGetValue(key, out var adapter);
+                if (adapter is null)
+                {
+                    adapter = new ServiceBusSenderAdapter(_serviceBusClient, topicName);
+                    _adapters.Add(key, adapter);
+                }
 
-            return adapter;
+                return adapter;
+            }
         }
 
 #pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
