@@ -63,7 +63,7 @@ public class SendAggregatedTimeSeriesTests : TestBase
             .HasReceiverRole(MarketRole.GridOperator.Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
-            .HasMessageRecordValue<TimeSeries>(x => x.Id, transactionId.ToString())
+            .HasMessageRecordValue<TimeSeries>(x => x.TransactionId, transactionId.ToString())
             .HasMessageRecordValue<TimeSeries>(x => x.GridAreaCode, SampleData.GridAreaCode)
             .HasMessageRecordValue<TimeSeries>(x => x.Resolution, SampleData.Resolution)
             .HasMessageRecordValue<TimeSeries>(x => x.MeasureUnitType, SampleData.MeasureUnitType)
