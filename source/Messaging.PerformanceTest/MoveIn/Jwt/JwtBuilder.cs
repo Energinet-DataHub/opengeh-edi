@@ -17,7 +17,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Messaging.PerformanceTest.MoveIn;
+namespace Messaging.PerformanceTest.MoveIn.Jwt;
 
 internal class JwtBuilder
 {

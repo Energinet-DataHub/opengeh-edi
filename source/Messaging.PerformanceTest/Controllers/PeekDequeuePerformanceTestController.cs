@@ -1,6 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using Messaging.PerformanceTest.Actors;
 using Messaging.PerformanceTest.MoveIn;
+using Messaging.PerformanceTest.MoveIn.Jwt;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Messaging.PerformanceTest.Controllers;
