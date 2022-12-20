@@ -24,6 +24,7 @@ using Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Messaging.Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Domain.SeedWork;
+using Messaging.Domain.Transactions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -53,7 +54,10 @@ namespace Messaging.Infrastructure.OutgoingMessages
                 .HasConversion(
                     toDbValue => toDbValue.ToString(),
                     fromDbValue => EnumerationType.FromName<MarketRole>(fromDbValue));
-            builder.Property(x => x.TransactionId);
+            builder.Property(x => x.TransactionId)
+                .HasConversion(
+                    toDbValue => toDbValue.Id,
+                    fromDbValue => TransactionId.Create(fromDbValue));
             builder.Property(x => x.ProcessType);
             builder.Property(x => x.SenderId)
                 .HasConversion(

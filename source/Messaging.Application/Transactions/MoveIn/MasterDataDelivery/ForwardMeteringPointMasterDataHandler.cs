@@ -26,6 +26,7 @@ using Messaging.Domain.MasterData.Dictionaries;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.AccountingPointCharacteristics;
 using Messaging.Domain.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails;
+using Messaging.Domain.Transactions;
 using Messaging.Domain.Transactions.MoveIn;
 using NodaTime.Extensions;
 using Address = Messaging.Domain.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails.Address;
@@ -127,7 +128,7 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
         return new OutgoingMessage(
             MessageType.AccountingPointCharacteristics,
             ActorNumber.Create(receiverId),
-            id,
+            TransactionId.Create(id),
             processType,
             MarketRole.EnergySupplier,
             DataHubDetails.IdentificationNumber,

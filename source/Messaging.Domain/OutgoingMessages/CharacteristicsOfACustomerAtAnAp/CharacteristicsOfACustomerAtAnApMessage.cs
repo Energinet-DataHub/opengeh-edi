@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Messaging.Domain.Actors;
+using Messaging.Domain.Transactions;
 using Messaging.Domain.Transactions.MoveIn;
 using NodaTime;
 
@@ -20,7 +21,7 @@ namespace Messaging.Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 
 public class CharacteristicsOfACustomerAtAnApMessage : OutgoingMessage
 {
-    private CharacteristicsOfACustomerAtAnApMessage(MessageType messageType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
+    private CharacteristicsOfACustomerAtAnApMessage(MessageType messageType, ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
         : base(messageType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, messageRecord)
     {
         MarketActivityRecord =
@@ -28,7 +29,7 @@ public class CharacteristicsOfACustomerAtAnApMessage : OutgoingMessage
                 messageRecord);
     }
 
-    private CharacteristicsOfACustomerAtAnApMessage(MessageType messageType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, MarketActivityRecord marketActivityRecord)
+    private CharacteristicsOfACustomerAtAnApMessage(MessageType messageType, ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, MarketActivityRecord marketActivityRecord)
         : base(messageType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, new Serializer().Serialize(marketActivityRecord))
     {
         MarketActivityRecord = marketActivityRecord;
@@ -57,7 +58,7 @@ public class CharacteristicsOfACustomerAtAnApMessage : OutgoingMessage
         return new CharacteristicsOfACustomerAtAnApMessage(
             MessageType.CharacteristicsOfACustomerAtAnAP,
             actorNumber,
-            transactionId,
+            TransactionId.Create(transactionId),
             processType.Code,
             receivingActorRole,
             DataHubDetails.IdentificationNumber,

@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Messaging.Domain.Transactions;
 using Xunit;
 
 namespace Messaging.Tests.Domain.OutgoingMessages;
@@ -47,7 +48,7 @@ public class RejectRequestChangeOfSupplierMessageTests
         }
 
         return RejectRequestChangeOfSupplierMessage.Create(
-            string.Empty,
+            TransactionId.New(),
             ProcessType.MoveIn,
             string.Empty,
             ActorNumber.Create("1234567890123"),
