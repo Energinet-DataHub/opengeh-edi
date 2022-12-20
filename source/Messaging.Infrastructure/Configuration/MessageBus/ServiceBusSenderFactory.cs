@@ -16,34 +16,36 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
-using Microsoft.Extensions.Azure;
 
 namespace Messaging.Infrastructure.Configuration.MessageBus
 {
     public sealed class ServiceBusSenderFactory : IServiceBusSenderFactory
     {
-        private readonly Dictionary<KeyValuePair<string, string>, IServiceBusSenderAdapter> _adapters = new();
-        private readonly IAzureClientFactory<ServiceBusClient> _clientFactory;
+        private readonly object _adaptersLock = new();
+        private readonly Dictionary<string, IServiceBusSenderAdapter> _adapters = new();
+        private readonly ServiceBusClient _serviceBusClient;
 
-        public ServiceBusSenderFactory(IAzureClientFactory<ServiceBusClient> clientFactory)
+        public ServiceBusSenderFactory(ServiceBusClient serviceBusClient)
         {
-            _clientFactory = clientFactory;
+            _serviceBusClient = serviceBusClient;
         }
 
-        public IServiceBusSenderAdapter GetSender(string topicName, string clientName)
+        public IServiceBusSenderAdapter GetSender(string topicName)
         {
             ArgumentNullException.ThrowIfNull(topicName);
-            ArgumentNullException.ThrowIfNull(clientName);
 
-            var key = new KeyValuePair<string, string>(clientName.ToUpperInvariant(), topicName.ToUpperInvariant());
-            _adapters.TryGetValue(key, out var adapter);
-            if (adapter is null)
+            var key = topicName.ToUpperInvariant();
+            lock (_adaptersLock)
             {
-                adapter = new ServiceBusSenderAdapter(_clientFactory.CreateClient(clientName), topicName);
-                _adapters.Add(key, adapter);
-            }
+                _adapters.TryGetValue(key, out var adapter);
+                if (adapter is null)
+                {
+                    adapter = new ServiceBusSenderAdapter(_serviceBusClient, topicName);
+                    _adapters.Add(key, adapter);
+                }
 
-            return adapter;
+                return adapter;
+            }
         }
 
 #pragma warning disable CA1816 // Dispose methods should call SuppressFinalize

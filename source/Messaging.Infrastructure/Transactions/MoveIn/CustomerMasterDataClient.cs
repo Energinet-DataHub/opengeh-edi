@@ -40,7 +40,7 @@ public class CustomerMasterDataClient : ICustomerMasterDataClient
         if (fetchCustomerMasterData == null) throw new ArgumentNullException(nameof(fetchCustomerMasterData));
         var message = CreateFrom(fetchCustomerMasterData);
         return _clientSenderFactory
-            .GetSender(_configuration.QueueName, _configuration.ClientRegistrationName)
+            .GetSender(_configuration.QueueName)
             .SendAsync(message);
     }
 

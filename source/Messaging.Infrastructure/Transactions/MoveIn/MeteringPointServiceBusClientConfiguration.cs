@@ -18,13 +18,10 @@ namespace Messaging.Infrastructure.Transactions.MoveIn;
 
 public class MeteringPointServiceBusClientConfiguration : IServiceBusClientConfiguration
 {
-    public MeteringPointServiceBusClientConfiguration(string queueName, string clientRegistrationName)
+    public MeteringPointServiceBusClientConfiguration(string queueName)
     {
         QueueName = queueName;
-        ClientRegistrationName = clientRegistrationName;
     }
 
     public string QueueName { get; }
-
-    public string ClientRegistrationName { get; }
 }

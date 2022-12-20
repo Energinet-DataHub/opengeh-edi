@@ -51,7 +51,7 @@ namespace Messaging.IntegrationTests
             Environment.SetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE", "true");
             _services = new ServiceCollection();
 
-            _services.AddSingleton(new EnergySupplyingServiceBusClientConfiguration("Fake", "Fake"));
+            _services.AddSingleton(new EnergySupplyingServiceBusClientConfiguration("Fake"));
             _services.AddSingleton<IServiceBusSenderFactory, ServiceBusSenderFactoryStub>();
 
             _services.AddSingleton(

@@ -79,22 +79,11 @@ namespace Messaging.Api
                 {
                     var databaseConnectionString = runtime.DB_CONNECTION_STRING;
 
-                    var meteringPointServiceBusClientConfiguration =
-                        new MeteringPointServiceBusClientConfiguration(
-                            runtime.MASTER_DATA_REQUEST_QUEUE_NAME!,
-                            "MeteringPointsSenderClient");
-                    services.AddSingleton(meteringPointServiceBusClientConfiguration);
-                    services.AddAzureServiceBusClient(new ServiceBusClientConfiguration(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND, meteringPointServiceBusClientConfiguration));
+                    services.AddSingleton(new MeteringPointServiceBusClientConfiguration(
+                        runtime.MASTER_DATA_REQUEST_QUEUE_NAME!));
 
-                    var energySupplyingServiceBusClientConfiguration =
-                        new EnergySupplyingServiceBusClientConfiguration(
-                            runtime.CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME!,
-                            "EnergySupplyingSenderClient");
-                    services.AddSingleton(energySupplyingServiceBusClientConfiguration);
-                    services.AddAzureServiceBusClient(new ServiceBusClientConfiguration(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND, energySupplyingServiceBusClientConfiguration));
-
-                    services.AddSingleton<ServiceBusClient>(
-                        _ => new ServiceBusClient(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND!));
+                    services.AddSingleton(new EnergySupplyingServiceBusClientConfiguration(
+                        runtime.CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME!));
 
                     services.AddSingleton(
                         _ => new RequestChangeOfSupplierTransaction(runtime.INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME!));
@@ -103,6 +92,7 @@ namespace Messaging.Api
                         _ => new RequestChangeCustomerCharacteristicsTransaction(runtime.INCOMING_CHANGE_CUSTOMER_CHARACTERISTICS_MESSAGE_QUEUE_NAME!));
 
                     CompositionRoot.Initialize(services)
+                        .AddMessageBus(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND!)
                         .AddPeekConfiguration(new BundleConfiguration(runtime.MAX_NUMBER_OF_PAYLOADS_IN_BUNDLE))
                         .AddRemoteBusinessService<DummyRequest, DummyReply>("Dummy", "Dummy")
                         .AddBearerAuthentication(tokenValidationParameters)

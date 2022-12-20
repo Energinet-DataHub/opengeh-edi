@@ -37,16 +37,14 @@ namespace Messaging.Infrastructure.IncomingMessages
         private readonly ICorrelationContext _correlationContext;
         private readonly IServiceBusSenderFactory _serviceBusSenderFactory;
 
-        public MessageQueueDispatcher(ISerializer jsonSerializer, ServiceBusClient serviceBusClient, ICorrelationContext correlationContext, TQueue queue, IServiceBusSenderFactory serviceBusSenderFactory)
+        public MessageQueueDispatcher(ISerializer jsonSerializer, ICorrelationContext correlationContext, TQueue queue, IServiceBusSenderFactory serviceBusSenderFactory)
         {
-            if (serviceBusClient == null) throw new ArgumentNullException(nameof(serviceBusClient));
             if (queue == null) throw new ArgumentNullException(nameof(queue));
 
             _correlationContext = correlationContext;
             _serviceBusSenderFactory = serviceBusSenderFactory;
             _jsonSerializer = jsonSerializer;
-            // TODO: "MeteringPointsSenderClient" is hardcoded - fix it!
-            _senderCreator = _serviceBusSenderFactory.GetSender(queue.Name, "MeteringPointsSenderClient");
+            _senderCreator = _serviceBusSenderFactory.GetSender(queue.Name);
             _transactionQueue = new List<ServiceBusMessage>();
         }
 
