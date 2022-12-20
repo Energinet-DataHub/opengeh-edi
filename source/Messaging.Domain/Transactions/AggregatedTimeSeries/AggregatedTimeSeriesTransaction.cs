@@ -34,7 +34,7 @@ public class AggregatedTimeSeriesTransaction : Entity
         _processType = processType;
         _series = series;
         Id = id;
-        CreateResultMessages();
+        _messages.Add(AggregatedTimeSeriesMessage.Create(_receivingActor, _receivingActorRole, Id, _processType, _series));
     }
 
     #pragma warning disable CS8618 // EF core need this private constructor
@@ -44,9 +44,4 @@ public class AggregatedTimeSeriesTransaction : Entity
     #pragma warning restore
 
     public TransactionId Id { get; }
-
-    private void CreateResultMessages()
-    {
-        _messages.Add(AggregatedTimeSeriesMessage.Create(_receivingActor, _receivingActorRole, Id, _processType, _series));
-    }
 }
