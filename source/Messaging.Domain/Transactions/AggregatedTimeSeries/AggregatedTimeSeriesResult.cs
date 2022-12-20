@@ -32,12 +32,11 @@ public class AggregatedTimeSeriesResult
 
 public class Series
 {
-    public Series(IReadOnlyList<Point> points, string gridAreaCode, string meteringPointType, ActorNumber gridOperatorId, string measureUnitType, string resolution)
+    public Series(IReadOnlyList<Point> points, string gridAreaCode, string meteringPointType, string measureUnitType, string resolution)
     {
         Points = points;
         GridAreaCode = gridAreaCode;
         MeteringPointType = meteringPointType;
-        GridOperatorId = gridOperatorId;
         MeasureUnitType = measureUnitType;
         Resolution = resolution;
     }
@@ -49,8 +48,6 @@ public class Series
     public string MeteringPointType { get; }
 
     public string MeasureUnitType { get; }
-
-    public ActorNumber GridOperatorId { get; }
 
     public string Resolution { get; }
 }
