@@ -22,6 +22,15 @@ namespace Messaging.PerformanceTest.MoveIn;
 
 internal class MoveInService : IMoveInService
 {
+    private readonly string _hostname;
+    private readonly string _hostport;
+
+    public MoveInService(IConfiguration configuration)
+    {
+        _hostname = configuration["MessagingApi:Hostname"];
+        _hostport = configuration["MessagingApi:Port"];
+    }
+
     public async Task MoveInAsync(string? uniqueActorNumber)
     {
         ArgumentNullException.ThrowIfNull(uniqueActorNumber);
@@ -35,7 +44,7 @@ internal class MoveInService : IMoveInService
 
         using var httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
-        await httpClient.PostAsync(new Uri($"http://localhost:7071/api/RequestChangeOfSupplier"), body).ConfigureAwait(false);
+        await httpClient.PostAsync(new Uri($"http://{_hostname}:{_hostport}/api/RequestChangeOfSupplier"), body).ConfigureAwait(false);
     }
 
     private static string GetMoveInPayload(string uniqueActorNumber)
