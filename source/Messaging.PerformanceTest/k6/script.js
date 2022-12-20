@@ -1,4 +1,4 @@
-// run 100 virtual users in paralle
+// run 100 virtual users in paralle:wq
 // k6 run --vus 100 --iterations 100 script.js
 
 import { sleep } from 'k6';
@@ -23,9 +23,11 @@ export default function () {
     let actorGln = actorNumberResponse.body;
     let actorToken = actorTokenResponse.body;
 
+    console.info(`GLN ${actorGln}: actorToken: ${actorToken}`);
+
     let headers = {
-      authorization: `Bearer ${actorToken}`,
-    };
+      'Authorization': 'Bearer ' + actorToken
+   };
 
     let isGettingMessages = true;
     while (isGettingMessages) {
@@ -37,6 +39,11 @@ export default function () {
         );
 
         console.info(`Peek response status: ${peekResponse.status}`);
+
+        const MessageId = peekResponse.headers.Messageid;
+        if ( MessageId === undefined) {
+            console.info(`GLN ${actorGln}: Missing MessageId in peekResponse:  ${JSON.stringify(peekResponse)}`);
+        }
 
         if (peekResponse.status === 500) {
           console.info(`GLN ${actorGln}: sleep for 1 second. internalError: ${peekResponse.status}`);
@@ -50,21 +57,19 @@ export default function () {
           console.info(`GLN ${actorGln}: noContent: exit loop:  ${peekResponse.status}`);
           isGettingMessages = false;
           break;
-        }
-
-        const MessageId = peekResponse.headers.MessageId;
-        if ( MessageId === '') {
-            console.info(`GLN ${actorGln}: Missing MessageId in peekResponse:  ${JSON.stringify(peekResponse)}`);
-        }
+        }        
 
         console.info(`GLN ${actorGln}: http delete: ${messagingApiHostDns}:${messagingApiHostPort}/api/dequeue/${MessageId}`);
+        console.info(`GLN ${actorGln}: Headers: ${JSON.stringify(headers)}`);
 
-        http.del(
-          `${messagingApiHostDns}:${messagingApiHostPort}/api/dequeue/${MessageId}`,
+        const dequeueResponse = http.del(
+          `${messagingApiHostDns}:${messagingApiHostPort}/api/dequeue/${MessageId}`, null,
           {
             headers: headers,
           }
         );
+
+        console.info(`GLN ${actorGln}: dequeueResponse status: ${dequeueResponse.status}`);
       }
     }
 }
