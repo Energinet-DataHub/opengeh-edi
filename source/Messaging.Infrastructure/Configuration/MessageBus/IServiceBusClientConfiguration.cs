@@ -20,11 +20,6 @@ namespace Messaging.Infrastructure.Configuration.MessageBus;
 public interface IServiceBusClientConfiguration
 {
     /// <summary>
-    /// The name to affiliate a service with
-    /// </summary>
-    string ClientRegistrationName { get; }
-
-    /// <summary>
     /// Queue name for service
     /// </summary>
     string QueueName { get; }

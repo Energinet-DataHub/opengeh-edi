@@ -79,11 +79,8 @@ namespace Messaging.Api
                 {
                     var databaseConnectionString = runtime.DB_CONNECTION_STRING;
 
-                    var meteringPointServiceBusClientConfiguration =
-                        new MeteringPointServiceBusClientConfiguration(
-                            runtime.MASTER_DATA_REQUEST_QUEUE_NAME!,
-                            "MeteringPointsSenderClient");
-                    services.AddSingleton(meteringPointServiceBusClientConfiguration);
+                    services.AddSingleton(new MeteringPointServiceBusClientConfiguration(
+                        runtime.MASTER_DATA_REQUEST_QUEUE_NAME!));
 
                     var energySupplyingServiceBusClientConfiguration =
                         new EnergySupplyingServiceBusClientConfiguration(
