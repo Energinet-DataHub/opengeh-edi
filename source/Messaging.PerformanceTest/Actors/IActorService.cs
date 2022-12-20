@@ -25,6 +25,12 @@ public interface IActorService
     string? GetUniqueActorNumber();
 
     /// <summary>
+    /// Get list of actornumbers
+    /// </summary>
+    /// <returns>List of string</returns>
+    List<string> GetActors();
+
+    /// <summary>
     /// Get number of actor numbers
     /// </summary>
     /// <returns>Number of actor numbers available</returns>

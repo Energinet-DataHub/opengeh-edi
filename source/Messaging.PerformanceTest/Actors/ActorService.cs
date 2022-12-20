@@ -40,6 +40,14 @@ public class ActorService : IActorService
         }
     }
 
+    public List<string> GetActors()
+    {
+        lock (_actorNumberLock)
+        {
+            return _actorNumberDictionary.Where(keyValuePair => keyValuePair.Value).Select(_ => _.Key).ToList();
+        }
+    }
+
     public int GetActorCount()
     {
         lock (_actorNumberLock)
