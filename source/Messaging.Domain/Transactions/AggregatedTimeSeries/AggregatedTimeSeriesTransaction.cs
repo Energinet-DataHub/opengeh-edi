@@ -24,15 +24,15 @@ public class AggregatedTimeSeriesTransaction : Entity
     private readonly ActorNumber _receivingActor;
     private readonly MarketRole _receivingActorRole;
     private readonly ProcessType _processType;
-    private readonly AggregatedTimeSeriesResult _aggregatedTimeSeriesResult;
+    private readonly Series _series;
     private readonly List<OutgoingMessage> _messages = new();
 
-    public AggregatedTimeSeriesTransaction(TransactionId id, ActorNumber receivingActor, MarketRole receivingActorRole, ProcessType processType, AggregatedTimeSeriesResult aggregatedTimeSeriesResult)
+    public AggregatedTimeSeriesTransaction(TransactionId id, ActorNumber receivingActor, MarketRole receivingActorRole, ProcessType processType, Series series)
     {
         _receivingActor = receivingActor;
         _receivingActorRole = receivingActorRole;
         _processType = processType;
-        _aggregatedTimeSeriesResult = aggregatedTimeSeriesResult;
+        _series = series;
         Id = id;
         CreateResultMessages();
     }
@@ -47,9 +47,6 @@ public class AggregatedTimeSeriesTransaction : Entity
 
     private void CreateResultMessages()
     {
-        foreach (var result in _aggregatedTimeSeriesResult.Series)
-        {
-            _messages.Add(AggregatedTimeSeriesMessage.Create(_receivingActor, _receivingActorRole, Id, _processType, result));
-        }
+        _messages.Add(AggregatedTimeSeriesMessage.Create(_receivingActor, _receivingActorRole, Id, _processType, _series));
     }
 }

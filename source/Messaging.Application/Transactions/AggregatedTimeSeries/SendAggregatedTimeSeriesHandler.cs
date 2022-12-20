@@ -46,7 +46,7 @@ public class SendAggregatedTimeSeriesHandler : IRequestHandler<SendAggregatedTim
             aggregatedTimeSeriesResult.Series[0].GridOperatorId,
             MarketRole.GridOperator,
             ProcessType.BalanceFixing,
-            aggregatedTimeSeriesResult);
+            aggregatedTimeSeriesResult.Series[0]);
         _transactions.Add(transaction);
         return Unit.Value;
     }
