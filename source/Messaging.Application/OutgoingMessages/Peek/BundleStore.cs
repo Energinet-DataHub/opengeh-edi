@@ -21,6 +21,7 @@ using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages.Dequeue;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages.Peek;
 using Microsoft.Data.SqlClient;
 
 namespace Messaging.Application.OutgoingMessages.Peek;
@@ -130,7 +131,6 @@ public class BundleStore
         if (bundleStoreQuery is null)
             return new DequeueResult(false);
         string messageIdIncluded = bundleStoreQuery.MessageIdsIncluded;
-        string actorNumber = bundleStoreQuery.ActorNumber;
         var statementBuilder = new StringBuilder();
         foreach (var id in messageIdIncluded.Split(","))
         {
@@ -138,17 +138,27 @@ public class BundleStore
             statementBuilder.AppendLine(deleteMessageRowSql);
         }
 
-        var deleteBundleStoreRowSql = $"DELETE FROM [B2B].[BundleStore] WHERE MessageId = @MessageId";
+        const string deleteBundleStoreRowSql = $"DELETE FROM [B2B].[BundleStore] WHERE MessageId = @MessageId";
         statementBuilder.AppendLine(deleteBundleStoreRowSql);
         var command = CreateCommand(
             statementBuilder.ToString(),
             new List<KeyValuePair<string, object>>()
             {
-                new("@MessageId", messageId),
+                new("@MessageId", messageId.ToString()),
             });
         var result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
 
         return result > 0 ? new DequeueResult(true) : new DequeueResult(false);
+    }
+
+    public async Task<Guid?> GetBundleMessageIdOfAsync(BundleId bundleId)
+    {
+        ArgumentNullException.ThrowIfNull(bundleId);
+        const string sqlquery = @"SELECT MessageId FROM [b2b].[BundleStore] WHERE ActorNumber = @ActorNumber AND MessageCategory = @MessageCategory";
+
+        var connection = _connectionFactory.GetOpenConnection();
+        var messageId = await connection.QueryFirstOrDefaultAsync<Guid?>(sqlquery, new { ActorNumber = bundleId.ReceiverNumber.Value, MessageCategory = bundleId.MessageCategory.Name }).ConfigureAwait(false);
+        return messageId;
     }
 
     private static async Task<bool> HasBundleRegisteredAsync(SqlDataReader reader)
