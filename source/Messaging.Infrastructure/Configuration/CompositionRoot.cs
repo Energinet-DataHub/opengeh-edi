@@ -36,6 +36,7 @@ using Messaging.Infrastructure.Actors;
 using Messaging.Infrastructure.Configuration.Authentication;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.FeatureFlag;
+using Messaging.Infrastructure.Configuration.MessageBus;
 using Messaging.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Messaging.Infrastructure.Configuration.Processing;
 using Messaging.Infrastructure.Configuration.Serialization;
@@ -97,6 +98,13 @@ namespace Messaging.Infrastructure.Configuration
         public static CompositionRoot Initialize(IServiceCollection services)
         {
             return new CompositionRoot(services);
+        }
+
+        public CompositionRoot AddMessageBus(string connectionString)
+        {
+            _services.AddSingleton<ServiceBusClient>(_ => new ServiceBusClient(connectionString));
+            _services.AddSingleton<IServiceBusSenderFactory, ServiceBusSenderFactory>();
+            return this;
         }
 
         public CompositionRoot AddPeekConfiguration(IBundleConfiguration bundleConfiguration)
