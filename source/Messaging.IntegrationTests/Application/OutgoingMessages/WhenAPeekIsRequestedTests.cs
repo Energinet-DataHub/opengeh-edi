@@ -82,7 +82,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     }
 
     [Fact]
-    public async Task Ensure_same_bundle_is_returned_is_not_dequeued()
+    public async Task Ensure_same_bundle_is_returned_if_not_dequeued()
     {
         await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
 
@@ -90,6 +90,8 @@ public class WhenAPeekIsRequestedTests : TestBase
         var firstPeekResult = await InvokeCommandAsync(command).ConfigureAwait(false);
         var secondPeekResult = await InvokeCommandAsync(command).ConfigureAwait(false);
 
+        Assert.NotNull(firstPeekResult.MessageId);
+        Assert.NotNull(secondPeekResult.MessageId);
         AssertXmlMessage.IsTheSameDocument(firstPeekResult.Bundle!, secondPeekResult.Bundle!);
     }
 
