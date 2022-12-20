@@ -36,9 +36,9 @@ public class DequeueRequestListener
         [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "dequeue/{messageId}"),]
         HttpRequestData request,
         FunctionContext executionContext,
-        Guid messageId)
+        string messageId)
     {
-        var result = await _mediator.Send(new DequeueRequest(messageId)).ConfigureAwait(false);
+        var result = await _mediator.Send(new DequeueRequest(Guid.Parse(messageId))).ConfigureAwait(false);
         return result.Success
             ? request.CreateResponse(HttpStatusCode.OK)
             : request.CreateResponse(HttpStatusCode.BadRequest);
