@@ -43,7 +43,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     {
         await GivenTwoMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
 
-        var result = await InvokeCommandAsync(CreatePeekRequest(MessageCategory.AggregationData)).ConfigureAwait(false);
+        var result = await InvokeCommandAsync(CreatePeekRequest(MessageCategory.Aggregations)).ConfigureAwait(false);
 
         Assert.Null(result.Bundle);
         Assert.False(await BundleIsRegistered().ConfigureAwait(false));

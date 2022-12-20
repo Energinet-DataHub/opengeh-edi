@@ -18,8 +18,8 @@ namespace Messaging.Domain.OutgoingMessages.Peek;
 
 public class MessageCategory : EnumerationType
 {
-    public static readonly MessageCategory MasterData = new MessageCategory(0, nameof(MasterData));
-    public static readonly MessageCategory AggregationData = new MessageCategory(1, nameof(AggregationData));
+    public static readonly MessageCategory MasterData = new(0, nameof(MasterData));
+    public static readonly MessageCategory Aggregations = new(1, nameof(Aggregations));
 
     private MessageCategory(int id, string name)
         : base(id, name)
