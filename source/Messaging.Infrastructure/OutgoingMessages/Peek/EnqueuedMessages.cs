@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
@@ -68,6 +69,17 @@ public class EnqueuedMessages : IEnqueuedMessages
                 MessageType = oldestMessage.MessageType,
                 MessageCategory = messageCategory.Name,
                 ReceiverId = actorNumber.Value,
+            }).ConfigureAwait(false);
+    }
+
+    public async Task<int> GetAvailableMessageCountAsync(ActorNumber actorNumber)
+    {
+        ArgumentNullException.ThrowIfNull(actorNumber);
+        return await _connectionFactory.GetOpenConnection().QuerySingleAsync<int>(
+            @"SELECT count(*) from [b2b].[EnqueuedMessages] WHERE ReceiverId = @ActorNumber",
+            new
+            {
+                ActorNumber = actorNumber.Value,
             }).ConfigureAwait(false);
     }
 

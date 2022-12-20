@@ -31,4 +31,11 @@ public interface IEnqueuedMessages
     /// /// /// <param name="messageCategory">The category of messages to include in message</param>
     /// <returns>List of enqueued messages</returns>
     Task<IEnumerable<EnqueuedMessage>> GetByAsync(ActorNumber actorNumber, MessageCategory messageCategory);
+
+    /// <summary>
+    /// Get the number of messages available for an actor
+    /// </summary>
+    /// <param name="actorNumber"></param>
+    /// <returns>Number of available messages</returns>
+    Task<int> GetAvailableMessageCountAsync(ActorNumber actorNumber);
 }
