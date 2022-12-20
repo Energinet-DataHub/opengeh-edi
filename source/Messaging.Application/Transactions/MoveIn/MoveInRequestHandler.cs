@@ -23,6 +23,7 @@ using Messaging.Application.OutgoingMessages.Common.Reasons;
 using Messaging.Domain.Actors;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Messaging.Domain.Transactions;
 using Messaging.Domain.Transactions.MoveIn;
 using NodaTime.Text;
 
@@ -55,7 +56,7 @@ namespace Messaging.Application.Transactions.MoveIn
                 await _marketEvaluationPointRepository.GetByNumberAsync(request.MarketActivityRecord.MarketEvaluationPointId).ConfigureAwait(false);
 
             var transaction = new MoveInTransaction(
-                request.MarketActivityRecord.Id,
+                TransactionId.Create(request.MarketActivityRecord.Id),
                 request.MarketActivityRecord.MarketEvaluationPointId,
                 InstantPattern.General.Parse(request.MarketActivityRecord.EffectiveDate).GetValueOrThrow(),
                 marketEvaluationPoint?.EnergySupplierNumber?.Value,

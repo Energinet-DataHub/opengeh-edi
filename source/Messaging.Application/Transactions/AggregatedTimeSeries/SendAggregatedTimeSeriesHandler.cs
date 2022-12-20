@@ -18,6 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.Configuration.Commands.Commands;
+using Messaging.Domain.Transactions;
 using Messaging.Domain.Transactions.AggregatedTimeSeries;
 
 namespace Messaging.Application.Transactions.AggregatedTimeSeries;
@@ -38,7 +39,7 @@ public class SendAggregatedTimeSeriesHandler : IRequestHandler<SendAggregatedTim
         ArgumentNullException.ThrowIfNull(request);
 
         var aggregatedTimeSeriesResult = await _aggregatedTimeSeriesResults.GetResultAsync(request.AggregatedTimeSeriesResultId).ConfigureAwait(false);
-        var transaction = new AggregatedTimeSeriesTransaction(aggregatedTimeSeriesResult);
+        var transaction = new AggregatedTimeSeriesTransaction(TransactionId.New(), aggregatedTimeSeriesResult);
         _transactions.Add(transaction);
         return Unit.Value;
     }

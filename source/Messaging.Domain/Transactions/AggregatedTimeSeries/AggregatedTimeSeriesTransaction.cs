@@ -24,10 +24,10 @@ public class AggregatedTimeSeriesTransaction : Entity
     private readonly AggregatedTimeSeriesResult _aggregatedTimeSeriesResult;
     private readonly List<OutgoingMessage> _messages = new();
 
-    public AggregatedTimeSeriesTransaction(AggregatedTimeSeriesResult aggregatedTimeSeriesResult)
+    public AggregatedTimeSeriesTransaction(TransactionId id, AggregatedTimeSeriesResult aggregatedTimeSeriesResult)
     {
         _aggregatedTimeSeriesResult = aggregatedTimeSeriesResult;
-        Id = Guid.NewGuid().ToString();
+        Id = id;
         CreateResultMessages();
     }
 
@@ -37,7 +37,7 @@ public class AggregatedTimeSeriesTransaction : Entity
     }
     #pragma warning restore
 
-    public string Id { get; }
+    public TransactionId Id { get; }
 
     private void CreateResultMessages()
     {

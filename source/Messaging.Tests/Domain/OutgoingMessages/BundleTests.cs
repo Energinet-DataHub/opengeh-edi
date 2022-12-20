@@ -14,6 +14,7 @@
 
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.Transactions;
 using NodaTime;
 using Xunit;
 
@@ -75,7 +76,7 @@ public class BundleTests
         return new OutgoingMessage(
             MessageType.GenericNotification,
             ActorNumber.Create(receiverId),
-            "FakeId",
+            TransactionId.New(),
             processType,
             MarketRole.MeteringPointAdministrator,
             ActorNumber.Create("1234567890124"),
@@ -88,7 +89,7 @@ public class BundleTests
         return new OutgoingMessage(
             MessageType.GenericNotification,
             ActorNumber.Create("1234567890123"),
-            "FakeId",
+            TransactionId.New(),
             processType,
             MarketRole.MeteringPointAdministrator,
             ActorNumber.Create("1234567890124"),

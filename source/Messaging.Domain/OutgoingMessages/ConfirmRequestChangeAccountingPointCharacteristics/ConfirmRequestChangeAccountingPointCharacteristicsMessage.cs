@@ -14,18 +14,19 @@
 
 using System.Text.Json;
 using Messaging.Domain.Actors;
+using Messaging.Domain.Transactions;
 
 namespace Messaging.Domain.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
 
 public class ConfirmRequestChangeAccountingPointCharacteristicsMessage : OutgoingMessage
 {
-    public ConfirmRequestChangeAccountingPointCharacteristicsMessage(MessageType messageType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
+    public ConfirmRequestChangeAccountingPointCharacteristicsMessage(MessageType messageType, ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
         : base(messageType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, messageRecord)
     {
         MarketActivityRecord = JsonSerializer.Deserialize<MarketActivityRecord>(messageRecord)!;
     }
 
-    public ConfirmRequestChangeAccountingPointCharacteristicsMessage(MessageType messageType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, MarketActivityRecord marketActivityRecord)
+    public ConfirmRequestChangeAccountingPointCharacteristicsMessage(MessageType messageType, ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, MarketActivityRecord marketActivityRecord)
         : base(messageType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, JsonSerializer.Serialize(marketActivityRecord))
     {
         MarketActivityRecord = marketActivityRecord;

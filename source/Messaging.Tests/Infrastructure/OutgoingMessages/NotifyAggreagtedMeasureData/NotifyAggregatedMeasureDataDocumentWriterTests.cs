@@ -61,7 +61,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
         var timeSeries = new List<TimeSeries>()
         {
             new(
-                Guid.NewGuid(),
+                Guid.NewGuid().ToString(),
                 "870",
                 "E18",
                 "KWH",
@@ -87,7 +87,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             .HasAttributeValue("receiver_MarketParticipant.mRID", "codingScheme", "A10")
             .HasValue("receiver_MarketParticipant.marketRole.type", header.ReceiverRole)
             .HasValue("createdDateTime", header.TimeStamp.ToString())
-            .HasValue("Series[1]/mRID", timeSeries[0].Id.ToString())
+            .HasValue("Series[1]/mRID", timeSeries[0].TransactionId.ToString())
             .HasValue("Series[1]/meteringGridArea_Domain.mRID", timeSeries[0].GridAreaCode)
             .HasValue("Series[1]/marketEvaluationPoint.type", timeSeries[0].MeteringPointType)
             .HasValue("Series[1]/quantity_Measure_Unit.name", timeSeries[0].MeasureUnitType)

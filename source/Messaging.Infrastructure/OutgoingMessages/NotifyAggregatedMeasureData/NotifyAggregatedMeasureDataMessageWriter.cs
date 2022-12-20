@@ -48,7 +48,7 @@ public class NotifyAggregatedMeasureDataMessageWriter : MessageWriter
         foreach (var timeSeries in ParseFrom<TimeSeries>(marketActivityPayloads))
         {
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Series", null).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, timeSeries.Id.ToString()).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, timeSeries.TransactionId.ToString()).ConfigureAwait(false);
 
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "marketEvaluationPoint.type", null, timeSeries.MeteringPointType).ConfigureAwait(false);
 

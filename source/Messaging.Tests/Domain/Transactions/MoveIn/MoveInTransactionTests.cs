@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Messaging.Domain.Transactions;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Domain.Transactions.MoveIn.Events;
 using Xunit;
@@ -121,7 +122,7 @@ public class MoveInTransactionTests
 
         var domainEvent = _transaction.DomainEvents.FirstOrDefault(e => e is CustomerMasterDataWasSent) as CustomerMasterDataWasSent;
         Assert.NotNull(domainEvent);
-        Assert.Equal(_transaction.TransactionId, domainEvent?.TransactionId);
+        Assert.Equal(_transaction.TransactionId.Id, domainEvent?.TransactionId);
     }
 
     [Fact]
@@ -150,7 +151,7 @@ public class MoveInTransactionTests
 
         var domainEvent = _transaction.DomainEvents.FirstOrDefault(e => e is MeteringPointMasterDataWasSent) as MeteringPointMasterDataWasSent;
         Assert.NotNull(domainEvent);
-        Assert.Equal(_transaction.TransactionId, domainEvent?.TransactionId);
+        Assert.Equal(_transaction.TransactionId.Id, domainEvent?.TransactionId);
     }
 
     [Fact]
@@ -199,7 +200,7 @@ public class MoveInTransactionTests
     private static MoveInTransaction CreateTransaction(string? currentEnergySupplierId)
     {
         return new MoveInTransaction(
-            SampleData.TransactionId,
+            TransactionId.Create(SampleData.TransactionId),
             SampleData.MarketEvaluationPointId,
             SampleData.EffectiveDate,
             currentEnergySupplierId,

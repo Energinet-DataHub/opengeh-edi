@@ -19,6 +19,7 @@ using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.GenericNotification;
+using Messaging.Domain.Transactions;
 using Messaging.Domain.Transactions.MoveIn;
 using NodaTime;
 
@@ -46,7 +47,7 @@ public class MoveInNotifications
         var message = new OutgoingMessage(
             MessageType.GenericNotification,
             ActorNumber.Create(energySupplierId),
-            transactionId,
+            TransactionId.Create(transactionId),
             BusinessReasonCode.CustomerMoveInOrMoveOut.Code,
             MarketRole.EnergySupplier,
             DataHubDetails.IdentificationNumber,
@@ -61,7 +62,7 @@ public class MoveInNotifications
         if (transaction == null) throw new ArgumentNullException(nameof(transaction));
         var marketActivityRecord = new MarketActivityRecord(
             Guid.NewGuid().ToString(),
-            transaction.TransactionId,
+            transaction.TransactionId.Id,
             transaction.MarketEvaluationPointId,
             transaction.EffectiveDate);
 
