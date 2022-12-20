@@ -41,13 +41,17 @@ public class SendAggregatedTimeSeriesHandler : IRequestHandler<SendAggregatedTim
         ArgumentNullException.ThrowIfNull(request);
 
         var aggregatedTimeSeriesResult = await _aggregatedTimeSeriesResults.GetResultAsync(request.AggregatedTimeSeriesResultId).ConfigureAwait(false);
-        var transaction = new AggregatedTimeSeriesTransaction(
-            TransactionId.New(),
-            aggregatedTimeSeriesResult.Series[0].GridOperatorId,
-            MarketRole.GridOperator,
-            ProcessType.BalanceFixing,
-            aggregatedTimeSeriesResult.Series[0]);
-        _transactions.Add(transaction);
+        foreach (var result in aggregatedTimeSeriesResult.Series)
+        {
+            var transaction = new AggregatedTimeSeriesTransaction(
+                TransactionId.New(),
+                result.GridOperatorId,
+                MarketRole.GridOperator,
+                ProcessType.BalanceFixing,
+                result);
+            _transactions.Add(transaction);
+        }
+
         return Unit.Value;
     }
 }
