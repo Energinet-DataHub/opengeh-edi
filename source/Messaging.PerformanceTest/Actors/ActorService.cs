@@ -70,7 +70,10 @@ public class ActorService : IActorService
 
     public void ResetActorNumbers()
     {
-        _actorNumberDictionary = CreateActorNumbers();
+        lock (_actorNumberLock)
+        {
+            _actorNumberDictionary = CreateActorNumbers();
+        }
     }
 
     private static ConcurrentDictionary<string, bool> CreateActorNumbers()
