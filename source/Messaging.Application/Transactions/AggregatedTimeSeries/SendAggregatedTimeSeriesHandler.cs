@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.Configuration.Commands.Commands;
 using Messaging.Domain.Actors;
+using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions;
 using Messaging.Domain.Transactions.AggregatedTimeSeries;
 
@@ -44,6 +45,7 @@ public class SendAggregatedTimeSeriesHandler : IRequestHandler<SendAggregatedTim
             TransactionId.New(),
             aggregatedTimeSeriesResult.Series[0].GridOperatorId,
             MarketRole.GridOperator,
+            ProcessType.BalanceFixing,
             aggregatedTimeSeriesResult);
         _transactions.Add(transaction);
         return Unit.Value;
