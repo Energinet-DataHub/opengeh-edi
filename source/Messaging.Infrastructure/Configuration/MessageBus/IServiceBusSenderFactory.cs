@@ -25,8 +25,7 @@ namespace Messaging.Infrastructure.Configuration.MessageBus
         /// Get sender for specified topic
         /// </summary>
         /// <param name="topicName">Topic name</param>
-        /// /// <param name="clientName">Registration name of Service Bus client</param>
         /// <returns><see cref="IServiceBusSenderAdapter"/></returns>
-        IServiceBusSenderAdapter GetSender(string topicName, string clientName);
+        IServiceBusSenderAdapter GetSender(string topicName);
     }
 }

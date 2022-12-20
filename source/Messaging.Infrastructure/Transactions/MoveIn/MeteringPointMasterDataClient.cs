@@ -38,7 +38,7 @@ public class MeteringPointMasterDataClient : IMeteringPointMasterDataClient
         if (fetchMeteringPointMasterData == null) throw new ArgumentNullException(nameof(fetchMeteringPointMasterData));
         var message = CreateFrom(fetchMeteringPointMasterData);
         return _serviceBusSenderFactory
-            .GetSender(_configuration.QueueName, _configuration.ClientRegistrationName)
+            .GetSender(_configuration.QueueName)
             .SendAsync(message);
     }
 
