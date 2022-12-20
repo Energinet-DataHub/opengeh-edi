@@ -29,6 +29,4 @@ internal class SampleData
     internal static string MeasureUnitType => "KWH";
 
     internal static string Resolution => "PT1H";
-
-    internal static string TransactionId => "E71FC033-FBE4-4064-BD38-19705021CAF4";
 }
