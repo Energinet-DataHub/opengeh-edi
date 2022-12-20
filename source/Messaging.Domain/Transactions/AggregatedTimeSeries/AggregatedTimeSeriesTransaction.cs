@@ -24,10 +24,10 @@ public class AggregatedTimeSeriesTransaction : Entity
     private readonly AggregatedTimeSeriesResult _aggregatedTimeSeriesResult;
     private readonly List<OutgoingMessage> _messages = new();
 
-    public AggregatedTimeSeriesTransaction(AggregatedTimeSeriesResult aggregatedTimeSeriesResult)
+    public AggregatedTimeSeriesTransaction(string id, AggregatedTimeSeriesResult aggregatedTimeSeriesResult)
     {
         _aggregatedTimeSeriesResult = aggregatedTimeSeriesResult;
-        Id = Guid.NewGuid().ToString();
+        Id = id;
         CreateResultMessages();
     }
 

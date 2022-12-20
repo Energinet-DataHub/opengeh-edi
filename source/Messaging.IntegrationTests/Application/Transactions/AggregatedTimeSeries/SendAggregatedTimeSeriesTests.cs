@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dapper;
@@ -51,7 +52,9 @@ public class SendAggregatedTimeSeriesTests : TestBase
     {
         await InvokeCommandAsync(CreateRequest()).ConfigureAwait(false);
 
+        var transactionId = await GetTransactionIdAsync().ConfigureAwait(false);
         AssertOutgoingMessage.OutgoingMessage(
+                transactionId.ToString(),
                 MessageType.NotifyAggregatedMeasureData.Name,
                 ProcessType.BalanceFixing.Code,
                 MarketRole.GridOperator,
@@ -60,6 +63,7 @@ public class SendAggregatedTimeSeriesTests : TestBase
             .HasReceiverRole(MarketRole.GridOperator.Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
+            .HasMessageRecordValue<TimeSeries>(x => x.Id, transactionId.ToString())
             .HasMessageRecordValue<TimeSeries>(x => x.GridAreaCode, SampleData.GridAreaCode)
             .HasMessageRecordValue<TimeSeries>(x => x.Resolution, SampleData.Resolution)
             .HasMessageRecordValue<TimeSeries>(x => x.MeasureUnitType, SampleData.MeasureUnitType)
@@ -93,5 +97,12 @@ public class SendAggregatedTimeSeriesTests : TestBase
             });
 
         results?.Add(SampleData.ResultId, dto);
+    }
+
+    private Task<Guid> GetTransactionIdAsync()
+    {
+        return GetService<IDbConnectionFactory>()
+            .GetOpenConnection()
+            .QueryFirstAsync<Guid>("SELECT TOP(1) Id FROM b2b.AggregatedTimeSeriesTransactions");
     }
 }

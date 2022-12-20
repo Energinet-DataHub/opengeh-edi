@@ -38,7 +38,7 @@ public class SendAggregatedTimeSeriesHandler : IRequestHandler<SendAggregatedTim
         ArgumentNullException.ThrowIfNull(request);
 
         var aggregatedTimeSeriesResult = await _aggregatedTimeSeriesResults.GetResultAsync(request.AggregatedTimeSeriesResultId).ConfigureAwait(false);
-        var transaction = new AggregatedTimeSeriesTransaction(aggregatedTimeSeriesResult);
+        var transaction = new AggregatedTimeSeriesTransaction(Guid.NewGuid().ToString(), aggregatedTimeSeriesResult);
         _transactions.Add(transaction);
         return Unit.Value;
     }

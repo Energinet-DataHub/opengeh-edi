@@ -40,7 +40,7 @@ public class AggregatedTimeSeriesMessage : OutgoingMessage
         ArgumentNullException.ThrowIfNull(result);
 
         var series = new TimeSeries(
-            Guid.NewGuid(),
+            transactionId,
             result.GridAreaCode,
             result.MeteringPointType,
             result.MeasureUnitType,
@@ -56,6 +56,6 @@ public class AggregatedTimeSeriesMessage : OutgoingMessage
     }
 }
 
-public record TimeSeries(Guid Id, string GridAreaCode, string MeteringPointType, string MeasureUnitType, string Resolution, IReadOnlyList<Point> Point);
+public record TimeSeries(string Id, string GridAreaCode, string MeteringPointType, string MeasureUnitType, string Resolution, IReadOnlyList<Point> Point);
 
 public record Point(int Position, decimal? Quantity, string? Quality, string SampleTime);
