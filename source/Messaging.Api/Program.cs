@@ -82,11 +82,8 @@ namespace Messaging.Api
                     services.AddSingleton(new MeteringPointServiceBusClientConfiguration(
                         runtime.MASTER_DATA_REQUEST_QUEUE_NAME!));
 
-                    var energySupplyingServiceBusClientConfiguration =
-                        new EnergySupplyingServiceBusClientConfiguration(
-                            runtime.CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME!,
-                            "EnergySupplyingSenderClient");
-                    services.AddSingleton(energySupplyingServiceBusClientConfiguration);
+                    services.AddSingleton(new EnergySupplyingServiceBusClientConfiguration(
+                        runtime.CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME!));
 
                     services.AddSingleton<ServiceBusClient>(
                         _ => new ServiceBusClient(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND!));
