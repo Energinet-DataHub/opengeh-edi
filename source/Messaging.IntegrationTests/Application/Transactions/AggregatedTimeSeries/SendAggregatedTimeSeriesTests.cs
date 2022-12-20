@@ -61,8 +61,6 @@ public class SendAggregatedTimeSeriesTests : TestBase
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
             .HasMessageRecordValue<TimeSeries>(x => x.GridAreaCode, SampleData.GridAreaCode)
-            .HasMessageRecordValue<TimeSeries>(x => x.StartTime, SampleData.StartTime)
-            .HasMessageRecordValue<TimeSeries>(x => x.EndTime, SampleData.EndTime)
             .HasMessageRecordValue<TimeSeries>(x => x.Resolution, SampleData.Resolution)
             .HasMessageRecordValue<TimeSeries>(x => x.MeasureUnitType, SampleData.MeasureUnitType)
             .HasMessageRecordValue<TimeSeries>(x => x.MeteringPointType, SampleData.MeteringPointType)
@@ -85,8 +83,6 @@ public class SendAggregatedTimeSeriesTests : TestBase
             SampleData.MeteringPointType,
             SampleData.MeasureUnitType,
             SampleData.Resolution,
-            SampleData.StartTime,
-            SampleData.EndTime,
             new List<Point>()
             {
                 new(
