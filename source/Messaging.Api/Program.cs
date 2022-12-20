@@ -84,17 +84,16 @@ namespace Messaging.Api
                             runtime.MASTER_DATA_REQUEST_QUEUE_NAME!,
                             "MeteringPointsSenderClient");
                     services.AddSingleton(meteringPointServiceBusClientConfiguration);
-                    services.AddAzureServiceBusClient(new ServiceBusClientConfiguration(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND, meteringPointServiceBusClientConfiguration));
 
                     var energySupplyingServiceBusClientConfiguration =
                         new EnergySupplyingServiceBusClientConfiguration(
                             runtime.CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME!,
                             "EnergySupplyingSenderClient");
                     services.AddSingleton(energySupplyingServiceBusClientConfiguration);
-                    services.AddAzureServiceBusClient(new ServiceBusClientConfiguration(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND, energySupplyingServiceBusClientConfiguration));
 
                     services.AddSingleton<ServiceBusClient>(
                         _ => new ServiceBusClient(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND!));
+                    services.AddSingleton<IServiceBusSenderFactory, ServiceBusSenderFactory>();
 
                     services.AddSingleton(
                         _ => new RequestChangeOfSupplierTransaction(runtime.INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME!));
