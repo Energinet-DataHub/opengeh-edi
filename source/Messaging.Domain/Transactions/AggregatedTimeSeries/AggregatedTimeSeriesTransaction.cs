@@ -22,12 +22,14 @@ namespace Messaging.Domain.Transactions.AggregatedTimeSeries;
 public class AggregatedTimeSeriesTransaction : Entity
 {
     private readonly ActorNumber _receivingActor;
+    private readonly MarketRole _receivingActorRole;
     private readonly AggregatedTimeSeriesResult _aggregatedTimeSeriesResult;
     private readonly List<OutgoingMessage> _messages = new();
 
-    public AggregatedTimeSeriesTransaction(TransactionId id, ActorNumber receivingActor, AggregatedTimeSeriesResult aggregatedTimeSeriesResult)
+    public AggregatedTimeSeriesTransaction(TransactionId id, ActorNumber receivingActor, MarketRole receivingActorRole, AggregatedTimeSeriesResult aggregatedTimeSeriesResult)
     {
         _receivingActor = receivingActor;
+        _receivingActorRole = receivingActorRole;
         _aggregatedTimeSeriesResult = aggregatedTimeSeriesResult;
         Id = id;
         CreateResultMessages();
@@ -45,7 +47,7 @@ public class AggregatedTimeSeriesTransaction : Entity
     {
         foreach (var result in _aggregatedTimeSeriesResult.Series)
         {
-            _messages.Add(AggregatedTimeSeriesMessage.Create(_receivingActor, MarketRole.GridOperator, Id, ProcessType.BalanceFixing, result));
+            _messages.Add(AggregatedTimeSeriesMessage.Create(_receivingActor, _receivingActorRole, Id, ProcessType.BalanceFixing, result));
         }
     }
 }
