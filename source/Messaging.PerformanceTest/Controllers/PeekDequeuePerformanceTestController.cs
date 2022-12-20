@@ -9,16 +9,13 @@ namespace Messaging.PerformanceTest.Controllers;
 [Route("api")]
 public class PeekDequeuePerformanceTestController : ControllerBase
 {
-    private readonly ILogger<PeekDequeuePerformanceTestController> _logger;
     private readonly IActorService _actorService;
     private readonly IMoveInService _moveInService;
 
     public PeekDequeuePerformanceTestController(
-        ILogger<PeekDequeuePerformanceTestController> logger,
         IActorService actorService,
         IMoveInService moveInService)
     {
-        _logger = logger;
         _actorService = actorService;
         _moveInService = moveInService;
     }
