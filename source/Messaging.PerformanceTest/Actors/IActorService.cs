@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.ObjectModel;
+
 namespace Messaging.PerformanceTest.Actors;
 
 /// <summary>
@@ -28,7 +30,7 @@ public interface IActorService
     /// Get list of actornumbers
     /// </summary>
     /// <returns>List of string</returns>
-    List<string> GetActors();
+    ReadOnlyCollection<string> GetActors();
 
     /// <summary>
     /// Get number of actor numbers

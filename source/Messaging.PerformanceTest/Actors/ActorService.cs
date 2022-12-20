@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 using System.Globalization;
 
 namespace Messaging.PerformanceTest.Actors;
@@ -40,11 +41,11 @@ public class ActorService : IActorService
         }
     }
 
-    public List<string> GetActors()
+    public ReadOnlyCollection<string> GetActors()
     {
         lock (_actorNumberLock)
         {
-            return _actorNumberDictionary.Where(keyValuePair => keyValuePair.Value).Select(_ => _.Key).ToList();
+            return new ReadOnlyCollection<string>(_actorNumberDictionary.Where(keyValuePair => keyValuePair.Value).Select(_ => _.Key).ToList());
         }
     }
 
