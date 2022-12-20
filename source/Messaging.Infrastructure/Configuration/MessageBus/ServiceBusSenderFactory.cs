@@ -51,7 +51,10 @@ namespace Messaging.Infrastructure.Configuration.MessageBus
         {
             foreach (var serviceBusSenderAdapter in _adapters)
             {
-                await serviceBusSenderAdapter.Value.DisposeAsync().ConfigureAwait(false);
+                if (serviceBusSenderAdapter.Value != null)
+                {
+                    await serviceBusSenderAdapter.Value.DisposeAsync().ConfigureAwait(false);
+                }
             }
 
             GC.SuppressFinalize(this);
@@ -61,7 +64,10 @@ namespace Messaging.Infrastructure.Configuration.MessageBus
         {
             foreach (var serviceBusSenderAdapter in _adapters)
             {
-                serviceBusSenderAdapter.Value.Dispose();
+                if (serviceBusSenderAdapter.Value != null)
+                {
+                    serviceBusSenderAdapter.Value.Dispose();
+                }
             }
         }
     }

@@ -22,6 +22,7 @@ using Messaging.Application.Configuration;
 using Messaging.Application.IncomingMessages;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Messages.Queues;
+using Messaging.Infrastructure.Configuration.MessageBus;
 using Messaging.Infrastructure.Configuration.Serialization;
 
 namespace Messaging.Infrastructure.IncomingMessages
@@ -32,17 +33,20 @@ namespace Messaging.Infrastructure.IncomingMessages
         private const string CorrelationId = "CorrelationID";
         private readonly ISerializer _jsonSerializer;
         private readonly List<ServiceBusMessage> _transactionQueue;
-        private readonly Lazy<ServiceBusSender> _senderCreator;
+        private readonly IServiceBusSenderAdapter _senderCreator;
         private readonly ICorrelationContext _correlationContext;
+        private readonly IServiceBusSenderFactory _serviceBusSenderFactory;
 
-        public MessageQueueDispatcher(ISerializer jsonSerializer, ServiceBusClient serviceBusClient, ICorrelationContext correlationContext, TQueue queue)
+        public MessageQueueDispatcher(ISerializer jsonSerializer, ServiceBusClient serviceBusClient, ICorrelationContext correlationContext, TQueue queue, IServiceBusSenderFactory serviceBusSenderFactory)
         {
             if (serviceBusClient == null) throw new ArgumentNullException(nameof(serviceBusClient));
             if (queue == null) throw new ArgumentNullException(nameof(queue));
 
             _correlationContext = correlationContext;
+            _serviceBusSenderFactory = serviceBusSenderFactory;
             _jsonSerializer = jsonSerializer;
-            _senderCreator = new Lazy<ServiceBusSender>(serviceBusClient.CreateSender(queue.Name));
+            // TODO: "MeteringPointsSenderClient" is hardcoded - fix it!
+            _senderCreator = _serviceBusSenderFactory.GetSender(queue.Name, "MeteringPointsSenderClient");
             _transactionQueue = new List<ServiceBusMessage>();
         }
 
@@ -56,7 +60,7 @@ namespace Messaging.Infrastructure.IncomingMessages
         {
             using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                await _senderCreator.Value.SendMessagesAsync(_transactionQueue).ConfigureAwait(false);
+                await _senderCreator.SendAsync(_transactionQueue.AsReadOnly()).ConfigureAwait(false);
                 scope.Complete();
             }
         }
