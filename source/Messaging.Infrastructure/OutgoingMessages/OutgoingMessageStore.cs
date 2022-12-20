@@ -17,6 +17,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.Transactions;
 using Messaging.Infrastructure.Configuration.DataAccess;
 
 namespace Messaging.Infrastructure.OutgoingMessages
@@ -47,7 +48,7 @@ namespace Messaging.Infrastructure.OutgoingMessages
         public OutgoingMessage? GetByTransactionId(string transactionId)
         {
             return _context.OutgoingMessages
-                .FirstOrDefault(message => message.TransactionId == transactionId);
+                .FirstOrDefault(message => message.TransactionId == TransactionId.Create(transactionId));
         }
 
         public ReadOnlyCollection<OutgoingMessage> GetByIds(IReadOnlyCollection<string> messageIds)

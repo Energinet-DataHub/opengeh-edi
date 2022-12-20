@@ -14,6 +14,7 @@
 
 using System.Linq;
 using System.Threading.Tasks;
+using Messaging.Domain.Transactions;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
@@ -40,7 +41,7 @@ namespace Messaging.Infrastructure.Transactions.MoveIn
             return _b2BContext
                 .Transactions
                 .Include("_messages")
-                .FirstOrDefault(transaction => transaction.TransactionId == transactionId);
+                .FirstOrDefault(transaction => transaction.TransactionId == TransactionId.Create(transactionId));
         }
 
         public Task<MoveInTransaction?> GetByProcessIdAsync(string processId)

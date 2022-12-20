@@ -29,4 +29,9 @@ public class TransactionId : ValueObject
     {
         return new TransactionId(transactionId);
     }
+
+    public static TransactionId New()
+    {
+        return new TransactionId(Guid.NewGuid().ToString());
+    }
 }

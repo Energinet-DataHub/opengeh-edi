@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 
@@ -34,6 +35,11 @@ namespace Messaging.Infrastructure.Configuration.MessageBus
         public Task SendAsync(ServiceBusMessage message)
         {
             return _serviceBusSender.SendMessageAsync(message);
+        }
+
+        public Task SendAsync(ReadOnlyCollection<ServiceBusMessage> messages)
+        {
+            return _serviceBusSender.SendMessagesAsync(messages);
         }
 
         public async ValueTask DisposeAsync()

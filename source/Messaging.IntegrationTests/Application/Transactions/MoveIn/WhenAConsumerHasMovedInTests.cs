@@ -20,6 +20,7 @@ using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Transactions.MoveIn.Notifications;
 using Messaging.Domain.Actors;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
+using Messaging.Domain.Transactions;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.InternalCommands;
 using Messaging.IntegrationTests.Assertions;
@@ -90,7 +91,7 @@ public class WhenAConsumerHasMovedInTests : TestBase
     private async Task<MoveInTransaction> StartMoveInTransaction()
     {
         var transaction = new MoveInTransaction(
-            SampleData.TransactionId,
+            TransactionId.Create(SampleData.TransactionId),
             SampleData.MeteringPointNumber,
             SampleData.SupplyStart,
             SampleData.CurrentEnergySupplierNumber,

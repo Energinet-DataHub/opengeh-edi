@@ -14,19 +14,20 @@
 
 using System.Text.Json;
 using Messaging.Domain.Actors;
+using Messaging.Domain.Transactions;
 
 namespace Messaging.Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 
 public class ConfirmRequestChangeOfSupplierMessage : OutgoingMessage
 {
-    private ConfirmRequestChangeOfSupplierMessage(MessageType messageType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
+    private ConfirmRequestChangeOfSupplierMessage(MessageType messageType, ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
         : base(messageType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, messageRecord)
     {
         ArgumentNullException.ThrowIfNull(messageRecord);
         MarketActivityRecord = JsonSerializer.Deserialize<MarketActivityRecord>(messageRecord)!;
     }
 
-    private ConfirmRequestChangeOfSupplierMessage(ActorNumber receiverId, string transactionId, string processType, MarketActivityRecord marketActivityRecord)
+    private ConfirmRequestChangeOfSupplierMessage(ActorNumber receiverId, TransactionId transactionId, string processType, MarketActivityRecord marketActivityRecord)
         : base(MessageType.ConfirmRequestChangeOfSupplier, receiverId, transactionId, processType, MarketRole.EnergySupplier, DataHubDetails.IdentificationNumber, MarketRole.MeteringPointAdministrator, JsonSerializer.Serialize(marketActivityRecord))
     {
         MarketActivityRecord = marketActivityRecord;
@@ -49,7 +50,7 @@ public class ConfirmRequestChangeOfSupplierMessage : OutgoingMessage
 
         return new ConfirmRequestChangeOfSupplierMessage(
             energySupplierNumber,
-            transactionId,
+            TransactionId.Create(transactionId),
             processType.Code,
             marketActivityRecord);
     }

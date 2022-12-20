@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 
@@ -29,9 +30,15 @@ namespace Messaging.Infrastructure.Configuration.MessageBus
         string TopicName { get; }
 
         /// <summary>
-        /// Send integration event to topic
+        /// Send service bys message to topic/queue
         /// </summary>
         /// <param name="message"></param>
         Task SendAsync(ServiceBusMessage message);
+
+        /// <summary>
+        /// Send service bys messages to topic/queue
+        /// </summary>
+        /// <param name="messages"></param>
+        Task SendAsync(ReadOnlyCollection<ServiceBusMessage> messages);
     }
 }

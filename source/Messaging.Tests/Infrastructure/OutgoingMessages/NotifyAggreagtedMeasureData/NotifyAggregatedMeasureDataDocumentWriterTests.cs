@@ -61,17 +61,15 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
         var timeSeries = new List<TimeSeries>()
         {
             new(
-                Guid.NewGuid(),
+                Guid.NewGuid().ToString(),
                 "870",
                 "E18",
                 "KWH",
                 "PT1H",
-                "2022-02-12T23:00Z",
-                "2022-02-13T23:00Z",
                 new List<Point>()
                 {
-                    new(1, 11, "A05"),
-                    new(2, null, null),
+                    new(1, 11, "A05", "2022-02-12T23:00Z"),
+                    new(2, null, null, "2022-02-13T23:00Z"),
                 }),
         };
 
@@ -89,13 +87,13 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             .HasAttributeValue("receiver_MarketParticipant.mRID", "codingScheme", "A10")
             .HasValue("receiver_MarketParticipant.marketRole.type", header.ReceiverRole)
             .HasValue("createdDateTime", header.TimeStamp.ToString())
-            .HasValue("Series[1]/mRID", timeSeries[0].Id.ToString())
+            .HasValue("Series[1]/mRID", timeSeries[0].TransactionId.ToString())
             .HasValue("Series[1]/meteringGridArea_Domain.mRID", timeSeries[0].GridAreaCode)
             .HasValue("Series[1]/marketEvaluationPoint.type", timeSeries[0].MeteringPointType)
             .HasValue("Series[1]/quantity_Measure_Unit.name", timeSeries[0].MeasureUnitType)
             .HasValue("Series[1]/Period/resolution", timeSeries[0].Resolution)
-            .HasValue("Series[1]/Period/timeInterval/start", timeSeries[0].StartTime)
-            .HasValue("Series[1]/Period/timeInterval/end", timeSeries[0].EndTime)
+            .HasValue("Series[1]/Period/timeInterval/start", timeSeries[0].Point[0].SampleTime)
+            .HasValue("Series[1]/Period/timeInterval/end", timeSeries[0].Point[^1].SampleTime)
             .HasValue("Series[1]/Period/Point[1]/position", timeSeries[0].Point[0].Position.ToString(NumberFormatInfo.InvariantInfo))
             .HasValue("Series[1]/Period/Point[1]/quantity", timeSeries[0].Point[0].Quantity.ToString()!)
             .HasValue("Series[1]/Period/Point[1]/quality", timeSeries[0].Point[0].Quality!)

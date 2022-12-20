@@ -18,6 +18,7 @@ using MediatR;
 using Messaging.Application.Actors;
 using Messaging.Domain.Actors;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
+using Messaging.Domain.Transactions;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using NodaTime;
@@ -57,7 +58,7 @@ public class Scenario
         B2BContext context)
     {
         _transaction = new MoveInTransaction(
-            transactionId,
+            TransactionId.Create(transactionId),
             meteringPointNumber,
             supplyStart,
             currentEnergySupplierNumber,

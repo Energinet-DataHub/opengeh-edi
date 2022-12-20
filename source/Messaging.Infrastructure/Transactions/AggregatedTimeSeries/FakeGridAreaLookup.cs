@@ -12,17 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.Domain.SeedWork;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Messaging.Application.Transactions.AggregatedTimeSeries;
+using Messaging.Domain.Actors;
 
-namespace Messaging.Domain.OutgoingMessages.Peek;
+namespace Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
 
-public class MessageCategory : EnumerationType
+public class FakeGridAreaLookup : IGridAreaLookup
 {
-    public static readonly MessageCategory MasterData = new(0, nameof(MasterData));
-    public static readonly MessageCategory Aggregations = new(1, nameof(Aggregations));
-
-    private MessageCategory(int id, string name)
-        : base(id, name)
+    private readonly Dictionary<string, ActorNumber> _gridAreas = new()
     {
+        { "805", ActorNumber.Create("8200000007739") },
+        { "806", ActorNumber.Create("8200000007746") },
+    };
+
+    public Task<ActorNumber> GetGridOperatorForAsync(string gridAreaCode)
+    {
+        return Task.FromResult(_gridAreas[gridAreaCode]);
     }
 }

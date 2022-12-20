@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.Transactions;
 using Messaging.Domain.Transactions.AggregatedTimeSeries;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.EntityFrameworkCore;
@@ -33,6 +34,8 @@ internal class AggregatedTimeSeriesTransactionEntityConfiguration : IEntityTypeC
     {
         builder.ToTable("AggregatedTimeSeriesTransactions", "b2b");
         builder.HasKey(entity => entity.Id);
+        builder.Property(entity => entity.Id)
+            .HasConversion(toDbValue => toDbValue.Id, fromDbValue => TransactionId.Create(fromDbValue));
         builder.HasMany<OutgoingMessage>("_messages")
             .WithOne()
             .HasForeignKey("TransactionId");

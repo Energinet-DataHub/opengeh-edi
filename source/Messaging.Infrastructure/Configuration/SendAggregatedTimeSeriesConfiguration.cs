@@ -27,5 +27,6 @@ internal static class SendAggregatedTimeSeriesConfiguration
         services.AddScoped<IRequestHandler<SendAggregatedTimeSeries, Unit>, SendAggregatedTimeSeriesHandler>();
         services.AddScoped<IAggregatedTimeSeriesTransactions, AggregatedTimeSeriesTransactions>();
         services.AddSingleton<IAggregatedTimeSeriesResults, FakeAggregatedTimeSeriesResults>();
+        services.AddSingleton<IGridAreaLookup, FakeGridAreaLookup>();
     }
 }

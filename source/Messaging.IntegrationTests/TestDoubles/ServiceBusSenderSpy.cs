@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Messaging.Infrastructure.Configuration.MessageBus;
@@ -36,7 +38,12 @@ namespace Messaging.IntegrationTests.TestDoubles
             return Task.CompletedTask;
         }
 
-        #pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
+        public Task SendAsync(ReadOnlyCollection<ServiceBusMessage> messages)
+        {
+            return Task.CompletedTask;
+        }
+
+#pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
         public ValueTask DisposeAsync()
         {
             Dispose();

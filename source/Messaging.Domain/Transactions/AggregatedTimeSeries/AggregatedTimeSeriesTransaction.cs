@@ -21,14 +21,12 @@ namespace Messaging.Domain.Transactions.AggregatedTimeSeries;
 
 public class AggregatedTimeSeriesTransaction : Entity
 {
-    private readonly AggregatedTimeSeriesResult _aggregatedTimeSeriesResult;
     private readonly List<OutgoingMessage> _messages = new();
 
-    public AggregatedTimeSeriesTransaction(AggregatedTimeSeriesResult aggregatedTimeSeriesResult)
+    public AggregatedTimeSeriesTransaction(TransactionId id, ActorNumber receivingActor, MarketRole receivingActorRole, ProcessType processType, Series series)
     {
-        _aggregatedTimeSeriesResult = aggregatedTimeSeriesResult;
-        Id = Guid.NewGuid().ToString();
-        CreateResultMessages();
+        Id = id;
+        _messages.Add(AggregatedTimeSeriesMessage.Create(receivingActor, receivingActorRole, Id, processType, series));
     }
 
     #pragma warning disable CS8618 // EF core need this private constructor
@@ -37,13 +35,5 @@ public class AggregatedTimeSeriesTransaction : Entity
     }
     #pragma warning restore
 
-    public string Id { get; }
-
-    private void CreateResultMessages()
-    {
-        foreach (var result in _aggregatedTimeSeriesResult.Series)
-        {
-            _messages.Add(AggregatedTimeSeriesMessage.Create(result.GridOperatorId, MarketRole.GridOperator, Id, ProcessType.BalanceFixing, result));
-        }
-    }
+    public TransactionId Id { get; }
 }

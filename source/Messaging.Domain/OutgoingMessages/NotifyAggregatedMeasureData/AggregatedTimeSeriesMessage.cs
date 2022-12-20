@@ -14,19 +14,20 @@
 
 using System.Text.Json;
 using Messaging.Domain.Actors;
+using Messaging.Domain.Transactions;
 using Messaging.Domain.Transactions.AggregatedTimeSeries;
 
 namespace Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 
 public class AggregatedTimeSeriesMessage : OutgoingMessage
 {
-    private AggregatedTimeSeriesMessage(MessageType messageType, ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
+    private AggregatedTimeSeriesMessage(MessageType messageType, ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
         : base(messageType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, JsonSerializer.Serialize(messageRecord))
     {
         Series = JsonSerializer.Deserialize<TimeSeries>(messageRecord)!;
     }
 
-    private AggregatedTimeSeriesMessage(ActorNumber receiverId, string transactionId, string processType, MarketRole receiverRole, TimeSeries series)
+    private AggregatedTimeSeriesMessage(ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, TimeSeries series)
         : base(MessageType.NotifyAggregatedMeasureData, receiverId, transactionId, processType, receiverRole, DataHubDetails.IdentificationNumber, MarketRole.MeteringDataAdministrator, JsonSerializer.Serialize(series))
     {
         Series = series;
@@ -34,20 +35,19 @@ public class AggregatedTimeSeriesMessage : OutgoingMessage
 
     public TimeSeries Series { get; }
 
-    public static AggregatedTimeSeriesMessage Create(ActorNumber receiverNumber, MarketRole receiverRole, string transactionId, ProcessType processType, Series result)
+    public static AggregatedTimeSeriesMessage Create(ActorNumber receiverNumber, MarketRole receiverRole, TransactionId transactionId, ProcessType processType, Series result)
     {
+        ArgumentNullException.ThrowIfNull(transactionId);
         ArgumentNullException.ThrowIfNull(processType);
         ArgumentNullException.ThrowIfNull(result);
 
         var series = new TimeSeries(
-            Guid.NewGuid(),
+            transactionId.Id,
             result.GridAreaCode,
             result.MeteringPointType,
             result.MeasureUnitType,
             result.Resolution,
-            result.StartTime,
-            result.EndTime,
-            result.Points.Select(p => new Point(p.Position, p.Quantity, p.Quality)).ToList());
+            result.Points.Select(p => new Point(p.Position, p.Quantity, p.Quality, p.SampleTime)).ToList());
 
         return new AggregatedTimeSeriesMessage(
             receiverNumber,
@@ -58,6 +58,6 @@ public class AggregatedTimeSeriesMessage : OutgoingMessage
     }
 }
 
-public record TimeSeries(Guid Id, string GridAreaCode, string MeteringPointType, string MeasureUnitType, string Resolution, string StartTime, string EndTime, IReadOnlyList<Point> Point);
+public record TimeSeries(string TransactionId, string GridAreaCode, string MeteringPointType, string MeasureUnitType, string Resolution, IReadOnlyList<Point> Point);
 
-public record Point(int Position, decimal? Quantity, string? Quality);
+public record Point(int Position, decimal? Quantity, string? Quality, string SampleTime);

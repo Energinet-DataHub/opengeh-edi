@@ -15,6 +15,7 @@
 using System;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.Transactions;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.EntityFrameworkCore;
@@ -35,6 +36,10 @@ namespace Messaging.Infrastructure.Transactions
         {
             builder.ToTable("MoveInTransactions", "b2b");
             builder.HasKey(x => x.TransactionId);
+            builder.Property(entity => entity.TransactionId)
+                .HasConversion(
+                    toDbValue => toDbValue.Id,
+                    fromDbValue => TransactionId.Create(fromDbValue));
             builder.Property(x => x.ProcessId);
             builder.Property(x => x.EffectiveDate);
             builder.Property(x => x.MarketEvaluationPointId);
