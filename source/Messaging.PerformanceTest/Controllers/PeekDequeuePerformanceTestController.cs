@@ -42,12 +42,17 @@ public class PeekDequeuePerformanceTestController : ControllerBase
 
         for (var i = 0; i < _actorService.GetActorCount(); i++)
         {
-             var uniqueActorNumber = _actorService.GetUniqueActorNumber();
+              _actorService.GetUniqueActorNumber();
+        }
 
-             for (var j = 0; j < 1000; j++)
-             {
-                 await _moveInService.MoveInAsync(uniqueActorNumber).ConfigureAwait(false);
-             }
+        var actors = _actorService.GetActors();
+
+        var tasks = new List<Task>();
+        for (var j = 0; j < 1000; j++)
+        {
+            tasks.Clear();
+            tasks.AddRange(actors.Select(actorNumber => _moveInService.MoveInAsync(actorNumber)));
+            await Task.WhenAll(tasks).ConfigureAwait(false);
         }
 
         _actorService.ResetActorNumbers();
