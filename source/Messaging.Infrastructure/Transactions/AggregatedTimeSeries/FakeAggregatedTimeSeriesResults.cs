@@ -39,8 +39,9 @@ public class FakeAggregatedTimeSeriesResults : IAggregatedTimeSeriesResults
             new Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point(
                 point.Position,
                 decimal.Parse(point.Quantity, NumberStyles.Number, CultureInfo.InvariantCulture),
-                point.Quality));
-        var gridArea = new Series(points.ToList(), aggregatedTimeSeriesResultDto.GridAreaCode, aggregatedTimeSeriesResultDto.MeteringPointType, ActorNumber.Create(aggregatedTimeSeriesResultDto.GridOperatorNumber), aggregatedTimeSeriesResultDto.MeasureUnitType, aggregatedTimeSeriesResultDto.Resolution, aggregatedTimeSeriesResultDto.StartTime, aggregatedTimeSeriesResultDto.EndTime);
+                point.Quality,
+                point.QuarterTime));
+        var gridArea = new Series(points.ToList(), aggregatedTimeSeriesResultDto.GridAreaCode, aggregatedTimeSeriesResultDto.MeteringPointType, ActorNumber.Create(aggregatedTimeSeriesResultDto.GridOperatorNumber), aggregatedTimeSeriesResultDto.MeasureUnitType, aggregatedTimeSeriesResultDto.Resolution);
         var result = new AggregatedTimeSeriesResult(resultId, new List<Series>()
         {
             gridArea,
