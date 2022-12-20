@@ -83,7 +83,6 @@ public class SendAggregatedTimeSeriesTests : TestBase
         var results = GetService<IAggregatedTimeSeriesResults>() as FakeAggregatedTimeSeriesResults;
         var dto = new AggregatedTimeSeriesResultDto(
             SampleData.GridAreaCode,
-            SampleData.GridOperatorNumber,
             SampleData.MeteringPointType,
             SampleData.MeasureUnitType,
             SampleData.Resolution,

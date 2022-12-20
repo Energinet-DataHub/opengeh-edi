@@ -18,6 +18,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.Configuration.Commands.Commands;
+using Messaging.Domain.Actors;
+using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions;
 using Messaging.Domain.Transactions.AggregatedTimeSeries;
 
@@ -27,11 +29,13 @@ public class SendAggregatedTimeSeriesHandler : IRequestHandler<SendAggregatedTim
 {
     private readonly IAggregatedTimeSeriesTransactions _transactions;
     private readonly IAggregatedTimeSeriesResults _aggregatedTimeSeriesResults;
+    private readonly IGridAreaLookup _gridAreaLookup;
 
-    public SendAggregatedTimeSeriesHandler(IAggregatedTimeSeriesTransactions transactions, IAggregatedTimeSeriesResults aggregatedTimeSeriesResults)
+    public SendAggregatedTimeSeriesHandler(IAggregatedTimeSeriesTransactions transactions, IAggregatedTimeSeriesResults aggregatedTimeSeriesResults, IGridAreaLookup gridAreaLookup)
     {
         _transactions = transactions;
         _aggregatedTimeSeriesResults = aggregatedTimeSeriesResults;
+        _gridAreaLookup = gridAreaLookup;
     }
 
     public async Task<Unit> Handle(SendAggregatedTimeSeries request, CancellationToken cancellationToken)
@@ -39,8 +43,18 @@ public class SendAggregatedTimeSeriesHandler : IRequestHandler<SendAggregatedTim
         ArgumentNullException.ThrowIfNull(request);
 
         var aggregatedTimeSeriesResult = await _aggregatedTimeSeriesResults.GetResultAsync(request.AggregatedTimeSeriesResultId).ConfigureAwait(false);
-        var transaction = new AggregatedTimeSeriesTransaction(TransactionId.New(), aggregatedTimeSeriesResult);
-        _transactions.Add(transaction);
+        foreach (var result in aggregatedTimeSeriesResult.Series)
+        {
+            var gridOperatorNumber = await _gridAreaLookup.GetGridOperatorForAsync(result.GridAreaCode).ConfigureAwait(false);
+            var transaction = new AggregatedTimeSeriesTransaction(
+                TransactionId.New(),
+                gridOperatorNumber,
+                MarketRole.GridOperator,
+                ProcessType.BalanceFixing,
+                result);
+            _transactions.Add(transaction);
+        }
+
         return Unit.Value;
     }
 }
