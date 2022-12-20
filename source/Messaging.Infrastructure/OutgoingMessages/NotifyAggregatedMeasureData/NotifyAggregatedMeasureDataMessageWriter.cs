@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
 using Messaging.Application.OutgoingMessages.Common;
@@ -90,6 +91,6 @@ public class NotifyAggregatedMeasureDataMessageWriter : MessageWriter
 
     private static string CalculatePeriodStartTime(TimeSeries timeSeries)
     {
-        return timeSeries.StartTime;
+        return timeSeries.Point[0].SampleTime;
     }
 }

@@ -70,8 +70,8 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
                 "2022-02-13T23:00Z",
                 new List<Point>()
                 {
-                    new(1, 11, "A05"),
-                    new(2, null, null),
+                    new(1, 11, "A05", "2022-02-12T23:00Z"),
+                    new(2, null, null, "2022-02-12T23:00Z"),
                 }),
         };
 
