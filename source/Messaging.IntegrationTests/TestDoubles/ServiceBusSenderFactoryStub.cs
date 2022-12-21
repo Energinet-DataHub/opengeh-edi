@@ -24,7 +24,7 @@ namespace Messaging.IntegrationTests.TestDoubles
     {
         private readonly List<IServiceBusSenderAdapter> _senders = new();
 
-        public IServiceBusSenderAdapter GetSender(string topicName, string clientName)
+        public IServiceBusSenderAdapter GetSender(string topicName)
         {
             return _senders.First(a => a.TopicName.Equals(topicName, StringComparison.OrdinalIgnoreCase));
         }
