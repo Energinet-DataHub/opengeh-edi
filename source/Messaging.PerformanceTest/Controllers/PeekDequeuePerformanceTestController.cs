@@ -45,7 +45,7 @@ public class PeekDequeuePerformanceTestController : ControllerBase
 
         var actors = _actorService.GetActors();
 
-        var tasks = new List<Task>();
+        var tasks = new List<Task>(_actorService.GetActorCount());
         for (var j = 0; j < 1000; j++)
         {
             tasks.Clear();
