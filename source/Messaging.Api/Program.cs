@@ -131,7 +131,8 @@ namespace Messaging.Api
                                         GracePeriodInDaysAfterEffectiveDateIfNotUpdated = 15,
                                     }),
                                 new BusinessService(new Uri("http://NotImplemented"))),
-                            _ => new FakeMoveInRequester())
+                            _ => new FakeMoveInRequester(),
+                            _ => new FakeCustomerMasterDataClient())
                         .AddMessageParserServices();
 
                     services.AddLiveHealthCheck();

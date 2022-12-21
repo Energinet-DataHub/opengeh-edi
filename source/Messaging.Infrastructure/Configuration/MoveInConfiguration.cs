@@ -30,12 +30,24 @@ namespace Messaging.Infrastructure.Configuration;
 
 internal static class MoveInConfiguration
 {
-    public static void Configure(IServiceCollection services, MoveInSettings settings, Func<IServiceProvider, IMoveInRequester> addMoveInRequestService)
+    public static void Configure(
+        IServiceCollection services,
+        MoveInSettings settings,
+        Func<IServiceProvider, IMoveInRequester> addMoveInRequestService,
+        Func<IServiceProvider, ICustomerMasterDataClient>? addCustomerMasterDataClient = null)
     {
+        if (addCustomerMasterDataClient is not null)
+        {
+            services.AddScoped(addCustomerMasterDataClient);
+        }
+        else
+        {
+            services.AddScoped<ICustomerMasterDataClient, CustomerMasterDataClient>();
+        }
+
         services.AddScoped(addMoveInRequestService);
-        services.AddScoped<MoveInNotifications>();
         services.AddScoped<IMeteringPointMasterDataClient, MeteringPointMasterDataClient>();
-        services.AddScoped<ICustomerMasterDataClient, CustomerMasterDataClient>();
+        services.AddScoped<MoveInNotifications>();
         services.AddTransient<IRequestHandler<RequestChangeOfSupplierTransaction, Unit>, MoveInRequestHandler>();
         services.AddTransient<IRequestHandler<FetchCustomerMasterData, Unit>, FetchCustomerMasterDataHandler>();
         services.AddTransient<IRequestHandler<FetchMeteringPointMasterData, Unit>, FetchMeteringPointMasterDataHandler>();
