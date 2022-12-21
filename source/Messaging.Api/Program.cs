@@ -132,7 +132,8 @@ namespace Messaging.Api
                                     }),
                                 new BusinessService(new Uri("http://NotImplemented"))),
                             _ => new FakeMoveInRequester(),
-                            _ => new FakeCustomerMasterDataClient())
+                            _ => new FakeCustomerMasterDataClient(),
+                            _ => new FakeMeteringPointMasterDataClient())
                         .AddMessageParserServices();
 
                     services.AddLiveHealthCheck();
