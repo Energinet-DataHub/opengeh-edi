@@ -12,6 +12,7 @@ public class PeekDequeuePerformanceTestController : ControllerBase
 {
     private readonly IActorService _actorService;
     private readonly IMoveInService _moveInService;
+    private bool _isDataBuildInProgress;
 
     public PeekDequeuePerformanceTestController(
         IActorService actorService,
@@ -33,26 +34,29 @@ public class PeekDequeuePerformanceTestController : ControllerBase
         return _actorService.IsActorNumberInUse(actorNumber) ? JwtBuilder.BuildToken(actorNumber) : null;
     }
 
+    [HttpPut("ResetActors", Name = "ResetActors")]
+    public void ResetActors()
+    {
+        _actorService.ResetActorNumbers();
+    }
+
     [HttpPost("GenerateTestData", Name = "GenerateTestData")]
     public async Task PostAsync()
     {
-        _actorService.ResetActorNumbers();
-
-        for (var i = 0; i < _actorService.GetActorCount(); i++)
+        if (_isDataBuildInProgress is false)
         {
-              _actorService.GetUniqueActorNumber();
+            _isDataBuildInProgress = true;
+            var actors = _actorService.GetActors();
+
+            var tasks = new List<Task>();
+            for (var j = 0; j < 1000; j++)
+            {
+                tasks.Clear();
+                tasks.AddRange(actors.Select(actorNumber => _moveInService.MoveInAsync(actorNumber)));
+                await Task.WhenAll(tasks).ConfigureAwait(false);
+            }
+
+            _isDataBuildInProgress = false;
         }
-
-        var actors = _actorService.GetActors();
-
-        var tasks = new List<Task>();
-        for (var j = 0; j < 1000; j++)
-        {
-            tasks.Clear();
-            tasks.AddRange(actors.Select(actorNumber => _moveInService.MoveInAsync(actorNumber)));
-            await Task.WhenAll(tasks).ConfigureAwait(false);
-        }
-
-        _actorService.ResetActorNumbers();
     }
 }

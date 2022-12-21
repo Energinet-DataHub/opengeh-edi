@@ -45,7 +45,7 @@ public class ActorService : IActorService
     {
         lock (_actorNumberLock)
         {
-            return new ReadOnlyCollection<string>(_actorNumberDictionary.Where(keyValuePair => keyValuePair.Value).Select(_ => _.Key).ToList());
+            return new ReadOnlyCollection<string>(_actorNumberDictionary.Select(_ => _.Key).ToList());
         }
     }
 
