@@ -130,7 +130,7 @@ namespace Messaging.Api
                                     {
                                         GracePeriodInDaysAfterEffectiveDateIfNotUpdated = 15,
                                     }),
-                                new BusinessService(new Uri(runtime.MOVE_IN_REQUEST_ENDPOINT!))),
+                                new BusinessService(new Uri("http://NotImplemented"))),
                             _ => new FakeMoveInRequester())
                         .AddMessageParserServices();
 
