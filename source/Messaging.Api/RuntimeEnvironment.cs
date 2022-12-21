@@ -30,10 +30,6 @@ namespace Messaging.Api
 
         public virtual string? INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME => GetEnvironmentVariable(nameof(INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME));
 
-        public virtual string? INCOMING_CHANGE_CUSTOMER_CHARACTERISTICS_MESSAGE_QUEUE_NAME => GetEnvironmentVariable(nameof(INCOMING_CHANGE_CUSTOMER_CHARACTERISTICS_MESSAGE_QUEUE_NAME));
-
-        public virtual string? MESSAGE_REQUEST_QUEUE => GetEnvironmentVariable(nameof(MESSAGE_REQUEST_QUEUE));
-
         public virtual string? REQUEST_RESPONSE_LOGGING_CONNECTION_STRING =>
             GetEnvironmentVariable(nameof(REQUEST_RESPONSE_LOGGING_CONNECTION_STRING));
 
@@ -43,35 +39,14 @@ namespace Messaging.Api
         public virtual string? AZURE_FUNCTIONS_ENVIRONMENT =>
             GetEnvironmentVariable(nameof(AZURE_FUNCTIONS_ENVIRONMENT));
 
-        public virtual string? MASTER_DATA_REQUEST_QUEUE_NAME =>
-            GetEnvironmentVariable(nameof(MASTER_DATA_REQUEST_QUEUE_NAME));
-
-        public virtual string? CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME =>
-            GetEnvironmentVariable(nameof(CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME));
-
-        public virtual string? CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME =>
-            GetEnvironmentVariable(nameof(CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME));
-
-        public virtual string? CUSTOMER_MASTER_DATA_UPDATE_RESPONSE_QUEUE_NAME =>
-            GetEnvironmentVariable(nameof(CUSTOMER_MASTER_DATA_UPDATE_RESPONSE_QUEUE_NAME));
-
         public string? SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE =>
             GetEnvironmentVariable(nameof(SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE));
 
         public string? INTEGRATION_EVENT_TOPIC_NAME =>
             GetEnvironmentVariable(nameof(INTEGRATION_EVENT_TOPIC_NAME));
 
-        public string? CONSUMER_MOVED_IN_EVENT_SUBSCRIPTION_NAME =>
-            GetEnvironmentVariable(nameof(CONSUMER_MOVED_IN_EVENT_SUBSCRIPTION_NAME));
-
-        public string? ENERGY_SUPPLIER_CHANGED_EVENT_SUBSCRIPTION_NAME =>
-            GetEnvironmentVariable(nameof(ENERGY_SUPPLIER_CHANGED_EVENT_SUBSCRIPTION_NAME));
-
         public string? MARKET_PARTICIPANT_CHANGED_ACTOR_CREATED_SUBSCRIPTION_NAME =>
             GetEnvironmentVariable(nameof(MARKET_PARTICIPANT_CHANGED_ACTOR_CREATED_SUBSCRIPTION_NAME));
-
-        public string? METERING_POINT_CREATED_EVENT_B2B_SUBSCRIPTION_NAME =>
-            GetEnvironmentVariable(nameof(METERING_POINT_CREATED_EVENT_B2B_SUBSCRIPTION_NAME));
 
         public int MAX_NUMBER_OF_PAYLOADS_IN_BUNDLE
         {

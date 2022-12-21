@@ -142,8 +142,6 @@ namespace Messaging.ArchitectureTests
             public override string? REQUEST_RESPONSE_LOGGING_CONNECTION_STRING =>
                 CreateFakeServiceBusConnectionString();
 
-            public override string? MASTER_DATA_REQUEST_QUEUE_NAME => "metering-point-master-data-request";
-
             public override bool IsRunningLocally()
             {
                 return true;

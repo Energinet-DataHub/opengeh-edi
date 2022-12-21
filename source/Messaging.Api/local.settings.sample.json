@@ -8,14 +8,11 @@
     "REQUEST_RESPONSE_LOGGING_CONTAINER_NAME": "<Name of storage container>",
     "REQUEST_RESPONSE_LOGGING_CONNECTION_STRING": "<connection string for logging request and response to storage>",
     "DB_CONNECTION_STRING": "<SQL database connection string>",
-    "INCOMING_MESSAGE_QUEUE_NAME": "<Name of transactions service bus queue>",
-    "MOVE_IN_REQUEST_ENDPOINT": "<Move in request url>",
     "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_LISTENER": "<service bus connection string for shared service bus with listener permissions>",
     "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE": "<connection string for shared service bus with manage permissions>",
     "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND": "<connection string for shared service bus with sender permissions>",
-    "METERING_POINT_MASTER_DATA_RESPONSE_QUEUE_NAME": "<Master data response queue name>",
-    "ENERGY_SUPPLIER_CHANGED_TOPIC": "<Energy supplier changed topic>",
-    "ENERGY_SUPPLIER_CHANGED_SUBSCRIPTION": "<Energy supplier changed subscription>",
-    "MASTER_DATA_REQUEST_QUEUE_NAME": "<Name of Queue to send master requests>",
+    "INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME": "<Name of queue where incoming move in transaction are placed>",
+    "INTEGRATION_EVENT_TOPIC_NAME": "<Name of topic where integration events are received>",
+    "MARKET_PARTICIPANT_CHANGED_ACTOR_CREATED_SUBSCRIPTION_NAME": ""
   }
 }

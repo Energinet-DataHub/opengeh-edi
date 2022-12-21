@@ -16,7 +16,6 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Azure.Messaging.ServiceBus;
 using Messaging.Api.Configuration.Middleware.Authentication.Bearer;
 using Messaging.Api.Configuration.Middleware.Authentication.MarketActors;
 using Messaging.Api.Configuration.Middleware.Correlation;
@@ -27,7 +26,6 @@ using Messaging.CimMessageAdapter.Messages.Queues;
 using Messaging.Infrastructure.Actors;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Authentication;
-using Messaging.Infrastructure.Configuration.MessageBus;
 using Messaging.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Messaging.Infrastructure.Transactions;
 using Messaging.Infrastructure.Transactions.MoveIn;
@@ -80,16 +78,16 @@ namespace Messaging.Api
                     var databaseConnectionString = runtime.DB_CONNECTION_STRING;
 
                     services.AddSingleton(new MeteringPointServiceBusClientConfiguration(
-                        runtime.MASTER_DATA_REQUEST_QUEUE_NAME!));
+                        "NotImplemented"));
 
                     services.AddSingleton(new EnergySupplyingServiceBusClientConfiguration(
-                        runtime.CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME!));
+                        "NotImplemented"));
 
                     services.AddSingleton(
                         _ => new RequestChangeOfSupplierTransaction(runtime.INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME!));
 
                     services.AddSingleton(
-                        _ => new RequestChangeCustomerCharacteristicsTransaction(runtime.INCOMING_CHANGE_CUSTOMER_CHARACTERISTICS_MESSAGE_QUEUE_NAME!));
+                        _ => new RequestChangeCustomerCharacteristicsTransaction("NotImplemented"));
 
                     CompositionRoot.Initialize(services)
                         .AddMessageBus(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND!)
@@ -139,19 +137,11 @@ namespace Messaging.Api
                     services.AddLiveHealthCheck();
                     services.AddExternalDomainServiceBusQueuesHealthCheck(
                         runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
-                        runtime.INCOMING_CHANGE_CUSTOMER_CHARACTERISTICS_MESSAGE_QUEUE_NAME!,
-                        runtime.INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME!,
-                        runtime.MESSAGE_REQUEST_QUEUE!,
-                        runtime.CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME!,
-                        runtime.CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME!,
-                        runtime.CUSTOMER_MASTER_DATA_UPDATE_RESPONSE_QUEUE_NAME!);
+                        runtime.INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME!);
                     services.AddExternalServiceBusSubscriptionsHealthCheck(
                         runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
                         runtime.INTEGRATION_EVENT_TOPIC_NAME!,
-                        runtime.CONSUMER_MOVED_IN_EVENT_SUBSCRIPTION_NAME!,
-                        runtime.ENERGY_SUPPLIER_CHANGED_EVENT_SUBSCRIPTION_NAME!,
-                        runtime.MARKET_PARTICIPANT_CHANGED_ACTOR_CREATED_SUBSCRIPTION_NAME!,
-                        runtime.METERING_POINT_CREATED_EVENT_B2B_SUBSCRIPTION_NAME!);
+                        runtime.MARKET_PARTICIPANT_CHANGED_ACTOR_CREATED_SUBSCRIPTION_NAME!);
                     services.AddSqlServerHealthCheck(runtime.DB_CONNECTION_STRING!);
                 })
                 .Build();
