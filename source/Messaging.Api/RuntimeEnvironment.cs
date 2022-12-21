@@ -23,8 +23,6 @@ namespace Messaging.Api
     {
         public static RuntimeEnvironment Default => new();
 
-        public virtual string? MOVE_IN_REQUEST_ENDPOINT => GetEnvironmentVariable(nameof(MOVE_IN_REQUEST_ENDPOINT));
-
         public virtual string? DB_CONNECTION_STRING => GetEnvironmentVariable(nameof(DB_CONNECTION_STRING));
 
         public virtual string? SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND =>
@@ -44,21 +42,6 @@ namespace Messaging.Api
 
         public virtual string? AZURE_FUNCTIONS_ENVIRONMENT =>
             GetEnvironmentVariable(nameof(AZURE_FUNCTIONS_ENVIRONMENT));
-
-        public virtual string? MESSAGEHUB_STORAGE_CONNECTION_STRING =>
-            GetEnvironmentVariable(nameof(MESSAGEHUB_STORAGE_CONNECTION_STRING));
-
-        public virtual string? MESSAGEHUB_STORAGE_CONTAINER_NAME =>
-            GetEnvironmentVariable(nameof(MESSAGEHUB_STORAGE_CONTAINER_NAME));
-
-        public virtual string?MESSAGEHUB_QUEUE_CONNECTION_STRING =>
-            GetEnvironmentVariable(nameof(MESSAGEHUB_QUEUE_CONNECTION_STRING));
-
-        public virtual string? MESSAGEHUB_DATA_AVAILABLE_QUEUE =>
-            GetEnvironmentVariable(nameof(MESSAGEHUB_DATA_AVAILABLE_QUEUE));
-
-        public virtual string? MESSAGEHUB_DOMAIN_REPLY_QUEUE =>
-            GetEnvironmentVariable(nameof(MESSAGEHUB_DOMAIN_REPLY_QUEUE));
 
         public virtual string? MASTER_DATA_REQUEST_QUEUE_NAME =>
             GetEnvironmentVariable(nameof(MASTER_DATA_REQUEST_QUEUE_NAME));
