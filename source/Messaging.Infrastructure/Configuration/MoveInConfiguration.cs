@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using MediatR;
 using Messaging.Application.Configuration.TimeEvents;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
@@ -29,10 +30,10 @@ namespace Messaging.Infrastructure.Configuration;
 
 internal static class MoveInConfiguration
 {
-    public static void Configure(IServiceCollection services, MoveInSettings settings)
+    public static void Configure(IServiceCollection services, MoveInSettings settings, Func<IServiceProvider, IMoveInRequester> addMoveInRequestService)
     {
+        services.AddScoped(addMoveInRequestService);
         services.AddScoped<MoveInNotifications>();
-        services.AddScoped<IMoveInRequester, MoveInRequester>();
         services.AddScoped<IMeteringPointMasterDataClient, MeteringPointMasterDataClient>();
         services.AddScoped<ICustomerMasterDataClient, CustomerMasterDataClient>();
         services.AddTransient<IRequestHandler<RequestChangeOfSupplierTransaction, Unit>, MoveInRequestHandler>();
