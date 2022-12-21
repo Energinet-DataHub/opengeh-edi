@@ -51,15 +51,9 @@ internal class MoveInService : IMoveInService
     {
         var xmlDocument = XDocument.Load($"MoveIn{Path.DirectorySeparatorChar}xml{Path.DirectorySeparatorChar}RequestChangeOfSupplier.xml");
         xmlDocument.DescendantNodes().OfType<XComment>().Remove();
-        var actorIdElement = xmlDocument.Root?.Elements()
-            .Single(x => x.Name.LocalName.Equals("sender_MarketParticipant.mRID", StringComparison.OrdinalIgnoreCase));
-        if (actorIdElement is not null) actorIdElement.Value = uniqueActorNumber;
-        var messageIdElement = xmlDocument.Root?.Elements()
-            .Single(x => x.Name.LocalName.Equals("mRID", StringComparison.OrdinalIgnoreCase));
-        if (messageIdElement is not null) messageIdElement.Value = RandomNumberGenerator.GetInt32(10000000).ToString(CultureInfo.InvariantCulture);
-        var transactionIdElement = xmlDocument.Root?.Elements()
-            .Single(x => x.Name.LocalName.Equals("MktActivityRecord", StringComparison.OrdinalIgnoreCase)).Elements().Single(x => x.Name.LocalName.Equals("mRID", StringComparison.OrdinalIgnoreCase));
-        if (transactionIdElement is not null) transactionIdElement.Value = RandomNumberGenerator.GetInt32(10000000).ToString(CultureInfo.InvariantCulture);
+        ReplaceElementValue(xmlDocument, "sender_MarketParticipant.mRID", uniqueActorNumber);
+        ReplaceElementValue(xmlDocument, "mRID", RandomNumberGenerator.GetInt32(10000000).ToString(CultureInfo.InvariantCulture));
+        ReplaceActivityRecordElementValue(xmlDocument, "mRID", RandomNumberGenerator.GetInt32(10000000).ToString(CultureInfo.InvariantCulture));
 
         var builder = new StringBuilder();
         using (TextWriter writer = new Utf8StringWriter(builder))
@@ -69,18 +63,19 @@ internal class MoveInService : IMoveInService
 
         return builder.ToString();
     }
-}
 
-public class Utf8StringWriter : StringWriter
-{
-    public Utf8StringWriter(StringBuilder builder)
-        : base(builder, CultureInfo.InvariantCulture)
+    private static void ReplaceElementValue(XDocument xmlDocument, string elementName, string value)
     {
+        var element = xmlDocument.Root?.Elements()
+            .Single(x => x.Name.LocalName.Equals(elementName, StringComparison.OrdinalIgnoreCase));
+        if (element is not null) element.Value = value;
     }
 
-    // Use UTF8 encoding but write no BOM to the wire
-    public override Encoding Encoding
+    private static void ReplaceActivityRecordElementValue(XDocument xmlDocument, string elementName, string value)
     {
-        get { return new UTF8Encoding(false); } // in real code I'll cache this encoding.
+        var element = xmlDocument.Root?.Elements()
+            .Single(x => x.Name.LocalName.Equals("MktActivityRecord", StringComparison.OrdinalIgnoreCase))
+            .Elements().Single(x => x.Name.LocalName.Equals(elementName, StringComparison.OrdinalIgnoreCase));
+        if (element is not null) element.Value = value;
     }
 }
