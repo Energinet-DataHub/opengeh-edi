@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Diagnostics;
 using System.Net.Http;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
@@ -27,8 +26,6 @@ using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.OutgoingMessages.Common.Reasons;
 using Messaging.Application.OutgoingMessages.Peek;
-
-// using Messaging.Application.OutgoingMessages.Requesting;
 using Messaging.Application.Transactions.AggregatedTimeSeries;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.CimMessageAdapter.Messages;
@@ -187,10 +184,13 @@ namespace Messaging.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddMoveInServices(MoveInSettings settings, IFeatureFlagProvider featureFlagProvider)
+        public CompositionRoot AddMoveInServices(
+            MoveInSettings settings,
+            Func<IServiceProvider, IMoveInRequester>? addMoveInRequestService = null,
+            Func<IServiceProvider, ICustomerMasterDataClient>? addCustomerMasterDataClient = null,
+            Func<IServiceProvider, IMeteringPointMasterDataClient>? addMeteringPointMasterDataClient = null)
         {
-            ArgumentNullException.ThrowIfNull(featureFlagProvider);
-            MoveInConfiguration.Configure(_services, settings, featureFlagProvider);
+            MoveInConfiguration.Configure(_services, settings, addMoveInRequestService, addCustomerMasterDataClient, addMeteringPointMasterDataClient);
             return this;
         }
 
