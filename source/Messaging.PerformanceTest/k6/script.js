@@ -40,10 +40,7 @@ export default function () {
 
         console.info(`Peek response status: ${peekResponse.status}`);
 
-        const MessageId = peekResponse.headers.Messageid;
-        if ( MessageId === undefined) {
-            console.info(`GLN ${actorGln}: Missing MessageId in peekResponse:  ${JSON.stringify(peekResponse)}`);
-        }
+        
 
         if (peekResponse.status === 500) {
           console.info(`GLN ${actorGln}: sleep for 1 second. internalError: ${peekResponse.status}`);
@@ -59,6 +56,11 @@ export default function () {
           break;
         }        
 
+        const MessageId = peekResponse.headers.Messageid;
+        if ( MessageId === undefined) {
+            console.info(`GLN ${actorGln}: Missing MessageId in peekResponse:  ${JSON.stringify(peekResponse)}`);
+        }
+        
         console.info(`GLN ${actorGln}: http delete: ${messagingApiHostDns}:${messagingApiHostPort}/api/dequeue/${MessageId}`);
         console.info(`GLN ${actorGln}: Headers: ${JSON.stringify(headers)}`);
 
