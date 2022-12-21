@@ -22,26 +22,21 @@ export default function () {
 
     let actorGln = actorNumberResponse.body;
     let actorToken = actorTokenResponse.body;
-
-    console.info(`GLN ${actorGln}: actorToken: ${actorToken}`);
-
     let headers = {
       'Authorization': 'Bearer ' + actorToken
    };
 
     let isGettingMessages = true;
     while (isGettingMessages) {
+        const numberOfMessagesLeft = NumberOfMessagesLeft(headers);
+        console.info(`GLN ${actorGln}: NumberOfMessagesLeft: ${numberOfMessagesLeft}`);
         const peekResponse = http.get(
           `${messagingApiHostDns}:${messagingApiHostPort}/api/peek/masterdata`,
           {
             headers: headers,
           }
         );
-
-        console.info(`Peek response status: ${peekResponse.status}`);
-
         
-
         if (peekResponse.status === 500) {
           console.info(`GLN ${actorGln}: sleep for 1 second. internalError: ${peekResponse.status}`);
           sleep(1000);
@@ -59,17 +54,13 @@ export default function () {
             }
           );
 
-          console.info(`GLN ${actorGln}: messageCountResponse status: ${messageCountResponse.status}`);
-
           if (messageCountResponse.status === 200) {
-            console.info(`GLN ${actorGln}: messageCountResponse body: ${messageCountResponse.body}`);
-
             if (messageCountResponse.body > 0) {
-              console.info(`GLN ${actorGln}: Addtional messages found: ${messageCountResponse.body}`);
+              console.info(`GLN ${actorGln}: Addtional messages found: ${messageCountResponse.body}. Sleep for 1 second and continue the peek/dequeue process.`);
+              sleep(1000);
               continue;
             }
           }
-
 
           console.info(`GLN ${actorGln}: noContent: exit loop:  ${peekResponse.status}`);
           isGettingMessages = false;
@@ -79,6 +70,7 @@ export default function () {
         const MessageId = peekResponse.headers.Messageid;
         if ( MessageId === undefined) {
             console.info(`GLN ${actorGln}: Missing MessageId in peekResponse:  ${JSON.stringify(peekResponse)}`);
+            continue;
         }
 
         console.info(`GLN ${actorGln}: http delete: ${messagingApiHostDns}:${messagingApiHostPort}/api/dequeue/${MessageId}`);
@@ -93,5 +85,23 @@ export default function () {
 
         console.info(`GLN ${actorGln}: dequeueResponse status: ${dequeueResponse.status}`);
       }
+      const numberOfMessagesLeft = NumberOfMessagesLeft(headers);
+        console.info(`DONE! GLN ${actorGln}: NumberOfMessagesLeft: ${numberOfMessagesLeft}`);
     }
 }
+
+function NumberOfMessagesLeft(headers) {
+  const messageCountResponse = http.get(
+    `${messagingApiHostDns}:${messagingApiHostPort}/api/messagecount`,
+    {
+      headers: headers,
+    }
+  );
+
+  if (messageCountResponse.status === 200) {
+    return messageCountResponse.body;
+  }
+
+  return 0;
+}
+
