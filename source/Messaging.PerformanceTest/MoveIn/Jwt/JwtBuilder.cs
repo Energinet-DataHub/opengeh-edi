@@ -23,23 +23,29 @@ internal class JwtBuilder
 {
     public static string BuildToken(string uniqueActorNumber)
     {
-        var claims = new List<Claim>
-        {
-            new("roles", "electricalsupplier"),
-            new("test-actornumber", uniqueActorNumber),
-            new("azp", Guid.NewGuid().ToString()),
-        };
-
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("test_not_so_secret_key")) { KeyId = "MyKeyId" };
-        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
         var token = new JwtSecurityToken(
             "https://login.microsoftonline.com/4a7411ea-ac71-4b63-9647-b8bd4c5a20e0/v2.0",
             "c7e5dc5c-2ee0-420c-b5d2-586e7527302c",
-            claims,
+            SetupClaims(uniqueActorNumber),
             expires: DateTime.Now.AddMinutes(30),
-            signingCredentials: credentials);
+            signingCredentials: SetupCredentials());
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    private static List<Claim> SetupClaims(string actorNumber)
+    {
+        return new List<Claim>
+        {
+            new("roles", "electricalsupplier"),
+            new("test-actornumber", actorNumber),
+            new("azp", Guid.NewGuid().ToString()),
+        };
+    }
+
+    private static SigningCredentials SetupCredentials()
+    {
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("test_not_so_secret_key")) { KeyId = "MyKeyId" };
+        return new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
     }
 }
