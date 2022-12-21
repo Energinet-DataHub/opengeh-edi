@@ -33,7 +33,7 @@ internal static class MoveInConfiguration
     public static void Configure(
         IServiceCollection services,
         MoveInSettings settings,
-        Func<IServiceProvider, IMoveInRequester> addMoveInRequestService,
+        Func<IServiceProvider, IMoveInRequester>? addMoveInRequestService = null,
         Func<IServiceProvider, ICustomerMasterDataClient>? addCustomerMasterDataClient = null)
     {
         if (addCustomerMasterDataClient is not null)
@@ -45,7 +45,15 @@ internal static class MoveInConfiguration
             services.AddScoped<ICustomerMasterDataClient, CustomerMasterDataClient>();
         }
 
-        services.AddScoped(addMoveInRequestService);
+        if (addMoveInRequestService is not null)
+        {
+            services.AddScoped(addMoveInRequestService);
+        }
+        else
+        {
+            services.AddScoped<IMoveInRequester, MoveInRequester>();
+        }
+
         services.AddScoped<IMeteringPointMasterDataClient, MeteringPointMasterDataClient>();
         services.AddScoped<MoveInNotifications>();
         services.AddTransient<IRequestHandler<RequestChangeOfSupplierTransaction, Unit>, MoveInRequestHandler>();

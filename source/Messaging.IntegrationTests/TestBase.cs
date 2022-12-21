@@ -76,12 +76,7 @@ namespace Messaging.IntegrationTests
                 .AddRequestHandler<TestCommandHandler>()
                 .AddHttpClientAdapter(_ => new HttpClientSpy())
                 .AddMoveInServices(
-                    new MoveInSettings(new MessageDelivery(new GridOperator() { GracePeriodInDaysAfterEffectiveDateIfNotUpdated = 1, }), new BusinessService(new Uri("http://someuri"))),
-                    sp => new MoveInRequester(
-                        sp.GetRequiredService<MoveInSettings>(),
-                        sp.GetRequiredService<IHttpClientAdapter>(),
-                        sp.GetRequiredService<ISerializer>(),
-                        sp.GetRequiredService<ILogger<MoveInRequester>>()))
+                    new MoveInSettings(new MessageDelivery(new GridOperator() { GracePeriodInDaysAfterEffectiveDateIfNotUpdated = 1, }), new BusinessService(new Uri("http://someuri"))))
                 .AddMessageParserServices();
             _serviceProvider = _services.BuildServiceProvider();
         }

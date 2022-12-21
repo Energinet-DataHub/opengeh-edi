@@ -186,7 +186,7 @@ namespace Messaging.Infrastructure.Configuration
 
         public CompositionRoot AddMoveInServices(
             MoveInSettings settings,
-            Func<IServiceProvider, IMoveInRequester> addMoveInRequestService,
+            Func<IServiceProvider, IMoveInRequester>? addMoveInRequestService = null,
             Func<IServiceProvider, ICustomerMasterDataClient>? addCustomerMasterDataClient = null)
         {
             MoveInConfiguration.Configure(_services, settings, addMoveInRequestService, addCustomerMasterDataClient);
