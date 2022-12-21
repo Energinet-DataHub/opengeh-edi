@@ -23,18 +23,12 @@ namespace Messaging.Api
     {
         public static RuntimeEnvironment Default => new();
 
-        public virtual string? MOVE_IN_REQUEST_ENDPOINT => GetEnvironmentVariable(nameof(MOVE_IN_REQUEST_ENDPOINT));
-
         public virtual string? DB_CONNECTION_STRING => GetEnvironmentVariable(nameof(DB_CONNECTION_STRING));
 
         public virtual string? SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND =>
             GetEnvironmentVariable(nameof(SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND));
 
         public virtual string? INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME => GetEnvironmentVariable(nameof(INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME));
-
-        public virtual string? INCOMING_CHANGE_CUSTOMER_CHARACTERISTICS_MESSAGE_QUEUE_NAME => GetEnvironmentVariable(nameof(INCOMING_CHANGE_CUSTOMER_CHARACTERISTICS_MESSAGE_QUEUE_NAME));
-
-        public virtual string? MESSAGE_REQUEST_QUEUE => GetEnvironmentVariable(nameof(MESSAGE_REQUEST_QUEUE));
 
         public virtual string? REQUEST_RESPONSE_LOGGING_CONNECTION_STRING =>
             GetEnvironmentVariable(nameof(REQUEST_RESPONSE_LOGGING_CONNECTION_STRING));
@@ -45,50 +39,14 @@ namespace Messaging.Api
         public virtual string? AZURE_FUNCTIONS_ENVIRONMENT =>
             GetEnvironmentVariable(nameof(AZURE_FUNCTIONS_ENVIRONMENT));
 
-        public virtual string? MESSAGEHUB_STORAGE_CONNECTION_STRING =>
-            GetEnvironmentVariable(nameof(MESSAGEHUB_STORAGE_CONNECTION_STRING));
-
-        public virtual string? MESSAGEHUB_STORAGE_CONTAINER_NAME =>
-            GetEnvironmentVariable(nameof(MESSAGEHUB_STORAGE_CONTAINER_NAME));
-
-        public virtual string?MESSAGEHUB_QUEUE_CONNECTION_STRING =>
-            GetEnvironmentVariable(nameof(MESSAGEHUB_QUEUE_CONNECTION_STRING));
-
-        public virtual string? MESSAGEHUB_DATA_AVAILABLE_QUEUE =>
-            GetEnvironmentVariable(nameof(MESSAGEHUB_DATA_AVAILABLE_QUEUE));
-
-        public virtual string? MESSAGEHUB_DOMAIN_REPLY_QUEUE =>
-            GetEnvironmentVariable(nameof(MESSAGEHUB_DOMAIN_REPLY_QUEUE));
-
-        public virtual string? MASTER_DATA_REQUEST_QUEUE_NAME =>
-            GetEnvironmentVariable(nameof(MASTER_DATA_REQUEST_QUEUE_NAME));
-
-        public virtual string? CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME =>
-            GetEnvironmentVariable(nameof(CUSTOMER_MASTER_DATA_REQUEST_QUEUE_NAME));
-
-        public virtual string? CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME =>
-            GetEnvironmentVariable(nameof(CUSTOMER_MASTER_DATA_RESPONSE_QUEUE_NAME));
-
-        public virtual string? CUSTOMER_MASTER_DATA_UPDATE_RESPONSE_QUEUE_NAME =>
-            GetEnvironmentVariable(nameof(CUSTOMER_MASTER_DATA_UPDATE_RESPONSE_QUEUE_NAME));
-
         public string? SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE =>
             GetEnvironmentVariable(nameof(SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE));
 
         public string? INTEGRATION_EVENT_TOPIC_NAME =>
             GetEnvironmentVariable(nameof(INTEGRATION_EVENT_TOPIC_NAME));
 
-        public string? CONSUMER_MOVED_IN_EVENT_SUBSCRIPTION_NAME =>
-            GetEnvironmentVariable(nameof(CONSUMER_MOVED_IN_EVENT_SUBSCRIPTION_NAME));
-
-        public string? ENERGY_SUPPLIER_CHANGED_EVENT_SUBSCRIPTION_NAME =>
-            GetEnvironmentVariable(nameof(ENERGY_SUPPLIER_CHANGED_EVENT_SUBSCRIPTION_NAME));
-
         public string? MARKET_PARTICIPANT_CHANGED_ACTOR_CREATED_SUBSCRIPTION_NAME =>
             GetEnvironmentVariable(nameof(MARKET_PARTICIPANT_CHANGED_ACTOR_CREATED_SUBSCRIPTION_NAME));
-
-        public string? METERING_POINT_CREATED_EVENT_B2B_SUBSCRIPTION_NAME =>
-            GetEnvironmentVariable(nameof(METERING_POINT_CREATED_EVENT_B2B_SUBSCRIPTION_NAME));
 
         public int MAX_NUMBER_OF_PAYLOADS_IN_BUNDLE
         {

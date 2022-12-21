@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using MediatR;
 using Messaging.Application.Configuration.TimeEvents;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
@@ -21,7 +22,6 @@ using Messaging.Application.Transactions.MoveIn.Notifications;
 using Messaging.Application.Transactions.MoveIn.UpdateCustomer;
 using Messaging.Application.Transactions.UpdateCustomer;
 using Messaging.Domain.Transactions.MoveIn.Events;
-using Messaging.Infrastructure.Configuration.FeatureFlag;
 using Messaging.Infrastructure.Transactions.MoveIn;
 using Messaging.Infrastructure.Transactions.MoveIn.UpdateCustomer;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,20 +30,41 @@ namespace Messaging.Infrastructure.Configuration;
 
 internal static class MoveInConfiguration
 {
-    public static void Configure(IServiceCollection services, MoveInSettings settings, IFeatureFlagProvider featureFlagProvider)
+    public static void Configure(
+        IServiceCollection services,
+        MoveInSettings settings,
+        Func<IServiceProvider, IMoveInRequester>? addMoveInRequestService = null,
+        Func<IServiceProvider, ICustomerMasterDataClient>? addCustomerMasterDataClient = null,
+        Func<IServiceProvider, IMeteringPointMasterDataClient>? addMeteringPointMasterDataClient = null)
     {
-        services.AddScoped<MoveInNotifications>();
-        if (featureFlagProvider.IsPeekDequeuePerformanceTestEnabled)
+        if (addCustomerMasterDataClient is not null)
         {
-            services.AddScoped<IMoveInRequester, MoveInRequesterDouble>();
+            services.AddScoped(addCustomerMasterDataClient);
+        }
+        else
+        {
+            services.AddScoped<ICustomerMasterDataClient, CustomerMasterDataClient>();
+        }
+
+        if (addMoveInRequestService is not null)
+        {
+            services.AddScoped(addMoveInRequestService);
         }
         else
         {
             services.AddScoped<IMoveInRequester, MoveInRequester>();
         }
 
-        services.AddScoped<IMeteringPointMasterDataClient, MeteringPointMasterDataClient>();
-        services.AddScoped<ICustomerMasterDataClient, CustomerMasterDataClient>();
+        if (addMeteringPointMasterDataClient is not null)
+        {
+            services.AddScoped(addMeteringPointMasterDataClient);
+        }
+        else
+        {
+            services.AddScoped<IMeteringPointMasterDataClient, MeteringPointMasterDataClient>();
+        }
+
+        services.AddScoped<MoveInNotifications>();
         services.AddTransient<IRequestHandler<RequestChangeOfSupplierTransaction, Unit>, MoveInRequestHandler>();
         services.AddTransient<IRequestHandler<FetchCustomerMasterData, Unit>, FetchCustomerMasterDataHandler>();
         services.AddTransient<IRequestHandler<FetchMeteringPointMasterData, Unit>, FetchMeteringPointMasterDataHandler>();

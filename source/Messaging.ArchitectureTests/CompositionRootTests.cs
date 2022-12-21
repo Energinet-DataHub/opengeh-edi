@@ -136,18 +136,11 @@ namespace Messaging.ArchitectureTests
 
         private class TestEnvironment : RuntimeEnvironment
         {
-            public override string? MOVE_IN_REQUEST_ENDPOINT => "https://test.dk";
-
             public override string? SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND =>
                 CreateFakeServiceBusConnectionString();
 
             public override string? REQUEST_RESPONSE_LOGGING_CONNECTION_STRING =>
                 CreateFakeServiceBusConnectionString();
-
-            public override string? MESSAGEHUB_QUEUE_CONNECTION_STRING =>
-                CreateFakeServiceBusConnectionString();
-
-            public override string? MASTER_DATA_REQUEST_QUEUE_NAME => "metering-point-master-data-request";
 
             public override bool IsRunningLocally()
             {
