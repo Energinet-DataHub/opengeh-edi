@@ -51,6 +51,26 @@ export default function () {
         const noContent = peekResponse.status === 204;
 
         if (noContent) {
+
+          const messageCountResponse = http.get(
+            `${messagingApiHostDns}:${messagingApiHostPort}/api/messagecount`,
+            {
+              headers: headers,
+            }
+          );
+
+          console.info(`GLN ${actorGln}: messageCountResponse status: ${messageCountResponse.status}`);
+
+          if (messageCountResponse.status === 200) {
+            console.info(`GLN ${actorGln}: messageCountResponse body: ${messageCountResponse.body}`);
+
+            if (messageCountResponse.body > 0) {
+              console.info(`GLN ${actorGln}: Addtional messages found: ${messageCountResponse.body}`);
+              continue;
+            }
+          }
+
+
           console.info(`GLN ${actorGln}: noContent: exit loop:  ${peekResponse.status}`);
           isGettingMessages = false;
           break;
@@ -60,7 +80,7 @@ export default function () {
         if ( MessageId === undefined) {
             console.info(`GLN ${actorGln}: Missing MessageId in peekResponse:  ${JSON.stringify(peekResponse)}`);
         }
-        
+
         console.info(`GLN ${actorGln}: http delete: ${messagingApiHostDns}:${messagingApiHostPort}/api/dequeue/${MessageId}`);
         console.info(`GLN ${actorGln}: Headers: ${JSON.stringify(headers)}`);
 
