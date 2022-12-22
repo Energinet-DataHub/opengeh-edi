@@ -52,8 +52,8 @@ internal class MoveInService : IMoveInService
         var xmlDocument = XDocument.Load($"MoveIn{Path.DirectorySeparatorChar}xml{Path.DirectorySeparatorChar}RequestChangeOfSupplier.xml");
         xmlDocument.DescendantNodes().OfType<XComment>().Remove();
         ReplaceElementValue(xmlDocument, "sender_MarketParticipant.mRID", uniqueActorNumber);
-        ReplaceElementValue(xmlDocument, "mRID", RandomNumberGenerator.GetInt32(10000000).ToString(CultureInfo.InvariantCulture));
-        ReplaceActivityRecordElementValue(xmlDocument, "mRID", RandomNumberGenerator.GetInt32(10000000).ToString(CultureInfo.InvariantCulture));
+        ReplaceElementValue(xmlDocument, "mRID", RandomNumberGenerator.GetInt32(int.MaxValue).ToString(CultureInfo.InvariantCulture));
+        ReplaceActivityRecordElementValue(xmlDocument, "mRID", RandomNumberGenerator.GetInt32(int.MaxValue).ToString(CultureInfo.InvariantCulture));
 
         var builder = new StringBuilder();
         using (TextWriter writer = new Utf8StringWriter(builder))
