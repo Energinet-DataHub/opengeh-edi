@@ -48,21 +48,12 @@ export default function () {
 
       const noContent = peekResponse.status === 204;
       if (noContent) {
-        const messageCountResponse = http.get(
-          `${messagingApiHostDns}:${messagingApiHostPort}/api/messagecount`,
-          {
-            headers: headers,
-          }
-        );
-
-        if (messageCountResponse.status === 200) {
-          if (messageCountResponse.body > 0) {
-            console.info(`NoContent with Addtional messages: GLN ${actorGln}: Messages left: ${messageCountResponse.body}. Sleep for 1 second and continue the peek/dequeue process.`);
-            continue;
-          }
+        const messagesLeft = NumberOfMessagesLeft(headers);
+        if(messagesLeft > 0) 
+        {
+          console.info(`NoContent with additional messages: GLN ${actorGln}: Messages left: ${messagesLeft}. Sleep for 1 second and continue the peek/dequeue process.`);
+          continue;
         }
-
-        if (peekResponse.status !== 204) console.info(`GLN ${actorGln}: noContent: exit loop:  ${peekResponse.status}`);
         isGettingMessages = false;
         break;
       }
@@ -84,8 +75,6 @@ export default function () {
       numberOfMessagesLeft = NumberOfMessagesLeft(headers);
       if(numberOfMessagesLeft > 0) console.info(`GLN ${actorGln}: Continue peek/dequeue. NumberOfMessagesLeft: ${numberOfMessagesLeft}`);
     }
-
-   
     numberOfMessagesLeft = NumberOfMessagesLeft(headers);
     console.info(`Peek/Queue DONE! GLN ${actorGln}: LoopCount: ${loopCount} Messages Dequeued: ${numberOfMessagesToPeek} NumberOfMessagesLeft: ${numberOfMessagesLeft}`);
   }
