@@ -186,7 +186,7 @@ public class WhenAPeekIsRequestedTests : TestBase
 
     private async Task<bool> BundleIsRegistered()
     {
-        var numberOfBundles = await GetService<IDbConnectionFactory>().GetOpenConnection()
+        var numberOfBundles = await GetService<IEdiDatabaseConnection>().GetConnectionAndOpen()
             .ExecuteScalarAsync<int>("SELECT COUNT(*) FROM b2b.BundleStore");
         return numberOfBundles == 1;
     }

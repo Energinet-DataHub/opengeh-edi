@@ -27,12 +27,12 @@ namespace Messaging.Infrastructure.OutgoingMessages.Peek;
 
 public class EnqueuedMessages : IEnqueuedMessages
 {
-    private readonly IDbConnectionFactory _connectionFactory;
+    private readonly IEdiDatabaseConnection _connection;
     private readonly IBundleConfiguration _bundleConfiguration;
 
-    public EnqueuedMessages(IDbConnectionFactory connectionFactory, IBundleConfiguration bundleConfiguration)
+    public EnqueuedMessages(IEdiDatabaseConnection connection, IBundleConfiguration bundleConfiguration)
     {
-        _connectionFactory = connectionFactory;
+        _connection = connection;
         _bundleConfiguration = bundleConfiguration;
     }
 
@@ -60,8 +60,8 @@ public class EnqueuedMessages : IEnqueuedMessages
             ProcessType AS {nameof(EnqueuedMessage.ProcessType)},
             MessageRecord FROM [b2b].[EnqueuedMessages]
             WHERE ProcessType = @ProcessType AND ReceiverId = @ReceiverId AND ReceiverRole = @ReceiverRole AND MessageType = @MessageType AND MessageCategory = @MessageCategory";
-        return await _connectionFactory
-            .GetOpenConnection()
+        return await _connection
+            .GetConnectionAndOpen()
             .QueryAsync<EnqueuedMessage>(sqlStatement, new
             {
                 ReceiverRole = oldestMessage.ReceiverRole,
@@ -75,7 +75,7 @@ public class EnqueuedMessages : IEnqueuedMessages
     public async Task<int> GetAvailableMessageCountAsync(ActorNumber actorNumber)
     {
         ArgumentNullException.ThrowIfNull(actorNumber);
-        return await _connectionFactory.GetOpenConnection().QuerySingleAsync<int>(
+        return await _connection.GetConnectionAndOpen().QuerySingleAsync<int>(
             @"SELECT count(*) from [b2b].[EnqueuedMessages] WHERE ReceiverId = @ActorNumber",
             new
             {
@@ -85,8 +85,8 @@ public class EnqueuedMessages : IEnqueuedMessages
 
     private async Task<OldestMessage?> FindOldestMessageAsync(ActorNumber actorNumber, MessageCategory messageCategory)
     {
-        return await _connectionFactory
-            .GetOpenConnection()
+        return await _connection
+            .GetConnectionAndOpen()
             .QuerySingleOrDefaultAsync<OldestMessage>(
                 @$"SELECT TOP(1) {nameof(OldestMessage.ProcessType)}, {nameof(OldestMessage.MessageType)}, {nameof(OldestMessage.ReceiverRole)} FROM [b2b].[EnqueuedMessages]
                 WHERE ReceiverId = @ReceiverId AND MessageCategory = @MessageCategory",

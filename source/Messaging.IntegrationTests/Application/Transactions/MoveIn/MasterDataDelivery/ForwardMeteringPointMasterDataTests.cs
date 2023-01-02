@@ -73,7 +73,7 @@ public class ForwardMeteringPointMasterDataTests : TestBase, IAsyncLifetime
         var forwardMeteringPointMasterData = new ForwardMeteringPointMasterData(SampleData.TransactionId, CreateMasterDataContent());
         await InvokeCommandAsync(forwardMeteringPointMasterData).ConfigureAwait(false);
 
-        AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>())
+        AssertTransaction.Transaction(SampleData.TransactionId, GetService<IEdiDatabaseConnection>())
             .MeteringPointMasterDataWasSent();
     }
 

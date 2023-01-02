@@ -41,16 +41,16 @@ public class AssertTransaction
         _serializer = serializer;
     }
 
-    public static AssertTransaction Transaction(string transactionId, IDbConnectionFactory connectionFactory)
+    public static AssertTransaction Transaction(string transactionId, IEdiDatabaseConnection connection)
     {
-        if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
-        return new AssertTransaction(GetTransaction(transactionId, connectionFactory));
+        if (connection == null) throw new ArgumentNullException(nameof(connection));
+        return new AssertTransaction(GetTransaction(transactionId, connection));
     }
 
-    public static AssertTransaction Transaction(string transactionId, IDbConnectionFactory connectionFactory, ISerializer serializer)
+    public static AssertTransaction Transaction(string transactionId, IEdiDatabaseConnection connection, ISerializer serializer)
     {
-        if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
-        return new AssertTransaction(GetTransaction(transactionId, connectionFactory), serializer);
+        if (connection == null) throw new ArgumentNullException(nameof(connection));
+        return new AssertTransaction(GetTransaction(transactionId, connection), serializer);
     }
 
     public AssertTransaction HasState(MoveInTransaction.State expectedState)
@@ -132,9 +132,9 @@ public class AssertTransaction
         return this;
     }
 
-    private static dynamic? GetTransaction(string transactionId, IDbConnectionFactory connectionFactory)
+    private static dynamic? GetTransaction(string transactionId, IEdiDatabaseConnection connection)
     {
-        return connectionFactory.GetOpenConnection().QuerySingle(
+        return connection.GetConnectionAndOpen().QuerySingle(
             $"SELECT * FROM b2b.MoveInTransactions WHERE TransactionId = @TransactionId",
             new
             {

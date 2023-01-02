@@ -93,12 +93,12 @@ public class NotifyCurrentEnergySupplierHandlerTests
 
     private AssertOutgoingMessage AssertMessage(MessageType messageType, string processType)
     {
-        return AssertOutgoingMessage.OutgoingMessage(SampleData.TransactionId, messageType.Name, processType, GetService<IDbConnectionFactory>());
+        return AssertOutgoingMessage.OutgoingMessage(SampleData.TransactionId, messageType.Name, processType, GetService<IEdiDatabaseConnection>());
     }
 
     private AssertTransaction AssertTransaction()
     {
         return MoveIn.AssertTransaction
-            .Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>());
+            .Transaction(SampleData.TransactionId, GetService<IEdiDatabaseConnection>());
     }
 }

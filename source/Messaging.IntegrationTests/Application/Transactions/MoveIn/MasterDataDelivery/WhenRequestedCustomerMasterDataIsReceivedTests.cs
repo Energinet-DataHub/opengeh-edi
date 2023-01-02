@@ -70,7 +70,7 @@ public class WhenRequestedCustomerMasterDataIsReceivedTests
         var command = CreateCommand();
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
-        AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>(), GetService<ISerializer>())
+        AssertTransaction.Transaction(SampleData.TransactionId, GetService<IEdiDatabaseConnection>(), GetService<ISerializer>())
             .HasCustomerMasterData(ParseFrom(command.Data));
     }
 
@@ -141,7 +141,7 @@ public class WhenRequestedCustomerMasterDataIsReceivedTests
             SampleData.TransactionId,
             MessageType.CharacteristicsOfACustomerAtAnAP.Name,
             ProcessType.MoveIn.Code,
-            GetService<IDbConnectionFactory>());
+            GetService<IEdiDatabaseConnection>());
         return assertMessage;
     }
 }

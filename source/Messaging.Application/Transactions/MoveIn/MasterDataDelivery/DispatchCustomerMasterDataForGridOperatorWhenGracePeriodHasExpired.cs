@@ -29,16 +29,16 @@ namespace Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 
 public class DispatchCustomerMasterDataForGridOperatorWhenGracePeriodHasExpired : INotificationHandler<ADayHasPassed>
 {
-    private readonly IDbConnectionFactory _connectionFactory;
+    private readonly IEdiDatabaseConnection _connection;
     private readonly CommandSchedulerFacade _commandScheduler;
     private readonly MoveInSettings _settings;
 
     public DispatchCustomerMasterDataForGridOperatorWhenGracePeriodHasExpired(
-        IDbConnectionFactory connectionFactory,
+        IEdiDatabaseConnection connection,
         CommandSchedulerFacade commandScheduler,
         MoveInSettings settings)
     {
-        _connectionFactory = connectionFactory;
+        _connection = connection;
         _commandScheduler = commandScheduler;
         _settings = settings;
     }
@@ -59,7 +59,7 @@ public class DispatchCustomerMasterDataForGridOperatorWhenGracePeriodHasExpired 
 
     private async Task<IEnumerable<string>> TransactionsWhereCustomerMasterDataDispatchIsPendingAsync(Instant now)
     {
-        return await _connectionFactory.GetOpenConnection().QueryAsync<string>(
+        return await _connection.GetConnectionAndOpen().QueryAsync<string>(
                 @$"SELECT TransactionId FROM [b2b].[MoveInTransactions] " +
                 $"WHERE GridOperator_MessageDeliveryState_CustomerMasterData = '{MoveInTransaction.MasterDataState.Pending}' " +
                 "AND CustomerMasterData IS NOT NULL AND DATEDIFF(day, EffectiveDate, @Now) >= @GracePeriod",

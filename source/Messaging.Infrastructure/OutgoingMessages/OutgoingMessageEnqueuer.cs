@@ -22,12 +22,12 @@ namespace Messaging.Infrastructure.OutgoingMessages;
 
 public class OutgoingMessageEnqueuer
 {
-    private readonly IDbConnectionFactory _dbConnectionFactory;
+    private readonly IEdiDatabaseConnection _ediDatabaseConnection;
     private readonly IUnitOfWork _unitOfWork;
 
-    public OutgoingMessageEnqueuer(IDbConnectionFactory dbConnectionFactory, IUnitOfWork unitOfWork)
+    public OutgoingMessageEnqueuer(IEdiDatabaseConnection ediDatabaseConnection, IUnitOfWork unitOfWork)
     {
-        _dbConnectionFactory = dbConnectionFactory;
+        _ediDatabaseConnection = ediDatabaseConnection;
         _unitOfWork = unitOfWork;
     }
 
@@ -37,7 +37,7 @@ public class OutgoingMessageEnqueuer
 
         var sql = @$"INSERT INTO [B2B].[EnqueuedMessages] VALUES (@Id, @MessageType, @MessageCategory, @ReceiverId, @ReceiverRole, @SenderId, @SenderRole, @ProcessType, @MessageRecord)";
 
-        return _dbConnectionFactory.GetOpenConnection()
+        return _ediDatabaseConnection.GetConnectionAndOpen()
             .ExecuteAsync(
                 sql,
                 new

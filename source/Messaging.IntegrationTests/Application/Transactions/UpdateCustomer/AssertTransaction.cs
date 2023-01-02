@@ -29,15 +29,15 @@ public class AssertTransaction
         _transaction = transaction;
     }
 
-    public static AssertTransaction Transaction(string transactionId, IDbConnectionFactory connectionFactory)
+    public static AssertTransaction Transaction(string transactionId, IEdiDatabaseConnection connection)
     {
-        if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
-        return new AssertTransaction(GetTransaction(transactionId, connectionFactory));
+        if (connection == null) throw new ArgumentNullException(nameof(connection));
+        return new AssertTransaction(GetTransaction(transactionId, connection));
     }
 
-    private static dynamic? GetTransaction(string transactionId, IDbConnectionFactory connectionFactory)
+    private static dynamic? GetTransaction(string transactionId, IEdiDatabaseConnection connection)
     {
-        return connectionFactory.GetOpenConnection().QuerySingle(
+        return connection.GetConnectionAndOpen().QuerySingle(
             $"SELECT * FROM b2b.UpdateCustomerMasterDataTransactions WHERE TransactionId = @TransactionId",
             new
             {

@@ -22,16 +22,16 @@ namespace Messaging.Infrastructure.IncomingMessages
 {
     public class MessageIdRegistry : IMessageIds
     {
-        private readonly IDbConnectionFactory _connectionFactory;
+        private readonly IEdiDatabaseConnection _connection;
 
-        public MessageIdRegistry(IDbConnectionFactory connectionFactory)
+        public MessageIdRegistry(IEdiDatabaseConnection connection)
         {
-            _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
+            _connection = connection ?? throw new ArgumentNullException(nameof(connection));
         }
 
         public async Task<bool> TryStoreAsync(string messageId)
         {
-            var connection = _connectionFactory.GetOpenConnection();
+            var connection = _connection.GetConnectionAndOpen();
 
             var result = await connection.ExecuteAsync(
                     $"IF NOT EXISTS (SELECT * FROM b2b.MessageIds WHERE MessageId = @MessageId)" +

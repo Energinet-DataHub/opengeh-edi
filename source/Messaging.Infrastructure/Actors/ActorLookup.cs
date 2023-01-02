@@ -23,17 +23,17 @@ namespace Messaging.Infrastructure.Actors;
 
 public class ActorLookup : IActorLookup
 {
-    private readonly IDbConnectionFactory _dbConnectionFactory;
+    private readonly IEdiDatabaseConnection _ediDatabaseConnection;
 
-    public ActorLookup(IDbConnectionFactory dbConnectionFactory)
+    public ActorLookup(IEdiDatabaseConnection ediDatabaseConnection)
     {
-        _dbConnectionFactory = dbConnectionFactory;
+        _ediDatabaseConnection = ediDatabaseConnection;
     }
 
     public Task<Guid> GetIdByActorNumberAsync(string actorNumber)
     {
-        return _dbConnectionFactory
-            .GetOpenConnection()
+        return _ediDatabaseConnection
+            .GetConnectionAndOpen()
             .ExecuteScalarAsync<Guid>(
                 "SELECT Id FROM [b2b].[Actor] WHERE IdentificationNumber = @Number",
                 new { ActorNumber = actorNumber, });
@@ -41,8 +41,8 @@ public class ActorLookup : IActorLookup
 
     public Task<string> GetActorNumberByIdAsync(Guid actorId)
     {
-        return _dbConnectionFactory
-            .GetOpenConnection()
+        return _ediDatabaseConnection
+            .GetConnectionAndOpen()
             .ExecuteScalarAsync<string>(
                 "SELECT IdentificationNumber FROM [b2b].[Actor] WHERE Id = @ActorId",
                 new { ActorId = actorId, });
@@ -50,8 +50,8 @@ public class ActorLookup : IActorLookup
 
     public async Task<ActorNumber?> GetActorNumberByB2CIdAsync(Guid actorId)
     {
-        var actorNumber = await _dbConnectionFactory
-            .GetOpenConnection()
+        var actorNumber = await _ediDatabaseConnection
+            .GetConnectionAndOpen()
             .ExecuteScalarAsync<string>(
                 "SELECT IdentificationNumber AS Identifier FROM [b2b].[Actor] WHERE B2CId=@ActorId",
                 new { ActorId = actorId, })

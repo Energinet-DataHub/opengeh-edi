@@ -102,7 +102,7 @@ public class SendCustomerMasterDataToGridOperatorTests
             .HasMarketEvaluationPointValue($"{nameof(MarketEvaluationPoint.UsagePointLocation)}[0].Type", "D01")
             .HasMarketEvaluationPointValue($"{nameof(MarketEvaluationPoint.UsagePointLocation)}[1].Type", "D04")
             .NotEmpty(nameof(MarketActivityRecord.Id));
-        AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>())
+        AssertTransaction.Transaction(SampleData.TransactionId, GetService<IEdiDatabaseConnection>())
             .HasCustomerMasterDataSentToGridOperatorState(MoveInTransaction.MasterDataState.Sent);
     }
 
@@ -113,7 +113,7 @@ public class SendCustomerMasterDataToGridOperatorTests
             MessageType.CharacteristicsOfACustomerAtAnAP.Name,
             ProcessType.MoveIn.Code,
             MarketRole.GridOperator,
-            GetService<IDbConnectionFactory>());
+            GetService<IEdiDatabaseConnection>());
         return assertMessage;
     }
 }

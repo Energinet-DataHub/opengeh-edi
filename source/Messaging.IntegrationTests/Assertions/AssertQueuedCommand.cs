@@ -24,31 +24,31 @@ namespace Messaging.IntegrationTests.Assertions;
 
 public class AssertQueuedCommand
 {
-    private readonly IDbConnectionFactory _connectionFactory;
+    private readonly IEdiDatabaseConnection _connection;
     private readonly string _commandPayload;
     private readonly CommandMetadata _commandMetadata;
 
-    private AssertQueuedCommand(IDbConnectionFactory connectionFactory, string commandPayload, CommandMetadata commandMetadata)
+    private AssertQueuedCommand(IEdiDatabaseConnection connection, string commandPayload, CommandMetadata commandMetadata)
     {
-        _connectionFactory = connectionFactory;
+        _connection = connection;
         _commandPayload = commandPayload;
         _commandMetadata = commandMetadata;
     }
 
-    public static AssertQueuedCommand QueuedCommand<TCommandType>(IDbConnectionFactory connectionFactory, InternalCommandMapper mapper)
+    public static AssertQueuedCommand QueuedCommand<TCommandType>(IEdiDatabaseConnection connection, InternalCommandMapper mapper)
     {
         ArgumentNullException.ThrowIfNull(mapper);
-        if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
+        if (connection == null) throw new ArgumentNullException(nameof(connection));
 
         var commandMetadata = mapper.GetByType(typeof(TCommandType));
         var sql =
             $"SELECT Data FROM [b2b].[QueuedInternalCommands] WHERE Type = @CommandType";
-        var commandPayload = connectionFactory.GetOpenConnection().QuerySingleOrDefault<string>(
+        var commandPayload = connection.GetConnectionAndOpen().QuerySingleOrDefault<string>(
             sql,
             new { CommandType = commandMetadata.CommandName, });
 
         Assert.NotNull(commandPayload);
-        return new AssertQueuedCommand(connectionFactory, commandPayload, commandMetadata);
+        return new AssertQueuedCommand(connection, commandPayload, commandMetadata);
     }
 
     public object Command()

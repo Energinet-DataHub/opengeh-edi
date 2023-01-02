@@ -34,7 +34,7 @@ public class InternalCommandProcessorTests : TestBase
     private readonly InternalCommandProcessor _processor;
     private readonly ISystemDateTimeProvider _timeProvider;
     private readonly ICommandScheduler _scheduler;
-    private readonly IDbConnectionFactory _connectionFactory;
+    private readonly IEdiDatabaseConnection _connection;
 
     public InternalCommandProcessorTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
@@ -43,12 +43,12 @@ public class InternalCommandProcessorTests : TestBase
         _processor = GetService<InternalCommandProcessor>();
         _timeProvider = GetService<ISystemDateTimeProvider>();
         _scheduler = GetService<ICommandScheduler>();
-        _connectionFactory = GetService<IDbConnectionFactory>();
+        _connection = GetService<IEdiDatabaseConnection>();
         var mapper = GetService<InternalCommandMapper>();
         mapper.Add(nameof(TestCommand), typeof(TestCommand));
     }
 
-    private IDbConnection Connection => _connectionFactory.GetOpenConnection();
+    private IDbConnection Connection => _connection.GetConnectionAndOpen();
 
     [Fact]
     public async Task Scheduled_commands_are_processed()

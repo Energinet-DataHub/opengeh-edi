@@ -27,13 +27,13 @@ namespace Messaging.IntegrationTests.Application.Actors;
 public class CreateActorsTests : TestBase
 {
     private readonly IMediator _mediator;
-    private readonly IDbConnectionFactory _connectionFactory;
+    private readonly IEdiDatabaseConnection _connection;
 
     public CreateActorsTests([NotNull] DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _mediator = GetService<IMediator>();
-        _connectionFactory = GetService<IDbConnectionFactory>();
+        _connection = GetService<IEdiDatabaseConnection>();
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public class CreateActorsTests : TestBase
     private async Task<Actor> GetActor()
     {
         var sql = $"SELECT Id, B2CId, IdentificationNUmber FROM [b2b].[Actor] WHERE Id = '{SampleData.ActorId}'";
-        return await _connectionFactory.GetOpenConnection().QuerySingleOrDefaultAsync<Actor>(sql).ConfigureAwait(false);
+        return await _connection.GetConnectionAndOpen().QuerySingleOrDefaultAsync<Actor>(sql).ConfigureAwait(false);
     }
 
 #pragma warning disable

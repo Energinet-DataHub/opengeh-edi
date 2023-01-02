@@ -13,18 +13,34 @@
 // limitations under the License.
 
 using System.Data;
+using System.Threading.Tasks;
 
 namespace Messaging.Application.Configuration.DataAccess
 {
     /// <summary>
     /// Factory for creating database connections
     /// </summary>
-    public interface IDbConnectionFactory
+    public interface IEdiDatabaseConnection
     {
         /// <summary>
-        /// Returns and existing open connection if any, or creates a new open connection
+        /// Creates and open a connection
         /// </summary>
+        /// <remarks>Returned connection must be disposed</remarks>
         /// <returns><see cref="IDbConnection"/></returns>
-        IDbConnection GetOpenConnection();
+        IDbConnection GetConnectionAndOpen();
+
+        /// <summary>
+        /// Creates and open a connection
+        /// </summary>
+        /// <remarks>Returned connection must be disposed</remarks>
+        /// <returns><see cref="IDbConnection"/></returns>
+        ValueTask<IDbConnection> GetConnectionAndOpenAsync();
+
+        /// <summary>
+        /// Create a connection
+        /// </summary>
+        /// <remarks>Returned connection must be disposed</remarks>
+        /// <returns><see cref="IDbConnection"/></returns>
+        IDbConnection GetConnection();
     }
 }

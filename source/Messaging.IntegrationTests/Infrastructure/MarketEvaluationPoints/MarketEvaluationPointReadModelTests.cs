@@ -69,8 +69,8 @@ public class MarketEvaluationPointReadModelTests : TestBase
 
     private Task<dynamic?> GetStoredMarketEvaluationPointModelAsync()
     {
-        return GetService<IDbConnectionFactory>()
-            .GetOpenConnection()
+        return GetService<IEdiDatabaseConnection>()
+            .GetConnectionAndOpen()
             .QuerySingleOrDefaultAsync(
                 "SELECT * FROM b2b.MarketEvaluationPoints WHERE Id = @Id AND MarketEvaluationPointNumber = @MarketEvaluationPointNumber",
                 new

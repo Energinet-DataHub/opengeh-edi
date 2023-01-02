@@ -23,17 +23,17 @@ namespace Messaging.Infrastructure.Actors;
 
 public class ActorRegistry : IActorRegistry
 {
-    private readonly IDbConnectionFactory _dbConnectionFactory;
+    private readonly IEdiDatabaseConnection _ediDatabaseConnection;
 
-    public ActorRegistry(IDbConnectionFactory dbConnectionFactory)
+    public ActorRegistry(IEdiDatabaseConnection ediDatabaseConnection)
     {
-        _dbConnectionFactory = dbConnectionFactory;
+        _ediDatabaseConnection = ediDatabaseConnection;
     }
 
     public async Task<Guid?> IfActorExistsGetB2CIdAsync(string identificationNumber)
     {
         if (identificationNumber == null) throw new ArgumentNullException(nameof(identificationNumber));
-        var connection = _dbConnectionFactory.GetOpenConnection();
+        var connection = _ediDatabaseConnection.GetConnectionAndOpen();
         var sqlStatement = @$"SELECT B2CId FROM [b2b].[Actor]  WHERE IdentificationNumber = @IdentificationNumber";
         var b2CId = await connection.QueryFirstOrDefaultAsync<Guid?>(sqlStatement, new { IdentificationNumber = identificationNumber }).ConfigureAwait(false);
         return b2CId;
@@ -42,7 +42,7 @@ public class ActorRegistry : IActorRegistry
     public async Task<bool> TryStoreAsync(CreateActor createActor)
     {
         if (createActor == null) throw new ArgumentNullException(nameof(createActor));
-        var connection = _dbConnectionFactory.GetOpenConnection();
+        var connection = _ediDatabaseConnection.GetConnectionAndOpen();
         var sqlStatement = @$"INSERT INTO [b2b].[Actor] ([Id], [B2CId], [IdentificationNumber]) VALUES ('{createActor.ActorId}', '{createActor.B2CId}', '{createActor.IdentificationNumber}')";
         try
         {

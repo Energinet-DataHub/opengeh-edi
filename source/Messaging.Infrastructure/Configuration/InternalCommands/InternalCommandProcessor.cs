@@ -31,7 +31,7 @@ namespace Messaging.Infrastructure.Configuration.InternalCommands
         private readonly ISerializer _serializer;
         private readonly CommandExecutor _commandExecutor;
         private readonly ILogger<InternalCommandProcessor> _logger;
-        private readonly IDbConnectionFactory _connectionFactory;
+        private readonly IEdiDatabaseConnection _connection;
 
         public InternalCommandProcessor(
             InternalCommandMapper mapper,
@@ -39,14 +39,14 @@ namespace Messaging.Infrastructure.Configuration.InternalCommands
             ISerializer serializer,
             CommandExecutor commandExecutor,
             ILogger<InternalCommandProcessor> logger,
-            IDbConnectionFactory connectionFactory)
+            IEdiDatabaseConnection connection)
         {
             _mapper = mapper;
             _internalCommandAccessor = internalCommandAccessor ?? throw new ArgumentNullException(nameof(internalCommandAccessor));
             _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
             _commandExecutor = commandExecutor ?? throw new ArgumentNullException(nameof(commandExecutor));
             _logger = logger;
-            _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
+            _connection = connection ?? throw new ArgumentNullException(nameof(connection));
         }
 
         public async Task ProcessPendingAsync()
@@ -87,7 +87,7 @@ namespace Messaging.Infrastructure.Configuration.InternalCommands
 
         private Task MarkAsFailedAsync(QueuedInternalCommand queuedCommand, string exception)
         {
-            var connection = _connectionFactory.GetOpenConnection();
+            var connection = _connection.GetConnectionAndOpen();
             return connection.ExecuteScalarAsync(
                 "UPDATE [b2b].[QueuedInternalCommands] " +
                 "SET ProcessedDate = @NowDate, " +
@@ -103,7 +103,7 @@ namespace Messaging.Infrastructure.Configuration.InternalCommands
 
         private Task MarkAsProcessedAsync(QueuedInternalCommand queuedCommand)
         {
-            var connection = _connectionFactory.GetOpenConnection();
+            var connection = _connection.GetConnectionAndOpen();
             return connection.ExecuteScalarAsync(
                 "UPDATE [b2b].[QueuedInternalCommands] " +
                 "SET ProcessedDate = @NowDate " +

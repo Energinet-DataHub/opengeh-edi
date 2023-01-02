@@ -77,7 +77,7 @@ public class WhenAConsumerHasMovedInTests : TestBase
     private AssertQueuedCommand AssertCommand<TCommand>()
     {
         return AssertQueuedCommand.QueuedCommand<TCommand>(
-            GetService<IDbConnectionFactory>(),
+            GetService<IEdiDatabaseConnection>(),
             GetService<InternalCommandMapper>());
     }
 
@@ -112,6 +112,6 @@ public class WhenAConsumerHasMovedInTests : TestBase
     private AssertTransaction AssertTransaction()
     {
         return MoveIn.AssertTransaction
-            .Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>());
+            .Transaction(SampleData.TransactionId, GetService<IEdiDatabaseConnection>());
     }
 }

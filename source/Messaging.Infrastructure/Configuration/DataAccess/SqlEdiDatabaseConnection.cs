@@ -14,52 +14,38 @@
 
 using System;
 using System.Data;
+using System.Threading.Tasks;
 using Messaging.Application.Configuration.DataAccess;
 using Microsoft.Data.SqlClient;
 
 namespace Messaging.Infrastructure.Configuration.DataAccess
 {
-    public class SqlDbConnectionFactory : IDbConnectionFactory, IDisposable
+    public class SqlEdiDatabaseConnection : IEdiDatabaseConnection
     {
         private readonly string _connectionString;
-        private IDbConnection _connection = null!;
-        private bool _disposed;
 
-        public SqlDbConnectionFactory(string connectionString)
+        public SqlEdiDatabaseConnection(string connectionString)
         {
             _connectionString = connectionString;
         }
 
-        public IDbConnection GetOpenConnection()
+        public IDbConnection GetConnectionAndOpen()
         {
-            if (_connection is null || _connection.State == ConnectionState.Broken)
-            {
-                _connection = new SqlConnection(_connectionString);
-            }
+            var connection = new SqlConnection(_connectionString);
+            connection.Open();
 
-            if (_connection.State != ConnectionState.Open)
-            {
-                _connection.Open();
-            }
-
-            return _connection;
+            return connection;
         }
 
-        public void Dispose()
+        public async ValueTask<IDbConnection> GetConnectionAndOpenAsync()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync().ConfigureAwait(false);
+
+            return connection;
         }
 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposed)
-            {
-                return;
-            }
-
-            _connection?.Dispose();
-            _disposed = true;
-        }
+        public IDbConnection GetConnection()
+            => new SqlConnection(_connectionString);
     }
 }
