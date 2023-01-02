@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
@@ -22,7 +23,7 @@ namespace Messaging.Infrastructure.Configuration.MessageBus
     public sealed class ServiceBusSenderFactory : IServiceBusSenderFactory
     {
         private readonly object _adaptersLock = new();
-        private readonly Dictionary<string, IServiceBusSenderAdapter> _adapters = new();
+        private readonly ConcurrentDictionary<string, IServiceBusSenderAdapter> _adapters = new();
         private readonly ServiceBusClient _serviceBusClient;
 
         public ServiceBusSenderFactory(ServiceBusClient serviceBusClient)
@@ -35,17 +36,18 @@ namespace Messaging.Infrastructure.Configuration.MessageBus
             ArgumentNullException.ThrowIfNull(topicName);
 
             var key = topicName.ToUpperInvariant();
-            lock (_adaptersLock)
-            {
-                _adapters.TryGetValue(key, out var adapter);
-                if (adapter is null)
-                {
-                    adapter = new ServiceBusSenderAdapter(_serviceBusClient, topicName);
-                    _adapters.Add(key, adapter);
-                }
 
-                return adapter;
+            _adapters.TryGetValue(key, out var adapter);
+            if (adapter is null)
+            {
+                adapter = new ServiceBusSenderAdapter(_serviceBusClient, topicName);
+                lock (_adaptersLock)
+                {
+                    _adapters.TryAdd(key, adapter);
+                }
             }
+
+            return adapter;
         }
 
 #pragma warning disable CA1816 // Dispose methods should call SuppressFinalize

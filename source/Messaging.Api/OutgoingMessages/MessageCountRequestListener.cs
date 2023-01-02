@@ -12,61 +12,48 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.Configuration.Authentication;
-using Messaging.Application.OutgoingMessages.Peek;
-using Messaging.Domain.OutgoingMessages.Peek;
-using Messaging.Domain.SeedWork;
+using Messaging.Application.OutgoingMessages.MessageCount;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Extensions.Logging;
 
 namespace Messaging.Api.OutgoingMessages;
 
-public class PeekRequestListener
+public class MessageCountRequestListener
 {
     private readonly IMediator _mediator;
-    private readonly IMarketActorAuthenticator _authenticator;
+    private readonly IMarketActorAuthenticator _marketActorAuthenticator;
 
-    public PeekRequestListener(IMediator mediator, IMarketActorAuthenticator authenticator)
+    public MessageCountRequestListener(IMediator mediator, IMarketActorAuthenticator marketActorAuthenticator)
     {
         _mediator = mediator;
-        _authenticator = authenticator;
+        _marketActorAuthenticator = marketActorAuthenticator;
     }
 
-    [Function("PeekRequestListener")]
+    [Function("MessageCountRequestListener")]
     public async Task<HttpResponseData> RunAsync(
         [HttpTrigger(
-            AuthorizationLevel.Anonymous,
+            AuthorizationLevel.Function,
             "get",
-            Route = "peek/{messageCategory}")]
+            Route = "messagecount")]
         HttpRequestData request,
-        FunctionContext executionContext,
-        string messageCategory)
+        FunctionContext executionContext)
     {
         var result = await _mediator.Send(
-            new PeekRequest(
-                _authenticator.CurrentIdentity.Number,
-                EnumerationType.FromName<MessageCategory>(messageCategory)))
+                new MessageCountRequest(_marketActorAuthenticator.CurrentIdentity.Number))
             .ConfigureAwait(false);
 
         var response = HttpResponseData.CreateResponse(request);
-        if (result.Bundle is null)
-        {
-            response.StatusCode = HttpStatusCode.NoContent;
-            return response;
-        }
-
-        if (result.MessageId == null)
-        {
-            response.StatusCode = HttpStatusCode.InternalServerError;
-            return response;
-        }
-
-        response.Body = result.Bundle;
+        response.Body = new MemoryStream(Encoding.UTF8.GetBytes(result.MessageCount.ToString(CultureInfo.InvariantCulture)));
         response.Headers.Add("content-type", "application/xml");
-        response.Headers.Add("MessageId", result.MessageId.ToString());
         response.StatusCode = HttpStatusCode.OK;
         return response;
     }

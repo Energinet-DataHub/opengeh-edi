@@ -12,12 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Infrastructure.Configuration.FeatureFlag;
+using System.Globalization;
+using System.Text;
 
-#pragma warning disable
-public interface IFeatureFlagProvider
+namespace Messaging.PerformanceTest.MoveIn;
+
+public class Utf8StringWriter : StringWriter
 {
-    bool IsActorMessageQueueEnabled { get; }
+    public Utf8StringWriter(StringBuilder builder)
+        : base(builder, CultureInfo.InvariantCulture)
+    {
+    }
 
-    bool IsPeekDequeuePerformanceTestEnabled { get; }
+    // Use UTF8 encoding but write no BOM to the wire
+    public override Encoding Encoding
+    {
+        get { return new UTF8Encoding(false); } // in real code I'll cache this encoding.
+    }
 }

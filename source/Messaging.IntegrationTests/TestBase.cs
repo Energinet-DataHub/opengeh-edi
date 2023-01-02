@@ -24,6 +24,7 @@ using Messaging.Application.Configuration.Commands.Commands;
 using Messaging.Application.Configuration.TimeEvents;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration;
+using Messaging.Infrastructure.Configuration.FeatureFlag;
 using Messaging.Infrastructure.Configuration.MessageBus;
 using Messaging.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Messaging.Infrastructure.Configuration.Serialization;

@@ -12,12 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Infrastructure.Configuration.FeatureFlag;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Messaging.Application.Transactions;
+using Messaging.Application.Transactions.MoveIn;
 
-#pragma warning disable
-public interface IFeatureFlagProvider
+namespace Messaging.Infrastructure.Transactions.MoveIn;
+
+public class MoveInRequesterDouble : IMoveInRequester
 {
-    bool IsActorMessageQueueEnabled { get; }
-
-    bool IsPeekDequeuePerformanceTestEnabled { get; }
+    public Task<BusinessRequestResult> InvokeAsync(MoveInRequest request)
+    {
+        var validationErrors = new List<string>();
+        validationErrors.Add("UnknownAccountingPoint");
+        return Task.FromResult(BusinessRequestResult.Failure(validationErrors.ToArray()));
+    }
 }

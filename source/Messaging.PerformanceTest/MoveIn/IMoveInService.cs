@@ -12,12 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Infrastructure.Configuration.FeatureFlag;
+namespace Messaging.PerformanceTest.MoveIn;
 
-#pragma warning disable
-public interface IFeatureFlagProvider
+/// <summary>
+/// Service for triggering a move in.
+/// </summary>
+public interface IMoveInService
 {
-    bool IsActorMessageQueueEnabled { get; }
-
-    bool IsPeekDequeuePerformanceTestEnabled { get; }
+    /// <summary>
+    /// Request a move in for a given actor.
+    /// </summary>
+    /// <param name="uniqueActorNumber"></param>
+    Task MoveInAsync(string? uniqueActorNumber);
 }

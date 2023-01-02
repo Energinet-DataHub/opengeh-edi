@@ -51,7 +51,13 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
             .GetBundleOfAsync(bundleId)
             .ConfigureAwait(false);
 
-        if (document is not null) return new PeekResult(document);
+        if (document is not null)
+        {
+            var messageId = await _bundleStore
+                .GetBundleMessageIdOfAsync(bundleId)
+                .ConfigureAwait(false);
+            return new PeekResult(document, messageId);
+        }
 
         if (!await _bundleStore.TryRegisterBundleAsync(bundleId).ConfigureAwait(false)) return new PeekResult(null);
 

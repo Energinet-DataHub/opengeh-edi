@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Messaging.Application.Actors;
@@ -38,11 +40,22 @@ public class DevMarketActorAuthenticator : MarketActorAuthenticator
         var userIdClaim = claimsPrincipal.FindFirst(claim => claim.Type.Equals(ClaimsMap.UserId, StringComparison.OrdinalIgnoreCase));
         if (actorNumberClaim is not null && userIdClaim is not null)
         {
-            await _actorRegistry.TryStoreAsync(
-                new CreateActor(
-                    Guid.NewGuid().ToString(),
-                    userIdClaim.Value,
-                    actorNumberClaim.Value)).ConfigureAwait(false);
+            var b2CId = await _actorRegistry.IfActorExistsGetB2CIdAsync(actorNumberClaim.Value).ConfigureAwait(false);
+            if (b2CId is null)
+            {
+                await _actorRegistry.TryStoreAsync(
+                    new CreateActor(
+                        Guid.NewGuid().ToString(),
+                        userIdClaim.Value,
+                        actorNumberClaim.Value)).ConfigureAwait(false);
+            }
+            else
+            {
+                var modifiedClaimsPrincipal = claimsPrincipal.Claims.Where(claim => !claim.Type.Equals(ClaimsMap.UserId, StringComparison.OrdinalIgnoreCase)).ToList();
+                modifiedClaimsPrincipal.Add(new Claim(ClaimsMap.UserId, b2CId.ToString() ?? throw new InvalidOperationException()));
+                var claimsIdentities = new List<ClaimsIdentity> { new(modifiedClaimsPrincipal) };
+                claimsPrincipal = new ClaimsPrincipal(claimsIdentities);
+            }
         }
 
         await base.AuthenticateAsync(claimsPrincipal).ConfigureAwait(false);

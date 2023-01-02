@@ -16,7 +16,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Messaging.Infrastructure.Actors;
 
 namespace Messaging.Application.Actors;
 
