@@ -31,13 +31,14 @@ public class OutgoingMessageEnqueuer
         _unitOfWork = unitOfWork;
     }
 
-    public Task EnqueueAsync(EnqueuedMessage message)
+    public async Task EnqueueAsync(EnqueuedMessage message)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
 
         var sql = @$"INSERT INTO [B2B].[EnqueuedMessages] VALUES (@Id, @MessageType, @MessageCategory, @ReceiverId, @ReceiverRole, @SenderId, @SenderRole, @ProcessType, @MessageRecord)";
 
-        return _ediDatabaseConnection.GetConnectionAndOpen()
+        using var connection = await _ediDatabaseConnection.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        await connection
             .ExecuteAsync(
                 sql,
                 new
@@ -52,6 +53,6 @@ public class OutgoingMessageEnqueuer
                     ProcessType = message.ProcessType,
                     MessageRecord = message.MessageRecord,
                 },
-                _unitOfWork.CurrentTransaction);
+                _unitOfWork.CurrentTransaction).ConfigureAwait(false);
     }
 }

@@ -30,28 +30,28 @@ public class ActorLookup : IActorLookup
         _ediDatabaseConnection = ediDatabaseConnection;
     }
 
-    public Task<Guid> GetIdByActorNumberAsync(string actorNumber)
+    public async Task<Guid> GetIdByActorNumberAsync(string actorNumber)
     {
-        return _ediDatabaseConnection
-            .GetConnectionAndOpen()
+        using var connection = await _ediDatabaseConnection.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        return await connection
             .ExecuteScalarAsync<Guid>(
                 "SELECT Id FROM [b2b].[Actor] WHERE IdentificationNumber = @Number",
-                new { ActorNumber = actorNumber, });
+                new { ActorNumber = actorNumber, }).ConfigureAwait(false);
     }
 
-    public Task<string> GetActorNumberByIdAsync(Guid actorId)
+    public async Task<string> GetActorNumberByIdAsync(Guid actorId)
     {
-        return _ediDatabaseConnection
-            .GetConnectionAndOpen()
+        using var connection = await _ediDatabaseConnection.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        return await connection
             .ExecuteScalarAsync<string>(
                 "SELECT IdentificationNumber FROM [b2b].[Actor] WHERE Id = @ActorId",
-                new { ActorId = actorId, });
+                new { ActorId = actorId, }).ConfigureAwait(false);
     }
 
     public async Task<ActorNumber?> GetActorNumberByB2CIdAsync(Guid actorId)
     {
-        var actorNumber = await _ediDatabaseConnection
-            .GetConnectionAndOpen()
+        using var connection = await _ediDatabaseConnection.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        var actorNumber = await connection
             .ExecuteScalarAsync<string>(
                 "SELECT IdentificationNumber AS Identifier FROM [b2b].[Actor] WHERE B2CId=@ActorId",
                 new { ActorId = actorId, })

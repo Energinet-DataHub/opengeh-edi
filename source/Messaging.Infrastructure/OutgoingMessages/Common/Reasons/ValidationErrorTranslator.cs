@@ -53,8 +53,8 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
     {
         const string sql = "SELECT [Text], [Code], [ErrorCode] FROM [b2b].[ReasonTranslations] WHERE ErrorCode IN @ErrorCodes AND LanguageCode = 'dk'";
 
-        var result = await _connection
-            .GetConnectionAndOpen()
+        using var connection = await _connection.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        var result = await connection
             .QueryAsync<ReasonTranslation>(sql, new { ErrorCodes = errorCodes })
             .ConfigureAwait(false);
 
