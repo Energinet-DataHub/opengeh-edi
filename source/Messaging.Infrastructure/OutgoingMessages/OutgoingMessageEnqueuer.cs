@@ -22,22 +22,23 @@ namespace Messaging.Infrastructure.OutgoingMessages;
 
 public class OutgoingMessageEnqueuer
 {
-    private readonly IDbConnectionFactory _dbConnectionFactory;
+    private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
     private readonly IUnitOfWork _unitOfWork;
 
-    public OutgoingMessageEnqueuer(IDbConnectionFactory dbConnectionFactory, IUnitOfWork unitOfWork)
+    public OutgoingMessageEnqueuer(IDatabaseConnectionFactory databaseConnectionFactory, IUnitOfWork unitOfWork)
     {
-        _dbConnectionFactory = dbConnectionFactory;
+        _databaseConnectionFactory = databaseConnectionFactory;
         _unitOfWork = unitOfWork;
     }
 
-    public Task EnqueueAsync(EnqueuedMessage message)
+    public async Task EnqueueAsync(EnqueuedMessage message)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
 
         var sql = @$"INSERT INTO [B2B].[EnqueuedMessages] VALUES (@Id, @MessageType, @MessageCategory, @ReceiverId, @ReceiverRole, @SenderId, @SenderRole, @ProcessType, @MessageRecord)";
 
-        return _dbConnectionFactory.GetOpenConnection()
+        using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        await connection
             .ExecuteAsync(
                 sql,
                 new
@@ -52,6 +53,6 @@ public class OutgoingMessageEnqueuer
                     ProcessType = message.ProcessType,
                     MessageRecord = message.MessageRecord,
                 },
-                _unitOfWork.CurrentTransaction);
+                _unitOfWork.CurrentTransaction).ConfigureAwait(false);
     }
 }

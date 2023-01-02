@@ -62,19 +62,19 @@ public class ValidationErrorTranslatorTests : TestBase
         Assert.Equal("999", reasons.First().Code);
     }
 
-    private Task RegisterTranslation(string errorCode, string code, string text)
+    private async Task RegisterTranslation(string errorCode, string code, string text)
     {
-        var connection = GetService<IDbConnectionFactory>().GetOpenConnection();
+        var connectionFactory = GetService<IDatabaseConnectionFactory>();
+        using var connection = await connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        const string insertStatement = $"INSERT INTO [b2b].[ReasonTranslations] (Id, ErrorCode, Code, Text, LanguageCode) " +
+                                       $"VALUES (@Id, @ErrorCode, @Code, @Text, 'dk');";
 
-        var insertStatement = $"INSERT INTO [b2b].[ReasonTranslations] (Id, ErrorCode, Code, Text, LanguageCode) " +
-                                    $"VALUES (@Id, @ErrorCode, @Code, @Text, 'dk');";
-
-        return connection.ExecuteAsync(insertStatement, new
+        await connection.ExecuteAsync(insertStatement, new
         {
             Id = Guid.NewGuid().ToString(),
             ErrorCode = errorCode,
             Code = code,
             Text = text,
-        });
+        }).ConfigureAwait(false);
     }
 }

@@ -31,7 +31,7 @@ namespace Messaging.Infrastructure.Configuration.InternalCommands
         private readonly ISerializer _serializer;
         private readonly CommandExecutor _commandExecutor;
         private readonly ILogger<InternalCommandProcessor> _logger;
-        private readonly IDbConnectionFactory _connectionFactory;
+        private readonly IDatabaseConnectionFactory _connectionFactory;
 
         public InternalCommandProcessor(
             InternalCommandMapper mapper,
@@ -39,7 +39,7 @@ namespace Messaging.Infrastructure.Configuration.InternalCommands
             ISerializer serializer,
             CommandExecutor commandExecutor,
             ILogger<InternalCommandProcessor> logger,
-            IDbConnectionFactory connectionFactory)
+            IDatabaseConnectionFactory connectionFactory)
         {
             _mapper = mapper;
             _internalCommandAccessor = internalCommandAccessor ?? throw new ArgumentNullException(nameof(internalCommandAccessor));
@@ -85,10 +85,10 @@ namespace Messaging.Infrastructure.Configuration.InternalCommands
             return _commandExecutor.ExecuteAsync(command, CancellationToken.None);
         }
 
-        private Task MarkAsFailedAsync(QueuedInternalCommand queuedCommand, string exception)
+        private async Task MarkAsFailedAsync(QueuedInternalCommand queuedCommand, string exception)
         {
-            var connection = _connectionFactory.GetOpenConnection();
-            return connection.ExecuteScalarAsync(
+            using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+            await connection.ExecuteScalarAsync(
                 "UPDATE [b2b].[QueuedInternalCommands] " +
                 "SET ProcessedDate = @NowDate, " +
                 "ErrorMessage = @Error " +
@@ -98,13 +98,13 @@ namespace Messaging.Infrastructure.Configuration.InternalCommands
                     NowDate = DateTime.UtcNow,
                     Error = exception,
                     queuedCommand.Id,
-                });
+                }).ConfigureAwait(false);
         }
 
-        private Task MarkAsProcessedAsync(QueuedInternalCommand queuedCommand)
+        private async Task MarkAsProcessedAsync(QueuedInternalCommand queuedCommand)
         {
-            var connection = _connectionFactory.GetOpenConnection();
-            return connection.ExecuteScalarAsync(
+            using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+            await connection.ExecuteScalarAsync(
                 "UPDATE [b2b].[QueuedInternalCommands] " +
                 "SET ProcessedDate = @NowDate " +
                 "WHERE [Id] = @Id",
@@ -112,7 +112,7 @@ namespace Messaging.Infrastructure.Configuration.InternalCommands
                 {
                     NowDate = DateTime.UtcNow,
                     queuedCommand.Id,
-                });
+                }).ConfigureAwait(false);
         }
     }
 }

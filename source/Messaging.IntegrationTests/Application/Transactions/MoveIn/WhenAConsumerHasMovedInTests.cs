@@ -54,8 +54,8 @@ public class WhenAConsumerHasMovedInTests : TestBase
         await ConsumerHasMovedIn().ConfigureAwait(false);
 
         AssertCommand<NotifyCurrentEnergySupplier>();
-        AssertTransaction()
-            .BusinessProcessCompleted();
+        var transaction = await AssertTransaction().ConfigureAwait(false);
+        transaction.BusinessProcessCompleted();
     }
 
     [Fact]
@@ -77,7 +77,7 @@ public class WhenAConsumerHasMovedInTests : TestBase
     private AssertQueuedCommand AssertCommand<TCommand>()
     {
         return AssertQueuedCommand.QueuedCommand<TCommand>(
-            GetService<IDbConnectionFactory>(),
+            GetService<IDatabaseConnectionFactory>(),
             GetService<InternalCommandMapper>());
     }
 
@@ -109,9 +109,9 @@ public class WhenAConsumerHasMovedInTests : TestBase
         return transaction;
     }
 
-    private AssertTransaction AssertTransaction()
+    private Task<AssertTransaction> AssertTransaction()
     {
         return MoveIn.AssertTransaction
-            .Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>());
+            .TransactionAsync(SampleData.TransactionId, GetService<IDatabaseConnectionFactory>());
     }
 }

@@ -68,10 +68,10 @@ public class NotifyCurrentEnergySupplierHandlerTests
     {
         await InvokeCommandAsync(CreateCommand()).ConfigureAwait(false);
 
-        AssertTransaction()
-            .HasEndOfSupplyNotificationState(MoveInTransaction.NotificationState.WasNotified);
-        AssertMessage(MessageType.GenericNotification, BusinessReasonCode.CustomerMoveInOrMoveOut.Code)
-            .HasReceiverId(SampleData.CurrentEnergySupplierNumber)
+        var assertTransaction = await AssertTransactionAsync().ConfigureAwait(false);
+        assertTransaction.HasEndOfSupplyNotificationState(MoveInTransaction.NotificationState.WasNotified);
+        var assertOutgoingMessage = await AssertMessageAsync(MessageType.GenericNotification, BusinessReasonCode.CustomerMoveInOrMoveOut.Code).ConfigureAwait(false);
+        assertOutgoingMessage.HasReceiverId(SampleData.CurrentEnergySupplierNumber)
             .HasReceiverRole(MarketRole.EnergySupplier.ToString())
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
             .HasSenderRole(MarketRole.MeteringPointAdministrator.ToString())
@@ -91,14 +91,14 @@ public class NotifyCurrentEnergySupplierHandlerTests
             SampleData.CurrentEnergySupplierNumber);
     }
 
-    private AssertOutgoingMessage AssertMessage(MessageType messageType, string processType)
+    private async Task<AssertOutgoingMessage> AssertMessageAsync(MessageType messageType, string processType)
     {
-        return AssertOutgoingMessage.OutgoingMessage(SampleData.TransactionId, messageType.Name, processType, GetService<IDbConnectionFactory>());
+        return await AssertOutgoingMessage.OutgoingMessageAsync(SampleData.TransactionId, messageType.Name, processType, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
     }
 
-    private AssertTransaction AssertTransaction()
+    private async Task<AssertTransaction> AssertTransactionAsync()
     {
-        return MoveIn.AssertTransaction
-            .Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>());
+        return await MoveIn.AssertTransaction
+            .TransactionAsync(SampleData.TransactionId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
     }
 }

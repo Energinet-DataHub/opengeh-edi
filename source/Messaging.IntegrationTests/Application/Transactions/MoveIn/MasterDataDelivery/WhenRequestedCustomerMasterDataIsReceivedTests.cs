@@ -70,8 +70,8 @@ public class WhenRequestedCustomerMasterDataIsReceivedTests
         var command = CreateCommand();
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
-        AssertTransaction.Transaction(SampleData.TransactionId, GetService<IDbConnectionFactory>(), GetService<ISerializer>())
-            .HasCustomerMasterData(ParseFrom(command.Data));
+        var assertTransaction = await AssertTransaction.TransactionAsync(SampleData.TransactionId, GetService<IDatabaseConnectionFactory>(), GetService<ISerializer>()).ConfigureAwait(false);
+        assertTransaction.HasCustomerMasterData(ParseFrom(command.Data));
     }
 
     [Fact]
@@ -80,7 +80,7 @@ public class WhenRequestedCustomerMasterDataIsReceivedTests
         var command = CreateCommand();
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
-        var assertMessage = AssertOutgoingMessage();
+        var assertMessage = await AssertOutgoingMessageAsync().ConfigureAwait(false);
         assertMessage.HasReceiverId(SampleData.NewEnergySupplierNumber);
         assertMessage.HasReceiverRole(MarketRole.EnergySupplier.ToString());
         assertMessage.HasSenderId(DataHubDetails.IdentificationNumber.Value);
@@ -135,13 +135,13 @@ public class WhenRequestedCustomerMasterDataIsReceivedTests
             supplyStart: data.SupplyStart);
     }
 
-    private AssertOutgoingMessage AssertOutgoingMessage()
+    private async Task<AssertOutgoingMessage> AssertOutgoingMessageAsync()
     {
-        var assertMessage = Assertions.AssertOutgoingMessage.OutgoingMessage(
+        var assertMessage = await AssertOutgoingMessage.OutgoingMessageAsync(
             SampleData.TransactionId,
             MessageType.CharacteristicsOfACustomerAtAnAP.Name,
             ProcessType.MoveIn.Code,
-            GetService<IDbConnectionFactory>());
+            GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
         return assertMessage;
     }
 }

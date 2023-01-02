@@ -42,7 +42,8 @@ public class SendAggregatedTimeSeriesTests : TestBase
     {
         await InvokeCommandAsync(CreateRequest()).ConfigureAwait(false);
 
-        var exists = await GetService<IDbConnectionFactory>().GetOpenConnection()
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
+        var exists = await connection
             .ExecuteScalarAsync<bool>("SELECT COUNT(*) FROM b2b.AggregatedTimeSeriesTransactions");
         Assert.True(exists);
     }
@@ -53,13 +54,13 @@ public class SendAggregatedTimeSeriesTests : TestBase
         await InvokeCommandAsync(CreateRequest()).ConfigureAwait(false);
 
         var transactionId = await GetTransactionIdAsync().ConfigureAwait(false);
-        AssertOutgoingMessage.OutgoingMessage(
-                transactionId.ToString(),
-                MessageType.NotifyAggregatedMeasureData.Name,
-                ProcessType.BalanceFixing.Code,
-                MarketRole.GridOperator,
-                GetService<IDbConnectionFactory>())
-            .HasReceiverId(SampleData.GridOperatorNumber)
+        var message = await AssertOutgoingMessage.OutgoingMessageAsync(
+            transactionId.ToString(),
+            MessageType.NotifyAggregatedMeasureData.Name,
+            ProcessType.BalanceFixing.Code,
+            MarketRole.GridOperator,
+            GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
+        message.HasReceiverId(SampleData.GridOperatorNumber)
             .HasReceiverRole(MarketRole.GridOperator.Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
@@ -98,10 +99,10 @@ public class SendAggregatedTimeSeriesTests : TestBase
         results?.Add(SampleData.ResultId, dto);
     }
 
-    private Task<Guid> GetTransactionIdAsync()
+    private async Task<Guid> GetTransactionIdAsync()
     {
-        return GetService<IDbConnectionFactory>()
-            .GetOpenConnection()
-            .QueryFirstAsync<Guid>("SELECT TOP(1) Id FROM b2b.AggregatedTimeSeriesTransactions");
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
+        return await connection
+            .QueryFirstAsync<Guid>("SELECT TOP(1) Id FROM b2b.AggregatedTimeSeriesTransactions").ConfigureAwait(false);
     }
 }

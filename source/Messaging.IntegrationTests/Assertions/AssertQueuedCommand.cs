@@ -24,18 +24,18 @@ namespace Messaging.IntegrationTests.Assertions;
 
 public class AssertQueuedCommand
 {
-    private readonly IDbConnectionFactory _connectionFactory;
+    private readonly IDatabaseConnectionFactory _connectionFactory;
     private readonly string _commandPayload;
     private readonly CommandMetadata _commandMetadata;
 
-    private AssertQueuedCommand(IDbConnectionFactory connectionFactory, string commandPayload, CommandMetadata commandMetadata)
+    private AssertQueuedCommand(IDatabaseConnectionFactory connectionFactory, string commandPayload, CommandMetadata commandMetadata)
     {
         _connectionFactory = connectionFactory;
         _commandPayload = commandPayload;
         _commandMetadata = commandMetadata;
     }
 
-    public static AssertQueuedCommand QueuedCommand<TCommandType>(IDbConnectionFactory connectionFactory, InternalCommandMapper mapper)
+    public static AssertQueuedCommand QueuedCommand<TCommandType>(IDatabaseConnectionFactory connectionFactory, InternalCommandMapper mapper)
     {
         ArgumentNullException.ThrowIfNull(mapper);
         if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
@@ -43,7 +43,7 @@ public class AssertQueuedCommand
         var commandMetadata = mapper.GetByType(typeof(TCommandType));
         var sql =
             $"SELECT Data FROM [b2b].[QueuedInternalCommands] WHERE Type = @CommandType";
-        var commandPayload = connectionFactory.GetOpenConnection().QuerySingleOrDefault<string>(
+        var commandPayload = connectionFactory.GetConnectionAndOpen().QuerySingleOrDefault<string>(
             sql,
             new { CommandType = commandMetadata.CommandName, });
 

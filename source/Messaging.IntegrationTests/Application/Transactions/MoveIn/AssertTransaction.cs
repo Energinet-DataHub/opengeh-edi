@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Data;
+using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Domain.Transactions.MoveIn;
@@ -41,16 +43,18 @@ public class AssertTransaction
         _serializer = serializer;
     }
 
-    public static AssertTransaction Transaction(string transactionId, IDbConnectionFactory connectionFactory)
+    public static async Task<AssertTransaction> TransactionAsync(string transactionId, IDatabaseConnectionFactory connectionFactory)
     {
         if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
-        return new AssertTransaction(GetTransaction(transactionId, connectionFactory));
+        using var connection = await connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        return new AssertTransaction(GetTransaction(transactionId, connection));
     }
 
-    public static AssertTransaction Transaction(string transactionId, IDbConnectionFactory connectionFactory, ISerializer serializer)
+    public static async Task<AssertTransaction> TransactionAsync(string transactionId, IDatabaseConnectionFactory connectionFactory, ISerializer serializer)
     {
         if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
-        return new AssertTransaction(GetTransaction(transactionId, connectionFactory), serializer);
+        using var connection = await connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        return new AssertTransaction(GetTransaction(transactionId, connection), serializer);
     }
 
     public AssertTransaction HasState(MoveInTransaction.State expectedState)
@@ -132,9 +136,9 @@ public class AssertTransaction
         return this;
     }
 
-    private static dynamic? GetTransaction(string transactionId, IDbConnectionFactory connectionFactory)
+    private static dynamic? GetTransaction(string transactionId, IDbConnection connection)
     {
-        return connectionFactory.GetOpenConnection().QuerySingle(
+        return connection.QuerySingle(
             $"SELECT * FROM b2b.MoveInTransactions WHERE TransactionId = @TransactionId",
             new
             {

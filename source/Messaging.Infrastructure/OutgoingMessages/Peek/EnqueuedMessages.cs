@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Globalization;
 using System.Threading.Tasks;
 using Dapper;
@@ -27,10 +28,10 @@ namespace Messaging.Infrastructure.OutgoingMessages.Peek;
 
 public class EnqueuedMessages : IEnqueuedMessages
 {
-    private readonly IDbConnectionFactory _connectionFactory;
+    private readonly IDatabaseConnectionFactory _connectionFactory;
     private readonly IBundleConfiguration _bundleConfiguration;
 
-    public EnqueuedMessages(IDbConnectionFactory connectionFactory, IBundleConfiguration bundleConfiguration)
+    public EnqueuedMessages(IDatabaseConnectionFactory connectionFactory, IBundleConfiguration bundleConfiguration)
     {
         _connectionFactory = connectionFactory;
         _bundleConfiguration = bundleConfiguration;
@@ -41,7 +42,8 @@ public class EnqueuedMessages : IEnqueuedMessages
         ArgumentNullException.ThrowIfNull(messageCategory);
         ArgumentNullException.ThrowIfNull(actorNumber);
 
-        var oldestMessage = await FindOldestMessageAsync(actorNumber, messageCategory).ConfigureAwait(false);
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        var oldestMessage = await FindOldestMessageAsync(actorNumber, messageCategory, connection).ConfigureAwait(false);
 
         if (oldestMessage is null)
         {
@@ -60,8 +62,7 @@ public class EnqueuedMessages : IEnqueuedMessages
             ProcessType AS {nameof(EnqueuedMessage.ProcessType)},
             MessageRecord FROM [b2b].[EnqueuedMessages]
             WHERE ProcessType = @ProcessType AND ReceiverId = @ReceiverId AND ReceiverRole = @ReceiverRole AND MessageType = @MessageType AND MessageCategory = @MessageCategory";
-        return await _connectionFactory
-            .GetOpenConnection()
+        return await connection
             .QueryAsync<EnqueuedMessage>(sqlStatement, new
             {
                 ReceiverRole = oldestMessage.ReceiverRole,
@@ -75,7 +76,8 @@ public class EnqueuedMessages : IEnqueuedMessages
     public async Task<int> GetAvailableMessageCountAsync(ActorNumber actorNumber)
     {
         ArgumentNullException.ThrowIfNull(actorNumber);
-        return await _connectionFactory.GetOpenConnection().QuerySingleAsync<int>(
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        return await connection.QuerySingleAsync<int>(
             @"SELECT count(*) from [b2b].[EnqueuedMessages] WHERE ReceiverId = @ActorNumber",
             new
             {
@@ -83,10 +85,9 @@ public class EnqueuedMessages : IEnqueuedMessages
             }).ConfigureAwait(false);
     }
 
-    private async Task<OldestMessage?> FindOldestMessageAsync(ActorNumber actorNumber, MessageCategory messageCategory)
+    private static async Task<OldestMessage?> FindOldestMessageAsync(ActorNumber actorNumber, MessageCategory messageCategory, IDbConnection connection)
     {
-        return await _connectionFactory
-            .GetOpenConnection()
+        return await connection
             .QuerySingleOrDefaultAsync<OldestMessage>(
                 @$"SELECT TOP(1) {nameof(OldestMessage.ProcessType)}, {nameof(OldestMessage.MessageType)}, {nameof(OldestMessage.ReceiverRole)} FROM [b2b].[EnqueuedMessages]
                 WHERE ReceiverId = @ReceiverId AND MessageCategory = @MessageCategory",

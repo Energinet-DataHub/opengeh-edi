@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,9 +29,9 @@ namespace Messaging.Application.OutgoingMessages.Peek;
 
 public class BundleStore
 {
-    private readonly IDbConnectionFactory _connectionFactory;
+    private readonly IDatabaseConnectionFactory _connectionFactory;
 
-    public BundleStore(IDbConnectionFactory connectionFactory)
+    public BundleStore(IDatabaseConnectionFactory connectionFactory)
     {
         _connectionFactory = connectionFactory;
     }
@@ -39,12 +40,16 @@ public class BundleStore
         BundleId bundleId)
     {
         ArgumentNullException.ThrowIfNull(bundleId);
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
 
-        var command = CreateCommand($"SELECT Bundle FROM b2b.BundleStore WHERE ActorNumber = @ActorNumber AND MessageCategory = @MessageCategory", new List<KeyValuePair<string, object>>
+        using var command = CreateCommand(
+            $"SELECT Bundle FROM b2b.BundleStore WHERE ActorNumber = @ActorNumber AND MessageCategory = @MessageCategory",
+            new List<KeyValuePair<string, object>>
         {
             new("@ActorNumber", bundleId.ReceiverNumber.Value),
             new("@MessageCategory", bundleId.MessageCategory.Name),
-        });
+        },
+            connection);
 
         using (var reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
         {
@@ -65,7 +70,8 @@ public class BundleStore
         ArgumentNullException.ThrowIfNull(bundleId);
         ArgumentNullException.ThrowIfNull(document);
 
-        var command = CreateCommand(
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var command = CreateCommand(
             @$"UPDATE [B2B].[BundleStore]
                      SET Bundle = @Bundle, MessageId = @MessageId, MessageIdsIncluded = @MessageIdsIncluded
                      WHERE ActorNumber = @ActorNumber
@@ -79,7 +85,8 @@ public class BundleStore
                 new("@Bundle", document),
                 new("@MessageId", messageId),
                 new("@MessageIdsIncluded", string.Join(",", messageIdsIncluded)),
-            });
+            },
+            connection);
 
         var result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
 
@@ -93,8 +100,8 @@ public class BundleStore
     {
         ArgumentNullException.ThrowIfNull(bundleId);
 
-        var result = await _connectionFactory
-            .GetOpenConnection().ExecuteAsync(
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        var result = await connection.ExecuteAsync(
                 $"IF NOT EXISTS (SELECT * FROM b2b.BundleStore WHERE ActorNumber = @ActorNumber AND MessageCategory = @MessageCategory)" +
                 $"INSERT INTO b2b.BundleStore(ActorNUmber, MessageCategory) VALUES(@ActorNumber, @MessageCategory)",
                 new
@@ -107,22 +114,24 @@ public class BundleStore
         return result == 1;
     }
 
-    public Task UnregisterBundleAsync(BundleId bundleId)
+    public async Task UnregisterBundleAsync(BundleId bundleId)
     {
         ArgumentNullException.ThrowIfNull(bundleId);
-        return _connectionFactory
-            .GetOpenConnection().ExecuteAsync(
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        await connection
+            .ExecuteAsync(
                 $"DELETE FROM b2b.BundleStore WHERE ActorNumber = @ActorNumber AND MessageCategory = @MessageCategory",
                 new
                 {
                     @ActorNumber = bundleId.ReceiverNumber.Value,
                     @MessageCategory = bundleId.MessageCategory.Name,
-                });
+                }).ConfigureAwait(false);
     }
 
     public async Task<DequeueResult> DequeueAsync(Guid messageId)
     {
-        var bundleStoreQuery = await _connectionFactory.GetOpenConnection().QuerySingleOrDefaultAsync(
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        var bundleStoreQuery = await connection.QuerySingleOrDefaultAsync(
             $"SELECT * FROM [B2B].[BundleStore] WHERE MessageId = @MessageId",
             new
         {
@@ -140,12 +149,13 @@ public class BundleStore
 
         const string deleteBundleStoreRowSql = $"DELETE FROM [B2B].[BundleStore] WHERE MessageId = @MessageId";
         statementBuilder.AppendLine(deleteBundleStoreRowSql);
-        var command = CreateCommand(
+        using var command = CreateCommand(
             statementBuilder.ToString(),
             new List<KeyValuePair<string, object>>()
             {
                 new("@MessageId", messageId.ToString()),
-            });
+            },
+            connection);
         var result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
 
         return result > 0 ? new DequeueResult(true) : new DequeueResult(false);
@@ -156,7 +166,7 @@ public class BundleStore
         ArgumentNullException.ThrowIfNull(bundleId);
         const string sqlquery = @"SELECT MessageId FROM [b2b].[BundleStore] WHERE ActorNumber = @ActorNumber AND MessageCategory = @MessageCategory";
 
-        var connection = _connectionFactory.GetOpenConnection();
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         var messageId = await connection.QueryFirstOrDefaultAsync<Guid?>(sqlquery, new { ActorNumber = bundleId.ReceiverNumber.Value, MessageCategory = bundleId.MessageCategory.Name }).ConfigureAwait(false);
         return messageId;
     }
@@ -174,11 +184,9 @@ public class BundleStore
         document.Position = 0;
     }
 
-    private SqlCommand CreateCommand(string sqlStatement, List<KeyValuePair<string, object>> parameters)
+    private static SqlCommand CreateCommand(string sqlStatement, List<KeyValuePair<string, object>> parameters, IDbConnection connection)
     {
-        var command = _connectionFactory
-            .GetOpenConnection()
-            .CreateCommand();
+        var command = connection.CreateCommand();
 
         command.CommandText = sqlStatement;
 

@@ -77,7 +77,7 @@ public class DispatchCustomerMasterDataForGridOperatorTests : TestBase, IAsyncLi
     {
         await GivenTheGracePeriodHasExpired();
 
-        AssertQueuedCommand.QueuedCommand<SendCustomerMasterDataToGridOperator>(GetService<IDbConnectionFactory>(), GetService<InternalCommandMapper>());
+        AssertQueuedCommand.QueuedCommand<SendCustomerMasterDataToGridOperator>(GetService<IDatabaseConnectionFactory>(), GetService<InternalCommandMapper>());
     }
 
     private async Task GivenTheGracePeriodHasExpired()
