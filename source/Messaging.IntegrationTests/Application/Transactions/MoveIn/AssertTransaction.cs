@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Data;
+using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Domain.Transactions.MoveIn;
@@ -41,15 +43,17 @@ public class AssertTransaction
         _serializer = serializer;
     }
 
-    public static AssertTransaction Transaction(string transactionId, IEdiDatabaseConnection connection)
+    public static async Task<AssertTransaction> TransactionAsync(string transactionId, IEdiDatabaseConnection ediConnection)
     {
-        if (connection == null) throw new ArgumentNullException(nameof(connection));
+        if (ediConnection == null) throw new ArgumentNullException(nameof(ediConnection));
+        using var connection = await ediConnection.GetConnectionAndOpenAsync().ConfigureAwait(false);
         return new AssertTransaction(GetTransaction(transactionId, connection));
     }
 
-    public static AssertTransaction Transaction(string transactionId, IEdiDatabaseConnection connection, ISerializer serializer)
+    public static async Task<AssertTransaction> TransactionAsync(string transactionId, IEdiDatabaseConnection ediConnection, ISerializer serializer)
     {
-        if (connection == null) throw new ArgumentNullException(nameof(connection));
+        if (ediConnection == null) throw new ArgumentNullException(nameof(ediConnection));
+        using var connection = await ediConnection.GetConnectionAndOpenAsync().ConfigureAwait(false);
         return new AssertTransaction(GetTransaction(transactionId, connection), serializer);
     }
 
@@ -132,9 +136,9 @@ public class AssertTransaction
         return this;
     }
 
-    private static dynamic? GetTransaction(string transactionId, IEdiDatabaseConnection connection)
+    private static dynamic? GetTransaction(string transactionId, IDbConnection connection)
     {
-        return connection.GetConnectionAndOpen().QuerySingle(
+        return connection.QuerySingle(
             $"SELECT * FROM b2b.MoveInTransactions WHERE TransactionId = @TransactionId",
             new
             {

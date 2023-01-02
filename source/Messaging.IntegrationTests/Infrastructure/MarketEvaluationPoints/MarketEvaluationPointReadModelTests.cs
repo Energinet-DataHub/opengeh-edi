@@ -67,10 +67,11 @@ public class MarketEvaluationPointReadModelTests : TestBase
         Assert.Equal(SampleData.EnergySupplierNumber, sut?.EnergySupplierNumber);
     }
 
-    private Task<dynamic?> GetStoredMarketEvaluationPointModelAsync()
+    private async Task<dynamic?> GetStoredMarketEvaluationPointModelAsync()
     {
-        return GetService<IEdiDatabaseConnection>()
-            .GetConnectionAndOpen()
+        var connectionFactory = GetService<IEdiDatabaseConnection>();
+        using var connection = await connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        return await connection
             .QuerySingleOrDefaultAsync(
                 "SELECT * FROM b2b.MarketEvaluationPoints WHERE Id = @Id AND MarketEvaluationPointNumber = @MarketEvaluationPointNumber",
                 new

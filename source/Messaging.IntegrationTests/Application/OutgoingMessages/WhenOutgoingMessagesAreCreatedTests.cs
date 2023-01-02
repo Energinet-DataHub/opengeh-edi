@@ -35,9 +35,10 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase
     {
         await GivenRequestHasBeenAccepted().ConfigureAwait(false);
 
+        using var connection = await GetService<IEdiDatabaseConnection>().GetConnectionAndOpenAsync().ConfigureAwait(false);
         var sql = $"SELECT * FROM [B2B].[EnqueuedMessages]";
-        var result = await GetService<IEdiDatabaseConnection>()
-            .GetConnectionAndOpen()
+        var result = await
+            connection
             .QuerySingleOrDefaultAsync(sql)
             .ConfigureAwait(false);
 

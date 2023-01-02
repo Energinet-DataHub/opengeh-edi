@@ -79,7 +79,7 @@ public class SendCustomerMasterDataToGridOperatorTests
     {
         await InvokeCommandAsync(new SendCustomerMasterDataToGridOperator(SampleData.TransactionId)).ConfigureAwait(false);
 
-        var assertMessage = AssertOutgoingMessage();
+        var assertMessage = await AssertOutgoingMessageAsync().ConfigureAwait(false);
         assertMessage.HasReceiverId(SampleData.NumberOfGridOperatorForMeteringPoint);
         assertMessage.HasReceiverRole(MarketRole.GridOperator.ToString());
         assertMessage.HasSenderId(DataHubDetails.IdentificationNumber.Value);
@@ -102,18 +102,18 @@ public class SendCustomerMasterDataToGridOperatorTests
             .HasMarketEvaluationPointValue($"{nameof(MarketEvaluationPoint.UsagePointLocation)}[0].Type", "D01")
             .HasMarketEvaluationPointValue($"{nameof(MarketEvaluationPoint.UsagePointLocation)}[1].Type", "D04")
             .NotEmpty(nameof(MarketActivityRecord.Id));
-        AssertTransaction.Transaction(SampleData.TransactionId, GetService<IEdiDatabaseConnection>())
-            .HasCustomerMasterDataSentToGridOperatorState(MoveInTransaction.MasterDataState.Sent);
+        var transaction = await AssertTransaction.TransactionAsync(SampleData.TransactionId, GetService<IEdiDatabaseConnection>()).ConfigureAwait(false);
+        transaction.HasCustomerMasterDataSentToGridOperatorState(MoveInTransaction.MasterDataState.Sent);
     }
 
-    private AssertOutgoingMessage AssertOutgoingMessage()
+    private async Task<AssertOutgoingMessage> AssertOutgoingMessageAsync()
     {
-        var assertMessage = Assertions.AssertOutgoingMessage.OutgoingMessage(
+        var assertMessage = await Assertions.AssertOutgoingMessage.OutgoingMessageAsync(
             SampleData.TransactionId,
             MessageType.CharacteristicsOfACustomerAtAnAP.Name,
             ProcessType.MoveIn.Code,
             MarketRole.GridOperator,
-            GetService<IEdiDatabaseConnection>());
+            GetService<IEdiDatabaseConnection>()).ConfigureAwait(false);
         return assertMessage;
     }
 }

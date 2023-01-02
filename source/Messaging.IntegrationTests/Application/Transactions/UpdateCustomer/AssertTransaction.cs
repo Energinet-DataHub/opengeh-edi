@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Data;
+using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Xunit;
@@ -29,15 +31,16 @@ public class AssertTransaction
         _transaction = transaction;
     }
 
-    public static AssertTransaction Transaction(string transactionId, IEdiDatabaseConnection connection)
+    public static async Task<AssertTransaction> TransactionAsync(string transactionId, IEdiDatabaseConnection ediConnection)
     {
-        if (connection == null) throw new ArgumentNullException(nameof(connection));
+        if (ediConnection == null) throw new ArgumentNullException(nameof(ediConnection));
+        using var connection = await ediConnection.GetConnectionAndOpenAsync().ConfigureAwait(false);
         return new AssertTransaction(GetTransaction(transactionId, connection));
     }
 
-    private static dynamic? GetTransaction(string transactionId, IEdiDatabaseConnection connection)
+    private static dynamic? GetTransaction(string transactionId, IDbConnection connection)
     {
-        return connection.GetConnectionAndOpen().QuerySingle(
+        return connection.QuerySingle(
             $"SELECT * FROM b2b.UpdateCustomerMasterDataTransactions WHERE TransactionId = @TransactionId",
             new
             {
