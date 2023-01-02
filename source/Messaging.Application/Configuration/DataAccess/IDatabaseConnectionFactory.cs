@@ -35,12 +35,5 @@ namespace Messaging.Application.Configuration.DataAccess
         /// <remarks>Returned connection must be disposed</remarks>
         /// <returns><see cref="IDbConnection"/></returns>
         ValueTask<IDbConnection> GetConnectionAndOpenAsync();
-
-        /// <summary>
-        /// Create a connection
-        /// </summary>
-        /// <remarks>Returned connection must be disposed</remarks>
-        /// <returns><see cref="IDbConnection"/></returns>
-        IDbConnection GetConnection();
     }
 }

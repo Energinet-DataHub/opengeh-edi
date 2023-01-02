@@ -44,8 +44,5 @@ namespace Messaging.Infrastructure.Configuration.DataAccess
 
             return connection;
         }
-
-        public IDbConnection GetConnection()
-            => new SqlConnection(_connectionString);
     }
 }
