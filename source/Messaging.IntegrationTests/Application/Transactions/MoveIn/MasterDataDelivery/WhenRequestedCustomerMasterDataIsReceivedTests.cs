@@ -70,7 +70,7 @@ public class WhenRequestedCustomerMasterDataIsReceivedTests
         var command = CreateCommand();
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
-        var assertTransaction = await AssertTransaction.TransactionAsync(SampleData.TransactionId, GetService<IEdiDatabaseConnection>(), GetService<ISerializer>()).ConfigureAwait(false);
+        var assertTransaction = await AssertTransaction.TransactionAsync(SampleData.TransactionId, GetService<IDatabaseConnectionFactory>(), GetService<ISerializer>()).ConfigureAwait(false);
         assertTransaction.HasCustomerMasterData(ParseFrom(command.Data));
     }
 
@@ -141,7 +141,7 @@ public class WhenRequestedCustomerMasterDataIsReceivedTests
             SampleData.TransactionId,
             MessageType.CharacteristicsOfACustomerAtAnAP.Name,
             ProcessType.MoveIn.Code,
-            GetService<IEdiDatabaseConnection>()).ConfigureAwait(false);
+            GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
         return assertMessage;
     }
 }

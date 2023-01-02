@@ -64,7 +64,7 @@ public class ValidationErrorTranslatorTests : TestBase
 
     private async Task RegisterTranslation(string errorCode, string code, string text)
     {
-        var connectionFactory = GetService<IEdiDatabaseConnection>();
+        var connectionFactory = GetService<IDatabaseConnectionFactory>();
         using var connection = await connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         const string insertStatement = $"INSERT INTO [b2b].[ReasonTranslations] (Id, ErrorCode, Code, Text, LanguageCode) " +
                                        $"VALUES (@Id, @ErrorCode, @Code, @Text, 'dk');";

@@ -42,7 +42,7 @@ public class SendAggregatedTimeSeriesTests : TestBase
     {
         await InvokeCommandAsync(CreateRequest()).ConfigureAwait(false);
 
-        using var connection = await GetService<IEdiDatabaseConnection>().GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
         var exists = await connection
             .ExecuteScalarAsync<bool>("SELECT COUNT(*) FROM b2b.AggregatedTimeSeriesTransactions");
         Assert.True(exists);
@@ -59,7 +59,7 @@ public class SendAggregatedTimeSeriesTests : TestBase
             MessageType.NotifyAggregatedMeasureData.Name,
             ProcessType.BalanceFixing.Code,
             MarketRole.GridOperator,
-            GetService<IEdiDatabaseConnection>()).ConfigureAwait(false);
+            GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
         message.HasReceiverId(SampleData.GridOperatorNumber)
             .HasReceiverRole(MarketRole.GridOperator.Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
@@ -101,7 +101,7 @@ public class SendAggregatedTimeSeriesTests : TestBase
 
     private async Task<Guid> GetTransactionIdAsync()
     {
-        using var connection = await GetService<IEdiDatabaseConnection>().GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
         return await connection
             .QueryFirstAsync<Guid>("SELECT TOP(1) Id FROM b2b.AggregatedTimeSeriesTransactions").ConfigureAwait(false);
     }

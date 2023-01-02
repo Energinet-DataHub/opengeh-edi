@@ -25,11 +25,11 @@ namespace Messaging.Infrastructure.OutgoingMessages.Common.Reasons;
 
 internal class ValidationErrorTranslator : IValidationErrorTranslator
 {
-    private readonly IEdiDatabaseConnection _connection;
+    private readonly IDatabaseConnectionFactory _connectionFactory;
 
-    public ValidationErrorTranslator(IEdiDatabaseConnection connection)
+    public ValidationErrorTranslator(IDatabaseConnectionFactory connectionFactory)
     {
-        _connection = connection;
+        _connectionFactory = connectionFactory;
     }
 
     public async Task<ReadOnlyCollection<Reason>> TranslateAsync(IEnumerable<string> validationErrors)
@@ -53,7 +53,7 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
     {
         const string sql = "SELECT [Text], [Code], [ErrorCode] FROM [b2b].[ReasonTranslations] WHERE ErrorCode IN @ErrorCodes AND LanguageCode = 'dk'";
 
-        using var connection = await _connection.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         var result = await connection
             .QueryAsync<ReasonTranslation>(sql, new { ErrorCodes = errorCodes })
             .ConfigureAwait(false);

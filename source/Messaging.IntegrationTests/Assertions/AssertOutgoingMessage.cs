@@ -33,10 +33,10 @@ namespace Messaging.IntegrationTests.Assertions
             _message = message;
         }
 
-        public static async Task<AssertOutgoingMessage> OutgoingMessageAsync(string transactionId, string messageType, string processType, IEdiDatabaseConnection connectionFactory)
+        public static async Task<AssertOutgoingMessage> OutgoingMessageAsync(string transactionId, string messageType, string processType, IDatabaseConnectionFactory connectionFactoryFactory)
         {
-            if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
-            using var connection = await connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+            if (connectionFactoryFactory == null) throw new ArgumentNullException(nameof(connectionFactoryFactory));
+            using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
             var message = connection.QuerySingle(
                 $"SELECT m.Id, m.RecordId, m.MessageType, m.ReceiverId, m.TransactionId, m.ProcessType," +
                 $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MessageRecord " +
@@ -47,11 +47,11 @@ namespace Messaging.IntegrationTests.Assertions
             return new AssertOutgoingMessage(message);
         }
 
-        public static async Task<AssertOutgoingMessage> OutgoingMessageAsync(string transactionId, string messageType, string processType, MarketRole receiverRole, IEdiDatabaseConnection connectionFactory)
+        public static async Task<AssertOutgoingMessage> OutgoingMessageAsync(string transactionId, string messageType, string processType, MarketRole receiverRole, IDatabaseConnectionFactory connectionFactoryFactory)
         {
-            if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
+            if (connectionFactoryFactory == null) throw new ArgumentNullException(nameof(connectionFactoryFactory));
             ArgumentNullException.ThrowIfNull(receiverRole);
-            using var connection = await connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+            using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
             var message = connection.QuerySingle(
                 $"SELECT m.Id, m.RecordId, m.MessageType, m.ReceiverId, m.TransactionId, m.ProcessType," +
                 $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MessageRecord " +
@@ -62,11 +62,11 @@ namespace Messaging.IntegrationTests.Assertions
             return new AssertOutgoingMessage(message);
         }
 
-        public static AssertOutgoingMessage OutgoingMessage(string messageType, string processType, MarketRole receiverRole, IEdiDatabaseConnection connectionFactory)
+        public static AssertOutgoingMessage OutgoingMessage(string messageType, string processType, MarketRole receiverRole, IDatabaseConnectionFactory connectionFactoryFactory)
         {
-            if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
+            if (connectionFactoryFactory == null) throw new ArgumentNullException(nameof(connectionFactoryFactory));
             ArgumentNullException.ThrowIfNull(receiverRole);
-            var message = connectionFactory.GetConnectionAndOpen().QuerySingle(
+            var message = connectionFactoryFactory.GetConnectionAndOpen().QuerySingle(
                 $"SELECT m.Id, m.RecordId, m.MessageType, m.ReceiverId, m.TransactionId, m.ProcessType," +
                 $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MessageRecord " +
                 $" FROM [b2b].[OutgoingMessages] m" +

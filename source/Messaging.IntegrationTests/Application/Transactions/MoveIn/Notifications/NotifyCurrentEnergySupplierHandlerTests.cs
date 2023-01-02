@@ -93,12 +93,12 @@ public class NotifyCurrentEnergySupplierHandlerTests
 
     private async Task<AssertOutgoingMessage> AssertMessageAsync(MessageType messageType, string processType)
     {
-        return await AssertOutgoingMessage.OutgoingMessageAsync(SampleData.TransactionId, messageType.Name, processType, GetService<IEdiDatabaseConnection>()).ConfigureAwait(false);
+        return await AssertOutgoingMessage.OutgoingMessageAsync(SampleData.TransactionId, messageType.Name, processType, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
     }
 
     private async Task<AssertTransaction> AssertTransactionAsync()
     {
         return await MoveIn.AssertTransaction
-            .TransactionAsync(SampleData.TransactionId, GetService<IEdiDatabaseConnection>()).ConfigureAwait(false);
+            .TransactionAsync(SampleData.TransactionId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
     }
 }

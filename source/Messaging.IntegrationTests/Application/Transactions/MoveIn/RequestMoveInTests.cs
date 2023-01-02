@@ -59,7 +59,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
 
-            var assertTransaction = await AssertTransaction.TransactionAsync(SampleData.TransactionId, GetService<IEdiDatabaseConnection>()).ConfigureAwait(false);
+            var assertTransaction = await AssertTransaction.TransactionAsync(SampleData.TransactionId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
             assertTransaction.HasState(MoveInTransaction.State.Started)
                 .HasStartedByMessageId(incomingMessage.Message.MessageId)
                 .HasNewEnergySupplierId(incomingMessage.Message.SenderId)
@@ -225,7 +225,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         private AssertQueuedCommand AssertCommand<TCommand>()
         {
             return AssertQueuedCommand.QueuedCommand<TCommand>(
-                GetService<IEdiDatabaseConnection>(),
+                GetService<IDatabaseConnectionFactory>(),
                 GetService<InternalCommandMapper>());
         }
     }

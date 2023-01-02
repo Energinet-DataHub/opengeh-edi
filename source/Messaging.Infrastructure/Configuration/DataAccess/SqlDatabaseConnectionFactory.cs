@@ -20,11 +20,11 @@ using Microsoft.Data.SqlClient;
 
 namespace Messaging.Infrastructure.Configuration.DataAccess
 {
-    public class SqlEdiDatabaseConnection : IEdiDatabaseConnection
+    public class SqlDatabaseConnectionFactory : IDatabaseConnectionFactory
     {
         private readonly string _connectionString;
 
-        public SqlEdiDatabaseConnection(string connectionString)
+        public SqlDatabaseConnectionFactory(string connectionString)
         {
             _connectionString = connectionString;
         }

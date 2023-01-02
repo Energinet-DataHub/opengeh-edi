@@ -102,7 +102,7 @@ public class SendCustomerMasterDataToGridOperatorTests
             .HasMarketEvaluationPointValue($"{nameof(MarketEvaluationPoint.UsagePointLocation)}[0].Type", "D01")
             .HasMarketEvaluationPointValue($"{nameof(MarketEvaluationPoint.UsagePointLocation)}[1].Type", "D04")
             .NotEmpty(nameof(MarketActivityRecord.Id));
-        var transaction = await AssertTransaction.TransactionAsync(SampleData.TransactionId, GetService<IEdiDatabaseConnection>()).ConfigureAwait(false);
+        var transaction = await AssertTransaction.TransactionAsync(SampleData.TransactionId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
         transaction.HasCustomerMasterDataSentToGridOperatorState(MoveInTransaction.MasterDataState.Sent);
     }
 
@@ -113,7 +113,7 @@ public class SendCustomerMasterDataToGridOperatorTests
             MessageType.CharacteristicsOfACustomerAtAnAP.Name,
             ProcessType.MoveIn.Code,
             MarketRole.GridOperator,
-            GetService<IEdiDatabaseConnection>()).ConfigureAwait(false);
+            GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
         return assertMessage;
     }
 }

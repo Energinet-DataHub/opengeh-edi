@@ -20,7 +20,7 @@ namespace Messaging.Application.Configuration.DataAccess
     /// <summary>
     /// Factory for creating database connections
     /// </summary>
-    public interface IEdiDatabaseConnection
+    public interface IDatabaseConnectionFactory
     {
         /// <summary>
         /// Creates and open a connection

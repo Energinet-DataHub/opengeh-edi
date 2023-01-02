@@ -31,10 +31,10 @@ public class AssertTransaction
         _transaction = transaction;
     }
 
-    public static async Task<AssertTransaction> TransactionAsync(string transactionId, IEdiDatabaseConnection ediConnection)
+    public static async Task<AssertTransaction> TransactionAsync(string transactionId, IDatabaseConnectionFactory connectionFactory)
     {
-        if (ediConnection == null) throw new ArgumentNullException(nameof(ediConnection));
-        using var connection = await ediConnection.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
+        using var connection = await connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         return new AssertTransaction(GetTransaction(transactionId, connection));
     }
 

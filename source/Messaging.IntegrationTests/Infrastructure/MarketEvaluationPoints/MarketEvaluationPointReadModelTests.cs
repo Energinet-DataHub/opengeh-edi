@@ -69,7 +69,7 @@ public class MarketEvaluationPointReadModelTests : TestBase
 
     private async Task<dynamic?> GetStoredMarketEvaluationPointModelAsync()
     {
-        var connectionFactory = GetService<IEdiDatabaseConnection>();
+        var connectionFactory = GetService<IDatabaseConnectionFactory>();
         using var connection = await connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         return await connection
             .QuerySingleOrDefaultAsync(

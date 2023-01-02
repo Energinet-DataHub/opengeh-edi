@@ -28,12 +28,12 @@ namespace Messaging.Infrastructure.OutgoingMessages.Peek;
 
 public class EnqueuedMessages : IEnqueuedMessages
 {
-    private readonly IEdiDatabaseConnection _connection;
+    private readonly IDatabaseConnectionFactory _connectionFactory;
     private readonly IBundleConfiguration _bundleConfiguration;
 
-    public EnqueuedMessages(IEdiDatabaseConnection connection, IBundleConfiguration bundleConfiguration)
+    public EnqueuedMessages(IDatabaseConnectionFactory connectionFactory, IBundleConfiguration bundleConfiguration)
     {
-        _connection = connection;
+        _connectionFactory = connectionFactory;
         _bundleConfiguration = bundleConfiguration;
     }
 
@@ -42,7 +42,7 @@ public class EnqueuedMessages : IEnqueuedMessages
         ArgumentNullException.ThrowIfNull(messageCategory);
         ArgumentNullException.ThrowIfNull(actorNumber);
 
-        using var connection = await _connection.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         var oldestMessage = await FindOldestMessageAsync(actorNumber, messageCategory, connection).ConfigureAwait(false);
 
         if (oldestMessage is null)
@@ -76,7 +76,7 @@ public class EnqueuedMessages : IEnqueuedMessages
     public async Task<int> GetAvailableMessageCountAsync(ActorNumber actorNumber)
     {
         ArgumentNullException.ThrowIfNull(actorNumber);
-        using var connection = await _connection.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         return await connection.QuerySingleAsync<int>(
             @"SELECT count(*) from [b2b].[EnqueuedMessages] WHERE ReceiverId = @ActorNumber",
             new

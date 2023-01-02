@@ -23,16 +23,16 @@ namespace Messaging.Infrastructure.Actors;
 
 public class ActorLookup : IActorLookup
 {
-    private readonly IEdiDatabaseConnection _ediDatabaseConnection;
+    private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
 
-    public ActorLookup(IEdiDatabaseConnection ediDatabaseConnection)
+    public ActorLookup(IDatabaseConnectionFactory databaseConnectionFactory)
     {
-        _ediDatabaseConnection = ediDatabaseConnection;
+        _databaseConnectionFactory = databaseConnectionFactory;
     }
 
     public async Task<Guid> GetIdByActorNumberAsync(string actorNumber)
     {
-        using var connection = await _ediDatabaseConnection.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         return await connection
             .ExecuteScalarAsync<Guid>(
                 "SELECT Id FROM [b2b].[Actor] WHERE IdentificationNumber = @Number",
@@ -41,7 +41,7 @@ public class ActorLookup : IActorLookup
 
     public async Task<string> GetActorNumberByIdAsync(Guid actorId)
     {
-        using var connection = await _ediDatabaseConnection.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         return await connection
             .ExecuteScalarAsync<string>(
                 "SELECT IdentificationNumber FROM [b2b].[Actor] WHERE Id = @ActorId",
@@ -50,7 +50,7 @@ public class ActorLookup : IActorLookup
 
     public async Task<ActorNumber?> GetActorNumberByB2CIdAsync(Guid actorId)
     {
-        using var connection = await _ediDatabaseConnection.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         var actorNumber = await connection
             .ExecuteScalarAsync<string>(
                 "SELECT IdentificationNumber AS Identifier FROM [b2b].[Actor] WHERE B2CId=@ActorId",

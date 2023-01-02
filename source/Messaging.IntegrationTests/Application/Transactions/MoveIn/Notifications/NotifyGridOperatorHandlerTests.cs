@@ -69,13 +69,13 @@ public class NotifyGridOperatorHandlerTests
         var command = new NotifyGridOperator(SampleData.TransactionId);
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
-        var transaction = await AssertTransaction.TransactionAsync(SampleData.TransactionId, GetService<IEdiDatabaseConnection>()).ConfigureAwait(false);
+        var transaction = await AssertTransaction.TransactionAsync(SampleData.TransactionId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
         transaction.HasGridOperatorNotificationState(MoveInTransaction.NotificationState.WasNotified);
         var outgoingMessageTransaction = await AssertOutgoingMessage.OutgoingMessageAsync(
             SampleData.TransactionId,
             MessageType.GenericNotification.Name,
             ProcessType.MoveIn.Code,
-            GetService<IEdiDatabaseConnection>()).ConfigureAwait(false);
+            GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
         outgoingMessageTransaction.HasSenderId(DataHubDetails.IdentificationNumber.Value)
             .HasSenderRole(MarketRole.MeteringPointAdministrator.ToString())
             .HasReceiverRole(MarketRole.GridOperator.ToString())

@@ -52,7 +52,7 @@ public class WhenADequeueIsRequestedTests : TestBase
 
         var dequeueResult = await InvokeCommandAsync(new DequeueRequest(peekResult.MessageId.GetValueOrDefault())).ConfigureAwait(false);
 
-        using var connection = await GetService<IEdiDatabaseConnection>().GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
         var found = await connection
             .QuerySingleOrDefaultAsync("SELECT * FROM [B2B].BundleStore")
             .ConfigureAwait(false);

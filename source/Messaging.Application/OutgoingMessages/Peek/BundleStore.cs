@@ -29,18 +29,18 @@ namespace Messaging.Application.OutgoingMessages.Peek;
 
 public class BundleStore
 {
-    private readonly IEdiDatabaseConnection _connection;
+    private readonly IDatabaseConnectionFactory _connectionFactory;
 
-    public BundleStore(IEdiDatabaseConnection connection)
+    public BundleStore(IDatabaseConnectionFactory connectionFactory)
     {
-        _connection = connection;
+        _connectionFactory = connectionFactory;
     }
 
     public async Task<Stream?> GetBundleOfAsync(
         BundleId bundleId)
     {
         ArgumentNullException.ThrowIfNull(bundleId);
-        using var connection = await _connection.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
 
         using var command = CreateCommand(
             $"SELECT Bundle FROM b2b.BundleStore WHERE ActorNumber = @ActorNumber AND MessageCategory = @MessageCategory",
@@ -70,7 +70,7 @@ public class BundleStore
         ArgumentNullException.ThrowIfNull(bundleId);
         ArgumentNullException.ThrowIfNull(document);
 
-        using var connection = await _connection.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         using var command = CreateCommand(
             @$"UPDATE [B2B].[BundleStore]
                      SET Bundle = @Bundle, MessageId = @MessageId, MessageIdsIncluded = @MessageIdsIncluded
@@ -100,7 +100,7 @@ public class BundleStore
     {
         ArgumentNullException.ThrowIfNull(bundleId);
 
-        using var connection = await _connection.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         var result = await connection.ExecuteAsync(
                 $"IF NOT EXISTS (SELECT * FROM b2b.BundleStore WHERE ActorNumber = @ActorNumber AND MessageCategory = @MessageCategory)" +
                 $"INSERT INTO b2b.BundleStore(ActorNUmber, MessageCategory) VALUES(@ActorNumber, @MessageCategory)",
@@ -117,7 +117,7 @@ public class BundleStore
     public async Task UnregisterBundleAsync(BundleId bundleId)
     {
         ArgumentNullException.ThrowIfNull(bundleId);
-        using var connection = await _connection.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         await connection
             .ExecuteAsync(
                 $"DELETE FROM b2b.BundleStore WHERE ActorNumber = @ActorNumber AND MessageCategory = @MessageCategory",
@@ -130,7 +130,7 @@ public class BundleStore
 
     public async Task<DequeueResult> DequeueAsync(Guid messageId)
     {
-        using var connection = await _connection.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         var bundleStoreQuery = await connection.QuerySingleOrDefaultAsync(
             $"SELECT * FROM [B2B].[BundleStore] WHERE MessageId = @MessageId",
             new
@@ -166,7 +166,7 @@ public class BundleStore
         ArgumentNullException.ThrowIfNull(bundleId);
         const string sqlquery = @"SELECT MessageId FROM [b2b].[BundleStore] WHERE ActorNumber = @ActorNumber AND MessageCategory = @MessageCategory";
 
-        using var connection = await _connection.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         var messageId = await connection.QueryFirstOrDefaultAsync<Guid?>(sqlquery, new { ActorNumber = bundleId.ReceiverNumber.Value, MessageCategory = bundleId.MessageCategory.Name }).ConfigureAwait(false);
         return messageId;
     }
