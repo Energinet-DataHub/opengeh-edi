@@ -21,13 +21,13 @@ using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages.Dequeue;
+using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.OutgoingMessages.Peek;
 using Microsoft.Data.SqlClient;
 
-namespace Messaging.Application.OutgoingMessages.Peek;
+namespace Messaging.Infrastructure.OutgoingMessages.Peek;
 
-public class BundleStore
+public class BundleStore : IBundleStore
 {
     private readonly IDatabaseConnectionFactory _connectionFactory;
 

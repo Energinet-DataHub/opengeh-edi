@@ -23,9 +23,9 @@ namespace Messaging.Application.OutgoingMessages.Dequeue;
 
 public class DequeueRequestHandler : IRequestHandler<DequeueRequest, DequeueResult>
 {
-    private readonly BundleStore _bundleStore;
+    private readonly IBundleStore _bundleStore;
 
-    public DequeueRequestHandler(BundleStore bundleStore)
+    public DequeueRequestHandler(IBundleStore bundleStore)
     {
         _bundleStore = bundleStore;
     }
