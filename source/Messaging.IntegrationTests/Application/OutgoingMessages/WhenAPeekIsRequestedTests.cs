@@ -22,6 +22,7 @@ using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.Peek;
 using Messaging.Infrastructure.OutgoingMessages;
+using Messaging.Infrastructure.OutgoingMessages.Peek;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Factories;
@@ -141,7 +142,7 @@ public class WhenAPeekIsRequestedTests : TestBase
 
     private async Task SimulateThatBundlingIsAlreadyInProgress()
     {
-        await GetService<BundleStore>()
+        await GetService<IBundleStore>()
             .TryRegisterBundleAsync(
                 BundleId.Create(
                     MessageCategory.MasterData,
