@@ -151,6 +151,7 @@ DELETE FROM [b2b].[BundleStore] WHERE MessageId = @messageId;
         try
         {
             result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+            await transaction.CommitAsync().ConfigureAwait(false);
         }
         catch (DbException)
         {
