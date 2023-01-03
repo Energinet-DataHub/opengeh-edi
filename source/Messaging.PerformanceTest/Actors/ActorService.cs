@@ -20,7 +20,7 @@ namespace Messaging.PerformanceTest.Actors;
 
 public class ActorService : IActorService
 {
-    private const int NumberOfActors = 20;
+    private const int NumberOfActors = 100;
     private readonly object _actorNumberLock = new();
     private ConcurrentDictionary<string, bool> _actorNumberDictionary;
 

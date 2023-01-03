@@ -123,3 +123,16 @@ AwaitingChargeDetailsDispatch
 IntegrationEvents
 integrationevents
 prerelease
+Api
+Azurite
+Powershell
+ps
+setupazure
+yourUserName
+yyy
+zzz
+ExecutionPolicy
+powershell
+exe
+PowerShell
+
