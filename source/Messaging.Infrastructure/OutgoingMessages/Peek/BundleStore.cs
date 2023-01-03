@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -145,7 +146,18 @@ DELETE FROM [b2b].[BundleStore] WHERE MessageId = @messageId;
         command.Transaction = transaction;
         command.CommandText = deleteStmt;
         command.Parameters.Add(new SqlParameter("messageId", SqlDbType.UniqueIdentifier) { Value = messageId });
-        var result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+        int result;
+
+        try
+        {
+            result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+        }
+        catch (DbException)
+        {
+            // Add exception logging
+            await transaction.RollbackAsync().ConfigureAwait(false);
+            throw; // re-throw exception
+        }
 
         return result > 0 ? new DequeueResult(true) : new DequeueResult(false);
     }
