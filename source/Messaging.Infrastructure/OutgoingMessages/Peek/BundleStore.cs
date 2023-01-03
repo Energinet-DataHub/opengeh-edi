@@ -130,32 +130,21 @@ public class BundleStore : IBundleStore
 
     public async Task<DequeueResult> DequeueAsync(Guid messageId)
     {
-        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
-        var bundleStoreQuery = await connection.QuerySingleOrDefaultAsync(
-            $"SELECT * FROM [B2B].[BundleStore] WHERE MessageId = @MessageId",
-            new
-        {
-            MessageId = messageId,
-        }).ConfigureAwait(false);
-        if (bundleStoreQuery is null)
-            return new DequeueResult(false);
-        string messageIdIncluded = bundleStoreQuery.MessageIdsIncluded;
-        var statementBuilder = new StringBuilder();
-        foreach (var id in messageIdIncluded.Split(","))
-        {
-            var deleteMessageRowSql = $"DELETE FROM [B2B].EnqueuedMessages WHERE Id = '{id}';";
-            statementBuilder.AppendLine(deleteMessageRowSql);
-        }
+        const string deleteStmt = @"
+DELETE E FROM [b2b].[EnqueuedMessages] E JOIN
+(SELECT MessageId, EnqueuedMessageId = value FROM [b2b].[BundleStore]
+CROSS APPLY STRING_SPLIT(MessageIdsIncluded, ',') WHERE MessageId = @messageId) AS P
+ON E.Id = P.EnqueuedMessageId;
 
-        const string deleteBundleStoreRowSql = $"DELETE FROM [B2B].[BundleStore] WHERE MessageId = @MessageId";
-        statementBuilder.AppendLine(deleteBundleStoreRowSql);
-        using var command = CreateCommand(
-            statementBuilder.ToString(),
-            new List<KeyValuePair<string, object>>()
-            {
-                new("@MessageId", messageId.ToString()),
-            },
-            connection);
+DELETE FROM [b2b].[BundleStore] WHERE MessageId = @messageId;
+";
+
+        using var connection = (SqlConnection)await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var transaction = connection.BeginTransaction();
+        using var command = connection.CreateCommand();
+        command.Transaction = transaction;
+        command.CommandText = deleteStmt;
+        command.Parameters.Add(new SqlParameter("messageId", SqlDbType.UniqueIdentifier) { Value = messageId });
         var result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
 
         return result > 0 ? new DequeueResult(true) : new DequeueResult(false);
