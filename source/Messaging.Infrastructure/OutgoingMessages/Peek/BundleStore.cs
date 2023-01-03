@@ -132,7 +132,7 @@ public class BundleStore : IBundleStore
     {
         const string deleteStmt = @"
 DELETE E FROM [b2b].[EnqueuedMessages] E JOIN
-(SELECT MessageId, EnqueuedMessageId = value FROM [b2b].[BundleStore]
+(SELECT EnqueuedMessageId = value FROM [b2b].[BundleStore]
 CROSS APPLY STRING_SPLIT(MessageIdsIncluded, ',') WHERE MessageId = @messageId) AS P
 ON E.Id = P.EnqueuedMessageId;
 
