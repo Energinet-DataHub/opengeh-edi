@@ -36,7 +36,7 @@ public class BundleStore : IBundleStore
         _connectionFactory = connectionFactory;
     }
 
-    public async Task<bool> SetBundleForAsync(
+    public async Task<bool> TryRegisterAsync(
         BundleId bundleId,
         Stream document,
         Guid messageId,
