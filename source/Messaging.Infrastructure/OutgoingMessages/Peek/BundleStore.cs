@@ -37,31 +37,6 @@ public class BundleStore : IBundleStore
         _connectionFactory = connectionFactory;
     }
 
-    public async Task<Stream?> GetBundleOfAsync(
-        BundleId bundleId)
-    {
-        ArgumentNullException.ThrowIfNull(bundleId);
-        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
-
-        using var command = CreateCommand(
-            $"SELECT Bundle FROM b2b.BundleStore WHERE ActorNumber = @ActorNumber AND MessageCategory = @MessageCategory",
-            new List<KeyValuePair<string, object>>
-        {
-            new("@ActorNumber", bundleId.ReceiverNumber.Value),
-            new("@MessageCategory", bundleId.MessageCategory.Name),
-        },
-            connection);
-
-        using (var reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
-        {
-            await reader.ReadAsync().ConfigureAwait(false);
-            if (await HasBundleRegisteredAsync(reader).ConfigureAwait(false) == false)
-                return null;
-
-            return reader.GetStream(0);
-        }
-    }
-
     public async Task SetBundleForAsync(
         BundleId bundleId,
         Stream document,
