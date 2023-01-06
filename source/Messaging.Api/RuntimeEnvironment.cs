@@ -45,6 +45,9 @@ namespace Messaging.Api
         public string? INTEGRATION_EVENT_TOPIC_NAME =>
             GetEnvironmentVariable(nameof(INTEGRATION_EVENT_TOPIC_NAME));
 
+        public virtual string? PERFORMANCE_TEST_ENABLED =>
+            GetEnvironmentVariable(nameof(PERFORMANCE_TEST_ENABLED));
+
         public string? MARKET_PARTICIPANT_CHANGED_ACTOR_CREATED_SUBSCRIPTION_NAME =>
             GetEnvironmentVariable(nameof(MARKET_PARTICIPANT_CHANGED_ACTOR_CREATED_SUBSCRIPTION_NAME));
 
