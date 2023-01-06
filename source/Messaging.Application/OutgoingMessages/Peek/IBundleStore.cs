@@ -41,21 +41,6 @@ public interface IBundleStore
         IEnumerable<Guid> messageIdsIncluded);
 
     /// <summary>
-    /// Try to register bundle
-    /// </summary>
-    /// <param name="bundleId"></param>
-    /// <returns>boolean indicating success/failure</returns>
-    Task<bool> TryRegisterBundleAsync(
-        BundleId bundleId);
-
-    /// <summary>
-    /// Unregister bundle
-    /// </summary>
-    /// <param name="bundleId"></param>
-    /// <returns>void</returns>
-    Task UnregisterBundleAsync(BundleId bundleId);
-
-    /// <summary>
     /// Dequeue bundle
     /// </summary>
     /// <param name="messageId"></param>

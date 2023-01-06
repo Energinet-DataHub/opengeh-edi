@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
@@ -66,40 +65,6 @@ public class BundleStore : IBundleStore
         ResetBundleStream(document);
 
         return result == 1;
-        //if (result == 0) throw new BundleException($"Fail to store bundle on registration: {bundleId.MessageCategory.Name}, {bundleId.ReceiverNumber.Value}");
-    }
-
-    public async Task<bool> TryRegisterBundleAsync(
-        BundleId bundleId)
-    {
-        ArgumentNullException.ThrowIfNull(bundleId);
-
-        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
-        var result = await connection.ExecuteAsync(
-                $"IF NOT EXISTS (SELECT * FROM b2b.BundleStore WHERE ActorNumber = @ActorNumber AND MessageCategory = @MessageCategory)" +
-                $"INSERT INTO b2b.BundleStore(ActorNUmber, MessageCategory) VALUES(@ActorNumber, @MessageCategory)",
-                new
-                {
-                    @ActorNumber = bundleId.ReceiverNumber.Value,
-                    @MessageCategory = bundleId.MessageCategory.Name,
-                })
-            .ConfigureAwait(false);
-
-        return result == 1;
-    }
-
-    public async Task UnregisterBundleAsync(BundleId bundleId)
-    {
-        ArgumentNullException.ThrowIfNull(bundleId);
-        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
-        await connection
-            .ExecuteAsync(
-                $"DELETE FROM b2b.BundleStore WHERE ActorNumber = @ActorNumber AND MessageCategory = @MessageCategory",
-                new
-                {
-                    @ActorNumber = bundleId.ReceiverNumber.Value,
-                    @MessageCategory = bundleId.MessageCategory.Name,
-                }).ConfigureAwait(false);
     }
 
     public async Task<DequeueResult> DequeueAsync(Guid messageId)
