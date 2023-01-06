@@ -111,14 +111,6 @@ DELETE FROM [b2b].[BundleStore] WHERE MessageId = @messageId;
         return messageId;
     }
 
-    private static async Task<bool> HasBundleRegisteredAsync(SqlDataReader reader)
-    {
-        if (!reader.HasRows)
-            return false;
-
-        return !await reader.IsDBNullAsync(0).ConfigureAwait(false);
-    }
-
     private static void ResetBundleStream(Stream document)
     {
         document.Position = 0;
