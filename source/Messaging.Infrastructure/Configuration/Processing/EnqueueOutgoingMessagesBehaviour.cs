@@ -21,7 +21,6 @@ using Messaging.Application.Configuration.Commands.Commands;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.Peek;
 using Messaging.Infrastructure.Configuration.DataAccess;
-using Messaging.Infrastructure.Configuration.FeatureFlag;
 using Messaging.Infrastructure.OutgoingMessages;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,13 +31,11 @@ public class EnqueueOutgoingMessagesBehaviour<TRequest, TResponse> : IPipelineBe
 {
     private readonly B2BContext _b2BContext;
     private readonly OutgoingMessageEnqueuer _outgoingMessageEnqueuer;
-    private readonly IFeatureFlagProvider _featureFlagProvider;
 
-    public EnqueueOutgoingMessagesBehaviour(B2BContext b2BContext, OutgoingMessageEnqueuer outgoingMessageEnqueuer, IFeatureFlagProvider featureFlagProvider)
+    public EnqueueOutgoingMessagesBehaviour(B2BContext b2BContext, OutgoingMessageEnqueuer outgoingMessageEnqueuer)
     {
         _b2BContext = b2BContext;
         _outgoingMessageEnqueuer = outgoingMessageEnqueuer;
-        _featureFlagProvider = featureFlagProvider;
     }
 
     public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)

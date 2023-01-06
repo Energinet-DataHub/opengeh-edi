@@ -19,6 +19,7 @@ using Messaging.Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
 using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Domain.OutgoingMessages.GenericNotification;
+using Messaging.Domain.OutgoingMessages.Peek;
 using Messaging.Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Domain.Transactions.AggregatedTimeSeries;
@@ -60,6 +61,8 @@ namespace Messaging.Infrastructure.Configuration.DataAccess
 
         public DbSet<MarketEvaluationPoint> MarketEvaluationPoints { get; private set; }
 
+        public DbSet<EnqueuedMessage> EnqueuedMessages { get; private set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
@@ -68,6 +71,7 @@ namespace Messaging.Infrastructure.Configuration.DataAccess
             modelBuilder.ApplyConfiguration(new AggregatedTimeSeriesTransactionEntityConfiguration(_serializer));
             modelBuilder.ApplyConfiguration(new EntityConfiguration());
             modelBuilder.ApplyConfiguration(new OutgoingMessageEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new EnqueuedMessageEntityConfiguration());
             modelBuilder.ApplyConfiguration(new QueuedInternalCommandEntityConfiguration());
             modelBuilder.ApplyConfiguration(new MarketEvaluationPointEntityConfiguration());
 

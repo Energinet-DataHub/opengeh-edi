@@ -14,45 +14,25 @@
 
 using System;
 using System.Threading.Tasks;
-using Dapper;
-using Messaging.Application.Configuration.DataAccess;
 using Messaging.Domain.OutgoingMessages.Peek;
+using Messaging.Infrastructure.Configuration.DataAccess;
 
 namespace Messaging.Infrastructure.OutgoingMessages;
 
 public class OutgoingMessageEnqueuer
 {
-    private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly B2BContext _context;
 
-    public OutgoingMessageEnqueuer(IDatabaseConnectionFactory databaseConnectionFactory, IUnitOfWork unitOfWork)
+    public OutgoingMessageEnqueuer(B2BContext context)
     {
-        _databaseConnectionFactory = databaseConnectionFactory;
-        _unitOfWork = unitOfWork;
+        _context = context;
     }
 
-    public async Task EnqueueAsync(EnqueuedMessage message)
+    public Task EnqueueAsync(EnqueuedMessage message)
     {
-        if (message == null) throw new ArgumentNullException(nameof(message));
-
-        var sql = @$"INSERT INTO [B2B].[EnqueuedMessages] VALUES (@Id, @MessageType, @MessageCategory, @ReceiverId, @ReceiverRole, @SenderId, @SenderRole, @ProcessType, @MessageRecord)";
-
-        using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
-        await connection
-            .ExecuteAsync(
-                sql,
-                new
-                {
-                    Id = message.Id,
-                    MessageType = message.MessageType,
-                    MessageCategory = message.Category,
-                    ReceiverId = message.ReceiverId,
-                    ReceiverRole = message.ReceiverRole,
-                    SenderId = message.SenderId,
-                    SenderRole = message.SenderRole,
-                    ProcessType = message.ProcessType,
-                    MessageRecord = message.MessageRecord,
-                },
-                _unitOfWork.CurrentTransaction).ConfigureAwait(false);
+        ArgumentNullException.ThrowIfNull(message);
+        return _context.EnqueuedMessages
+            .AddAsync(message)
+            .AsTask();
     }
 }
