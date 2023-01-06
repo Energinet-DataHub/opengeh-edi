@@ -67,7 +67,6 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
         }
 
         if (!await _bundleStore.TryRegisterBundleAsync(bundleId).ConfigureAwait(false)) return new PeekResult(null);
-
         var messages = (await _enqueuedMessages.GetByAsync(request.ActorNumber, request.MessageCategory)
             .ConfigureAwait(false))
             .ToList();

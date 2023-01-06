@@ -33,7 +33,7 @@ public class MessageStorage : IMessageStorage
         _connectionFactory = connectionFactory;
     }
 
-    public async Task<Stream?> GetMessageOfAsync(BundleId bundleId)
+    public virtual async Task<Stream?> GetMessageOfAsync(BundleId bundleId)
     {
         ArgumentNullException.ThrowIfNull(bundleId);
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
