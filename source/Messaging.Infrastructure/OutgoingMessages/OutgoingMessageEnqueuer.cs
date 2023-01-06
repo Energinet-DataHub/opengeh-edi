@@ -30,8 +30,9 @@ public class OutgoingMessageEnqueuer
 
     public Task EnqueueAsync(EnqueuedMessage message)
     {
-        if (message == null) throw new ArgumentNullException(nameof(message));
-        _context.EnqueuedMessages.Add(message);
-        return Task.CompletedTask;
+        ArgumentNullException.ThrowIfNull(message);
+        return _context.EnqueuedMessages
+            .AddAsync(message)
+            .AsTask();
     }
 }
