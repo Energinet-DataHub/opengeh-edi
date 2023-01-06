@@ -32,7 +32,10 @@ public class MessageStorageStub : MessageStorage
     public override Task<Stream?> GetMessageOfAsync(BundleId bundleId)
     {
         if (_shouldReturnEmptyMessage)
+        {
+            _shouldReturnEmptyMessage = false;
             return Task.FromResult(default(Stream));
+        }
 
         return base.GetMessageOfAsync(bundleId);
     }
