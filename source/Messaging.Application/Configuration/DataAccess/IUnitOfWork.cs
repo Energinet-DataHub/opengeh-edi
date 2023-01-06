@@ -23,11 +23,6 @@ namespace Messaging.Application.Configuration.DataAccess
     public interface IUnitOfWork
     {
         /// <summary>
-        /// Gets the current transaction
-        /// </summary>
-        IDbTransaction? CurrentTransaction { get; }
-
-        /// <summary>
         /// Commits current transaction
         /// </summary>
         Task CommitAsync();
