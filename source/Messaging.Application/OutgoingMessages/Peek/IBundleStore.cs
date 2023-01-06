@@ -34,7 +34,7 @@ public interface IBundleStore
     /// <param name="messageId"></param>
     /// <param name="messageIdsIncluded"></param>
     /// <returns>void</returns>
-    Task SetBundleForAsync(
+    Task<bool> SetBundleForAsync(
         BundleId bundleId,
         Stream document,
         Guid messageId,

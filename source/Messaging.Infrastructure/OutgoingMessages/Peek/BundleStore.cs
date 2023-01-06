@@ -37,7 +37,7 @@ public class BundleStore : IBundleStore
         _connectionFactory = connectionFactory;
     }
 
-    public async Task SetBundleForAsync(
+    public async Task<bool> SetBundleForAsync(
         BundleId bundleId,
         Stream document,
         Guid messageId,
@@ -47,13 +47,11 @@ public class BundleStore : IBundleStore
         ArgumentNullException.ThrowIfNull(document);
 
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        var insertStatement =
+            $"IF NOT EXISTS (SELECT * FROM b2b.BundleStore WHERE ActorNumber = @ActorNumber AND MessageCategory = @MessageCategory)" +
+            $"INSERT INTO b2b.BundleStore(ActorNUmber, MessageCategory, MessageId, MessageIdsIncluded, Bundle) VALUES(@ActorNumber, @MessageCategory, @MessageId, @MessageIdsIncluded, @Bundle)";
         using var command = CreateCommand(
-            @$"UPDATE [B2B].[BundleStore]
-                     SET Bundle = @Bundle, MessageId = @MessageId, MessageIdsIncluded = @MessageIdsIncluded
-                     WHERE ActorNumber = @ActorNumber
-                     AND MessageCategory = @MessageCategory
-                     AND Bundle IS NULL
-                     AND MessageId IS NULL",
+            insertStatement,
             new List<KeyValuePair<string, object>>()
             {
                 new("@ActorNumber", bundleId.ReceiverNumber.Value),
@@ -65,10 +63,10 @@ public class BundleStore : IBundleStore
             connection);
 
         var result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
-
         ResetBundleStream(document);
 
-        if (result == 0) throw new BundleException($"Fail to store bundle on registration: {bundleId.MessageCategory.Name}, {bundleId.ReceiverNumber.Value}");
+        return result == 1;
+        //if (result == 0) throw new BundleException($"Fail to store bundle on registration: {bundleId.MessageCategory.Name}, {bundleId.ReceiverNumber.Value}");
     }
 
     public async Task<bool> TryRegisterBundleAsync(
