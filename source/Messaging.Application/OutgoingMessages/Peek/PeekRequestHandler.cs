@@ -33,13 +33,20 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
     private readonly DocumentFactory _documentFactory;
     private readonly IEnqueuedMessages _enqueuedMessages;
     private readonly IBundleStore _bundleStore;
+    private readonly IMessageStorage _messageStorage;
 
-    public PeekRequestHandler(ISystemDateTimeProvider systemDateTimeProvider, DocumentFactory documentFactory, IEnqueuedMessages enqueuedMessages, IBundleStore bundleStore)
+    public PeekRequestHandler(
+        ISystemDateTimeProvider systemDateTimeProvider,
+        DocumentFactory documentFactory,
+        IEnqueuedMessages enqueuedMessages,
+        IBundleStore bundleStore,
+        IMessageStorage messageStorage)
     {
         _systemDateTimeProvider = systemDateTimeProvider;
         _documentFactory = documentFactory;
         _enqueuedMessages = enqueuedMessages;
         _bundleStore = bundleStore;
+        _messageStorage = messageStorage;
     }
 
     public async Task<PeekResult> Handle(PeekRequest request, CancellationToken cancellationToken)
@@ -47,8 +54,8 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
         ArgumentNullException.ThrowIfNull(request);
 
         var bundleId = BundleId.Create(request.MessageCategory, request.ActorNumber);
-        var document = await _bundleStore
-            .GetBundleOfAsync(bundleId)
+        var document = await _messageStorage
+            .GetMessageOfAsync(bundleId)
             .ConfigureAwait(false);
 
         if (document is not null)

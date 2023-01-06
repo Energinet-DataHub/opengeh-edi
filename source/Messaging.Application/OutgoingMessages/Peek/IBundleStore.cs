@@ -27,14 +27,6 @@ namespace Messaging.Application.OutgoingMessages.Peek;
 public interface IBundleStore
 {
     /// <summary>
-    /// Get bundle based on bundle Id
-    /// </summary>
-    /// <param name="bundleId"></param>
-    /// <returns>Stream containing bundle</returns>
-    Task<Stream?> GetBundleOfAsync(
-        BundleId bundleId);
-
-    /// <summary>
     /// Set bundle
     /// </summary>
     /// <param name="bundleId"></param>

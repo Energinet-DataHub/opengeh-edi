@@ -106,6 +106,18 @@ public class WhenAPeekIsRequestedTests : TestBase
         Assert.Null(peekResult.Bundle);
     }
 
+    [Fact(Skip = "While refactoring")]
+    public async Task Return_empty_bundle_if_bundle_is_already_registered()
+    {
+        await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
+        await InvokeCommandAsync(CreatePeekRequest(MessageCategory.MasterData)).ConfigureAwait(false);
+
+        await InvokeCommandAsync(CreatePeekRequest(MessageCategory.MasterData)).ConfigureAwait(false);
+        var peekResult = await InvokeCommandAsync(CreatePeekRequest(MessageCategory.MasterData)).ConfigureAwait(false);
+
+        Assert.Null(peekResult.Bundle);
+    }
+
     private static PeekRequest CreatePeekRequest(MessageCategory messageCategory)
     {
         return new PeekRequest(ActorNumber.Create(SampleData.NewEnergySupplierNumber), messageCategory);

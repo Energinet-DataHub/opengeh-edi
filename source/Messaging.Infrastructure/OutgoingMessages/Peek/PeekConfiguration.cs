@@ -29,5 +29,6 @@ internal static class PeekConfiguration
         services.AddScoped<IEnqueuedMessages, EnqueuedMessages>();
         services.AddScoped(_ => bundleConfiguration);
         services.AddSingleton<IBundleStore, BundleStore>();
+        services.AddSingleton<IMessageStorage, MessageStorage>();
     }
 }
