@@ -138,10 +138,6 @@ namespace Messaging.Api
                     services.AddExternalDomainServiceBusQueuesHealthCheck(
                         runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
                         runtime.INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME!);
-                    services.AddExternalServiceBusSubscriptionsHealthCheck(
-                        runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
-                        runtime.INTEGRATION_EVENT_TOPIC_NAME!,
-                        runtime.MARKET_PARTICIPANT_CHANGED_ACTOR_CREATED_SUBSCRIPTION_NAME!);
                     services.AddSqlServerHealthCheck(runtime.DB_CONNECTION_STRING!);
                 })
                 .Build();
