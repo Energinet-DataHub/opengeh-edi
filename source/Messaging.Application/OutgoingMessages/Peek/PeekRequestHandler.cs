@@ -53,15 +53,14 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var bundleId = BundleId.Create(request.MessageCategory, request.ActorNumber);
         var document = await _messageStorage
-            .GetMessageOfAsync(bundleId)
+            .GetMessageOfAsync(BundleId.Create(request.MessageCategory, request.ActorNumber))
             .ConfigureAwait(false);
 
         if (document is not null)
         {
             var messageId = await _bundleStore
-                .GetBundleMessageIdOfAsync(bundleId)
+                .GetBundleMessageIdOfAsync(BundleId.Create(request.MessageCategory, request.ActorNumber))
                 .ConfigureAwait(false);
             return new PeekResult(document, messageId);
         }
