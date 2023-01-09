@@ -42,14 +42,8 @@ namespace Messaging.Api
         public string? SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE =>
             GetEnvironmentVariable(nameof(SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE));
 
-        public string? INTEGRATION_EVENT_TOPIC_NAME =>
-            GetEnvironmentVariable(nameof(INTEGRATION_EVENT_TOPIC_NAME));
-
         public virtual string? PERFORMANCE_TEST_ENABLED =>
             GetEnvironmentVariable(nameof(PERFORMANCE_TEST_ENABLED));
-
-        public string? MARKET_PARTICIPANT_CHANGED_ACTOR_CREATED_SUBSCRIPTION_NAME =>
-            GetEnvironmentVariable(nameof(MARKET_PARTICIPANT_CHANGED_ACTOR_CREATED_SUBSCRIPTION_NAME));
 
         public int MAX_NUMBER_OF_PAYLOADS_IN_BUNDLE
         {
