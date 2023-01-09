@@ -75,10 +75,10 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
             return new PeekResult(null);
         }
 
-        var bundle = CreateBundleFrom(messages.ToList());
+        var bundle = new Bundle(_systemDateTimeProvider.Now(), messages);
         var cimMessage = bundle.CreateMessage();
         document = await _documentFactory.CreateFromAsync(cimMessage, MessageFormat.Xml).ConfigureAwait(false);
-        if (await _bundleStore.TryRegisterAsync(bundleId, document, bundle.MessageId, bundle.GetMessageIdsIncluded())
+        if (await _bundleStore.TryRegisterAsync(bundleId, document, bundle.MessageId, bundle.GetMessageIdsIncluded(), bundle)
                 .ConfigureAwait(false) == false)
         {
             return new PeekResult(null);

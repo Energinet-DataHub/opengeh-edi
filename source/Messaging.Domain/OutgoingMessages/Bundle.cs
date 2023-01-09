@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages.Peek;
 using Messaging.Domain.SeedWork;
 using NodaTime;
@@ -25,6 +26,7 @@ public class Bundle
     private MessageHeader _header;
     private MessageType? _documentType;
 
+    #pragma warning disable
     public Bundle(Instant timestamp)
     {
         MessageId = Guid.NewGuid();
@@ -32,7 +34,23 @@ public class Bundle
         _header = new MessageHeader(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, _timestamp);
     }
 
+    public Bundle(Instant timestamp, IEnumerable<EnqueuedMessage> messages)
+    {
+        MessageId = Guid.NewGuid();
+        _timestamp = timestamp;
+        _header = new MessageHeader(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, _timestamp);
+        _messages = messages.ToList();
+        CreateHeaderFrom(_messages.First());
+        _documentType = EnumerationType.FromName<MessageType>(_messages.First().MessageType);
+        ReceiverNumber = ActorNumber.Create(_messages.First().ReceiverId);
+        Category = EnumerationType.FromName<MessageCategory>(_messages.First().Category);
+    }
+
     public Guid MessageId { get; }
+
+    public ActorNumber ReceiverNumber { get; }
+
+    public MessageCategory Category { get; }
 
     public IEnumerable<Guid> GetMessageIdsIncluded()
     {

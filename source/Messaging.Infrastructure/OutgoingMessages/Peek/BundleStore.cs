@@ -40,10 +40,12 @@ public class BundleStore : IBundleStore
         BundleId bundleId,
         Stream document,
         Guid messageId,
-        IEnumerable<Guid> messageIdsIncluded)
+        IEnumerable<Guid> messageIdsIncluded,
+        Bundle bundle)
     {
         ArgumentNullException.ThrowIfNull(bundleId);
         ArgumentNullException.ThrowIfNull(document);
+        ArgumentNullException.ThrowIfNull(bundle);
 
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         var insertStatement =
@@ -53,10 +55,10 @@ public class BundleStore : IBundleStore
             insertStatement,
             new List<KeyValuePair<string, object>>()
             {
-                new("@ActorNumber", bundleId.ReceiverNumber.Value),
-                new("@MessageCategory", bundleId.MessageCategory.Name),
+                new("@ActorNumber", bundle.ReceiverNumber.Value),
+                new("@MessageCategory", bundle.Category.Name),
                 new("@Bundle", document),
-                new("@MessageId", messageId),
+                new("@MessageId", bundle.MessageId),
                 new("@MessageIdsIncluded", string.Join(",", messageIdsIncluded)),
             },
             connection);

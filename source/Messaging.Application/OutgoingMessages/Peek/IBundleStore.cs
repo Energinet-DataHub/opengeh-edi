@@ -33,12 +33,14 @@ public interface IBundleStore
     /// <param name="document"></param>
     /// <param name="messageId"></param>
     /// <param name="messageIdsIncluded"></param>
+    /// <param name="bundle"></param>
     /// <returns>void</returns>
     Task<bool> TryRegisterAsync(
         BundleId bundleId,
         Stream document,
         Guid messageId,
-        IEnumerable<Guid> messageIdsIncluded);
+        IEnumerable<Guid> messageIdsIncluded,
+        Bundle bundle);
 
     /// <summary>
     /// Dequeue bundle
