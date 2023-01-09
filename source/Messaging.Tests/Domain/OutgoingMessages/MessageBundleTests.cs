@@ -28,13 +28,17 @@ public class MessageBundleTests
     {
         var messages = new List<EnqueuedMessage>()
         {
-            new(Guid.NewGuid(), "FakeActorNumber", "FakeRole", "FakeActorNumber", "FakeRole", "FakeType",
-                "FakeCategory", "E65", string.Empty),
-            new(Guid.NewGuid(), "FakeActorNumber", "FakeRole", "FakeActorNumber", "FakeRole", "FakeType",
-                "FakeCategory", "E66", string.Empty),
+            CreateEnqueuedMessage("E65"),
+            CreateEnqueuedMessage("E66"),
         };
 
         Assert.Throws<ProcessTypesDoesNotMatchException>(() =>
             MessageBundle.Create(ActorNumber.Create("1234567890123"), MessageCategory.Aggregations, messages));
+    }
+
+    private static EnqueuedMessage CreateEnqueuedMessage(string processType)
+    {
+        return new(Guid.NewGuid(), "FakeActorNumber", "FakeRole", "FakeActorNumber", "FakeRole", "FakeType",
+            "FakeCategory", processType, string.Empty);
     }
 }
