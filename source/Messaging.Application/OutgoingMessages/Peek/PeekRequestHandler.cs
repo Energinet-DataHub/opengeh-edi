@@ -86,17 +86,6 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
 
         return new PeekResult(document, bundle.MessageId);
     }
-
-    private Bundle CreateBundleFrom(IReadOnlyList<EnqueuedMessage> messages)
-    {
-        var bundle = new Bundle(_systemDateTimeProvider.Now());
-        foreach (var outgoingMessage in messages)
-        {
-            bundle.Add(outgoingMessage);
-        }
-
-        return bundle;
-    }
 }
 
 public record PeekRequest(ActorNumber ActorNumber, MessageCategory MessageCategory) : ICommand<PeekResult>;
