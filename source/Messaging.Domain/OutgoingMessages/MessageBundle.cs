@@ -45,6 +45,7 @@ public class MessageBundle : ValueObject
         EnsureReceiverRoleMatches(messages);
         EnsureSenderNumberMatches(messages);
         EnsureSenderRoleMatches(messages);
+        EnsureMessageTypeMatches(messages);
         return new MessageBundle(actorNumber, messageCategory, messages);
     }
 
@@ -106,7 +107,7 @@ public class MessageBundle : ValueObject
 
     private static void EnsureSenderRoleMatches(IReadOnlyList<EnqueuedMessage> messages)
     {
-        var senderRole = messages[0].ReceiverRole;
+        var senderRole = messages[0].SenderRole;
         var messagesNotMatching = messages
             .Where(message => message.SenderRole.Equals(senderRole, StringComparison.OrdinalIgnoreCase) == false)
             .Select(message => message.Id)
@@ -114,7 +115,21 @@ public class MessageBundle : ValueObject
 
         if (messagesNotMatching.Count > 0)
         {
-            throw new ReceiverRoleDoesNotMatchException(messagesNotMatching);
+            throw new SenderRoleDoesNotMatchException(messagesNotMatching);
+        }
+    }
+
+    private static void EnsureMessageTypeMatches(IReadOnlyList<EnqueuedMessage> messages)
+    {
+        var messageType = messages[0].MessageType;
+        var messagesNotMatching = messages
+            .Where(message => message.MessageType.Equals(messageType, StringComparison.OrdinalIgnoreCase) == false)
+            .Select(message => message.Id)
+            .ToList();
+
+        if (messagesNotMatching.Count > 0)
+        {
+            throw new MessageTypeDoesNotMatchException(messagesNotMatching);
         }
     }
 }
