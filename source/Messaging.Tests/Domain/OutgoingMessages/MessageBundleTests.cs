@@ -62,9 +62,22 @@ public class MessageBundleTests
             MessageBundle.Create(ActorNumber.Create("1234567890123"), MessageCategory.Aggregations, messages));
     }
 
-    private static EnqueuedMessage CreateEnqueuedMessage(string processType = "123", string receiverNumber = "1234567890123", string receiverRole = "Role1")
+    [Fact]
+    public void All_messages_in_bundle_must_have_same_sender_number()
     {
-        return new(Guid.NewGuid(), receiverNumber, receiverRole, "FakeActorNumber", "FakeRole", "FakeType",
+        var messages = new List<EnqueuedMessage>()
+        {
+            CreateEnqueuedMessage(),
+            CreateEnqueuedMessage(senderNumber: "1234567890098"),
+        };
+
+        Assert.Throws<SenderNumberDoesNotMatchException>(() =>
+            MessageBundle.Create(ActorNumber.Create("1234567890123"), MessageCategory.Aggregations, messages));
+    }
+
+    private static EnqueuedMessage CreateEnqueuedMessage(string processType = "123", string receiverNumber = "1234567890123", string receiverRole = "Role1", string senderNumber = "1234567890123")
+    {
+        return new(Guid.NewGuid(), receiverNumber, receiverRole, senderNumber, "FakeRole", "FakeType",
             "FakeCategory", processType, string.Empty);
     }
 }
