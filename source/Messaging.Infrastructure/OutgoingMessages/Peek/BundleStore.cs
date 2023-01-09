@@ -59,7 +59,7 @@ public class BundleStore : IBundleStore
                 new("@MessageCategory", bundle.Category.Name),
                 new("@Bundle", document),
                 new("@MessageId", bundle.MessageId),
-                new("@MessageIdsIncluded", string.Join(",", messageIdsIncluded)),
+                new("@MessageIdsIncluded", string.Join(",", bundle.GetMessageIdsIncluded())),
             },
             connection);
 
