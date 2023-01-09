@@ -44,6 +44,7 @@ public class MessageBundle : ValueObject
         EnsureReceiverNumberMatches(messages);
         EnsureReceiverRoleMatches(messages);
         EnsureSenderNumberMatches(messages);
+        EnsureSenderRoleMatches(messages);
         return new MessageBundle(actorNumber, messageCategory, messages);
     }
 
@@ -100,6 +101,20 @@ public class MessageBundle : ValueObject
         if (messagesNotMatching.Count > 0)
         {
             throw new SenderNumberDoesNotMatchException(messagesNotMatching);
+        }
+    }
+
+    private static void EnsureSenderRoleMatches(IReadOnlyList<EnqueuedMessage> messages)
+    {
+        var senderRole = messages[0].ReceiverRole;
+        var messagesNotMatching = messages
+            .Where(message => message.SenderRole.Equals(senderRole, StringComparison.OrdinalIgnoreCase) == false)
+            .Select(message => message.Id)
+            .ToList();
+
+        if (messagesNotMatching.Count > 0)
+        {
+            throw new ReceiverRoleDoesNotMatchException(messagesNotMatching);
         }
     }
 }
