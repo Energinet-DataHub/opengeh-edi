@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.Peek;
 using Xunit;
