@@ -75,8 +75,8 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
         }
 
         var bundle = new Bundle(_systemDateTimeProvider.Now(), messages);
-        var cimMessage = bundle.CreateMessage();
-        document = await _documentFactory.CreateFromAsync(cimMessage, MessageFormat.Xml).ConfigureAwait(false);
+        document = await _documentFactory.CreateFromAsync(bundle.CreateMessage(), MessageFormat.Xml).ConfigureAwait(false);
+        bundle.SetDocument(document);
         if (await _bundleStore.TryRegisterAsync(document, bundle)
                 .ConfigureAwait(false) == false)
         {
