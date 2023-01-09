@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
@@ -78,7 +79,7 @@ public class EnqueuedMessages : IEnqueuedMessages
         return MessageBundle.Create(
             actorNumber,
             messageCategory,
-            messages);
+            messages.ToList());
     }
 
     public async Task<int> GetAvailableMessageCountAsync(ActorNumber actorNumber)

@@ -36,8 +36,21 @@ public class MessageBundle : ValueObject
         return new MessageBundle();
     }
 
-    public static MessageBundle Create(ActorNumber actorNumber, MessageCategory messageCategory, IEnumerable<EnqueuedMessage> messages)
+    public static MessageBundle Create(ActorNumber actorNumber, MessageCategory messageCategory, IReadOnlyList<EnqueuedMessage> messages)
     {
+        ArgumentNullException.ThrowIfNull(messages);
+
+        var processType = messages[0].ProcessType;
+        var messagesNotMatchingProcessType = messages
+            .Where(message => message.ProcessType.Equals(processType, StringComparison.OrdinalIgnoreCase) == false)
+            .Select(message => message.Id)
+            .ToList();
+
+        if (messagesNotMatchingProcessType.Count > 0)
+        {
+            throw new ProcessTypesDoesNotMatchException(messagesNotMatchingProcessType);
+        }
+
         return new MessageBundle(actorNumber, messageCategory, messages);
     }
 }
