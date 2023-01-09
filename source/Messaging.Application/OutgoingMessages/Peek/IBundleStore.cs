@@ -27,14 +27,6 @@ namespace Messaging.Application.OutgoingMessages.Peek;
 public interface IBundleStore
 {
     /// <summary>
-    /// Get bundle based on bundle Id
-    /// </summary>
-    /// <param name="bundleId"></param>
-    /// <returns>Stream containing bundle</returns>
-    Task<Stream?> GetBundleOfAsync(
-        BundleId bundleId);
-
-    /// <summary>
     /// Set bundle
     /// </summary>
     /// <param name="bundleId"></param>
@@ -42,26 +34,11 @@ public interface IBundleStore
     /// <param name="messageId"></param>
     /// <param name="messageIdsIncluded"></param>
     /// <returns>void</returns>
-    Task SetBundleForAsync(
+    Task<bool> TryRegisterAsync(
         BundleId bundleId,
         Stream document,
         Guid messageId,
         IEnumerable<Guid> messageIdsIncluded);
-
-    /// <summary>
-    /// Try to register bundle
-    /// </summary>
-    /// <param name="bundleId"></param>
-    /// <returns>boolean indicating success/failure</returns>
-    Task<bool> TryRegisterBundleAsync(
-        BundleId bundleId);
-
-    /// <summary>
-    /// Unregister bundle
-    /// </summary>
-    /// <param name="bundleId"></param>
-    /// <returns>void</returns>
-    Task UnregisterBundleAsync(BundleId bundleId);
 
     /// <summary>
     /// Dequeue bundle

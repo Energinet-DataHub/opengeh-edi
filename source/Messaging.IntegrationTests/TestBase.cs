@@ -21,6 +21,7 @@ using MediatR;
 using Messaging.Api.Configuration.Middleware.Correlation;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.Commands.Commands;
+using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.Configuration.TimeEvents;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration;
@@ -62,7 +63,7 @@ namespace Messaging.IntegrationTests
                 _ => new ServiceBusClient(CreateFakeServiceBusConnectionString()));
             CompositionRoot.Initialize(_services)
                 .AddAuthentication()
-                .AddPeekConfiguration(new BundleConfigurationStub())
+                .AddPeekConfiguration(new BundleConfigurationStub(), sp => new MessageStorageStub(sp.GetRequiredService<IDatabaseConnectionFactory>()))
                 .AddRemoteBusinessService<DummyRequest, DummyReply>(sp => new RemoteBusinessServiceRequestSenderSpy<DummyRequest>("Dummy"), "Dummy")
                 .AddDatabaseConnectionFactory(DatabaseFixture.ConnectionString)
                 .AddDatabaseContext(DatabaseFixture.ConnectionString)

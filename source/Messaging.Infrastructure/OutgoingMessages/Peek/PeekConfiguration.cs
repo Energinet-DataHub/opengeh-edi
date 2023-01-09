@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using MediatR;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.MessageCount;
@@ -22,12 +23,21 @@ namespace Messaging.Infrastructure.OutgoingMessages.Peek;
 
 internal static class PeekConfiguration
 {
-    internal static void Configure(IServiceCollection services, IBundleConfiguration bundleConfiguration)
+    internal static void Configure(IServiceCollection services, IBundleConfiguration bundleConfiguration, Func<IServiceProvider, IMessageStorage>? messageStorageBuilder)
     {
         services.AddTransient<IRequestHandler<PeekRequest, PeekResult>, PeekRequestHandler>();
         services.AddTransient<IRequestHandler<MessageCountRequest, MessageCountResult>, MessageCountRequestHandler>();
         services.AddScoped<IEnqueuedMessages, EnqueuedMessages>();
         services.AddScoped(_ => bundleConfiguration);
         services.AddSingleton<IBundleStore, BundleStore>();
+
+        if (messageStorageBuilder is null)
+        {
+            services.AddSingleton<IMessageStorage, MessageStorage>();
+        }
+        else
+        {
+            services.AddSingleton(messageStorageBuilder);
+        }
     }
 }

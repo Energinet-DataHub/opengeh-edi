@@ -22,7 +22,6 @@ using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.Peek;
 using Messaging.Infrastructure.OutgoingMessages;
-using Messaging.Infrastructure.OutgoingMessages.Peek;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Factories;
@@ -34,9 +33,12 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages;
 
 public class WhenAPeekIsRequestedTests : TestBase
 {
+    private readonly MessageStorageStub _messageStorageStub;
+
     public WhenAPeekIsRequestedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
+        _messageStorageStub = (MessageStorageStub)GetService<IMessageStorage>();
     }
 
     [Fact]
@@ -97,10 +99,12 @@ public class WhenAPeekIsRequestedTests : TestBase
     }
 
     [Fact]
-    public async Task Return_no_content_if_bundling_is_in_progress()
+    public async Task Return_empty_bundle_if_bundle_is_already_registered()
     {
-        await SimulateThatBundlingIsAlreadyInProgress().ConfigureAwait(false);
+        await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
+        await InvokeCommandAsync(CreatePeekRequest(MessageCategory.MasterData)).ConfigureAwait(false);
 
+        _messageStorageStub.ReturnsEmptyMessage();
         var peekResult = await InvokeCommandAsync(CreatePeekRequest(MessageCategory.MasterData)).ConfigureAwait(false);
 
         Assert.Null(peekResult.Bundle);
@@ -138,16 +142,6 @@ public class WhenAPeekIsRequestedTests : TestBase
 
             await messageEnqueuer.EnqueueAsync(message).ConfigureAwait(false);
         }
-    }
-
-    private async Task SimulateThatBundlingIsAlreadyInProgress()
-    {
-        await GetService<IBundleStore>()
-            .TryRegisterBundleAsync(
-                BundleId.Create(
-                    MessageCategory.MasterData,
-                    ActorNumber.Create(SampleData.NewEnergySupplierNumber)))
-            .ConfigureAwait(false);
     }
 
     private async Task GivenAMoveInTransactionHasBeenAccepted()
