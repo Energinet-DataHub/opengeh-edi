@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages.Peek;
 using Messaging.Domain.SeedWork;
 
@@ -24,8 +23,14 @@ public class MessageBundle : ValueObject
     {
     }
 
-    private MessageBundle(ActorNumber actorNumber, MessageCategory messageCategory, IEnumerable<EnqueuedMessage> messages)
+    private MessageBundle(IReadOnlyList<EnqueuedMessage> messages)
     {
+        EnsureProcessTypeMatches(messages);
+        EnsureReceiverNumberMatches(messages);
+        EnsureReceiverRoleMatches(messages);
+        EnsureSenderNumberMatches(messages);
+        EnsureSenderRoleMatches(messages);
+        EnsureMessageTypeMatches(messages);
         Messages = messages.ToList();
     }
 
@@ -36,17 +41,10 @@ public class MessageBundle : ValueObject
         return new MessageBundle();
     }
 
-    public static MessageBundle Create(ActorNumber actorNumber, MessageCategory messageCategory, IReadOnlyList<EnqueuedMessage> messages)
+    public static MessageBundle Create(IReadOnlyList<EnqueuedMessage> messages)
     {
         ArgumentNullException.ThrowIfNull(messages);
-
-        EnsureProcessTypeMatches(messages);
-        EnsureReceiverNumberMatches(messages);
-        EnsureReceiverRoleMatches(messages);
-        EnsureSenderNumberMatches(messages);
-        EnsureSenderRoleMatches(messages);
-        EnsureMessageTypeMatches(messages);
-        return new MessageBundle(actorNumber, messageCategory, messages);
+        return new MessageBundle(messages);
     }
 
     private static void EnsureProcessTypeMatches(IReadOnlyList<EnqueuedMessage> messages)
@@ -93,7 +91,7 @@ public class MessageBundle : ValueObject
 
     private static void EnsureSenderNumberMatches(IReadOnlyList<EnqueuedMessage> messages)
     {
-        var senderNumber = messages[0].ReceiverId;
+        var senderNumber = messages[0].SenderId;
         var messagesNotMatching = messages
             .Where(message => message.SenderId.Equals(senderNumber, StringComparison.OrdinalIgnoreCase) == false)
             .Select(message => message.Id)

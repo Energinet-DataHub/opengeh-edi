@@ -33,7 +33,7 @@ public class MessageBundleTests
         };
 
         Assert.Throws<ProcessTypesDoesNotMatchException>(() =>
-            MessageBundle.Create(ActorNumber.Create("1234567890123"), MessageCategory.Aggregations, messages));
+            MessageBundle.Create(messages));
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public class MessageBundleTests
         };
 
         Assert.Throws<ReceiverIdsDoesNotMatchException>(() =>
-            MessageBundle.Create(ActorNumber.Create("1234567890123"), MessageCategory.Aggregations, messages));
+            MessageBundle.Create(messages));
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public class MessageBundleTests
         };
 
         Assert.Throws<ReceiverRoleDoesNotMatchException>(() =>
-            MessageBundle.Create(ActorNumber.Create("1234567890123"), MessageCategory.Aggregations, messages));
+            MessageBundle.Create(messages));
     }
 
     [Fact]
@@ -72,7 +72,7 @@ public class MessageBundleTests
         };
 
         Assert.Throws<SenderNumberDoesNotMatchException>(() =>
-            MessageBundle.Create(ActorNumber.Create("1234567890123"), MessageCategory.Aggregations, messages));
+            MessageBundle.Create(messages));
     }
 
     [Fact]
@@ -85,7 +85,7 @@ public class MessageBundleTests
         };
 
         Assert.Throws<SenderRoleDoesNotMatchException>(() =>
-            MessageBundle.Create(ActorNumber.Create("1234567890123"), MessageCategory.Aggregations, messages));
+            MessageBundle.Create(messages));
     }
 
     [Fact]
@@ -98,7 +98,7 @@ public class MessageBundleTests
         };
 
         Assert.Throws<MessageTypeDoesNotMatchException>(() =>
-            MessageBundle.Create(ActorNumber.Create("1234567890123"), MessageCategory.Aggregations, messages));
+            MessageBundle.Create(messages));
     }
 
     private static EnqueuedMessage CreateEnqueuedMessage(

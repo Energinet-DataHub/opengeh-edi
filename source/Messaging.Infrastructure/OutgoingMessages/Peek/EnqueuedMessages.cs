@@ -77,8 +77,6 @@ public class EnqueuedMessages : IEnqueuedMessages
             }).ConfigureAwait(false);
 
         return MessageBundle.Create(
-            actorNumber,
-            messageCategory,
             messages.ToList());
     }
 
