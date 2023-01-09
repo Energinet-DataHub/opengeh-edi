@@ -37,10 +37,8 @@ public class BundleStore : IBundleStore
     }
 
     public async Task<bool> TryRegisterAsync(
-        Stream document,
         Bundle bundle)
     {
-        ArgumentNullException.ThrowIfNull(document);
         ArgumentNullException.ThrowIfNull(bundle);
 
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
@@ -53,14 +51,14 @@ public class BundleStore : IBundleStore
             {
                 new("@ActorNumber", bundle.ReceiverNumber.Value),
                 new("@MessageCategory", bundle.Category.Name),
-                new("@Bundle", bundle.GeneratedDocument!),
+                new("@Bundle", bundle.GeneratedDocument()),
                 new("@MessageId", bundle.MessageId),
                 new("@MessageIdsIncluded", string.Join(",", bundle.GetMessageIdsIncluded())),
             },
             connection);
 
         var result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
-        ResetBundleStream(document);
+        ResetBundleStream(bundle.GeneratedDocument());
 
         return result == 1;
     }

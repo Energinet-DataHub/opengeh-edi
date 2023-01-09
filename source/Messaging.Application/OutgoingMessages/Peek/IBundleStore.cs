@@ -28,11 +28,9 @@ public interface IBundleStore
     /// <summary>
     /// Set bundle
     /// </summary>
-    /// <param name="document"></param>
     /// <param name="bundle"></param>
     /// <returns>void</returns>
     Task<bool> TryRegisterAsync(
-        Stream document,
         Bundle bundle);
 
     /// <summary>

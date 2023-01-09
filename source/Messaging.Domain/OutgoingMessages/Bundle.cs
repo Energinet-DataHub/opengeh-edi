@@ -25,6 +25,7 @@ public class Bundle
     private readonly List<EnqueuedMessage> _messages = new();
     private MessageHeader _header;
     private MessageType? _documentType;
+    private Stream? _generatedDocument;
 
     #pragma warning disable
     public Bundle(Instant timestamp)
@@ -52,7 +53,15 @@ public class Bundle
 
     public MessageCategory Category { get; }
 
-    public Stream? GeneratedDocument { get; set; }
+    public Stream GeneratedDocument()
+    {
+        return _generatedDocument!;
+    }
+
+    public void SetGeneratedDocument(Stream document)
+    {
+        _generatedDocument = document;
+    }
 
     public IEnumerable<Guid> GetMessageIdsIncluded()
     {
