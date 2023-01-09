@@ -36,7 +36,20 @@ public class MessageBundleTests
             MessageBundle.Create(ActorNumber.Create("1234567890123"), MessageCategory.Aggregations, messages));
     }
 
-    private static EnqueuedMessage CreateEnqueuedMessage(string processType)
+    [Fact]
+    public void All_messages_in_bundle_must_have_same_receiver_number()
+    {
+        var messages = new List<EnqueuedMessage>()
+        {
+            CreateEnqueuedMessage(),
+            CreateEnqueuedMessage(receiverNumber: "1234567890098"),
+        };
+
+        Assert.Throws<ReceiverIdsDoesNotMatchException>(() =>
+            MessageBundle.Create(ActorNumber.Create("1234567890123"), MessageCategory.Aggregations, messages));
+    }
+
+    private static EnqueuedMessage CreateEnqueuedMessage(string processType = "123", string receiverNumber = "1234567890123")
     {
         return new(Guid.NewGuid(), "FakeActorNumber", "FakeRole", "FakeActorNumber", "FakeRole", "FakeType",
             "FakeCategory", processType, string.Empty);

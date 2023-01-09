@@ -41,6 +41,7 @@ public class MessageBundle : ValueObject
         ArgumentNullException.ThrowIfNull(messages);
 
         EnsureProcessType(messages);
+        EnsureReceiverNumberMatches(messages);
 
         return new MessageBundle(actorNumber, messageCategory, messages);
     }
@@ -56,6 +57,20 @@ public class MessageBundle : ValueObject
         if (messagesNotMatchingProcessType.Count > 0)
         {
             throw new ProcessTypesDoesNotMatchException(messagesNotMatchingProcessType);
+        }
+    }
+
+    private static void EnsureReceiverNumberMatches(IReadOnlyList<EnqueuedMessage> messages)
+    {
+        var receiverNumber = messages[0].ReceiverId;
+        var messagesNotMatching = messages
+            .Where(message => message.ProcessType.Equals(receiverNumber, StringComparison.OrdinalIgnoreCase) == false)
+            .Select(message => message.Id)
+            .ToList();
+
+        if (messagesNotMatching.Count > 0)
+        {
+            throw new ReceiverIdsDoesNotMatchException(messagesNotMatching);
         }
     }
 }
