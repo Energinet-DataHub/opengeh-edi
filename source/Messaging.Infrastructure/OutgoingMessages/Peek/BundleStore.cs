@@ -53,7 +53,7 @@ public class BundleStore : IBundleStore
             {
                 new("@ActorNumber", bundle.ReceiverNumber.Value),
                 new("@MessageCategory", bundle.Category.Name),
-                new("@Bundle", document),
+                new("@Bundle", bundle.GeneratedDocument!),
                 new("@MessageId", bundle.MessageId),
                 new("@MessageIdsIncluded", string.Join(",", bundle.GetMessageIdsIncluded())),
             },
