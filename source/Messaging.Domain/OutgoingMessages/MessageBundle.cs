@@ -40,6 +40,13 @@ public class MessageBundle : ValueObject
     {
         ArgumentNullException.ThrowIfNull(messages);
 
+        EnsureProcessType(messages);
+
+        return new MessageBundle(actorNumber, messageCategory, messages);
+    }
+
+    private static void EnsureProcessType(IReadOnlyList<EnqueuedMessage> messages)
+    {
         var processType = messages[0].ProcessType;
         var messagesNotMatchingProcessType = messages
             .Where(message => message.ProcessType.Equals(processType, StringComparison.OrdinalIgnoreCase) == false)
@@ -50,7 +57,5 @@ public class MessageBundle : ValueObject
         {
             throw new ProcessTypesDoesNotMatchException(messagesNotMatchingProcessType);
         }
-
-        return new MessageBundle(actorNumber, messageCategory, messages);
     }
 }
