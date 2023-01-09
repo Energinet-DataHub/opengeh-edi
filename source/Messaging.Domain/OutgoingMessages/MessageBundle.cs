@@ -42,7 +42,7 @@ public class MessageBundle : ValueObject
 
         EnsureProcessTypeMatches(messages);
         EnsureReceiverNumberMatches(messages);
-
+        EnsureReceiverRoleMatches(messages);
         return new MessageBundle(actorNumber, messageCategory, messages);
     }
 
@@ -64,13 +64,27 @@ public class MessageBundle : ValueObject
     {
         var receiverNumber = messages[0].ReceiverId;
         var messagesNotMatching = messages
-            .Where(message => message.ProcessType.Equals(receiverNumber, StringComparison.OrdinalIgnoreCase) == false)
+            .Where(message => message.ReceiverId.Equals(receiverNumber, StringComparison.OrdinalIgnoreCase) == false)
             .Select(message => message.Id)
             .ToList();
 
         if (messagesNotMatching.Count > 0)
         {
             throw new ReceiverIdsDoesNotMatchException(messagesNotMatching);
+        }
+    }
+
+    private static void EnsureReceiverRoleMatches(IReadOnlyList<EnqueuedMessage> messages)
+    {
+        var receiverRole = messages[0].ReceiverRole;
+        var messagesNotMatching = messages
+            .Where(message => message.ReceiverRole.Equals(receiverRole, StringComparison.OrdinalIgnoreCase) == false)
+            .Select(message => message.Id)
+            .ToList();
+
+        if (messagesNotMatching.Count > 0)
+        {
+            throw new ReceiverRoleDoesNotMatchException(messagesNotMatching);
         }
     }
 }
