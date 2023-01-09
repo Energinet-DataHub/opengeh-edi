@@ -37,13 +37,9 @@ public class BundleStore : IBundleStore
     }
 
     public async Task<bool> TryRegisterAsync(
-        BundleId bundleId,
         Stream document,
-        Guid messageId,
-        IEnumerable<Guid> messageIdsIncluded,
         Bundle bundle)
     {
-        ArgumentNullException.ThrowIfNull(bundleId);
         ArgumentNullException.ThrowIfNull(document);
         ArgumentNullException.ThrowIfNull(bundle);
 
