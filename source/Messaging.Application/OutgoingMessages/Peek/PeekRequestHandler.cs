@@ -65,16 +65,15 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
             return new PeekResult(document, messageId);
         }
 
-        var messages = (await _enqueuedMessages.GetByAsync(request.ActorNumber, request.MessageCategory)
-            .ConfigureAwait(false))
-            .ToList();
+        var messages = await _enqueuedMessages.GetByAsync(request.ActorNumber, request.MessageCategory)
+            .ConfigureAwait(false);
 
-        if (messages.Count == 0)
+        if (messages.Messages.Count == 0)
         {
             return new PeekResult(null);
         }
 
-        var bundle = new Bundle(_systemDateTimeProvider.Now(), messages);
+        var bundle = new Bundle(_systemDateTimeProvider.Now(), messages.Messages);
         document = await _documentFactory.CreateFromAsync(bundle.CreateMessage(), MessageFormat.Xml)
             .ConfigureAwait(false);
         bundle.SetGeneratedDocument(document);
