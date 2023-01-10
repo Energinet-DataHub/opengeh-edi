@@ -62,10 +62,7 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
             return new PeekResult(null);
         }
 
-        var readyMessageId = ReadyMessageId.New();
-        var document = await _documentFactory.CreateFromAsync(readyMessageId, messageBundle, MessageFormat.Xml, _systemDateTimeProvider.Now())
-            .ConfigureAwait(false);
-        readyMessage = ReadyMessage.CreateFrom(readyMessageId, messageBundle, document);
+        readyMessage = await CreateReadyMessageAsync(messageBundle).ConfigureAwait(false);
 
         if (await _bundleStore.TryAddAsync(readyMessage)
                 .ConfigureAwait(false) == false)
@@ -73,7 +70,15 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
             return new PeekResult(null);
         }
 
-        return new PeekResult(document, readyMessage.Id.Value);
+        return new PeekResult(readyMessage.GeneratedDocument, readyMessage.Id.Value);
+    }
+
+    private async Task<ReadyMessage> CreateReadyMessageAsync(MessageBundle messageBundle)
+    {
+        var id = ReadyMessageId.New();
+        var document = await _documentFactory.CreateFromAsync(id, messageBundle, MessageFormat.Xml, _systemDateTimeProvider.Now())
+            .ConfigureAwait(false);
+        return ReadyMessage.CreateFrom(id, messageBundle, document);
     }
 }
 
