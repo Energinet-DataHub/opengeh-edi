@@ -74,11 +74,10 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
         }
 
         var readyMessageId = ReadyMessageId.New();
-        var readyMessage = ReadyMessage.CreateFrom(readyMessageId, messages);
 
         document = await _documentFactory.CreateFromAsync(readyMessageId, messages, MessageFormat.Xml, _systemDateTimeProvider.Now())
             .ConfigureAwait(false);
-        readyMessage.SetGeneratedDocument(document);
+        var readyMessage = ReadyMessage.CreateFrom(readyMessageId, messages, document);
 
         if (await _bundleStore.TryRegisterAsync(readyMessage)
                 .ConfigureAwait(false) == false)

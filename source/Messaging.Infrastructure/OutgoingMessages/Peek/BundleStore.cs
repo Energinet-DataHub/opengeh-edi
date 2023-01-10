@@ -51,14 +51,14 @@ public class BundleStore : IBundleStore
             {
                 new("@ActorNumber", readyMessage.ReceiverNumber.Value),
                 new("@MessageCategory", readyMessage.Category.Name),
-                new("@Bundle", readyMessage.GeneratedDocument()),
+                new("@Bundle", readyMessage.GeneratedDocument),
                 new("@MessageId", readyMessage.Id.Value),
                 new("@MessageIdsIncluded", string.Join(",", readyMessage.MessageIdsIncluded)),
             },
             connection);
 
         var result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
-        ResetBundleStream(readyMessage.GeneratedDocument());
+        ResetBundleStream(readyMessage.GeneratedDocument);
 
         return result == 1;
     }

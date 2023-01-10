@@ -20,10 +20,9 @@ namespace Messaging.Domain.OutgoingMessages;
 
 public class ReadyMessage
 {
-    private Stream? _generatedDocument;
-
-    private ReadyMessage(ReadyMessageId id, ActorNumber receiverNumber, MessageCategory category, IEnumerable<Guid> messageIdsIncluded)
+    private ReadyMessage(ReadyMessageId id, ActorNumber receiverNumber, MessageCategory category, IEnumerable<Guid> messageIdsIncluded, Stream generatedDocument)
     {
+        GeneratedDocument = generatedDocument;
         Id = id;
         ReceiverNumber = receiverNumber;
         Category = category;
@@ -38,7 +37,9 @@ public class ReadyMessage
 
     public IEnumerable<Guid> MessageIdsIncluded { get; }
 
-    public static ReadyMessage CreateFrom(ReadyMessageId id, MessageBundle messageBundle)
+    public Stream GeneratedDocument { get; }
+
+    public static ReadyMessage CreateFrom(ReadyMessageId id, MessageBundle messageBundle, Stream generatedDocument)
     {
         ArgumentNullException.ThrowIfNull(messageBundle);
 
@@ -46,16 +47,7 @@ public class ReadyMessage
             id,
             ActorNumber.Create(messageBundle.ReceiverNumber),
             EnumerationType.FromName<MessageCategory>(messageBundle.Category),
-            messageBundle.MessageIds);
-    }
-
-    public Stream GeneratedDocument()
-    {
-        return _generatedDocument!;
-    }
-
-    public void SetGeneratedDocument(Stream document)
-    {
-        _generatedDocument = document;
+            messageBundle.MessageIds,
+            generatedDocument);
     }
 }
