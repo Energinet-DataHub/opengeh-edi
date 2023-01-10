@@ -15,21 +15,19 @@
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages.Peek;
 using Messaging.Domain.SeedWork;
-using NodaTime;
 
 namespace Messaging.Domain.OutgoingMessages;
 
 public class ReadyMessage
 {
-    private readonly List<EnqueuedMessage> _messages;
     private Stream? _generatedDocument;
 
-    public ReadyMessage(ReadyMessageId id, IEnumerable<EnqueuedMessage> messages)
+    private ReadyMessage(ReadyMessageId id, ActorNumber receiverNumber, MessageCategory category, IEnumerable<Guid> messageIdsIncluded)
     {
         Id = id;
-        _messages = messages.ToList();
-        ReceiverNumber = ActorNumber.Create(_messages.First().ReceiverId);
-        Category = EnumerationType.FromName<MessageCategory>(_messages.First().Category);
+        ReceiverNumber = receiverNumber;
+        Category = category;
+        MessageIdsIncluded = messageIdsIncluded;
     }
 
     public ReadyMessageId Id { get; }
@@ -37,6 +35,19 @@ public class ReadyMessage
     public ActorNumber ReceiverNumber { get; }
 
     public MessageCategory Category { get; }
+
+    public IEnumerable<Guid> MessageIdsIncluded { get; }
+
+    public static ReadyMessage CreateFrom(ReadyMessageId id, MessageBundle messageBundle)
+    {
+        ArgumentNullException.ThrowIfNull(messageBundle);
+
+        return new ReadyMessage(
+            id,
+            ActorNumber.Create(messageBundle.ReceiverNumber),
+            EnumerationType.FromName<MessageCategory>(messageBundle.Category),
+            messageBundle.MessageIds);
+    }
 
     public Stream GeneratedDocument()
     {
@@ -46,10 +57,5 @@ public class ReadyMessage
     public void SetGeneratedDocument(Stream document)
     {
         _generatedDocument = document;
-    }
-
-    public IEnumerable<Guid> GetMessageIdsIncluded()
-    {
-        return _messages.Select(message => message.Id);
     }
 }

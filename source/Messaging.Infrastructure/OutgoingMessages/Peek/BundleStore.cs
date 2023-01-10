@@ -53,7 +53,7 @@ public class BundleStore : IBundleStore
                 new("@MessageCategory", readyMessage.Category.Name),
                 new("@Bundle", readyMessage.GeneratedDocument()),
                 new("@MessageId", readyMessage.Id.Value),
-                new("@MessageIdsIncluded", string.Join(",", readyMessage.GetMessageIdsIncluded())),
+                new("@MessageIdsIncluded", string.Join(",", readyMessage.MessageIdsIncluded)),
             },
             connection);
 
