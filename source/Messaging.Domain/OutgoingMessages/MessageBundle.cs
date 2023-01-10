@@ -40,7 +40,7 @@ public class MessageBundle : ValueObject
             EnsureMessageTypeMatches(messages);
         }
 
-        Messages = messages.ToList();
+        Messages = messages;
     }
 
     public IReadOnlyList<EnqueuedMessage> Messages { get; } = new List<EnqueuedMessage>();
