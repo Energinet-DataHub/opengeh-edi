@@ -73,7 +73,7 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
             return new PeekResult(null);
         }
 
-        var bundle = new ReadyMessage(ReadyMessageId.New(), _systemDateTimeProvider.Now(), messages.Messages);
+        var bundle = new ReadyMessage(ReadyMessageId.New(), messages.Messages);
 
         var messageHeader = new MessageHeader(
             messages.ProcessType,
