@@ -85,6 +85,8 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Seed\202210111000 Cancel processes.sql" />
     <None Remove="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
     <EmbeddedResource Include="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
+    <None Remove="Scripts\Model\202227101336 Add ReadyMessages Table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101336 Add ReadyMessages Table.sql" />
   </ItemGroup>
 
 </Project>

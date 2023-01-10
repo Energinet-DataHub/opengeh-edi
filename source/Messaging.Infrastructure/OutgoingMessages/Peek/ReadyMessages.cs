@@ -44,16 +44,16 @@ public class ReadyMessages : IReadyMessages
 
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         var insertStatement =
-            $"IF NOT EXISTS (SELECT * FROM b2b.BundleStore WHERE ActorNumber = @ActorNumber AND MessageCategory = @MessageCategory)" +
-            $"INSERT INTO b2b.BundleStore(ActorNUmber, MessageCategory, MessageId, MessageIdsIncluded, Bundle) VALUES(@ActorNumber, @MessageCategory, @MessageId, @MessageIdsIncluded, @Bundle)";
+            $"IF NOT EXISTS (SELECT * FROM b2b.ReadyMessages WHERE ReceiverNumber = @ReceiverNumber AND MessageCategory = @MessageCategory)" +
+            $"INSERT INTO b2b.ReadyMessages(ReceiverNumber, MessageCategory, Id, MessageIdsIncluded, GeneratedDocument) VALUES(@ReceiverNumber, @MessageCategory, @Id, @MessageIdsIncluded, @GeneratedDocument)";
         using var command = CreateCommand(
             insertStatement,
             new List<KeyValuePair<string, object>>()
             {
-                new("@ActorNumber", readyMessage.ReceiverNumber.Value),
+                new("@ReceiverNumber", readyMessage.ReceiverNumber.Value),
                 new("@MessageCategory", readyMessage.Category.Name),
-                new("@Bundle", readyMessage.GeneratedDocument),
-                new("@MessageId", readyMessage.Id.Value),
+                new("@GeneratedDocument", readyMessage.GeneratedDocument),
+                new("@Id", readyMessage.Id.Value),
                 new("@MessageIdsIncluded", string.Join(",", readyMessage.MessageIdsIncluded)),
             },
             connection);
@@ -68,11 +68,11 @@ public class ReadyMessages : IReadyMessages
     {
         const string deleteStmt = @"
 DELETE E FROM [b2b].[EnqueuedMessages] E JOIN
-(SELECT EnqueuedMessageId = value FROM [b2b].[BundleStore]
-CROSS APPLY STRING_SPLIT(MessageIdsIncluded, ',') WHERE MessageId = @messageId) AS P
+(SELECT EnqueuedMessageId = value FROM [b2b].[ReadyMessages]
+CROSS APPLY STRING_SPLIT(MessageIdsIncluded, ',') WHERE Id = @Id) AS P
 ON E.Id = P.EnqueuedMessageId;
 
-DELETE FROM [b2b].[BundleStore] WHERE MessageId = @messageId;
+DELETE FROM [b2b].[ReadyMessages] WHERE Id = @Id;
 ";
 
         using var connection = (SqlConnection)await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
@@ -80,7 +80,7 @@ DELETE FROM [b2b].[BundleStore] WHERE MessageId = @messageId;
         using var command = connection.CreateCommand();
         command.Transaction = transaction;
         command.CommandText = deleteStmt;
-        command.Parameters.Add(new SqlParameter("messageId", SqlDbType.UniqueIdentifier) { Value = messageId });
+        command.Parameters.Add(new SqlParameter("Id", SqlDbType.UniqueIdentifier) { Value = messageId });
         int result;
 
         try
@@ -105,10 +105,10 @@ DELETE FROM [b2b].[BundleStore] WHERE MessageId = @messageId;
 
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         using var command = CreateCommand(
-            $"SELECT MessageId, ActorNumber, MessageCategory, MessageIdsIncluded, Bundle FROM b2b.BundleStore WHERE ActorNumber = @ActorNumber AND MessageCategory = @MessageCategory",
+            $"SELECT Id, ReceiverNumber, MessageCategory, MessageIdsIncluded, GeneratedDocument FROM b2b.ReadyMessages WHERE ReceiverNumber = @ReceiverNumber AND MessageCategory = @MessageCategory",
             new List<KeyValuePair<string, object>>
             {
-                new("@ActorNumber", receiverNumber.Value),
+                new("@ReceiverNumber", receiverNumber.Value),
                 new("@MessageCategory", category.Name),
             },
             connection);

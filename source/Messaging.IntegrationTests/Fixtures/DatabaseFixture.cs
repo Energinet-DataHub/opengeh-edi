@@ -13,9 +13,7 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
-using Dapper;
 using Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.Helpers;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.Serialization;
@@ -73,7 +71,7 @@ namespace Messaging.IntegrationTests.Fixtures
                 $"DELETE FROM [b2b].[QueuedInternalCommands] " +
                 $"DELETE FROM [b2b].[MarketEvaluationPoints]" +
                 $"DELETE FROM [b2b].[Actor]" +
-                $"DELETE FROM [b2b].[BundleStore]" +
+                $"DELETE FROM [b2b].[ReadyMessages]" +
                 $"DELETE FROM [b2b].[EnqueuedMessages]";
 
             _context.Database.ExecuteSqlRaw(cleanupStatement);
