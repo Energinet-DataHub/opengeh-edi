@@ -70,4 +70,4 @@ runs:
           --no-build \
           --no-restore \
           --configuration Release \
-          --output '${{ inputs.OUTPUT_PATH }}\functions\performancetest_webapi'
+          --output '${{ inputs.OUTPUT_PATH }}\functions\performancetest'
