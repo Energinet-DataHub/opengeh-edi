@@ -73,7 +73,7 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
             return new PeekResult(null);
         }
 
-        var bundle = new Bundle(_systemDateTimeProvider.Now(), messages.Messages);
+        var bundle = new ReadyMessage(_systemDateTimeProvider.Now(), messages.Messages);
         document = await _documentFactory.CreateFromAsync(bundle.CreateMessage(), MessageFormat.Xml)
             .ConfigureAwait(false);
         bundle.SetGeneratedDocument(document);

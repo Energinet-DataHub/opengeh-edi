@@ -28,10 +28,10 @@ public interface IBundleStore
     /// <summary>
     /// Set bundle
     /// </summary>
-    /// <param name="bundle"></param>
+    /// <param name="readyMessage"></param>
     /// <returns>void</returns>
     Task<bool> TryRegisterAsync(
-        Bundle bundle);
+        ReadyMessage readyMessage);
 
     /// <summary>
     /// Dequeue bundle

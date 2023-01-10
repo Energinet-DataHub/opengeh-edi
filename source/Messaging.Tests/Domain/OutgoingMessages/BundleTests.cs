@@ -22,22 +22,22 @@ namespace Messaging.Tests.Domain.OutgoingMessages;
 
 public class BundleTests
 {
-    private readonly Bundle _bundle;
+    private readonly ReadyMessage _readyMessage;
 
     public BundleTests()
     {
-        _bundle = new Bundle(SystemClock.Instance.GetCurrentInstant());
+        _readyMessage = new ReadyMessage(SystemClock.Instance.GetCurrentInstant());
     }
 
     [Fact]
     public void Can_create_message()
     {
         var outgoingMessage1 = CreateOutgoingMessage("ProcessType1");
-        _bundle.Add(outgoingMessage1);
+        _readyMessage.Add(outgoingMessage1);
         var outgoingMessage2 = CreateOutgoingMessage("ProcessType1");
-        _bundle.Add(outgoingMessage2);
+        _readyMessage.Add(outgoingMessage2);
 
-        var bundledMessage = _bundle.CreateMessage();
+        var bundledMessage = _readyMessage.CreateMessage();
 
         Assert.Equal(outgoingMessage1.MessageType, bundledMessage.MessageType);
         Assert.Equal(outgoingMessage1.ProcessType, bundledMessage.Header.ProcessType);
@@ -52,23 +52,23 @@ public class BundleTests
     [Fact]
     public void Cannot_create_message_when_bundle_does_not_contain_any_messages()
     {
-        Assert.Throws<NoMessagesInBundleException>(() => _bundle.CreateMessage());
+        Assert.Throws<NoMessagesInBundleException>(() => _readyMessage.CreateMessage());
     }
 
     [Fact]
     public void Messages_must_originate_from_the_same_type_of_business_process()
     {
-        _bundle.Add(CreateOutgoingMessage("ProcessType1"));
+        _readyMessage.Add(CreateOutgoingMessage("ProcessType1"));
 
-        Assert.Throws<ProcessTypesDoesNotMatchException>(() => _bundle.Add(CreateOutgoingMessage("ProcessType2")));
+        Assert.Throws<ProcessTypesDoesNotMatchException>(() => _readyMessage.Add(CreateOutgoingMessage("ProcessType2")));
     }
 
     [Fact]
     public void Messages_must_same_receiver()
     {
-        _bundle.Add(CreateOutgoingMessage("ProcessType1", "1234567890123"));
+        _readyMessage.Add(CreateOutgoingMessage("ProcessType1", "1234567890123"));
 
-        Assert.Throws<ReceiverIdsDoesNotMatchException>(() => _bundle.Add(CreateOutgoingMessage("ProcessType1", "1234567890124")));
+        Assert.Throws<ReceiverIdsDoesNotMatchException>(() => _readyMessage.Add(CreateOutgoingMessage("ProcessType1", "1234567890124")));
     }
 
     private static OutgoingMessage CreateOutgoingMessage(string processType, string receiverId)

@@ -37,9 +37,9 @@ public class BundleStore : IBundleStore
     }
 
     public async Task<bool> TryRegisterAsync(
-        Bundle bundle)
+        ReadyMessage readyMessage)
     {
-        ArgumentNullException.ThrowIfNull(bundle);
+        ArgumentNullException.ThrowIfNull(readyMessage);
 
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         var insertStatement =
@@ -49,16 +49,16 @@ public class BundleStore : IBundleStore
             insertStatement,
             new List<KeyValuePair<string, object>>()
             {
-                new("@ActorNumber", bundle.ReceiverNumber.Value),
-                new("@MessageCategory", bundle.Category.Name),
-                new("@Bundle", bundle.GeneratedDocument()),
-                new("@MessageId", bundle.MessageId),
-                new("@MessageIdsIncluded", string.Join(",", bundle.GetMessageIdsIncluded())),
+                new("@ActorNumber", readyMessage.ReceiverNumber.Value),
+                new("@MessageCategory", readyMessage.Category.Name),
+                new("@Bundle", readyMessage.GeneratedDocument()),
+                new("@MessageId", readyMessage.MessageId),
+                new("@MessageIdsIncluded", string.Join(",", readyMessage.GetMessageIdsIncluded())),
             },
             connection);
 
         var result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
-        ResetBundleStream(bundle.GeneratedDocument());
+        ResetBundleStream(readyMessage.GeneratedDocument());
 
         return result == 1;
     }

@@ -19,7 +19,7 @@ using NodaTime;
 
 namespace Messaging.Domain.OutgoingMessages;
 
-public class Bundle
+public class ReadyMessage
 {
     private readonly Instant _timestamp;
     private readonly List<EnqueuedMessage> _messages = new();
@@ -28,14 +28,14 @@ public class Bundle
     private Stream? _generatedDocument;
 
     #pragma warning disable
-    public Bundle(Instant timestamp)
+    public ReadyMessage(Instant timestamp)
     {
         MessageId = Guid.NewGuid();
         _timestamp = timestamp;
         _header = new MessageHeader(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, _timestamp);
     }
 
-    public Bundle(Instant timestamp, IEnumerable<EnqueuedMessage> messages)
+    public ReadyMessage(Instant timestamp, IEnumerable<EnqueuedMessage> messages)
     {
         MessageId = Guid.NewGuid();
         _timestamp = timestamp;
