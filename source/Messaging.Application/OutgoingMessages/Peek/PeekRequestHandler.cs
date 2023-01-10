@@ -73,7 +73,7 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
             return new PeekResult(null);
         }
 
-        var bundle = ReadyMessage.CreateFrom(ReadyMessageId.New(), messages);
+        var readyMessage = ReadyMessage.CreateFrom(ReadyMessageId.New(), messages);
 
         var messageHeader = new MessageHeader(
             messages.ProcessType,
@@ -81,7 +81,7 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
             messages.SenderRole,
             messages.ReceiverNumber,
             messages.ReceiverRole,
-            bundle.Id.Value.ToString(),
+            readyMessage.Id.Value.ToString(),
             _systemDateTimeProvider.Now());
         var cimMessage = new CimMessage(
             messages.MessageType,
@@ -90,15 +90,15 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
 
         document = await _documentFactory.CreateFromAsync(cimMessage, MessageFormat.Xml)
             .ConfigureAwait(false);
-        bundle.SetGeneratedDocument(document);
+        readyMessage.SetGeneratedDocument(document);
 
-        if (await _bundleStore.TryRegisterAsync(bundle)
+        if (await _bundleStore.TryRegisterAsync(readyMessage)
                 .ConfigureAwait(false) == false)
         {
             return new PeekResult(null);
         }
 
-        return new PeekResult(document, bundle.Id.Value);
+        return new PeekResult(document, readyMessage.Id.Value);
     }
 }
 
