@@ -86,7 +86,7 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
         var cimMessage = new CimMessage(
             messages.MessageType,
             messageHeader,
-            messages.Messages.Select(message => message.MessageRecord).ToList());
+            messages.MessageRecords);
 
         document = await _documentFactory.CreateFromAsync(cimMessage, MessageFormat.Xml)
             .ConfigureAwait(false);

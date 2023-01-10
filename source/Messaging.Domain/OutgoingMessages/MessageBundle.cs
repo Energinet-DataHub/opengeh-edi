@@ -53,6 +53,8 @@ public class MessageBundle : ValueObject
 
     public MessageType MessageType => EnumerationType.FromName<MessageType>(Messages[0].MessageType);
 
+    public IReadOnlyList<string> MessageRecords => Messages.Select(message => message.MessageRecord).ToList();
+
     public static MessageBundle Create(IReadOnlyList<EnqueuedMessage> messages)
     {
         ArgumentNullException.ThrowIfNull(messages);
