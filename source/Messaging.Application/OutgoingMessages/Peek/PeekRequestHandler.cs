@@ -65,19 +65,19 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
             return new PeekResult(document, messageId);
         }
 
-        var messages = await _enqueuedMessages.GetByAsync(request.ActorNumber, request.MessageCategory)
+        var messageBundle = await _enqueuedMessages.GetByAsync(request.ActorNumber, request.MessageCategory)
             .ConfigureAwait(false);
 
-        if (messages is null)
+        if (messageBundle is null)
         {
             return new PeekResult(null);
         }
 
         var readyMessageId = ReadyMessageId.New();
 
-        document = await _documentFactory.CreateFromAsync(readyMessageId, messages, MessageFormat.Xml, _systemDateTimeProvider.Now())
+        document = await _documentFactory.CreateFromAsync(readyMessageId, messageBundle, MessageFormat.Xml, _systemDateTimeProvider.Now())
             .ConfigureAwait(false);
-        var readyMessage = ReadyMessage.CreateFrom(readyMessageId, messages, document);
+        var readyMessage = ReadyMessage.CreateFrom(readyMessageId, messageBundle, document);
 
         if (await _bundleStore.TryRegisterAsync(readyMessage)
                 .ConfigureAwait(false) == false)
