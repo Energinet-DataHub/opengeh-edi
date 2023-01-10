@@ -23,13 +23,21 @@ namespace Messaging.Infrastructure.OutgoingMessages.Peek;
 
 internal static class PeekConfiguration
 {
-    internal static void Configure(IServiceCollection services, IBundleConfiguration bundleConfiguration, Func<IServiceProvider, IMessageStorage>? messageStorageBuilder)
+    internal static void Configure(IServiceCollection services, IBundleConfiguration bundleConfiguration, Func<IServiceProvider, IMessageStorage>? messageStorageBuilder, Func<IServiceProvider, IBundleStore>? bundleStoreBuilder)
     {
         services.AddTransient<IRequestHandler<PeekRequest, PeekResult>, PeekRequestHandler>();
         services.AddTransient<IRequestHandler<MessageCountRequest, MessageCountResult>, MessageCountRequestHandler>();
         services.AddScoped<IEnqueuedMessages, EnqueuedMessages>();
         services.AddScoped(_ => bundleConfiguration);
-        services.AddSingleton<IBundleStore, BundleStore>();
+
+        if (bundleStoreBuilder is null)
+        {
+            services.AddSingleton<IBundleStore, BundleStore>();
+        }
+        else
+        {
+            services.AddSingleton(bundleStoreBuilder);
+        }
 
         if (messageStorageBuilder is null)
         {

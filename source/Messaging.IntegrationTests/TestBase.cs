@@ -29,6 +29,7 @@ using Messaging.Infrastructure.Configuration.FeatureFlag;
 using Messaging.Infrastructure.Configuration.MessageBus;
 using Messaging.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Messaging.Infrastructure.Configuration.Serialization;
+using Messaging.Infrastructure.OutgoingMessages.Peek;
 using Messaging.Infrastructure.Transactions;
 using Messaging.Infrastructure.Transactions.MoveIn;
 using Messaging.IntegrationTests.Fixtures;
@@ -63,7 +64,10 @@ namespace Messaging.IntegrationTests
                 _ => new ServiceBusClient(CreateFakeServiceBusConnectionString()));
             CompositionRoot.Initialize(_services)
                 .AddAuthentication()
-                .AddPeekConfiguration(new BundleConfigurationStub(), sp => new MessageStorageStub(sp.GetRequiredService<IDatabaseConnectionFactory>()))
+                .AddPeekConfiguration(
+                    new BundleConfigurationStub(),
+                    sp => new MessageStorageStub(sp.GetRequiredService<IDatabaseConnectionFactory>()),
+                    sp => new BundleStoreStub(sp.GetRequiredService<IDatabaseConnectionFactory>()))
                 .AddRemoteBusinessService<DummyRequest, DummyReply>(sp => new RemoteBusinessServiceRequestSenderSpy<DummyRequest>("Dummy"), "Dummy")
                 .AddDatabaseConnectionFactory(DatabaseFixture.ConnectionString)
                 .AddDatabaseContext(DatabaseFixture.ConnectionString)

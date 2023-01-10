@@ -109,7 +109,7 @@ DELETE FROM [b2b].[BundleStore] WHERE MessageId = @messageId;
         return messageId;
     }
 
-    public async Task<ReadyMessage?> GetAsync(MessageCategory category, ActorNumber receiverNumber)
+    public virtual async Task<ReadyMessage?> GetAsync(MessageCategory category, ActorNumber receiverNumber)
     {
         ArgumentNullException.ThrowIfNull(category);
         ArgumentNullException.ThrowIfNull(receiverNumber);

@@ -107,9 +107,9 @@ namespace Messaging.Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddPeekConfiguration(IBundleConfiguration bundleConfiguration, Func<IServiceProvider, IMessageStorage>? messageStorageBuilder = null)
+        public CompositionRoot AddPeekConfiguration(IBundleConfiguration bundleConfiguration, Func<IServiceProvider, IMessageStorage>? messageStorageBuilder = null, Func<IServiceProvider, IBundleStore>? bundleStoreBuilder = null)
         {
-            PeekConfiguration.Configure(_services, bundleConfiguration, messageStorageBuilder);
+            PeekConfiguration.Configure(_services, bundleConfiguration, messageStorageBuilder, bundleStoreBuilder);
             return this;
         }
 

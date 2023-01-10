@@ -33,12 +33,12 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages;
 
 public class WhenAPeekIsRequestedTests : TestBase
 {
-    private readonly MessageStorageStub _messageStorageStub;
+    private readonly BundleStoreStub _bundleStoreStub;
 
     public WhenAPeekIsRequestedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _messageStorageStub = (MessageStorageStub)GetService<IMessageStorage>();
+        _bundleStoreStub = (BundleStoreStub)GetService<IBundleStore>();
     }
 
     [Fact]
@@ -104,7 +104,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
         await InvokeCommandAsync(CreatePeekRequest(MessageCategory.MasterData)).ConfigureAwait(false);
 
-        _messageStorageStub.ReturnsEmptyMessage();
+        _bundleStoreStub.ReturnsEmptyMessage();
         var peekResult = await InvokeCommandAsync(CreatePeekRequest(MessageCategory.MasterData)).ConfigureAwait(false);
 
         Assert.Null(peekResult.Bundle);
