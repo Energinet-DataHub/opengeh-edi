@@ -19,10 +19,6 @@ namespace Messaging.Domain.OutgoingMessages;
 
 public class MessageBundle : ValueObject
 {
-    private MessageBundle()
-    {
-    }
-
     private MessageBundle(IReadOnlyList<EnqueuedMessage> messages)
     {
         if (messages.Count == 0)
@@ -43,12 +39,7 @@ public class MessageBundle : ValueObject
         Messages = messages;
     }
 
-    public IReadOnlyList<EnqueuedMessage> Messages { get; } = new List<EnqueuedMessage>();
-
-    public static MessageBundle Empty()
-    {
-        return new MessageBundle();
-    }
+    public IReadOnlyList<EnqueuedMessage> Messages { get; }
 
     public static MessageBundle Create(IReadOnlyList<EnqueuedMessage> messages)
     {

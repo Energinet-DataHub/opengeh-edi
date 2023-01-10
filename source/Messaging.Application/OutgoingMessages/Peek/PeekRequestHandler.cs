@@ -68,7 +68,7 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
         var messages = await _enqueuedMessages.GetByAsync(request.ActorNumber, request.MessageCategory)
             .ConfigureAwait(false);
 
-        if (messages.Messages.Count == 0)
+        if (messages is null)
         {
             return new PeekResult(null);
         }

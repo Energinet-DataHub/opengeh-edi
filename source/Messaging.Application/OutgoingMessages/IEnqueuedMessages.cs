@@ -31,7 +31,7 @@ public interface IEnqueuedMessages
     /// <param name="actorNumber">Actor number of requesting actor</param>
     /// /// /// <param name="messageCategory">The category of messages to include in message</param>
     /// <returns>List of enqueued messages</returns>
-    Task<MessageBundle> GetByAsync(ActorNumber actorNumber, MessageCategory messageCategory);
+    Task<MessageBundle?> GetByAsync(ActorNumber actorNumber, MessageCategory messageCategory);
 
     /// <summary>
     /// Get the number of messages available for an actor

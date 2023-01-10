@@ -39,7 +39,7 @@ public class EnqueuedMessages : IEnqueuedMessages
         _bundleConfiguration = bundleConfiguration;
     }
 
-    public async Task<MessageBundle> GetByAsync(ActorNumber actorNumber, MessageCategory messageCategory)
+    public async Task<MessageBundle?> GetByAsync(ActorNumber actorNumber, MessageCategory messageCategory)
     {
         ArgumentNullException.ThrowIfNull(messageCategory);
         ArgumentNullException.ThrowIfNull(actorNumber);
@@ -49,7 +49,7 @@ public class EnqueuedMessages : IEnqueuedMessages
 
         if (oldestMessage is null)
         {
-            return MessageBundle.Empty();
+            return null;
         }
 
         var sqlStatement =
