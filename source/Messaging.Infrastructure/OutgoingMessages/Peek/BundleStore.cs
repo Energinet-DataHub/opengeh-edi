@@ -23,6 +23,7 @@ using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages.Dequeue;
 using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Infrastructure.Configuration.DataAccess;
 using Microsoft.Data.SqlClient;
 
 namespace Messaging.Infrastructure.OutgoingMessages.Peek;
@@ -36,8 +37,7 @@ public class BundleStore : IBundleStore
         _connectionFactory = connectionFactory;
     }
 
-    public async Task<bool> TryRegisterAsync(
-        ReadyMessage readyMessage)
+    public async Task<bool> TryAddAsync(ReadyMessage readyMessage)
     {
         ArgumentNullException.ThrowIfNull(readyMessage);
 

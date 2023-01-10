@@ -79,7 +79,7 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
             .ConfigureAwait(false);
         var readyMessage = ReadyMessage.CreateFrom(readyMessageId, messageBundle, document);
 
-        if (await _bundleStore.TryRegisterAsync(readyMessage)
+        if (await _bundleStore.TryAddAsync(readyMessage)
                 .ConfigureAwait(false) == false)
         {
             return new PeekResult(null);

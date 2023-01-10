@@ -30,7 +30,7 @@ public interface IBundleStore
     /// </summary>
     /// <param name="readyMessage"></param>
     /// <returns>void</returns>
-    Task<bool> TryRegisterAsync(
+    Task<bool> TryAddAsync(
         ReadyMessage readyMessage);
 
     /// <summary>
