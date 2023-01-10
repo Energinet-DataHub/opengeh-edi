@@ -16,7 +16,9 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Messaging.Application.OutgoingMessages.Dequeue;
+using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages.Peek;
 
 namespace Messaging.Application.OutgoingMessages.Peek;
 
@@ -46,4 +48,12 @@ public interface IBundleStore
     /// <param name="bundleId"></param>
     /// <returns>Message Id</returns>
     Task<Guid?> GetBundleMessageIdOfAsync(BundleId bundleId);
+
+    /// <summary>
+    /// Retrieve a ready message from repository
+    /// </summary>
+    /// <param name="category"></param>
+    /// <param name="receiverNumber"></param>
+    /// <returns><see cref="ReadyMessage"/></returns>
+    Task<ReadyMessage?> GetAsync(MessageCategory category, ActorNumber receiverNumber);
 }

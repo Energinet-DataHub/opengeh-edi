@@ -50,4 +50,9 @@ public class ReadyMessage
             messageBundle.MessageIds,
             generatedDocument);
     }
+
+    public static ReadyMessage Create(ReadyMessageId id, ActorNumber receiverNumber, MessageCategory category, IEnumerable<Guid> messageIdsIncluded, Stream document)
+    {
+        return new ReadyMessage(id, receiverNumber, category, messageIdsIncluded, document);
+    }
 }

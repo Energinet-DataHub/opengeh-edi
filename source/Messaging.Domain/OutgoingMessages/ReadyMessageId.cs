@@ -29,4 +29,9 @@ public class ReadyMessageId : ValueObject
     {
         return new ReadyMessageId(Guid.NewGuid());
     }
+
+    public static ReadyMessageId From(Guid id)
+    {
+        return new ReadyMessageId(id);
+    }
 }

@@ -17,13 +17,15 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages.Dequeue;
 using Messaging.Application.OutgoingMessages.Peek;
+using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
-using Messaging.Infrastructure.Configuration.DataAccess;
+using Messaging.Domain.OutgoingMessages.Peek;
 using Microsoft.Data.SqlClient;
 
 namespace Messaging.Infrastructure.OutgoingMessages.Peek;
@@ -105,6 +107,38 @@ DELETE FROM [b2b].[BundleStore] WHERE MessageId = @messageId;
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         var messageId = await connection.QueryFirstOrDefaultAsync<Guid?>(sqlquery, new { ActorNumber = bundleId.ReceiverNumber.Value, MessageCategory = bundleId.MessageCategory.Name }).ConfigureAwait(false);
         return messageId;
+    }
+
+    public async Task<ReadyMessage?> GetAsync(MessageCategory category, ActorNumber receiverNumber)
+    {
+        ArgumentNullException.ThrowIfNull(category);
+        ArgumentNullException.ThrowIfNull(receiverNumber);
+
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var command = CreateCommand(
+            $"SELECT MessageId, ActorNumber, MessageCategory, MessageIdsIncluded, Bundle FROM b2b.BundleStore WHERE ActorNumber = @ActorNumber AND MessageCategory = @MessageCategory",
+            new List<KeyValuePair<string, object>>
+            {
+                new("@ActorNumber", receiverNumber.Value),
+                new("@MessageCategory", category.Name),
+            },
+            connection);
+
+        using var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
+        await reader.ReadAsync().ConfigureAwait(false);
+        if (reader.HasRows == false)
+        {
+            return null;
+        }
+
+        var id = ReadyMessageId.From(reader.GetGuid(0));
+        var messageIdsIncluded = reader
+            .GetString(3)
+            .Split(",")
+            .Select(messageId => Guid.Parse(messageId))
+            .AsEnumerable();
+        var document = reader.GetStream(4);
+        return ReadyMessage.Create(id, receiverNumber, category, messageIdsIncluded, document);
     }
 
     private static void ResetBundleStream(Stream document)

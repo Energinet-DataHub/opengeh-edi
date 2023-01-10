@@ -53,6 +53,7 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
     {
         ArgumentNullException.ThrowIfNull(request);
 
+        var readyMessage = await _bundleStore.GetAsync(request.MessageCategory, request.ActorNumber).ConfigureAwait(false);
         var document = await _messageStorage
             .GetMessageOfAsync(BundleId.Create(request.MessageCategory, request.ActorNumber))
             .ConfigureAwait(false);
@@ -77,7 +78,7 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
 
         document = await _documentFactory.CreateFromAsync(readyMessageId, messageBundle, MessageFormat.Xml, _systemDateTimeProvider.Now())
             .ConfigureAwait(false);
-        var readyMessage = ReadyMessage.CreateFrom(readyMessageId, messageBundle, document);
+        readyMessage = ReadyMessage.CreateFrom(readyMessageId, messageBundle, document);
 
         if (await _bundleStore.TryAddAsync(readyMessage)
                 .ConfigureAwait(false) == false)
