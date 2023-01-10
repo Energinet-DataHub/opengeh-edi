@@ -31,24 +31,6 @@ public class DocumentFactory
         _documentWriters = documentWriters.ToList();
     }
 
-    public Task<Stream> CreateFromAsync(CimMessage message, MessageFormat documentFormat)
-    {
-        if (message == null) throw new ArgumentNullException(nameof(message));
-        var documentWriter =
-            _documentWriters.FirstOrDefault(writer =>
-                writer.HandlesType(message.MessageType) &&
-                writer.HandlesFormat(documentFormat));
-
-        if (documentWriter is null)
-        {
-            throw new OutgoingMessageException($"Could not handle document type {message.MessageType}");
-        }
-
-        return documentWriter.WriteAsync(
-            message.Header,
-            message.MarketActivityRecordPayloads);
-    }
-
     public Task<Stream> CreateFromAsync(ReadyMessageId readyMessageId, MessageBundle messageBundle, MessageFormat documentFormat, Instant timestamp)
     {
         ArgumentNullException.ThrowIfNull(readyMessageId);
