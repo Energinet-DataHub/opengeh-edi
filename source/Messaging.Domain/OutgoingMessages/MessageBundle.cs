@@ -30,12 +30,16 @@ public class MessageBundle : ValueObject
             throw new BundleException("A message bundle cannot be empty.");
         }
 
-        EnsureProcessTypeMatches(messages);
-        EnsureReceiverNumberMatches(messages);
-        EnsureReceiverRoleMatches(messages);
-        EnsureSenderNumberMatches(messages);
-        EnsureSenderRoleMatches(messages);
-        EnsureMessageTypeMatches(messages);
+        if (messages.Count > 1)
+        {
+            EnsureProcessTypeMatches(messages);
+            EnsureReceiverNumberMatches(messages);
+            EnsureReceiverRoleMatches(messages);
+            EnsureSenderNumberMatches(messages);
+            EnsureSenderRoleMatches(messages);
+            EnsureMessageTypeMatches(messages);
+        }
+
         Messages = messages.ToList();
     }
 
