@@ -99,16 +99,6 @@ DELETE FROM [b2b].[BundleStore] WHERE MessageId = @messageId;
         return result > 0 ? new DequeueResult(true) : new DequeueResult(false);
     }
 
-    public async Task<Guid?> GetBundleMessageIdOfAsync(BundleId bundleId)
-    {
-        ArgumentNullException.ThrowIfNull(bundleId);
-        const string sqlquery = @"SELECT MessageId FROM [b2b].[BundleStore] WHERE ActorNumber = @ActorNumber AND MessageCategory = @MessageCategory";
-
-        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
-        var messageId = await connection.QueryFirstOrDefaultAsync<Guid?>(sqlquery, new { ActorNumber = bundleId.ReceiverNumber.Value, MessageCategory = bundleId.MessageCategory.Name }).ConfigureAwait(false);
-        return messageId;
-    }
-
     public virtual async Task<ReadyMessage?> GetAsync(MessageCategory category, ActorNumber receiverNumber)
     {
         ArgumentNullException.ThrowIfNull(category);

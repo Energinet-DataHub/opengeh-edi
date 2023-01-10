@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.IO;
 using System.Threading.Tasks;
 using Messaging.Application.OutgoingMessages.Dequeue;
 using Messaging.Domain.Actors;
@@ -41,13 +40,6 @@ public interface IBundleStore
     /// <param name="messageId"></param>
     /// <returns>DequeueResult</returns>
     Task<DequeueResult> DequeueAsync(Guid messageId);
-
-    /// <summary>
-    /// Get bundle message Id
-    /// </summary>
-    /// <param name="bundleId"></param>
-    /// <returns>Message Id</returns>
-    Task<Guid?> GetBundleMessageIdOfAsync(BundleId bundleId);
 
     /// <summary>
     /// Retrieve a ready message from repository
