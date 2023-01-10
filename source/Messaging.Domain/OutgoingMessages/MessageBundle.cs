@@ -41,6 +41,18 @@ public class MessageBundle : ValueObject
 
     public IReadOnlyList<EnqueuedMessage> Messages { get; }
 
+    public string ProcessType => Messages[0].ProcessType;
+
+    public string SenderNumber => Messages[0].SenderId;
+
+    public string SenderRole => Messages[0].SenderRole;
+
+    public string ReceiverNumber => Messages[0].ReceiverId;
+
+    public string ReceiverRole => Messages[0].ReceiverRole;
+
+    public MessageType MessageType => EnumerationType.FromName<MessageType>(Messages[0].MessageType);
+
     public static MessageBundle Create(IReadOnlyList<EnqueuedMessage> messages)
     {
         ArgumentNullException.ThrowIfNull(messages);

@@ -73,8 +73,22 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
             return new PeekResult(null);
         }
 
-        var bundle = new ReadyMessage(_systemDateTimeProvider.Now(), messages.Messages);
-        document = await _documentFactory.CreateFromAsync(bundle.CreateMessage(), MessageFormat.Xml)
+        var bundle = new ReadyMessage(ReadyMessageId.New(), _systemDateTimeProvider.Now(), messages.Messages);
+
+        var messageHeader = new MessageHeader(
+            messages.ProcessType,
+            messages.SenderNumber,
+            messages.SenderRole,
+            messages.ReceiverNumber,
+            messages.ReceiverRole,
+            bundle.Id.Value.ToString(),
+            _systemDateTimeProvider.Now());
+        var cimMessage = new CimMessage(
+            messages.MessageType,
+            messageHeader,
+            messages.Messages.Select(message => message.MessageRecord).ToList());
+
+        document = await _documentFactory.CreateFromAsync(cimMessage, MessageFormat.Xml)
             .ConfigureAwait(false);
         bundle.SetGeneratedDocument(document);
 

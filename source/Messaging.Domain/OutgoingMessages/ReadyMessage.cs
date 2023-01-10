@@ -30,14 +30,14 @@ public class ReadyMessage
     #pragma warning disable
     public ReadyMessage(Instant timestamp)
     {
-        MessageId = Guid.NewGuid();
+        Id = ReadyMessageId.New();
         _timestamp = timestamp;
         _header = new MessageHeader(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, _timestamp);
     }
 
-    public ReadyMessage(Instant timestamp, IEnumerable<EnqueuedMessage> messages)
+    public ReadyMessage(ReadyMessageId id, Instant timestamp, IEnumerable<EnqueuedMessage> messages)
     {
-        MessageId = Guid.NewGuid();
+        Id = id;
         _timestamp = timestamp;
         _header = new MessageHeader(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, _timestamp);
         _messages = messages.ToList();
@@ -47,7 +47,9 @@ public class ReadyMessage
         Category = EnumerationType.FromName<MessageCategory>(_messages.First().Category);
     }
 
-    public Guid MessageId { get; }
+    public ReadyMessageId Id { get; }
+
+    public Guid MessageId => Id.Value;
 
     public ActorNumber ReceiverNumber { get; }
 
