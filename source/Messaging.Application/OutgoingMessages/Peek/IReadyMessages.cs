@@ -22,20 +22,19 @@ using Messaging.Domain.OutgoingMessages.Peek;
 namespace Messaging.Application.OutgoingMessages.Peek;
 
 /// <summary>
-/// Bundlestore interface
+/// Repository of ready messages
 /// </summary>
-public interface IBundleStore
+public interface IReadyMessages
 {
     /// <summary>
-    /// Set bundle
+    /// Adds a ready message to repository
     /// </summary>
     /// <param name="readyMessage"></param>
     /// <returns>void</returns>
-    Task<bool> TryAddAsync(
-        ReadyMessage readyMessage);
+    Task<bool> TryAddAsync(ReadyMessage readyMessage);
 
     /// <summary>
-    /// Dequeue bundle
+    /// Dequeue ready message
     /// </summary>
     /// <param name="messageId"></param>
     /// <returns>DequeueResult</returns>

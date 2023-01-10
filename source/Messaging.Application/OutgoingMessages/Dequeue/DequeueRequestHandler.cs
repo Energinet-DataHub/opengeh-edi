@@ -23,18 +23,18 @@ namespace Messaging.Application.OutgoingMessages.Dequeue;
 
 public class DequeueRequestHandler : IRequestHandler<DequeueRequest, DequeueResult>
 {
-    private readonly IBundleStore _bundleStore;
+    private readonly IReadyMessages _readyMessages;
 
-    public DequeueRequestHandler(IBundleStore bundleStore)
+    public DequeueRequestHandler(IReadyMessages readyMessages)
     {
-        _bundleStore = bundleStore;
+        _readyMessages = readyMessages;
     }
 
     public Task<DequeueResult> Handle(DequeueRequest request, CancellationToken cancellationToken)
     {
        ArgumentNullException.ThrowIfNull(request);
 
-       return _bundleStore.DequeueAsync(request.MessageId);
+       return _readyMessages.DequeueAsync(request.MessageId);
     }
 }
 

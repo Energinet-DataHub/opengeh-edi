@@ -21,11 +21,11 @@ using Messaging.Infrastructure.OutgoingMessages.Peek;
 
 namespace Messaging.IntegrationTests.TestDoubles;
 
-public class BundleStoreStub : BundleStore
+public class ReadyMessagesStub : ReadyMessages
 {
     private bool _shouldReturnEmptyMessage;
 
-    public BundleStoreStub(IDatabaseConnectionFactory connectionFactory)
+    public ReadyMessagesStub(IDatabaseConnectionFactory connectionFactory)
         : base(connectionFactory)
     {
     }

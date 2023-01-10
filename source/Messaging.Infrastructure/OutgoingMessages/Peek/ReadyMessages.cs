@@ -19,7 +19,6 @@ using System.Data.Common;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages.Dequeue;
 using Messaging.Application.OutgoingMessages.Peek;
@@ -30,11 +29,11 @@ using Microsoft.Data.SqlClient;
 
 namespace Messaging.Infrastructure.OutgoingMessages.Peek;
 
-public class BundleStore : IBundleStore
+public class ReadyMessages : IReadyMessages
 {
     private readonly IDatabaseConnectionFactory _connectionFactory;
 
-    public BundleStore(IDatabaseConnectionFactory connectionFactory)
+    public ReadyMessages(IDatabaseConnectionFactory connectionFactory)
     {
         _connectionFactory = connectionFactory;
     }
