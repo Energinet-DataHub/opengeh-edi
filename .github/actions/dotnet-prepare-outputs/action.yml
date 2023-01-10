@@ -61,3 +61,13 @@ runs:
           --no-restore \
           --configuration Release \
           --output '${{ inputs.OUTPUT_PATH }}\functions\processing'
+
+    - name: Publish PerformanceTest
+      shell: bash
+      run: |
+        dotnet publish \
+          'source/Messaging.PerformanceTest/Messaging.PerformanceTest.csproj' \
+          --no-build \
+          --no-restore \
+          --configuration Release \
+          --output '${{ inputs.OUTPUT_PATH }}\functions\performancetest'

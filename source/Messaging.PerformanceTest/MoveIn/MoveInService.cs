@@ -44,7 +44,12 @@ internal class MoveInService : IMoveInService
 
         using var httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
-        await httpClient.PostAsync(new Uri($"http://{_hostname}:{_hostport}/api/RequestChangeOfSupplier"), body).ConfigureAwait(false);
+        await httpClient.PostAsync(new Uri($"{GetHttpProtocol(_hostport)}://{_hostname}:{_hostport}/api/RequestChangeOfSupplier"), body).ConfigureAwait(false);
+    }
+
+    private static string GetHttpProtocol(string httpPort)
+    {
+        return httpPort.Equals("443", StringComparison.Ordinal) ? "https" : "http";
     }
 
     private static string GetMoveInPayload(string uniqueActorNumber)
