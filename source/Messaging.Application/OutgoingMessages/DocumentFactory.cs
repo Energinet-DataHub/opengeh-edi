@@ -18,6 +18,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Messaging.Domain.OutgoingMessages;
+using NodaTime;
 
 namespace Messaging.Application.OutgoingMessages;
 
@@ -48,10 +49,35 @@ public class DocumentFactory
             message.MarketActivityRecordPayloads);
     }
 
-    public bool CanHandle(MessageType messageType, MessageFormat documentFormat)
+    public Task<Stream> CreateFromAsync(ReadyMessageId readyMessageId, MessageBundle messageBundle, MessageFormat documentFormat, Instant timestamp)
     {
-        return _documentWriters.Any(writer =>
-            writer.HandlesType(messageType) &&
-            writer.HandlesFormat(documentFormat));
+        ArgumentNullException.ThrowIfNull(readyMessageId);
+        ArgumentNullException.ThrowIfNull(messageBundle);
+
+        var documentWriter =
+            _documentWriters.FirstOrDefault(writer =>
+                writer.HandlesType(messageBundle.MessageType) &&
+                writer.HandlesFormat(documentFormat));
+
+        if (documentWriter is null)
+        {
+            throw new OutgoingMessageException($"Could not handle document type {messageBundle.MessageType.Name}");
+        }
+
+        return documentWriter.WriteAsync(
+            CreateHeader(readyMessageId, messageBundle, timestamp),
+            messageBundle.MessageRecords);
+    }
+
+    private static MessageHeader CreateHeader(ReadyMessageId readyMessageId, MessageBundle messageBundle, Instant timeStamp)
+    {
+        return new MessageHeader(
+            messageBundle.ProcessType,
+            messageBundle.SenderNumber,
+            messageBundle.SenderRole,
+            messageBundle.ReceiverNumber,
+            messageBundle.ReceiverRole,
+            readyMessageId.Value.ToString(),
+            timeStamp);
     }
 }
