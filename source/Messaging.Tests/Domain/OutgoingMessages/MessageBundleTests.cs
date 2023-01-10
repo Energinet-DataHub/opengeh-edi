@@ -23,6 +23,12 @@ namespace Messaging.Tests.Domain.OutgoingMessages;
 public class MessageBundleTests
 {
     [Fact]
+    public void A_message_bundle_must_contain_message()
+    {
+        Assert.Throws<BundleException>(() => MessageBundle.Create(new List<EnqueuedMessage>()));
+    }
+
+    [Fact]
     public void All_messages_in_bundle_must_originate_from_the_same_type_of_process()
     {
         var messages = new List<EnqueuedMessage>()

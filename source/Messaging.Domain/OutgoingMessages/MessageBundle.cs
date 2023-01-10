@@ -25,6 +25,11 @@ public class MessageBundle : ValueObject
 
     private MessageBundle(IReadOnlyList<EnqueuedMessage> messages)
     {
+        if (messages.Count == 0)
+        {
+            throw new BundleException("A message bundle cannot be empty.");
+        }
+
         EnsureProcessTypeMatches(messages);
         EnsureReceiverNumberMatches(messages);
         EnsureReceiverRoleMatches(messages);
