@@ -66,7 +66,6 @@ namespace Messaging.IntegrationTests
                 .AddAuthentication()
                 .AddPeekConfiguration(
                     new BundleConfigurationStub(),
-                    sp => new MessageStorageStub(sp.GetRequiredService<IDatabaseConnectionFactory>()),
                     sp => new BundleStoreStub(sp.GetRequiredService<IDatabaseConnectionFactory>()))
                 .AddRemoteBusinessService<DummyRequest, DummyReply>(sp => new RemoteBusinessServiceRequestSenderSpy<DummyRequest>("Dummy"), "Dummy")
                 .AddDatabaseConnectionFactory(DatabaseFixture.ConnectionString)

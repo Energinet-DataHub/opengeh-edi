@@ -13,9 +13,7 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -33,20 +31,17 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
     private readonly DocumentFactory _documentFactory;
     private readonly IEnqueuedMessages _enqueuedMessages;
     private readonly IBundleStore _bundleStore;
-    private readonly IMessageStorage _messageStorage;
 
     public PeekRequestHandler(
         ISystemDateTimeProvider systemDateTimeProvider,
         DocumentFactory documentFactory,
         IEnqueuedMessages enqueuedMessages,
-        IBundleStore bundleStore,
-        IMessageStorage messageStorage)
+        IBundleStore bundleStore)
     {
         _systemDateTimeProvider = systemDateTimeProvider;
         _documentFactory = documentFactory;
         _enqueuedMessages = enqueuedMessages;
         _bundleStore = bundleStore;
-        _messageStorage = messageStorage;
     }
 
     public async Task<PeekResult> Handle(PeekRequest request, CancellationToken cancellationToken)

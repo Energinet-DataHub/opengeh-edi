@@ -23,7 +23,7 @@ namespace Messaging.Infrastructure.OutgoingMessages.Peek;
 
 internal static class PeekConfiguration
 {
-    internal static void Configure(IServiceCollection services, IBundleConfiguration bundleConfiguration, Func<IServiceProvider, IMessageStorage>? messageStorageBuilder, Func<IServiceProvider, IBundleStore>? bundleStoreBuilder)
+    internal static void Configure(IServiceCollection services, IBundleConfiguration bundleConfiguration, Func<IServiceProvider, IBundleStore>? bundleStoreBuilder)
     {
         services.AddTransient<IRequestHandler<PeekRequest, PeekResult>, PeekRequestHandler>();
         services.AddTransient<IRequestHandler<MessageCountRequest, MessageCountResult>, MessageCountRequestHandler>();
@@ -37,15 +37,6 @@ internal static class PeekConfiguration
         else
         {
             services.AddSingleton(bundleStoreBuilder);
-        }
-
-        if (messageStorageBuilder is null)
-        {
-            services.AddSingleton<IMessageStorage, MessageStorage>();
-        }
-        else
-        {
-            services.AddSingleton(messageStorageBuilder);
         }
     }
 }
