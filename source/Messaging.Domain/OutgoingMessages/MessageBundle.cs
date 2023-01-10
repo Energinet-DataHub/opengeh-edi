@@ -19,6 +19,8 @@ namespace Messaging.Domain.OutgoingMessages;
 
 public class MessageBundle : ValueObject
 {
+    private readonly IReadOnlyList<EnqueuedMessage> _messages;
+
     private MessageBundle(IReadOnlyList<EnqueuedMessage> messages)
     {
         if (messages.Count == 0)
@@ -36,28 +38,26 @@ public class MessageBundle : ValueObject
             EnsureMessageTypeMatches(messages);
         }
 
-        Messages = messages;
+        _messages = messages;
     }
 
-    public IReadOnlyList<EnqueuedMessage> Messages { get; }
+    public string ProcessType => _messages[0].ProcessType;
 
-    public string ProcessType => Messages[0].ProcessType;
+    public string SenderNumber => _messages[0].SenderId;
 
-    public string SenderNumber => Messages[0].SenderId;
+    public string SenderRole => _messages[0].SenderRole;
 
-    public string SenderRole => Messages[0].SenderRole;
+    public string ReceiverNumber => _messages[0].ReceiverId;
 
-    public string ReceiverNumber => Messages[0].ReceiverId;
+    public string ReceiverRole => _messages[0].ReceiverRole;
 
-    public string ReceiverRole => Messages[0].ReceiverRole;
+    public MessageType MessageType => EnumerationType.FromName<MessageType>(_messages[0].MessageType);
 
-    public MessageType MessageType => EnumerationType.FromName<MessageType>(Messages[0].MessageType);
+    public string Category => _messages[0].Category;
 
-    public string Category => Messages[0].Category;
+    public IReadOnlyList<string> MessageRecords => _messages.Select(message => message.MessageRecord).ToList();
 
-    public IReadOnlyList<string> MessageRecords => Messages.Select(message => message.MessageRecord).ToList();
-
-    public IEnumerable<Guid> MessageIds => Messages.Select(message => message.Id).AsEnumerable();
+    public IEnumerable<Guid> MessageIds => _messages.Select(message => message.Id).AsEnumerable();
 
     public static MessageBundle Create(IReadOnlyList<EnqueuedMessage> messages)
     {
