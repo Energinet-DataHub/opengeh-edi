@@ -34,8 +34,6 @@ public class ReadyMessage
 
     public ReadyMessageId Id { get; }
 
-    public Guid MessageId => Id.Value;
-
     public ActorNumber ReceiverNumber { get; }
 
     public MessageCategory Category { get; }

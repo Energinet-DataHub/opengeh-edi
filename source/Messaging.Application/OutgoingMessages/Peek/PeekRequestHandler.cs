@@ -98,7 +98,7 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
             return new PeekResult(null);
         }
 
-        return new PeekResult(document, bundle.MessageId);
+        return new PeekResult(document, bundle.Id.Value);
     }
 }
 

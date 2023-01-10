@@ -52,7 +52,7 @@ public class BundleStore : IBundleStore
                 new("@ActorNumber", readyMessage.ReceiverNumber.Value),
                 new("@MessageCategory", readyMessage.Category.Name),
                 new("@Bundle", readyMessage.GeneratedDocument()),
-                new("@MessageId", readyMessage.MessageId),
+                new("@MessageId", readyMessage.Id.Value),
                 new("@MessageIdsIncluded", string.Join(",", readyMessage.GetMessageIdsIncluded())),
             },
             connection);
