@@ -76,8 +76,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         await GivenTwoMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
         await InsertFakeMessagesAsync(SampleData.NewEnergySupplierNumber, MarketRole.EnergySupplier, MessageCategory.MasterData, ProcessType.MoveIn, MessageType.ConfirmRequestChangeOfSupplier).ConfigureAwait(false);
 
-        var command = CreatePeekRequest(MessageCategory.MasterData);
-        var result = await InvokeCommandAsync(command).ConfigureAwait(false);
+        var result = await PeekMessage(MessageCategory.Aggregations).ConfigureAwait(false);
 
         AssertXmlMessage.Document(XDocument.Load(result.Bundle!))
             .IsDocumentType(MessageType.ConfirmRequestChangeOfSupplier)
