@@ -183,7 +183,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     {
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
         var numberOfBundles = await connection
-            .ExecuteScalarAsync<int>("SELECT COUNT(*) FROM b2b.ReadyMessages").ConfigureAwait(false);
+            .ExecuteScalarAsync<int>("SELECT COUNT(*) FROM b2b.BundledMessages").ConfigureAwait(false);
         return numberOfBundles == 1;
     }
 }

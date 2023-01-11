@@ -44,8 +44,8 @@ public class BundledMessages : IBundledMessages
 
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         var insertStatement =
-            $"IF NOT EXISTS (SELECT * FROM b2b.ReadyMessages WHERE ReceiverNumber = @ReceiverNumber AND MessageCategory = @MessageCategory)" +
-            $"INSERT INTO b2b.ReadyMessages(ReceiverNumber, MessageCategory, Id, MessageIdsIncluded, GeneratedDocument) VALUES(@ReceiverNumber, @MessageCategory, @Id, @MessageIdsIncluded, @GeneratedDocument)";
+            $"IF NOT EXISTS (SELECT * FROM b2b.BundledMessages WHERE ReceiverNumber = @ReceiverNumber AND MessageCategory = @MessageCategory)" +
+            $"INSERT INTO b2b.BundledMessages(ReceiverNumber, MessageCategory, Id, MessageIdsIncluded, GeneratedDocument) VALUES(@ReceiverNumber, @MessageCategory, @Id, @MessageIdsIncluded, @GeneratedDocument)";
         using var command = CreateCommand(
             insertStatement,
             new List<KeyValuePair<string, object>>()
@@ -68,11 +68,11 @@ public class BundledMessages : IBundledMessages
     {
         const string deleteStmt = @"
 DELETE E FROM [b2b].[EnqueuedMessages] E JOIN
-(SELECT EnqueuedMessageId = value FROM [b2b].[ReadyMessages]
+(SELECT EnqueuedMessageId = value FROM [b2b].[BundledMessages]
 CROSS APPLY STRING_SPLIT(MessageIdsIncluded, ',') WHERE Id = @Id) AS P
 ON E.Id = P.EnqueuedMessageId;
 
-DELETE FROM [b2b].[ReadyMessages] WHERE Id = @Id;
+DELETE FROM [b2b].[BundledMessages] WHERE Id = @Id;
 ";
 
         using var connection = (SqlConnection)await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
@@ -105,7 +105,7 @@ DELETE FROM [b2b].[ReadyMessages] WHERE Id = @Id;
 
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         using var command = CreateCommand(
-            $"SELECT Id, ReceiverNumber, MessageCategory, MessageIdsIncluded, GeneratedDocument FROM b2b.ReadyMessages WHERE ReceiverNumber = @ReceiverNumber AND MessageCategory = @MessageCategory",
+            $"SELECT Id, ReceiverNumber, MessageCategory, MessageIdsIncluded, GeneratedDocument FROM b2b.BundledMessages WHERE ReceiverNumber = @ReceiverNumber AND MessageCategory = @MessageCategory",
             new List<KeyValuePair<string, object>>
             {
                 new("@ReceiverNumber", receiverNumber.Value),

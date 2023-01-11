@@ -86,7 +86,7 @@ limitations under the License.
     <None Remove="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
     <EmbeddedResource Include="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
     <None Remove="Scripts\Model\202227101336 Add ReadyMessages Table.sql" />
-    <EmbeddedResource Include="Scripts\Model\202227101336 Add ReadyMessages Table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101336 Add BundledMessages Table.sql" />
   </ItemGroup>
 
 </Project>

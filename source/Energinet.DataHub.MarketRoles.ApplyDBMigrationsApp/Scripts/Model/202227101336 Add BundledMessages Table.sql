@@ -1,5 +1,5 @@
 ﻿DROP TABLE [B2B].[BundleStore]
-CREATE TABLE [B2B].[ReadyMessages]
+CREATE TABLE [B2B].[BundledMessages]
 (
     [RecordId]                         [int] IDENTITY (1,1) NOT NULL,
     [Id]                               [uniqueIdentifier]   NOT NULL,
