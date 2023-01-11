@@ -17,11 +17,11 @@ using Messaging.Domain.SeedWork;
 
 namespace Messaging.Domain.OutgoingMessages;
 
-public class MessageBundle : ValueObject
+public class MessageRecords : ValueObject
 {
     private readonly IReadOnlyList<EnqueuedMessage> _messages;
 
-    private MessageBundle(IReadOnlyList<EnqueuedMessage> messages)
+    private MessageRecords(IReadOnlyList<EnqueuedMessage> messages)
     {
         if (messages.Count == 0)
         {
@@ -55,14 +55,14 @@ public class MessageBundle : ValueObject
 
     public string Category => _messages[0].Category;
 
-    public IReadOnlyList<string> MessageRecords => _messages.Select(message => message.MessageRecord).ToList();
+    public IReadOnlyList<string> Records => _messages.Select(message => message.MessageRecord).ToList();
 
     public IEnumerable<Guid> MessageIds => _messages.Select(message => message.Id).AsEnumerable();
 
-    public static MessageBundle Create(IReadOnlyList<EnqueuedMessage> messages)
+    public static MessageRecords Create(IReadOnlyList<EnqueuedMessage> messages)
     {
         ArgumentNullException.ThrowIfNull(messages);
-        return new MessageBundle(messages);
+        return new MessageRecords(messages);
     }
 
     private static void EnsureProcessTypeMatches(IReadOnlyList<EnqueuedMessage> messages)

@@ -39,7 +39,7 @@ public class EnqueuedMessages : IEnqueuedMessages
         _bundleConfiguration = bundleConfiguration;
     }
 
-    public async Task<MessageBundle?> GetByAsync(ActorNumber actorNumber, MessageCategory messageCategory)
+    public async Task<MessageRecords?> GetByAsync(ActorNumber actorNumber, MessageCategory messageCategory)
     {
         ArgumentNullException.ThrowIfNull(messageCategory);
         ArgumentNullException.ThrowIfNull(actorNumber);
@@ -76,7 +76,7 @@ public class EnqueuedMessages : IEnqueuedMessages
                 ReceiverId = actorNumber.Value,
             }).ConfigureAwait(false);
 
-        return MessageBundle.Create(
+        return MessageRecords.Create(
             messages.ToList());
     }
 

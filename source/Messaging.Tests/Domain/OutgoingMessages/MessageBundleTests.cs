@@ -25,7 +25,7 @@ public class MessageBundleTests
     [Fact]
     public void A_message_bundle_must_contain_message()
     {
-        Assert.Throws<BundleException>(() => MessageBundle.Create(new List<EnqueuedMessage>()));
+        Assert.Throws<BundleException>(() => MessageRecords.Create(new List<EnqueuedMessage>()));
     }
 
     [Fact]
@@ -38,7 +38,7 @@ public class MessageBundleTests
         };
 
         Assert.Throws<ProcessTypesDoesNotMatchException>(() =>
-            MessageBundle.Create(messages));
+            MessageRecords.Create(messages));
     }
 
     [Fact]
@@ -51,7 +51,7 @@ public class MessageBundleTests
         };
 
         Assert.Throws<ReceiverIdsDoesNotMatchException>(() =>
-            MessageBundle.Create(messages));
+            MessageRecords.Create(messages));
     }
 
     [Fact]
@@ -64,7 +64,7 @@ public class MessageBundleTests
         };
 
         Assert.Throws<ReceiverRoleDoesNotMatchException>(() =>
-            MessageBundle.Create(messages));
+            MessageRecords.Create(messages));
     }
 
     [Fact]
@@ -77,7 +77,7 @@ public class MessageBundleTests
         };
 
         Assert.Throws<SenderNumberDoesNotMatchException>(() =>
-            MessageBundle.Create(messages));
+            MessageRecords.Create(messages));
     }
 
     [Fact]
@@ -90,7 +90,7 @@ public class MessageBundleTests
         };
 
         Assert.Throws<SenderRoleDoesNotMatchException>(() =>
-            MessageBundle.Create(messages));
+            MessageRecords.Create(messages));
     }
 
     [Fact]
@@ -103,7 +103,7 @@ public class MessageBundleTests
         };
 
         Assert.Throws<MessageTypeDoesNotMatchException>(() =>
-            MessageBundle.Create(messages));
+            MessageRecords.Create(messages));
     }
 
     private static EnqueuedMessage CreateEnqueuedMessage(

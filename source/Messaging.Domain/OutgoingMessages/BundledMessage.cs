@@ -39,15 +39,15 @@ public class BundledMessage
 
     public Stream GeneratedDocument { get; }
 
-    public static BundledMessage CreateFrom(BundledMessageId id, MessageBundle messageBundle, Stream generatedDocument)
+    public static BundledMessage CreateFrom(BundledMessageId id, MessageRecords messageRecords, Stream generatedDocument)
     {
-        ArgumentNullException.ThrowIfNull(messageBundle);
+        ArgumentNullException.ThrowIfNull(messageRecords);
 
         return new BundledMessage(
             id,
-            ActorNumber.Create(messageBundle.ReceiverNumber),
-            EnumerationType.FromName<MessageCategory>(messageBundle.Category),
-            messageBundle.MessageIds,
+            ActorNumber.Create(messageRecords.ReceiverNumber),
+            EnumerationType.FromName<MessageCategory>(messageRecords.Category),
+            messageRecords.MessageIds,
             generatedDocument);
     }
 

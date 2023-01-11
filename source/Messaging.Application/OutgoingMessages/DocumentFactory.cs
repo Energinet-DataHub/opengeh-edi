@@ -31,34 +31,34 @@ public class DocumentFactory
         _documentWriters = documentWriters.ToList();
     }
 
-    public Task<Stream> CreateFromAsync(BundledMessageId bundledMessageId, MessageBundle messageBundle, MessageFormat documentFormat, Instant timestamp)
+    public Task<Stream> CreateFromAsync(BundledMessageId bundledMessageId, MessageRecords messageRecords, MessageFormat documentFormat, Instant timestamp)
     {
         ArgumentNullException.ThrowIfNull(bundledMessageId);
-        ArgumentNullException.ThrowIfNull(messageBundle);
+        ArgumentNullException.ThrowIfNull(messageRecords);
 
         var documentWriter =
             _documentWriters.FirstOrDefault(writer =>
-                writer.HandlesType(messageBundle.MessageType) &&
+                writer.HandlesType(messageRecords.MessageType) &&
                 writer.HandlesFormat(documentFormat));
 
         if (documentWriter is null)
         {
-            throw new OutgoingMessageException($"Could not handle document type {messageBundle.MessageType.Name}");
+            throw new OutgoingMessageException($"Could not handle document type {messageRecords.MessageType.Name}");
         }
 
         return documentWriter.WriteAsync(
-            CreateHeader(bundledMessageId, messageBundle, timestamp),
-            messageBundle.MessageRecords);
+            CreateHeader(bundledMessageId, messageRecords, timestamp),
+            messageRecords.Records);
     }
 
-    private static MessageHeader CreateHeader(BundledMessageId bundledMessageId, MessageBundle messageBundle, Instant timeStamp)
+    private static MessageHeader CreateHeader(BundledMessageId bundledMessageId, MessageRecords messageRecords, Instant timeStamp)
     {
         return new MessageHeader(
-            messageBundle.ProcessType,
-            messageBundle.SenderNumber,
-            messageBundle.SenderRole,
-            messageBundle.ReceiverNumber,
-            messageBundle.ReceiverRole,
+            messageRecords.ProcessType,
+            messageRecords.SenderNumber,
+            messageRecords.SenderRole,
+            messageRecords.ReceiverNumber,
+            messageRecords.ReceiverRole,
             bundledMessageId.Value.ToString(),
             timeStamp);
     }
