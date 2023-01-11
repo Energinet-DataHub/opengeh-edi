@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 using Messaging.PerformanceTest.Actors;
 using Messaging.PerformanceTest.MoveIn;
 
@@ -30,17 +31,21 @@ builder.Services.AddTransient<IMoveInService, MoveInService>();
 
 builder.Services.AddSingleton(builder.Configuration);
 
+builder.Services.AddHealthChecks();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+
+app.UseSwaggerUI();
 
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHealthChecks("api/monitor/live");
+
+app.MapHealthChecks("api/monitor/ready");
 
 app.Run();
