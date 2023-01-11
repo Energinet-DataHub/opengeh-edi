@@ -20,7 +20,7 @@ namespace Messaging.Domain.OutgoingMessages;
 
 public class BundledMessage
 {
-    private BundledMessage(ReadyMessageId id, ActorNumber receiverNumber, MessageCategory category, IEnumerable<Guid> messageIdsIncluded, Stream generatedDocument)
+    private BundledMessage(BundledMessageId id, ActorNumber receiverNumber, MessageCategory category, IEnumerable<Guid> messageIdsIncluded, Stream generatedDocument)
     {
         GeneratedDocument = generatedDocument;
         Id = id;
@@ -29,7 +29,7 @@ public class BundledMessage
         MessageIdsIncluded = messageIdsIncluded;
     }
 
-    public ReadyMessageId Id { get; }
+    public BundledMessageId Id { get; }
 
     public ActorNumber ReceiverNumber { get; }
 
@@ -39,7 +39,7 @@ public class BundledMessage
 
     public Stream GeneratedDocument { get; }
 
-    public static BundledMessage CreateFrom(ReadyMessageId id, MessageBundle messageBundle, Stream generatedDocument)
+    public static BundledMessage CreateFrom(BundledMessageId id, MessageBundle messageBundle, Stream generatedDocument)
     {
         ArgumentNullException.ThrowIfNull(messageBundle);
 
@@ -51,7 +51,7 @@ public class BundledMessage
             generatedDocument);
     }
 
-    public static BundledMessage Create(ReadyMessageId id, ActorNumber receiverNumber, MessageCategory category, IEnumerable<Guid> messageIdsIncluded, Stream document)
+    public static BundledMessage Create(BundledMessageId id, ActorNumber receiverNumber, MessageCategory category, IEnumerable<Guid> messageIdsIncluded, Stream document)
     {
         return new BundledMessage(id, receiverNumber, category, messageIdsIncluded, document);
     }

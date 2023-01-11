@@ -16,22 +16,22 @@ using Messaging.Domain.SeedWork;
 
 namespace Messaging.Domain.OutgoingMessages;
 
-public class ReadyMessageId : ValueObject
+public class BundledMessageId : ValueObject
 {
-    private ReadyMessageId(Guid value)
+    private BundledMessageId(Guid value)
     {
         Value = value;
     }
 
     public Guid Value { get; }
 
-    public static ReadyMessageId New()
+    public static BundledMessageId New()
     {
-        return new ReadyMessageId(Guid.NewGuid());
+        return new BundledMessageId(Guid.NewGuid());
     }
 
-    public static ReadyMessageId From(Guid id)
+    public static BundledMessageId From(Guid id)
     {
-        return new ReadyMessageId(id);
+        return new BundledMessageId(id);
     }
 }

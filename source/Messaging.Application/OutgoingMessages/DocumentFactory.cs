@@ -31,9 +31,9 @@ public class DocumentFactory
         _documentWriters = documentWriters.ToList();
     }
 
-    public Task<Stream> CreateFromAsync(ReadyMessageId readyMessageId, MessageBundle messageBundle, MessageFormat documentFormat, Instant timestamp)
+    public Task<Stream> CreateFromAsync(BundledMessageId bundledMessageId, MessageBundle messageBundle, MessageFormat documentFormat, Instant timestamp)
     {
-        ArgumentNullException.ThrowIfNull(readyMessageId);
+        ArgumentNullException.ThrowIfNull(bundledMessageId);
         ArgumentNullException.ThrowIfNull(messageBundle);
 
         var documentWriter =
@@ -47,11 +47,11 @@ public class DocumentFactory
         }
 
         return documentWriter.WriteAsync(
-            CreateHeader(readyMessageId, messageBundle, timestamp),
+            CreateHeader(bundledMessageId, messageBundle, timestamp),
             messageBundle.MessageRecords);
     }
 
-    private static MessageHeader CreateHeader(ReadyMessageId readyMessageId, MessageBundle messageBundle, Instant timeStamp)
+    private static MessageHeader CreateHeader(BundledMessageId bundledMessageId, MessageBundle messageBundle, Instant timeStamp)
     {
         return new MessageHeader(
             messageBundle.ProcessType,
@@ -59,7 +59,7 @@ public class DocumentFactory
             messageBundle.SenderRole,
             messageBundle.ReceiverNumber,
             messageBundle.ReceiverRole,
-            readyMessageId.Value.ToString(),
+            bundledMessageId.Value.ToString(),
             timeStamp);
     }
 }

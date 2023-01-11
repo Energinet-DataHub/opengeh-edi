@@ -120,7 +120,7 @@ DELETE FROM [b2b].[ReadyMessages] WHERE Id = @Id;
             return null;
         }
 
-        var id = ReadyMessageId.From(reader.GetGuid(0));
+        var id = BundledMessageId.From(reader.GetGuid(0));
         var messageIdsIncluded = reader
             .GetString(3)
             .Split(",")

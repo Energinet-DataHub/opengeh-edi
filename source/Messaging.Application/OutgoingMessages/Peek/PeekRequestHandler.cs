@@ -75,7 +75,7 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
 
     private async Task<BundledMessage> CreateReadyMessageAsync(MessageBundle messageBundle)
     {
-        var id = ReadyMessageId.New();
+        var id = BundledMessageId.New();
         var document = await _documentFactory.CreateFromAsync(id, messageBundle, MessageFormat.Xml, _systemDateTimeProvider.Now())
             .ConfigureAwait(false);
         return BundledMessage.CreateFrom(id, messageBundle, document);
