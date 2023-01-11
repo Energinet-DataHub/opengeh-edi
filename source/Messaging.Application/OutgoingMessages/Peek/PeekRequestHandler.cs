@@ -63,12 +63,7 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
         }
 
         bundledMessage = await CreateBundledMessageAsync(messageRecords).ConfigureAwait(false);
-
-        if (await _bundledMessages.TryAddAsync(bundledMessage)
-                .ConfigureAwait(false) == false)
-        {
-            return new PeekResult(null);
-        }
+        await _bundledMessages.AddAsync(bundledMessage).ConfigureAwait(false);
 
         return new PeekResult(bundledMessage.GeneratedDocument, bundledMessage.Id.Value);
     }

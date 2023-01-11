@@ -26,12 +26,12 @@ namespace Messaging.Api.OutgoingMessages;
 
 public class PeekRequestListener
 {
-    private readonly IMediator _mediator;
+    private readonly MessagePeeker _messagePeeker;
     private readonly IMarketActorAuthenticator _authenticator;
 
-    public PeekRequestListener(IMediator mediator, IMarketActorAuthenticator authenticator)
+    public PeekRequestListener(MessagePeeker messagePeeker, IMarketActorAuthenticator authenticator)
     {
-        _mediator = mediator;
+        _messagePeeker = messagePeeker;
         _authenticator = authenticator;
     }
 
@@ -45,10 +45,9 @@ public class PeekRequestListener
         FunctionContext executionContext,
         string messageCategory)
     {
-        var result = await _mediator.Send(
-            new PeekRequest(
+        var result = await _messagePeeker.PeekAsync(
                 _authenticator.CurrentIdentity.Number,
-                EnumerationType.FromName<MessageCategory>(messageCategory)))
+                EnumerationType.FromName<MessageCategory>(messageCategory))
             .ConfigureAwait(false);
 
         var response = HttpResponseData.CreateResponse(request);

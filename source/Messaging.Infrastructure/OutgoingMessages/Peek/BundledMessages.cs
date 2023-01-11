@@ -41,32 +41,10 @@ public class BundledMessages : IBundledMessages
         _context = context;
     }
 
-    public async Task<bool> TryAddAsync(BundledMessage bundledMessage)
+    public Task AddAsync(BundledMessage bundledMessage)
     {
         ArgumentNullException.ThrowIfNull(bundledMessage);
-
-        await _context.BundledMessages.AddAsync(bundledMessage).ConfigureAwait(false);
-        /*using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
-        var insertStatement =
-            $"IF NOT EXISTS (SELECT * FROM b2b.BundledMessages WHERE ReceiverNumber = @ReceiverNumber AND MessageCategory = @MessageCategory)" +
-            $"INSERT INTO b2b.BundledMessages(ReceiverNumber, MessageCategory, Id, MessageIdsIncluded, GeneratedDocument) VALUES(@ReceiverNumber, @MessageCategory, @Id, @MessageIdsIncluded, @GeneratedDocument)";
-        using var command = CreateCommand(
-            insertStatement,
-            new List<KeyValuePair<string, object>>()
-            {
-                new("@ReceiverNumber", bundledMessage.ReceiverNumber.Value),
-                new("@MessageCategory", bundledMessage.Category.Name),
-                new("@GeneratedDocument", bundledMessage.GeneratedDocument),
-                new("@Id", bundledMessage.Id.Value),
-                new("@MessageIdsIncluded", string.Join(",", bundledMessage.MessageIdsIncluded)),
-            },
-            connection);
-
-        var result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
-        ResetBundleStream(bundledMessage.GeneratedDocument);
-
-        return result == 1;*/
-        return true;
+        return _context.BundledMessages.AddAsync(bundledMessage).AsTask();
     }
 
     public async Task<DequeueResult> DequeueAsync(Guid messageId)
