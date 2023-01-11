@@ -17,6 +17,7 @@ using Messaging.Application.Configuration.DataAccess;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.Peek;
+using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.Infrastructure.OutgoingMessages.Peek;
 
 namespace Messaging.IntegrationTests.TestDoubles;
@@ -25,8 +26,8 @@ public class BundledMessagesStub : BundledMessages
 {
     private bool _shouldReturnEmptyMessage;
 
-    public BundledMessagesStub(IDatabaseConnectionFactory connectionFactory)
-        : base(connectionFactory)
+    public BundledMessagesStub(IDatabaseConnectionFactory connectionFactory, B2BContext context)
+        : base(connectionFactory, context)
     {
     }
 

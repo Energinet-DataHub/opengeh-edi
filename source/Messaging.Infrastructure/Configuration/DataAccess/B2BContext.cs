@@ -28,6 +28,7 @@ using Messaging.Infrastructure.Configuration.InternalCommands;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.MasterData.MarketEvaluationPoints;
 using Messaging.Infrastructure.OutgoingMessages;
+using Messaging.Infrastructure.OutgoingMessages.Peek;
 using Messaging.Infrastructure.Transactions;
 using Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
 using Messaging.Infrastructure.Transactions.UpdateCustomer;
@@ -63,6 +64,8 @@ namespace Messaging.Infrastructure.Configuration.DataAccess
 
         public DbSet<EnqueuedMessage> EnqueuedMessages { get; private set; }
 
+        public DbSet<BundledMessage> BundledMessages { get; private set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
@@ -74,6 +77,7 @@ namespace Messaging.Infrastructure.Configuration.DataAccess
             modelBuilder.ApplyConfiguration(new EnqueuedMessageEntityConfiguration());
             modelBuilder.ApplyConfiguration(new QueuedInternalCommandEntityConfiguration());
             modelBuilder.ApplyConfiguration(new MarketEvaluationPointEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new BundledMessageConfiguration());
 
             modelBuilder.Entity<GenericNotificationMessage>()
                 .Ignore(entity => entity.MarketActivityRecord);

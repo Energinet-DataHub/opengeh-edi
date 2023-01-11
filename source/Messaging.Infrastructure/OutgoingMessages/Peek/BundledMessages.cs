@@ -25,6 +25,7 @@ using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.Peek;
+using Messaging.Infrastructure.Configuration.DataAccess;
 using Microsoft.Data.SqlClient;
 
 namespace Messaging.Infrastructure.OutgoingMessages.Peek;
@@ -32,36 +33,18 @@ namespace Messaging.Infrastructure.OutgoingMessages.Peek;
 public class BundledMessages : IBundledMessages
 {
     private readonly IDatabaseConnectionFactory _connectionFactory;
+    private readonly B2BContext _context;
 
-    public BundledMessages(IDatabaseConnectionFactory connectionFactory)
+    public BundledMessages(IDatabaseConnectionFactory connectionFactory, B2BContext context)
     {
         _connectionFactory = connectionFactory;
+        _context = context;
     }
 
-    public async Task<bool> TryAddAsync(BundledMessage bundledMessage)
+    public Task AddAsync(BundledMessage bundledMessage)
     {
         ArgumentNullException.ThrowIfNull(bundledMessage);
-
-        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
-        var insertStatement =
-            $"IF NOT EXISTS (SELECT * FROM b2b.BundledMessages WHERE ReceiverNumber = @ReceiverNumber AND MessageCategory = @MessageCategory)" +
-            $"INSERT INTO b2b.BundledMessages(ReceiverNumber, MessageCategory, Id, MessageIdsIncluded, GeneratedDocument) VALUES(@ReceiverNumber, @MessageCategory, @Id, @MessageIdsIncluded, @GeneratedDocument)";
-        using var command = CreateCommand(
-            insertStatement,
-            new List<KeyValuePair<string, object>>()
-            {
-                new("@ReceiverNumber", bundledMessage.ReceiverNumber.Value),
-                new("@MessageCategory", bundledMessage.Category.Name),
-                new("@GeneratedDocument", bundledMessage.GeneratedDocument),
-                new("@Id", bundledMessage.Id.Value),
-                new("@MessageIdsIncluded", string.Join(",", bundledMessage.MessageIdsIncluded)),
-            },
-            connection);
-
-        var result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
-        ResetBundleStream(bundledMessage.GeneratedDocument);
-
-        return result == 1;
+        return _context.BundledMessages.AddAsync(bundledMessage).AsTask();
     }
 
     public async Task<DequeueResult> DequeueAsync(Guid messageId)

@@ -31,7 +31,7 @@ public interface IBundledMessages
     /// </summary>
     /// <param name="bundledMessage"></param>
     /// <returns>void</returns>
-    Task<bool> TryAddAsync(BundledMessage bundledMessage);
+    Task AddAsync(BundledMessage bundledMessage);
 
     /// <summary>
     /// Dequeue bundled message
