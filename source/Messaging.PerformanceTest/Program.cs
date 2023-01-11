@@ -44,8 +44,8 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapHealthChecks("api/monitor/live");
+app.MapHealthChecks("monitor/live");
 
-app.MapHealthChecks("api/monitor/ready");
+app.MapHealthChecks("monitor/ready");
 
 app.Run();
