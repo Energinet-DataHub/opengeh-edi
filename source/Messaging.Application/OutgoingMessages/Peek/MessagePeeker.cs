@@ -29,15 +29,15 @@ public class MessagePeeker
         _mediator = mediator;
     }
 
-    public Task<PeekResult> PeekAsync(ActorNumber actorNumber, MessageCategory messageCategory)
+    public async Task<PeekResult> PeekAsync(ActorNumber actorNumber, MessageCategory messageCategory)
     {
         try
         {
-            return _mediator.Send(new PeekRequest(actorNumber, messageCategory));
+            return await _mediator.Send(new PeekRequest(actorNumber, messageCategory)).ConfigureAwait(false);
         }
-        catch (DbUpdateConcurrencyException)
+        catch (DbUpdateException)
         {
-            return Task.FromResult(new PeekResult(null));
+            return new PeekResult(null);
         }
     }
 }

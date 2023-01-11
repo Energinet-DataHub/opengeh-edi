@@ -76,7 +76,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         await GivenTwoMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
         await InsertFakeMessagesAsync(SampleData.NewEnergySupplierNumber, MarketRole.EnergySupplier, MessageCategory.MasterData, ProcessType.MoveIn, MessageType.ConfirmRequestChangeOfSupplier).ConfigureAwait(false);
 
-        var result = await PeekMessage(MessageCategory.Aggregations).ConfigureAwait(false);
+        var result = await PeekMessage(MessageCategory.MasterData).ConfigureAwait(false);
 
         AssertXmlMessage.Document(XDocument.Load(result.Bundle!))
             .IsDocumentType(MessageType.ConfirmRequestChangeOfSupplier)
@@ -89,9 +89,8 @@ public class WhenAPeekIsRequestedTests : TestBase
     {
         await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
 
-        var command = CreatePeekRequest(MessageCategory.MasterData);
-        var firstPeekResult = await InvokeCommandAsync(command).ConfigureAwait(false);
-        var secondPeekResult = await InvokeCommandAsync(command).ConfigureAwait(false);
+        var firstPeekResult = await PeekMessage(MessageCategory.MasterData).ConfigureAwait(false);
+        var secondPeekResult = await PeekMessage(MessageCategory.MasterData).ConfigureAwait(false);
 
         Assert.NotNull(firstPeekResult.MessageId);
         Assert.NotNull(secondPeekResult.MessageId);
@@ -102,10 +101,10 @@ public class WhenAPeekIsRequestedTests : TestBase
     public async Task Return_empty_bundle_if_bundle_is_already_registered()
     {
         await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
-        await InvokeCommandAsync(CreatePeekRequest(MessageCategory.MasterData)).ConfigureAwait(false);
+        await PeekMessage(MessageCategory.MasterData).ConfigureAwait(false);
 
         _bundledMessagesStub.ReturnsEmptyMessage();
-        var peekResult = await _messagePeeker.PeekAsync(ActorNumber.Create(SampleData.ReceiverId), MessageCategory.MasterData).ConfigureAwait(false); //InvokeCommandAsync(CreatePeekRequest(MessageCategory.MasterData)).ConfigureAwait(false);
+        var peekResult = await PeekMessage(MessageCategory.MasterData).ConfigureAwait(false);
 
         Assert.Null(peekResult.Bundle);
     }
@@ -189,6 +188,6 @@ public class WhenAPeekIsRequestedTests : TestBase
 
     private Task<PeekResult> PeekMessage(MessageCategory category)
     {
-        return InvokeCommandAsync(CreatePeekRequest(category));
+        return _messagePeeker.PeekAsync(ActorNumber.Create(SampleData.NewEnergySupplierNumber), category);
     }
 }
