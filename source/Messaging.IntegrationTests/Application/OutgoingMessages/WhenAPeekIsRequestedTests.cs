@@ -48,7 +48,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     {
         await GivenTwoMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
 
-        var result = await InvokeCommandAsync(CreatePeekRequest(MessageCategory.Aggregations)).ConfigureAwait(false);
+        var result = await PeekMessage(MessageCategory.Aggregations).ConfigureAwait(false);
 
         Assert.Null(result.Bundle);
         Assert.False(await BundleIsRegistered().ConfigureAwait(false));
@@ -187,5 +187,10 @@ public class WhenAPeekIsRequestedTests : TestBase
         var numberOfBundles = await connection
             .ExecuteScalarAsync<int>("SELECT COUNT(*) FROM b2b.BundledMessages").ConfigureAwait(false);
         return numberOfBundles == 1;
+    }
+
+    private Task<PeekResult> PeekMessage(MessageCategory category)
+    {
+        return InvokeCommandAsync(CreatePeekRequest(category));
     }
 }
