@@ -48,10 +48,10 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var readyMessage = await _bundledMessages.GetAsync(request.MessageCategory, request.ActorNumber).ConfigureAwait(false);
-        if (readyMessage is not null)
+        var bundledMessage = await _bundledMessages.GetAsync(request.MessageCategory, request.ActorNumber).ConfigureAwait(false);
+        if (bundledMessage is not null)
         {
-            return new PeekResult(readyMessage.GeneratedDocument, readyMessage.Id.Value);
+            return new PeekResult(bundledMessage.GeneratedDocument, bundledMessage.Id.Value);
         }
 
         var messageBundle = await _enqueuedMessages.GetByAsync(request.ActorNumber, request.MessageCategory)
@@ -62,18 +62,18 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
             return new PeekResult(null);
         }
 
-        readyMessage = await CreateReadyMessageAsync(messageBundle).ConfigureAwait(false);
+        bundledMessage = await CreateBundledMessageAsync(messageBundle).ConfigureAwait(false);
 
-        if (await _bundledMessages.TryAddAsync(readyMessage)
+        if (await _bundledMessages.TryAddAsync(bundledMessage)
                 .ConfigureAwait(false) == false)
         {
             return new PeekResult(null);
         }
 
-        return new PeekResult(readyMessage.GeneratedDocument, readyMessage.Id.Value);
+        return new PeekResult(bundledMessage.GeneratedDocument, bundledMessage.Id.Value);
     }
 
-    private async Task<BundledMessage> CreateReadyMessageAsync(MessageBundle messageBundle)
+    private async Task<BundledMessage> CreateBundledMessageAsync(MessageBundle messageBundle)
     {
         var id = BundledMessageId.New();
         var document = await _documentFactory.CreateFromAsync(id, messageBundle, MessageFormat.Xml, _systemDateTimeProvider.Now())
