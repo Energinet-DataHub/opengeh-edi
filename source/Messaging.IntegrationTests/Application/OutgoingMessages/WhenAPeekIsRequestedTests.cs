@@ -59,8 +59,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     {
         await GivenTwoMoveInTransactionHasBeenAccepted();
 
-        var command = CreatePeekRequest(MessageCategory.MasterData);
-        var result = await InvokeCommandAsync(command).ConfigureAwait(false);
+        var result = await PeekMessage(MessageCategory.MasterData).ConfigureAwait(false);
 
         Assert.NotNull(result.Bundle);
 
