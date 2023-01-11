@@ -25,6 +25,7 @@ using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.Configuration.TimeEvents;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration;
+using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.FeatureFlag;
 using Messaging.Infrastructure.Configuration.MessageBus;
 using Messaging.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
@@ -66,7 +67,7 @@ namespace Messaging.IntegrationTests
                 .AddAuthentication()
                 .AddPeekConfiguration(
                     new BundleConfigurationStub(),
-                    sp => new BundledMessagesStub(sp.GetRequiredService<IDatabaseConnectionFactory>()))
+                    sp => new BundledMessagesStub(sp.GetRequiredService<IDatabaseConnectionFactory>(), sp.GetRequiredService<B2BContext>()))
                 .AddRemoteBusinessService<DummyRequest, DummyReply>(sp => new RemoteBusinessServiceRequestSenderSpy<DummyRequest>("Dummy"), "Dummy")
                 .AddDatabaseConnectionFactory(DatabaseFixture.ConnectionString)
                 .AddDatabaseContext(DatabaseFixture.ConnectionString)

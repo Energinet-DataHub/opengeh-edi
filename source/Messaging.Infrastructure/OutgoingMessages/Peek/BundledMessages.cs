@@ -25,6 +25,7 @@ using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.Peek;
+using Messaging.Infrastructure.Configuration.DataAccess;
 using Microsoft.Data.SqlClient;
 
 namespace Messaging.Infrastructure.OutgoingMessages.Peek;
@@ -32,17 +33,20 @@ namespace Messaging.Infrastructure.OutgoingMessages.Peek;
 public class BundledMessages : IBundledMessages
 {
     private readonly IDatabaseConnectionFactory _connectionFactory;
+    private readonly B2BContext _context;
 
-    public BundledMessages(IDatabaseConnectionFactory connectionFactory)
+    public BundledMessages(IDatabaseConnectionFactory connectionFactory, B2BContext context)
     {
         _connectionFactory = connectionFactory;
+        _context = context;
     }
 
     public async Task<bool> TryAddAsync(BundledMessage bundledMessage)
     {
         ArgumentNullException.ThrowIfNull(bundledMessage);
 
-        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        await _context.BundledMessages.AddAsync(bundledMessage).ConfigureAwait(false);
+        /*using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         var insertStatement =
             $"IF NOT EXISTS (SELECT * FROM b2b.BundledMessages WHERE ReceiverNumber = @ReceiverNumber AND MessageCategory = @MessageCategory)" +
             $"INSERT INTO b2b.BundledMessages(ReceiverNumber, MessageCategory, Id, MessageIdsIncluded, GeneratedDocument) VALUES(@ReceiverNumber, @MessageCategory, @Id, @MessageIdsIncluded, @GeneratedDocument)";
@@ -61,7 +65,8 @@ public class BundledMessages : IBundledMessages
         var result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
         ResetBundleStream(bundledMessage.GeneratedDocument);
 
-        return result == 1;
+        return result == 1;*/
+        return true;
     }
 
     public async Task<DequeueResult> DequeueAsync(Guid messageId)
