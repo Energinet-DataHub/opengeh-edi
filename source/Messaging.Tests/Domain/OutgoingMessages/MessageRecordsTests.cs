@@ -20,16 +20,16 @@ using Xunit;
 
 namespace Messaging.Tests.Domain.OutgoingMessages;
 
-public class MessageBundleTests
+public class MessageRecordsTests
 {
     [Fact]
-    public void A_message_bundle_must_contain_message()
+    public void Must_contain_at_least_one_message_record()
     {
         Assert.Throws<BundleException>(() => MessageRecords.Create(new List<EnqueuedMessage>()));
     }
 
     [Fact]
-    public void All_messages_in_bundle_must_originate_from_the_same_type_of_process()
+    public void All_message_records_must_originate_from_the_same_type_of_process()
     {
         var messages = new List<EnqueuedMessage>()
         {
@@ -42,7 +42,7 @@ public class MessageBundleTests
     }
 
     [Fact]
-    public void All_messages_in_bundle_must_have_same_receiver_number()
+    public void All_message_records_must_have_same_receiver_number()
     {
         var messages = new List<EnqueuedMessage>()
         {
@@ -55,7 +55,7 @@ public class MessageBundleTests
     }
 
     [Fact]
-    public void All_messages_in_bundle_must_have_same_receiver_role()
+    public void All_message_records_must_have_same_receiver_role()
     {
         var messages = new List<EnqueuedMessage>()
         {
@@ -68,7 +68,7 @@ public class MessageBundleTests
     }
 
     [Fact]
-    public void All_messages_in_bundle_must_have_same_sender_number()
+    public void All_message_records_must_have_same_sender_number()
     {
         var messages = new List<EnqueuedMessage>()
         {
@@ -81,7 +81,7 @@ public class MessageBundleTests
     }
 
     [Fact]
-    public void All_messages_in_bundle_must_have_same_sender_role()
+    public void All_message_records_must_have_same_sender_role()
     {
         var messages = new List<EnqueuedMessage>()
         {
@@ -94,7 +94,7 @@ public class MessageBundleTests
     }
 
     [Fact]
-    public void All_messages_in_bundle_must_be_of_same_type()
+    public void All_message_records_must_be_of_same_type()
     {
         var messages = new List<EnqueuedMessage>()
         {
