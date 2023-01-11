@@ -73,12 +73,12 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
         return new PeekResult(readyMessage.GeneratedDocument, readyMessage.Id.Value);
     }
 
-    private async Task<ReadyMessage> CreateReadyMessageAsync(MessageBundle messageBundle)
+    private async Task<BundledMessage> CreateReadyMessageAsync(MessageBundle messageBundle)
     {
         var id = ReadyMessageId.New();
         var document = await _documentFactory.CreateFromAsync(id, messageBundle, MessageFormat.Xml, _systemDateTimeProvider.Now())
             .ConfigureAwait(false);
-        return ReadyMessage.CreateFrom(id, messageBundle, document);
+        return BundledMessage.CreateFrom(id, messageBundle, document);
     }
 }
 

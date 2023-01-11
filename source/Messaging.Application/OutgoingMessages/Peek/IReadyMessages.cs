@@ -29,9 +29,9 @@ public interface IReadyMessages
     /// <summary>
     /// Adds a ready message to repository
     /// </summary>
-    /// <param name="readyMessage"></param>
+    /// <param name="bundledMessage"></param>
     /// <returns>void</returns>
-    Task<bool> TryAddAsync(ReadyMessage readyMessage);
+    Task<bool> TryAddAsync(BundledMessage bundledMessage);
 
     /// <summary>
     /// Dequeue ready message
@@ -45,6 +45,6 @@ public interface IReadyMessages
     /// </summary>
     /// <param name="category"></param>
     /// <param name="receiverNumber"></param>
-    /// <returns><see cref="ReadyMessage"/></returns>
-    Task<ReadyMessage?> GetAsync(MessageCategory category, ActorNumber receiverNumber);
+    /// <returns><see cref="BundledMessage"/></returns>
+    Task<BundledMessage?> GetAsync(MessageCategory category, ActorNumber receiverNumber);
 }

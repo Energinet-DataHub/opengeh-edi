@@ -30,12 +30,12 @@ public class ReadyMessagesStub : ReadyMessages
     {
     }
 
-    public override Task<ReadyMessage?> GetAsync(MessageCategory category, ActorNumber receiverNumber)
+    public override Task<BundledMessage?> GetAsync(MessageCategory category, ActorNumber receiverNumber)
     {
         if (_shouldReturnEmptyMessage)
         {
             _shouldReturnEmptyMessage = false;
-            return Task.FromResult(default(ReadyMessage));
+            return Task.FromResult(default(BundledMessage));
         }
 
         return base.GetAsync(category, receiverNumber);

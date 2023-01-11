@@ -38,9 +38,9 @@ public class ReadyMessages : IReadyMessages
         _connectionFactory = connectionFactory;
     }
 
-    public async Task<bool> TryAddAsync(ReadyMessage readyMessage)
+    public async Task<bool> TryAddAsync(BundledMessage bundledMessage)
     {
-        ArgumentNullException.ThrowIfNull(readyMessage);
+        ArgumentNullException.ThrowIfNull(bundledMessage);
 
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         var insertStatement =
@@ -50,16 +50,16 @@ public class ReadyMessages : IReadyMessages
             insertStatement,
             new List<KeyValuePair<string, object>>()
             {
-                new("@ReceiverNumber", readyMessage.ReceiverNumber.Value),
-                new("@MessageCategory", readyMessage.Category.Name),
-                new("@GeneratedDocument", readyMessage.GeneratedDocument),
-                new("@Id", readyMessage.Id.Value),
-                new("@MessageIdsIncluded", string.Join(",", readyMessage.MessageIdsIncluded)),
+                new("@ReceiverNumber", bundledMessage.ReceiverNumber.Value),
+                new("@MessageCategory", bundledMessage.Category.Name),
+                new("@GeneratedDocument", bundledMessage.GeneratedDocument),
+                new("@Id", bundledMessage.Id.Value),
+                new("@MessageIdsIncluded", string.Join(",", bundledMessage.MessageIdsIncluded)),
             },
             connection);
 
         var result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
-        ResetBundleStream(readyMessage.GeneratedDocument);
+        ResetBundleStream(bundledMessage.GeneratedDocument);
 
         return result == 1;
     }
@@ -98,7 +98,7 @@ DELETE FROM [b2b].[ReadyMessages] WHERE Id = @Id;
         return result > 0 ? new DequeueResult(true) : new DequeueResult(false);
     }
 
-    public virtual async Task<ReadyMessage?> GetAsync(MessageCategory category, ActorNumber receiverNumber)
+    public virtual async Task<BundledMessage?> GetAsync(MessageCategory category, ActorNumber receiverNumber)
     {
         ArgumentNullException.ThrowIfNull(category);
         ArgumentNullException.ThrowIfNull(receiverNumber);
@@ -127,7 +127,7 @@ DELETE FROM [b2b].[ReadyMessages] WHERE Id = @Id;
             .Select(messageId => Guid.Parse(messageId))
             .AsEnumerable();
         var document = reader.GetStream(4);
-        return ReadyMessage.Create(id, receiverNumber, category, messageIdsIncluded, document);
+        return BundledMessage.Create(id, receiverNumber, category, messageIdsIncluded, document);
     }
 
     private static void ResetBundleStream(Stream document)

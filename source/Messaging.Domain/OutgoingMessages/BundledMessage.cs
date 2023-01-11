@@ -18,9 +18,9 @@ using Messaging.Domain.SeedWork;
 
 namespace Messaging.Domain.OutgoingMessages;
 
-public class ReadyMessage
+public class BundledMessage
 {
-    private ReadyMessage(ReadyMessageId id, ActorNumber receiverNumber, MessageCategory category, IEnumerable<Guid> messageIdsIncluded, Stream generatedDocument)
+    private BundledMessage(ReadyMessageId id, ActorNumber receiverNumber, MessageCategory category, IEnumerable<Guid> messageIdsIncluded, Stream generatedDocument)
     {
         GeneratedDocument = generatedDocument;
         Id = id;
@@ -39,11 +39,11 @@ public class ReadyMessage
 
     public Stream GeneratedDocument { get; }
 
-    public static ReadyMessage CreateFrom(ReadyMessageId id, MessageBundle messageBundle, Stream generatedDocument)
+    public static BundledMessage CreateFrom(ReadyMessageId id, MessageBundle messageBundle, Stream generatedDocument)
     {
         ArgumentNullException.ThrowIfNull(messageBundle);
 
-        return new ReadyMessage(
+        return new BundledMessage(
             id,
             ActorNumber.Create(messageBundle.ReceiverNumber),
             EnumerationType.FromName<MessageCategory>(messageBundle.Category),
@@ -51,8 +51,8 @@ public class ReadyMessage
             generatedDocument);
     }
 
-    public static ReadyMessage Create(ReadyMessageId id, ActorNumber receiverNumber, MessageCategory category, IEnumerable<Guid> messageIdsIncluded, Stream document)
+    public static BundledMessage Create(ReadyMessageId id, ActorNumber receiverNumber, MessageCategory category, IEnumerable<Guid> messageIdsIncluded, Stream document)
     {
-        return new ReadyMessage(id, receiverNumber, category, messageIdsIncluded, document);
+        return new BundledMessage(id, receiverNumber, category, messageIdsIncluded, document);
     }
 }
