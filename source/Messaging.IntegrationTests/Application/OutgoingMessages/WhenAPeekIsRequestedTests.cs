@@ -34,11 +34,13 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages;
 public class WhenAPeekIsRequestedTests : TestBase
 {
     private readonly BundledMessagesStub _bundledMessagesStub;
+    private readonly MessagePeeker _messagePeeker;
 
     public WhenAPeekIsRequestedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _bundledMessagesStub = (BundledMessagesStub)GetService<IBundledMessages>();
+        _messagePeeker = GetService<MessagePeeker>();
     }
 
     [Fact]
@@ -105,7 +107,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         await InvokeCommandAsync(CreatePeekRequest(MessageCategory.MasterData)).ConfigureAwait(false);
 
         _bundledMessagesStub.ReturnsEmptyMessage();
-        var peekResult = await InvokeCommandAsync(CreatePeekRequest(MessageCategory.MasterData)).ConfigureAwait(false);
+        var peekResult = await _messagePeeker.PeekAsync(ActorNumber.Create(SampleData.ReceiverId), MessageCategory.MasterData).ConfigureAwait(false); //InvokeCommandAsync(CreatePeekRequest(MessageCategory.MasterData)).ConfigureAwait(false);
 
         Assert.Null(peekResult.Bundle);
     }
