@@ -13,9 +13,7 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -32,70 +30,55 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly DocumentFactory _documentFactory;
     private readonly IEnqueuedMessages _enqueuedMessages;
-    private readonly IBundleStore _bundleStore;
-    private readonly IMessageStorage _messageStorage;
+    private readonly IBundledMessages _bundledMessages;
 
     public PeekRequestHandler(
         ISystemDateTimeProvider systemDateTimeProvider,
         DocumentFactory documentFactory,
         IEnqueuedMessages enqueuedMessages,
-        IBundleStore bundleStore,
-        IMessageStorage messageStorage)
+        IBundledMessages bundledMessages)
     {
         _systemDateTimeProvider = systemDateTimeProvider;
         _documentFactory = documentFactory;
         _enqueuedMessages = enqueuedMessages;
-        _bundleStore = bundleStore;
-        _messageStorage = messageStorage;
+        _bundledMessages = bundledMessages;
     }
 
     public async Task<PeekResult> Handle(PeekRequest request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var bundleId = BundleId.Create(request.MessageCategory, request.ActorNumber);
-        var document = await _messageStorage
-            .GetMessageOfAsync(bundleId)
-            .ConfigureAwait(false);
-
-        if (document is not null)
+        var bundledMessage = await _bundledMessages.GetAsync(request.MessageCategory, request.ActorNumber).ConfigureAwait(false);
+        if (bundledMessage is not null)
         {
-            var messageId = await _bundleStore
-                .GetBundleMessageIdOfAsync(bundleId)
-                .ConfigureAwait(false);
-            return new PeekResult(document, messageId);
+            return new PeekResult(bundledMessage.GeneratedDocument, bundledMessage.Id.Value);
         }
 
-        var messages = (await _enqueuedMessages.GetByAsync(request.ActorNumber, request.MessageCategory)
-            .ConfigureAwait(false))
-            .ToList();
+        var messageRecords = await _enqueuedMessages.GetByAsync(request.ActorNumber, request.MessageCategory)
+            .ConfigureAwait(false);
 
-        if (messages.Count == 0)
+        if (messageRecords is null)
         {
             return new PeekResult(null);
         }
 
-        var bundle = CreateBundleFrom(messages.ToList());
-        var cimMessage = bundle.CreateMessage();
-        document = await _documentFactory.CreateFromAsync(cimMessage, MessageFormat.Xml).ConfigureAwait(false);
-        if (await _bundleStore.TryRegisterAsync(bundleId, document, bundle.MessageId, bundle.GetMessageIdsIncluded())
+        bundledMessage = await CreateBundledMessageAsync(messageRecords).ConfigureAwait(false);
+
+        if (await _bundledMessages.TryAddAsync(bundledMessage)
                 .ConfigureAwait(false) == false)
         {
             return new PeekResult(null);
         }
 
-        return new PeekResult(document, bundle.MessageId);
+        return new PeekResult(bundledMessage.GeneratedDocument, bundledMessage.Id.Value);
     }
 
-    private Bundle CreateBundleFrom(IReadOnlyList<EnqueuedMessage> messages)
+    private async Task<BundledMessage> CreateBundledMessageAsync(MessageRecords messageRecords)
     {
-        var bundle = new Bundle(_systemDateTimeProvider.Now());
-        foreach (var outgoingMessage in messages)
-        {
-            bundle.Add(outgoingMessage);
-        }
-
-        return bundle;
+        var id = BundledMessageId.New();
+        var document = await _documentFactory.CreateFromAsync(id, messageRecords, MessageFormat.Xml, _systemDateTimeProvider.Now())
+            .ConfigureAwait(false);
+        return BundledMessage.CreateFrom(id, messageRecords, document);
     }
 }
 

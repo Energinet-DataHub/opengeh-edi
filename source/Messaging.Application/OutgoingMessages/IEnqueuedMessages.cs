@@ -15,6 +15,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Messaging.Domain.Actors;
+using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.Peek;
 
 namespace Messaging.Application.OutgoingMessages;
@@ -30,7 +31,7 @@ public interface IEnqueuedMessages
     /// <param name="actorNumber">Actor number of requesting actor</param>
     /// /// /// <param name="messageCategory">The category of messages to include in message</param>
     /// <returns>List of enqueued messages</returns>
-    Task<IEnumerable<EnqueuedMessage>> GetByAsync(ActorNumber actorNumber, MessageCategory messageCategory);
+    Task<MessageRecords?> GetByAsync(ActorNumber actorNumber, MessageCategory messageCategory);
 
     /// <summary>
     /// Get the number of messages available for an actor

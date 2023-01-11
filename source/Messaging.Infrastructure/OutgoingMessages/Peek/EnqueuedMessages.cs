@@ -16,12 +16,14 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Domain.Actors;
+using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.Peek;
 
 namespace Messaging.Infrastructure.OutgoingMessages.Peek;
@@ -37,7 +39,7 @@ public class EnqueuedMessages : IEnqueuedMessages
         _bundleConfiguration = bundleConfiguration;
     }
 
-    public async Task<IEnumerable<EnqueuedMessage>> GetByAsync(ActorNumber actorNumber, MessageCategory messageCategory)
+    public async Task<MessageRecords?> GetByAsync(ActorNumber actorNumber, MessageCategory messageCategory)
     {
         ArgumentNullException.ThrowIfNull(messageCategory);
         ArgumentNullException.ThrowIfNull(actorNumber);
@@ -47,7 +49,7 @@ public class EnqueuedMessages : IEnqueuedMessages
 
         if (oldestMessage is null)
         {
-            return Array.Empty<EnqueuedMessage>();
+            return null;
         }
 
         var sqlStatement =
@@ -62,8 +64,10 @@ public class EnqueuedMessages : IEnqueuedMessages
             ProcessType AS {nameof(EnqueuedMessage.ProcessType)},
             MessageRecord FROM [b2b].[EnqueuedMessages]
             WHERE ProcessType = @ProcessType AND ReceiverId = @ReceiverId AND ReceiverRole = @ReceiverRole AND MessageType = @MessageType AND MessageCategory = @MessageCategory";
-        return await connection
-            .QueryAsync<EnqueuedMessage>(sqlStatement, new
+
+        var messages = await connection.QueryAsync<EnqueuedMessage>(
+            sqlStatement,
+            new
             {
                 ReceiverRole = oldestMessage.ReceiverRole,
                 ProcessType = oldestMessage.ProcessType,
@@ -71,6 +75,9 @@ public class EnqueuedMessages : IEnqueuedMessages
                 MessageCategory = messageCategory.Name,
                 ReceiverId = actorNumber.Value,
             }).ConfigureAwait(false);
+
+        return MessageRecords.Create(
+            messages.ToList());
     }
 
     public async Task<int> GetAvailableMessageCountAsync(ActorNumber actorNumber)

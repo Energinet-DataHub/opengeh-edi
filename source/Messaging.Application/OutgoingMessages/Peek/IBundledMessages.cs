@@ -13,44 +13,38 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 using Messaging.Application.OutgoingMessages.Dequeue;
+using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages.Peek;
 
 namespace Messaging.Application.OutgoingMessages.Peek;
 
 /// <summary>
-/// Bundlestore interface
+/// Repository of ready messages
 /// </summary>
-public interface IBundleStore
+public interface IBundledMessages
 {
     /// <summary>
-    /// Set bundle
+    /// Adds a bundled message to repository
     /// </summary>
-    /// <param name="bundleId"></param>
-    /// <param name="document"></param>
-    /// <param name="messageId"></param>
-    /// <param name="messageIdsIncluded"></param>
+    /// <param name="bundledMessage"></param>
     /// <returns>void</returns>
-    Task<bool> TryRegisterAsync(
-        BundleId bundleId,
-        Stream document,
-        Guid messageId,
-        IEnumerable<Guid> messageIdsIncluded);
+    Task<bool> TryAddAsync(BundledMessage bundledMessage);
 
     /// <summary>
-    /// Dequeue bundle
+    /// Dequeue bundled message
     /// </summary>
     /// <param name="messageId"></param>
     /// <returns>DequeueResult</returns>
     Task<DequeueResult> DequeueAsync(Guid messageId);
 
     /// <summary>
-    /// Get bundle message Id
+    /// Retrieve a bundled message from repository
     /// </summary>
-    /// <param name="bundleId"></param>
-    /// <returns>Message Id</returns>
-    Task<Guid?> GetBundleMessageIdOfAsync(BundleId bundleId);
+    /// <param name="category"></param>
+    /// <param name="receiverNumber"></param>
+    /// <returns><see cref="BundledMessage"/></returns>
+    Task<BundledMessage?> GetAsync(MessageCategory category, ActorNumber receiverNumber);
 }

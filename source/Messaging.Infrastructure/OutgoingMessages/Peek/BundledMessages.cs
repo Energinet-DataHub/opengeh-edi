@@ -17,52 +17,49 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
-using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages.Dequeue;
 using Messaging.Application.OutgoingMessages.Peek;
+using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages.Peek;
 using Microsoft.Data.SqlClient;
 
 namespace Messaging.Infrastructure.OutgoingMessages.Peek;
 
-public class BundleStore : IBundleStore
+public class BundledMessages : IBundledMessages
 {
     private readonly IDatabaseConnectionFactory _connectionFactory;
 
-    public BundleStore(IDatabaseConnectionFactory connectionFactory)
+    public BundledMessages(IDatabaseConnectionFactory connectionFactory)
     {
         _connectionFactory = connectionFactory;
     }
 
-    public async Task<bool> TryRegisterAsync(
-        BundleId bundleId,
-        Stream document,
-        Guid messageId,
-        IEnumerable<Guid> messageIdsIncluded)
+    public async Task<bool> TryAddAsync(BundledMessage bundledMessage)
     {
-        ArgumentNullException.ThrowIfNull(bundleId);
-        ArgumentNullException.ThrowIfNull(document);
+        ArgumentNullException.ThrowIfNull(bundledMessage);
 
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         var insertStatement =
-            $"IF NOT EXISTS (SELECT * FROM b2b.BundleStore WHERE ActorNumber = @ActorNumber AND MessageCategory = @MessageCategory)" +
-            $"INSERT INTO b2b.BundleStore(ActorNUmber, MessageCategory, MessageId, MessageIdsIncluded, Bundle) VALUES(@ActorNumber, @MessageCategory, @MessageId, @MessageIdsIncluded, @Bundle)";
+            $"IF NOT EXISTS (SELECT * FROM b2b.BundledMessages WHERE ReceiverNumber = @ReceiverNumber AND MessageCategory = @MessageCategory)" +
+            $"INSERT INTO b2b.BundledMessages(ReceiverNumber, MessageCategory, Id, MessageIdsIncluded, GeneratedDocument) VALUES(@ReceiverNumber, @MessageCategory, @Id, @MessageIdsIncluded, @GeneratedDocument)";
         using var command = CreateCommand(
             insertStatement,
             new List<KeyValuePair<string, object>>()
             {
-                new("@ActorNumber", bundleId.ReceiverNumber.Value),
-                new("@MessageCategory", bundleId.MessageCategory.Name),
-                new("@Bundle", document),
-                new("@MessageId", messageId),
-                new("@MessageIdsIncluded", string.Join(",", messageIdsIncluded)),
+                new("@ReceiverNumber", bundledMessage.ReceiverNumber.Value),
+                new("@MessageCategory", bundledMessage.Category.Name),
+                new("@GeneratedDocument", bundledMessage.GeneratedDocument),
+                new("@Id", bundledMessage.Id.Value),
+                new("@MessageIdsIncluded", string.Join(",", bundledMessage.MessageIdsIncluded)),
             },
             connection);
 
         var result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
-        ResetBundleStream(document);
+        ResetBundleStream(bundledMessage.GeneratedDocument);
 
         return result == 1;
     }
@@ -71,11 +68,11 @@ public class BundleStore : IBundleStore
     {
         const string deleteStmt = @"
 DELETE E FROM [b2b].[EnqueuedMessages] E JOIN
-(SELECT EnqueuedMessageId = value FROM [b2b].[BundleStore]
-CROSS APPLY STRING_SPLIT(MessageIdsIncluded, ',') WHERE MessageId = @messageId) AS P
+(SELECT EnqueuedMessageId = value FROM [b2b].[BundledMessages]
+CROSS APPLY STRING_SPLIT(MessageIdsIncluded, ',') WHERE Id = @Id) AS P
 ON E.Id = P.EnqueuedMessageId;
 
-DELETE FROM [b2b].[BundleStore] WHERE MessageId = @messageId;
+DELETE FROM [b2b].[BundledMessages] WHERE Id = @Id;
 ";
 
         using var connection = (SqlConnection)await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
@@ -83,7 +80,7 @@ DELETE FROM [b2b].[BundleStore] WHERE MessageId = @messageId;
         using var command = connection.CreateCommand();
         command.Transaction = transaction;
         command.CommandText = deleteStmt;
-        command.Parameters.Add(new SqlParameter("messageId", SqlDbType.UniqueIdentifier) { Value = messageId });
+        command.Parameters.Add(new SqlParameter("Id", SqlDbType.UniqueIdentifier) { Value = messageId });
         int result;
 
         try
@@ -101,14 +98,36 @@ DELETE FROM [b2b].[BundleStore] WHERE MessageId = @messageId;
         return result > 0 ? new DequeueResult(true) : new DequeueResult(false);
     }
 
-    public async Task<Guid?> GetBundleMessageIdOfAsync(BundleId bundleId)
+    public virtual async Task<BundledMessage?> GetAsync(MessageCategory category, ActorNumber receiverNumber)
     {
-        ArgumentNullException.ThrowIfNull(bundleId);
-        const string sqlquery = @"SELECT MessageId FROM [b2b].[BundleStore] WHERE ActorNumber = @ActorNumber AND MessageCategory = @MessageCategory";
+        ArgumentNullException.ThrowIfNull(category);
+        ArgumentNullException.ThrowIfNull(receiverNumber);
 
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
-        var messageId = await connection.QueryFirstOrDefaultAsync<Guid?>(sqlquery, new { ActorNumber = bundleId.ReceiverNumber.Value, MessageCategory = bundleId.MessageCategory.Name }).ConfigureAwait(false);
-        return messageId;
+        using var command = CreateCommand(
+            $"SELECT Id, ReceiverNumber, MessageCategory, MessageIdsIncluded, GeneratedDocument FROM b2b.BundledMessages WHERE ReceiverNumber = @ReceiverNumber AND MessageCategory = @MessageCategory",
+            new List<KeyValuePair<string, object>>
+            {
+                new("@ReceiverNumber", receiverNumber.Value),
+                new("@MessageCategory", category.Name),
+            },
+            connection);
+
+        using var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
+        await reader.ReadAsync().ConfigureAwait(false);
+        if (reader.HasRows == false)
+        {
+            return null;
+        }
+
+        var id = BundledMessageId.From(reader.GetGuid(0));
+        var messageIdsIncluded = reader
+            .GetString(3)
+            .Split(",")
+            .Select(messageId => Guid.Parse(messageId))
+            .AsEnumerable();
+        var document = reader.GetStream(4);
+        return BundledMessage.Create(id, receiverNumber, category, messageIdsIncluded, document);
     }
 
     private static void ResetBundleStream(Stream document)

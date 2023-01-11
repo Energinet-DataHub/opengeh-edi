@@ -12,5 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Messaging.Domain.SeedWork;
+
 namespace Messaging.Domain.OutgoingMessages;
-public record CimMessage(MessageType MessageType, MessageHeader Header, IReadOnlyList<string> MarketActivityRecordPayloads);
+
+public class BundledMessageId : ValueObject
+{
+    private BundledMessageId(Guid value)
+    {
+        Value = value;
+    }
+
+    public Guid Value { get; }
+
+    public static BundledMessageId New()
+    {
+        return new BundledMessageId(Guid.NewGuid());
+    }
+
+    public static BundledMessageId From(Guid id)
+    {
+        return new BundledMessageId(id);
+    }
+}

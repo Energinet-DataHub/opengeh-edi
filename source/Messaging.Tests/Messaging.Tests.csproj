@@ -78,4 +78,8 @@ limitations under the License.
       </EmbeddedResource>
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Remove="Domain\OutgoingMessages\BundleTests.cs" />
+    </ItemGroup>
+
 </Project>

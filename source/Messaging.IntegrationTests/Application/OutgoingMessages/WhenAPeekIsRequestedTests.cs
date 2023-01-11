@@ -33,12 +33,12 @@ namespace Messaging.IntegrationTests.Application.OutgoingMessages;
 
 public class WhenAPeekIsRequestedTests : TestBase
 {
-    private readonly MessageStorageStub _messageStorageStub;
+    private readonly BundledMessagesStub _bundledMessagesStub;
 
     public WhenAPeekIsRequestedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _messageStorageStub = (MessageStorageStub)GetService<IMessageStorage>();
+        _bundledMessagesStub = (BundledMessagesStub)GetService<IBundledMessages>();
     }
 
     [Fact]
@@ -104,7 +104,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
         await InvokeCommandAsync(CreatePeekRequest(MessageCategory.MasterData)).ConfigureAwait(false);
 
-        _messageStorageStub.ReturnsEmptyMessage();
+        _bundledMessagesStub.ReturnsEmptyMessage();
         var peekResult = await InvokeCommandAsync(CreatePeekRequest(MessageCategory.MasterData)).ConfigureAwait(false);
 
         Assert.Null(peekResult.Bundle);
@@ -183,7 +183,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     {
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
         var numberOfBundles = await connection
-            .ExecuteScalarAsync<int>("SELECT COUNT(*) FROM b2b.BundleStore").ConfigureAwait(false);
+            .ExecuteScalarAsync<int>("SELECT COUNT(*) FROM b2b.BundledMessages").ConfigureAwait(false);
         return numberOfBundles == 1;
     }
 }

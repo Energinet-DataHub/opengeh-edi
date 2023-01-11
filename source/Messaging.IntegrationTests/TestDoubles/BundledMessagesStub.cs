@@ -12,32 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.IO;
 using System.Threading.Tasks;
 using Messaging.Application.Configuration.DataAccess;
+using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages.Peek;
 using Messaging.Infrastructure.OutgoingMessages.Peek;
 
 namespace Messaging.IntegrationTests.TestDoubles;
 
-public class MessageStorageStub : MessageStorage
+public class BundledMessagesStub : BundledMessages
 {
     private bool _shouldReturnEmptyMessage;
 
-    public MessageStorageStub(IDatabaseConnectionFactory connectionFactory)
+    public BundledMessagesStub(IDatabaseConnectionFactory connectionFactory)
         : base(connectionFactory)
     {
     }
 
-    public override Task<Stream?> GetMessageOfAsync(BundleId bundleId)
+    public override Task<BundledMessage?> GetAsync(MessageCategory category, ActorNumber receiverNumber)
     {
         if (_shouldReturnEmptyMessage)
         {
             _shouldReturnEmptyMessage = false;
-            return Task.FromResult(default(Stream));
+            return Task.FromResult(default(BundledMessage));
         }
 
-        return base.GetMessageOfAsync(bundleId);
+        return base.GetAsync(category, receiverNumber);
     }
 
     public void ReturnsEmptyMessage()
