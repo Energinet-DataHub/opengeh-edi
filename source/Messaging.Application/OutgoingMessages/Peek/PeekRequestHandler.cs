@@ -30,25 +30,25 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly DocumentFactory _documentFactory;
     private readonly IEnqueuedMessages _enqueuedMessages;
-    private readonly IReadyMessages _readyMessages;
+    private readonly IBundledMessages _bundledMessages;
 
     public PeekRequestHandler(
         ISystemDateTimeProvider systemDateTimeProvider,
         DocumentFactory documentFactory,
         IEnqueuedMessages enqueuedMessages,
-        IReadyMessages readyMessages)
+        IBundledMessages bundledMessages)
     {
         _systemDateTimeProvider = systemDateTimeProvider;
         _documentFactory = documentFactory;
         _enqueuedMessages = enqueuedMessages;
-        _readyMessages = readyMessages;
+        _bundledMessages = bundledMessages;
     }
 
     public async Task<PeekResult> Handle(PeekRequest request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var readyMessage = await _readyMessages.GetAsync(request.MessageCategory, request.ActorNumber).ConfigureAwait(false);
+        var readyMessage = await _bundledMessages.GetAsync(request.MessageCategory, request.ActorNumber).ConfigureAwait(false);
         if (readyMessage is not null)
         {
             return new PeekResult(readyMessage.GeneratedDocument, readyMessage.Id.Value);
@@ -64,7 +64,7 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
 
         readyMessage = await CreateReadyMessageAsync(messageBundle).ConfigureAwait(false);
 
-        if (await _readyMessages.TryAddAsync(readyMessage)
+        if (await _bundledMessages.TryAddAsync(readyMessage)
                 .ConfigureAwait(false) == false)
         {
             return new PeekResult(null);

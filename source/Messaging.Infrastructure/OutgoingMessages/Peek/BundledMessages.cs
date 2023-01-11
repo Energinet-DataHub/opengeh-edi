@@ -29,11 +29,11 @@ using Microsoft.Data.SqlClient;
 
 namespace Messaging.Infrastructure.OutgoingMessages.Peek;
 
-public class ReadyMessages : IReadyMessages
+public class BundledMessages : IBundledMessages
 {
     private readonly IDatabaseConnectionFactory _connectionFactory;
 
-    public ReadyMessages(IDatabaseConnectionFactory connectionFactory)
+    public BundledMessages(IDatabaseConnectionFactory connectionFactory)
     {
         _connectionFactory = connectionFactory;
     }

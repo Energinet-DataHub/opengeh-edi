@@ -24,24 +24,24 @@ namespace Messaging.Application.OutgoingMessages.Peek;
 /// <summary>
 /// Repository of ready messages
 /// </summary>
-public interface IReadyMessages
+public interface IBundledMessages
 {
     /// <summary>
-    /// Adds a ready message to repository
+    /// Adds a bundled message to repository
     /// </summary>
     /// <param name="bundledMessage"></param>
     /// <returns>void</returns>
     Task<bool> TryAddAsync(BundledMessage bundledMessage);
 
     /// <summary>
-    /// Dequeue ready message
+    /// Dequeue bundled message
     /// </summary>
     /// <param name="messageId"></param>
     /// <returns>DequeueResult</returns>
     Task<DequeueResult> DequeueAsync(Guid messageId);
 
     /// <summary>
-    /// Retrieve a ready message from repository
+    /// Retrieve a bundled message from repository
     /// </summary>
     /// <param name="category"></param>
     /// <param name="receiverNumber"></param>
