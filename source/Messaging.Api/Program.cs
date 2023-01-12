@@ -96,7 +96,7 @@ namespace Messaging.Api
                         .AddBearerAuthentication(tokenValidationParameters)
                         .AddAuthentication(sp =>
                         {
-                            if (runtime.IsRunningLocally() || string.Equals(runtime.PERFORMANCE_TEST_ENABLED, "true", StringComparison.OrdinalIgnoreCase))
+                            if (runtime.IsRunningLocally() || runtime.PERFORMANCE_TEST_ENABLED)
                             {
                                 return new DevMarketActorAuthenticator(
                                     sp.GetRequiredService<IActorLookup>(),
