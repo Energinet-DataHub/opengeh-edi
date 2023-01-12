@@ -22,9 +22,9 @@ public static class BalanceFixingResultAvailableEventListener
     [Function(nameof(BalanceFixingResultAvailableEventListener))]
     public static void Run(
         [ServiceBusTrigger(
-            "%INTEGRATION_EVENT_TOPIC_NAME%",
+            "%INTEGRATION_EVENTS_TOPIC_NAME%",
             "%BALANCE_FIXING_RESULT_AVAILABLE_EVENT_SUBSCRIPTION_NAME%",
-            Connection = "%SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_LISTENER%")]
+            Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_LISTENER")]
         byte[] eventData,
         FunctionContext context)
     {
