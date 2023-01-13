@@ -15,7 +15,7 @@ CreateTopic -topicName $username"-sbt-integration_event_topic" -serviceBusNamesp
 
 CreateTopicSubscription -topicName $username"-sbt-integration_event_topic" -topicSubscriptionName $username"-sbts-integration_event_subscription" -serviceBusNamespaceName $serviceBusNamespaceName
 
-CreateTopicSubscription -topicName $username"-sbt-integration_event_topic" -topicSubscriptionName $username"-sbts-market_participant_changed_actor_created" -serviceBusNamespaceName $serviceBusNamespaceName
+CreateTopicSubscription -topicName $username"-sbt-integration_event_topic" -topicSubscriptionName $username"-sbts-market_part_changed_actor_created" -serviceBusNamespaceName $serviceBusNamespaceName
 
 CreateTopicSubscription -topicName $username"-sbt-integration_event_topic" -topicSubscriptionName $username"-sbts-balance_result_available_event" -serviceBusNamespaceName $serviceBusNamespaceName
 
