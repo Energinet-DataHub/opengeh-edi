@@ -32,6 +32,7 @@ using Messaging.Infrastructure.Transactions.MoveIn;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
@@ -98,11 +99,13 @@ namespace Messaging.Api
                         {
                             if (runtime.IsRunningLocally() || runtime.PERFORMANCE_TEST_ENABLED)
                             {
+                                Console.WriteLine("CompositionRoot: DevMarketActorAuthenticator");
                                 return new DevMarketActorAuthenticator(
                                     sp.GetRequiredService<IActorLookup>(),
                                     sp.GetRequiredService<IActorRegistry>());
                             }
 
+                            Console.WriteLine("CompositionRoot: MarketActorAuthenticator");
                             return new MarketActorAuthenticator(sp.GetRequiredService<IActorLookup>());
                         })
                         .AddDatabaseConnectionFactory(databaseConnectionString!)
