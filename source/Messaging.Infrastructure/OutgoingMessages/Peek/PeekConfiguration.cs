@@ -33,11 +33,11 @@ internal static class PeekConfiguration
 
         if (bundleStoreBuilder is null)
         {
-            services.AddSingleton<IBundledMessages, BundledMessages>();
+            services.AddScoped<IBundledMessages, BundledMessages>();
         }
         else
         {
-            services.AddSingleton(bundleStoreBuilder);
+            services.AddScoped(bundleStoreBuilder);
         }
     }
 }
