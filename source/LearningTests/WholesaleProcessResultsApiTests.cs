@@ -14,6 +14,7 @@
 
 using System.Net;
 using System.Net.Http.Json;
+using System.Reflection;
 using Microsoft.Extensions.Configuration;
 
 namespace LearningTests;
@@ -25,8 +26,7 @@ public class WholesaleProcessResultsApiTests
     public WholesaleProcessResultsApiTests()
     {
         _configuration = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", false, false)
+            .AddUserSecrets(Assembly.GetExecutingAssembly(), false, false)
             .Build();
     }
 
