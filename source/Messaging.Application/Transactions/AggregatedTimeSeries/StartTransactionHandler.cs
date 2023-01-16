@@ -17,6 +17,7 @@ using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Messaging.Application.Configuration.Commands;
 using Messaging.Application.Configuration.Commands.Commands;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
@@ -29,11 +30,13 @@ public class StartTransactionHandler : IRequestHandler<StartTransaction, Unit>
 {
     private readonly IGridAreaLookup _gridAreaLookup;
     private readonly IAggregatedTimeSeriesTransactions _transactions;
+    private readonly ICommandScheduler _commandScheduler;
 
-    public StartTransactionHandler(IGridAreaLookup gridAreaLookup, IAggregatedTimeSeriesTransactions transactions)
+    public StartTransactionHandler(IGridAreaLookup gridAreaLookup, IAggregatedTimeSeriesTransactions transactions, ICommandScheduler commandScheduler)
     {
         _gridAreaLookup = gridAreaLookup;
         _transactions = transactions;
+        _commandScheduler = commandScheduler;
     }
 
     public async Task<Unit> Handle(StartTransaction request, CancellationToken cancellationToken)
@@ -48,6 +51,7 @@ public class StartTransactionHandler : IRequestHandler<StartTransaction, Unit>
             ProcessType.BalanceFixing);
 
         _transactions.Add(transaction);
+        await _commandScheduler.EnqueueAsync(new RetrieveAggregationResult()).ConfigureAwait(false);
 
         return Unit.Value;
     }

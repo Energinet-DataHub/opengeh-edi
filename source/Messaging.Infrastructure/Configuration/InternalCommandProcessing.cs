@@ -54,6 +54,7 @@ internal static class InternalCommandProcessing
         mapper.Add("UpdateCustomerMasterData", typeof(UpdateCustomerMasterData));
         mapper.Add("SendAggregatedTimeSeries", typeof(SendAggregatedTimeSeries));
         mapper.Add("StartTransaction", typeof(StartTransaction));
+        mapper.Add("RetrieveAggregationResult", typeof(RetrieveAggregationResult));
 
         return mapper;
     }
