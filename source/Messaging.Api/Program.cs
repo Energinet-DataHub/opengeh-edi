@@ -99,13 +99,11 @@ namespace Messaging.Api
                         {
                             if (runtime.IsRunningLocally() || runtime.PERFORMANCE_TEST_ENABLED)
                             {
-                                Console.WriteLine("CompositionRoot: DevMarketActorAuthenticator");
                                 return new DevMarketActorAuthenticator(
                                     sp.GetRequiredService<IActorLookup>(),
                                     sp.GetRequiredService<IActorRegistry>());
                             }
 
-                            Console.WriteLine("CompositionRoot: MarketActorAuthenticator");
                             return new MarketActorAuthenticator(sp.GetRequiredService<IActorLookup>());
                         })
                         .AddDatabaseConnectionFactory(databaseConnectionString!)
