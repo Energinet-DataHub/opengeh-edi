@@ -17,10 +17,17 @@ using Microsoft.Extensions.Logging;
 
 namespace Messaging.Api.EventListeners;
 
-public static class BalanceFixingResultAvailableEventListener
+public class BalanceFixingResultAvailableEventListener
 {
+    private readonly ILogger<BalanceFixingResultAvailableEventListener> _logger;
+
+    public BalanceFixingResultAvailableEventListener(ILogger<BalanceFixingResultAvailableEventListener> logger)
+    {
+        _logger = logger;
+    }
+
     [Function(nameof(BalanceFixingResultAvailableEventListener))]
-    public static void Run(
+    public void Run(
         [ServiceBusTrigger(
             "%INTEGRATION_EVENTS_TOPIC_NAME%",
             "%BALANCE_FIXING_RESULT_AVAILABLE_EVENT_SUBSCRIPTION_NAME%",
@@ -28,7 +35,8 @@ public static class BalanceFixingResultAvailableEventListener
         byte[] eventData,
         FunctionContext context)
     {
-        var logger = context.GetLogger("BalanceFixingResultAvailableEventListener");
-        logger.LogInformation($"Received ProcessCompleted event");
+        var processCompletedEvent =
+            Energinet.DataHub.Wholesale.Contracts.Events.ProcessCompleted.Parser.ParseFrom(eventData);
+        _logger.LogInformation($"Received ProcessCompleted event: {processCompletedEvent}");
     }
 }
