@@ -30,7 +30,7 @@ public class WholesaleProcessResultsApiTests
             .Build();
     }
 
-    [Fact]
+    [Fact(Skip = "Enable if needed")]
     public async Task Fetch_aggregated_production_per_grid_area()
     {
         using var httpClient = new HttpClient();
