@@ -17,7 +17,7 @@ using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Messaging.Domain.SeedWork;
 
-namespace Messaging.Domain.Transactions.AggregatedTimeSeries;
+namespace Messaging.Domain.Transactions.Aggregations;
 
 public class AggregatedTimeSeriesTransaction : Entity
 {

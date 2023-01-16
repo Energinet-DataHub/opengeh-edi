@@ -15,7 +15,7 @@
 using System.Text.Json;
 using Messaging.Domain.Actors;
 using Messaging.Domain.Transactions;
-using Messaging.Domain.Transactions.AggregatedTimeSeries;
+using Messaging.Domain.Transactions.Aggregations;
 
 namespace Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 

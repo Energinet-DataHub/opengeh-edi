@@ -28,7 +28,7 @@ using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 using Point = Messaging.Infrastructure.Transactions.AggregatedTimeSeries.Point;
 
-namespace Messaging.IntegrationTests.Application.Transactions.AggregatedTimeSeries;
+namespace Messaging.IntegrationTests.Application.Transactions.Aggregations;
 
 public class WhenATransactionIsStartedTests : TestBase
 {

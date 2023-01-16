@@ -18,16 +18,12 @@ using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.Transactions.Aggregations;
-using Messaging.Domain.Actors;
-using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
-using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 using Point = Messaging.Infrastructure.Transactions.AggregatedTimeSeries.Point;
 
-namespace Messaging.IntegrationTests.Application.Transactions.AggregatedTimeSeries;
+namespace Messaging.IntegrationTests.Application.Transactions.Aggregations;
 
 public class SendAggregatedTimeSeriesTests : TestBase
 {

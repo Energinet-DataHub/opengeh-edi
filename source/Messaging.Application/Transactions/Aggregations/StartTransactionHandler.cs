@@ -22,7 +22,7 @@ using Messaging.Application.Configuration.Commands.Commands;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions;
-using Messaging.Domain.Transactions.AggregatedTimeSeries;
+using Messaging.Domain.Transactions.Aggregations;
 
 namespace Messaging.Application.Transactions.Aggregations;
 

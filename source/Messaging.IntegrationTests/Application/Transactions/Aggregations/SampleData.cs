@@ -12,11 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Domain.Transactions.AggregatedTimeSeries;
+using System;
 
-#pragma warning disable
-public interface IAggregatedTimeSeriesTransactions
+namespace Messaging.IntegrationTests.Application.Transactions.Aggregations;
+
+internal class SampleData
 {
-    void Add(AggregatedTimeSeriesTransaction transaction);
-    Task<AggregatedTimeSeriesTransaction?> GetAsync(TransactionId transactionId);
+    internal static string GridOperatorNumber => "8200000007739";
+
+    internal static string GridAreaCode => "805";
+
+    internal static Guid ResultId => Guid.Parse("42AB7292-FE2E-4F33-B537-4A15FEDB9754");
+
+    internal static string MeteringPointType => "E18";
+
+    internal static string MeasureUnitType => "KWH";
+
+    internal static string Resolution => "PT1H";
 }

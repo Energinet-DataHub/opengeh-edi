@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.Configuration.Commands.Commands;
 using Messaging.Domain.Transactions;
-using Messaging.Domain.Transactions.AggregatedTimeSeries;
+using Messaging.Domain.Transactions.Aggregations;
 using Messaging.Domain.Transactions.MoveIn;
 
 namespace Messaging.Application.Transactions.Aggregations;

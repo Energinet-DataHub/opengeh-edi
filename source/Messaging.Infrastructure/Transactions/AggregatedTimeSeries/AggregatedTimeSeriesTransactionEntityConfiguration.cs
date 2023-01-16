@@ -15,7 +15,7 @@
 using System;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions;
-using Messaging.Domain.Transactions.AggregatedTimeSeries;
+using Messaging.Domain.Transactions.Aggregations;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

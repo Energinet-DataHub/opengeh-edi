@@ -14,7 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
-using Messaging.Domain.Transactions.AggregatedTimeSeries;
+using Messaging.Domain.Transactions.Aggregations;
 
 namespace Messaging.Application.Transactions.Aggregations;
 

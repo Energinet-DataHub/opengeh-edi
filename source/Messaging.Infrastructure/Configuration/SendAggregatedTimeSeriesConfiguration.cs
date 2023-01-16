@@ -14,7 +14,7 @@
 
 using MediatR;
 using Messaging.Application.Transactions.Aggregations;
-using Messaging.Domain.Transactions.AggregatedTimeSeries;
+using Messaging.Domain.Transactions.Aggregations;
 using Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
 using Microsoft.Extensions.DependencyInjection;
 

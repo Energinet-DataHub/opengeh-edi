@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 
-namespace Messaging.Domain.Transactions.AggregatedTimeSeries;
+namespace Messaging.Domain.Transactions.Aggregations;
 
 public class AggregatedTimeSeriesResult
 {

@@ -15,7 +15,7 @@
 using System;
 using System.Threading.Tasks;
 using Messaging.Domain.Transactions;
-using Messaging.Domain.Transactions.AggregatedTimeSeries;
+using Messaging.Domain.Transactions.Aggregations;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 

@@ -19,7 +19,7 @@ using Messaging.Application.Transactions.Aggregations;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 
-namespace Messaging.IntegrationTests.Application.Transactions.AggregatedTimeSeries;
+namespace Messaging.IntegrationTests.Application.Transactions.Aggregations;
 
 public class WhenAggregationOfTotalProductionIsCompletedTests : TestBase
 {
