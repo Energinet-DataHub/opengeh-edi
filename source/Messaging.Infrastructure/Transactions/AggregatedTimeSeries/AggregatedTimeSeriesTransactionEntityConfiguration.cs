@@ -12,16 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions;
-using Messaging.Domain.Transactions.AggregatedTimeSeries;
+using Messaging.Domain.Transactions.Aggregations;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
 
-internal class AggregatedTimeSeriesTransactionEntityConfiguration : IEntityTypeConfiguration<AggregatedTimeSeriesTransaction>
+internal class AggregatedTimeSeriesTransactionEntityConfiguration : IEntityTypeConfiguration<AggregationResultForwarding>
 {
     private readonly ISerializer _serializer;
 
@@ -30,12 +31,12 @@ internal class AggregatedTimeSeriesTransactionEntityConfiguration : IEntityTypeC
         _serializer = serializer;
     }
 
-    public void Configure(EntityTypeBuilder<AggregatedTimeSeriesTransaction> builder)
+    public void Configure(EntityTypeBuilder<AggregationResultForwarding> builder)
     {
         builder.ToTable("AggregatedTimeSeriesTransactions", "b2b");
         builder.HasKey(entity => entity.Id);
         builder.Property(entity => entity.Id)
-            .HasConversion(toDbValue => toDbValue.Id, fromDbValue => TransactionId.Create(fromDbValue));
+            .HasConversion(toDbValue => Guid.Parse(toDbValue.Id), fromDbValue => TransactionId.Create(fromDbValue.ToString()));
         builder.HasMany<OutgoingMessage>("_messages")
             .WithOne()
             .HasForeignKey("TransactionId");

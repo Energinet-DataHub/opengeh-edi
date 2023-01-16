@@ -17,20 +17,31 @@ using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Messaging.Domain.SeedWork;
 
-namespace Messaging.Domain.Transactions.AggregatedTimeSeries;
+namespace Messaging.Domain.Transactions.Aggregations;
 
-public class AggregatedTimeSeriesTransaction : Entity
+public class AggregationResultForwarding : Entity
 {
+    private readonly ActorNumber _receivingActor;
+    private readonly MarketRole _receivingActorRole;
+    private readonly ProcessType _processType;
+#pragma warning disable
     private readonly List<OutgoingMessage> _messages = new();
 
-    public AggregatedTimeSeriesTransaction(TransactionId id, ActorNumber receivingActor, MarketRole receivingActorRole, ProcessType processType, Series series)
+    public AggregationResultForwarding(TransactionId id, ActorNumber receivingActor, MarketRole receivingActorRole, ProcessType processType)
     {
+        _receivingActor = receivingActor;
+        _receivingActorRole = receivingActorRole;
+        _processType = processType;
         Id = id;
-        _messages.Add(AggregatedTimeSeriesMessage.Create(receivingActor, receivingActorRole, Id, processType, series));
+    }
+
+    public void SendResult(AggregationResult aggregationResult)
+    {
+        _messages.Add(AggregationResultMessage.Create(_receivingActor, _receivingActorRole, Id, _processType, aggregationResult));
     }
 
     #pragma warning disable CS8618 // EF core need this private constructor
-    private AggregatedTimeSeriesTransaction()
+    private AggregationResultForwarding()
     {
     }
     #pragma warning restore

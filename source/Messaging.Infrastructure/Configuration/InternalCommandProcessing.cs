@@ -16,7 +16,7 @@ using MediatR;
 using Messaging.Application.Actors;
 using Messaging.Application.Configuration.Commands;
 using Messaging.Application.Configuration.TimeEvents;
-using Messaging.Application.Transactions.AggregatedTimeSeries;
+using Messaging.Application.Transactions.Aggregations;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 using Messaging.Application.Transactions.MoveIn.Notifications;
@@ -52,7 +52,8 @@ internal static class InternalCommandProcessing
         mapper.Add("NotifyGridOperator", typeof(NotifyGridOperator));
         mapper.Add("SetConsumerHasMovedIn", typeof(SetConsumerHasMovedIn));
         mapper.Add("UpdateCustomerMasterData", typeof(UpdateCustomerMasterData));
-        mapper.Add("SendAggregatedTimeSeries", typeof(SendAggregatedTimeSeries));
+        mapper.Add("StartTransaction", typeof(StartTransaction));
+        mapper.Add("RetrieveAggregationResult", typeof(RetrieveAggregationResult));
 
         return mapper;
     }

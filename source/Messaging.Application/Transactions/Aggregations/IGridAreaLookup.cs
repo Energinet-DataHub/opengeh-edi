@@ -12,21 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using System.Threading.Tasks;
+using Messaging.Domain.Actors;
 
-namespace Messaging.IntegrationTests.Application.Transactions.AggregatedTimeSeries;
+namespace Messaging.Application.Transactions.Aggregations;
 
-internal class SampleData
+/// <summary>
+/// Service looking up grid area details
+/// </summary>
+public interface IGridAreaLookup
 {
-    internal static string GridOperatorNumber => "8200000007739";
-
-    internal static string GridAreaCode => "805";
-
-    internal static Guid ResultId => Guid.Parse("42AB7292-FE2E-4F33-B537-4A15FEDB9754");
-
-    internal static string MeteringPointType => "E18";
-
-    internal static string MeasureUnitType => "KWH";
-
-    internal static string Resolution => "PT1H";
+    /// <summary>
+    /// Finds the actor number of the grid operator of the specified grid area
+    /// </summary>
+    /// <param name="gridAreaCode"></param>
+    /// <returns><see cref="ActorNumber"/></returns>
+    Task<ActorNumber> GetGridOperatorForAsync(string gridAreaCode);
 }

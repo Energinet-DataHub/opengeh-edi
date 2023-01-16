@@ -22,7 +22,7 @@ using Messaging.Domain.OutgoingMessages.GenericNotification;
 using Messaging.Domain.OutgoingMessages.Peek;
 using Messaging.Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
-using Messaging.Domain.Transactions.AggregatedTimeSeries;
+using Messaging.Domain.Transactions.Aggregations;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.InternalCommands;
 using Messaging.Infrastructure.Configuration.Serialization;
@@ -54,7 +54,7 @@ namespace Messaging.Infrastructure.Configuration.DataAccess
 
         public DbSet<MoveInTransaction> Transactions { get; private set; }
 
-        public DbSet<AggregatedTimeSeriesTransaction> AggregatedTimeSeriesTransactions { get; private set; }
+        public DbSet<AggregationResultForwarding> AggregatedTimeSeriesTransactions { get; private set; }
 
         public DbSet<OutgoingMessage> OutgoingMessages { get; private set; }
 

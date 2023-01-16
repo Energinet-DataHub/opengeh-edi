@@ -14,7 +14,7 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Messaging.Application.Transactions.AggregatedTimeSeries;
+using Messaging.Application.Transactions.Aggregations;
 using Messaging.Domain.Actors;
 
 namespace Messaging.Infrastructure.Transactions.AggregatedTimeSeries;

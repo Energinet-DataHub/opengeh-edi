@@ -12,10 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Domain.Transactions.AggregatedTimeSeries;
+using System;
+using System.Threading.Tasks;
+using Messaging.Domain.Transactions.Aggregations;
 
-#pragma warning disable
-public interface IAggregatedTimeSeriesTransactions
+namespace Messaging.Application.Transactions.Aggregations;
+
+/// <summary>
+/// Retrieves stored aggregation results
+/// </summary>
+public interface IAggregationResults
 {
-    void Add(AggregatedTimeSeriesTransaction transaction);
+    /// <summary>
+    /// Fetch a result by id
+    /// </summary>
+    /// <param name="resultId"></param>
+    Task<AggregationResult> GetResultAsync(Guid resultId);
 }

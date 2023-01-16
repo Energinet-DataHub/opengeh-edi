@@ -13,23 +13,32 @@
 // limitations under the License.
 
 using System;
-using Messaging.Domain.Transactions.AggregatedTimeSeries;
+using System.Threading.Tasks;
+using Messaging.Domain.Transactions;
+using Messaging.Domain.Transactions.Aggregations;
 using Messaging.Infrastructure.Configuration.DataAccess;
+using Microsoft.EntityFrameworkCore;
 
 namespace Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
 
-internal class AggregatedTimeSeriesTransactions : IAggregatedTimeSeriesTransactions
+internal class AggregationResultForwardingRepository : IAggregationResultForwardingRepository
 {
     private readonly B2BContext _context;
 
-    public AggregatedTimeSeriesTransactions(B2BContext context)
+    public AggregationResultForwardingRepository(B2BContext context)
     {
         _context = context;
     }
 
-    public void Add(AggregatedTimeSeriesTransaction transaction)
+    public void Add(AggregationResultForwarding transaction)
     {
         ArgumentNullException.ThrowIfNull(transaction);
         _context.AggregatedTimeSeriesTransactions.Add(transaction);
+    }
+
+    public Task<AggregationResultForwarding?> GetAsync(TransactionId transactionId)
+    {
+        ArgumentNullException.ThrowIfNull(transactionId);
+        return _context.AggregatedTimeSeriesTransactions.Include("_messages").FirstOrDefaultAsync(t => t.Id == transactionId);
     }
 }

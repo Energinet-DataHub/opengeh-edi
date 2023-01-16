@@ -17,16 +17,16 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using Messaging.Application.Transactions.AggregatedTimeSeries;
-using Messaging.Domain.Transactions.AggregatedTimeSeries;
+using Messaging.Application.Transactions.Aggregations;
+using Messaging.Domain.Transactions.Aggregations;
 
 namespace Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
 
-public class FakeAggregatedTimeSeriesResults : IAggregatedTimeSeriesResults
+public class FakeAggregationResults : IAggregationResults
 {
-    private readonly Dictionary<Guid, AggregatedTimeSeriesResult> _results = new();
+    private readonly Dictionary<Guid, AggregationResult> _results = new();
 
-    public Task<AggregatedTimeSeriesResult> GetResultAsync(Guid resultId)
+    public Task<AggregationResult> GetResultAsync(Guid resultId)
     {
         return Task.FromResult(_results[resultId]);
     }
@@ -40,12 +40,7 @@ public class FakeAggregatedTimeSeriesResults : IAggregatedTimeSeriesResults
                 decimal.Parse(point.Quantity, NumberStyles.Number, CultureInfo.InvariantCulture),
                 point.Quality,
                 point.QuarterTime));
-        var gridArea = new Series(points.ToList(), aggregatedTimeSeriesResultDto.GridAreaCode, aggregatedTimeSeriesResultDto.MeteringPointType, aggregatedTimeSeriesResultDto.MeasureUnitType, aggregatedTimeSeriesResultDto.Resolution);
-        var result = new AggregatedTimeSeriesResult(resultId, new List<Series>()
-        {
-            gridArea,
-        });
-
+        var result = new AggregationResult(resultId, points.ToList(), aggregatedTimeSeriesResultDto.GridAreaCode, aggregatedTimeSeriesResultDto.MeteringPointType, aggregatedTimeSeriesResultDto.MeasureUnitType, aggregatedTimeSeriesResultDto.Resolution);
         _results.Add(resultId, result);
     }
 }
