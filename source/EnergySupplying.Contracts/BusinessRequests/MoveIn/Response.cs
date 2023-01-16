@@ -12,13 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Contracts.BusinessRequests.MoveIn
+namespace EnergySupplying.Contracts.BusinessRequests.MoveIn
 {
-    public record RequestV2(
-        string? AccountingPointNumber,
-        string? EnergySupplierNumber,
-        string? EffectiveDate,
-        Customer? Customer);
-
-    public record Customer(string? Name, string? Number);
+    public record Response(IEnumerable<string> ValidationErrors, string ProcessId = "");
 }
