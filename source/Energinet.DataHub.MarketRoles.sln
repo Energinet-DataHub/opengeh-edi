@@ -39,7 +39,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.Tests", "Messagin
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BusinessProcessing", "BusinessProcessing", "{582BFE4E-BBFB-4CBE-840D-2F97C2BA1D3C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Contracts", "Contracts\Contracts.csproj", "{4AA95CA9-C2EB-4F47-88D5-8E320F62142C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EnergySupplying.Contracts", "EnergySupplying.Contracts\EnergySupplying.Contracts.csproj", "{4AA95CA9-C2EB-4F47-88D5-8E320F62142C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Processing.ArchitectureTests", "Processing.ArchitectureTests\Processing.ArchitectureTests.csproj", "{0229A857-9C48-4D36-A4DF-6576FC6692EF}"
 EndProject

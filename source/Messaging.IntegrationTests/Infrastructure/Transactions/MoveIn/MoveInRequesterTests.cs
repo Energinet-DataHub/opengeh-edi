@@ -16,7 +16,7 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Contracts.BusinessRequests.MoveIn;
+using EnergySupplying.Contracts.BusinessRequests.MoveIn;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Transactions;
 using Messaging.IntegrationTests.Fixtures;
