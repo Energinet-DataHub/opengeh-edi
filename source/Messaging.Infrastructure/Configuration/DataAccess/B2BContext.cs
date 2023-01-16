@@ -71,7 +71,7 @@ namespace Messaging.Infrastructure.Configuration.DataAccess
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
 
             modelBuilder.ApplyConfiguration(new MoveInTransactionEntityConfiguration(_serializer));
-            modelBuilder.ApplyConfiguration(new AggregatedTimeSeriesTransactionEntityConfiguration(_serializer));
+            modelBuilder.ApplyConfiguration(new AggregationResultForwardingEntityConfiguration(_serializer));
             modelBuilder.ApplyConfiguration(new EntityConfiguration());
             modelBuilder.ApplyConfiguration(new OutgoingMessageEntityConfiguration());
             modelBuilder.ApplyConfiguration(new EnqueuedMessageEntityConfiguration());
