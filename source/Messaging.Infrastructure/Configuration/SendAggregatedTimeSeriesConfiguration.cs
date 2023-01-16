@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using MediatR;
-using Messaging.Application.Transactions.AggregatedTimeSeries;
+using Messaging.Application.Transactions.Aggregations;
 using Messaging.Domain.Transactions.AggregatedTimeSeries;
 using Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
 using Microsoft.Extensions.DependencyInjection;

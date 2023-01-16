@@ -15,7 +15,7 @@
 using System.Threading.Tasks;
 using Messaging.Domain.Actors;
 
-namespace Messaging.Application.Transactions.AggregatedTimeSeries;
+namespace Messaging.Application.Transactions.Aggregations;
 
 /// <summary>
 /// Service looking up grid area details

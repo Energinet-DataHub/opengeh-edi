@@ -16,7 +16,7 @@ using MediatR;
 using Messaging.Application.Actors;
 using Messaging.Application.Configuration.Commands;
 using Messaging.Application.Configuration.TimeEvents;
-using Messaging.Application.Transactions.AggregatedTimeSeries;
+using Messaging.Application.Transactions.Aggregations;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 using Messaging.Application.Transactions.MoveIn.Notifications;

@@ -17,7 +17,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using Messaging.Application.Transactions.AggregatedTimeSeries;
+using Messaging.Application.Transactions.Aggregations;
 using Messaging.Domain.Transactions.AggregatedTimeSeries;
 
 namespace Messaging.Infrastructure.Transactions.AggregatedTimeSeries;

@@ -16,7 +16,7 @@ using System;
 using System.Net;
 using System.Threading.Tasks;
 using MediatR;
-using Messaging.Application.Transactions.AggregatedTimeSeries;
+using Messaging.Application.Transactions.Aggregations;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
 using Microsoft.Azure.Functions.Worker;

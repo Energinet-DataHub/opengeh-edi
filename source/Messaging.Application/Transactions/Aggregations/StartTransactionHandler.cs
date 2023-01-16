@@ -24,7 +24,7 @@ using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions;
 using Messaging.Domain.Transactions.AggregatedTimeSeries;
 
-namespace Messaging.Application.Transactions.AggregatedTimeSeries;
+namespace Messaging.Application.Transactions.Aggregations;
 
 public class StartTransactionHandler : IRequestHandler<StartTransaction, Unit>
 {

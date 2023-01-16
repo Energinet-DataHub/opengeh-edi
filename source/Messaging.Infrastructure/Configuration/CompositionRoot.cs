@@ -26,7 +26,6 @@ using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.OutgoingMessages.Common.Reasons;
 using Messaging.Application.OutgoingMessages.Peek;
-using Messaging.Application.Transactions.AggregatedTimeSeries;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;

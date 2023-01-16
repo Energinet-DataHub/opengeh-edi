@@ -16,7 +16,7 @@ using System;
 using System.Threading.Tasks;
 using Messaging.Domain.Transactions.AggregatedTimeSeries;
 
-namespace Messaging.Application.Transactions.AggregatedTimeSeries;
+namespace Messaging.Application.Transactions.Aggregations;
 
 /// <summary>
 /// Store containing results for aggregated time series
