@@ -21,11 +21,11 @@ using Messaging.Application.Transactions.Aggregations;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
+using Messaging.Infrastructure.Transactions.Aggregations;
 using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
-using Point = Messaging.Infrastructure.Transactions.AggregatedTimeSeries.Point;
+using Point = Messaging.Infrastructure.Transactions.Aggregations.Point;
 
 namespace Messaging.IntegrationTests.Application.Transactions.Aggregations;
 

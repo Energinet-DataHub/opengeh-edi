@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 using Messaging.Application.Transactions.Aggregations;
 using Messaging.Domain.Transactions.Aggregations;
 
-namespace Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
+namespace Messaging.Infrastructure.Transactions.Aggregations;
 
 public class FakeAggregationResults : IAggregationResults
 {

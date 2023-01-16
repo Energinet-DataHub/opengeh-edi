@@ -15,7 +15,7 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
+namespace Messaging.Infrastructure.Transactions.Aggregations;
 
 public record AggregatedTimeSeriesResultsDto(IEnumerable<AggregatedTimeSeriesResultDto> Results);
 

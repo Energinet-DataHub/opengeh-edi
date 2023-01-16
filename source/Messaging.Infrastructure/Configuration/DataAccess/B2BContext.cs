@@ -30,7 +30,7 @@ using Messaging.Infrastructure.MasterData.MarketEvaluationPoints;
 using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.Infrastructure.OutgoingMessages.Peek;
 using Messaging.Infrastructure.Transactions;
-using Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
+using Messaging.Infrastructure.Transactions.Aggregations;
 using Messaging.Infrastructure.Transactions.UpdateCustomer;
 using Microsoft.EntityFrameworkCore;
 using MarketEvaluationPoint = Messaging.Domain.MasterData.MarketEvaluationPoints.MarketEvaluationPoint;

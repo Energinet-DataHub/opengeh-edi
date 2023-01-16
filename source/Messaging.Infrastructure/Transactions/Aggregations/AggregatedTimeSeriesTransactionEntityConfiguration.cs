@@ -20,7 +20,7 @@ using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
+namespace Messaging.Infrastructure.Transactions.Aggregations;
 
 internal class AggregatedTimeSeriesTransactionEntityConfiguration : IEntityTypeConfiguration<AggregationResultForwarding>
 {
