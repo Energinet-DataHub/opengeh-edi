@@ -12,21 +12,56 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.Configuration.Commands.Commands;
+using Messaging.Application.Configuration.DataAccess;
+using Messaging.Domain.Transactions;
+using Messaging.Domain.Transactions.AggregatedTimeSeries;
+using Messaging.Domain.Transactions.MoveIn;
 
 namespace Messaging.Application.Transactions.AggregatedTimeSeries;
 
 public class RetrieveAggregationResultHandler : IRequestHandler<RetrieveAggregationResult, Unit>
 {
-    public Task<Unit> Handle(RetrieveAggregationResult request, CancellationToken cancellationToken)
+    private readonly IAggregatedTimeSeriesResults _aggregationResults;
+    private readonly IAggregatedTimeSeriesTransactions _transactions;
+
+    public RetrieveAggregationResultHandler(IAggregatedTimeSeriesResults aggregationResults, IAggregatedTimeSeriesTransactions transactions)
     {
-        throw new System.NotImplementedException();
+        _aggregationResults = aggregationResults;
+        _transactions = transactions;
+    }
+
+    public async Task<Unit> Handle(RetrieveAggregationResult request, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        var aggregationResult = await _aggregationResults.GetResultAsync(request.ResultId).ConfigureAwait(false);
+        var transaction = await _transactions.GetAsync(TransactionId.Create(request.TransactionId.ToString())).ConfigureAwait(false);
+        if (transaction is null) throw TransactionNotFoundException.TransactionIdNotFound(request.Id.ToString());
+        transaction.SendResult(aggregationResult.Series[0]);
+        return Unit.Value;
     }
 }
 
 public class RetrieveAggregationResult : InternalCommand
 {
+    [JsonConstructor]
+    public RetrieveAggregationResult(Guid id, Guid resultId, Guid transactionId)
+        : base(id)
+    {
+    }
+
+    public RetrieveAggregationResult(Guid resultId, Guid transactionId)
+    {
+        ResultId = resultId;
+        TransactionId = transactionId;
+    }
+
+    public Guid ResultId { get; }
+
+    public Guid TransactionId { get; }
 }

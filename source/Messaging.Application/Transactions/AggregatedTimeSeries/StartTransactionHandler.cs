@@ -51,7 +51,7 @@ public class StartTransactionHandler : IRequestHandler<StartTransaction, Unit>
             ProcessType.BalanceFixing);
 
         _transactions.Add(transaction);
-        await _commandScheduler.EnqueueAsync(new RetrieveAggregationResult()).ConfigureAwait(false);
+        await _commandScheduler.EnqueueAsync(new RetrieveAggregationResult(request.ResultId, Guid.Parse(transaction.Id.Id))).ConfigureAwait(false);
 
         return Unit.Value;
     }
@@ -59,17 +59,21 @@ public class StartTransactionHandler : IRequestHandler<StartTransaction, Unit>
 
 public class StartTransaction : InternalCommand
 {
-    public StartTransaction(string gridAreaCode)
+    public StartTransaction(string gridAreaCode, Guid resultId)
     {
         GridAreaCode = gridAreaCode;
+        ResultId = resultId;
     }
 
     [JsonConstructor]
-    public StartTransaction(Guid id, string gridAreaCode)
+    public StartTransaction(Guid id, string gridAreaCode, Guid resultId)
         : base(id)
     {
         GridAreaCode = gridAreaCode;
+        ResultId = resultId;
     }
 
     public string GridAreaCode { get; }
+
+    public Guid ResultId { get; }
 }

@@ -18,4 +18,5 @@ namespace Messaging.Domain.Transactions.AggregatedTimeSeries;
 public interface IAggregatedTimeSeriesTransactions
 {
     void Add(AggregatedTimeSeriesTransaction transaction);
+    Task<AggregatedTimeSeriesTransaction?> GetAsync(TransactionId transactionId);
 }

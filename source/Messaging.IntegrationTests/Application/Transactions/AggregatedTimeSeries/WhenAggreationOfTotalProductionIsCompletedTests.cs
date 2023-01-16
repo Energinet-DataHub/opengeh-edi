@@ -31,7 +31,7 @@ public class WhenAggregationOfTotalProductionIsCompletedTests : TestBase
     [Fact]
     public async Task A_transaction_is_started()
     {
-        await InvokeCommandAsync(new StartTransaction("805"));
+        await InvokeCommandAsync(new StartTransaction(SampleData.GridAreaCode, SampleData.ResultId));
 
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
         var exists = await connection

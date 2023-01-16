@@ -13,8 +13,11 @@
 // limitations under the License.
 
 using System;
+using System.Threading.Tasks;
+using Messaging.Domain.Transactions;
 using Messaging.Domain.Transactions.AggregatedTimeSeries;
 using Messaging.Infrastructure.Configuration.DataAccess;
+using Microsoft.EntityFrameworkCore;
 
 namespace Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
 
@@ -31,5 +34,11 @@ internal class AggregatedTimeSeriesTransactions : IAggregatedTimeSeriesTransacti
     {
         ArgumentNullException.ThrowIfNull(transaction);
         _context.AggregatedTimeSeriesTransactions.Add(transaction);
+    }
+
+    public Task<AggregatedTimeSeriesTransaction?> GetAsync(TransactionId transactionId)
+    {
+        ArgumentNullException.ThrowIfNull(transactionId);
+        return _context.AggregatedTimeSeriesTransactions.Include("_messages").FirstOrDefaultAsync(t => t.Id == transactionId);
     }
 }

@@ -21,13 +21,23 @@ namespace Messaging.Domain.Transactions.AggregatedTimeSeries;
 
 public class AggregatedTimeSeriesTransaction : Entity
 {
-    #pragma warning disable
+    private readonly ActorNumber _receivingActor;
+    private readonly MarketRole _receivingActorRole;
+    private readonly ProcessType _processType;
+#pragma warning disable
     private readonly List<OutgoingMessage> _messages = new();
 
     public AggregatedTimeSeriesTransaction(TransactionId id, ActorNumber receivingActor, MarketRole receivingActorRole, ProcessType processType)
     {
+        _receivingActor = receivingActor;
+        _receivingActorRole = receivingActorRole;
+        _processType = processType;
         Id = id;
-        //_messages.Add(AggregatedTimeSeriesMessage.Create(receivingActor, receivingActorRole, Id, processType, series));
+    }
+
+    public void SendResult(Series series)
+    {
+        _messages.Add(AggregatedTimeSeriesMessage.Create(_receivingActor, _receivingActorRole, Id, _processType, series));
     }
 
     #pragma warning disable CS8618 // EF core need this private constructor
