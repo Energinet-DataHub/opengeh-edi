@@ -27,5 +27,5 @@ public interface IAggregatedTimeSeriesResults
     /// Fetch a result by id
     /// </summary>
     /// <param name="resultId"></param>
-    Task<AggregatedTimeSeriesResult> GetResultAsync(Guid resultId);
+    Task<AggregationResult> GetResultAsync(Guid resultId);
 }

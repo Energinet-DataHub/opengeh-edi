@@ -18,7 +18,7 @@ namespace Messaging.Domain.Transactions.Aggregations;
 
 public class AggregatedTimeSeriesResult
 {
-    public AggregatedTimeSeriesResult(Guid id, IReadOnlyList<Series> series)
+    public AggregatedTimeSeriesResult(Guid id, IReadOnlyList<AggregationResult> series)
     {
         Id = id;
         Series = series;
@@ -26,19 +26,22 @@ public class AggregatedTimeSeriesResult
 
     public Guid Id { get; }
 
-    public IReadOnlyList<Series> Series { get; }
+    public IReadOnlyList<AggregationResult> Series { get; }
 }
 
-public class Series
+public class AggregationResult
 {
-    public Series(IReadOnlyList<Point> points, string gridAreaCode, string meteringPointType, string measureUnitType, string resolution)
+    public AggregationResult(Guid id, IReadOnlyList<Point> points, string gridAreaCode, string meteringPointType, string measureUnitType, string resolution)
     {
+        Id = id;
         Points = points;
         GridAreaCode = gridAreaCode;
         MeteringPointType = meteringPointType;
         MeasureUnitType = measureUnitType;
         Resolution = resolution;
     }
+
+    public Guid Id { get; }
 
     public IReadOnlyList<Point> Points { get; }
 

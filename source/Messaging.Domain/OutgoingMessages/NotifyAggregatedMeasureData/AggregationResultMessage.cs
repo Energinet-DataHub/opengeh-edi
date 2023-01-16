@@ -35,7 +35,7 @@ public class AggregationResultMessage : OutgoingMessage
 
     public TimeSeries Series { get; }
 
-    public static AggregationResultMessage Create(ActorNumber receiverNumber, MarketRole receiverRole, TransactionId transactionId, ProcessType processType, Series result)
+    public static AggregationResultMessage Create(ActorNumber receiverNumber, MarketRole receiverRole, TransactionId transactionId, ProcessType processType, AggregationResult result)
     {
         ArgumentNullException.ThrowIfNull(transactionId);
         ArgumentNullException.ThrowIfNull(processType);

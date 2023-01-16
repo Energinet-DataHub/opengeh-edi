@@ -41,7 +41,7 @@ public class RetrieveAggregationResultHandler : IRequestHandler<RetrieveAggregat
         var aggregationResult = await _aggregationResults.GetResultAsync(request.ResultId).ConfigureAwait(false);
         var transaction = await _transactions.GetAsync(TransactionId.Create(request.TransactionId.ToString())).ConfigureAwait(false);
         if (transaction is null) throw TransactionNotFoundException.TransactionIdNotFound(request.Id.ToString());
-        transaction.SendResult(aggregationResult.Series[0]);
+        transaction.SendResult(aggregationResult);
         return Unit.Value;
     }
 }

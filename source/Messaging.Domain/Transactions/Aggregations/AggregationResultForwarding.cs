@@ -35,9 +35,9 @@ public class AggregationResultForwarding : Entity
         Id = id;
     }
 
-    public void SendResult(Series series)
+    public void SendResult(AggregationResult aggregationResult)
     {
-        _messages.Add(AggregationResultMessage.Create(_receivingActor, _receivingActorRole, Id, _processType, series));
+        _messages.Add(AggregationResultMessage.Create(_receivingActor, _receivingActorRole, Id, _processType, aggregationResult));
     }
 
     #pragma warning disable CS8618 // EF core need this private constructor
