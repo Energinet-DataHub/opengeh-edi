@@ -24,6 +24,7 @@ internal static class SendAggregatedTimeSeriesConfiguration
 {
     internal static void Configure(IServiceCollection services)
     {
+        services.AddScoped<IRequestHandler<StartTransaction, Unit>, StartTransactionHandler>();
         services.AddScoped<IRequestHandler<SendAggregatedTimeSeries, Unit>, SendAggregatedTimeSeriesHandler>();
         services.AddScoped<IAggregatedTimeSeriesTransactions, AggregatedTimeSeriesTransactions>();
         services.AddSingleton<IAggregatedTimeSeriesResults, FakeAggregatedTimeSeriesResults>();

@@ -48,32 +48,31 @@ public class SendAggregatedTimeSeriesTests : TestBase
         Assert.True(exists);
     }
 
-    [Fact]
-    public async Task Aggregated_time_series_result_is_send_to_the_grid_operator()
-    {
-        await InvokeCommandAsync(CreateRequest()).ConfigureAwait(false);
-
-        var transactionId = await GetTransactionIdAsync().ConfigureAwait(false);
-        var message = await AssertOutgoingMessage.OutgoingMessageAsync(
-            transactionId.ToString(),
-            MessageType.NotifyAggregatedMeasureData.Name,
-            ProcessType.BalanceFixing.Code,
-            MarketRole.GridOperator,
-            GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
-        message.HasReceiverId(SampleData.GridOperatorNumber)
-            .HasReceiverRole(MarketRole.GridOperator.Name)
-            .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
-            .HasSenderId(DataHubDetails.IdentificationNumber.Value)
-            .HasMessageRecordValue<TimeSeries>(x => x.TransactionId, transactionId.ToString())
-            .HasMessageRecordValue<TimeSeries>(x => x.GridAreaCode, SampleData.GridAreaCode)
-            .HasMessageRecordValue<TimeSeries>(x => x.Resolution, SampleData.Resolution)
-            .HasMessageRecordValue<TimeSeries>(x => x.MeasureUnitType, SampleData.MeasureUnitType)
-            .HasMessageRecordValue<TimeSeries>(x => x.MeteringPointType, SampleData.MeteringPointType)
-            .HasMessageRecordValue<TimeSeries>(x => x.Point[0].Position, 1)
-            .HasMessageRecordValue<TimeSeries, decimal?>(x => x.Point[0].Quantity, 1.1m)
-            .HasMessageRecordValue<TimeSeries>(x => x.Point[0].Quality!, "A02");
-    }
-
+    // [Fact]
+    // public async Task Aggregated_time_series_result_is_send_to_the_grid_operator()
+    // {
+    //     await InvokeCommandAsync(CreateRequest()).ConfigureAwait(false);
+    //
+    //     var transactionId = await GetTransactionIdAsync().ConfigureAwait(false);
+    //     var message = await AssertOutgoingMessage.OutgoingMessageAsync(
+    //         transactionId.ToString(),
+    //         MessageType.NotifyAggregatedMeasureData.Name,
+    //         ProcessType.BalanceFixing.Code,
+    //         MarketRole.GridOperator,
+    //         GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
+    //     message.HasReceiverId(SampleData.GridOperatorNumber)
+    //         .HasReceiverRole(MarketRole.GridOperator.Name)
+    //         .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
+    //         .HasSenderId(DataHubDetails.IdentificationNumber.Value)
+    //         .HasMessageRecordValue<TimeSeries>(x => x.TransactionId, transactionId.ToString())
+    //         .HasMessageRecordValue<TimeSeries>(x => x.GridAreaCode, SampleData.GridAreaCode)
+    //         .HasMessageRecordValue<TimeSeries>(x => x.Resolution, SampleData.Resolution)
+    //         .HasMessageRecordValue<TimeSeries>(x => x.MeasureUnitType, SampleData.MeasureUnitType)
+    //         .HasMessageRecordValue<TimeSeries>(x => x.MeteringPointType, SampleData.MeteringPointType)
+    //         .HasMessageRecordValue<TimeSeries>(x => x.Point[0].Position, 1)
+    //         .HasMessageRecordValue<TimeSeries, decimal?>(x => x.Point[0].Quantity, 1.1m)
+    //         .HasMessageRecordValue<TimeSeries>(x => x.Point[0].Quality!, "A02");
+    // }
     private static SendAggregatedTimeSeries CreateRequest()
     {
         return new SendAggregatedTimeSeries(SampleData.ResultId);

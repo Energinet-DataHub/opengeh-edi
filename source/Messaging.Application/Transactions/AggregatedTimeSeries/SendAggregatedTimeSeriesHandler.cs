@@ -50,8 +50,7 @@ public class SendAggregatedTimeSeriesHandler : IRequestHandler<SendAggregatedTim
                 TransactionId.New(),
                 gridOperatorNumber,
                 MarketRole.GridOperator,
-                ProcessType.BalanceFixing,
-                result);
+                ProcessType.BalanceFixing);
             _transactions.Add(transaction);
         }
 

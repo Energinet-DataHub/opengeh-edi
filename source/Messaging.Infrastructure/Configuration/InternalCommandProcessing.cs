@@ -53,6 +53,7 @@ internal static class InternalCommandProcessing
         mapper.Add("SetConsumerHasMovedIn", typeof(SetConsumerHasMovedIn));
         mapper.Add("UpdateCustomerMasterData", typeof(UpdateCustomerMasterData));
         mapper.Add("SendAggregatedTimeSeries", typeof(SendAggregatedTimeSeries));
+        mapper.Add("StartTransaction", typeof(StartTransaction));
 
         return mapper;
     }
