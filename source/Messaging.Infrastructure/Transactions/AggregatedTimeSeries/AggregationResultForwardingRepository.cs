@@ -21,11 +21,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
 
-internal class AggregatedTimeSeriesTransactions : IAggregatedTimeSeriesTransactions
+internal class AggregationResultForwardingRepository : IAggregationResultForwardingRepository
 {
     private readonly B2BContext _context;
 
-    public AggregatedTimeSeriesTransactions(B2BContext context)
+    public AggregationResultForwardingRepository(B2BContext context)
     {
         _context = context;
     }

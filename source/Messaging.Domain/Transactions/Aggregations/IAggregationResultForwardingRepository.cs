@@ -15,7 +15,7 @@
 namespace Messaging.Domain.Transactions.Aggregations;
 
 #pragma warning disable
-public interface IAggregatedTimeSeriesTransactions
+public interface IAggregationResultForwardingRepository
 {
     void Add(AggregationResultForwarding transaction);
     Task<AggregationResultForwarding?> GetAsync(TransactionId transactionId);

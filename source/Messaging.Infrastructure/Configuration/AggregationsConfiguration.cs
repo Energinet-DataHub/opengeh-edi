@@ -25,7 +25,7 @@ internal static class AggregationsConfiguration
     internal static void Configure(IServiceCollection services)
     {
         services.AddTransient<IRequestHandler<StartTransaction, Unit>, StartTransactionHandler>();
-        services.AddScoped<IAggregatedTimeSeriesTransactions, AggregatedTimeSeriesTransactions>();
+        services.AddScoped<IAggregationResultForwardingRepository, AggregationResultForwardingRepository>();
         services.AddSingleton<IAggregationResults, FakeAggregationResults>();
         services.AddSingleton<IGridAreaLookup, FakeGridAreaLookup>();
         services.AddTransient<IRequestHandler<RetrieveAggregationResult, Unit>, RetrieveAggregationResultHandler>();

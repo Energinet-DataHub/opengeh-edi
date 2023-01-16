@@ -29,10 +29,10 @@ namespace Messaging.Application.Transactions.Aggregations;
 public class StartTransactionHandler : IRequestHandler<StartTransaction, Unit>
 {
     private readonly IGridAreaLookup _gridAreaLookup;
-    private readonly IAggregatedTimeSeriesTransactions _transactions;
+    private readonly IAggregationResultForwardingRepository _transactions;
     private readonly ICommandScheduler _commandScheduler;
 
-    public StartTransactionHandler(IGridAreaLookup gridAreaLookup, IAggregatedTimeSeriesTransactions transactions, ICommandScheduler commandScheduler)
+    public StartTransactionHandler(IGridAreaLookup gridAreaLookup, IAggregationResultForwardingRepository transactions, ICommandScheduler commandScheduler)
     {
         _gridAreaLookup = gridAreaLookup;
         _transactions = transactions;

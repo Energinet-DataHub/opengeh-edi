@@ -27,9 +27,9 @@ namespace Messaging.Application.Transactions.Aggregations;
 public class RetrieveAggregationResultHandler : IRequestHandler<RetrieveAggregationResult, Unit>
 {
     private readonly IAggregationResults _aggregationResults;
-    private readonly IAggregatedTimeSeriesTransactions _transactions;
+    private readonly IAggregationResultForwardingRepository _transactions;
 
-    public RetrieveAggregationResultHandler(IAggregationResults aggregationResults, IAggregatedTimeSeriesTransactions transactions)
+    public RetrieveAggregationResultHandler(IAggregationResults aggregationResults, IAggregationResultForwardingRepository transactions)
     {
         _aggregationResults = aggregationResults;
         _transactions = transactions;
