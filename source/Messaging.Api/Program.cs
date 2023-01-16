@@ -99,13 +99,11 @@ namespace Messaging.Api
                         {
                             if (runtime.IsRunningLocally() || runtime.PERFORMANCE_TEST_ENABLED)
                             {
-                                Console.WriteLine("CompositionRoot: DevMarketActorAuthenticator");
                                 return new DevMarketActorAuthenticator(
                                     sp.GetRequiredService<IActorLookup>(),
                                     sp.GetRequiredService<IActorRegistry>());
                             }
 
-                            Console.WriteLine("CompositionRoot: MarketActorAuthenticator");
                             return new MarketActorAuthenticator(sp.GetRequiredService<IActorLookup>());
                         })
                         .AddDatabaseConnectionFactory(databaseConnectionString!)
@@ -154,7 +152,7 @@ namespace Messaging.Api
 
         private static async Task<TokenValidationParameters> GetTokenValidationParametersAsync(RuntimeEnvironment runtime)
         {
-            if (runtime.IsRunningLocally())
+            if (runtime.IsRunningLocally() || runtime.PERFORMANCE_TEST_ENABLED)
             {
 #pragma warning disable CA5404 // Do not disable token validation checks
                 return DevelopmentTokenValidationParameters();
