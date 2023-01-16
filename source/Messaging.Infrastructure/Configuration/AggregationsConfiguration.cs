@@ -20,7 +20,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Messaging.Infrastructure.Configuration;
 
-internal static class SendAggregatedTimeSeriesConfiguration
+internal static class AggregationsConfiguration
 {
     internal static void Configure(IServiceCollection services)
     {

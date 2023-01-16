@@ -91,7 +91,7 @@ namespace Messaging.Infrastructure.Configuration
             ReadModelHandlingConfiguration.AddReadModelHandling(services);
             UpdateCustomerMasterDataConfiguration.Configure(services);
             DequeueConfiguration.Configure(services);
-            SendAggregatedTimeSeriesConfiguration.Configure(services);
+            AggregationsConfiguration.Configure(services);
         }
 
         public static CompositionRoot Initialize(IServiceCollection services)
