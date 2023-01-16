@@ -14,9 +14,21 @@
 
 namespace Messaging.Domain.Transactions.Aggregations;
 
-#pragma warning disable
+/// <summary>
+/// Repository of aggregation result forwarding transactions
+/// </summary>
 public interface IAggregationResultForwardingRepository
 {
+    /// <summary>
+    /// Add a transaction
+    /// </summary>
+    /// <param name="transaction"></param>
     void Add(AggregationResultForwarding transaction);
+
+    /// <summary>
+    /// Retrieve a transaction by id
+    /// </summary>
+    /// <param name="transactionId"></param>
+    /// <returns><see cref="AggregationResultForwarding"/></returns>
     Task<AggregationResultForwarding?> GetAsync(TransactionId transactionId);
 }
