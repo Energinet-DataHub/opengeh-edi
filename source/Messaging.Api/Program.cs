@@ -154,7 +154,7 @@ namespace Messaging.Api
 
         private static async Task<TokenValidationParameters> GetTokenValidationParametersAsync(RuntimeEnvironment runtime)
         {
-            if (runtime.IsRunningLocally())
+            if (runtime.IsRunningLocally() || runtime.PERFORMANCE_TEST_ENABLED)
             {
 #pragma warning disable CA5404 // Do not disable token validation checks
                 return DevelopmentTokenValidationParameters();
