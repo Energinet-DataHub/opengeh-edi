@@ -52,7 +52,6 @@ internal static class InternalCommandProcessing
         mapper.Add("NotifyGridOperator", typeof(NotifyGridOperator));
         mapper.Add("SetConsumerHasMovedIn", typeof(SetConsumerHasMovedIn));
         mapper.Add("UpdateCustomerMasterData", typeof(UpdateCustomerMasterData));
-        mapper.Add("SendAggregatedTimeSeries", typeof(SendAggregatedTimeSeries));
         mapper.Add("StartTransaction", typeof(StartTransaction));
         mapper.Add("RetrieveAggregationResult", typeof(RetrieveAggregationResult));
 
