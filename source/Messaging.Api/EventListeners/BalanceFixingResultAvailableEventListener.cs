@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Threading.Tasks;
+using Messaging.Application.Configuration.Commands;
+using Messaging.Application.Transactions.Aggregations;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
@@ -20,14 +24,16 @@ namespace Messaging.Api.EventListeners;
 public class BalanceFixingResultAvailableEventListener
 {
     private readonly ILogger<BalanceFixingResultAvailableEventListener> _logger;
+    private readonly CommandSchedulerFacade _commandScheduler;
 
-    public BalanceFixingResultAvailableEventListener(ILogger<BalanceFixingResultAvailableEventListener> logger)
+    public BalanceFixingResultAvailableEventListener(ILogger<BalanceFixingResultAvailableEventListener> logger, CommandSchedulerFacade commandScheduler)
     {
         _logger = logger;
+        _commandScheduler = commandScheduler;
     }
 
     [Function(nameof(BalanceFixingResultAvailableEventListener))]
-    public void Run(
+    public Task RunAsync(
         [ServiceBusTrigger(
             "%INTEGRATION_EVENTS_TOPIC_NAME%",
             "%BALANCE_FIXING_RESULT_AVAILABLE_EVENT_SUBSCRIPTION_NAME%",
@@ -38,5 +44,7 @@ public class BalanceFixingResultAvailableEventListener
         var processCompletedEvent =
             Energinet.DataHub.Wholesale.Contracts.Events.ProcessCompleted.Parser.ParseFrom(eventData);
         _logger.LogInformation($"Received ProcessCompleted event: {processCompletedEvent}");
+        return _commandScheduler.EnqueueAsync(
+            new StartTransaction(processCompletedEvent.GridAreaCode, Guid.Parse(processCompletedEvent.BatchId)));
     }
 }
