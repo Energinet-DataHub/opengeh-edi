@@ -21,18 +21,18 @@ using Microsoft.Extensions.Logging;
 
 namespace Messaging.Api.EventListeners;
 
-public class BalanceFixingResultAvailableEventListener
+public class BalanceFixingWasCompletedListener
 {
-    private readonly ILogger<BalanceFixingResultAvailableEventListener> _logger;
+    private readonly ILogger<BalanceFixingWasCompletedListener> _logger;
     private readonly CommandSchedulerFacade _commandScheduler;
 
-    public BalanceFixingResultAvailableEventListener(ILogger<BalanceFixingResultAvailableEventListener> logger, CommandSchedulerFacade commandScheduler)
+    public BalanceFixingWasCompletedListener(ILogger<BalanceFixingWasCompletedListener> logger, CommandSchedulerFacade commandScheduler)
     {
         _logger = logger;
         _commandScheduler = commandScheduler;
     }
 
-    [Function(nameof(BalanceFixingResultAvailableEventListener))]
+    [Function(nameof(BalanceFixingWasCompletedListener))]
     public Task RunAsync(
         [ServiceBusTrigger(
             "%INTEGRATION_EVENTS_TOPIC_NAME%",
