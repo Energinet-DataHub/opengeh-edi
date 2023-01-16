@@ -44,7 +44,7 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Infrastructure" />
+      <ProjectReference Include="..\Messaging.Infrastructure\Messaging.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>
