@@ -42,7 +42,7 @@ public class RetrieveAggregationResultTests : TestBase
         await TransactionHasBeenStarted().ConfigureAwait(false);
         var transactionId = await GetTransactionIdAsync().ConfigureAwait(false);
 
-        await InvokeCommandAsync(new RetrieveAggregationResult(SampleData.ResultId, transactionId)).ConfigureAwait(false);
+        await InvokeCommandAsync(new RetrieveAggregationResult(SampleData.ResultId, SampleData.GridAreaCode, transactionId)).ConfigureAwait(false);
 
         var message = await AssertOutgoingMessage.OutgoingMessageAsync(
                  transactionId.ToString(),

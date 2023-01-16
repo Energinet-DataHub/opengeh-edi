@@ -24,11 +24,13 @@ namespace Messaging.Infrastructure.Transactions.Aggregations;
 
 public class FakeAggregationResults : IAggregationResults
 {
-    private readonly Dictionary<Guid, AggregationResult> _results = new();
+    private readonly List<AggregationResult> _results = new();
 
-    public Task<AggregationResult> GetResultAsync(Guid resultId)
+    public Task<AggregationResult> GetResultAsync(Guid resultId, string gridArea)
     {
-        return Task.FromResult(_results[resultId]);
+        return Task.FromResult(_results.First(result =>
+            result.Id.Equals(resultId) &&
+            result.GridAreaCode.Equals(gridArea, StringComparison.OrdinalIgnoreCase)));
     }
 
     public void Add(Guid resultId, AggregationResultDto aggregationResultDto)
@@ -41,6 +43,6 @@ public class FakeAggregationResults : IAggregationResults
                 point.Quality,
                 point.QuarterTime));
         var result = new AggregationResult(resultId, points.ToList(), aggregationResultDto.GridAreaCode, aggregationResultDto.MeteringPointType, aggregationResultDto.MeasureUnitType, aggregationResultDto.Resolution);
-        _results.Add(resultId, result);
+        _results.Add(result);
     }
 }

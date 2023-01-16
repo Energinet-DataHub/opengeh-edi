@@ -51,7 +51,7 @@ public class StartTransactionHandler : IRequestHandler<StartTransaction, Unit>
             ProcessType.BalanceFixing);
 
         _transactions.Add(transaction);
-        await _commandScheduler.EnqueueAsync(new RetrieveAggregationResult(request.ResultId, Guid.Parse(transaction.Id.Id))).ConfigureAwait(false);
+        await _commandScheduler.EnqueueAsync(new RetrieveAggregationResult(request.ResultId, request.GridAreaCode, Guid.Parse(transaction.Id.Id))).ConfigureAwait(false);
 
         return Unit.Value;
     }
