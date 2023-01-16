@@ -17,11 +17,11 @@ using System.Text.Json.Serialization;
 
 namespace Messaging.Infrastructure.Transactions.Aggregations;
 
-public record AggregationResultDto(string GridAreaCode, string MeteringPointType, string MeasureUnitType, string Resolution, IEnumerable<Point> Points);
+public record AggregationResultDto(string GridAreaCode, string MeteringPointType, string MeasureUnitType, string Resolution, IEnumerable<PointDto> Points);
 
-public class Point
+public class PointDto
 {
-    public Point(int position, string quantity, string? quality, string quarterTime)
+    public PointDto(int position, string quantity, string? quality, string quarterTime)
     {
         Position = position;
         Quantity = quantity;

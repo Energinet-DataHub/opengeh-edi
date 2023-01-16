@@ -25,7 +25,6 @@ using Messaging.Infrastructure.Transactions.Aggregations;
 using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
-using Point = Messaging.Infrastructure.Transactions.Aggregations.Point;
 
 namespace Messaging.IntegrationTests.Application.Transactions.Aggregations;
 
@@ -73,7 +72,7 @@ public class RetrieveAggregationResultTests : TestBase
             SampleData.MeteringPointType,
             SampleData.MeasureUnitType,
             SampleData.Resolution,
-            new List<Point>()
+            new List<PointDto>()
             {
                 new(
                     1,
