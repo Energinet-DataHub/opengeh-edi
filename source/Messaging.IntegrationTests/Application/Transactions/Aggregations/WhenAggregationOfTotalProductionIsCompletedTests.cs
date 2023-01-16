@@ -16,6 +16,8 @@ using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.Transactions.Aggregations;
+using Messaging.Infrastructure.Configuration.InternalCommands;
+using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 
@@ -31,11 +33,24 @@ public class WhenAggregationOfTotalProductionIsCompletedTests : TestBase
     [Fact]
     public async Task A_transaction_is_started()
     {
-        await InvokeCommandAsync(new StartTransaction(SampleData.GridAreaCode, SampleData.ResultId));
+        await StartTransaction().ConfigureAwait(false);
 
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
         var exists = await connection
             .ExecuteScalarAsync<bool>("SELECT COUNT(*) FROM b2b.AggregatedTimeSeriesTransactions");
         Assert.True(exists);
+    }
+
+    [Fact]
+    public async Task Aggregation_result_retrieval_is_scheduled()
+    {
+        await StartTransaction().ConfigureAwait(false);
+
+        AssertQueuedCommand.QueuedCommand<RetrieveAggregationResult>(GetService<IDatabaseConnectionFactory>(), GetService<InternalCommandMapper>());
+    }
+
+    private async Task StartTransaction()
+    {
+        await InvokeCommandAsync(new StartTransaction(SampleData.GridAreaCode, SampleData.ResultId));
     }
 }

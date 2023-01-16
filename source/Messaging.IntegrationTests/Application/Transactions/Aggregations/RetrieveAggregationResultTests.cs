@@ -21,7 +21,6 @@ using Messaging.Application.Transactions.Aggregations;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Messaging.Infrastructure.Configuration.InternalCommands;
 using Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
 using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
@@ -30,26 +29,18 @@ using Point = Messaging.Infrastructure.Transactions.AggregatedTimeSeries.Point;
 
 namespace Messaging.IntegrationTests.Application.Transactions.Aggregations;
 
-public class WhenATransactionIsStartedTests : TestBase
+public class RetrieveAggregationResultTests : TestBase
 {
-    public WhenATransactionIsStartedTests(DatabaseFixture databaseFixture)
+    public RetrieveAggregationResultTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
+        SetupFakeAggregationResult();
     }
 
     [Fact]
-    public async Task Result_Is_Retrieved()
+    public async Task Aggregation_result_is_forwarded_to_the_receiver()
     {
-        await StartTransaction().ConfigureAwait(false);
-
-        AssertQueuedCommand.QueuedCommand<RetrieveAggregationResult>(GetService<IDatabaseConnectionFactory>(), GetService<InternalCommandMapper>());
-    }
-
-    [Fact]
-    public async Task Result_Is_Forwarded_To_The_Receiver()
-    {
-        AddFakeResult();
-        await StartTransaction().ConfigureAwait(false);
+        await TransactionHasBeenStarted().ConfigureAwait(false);
         var transactionId = await GetTransactionIdAsync().ConfigureAwait(false);
 
         await InvokeCommandAsync(new RetrieveAggregationResult(SampleData.ResultId, transactionId)).ConfigureAwait(false);
@@ -74,7 +65,7 @@ public class WhenATransactionIsStartedTests : TestBase
                  .HasMessageRecordValue<TimeSeries>(x => x.Point[0].Quality!, "A02");
     }
 
-    private void AddFakeResult()
+    private void SetupFakeAggregationResult()
     {
         var results = GetService<IAggregationResults>() as FakeAggregationResults;
         var dto = new AggregatedTimeSeriesResultDto(
@@ -101,7 +92,7 @@ public class WhenATransactionIsStartedTests : TestBase
             .QueryFirstAsync<Guid>("SELECT TOP(1) Id FROM b2b.AggregatedTimeSeriesTransactions").ConfigureAwait(false);
     }
 
-    private async Task StartTransaction()
+    private async Task TransactionHasBeenStarted()
     {
         await InvokeCommandAsync(new StartTransaction(SampleData.GridAreaCode, SampleData.ResultId));
     }
