@@ -19,7 +19,7 @@ using Messaging.Domain.SeedWork;
 
 namespace Messaging.Domain.Transactions.Aggregations;
 
-public class AggregatedTimeSeriesTransaction : Entity
+public class AggregationResultForwarding : Entity
 {
     private readonly ActorNumber _receivingActor;
     private readonly MarketRole _receivingActorRole;
@@ -27,7 +27,7 @@ public class AggregatedTimeSeriesTransaction : Entity
 #pragma warning disable
     private readonly List<OutgoingMessage> _messages = new();
 
-    public AggregatedTimeSeriesTransaction(TransactionId id, ActorNumber receivingActor, MarketRole receivingActorRole, ProcessType processType)
+    public AggregationResultForwarding(TransactionId id, ActorNumber receivingActor, MarketRole receivingActorRole, ProcessType processType)
     {
         _receivingActor = receivingActor;
         _receivingActorRole = receivingActorRole;
@@ -41,7 +41,7 @@ public class AggregatedTimeSeriesTransaction : Entity
     }
 
     #pragma warning disable CS8618 // EF core need this private constructor
-    private AggregatedTimeSeriesTransaction()
+    private AggregationResultForwarding()
     {
     }
     #pragma warning restore

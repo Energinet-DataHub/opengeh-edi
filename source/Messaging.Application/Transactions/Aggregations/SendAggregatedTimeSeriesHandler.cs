@@ -46,7 +46,7 @@ public class SendAggregatedTimeSeriesHandler : IRequestHandler<SendAggregatedTim
         foreach (var result in aggregatedTimeSeriesResult.Series)
         {
             var gridOperatorNumber = await _gridAreaLookup.GetGridOperatorForAsync(result.GridAreaCode).ConfigureAwait(false);
-            var transaction = new AggregatedTimeSeriesTransaction(
+            var transaction = new AggregationResultForwarding(
                 TransactionId.New(),
                 gridOperatorNumber,
                 MarketRole.GridOperator,

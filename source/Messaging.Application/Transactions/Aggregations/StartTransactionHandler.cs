@@ -44,7 +44,7 @@ public class StartTransactionHandler : IRequestHandler<StartTransaction, Unit>
         ArgumentNullException.ThrowIfNull(request);
 
         var gridOperatorNumber = await _gridAreaLookup.GetGridOperatorForAsync(request.GridAreaCode).ConfigureAwait(false);
-        var transaction = new AggregatedTimeSeriesTransaction(
+        var transaction = new AggregationResultForwarding(
             TransactionId.New(),
             gridOperatorNumber,
             MarketRole.GridOperator,

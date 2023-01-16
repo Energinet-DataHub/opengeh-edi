@@ -22,7 +22,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
 
-internal class AggregatedTimeSeriesTransactionEntityConfiguration : IEntityTypeConfiguration<AggregatedTimeSeriesTransaction>
+internal class AggregatedTimeSeriesTransactionEntityConfiguration : IEntityTypeConfiguration<AggregationResultForwarding>
 {
     private readonly ISerializer _serializer;
 
@@ -31,7 +31,7 @@ internal class AggregatedTimeSeriesTransactionEntityConfiguration : IEntityTypeC
         _serializer = serializer;
     }
 
-    public void Configure(EntityTypeBuilder<AggregatedTimeSeriesTransaction> builder)
+    public void Configure(EntityTypeBuilder<AggregationResultForwarding> builder)
     {
         builder.ToTable("AggregatedTimeSeriesTransactions", "b2b");
         builder.HasKey(entity => entity.Id);
