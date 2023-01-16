@@ -26,10 +26,10 @@ namespace Messaging.Application.Transactions.Aggregations;
 
 public class RetrieveAggregationResultHandler : IRequestHandler<RetrieveAggregationResult, Unit>
 {
-    private readonly IAggregatedTimeSeriesResults _aggregationResults;
+    private readonly IAggregationResults _aggregationResults;
     private readonly IAggregatedTimeSeriesTransactions _transactions;
 
-    public RetrieveAggregationResultHandler(IAggregatedTimeSeriesResults aggregationResults, IAggregatedTimeSeriesTransactions transactions)
+    public RetrieveAggregationResultHandler(IAggregationResults aggregationResults, IAggregatedTimeSeriesTransactions transactions)
     {
         _aggregationResults = aggregationResults;
         _transactions = transactions;

@@ -76,7 +76,7 @@ public class WhenATransactionIsStartedTests : TestBase
 
     private void AddFakeResult()
     {
-        var results = GetService<IAggregatedTimeSeriesResults>() as FakeAggregatedTimeSeriesResults;
+        var results = GetService<IAggregationResults>() as FakeAggregationResults;
         var dto = new AggregatedTimeSeriesResultDto(
             SampleData.GridAreaCode,
             SampleData.MeteringPointType,

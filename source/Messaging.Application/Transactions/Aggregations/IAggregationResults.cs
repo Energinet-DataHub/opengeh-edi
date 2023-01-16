@@ -19,9 +19,9 @@ using Messaging.Domain.Transactions.Aggregations;
 namespace Messaging.Application.Transactions.Aggregations;
 
 /// <summary>
-/// Store containing results for aggregated time series
+/// Retrieves stored aggregation results
 /// </summary>
-public interface IAggregatedTimeSeriesResults
+public interface IAggregationResults
 {
     /// <summary>
     /// Fetch a result by id

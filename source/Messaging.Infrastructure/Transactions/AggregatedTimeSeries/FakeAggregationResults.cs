@@ -22,7 +22,7 @@ using Messaging.Domain.Transactions.Aggregations;
 
 namespace Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
 
-public class FakeAggregatedTimeSeriesResults : IAggregatedTimeSeriesResults
+public class FakeAggregationResults : IAggregationResults
 {
     private readonly Dictionary<Guid, AggregationResult> _results = new();
 
