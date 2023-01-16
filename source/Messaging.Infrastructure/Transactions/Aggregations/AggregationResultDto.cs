@@ -17,9 +17,7 @@ using System.Text.Json.Serialization;
 
 namespace Messaging.Infrastructure.Transactions.Aggregations;
 
-public record AggregatedTimeSeriesResultsDto(IEnumerable<AggregatedTimeSeriesResultDto> Results);
-
-public record AggregatedTimeSeriesResultDto(string GridAreaCode, string MeteringPointType, string MeasureUnitType, string Resolution, IEnumerable<Point> Points);
+public record AggregationResultDto(string GridAreaCode, string MeteringPointType, string MeasureUnitType, string Resolution, IEnumerable<Point> Points);
 
 public class Point
 {

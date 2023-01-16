@@ -31,16 +31,16 @@ public class FakeAggregationResults : IAggregationResults
         return Task.FromResult(_results[resultId]);
     }
 
-    public void Add(Guid resultId, AggregatedTimeSeriesResultDto aggregatedTimeSeriesResultDto)
+    public void Add(Guid resultId, AggregationResultDto aggregationResultDto)
     {
-        ArgumentNullException.ThrowIfNull(aggregatedTimeSeriesResultDto);
-        var points = aggregatedTimeSeriesResultDto.Points.Select(point =>
+        ArgumentNullException.ThrowIfNull(aggregationResultDto);
+        var points = aggregationResultDto.Points.Select(point =>
             new Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point(
                 point.Position,
                 decimal.Parse(point.Quantity, NumberStyles.Number, CultureInfo.InvariantCulture),
                 point.Quality,
                 point.QuarterTime));
-        var result = new AggregationResult(resultId, points.ToList(), aggregatedTimeSeriesResultDto.GridAreaCode, aggregatedTimeSeriesResultDto.MeteringPointType, aggregatedTimeSeriesResultDto.MeasureUnitType, aggregatedTimeSeriesResultDto.Resolution);
+        var result = new AggregationResult(resultId, points.ToList(), aggregationResultDto.GridAreaCode, aggregationResultDto.MeteringPointType, aggregationResultDto.MeasureUnitType, aggregationResultDto.Resolution);
         _results.Add(resultId, result);
     }
 }

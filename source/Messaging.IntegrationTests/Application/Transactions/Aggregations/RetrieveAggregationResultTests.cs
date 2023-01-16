@@ -68,7 +68,7 @@ public class RetrieveAggregationResultTests : TestBase
     private void SetupFakeAggregationResult()
     {
         var results = GetService<IAggregationResults>() as FakeAggregationResults;
-        var dto = new AggregatedTimeSeriesResultDto(
+        var dto = new AggregationResultDto(
             SampleData.GridAreaCode,
             SampleData.MeteringPointType,
             SampleData.MeasureUnitType,
