@@ -18,6 +18,7 @@ on:
   push:
     branches:
       - main
+      - dstenroejl/verify-use-test-filter # TODO: Remove when tested
 
 jobs:
   #
@@ -34,9 +35,10 @@ jobs:
   dotnet_update_coverage_report:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@v9
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@9.4.0-preview # TODO: Revert back to v9
     with:
       SOLUTION_FILE_PATH: 'source/Energinet.DataHub.MarketRoles.sln'
+      TESTS_FILTER_EXPRESSION: 'FullyQualifiedName\!~LearningTests' # Skip all tests within namespace 'LearningTests'
       USE_SQLLOCALDB_2019: true
       ENVIRONMENT: AzureAuth
     secrets:
@@ -46,47 +48,47 @@ jobs:
       AZURE_KEYVAULT_URL: ${{ secrets.AZURE_KEYVAULT_URL }}
       AZURE_SECRETS_KEYVAULT_URL: ${{ secrets.AZURE_SECRETS_KEYVAULT_URL }}
 
-  dotnet_promote_prerelease:
-    needs: changes
-    if: ${{ needs.changes.outputs.dotnet == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/promote-prerelease.yml@v9
-    with:
-      RELEASE_NAME_PREFIX: dotnet
+  # # dotnet_promote_prerelease:
+  # #   needs: changes
+  # #   if: ${{ needs.changes.outputs.dotnet == 'true' }}
+  # #   uses: Energinet-DataHub/.github/.github/workflows/promote-prerelease.yml@v9
+  # #   with:
+  # #     RELEASE_NAME_PREFIX: dotnet
 
-  #
-  # Dispatch deployment request
-  #
+  # # #
+  # # # Dispatch deployment request
+  # # #
 
-  dispatch_deploment_event:
-    runs-on: ubuntu-latest
-    needs: dotnet_promote_prerelease
-    steps:
-      - name: Find associated pull request
-        uses: Energinet-DataHub/.github/.github/actions/find-related-pr-number@v9
-        id: find_pull_request
+  # # dispatch_deploment_event:
+  # #   runs-on: ubuntu-latest
+  # #   needs: dotnet_promote_prerelease
+  # #   steps:
+  # #     - name: Find associated pull request
+  # #       uses: Energinet-DataHub/.github/.github/actions/find-related-pr-number@v9
+  # #       id: find_pull_request
 
-      - name: Repository Dispatch
-        uses: peter-evans/repository-dispatch@v2
-        with:
-          token: ${{ secrets.PAT_TOKEN }}
-          repository: '${{ secrets.ENVIRONMENT_REPOSITORY_PATH }}'
-          event-type: 'market-roles-deployment-request-domain'
-          client-payload: '{"domain_pr": "${{ steps.find_pull_request.outputs.pull_request_number }}"}'
+  # #     - name: Repository Dispatch
+  # #       uses: peter-evans/repository-dispatch@v2
+  # #       with:
+  # #         token: ${{ secrets.PAT_TOKEN }}
+  # #         repository: '${{ secrets.ENVIRONMENT_REPOSITORY_PATH }}'
+  # #         event-type: 'market-roles-deployment-request-domain'
+  # #         client-payload: '{"domain_pr": "${{ steps.find_pull_request.outputs.pull_request_number }}"}'
 
-  #
-  # Send notification to teams channel if deployment dispatch failed
-  #
+  # # #
+  # # # Send notification to teams channel if deployment dispatch failed
+  # # #
 
-  dispatch_failed:
-    needs: [
-      dotnet_promote_prerelease,
-      dispatch_deploment_event,
-    ]
-    if: |
-      always() &&
-      contains(needs.*.result, 'failure')
-    uses: Energinet-DataHub/.github/.github/workflows/notify-team.yml@v9
-    with:
-      TEAM_NAME: 'Batman'
-      SUBJECT: 'Deployment dispatch failed: Market Roles'
-    secrets: inherit
+  # # dispatch_failed:
+  # #   needs: [
+  # #     dotnet_promote_prerelease,
+  # #     dispatch_deploment_event,
+  # #   ]
+  # #   if: |
+  # #     always() &&
+  # #     contains(needs.*.result, 'failure')
+  # #   uses: Energinet-DataHub/.github/.github/workflows/notify-team.yml@v9
+  # #   with:
+  # #     TEAM_NAME: 'Batman'
+  # #     SUBJECT: 'Deployment dispatch failed: Market Roles'
+  # #   secrets: inherit
