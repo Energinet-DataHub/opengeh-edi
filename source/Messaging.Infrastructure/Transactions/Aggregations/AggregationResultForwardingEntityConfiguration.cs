@@ -20,13 +20,13 @@ using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
+namespace Messaging.Infrastructure.Transactions.Aggregations;
 
-internal class AggregatedTimeSeriesTransactionEntityConfiguration : IEntityTypeConfiguration<AggregationResultForwarding>
+internal class AggregationResultForwardingEntityConfiguration : IEntityTypeConfiguration<AggregationResultForwarding>
 {
     private readonly ISerializer _serializer;
 
-    internal AggregatedTimeSeriesTransactionEntityConfiguration(ISerializer serializer)
+    internal AggregationResultForwardingEntityConfiguration(ISerializer serializer)
     {
         _serializer = serializer;
     }

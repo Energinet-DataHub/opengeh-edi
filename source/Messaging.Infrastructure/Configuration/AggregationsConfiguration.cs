@@ -12,22 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using MediatR;
 using Messaging.Application.Transactions.Aggregations;
 using Messaging.Domain.Transactions.Aggregations;
-using Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
+using Messaging.Infrastructure.Transactions.Aggregations;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Messaging.Infrastructure.Configuration;
 
 internal static class AggregationsConfiguration
 {
-    internal static void Configure(IServiceCollection services)
+    internal static void Configure(IServiceCollection services, Func<IServiceProvider, IAggregationResults> aggregationResultsBuilder)
     {
+        services.AddScoped<AggregationResultMapper>();
         services.AddTransient<IRequestHandler<StartTransaction, Unit>, StartTransactionHandler>();
         services.AddScoped<IAggregationResultForwardingRepository, AggregationResultForwardingRepository>();
-        services.AddSingleton<IAggregationResults, FakeAggregationResults>();
         services.AddSingleton<IGridAreaLookup, FakeGridAreaLookup>();
         services.AddTransient<IRequestHandler<RetrieveAggregationResult, Unit>, RetrieveAggregationResultHandler>();
+        services.AddSingleton(aggregationResultsBuilder);
     }
 }

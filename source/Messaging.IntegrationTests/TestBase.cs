@@ -32,6 +32,7 @@ using Messaging.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.OutgoingMessages.Peek;
 using Messaging.Infrastructure.Transactions;
+using Messaging.Infrastructure.Transactions.Aggregations;
 using Messaging.Infrastructure.Transactions.MoveIn;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.Infrastructure.Configuration.InternalCommands;
@@ -65,6 +66,7 @@ namespace Messaging.IntegrationTests
                 _ => new ServiceBusClient(CreateFakeServiceBusConnectionString()));
             CompositionRoot.Initialize(_services)
                 .AddAuthentication()
+                .AddAggregationsConfiguration(_ => new AggregationResultsStub())
                 .AddPeekConfiguration(
                     new BundleConfigurationStub(),
                     sp => new BundledMessagesStub(sp.GetRequiredService<IDatabaseConnectionFactory>(), sp.GetRequiredService<B2BContext>()))

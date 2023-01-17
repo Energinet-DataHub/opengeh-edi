@@ -19,28 +19,31 @@ using System.Linq;
 using System.Threading.Tasks;
 using Messaging.Application.Transactions.Aggregations;
 using Messaging.Domain.Transactions.Aggregations;
+using Messaging.Infrastructure.Transactions.Aggregations;
 
-namespace Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
+namespace Messaging.IntegrationTests.TestDoubles;
 
-public class FakeAggregationResults : IAggregationResults
+public class AggregationResultsStub : IAggregationResults
 {
-    private readonly Dictionary<Guid, AggregationResult> _results = new();
+    private readonly List<AggregationResult> _results = new();
 
-    public Task<AggregationResult> GetResultAsync(Guid resultId)
+    public Task<AggregationResult> GetResultAsync(Guid resultId, string gridArea)
     {
-        return Task.FromResult(_results[resultId]);
+        return Task.FromResult(_results.First(result =>
+            result.Id.Equals(resultId) &&
+            result.GridAreaCode.Equals(gridArea, StringComparison.OrdinalIgnoreCase)));
     }
 
-    public void Add(Guid resultId, AggregatedTimeSeriesResultDto aggregatedTimeSeriesResultDto)
+    public void Add(Guid resultId, AggregationResultDto aggregationResultDto)
     {
-        ArgumentNullException.ThrowIfNull(aggregatedTimeSeriesResultDto);
-        var points = aggregatedTimeSeriesResultDto.Points.Select(point =>
+        ArgumentNullException.ThrowIfNull(aggregationResultDto);
+        var points = aggregationResultDto.Points.Select(point =>
             new Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point(
                 point.Position,
                 decimal.Parse(point.Quantity, NumberStyles.Number, CultureInfo.InvariantCulture),
                 point.Quality,
                 point.QuarterTime));
-        var result = new AggregationResult(resultId, points.ToList(), aggregatedTimeSeriesResultDto.GridAreaCode, aggregatedTimeSeriesResultDto.MeteringPointType, aggregatedTimeSeriesResultDto.MeasureUnitType, aggregatedTimeSeriesResultDto.Resolution);
-        _results.Add(resultId, result);
+        var result = new AggregationResult(resultId, points.ToList(), aggregationResultDto.GridAreaCode, aggregationResultDto.MeteringPointType, aggregationResultDto.MeasureUnitType, aggregationResultDto.Resolution);
+        _results.Add(result);
     }
 }

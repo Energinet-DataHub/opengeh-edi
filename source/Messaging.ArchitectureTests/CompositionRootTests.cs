@@ -142,6 +142,8 @@ namespace Messaging.ArchitectureTests
             public override string? REQUEST_RESPONSE_LOGGING_CONNECTION_STRING =>
                 CreateFakeServiceBusConnectionString();
 
+            public override Uri AGGREGATION_RESULTS_API_URI => new Uri("http://fake");
+
             public override bool IsRunningLocally()
             {
                 return true;

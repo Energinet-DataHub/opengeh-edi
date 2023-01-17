@@ -56,6 +56,9 @@ namespace Messaging.Api
             }
         }
 
+        public virtual Uri AGGREGATION_RESULTS_API_URI =>
+            new(GetEnvironmentVariable(nameof(AGGREGATION_RESULTS_API_URI))!);
+
         public virtual bool IsRunningLocally()
         {
             return AZURE_FUNCTIONS_ENVIRONMENT == "Development";

@@ -43,4 +43,8 @@ limitations under the License.
       <None Remove="appsettings.json" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Messaging.Infrastructure\Messaging.Infrastructure.csproj" />
+    </ItemGroup>
+
 </Project>

@@ -19,7 +19,7 @@ using Messaging.Domain.Transactions.Aggregations;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
-namespace Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
+namespace Messaging.Infrastructure.Transactions.Aggregations;
 
 internal class AggregationResultForwardingRepository : IAggregationResultForwardingRepository
 {

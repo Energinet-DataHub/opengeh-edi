@@ -27,5 +27,6 @@ public interface IAggregationResults
     /// Fetch a result by id
     /// </summary>
     /// <param name="resultId"></param>
-    Task<AggregationResult> GetResultAsync(Guid resultId);
+    /// <param name="gridArea"></param>
+    Task<AggregationResult> GetResultAsync(Guid resultId, string gridArea);
 }
