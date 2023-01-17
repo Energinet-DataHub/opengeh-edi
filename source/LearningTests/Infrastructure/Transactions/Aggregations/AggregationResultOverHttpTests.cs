@@ -14,6 +14,7 @@
 
 using System.Reflection;
 using Messaging.Infrastructure.Configuration.Serialization;
+using Messaging.Infrastructure.Transactions;
 using Messaging.Infrastructure.Transactions.Aggregations;
 using Microsoft.Extensions.Configuration;
 
@@ -23,6 +24,7 @@ public class AggregationResultOverHttpTests
 {
     private readonly IConfigurationRoot _configuration;
     private readonly AggregationResultMapper _mapper;
+    private readonly ISerializer _serializer;
 
     public AggregationResultOverHttpTests()
     {
@@ -30,14 +32,15 @@ public class AggregationResultOverHttpTests
             .AddUserSecrets(Assembly.GetExecutingAssembly(), false, false)
             .Build();
 
-        _mapper = new AggregationResultMapper(new Serializer());
+        _serializer = new Serializer();
+        _mapper = new AggregationResultMapper(_serializer);
     }
 
     [Fact]
     public async Task Service_is_unavailable()
     {
         using var httpClient = new HttpClient();
-        var service = new AggregationResultsOverHttp(httpClient, new Uri($"{_configuration["ServiceUri"]!}/WrongUri"), _mapper);
+        var service = new AggregationResultsOverHttp(new HttpClientAdapter(httpClient), new Uri($"{_configuration["ServiceUri"]!}/WrongUri"), _mapper, _serializer);
 
         await Assert.ThrowsAnyAsync<Exception>(() => service.GetResultAsync(Guid.Parse(_configuration["BatchId"]!), _configuration["GridArea"]!)).ConfigureAwait(false);
     }
@@ -46,7 +49,7 @@ public class AggregationResultOverHttpTests
     public async Task Can_retrieve_result()
     {
         using var httpClient = new HttpClient();
-        var service = new AggregationResultsOverHttp(httpClient, new Uri(_configuration["ServiceUri"]!), _mapper);
+        var service = new AggregationResultsOverHttp(new HttpClientAdapter(httpClient), new Uri(_configuration["ServiceUri"]!), _mapper, _serializer);
 
         var result = await service.GetResultAsync(Guid.Parse(_configuration["BatchId"]!), _configuration["GridArea"]!).ConfigureAwait(false);
 
