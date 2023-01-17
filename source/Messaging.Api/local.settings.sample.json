@@ -13,6 +13,8 @@
     "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND": "<connection string for shared service bus with sender permissions>",
     "INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME": "<Name of queue where incoming move in transaction are placed>",
     "INTEGRATION_EVENT_TOPIC_NAME": "<Name of topic where integration events are received>",
-    "MARKET_PARTICIPANT_CHANGED_ACTOR_CREATED_SUBSCRIPTION_NAME": ""
+    "MARKET_PARTICIPANT_CHANGED_ACTOR_CREATED_SUBSCRIPTION_NAME": "",
+    "BALANCE_FIXING_RESULT_AVAILABLE_EVENT_SUBSCRIPTION_NAME" : "<Name of the service bus topic subscription for aggregation result notifications>",
+    "AGGREGATION_RESULTS_API_URI": "<Uri of API where aggregation results can be retrieved>"
   }
 }
