@@ -19,10 +19,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Messaging.Application.Transactions.Aggregations;
 using Messaging.Domain.Transactions.Aggregations;
+using Messaging.Infrastructure.Transactions.Aggregations;
 
-namespace Messaging.Infrastructure.Transactions.Aggregations;
+namespace Messaging.IntegrationTests.TestDoubles;
 
-public class FakeAggregationResults : IAggregationResults
+public class AggregationResultsStub : IAggregationResults
 {
     private readonly List<AggregationResult> _results = new();
 

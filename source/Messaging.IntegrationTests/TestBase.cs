@@ -66,7 +66,7 @@ namespace Messaging.IntegrationTests
                 _ => new ServiceBusClient(CreateFakeServiceBusConnectionString()));
             CompositionRoot.Initialize(_services)
                 .AddAuthentication()
-                .AddAggregationsConfiguration(_ => new FakeAggregationResults())
+                .AddAggregationsConfiguration(_ => new AggregationResultsStub())
                 .AddPeekConfiguration(
                     new BundleConfigurationStub(),
                     sp => new BundledMessagesStub(sp.GetRequiredService<IDatabaseConnectionFactory>(), sp.GetRequiredService<B2BContext>()))

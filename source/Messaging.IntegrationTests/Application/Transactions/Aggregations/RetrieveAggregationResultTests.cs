@@ -24,6 +24,7 @@ using Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Messaging.Infrastructure.Transactions.Aggregations;
 using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
+using Messaging.IntegrationTests.TestDoubles;
 using Xunit;
 
 namespace Messaging.IntegrationTests.Application.Transactions.Aggregations;
@@ -66,7 +67,7 @@ public class RetrieveAggregationResultTests : TestBase
 
     private void SetupFakeAggregationResult()
     {
-        var results = GetService<IAggregationResults>() as FakeAggregationResults;
+        var results = GetService<IAggregationResults>() as AggregationResultsStub;
         var dto = new AggregationResultDto(
             SampleData.GridAreaCode,
             SampleData.MeteringPointType,
