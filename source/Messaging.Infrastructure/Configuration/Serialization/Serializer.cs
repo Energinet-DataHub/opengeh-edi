@@ -31,6 +31,7 @@ namespace Messaging.Infrastructure.Configuration.Serialization
         public Serializer()
         {
             _options = new JsonSerializerOptions();
+            _options.PropertyNameCaseInsensitive = true;
             _options.Converters.Add(NodaConverters.InstantConverter);
             _options.Converters.Add(new CustomJsonConverterForType());
             _options.Converters.Add(new ObjectToInferredTypesConverter());

@@ -13,12 +13,10 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Messaging.Application.Transactions.Aggregations;
-using Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Messaging.Domain.Transactions.Aggregations;
 
 namespace Messaging.Infrastructure.Transactions.Aggregations;
@@ -27,16 +25,13 @@ public class AggregationResultsOverHttp : IAggregationResults
 {
     private readonly HttpClient _httpClient;
     private readonly Uri _serviceEndpoint;
+    private readonly AggregationResultMapper _aggregationResultMapper;
 
-    public AggregationResultsOverHttp(HttpClient httpClient, Uri serviceEndpoint)
+    public AggregationResultsOverHttp(HttpClient httpClient, Uri serviceEndpoint, AggregationResultMapper aggregationResultMapper)
     {
         _httpClient = httpClient;
         _serviceEndpoint = serviceEndpoint;
-    }
-
-    private enum ProcessStepMeteringPointType
-    {
-        Production = 0,
+        _aggregationResultMapper = aggregationResultMapper;
     }
 
     private enum ProcessStepType
@@ -50,38 +45,9 @@ public class AggregationResultsOverHttp : IAggregationResults
         var response = await _httpClient.PostAsJsonAsync(_serviceEndpoint, request).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
 
-        var resultDto = await response.Content.ReadFromJsonAsync<ProcessStepResultDto>().ConfigureAwait(false);
-
-        return new AggregationResult(
-            resultId,
-            ExtractPoints(resultDto!.TimeSeriesPoints),
-            gridArea,
-            "E18",
-            "KWH",
-            "PT1H");
-    }
-
-    private static IReadOnlyList<Point> ExtractPoints(TimeSeriesPointDto[] timeSeriesPoints)
-    {
-        var points = new List<Point>();
-        for (int i = 0; i < timeSeriesPoints.Length; i++)
-        {
-            points.Add(new Point(i, timeSeriesPoints[i].Quantity, "quality", NodaTime.Instant.FromDateTimeOffset(timeSeriesPoints[i].Time).ToString()));
-        }
-
-        return points.AsReadOnly();
+        return await _aggregationResultMapper.MapFromAsync(
+            await response.Content.ReadAsStreamAsync().ConfigureAwait(false), resultId, gridArea).ConfigureAwait(false);
     }
 
     private record ProcessStepResultRequestDto(Guid BatchId, string GridAreaCode, ProcessStepType ProcessStepResult);
-
-    private record ProcessStepResultDto(
-        ProcessStepMeteringPointType ProcessStepMeteringPointType,
-        decimal Sum,
-        decimal Min,
-        decimal Max,
-        TimeSeriesPointDto[] TimeSeriesPoints);
-
-    private record TimeSeriesPointDto(
-        DateTimeOffset Time,
-        decimal Quantity);
 }
