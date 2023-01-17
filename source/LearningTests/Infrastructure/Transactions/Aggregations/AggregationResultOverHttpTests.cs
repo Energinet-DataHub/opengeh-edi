@@ -30,6 +30,15 @@ public class AggregationResultOverHttpTests
     }
 
     [Fact]
+    public async Task Service_is_unavailable()
+    {
+        using var httpClient = new HttpClient();
+        var service = new AggregationResultsOverHttp(httpClient, new Uri($"{_configuration["ServiceUri"]!}/WrongUri"));
+
+        await Assert.ThrowsAnyAsync<Exception>(() => service.GetResultAsync(Guid.Parse(_configuration["BatchId"]!), _configuration["GridArea"]!)).ConfigureAwait(false);
+    }
+
+    [Fact]
     public async Task Test()
     {
         using var httpClient = new HttpClient();
