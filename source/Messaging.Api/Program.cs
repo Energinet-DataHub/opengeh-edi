@@ -23,16 +23,15 @@ using Messaging.Application.Actors;
 using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.CimMessageAdapter.Messages.Queues;
-using Messaging.Infrastructure.Actors;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Authentication;
 using Messaging.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Messaging.Infrastructure.Transactions;
+using Messaging.Infrastructure.Transactions.Aggregations;
 using Messaging.Infrastructure.Transactions.MoveIn;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
@@ -93,6 +92,8 @@ namespace Messaging.Api
                     CompositionRoot.Initialize(services)
                         .AddMessageBus(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND!)
                         .AddPeekConfiguration(new BundleConfiguration(runtime.MAX_NUMBER_OF_PAYLOADS_IN_BUNDLE))
+                        .AddAggregationsConfiguration(sp => new AggregationResultsOverHttp(
+                            sp.GetRequiredService<HttpClient>(), runtime.AGGREGATION_RESULTS_API_URI, sp.GetRequiredService<AggregationResultMapper>()))
                         .AddRemoteBusinessService<DummyRequest, DummyReply>("Dummy", "Dummy")
                         .AddBearerAuthentication(tokenValidationParameters)
                         .AddAuthentication(sp =>
