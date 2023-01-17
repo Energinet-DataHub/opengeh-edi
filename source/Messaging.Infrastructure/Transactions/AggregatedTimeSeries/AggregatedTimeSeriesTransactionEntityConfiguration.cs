@@ -39,11 +39,14 @@ internal class AggregatedTimeSeriesTransactionEntityConfiguration : IEntityTypeC
         builder.HasKey(entity => entity.Id);
         builder.Property(entity => entity.Id)
             .HasConversion(toDbValue => Guid.Parse(toDbValue.Id), fromDbValue => TransactionId.Create(fromDbValue.ToString()));
-        builder.Property(entity => entity.ProcessType)
+        builder.Property<ProcessType>("_processType")
+            .HasColumnName("ProcessType")
             .HasConversion(toDbValue => toDbValue.Name, fromDbValue => EnumerationType.FromName<ProcessType>(fromDbValue));
-        builder.Property(entity => entity.ReceivingActor)
+        builder.Property<ActorNumber>("_receivingActor")
+            .HasColumnName("ReceivingActor")
             .HasConversion(toDbValue => toDbValue.Value, fromDbValue => ActorNumber.Create(fromDbValue));
-        builder.Property(entity => entity.ReceivingActorRole)
+        builder.Property<MarketRole>("_receivingActorRole")
+            .HasColumnName("ReceivingActorRole")
             .HasConversion(toDbValue => toDbValue.Name, fromDbValue => EnumerationType.FromName<MarketRole>(fromDbValue));
         builder.HasMany<OutgoingMessage>("_messages")
             .WithOne()
