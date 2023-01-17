@@ -48,6 +48,8 @@ public class AggregationResultsOverHttp : IAggregationResults
     {
         var request = new ProcessStepResultRequestDto(resultId, gridArea, ProcessStepType.AggregateProductionPerGridArea);
         var response = await _httpClient.PostAsJsonAsync(_serviceEndpoint, request).ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+
         var resultDto = await response.Content.ReadFromJsonAsync<ProcessStepResultDto>().ConfigureAwait(false);
 
         return new AggregationResult(
