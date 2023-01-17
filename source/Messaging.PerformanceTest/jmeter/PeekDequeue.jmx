@@ -170,7 +170,7 @@
           </RegexExtractor>
           <hashTree/>
         </hashTree>
-        <WhileController guiclass="WhileControllerGui" testclass="WhileController" testname="While Controller" enabled="true">
+        <WhileController guiclass="WhileControllerGui" testclass="WhileController" testname="While Controller" enabled="false">
           <stringProp name="WhileController.condition">${MESSAGECOUNT} &gt; 0</stringProp>
         </WhileController>
         <hashTree/>
