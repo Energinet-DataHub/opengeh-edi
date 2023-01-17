@@ -38,7 +38,7 @@ public class RetrieveAggregationResultHandler : IRequestHandler<RetrieveAggregat
     public async Task<Unit> Handle(RetrieveAggregationResult request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        var aggregationResult = await _aggregationResults.GetResultAsync(request.ResultId).ConfigureAwait(false);
+        var aggregationResult = await _aggregationResults.GetResultAsync(request.ResultId, request.GridArea).ConfigureAwait(false);
         var transaction = await _transactions.GetAsync(TransactionId.Create(request.TransactionId.ToString())).ConfigureAwait(false);
         if (transaction is null) throw TransactionNotFoundException.TransactionIdNotFound(request.Id.ToString());
         transaction.SendResult(aggregationResult);
@@ -49,18 +49,24 @@ public class RetrieveAggregationResultHandler : IRequestHandler<RetrieveAggregat
 public class RetrieveAggregationResult : InternalCommand
 {
     [JsonConstructor]
-    public RetrieveAggregationResult(Guid id, Guid resultId, Guid transactionId)
+    public RetrieveAggregationResult(Guid id, Guid resultId, string gridArea, Guid transactionId)
         : base(id)
     {
+        ResultId = resultId;
+        GridArea = gridArea;
+        TransactionId = transactionId;
     }
 
-    public RetrieveAggregationResult(Guid resultId, Guid transactionId)
+    public RetrieveAggregationResult(Guid resultId, string gridArea, Guid transactionId)
     {
         ResultId = resultId;
+        GridArea = gridArea;
         TransactionId = transactionId;
     }
 
     public Guid ResultId { get; }
+
+    public string GridArea { get; }
 
     public Guid TransactionId { get; }
 }

@@ -21,11 +21,11 @@ using Messaging.Application.Transactions.Aggregations;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
+using Messaging.Infrastructure.Transactions.Aggregations;
 using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
+using Messaging.IntegrationTests.TestDoubles;
 using Xunit;
-using Point = Messaging.Infrastructure.Transactions.AggregatedTimeSeries.Point;
 
 namespace Messaging.IntegrationTests.Application.Transactions.Aggregations;
 
@@ -43,7 +43,7 @@ public class RetrieveAggregationResultTests : TestBase
         await TransactionHasBeenStarted().ConfigureAwait(false);
         var transactionId = await GetTransactionIdAsync().ConfigureAwait(false);
 
-        await InvokeCommandAsync(new RetrieveAggregationResult(SampleData.ResultId, transactionId)).ConfigureAwait(false);
+        await InvokeCommandAsync(new RetrieveAggregationResult(SampleData.ResultId, SampleData.GridAreaCode, transactionId)).ConfigureAwait(false);
 
         var message = await AssertOutgoingMessage.OutgoingMessageAsync(
                  transactionId.ToString(),
@@ -67,13 +67,13 @@ public class RetrieveAggregationResultTests : TestBase
 
     private void SetupFakeAggregationResult()
     {
-        var results = GetService<IAggregationResults>() as FakeAggregationResults;
-        var dto = new AggregatedTimeSeriesResultDto(
+        var results = GetService<IAggregationResults>() as AggregationResultsStub;
+        var dto = new AggregationResultDto(
             SampleData.GridAreaCode,
             SampleData.MeteringPointType,
             SampleData.MeasureUnitType,
             SampleData.Resolution,
-            new List<Point>()
+            new List<PointDto>()
             {
                 new(
                     1,
