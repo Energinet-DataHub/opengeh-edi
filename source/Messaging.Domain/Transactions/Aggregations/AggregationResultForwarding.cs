@@ -21,23 +21,20 @@ namespace Messaging.Domain.Transactions.Aggregations;
 
 public class AggregationResultForwarding : Entity
 {
-    private readonly ActorNumber _receivingActor;
-    private readonly MarketRole _receivingActorRole;
-    private readonly ProcessType _processType;
 #pragma warning disable
     private readonly List<OutgoingMessage> _messages = new();
 
     public AggregationResultForwarding(TransactionId id, ActorNumber receivingActor, MarketRole receivingActorRole, ProcessType processType)
     {
-        _receivingActor = receivingActor;
-        _receivingActorRole = receivingActorRole;
-        _processType = processType;
+        ReceivingActor = receivingActor;
+        ReceivingActorRole = receivingActorRole;
+        ProcessType = processType;
         Id = id;
     }
 
     public void SendResult(AggregationResult aggregationResult)
     {
-        _messages.Add(AggregationResultMessage.Create(_receivingActor, _receivingActorRole, Id, _processType, aggregationResult));
+        _messages.Add(AggregationResultMessage.Create(ReceivingActor, ReceivingActorRole, Id, ProcessType, aggregationResult));
     }
 
     #pragma warning disable CS8618 // EF core need this private constructor
@@ -47,4 +44,10 @@ public class AggregationResultForwarding : Entity
     #pragma warning restore
 
     public TransactionId Id { get; }
+
+    public ActorNumber ReceivingActor { get; }
+
+    public MarketRole ReceivingActorRole { get; }
+
+    public ProcessType ProcessType { get; }
 }
