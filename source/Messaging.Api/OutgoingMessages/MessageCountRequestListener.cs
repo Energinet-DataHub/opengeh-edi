@@ -41,7 +41,7 @@ public class MessageCountRequestListener
     [Function("MessageCountRequestListener")]
     public async Task<HttpResponseData> RunAsync(
         [HttpTrigger(
-            AuthorizationLevel.Function,
+            AuthorizationLevel.Anonymous,
             "get",
             Route = "messagecount")]
         HttpRequestData request,
