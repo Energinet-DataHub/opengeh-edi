@@ -13,9 +13,13 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
+using System.Transactions;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.Transactions.Aggregations;
+using Messaging.Domain.Actors;
+using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.SeedWork;
 using Messaging.Infrastructure.Configuration.InternalCommands;
 using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
@@ -33,12 +37,17 @@ public class WhenAggregationOfTotalProductionIsCompletedTests : TestBase
     [Fact]
     public async Task A_transaction_is_started()
     {
+        var gridAreaLookup = GetService<IGridAreaLookup>();
+        var gridOperatorNumber = await gridAreaLookup.GetGridOperatorForAsync(SampleData.GridAreaCode).ConfigureAwait(false);
         await StartTransaction().ConfigureAwait(false);
 
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
-        var exists = await connection
-            .ExecuteScalarAsync<bool>("SELECT COUNT(*) FROM b2b.AggregatedTimeSeriesTransactions");
-        Assert.True(exists);
+        var transaction = await connection
+            .QueryFirstOrDefaultAsync("SELECT * FROM b2b.AggregatedTimeSeriesTransactions");
+        Assert.NotNull(transaction);
+        Assert.Equal(MarketRole.GridOperator, EnumerationType.FromName<MarketRole>(transaction.ReceivingActorRole));
+        Assert.Equal(ProcessType.BalanceFixing, EnumerationType.FromName<ProcessType>(transaction.ProcessType));
+        Assert.Equal(gridOperatorNumber.Value, transaction.ReceivingActor);
     }
 
     [Fact]

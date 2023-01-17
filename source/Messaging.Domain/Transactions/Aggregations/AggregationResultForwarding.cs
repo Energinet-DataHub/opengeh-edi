@@ -21,12 +21,14 @@ namespace Messaging.Domain.Transactions.Aggregations;
 
 public class AggregationResultForwarding : Entity
 {
-    private readonly ActorNumber _receivingActor;
-    private readonly MarketRole _receivingActorRole;
-    private readonly ProcessType _processType;
 #pragma warning disable
     private readonly List<OutgoingMessage> _messages = new();
 
+    private readonly ActorNumber _receivingActor;
+
+    private readonly MarketRole _receivingActorRole;
+
+    private readonly ProcessType _processType;
     public AggregationResultForwarding(TransactionId id, ActorNumber receivingActor, MarketRole receivingActorRole, ProcessType processType)
     {
         _receivingActor = receivingActor;
