@@ -39,7 +39,7 @@ public class AggregationResultOverHttpTests
     }
 
     [Fact]
-    public async Task Test()
+    public async Task Can_retrieve_result()
     {
         using var httpClient = new HttpClient();
         var service = new AggregationResultsOverHttp(httpClient, new Uri(_configuration["ServiceUri"]!));
