@@ -28,7 +28,7 @@ internal static class AggregationsConfiguration
         services.AddScoped<AggregationResultMapper>();
         services.AddTransient<IRequestHandler<StartTransaction, Unit>, StartTransactionHandler>();
         services.AddScoped<IAggregationResultForwardingRepository, AggregationResultForwardingRepository>();
-        services.AddSingleton<IGridAreaLookup, FakeGridAreaLookup>();
+        services.AddSingleton<IGridAreaLookup, GridAreaLookup>();
         services.AddTransient<IRequestHandler<RetrieveAggregationResult, Unit>, RetrieveAggregationResultHandler>();
         services.AddSingleton(aggregationResultsBuilder);
     }

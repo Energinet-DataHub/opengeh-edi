@@ -19,7 +19,7 @@ using Messaging.Domain.Actors;
 
 namespace Messaging.Infrastructure.Transactions.Aggregations;
 
-public class FakeGridAreaLookup : IGridAreaLookup
+public class GridAreaLookup : IGridAreaLookup
 {
     private readonly Dictionary<string, ActorNumber> _gridAreas = new()
     {
