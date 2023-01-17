@@ -35,10 +35,10 @@ jobs:
   dotnet_update_coverage_report:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@9.4.0-preview # TODO: Revert back to v9
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@v9
     with:
       SOLUTION_FILE_PATH: 'source/Energinet.DataHub.MarketRoles.sln'
-      TESTS_FILTER_EXPRESSION: 'FullyQualifiedName!~LearningTests' # Skip all tests within namespace 'LearningTests'
+      TESTS_FILTER_EXPRESSION: 'FullyQualifiedName!~LearningTests' # Filter => Skip all tests within namespace 'LearningTests'
       USE_SQLLOCALDB_2019: true
       ENVIRONMENT: AzureAuth
     secrets:
