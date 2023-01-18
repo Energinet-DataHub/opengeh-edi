@@ -23,33 +23,39 @@ namespace Messaging.Tests.Infrastructure.Configuration.MessageBus;
 
 public class IntegrationEventReceiverTests
 {
+    private readonly EventHandlerSpy _eventHandler;
+    private readonly IntegrationEventReceiver _receiver;
+
+    public IntegrationEventReceiverTests()
+    {
+        _eventHandler = new EventHandlerSpy();
+        _receiver = new IntegrationEventReceiver(new List<IIntegrationEventHandler>() { _eventHandler });
+    }
+
     [Fact]
     public async Task Throw_if_event_cannot_be_handled()
     {
-        var receiver = new IntegrationEventReceiver(new List<IIntegrationEventHandler>());
         var eventId = "1";
         var eventType = "TestEvent";
         var @event = new TestIntegrationEvent();
         var eventPayload = JsonSerializer.SerializeToUtf8Bytes(@event);
 
-        await Assert.ThrowsAsync<UnknownIntegrationEventTypeException>(() => receiver.ReceiveAsync(eventId, eventType, eventPayload))
+        await Assert.ThrowsAsync<UnknownIntegrationEventTypeException>(() => _receiver.ReceiveAsync(eventId, eventType, eventPayload))
             .ConfigureAwait(false);
     }
 
     [Fact]
     public async Task Event_is_handled()
     {
-        var eventHandler = new EventHandlerSpy();
-        eventHandler.HandlesReturns = true;
-        var receiver = new IntegrationEventReceiver(new List<IIntegrationEventHandler>() { eventHandler });
+        _eventHandler.HandlesReturns = true;
         var eventId = "1";
         var eventType = "TestEvent";
         var @event = new TestIntegrationEvent();
         var eventPayload = JsonSerializer.SerializeToUtf8Bytes(@event);
 
-        await receiver.ReceiveAsync(eventId, eventType, eventPayload).ConfigureAwait(false);
+        await _receiver.ReceiveAsync(eventId, eventType, eventPayload).ConfigureAwait(false);
 
-        eventHandler.WasInvoked();
+        _eventHandler.WasInvoked();
     }
 }
 #pragma warning disable
