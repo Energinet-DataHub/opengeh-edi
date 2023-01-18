@@ -38,7 +38,7 @@ public class IntegrationEventReceiverTests
         var eventId = "1";
         var eventType = "TestEvent";
         var @event = new TestIntegrationEvent();
-        var eventPayload = JsonSerializer.SerializeToUtf8Bytes(@event);
+        var eventPayload = CreateEventPayload(@event);
 
         await Assert.ThrowsAsync<UnknownIntegrationEventTypeException>(() => _receiver.ReceiveAsync(eventId, eventType, eventPayload))
             .ConfigureAwait(false);
@@ -51,14 +51,21 @@ public class IntegrationEventReceiverTests
         var eventId = "1";
         var eventType = "TestEvent";
         var @event = new TestIntegrationEvent();
-        var eventPayload = JsonSerializer.SerializeToUtf8Bytes(@event);
+        var eventPayload = CreateEventPayload(@event);
 
         await _receiver.ReceiveAsync(eventId, eventType, eventPayload).ConfigureAwait(false);
 
         _eventHandler.WasInvoked();
     }
+
+    private static byte[] CreateEventPayload(TestIntegrationEvent @event)
+    {
+        return JsonSerializer.SerializeToUtf8Bytes(@event);
+    }
 }
 #pragma warning disable
+
+
 
 public class UnknownIntegrationEventTypeException : Exception
 {
