@@ -19,7 +19,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Messaging.Tests.Infrastructure.Configuration.MessageBus;
+namespace Messaging.IntegrationTests.Infrastructure.Configuration.MessageBus;
 
 public class IntegrationEventReceiverTests
 {
