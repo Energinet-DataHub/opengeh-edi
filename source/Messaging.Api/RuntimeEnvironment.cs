@@ -57,7 +57,7 @@ namespace Messaging.Api
         }
 
         public virtual Uri AGGREGATION_RESULTS_API_URI =>
-            new(GetEnvironmentVariable(nameof(AGGREGATION_RESULTS_API_URI))! + @"v2/processstepresult");
+            new(GetEnvironmentVariable(nameof(AGGREGATION_RESULTS_API_URI))! + @"/v2/processstepresult");
 
         public virtual bool IsRunningLocally()
         {
