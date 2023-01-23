@@ -89,7 +89,7 @@ public class RetrieveAggregationResultTests : TestBase
     {
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
         return await connection
-            .QueryFirstAsync<Guid>("SELECT TOP(1) Id FROM b2b.AggregatedTimeSeriesTransactions").ConfigureAwait(false);
+            .QueryFirstAsync<Guid>("SELECT TOP(1) CAST(Id AS uniqueidentifier) FROM b2b.AggregatedTimeSeriesTransactions").ConfigureAwait(false);
     }
 
     private async Task TransactionHasBeenStarted()
