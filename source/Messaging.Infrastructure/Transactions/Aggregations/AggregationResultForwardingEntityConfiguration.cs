@@ -38,7 +38,7 @@ internal class AggregationResultForwardingEntityConfiguration : IEntityTypeConfi
         builder.ToTable("AggregatedTimeSeriesTransactions", "b2b");
         builder.HasKey(entity => entity.Id);
         builder.Property(entity => entity.Id)
-            .HasConversion(toDbValue => Guid.Parse(toDbValue.Id), fromDbValue => TransactionId.Create(fromDbValue.ToString()));
+            .HasConversion(toDbValue => toDbValue.Id, fromDbValue => TransactionId.Create(fromDbValue));
         builder.Property<ProcessType>("_processType")
             .HasColumnName("ProcessType")
             .HasConversion(toDbValue => toDbValue.Name, fromDbValue => EnumerationType.FromName<ProcessType>(fromDbValue));
