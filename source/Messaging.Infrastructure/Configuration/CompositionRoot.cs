@@ -26,7 +26,7 @@ using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.OutgoingMessages.Common.Reasons;
 using Messaging.Application.OutgoingMessages.Peek;
-using Messaging.Application.Transactions.AggregatedTimeSeries;
+using Messaging.Application.Transactions.Aggregations;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
@@ -92,7 +92,6 @@ namespace Messaging.Infrastructure.Configuration
             ReadModelHandlingConfiguration.AddReadModelHandling(services);
             UpdateCustomerMasterDataConfiguration.Configure(services);
             DequeueConfiguration.Configure(services);
-            SendAggregatedTimeSeriesConfiguration.Configure(services);
         }
 
         public static CompositionRoot Initialize(IServiceCollection services)
@@ -110,6 +109,13 @@ namespace Messaging.Infrastructure.Configuration
         public CompositionRoot AddPeekConfiguration(IBundleConfiguration bundleConfiguration, Func<IServiceProvider, IBundledMessages>? bundleStoreBuilder = null)
         {
             PeekConfiguration.Configure(_services, bundleConfiguration, bundleStoreBuilder);
+            return this;
+        }
+
+        public CompositionRoot AddAggregationsConfiguration(
+            Func<IServiceProvider, IAggregationResults> aggregationResultsBuilder)
+        {
+            AggregationsConfiguration.Configure(_services, aggregationResultsBuilder);
             return this;
         }
 

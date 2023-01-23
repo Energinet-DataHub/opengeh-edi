@@ -13,20 +13,20 @@
 // limitations under the License.
 
 using System;
+using System.Threading.Tasks;
+using Messaging.Domain.Transactions.Aggregations;
 
-namespace Messaging.IntegrationTests.Application.Transactions.AggregatedTimeSeries;
+namespace Messaging.Application.Transactions.Aggregations;
 
-internal class SampleData
+/// <summary>
+/// Retrieves stored aggregation results
+/// </summary>
+public interface IAggregationResults
 {
-    internal static string GridOperatorNumber => "8200000007739";
-
-    internal static string GridAreaCode => "805";
-
-    internal static Guid ResultId => Guid.Parse("42AB7292-FE2E-4F33-B537-4A15FEDB9754");
-
-    internal static string MeteringPointType => "E18";
-
-    internal static string MeasureUnitType => "KWH";
-
-    internal static string Resolution => "PT1H";
+    /// <summary>
+    /// Fetch a result by id
+    /// </summary>
+    /// <param name="resultId"></param>
+    /// <param name="gridArea"></param>
+    Task<AggregationResult> GetResultAsync(Guid resultId, string gridArea);
 }

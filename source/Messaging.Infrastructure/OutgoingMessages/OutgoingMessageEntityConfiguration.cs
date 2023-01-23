@@ -79,7 +79,7 @@ namespace Messaging.Infrastructure.OutgoingMessages
                 .HasValue<CharacteristicsOfACustomerAtAnApMessage>(MessageType.CharacteristicsOfACustomerAtAnAP.Name)
                 .HasValue<ConfirmRequestChangeAccountingPointCharacteristicsMessage>(MessageType.ConfirmRequestChangeAccountingPointCharacteristics.Name)
                 .HasValue<RejectRequestChangeAccountingPointCharacteristicsMessage>(MessageType.RejectRequestChangeAccountingPointCharacteristics.Name)
-                .HasValue<AggregatedTimeSeriesMessage>(MessageType.NotifyAggregatedMeasureData.Name)
+                .HasValue<AggregationResultMessage>(MessageType.NotifyAggregatedMeasureData.Name)
                 .IsComplete(false);
         }
     }

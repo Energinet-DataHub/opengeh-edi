@@ -12,10 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Messaging.Domain.Transactions.AggregatedTimeSeries;
+namespace EnergySupplying.Contracts;
 
-#pragma warning disable
-public interface IAggregatedTimeSeriesTransactions
+public class AssemblyInfo
 {
-    void Add(AggregatedTimeSeriesTransaction transaction);
 }

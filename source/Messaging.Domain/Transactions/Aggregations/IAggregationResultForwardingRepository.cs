@@ -12,20 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading.Tasks;
-using Messaging.Domain.Transactions.AggregatedTimeSeries;
-
-namespace Messaging.Application.Transactions.AggregatedTimeSeries;
+namespace Messaging.Domain.Transactions.Aggregations;
 
 /// <summary>
-/// Store containing results for aggregated time series
+/// Repository of aggregation result forwarding transactions
 /// </summary>
-public interface IAggregatedTimeSeriesResults
+public interface IAggregationResultForwardingRepository
 {
     /// <summary>
-    /// Fetch a result by id
+    /// Add a transaction
     /// </summary>
-    /// <param name="resultId"></param>
-    Task<AggregatedTimeSeriesResult> GetResultAsync(Guid resultId);
+    /// <param name="transaction"></param>
+    void Add(AggregationResultForwarding transaction);
+
+    /// <summary>
+    /// Retrieve a transaction by id
+    /// </summary>
+    /// <param name="transactionId"></param>
+    /// <returns><see cref="AggregationResultForwarding"/></returns>
+    Task<AggregationResultForwarding?> GetAsync(TransactionId transactionId);
 }

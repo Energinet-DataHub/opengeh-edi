@@ -12,23 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using Messaging.Application.Transactions.AggregatedTimeSeries;
 using Messaging.Domain.Actors;
 
-namespace Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
+namespace Messaging.Application.Transactions.Aggregations;
 
-public class FakeGridAreaLookup : IGridAreaLookup
+/// <summary>
+/// Service looking up grid area details
+/// </summary>
+public interface IGridAreaLookup
 {
-    private readonly Dictionary<string, ActorNumber> _gridAreas = new()
-    {
-        { "805", ActorNumber.Create("8200000007739") },
-        { "806", ActorNumber.Create("8200000007746") },
-    };
-
-    public Task<ActorNumber> GetGridOperatorForAsync(string gridAreaCode)
-    {
-        return Task.FromResult(_gridAreas[gridAreaCode]);
-    }
+    /// <summary>
+    /// Finds the actor number of the grid operator of the specified grid area
+    /// </summary>
+    /// <param name="gridAreaCode"></param>
+    /// <returns><see cref="ActorNumber"/></returns>
+    Task<ActorNumber> GetGridOperatorForAsync(string gridAreaCode);
 }

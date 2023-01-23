@@ -23,16 +23,16 @@ using Messaging.Application.Actors;
 using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.CimMessageAdapter.Messages.Queues;
-using Messaging.Infrastructure.Actors;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Authentication;
 using Messaging.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
+using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.Transactions;
+using Messaging.Infrastructure.Transactions.Aggregations;
 using Messaging.Infrastructure.Transactions.MoveIn;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
@@ -93,19 +93,22 @@ namespace Messaging.Api
                     CompositionRoot.Initialize(services)
                         .AddMessageBus(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND!)
                         .AddPeekConfiguration(new BundleConfiguration(runtime.MAX_NUMBER_OF_PAYLOADS_IN_BUNDLE))
+                        .AddAggregationsConfiguration(sp => new AggregationResultsOverHttp(
+                            sp.GetRequiredService<IHttpClientAdapter>(),
+                            runtime.AGGREGATION_RESULTS_API_URI,
+                            sp.GetRequiredService<AggregationResultMapper>(),
+                            sp.GetRequiredService<ISerializer>()))
                         .AddRemoteBusinessService<DummyRequest, DummyReply>("Dummy", "Dummy")
                         .AddBearerAuthentication(tokenValidationParameters)
                         .AddAuthentication(sp =>
                         {
                             if (runtime.IsRunningLocally() || runtime.PERFORMANCE_TEST_ENABLED)
                             {
-                                Console.WriteLine("CompositionRoot: DevMarketActorAuthenticator");
                                 return new DevMarketActorAuthenticator(
                                     sp.GetRequiredService<IActorLookup>(),
                                     sp.GetRequiredService<IActorRegistry>());
                             }
 
-                            Console.WriteLine("CompositionRoot: MarketActorAuthenticator");
                             return new MarketActorAuthenticator(sp.GetRequiredService<IActorLookup>());
                         })
                         .AddDatabaseConnectionFactory(databaseConnectionString!)
@@ -154,7 +157,7 @@ namespace Messaging.Api
 
         private static async Task<TokenValidationParameters> GetTokenValidationParametersAsync(RuntimeEnvironment runtime)
         {
-            if (runtime.IsRunningLocally())
+            if (runtime.IsRunningLocally() || runtime.PERFORMANCE_TEST_ENABLED)
             {
 #pragma warning disable CA5404 // Do not disable token validation checks
                 return DevelopmentTokenValidationParameters();

@@ -22,7 +22,7 @@ using Messaging.Domain.OutgoingMessages.GenericNotification;
 using Messaging.Domain.OutgoingMessages.Peek;
 using Messaging.Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
-using Messaging.Domain.Transactions.AggregatedTimeSeries;
+using Messaging.Domain.Transactions.Aggregations;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.InternalCommands;
 using Messaging.Infrastructure.Configuration.Serialization;
@@ -30,7 +30,7 @@ using Messaging.Infrastructure.MasterData.MarketEvaluationPoints;
 using Messaging.Infrastructure.OutgoingMessages;
 using Messaging.Infrastructure.OutgoingMessages.Peek;
 using Messaging.Infrastructure.Transactions;
-using Messaging.Infrastructure.Transactions.AggregatedTimeSeries;
+using Messaging.Infrastructure.Transactions.Aggregations;
 using Messaging.Infrastructure.Transactions.UpdateCustomer;
 using Microsoft.EntityFrameworkCore;
 using MarketEvaluationPoint = Messaging.Domain.MasterData.MarketEvaluationPoints.MarketEvaluationPoint;
@@ -54,7 +54,7 @@ namespace Messaging.Infrastructure.Configuration.DataAccess
 
         public DbSet<MoveInTransaction> Transactions { get; private set; }
 
-        public DbSet<AggregatedTimeSeriesTransaction> AggregatedTimeSeriesTransactions { get; private set; }
+        public DbSet<AggregationResultForwarding> AggregatedTimeSeriesTransactions { get; private set; }
 
         public DbSet<OutgoingMessage> OutgoingMessages { get; private set; }
 
@@ -71,7 +71,7 @@ namespace Messaging.Infrastructure.Configuration.DataAccess
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
 
             modelBuilder.ApplyConfiguration(new MoveInTransactionEntityConfiguration(_serializer));
-            modelBuilder.ApplyConfiguration(new AggregatedTimeSeriesTransactionEntityConfiguration(_serializer));
+            modelBuilder.ApplyConfiguration(new AggregationResultForwardingEntityConfiguration(_serializer));
             modelBuilder.ApplyConfiguration(new EntityConfiguration());
             modelBuilder.ApplyConfiguration(new OutgoingMessageEntityConfiguration());
             modelBuilder.ApplyConfiguration(new EnqueuedMessageEntityConfiguration());
