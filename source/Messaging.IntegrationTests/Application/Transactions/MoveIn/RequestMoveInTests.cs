@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
@@ -112,8 +113,8 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
                 .Build();
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
-            var rejectMessage = _outgoingMessageStore.GetByTransactionId(SampleData.ActorProvidedId)!;
 
+            var rejectMessage = _outgoingMessageStore.GetByTransactionId(SampleData.ActorProvidedId)!;
             await AssertRejectMessage(rejectMessage).ConfigureAwait(false);
         }
 
@@ -128,9 +129,8 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
                 .Build();
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
-            var rejectMessage = _outgoingMessageStore.GetByTransactionId(SampleData.ActorProvidedId)!;
 
-            await AssertRejectMessage(rejectMessage).ConfigureAwait(false);
+            await RejectMessageIsCreated().ConfigureAwait(false);
         }
 
         [Fact]
@@ -249,6 +249,24 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             assertMessage.HasMessageRecordValue<MarketActivityRecord>(
                 record => record.MarketEvaluationPointId,
                 SampleData.MeteringPointNumber);
+        }
+
+        private async Task RejectMessageIsCreated()
+        {
+            var assertMessage = await AssertOutgoingMessage
+                .OutgoingMessageAsync(
+                    MessageType.RejectRequestChangeOfSupplier.Name,
+                    ProcessType.MoveIn.Code,
+                    MarketRole.EnergySupplier,
+                    GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
+            assertMessage.HasReceiverId(SampleData.NewEnergySupplierNumber);
+            assertMessage.HasReceiverRole(MarketRole.EnergySupplier.Name);
+            assertMessage
+                .HasMessageRecordValue<Domain.OutgoingMessages.RejectRequestChangeOfSupplier.MarketActivityRecord>(
+                    record => record.MarketEvaluationPointId, SampleData.MeteringPointNumber);
+            assertMessage
+                .HasMessageRecordValue<Domain.OutgoingMessages.RejectRequestChangeOfSupplier.MarketActivityRecord>(
+                    record => record.OriginalTransactionId, SampleData.ActorProvidedId);
         }
 
         private async Task<Guid> GetTransactionIdAsync()
