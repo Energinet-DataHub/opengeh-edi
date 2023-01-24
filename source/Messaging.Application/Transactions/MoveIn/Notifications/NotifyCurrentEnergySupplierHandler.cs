@@ -41,7 +41,7 @@ public class NotifyCurrentEnergySupplierHandler : IRequestHandler<NotifyCurrentE
             throw TransactionNotFoundException.TransactionIdNotFound(request.TransactionId);
         }
 
-        _notifications.InformCurrentEnergySupplierAboutEndOfSupply(request.TransactionId, request.EffectiveDate, request.MarketEvaluationPointId, request.EnergySupplierId);
+        _notifications.InformCurrentEnergySupplierAboutEndOfSupply(request.TransactionId, request.EffectiveDate, request.MarketEvaluationPointId, request.EnergySupplierId, transaction);
 
         transaction.SetCurrentEnergySupplierWasNotified();
         return Unit.Task;

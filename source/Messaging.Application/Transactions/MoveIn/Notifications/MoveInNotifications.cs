@@ -36,11 +36,13 @@ public class MoveInNotifications
         _messageRecordParser = messageRecordParser;
     }
 
-    public void InformCurrentEnergySupplierAboutEndOfSupply(string transactionId, Instant effectiveDate, string marketEvaluationPointId, string energySupplierId)
+    public void InformCurrentEnergySupplierAboutEndOfSupply(string transactionId, Instant effectiveDate, string marketEvaluationPointId, string energySupplierId, MoveInTransaction transaction)
     {
+        ArgumentNullException.ThrowIfNull(transaction);
+
         var marketActivityRecord = new MarketActivityRecord(
             Guid.NewGuid().ToString(),
-            transactionId,
+            transaction.ActorProvidedId.Id,
             marketEvaluationPointId,
             effectiveDate);
 
