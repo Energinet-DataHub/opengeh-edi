@@ -145,9 +145,8 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
                 .Build();
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
-            var rejectMessage = _outgoingMessageStore.GetByTransactionId(SampleData.ActorProvidedId)!;
 
-            await AssertRejectMessage(rejectMessage).ConfigureAwait(false);
+            await RejectMessageIsCreated().ConfigureAwait(false);
         }
 
         private static void AssertHeader(XDocument document, OutgoingMessage message, string expectedReasonCode)
