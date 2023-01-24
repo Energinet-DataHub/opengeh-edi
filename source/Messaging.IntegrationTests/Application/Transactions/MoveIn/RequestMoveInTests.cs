@@ -222,7 +222,9 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         {
             using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
             return await connection
-                .QueryFirstAsync<Guid>("SELECT TOP(1) CAST(TransactionId AS uniqueidentifier) FROM b2b.MoveInTransactions").ConfigureAwait(false);
+                .QueryFirstAsync<Guid>(
+                    "SELECT TOP(1) CAST(TransactionId AS uniqueidentifier) FROM b2b.MoveInTransactions WHERE ActorProvidedId = @ActorProvidedId",
+                    new { SampleData.ActorProvidedId }).ConfigureAwait(false);
         }
     }
 }
