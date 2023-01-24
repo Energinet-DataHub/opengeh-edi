@@ -70,7 +70,10 @@ public class WhenRequestedCustomerMasterDataIsReceivedTests
         var command = CreateCommand();
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
-        var assertTransaction = await AssertTransaction.TransactionAsync(SampleData.TransactionId, GetService<IDatabaseConnectionFactory>(), GetService<ISerializer>()).ConfigureAwait(false);
+        var assertTransaction = await AssertTransaction.TransactionAsync(
+            SampleData.ActorProvidedId,
+            GetService<IDatabaseConnectionFactory>(),
+            GetService<ISerializer>()).ConfigureAwait(false);
         assertTransaction.HasCustomerMasterData(ParseFrom(command.Data));
     }
 
@@ -86,7 +89,7 @@ public class WhenRequestedCustomerMasterDataIsReceivedTests
         assertMessage.HasSenderId(DataHubDetails.IdentificationNumber.Value);
         assertMessage.HasSenderRole(MarketRole.MeteringPointAdministrator.ToString());
         assertMessage.WithMarketActivityRecord()
-            .HasOriginalTransactionId(SampleData.ActorProvidedId)
+            .HasOriginalTransactionId(SampleData.ActorProvidedId.Id)
             .HasValidityStart(SampleData.SupplyStart)
             .HasMarketEvaluationPointValue(nameof(MarketEvaluationPoint.MarketEvaluationPointId), SampleData.MeteringPointNumber)
             .HasMarketEvaluationPointDateValue(nameof(MarketEvaluationPoint.SupplyStart), SampleData.SupplyStart)

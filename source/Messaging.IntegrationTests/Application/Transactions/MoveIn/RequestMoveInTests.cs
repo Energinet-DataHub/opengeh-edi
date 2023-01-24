@@ -21,6 +21,7 @@ using Messaging.Application.Transactions.MoveIn;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
+using Messaging.Domain.Transactions;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.InternalCommands;
 using Messaging.Infrastructure.Transactions;
@@ -50,7 +51,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
 
-            var assertTransaction = await AssertTransaction.TransactionAsync(SampleData.TransactionId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
+            var assertTransaction = await AssertTransaction.TransactionAsync(SampleData.ActorProvidedId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
             assertTransaction.HasState(MoveInTransaction.State.Started)
                 .HasStartedByMessageId(incomingMessage.Message.MessageId)
                 .HasNewEnergySupplierId(incomingMessage.Message.SenderId)
@@ -143,7 +144,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
                 .WithEnergySupplierId(SampleData.NewEnergySupplierNumber)
                 .WithMessageId(SampleData.OriginalMessageId)
                 .WithMarketEvaluationPointId(SampleData.MeteringPointNumber)
-                .WithTransactionId(SampleData.ActorProvidedId);
+                .WithTransactionId(SampleData.ActorProvidedId.Id);
         }
 
         private async Task GivenRequestHasBeenAccepted()
@@ -187,7 +188,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             assertMessage.HasReceiverRole(MarketRole.EnergySupplier.Name);
             assertMessage.HasMessageRecordValue<MarketActivityRecord>(
                 record => record.OriginalTransactionId,
-                SampleData.ActorProvidedId);
+                SampleData.ActorProvidedId.Id);
             assertMessage.HasMessageRecordValue<MarketActivityRecord>(
                 record => record.MarketEvaluationPointId,
                 SampleData.MeteringPointNumber);
@@ -213,7 +214,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
                     record => record.MarketEvaluationPointId, SampleData.MeteringPointNumber);
             assertMessage
                 .HasMessageRecordValue<Domain.OutgoingMessages.RejectRequestChangeOfSupplier.MarketActivityRecord>(
-                    record => record.OriginalTransactionId, SampleData.ActorProvidedId);
+                    record => record.OriginalTransactionId, SampleData.ActorProvidedId.Id);
 
             return assertMessage;
         }
@@ -223,8 +224,8 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
             return await connection
                 .QueryFirstAsync<Guid>(
-                    "SELECT TOP(1) CAST(TransactionId AS uniqueidentifier) FROM b2b.MoveInTransactions WHERE ActorProvidedId = @ActorProvidedId",
-                    new { ActorProvidedId = SampleData.ActorProvidedId }).ConfigureAwait(false);
+                    "SELECT TOP(1) TransactionId FROM b2b.MoveInTransactions WHERE ActorProvidedId = @ActorProvidedId",
+                    new { ActorProvidedId = SampleData.ActorProvidedId.Id }).ConfigureAwait(false);
         }
     }
 }

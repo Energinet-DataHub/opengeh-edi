@@ -69,7 +69,7 @@ public class NotifyGridOperatorHandlerTests
         var command = new NotifyGridOperator(SampleData.TransactionId);
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
-        var transaction = await AssertTransaction.TransactionAsync(SampleData.TransactionId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
+        var transaction = await AssertTransaction.TransactionAsync(SampleData.ActorProvidedId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
         transaction.HasGridOperatorNotificationState(MoveInTransaction.NotificationState.WasNotified);
         var outgoingMessageTransaction = await AssertOutgoingMessage.OutgoingMessageAsync(
             SampleData.TransactionId,
@@ -83,7 +83,7 @@ public class NotifyGridOperatorHandlerTests
             .WithMarketActivityRecord()
             .HasValidityStart(SampleData.SupplyStart)
             .HasId()
-            .HasOriginalTransactionId(SampleData.ActorProvidedId)
+            .HasOriginalTransactionId(SampleData.ActorProvidedId.Id)
             .HasMarketEvaluationPointId(SampleData.MeteringPointNumber);
     }
 }

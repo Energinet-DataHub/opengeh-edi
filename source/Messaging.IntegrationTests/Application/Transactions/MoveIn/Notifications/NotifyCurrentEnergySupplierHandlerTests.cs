@@ -78,7 +78,7 @@ public class NotifyCurrentEnergySupplierHandlerTests
             .WithMarketActivityRecord()
             .HasId()
             .HasValidityStart(SampleData.SupplyStart)
-            .HasOriginalTransactionId(SampleData.ActorProvidedId)
+            .HasOriginalTransactionId(SampleData.ActorProvidedId.Id)
             .HasMarketEvaluationPointId(SampleData.MeteringPointNumber);
     }
 
@@ -99,6 +99,6 @@ public class NotifyCurrentEnergySupplierHandlerTests
     private async Task<AssertTransaction> AssertTransactionAsync()
     {
         return await MoveIn.AssertTransaction
-            .TransactionAsync(SampleData.TransactionId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
+            .TransactionAsync(SampleData.ActorProvidedId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
     }
 }

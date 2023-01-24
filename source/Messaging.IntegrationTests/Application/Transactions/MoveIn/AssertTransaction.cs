@@ -17,6 +17,7 @@ using System.Data;
 using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
+using Messaging.Domain.Transactions;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Xunit;
@@ -43,18 +44,20 @@ public class AssertTransaction
         _serializer = serializer;
     }
 
-    public static async Task<AssertTransaction> TransactionAsync(Guid transactionId, IDatabaseConnectionFactory connectionFactory)
+    public static async Task<AssertTransaction> TransactionAsync(ActorProvidedId actorProvidedId, IDatabaseConnectionFactory connectionFactory)
     {
+        ArgumentNullException.ThrowIfNull(actorProvidedId);
         if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
         using var connection = await connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
-        return new AssertTransaction(GetTransaction(transactionId, connection));
+        return new AssertTransaction(GetTransaction(actorProvidedId, connection));
     }
 
-    public static async Task<AssertTransaction> TransactionAsync(Guid transactionId, IDatabaseConnectionFactory connectionFactory, ISerializer serializer)
+    public static async Task<AssertTransaction> TransactionAsync(ActorProvidedId actorProvidedId, IDatabaseConnectionFactory connectionFactory, ISerializer serializer)
     {
+        ArgumentNullException.ThrowIfNull(actorProvidedId);
         if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
         using var connection = await connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
-        return new AssertTransaction(GetTransaction(transactionId, connection), serializer);
+        return new AssertTransaction(GetTransaction(actorProvidedId, connection), serializer);
     }
 
     public AssertTransaction HasState(MoveInTransaction.State expectedState)
@@ -136,13 +139,13 @@ public class AssertTransaction
         return this;
     }
 
-    private static dynamic? GetTransaction(Guid transactionId, IDbConnection connection)
+    private static dynamic? GetTransaction(ActorProvidedId actorProvidedId, IDbConnection connection)
     {
         return connection.QuerySingle(
-            $"SELECT * FROM b2b.MoveInTransactions WHERE TransactionId = @TransactionId",
+            $"SELECT * FROM b2b.MoveInTransactions WHERE ActorProvidedId = @ActorProvidedId",
             new
             {
-                TransactionId = transactionId,
+                ActorProvidedId = actorProvidedId.Id,
             });
     }
 }
