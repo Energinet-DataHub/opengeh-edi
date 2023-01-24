@@ -130,7 +130,8 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
 
-            await RejectMessageIsCreated().ConfigureAwait(false);
+            var rejectMessage = await RejectMessage().ConfigureAwait(false);
+            rejectMessage.HasReceiverId(incomingMessage.Message.SenderId);
         }
 
         [Fact]
@@ -177,6 +178,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             return new IncomingMessageBuilder()
                 .WithEnergySupplierId(SampleData.NewEnergySupplierNumber)
                 .WithMessageId(SampleData.OriginalMessageId)
+                .WithMarketEvaluationPointId(SampleData.MeteringPointNumber)
                 .WithTransactionId(SampleData.ActorProvidedId);
         }
 
@@ -267,6 +269,25 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             assertMessage
                 .HasMessageRecordValue<Domain.OutgoingMessages.RejectRequestChangeOfSupplier.MarketActivityRecord>(
                     record => record.OriginalTransactionId, SampleData.ActorProvidedId);
+        }
+
+        private async Task<AssertOutgoingMessage> RejectMessage()
+        {
+            var assertMessage = await AssertOutgoingMessage
+                .OutgoingMessageAsync(
+                    MessageType.RejectRequestChangeOfSupplier.Name,
+                    ProcessType.MoveIn.Code,
+                    MarketRole.EnergySupplier,
+                    GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
+            assertMessage.HasReceiverRole(MarketRole.EnergySupplier.Name);
+            assertMessage
+                .HasMessageRecordValue<Domain.OutgoingMessages.RejectRequestChangeOfSupplier.MarketActivityRecord>(
+                    record => record.MarketEvaluationPointId, SampleData.MeteringPointNumber);
+            assertMessage
+                .HasMessageRecordValue<Domain.OutgoingMessages.RejectRequestChangeOfSupplier.MarketActivityRecord>(
+                    record => record.OriginalTransactionId, SampleData.ActorProvidedId);
+
+            return assertMessage;
         }
 
         private async Task<Guid> GetTransactionIdAsync()
