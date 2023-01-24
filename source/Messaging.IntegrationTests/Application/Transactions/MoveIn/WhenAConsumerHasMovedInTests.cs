@@ -91,8 +91,8 @@ public class WhenAConsumerHasMovedInTests : TestBase
     private async Task<MoveInTransaction> StartMoveInTransaction()
     {
         var transaction = new MoveInTransaction(
-            TransactionId.Create(SampleData.ActorProvidedId),
-            ActorProvidedId.Create(SampleData.ActorProvidedId),
+            TransactionId.Create(SampleData.TransactionId),
+            SampleData.ActorProvidedId,
             SampleData.MeteringPointNumber,
             SampleData.SupplyStart,
             SampleData.CurrentEnergySupplierNumber,

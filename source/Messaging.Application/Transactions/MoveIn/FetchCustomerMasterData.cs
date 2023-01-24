@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Text.Json.Serialization;
 using Messaging.Application.Configuration.Commands.Commands;
 
@@ -20,7 +21,7 @@ namespace Messaging.Application.Transactions.MoveIn;
 public class FetchCustomerMasterData : InternalCommand
 {
     [JsonConstructor]
-    public FetchCustomerMasterData(string businessProcessId, string marketEvaluationPointNumber, string transactionId)
+    public FetchCustomerMasterData(string businessProcessId, string marketEvaluationPointNumber, Guid transactionId)
     {
         BusinessProcessId = businessProcessId;
         MarketEvaluationPointNumber = marketEvaluationPointNumber;
@@ -31,5 +32,5 @@ public class FetchCustomerMasterData : InternalCommand
 
     public string MarketEvaluationPointNumber { get; }
 
-    public string TransactionId { get; }
+    public Guid TransactionId { get; }
 }

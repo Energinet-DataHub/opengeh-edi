@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Text.Json.Serialization;
 using Messaging.Application.Configuration.Commands.Commands;
 
@@ -20,10 +21,10 @@ namespace Messaging.Application.Transactions.MoveIn.Notifications;
 public class NotifyGridOperator : InternalCommand
 {
     [JsonConstructor]
-    public NotifyGridOperator(string transactionId)
+    public NotifyGridOperator(Guid transactionId)
     {
         TransactionId = transactionId;
     }
 
-    public string TransactionId { get; }
+    public Guid TransactionId { get; }
 }

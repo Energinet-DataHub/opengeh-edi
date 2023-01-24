@@ -201,7 +201,7 @@ public class MoveInTransactionTests
     {
         return new MoveInTransaction(
             TransactionId.Create(SampleData.TransactionId),
-            ActorProvidedId.Create(SampleData.TransactionId),
+            ActorProvidedId.Create(SampleData.TransactionId.ToString()),
             SampleData.MarketEvaluationPointId,
             SampleData.EffectiveDate,
             currentEnergySupplierId,

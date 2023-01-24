@@ -40,7 +40,7 @@ public class NotifyGridOperatorHandlerTests
     public Task InitializeAsync()
     {
         return Scenario.Details(
-                SampleData.ActorProvidedId,
+                SampleData.TransactionId,
                 SampleData.MeteringPointNumber,
                 SampleData.SupplyStart,
                 SampleData.CurrentEnergySupplierNumber,
@@ -66,13 +66,13 @@ public class NotifyGridOperatorHandlerTests
     [Fact]
     public async Task Grid_operator_is_notified_about_the_move_in()
     {
-        var command = new NotifyGridOperator(SampleData.ActorProvidedId);
+        var command = new NotifyGridOperator(SampleData.TransactionId);
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
         var transaction = await AssertTransaction.TransactionAsync(SampleData.ActorProvidedId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
         transaction.HasGridOperatorNotificationState(MoveInTransaction.NotificationState.WasNotified);
         var outgoingMessageTransaction = await AssertOutgoingMessage.OutgoingMessageAsync(
-            SampleData.ActorProvidedId,
+            SampleData.TransactionId,
             MessageType.GenericNotification.Name,
             ProcessType.MoveIn.Code,
             GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
@@ -83,7 +83,7 @@ public class NotifyGridOperatorHandlerTests
             .WithMarketActivityRecord()
             .HasValidityStart(SampleData.SupplyStart)
             .HasId()
-            .HasOriginalTransactionId(SampleData.ActorProvidedId)
+            .HasOriginalTransactionId(SampleData.ActorProvidedId.Id)
             .HasMarketEvaluationPointId(SampleData.MeteringPointNumber);
     }
 }

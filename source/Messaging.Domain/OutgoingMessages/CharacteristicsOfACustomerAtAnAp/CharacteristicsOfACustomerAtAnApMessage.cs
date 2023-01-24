@@ -38,7 +38,8 @@ public class CharacteristicsOfACustomerAtAnApMessage : OutgoingMessage
     public MarketActivityRecord MarketActivityRecord { get; }
 
     public static CharacteristicsOfACustomerAtAnApMessage Create(
-        string transactionId,
+        TransactionId transactionId,
+        ActorProvidedId actorProvidedId,
         ProcessType processType,
         ActorNumber actorNumber,
         MarketRole receivingActorRole,
@@ -47,18 +48,20 @@ public class CharacteristicsOfACustomerAtAnApMessage : OutgoingMessage
     {
         ArgumentNullException.ThrowIfNull(processType);
         ArgumentNullException.ThrowIfNull(customerMasterData);
+        ArgumentNullException.ThrowIfNull(transactionId);
+        ArgumentNullException.ThrowIfNull(actorProvidedId);
 
         var marketEvaluationPoint = CreateMarketEvaluationPoint(customerMasterData);
         var marketActivityRecord = new MarketActivityRecord(
             Guid.NewGuid().ToString(),
-            transactionId,
+            actorProvidedId.Id,
             validityStart,
             marketEvaluationPoint);
 
         return new CharacteristicsOfACustomerAtAnApMessage(
             MessageType.CharacteristicsOfACustomerAtAnAP,
             actorNumber,
-            TransactionId.Create(transactionId),
+            TransactionId.Create(transactionId.Id),
             processType.Code,
             receivingActorRole,
             DataHubDetails.IdentificationNumber,

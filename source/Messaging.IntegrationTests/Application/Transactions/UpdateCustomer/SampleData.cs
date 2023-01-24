@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Messaging.IntegrationTests.Factories;
 using NodaTime;
 
@@ -19,7 +20,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.UpdateCustomer;
 
 internal static class SampleData
 {
-    internal static string TransactionId => "1234567890";
+    internal static Guid TransactionId => Guid.Parse("a761ca16-7fa6-4a04-8420-9f7bda780362");
 
     internal static string MarketEvaluationPointNumber => "571234567891234568";
 

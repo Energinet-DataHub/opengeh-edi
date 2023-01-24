@@ -20,17 +20,17 @@ namespace Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 
 public class SendCustomerMasterDataToGridOperator : InternalCommand
 {
-    public SendCustomerMasterDataToGridOperator(string transactionId)
+    public SendCustomerMasterDataToGridOperator(Guid transactionId)
     {
         TransactionId = transactionId;
     }
 
     [JsonConstructor]
-    public SendCustomerMasterDataToGridOperator(Guid id, string transactionId)
+    public SendCustomerMasterDataToGridOperator(Guid id, Guid transactionId)
         : base(id)
     {
         TransactionId = transactionId;
     }
 
-    public string TransactionId { get; }
+    public Guid TransactionId { get; }
 }

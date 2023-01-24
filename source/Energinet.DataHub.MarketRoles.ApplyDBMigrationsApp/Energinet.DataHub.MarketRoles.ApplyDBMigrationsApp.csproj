@@ -91,6 +91,8 @@ limitations under the License.
     <None Remove="Scripts\Model\202227101336 Add ReadyMessages Table.sql" />
     <EmbeddedResource Include="Scripts\Model\202227101336 Add BundledMessages Table.sql" />
     <None Remove="Scripts\Model\202227101337 Alter AggregatedTimeSeriesTransactions table.sql" />
+    <None Remove="Scripts\Model\202227101352 Change Id from string to uniqueidentifier.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101352 Change Id from string to uniqueidentifier.sql" />
   </ItemGroup>
 
 </Project>

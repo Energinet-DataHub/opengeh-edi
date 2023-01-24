@@ -44,7 +44,7 @@ public class ForwardMeteringPointMasterDataTests : TestBase, IAsyncLifetime
     public Task InitializeAsync()
     {
         return Scenario.Details(
-                SampleData.ActorProvidedId,
+                SampleData.TransactionId,
                 SampleData.MarketEvaluationPointId,
                 SampleData.SupplyStart,
                 SampleData.CurrentEnergySupplierNumber,
@@ -70,7 +70,7 @@ public class ForwardMeteringPointMasterDataTests : TestBase, IAsyncLifetime
     [Fact]
     public async Task Metering_point_master_data_is_forwarded_to_the_new_energy_supplier()
     {
-        var forwardMeteringPointMasterData = new ForwardMeteringPointMasterData(SampleData.ActorProvidedId, CreateMasterDataContent());
+        var forwardMeteringPointMasterData = new ForwardMeteringPointMasterData(SampleData.TransactionId, CreateMasterDataContent());
         await InvokeCommandAsync(forwardMeteringPointMasterData).ConfigureAwait(false);
 
         var assertTransaction = await AssertTransaction.TransactionAsync(SampleData.ActorProvidedId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
@@ -82,7 +82,7 @@ public class ForwardMeteringPointMasterDataTests : TestBase, IAsyncLifetime
     {
         var masterData = CreateMasterDataContent();
 
-        var forwardMeteringPointMasterData = new ForwardMeteringPointMasterData(SampleData.ActorProvidedId, masterData);
+        var forwardMeteringPointMasterData = new ForwardMeteringPointMasterData(SampleData.TransactionId, masterData);
         await InvokeCommandAsync(forwardMeteringPointMasterData).ConfigureAwait(false);
 
         var marketActivityRecord = await GetMarketActivityRecordAsync(MessageType.AccountingPointCharacteristics).ConfigureAwait(false);
@@ -94,7 +94,7 @@ public class ForwardMeteringPointMasterDataTests : TestBase, IAsyncLifetime
     {
         var masterData = CreateMasterDataContentWithNullValues();
 
-        var forwardMeteringPointMasterData = new ForwardMeteringPointMasterData(SampleData.ActorProvidedId, masterData);
+        var forwardMeteringPointMasterData = new ForwardMeteringPointMasterData(SampleData.TransactionId, masterData);
         await InvokeCommandAsync(forwardMeteringPointMasterData).ConfigureAwait(false);
 
         var marketActivityRecord = await GetMarketActivityRecordAsync(MessageType.AccountingPointCharacteristics).ConfigureAwait(false);

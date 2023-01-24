@@ -21,21 +21,21 @@ namespace Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 
 public class SetCurrentKnownCustomerMasterData : InternalCommand
 {
-    public SetCurrentKnownCustomerMasterData(string transactionId, CustomerMasterDataContent data)
+    public SetCurrentKnownCustomerMasterData(Guid transactionId, CustomerMasterDataContent data)
     {
         TransactionId = transactionId;
         Data = data;
     }
 
     [JsonConstructor]
-    public SetCurrentKnownCustomerMasterData(Guid id, string transactionId, CustomerMasterDataContent data)
+    public SetCurrentKnownCustomerMasterData(Guid id, Guid transactionId, CustomerMasterDataContent data)
         : base(id)
     {
         TransactionId = transactionId;
         Data = data;
     }
 
-    public string TransactionId { get; }
+    public Guid TransactionId { get; }
 
     public CustomerMasterDataContent Data { get; }
 }

@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using Messaging.Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
+using Messaging.Domain.Transactions;
 using Messaging.IntegrationTests.Factories;
 using NodaTime;
 
@@ -28,7 +29,9 @@ internal static class SampleData
 
     internal static string NewEnergySupplierNumber => "5790000555551";
 
-    internal static string ActorProvidedId => "8BA514FA-2E4D-4CB7-8B4A-1B1137185BD7";
+    internal static Guid TransactionId => Guid.Parse("8BA514FA-2E4D-4CB7-8B4A-1B1137185BD7");
+
+    internal static ActorProvidedId ActorProvidedId => ActorProvidedId.Create("123456987");
 
     internal static string MarketEvaluationPointId => "e17fe44f-ea4e-47e0-bbb0-64bfb382922a";
 

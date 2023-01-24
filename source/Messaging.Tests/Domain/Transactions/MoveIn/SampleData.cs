@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using NodaTime;
 
 namespace Messaging.Tests.Domain.Transactions.MoveIn;
 
 internal class SampleData
 {
-    internal static string TransactionId => "17DE02FC-6A83-436F-BC89-779ABBD6AB35";
+    internal static Guid TransactionId => Guid.Parse("17DE02FC-6A83-436F-BC89-779ABBD6AB35");
 
     internal static string ProcessId => "1F4D6E69-5C0D-461C-AB52-E34EF77E24D8";
 

@@ -46,7 +46,7 @@ public class RetrieveAggregationResultTests : TestBase
         await InvokeCommandAsync(new RetrieveAggregationResult(SampleData.ResultId, SampleData.GridAreaCode, transactionId)).ConfigureAwait(false);
 
         var message = await AssertOutgoingMessage.OutgoingMessageAsync(
-                 transactionId.ToString(),
+                 transactionId,
                  MessageType.NotifyAggregatedMeasureData.Name,
                  ProcessType.BalanceFixing.Code,
                  MarketRole.GridOperator,
@@ -55,7 +55,7 @@ public class RetrieveAggregationResultTests : TestBase
                  .HasReceiverRole(MarketRole.GridOperator.Name)
                  .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
                  .HasSenderId(DataHubDetails.IdentificationNumber.Value)
-                 .HasMessageRecordValue<TimeSeries>(x => x.TransactionId, transactionId.ToString())
+                 .HasMessageRecordValue<TimeSeries>(x => x.TransactionId, transactionId)
                  .HasMessageRecordValue<TimeSeries>(x => x.GridAreaCode, SampleData.GridAreaCode)
                  .HasMessageRecordValue<TimeSeries>(x => x.Resolution, SampleData.Resolution)
                  .HasMessageRecordValue<TimeSeries>(x => x.MeasureUnitType, SampleData.MeasureUnitType)

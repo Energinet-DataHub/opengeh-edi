@@ -123,7 +123,7 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
             masterData.Address.PostCode);
     }
 
-    private static OutgoingMessage CreateOutgoingMessage(string id, string processType, string receiverId, string marketActivityRecordPayload)
+    private static OutgoingMessage CreateOutgoingMessage(Guid id, string processType, string receiverId, string marketActivityRecordPayload)
     {
         return new OutgoingMessage(
             MessageType.AccountingPointCharacteristics,
@@ -146,7 +146,7 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
             marketEvaluationPoint);
 
         return CreateOutgoingMessage(
-            transaction.StartedByMessageId,
+            transaction.TransactionId.Id,
             "E65",
             transaction.NewEnergySupplierId,
             _messageRecordParser.From(marketActivityRecord));

@@ -61,7 +61,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
         var timeSeries = new List<TimeSeries>()
         {
             new(
-                Guid.NewGuid().ToString(),
+                Guid.NewGuid(),
                 "870",
                 "E18",
                 "KWH",
