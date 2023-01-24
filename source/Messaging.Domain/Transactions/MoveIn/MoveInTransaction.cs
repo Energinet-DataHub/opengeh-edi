@@ -144,7 +144,8 @@ namespace Messaging.Domain.Transactions.MoveIn
                 throw new MoveInException($"Transaction has already been rejected");
 
             _messages.Add(RejectRequestChangeOfSupplierMessage.Create(
-                Transactions.TransactionId.Create(TransactionId.Id),
+                TransactionId,
+                ActorProvidedId,
                 ProcessType.MoveIn,
                 MarketEvaluationPointId,
                 _requestedBy,

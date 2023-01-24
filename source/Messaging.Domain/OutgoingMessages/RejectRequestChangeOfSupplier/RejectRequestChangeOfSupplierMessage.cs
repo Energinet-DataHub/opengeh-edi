@@ -37,6 +37,7 @@ public class RejectRequestChangeOfSupplierMessage : OutgoingMessage
 
     public static RejectRequestChangeOfSupplierMessage Create(
         TransactionId transactionId,
+        ActorProvidedId actorProvidedId,
         ProcessType processType,
         string marketEvaluationPointNumber,
         ActorNumber energySupplierNumber,
@@ -46,6 +47,7 @@ public class RejectRequestChangeOfSupplierMessage : OutgoingMessage
         ArgumentNullException.ThrowIfNull(processType);
         ArgumentNullException.ThrowIfNull(energySupplierNumber);
         ArgumentNullException.ThrowIfNull(reasons);
+        ArgumentNullException.ThrowIfNull(actorProvidedId);
 
         if (reasons.Count == 0)
         {
@@ -54,7 +56,7 @@ public class RejectRequestChangeOfSupplierMessage : OutgoingMessage
 
         var marketActivityRecord = new MarketActivityRecord(
             Guid.NewGuid().ToString(),
-            transactionId.Id,
+            actorProvidedId.Id,
             marketEvaluationPointNumber,
             reasons);
         return new RejectRequestChangeOfSupplierMessage(
