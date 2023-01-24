@@ -59,6 +59,7 @@ public class Scenario
     {
         _transaction = new MoveInTransaction(
             TransactionId.Create(transactionId),
+            ActorProvidedId.Create(SampleData.TransactionId),
             meteringPointNumber,
             supplyStart,
             currentEnergySupplierNumber,
