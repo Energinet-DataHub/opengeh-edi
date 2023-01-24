@@ -14,24 +14,16 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Xml.Linq;
-using System.Xml.Schema;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages;
-using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Application.Transactions.MoveIn;
-using Messaging.Application.Xml;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
-using Messaging.Domain.OutgoingMessages.Peek;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.InternalCommands;
-using Messaging.Infrastructure.IncomingMessages.SchemaStore;
 using Messaging.Infrastructure.Transactions;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Assertions;
@@ -45,12 +37,9 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
     [IntegrationTest]
     public class RequestMoveInTests : TestBase
     {
-        private readonly IOutgoingMessageStore _outgoingMessageStore;
-
         public RequestMoveInTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
-            _outgoingMessageStore = GetService<IOutgoingMessageStore>();
         }
 
         [Fact]
@@ -149,28 +138,6 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             await RejectMessageIsCreated().ConfigureAwait(false);
         }
 
-        private static void AssertHeader(XDocument document, OutgoingMessage message, string expectedReasonCode)
-        {
-            Assert.NotEmpty(AssertXmlMessage.GetMessageHeaderValue(document, "mRID")!);
-            AssertXmlMessage.AssertHasHeaderValue(document, "type", "414");
-            AssertXmlMessage.AssertHasHeaderValue(document, "process.processType", message.ProcessType);
-            AssertXmlMessage.AssertHasHeaderValue(document, "businessSector.type", "23");
-            AssertXmlMessage.AssertHasHeaderValue(document, "sender_MarketParticipant.mRID", message.SenderId.Value);
-            AssertXmlMessage.AssertHasHeaderValue(document, "sender_MarketParticipant.marketRole.type", message.SenderRole.ToString());
-            AssertXmlMessage.AssertHasHeaderValue(document, "receiver_MarketParticipant.mRID", message.ReceiverId.Value);
-            AssertXmlMessage.AssertHasHeaderValue(document, "receiver_MarketParticipant.marketRole.type", message.ReceiverRole.ToString());
-            AssertXmlMessage.AssertHasHeaderValue(document, "reason.code", expectedReasonCode);
-        }
-
-        private static async Task ValidateDocument(Stream dispatchedDocument, string schemaName, string schemaVersion)
-        {
-            var schemaProvider = new XmlSchemaProvider();
-            var schema = await schemaProvider.GetSchemaAsync<XmlSchema>(schemaName, schemaVersion).ConfigureAwait(false);
-
-            var validationResult = await MessageValidator.ValidateAsync(dispatchedDocument, schema!);
-            Assert.True(validationResult.IsValid);
-        }
-
         private static IncomingMessageBuilder MessageBuilder()
         {
             return new IncomingMessageBuilder()
@@ -191,30 +158,6 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
                 .Build();
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
-        }
-
-        private async Task AssertRejectMessage(OutgoingMessage rejectMessage)
-        {
-            var peekResult = await InvokeCommandAsync(new PeekRequest(
-                rejectMessage.ReceiverId,
-                MessageCategory.MasterData));
-
-            await ValidateDocument(peekResult.Bundle!, "rejectrequestchangeofsupplier", "0.1").ConfigureAwait(false);
-
-            var document = XDocument.Load(peekResult.Bundle!);
-            AssertHeader(document, rejectMessage, "A02");
-        }
-
-        private async Task AsserConfirmMessage(OutgoingMessage message)
-        {
-            var peekResult = await InvokeCommandAsync(new PeekRequest(
-                ActorNumber.Create(SampleData.NewEnergySupplierNumber),
-                MessageCategory.MasterData));
-
-            await ValidateDocument(peekResult.Bundle!, "confirmrequestchangeofsupplier", "0.1").ConfigureAwait(false);
-
-            var document = XDocument.Load(peekResult.Bundle!);
-            AssertHeader(document, message, "A01");
         }
 
         private HttpClientSpy GetHttpClientMock()
