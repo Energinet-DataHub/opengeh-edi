@@ -14,21 +14,15 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
-using System.Xml.Linq;
-using System.Xml.Schema;
+using Dapper;
 using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.OutgoingMessages;
-using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Application.Transactions.MoveIn;
-using Messaging.Application.Xml;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.OutgoingMessages.Peek;
+using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.InternalCommands;
-using Messaging.Infrastructure.IncomingMessages.SchemaStore;
 using Messaging.Infrastructure.Transactions;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Assertions;
@@ -42,12 +36,9 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
     [IntegrationTest]
     public class RequestMoveInTests : TestBase
     {
-        private readonly IOutgoingMessageStore _outgoingMessageStore;
-
         public RequestMoveInTests(DatabaseFixture databaseFixture)
             : base(databaseFixture)
         {
-            _outgoingMessageStore = GetService<IOutgoingMessageStore>();
         }
 
         [Fact]
@@ -59,7 +50,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
 
-            var assertTransaction = await AssertTransaction.TransactionAsync(SampleData.TransactionId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
+            var assertTransaction = await AssertTransaction.TransactionAsync(SampleData.ActorProvidedId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
             assertTransaction.HasState(MoveInTransaction.State.Started)
                 .HasStartedByMessageId(incomingMessage.Message.MessageId)
                 .HasNewEnergySupplierId(incomingMessage.Message.SenderId)
@@ -77,9 +68,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         {
             await GivenRequestHasBeenAccepted().ConfigureAwait(false);
 
-            var confirmMessage = _outgoingMessageStore.GetByTransactionId(SampleData.TransactionId)!;
-
-            await AsserConfirmMessage(confirmMessage).ConfigureAwait(false);
+            await ConfirmMessageIsCreated().ConfigureAwait(false);
         }
 
         [Fact]
@@ -112,9 +101,8 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
                 .Build();
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
-            var rejectMessage = _outgoingMessageStore.GetByTransactionId(SampleData.TransactionId)!;
 
-            await AssertRejectMessage(rejectMessage).ConfigureAwait(false);
+            await RejectMessageIsCreated().ConfigureAwait(false);
         }
 
         [Fact]
@@ -128,9 +116,9 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
                 .Build();
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
-            var rejectMessage = _outgoingMessageStore.GetByTransactionId(SampleData.TransactionId)!;
 
-            await AssertRejectMessage(rejectMessage).ConfigureAwait(false);
+            var rejectMessage = await RejectMessage().ConfigureAwait(false);
+            rejectMessage.HasReceiverId(incomingMessage.Message.SenderId);
         }
 
         [Fact]
@@ -145,31 +133,8 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
                 .Build();
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
-            var rejectMessage = _outgoingMessageStore.GetByTransactionId(SampleData.TransactionId)!;
 
-            await AssertRejectMessage(rejectMessage).ConfigureAwait(false);
-        }
-
-        private static void AssertHeader(XDocument document, OutgoingMessage message, string expectedReasonCode)
-        {
-            Assert.NotEmpty(AssertXmlMessage.GetMessageHeaderValue(document, "mRID")!);
-            AssertXmlMessage.AssertHasHeaderValue(document, "type", "414");
-            AssertXmlMessage.AssertHasHeaderValue(document, "process.processType", message.ProcessType);
-            AssertXmlMessage.AssertHasHeaderValue(document, "businessSector.type", "23");
-            AssertXmlMessage.AssertHasHeaderValue(document, "sender_MarketParticipant.mRID", message.SenderId.Value);
-            AssertXmlMessage.AssertHasHeaderValue(document, "sender_MarketParticipant.marketRole.type", message.SenderRole.ToString());
-            AssertXmlMessage.AssertHasHeaderValue(document, "receiver_MarketParticipant.mRID", message.ReceiverId.Value);
-            AssertXmlMessage.AssertHasHeaderValue(document, "receiver_MarketParticipant.marketRole.type", message.ReceiverRole.ToString());
-            AssertXmlMessage.AssertHasHeaderValue(document, "reason.code", expectedReasonCode);
-        }
-
-        private static async Task ValidateDocument(Stream dispatchedDocument, string schemaName, string schemaVersion)
-        {
-            var schemaProvider = new XmlSchemaProvider();
-            var schema = await schemaProvider.GetSchemaAsync<XmlSchema>(schemaName, schemaVersion).ConfigureAwait(false);
-
-            var validationResult = await MessageValidator.ValidateAsync(dispatchedDocument, schema!);
-            Assert.True(validationResult.IsValid);
+            await RejectMessageIsCreated().ConfigureAwait(false);
         }
 
         private static IncomingMessageBuilder MessageBuilder()
@@ -177,7 +142,8 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             return new IncomingMessageBuilder()
                 .WithEnergySupplierId(SampleData.NewEnergySupplierNumber)
                 .WithMessageId(SampleData.OriginalMessageId)
-                .WithTransactionId(SampleData.TransactionId);
+                .WithMarketEvaluationPointId(SampleData.MeteringPointNumber)
+                .WithTransactionId(SampleData.ActorProvidedId);
         }
 
         private async Task GivenRequestHasBeenAccepted()
@@ -187,33 +153,10 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
                 .WithReceiver(SampleData.ReceiverId)
                 .WithSenderId(SampleData.SenderId)
                 .WithConsumerName(SampleData.ConsumerName)
+                .WithMarketEvaluationPointId(SampleData.MeteringPointNumber)
                 .Build();
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
-        }
-
-        private async Task AssertRejectMessage(OutgoingMessage rejectMessage)
-        {
-            var peekResult = await InvokeCommandAsync(new PeekRequest(
-                rejectMessage.ReceiverId,
-                MessageCategory.MasterData));
-
-            await ValidateDocument(peekResult.Bundle!, "rejectrequestchangeofsupplier", "0.1").ConfigureAwait(false);
-
-            var document = XDocument.Load(peekResult.Bundle!);
-            AssertHeader(document, rejectMessage, "A02");
-        }
-
-        private async Task AsserConfirmMessage(OutgoingMessage message)
-        {
-            var peekResult = await InvokeCommandAsync(new PeekRequest(
-                ActorNumber.Create(SampleData.NewEnergySupplierNumber),
-                MessageCategory.MasterData));
-
-            await ValidateDocument(peekResult.Bundle!, "confirmrequestchangeofsupplier", "0.1").ConfigureAwait(false);
-
-            var document = XDocument.Load(peekResult.Bundle!);
-            AssertHeader(document, message, "A01");
         }
 
         private HttpClientSpy GetHttpClientMock()
@@ -227,6 +170,61 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             return AssertQueuedCommand.QueuedCommand<TCommand>(
                 GetService<IDatabaseConnectionFactory>(),
                 GetService<InternalCommandMapper>());
+        }
+
+        private async Task ConfirmMessageIsCreated()
+        {
+            var currentTransactionId = await GetTransactionIdAsync().ConfigureAwait(false);
+            var assertMessage = await AssertOutgoingMessage.OutgoingMessageAsync(
+                    currentTransactionId.ToString(),
+                    MessageType.ConfirmRequestChangeOfSupplier.Name,
+                    ProcessType.MoveIn.Code,
+                    MarketRole.EnergySupplier,
+                    GetService<IDatabaseConnectionFactory>())
+                .ConfigureAwait(false);
+
+            assertMessage.HasReceiverId(SampleData.NewEnergySupplierNumber);
+            assertMessage.HasReceiverRole(MarketRole.EnergySupplier.Name);
+            assertMessage.HasMessageRecordValue<MarketActivityRecord>(
+                record => record.OriginalTransactionId,
+                SampleData.ActorProvidedId);
+            assertMessage.HasMessageRecordValue<MarketActivityRecord>(
+                record => record.MarketEvaluationPointId,
+                SampleData.MeteringPointNumber);
+        }
+
+        private async Task RejectMessageIsCreated()
+        {
+            var sut = await RejectMessage().ConfigureAwait(false);
+            sut.HasReceiverId(SampleData.NewEnergySupplierNumber);
+        }
+
+        private async Task<AssertOutgoingMessage> RejectMessage()
+        {
+            var assertMessage = await AssertOutgoingMessage
+                .OutgoingMessageAsync(
+                    MessageType.RejectRequestChangeOfSupplier.Name,
+                    ProcessType.MoveIn.Code,
+                    MarketRole.EnergySupplier,
+                    GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
+            assertMessage.HasReceiverRole(MarketRole.EnergySupplier.Name);
+            assertMessage
+                .HasMessageRecordValue<Domain.OutgoingMessages.RejectRequestChangeOfSupplier.MarketActivityRecord>(
+                    record => record.MarketEvaluationPointId, SampleData.MeteringPointNumber);
+            assertMessage
+                .HasMessageRecordValue<Domain.OutgoingMessages.RejectRequestChangeOfSupplier.MarketActivityRecord>(
+                    record => record.OriginalTransactionId, SampleData.ActorProvidedId);
+
+            return assertMessage;
+        }
+
+        private async Task<Guid> GetTransactionIdAsync()
+        {
+            using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
+            return await connection
+                .QueryFirstAsync<Guid>(
+                    "SELECT TOP(1) CAST(TransactionId AS uniqueidentifier) FROM b2b.MoveInTransactions WHERE ActorProvidedId = @ActorProvidedId",
+                    new { SampleData.ActorProvidedId }).ConfigureAwait(false);
         }
     }
 }
