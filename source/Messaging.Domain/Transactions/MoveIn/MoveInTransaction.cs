@@ -231,7 +231,8 @@ namespace Messaging.Domain.Transactions.MoveIn
         private void CreateCustomerMasterDataMessage(ActorNumber receiverNumber, MarketRole receiverRole)
         {
             _messages.Add(CharacteristicsOfACustomerAtAnApMessage.Create(
-                TransactionId.Id,
+                TransactionId,
+                ActorProvidedId,
                 ProcessType.MoveIn,
                 receiverNumber,
                 receiverRole,
