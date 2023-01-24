@@ -15,30 +15,24 @@
 using System;
 using System.Globalization;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using MediatR;
 using Messaging.Api.Configuration.Middleware.Correlation;
-using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.Commands.Commands;
 using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.Configuration.TimeEvents;
+using Messaging.Application.Configuration.Queries;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.DataAccess;
-using Messaging.Infrastructure.Configuration.FeatureFlag;
 using Messaging.Infrastructure.Configuration.MessageBus;
 using Messaging.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
-using Messaging.Infrastructure.Configuration.Serialization;
-using Messaging.Infrastructure.OutgoingMessages.Peek;
-using Messaging.Infrastructure.Transactions;
-using Messaging.Infrastructure.Transactions.Aggregations;
 using Messaging.Infrastructure.Transactions.MoveIn;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.Infrastructure.Configuration.InternalCommands;
 using Messaging.IntegrationTests.TestDoubles;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace Messaging.IntegrationTests
@@ -127,6 +121,11 @@ namespace Messaging.IntegrationTests
         protected Task<TResult> InvokeCommandAsync<TResult>(ICommand<TResult> command)
         {
             return GetService<IMediator>().Send(command);
+        }
+
+        protected Task<TResult> QueryAsync<TResult>(IQuery<TResult> query)
+        {
+            return GetService<IMediator>().Send(query, CancellationToken.None);
         }
 
         private static string CreateFakeServiceBusConnectionString()
