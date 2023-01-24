@@ -50,7 +50,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
 
-            var assertTransaction = await AssertTransaction.TransactionAsync(SampleData.ActorProvidedId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
+            var assertTransaction = await AssertTransaction.TransactionAsync(SampleData.TransactionId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
             assertTransaction.HasState(MoveInTransaction.State.Started)
                 .HasStartedByMessageId(incomingMessage.Message.MessageId)
                 .HasNewEnergySupplierId(incomingMessage.Message.SenderId)
@@ -176,7 +176,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         {
             var currentTransactionId = await GetTransactionIdAsync().ConfigureAwait(false);
             var assertMessage = await AssertOutgoingMessage.OutgoingMessageAsync(
-                    currentTransactionId.ToString(),
+                    currentTransactionId,
                     MessageType.ConfirmRequestChangeOfSupplier.Name,
                     ProcessType.MoveIn.Code,
                     MarketRole.EnergySupplier,
@@ -224,7 +224,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             return await connection
                 .QueryFirstAsync<Guid>(
                     "SELECT TOP(1) CAST(TransactionId AS uniqueidentifier) FROM b2b.MoveInTransactions WHERE ActorProvidedId = @ActorProvidedId",
-                    new { SampleData.ActorProvidedId }).ConfigureAwait(false);
+                    new { ActorProvidedId = SampleData.ActorProvidedId }).ConfigureAwait(false);
         }
     }
 }

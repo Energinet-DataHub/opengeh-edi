@@ -18,10 +18,10 @@ namespace Messaging.Domain.Transactions.MoveIn.Events;
 
 public class BusinessProcessWasCompleted : DomainEvent
 {
-    public BusinessProcessWasCompleted(string transactionId)
+    public BusinessProcessWasCompleted(Guid transactionId)
     {
         TransactionId = transactionId;
     }
 
-    public string TransactionId { get; }
+    public Guid TransactionId { get; }
 }

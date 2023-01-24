@@ -64,7 +64,7 @@ public class MoveInNotifications
         if (transaction == null) throw new ArgumentNullException(nameof(transaction));
         var marketActivityRecord = new MarketActivityRecord(
             Guid.NewGuid().ToString(),
-            transaction.TransactionId.Id,
+            transaction.ActorProvidedId.Id,
             transaction.MarketEvaluationPointId,
             transaction.EffectiveDate);
 

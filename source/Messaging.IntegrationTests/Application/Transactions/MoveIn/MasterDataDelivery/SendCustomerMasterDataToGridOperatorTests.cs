@@ -40,7 +40,7 @@ public class SendCustomerMasterDataToGridOperatorTests
     public Task InitializeAsync()
     {
         return Scenario.Details(
-                SampleData.ActorProvidedId,
+                SampleData.TransactionId,
                 SampleData.MeteringPointNumber,
                 SampleData.SupplyStart,
                 SampleData.CurrentEnergySupplierNumber,
@@ -77,7 +77,7 @@ public class SendCustomerMasterDataToGridOperatorTests
     [Fact]
     public async Task Message_is_delivered()
     {
-        await InvokeCommandAsync(new SendCustomerMasterDataToGridOperator(SampleData.ActorProvidedId)).ConfigureAwait(false);
+        await InvokeCommandAsync(new SendCustomerMasterDataToGridOperator(SampleData.TransactionId)).ConfigureAwait(false);
 
         var assertMessage = await AssertOutgoingMessageAsync().ConfigureAwait(false);
         assertMessage.HasReceiverId(SampleData.NumberOfGridOperatorForMeteringPoint);
@@ -102,14 +102,14 @@ public class SendCustomerMasterDataToGridOperatorTests
             .HasMarketEvaluationPointValue($"{nameof(MarketEvaluationPoint.UsagePointLocation)}[0].Type", "D01")
             .HasMarketEvaluationPointValue($"{nameof(MarketEvaluationPoint.UsagePointLocation)}[1].Type", "D04")
             .NotEmpty(nameof(MarketActivityRecord.Id));
-        var transaction = await AssertTransaction.TransactionAsync(SampleData.ActorProvidedId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
+        var transaction = await AssertTransaction.TransactionAsync(SampleData.TransactionId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
         transaction.HasCustomerMasterDataSentToGridOperatorState(MoveInTransaction.MasterDataState.Sent);
     }
 
     private async Task<AssertOutgoingMessage> AssertOutgoingMessageAsync()
     {
         var assertMessage = await Assertions.AssertOutgoingMessage.OutgoingMessageAsync(
-            SampleData.ActorProvidedId,
+            SampleData.TransactionId,
             MessageType.CharacteristicsOfACustomerAtAnAP.Name,
             ProcessType.MoveIn.Code,
             MarketRole.GridOperator,

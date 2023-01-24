@@ -40,7 +40,7 @@ public class NotifyCurrentEnergySupplierHandlerTests
     public Task InitializeAsync()
     {
         return Scenario.Details(
-                SampleData.ActorProvidedId,
+                SampleData.TransactionId,
                 SampleData.MeteringPointNumber,
                 SampleData.SupplyStart,
                 SampleData.CurrentEnergySupplierNumber,
@@ -85,7 +85,7 @@ public class NotifyCurrentEnergySupplierHandlerTests
     private static NotifyCurrentEnergySupplier CreateCommand()
     {
         return new NotifyCurrentEnergySupplier(
-            SampleData.ActorProvidedId,
+            SampleData.TransactionId,
             SampleData.SupplyStart,
             SampleData.MeteringPointNumber,
             SampleData.CurrentEnergySupplierNumber);
@@ -93,12 +93,12 @@ public class NotifyCurrentEnergySupplierHandlerTests
 
     private async Task<AssertOutgoingMessage> AssertMessageAsync(MessageType messageType, string processType)
     {
-        return await AssertOutgoingMessage.OutgoingMessageAsync(SampleData.ActorProvidedId, messageType.Name, processType, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
+        return await AssertOutgoingMessage.OutgoingMessageAsync(SampleData.TransactionId, messageType.Name, processType, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
     }
 
     private async Task<AssertTransaction> AssertTransactionAsync()
     {
         return await MoveIn.AssertTransaction
-            .TransactionAsync(SampleData.ActorProvidedId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
+            .TransactionAsync(SampleData.TransactionId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
     }
 }

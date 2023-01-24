@@ -18,20 +18,20 @@ namespace Messaging.Domain.Transactions;
 
 public class TransactionId : ValueObject
 {
-    private TransactionId(string id)
+    private TransactionId(Guid id)
     {
         Id = id;
     }
 
-    public string Id { get; }
+    public Guid Id { get; }
 
-    public static TransactionId Create(string transactionId)
+    public static TransactionId Create(Guid transactionId)
     {
         return new TransactionId(transactionId);
     }
 
     public static TransactionId New()
     {
-        return new TransactionId(Guid.NewGuid().ToString());
+        return new TransactionId(Guid.NewGuid());
     }
 }

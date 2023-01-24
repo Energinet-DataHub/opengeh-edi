@@ -46,7 +46,7 @@ public class RetrieveAggregationResultTests : TestBase
         await InvokeCommandAsync(new RetrieveAggregationResult(SampleData.ResultId, SampleData.GridAreaCode, transactionId)).ConfigureAwait(false);
 
         var message = await AssertOutgoingMessage.OutgoingMessageAsync(
-                 transactionId.ToString(),
+                 transactionId,
                  MessageType.NotifyAggregatedMeasureData.Name,
                  ProcessType.BalanceFixing.Code,
                  MarketRole.GridOperator,

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Text.Json.Serialization;
 using Messaging.Application.Configuration.Commands.Commands;
 using NodaTime;
@@ -21,7 +22,7 @@ namespace Messaging.Application.Transactions.MoveIn.Notifications;
 public class NotifyCurrentEnergySupplier : InternalCommand
 {
     [JsonConstructor]
-    public NotifyCurrentEnergySupplier(string transactionId, Instant effectiveDate, string marketEvaluationPointId, string energySupplierId)
+    public NotifyCurrentEnergySupplier(Guid transactionId, Instant effectiveDate, string marketEvaluationPointId, string energySupplierId)
     {
         TransactionId = transactionId;
         EffectiveDate = effectiveDate;
@@ -29,7 +30,7 @@ public class NotifyCurrentEnergySupplier : InternalCommand
         EnergySupplierId = energySupplierId;
     }
 
-    public string TransactionId { get; }
+    public Guid TransactionId { get; }
 
     public Instant EffectiveDate { get; }
 

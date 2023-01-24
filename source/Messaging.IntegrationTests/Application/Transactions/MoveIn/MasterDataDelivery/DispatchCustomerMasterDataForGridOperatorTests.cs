@@ -38,7 +38,7 @@ public class DispatchCustomerMasterDataForGridOperatorTests : TestBase, IAsyncLi
     public Task InitializeAsync()
     {
         return Scenario.Details(
-                SampleData.ActorProvidedId,
+                SampleData.TransactionId,
                 SampleData.MeteringPointNumber,
                 SampleData.SupplyStart,
                 SampleData.CurrentEnergySupplierNumber,

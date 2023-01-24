@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Text.Json.Serialization;
 using Messaging.Application.Configuration.Commands.Commands;
 using Messaging.Application.MasterData;
@@ -21,13 +22,13 @@ namespace Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 public class ForwardMeteringPointMasterData : InternalCommand
 {
     [JsonConstructor]
-    public ForwardMeteringPointMasterData(string transactionId, MasterDataContent masterDataContent)
+    public ForwardMeteringPointMasterData(Guid transactionId, MasterDataContent masterDataContent)
     {
         TransactionId = transactionId;
         MasterDataContent = masterDataContent;
     }
 
-    public string TransactionId { get; }
+    public Guid TransactionId { get; }
 
     public MasterDataContent MasterDataContent { get; set; }
 }

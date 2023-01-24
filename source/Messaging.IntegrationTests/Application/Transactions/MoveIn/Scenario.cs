@@ -45,7 +45,7 @@ public class Scenario
     }
 
     public static Scenario Details(
-        string transactionId,
+        Guid transactionId,
         string meteringPointNumber,
         Instant supplyStart,
         string currentEnergySupplierNumber,

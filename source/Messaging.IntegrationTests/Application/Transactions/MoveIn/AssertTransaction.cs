@@ -43,14 +43,14 @@ public class AssertTransaction
         _serializer = serializer;
     }
 
-    public static async Task<AssertTransaction> TransactionAsync(string transactionId, IDatabaseConnectionFactory connectionFactory)
+    public static async Task<AssertTransaction> TransactionAsync(Guid transactionId, IDatabaseConnectionFactory connectionFactory)
     {
         if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
         using var connection = await connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         return new AssertTransaction(GetTransaction(transactionId, connection));
     }
 
-    public static async Task<AssertTransaction> TransactionAsync(string transactionId, IDatabaseConnectionFactory connectionFactory, ISerializer serializer)
+    public static async Task<AssertTransaction> TransactionAsync(Guid transactionId, IDatabaseConnectionFactory connectionFactory, ISerializer serializer)
     {
         if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
         using var connection = await connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
@@ -136,7 +136,7 @@ public class AssertTransaction
         return this;
     }
 
-    private static dynamic? GetTransaction(string transactionId, IDbConnection connection)
+    private static dynamic? GetTransaction(Guid transactionId, IDbConnection connection)
     {
         return connection.QuerySingle(
             $"SELECT * FROM b2b.MoveInTransactions WHERE TransactionId = @TransactionId",

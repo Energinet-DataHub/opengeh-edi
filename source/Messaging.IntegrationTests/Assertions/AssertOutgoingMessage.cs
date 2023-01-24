@@ -33,7 +33,7 @@ namespace Messaging.IntegrationTests.Assertions
             _message = message;
         }
 
-        public static async Task<AssertOutgoingMessage> OutgoingMessageAsync(string transactionId, string messageType, string processType, IDatabaseConnectionFactory connectionFactoryFactory)
+        public static async Task<AssertOutgoingMessage> OutgoingMessageAsync(Guid transactionId, string messageType, string processType, IDatabaseConnectionFactory connectionFactoryFactory)
         {
             if (connectionFactoryFactory == null) throw new ArgumentNullException(nameof(connectionFactoryFactory));
             using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
@@ -47,7 +47,7 @@ namespace Messaging.IntegrationTests.Assertions
             return new AssertOutgoingMessage(message);
         }
 
-        public static async Task<AssertOutgoingMessage> OutgoingMessageAsync(string transactionId, string messageType, string processType, MarketRole receiverRole, IDatabaseConnectionFactory connectionFactoryFactory)
+        public static async Task<AssertOutgoingMessage> OutgoingMessageAsync(Guid transactionId, string messageType, string processType, MarketRole receiverRole, IDatabaseConnectionFactory connectionFactoryFactory)
         {
             if (connectionFactoryFactory == null) throw new ArgumentNullException(nameof(connectionFactoryFactory));
             ArgumentNullException.ThrowIfNull(receiverRole);

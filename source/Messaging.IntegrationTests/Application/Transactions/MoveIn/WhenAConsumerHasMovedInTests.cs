@@ -91,7 +91,7 @@ public class WhenAConsumerHasMovedInTests : TestBase
     private async Task<MoveInTransaction> StartMoveInTransaction()
     {
         var transaction = new MoveInTransaction(
-            TransactionId.Create(SampleData.ActorProvidedId),
+            TransactionId.Create(SampleData.TransactionId),
             ActorProvidedId.Create(SampleData.ActorProvidedId),
             SampleData.MeteringPointNumber,
             SampleData.SupplyStart,
@@ -113,6 +113,6 @@ public class WhenAConsumerHasMovedInTests : TestBase
     private Task<AssertTransaction> AssertTransaction()
     {
         return MoveIn.AssertTransaction
-            .TransactionAsync(SampleData.ActorProvidedId, GetService<IDatabaseConnectionFactory>());
+            .TransactionAsync(SampleData.TransactionId, GetService<IDatabaseConnectionFactory>());
     }
 }

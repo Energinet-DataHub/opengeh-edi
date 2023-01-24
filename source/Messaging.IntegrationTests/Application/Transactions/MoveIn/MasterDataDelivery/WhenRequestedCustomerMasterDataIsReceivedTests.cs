@@ -41,7 +41,7 @@ public class WhenRequestedCustomerMasterDataIsReceivedTests
     public Task InitializeAsync()
     {
         return Scenario.Details(
-                SampleData.ActorProvidedId,
+                SampleData.TransactionId,
                 SampleData.MarketEvaluationPointId,
                 SampleData.SupplyStart,
                 SampleData.CurrentEnergySupplierNumber,
@@ -70,7 +70,7 @@ public class WhenRequestedCustomerMasterDataIsReceivedTests
         var command = CreateCommand();
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
-        var assertTransaction = await AssertTransaction.TransactionAsync(SampleData.ActorProvidedId, GetService<IDatabaseConnectionFactory>(), GetService<ISerializer>()).ConfigureAwait(false);
+        var assertTransaction = await AssertTransaction.TransactionAsync(SampleData.TransactionId, GetService<IDatabaseConnectionFactory>(), GetService<ISerializer>()).ConfigureAwait(false);
         assertTransaction.HasCustomerMasterData(ParseFrom(command.Data));
     }
 
@@ -117,7 +117,7 @@ public class WhenRequestedCustomerMasterDataIsReceivedTests
             SampleData.HasEnergySupplier,
             SampleData.SupplyStart,
             Array.Empty<UsagePointLocation>());
-        return new SetCurrentKnownCustomerMasterData(SampleData.ActorProvidedId, customerMasterData);
+        return new SetCurrentKnownCustomerMasterData(SampleData.TransactionId, customerMasterData);
     }
 
     private static CustomerMasterData ParseFrom(CustomerMasterDataContent data)
@@ -138,7 +138,7 @@ public class WhenRequestedCustomerMasterDataIsReceivedTests
     private async Task<AssertOutgoingMessage> AssertOutgoingMessageAsync()
     {
         var assertMessage = await AssertOutgoingMessage.OutgoingMessageAsync(
-            SampleData.ActorProvidedId,
+            SampleData.TransactionId,
             MessageType.CharacteristicsOfACustomerAtAnAP.Name,
             ProcessType.MoveIn.Code,
             GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);

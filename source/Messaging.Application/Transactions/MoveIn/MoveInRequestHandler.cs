@@ -56,7 +56,7 @@ namespace Messaging.Application.Transactions.MoveIn
                 await _marketEvaluationPointRepository.GetByNumberAsync(request.MarketActivityRecord.MarketEvaluationPointId).ConfigureAwait(false);
 
             var transaction = new MoveInTransaction(
-                TransactionId.Create(request.MarketActivityRecord.Id),
+                TransactionId.New(),
                 ActorProvidedId.Create(request.MarketActivityRecord.Id),
                 request.MarketActivityRecord.MarketEvaluationPointId,
                 InstantPattern.General.Parse(request.MarketActivityRecord.EffectiveDate).GetValueOrThrow(),
