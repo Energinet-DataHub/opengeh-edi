@@ -92,6 +92,7 @@ public class WhenAConsumerHasMovedInTests : TestBase
     {
         var transaction = new MoveInTransaction(
             TransactionId.Create(SampleData.TransactionId),
+            ActorProvidedId.Create(SampleData.TransactionId),
             SampleData.MeteringPointNumber,
             SampleData.SupplyStart,
             SampleData.CurrentEnergySupplierNumber,

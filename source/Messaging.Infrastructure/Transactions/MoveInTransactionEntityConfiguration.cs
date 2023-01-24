@@ -40,6 +40,10 @@ namespace Messaging.Infrastructure.Transactions
                 .HasConversion(
                     toDbValue => toDbValue.Id,
                     fromDbValue => TransactionId.Create(fromDbValue));
+            builder.Property(entity => entity.ActorProvidedId)
+                .HasConversion(
+                    toDbValue => toDbValue.Id,
+                    fromDbValue => ActorProvidedId.Create(fromDbValue));
             builder.Property(x => x.ProcessId);
             builder.Property(x => x.EffectiveDate);
             builder.Property(x => x.MarketEvaluationPointId);
@@ -89,6 +93,7 @@ namespace Messaging.Infrastructure.Transactions
             builder.HasMany<OutgoingMessage>("_messages")
                 .WithOne()
                 .HasForeignKey("TransactionId");
+
             builder.Ignore(x => x.DomainEvents);
         }
     }

@@ -35,7 +35,7 @@ namespace Messaging.Domain.Transactions.MoveIn
         private MasterDataState _customerMasterDataForGridOperatorDeliveryState = MasterDataState.Pending;
         private CustomerMasterData? _customerMasterData;
 
-        public MoveInTransaction(TransactionId transactionId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId, string startedByMessageId, string newEnergySupplierId, string? consumerId, string? consumerName, string? consumerIdType, ActorNumber requestedBy)
+        public MoveInTransaction(TransactionId transactionId, ActorProvidedId actorProvidedId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId, string startedByMessageId, string newEnergySupplierId, string? consumerId, string? consumerName, string? consumerIdType, ActorNumber requestedBy)
         {
             _requestedBy = requestedBy;
             _businessProcessState = BusinessProcessState.Pending;
@@ -43,6 +43,7 @@ namespace Messaging.Domain.Transactions.MoveIn
                 ? NotificationState.Required
                 : NotificationState.NotNeeded;
             TransactionId = transactionId;
+            ActorProvidedId = actorProvidedId;
             MarketEvaluationPointId = marketEvaluationPointId;
             EffectiveDate = effectiveDate;
             CurrentEnergySupplierId = currentEnergySupplierId;
@@ -83,6 +84,8 @@ namespace Messaging.Domain.Transactions.MoveIn
         }
 
         public TransactionId TransactionId { get; }
+
+        public ActorProvidedId ActorProvidedId { get; }
 
         public string? ProcessId { get; private set; }
 

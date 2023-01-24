@@ -73,6 +73,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202227101335 Cleanup enqueued messages.sql" />
     <EmbeddedResource Include="Scripts\Model\202227101350 Alter AggregatedTimeSeriesTransactions table.sql" />
     <EmbeddedResource Include="Scripts\Model\202227101351 Change Id from uniqueidentifier to string.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101352 Add actor provided id.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281100 Seed cleanup.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281101 Insert Reasons.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241100 Consolidated dbo model.sql" />
