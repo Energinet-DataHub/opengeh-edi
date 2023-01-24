@@ -36,21 +36,23 @@ public class ConfirmRequestChangeOfSupplierMessage : OutgoingMessage
     public MarketActivityRecord MarketActivityRecord { get; }
 
     public static OutgoingMessage Create(
-        string transactionId,
+        TransactionId transactionId,
+        ActorProvidedId actorProvidedId,
         ProcessType processType,
         string marketEvaluationPointNumber,
         ActorNumber energySupplierNumber)
     {
         ArgumentNullException.ThrowIfNull(processType);
+        ArgumentNullException.ThrowIfNull(actorProvidedId);
 
         var marketActivityRecord = new MarketActivityRecord(
             Guid.NewGuid().ToString(),
-            transactionId,
+            actorProvidedId.Id,
             marketEvaluationPointNumber);
 
         return new ConfirmRequestChangeOfSupplierMessage(
             energySupplierNumber,
-            TransactionId.Create(transactionId),
+            transactionId,
             processType.Code,
             marketActivityRecord);
     }
