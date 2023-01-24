@@ -36,20 +36,20 @@ public class MoveInNotifications
         _messageRecordParser = messageRecordParser;
     }
 
-    public void InformCurrentEnergySupplierAboutEndOfSupply(string transactionId, Instant effectiveDate, string marketEvaluationPointId, string energySupplierId, MoveInTransaction transaction)
+    public void InformCurrentEnergySupplierAboutEndOfSupply(MoveInTransaction transaction)
     {
         ArgumentNullException.ThrowIfNull(transaction);
 
         var marketActivityRecord = new MarketActivityRecord(
             Guid.NewGuid().ToString(),
             transaction.ActorProvidedId.Id,
-            marketEvaluationPointId,
-            effectiveDate);
+            transaction.MarketEvaluationPointId,
+            transaction.EffectiveDate);
 
         var message = new OutgoingMessage(
             MessageType.GenericNotification,
-            ActorNumber.Create(energySupplierId),
-            TransactionId.Create(transactionId),
+            ActorNumber.Create(transaction.CurrentEnergySupplierId!),
+            transaction.TransactionId,
             BusinessReasonCode.CustomerMoveInOrMoveOut.Code,
             MarketRole.EnergySupplier,
             DataHubDetails.IdentificationNumber,
