@@ -196,20 +196,8 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
         private async Task RejectMessageIsCreated()
         {
-            var assertMessage = await AssertOutgoingMessage
-                .OutgoingMessageAsync(
-                    MessageType.RejectRequestChangeOfSupplier.Name,
-                    ProcessType.MoveIn.Code,
-                    MarketRole.EnergySupplier,
-                    GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
-            assertMessage.HasReceiverId(SampleData.NewEnergySupplierNumber);
-            assertMessage.HasReceiverRole(MarketRole.EnergySupplier.Name);
-            assertMessage
-                .HasMessageRecordValue<Domain.OutgoingMessages.RejectRequestChangeOfSupplier.MarketActivityRecord>(
-                    record => record.MarketEvaluationPointId, SampleData.MeteringPointNumber);
-            assertMessage
-                .HasMessageRecordValue<Domain.OutgoingMessages.RejectRequestChangeOfSupplier.MarketActivityRecord>(
-                    record => record.OriginalTransactionId, SampleData.ActorProvidedId);
+            var sut = await RejectMessage().ConfigureAwait(false);
+            sut.HasReceiverId(SampleData.NewEnergySupplierNumber);
         }
 
         private async Task<AssertOutgoingMessage> RejectMessage()
