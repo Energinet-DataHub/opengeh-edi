@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.OutgoingMessages;
 using Messaging.Application.Transactions.MoveIn;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
