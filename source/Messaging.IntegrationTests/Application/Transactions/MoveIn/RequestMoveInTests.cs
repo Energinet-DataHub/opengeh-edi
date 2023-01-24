@@ -114,8 +114,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
 
-            var rejectMessage = _outgoingMessageStore.GetByTransactionId(SampleData.ActorProvidedId)!;
-            await AssertRejectMessage(rejectMessage).ConfigureAwait(false);
+            await RejectMessageIsCreated().ConfigureAwait(false);
         }
 
         [Fact]
