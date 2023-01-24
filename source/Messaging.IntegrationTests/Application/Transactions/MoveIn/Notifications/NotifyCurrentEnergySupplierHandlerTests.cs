@@ -40,7 +40,7 @@ public class NotifyCurrentEnergySupplierHandlerTests
     public Task InitializeAsync()
     {
         return Scenario.Details(
-                SampleData.TransactionId,
+                SampleData.ActorProvidedId,
                 SampleData.MeteringPointNumber,
                 SampleData.SupplyStart,
                 SampleData.CurrentEnergySupplierNumber,
@@ -78,14 +78,14 @@ public class NotifyCurrentEnergySupplierHandlerTests
             .WithMarketActivityRecord()
             .HasId()
             .HasValidityStart(SampleData.SupplyStart)
-            .HasOriginalTransactionId(SampleData.TransactionId)
+            .HasOriginalTransactionId(SampleData.ActorProvidedId)
             .HasMarketEvaluationPointId(SampleData.MeteringPointNumber);
     }
 
     private static NotifyCurrentEnergySupplier CreateCommand()
     {
         return new NotifyCurrentEnergySupplier(
-            SampleData.TransactionId,
+            SampleData.ActorProvidedId,
             SampleData.SupplyStart,
             SampleData.MeteringPointNumber,
             SampleData.CurrentEnergySupplierNumber);
@@ -93,12 +93,12 @@ public class NotifyCurrentEnergySupplierHandlerTests
 
     private async Task<AssertOutgoingMessage> AssertMessageAsync(MessageType messageType, string processType)
     {
-        return await AssertOutgoingMessage.OutgoingMessageAsync(SampleData.TransactionId, messageType.Name, processType, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
+        return await AssertOutgoingMessage.OutgoingMessageAsync(SampleData.ActorProvidedId, messageType.Name, processType, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
     }
 
     private async Task<AssertTransaction> AssertTransactionAsync()
     {
         return await MoveIn.AssertTransaction
-            .TransactionAsync(SampleData.TransactionId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
+            .TransactionAsync(SampleData.ActorProvidedId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
     }
 }

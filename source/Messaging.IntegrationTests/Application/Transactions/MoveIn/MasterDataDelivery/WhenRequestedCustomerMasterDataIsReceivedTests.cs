@@ -41,7 +41,7 @@ public class WhenRequestedCustomerMasterDataIsReceivedTests
     public Task InitializeAsync()
     {
         return Scenario.Details(
-                SampleData.TransactionId,
+                SampleData.ActorProvidedId,
                 SampleData.MarketEvaluationPointId,
                 SampleData.SupplyStart,
                 SampleData.CurrentEnergySupplierNumber,
@@ -70,7 +70,7 @@ public class WhenRequestedCustomerMasterDataIsReceivedTests
         var command = CreateCommand();
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
-        var assertTransaction = await AssertTransaction.TransactionAsync(SampleData.TransactionId, GetService<IDatabaseConnectionFactory>(), GetService<ISerializer>()).ConfigureAwait(false);
+        var assertTransaction = await AssertTransaction.TransactionAsync(SampleData.ActorProvidedId, GetService<IDatabaseConnectionFactory>(), GetService<ISerializer>()).ConfigureAwait(false);
         assertTransaction.HasCustomerMasterData(ParseFrom(command.Data));
     }
 
@@ -86,7 +86,7 @@ public class WhenRequestedCustomerMasterDataIsReceivedTests
         assertMessage.HasSenderId(DataHubDetails.IdentificationNumber.Value);
         assertMessage.HasSenderRole(MarketRole.MeteringPointAdministrator.ToString());
         assertMessage.WithMarketActivityRecord()
-            .HasOriginalTransactionId(SampleData.TransactionId)
+            .HasOriginalTransactionId(SampleData.ActorProvidedId)
             .HasValidityStart(SampleData.SupplyStart)
             .HasMarketEvaluationPointValue(nameof(MarketEvaluationPoint.MarketEvaluationPointId), SampleData.MeteringPointNumber)
             .HasMarketEvaluationPointDateValue(nameof(MarketEvaluationPoint.SupplyStart), SampleData.SupplyStart)
@@ -117,7 +117,7 @@ public class WhenRequestedCustomerMasterDataIsReceivedTests
             SampleData.HasEnergySupplier,
             SampleData.SupplyStart,
             Array.Empty<UsagePointLocation>());
-        return new SetCurrentKnownCustomerMasterData(SampleData.TransactionId, customerMasterData);
+        return new SetCurrentKnownCustomerMasterData(SampleData.ActorProvidedId, customerMasterData);
     }
 
     private static CustomerMasterData ParseFrom(CustomerMasterDataContent data)
@@ -138,7 +138,7 @@ public class WhenRequestedCustomerMasterDataIsReceivedTests
     private async Task<AssertOutgoingMessage> AssertOutgoingMessageAsync()
     {
         var assertMessage = await AssertOutgoingMessage.OutgoingMessageAsync(
-            SampleData.TransactionId,
+            SampleData.ActorProvidedId,
             MessageType.CharacteristicsOfACustomerAtAnAP.Name,
             ProcessType.MoveIn.Code,
             GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);

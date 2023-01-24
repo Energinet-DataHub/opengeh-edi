@@ -18,6 +18,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
+using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Application.OutgoingMessages.Peek;
@@ -25,6 +26,7 @@ using Messaging.Application.Transactions.MoveIn;
 using Messaging.Application.Xml;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
+using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Domain.OutgoingMessages.Peek;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.InternalCommands;
@@ -59,7 +61,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
 
-            var assertTransaction = await AssertTransaction.TransactionAsync(SampleData.TransactionId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
+            var assertTransaction = await AssertTransaction.TransactionAsync(SampleData.ActorProvidedId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
             assertTransaction.HasState(MoveInTransaction.State.Started)
                 .HasStartedByMessageId(incomingMessage.Message.MessageId)
                 .HasNewEnergySupplierId(incomingMessage.Message.SenderId)
@@ -77,9 +79,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
         {
             await GivenRequestHasBeenAccepted().ConfigureAwait(false);
 
-            var confirmMessage = _outgoingMessageStore.GetByTransactionId(SampleData.TransactionId)!;
-
-            await AsserConfirmMessage(confirmMessage).ConfigureAwait(false);
+            await ConfirmMessageIsCreated().ConfigureAwait(false);
         }
 
         [Fact]
@@ -112,7 +112,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
                 .Build();
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
-            var rejectMessage = _outgoingMessageStore.GetByTransactionId(SampleData.TransactionId)!;
+            var rejectMessage = _outgoingMessageStore.GetByTransactionId(SampleData.ActorProvidedId)!;
 
             await AssertRejectMessage(rejectMessage).ConfigureAwait(false);
         }
@@ -128,7 +128,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
                 .Build();
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
-            var rejectMessage = _outgoingMessageStore.GetByTransactionId(SampleData.TransactionId)!;
+            var rejectMessage = _outgoingMessageStore.GetByTransactionId(SampleData.ActorProvidedId)!;
 
             await AssertRejectMessage(rejectMessage).ConfigureAwait(false);
         }
@@ -145,7 +145,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
                 .Build();
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
-            var rejectMessage = _outgoingMessageStore.GetByTransactionId(SampleData.TransactionId)!;
+            var rejectMessage = _outgoingMessageStore.GetByTransactionId(SampleData.ActorProvidedId)!;
 
             await AssertRejectMessage(rejectMessage).ConfigureAwait(false);
         }
@@ -177,7 +177,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             return new IncomingMessageBuilder()
                 .WithEnergySupplierId(SampleData.NewEnergySupplierNumber)
                 .WithMessageId(SampleData.OriginalMessageId)
-                .WithTransactionId(SampleData.TransactionId);
+                .WithTransactionId(SampleData.ActorProvidedId);
         }
 
         private async Task GivenRequestHasBeenAccepted()
@@ -187,6 +187,7 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
                 .WithReceiver(SampleData.ReceiverId)
                 .WithSenderId(SampleData.SenderId)
                 .WithConsumerName(SampleData.ConsumerName)
+                .WithMarketEvaluationPointId(SampleData.MeteringPointNumber)
                 .Build();
 
             await InvokeCommandAsync(incomingMessage).ConfigureAwait(false);
@@ -227,6 +228,34 @@ namespace Messaging.IntegrationTests.Application.Transactions.MoveIn
             return AssertQueuedCommand.QueuedCommand<TCommand>(
                 GetService<IDatabaseConnectionFactory>(),
                 GetService<InternalCommandMapper>());
+        }
+
+        private async Task ConfirmMessageIsCreated()
+        {
+            var currentTransactionId = await GetTransactionIdAsync().ConfigureAwait(false);
+            var assertMessage = await AssertOutgoingMessage.OutgoingMessageAsync(
+                    currentTransactionId.ToString(),
+                    MessageType.ConfirmRequestChangeOfSupplier.Name,
+                    ProcessType.MoveIn.Code,
+                    MarketRole.EnergySupplier,
+                    GetService<IDatabaseConnectionFactory>())
+                .ConfigureAwait(false);
+
+            assertMessage.HasReceiverId(SampleData.NewEnergySupplierNumber);
+            assertMessage.HasReceiverRole(MarketRole.EnergySupplier.Name);
+            assertMessage.HasMessageRecordValue<MarketActivityRecord>(
+                record => record.OriginalTransactionId,
+                SampleData.ActorProvidedId);
+            assertMessage.HasMessageRecordValue<MarketActivityRecord>(
+                record => record.MarketEvaluationPointId,
+                SampleData.MeteringPointNumber);
+        }
+
+        private async Task<Guid> GetTransactionIdAsync()
+        {
+            using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
+            return await connection
+                .QueryFirstAsync<Guid>("SELECT TOP(1) CAST(TransactionId AS uniqueidentifier) FROM b2b.MoveInTransactions").ConfigureAwait(false);
         }
     }
 }

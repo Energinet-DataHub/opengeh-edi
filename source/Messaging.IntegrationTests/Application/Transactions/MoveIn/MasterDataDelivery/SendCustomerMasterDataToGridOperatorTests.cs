@@ -40,7 +40,7 @@ public class SendCustomerMasterDataToGridOperatorTests
     public Task InitializeAsync()
     {
         return Scenario.Details(
-                SampleData.TransactionId,
+                SampleData.ActorProvidedId,
                 SampleData.MeteringPointNumber,
                 SampleData.SupplyStart,
                 SampleData.CurrentEnergySupplierNumber,
@@ -77,7 +77,7 @@ public class SendCustomerMasterDataToGridOperatorTests
     [Fact]
     public async Task Message_is_delivered()
     {
-        await InvokeCommandAsync(new SendCustomerMasterDataToGridOperator(SampleData.TransactionId)).ConfigureAwait(false);
+        await InvokeCommandAsync(new SendCustomerMasterDataToGridOperator(SampleData.ActorProvidedId)).ConfigureAwait(false);
 
         var assertMessage = await AssertOutgoingMessageAsync().ConfigureAwait(false);
         assertMessage.HasReceiverId(SampleData.NumberOfGridOperatorForMeteringPoint);
@@ -85,7 +85,7 @@ public class SendCustomerMasterDataToGridOperatorTests
         assertMessage.HasSenderId(DataHubDetails.IdentificationNumber.Value);
         assertMessage.HasSenderRole(MarketRole.MeteringPointAdministrator.ToString());
         assertMessage.WithMarketActivityRecord()
-            .HasOriginalTransactionId(SampleData.TransactionId)
+            .HasOriginalTransactionId(SampleData.ActorProvidedId)
             .HasValidityStart(SampleData.SupplyStart)
             .HasMarketEvaluationPointValue(nameof(MarketEvaluationPoint.MarketEvaluationPointId), SampleData.MeteringPointNumber)
             .HasMarketEvaluationPointDateValue(nameof(MarketEvaluationPoint.SupplyStart), SampleData.SupplyStart)
@@ -102,14 +102,14 @@ public class SendCustomerMasterDataToGridOperatorTests
             .HasMarketEvaluationPointValue($"{nameof(MarketEvaluationPoint.UsagePointLocation)}[0].Type", "D01")
             .HasMarketEvaluationPointValue($"{nameof(MarketEvaluationPoint.UsagePointLocation)}[1].Type", "D04")
             .NotEmpty(nameof(MarketActivityRecord.Id));
-        var transaction = await AssertTransaction.TransactionAsync(SampleData.TransactionId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
+        var transaction = await AssertTransaction.TransactionAsync(SampleData.ActorProvidedId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
         transaction.HasCustomerMasterDataSentToGridOperatorState(MoveInTransaction.MasterDataState.Sent);
     }
 
     private async Task<AssertOutgoingMessage> AssertOutgoingMessageAsync()
     {
         var assertMessage = await Assertions.AssertOutgoingMessage.OutgoingMessageAsync(
-            SampleData.TransactionId,
+            SampleData.ActorProvidedId,
             MessageType.CharacteristicsOfACustomerAtAnAP.Name,
             ProcessType.MoveIn.Code,
             MarketRole.GridOperator,
