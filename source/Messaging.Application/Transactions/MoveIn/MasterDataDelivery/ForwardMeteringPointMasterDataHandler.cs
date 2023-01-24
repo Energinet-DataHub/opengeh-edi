@@ -53,7 +53,7 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
     public async Task<Unit> Handle(ForwardMeteringPointMasterData request, CancellationToken cancellationToken)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
-        var transaction = _transactionRepository.GetById(request.TransactionId);
+        var transaction = _transactionRepository.GetById(TransactionId.Create(request.TransactionId));
         if (transaction is null)
         {
             throw new MoveInException($"Could not find move in transaction '{request.TransactionId}'");

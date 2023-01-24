@@ -36,12 +36,12 @@ namespace Messaging.Infrastructure.Transactions.MoveIn
             _b2BContext.Transactions.Add(moveInTransaction);
         }
 
-        public MoveInTransaction? GetById(string transactionId)
+        public MoveInTransaction? GetById(TransactionId transactionId)
         {
             return _b2BContext
                 .Transactions
                 .Include("_messages")
-                .FirstOrDefault(transaction => transaction.TransactionId == TransactionId.Create(transactionId));
+                .FirstOrDefault(transaction => transaction.TransactionId == transactionId);
         }
 
         public Task<MoveInTransaction?> GetByProcessIdAsync(string processId)

@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.MasterData;
+using Messaging.Domain.Transactions;
 using Messaging.Domain.Transactions.MoveIn;
 
 namespace Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
@@ -33,7 +34,7 @@ public class SetCurrentKnownCustomerMasterDataHandler : IRequestHandler<SetCurre
     public Task<Unit> Handle(SetCurrentKnownCustomerMasterData request, CancellationToken cancellationToken)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
-        var transaction = _transactionRepository.GetById(request.TransactionId);
+        var transaction = _transactionRepository.GetById(TransactionId.Create(request.TransactionId));
         if (transaction is null)
         {
             throw TransactionNotFoundException.TransactionIdNotFound(request.TransactionId);
