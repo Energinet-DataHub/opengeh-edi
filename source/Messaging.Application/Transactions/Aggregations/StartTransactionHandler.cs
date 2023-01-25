@@ -23,6 +23,7 @@ using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions;
 using Messaging.Domain.Transactions.Aggregations;
+using NodaTime;
 
 namespace Messaging.Application.Transactions.Aggregations;
 
@@ -59,21 +60,29 @@ public class StartTransactionHandler : IRequestHandler<StartTransaction, Unit>
 
 public class StartTransaction : InternalCommand
 {
-    public StartTransaction(string gridAreaCode, Guid resultId)
+    public StartTransaction(string gridAreaCode, Guid resultId, Instant periodStart, Instant periodEnd)
     {
         GridAreaCode = gridAreaCode;
         ResultId = resultId;
+        PeriodStart = periodStart;
+        PeriodEnd = periodEnd;
     }
 
     [JsonConstructor]
-    public StartTransaction(Guid id, string gridAreaCode, Guid resultId)
+    public StartTransaction(Guid id, string gridAreaCode, Guid resultId, Instant periodStart, Instant periodEnd)
         : base(id)
     {
         GridAreaCode = gridAreaCode;
         ResultId = resultId;
+        PeriodStart = periodStart;
+        PeriodEnd = periodEnd;
     }
 
     public string GridAreaCode { get; }
 
     public Guid ResultId { get; }
+
+    public Instant PeriodStart { get; }
+
+    public Instant PeriodEnd { get; }
 }
