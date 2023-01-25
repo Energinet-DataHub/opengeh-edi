@@ -40,6 +40,9 @@ namespace Messaging.IntegrationTests
     [Collection("IntegrationTest")]
     public class TestBase : IDisposable
     {
+        private readonly AggregationResultsStub _aggregationResultsStub;
+        private readonly ServiceBusSenderFactoryStub _serviceBusSenderFactoryStub;
+        private readonly HttpClientSpy _httpClientSpy;
         private readonly DatabaseFixture _databaseFixture;
         private ServiceCollection? _services;
         private IServiceProvider? _serviceProvider;
@@ -49,12 +52,15 @@ namespace Messaging.IntegrationTests
         {
             _databaseFixture = databaseFixture;
             _databaseFixture.CleanupDatabase();
-
+            _httpClientSpy = new HttpClientSpy();
+            _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
+            _aggregationResultsStub = new AggregationResultsStub();
             BuildServices();
         }
 
         public Task InvokeCommandAsync(object command)
         {
+            BuildServices();
             return GetService<IMediator>().Send(command);
         }
 
@@ -77,12 +83,14 @@ namespace Messaging.IntegrationTests
                 return;
             }
 
+            _serviceBusSenderFactoryStub?.Dispose();
             ((ServiceProvider)_serviceProvider!).Dispose();
             _disposed = true;
         }
 
         protected Task<TResult> InvokeCommandAsync<TResult>(ICommand<TResult> command)
         {
+            BuildServices();
             return GetService<IMediator>().Send(command);
         }
 
@@ -106,13 +114,13 @@ namespace Messaging.IntegrationTests
             _services = new ServiceCollection();
 
             _services.AddSingleton(new EnergySupplyingServiceBusClientConfiguration("Fake"));
-            _services.AddSingleton<IServiceBusSenderFactory, ServiceBusSenderFactoryStub>();
+            _services.AddSingleton<IServiceBusSenderFactory>(_serviceBusSenderFactoryStub);
 
             _services.AddSingleton(
                 _ => new ServiceBusClient(CreateFakeServiceBusConnectionString()));
             CompositionRoot.Initialize(_services)
                 .AddAuthentication()
-                .AddAggregationsConfiguration(_ => new AggregationResultsStub())
+                .AddAggregationsConfiguration(_ => _aggregationResultsStub)
                 .AddPeekConfiguration(
                     new BundleConfigurationStub(),
                     sp => new BundledMessagesStub(
@@ -131,7 +139,7 @@ namespace Messaging.IntegrationTests
                 })
                 .AddMessagePublishing()
                 .AddRequestHandler<TestCommandHandler>()
-                .AddHttpClientAdapter(_ => new HttpClientSpy())
+                .AddHttpClientAdapter(_ => _httpClientSpy)
                 .AddMoveInServices(
                     new MoveInSettings(
                         new MessageDelivery(new GridOperator() { GracePeriodInDaysAfterEffectiveDateIfNotUpdated = 1, }),
