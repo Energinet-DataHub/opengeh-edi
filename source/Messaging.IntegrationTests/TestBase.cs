@@ -43,15 +43,14 @@ namespace Messaging.IntegrationTests
         private readonly AggregationResultsStub _aggregationResultsStub;
         private readonly ServiceBusSenderFactoryStub _serviceBusSenderFactoryStub;
         private readonly HttpClientSpy _httpClientSpy;
-        private readonly DatabaseFixture _databaseFixture;
         private ServiceCollection? _services;
         private IServiceProvider? _serviceProvider;
         private bool _disposed;
 
         protected TestBase(DatabaseFixture databaseFixture)
         {
-            _databaseFixture = databaseFixture;
-            _databaseFixture.CleanupDatabase();
+            ArgumentNullException.ThrowIfNull(databaseFixture);
+            databaseFixture.CleanupDatabase();
             _httpClientSpy = new HttpClientSpy();
             _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
             _aggregationResultsStub = new AggregationResultsStub();
