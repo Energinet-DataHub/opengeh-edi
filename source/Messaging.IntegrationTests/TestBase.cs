@@ -81,13 +81,6 @@ namespace Messaging.IntegrationTests
             _disposed = true;
         }
 
-        protected void RegisterInstance<TService>(TService instance)
-        where TService : class
-        {
-            _services!.AddScoped(_ => instance);
-            _serviceProvider = _services!.BuildServiceProvider();
-        }
-
         protected Task<TResult> InvokeCommandAsync<TResult>(ICommand<TResult> command)
         {
             return GetService<IMediator>().Send(command);
