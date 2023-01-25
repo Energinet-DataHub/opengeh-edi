@@ -57,12 +57,6 @@ namespace Messaging.IntegrationTests
             BuildServices();
         }
 
-        public Task InvokeCommandAsync(object command)
-        {
-            BuildServices();
-            return GetService<IMediator>().Send(command);
-        }
-
         public void Dispose()
         {
             Dispose(true);
