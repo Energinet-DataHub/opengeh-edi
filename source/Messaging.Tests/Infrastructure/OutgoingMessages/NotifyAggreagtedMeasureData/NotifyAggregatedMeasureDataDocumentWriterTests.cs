@@ -27,6 +27,7 @@ using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.IncomingMessages.SchemaStore;
 using Messaging.Infrastructure.OutgoingMessages.Common;
 using Messaging.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
+using Messaging.Tests.Factories;
 using Messaging.Tests.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
 using Messaging.Tests.Infrastructure.OutgoingMessages.Asserts;
 using NodaTime;
@@ -70,7 +71,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
                 "E18",
                 "KWH",
                 "PT1H",
-                new Period(SystemClock.Instance.GetCurrentInstant(), SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(1))),
+                new Period(EffectiveDateFactory.InstantAsOfToday(), EffectiveDateFactory.OffsetDaysFromToday(1)),
                 new List<Point>()
                 {
                     new(1, 11, "A05", "2022-02-12T23:00Z"),
@@ -97,8 +98,8 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             .HasValue("Series[1]/marketEvaluationPoint.type", timeSeries[0].MeteringPointType)
             .HasValue("Series[1]/quantity_Measure_Unit.name", timeSeries[0].MeasureUnitType)
             .HasValue("Series[1]/Period/resolution", timeSeries[0].Resolution)
-            .HasValue("Series[1]/Period/timeInterval/start", timeSeries[0].Point[0].SampleTime)
-            .HasValue("Series[1]/Period/timeInterval/end", timeSeries[0].Point[^1].SampleTime)
+            .HasValue("Series[1]/Period/timeInterval/start", timeSeries[0].Period.Start.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture))
+            .HasValue("Series[1]/Period/timeInterval/end", timeSeries[0].Period.End.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture))
             .HasValue("Series[1]/Period/Point[1]/position", timeSeries[0].Point[0].Position.ToString(NumberFormatInfo.InvariantInfo))
             .HasValue("Series[1]/Period/Point[1]/quantity", timeSeries[0].Point[0].Quantity.ToString()!)
             .HasValue("Series[1]/Period/Point[1]/quality", timeSeries[0].Point[0].Quality!)

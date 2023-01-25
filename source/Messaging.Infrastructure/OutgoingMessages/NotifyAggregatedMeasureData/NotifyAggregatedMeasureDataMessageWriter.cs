@@ -64,12 +64,9 @@ public class NotifyAggregatedMeasureDataMessageWriter : MessageWriter
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "timeInterval", null).ConfigureAwait(false);
 
-            // await writer.WriteElementStringAsync(DocumentDetails.Prefix, "start", null, timeSeries.Period.Start.ToString()).ConfigureAwait(false);
-            // await writer.WriteElementStringAsync(DocumentDetails.Prefix, "end", null, timeSeries.Period.End.ToString()).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "start", null, CalculatePeriodStartTime(timeSeries)).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "end", null, CalculatePeriodEndTime(timeSeries)).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "start", null, timeSeries.Period.Start.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture)).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "end", null, timeSeries.Period.End.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture)).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
-
             foreach (var point in timeSeries.Point)
             {
                 await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Point", null).ConfigureAwait(false);
