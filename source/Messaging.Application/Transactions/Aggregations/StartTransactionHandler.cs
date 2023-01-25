@@ -24,6 +24,7 @@ using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions;
 using Messaging.Domain.Transactions.Aggregations;
 using NodaTime;
+using Period = Messaging.Domain.Transactions.Aggregations.Period;
 
 namespace Messaging.Application.Transactions.Aggregations;
 
@@ -45,11 +46,13 @@ public class StartTransactionHandler : IRequestHandler<StartTransaction, Unit>
         ArgumentNullException.ThrowIfNull(request);
 
         var gridOperatorNumber = await _gridAreaLookup.GetGridOperatorForAsync(request.GridAreaCode).ConfigureAwait(false);
+
         var transaction = new AggregationResultForwarding(
             TransactionId.New(),
             gridOperatorNumber,
             MarketRole.GridOperator,
-            ProcessType.BalanceFixing);
+            ProcessType.BalanceFixing,
+            new Period(request.PeriodStart, request.PeriodEnd));
 
         _transactions.Add(transaction);
         await _commandScheduler.EnqueueAsync(new RetrieveAggregationResult(request.ResultId, request.GridAreaCode, transaction.Id.Id)).ConfigureAwait(false);
