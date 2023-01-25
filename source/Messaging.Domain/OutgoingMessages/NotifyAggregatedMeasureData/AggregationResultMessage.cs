@@ -43,6 +43,7 @@ public class AggregationResultMessage : OutgoingMessage
         Period period,
         AggregationResult result)
     {
+        ArgumentNullException.ThrowIfNull(period);
         ArgumentNullException.ThrowIfNull(transactionId);
         ArgumentNullException.ThrowIfNull(processType);
         ArgumentNullException.ThrowIfNull(result);
