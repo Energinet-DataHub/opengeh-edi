@@ -49,6 +49,8 @@ public class WhenAggregationOfTotalProductionIsCompletedTests : TestBase
         Assert.Equal(MarketRole.GridOperator, EnumerationType.FromName<MarketRole>(transaction.ReceivingActorRole));
         Assert.Equal(ProcessType.BalanceFixing, EnumerationType.FromName<ProcessType>(transaction.ProcessType));
         Assert.Equal(gridOperatorNumber.Value, transaction.ReceivingActor);
+        Assert.Equal(SampleData.StartOfPeriod.ToDateTimeUtc(), transaction.PeriodStart);
+        Assert.Equal(SampleData.EndOfPeriod.ToDateTimeUtc(), transaction.PeriodEnd);
     }
 
     [Fact]
