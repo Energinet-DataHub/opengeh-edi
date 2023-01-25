@@ -48,6 +48,14 @@ internal class AggregationResultForwardingEntityConfiguration : IEntityTypeConfi
         builder.Property<MarketRole>("_receivingActorRole")
             .HasColumnName("ReceivingActorRole")
             .HasConversion(toDbValue => toDbValue.Name, fromDbValue => EnumerationType.FromName<MarketRole>(fromDbValue));
+        builder.OwnsOne<Period>("_period", x =>
+        {
+            x.Property(entity => entity.Start)
+                .HasColumnName("PeriodStart");
+            x.Property(entity => entity.End)
+                .HasColumnName("PeriodEnd");
+        });
+
         builder.HasMany<OutgoingMessage>("_messages")
             .WithOne()
             .HasForeignKey("TransactionId");

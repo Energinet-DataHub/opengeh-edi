@@ -29,7 +29,7 @@ public class AggregationResultForwarding : Entity
 
     private readonly ProcessType _processType;
 
-    private readonly Period _period;
+    private readonly Period _period = default!;
 
     public AggregationResultForwarding(
         TransactionId id,
@@ -42,6 +42,18 @@ public class AggregationResultForwarding : Entity
         _receivingActorRole = receivingActorRole;
         _processType = processType;
         _period = period;
+        Id = id;
+    }
+
+    private AggregationResultForwarding(
+        TransactionId id,
+        ActorNumber receivingActor,
+        MarketRole receivingActorRole,
+        ProcessType processType)
+    {
+        _receivingActor = receivingActor;
+        _receivingActorRole = receivingActorRole;
+        _processType = processType;
         Id = id;
     }
 
