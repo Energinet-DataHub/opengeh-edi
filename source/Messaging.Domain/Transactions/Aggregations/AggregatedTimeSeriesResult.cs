@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using NodaTime;
 
 namespace Messaging.Domain.Transactions.Aggregations;
 

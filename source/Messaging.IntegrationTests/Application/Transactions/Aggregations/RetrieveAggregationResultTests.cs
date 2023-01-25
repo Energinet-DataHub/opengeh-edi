@@ -94,6 +94,6 @@ public class RetrieveAggregationResultTests : TestBase
 
     private async Task TransactionHasBeenStarted()
     {
-        await InvokeCommandAsync(new StartTransaction(SampleData.GridAreaCode, SampleData.ResultId));
+        await InvokeCommandAsync(new StartTransaction(SampleData.GridAreaCode, SampleData.ResultId, SampleData.StartOfPeriod, SampleData.EndOfPeriod));
     }
 }

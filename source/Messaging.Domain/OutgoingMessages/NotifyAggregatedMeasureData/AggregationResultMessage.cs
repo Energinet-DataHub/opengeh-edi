@@ -35,8 +35,15 @@ public class AggregationResultMessage : OutgoingMessage
 
     public TimeSeries Series { get; }
 
-    public static AggregationResultMessage Create(ActorNumber receiverNumber, MarketRole receiverRole, TransactionId transactionId, ProcessType processType, AggregationResult result)
+    public static AggregationResultMessage Create(
+        ActorNumber receiverNumber,
+        MarketRole receiverRole,
+        TransactionId transactionId,
+        ProcessType processType,
+        Period period,
+        AggregationResult result)
     {
+        ArgumentNullException.ThrowIfNull(period);
         ArgumentNullException.ThrowIfNull(transactionId);
         ArgumentNullException.ThrowIfNull(processType);
         ArgumentNullException.ThrowIfNull(result);
@@ -47,6 +54,7 @@ public class AggregationResultMessage : OutgoingMessage
             result.MeteringPointType,
             result.MeasureUnitType,
             result.Resolution,
+            period,
             result.Points.Select(p => new Point(p.Position, p.Quantity, p.Quality, p.SampleTime)).ToList());
 
         return new AggregationResultMessage(
@@ -58,6 +66,7 @@ public class AggregationResultMessage : OutgoingMessage
     }
 }
 
-public record TimeSeries(Guid TransactionId, string GridAreaCode, string MeteringPointType, string MeasureUnitType, string Resolution, IReadOnlyList<Point> Point);
+public record TimeSeries(Guid TransactionId, string GridAreaCode, string MeteringPointType, string MeasureUnitType,
+    string Resolution, Period Period, IReadOnlyList<Point> Point);
 
 public record Point(int Position, decimal? Quantity, string? Quality, string SampleTime);
