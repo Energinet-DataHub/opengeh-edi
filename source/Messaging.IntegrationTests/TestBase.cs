@@ -76,7 +76,7 @@ namespace Messaging.IntegrationTests
                 return;
             }
 
-            _serviceBusSenderFactoryStub?.Dispose();
+            _serviceBusSenderFactoryStub.Dispose();
             ((ServiceProvider)_serviceProvider!).Dispose();
             _disposed = true;
         }
