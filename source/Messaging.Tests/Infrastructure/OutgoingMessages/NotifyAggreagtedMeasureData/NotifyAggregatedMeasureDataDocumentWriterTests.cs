@@ -22,13 +22,19 @@ using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Messaging.Domain.Transactions.Aggregations;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.IncomingMessages.SchemaStore;
 using Messaging.Infrastructure.OutgoingMessages.Common;
 using Messaging.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
+using Messaging.Tests.Factories;
+using Messaging.Tests.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
 using Messaging.Tests.Infrastructure.OutgoingMessages.Asserts;
 using NodaTime;
+using NodaTime.Extensions;
+using NodaTime.Text;
 using Xunit;
+using Period = Messaging.Domain.Transactions.Aggregations.Period;
 
 namespace Messaging.Tests.Infrastructure.OutgoingMessages.NotifyAggreagtedMeasureData;
 
@@ -66,6 +72,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
                 "E18",
                 "KWH",
                 "PT1H",
+                new Period(InstantPattern.General.Parse("2022-02-12T23:00:00Z").Value, InstantPattern.General.Parse("2022-02-13T23:00:00Z").Value),
                 new List<Point>()
                 {
                     new(1, 11, "A05", "2022-02-12T23:00Z"),
@@ -92,8 +99,8 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             .HasValue("Series[1]/marketEvaluationPoint.type", timeSeries[0].MeteringPointType)
             .HasValue("Series[1]/quantity_Measure_Unit.name", timeSeries[0].MeasureUnitType)
             .HasValue("Series[1]/Period/resolution", timeSeries[0].Resolution)
-            .HasValue("Series[1]/Period/timeInterval/start", timeSeries[0].Point[0].SampleTime)
-            .HasValue("Series[1]/Period/timeInterval/end", timeSeries[0].Point[^1].SampleTime)
+            .HasValue("Series[1]/Period/timeInterval/start", "2022-02-12T23:00Z")
+            .HasValue("Series[1]/Period/timeInterval/end", "2022-02-13T23:00Z")
             .HasValue("Series[1]/Period/Point[1]/position", timeSeries[0].Point[0].Position.ToString(NumberFormatInfo.InvariantInfo))
             .HasValue("Series[1]/Period/Point[1]/quantity", timeSeries[0].Point[0].Quantity.ToString()!)
             .HasValue("Series[1]/Period/Point[1]/quality", timeSeries[0].Point[0].Quality!)
