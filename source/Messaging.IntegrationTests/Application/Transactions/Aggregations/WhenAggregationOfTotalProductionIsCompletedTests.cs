@@ -23,6 +23,7 @@ using Messaging.Domain.SeedWork;
 using Messaging.Infrastructure.Configuration.InternalCommands;
 using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
+using NodaTime;
 using Xunit;
 
 namespace Messaging.IntegrationTests.Application.Transactions.Aggregations;
@@ -60,6 +61,6 @@ public class WhenAggregationOfTotalProductionIsCompletedTests : TestBase
 
     private async Task StartTransaction()
     {
-        await InvokeCommandAsync(new StartTransaction(SampleData.GridAreaCode, SampleData.ResultId));
+        await InvokeCommandAsync(new StartTransaction(SampleData.GridAreaCode, SampleData.ResultId, SampleData.StartOfPeriod, SampleData.EndOfPeriod));
     }
 }
