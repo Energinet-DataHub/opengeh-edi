@@ -22,6 +22,7 @@ using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Application.OutgoingMessages.Common.Xml;
 using Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Messaging.Infrastructure.OutgoingMessages.Common.Xml;
+using NodaTime;
 
 namespace Messaging.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 
@@ -64,8 +65,8 @@ public class NotifyAggregatedMeasureDataMessageWriter : MessageWriter
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "timeInterval", null).ConfigureAwait(false);
 
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "start", null, timeSeries.Period.Start.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture)).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "end", null, timeSeries.Period.End.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture)).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "start", null, ParsePeriodDateFrom(timeSeries.Period.Start)).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "end", null, ParsePeriodDateFrom(timeSeries.Period.End)).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
             foreach (var point in timeSeries.Point)
             {
@@ -89,13 +90,8 @@ public class NotifyAggregatedMeasureDataMessageWriter : MessageWriter
         }
     }
 
-    private static string CalculatePeriodEndTime(TimeSeries timeSeries)
+    private static string ParsePeriodDateFrom(Instant instant)
     {
-        return timeSeries.Point[^1].SampleTime;
-    }
-
-    private static string CalculatePeriodStartTime(TimeSeries timeSeries)
-    {
-        return timeSeries.Point[0].SampleTime;
+        return instant.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture);
     }
 }
