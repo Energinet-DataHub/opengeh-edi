@@ -22,13 +22,17 @@ using Messaging.Application.OutgoingMessages.Common;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Messaging.Domain.Transactions.Aggregations;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Messaging.Infrastructure.IncomingMessages.SchemaStore;
 using Messaging.Infrastructure.OutgoingMessages.Common;
 using Messaging.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
+using Messaging.Tests.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
 using Messaging.Tests.Infrastructure.OutgoingMessages.Asserts;
 using NodaTime;
+using NodaTime.Extensions;
 using Xunit;
+using Period = Messaging.Domain.Transactions.Aggregations.Period;
 
 namespace Messaging.Tests.Infrastructure.OutgoingMessages.NotifyAggreagtedMeasureData;
 
@@ -66,6 +70,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
                 "E18",
                 "KWH",
                 "PT1H",
+                new Period(SystemClock.Instance.GetCurrentInstant(), SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(1))),
                 new List<Point>()
                 {
                     new(1, 11, "A05", "2022-02-12T23:00Z"),
