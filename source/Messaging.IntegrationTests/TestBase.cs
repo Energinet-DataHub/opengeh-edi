@@ -40,9 +40,9 @@ namespace Messaging.IntegrationTests
     [Collection("IntegrationTest")]
     public class TestBase : IDisposable
     {
-        private readonly ServiceCollection _services;
         private readonly DatabaseFixture _databaseFixture;
-        private IServiceProvider _serviceProvider;
+        private ServiceCollection? _services;
+        private IServiceProvider? _serviceProvider;
         private bool _disposed;
 
         protected TestBase(DatabaseFixture databaseFixture)
@@ -50,37 +50,7 @@ namespace Messaging.IntegrationTests
             _databaseFixture = databaseFixture;
             _databaseFixture.CleanupDatabase();
 
-            Environment.SetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE", "true");
-            _services = new ServiceCollection();
-
-            _services.AddSingleton(new EnergySupplyingServiceBusClientConfiguration("Fake"));
-            _services.AddSingleton<IServiceBusSenderFactory, ServiceBusSenderFactoryStub>();
-
-            _services.AddSingleton(
-                _ => new ServiceBusClient(CreateFakeServiceBusConnectionString()));
-            CompositionRoot.Initialize(_services)
-                .AddAuthentication()
-                .AddAggregationsConfiguration(_ => new AggregationResultsStub())
-                .AddPeekConfiguration(
-                    new BundleConfigurationStub(),
-                    sp => new BundledMessagesStub(sp.GetRequiredService<IDatabaseConnectionFactory>(), sp.GetRequiredService<B2BContext>()))
-                .AddRemoteBusinessService<DummyRequest, DummyReply>(sp => new RemoteBusinessServiceRequestSenderSpy<DummyRequest>("Dummy"), "Dummy")
-                .AddDatabaseConnectionFactory(DatabaseFixture.ConnectionString)
-                .AddDatabaseContext(DatabaseFixture.ConnectionString)
-                .AddSystemClock(new SystemDateTimeProviderStub())
-                .AddCorrelationContext(_ =>
-                {
-                    var correlation = new CorrelationContext();
-                    correlation.SetId(Guid.NewGuid().ToString());
-                    return correlation;
-                })
-                .AddMessagePublishing()
-                .AddRequestHandler<TestCommandHandler>()
-                .AddHttpClientAdapter(_ => new HttpClientSpy())
-                .AddMoveInServices(
-                    new MoveInSettings(new MessageDelivery(new GridOperator() { GracePeriodInDaysAfterEffectiveDateIfNotUpdated = 1, }), new BusinessService(new Uri("http://someuri"))))
-                .AddMessageParserServices();
-            _serviceProvider = _services.BuildServiceProvider();
+            BuildServices();
         }
 
         public Task InvokeCommandAsync(object command)
@@ -97,7 +67,7 @@ namespace Messaging.IntegrationTests
         public T GetService<T>()
             where T : notnull
         {
-            return _serviceProvider.GetRequiredService<T>();
+            return _serviceProvider!.GetRequiredService<T>();
         }
 
         protected virtual void Dispose(bool disposing)
@@ -107,15 +77,15 @@ namespace Messaging.IntegrationTests
                 return;
             }
 
-            ((ServiceProvider)_serviceProvider).Dispose();
+            ((ServiceProvider)_serviceProvider!).Dispose();
             _disposed = true;
         }
 
         protected void RegisterInstance<TService>(TService instance)
         where TService : class
         {
-            _services.AddScoped(_ => instance);
-            _serviceProvider = _services.BuildServiceProvider();
+            _services!.AddScoped(_ => instance);
+            _serviceProvider = _services!.BuildServiceProvider();
         }
 
         protected Task<TResult> InvokeCommandAsync<TResult>(ICommand<TResult> command)
@@ -135,6 +105,46 @@ namespace Messaging.IntegrationTests
                 .Append("SharedAccessKeyName=send;")
                 .Append(CultureInfo.InvariantCulture, $"SharedAccessKey={Guid.NewGuid():N}")
                 .ToString();
+        }
+
+        private void BuildServices()
+        {
+            Environment.SetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE", "true");
+            _services = new ServiceCollection();
+
+            _services.AddSingleton(new EnergySupplyingServiceBusClientConfiguration("Fake"));
+            _services.AddSingleton<IServiceBusSenderFactory, ServiceBusSenderFactoryStub>();
+
+            _services.AddSingleton(
+                _ => new ServiceBusClient(CreateFakeServiceBusConnectionString()));
+            CompositionRoot.Initialize(_services)
+                .AddAuthentication()
+                .AddAggregationsConfiguration(_ => new AggregationResultsStub())
+                .AddPeekConfiguration(
+                    new BundleConfigurationStub(),
+                    sp => new BundledMessagesStub(
+                        sp.GetRequiredService<IDatabaseConnectionFactory>(),
+                        sp.GetRequiredService<B2BContext>()))
+                .AddRemoteBusinessService<DummyRequest, DummyReply>(
+                    sp => new RemoteBusinessServiceRequestSenderSpy<DummyRequest>("Dummy"), "Dummy")
+                .AddDatabaseConnectionFactory(DatabaseFixture.ConnectionString)
+                .AddDatabaseContext(DatabaseFixture.ConnectionString)
+                .AddSystemClock(new SystemDateTimeProviderStub())
+                .AddCorrelationContext(_ =>
+                {
+                    var correlation = new CorrelationContext();
+                    correlation.SetId(Guid.NewGuid().ToString());
+                    return correlation;
+                })
+                .AddMessagePublishing()
+                .AddRequestHandler<TestCommandHandler>()
+                .AddHttpClientAdapter(_ => new HttpClientSpy())
+                .AddMoveInServices(
+                    new MoveInSettings(
+                        new MessageDelivery(new GridOperator() { GracePeriodInDaysAfterEffectiveDateIfNotUpdated = 1, }),
+                        new BusinessService(new Uri("http://someuri"))))
+                .AddMessageParserServices();
+            _serviceProvider = _services.BuildServiceProvider();
         }
     }
 }
