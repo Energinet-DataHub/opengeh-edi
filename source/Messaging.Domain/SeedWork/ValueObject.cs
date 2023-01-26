@@ -23,17 +23,7 @@ namespace Messaging.Domain.SeedWork
 
         public static bool operator ==(ValueObject? obj1, ValueObject? obj2)
         {
-            if (Equals(obj1, null))
-            {
-                if (Equals(obj2, null))
-                {
-                    return true;
-                }
-
-                return false;
-            }
-
-            return obj1.Equals(obj2);
+            return obj1?.Equals(obj2) ?? Equals(obj2, null);
         }
 
         public static bool operator !=(ValueObject obj1, ValueObject obj2)
@@ -48,45 +38,17 @@ namespace Messaging.Domain.SeedWork
 
         public override bool Equals(object? obj)
         {
-            if (obj == null || GetType() != obj.GetType())
-            {
-                return false;
-            }
-
-            return GetProperties().All(p => PropertiesAreEqual(obj, p))
-                && GetFields().All(f => FieldsAreEqual(obj, f));
+            return obj != null && GetType() == obj.GetType() && GetProperties().All(p => PropertiesAreEqual(obj, p))
+                                                                 && GetFields().All(f => FieldsAreEqual(obj, f));
         }
 
         public override int GetHashCode()
         {
-            unchecked
-            {
-                int hash = 17;
-                foreach (var prop in GetProperties())
-                {
-                    var value = prop.GetValue(this, null);
-                    hash = HashValue(hash, value!);
-                }
+            var hash = GetProperties().Select(prop => prop.GetValue(this, null)).Aggregate(17, (current, value) => HashValue(current, value!));
 
-                foreach (var field in GetFields())
-                {
-                    var value = field.GetValue(this);
-                    hash = HashValue(hash, value!);
-                }
-
-                return hash;
-            }
+            return GetFields().Select(field => field.GetValue(this)).Aggregate(hash, (current, value) => HashValue(current, value!));
         }
 
-        // protected static BusinessRuleValidationResult CheckRule(IBusinessRule rule)
-        // {
-        //     if (rule is null)
-        //     {
-        //         throw new ArgumentNullException(nameof(rule));
-        //     }
-        //
-        //     return rule.Validate();
-        // }}
         private static int HashValue(int seed, object value)
         {
             var currentHash = value?.GetHashCode() ?? 0;
@@ -96,40 +58,26 @@ namespace Messaging.Domain.SeedWork
 
         private bool PropertiesAreEqual(object obj, PropertyInfo p)
         {
-            return object.Equals(p.GetValue(this, null), p.GetValue(obj, null));
+            return Equals(p.GetValue(this, null), p.GetValue(obj, null));
         }
 
         private bool FieldsAreEqual(object obj, FieldInfo f)
         {
-            return object.Equals(f.GetValue(this), f.GetValue(obj));
+            return Equals(f.GetValue(this), f.GetValue(obj));
         }
 
         private IEnumerable<PropertyInfo> GetProperties()
         {
-            if (_properties == null)
-            {
-                _properties = GetType()
-                    .GetProperties(BindingFlags.Instance | BindingFlags.Public)
-                    //.Where(p => p.GetCustomAttribute(typeof(IgnoreMemberAttribute)) == null)
-                    .ToList();
-
-                // Not available in Core
-                // !Attribute.IsDefined(p, typeof(IgnoreMemberAttribute))).ToList();
-            }
-
-            return _properties;
+            return _properties ??= GetType()
+                .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                .ToList();
         }
 
         private IEnumerable<FieldInfo> GetFields()
         {
-            if (_fields == null)
-            {
-                _fields = GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                    //.Where(p => p.GetCustomAttribute(typeof(IgnoreMemberAttribute)) == null)
-                    .ToList();
-            }
-
-            return _fields;
+            return _fields ??= GetType()
+                .GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .ToList();
         }
     }
 }
