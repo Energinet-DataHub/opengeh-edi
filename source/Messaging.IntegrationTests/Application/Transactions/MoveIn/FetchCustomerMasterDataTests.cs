@@ -42,13 +42,13 @@ public class FetchCustomerMasterDataTests : TestBase
         var command = new FetchCustomerMasterData(
             Guid.NewGuid().ToString(),
             "123445611",
-            Guid.NewGuid().ToString());
+            Guid.NewGuid());
 
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
         var dispatchedMessage = _senderSpy.Message;
         Assert.NotNull(dispatchedMessage);
-        Assert.Equal(command.TransactionId, dispatchedMessage?.CorrelationId);
+        Assert.Equal(command.TransactionId.ToString(), dispatchedMessage?.CorrelationId);
         var request = CustomerMasterDataRequest.Parser.ParseFrom(dispatchedMessage?.Body);
         Assert.Equal(command.BusinessProcessId, request.Processid);
     }

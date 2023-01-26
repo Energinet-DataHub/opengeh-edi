@@ -48,11 +48,11 @@ public class MessageCountRequestListener
         FunctionContext executionContext)
     {
         var result = await _mediator.Send(
-                new MessageCountRequest(_marketActorAuthenticator.CurrentIdentity.Number))
+                new MessageCountQuery(_marketActorAuthenticator.CurrentIdentity.Number))
             .ConfigureAwait(false);
 
         var response = HttpResponseData.CreateResponse(request);
-        response.Body = new MemoryStream(Encoding.UTF8.GetBytes(result.MessageCount.ToString(CultureInfo.InvariantCulture)));
+        response.Body = new MemoryStream(Encoding.UTF8.GetBytes(result.Data!.MessageCount.ToString(CultureInfo.InvariantCulture)));
         response.Headers.Add("content-type", "application/xml");
         response.StatusCode = HttpStatusCode.OK;
         return response;

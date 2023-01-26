@@ -17,11 +17,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Messaging.Application.Configuration.Commands.Commands;
+using Messaging.Application.Configuration.Queries;
 using Messaging.Domain.Actors;
 
 namespace Messaging.Application.OutgoingMessages.MessageCount;
 
-public class MessageCountRequestHandler : IRequestHandler<MessageCountRequest, MessageCountResult>
+public class MessageCountRequestHandler : IRequestHandler<MessageCountQuery, QueryResult<MessageCountData>>
 {
     private readonly IEnqueuedMessages _enqueuedMessages;
 
@@ -30,14 +31,14 @@ public class MessageCountRequestHandler : IRequestHandler<MessageCountRequest, M
         _enqueuedMessages = enqueuedMessages;
     }
 
-    public async Task<MessageCountResult> Handle(MessageCountRequest request, CancellationToken cancellationToken)
+    public async Task<QueryResult<MessageCountData>> Handle(MessageCountQuery request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
         var messageCount = await _enqueuedMessages.GetAvailableMessageCountAsync(request.ActorNumber).ConfigureAwait(false);
-        return new MessageCountResult(messageCount);
+        return new QueryResult<MessageCountData>(new MessageCountData(messageCount));
     }
 }
 
-public record MessageCountRequest(ActorNumber ActorNumber) : ICommand<MessageCountResult>;
+public record MessageCountQuery(ActorNumber ActorNumber) : IQuery<QueryResult<MessageCountData>>;
 
-public record MessageCountResult(int MessageCount);
+public record MessageCountData(int MessageCount);

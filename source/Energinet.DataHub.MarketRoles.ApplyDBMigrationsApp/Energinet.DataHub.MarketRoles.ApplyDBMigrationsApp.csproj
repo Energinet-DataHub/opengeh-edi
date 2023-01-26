@@ -72,6 +72,9 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202227101334 Fix aggregations message type.sql" />
     <EmbeddedResource Include="Scripts\Model\202227101335 Cleanup enqueued messages.sql" />
     <EmbeddedResource Include="Scripts\Model\202227101350 Alter AggregatedTimeSeriesTransactions table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101351 Change Id from uniqueidentifier to string.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101352 Add actor provided id.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101354 Add period start and end.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281100 Seed cleanup.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281101 Insert Reasons.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241100 Consolidated dbo model.sql" />
@@ -89,6 +92,8 @@ limitations under the License.
     <None Remove="Scripts\Model\202227101336 Add ReadyMessages Table.sql" />
     <EmbeddedResource Include="Scripts\Model\202227101336 Add BundledMessages Table.sql" />
     <None Remove="Scripts\Model\202227101337 Alter AggregatedTimeSeriesTransactions table.sql" />
+    <None Remove="Scripts\Model\202227101352 Change Id from string to uniqueidentifier.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101353 Change Id from string to uniqueidentifier.sql" />
   </ItemGroup>
 
 </Project>

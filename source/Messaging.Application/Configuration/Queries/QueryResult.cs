@@ -12,16 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.Domain.SeedWork;
+namespace Messaging.Application.Configuration.Queries;
 
-namespace Messaging.Domain.Transactions.MoveIn.Events;
-
-public class CustomerMasterDataWasUpdated : DomainEvent
+public class QueryResult<TData>
 {
-    public CustomerMasterDataWasUpdated(Guid transactionId)
+    public QueryResult(string error)
     {
-        TransactionId = transactionId;
+        Error = error;
     }
 
-    public Guid TransactionId { get; }
+    public QueryResult(TData data)
+    {
+        Data = data;
+    }
+
+    public string Error { get; } = string.Empty;
+
+    public TData? Data { get; }
 }

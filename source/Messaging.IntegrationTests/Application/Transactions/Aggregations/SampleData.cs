@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using Messaging.IntegrationTests.Factories;
+using NodaTime;
 
 namespace Messaging.IntegrationTests.Application.Transactions.Aggregations;
 
@@ -29,4 +31,8 @@ internal class SampleData
     internal static string MeasureUnitType => "KWH";
 
     internal static string Resolution => "PT1H";
+
+    internal static Instant StartOfPeriod => EffectiveDateFactory.InstantAsOfToday();
+
+    internal static Instant EndOfPeriod => EffectiveDateFactory.OffsetDaysFromToday(1);
 }

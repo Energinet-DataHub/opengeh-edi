@@ -38,7 +38,7 @@ internal class AggregationResultForwardingEntityConfiguration : IEntityTypeConfi
         builder.ToTable("AggregatedTimeSeriesTransactions", "b2b");
         builder.HasKey(entity => entity.Id);
         builder.Property(entity => entity.Id)
-            .HasConversion(toDbValue => Guid.Parse(toDbValue.Id), fromDbValue => TransactionId.Create(fromDbValue.ToString()));
+            .HasConversion(toDbValue => toDbValue.Id, fromDbValue => TransactionId.Create(fromDbValue));
         builder.Property<ProcessType>("_processType")
             .HasColumnName("ProcessType")
             .HasConversion(toDbValue => toDbValue.Name, fromDbValue => EnumerationType.FromName<ProcessType>(fromDbValue));
@@ -48,6 +48,14 @@ internal class AggregationResultForwardingEntityConfiguration : IEntityTypeConfi
         builder.Property<MarketRole>("_receivingActorRole")
             .HasColumnName("ReceivingActorRole")
             .HasConversion(toDbValue => toDbValue.Name, fromDbValue => EnumerationType.FromName<MarketRole>(fromDbValue));
+        builder.OwnsOne<Period>("_period", x =>
+        {
+            x.Property(entity => entity.Start)
+                .HasColumnName("PeriodStart");
+            x.Property(entity => entity.End)
+                .HasColumnName("PeriodEnd");
+        });
+
         builder.HasMany<OutgoingMessage>("_messages")
             .WithOne()
             .HasForeignKey("TransactionId");

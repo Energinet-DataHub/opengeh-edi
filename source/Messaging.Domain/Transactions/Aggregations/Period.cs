@@ -12,16 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.Domain.SeedWork;
+using NodaTime;
 
-namespace Messaging.Domain.Transactions.MoveIn.Events;
+namespace Messaging.Domain.Transactions.Aggregations;
 
-public class CustomerMasterDataWasUpdated : DomainEvent
+public class Period
 {
-    public CustomerMasterDataWasUpdated(Guid transactionId)
+    public Period(Instant start, Instant end)
     {
-        TransactionId = transactionId;
+        Start = start;
+        End = end;
     }
 
-    public Guid TransactionId { get; }
+    public Instant Start { get; }
+
+    public Instant End { get; }
 }

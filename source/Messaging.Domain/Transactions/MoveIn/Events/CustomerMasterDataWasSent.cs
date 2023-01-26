@@ -18,10 +18,10 @@ namespace Messaging.Domain.Transactions.MoveIn.Events;
 
 public class CustomerMasterDataWasSent : DomainEvent
 {
-    public CustomerMasterDataWasSent(string transactionId)
+    public CustomerMasterDataWasSent(Guid transactionId)
     {
         TransactionId = transactionId;
     }
 
-    public string TransactionId { get; }
+    public Guid TransactionId { get; }
 }

@@ -12,12 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.Transactions;
 using Messaging.Infrastructure.Configuration.DataAccess;
 
 namespace Messaging.Infrastructure.OutgoingMessages
@@ -34,26 +30,6 @@ namespace Messaging.Infrastructure.OutgoingMessages
         public void Add(OutgoingMessage message)
         {
             _context.OutgoingMessages.Add(message);
-        }
-
-        public ReadOnlyCollection<OutgoingMessage> GetUnpublished()
-        {
-            return _context
-                .OutgoingMessages
-                .Where(x => x.IsPublished == false)
-                .ToList()
-                .AsReadOnly();
-        }
-
-        public OutgoingMessage? GetByTransactionId(string transactionId)
-        {
-            return _context.OutgoingMessages
-                .FirstOrDefault(message => message.TransactionId == TransactionId.Create(transactionId));
-        }
-
-        public ReadOnlyCollection<OutgoingMessage> GetByIds(IReadOnlyCollection<string> messageIds)
-        {
-            return _context.OutgoingMessages.Where(message => messageIds.Contains(message.Id.ToString())).ToList().AsReadOnly();
         }
     }
 }

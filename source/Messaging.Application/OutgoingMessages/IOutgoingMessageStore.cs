@@ -12,13 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Threading.Tasks;
-using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.OutgoingMessages.Peek;
 
 namespace Messaging.Application.OutgoingMessages
 {
@@ -32,25 +26,5 @@ namespace Messaging.Application.OutgoingMessages
         /// </summary>
         /// <param name="message"></param>
         void Add(OutgoingMessage message);
-
-        /// <summary>
-        /// Get unpublished messages
-        /// </summary>
-        /// <returns> A read only collection of unpublished messages</returns>
-        ReadOnlyCollection<OutgoingMessage> GetUnpublished();
-
-        /// <summary>
-        /// Get outgoing message by the id of the transaction that generated the message
-        /// </summary>
-        /// <param name="transactionId"></param>
-        /// <returns><see cref="OutgoingMessage"/></returns>
-        OutgoingMessage? GetByTransactionId(string transactionId);
-
-        /// <summary>
-        /// Get outgoing messages by list of incoming message ids
-        /// </summary>
-        /// <param name="messageIds"></param>
-        /// <returns><see cref="ReadOnlyCollection{OutgoingMessage}"/></returns>
-        ReadOnlyCollection<OutgoingMessage> GetByIds(IReadOnlyCollection<string> messageIds);
     }
 }

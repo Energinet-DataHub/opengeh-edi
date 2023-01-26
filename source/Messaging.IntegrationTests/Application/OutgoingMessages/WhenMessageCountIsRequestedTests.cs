@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using Messaging.Application.OutgoingMessages.MessageCount;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
@@ -33,10 +32,10 @@ public class WhenMessageCountIsRequestedTests : TestBase
     [Fact]
     public async Task When_no_messages_are_available_return_zero()
     {
-        var result = await InvokeCommandAsync(CreateMessageCountRequest(SampleData.NewEnergySupplierNumber))
+        var result = await QueryAsync(CreateMessageCountRequest(SampleData.NewEnergySupplierNumber))
             .ConfigureAwait(false);
 
-        Assert.Equal(0, result.MessageCount);
+        Assert.Equal(0, result.Data!.MessageCount);
     }
 
     [Fact]
@@ -44,15 +43,15 @@ public class WhenMessageCountIsRequestedTests : TestBase
     {
         await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
 
-        var result = await InvokeCommandAsync(CreateMessageCountRequest(SampleData.NewEnergySupplierNumber))
+        var result = await QueryAsync(CreateMessageCountRequest(SampleData.NewEnergySupplierNumber))
             .ConfigureAwait(false);
 
-        Assert.Equal(1, result.MessageCount);
+        Assert.Equal(1, result.Data!.MessageCount);
     }
 
-    private static MessageCountRequest CreateMessageCountRequest(string actorNumber)
+    private static MessageCountQuery CreateMessageCountRequest(string actorNumber)
     {
-        return new MessageCountRequest(ActorNumber.Create(SampleData.NewEnergySupplierNumber));
+        return new MessageCountQuery(ActorNumber.Create(SampleData.NewEnergySupplierNumber));
     }
 
     private static IncomingMessageBuilder MessageBuilder()

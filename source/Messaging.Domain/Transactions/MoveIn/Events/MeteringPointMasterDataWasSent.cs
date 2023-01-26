@@ -18,10 +18,10 @@ namespace Messaging.Domain.Transactions.MoveIn.Events;
 
 public class MeteringPointMasterDataWasSent : DomainEvent
 {
-    public MeteringPointMasterDataWasSent(string transactionId)
+    public MeteringPointMasterDataWasSent(Guid transactionId)
     {
         TransactionId = transactionId;
     }
 
-    public string TransactionId { get; }
+    public Guid TransactionId { get; }
 }

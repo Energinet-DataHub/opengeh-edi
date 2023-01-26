@@ -18,10 +18,10 @@ namespace Messaging.Domain.Transactions.MoveIn.Events;
 
 public class MoveInWasRejected : DomainEvent
 {
-    public MoveInWasRejected(string transactionId)
+    public MoveInWasRejected(Guid transactionId)
     {
         TransactionId = transactionId;
     }
 
-    public string TransactionId { get; }
+    public Guid TransactionId { get; }
 }

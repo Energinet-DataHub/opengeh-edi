@@ -19,7 +19,7 @@ namespace Messaging.Domain.Transactions.MoveIn.Events;
 
 public class EndOfSupplyNotificationChangedToPending : DomainEvent
 {
-    public EndOfSupplyNotificationChangedToPending(string transactionId, Instant effectiveDate, string marketEvaluationPointId, string energySupplierId)
+    public EndOfSupplyNotificationChangedToPending(Guid transactionId, Instant effectiveDate, string marketEvaluationPointId, string energySupplierId)
     {
         TransactionId = transactionId;
         EffectiveDate = effectiveDate;
@@ -27,7 +27,7 @@ public class EndOfSupplyNotificationChangedToPending : DomainEvent
         EnergySupplierId = energySupplierId;
     }
 
-    public string TransactionId { get; }
+    public Guid TransactionId { get; }
 
     public Instant EffectiveDate { get; }
 

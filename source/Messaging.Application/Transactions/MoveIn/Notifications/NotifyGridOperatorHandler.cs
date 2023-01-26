@@ -19,6 +19,7 @@ using MediatR;
 using Messaging.Application.Actors;
 using Messaging.Application.OutgoingMessages;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
+using Messaging.Domain.Transactions;
 using Messaging.Domain.Transactions.MoveIn;
 
 namespace Messaging.Application.Transactions.MoveIn.Notifications;
@@ -45,7 +46,7 @@ public class NotifyGridOperatorHandler : IRequestHandler<NotifyGridOperator>
     public async Task<Unit> Handle(NotifyGridOperator request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        var transaction = _transactionRepository.GetById(request.TransactionId);
+        var transaction = _transactionRepository.GetById(TransactionId.Create(request.TransactionId));
         if (transaction is null)
         {
             throw TransactionNotFoundException.TransactionIdNotFound(request.TransactionId);

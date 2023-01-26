@@ -18,6 +18,7 @@ using Messaging.Application.Configuration.Commands;
 using Messaging.Application.Transactions.Aggregations;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using NodaTime.Serialization.Protobuf;
 
 namespace Messaging.Api.EventListeners;
 
@@ -45,6 +46,6 @@ public class BalanceFixingWasCompletedListener
             Energinet.DataHub.Wholesale.Contracts.Events.ProcessCompleted.Parser.ParseFrom(eventData);
         _logger.LogInformation($"Received ProcessCompleted event: {processCompletedEvent}");
         return _commandScheduler.EnqueueAsync(
-            new StartTransaction(processCompletedEvent.GridAreaCode, Guid.Parse(processCompletedEvent.BatchId)));
+            new StartTransaction(processCompletedEvent.GridAreaCode, Guid.Parse(processCompletedEvent.BatchId), processCompletedEvent.PeriodStartUtc.ToInstant(), processCompletedEvent.PeriodEndUtc.ToInstant()));
     }
 }

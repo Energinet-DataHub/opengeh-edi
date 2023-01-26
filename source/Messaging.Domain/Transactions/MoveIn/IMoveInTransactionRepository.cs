@@ -32,7 +32,7 @@ namespace Messaging.Domain.Transactions.MoveIn
         /// </summary>
         /// <param name="transactionId"></param>
         /// <returns><see cref="MoveInTransaction"/></returns>
-        MoveInTransaction? GetById(string transactionId);
+        MoveInTransaction? GetById(TransactionId transactionId);
 
         /// <summary>
         /// Find transaction by business process id

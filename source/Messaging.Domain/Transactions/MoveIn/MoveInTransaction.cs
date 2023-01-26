@@ -35,7 +35,7 @@ namespace Messaging.Domain.Transactions.MoveIn
         private MasterDataState _customerMasterDataForGridOperatorDeliveryState = MasterDataState.Pending;
         private CustomerMasterData? _customerMasterData;
 
-        public MoveInTransaction(TransactionId transactionId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId, string startedByMessageId, string newEnergySupplierId, string? consumerId, string? consumerName, string? consumerIdType, ActorNumber requestedBy)
+        public MoveInTransaction(TransactionId transactionId, ActorProvidedId actorProvidedId, string marketEvaluationPointId, Instant effectiveDate, string? currentEnergySupplierId, string startedByMessageId, string newEnergySupplierId, string? consumerId, string? consumerName, string? consumerIdType, ActorNumber requestedBy)
         {
             _requestedBy = requestedBy;
             _businessProcessState = BusinessProcessState.Pending;
@@ -43,6 +43,7 @@ namespace Messaging.Domain.Transactions.MoveIn
                 ? NotificationState.Required
                 : NotificationState.NotNeeded;
             TransactionId = transactionId;
+            ActorProvidedId = actorProvidedId;
             MarketEvaluationPointId = marketEvaluationPointId;
             EffectiveDate = effectiveDate;
             CurrentEnergySupplierId = currentEnergySupplierId;
@@ -83,6 +84,8 @@ namespace Messaging.Domain.Transactions.MoveIn
         }
 
         public TransactionId TransactionId { get; }
+
+        public ActorProvidedId ActorProvidedId { get; }
 
         public string? ProcessId { get; private set; }
 
@@ -128,7 +131,7 @@ namespace Messaging.Domain.Transactions.MoveIn
             if (_businessProcessState == BusinessProcessState.Accepted)
                 return;
 
-            _messages.Add(ConfirmRequestChangeOfSupplierMessage.Create(TransactionId.Id, ProcessType.MoveIn, MarketEvaluationPointId, _requestedBy));
+            _messages.Add(ConfirmRequestChangeOfSupplierMessage.Create(TransactionId, ActorProvidedId, ProcessType.MoveIn, MarketEvaluationPointId, _requestedBy));
 
             _businessProcessState = BusinessProcessState.Accepted;
             ProcessId = processId ?? throw new ArgumentNullException(nameof(processId));
@@ -141,7 +144,8 @@ namespace Messaging.Domain.Transactions.MoveIn
                 throw new MoveInException($"Transaction has already been rejected");
 
             _messages.Add(RejectRequestChangeOfSupplierMessage.Create(
-                Transactions.TransactionId.Create(TransactionId.Id),
+                TransactionId,
+                ActorProvidedId,
                 ProcessType.MoveIn,
                 MarketEvaluationPointId,
                 _requestedBy,
@@ -227,7 +231,8 @@ namespace Messaging.Domain.Transactions.MoveIn
         private void CreateCustomerMasterDataMessage(ActorNumber receiverNumber, MarketRole receiverRole)
         {
             _messages.Add(CharacteristicsOfACustomerAtAnApMessage.Create(
-                TransactionId.Id,
+                TransactionId,
+                ActorProvidedId,
                 ProcessType.MoveIn,
                 receiverNumber,
                 receiverRole,

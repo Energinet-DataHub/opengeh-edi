@@ -12,16 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.Domain.SeedWork;
+using MediatR;
 
-namespace Messaging.Domain.Transactions.MoveIn.Events;
+namespace Messaging.Application.Configuration.Queries;
 
-public class CustomerMasterDataWasUpdated : DomainEvent
+/// <summary>
+/// Data query
+/// </summary>
+#pragma warning disable CA1040 // This marker interface is needed in order to distinguish between commands and queries
+public interface IQuery<out TResult> : IRequest<TResult>
 {
-    public CustomerMasterDataWasUpdated(Guid transactionId)
-    {
-        TransactionId = transactionId;
-    }
-
-    public Guid TransactionId { get; }
 }
+#pragma warning restore

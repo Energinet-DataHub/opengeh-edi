@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Text.Json.Serialization;
 using Messaging.Application.Configuration.Commands.Commands;
 using NodaTime;
@@ -21,7 +22,7 @@ namespace Messaging.Application.Transactions.UpdateCustomer;
 public class UpdateCustomerMasterData : InternalCommand
 {
     [JsonConstructor]
-    public UpdateCustomerMasterData(string marketEvaluationPointNumber, Instant effectiveDate, string transactionId)
+    public UpdateCustomerMasterData(string marketEvaluationPointNumber, Instant effectiveDate, Guid transactionId)
     {
         MarketEvaluationPointNumber = marketEvaluationPointNumber;
         EffectiveDate = effectiveDate;
@@ -32,5 +33,5 @@ public class UpdateCustomerMasterData : InternalCommand
 
     public Instant EffectiveDate { get; }
 
-    public string TransactionId { get; }
+    public Guid TransactionId { get; }
 }

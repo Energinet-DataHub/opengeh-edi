@@ -14,14 +14,19 @@
 
 using Messaging.Domain.SeedWork;
 
-namespace Messaging.Domain.Transactions.MoveIn.Events;
+namespace Messaging.Domain.Transactions;
 
-public class CustomerMasterDataWasUpdated : DomainEvent
+public class ActorProvidedId : ValueObject
 {
-    public CustomerMasterDataWasUpdated(Guid transactionId)
+    private ActorProvidedId(string id)
     {
-        TransactionId = transactionId;
+        Id = id;
     }
 
-    public Guid TransactionId { get; }
+    public string Id { get; }
+
+    public static ActorProvidedId Create(string id)
+    {
+        return new ActorProvidedId(id);
+    }
 }

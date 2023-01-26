@@ -92,6 +92,7 @@ public class WhenAConsumerHasMovedInTests : TestBase
     {
         var transaction = new MoveInTransaction(
             TransactionId.Create(SampleData.TransactionId),
+            SampleData.ActorProvidedId,
             SampleData.MeteringPointNumber,
             SampleData.SupplyStart,
             SampleData.CurrentEnergySupplierNumber,
@@ -112,6 +113,6 @@ public class WhenAConsumerHasMovedInTests : TestBase
     private Task<AssertTransaction> AssertTransaction()
     {
         return MoveIn.AssertTransaction
-            .TransactionAsync(SampleData.TransactionId, GetService<IDatabaseConnectionFactory>());
+            .TransactionAsync(SampleData.ActorProvidedId, GetService<IDatabaseConnectionFactory>());
     }
 }

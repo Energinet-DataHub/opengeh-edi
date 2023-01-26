@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using Messaging.Application.Transactions.Aggregations;
 using Messaging.Domain.Transactions.Aggregations;
 using Messaging.Infrastructure.Configuration.Serialization;
+using Polly;
 
 namespace Messaging.Infrastructure.Transactions.Aggregations;
 
@@ -45,12 +46,27 @@ public class AggregationResultsOverHttp : IAggregationResults
 
     public async Task<AggregationResult> GetResultAsync(Guid resultId, string gridArea)
     {
-        using var httpContent = CreateRequest(resultId, gridArea);
-        var response = await _httpClient.PostAsync(_serviceEndpoint, httpContent).ConfigureAwait(false);
-        response.EnsureSuccessStatusCode();
+        var executionPolicy = Policy
+            .Handle<Exception>()
+            .WaitAndRetryAsync(new[]
+            {
+                TimeSpan.FromSeconds(1),
+                TimeSpan.FromSeconds(2),
+                TimeSpan.FromSeconds(3),
+            });
+
+        var response = await executionPolicy.ExecuteAsync(() => CallApiAsync(resultId, gridArea)).ConfigureAwait(false);
 
         return await _aggregationResultMapper.MapFromAsync(
             await response.Content.ReadAsStreamAsync().ConfigureAwait(false), resultId, gridArea).ConfigureAwait(false);
+    }
+
+    private async Task<HttpResponseMessage> CallApiAsync(Guid resultId, string gridArea)
+    {
+        using var httpContent = CreateRequest(resultId, gridArea);
+        var response = await _httpClient.PostAsync(_serviceEndpoint, httpContent).ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+        return response;
     }
 
     private StringContent CreateRequest(Guid resultId, string gridArea)

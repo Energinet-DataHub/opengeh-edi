@@ -16,6 +16,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Messaging.Domain.Transactions;
 using Messaging.Domain.Transactions.MoveIn;
 
 namespace Messaging.Application.Transactions.MoveIn.Notifications;
@@ -34,13 +35,13 @@ public class NotifyCurrentEnergySupplierHandler : IRequestHandler<NotifyCurrentE
     public Task<Unit> Handle(NotifyCurrentEnergySupplier request, CancellationToken cancellationToken)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
-        var transaction = _repository.GetById(request.TransactionId);
+        var transaction = _repository.GetById(TransactionId.Create(request.TransactionId));
         if (transaction is null)
         {
             throw TransactionNotFoundException.TransactionIdNotFound(request.TransactionId);
         }
 
-        _notifications.InformCurrentEnergySupplierAboutEndOfSupply(request.TransactionId, request.EffectiveDate, request.MarketEvaluationPointId, request.EnergySupplierId);
+        _notifications.InformCurrentEnergySupplierAboutEndOfSupply(transaction);
 
         transaction.SetCurrentEnergySupplierWasNotified();
         return Unit.Task;

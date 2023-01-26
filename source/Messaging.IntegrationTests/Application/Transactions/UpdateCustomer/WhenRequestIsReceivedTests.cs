@@ -34,6 +34,6 @@ public class WhenRequestIsReceivedTests : TestBase
 
         await InvokeCommandAsync(command).ConfigureAwait(false);
 
-        await AssertTransaction.TransactionAsync(SampleData.TransactionId, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
+        await AssertTransaction.TransactionAsync(SampleData.TransactionId.ToString(), GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
     }
 }

@@ -32,7 +32,7 @@ public class TransactionNotFoundException : Exception
     {
     }
 
-    public static TransactionNotFoundException TransactionIdNotFound(string transactionId)
+    public static TransactionNotFoundException TransactionIdNotFound(Guid transactionId)
     {
         return new TransactionNotFoundException($"Move in transaction {transactionId} was not found");
     }
