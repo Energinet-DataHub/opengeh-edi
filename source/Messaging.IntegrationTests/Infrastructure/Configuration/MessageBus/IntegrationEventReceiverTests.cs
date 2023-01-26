@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.DataAccess;
-using Messaging.Infrastructure.Configuration.Processing.Inbox;
+using Messaging.Infrastructure.Configuration.MessageBus;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 
@@ -80,27 +80,4 @@ public class IntegrationEventReceiverTests : TestBase
 
 public class TestIntegrationEvent
 {
-}
-
-public class IntegrationEventReceiver
-{
-    private readonly B2BContext _context;
-
-    public IntegrationEventReceiver(B2BContext context)
-    {
-        _context = context;
-    }
-
-    public async Task ReceiveAsync(string eventId, string eventType, byte[] eventPayload)
-    {
-        var inboxMessage = await _context.InboxMessages.FindAsync(eventId).ConfigureAwait(false);
-        if (inboxMessage is not null)
-        {
-            return;
-        }
-
-        inboxMessage = new InboxMessage(eventId);
-        _context.InboxMessages.Add(inboxMessage);
-        await _context.SaveChangesAsync();
-    }
 }
