@@ -11,17 +11,18 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+using System.Threading;
+using System.Threading.Tasks;
 using MediatR;
 
-namespace Messaging.IntegrationTests.Infrastructure.Configuration.MessageBus;
+namespace Messaging.IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 
 #pragma warning disable
-public class TestNotification : INotification
+public class TestNotificationHandler : INotificationHandler<TestNotification>
 {
-    public TestNotification(string aProperty)
+    public Task Handle(TestNotification notification, CancellationToken cancellationToken)
     {
-        AProperty = aProperty;
+        return Task.CompletedTask;
     }
-
-    public string AProperty { get; }
 }

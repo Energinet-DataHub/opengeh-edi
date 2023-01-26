@@ -11,17 +11,26 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-using System.Threading;
-using System.Threading.Tasks;
+
 using MediatR;
 
-namespace Messaging.IntegrationTests.Infrastructure.Configuration.MessageBus;
+namespace Messaging.Infrastructure.Configuration.IntegrationEvents;
 
-#pragma warning disable
-public class TestNotificationHandler : INotificationHandler<TestNotification>
+/// <summary>
+/// Maps from an integration event to a notification
+/// </summary>
+public interface IIntegrationEventMapper
 {
-    public Task Handle(TestNotification notification, CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
-    }
+    /// <summary>
+    /// Map payload to a notification
+    /// </summary>
+    /// <param name="payload"></param>
+    /// <returns><see cref="INotification"/></returns>
+    INotification MapFrom(byte[] payload);
+
+    /// <summary>
+    /// Determines whether the specified event type can be handled by the mapper
+    /// </summary>
+    /// <param name="eventType"></param>
+    bool CanHandle(string eventType);
 }

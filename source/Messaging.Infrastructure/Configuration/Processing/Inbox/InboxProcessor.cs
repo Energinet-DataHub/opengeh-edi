@@ -19,6 +19,7 @@ using Dapper;
 using MediatR;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
+using Messaging.Infrastructure.Configuration.IntegrationEvents;
 using Messaging.Infrastructure.Configuration.MessageBus;
 
 namespace Messaging.Infrastructure.Configuration.Processing.Inbox;

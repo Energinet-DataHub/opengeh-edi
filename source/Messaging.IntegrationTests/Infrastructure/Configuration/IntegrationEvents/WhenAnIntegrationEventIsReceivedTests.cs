@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Data;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Dapper;
@@ -21,18 +19,18 @@ using MediatR;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.DataAccess;
-using Messaging.Infrastructure.Configuration.MessageBus;
+using Messaging.Infrastructure.Configuration.IntegrationEvents;
 using Messaging.Infrastructure.Configuration.Processing.Inbox;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 
-namespace Messaging.IntegrationTests.Infrastructure.Configuration.MessageBus;
+namespace Messaging.IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 
-public class IntegrationEventReceiverTests : TestBase
+public class WhenAnIntegrationEventIsReceivedTests : TestBase
 {
     private readonly IntegrationEventReceiver _receiver;
 
-    public IntegrationEventReceiverTests(DatabaseFixture databaseFixture)
+    public WhenAnIntegrationEventIsReceivedTests(DatabaseFixture databaseFixture)
      : base(databaseFixture)
     {
         _receiver = new IntegrationEventReceiver(GetService<B2BContext>(), GetService<ISystemDateTimeProvider>());

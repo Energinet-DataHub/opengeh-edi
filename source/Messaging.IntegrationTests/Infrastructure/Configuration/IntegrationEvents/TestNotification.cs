@@ -11,10 +11,18 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-namespace Messaging.IntegrationTests.Infrastructure.Configuration.MessageBus;
+
+using MediatR;
+
+namespace Messaging.IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 
 #pragma warning disable
-public class TestIntegrationEvent
+public class TestNotification : INotification
 {
-    public string Property1 { get; set; } = "Test";
+    public TestNotification(string aProperty)
+    {
+        AProperty = aProperty;
+    }
+
+    public string AProperty { get; }
 }

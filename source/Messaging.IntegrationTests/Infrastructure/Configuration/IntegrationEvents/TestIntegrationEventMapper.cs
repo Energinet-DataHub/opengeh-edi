@@ -12,25 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text.Json;
 using MediatR;
+using Messaging.Infrastructure.Configuration.IntegrationEvents;
 
-namespace Messaging.Infrastructure.Configuration.MessageBus;
+namespace Messaging.IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 
-/// <summary>
-/// Maps from an integration event to a notification
-/// </summary>
-public interface IIntegrationEventMapper
+#pragma warning disable
+public class TestIntegrationEventMapper : IIntegrationEventMapper
 {
-    /// <summary>
-    /// Map payload to a notification
-    /// </summary>
-    /// <param name="payload"></param>
-    /// <returns><see cref="INotification"/></returns>
-    INotification MapFrom(byte[] payload);
+    public INotification MapFrom(byte[] payload)
+    {
+        var integrationEvent = JsonSerializer.Deserialize<TestIntegrationEvent>(payload);
+        return new TestNotification(integrationEvent.Property1);
+    }
 
-    /// <summary>
-    /// Determines whether the specified event type can be handled by the mapper
-    /// </summary>
-    /// <param name="eventType"></param>
-    bool CanHandle(string eventType);
+    public bool CanHandle(string eventType)
+    {
+        return eventType.Equals(nameof(TestIntegrationEvent));
+    }
 }

@@ -11,24 +11,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-using System.Text.Json;
-using MediatR;
-using Messaging.Infrastructure.Configuration.MessageBus;
-
-namespace Messaging.IntegrationTests.Infrastructure.Configuration.MessageBus;
+namespace Messaging.IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 
 #pragma warning disable
-public class TestIntegrationEventMapper : IIntegrationEventMapper
+public class TestIntegrationEvent
 {
-    public INotification MapFrom(byte[] payload)
-    {
-        var integrationEvent = JsonSerializer.Deserialize<TestIntegrationEvent>(payload);
-        return new TestNotification(integrationEvent.Property1);
-    }
-
-    public bool CanHandle(string eventType)
-    {
-        return eventType.Equals(nameof(TestIntegrationEvent));
-    }
+    public string Property1 { get; set; } = "Test";
 }
