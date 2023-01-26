@@ -31,6 +31,7 @@ using Messaging.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Messaging.Infrastructure.Transactions.MoveIn;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.Infrastructure.Configuration.InternalCommands;
+using Messaging.IntegrationTests.Infrastructure.Configuration.MessageBus;
 using Messaging.IntegrationTests.TestDoubles;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -108,9 +109,11 @@ namespace Messaging.IntegrationTests
 
             _services.AddSingleton(new EnergySupplyingServiceBusClientConfiguration("Fake"));
             _services.AddSingleton<IServiceBusSenderFactory>(_serviceBusSenderFactoryStub);
-
             _services.AddSingleton(
                 _ => new ServiceBusClient(CreateFakeServiceBusConnectionString()));
+
+            _services.AddTransient<INotificationHandler<TestNotification>, TestNotificationHandler>();
+
             CompositionRoot.Initialize(_services)
                 .AddAuthentication()
                 .AddAggregationsConfiguration(_ => _aggregationResultsStub)

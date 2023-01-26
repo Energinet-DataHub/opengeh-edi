@@ -12,14 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.IO;
+using NodaTime;
+
 namespace Messaging.Infrastructure.Configuration.Processing.Inbox;
 
 public class InboxMessage
 {
-    public InboxMessage(string id)
+    public InboxMessage(string id, string eventType, byte[] eventPayload, Instant occurredOn)
     {
         Id = id;
+        OccurredOn = occurredOn;
+        EventType = eventType;
+        EventPayload = eventPayload;
+    }
+
+    #pragma warning disable CS8618 // Needed by ORM
+    private InboxMessage()
+    {
     }
 
     public string Id { get; }
+
+    public Instant OccurredOn { get; }
+
+    public string EventType { get; }
+
+    #pragma warning disable CA1819
+    public byte[] EventPayload { get; }
 }

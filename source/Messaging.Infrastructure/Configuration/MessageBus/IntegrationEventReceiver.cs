@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.IO;
 using System.Threading.Tasks;
+using Messaging.Application.Configuration;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.Processing.Inbox;
 
@@ -21,10 +23,12 @@ namespace Messaging.Infrastructure.Configuration.MessageBus;
 public class IntegrationEventReceiver
 {
     private readonly B2BContext _context;
+    private readonly ISystemDateTimeProvider _dateTimeProvider;
 
-    public IntegrationEventReceiver(B2BContext context)
+    public IntegrationEventReceiver(B2BContext context, ISystemDateTimeProvider dateTimeProvider)
     {
         _context = context;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task ReceiveAsync(string eventId, string eventType, byte[] eventPayload)
@@ -35,12 +39,12 @@ public class IntegrationEventReceiver
             return;
         }
 
-        await RegisterAsync(eventId).ConfigureAwait(false);
+        await RegisterAsync(eventId, eventType, eventPayload).ConfigureAwait(false);
     }
 
-    private async Task RegisterAsync(string eventId)
+    private async Task RegisterAsync(string eventId, string eventType, byte[] eventPayload)
     {
-        _context.InboxMessages.Add(new InboxMessage(eventId));
+        _context.InboxMessages.Add(new InboxMessage(eventId, eventType, eventPayload, _dateTimeProvider.Now()));
         await _context.SaveChangesAsync().ConfigureAwait(false);
     }
 }

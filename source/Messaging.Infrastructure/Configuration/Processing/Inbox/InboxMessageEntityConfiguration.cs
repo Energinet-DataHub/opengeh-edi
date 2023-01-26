@@ -27,5 +27,8 @@ public class InboxMessageEntityConfiguration : IEntityTypeConfiguration<InboxMes
         builder.ToTable("InboxMessages", "b2b");
         builder.HasKey(entity => entity.Id);
         builder.Property(entity => entity.Id);
+        builder.Property(entity => entity.OccurredOn);
+        builder.Property(entity => entity.EventType);
+        builder.Property(entity => entity.EventPayload);
     }
 }
