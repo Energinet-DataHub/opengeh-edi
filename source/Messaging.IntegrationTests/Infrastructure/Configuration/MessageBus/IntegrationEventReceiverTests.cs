@@ -107,7 +107,8 @@ public class IntegrationEventReceiverTests : TestBase
         var inboxProcessor = new InboxProcessor(
             GetService<IDatabaseConnectionFactory>(),
             GetService<IMediator>(),
-            GetService<ISystemDateTimeProvider>());
+            GetService<ISystemDateTimeProvider>(),
+            new []{ new TestIntegrationEventMapper(), });
         return inboxProcessor.ProcessMessagesAsync();
     }
 }
@@ -118,17 +119,14 @@ public class InboxProcessor
     private readonly IDatabaseConnectionFactory _connectionFactory;
     private readonly IMediator _mediator;
     private readonly ISystemDateTimeProvider _dateTimeProvider;
+    private readonly List<IIntegrationEventMapper> _mappers;
 
-    private readonly List<IIntegrationEventMapper> _mappers = new()
-    {
-        new TestIntegrationEventMapper(),
-    };
-
-    public InboxProcessor(IDatabaseConnectionFactory connectionFactory, IMediator mediator, ISystemDateTimeProvider dateTimeProvider)
+    public InboxProcessor(IDatabaseConnectionFactory connectionFactory, IMediator mediator, ISystemDateTimeProvider dateTimeProvider, IEnumerable<IIntegrationEventMapper> mappers)
     {
         _connectionFactory = connectionFactory;
         _mediator = mediator;
         _dateTimeProvider = dateTimeProvider;
+        _mappers = mappers.ToList();
     }
     public async Task ProcessMessagesAsync()
     {
