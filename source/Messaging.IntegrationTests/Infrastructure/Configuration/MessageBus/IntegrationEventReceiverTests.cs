@@ -15,7 +15,6 @@
 using System;
 using System.Data;
 using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using MediatR;
@@ -99,53 +98,13 @@ public class IntegrationEventReceiverTests : TestBase
         Assert.True(isProcessed);
     }
 
-    #pragma warning disable
     private Task ProcessInboxMessages()
     {
         var inboxProcessor = new InboxProcessor(
             GetService<IDatabaseConnectionFactory>(),
             GetService<IMediator>(),
             GetService<ISystemDateTimeProvider>(),
-            new []{ new TestIntegrationEventMapper(), });
+            new[] { new TestIntegrationEventMapper(), });
         return inboxProcessor.ProcessMessagesAsync();
-    }
-}
-
-#pragma warning disable
-
-public class TestIntegrationEventMapper : IIntegrationEventMapper
-{
-    public INotification MapFrom(byte[] payload)
-    {
-        var integrationEvent = JsonSerializer.Deserialize<TestIntegrationEvent>(payload);
-        return new TestNotification(integrationEvent.Property1);
-    }
-
-    public bool CanHandle(string eventType)
-    {
-        return eventType.Equals(nameof(TestIntegrationEvent));
-    }
-}
-
-public class TestIntegrationEvent
-{
-    public string Property1 { get; set; } = "Test";
-}
-
-public class TestNotification : INotification
-{
-    public TestNotification(string aProperty)
-    {
-        AProperty = aProperty;
-    }
-
-    public string AProperty { get; }
-}
-
-public class TestNotificationHandler : INotificationHandler<TestNotification>
-{
-    public Task Handle(TestNotification notification, CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
     }
 }
