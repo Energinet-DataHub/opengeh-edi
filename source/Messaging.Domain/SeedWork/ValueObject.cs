@@ -78,15 +78,6 @@ namespace Messaging.Domain.SeedWork
             }
         }
 
-        // protected static BusinessRuleValidationResult CheckRule(IBusinessRule rule)
-        // {
-        //     if (rule is null)
-        //     {
-        //         throw new ArgumentNullException(nameof(rule));
-        //     }
-        //
-        //     return rule.Validate();
-        // }}
         private static int HashValue(int seed, object value)
         {
             var currentHash = value?.GetHashCode() ?? 0;
@@ -110,11 +101,7 @@ namespace Messaging.Domain.SeedWork
             {
                 _properties = GetType()
                     .GetProperties(BindingFlags.Instance | BindingFlags.Public)
-                    //.Where(p => p.GetCustomAttribute(typeof(IgnoreMemberAttribute)) == null)
                     .ToList();
-
-                // Not available in Core
-                // !Attribute.IsDefined(p, typeof(IgnoreMemberAttribute))).ToList();
             }
 
             return _properties;
@@ -125,7 +112,6 @@ namespace Messaging.Domain.SeedWork
             if (_fields == null)
             {
                 _fields = GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                    //.Where(p => p.GetCustomAttribute(typeof(IgnoreMemberAttribute)) == null)
                     .ToList();
             }
 
