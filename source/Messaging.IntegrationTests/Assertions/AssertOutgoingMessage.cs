@@ -18,12 +18,14 @@ using System.Threading.Tasks;
 using Dapper;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Domain.Actors;
+using Messaging.Infrastructure.Configuration.Serialization;
 using Xunit;
 
 namespace Messaging.IntegrationTests.Assertions
 {
     public class AssertOutgoingMessage
     {
+        private readonly ISerializer _serializer = new Serializer();
         private readonly dynamic _message;
 
         private AssertOutgoingMessage(dynamic message)
@@ -108,14 +110,14 @@ namespace Messaging.IntegrationTests.Assertions
 
         public AssertOutgoingMessage HasMessageRecordValue<TMessageRecord>(Func<TMessageRecord, object> propertySelector, object expectedValue)
         {
-            var sut = JsonSerializer.Deserialize<TMessageRecord>(_message.MessageRecord);
+            var sut = _serializer.Deserialize<TMessageRecord>(_message.MessageRecord);
             Assert.Equal(expectedValue, propertySelector(sut));
             return this;
         }
 
         public AssertOutgoingMessage HasMessageRecordValue<TMessageRecord, TValueType>(Func<TMessageRecord, TValueType> propertySelector, TValueType expectedValue)
         {
-            var sut = JsonSerializer.Deserialize<TMessageRecord>(_message.MessageRecord);
+            var sut = _serializer.Deserialize<TMessageRecord>(_message.MessageRecord);
             Assert.Equal(expectedValue, propertySelector(sut));
             return this;
         }
