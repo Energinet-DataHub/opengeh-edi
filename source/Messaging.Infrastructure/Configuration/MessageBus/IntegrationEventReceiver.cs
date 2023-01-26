@@ -40,9 +40,7 @@ public class IntegrationEventReceiver
 
     private async Task RegisterAsync(string eventId)
     {
-        InboxMessage inboxMessage;
-        inboxMessage = new InboxMessage(eventId);
-        _context.InboxMessages.Add(inboxMessage);
+        _context.InboxMessages.Add(new InboxMessage(eventId));
         await _context.SaveChangesAsync().ConfigureAwait(false);
     }
 }
