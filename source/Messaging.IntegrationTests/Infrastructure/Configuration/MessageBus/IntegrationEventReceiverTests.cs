@@ -139,16 +139,21 @@ public class InboxProcessor
             var notification = MapperFor(message.EventType).MapFrom(message.EventPayload);
             await _mediator.Publish(notification).ConfigureAwait(false);
 
-            var updateStatement = $"UPDATE b2b.InboxMessages " +
-                                  "SET ProcessedDate = @Now " +
-                                  "WHERE Id = @Id";
-            using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
-            await connection.ExecuteAsync(updateStatement, new
-            {
-                Id = message.Id,
-                Now = _dateTimeProvider.Now().ToDateTimeUtc(),
-            }).ConfigureAwait(false);
+            await MarkAsProcessedAsync(message).ConfigureAwait(false);
         }
+    }
+
+    private async Task MarkAsProcessedAsync(InboxMessage message)
+    {
+        var updateStatement = $"UPDATE b2b.InboxMessages " +
+                              "SET ProcessedDate = @Now " +
+                              "WHERE Id = @Id";
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        await connection.ExecuteAsync(updateStatement, new
+        {
+            Id = message.Id,
+            Now = _dateTimeProvider.Now().ToDateTimeUtc(),
+        }).ConfigureAwait(false);
     }
 
     private async Task<IReadOnlyList<InboxMessage>> FindPendingMessages()
