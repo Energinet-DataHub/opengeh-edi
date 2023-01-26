@@ -191,12 +191,6 @@ public class TestIntegrationEventMapper : IIntegrationEventMapper
     }
 }
 
-public interface IIntegrationEventMapper
-{
-    INotification MapFrom(byte[] payload);
-    bool CanHandle(string eventType);
-}
-
 public class TestIntegrationEvent
 {
     public string Property1 { get; set; } = "Test";
