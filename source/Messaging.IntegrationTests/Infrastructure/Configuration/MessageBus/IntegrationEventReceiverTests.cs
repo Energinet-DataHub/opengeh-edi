@@ -49,6 +49,23 @@ public class IntegrationEventReceiverTests : TestBase
         Assert.True(isRegistered);
     }
 
+    [Fact]
+    public async Task If_event_is_already_registered_registration_is_omitted()
+    {
+        var eventId = "1";
+        var eventType = "TestEvent";
+        var @event = new TestIntegrationEvent();
+        var eventPayload = CreateEventPayload(@event);
+        await _receiver.ReceiveAsync(eventId, eventType, eventPayload).ConfigureAwait(false);
+
+        await _receiver.ReceiveAsync(eventId, eventType, eventPayload).ConfigureAwait(false);
+
+        var findRegisteredEventStatement = $"SELECT COUNT(*) FROM b2b.InboxMessages WHERE Id = @EventId";
+        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
+        var isRegistered = connection.ExecuteScalar<bool>(findRegisteredEventStatement, new { EventId = eventId, });
+        Assert.True(isRegistered);
+    }
+
     private static byte[] CreateEventPayload(TestIntegrationEvent @event)
     {
         return JsonSerializer.SerializeToUtf8Bytes(@event);
@@ -70,10 +87,16 @@ public class IntegrationEventReceiver
         _context = context;
     }
 
-    public Task ReceiveAsync(string eventId, string eventType, byte[] eventPayload)
+    public async Task ReceiveAsync(string eventId, string eventType, byte[] eventPayload)
     {
-        var inboxMessage = new InboxMessage(eventId);
+        var inboxMessage = await _context.InboxMessages.FindAsync(eventId).ConfigureAwait(false);
+        if (inboxMessage is not null)
+        {
+            return;
+        }
+
+        inboxMessage = new InboxMessage(eventId);
         _context.InboxMessages.Add(inboxMessage);
-        return _context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
     }
 }
