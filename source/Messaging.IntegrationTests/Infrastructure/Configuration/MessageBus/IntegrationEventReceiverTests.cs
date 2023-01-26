@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text.Json;
 using System.Threading;
@@ -131,16 +132,7 @@ public class InboxProcessor
     }
     public async Task ProcessMessagesAsync()
     {
-        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
-        var sql = "SELECT " +
-                     $"Id AS {nameof(InboxMessage.Id)}, " +
-                     $"EventType AS {nameof(InboxMessage.EventType)}, " +
-                     $"EventPayload AS {nameof(InboxMessage.EventPayload)} " +
-                     "FROM b2b.InboxMessages " +
-                     "WHERE ProcessedDate IS NULL " +
-                     "ORDER BY OccurredOn";
-
-        var messages = await connection.QueryAsync<InboxMessage>(sql).ConfigureAwait(false);
+        var messages = await FindPendingEvents();
 
         foreach (var message in messages)
         {
@@ -150,13 +142,28 @@ public class InboxProcessor
             var updateStatement = $"UPDATE b2b.InboxMessages " +
                                   "SET ProcessedDate = @Now " +
                                   "WHERE Id = @Id";
+            using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
             await connection.ExecuteAsync(updateStatement, new
             {
                 Id = message.Id,
                 Now = _dateTimeProvider.Now().ToDateTimeUtc(),
             }).ConfigureAwait(false);
         }
+    }
 
+    private async Task<IReadOnlyList<InboxMessage>> FindPendingEvents()
+    {
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        var sql = "SELECT " +
+                  $"Id AS {nameof(InboxMessage.Id)}, " +
+                  $"EventType AS {nameof(InboxMessage.EventType)}, " +
+                  $"EventPayload AS {nameof(InboxMessage.EventPayload)} " +
+                  "FROM b2b.InboxMessages " +
+                  "WHERE ProcessedDate IS NULL " +
+                  "ORDER BY OccurredOn";
+
+        var messages = await connection.QueryAsync<InboxMessage>(sql).ConfigureAwait(false);
+        return messages.ToList();
     }
 
     private IIntegrationEventMapper MapperFor(string eventType)
