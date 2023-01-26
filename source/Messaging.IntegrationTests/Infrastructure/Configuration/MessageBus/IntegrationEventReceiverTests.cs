@@ -44,7 +44,7 @@ public class IntegrationEventReceiverTests : TestBase
     }
 
     [Fact]
-    public async Task If_event_is_already_registered_registration_is_omitted()
+    public async Task Event_registration_is_omitted_if_already_registered()
     {
         var eventId = "1";
         await EventIsReceived(eventId).ConfigureAwait(false);
