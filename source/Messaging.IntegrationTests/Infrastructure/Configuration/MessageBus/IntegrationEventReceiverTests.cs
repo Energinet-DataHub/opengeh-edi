@@ -37,11 +37,8 @@ public class IntegrationEventReceiverTests : TestBase
     public async Task Event_is_registered()
     {
         var eventId = "1";
-        var eventType = "TestEvent";
-        var @event = new TestIntegrationEvent();
-        var eventPayload = CreateEventPayload(@event);
 
-        await _receiver.ReceiveAsync(eventId, eventType, eventPayload).ConfigureAwait(false);
+        await EventIsReceived(eventId);
 
         var findRegisteredEventStatement = $"SELECT COUNT(*) FROM b2b.InboxMessages WHERE Id = @EventId";
         var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
@@ -69,6 +66,15 @@ public class IntegrationEventReceiverTests : TestBase
     private static byte[] CreateEventPayload(TestIntegrationEvent @event)
     {
         return JsonSerializer.SerializeToUtf8Bytes(@event);
+    }
+
+    private Task EventIsReceived(string eventId)
+    {
+        var eventType = "TestEvent";
+        var @event = new TestIntegrationEvent();
+        var eventPayload = CreateEventPayload(@event);
+
+        return _receiver.ReceiveAsync(eventId, eventType, eventPayload);
     }
 }
 #pragma warning disable
