@@ -50,12 +50,9 @@ public class IntegrationEventReceiverTests : TestBase
     public async Task If_event_is_already_registered_registration_is_omitted()
     {
         var eventId = "1";
-        var eventType = "TestEvent";
-        var @event = new TestIntegrationEvent();
-        var eventPayload = CreateEventPayload(@event);
-        await _receiver.ReceiveAsync(eventId, eventType, eventPayload).ConfigureAwait(false);
+        await EventIsReceived(eventId).ConfigureAwait(false);
 
-        await _receiver.ReceiveAsync(eventId, eventType, eventPayload).ConfigureAwait(false);
+        await EventIsReceived(eventId).ConfigureAwait(false);
 
         var findRegisteredEventStatement = $"SELECT COUNT(*) FROM b2b.InboxMessages WHERE Id = @EventId";
         var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
