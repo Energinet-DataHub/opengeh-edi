@@ -132,7 +132,7 @@ public class InboxProcessor
     }
     public async Task ProcessMessagesAsync()
     {
-        var messages = await FindPendingEvents();
+        var messages = await FindPendingMessages();
 
         foreach (var message in messages)
         {
@@ -151,7 +151,7 @@ public class InboxProcessor
         }
     }
 
-    private async Task<IReadOnlyList<InboxMessage>> FindPendingEvents()
+    private async Task<IReadOnlyList<InboxMessage>> FindPendingMessages()
     {
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         var sql = "SELECT " +
