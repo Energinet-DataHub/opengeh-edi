@@ -27,8 +27,4 @@ limitations under the License.
     <PackageReference Include="SimpleInjector.Integration.GenericHost" Version="5.3.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Processing.Infrastructure\Processing.Infrastructure.csproj" />
-  </ItemGroup>
-
 </Project>
