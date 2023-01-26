@@ -70,9 +70,8 @@ public class IntegrationEventReceiverTests : TestBase
 
     private async Task EventIsRegisteredWithInbox(string eventId)
     {
-        var findRegisteredEventStatement = $"SELECT COUNT(*) FROM b2b.InboxMessages WHERE Id = @EventId";
         var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
-        var isRegistered = connection.ExecuteScalar<bool>(findRegisteredEventStatement, new { EventId = eventId, });
+        var isRegistered = connection.ExecuteScalar<bool>($"SELECT COUNT(*) FROM b2b.InboxMessages WHERE Id = @EventId", new { EventId = eventId, });
         Assert.True(isRegistered);
     }
 }
