@@ -61,6 +61,7 @@ public class RetrieveAggregationResultTests : TestBase
                  .HasMessageRecordValue<TimeSeries>(x => x.MeasureUnitType, SampleData.MeasureUnitType)
                  .HasMessageRecordValue<TimeSeries>(x => x.MeteringPointType, SampleData.MeteringPointType)
                  .HasMessageRecordValue<TimeSeries>(x => x.Period.Start, SampleData.StartOfPeriod)
+                 .HasMessageRecordValue<TimeSeries>(x => x.Period.End, SampleData.EndOfPeriod)
                  .HasMessageRecordValue<TimeSeries>(x => x.Point[0].Position, 1)
                  .HasMessageRecordValue<TimeSeries, decimal?>(x => x.Point[0].Quantity, 1.1m)
                  .HasMessageRecordValue<TimeSeries>(x => x.Point[0].Quality!, "A02");
