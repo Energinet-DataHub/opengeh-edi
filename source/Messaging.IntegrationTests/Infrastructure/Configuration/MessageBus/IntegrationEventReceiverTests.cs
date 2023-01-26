@@ -40,10 +40,7 @@ public class IntegrationEventReceiverTests : TestBase
 
         await EventIsReceived(eventId);
 
-        var findRegisteredEventStatement = $"SELECT COUNT(*) FROM b2b.InboxMessages WHERE Id = @EventId";
-        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
-        var isRegistered = connection.ExecuteScalar<bool>(findRegisteredEventStatement, new { EventId = eventId, });
-        Assert.True(isRegistered);
+        await EventIsRegisteredWithInbox(eventId);
     }
 
     [Fact]
@@ -72,6 +69,14 @@ public class IntegrationEventReceiverTests : TestBase
         var eventPayload = CreateEventPayload(@event);
 
         return _receiver.ReceiveAsync(eventId, eventType, eventPayload);
+    }
+
+    private async Task EventIsRegisteredWithInbox(string eventId)
+    {
+        var findRegisteredEventStatement = $"SELECT COUNT(*) FROM b2b.InboxMessages WHERE Id = @EventId";
+        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
+        var isRegistered = connection.ExecuteScalar<bool>(findRegisteredEventStatement, new { EventId = eventId, });
+        Assert.True(isRegistered);
     }
 }
 #pragma warning disable
