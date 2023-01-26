@@ -24,11 +24,11 @@ public class AggregationResultMessage : OutgoingMessage
     private AggregationResultMessage(MessageType messageType, ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
         : base(messageType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, JsonSerializer.Serialize(messageRecord))
     {
-        Series = JsonSerializer.Deserialize<TimeSeries>(messageRecord)!;
+        Series = new Serializer().Deserialize<TimeSeries>(messageRecord)!;
     }
 
     private AggregationResultMessage(ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, TimeSeries series)
-        : base(MessageType.NotifyAggregatedMeasureData, receiverId, transactionId, processType, receiverRole, DataHubDetails.IdentificationNumber, MarketRole.MeteringDataAdministrator, JsonSerializer.Serialize(series))
+        : base(MessageType.NotifyAggregatedMeasureData, receiverId, transactionId, processType, receiverRole, DataHubDetails.IdentificationNumber, MarketRole.MeteringDataAdministrator, new Serializer().Serialize(series))
     {
         Series = series;
     }
