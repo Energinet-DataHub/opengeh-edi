@@ -3,10 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EntryPoints", "EntryPoints", "{FD29AEE1-CB22-41FD-A875-1E99C4D5D81C}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energinet.DataHub.MarketRoles.EntryPoints.Common", "Energinet.DataHub.MarketRoles.EntryPoints.Common\Energinet.DataHub.MarketRoles.EntryPoints.Common.csproj", "{CAD21241-8CA0-4E1E-BE4C-7C2F902B138F}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp", "Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp\Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.csproj", "{2B806039-5BCF-4768-95FE-56778403E64D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.CimMessageAdapter", "Messaging.CimMessageAdapter\Messaging.CimMessageAdapter.csproj", "{27395443-B503-4A4A-B9F1-01C3F9C75222}"
@@ -41,10 +37,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CAD21241-8CA0-4E1E-BE4C-7C2F902B138F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CAD21241-8CA0-4E1E-BE4C-7C2F902B138F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CAD21241-8CA0-4E1E-BE4C-7C2F902B138F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CAD21241-8CA0-4E1E-BE4C-7C2F902B138F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2B806039-5BCF-4768-95FE-56778403E64D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2B806039-5BCF-4768-95FE-56778403E64D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B806039-5BCF-4768-95FE-56778403E64D}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -102,7 +94,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{CAD21241-8CA0-4E1E-BE4C-7C2F902B138F} = {FD29AEE1-CB22-41FD-A875-1E99C4D5D81C}
 		{27395443-B503-4A4A-B9F1-01C3F9C75222} = {1C877C68-8E3D-4371-B96A-7360850A538E}
 		{B14EBA74-CCAF-4677-8AE5-A0F6302ED54C} = {1C877C68-8E3D-4371-B96A-7360850A538E}
 		{76FA7684-27E1-4022-9FB3-F72811E45C60} = {1C877C68-8E3D-4371-B96A-7360850A538E}

@@ -27,4 +27,8 @@ limitations under the License.
     <PackageReference Include="SimpleInjector.Integration.GenericHost" Version="5.3.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Messaging.Application\Messaging.Application.csproj" />
+  </ItemGroup>
+
 </Project>
