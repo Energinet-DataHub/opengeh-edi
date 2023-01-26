@@ -136,8 +136,10 @@ public class InboxProcessor
 
         foreach (var message in messages)
         {
-            var notification = MapperFor(message.EventType).MapFrom(message.EventPayload);
-            await _mediator.Publish(notification).ConfigureAwait(false);
+            await _mediator.Publish(
+                MapperFor(message.EventType)
+                    .MapFrom(message.EventPayload))
+                .ConfigureAwait(false);
 
             await MarkAsProcessedAsync(message).ConfigureAwait(false);
         }
