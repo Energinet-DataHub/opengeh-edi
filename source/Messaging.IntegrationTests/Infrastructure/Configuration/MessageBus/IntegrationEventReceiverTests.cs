@@ -12,42 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Dapper;
+using Messaging.Application.Configuration.DataAccess;
+using Messaging.Infrastructure.Configuration.DataAccess;
+using Messaging.Infrastructure.Configuration.Processing.Inbox;
+using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 
 namespace Messaging.IntegrationTests.Infrastructure.Configuration.MessageBus;
 
-public class IntegrationEventReceiverTests
+public class IntegrationEventReceiverTests : TestBase
 {
-    private readonly EventHandlerSpy _eventHandler;
     private readonly IntegrationEventReceiver _receiver;
 
-    public IntegrationEventReceiverTests()
+    public IntegrationEventReceiverTests(DatabaseFixture databaseFixture)
+     : base(databaseFixture)
     {
-        _eventHandler = new EventHandlerSpy();
-        _receiver = new IntegrationEventReceiver(new List<IIntegrationEventHandler>() { _eventHandler });
+        _receiver = new IntegrationEventReceiver(GetService<B2BContext>());
     }
 
     [Fact]
-    public async Task Throw_if_event_cannot_be_handled()
+    public async Task Event_is_registered()
     {
-        var eventId = "1";
-        var eventType = "TestEvent";
-        var @event = new TestIntegrationEvent();
-        var eventPayload = CreateEventPayload(@event);
-
-        await Assert.ThrowsAsync<UnknownIntegrationEventTypeException>(() => _receiver.ReceiveAsync(eventId, eventType, eventPayload))
-            .ConfigureAwait(false);
-    }
-
-    [Fact]
-    public async Task Event_is_handled()
-    {
-        _eventHandler.HandlesReturns = true;
         var eventId = "1";
         var eventType = "TestEvent";
         var @event = new TestIntegrationEvent();
@@ -55,7 +43,10 @@ public class IntegrationEventReceiverTests
 
         await _receiver.ReceiveAsync(eventId, eventType, eventPayload).ConfigureAwait(false);
 
-        _eventHandler.WasInvoked();
+        var findRegisteredEventStatement = $"SELECT COUNT(*) FROM b2b.InboxMessages WHERE Id = @EventId";
+        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
+        var isRegistered = connection.ExecuteScalar<bool>(findRegisteredEventStatement, new { EventId = eventId, });
+        Assert.True(isRegistered);
     }
 
     private static byte[] CreateEventPayload(TestIntegrationEvent @event)
@@ -66,73 +57,23 @@ public class IntegrationEventReceiverTests
 #pragma warning disable
 
 
-
-public class UnknownIntegrationEventTypeException : Exception
-{
-    public UnknownIntegrationEventTypeException(string message)
-        : base(message)
-    {
-    }
-
-    public UnknownIntegrationEventTypeException()
-    {
-    }
-
-    public UnknownIntegrationEventTypeException(string message, Exception innerException)
-        : base(message, innerException)
-    {
-    }
-}
-
 public class TestIntegrationEvent
 {
 }
 
 public class IntegrationEventReceiver
 {
-    private readonly List<IIntegrationEventHandler> _handlers;
+    private readonly B2BContext _context;
 
-    public IntegrationEventReceiver(IEnumerable<IIntegrationEventHandler> eventHandlers)
+    public IntegrationEventReceiver(B2BContext context)
     {
-        _handlers = eventHandlers.ToList();
+        _context = context;
     }
 
     public Task ReceiveAsync(string eventId, string eventType, byte[] eventPayload)
     {
-        var handler = _handlers.FirstOrDefault(handler => handler.Handles(eventType));
-        if (handler is null)
-        {
-            throw new UnknownIntegrationEventTypeException();
-        }
-
-        return handler.ProcessAsync(eventPayload);
-    }
-}
-
-public interface IIntegrationEventHandler
-{
-    bool Handles(string eventType);
-    Task ProcessAsync(byte[] eventPayload);
-}
-
-public class EventHandlerSpy : IIntegrationEventHandler
-{
-    private bool _wasProcessed;
-    public bool HandlesReturns { get; set; }
-
-    public void WasInvoked()
-    {
-        Assert.True(_wasProcessed);
-    }
-
-    public bool Handles(string eventType)
-    {
-        return HandlesReturns;
-    }
-
-    public Task ProcessAsync(byte[] eventPayload)
-    {
-        _wasProcessed = true;
-        return Task.CompletedTask;
+        var inboxMessage = new InboxMessage(eventId);
+        _context.InboxMessages.Add(inboxMessage);
+        return _context.SaveChangesAsync();
     }
 }
