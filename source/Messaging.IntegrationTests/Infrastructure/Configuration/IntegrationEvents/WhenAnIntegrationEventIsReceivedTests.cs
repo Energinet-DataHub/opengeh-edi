@@ -29,11 +29,16 @@ namespace Messaging.IntegrationTests.Infrastructure.Configuration.IntegrationEve
 public class WhenAnIntegrationEventIsReceivedTests : TestBase
 {
     private readonly IntegrationEventReceiver _receiver;
+    private readonly string _eventType = nameof(TestIntegrationEvent);
+    private readonly TestIntegrationEvent _event;
+    private readonly byte[] _eventPayload;
 
     public WhenAnIntegrationEventIsReceivedTests(DatabaseFixture databaseFixture)
      : base(databaseFixture)
     {
         _receiver = new IntegrationEventReceiver(GetService<B2BContext>(), GetService<ISystemDateTimeProvider>());
+        _event = new TestIntegrationEvent();
+        _eventPayload = CreateEventPayload(_event);
     }
 
     [Fact]
@@ -87,11 +92,7 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
 
     private Task EventIsReceived(string eventId)
     {
-        var eventType = nameof(TestIntegrationEvent);
-        var @event = new TestIntegrationEvent();
-        var eventPayload = CreateEventPayload(@event);
-
-        return _receiver.ReceiveAsync(eventId, eventType, eventPayload);
+        return _receiver.ReceiveAsync(eventId, _eventType, _eventPayload);
     }
 
     private async Task EventIsRegisteredWithInbox(string eventId)
