@@ -4,12 +4,10 @@
 
 ## Intro
 
-The EDI domain is responsible for handling incoming and outgoing message to and from DataHub. 
+The EDI domain is responsible for handling incoming and outgoing message to and from DataHub.
 EDI domain receives incoming requests from actor and performs B2B validations on the request.
 The request is then forwarded to relevant domain.
-When a actor wished to peek a message from Datahub. EDI is responsible for generating the message, and ensuring that the correct actor receives the message
-
-
+When a actor wished to peek a message from DataHub. EDI is responsible for generating the message, and ensuring that the correct actor receives the message
 
 ## Architecture
 
