@@ -19,7 +19,6 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Messaging.Application.Configuration;
-using Messaging.CimMessageAdapter;
 using Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 using Messaging.CimMessageAdapter.Response;
 using Messaging.Infrastructure.IncomingMessages;
@@ -27,7 +26,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 
-namespace Messaging.Api.IncomingMessages
+namespace Api.IncomingMessages
 {
     public class RequestChangeOfSupplierMessageReceiver
     {

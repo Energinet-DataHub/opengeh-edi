@@ -16,14 +16,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MeteringPoints.EntryPoints.Common;
 using Messaging.Application.Configuration;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;
 
-namespace Messaging.Api.Configuration.Middleware.Correlation
+namespace Api.Configuration.Middleware.Correlation
 {
     public class CorrelationIdMiddleware : IFunctionsWorkerMiddleware
     {

@@ -15,15 +15,15 @@
 using System;
 using System.Text;
 using System.Threading.Tasks;
+using Api.Configuration;
 using MediatR;
-using Messaging.Api.Configuration;
 using Messaging.Application.Configuration;
 using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace Messaging.Api.IncomingMessages
+namespace Api.IncomingMessages
 {
     public class RequestChangeOfSupplierTransactionQueueListener
     {

@@ -15,7 +15,7 @@
 using System;
 using Messaging.Application.Configuration;
 
-namespace Messaging.Api.Configuration.Middleware.Correlation
+namespace Api.Configuration.Middleware.Correlation
 {
     public sealed class CorrelationContext : ICorrelationContext
     {

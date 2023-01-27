@@ -20,7 +20,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Messaging.Api.Configuration.Middleware
+namespace Api.Configuration.Middleware
 {
     public static class FunctionContextExtensions
     {

@@ -16,9 +16,9 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Messaging.Api.Configuration.Middleware.Authentication.Bearer;
-using Messaging.Api.Configuration.Middleware.Authentication.MarketActors;
-using Messaging.Api.Configuration.Middleware.Correlation;
+using Api.Configuration.Middleware.Authentication.Bearer;
+using Api.Configuration.Middleware.Authentication.MarketActors;
+using Api.Configuration.Middleware.Correlation;
 using Messaging.Application.Actors;
 using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Application.Transactions.MoveIn;
@@ -37,7 +37,7 @@ using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Messaging.Api
+namespace Api
 {
     public static class Program
     {

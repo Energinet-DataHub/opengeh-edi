@@ -20,7 +20,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;
 
-namespace Messaging.Api.Configuration.Middleware.Authentication.Bearer
+namespace Api.Configuration.Middleware.Authentication.Bearer
 {
     public class BearerAuthenticationMiddleware : IFunctionsWorkerMiddleware
     {

@@ -20,7 +20,7 @@ using Messaging.Application.OutgoingMessages.Dequeue;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 
-namespace Messaging.Api.OutgoingMessages;
+namespace Api.OutgoingMessages;
 
 public class DequeueRequestListener
 {

@@ -21,7 +21,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;
 
-namespace Messaging.Api.Configuration.Middleware.Authentication.MarketActors
+namespace Api.Configuration.Middleware.Authentication.MarketActors
 {
     public class MarketActorAuthenticatorMiddleware : IFunctionsWorkerMiddleware
     {

@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Net;
@@ -23,9 +22,8 @@ using Messaging.Application.Configuration.Authentication;
 using Messaging.Application.OutgoingMessages.MessageCount;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
-using Microsoft.Extensions.Logging;
 
-namespace Messaging.Api.OutgoingMessages;
+namespace Api.OutgoingMessages;
 
 public class MessageCountRequestListener
 {

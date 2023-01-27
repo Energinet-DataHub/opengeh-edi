@@ -18,7 +18,7 @@ using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.TimeEvents;
 using Microsoft.Azure.Functions.Worker;
 
-namespace Messaging.Api.Configuration
+namespace Api.Configuration
 {
     public class SystemTimer
     {

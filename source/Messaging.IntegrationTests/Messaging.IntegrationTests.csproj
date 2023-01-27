@@ -41,7 +41,7 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Messaging.Api\Messaging.Api.csproj" />
+      <ProjectReference Include="..\Api\Api.csproj" />
       <ProjectReference Include="..\Messaging.Infrastructure\Messaging.Infrastructure.csproj" />
       <ProjectReference Include="..\Messaging.Application\Messaging.Application.csproj" />
       <ProjectReference Include="..\ApplyDBMigrationsApp\ApplyDBMigrationsApp.csproj" />

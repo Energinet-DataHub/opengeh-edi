@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MeteringPoints.EntryPoints.Common
+namespace Api.Configuration.Middleware.Correlation
 {
     public record UserProperties(string OperationCorrelationId);
 }

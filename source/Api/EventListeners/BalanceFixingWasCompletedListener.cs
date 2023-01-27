@@ -20,7 +20,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using NodaTime.Serialization.Protobuf;
 
-namespace Messaging.Api.EventListeners;
+namespace Api.EventListeners;
 
 public class BalanceFixingWasCompletedListener
 {
