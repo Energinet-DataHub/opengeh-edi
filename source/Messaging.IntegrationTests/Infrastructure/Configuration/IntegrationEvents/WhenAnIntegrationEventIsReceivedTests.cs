@@ -127,7 +127,6 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
 
     private void ExceptEventHandlerToFail()
     {
-        var eventHandlerSpy = GetServiceByServiceType();
-        eventHandlerSpy.ShouldThrowException();
+        NotificationHandlerSpy.ShouldThrowException();
     }
 }
