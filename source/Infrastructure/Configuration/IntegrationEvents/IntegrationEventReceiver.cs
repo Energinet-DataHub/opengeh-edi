@@ -31,7 +31,7 @@ public class IntegrationEventReceiver
 
     public async Task ReceiveAsync(string eventId, string eventType, byte[] eventPayload)
     {
-        var inboxMessage = await _context.InboxMessages.FindAsync(eventId).ConfigureAwait(false);
+        var inboxMessage = await _context.ReceivedIntegrationEvents.FindAsync(eventId).ConfigureAwait(false);
         if (inboxMessage is not null)
         {
             return;
@@ -42,7 +42,7 @@ public class IntegrationEventReceiver
 
     private async Task RegisterAsync(string eventId, string eventType, byte[] eventPayload)
     {
-        _context.InboxMessages.Add(new ReceivedIntegrationEvent(eventId, eventType, eventPayload, _dateTimeProvider.Now()));
+        _context.ReceivedIntegrationEvents.Add(new ReceivedIntegrationEvent(eventId, eventType, eventPayload, _dateTimeProvider.Now()));
         await _context.SaveChangesAsync().ConfigureAwait(false);
     }
 }

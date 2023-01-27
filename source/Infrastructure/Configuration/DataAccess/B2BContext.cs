@@ -67,7 +67,7 @@ namespace Infrastructure.Configuration.DataAccess
 
         public DbSet<BundledMessage> BundledMessages { get; private set; }
 
-        public DbSet<ReceivedIntegrationEvent> InboxMessages { get; private set; }
+        public DbSet<ReceivedIntegrationEvent> ReceivedIntegrationEvents { get; private set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
