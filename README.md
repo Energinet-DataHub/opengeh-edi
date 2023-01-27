@@ -4,7 +4,7 @@
 
 ## Intro
 
-The EDI domain is responsible for handling incoming and outgoing message to and from Datahub. 
+The EDI domain is responsible for handling incoming and outgoing message to and from DataHub. 
 EDI domain receives incoming requests from actor and performs B2B validations on the request.
 The request is then forwarded to relevant domain.
 When a actor wished to peek a message from Datahub. EDI is responsible for generating the message, and ensuring that the correct actor receives the message
@@ -30,7 +30,7 @@ In this program increment we are working on
 - Sending out calculation results for calculated flex consumption for the Energy supplier
 - Fixing minor errors in CIM XML schema
 
-In the next programme increment we are working on
+In the next program increment we are working on
 
 - Sending out calculation results for calculated flex consumption for the Balance supplier and balance responsible party
 
