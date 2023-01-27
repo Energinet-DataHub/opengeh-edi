@@ -32,6 +32,7 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
     private readonly string _eventType = nameof(TestIntegrationEvent);
     private readonly TestIntegrationEvent _event;
     private readonly byte[] _eventPayload;
+    private readonly string _eventId = "1";
 
     public WhenAnIntegrationEventIsReceivedTests(DatabaseFixture databaseFixture)
      : base(databaseFixture)
@@ -44,11 +45,9 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
     [Fact]
     public async Task Event_is_registered()
     {
-        var eventId = "1";
+        await EventIsReceived(_eventId);
 
-        await EventIsReceived(eventId);
-
-        await EventIsRegisteredWithInbox(eventId);
+        await EventIsRegisteredWithInbox(_eventId);
     }
 
     [Fact]
