@@ -1,0 +1,111 @@
+﻿<!--
+Copyright 2020 Energinet DataHub A/S
+
+Licensed under the Apache License, Version 2.0 (the "License2");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+    </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AspNetCore.HealthChecks.AzureServiceBus" Version="6.0.3" />
+    <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="6.0.2" />
+    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.7.0" />
+    <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="2.3.3" />
+    <PackageReference Include="Energinet.DataHub.Core.Logging" Version="2.2.0" />
+    <PackageReference Include="Energinet.DataHub.EnergySupplying.IntegrationEvents" Version="1.0.2" />
+    <PackageReference Include="Energinet.DataHub.EnergySupplying.RequestResponse" Version="1.1.0" />
+    <PackageReference Include="Energinet.DataHub.MeteringPoints.IntegrationEvents" Version="1.0.4" />
+    <PackageReference Include="Energinet.DataHub.MeteringPoints.RequestResponse" Version="1.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Azure" Version="1.2.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="10.0.1" />
+    <PackageReference Include="NodaTime.Serialization.Protobuf" Version="2.0.0" />
+    <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.0.0" />
+    <PackageReference Include="Polly" Version="7.2.2" />
+    <PackageReference Include="SimplerSoftware.EntityFrameworkCore.SqlServer.NodaTime" Version="6.0.1" />
+  </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\EnergySupplying.Contracts\EnergySupplying.Contracts.csproj" />
+      <ProjectReference Include="..\CimMessageAdapter\CimMessageAdapter.csproj" />
+      <ProjectReference Include="..\Application\Application.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Configuration\SystemTime" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="IncomingMessages\SchemaStore\Schemas\Xml\urn-ediel-org-structure-requestchangeaccountingpointcharacteristics-0-1.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="IncomingMessages\SchemaStore\Schemas\Json\Confirm-request-Change-of-Supplier-assembly-model.schema.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="IncomingMessages\SchemaStore\Schemas\Json\Reject-request-Change-of-Supplier-assembly-model.schema.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="IncomingMessages\SchemaStore\Schemas\Json\Request-Change-of-Supplier-assembly-model.schema.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="IncomingMessages\SchemaStore\Schemas\Json\urn-entsoe-eu-local-extension-types.schema.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="IncomingMessages\SchemaStore\Schemas\Json\urn-entsoe-eu-wgedi-codelists.schema.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="IncomingMessages\SchemaStore\Schemas\Xml\urn-ediel-org-measure-notifyaggregatedmeasuredata-0-1.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="IncomingMessages\SchemaStore\Schemas\Xml\urn-ediel-org-structure-accountingpointcharacteristics-0-1.xsd">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="IncomingMessages\SchemaStore\Schemas\Xml\urn-ediel-org-structure-characteristicsofacustomeratanap-0-1.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="IncomingMessages\SchemaStore\Schemas\Xml\urn-ediel-org-structure-confirmrequestchangeaccountingpointcharacteristics-0-1.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="IncomingMessages\SchemaStore\Schemas\Xml\urn-ediel-org-structure-confirmrequestchangeofsupplier-0-1.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="IncomingMessages\SchemaStore\Schemas\Xml\urn-ediel-org-structure-genericnotification-0-1.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="IncomingMessages\SchemaStore\Schemas\Xml\urn-ediel-org-structure-rejectrequestchangeaccountingpointcharacteristics-0-1.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="IncomingMessages\SchemaStore\Schemas\Xml\urn-ediel-org-structure-rejectrequestchangeofsupplier-0-1.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="IncomingMessages\SchemaStore\Schemas\Xml\urn-ediel-org-structure-requestchangecustomercharacteristics-0-1.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="IncomingMessages\SchemaStore\Schemas\Xml\urn-ediel-org-structure-requestchangeofsupplier-0-1.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="IncomingMessages\SchemaStore\Schemas\Xml\urn-entsoe-eu-local-extension-types.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="IncomingMessages\SchemaStore\Schemas\Xml\urn-entsoe-eu-wgedi-codelists.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+    </ItemGroup>
+
+</Project>
