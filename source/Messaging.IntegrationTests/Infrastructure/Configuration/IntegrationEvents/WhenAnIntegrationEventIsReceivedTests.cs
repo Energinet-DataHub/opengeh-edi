@@ -53,35 +53,32 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
     [Fact]
     public async Task Event_registration_is_omitted_if_already_registered()
     {
-        var eventId = "1";
-        await EventIsReceived(eventId).ConfigureAwait(false);
+        await EventIsReceived(_eventId).ConfigureAwait(false);
 
-        await EventIsReceived(eventId).ConfigureAwait(false);
+        await EventIsReceived(_eventId).ConfigureAwait(false);
 
-        await EventIsRegisteredWithInbox(eventId);
+        await EventIsRegisteredWithInbox(_eventId);
     }
 
     [Fact]
     public async Task Event_is_marked_as_processed_when_a_handler_has_handled_it_successfully()
     {
-        var eventId = "1";
-        await EventIsReceived(eventId).ConfigureAwait(false);
+        await EventIsReceived(_eventId).ConfigureAwait(false);
 
         await ProcessInboxMessages().ConfigureAwait(false);
 
-        await EventIsMarkedAsProcessed(eventId).ConfigureAwait(false);
+        await EventIsMarkedAsProcessed(_eventId).ConfigureAwait(false);
     }
 
     [Fact]
     public async Task Event_is_marked_as_failed_if_the_event_handler_throws_an_exception()
     {
         ExceptEventHandlerToFail();
-        var eventId = "1";
-        await EventIsReceived(eventId).ConfigureAwait(false);
+        await EventIsReceived(_eventId).ConfigureAwait(false);
 
         await ProcessInboxMessages().ConfigureAwait(false);
 
-        await EventIsMarkedAsFailed(eventId);
+        await EventIsMarkedAsFailed(_eventId);
     }
 
     private static byte[] CreateEventPayload(TestIntegrationEvent @event)
