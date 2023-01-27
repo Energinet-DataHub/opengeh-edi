@@ -25,7 +25,7 @@ jobs:
   #
 
   ci_base:
-    uses: Energinet-DataHub/.github/.github/workflows/ci-base.yml@v9
+    uses: Energinet-DataHub/.github/.github/workflows/ci-base.yml@v10
 
   #
   # Detect changes to start relevant jobs
@@ -42,70 +42,35 @@ jobs:
   dotnet_ci_build:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@v9
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@v10
     with:
-      SOLUTION_FILE_PATH: 'source/Energinet.DataHub.MarketRoles.sln'
+      SOLUTION_FILE_PATH: 'source/EDI.sln'
 
-  # Run all tests in 'Messaging.IntegrationTests.dll'
-  messaging_integration_tests:
+  # Run all tests in 'IntegrationTests.dll'
+  integration_tests:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v9
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v10
     with:
-      TESTS_DLL_FILE_PATH: '\source\Messaging.IntegrationTests\bin\Release\net6.0\Messaging.IntegrationTests.dll'
+      TESTS_DLL_FILE_PATH: '\source\IntegrationTests\bin\Release\net6.0\IntegrationTests.dll'
       DOWNLOAD_ATTEMPT_LIMIT: 12
 
-  # Run all tests in 'Messaging.ArchitectureTests.dll'
-  messaging_architecture_tests:
+  # Run all tests in 'ArchitectureTests.dll'
+  architecture_tests:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v9
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v10
     with:
-      TESTS_DLL_FILE_PATH: '\source\Messaging.ArchitectureTests\bin\Release\net6.0\Messaging.ArchitectureTests.dll'
+      TESTS_DLL_FILE_PATH: '\source\ArchitectureTests\bin\Release\net6.0\ArchitectureTests.dll'
       DOWNLOAD_ATTEMPT_LIMIT: 12
 
-  # Run all tests in 'Messaging.Tests.dll'
-  messaging_tests:
+  # Run all tests in 'Tests.dll'
+  tests:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v9
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v10
     with:
-      TESTS_DLL_FILE_PATH: '\source\Messaging.Tests\bin\Release\net6.0\Messaging.Tests.dll'
-      DOWNLOAD_ATTEMPT_LIMIT: 12
-
-  # Run all tests in 'Processing.ArchitectureTests.dll'
-  processing_architecture_tests:
-    needs: changes
-    if: ${{ needs.changes.outputs.dotnet == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v9
-    with:
-      TESTS_DLL_FILE_PATH: '\source\Processing.ArchitectureTests\bin\Release\net6.0\Processing.ArchitectureTests.dll'
-      DOWNLOAD_ATTEMPT_LIMIT: 12
-
-  # Run all tests in 'Processing.IntegrationTests.dll'
-  processing_integration_tests:
-    needs: changes
-    if: ${{ needs.changes.outputs.dotnet == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v9
-    with:
-      TESTS_DLL_FILE_PATH: '\source\Processing.IntegrationTests\bin\Release\net6.0\Processing.IntegrationTests.dll'
-      DOWNLOAD_ATTEMPT_LIMIT: 12
-      USE_SQLLOCALDB_2019: true
-      ENVIRONMENT: AzureAuth
-    secrets:
-      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      AZURE_SPN_ID: ${{ secrets.AZURE_SPN_ID_OIDC }}
-      AZURE_KEYVAULT_URL: ${{ secrets.AZURE_KEYVAULT_URL }}
-      AZURE_SECRETS_KEYVAULT_URL: ${{ secrets.AZURE_SECRETS_KEYVAULT_URL }}
-
-  # Run all tests in 'Processing.Tests.dll'
-  processing_tests:
-    needs: changes
-    if: ${{ needs.changes.outputs.dotnet == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v9
-    with:
-      TESTS_DLL_FILE_PATH: '\source\Processing.Tests\bin\Release\net6.0\Processing.Tests.dll'
+      TESTS_DLL_FILE_PATH: '\source\Tests\bin\Release\net6.0\Tests.dll'
       DOWNLOAD_ATTEMPT_LIMIT: 12
 
   #
@@ -118,12 +83,9 @@ jobs:
       ci_base,
       # .NET
       dotnet_ci_build,
-      messaging_integration_tests,
-      messaging_architecture_tests,
-      messaging_tests,
-      processing_architecture_tests,
-      processing_integration_tests,
-      processing_tests,
+      integration_tests,
+      architecture_tests,
+      tests,
     ]
     if: |
       always()
