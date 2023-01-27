@@ -21,7 +21,7 @@ using Application.Configuration.Commands.Commands;
 using Messaging.Infrastructure.Configuration;
 using Xunit;
 
-namespace Messaging.ArchitectureTests.Application;
+namespace ArchitectureTests.Application;
 
 public class InternalCommandTests
 {

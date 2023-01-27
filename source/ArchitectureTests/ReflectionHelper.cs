@@ -18,7 +18,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.Azure.Functions.Worker;
 
-namespace Messaging.ArchitectureTests
+namespace ArchitectureTests
 {
     public static class ReflectionHelper
     {

@@ -28,7 +28,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Xunit;
 
-namespace Messaging.ArchitectureTests
+namespace ArchitectureTests
 {
     public class CompositionRootTests
     {
