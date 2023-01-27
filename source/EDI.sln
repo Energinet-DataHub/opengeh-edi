@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "Domain\Domain.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequestResponse", "RequestResponse\source\RequestResponse\RequestResponse.csproj", "{6A9A18B6-9445-45A0-813D-B7143DB9BC74}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Messaging.PerformanceTest", "Messaging.PerformanceTest\Messaging.PerformanceTest.csproj", "{B021EA3C-AB51-4069-AE26-B1F907A0D165}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerformanceTest", "PerformanceTest\PerformanceTest.csproj", "{B021EA3C-AB51-4069-AE26-B1F907A0D165}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearningTests", "LearningTests\LearningTests.csproj", "{CDC5AB8C-7D15-4EA6-9FD6-8FAD8C9E35CB}"
 EndProject

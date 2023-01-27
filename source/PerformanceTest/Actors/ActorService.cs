@@ -16,7 +16,7 @@ using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Globalization;
 
-namespace Messaging.PerformanceTest.Actors;
+namespace PerformanceTest.Actors;
 
 public class ActorService : IActorService
 {

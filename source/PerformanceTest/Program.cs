@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.PerformanceTest.Actors;
-using Messaging.PerformanceTest.MoveIn;
+using PerformanceTest.Actors;
+using PerformanceTest.MoveIn;
 
 var builder = WebApplication.CreateBuilder(args);
 

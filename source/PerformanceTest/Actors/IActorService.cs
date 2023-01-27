@@ -14,7 +14,7 @@
 
 using System.Collections.ObjectModel;
 
-namespace Messaging.PerformanceTest.Actors;
+namespace PerformanceTest.Actors;
 
 /// <summary>
 /// Service for get actor numbers for test

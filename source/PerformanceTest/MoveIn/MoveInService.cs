@@ -11,14 +11,15 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 using System.Globalization;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml.Linq;
-using Messaging.PerformanceTest.MoveIn.Jwt;
+using PerformanceTest.MoveIn.Jwt;
 
-namespace Messaging.PerformanceTest.MoveIn;
+namespace PerformanceTest.MoveIn;
 
 internal class MoveInService : IMoveInService
 {

@@ -15,7 +15,7 @@
 using System.Globalization;
 using System.Text;
 
-namespace Messaging.PerformanceTest.MoveIn;
+namespace PerformanceTest.MoveIn;
 
 public class Utf8StringWriter : StringWriter
 {

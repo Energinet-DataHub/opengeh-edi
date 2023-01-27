@@ -11,12 +11,13 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-using Messaging.PerformanceTest.Actors;
-using Messaging.PerformanceTest.MoveIn;
-using Messaging.PerformanceTest.MoveIn.Jwt;
-using Microsoft.AspNetCore.Mvc;
 
-namespace Messaging.PerformanceTest.Controllers;
+using Microsoft.AspNetCore.Mvc;
+using PerformanceTest.Actors;
+using PerformanceTest.MoveIn;
+using PerformanceTest.MoveIn.Jwt;
+
+namespace PerformanceTest.Controllers;
 
 [ApiController]
 [Route("api")]
