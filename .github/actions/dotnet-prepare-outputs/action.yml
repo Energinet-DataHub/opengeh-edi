@@ -36,7 +36,7 @@ runs:
       shell: bash
       run: |
         dotnet publish \
-          'source/Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp/Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.csproj' \
+          'source/ApplyDBMigrationsApp/ApplyDBMigrationsApp.csproj' \
           --no-build \
           --no-restore \
           --configuration Release \
@@ -51,16 +51,6 @@ runs:
           --no-restore \
           --configuration Release \
           --output '${{ inputs.OUTPUT_PATH }}\functions\api'
-
-    - name: Publish Processing
-      shell: bash
-      run: |
-        dotnet publish \
-          'source/Processing.Api/Processing.Api.csproj' \
-          --no-build \
-          --no-restore \
-          --configuration Release \
-          --output '${{ inputs.OUTPUT_PATH }}\functions\processing'
 
     - name: Publish PerformanceTest
       shell: bash

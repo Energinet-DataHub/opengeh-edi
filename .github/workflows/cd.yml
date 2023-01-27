@@ -36,7 +36,7 @@ jobs:
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@v9
     with:
-      SOLUTION_FILE_PATH: 'source/Energinet.DataHub.MarketRoles.sln'
+      SOLUTION_FILE_PATH: 'source/EDI.sln'
       TESTS_FILTER_EXPRESSION: 'FullyQualifiedName!~LearningTests' # Filter => Skip all tests within namespace 'LearningTests'
       USE_SQLLOCALDB_2019: true
       ENVIRONMENT: AzureAuth
@@ -71,7 +71,7 @@ jobs:
         with:
           token: ${{ secrets.PAT_TOKEN }}
           repository: '${{ secrets.ENVIRONMENT_REPOSITORY_PATH }}'
-          event-type: 'market-roles-deployment-request-domain'
+          event-type: 'edi-deployment-request-domain'
           client-payload: '{"domain_pr": "${{ steps.find_pull_request.outputs.pull_request_number }}"}'
 
   #
@@ -89,5 +89,5 @@ jobs:
     uses: Energinet-DataHub/.github/.github/workflows/notify-team.yml@v9
     with:
       TEAM_NAME: 'Batman'
-      SUBJECT: 'Deployment dispatch failed: Market Roles'
+      SUBJECT: 'Deployment dispatch failed: EDI'
     secrets: inherit

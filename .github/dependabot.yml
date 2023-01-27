@@ -5,19 +5,7 @@
 version: 2
 updates:
   - package-ecosystem: "nuget"
-    directory: "/source/Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 0
-
-  - package-ecosystem: "nuget"
-    directory: "/source/Energinet.DataHub.MarketRoles.EntryPoints.Common"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 0
-
-  - package-ecosystem: "nuget"
-    directory: "/source/Energinet.DataHub.MarketRoles.EntryPoints.Processing"
+    directory: "/source/ApplyDBMigrationsApp"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
@@ -66,36 +54,6 @@ updates:
 
   - package-ecosystem: "nuget"
     directory: "/source/Messaging.Tests"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 0
-
-  - package-ecosystem: "nuget"
-    directory: "/source/Processing.Application"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 0
-
-  - package-ecosystem: "nuget"
-    directory: "/source/Processing.Domain"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 0
-    
-  - package-ecosystem: "nuget"
-    directory: "/source/Processing.Infrastructure"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 0
-
-  - package-ecosystem: "nuget"
-    directory: "/source/Processing.IntegrationTests"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 0
-
-  - package-ecosystem: "nuget"
-    directory: "/source/Processing.Tests"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0

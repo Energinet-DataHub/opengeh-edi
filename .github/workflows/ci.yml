@@ -44,7 +44,7 @@ jobs:
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@v9
     with:
-      SOLUTION_FILE_PATH: 'source/Energinet.DataHub.MarketRoles.sln'
+      SOLUTION_FILE_PATH: 'source/EDI.sln'
 
   # Run all tests in 'Messaging.IntegrationTests.dll'
   messaging_integration_tests:
@@ -73,41 +73,6 @@ jobs:
       TESTS_DLL_FILE_PATH: '\source\Messaging.Tests\bin\Release\net6.0\Messaging.Tests.dll'
       DOWNLOAD_ATTEMPT_LIMIT: 12
 
-  # Run all tests in 'Processing.ArchitectureTests.dll'
-  processing_architecture_tests:
-    needs: changes
-    if: ${{ needs.changes.outputs.dotnet == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v9
-    with:
-      TESTS_DLL_FILE_PATH: '\source\Processing.ArchitectureTests\bin\Release\net6.0\Processing.ArchitectureTests.dll'
-      DOWNLOAD_ATTEMPT_LIMIT: 12
-
-  # Run all tests in 'Processing.IntegrationTests.dll'
-  processing_integration_tests:
-    needs: changes
-    if: ${{ needs.changes.outputs.dotnet == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v9
-    with:
-      TESTS_DLL_FILE_PATH: '\source\Processing.IntegrationTests\bin\Release\net6.0\Processing.IntegrationTests.dll'
-      DOWNLOAD_ATTEMPT_LIMIT: 12
-      USE_SQLLOCALDB_2019: true
-      ENVIRONMENT: AzureAuth
-    secrets:
-      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      AZURE_SPN_ID: ${{ secrets.AZURE_SPN_ID_OIDC }}
-      AZURE_KEYVAULT_URL: ${{ secrets.AZURE_KEYVAULT_URL }}
-      AZURE_SECRETS_KEYVAULT_URL: ${{ secrets.AZURE_SECRETS_KEYVAULT_URL }}
-
-  # Run all tests in 'Processing.Tests.dll'
-  processing_tests:
-    needs: changes
-    if: ${{ needs.changes.outputs.dotnet == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v9
-    with:
-      TESTS_DLL_FILE_PATH: '\source\Processing.Tests\bin\Release\net6.0\Processing.Tests.dll'
-      DOWNLOAD_ATTEMPT_LIMIT: 12
-
   #
   # Branch policy status check
   #
@@ -121,9 +86,6 @@ jobs:
       messaging_integration_tests,
       messaging_architecture_tests,
       messaging_tests,
-      processing_architecture_tests,
-      processing_integration_tests,
-      processing_tests,
     ]
     if: |
       always()
