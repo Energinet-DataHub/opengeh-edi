@@ -46,7 +46,7 @@ runs:
       shell: bash
       run: |
         dotnet publish \
-          'source/Messaging.Api/Messaging.Api.csproj' \
+          'source/Api/Api.csproj' \
           --no-build \
           --no-restore \
           --configuration Release \
@@ -56,7 +56,7 @@ runs:
       shell: bash
       run: |
         dotnet publish \
-          'source/Messaging.PerformanceTest/Messaging.PerformanceTest.csproj' \
+          'source/PerformanceTest/PerformanceTest.csproj' \
           --no-build \
           --no-restore \
           --configuration Release \

@@ -11,49 +11,49 @@ updates:
     open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
-    directory: "/source/Messaging.Api"
+    directory: "/source/Api"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
-    directory: "/source/Messaging.Application"
+    directory: "/source/Application"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
-    directory: "/source/Messaging.ArchitectureTests"
+    directory: "/source/ArchitectureTests"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
-    directory: "/source/Messaging.CimMessageAdapter"
+    directory: "/source/CimMessageAdapter"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
-    directory: "/source/Messaging.CimMessageAdapter.Tests"
+    directory: "/source/CimMessageAdapter.Tests"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
-    directory: "/source/Messaging.Infrastructure"
+    directory: "/source/Infrastructure"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
-    directory: "/source/Messaging.IntegrationTests"
+    directory: "/source/IntegrationTests"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
-    directory: "/source/Messaging.Tests"
+    directory: "/source/Tests"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0

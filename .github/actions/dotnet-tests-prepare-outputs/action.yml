@@ -29,39 +29,39 @@ runs:
   steps:
     # To ensure code coverage tooling is available in bin folder, we use publish on test assemblies
     # See https://github.com/coverlet-coverage/coverlet/issues/521#issuecomment-522429394
-    - name: Publish Messaging.IntegrationTests
+    - name: Publish IntegrationTests
       shell: bash
       run: |
         dotnet publish \
-          '.\source\Messaging.IntegrationTests\Messaging.IntegrationTests.csproj' \
+          '.\source\IntegrationTests\IntegrationTests.csproj' \
           --no-build \
           --no-restore \
           --configuration Release \
-          --output '.\source\Messaging.IntegrationTests\bin\Release\net6.0'
+          --output '.\source\IntegrationTests\bin\Release\net6.0'
 
     # To ensure code coverage tooling is available in bin folder, we use publish on test assemblies
     # See https://github.com/coverlet-coverage/coverlet/issues/521#issuecomment-522429394
-    - name: Publish Messaging.ArchitectureTests
+    - name: Publish ArchitectureTests
       shell: bash
       run: |
         dotnet publish \
-          '.\source\Messaging.ArchitectureTests\Messaging.ArchitectureTests.csproj' \
+          '.\source\ArchitectureTests\ArchitectureTests.csproj' \
           --no-build \
           --no-restore \
           --configuration Release \
-          --output '.\source\Messaging.ArchitectureTests\bin\Release\net6.0'
+          --output '.\source\ArchitectureTests\bin\Release\net6.0'
 
     # To ensure code coverage tooling is available in bin folder, we use publish on test assemblies
     # See https://github.com/coverlet-coverage/coverlet/issues/521#issuecomment-522429394
-    - name: Publish Messaging.Tests
+    - name: Publish Tests
       shell: bash
       run: |
         dotnet publish \
-          '.\source\Messaging.Tests\Messaging.Tests.csproj' \
+          '.\source\Tests\Tests.csproj' \
           --no-build \
           --no-restore \
           --configuration Release \
-          --output '.\source\Messaging.Tests\bin\Release\net6.0'
+          --output '.\source\Tests\bin\Release\net6.0'
 
     - name: Copy all bin folders
       shell: bash

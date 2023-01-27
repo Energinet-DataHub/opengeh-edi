@@ -46,31 +46,31 @@ jobs:
     with:
       SOLUTION_FILE_PATH: 'source/EDI.sln'
 
-  # Run all tests in 'Messaging.IntegrationTests.dll'
-  messaging_integration_tests:
+  # Run all tests in 'IntegrationTests.dll'
+  integration_tests:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v9
     with:
-      TESTS_DLL_FILE_PATH: '\source\Messaging.IntegrationTests\bin\Release\net6.0\Messaging.IntegrationTests.dll'
+      TESTS_DLL_FILE_PATH: '\source\IntegrationTests\bin\Release\net6.0\IntegrationTests.dll'
       DOWNLOAD_ATTEMPT_LIMIT: 12
 
-  # Run all tests in 'Messaging.ArchitectureTests.dll'
-  messaging_architecture_tests:
+  # Run all tests in 'ArchitectureTests.dll'
+  architecture_tests:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v9
     with:
-      TESTS_DLL_FILE_PATH: '\source\Messaging.ArchitectureTests\bin\Release\net6.0\Messaging.ArchitectureTests.dll'
+      TESTS_DLL_FILE_PATH: '\source\ArchitectureTests\bin\Release\net6.0\ArchitectureTests.dll'
       DOWNLOAD_ATTEMPT_LIMIT: 12
 
-  # Run all tests in 'Messaging.Tests.dll'
-  messaging_tests:
+  # Run all tests in 'Tests.dll'
+  tests:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v9
     with:
-      TESTS_DLL_FILE_PATH: '\source\Messaging.Tests\bin\Release\net6.0\Messaging.Tests.dll'
+      TESTS_DLL_FILE_PATH: '\source\Tests\bin\Release\net6.0\Tests.dll'
       DOWNLOAD_ATTEMPT_LIMIT: 12
 
   #
@@ -83,9 +83,9 @@ jobs:
       ci_base,
       # .NET
       dotnet_ci_build,
-      messaging_integration_tests,
-      messaging_architecture_tests,
-      messaging_tests,
+      integration_tests,
+      architecture_tests,
+      tests,
     ]
     if: |
       always()
