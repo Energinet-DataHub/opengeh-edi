@@ -12,17 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 
 namespace Messaging.IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 
-#pragma warning disable
-public class TestNotificationHandler : INotificationHandler<TestNotification>
+public class TestNotificationHandlerSpy : INotificationHandler<TestNotification>
 {
+    private bool _shouldThrowException;
+
     public Task Handle(TestNotification notification, CancellationToken cancellationToken)
     {
+        if (_shouldThrowException)
+        {
+            _shouldThrowException = false;
+            throw new InvalidOperationException("A test exception");
+        }
+
         return Task.CompletedTask;
+    }
+
+    public void ShouldThrowException()
+    {
+        _shouldThrowException = true;
     }
 }

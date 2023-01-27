@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,7 +21,7 @@ using MediatR;
 using Messaging.Application.Configuration;
 using Messaging.Application.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.IntegrationEvents;
-using Messaging.Infrastructure.Configuration.MessageBus;
+using Polly;
 
 namespace Messaging.Infrastructure.Configuration.Processing.Inbox;
 
@@ -45,12 +46,16 @@ public class InboxProcessor
 
         foreach (var message in messages)
         {
-            await _mediator.Publish(
-                    MapperFor(message.EventType)
-                        .MapFrom(message.EventPayload))
-                .ConfigureAwait(false);
-
-            await MarkAsProcessedAsync(message).ConfigureAwait(false);
+            try
+            {
+                await _mediator.Publish(MapperFor(message.EventType).MapFrom(message.EventPayload)).ConfigureAwait(false);
+                await MarkAsProcessedAsync(message).ConfigureAwait(false);
+            }
+            #pragma warning disable CA1031 // We dont' the type of exception here
+            catch (Exception e)
+            {
+                await MarkAsFailedAsync(message, e).ConfigureAwait(false);
+            }
         }
     }
 
@@ -64,6 +69,21 @@ public class InboxProcessor
         {
             Id = message.Id,
             Now = _dateTimeProvider.Now().ToDateTimeUtc(),
+        }).ConfigureAwait(false);
+    }
+
+    private async Task MarkAsFailedAsync(InboxMessage message, Exception exception)
+    {
+        var updateStatement = $"UPDATE b2b.InboxMessages " +
+                              "SET ProcessedDate = @Now, " +
+                              "ErrorMessage = @ErrorMessage " +
+                              "WHERE Id = @Id";
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        await connection.ExecuteAsync(updateStatement, new
+        {
+            Id = message.Id,
+            Now = _dateTimeProvider.Now().ToDateTimeUtc(),
+            ErrorMessage = exception.ToString(),
         }).ConfigureAwait(false);
     }
 

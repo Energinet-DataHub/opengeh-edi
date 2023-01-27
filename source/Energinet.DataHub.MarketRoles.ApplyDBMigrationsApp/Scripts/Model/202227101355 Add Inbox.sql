@@ -6,5 +6,6 @@
     OccurredOn datetime2(7) NOT NULL,
     EventType nvarchar(100) NOT NULL,
     EventPayload varbinary(MAX) NOT NULL,
+    ErrorMessage nvarchar(MAX) NULL,
     CONSTRAINT PK_Inbox PRIMARY KEY NONCLUSTERED (Id)
 )

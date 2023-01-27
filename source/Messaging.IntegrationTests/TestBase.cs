@@ -14,6 +14,7 @@
 
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,8 +45,9 @@ namespace Messaging.IntegrationTests
         private readonly AggregationResultsStub _aggregationResultsStub;
         private readonly ServiceBusSenderFactoryStub _serviceBusSenderFactoryStub;
         private readonly HttpClientSpy _httpClientSpy;
+        private readonly TestNotificationHandlerSpy _testNotificationHandlerSpy;
         private ServiceCollection? _services;
-        private IServiceProvider? _serviceProvider;
+        private IServiceProvider _serviceProvider = default!;
         private bool _disposed;
 
         protected TestBase(DatabaseFixture databaseFixture)
@@ -55,6 +57,7 @@ namespace Messaging.IntegrationTests
             _httpClientSpy = new HttpClientSpy();
             _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
             _aggregationResultsStub = new AggregationResultsStub();
+            _testNotificationHandlerSpy = new TestNotificationHandlerSpy();
             BuildServices();
         }
 
@@ -68,6 +71,12 @@ namespace Messaging.IntegrationTests
             where T : notnull
         {
             return _serviceProvider!.GetRequiredService<T>();
+        }
+
+        #pragma warning disable
+        protected TestNotificationHandlerSpy GetServiceByServiceType()
+        {
+            return _testNotificationHandlerSpy;
         }
 
         protected virtual void Dispose(bool disposing)
@@ -112,7 +121,7 @@ namespace Messaging.IntegrationTests
             _services.AddSingleton(
                 _ => new ServiceBusClient(CreateFakeServiceBusConnectionString()));
 
-            _services.AddTransient<INotificationHandler<TestNotification>, TestNotificationHandler>();
+            _services.AddScoped<INotificationHandler<TestNotification>>(_ => _testNotificationHandlerSpy);
 
             CompositionRoot.Initialize(_services)
                 .AddAuthentication()

@@ -68,6 +68,18 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
         await EventIsMarkedAsProcessed(eventId).ConfigureAwait(false);
     }
 
+    [Fact]
+    public async Task Event_is_marked_as_failed_if_the_event_handler_throws_an_exception()
+    {
+        ExceptEventHandlerToFail();
+        var eventId = "1";
+        await EventIsReceived(eventId).ConfigureAwait(false);
+
+        await ProcessInboxMessages().ConfigureAwait(false);
+
+        await EventIsMarkedAsFailed(eventId);
+    }
+
     private static byte[] CreateEventPayload(TestIntegrationEvent @event)
     {
         return JsonSerializer.SerializeToUtf8Bytes(@event);
@@ -96,6 +108,13 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
         Assert.True(isProcessed);
     }
 
+    private async Task EventIsMarkedAsFailed(string eventId)
+    {
+        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
+        var isProcessed = connection.ExecuteScalar<bool>($"SELECT COUNT(*) FROM b2b.InboxMessages WHERE Id = @EventId AND ProcessedDate IS NOT NULL AND ErrorMessage IS NOT NULL", new { EventId = eventId, });
+        Assert.True(isProcessed);
+    }
+
     private Task ProcessInboxMessages()
     {
         var inboxProcessor = new InboxProcessor(
@@ -104,5 +123,11 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
             GetService<ISystemDateTimeProvider>(),
             new[] { new TestIntegrationEventMapper(), });
         return inboxProcessor.ProcessMessagesAsync();
+    }
+
+    private void ExceptEventHandlerToFail()
+    {
+        var eventHandlerSpy = GetServiceByServiceType();
+        eventHandlerSpy.ShouldThrowException();
     }
 }
