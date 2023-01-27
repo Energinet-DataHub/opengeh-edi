@@ -5,97 +5,55 @@
 version: 2
 updates:
   - package-ecosystem: "nuget"
-    directory: "/source/Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp"
+    directory: "/source/ApplyDBMigrationsApp"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
-    directory: "/source/Energinet.DataHub.MarketRoles.EntryPoints.Common"
+    directory: "/source/Api"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
-    directory: "/source/Energinet.DataHub.MarketRoles.EntryPoints.Processing"
+    directory: "/source/Application"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
-    directory: "/source/Messaging.Api"
+    directory: "/source/ArchitectureTests"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
-    directory: "/source/Messaging.Application"
+    directory: "/source/CimMessageAdapter"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
-    directory: "/source/Messaging.ArchitectureTests"
+    directory: "/source/CimMessageAdapter.Tests"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
-    directory: "/source/Messaging.CimMessageAdapter"
+    directory: "/source/Infrastructure"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
-    directory: "/source/Messaging.CimMessageAdapter.Tests"
+    directory: "/source/IntegrationTests"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
 
   - package-ecosystem: "nuget"
-    directory: "/source/Messaging.Infrastructure"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 0
-
-  - package-ecosystem: "nuget"
-    directory: "/source/Messaging.IntegrationTests"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 0
-
-  - package-ecosystem: "nuget"
-    directory: "/source/Messaging.Tests"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 0
-
-  - package-ecosystem: "nuget"
-    directory: "/source/Processing.Application"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 0
-
-  - package-ecosystem: "nuget"
-    directory: "/source/Processing.Domain"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 0
-    
-  - package-ecosystem: "nuget"
-    directory: "/source/Processing.Infrastructure"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 0
-
-  - package-ecosystem: "nuget"
-    directory: "/source/Processing.IntegrationTests"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 0
-
-  - package-ecosystem: "nuget"
-    directory: "/source/Processing.Tests"
+    directory: "/source/Tests"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0

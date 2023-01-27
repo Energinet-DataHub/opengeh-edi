@@ -1,0 +1,98 @@
+﻿<!--
+Copyright 2020 Energinet DataHub A/S
+
+Licensed under the Apache License, Version 2.0 (the "License2");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Scripts\Test" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DbUp.Reboot.SqlServer" Version="1.4.0" />
+    <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.2" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Scripts\Model\202207041353 Re-create QueuedInternalCommands table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202207080938 Add effective date for electrical heating.sql" />
+    <EmbeddedResource Include="Scripts\Model\202208181332 Add actor table to BtwoB.sql" />
+    <EmbeddedResource Include="Scripts\Model\202208241040 Alter BtwoB actor table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202208241043 Clean BtwoB actor table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202210091043 Remove correlation id.sql" />
+    <EmbeddedResource Include="Scripts\Model\202211081048 Add business process state columns.sql" />
+    <EmbeddedResource Include="Scripts\Model\202212081032 Add end of supply notification state.sql" />
+    <EmbeddedResource Include="Scripts\Model\202225081326 Create index on QueuedInternalCommands.sql" />
+    <EmbeddedResource Include="Scripts\Model\202225081325 Refactor columns.sql" />
+    <EmbeddedResource Include="Scripts\Model\202225081509 Remove reasoncode column.sql" />
+    <EmbeddedResource Include="Scripts\Model\202225081510 Drop actors table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202225081512 Add grid operator notification state.sql" />
+    <EmbeddedResource Include="Scripts\Model\202225081512 Change energy supplier notification state.sql" />
+    <EmbeddedResource Include="Scripts\Model\202226081401 Add sts user id to actor table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202226081402 Add customer to consumerregistration.sql" />
+    <EmbeddedResource Include="Scripts\Model\202226081403 Remove consumer id.sql" />
+    <EmbeddedResource Include="Scripts\Model\202226081404 Drop consumers.sql" />
+    <EmbeddedResource Include="Scripts\Model\202226081405 Add grid operator message delivery state.sql" />
+    <EmbeddedResource Include="Scripts\Model\202226081406 Add customer master data.sql" />
+    <EmbeddedResource Include="Scripts\Model\202226081407 Rename outgoing message column.sql" />
+    <EmbeddedResource Include="Scripts\Model\202226081408 Add temp discriminator column.sql" />
+    <EmbeddedResource Include="Scripts\Model\202226081409 Add requesting actor number to move in transaction.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101321 Extent ConsumerRegistration with second customer.sql" />
+    <EmbeddedResource Include="Scripts\Model\202226081410 Drop customer master data state coulmn.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101322 Add update customer transactions table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101323 Add bundle id to OutgoingMessage table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101324 Remove bundle id from OutgoingMessage table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101325 Add BundleStore Table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101326 Add columns to bundlestore.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101327 Add MessageId column to bundlestore.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101328 Add MessageIdsIncluded column to bundlestore.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101329 Add EnqueuedMessages table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101330 Remove actor role from bundle store.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101331 Rename document type column.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101332 Rename marketactivityrecordpayload column.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101334 Fix aggregations message type.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101335 Cleanup enqueued messages.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101350 Alter AggregatedTimeSeriesTransactions table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101351 Change Id from uniqueidentifier to string.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101352 Add actor provided id.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101354 Add period start and end.sql" />
+    <EmbeddedResource Include="Scripts\Seed\202206281100 Seed cleanup.sql" />
+    <EmbeddedResource Include="Scripts\Seed\202206281101 Insert Reasons.sql" />
+    <EmbeddedResource Include="Scripts\Model\202205241100 Consolidated dbo model.sql" />
+    <EmbeddedResource Include="Scripts\Model\202205241101 Consolidated BtwoB model.sql" />
+    <EmbeddedResource Include="Scripts\Seed\202206281102 Insert AccountPoints.sql" />
+    <EmbeddedResource Include="Scripts\Seed\202209151140 Insert Reasons.sql" />
+    <EmbeddedResource Include="Scripts\Model\202225081511 Add grid operator id.sql" />
+    <EmbeddedResource Include="Scripts\Model\202226081400 Make EnergySupplierNumber nullable.sql" />
+    <EmbeddedResource Include="Scripts\Seed\202210041540 Remove failed outgoing messages.sql" />
+    <EmbeddedResource Include="Scripts\Seed\202210041440 Insert Reasons.sql" />
+    <EmbeddedResource Include="Scripts\Seed\202210071000 Insert Reasons.sql" />
+    <EmbeddedResource Include="Scripts\Seed\202210111000 Cancel processes.sql" />
+    <None Remove="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
+    <None Remove="Scripts\Model\202227101336 Add ReadyMessages Table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101336 Add BundledMessages Table.sql" />
+    <None Remove="Scripts\Model\202227101337 Alter AggregatedTimeSeriesTransactions table.sql" />
+    <None Remove="Scripts\Model\202227101352 Change Id from string to uniqueidentifier.sql" />
+    <EmbeddedResource Include="Scripts\Model\202227101353 Change Id from string to uniqueidentifier.sql" />
+  </ItemGroup>
+
+</Project>

@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using System.Reflection;
-using Messaging.Infrastructure.Configuration.Serialization;
-using Messaging.Infrastructure.Transactions;
-using Messaging.Infrastructure.Transactions.Aggregations;
+using Infrastructure.Configuration.Serialization;
+using Infrastructure.Transactions;
+using Infrastructure.Transactions.Aggregations;
 using Microsoft.Extensions.Configuration;
 
 namespace LearningTests.Infrastructure.Transactions.Aggregations;
