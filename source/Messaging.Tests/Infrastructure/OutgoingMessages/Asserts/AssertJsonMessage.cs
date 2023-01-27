@@ -14,8 +14,8 @@
 
 using System;
 using System.Text.Json;
+using Domain.OutgoingMessages;
 using Json.Schema;
-using Messaging.Domain.OutgoingMessages;
 using Xunit;
 
 namespace Messaging.Tests.Infrastructure.OutgoingMessages.Asserts;

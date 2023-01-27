@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 using Application.Actors;
 using Application.Configuration.DataAccess;
 using Dapper;
-using Messaging.Domain.Actors;
+using Domain.Actors;
 
 namespace Infrastructure.Actors;
 

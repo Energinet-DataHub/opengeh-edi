@@ -14,8 +14,8 @@
 
 using System;
 using System.Collections.Generic;
-using Messaging.Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
-using Messaging.Domain.Transactions;
+using Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
+using Domain.Transactions;
 using Messaging.IntegrationTests.Factories;
 using NodaTime;
 

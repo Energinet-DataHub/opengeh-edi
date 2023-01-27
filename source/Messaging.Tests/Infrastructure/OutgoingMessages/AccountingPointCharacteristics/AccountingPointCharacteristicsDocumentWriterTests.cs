@@ -21,15 +21,15 @@ using System.Xml.Linq;
 using System.Xml.Schema;
 using Application.Configuration;
 using Application.OutgoingMessages.Common;
+using Domain.OutgoingMessages;
 using Infrastructure.Configuration;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.IncomingMessages.SchemaStore;
 using Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
 using Infrastructure.OutgoingMessages.Common;
-using Messaging.Domain.OutgoingMessages;
 using Messaging.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
-using MarketActivityRecord = Messaging.Domain.OutgoingMessages.AccountingPointCharacteristics.MarketActivityRecord;
+using MarketActivityRecord = Domain.OutgoingMessages.AccountingPointCharacteristics.MarketActivityRecord;
 
 namespace Messaging.Tests.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
 

@@ -14,9 +14,9 @@
 
 using System.Linq;
 using System.Threading.Tasks;
+using Domain.Transactions;
+using Domain.Transactions.MoveIn;
 using Infrastructure.Configuration.DataAccess;
-using Messaging.Domain.Transactions;
-using Messaging.Domain.Transactions.MoveIn;
 using Microsoft.EntityFrameworkCore;
 using NodaTime;
 

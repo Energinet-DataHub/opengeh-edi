@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using Messaging.Domain.Actors;
+using Domain.Actors;
 
 namespace Application.Configuration.Authentication
 {

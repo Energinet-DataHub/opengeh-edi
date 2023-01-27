@@ -19,7 +19,7 @@ using System.Xml;
 using Application.OutgoingMessages.Common;
 using Application.OutgoingMessages.Common.Xml;
 using Infrastructure.OutgoingMessages.Common.Xml;
-using MarketActivityRecord = Messaging.Domain.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics.MarketActivityRecord;
+using MarketActivityRecord = Domain.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics.MarketActivityRecord;
 
 namespace Infrastructure.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
 

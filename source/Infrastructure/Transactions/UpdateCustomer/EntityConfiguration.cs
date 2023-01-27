@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System;
-using Messaging.Domain.Transactions;
-using Messaging.Domain.Transactions.UpdateCustomer;
+using Domain.Transactions;
+using Domain.Transactions.UpdateCustomer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

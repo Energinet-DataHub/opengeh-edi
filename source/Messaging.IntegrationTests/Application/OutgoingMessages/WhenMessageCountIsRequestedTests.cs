@@ -14,8 +14,8 @@
 
 using System.Threading.Tasks;
 using Application.OutgoingMessages.MessageCount;
-using Messaging.Domain.Actors;
-using Messaging.Domain.OutgoingMessages;
+using Domain.Actors;
+using Domain.OutgoingMessages;
 using Messaging.IntegrationTests.Application.IncomingMessages;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;

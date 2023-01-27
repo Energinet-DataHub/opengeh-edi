@@ -16,9 +16,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Domain.Transactions.Aggregations;
 using Infrastructure.Configuration.Serialization;
-using Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Messaging.Domain.Transactions.Aggregations;
 
 namespace Infrastructure.Transactions.Aggregations;
 

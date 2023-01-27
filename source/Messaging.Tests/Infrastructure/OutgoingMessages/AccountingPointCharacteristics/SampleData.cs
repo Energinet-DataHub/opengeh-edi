@@ -13,10 +13,10 @@
 // limitations under the License.
 
 using System;
+using Domain.MasterData;
+using Domain.OutgoingMessages.AccountingPointCharacteristics;
+using Domain.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails;
 using Infrastructure.Configuration;
-using Messaging.Domain.MasterData;
-using Messaging.Domain.OutgoingMessages.AccountingPointCharacteristics;
-using Messaging.Domain.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails;
 
 namespace Messaging.Tests.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
 

@@ -14,11 +14,11 @@
 
 using System;
 using System.Threading.Tasks;
+using Domain.Actors;
+using Domain.MasterData.MarketEvaluationPoints;
 using Energinet.DataHub.EnergySupplying.IntegrationEvents;
 using Energinet.DataHub.MeteringPoints.IntegrationEvents.CreateMeteringPoint;
 using Infrastructure.Configuration.DataAccess;
-using Messaging.Domain.Actors;
-using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.MarketEvaluationPoints;

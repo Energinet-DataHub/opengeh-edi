@@ -18,13 +18,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.Commands;
 using Application.Configuration.Commands.Commands;
+using Domain.Actors;
+using Domain.OutgoingMessages;
+using Domain.Transactions;
+using Domain.Transactions.Aggregations;
 using MediatR;
-using Messaging.Domain.Actors;
-using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.Transactions;
-using Messaging.Domain.Transactions.Aggregations;
 using NodaTime;
-using Period = Messaging.Domain.Transactions.Aggregations.Period;
+using Period = Domain.Transactions.Aggregations.Period;
 
 namespace Application.Transactions.Aggregations;
 

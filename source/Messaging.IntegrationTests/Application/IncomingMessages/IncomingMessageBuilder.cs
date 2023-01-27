@@ -14,8 +14,8 @@
 
 using System;
 using Application.IncomingMessages.RequestChangeOfSupplier;
-using Messaging.Domain.Actors;
-using Messaging.Domain.OutgoingMessages;
+using Domain.Actors;
+using Domain.OutgoingMessages;
 using NodaTime;
 using MessageHeader = Application.IncomingMessages.MessageHeader;
 

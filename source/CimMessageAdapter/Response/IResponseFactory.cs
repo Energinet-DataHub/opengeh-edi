@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using CimMessageAdapter.Messages;
-using Messaging.Domain.OutgoingMessages;
+using Domain.OutgoingMessages;
 
 namespace CimMessageAdapter.Response;
 

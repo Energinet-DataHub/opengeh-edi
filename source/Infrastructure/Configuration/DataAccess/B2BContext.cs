@@ -13,6 +13,17 @@
 // limitations under the License.
 
 using System;
+using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.AccountingPointCharacteristics;
+using Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
+using Domain.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
+using Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
+using Domain.OutgoingMessages.GenericNotification;
+using Domain.OutgoingMessages.Peek;
+using Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
+using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Domain.Transactions.Aggregations;
+using Domain.Transactions.MoveIn;
 using Infrastructure.Configuration.InternalCommands;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.MasterData.MarketEvaluationPoints;
@@ -21,19 +32,8 @@ using Infrastructure.OutgoingMessages.Peek;
 using Infrastructure.Transactions;
 using Infrastructure.Transactions.Aggregations;
 using Infrastructure.Transactions.UpdateCustomer;
-using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.OutgoingMessages.AccountingPointCharacteristics;
-using Messaging.Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
-using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
-using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
-using Messaging.Domain.OutgoingMessages.GenericNotification;
-using Messaging.Domain.OutgoingMessages.Peek;
-using Messaging.Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
-using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
-using Messaging.Domain.Transactions.Aggregations;
-using Messaging.Domain.Transactions.MoveIn;
 using Microsoft.EntityFrameworkCore;
-using MarketEvaluationPoint = Messaging.Domain.MasterData.MarketEvaluationPoints.MarketEvaluationPoint;
+using MarketEvaluationPoint = Domain.MasterData.MarketEvaluationPoints.MarketEvaluationPoint;
 
 namespace Infrastructure.Configuration.DataAccess
 {

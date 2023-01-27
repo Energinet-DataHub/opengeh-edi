@@ -15,10 +15,10 @@
 using System;
 using Application.OutgoingMessages;
 using Application.OutgoingMessages.Common;
-using Messaging.Domain.Actors;
-using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.OutgoingMessages.GenericNotification;
-using Messaging.Domain.Transactions.MoveIn;
+using Domain.Actors;
+using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.GenericNotification;
+using Domain.Transactions.MoveIn;
 
 namespace Application.Transactions.MoveIn.Notifications;
 

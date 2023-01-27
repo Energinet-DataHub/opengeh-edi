@@ -21,13 +21,13 @@ using System.Xml.Linq;
 using System.Xml.Schema;
 using Application.Configuration;
 using Application.OutgoingMessages.Common;
+using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Infrastructure.Configuration;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.IncomingMessages.SchemaStore;
 using Infrastructure.OutgoingMessages.Common;
 using Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier;
-using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Messaging.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
 

@@ -17,7 +17,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Messaging.Domain.OutgoingMessages;
+using Domain.OutgoingMessages;
 using NodaTime;
 
 namespace Application.OutgoingMessages;

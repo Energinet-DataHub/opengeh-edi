@@ -17,10 +17,10 @@ using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.Commands.Commands;
+using Domain.Transactions;
+using Domain.Transactions.Aggregations;
+using Domain.Transactions.MoveIn;
 using MediatR;
-using Messaging.Domain.Transactions;
-using Messaging.Domain.Transactions.Aggregations;
-using Messaging.Domain.Transactions.MoveIn;
 
 namespace Application.Transactions.Aggregations;
 

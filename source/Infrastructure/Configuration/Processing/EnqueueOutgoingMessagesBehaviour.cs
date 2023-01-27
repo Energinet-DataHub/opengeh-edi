@@ -17,11 +17,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.Commands.Commands;
+using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.Peek;
 using Infrastructure.Configuration.DataAccess;
 using Infrastructure.OutgoingMessages;
 using MediatR;
-using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.OutgoingMessages.Peek;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Configuration.Processing;

@@ -14,8 +14,8 @@
 
 using System;
 using System.Threading.Tasks;
+using Domain.OutgoingMessages.Peek;
 using Infrastructure.Configuration.DataAccess;
-using Messaging.Domain.OutgoingMessages.Peek;
 
 namespace Infrastructure.OutgoingMessages;
 

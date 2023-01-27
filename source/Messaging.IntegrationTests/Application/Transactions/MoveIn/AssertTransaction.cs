@@ -17,9 +17,9 @@ using System.Data;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Dapper;
+using Domain.Transactions;
+using Domain.Transactions.MoveIn;
 using Infrastructure.Configuration.Serialization;
-using Messaging.Domain.Transactions;
-using Messaging.Domain.Transactions.MoveIn;
 using Xunit;
 
 namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;

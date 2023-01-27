@@ -17,7 +17,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Application.Configuration.Authentication;
 using CimMessageAdapter.Errors;
-using Messaging.Domain.Actors;
+using Domain.Actors;
 
 namespace CimMessageAdapter.Messages.RequestChangeOfSupplier
 {

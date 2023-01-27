@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Messaging.Domain.Actors;
+using Domain.Actors;
 
 namespace Application.Transactions.Aggregations;
 

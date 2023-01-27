@@ -15,9 +15,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Domain.Transactions;
+using Domain.Transactions.MoveIn;
 using MediatR;
-using Messaging.Domain.Transactions;
-using Messaging.Domain.Transactions.MoveIn;
 
 namespace Application.Transactions.MoveIn.Notifications;
 

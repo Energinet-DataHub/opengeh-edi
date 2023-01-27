@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.Domain.Actors;
+using Domain.Actors;
 using Xunit;
 
 namespace Messaging.Tests.Domain.Actors;

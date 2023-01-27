@@ -15,10 +15,10 @@
 using System;
 using System.IO;
 using System.Linq;
-using Messaging.Domain.Actors;
-using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.OutgoingMessages.Peek;
-using Messaging.Domain.SeedWork;
+using Domain.Actors;
+using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.Peek;
+using Domain.SeedWork;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

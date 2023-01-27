@@ -19,14 +19,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Schema;
 using Application.OutgoingMessages.Common;
+using Domain.Actors;
+using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.IncomingMessages.SchemaStore;
 using Infrastructure.OutgoingMessages.Common;
 using Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
-using Messaging.Domain.Actors;
-using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Messaging.Domain.Transactions.Aggregations;
 using Messaging.Tests.Factories;
 using Messaging.Tests.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
 using Messaging.Tests.Infrastructure.OutgoingMessages.Asserts;
@@ -34,7 +33,7 @@ using NodaTime;
 using NodaTime.Extensions;
 using NodaTime.Text;
 using Xunit;
-using Period = Messaging.Domain.Transactions.Aggregations.Period;
+using Period = Domain.Transactions.Aggregations.Period;
 
 namespace Messaging.Tests.Infrastructure.OutgoingMessages.NotifyAggreagtedMeasureData;
 

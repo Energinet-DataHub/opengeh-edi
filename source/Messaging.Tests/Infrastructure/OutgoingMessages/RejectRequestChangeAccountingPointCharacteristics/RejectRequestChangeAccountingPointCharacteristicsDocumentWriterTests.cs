@@ -21,16 +21,16 @@ using System.Xml.Linq;
 using System.Xml.Schema;
 using Application.Configuration;
 using Application.OutgoingMessages.Common;
+using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Infrastructure.Configuration;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.IncomingMessages.SchemaStore;
 using Infrastructure.OutgoingMessages.Common;
 using Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
-using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
-using MarketActivityRecord = Messaging.Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics.MarketActivityRecord;
+using MarketActivityRecord = Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics.MarketActivityRecord;
 
 namespace Messaging.Tests.Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 

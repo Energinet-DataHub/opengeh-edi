@@ -19,7 +19,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Application.Actors;
 using Application.Configuration.Authentication;
-using Messaging.Domain.Actors;
+using Domain.Actors;
 
 namespace Infrastructure.Configuration.Authentication
 {

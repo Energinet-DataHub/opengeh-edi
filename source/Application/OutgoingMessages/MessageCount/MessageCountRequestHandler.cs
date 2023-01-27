@@ -16,8 +16,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.Queries;
+using Domain.Actors;
 using MediatR;
-using Messaging.Domain.Actors;
 
 namespace Application.OutgoingMessages.MessageCount;
 

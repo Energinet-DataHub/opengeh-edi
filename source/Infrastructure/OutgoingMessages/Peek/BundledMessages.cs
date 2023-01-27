@@ -22,10 +22,10 @@ using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Application.OutgoingMessages.Dequeue;
 using Application.OutgoingMessages.Peek;
+using Domain.Actors;
+using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.Peek;
 using Infrastructure.Configuration.DataAccess;
-using Messaging.Domain.Actors;
-using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.OutgoingMessages.Peek;
 using Microsoft.Data.SqlClient;
 
 namespace Infrastructure.OutgoingMessages.Peek;

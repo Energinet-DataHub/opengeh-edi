@@ -13,11 +13,11 @@
 // limitations under the License.
 
 using System;
+using Domain.Actors;
+using Domain.OutgoingMessages;
+using Domain.Transactions;
+using Domain.Transactions.MoveIn;
 using Infrastructure.Configuration.Serialization;
-using Messaging.Domain.Actors;
-using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.Transactions;
-using Messaging.Domain.Transactions.MoveIn;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

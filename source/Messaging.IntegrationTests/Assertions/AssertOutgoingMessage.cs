@@ -17,8 +17,8 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Dapper;
+using Domain.Actors;
 using Infrastructure.Configuration.Serialization;
-using Messaging.Domain.Actors;
 using Xunit;
 
 namespace Messaging.IntegrationTests.Assertions

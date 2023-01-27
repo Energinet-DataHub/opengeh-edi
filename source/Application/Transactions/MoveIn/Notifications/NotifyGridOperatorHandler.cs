@@ -16,10 +16,10 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Actors;
+using Domain.MasterData.MarketEvaluationPoints;
+using Domain.Transactions;
+using Domain.Transactions.MoveIn;
 using MediatR;
-using Messaging.Domain.MasterData.MarketEvaluationPoints;
-using Messaging.Domain.Transactions;
-using Messaging.Domain.Transactions.MoveIn;
 
 namespace Application.Transactions.MoveIn.Notifications;
 

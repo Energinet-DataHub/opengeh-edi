@@ -14,7 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
-using Messaging.Domain.Transactions.Aggregations;
+using Domain.Transactions.Aggregations;
 
 namespace Application.Transactions.Aggregations;
 

@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using Application.OutgoingMessages;
+using Domain.OutgoingMessages;
 using Infrastructure.Configuration.DataAccess;
-using Messaging.Domain.OutgoingMessages;
 
 namespace Infrastructure.OutgoingMessages
 {

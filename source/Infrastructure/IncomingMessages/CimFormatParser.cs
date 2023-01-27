@@ -14,8 +14,8 @@
 
 using System;
 using System.Linq;
-using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.SeedWork;
+using Domain.OutgoingMessages;
+using Domain.SeedWork;
 
 namespace Infrastructure.IncomingMessages;
 

@@ -15,7 +15,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Application.Transactions.Aggregations;
-using Messaging.Domain.Actors;
+using Domain.Actors;
 
 namespace Infrastructure.Transactions.Aggregations;
 

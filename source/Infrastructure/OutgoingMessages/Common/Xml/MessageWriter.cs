@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Application.OutgoingMessages.Common;
 using Application.OutgoingMessages.Common.Xml;
-using Messaging.Domain.OutgoingMessages;
+using Domain.OutgoingMessages;
 
 namespace Infrastructure.OutgoingMessages.Common.Xml;
 

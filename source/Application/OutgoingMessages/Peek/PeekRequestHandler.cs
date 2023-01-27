@@ -18,10 +18,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration;
 using Application.Configuration.Commands.Commands;
+using Domain.Actors;
+using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.Peek;
 using MediatR;
-using Messaging.Domain.Actors;
-using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.OutgoingMessages.Peek;
 
 namespace Application.OutgoingMessages.Peek;
 

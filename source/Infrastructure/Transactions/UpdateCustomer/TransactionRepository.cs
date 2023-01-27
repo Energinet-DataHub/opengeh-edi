@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Domain.Transactions.UpdateCustomer;
 using Infrastructure.Configuration.DataAccess;
-using Messaging.Domain.Transactions.UpdateCustomer;
 
 namespace Infrastructure.Transactions.UpdateCustomer;
 

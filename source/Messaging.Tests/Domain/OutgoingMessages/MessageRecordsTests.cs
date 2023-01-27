@@ -14,8 +14,8 @@
 
 using System;
 using System.Collections.Generic;
-using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.OutgoingMessages.Peek;
+using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.Peek;
 using Xunit;
 
 namespace Messaging.Tests.Domain.OutgoingMessages;

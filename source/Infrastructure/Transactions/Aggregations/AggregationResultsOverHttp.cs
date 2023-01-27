@@ -18,8 +18,8 @@ using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 using Application.Transactions.Aggregations;
+using Domain.Transactions.Aggregations;
 using Infrastructure.Configuration.Serialization;
-using Messaging.Domain.Transactions.Aggregations;
 using Polly;
 
 namespace Infrastructure.Transactions.Aggregations;

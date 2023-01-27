@@ -13,18 +13,18 @@
 // limitations under the License.
 
 using System;
-using Messaging.Domain.Actors;
-using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.OutgoingMessages.AccountingPointCharacteristics;
-using Messaging.Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
-using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
-using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
-using Messaging.Domain.OutgoingMessages.GenericNotification;
-using Messaging.Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Messaging.Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
-using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
-using Messaging.Domain.SeedWork;
-using Messaging.Domain.Transactions;
+using Domain.Actors;
+using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.AccountingPointCharacteristics;
+using Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
+using Domain.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
+using Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
+using Domain.OutgoingMessages.GenericNotification;
+using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
+using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Domain.SeedWork;
+using Domain.Transactions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

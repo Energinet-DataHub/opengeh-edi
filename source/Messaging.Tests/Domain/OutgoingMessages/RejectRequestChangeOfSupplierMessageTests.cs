@@ -13,10 +13,10 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using Messaging.Domain.Actors;
-using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
-using Messaging.Domain.Transactions;
+using Domain.Actors;
+using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Domain.Transactions;
 using Xunit;
 
 namespace Messaging.Tests.Domain.OutgoingMessages;

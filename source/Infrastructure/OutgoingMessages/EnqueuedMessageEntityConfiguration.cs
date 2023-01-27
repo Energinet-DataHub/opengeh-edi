@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System;
-using Messaging.Domain.OutgoingMessages.Peek;
+using Domain.OutgoingMessages.Peek;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

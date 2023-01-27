@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Domain.Actors;
+using Domain.OutgoingMessages;
+using Domain.SeedWork;
+using Domain.Transactions;
+using Domain.Transactions.Aggregations;
 using Infrastructure.Configuration.Serialization;
-using Messaging.Domain.Actors;
-using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.SeedWork;
-using Messaging.Domain.Transactions;
-using Messaging.Domain.Transactions.Aggregations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

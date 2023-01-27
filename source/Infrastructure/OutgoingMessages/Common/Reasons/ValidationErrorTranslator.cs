@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Application.OutgoingMessages.Common.Reasons;
 using Dapper;
-using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 
 namespace Infrastructure.OutgoingMessages.Common.Reasons;
 

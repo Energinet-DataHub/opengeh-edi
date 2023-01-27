@@ -20,8 +20,8 @@ using Application.Configuration.Commands;
 using Application.Configuration.DataAccess;
 using Application.Configuration.TimeEvents;
 using Dapper;
+using Domain.Transactions.MoveIn;
 using MediatR;
-using Messaging.Domain.Transactions.MoveIn;
 using NodaTime;
 
 namespace Application.Transactions.MoveIn.MasterDataDelivery;

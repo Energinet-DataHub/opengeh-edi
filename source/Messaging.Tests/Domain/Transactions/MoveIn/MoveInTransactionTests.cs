@@ -14,11 +14,11 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Messaging.Domain.Actors;
-using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
-using Messaging.Domain.Transactions;
-using Messaging.Domain.Transactions.MoveIn;
-using Messaging.Domain.Transactions.MoveIn.Events;
+using Domain.Actors;
+using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Domain.Transactions;
+using Domain.Transactions.MoveIn;
+using Domain.Transactions.MoveIn.Events;
 using Xunit;
 
 namespace Messaging.Tests.Domain.Transactions.MoveIn;

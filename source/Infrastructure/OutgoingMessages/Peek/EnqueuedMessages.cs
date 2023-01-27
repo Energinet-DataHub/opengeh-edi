@@ -20,9 +20,9 @@ using Application.Configuration.DataAccess;
 using Application.OutgoingMessages;
 using Application.OutgoingMessages.Peek;
 using Dapper;
-using Messaging.Domain.Actors;
-using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.OutgoingMessages.Peek;
+using Domain.Actors;
+using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.Peek;
 
 namespace Infrastructure.OutgoingMessages.Peek;
 

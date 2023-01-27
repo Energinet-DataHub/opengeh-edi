@@ -15,11 +15,11 @@
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Application.Transactions.MoveIn.Notifications;
+using Domain.Actors;
+using Domain.OutgoingMessages;
+using Domain.Transactions.MoveIn;
 using Infrastructure.Configuration.DataAccess;
 using MediatR;
-using Messaging.Domain.Actors;
-using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.Transactions.MoveIn;
 using Messaging.IntegrationTests.Assertions;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;

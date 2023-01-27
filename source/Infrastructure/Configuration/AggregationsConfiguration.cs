@@ -14,9 +14,9 @@
 
 using System;
 using Application.Transactions.Aggregations;
+using Domain.Transactions.Aggregations;
 using Infrastructure.Transactions.Aggregations;
 using MediatR;
-using Messaging.Domain.Transactions.Aggregations;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure.Configuration;

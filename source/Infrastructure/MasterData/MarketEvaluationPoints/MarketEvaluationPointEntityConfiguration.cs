@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System;
-using Messaging.Domain.Actors;
-using Messaging.Domain.MasterData.MarketEvaluationPoints;
+using Domain.Actors;
+using Domain.MasterData.MarketEvaluationPoints;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

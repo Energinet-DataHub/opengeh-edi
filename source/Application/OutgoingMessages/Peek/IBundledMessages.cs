@@ -15,9 +15,9 @@
 using System;
 using System.Threading.Tasks;
 using Application.OutgoingMessages.Dequeue;
-using Messaging.Domain.Actors;
-using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.OutgoingMessages.Peek;
+using Domain.Actors;
+using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.Peek;
 
 namespace Application.OutgoingMessages.Peek;
 

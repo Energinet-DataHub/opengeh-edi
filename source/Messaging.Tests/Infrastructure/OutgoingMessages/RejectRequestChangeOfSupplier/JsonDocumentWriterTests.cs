@@ -20,14 +20,14 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Application.Configuration;
 using Application.OutgoingMessages.Common;
+using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Infrastructure.Configuration;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.IncomingMessages.SchemaStore;
 using Infrastructure.OutgoingMessages.Common;
 using Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Json.Schema;
-using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
 

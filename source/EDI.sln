@@ -21,7 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.Tests", "Messagin
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EnergySupplying.Contracts", "EnergySupplying.Contracts\EnergySupplying.Contracts.csproj", "{4AA95CA9-C2EB-4F47-88D5-8E320F62142C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.Domain", "Messaging.Domain\Messaging.Domain.csproj", "{093FBBA9-B7CF-411E-93DA-2B743FA153AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "Domain\Domain.csproj", "{093FBBA9-B7CF-411E-93DA-2B743FA153AB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequestResponse", "RequestResponse\source\RequestResponse\RequestResponse.csproj", "{6A9A18B6-9445-45A0-813D-B7143DB9BC74}"
 EndProject

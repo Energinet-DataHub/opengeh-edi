@@ -17,9 +17,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Application.OutgoingMessages.Common;
+using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Infrastructure.OutgoingMessages.Common.Json;
-using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Newtonsoft.Json;
 
 namespace Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier;

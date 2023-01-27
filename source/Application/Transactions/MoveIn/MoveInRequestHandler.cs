@@ -19,12 +19,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.IncomingMessages.RequestChangeOfSupplier;
 using Application.OutgoingMessages.Common.Reasons;
+using Domain.Actors;
+using Domain.MasterData.MarketEvaluationPoints;
+using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Domain.Transactions;
+using Domain.Transactions.MoveIn;
 using MediatR;
-using Messaging.Domain.Actors;
-using Messaging.Domain.MasterData.MarketEvaluationPoints;
-using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
-using Messaging.Domain.Transactions;
-using Messaging.Domain.Transactions.MoveIn;
 using NodaTime.Text;
 
 namespace Application.Transactions.MoveIn

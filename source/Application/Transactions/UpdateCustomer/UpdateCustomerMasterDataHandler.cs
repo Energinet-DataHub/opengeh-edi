@@ -15,9 +15,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Domain.Transactions;
+using Domain.Transactions.UpdateCustomer;
 using MediatR;
-using Messaging.Domain.Transactions;
-using Messaging.Domain.Transactions.UpdateCustomer;
 
 namespace Application.Transactions.UpdateCustomer;
 

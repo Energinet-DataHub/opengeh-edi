@@ -17,8 +17,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using Messaging.Domain.Actors;
-using Messaging.Domain.OutgoingMessages;
+using Domain.Actors;
+using Domain.OutgoingMessages;
 using Xunit;
 
 namespace Messaging.IntegrationTests.Assertions

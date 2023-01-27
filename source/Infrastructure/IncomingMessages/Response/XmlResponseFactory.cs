@@ -18,7 +18,7 @@ using System.Text;
 using System.Xml;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.Response;
-using Messaging.Domain.OutgoingMessages;
+using Domain.OutgoingMessages;
 
 namespace Infrastructure.IncomingMessages.Response
 {

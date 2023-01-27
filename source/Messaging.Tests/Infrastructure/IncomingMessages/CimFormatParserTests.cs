@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Domain.OutgoingMessages;
+using Domain.SeedWork;
 using Infrastructure.IncomingMessages;
-using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.SeedWork;
 using Xunit;
 
 namespace Messaging.Tests.Infrastructure.IncomingMessages;

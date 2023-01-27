@@ -21,8 +21,8 @@ using System.Xml.Schema;
 using Application.IncomingMessages.RequestChangeCustomerCharacteristics;
 using CimMessageAdapter.Errors;
 using CimMessageAdapter.Messages;
+using Domain.OutgoingMessages;
 using Infrastructure.IncomingMessages.SchemaStore;
-using Messaging.Domain.OutgoingMessages;
 using MarketActivityRecord = Application.IncomingMessages.RequestChangeCustomerCharacteristics.MarketActivityRecord;
 
 namespace Infrastructure.IncomingMessages.RequestChangeCustomerCharacteristics;

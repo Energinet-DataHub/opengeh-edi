@@ -21,11 +21,11 @@ using System.Xml;
 using Application.OutgoingMessages;
 using Application.OutgoingMessages.Common;
 using Application.OutgoingMessages.Common.Xml;
+using Domain.Actors;
+using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
+using Domain.SeedWork;
 using Infrastructure.OutgoingMessages.Common.Xml;
-using Messaging.Domain.Actors;
-using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
-using Messaging.Domain.SeedWork;
 
 namespace Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 

@@ -15,7 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Messaging.Domain.Actors;
+using Domain.Actors;
 
 namespace Application.Configuration.Authentication
 {

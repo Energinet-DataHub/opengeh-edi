@@ -19,17 +19,17 @@ using System.Threading.Tasks;
 using Application.MasterData;
 using Application.OutgoingMessages;
 using Application.OutgoingMessages.Common;
+using Domain.Actors;
+using Domain.MasterData.Dictionaries;
+using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.AccountingPointCharacteristics;
+using Domain.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails;
+using Domain.Transactions;
+using Domain.Transactions.MoveIn;
 using MediatR;
-using Messaging.Domain.Actors;
-using Messaging.Domain.MasterData.Dictionaries;
-using Messaging.Domain.OutgoingMessages;
-using Messaging.Domain.OutgoingMessages.AccountingPointCharacteristics;
-using Messaging.Domain.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails;
-using Messaging.Domain.Transactions;
-using Messaging.Domain.Transactions.MoveIn;
 using NodaTime.Extensions;
-using Address = Messaging.Domain.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails.Address;
-using Series = Messaging.Domain.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails.Series;
+using Address = Domain.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails.Address;
+using Series = Domain.OutgoingMessages.AccountingPointCharacteristics.MarketEvaluationPointDetails.Series;
 
 namespace Application.Transactions.MoveIn.MasterDataDelivery;
 

@@ -14,9 +14,9 @@
 
 using System;
 using System.Threading.Tasks;
+using Domain.Transactions;
+using Domain.Transactions.Aggregations;
 using Infrastructure.Configuration.DataAccess;
-using Messaging.Domain.Transactions;
-using Messaging.Domain.Transactions.Aggregations;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Transactions.Aggregations;

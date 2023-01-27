@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System;
-using Messaging.Domain.OutgoingMessages;
+using Domain.OutgoingMessages;
 using Newtonsoft.Json;
 
 namespace Infrastructure.OutgoingMessages.Common.Json;

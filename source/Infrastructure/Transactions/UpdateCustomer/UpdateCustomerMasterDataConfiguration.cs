@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.Domain.Transactions.UpdateCustomer;
+using Domain.Transactions.UpdateCustomer;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure.Transactions.UpdateCustomer;
