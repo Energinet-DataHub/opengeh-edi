@@ -25,7 +25,7 @@ jobs:
   #
 
   ci_base:
-    uses: Energinet-DataHub/.github/.github/workflows/ci-base.yml@v9
+    uses: Energinet-DataHub/.github/.github/workflows/ci-base.yml@v10
 
   #
   # Detect changes to start relevant jobs
@@ -42,7 +42,7 @@ jobs:
   dotnet_ci_build:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@v9
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@v10
     with:
       SOLUTION_FILE_PATH: 'source/EDI.sln'
 
@@ -50,7 +50,7 @@ jobs:
   integration_tests:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v9
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v10
     with:
       TESTS_DLL_FILE_PATH: '\source\IntegrationTests\bin\Release\net6.0\IntegrationTests.dll'
       DOWNLOAD_ATTEMPT_LIMIT: 12
@@ -59,7 +59,7 @@ jobs:
   architecture_tests:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v9
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v10
     with:
       TESTS_DLL_FILE_PATH: '\source\ArchitectureTests\bin\Release\net6.0\ArchitectureTests.dll'
       DOWNLOAD_ATTEMPT_LIMIT: 12
@@ -68,7 +68,7 @@ jobs:
   tests:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v9
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v10
     with:
       TESTS_DLL_FILE_PATH: '\source\Tests\bin\Release\net6.0\Tests.dll'
       DOWNLOAD_ATTEMPT_LIMIT: 12
