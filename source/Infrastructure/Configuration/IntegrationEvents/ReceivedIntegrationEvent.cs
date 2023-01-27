@@ -14,7 +14,7 @@
 
 using NodaTime;
 
-namespace Infrastructure.Configuration.Processing.Inbox;
+namespace Infrastructure.Configuration.IntegrationEvents;
 
 public class ReceivedIntegrationEvent
 {

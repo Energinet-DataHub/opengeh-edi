@@ -15,7 +15,6 @@
 using System.Threading.Tasks;
 using Application.Configuration;
 using Infrastructure.Configuration.DataAccess;
-using Infrastructure.Configuration.Processing.Inbox;
 
 namespace Infrastructure.Configuration.IntegrationEvents;
 

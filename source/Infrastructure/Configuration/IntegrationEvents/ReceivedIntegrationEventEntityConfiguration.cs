@@ -16,9 +16,9 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Configuration.Processing.Inbox;
+namespace Infrastructure.Configuration.IntegrationEvents;
 
-public class InboxMessageEntityConfiguration : IEntityTypeConfiguration<ReceivedIntegrationEvent>
+public class ReceivedIntegrationEventEntityConfiguration : IEntityTypeConfiguration<ReceivedIntegrationEvent>
 {
     public void Configure(EntityTypeBuilder<ReceivedIntegrationEvent> builder)
     {

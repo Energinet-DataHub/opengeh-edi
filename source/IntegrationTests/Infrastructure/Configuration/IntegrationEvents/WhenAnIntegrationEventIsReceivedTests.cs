@@ -19,7 +19,6 @@ using Application.Configuration.DataAccess;
 using Dapper;
 using Infrastructure.Configuration.DataAccess;
 using Infrastructure.Configuration.IntegrationEvents;
-using Infrastructure.Configuration.Processing.Inbox;
 using IntegrationTests.Fixtures;
 using MediatR;
 using Xunit;

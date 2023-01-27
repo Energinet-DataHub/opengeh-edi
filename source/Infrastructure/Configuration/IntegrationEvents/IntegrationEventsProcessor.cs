@@ -19,10 +19,9 @@ using System.Threading.Tasks;
 using Application.Configuration;
 using Application.Configuration.DataAccess;
 using Dapper;
-using Infrastructure.Configuration.IntegrationEvents;
 using MediatR;
 
-namespace Infrastructure.Configuration.Processing.Inbox;
+namespace Infrastructure.Configuration.IntegrationEvents;
 
 public class IntegrationEventsProcessor
 {
