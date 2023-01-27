@@ -1,60 +1,38 @@
-# Market Roles(energy supplier domain)
+# EDI domain
 
 [![codecov](https://codecov.io/gh/Energinet-DataHub/geh-market-roles/branch/main/graph/badge.svg?token=R80X7DC6C0)](https://codecov.io/gh/Energinet-DataHub/geh-market-roles)
 
 ## Intro
 
-The market roles domain is in charge of supply and consumer relations.
-It handles changes in supply (who supplies/produces electricity),
-and changes in consumers/producers (who is a consumer), on metering points.
+The EDI domain is responsible for handling incoming and outgoing message to and from Datahub. 
+EDI domain receives incoming requests from actor and performs B2B validations on the request.
+The request is then forwarded to relevant domain.
+When a actor wished to peek a message from Datahub. EDI is responsible for generating the message, and ensuring that the correct actor receives the message
 
-These are the processes maintained by this domain.
 
-| Process                                                                                                                                                                                       |
-| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Change of Energy Supplier](https://github.com/Energinet-DataHub/geh-market-roles/blob/main/docs/business-processes/change-of-energy-supplier.md)                                             |
-| [End of Supply](https://github.com/Energinet-DataHub/geh-market-roles/blob/main/docs/business-processes/end-of-supply.md)                                                                     |
-| [Forced Energy Supplier change](https://github.com/Energinet-DataHub/geh-market-roles/blob/main/docs/business-processes/forced-energy-supplier-change.md)                                     |
-| [Incorrect Energy Supplier change](https://github.com/Energinet-DataHub/geh-market-roles/blob/main/docs/business-processes/incorrect-energy-supplier-change.md)                               |
-| [Consumer move in](https://github.com/Energinet-DataHub/geh-market-roles/blob/main/docs/business-processes/consumer-move-in.md)                                                               |
-| [Consumer move out](https://github.com/Energinet-DataHub/geh-market-roles/blob/main/docs/business-processes/consumer-move-out.md)                                                             |
-| [Incorrect move](https://github.com/Energinet-DataHub/geh-market-roles/blob/main/docs/business-processes/incorrect-move.md)                                                                   |
-| [Forward consumer master data by Energy Supplier](https://github.com/Energinet-DataHub/geh-market-roles/blob/main/docs/business-processes/forward-consumer-master-data-by-energy-supplier.md) |
-| [Forward contact address by Grid Access Provider](https://github.com/Energinet-DataHub/geh-market-roles/blob/main/docs/business-processes/forward-contact-address-by-grid-access-provider.md)    |
-| [Change of BRP for Energy Supplier](https://github.com/Energinet-DataHub/geh-market-roles/blob/main/docs/business-processes/change-of-energy-supplier.md)                                     |
-| ....                                                                                                                                                                                          |
 
 ## Architecture
 
-![Market role Architecture](https://user-images.githubusercontent.com/72008816/160091353-afb253c0-ba98-424d-9821-4e895da0a1cf.png)
+![structurizr-EDI-Container](https://user-images.githubusercontent.com/72008816/215046778-938cf41d-b6ba-4086-807a-7a5dc9460d9c.png)
 
-## Context Streams
+## Business diagram of EDI
 
-![Market role domain context](https://user-images.githubusercontent.com/72008816/160091489-023a18f5-9c78-4c10-99b8-7b32383c9858.png)
+![image](https://user-images.githubusercontent.com/72008816/215047284-652c90d7-7e50-408f-b3ce-93f58ea62929.png)
 
-Events sent from market role to other domains
+## Supported formats
 
-![image](https://user-images.githubusercontent.com/72008816/182849372-8fae47d9-3561-4e5a-99dc-1a8681874977.png)
-
-## Market Participants
-
-The market roles domain introduces the following roles into the Green Energy Hub ecosystem:
-
-- Balance Responsible Party
-- Consumer
-- Energy supplier
-- Grid Access Provider
-- Imbalance settlement Responsible
-- Metered data aggregator
-- Metered data responsible
-- System Operator
+Currently we support the CIM XML format. The EDI domain will also support the following incoming and outgoing formats: CIM JSON and Ebix.
 
 ## Domain Roadmap
 
 In this program increment we are working on
 
-- A energy supplier can receive responses in CIM JSON format
-- The future energy supplier can receive customer master data
+- Sending out calculation results for calculated flex consumption for the Energy supplier
+- Fixing minor errors in CIM XML schema
+
+In the next programme increment we are working on
+
+- Sending out calculation results for calculated flex consumption for the Balance supplier and balance responsible party
 
 ## Getting Started
 
