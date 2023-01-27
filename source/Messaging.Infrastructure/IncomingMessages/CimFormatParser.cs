@@ -14,7 +14,6 @@
 
 using System;
 using System.Linq;
-using Messaging.CimMessageAdapter.Messages;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.SeedWork;
 

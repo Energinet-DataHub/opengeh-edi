@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.CimMessageAdapter.Messages;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.SeedWork;
 using Messaging.Infrastructure.IncomingMessages;

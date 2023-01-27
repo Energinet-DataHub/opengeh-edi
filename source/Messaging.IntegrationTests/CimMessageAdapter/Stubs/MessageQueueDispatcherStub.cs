@@ -16,8 +16,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Application.IncomingMessages;
-using Messaging.CimMessageAdapter.Messages;
-using Messaging.CimMessageAdapter.Messages.Queues;
+using CimMessageAdapter.Messages;
+using CimMessageAdapter.Messages.Queues;
 
 namespace Messaging.IntegrationTests.CimMessageAdapter.Stubs
 {

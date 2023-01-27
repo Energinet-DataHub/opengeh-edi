@@ -16,8 +16,8 @@ using System;
 using System.Linq;
 using System.Text;
 using System.Xml;
-using Messaging.CimMessageAdapter.Messages;
-using Messaging.CimMessageAdapter.Response;
+using CimMessageAdapter.Messages;
+using CimMessageAdapter.Response;
 using Messaging.Domain.OutgoingMessages;
 
 namespace Messaging.Infrastructure.IncomingMessages.Response

@@ -14,17 +14,17 @@
 
 using Application.IncomingMessages.RequestChangeCustomerCharacteristics;
 using Application.IncomingMessages.RequestChangeOfSupplier;
-using Messaging.CimMessageAdapter.Messages;
-using Messaging.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
-using Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
-using Messaging.CimMessageAdapter.Response;
+using CimMessageAdapter.Messages;
+using CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
+using CimMessageAdapter.Messages.RequestChangeOfSupplier;
+using CimMessageAdapter.Response;
 using Messaging.Infrastructure.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Infrastructure.IncomingMessages.Response;
 using Messaging.Infrastructure.IncomingMessages.SchemaStore;
 using Microsoft.Extensions.DependencyInjection;
 using MarketActivityRecord = Application.IncomingMessages.RequestChangeOfSupplier.MarketActivityRecord;
-using MessageParser = Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier.MessageParser;
-using SenderAuthorizer = Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier.SenderAuthorizer;
+using MessageParser = CimMessageAdapter.Messages.RequestChangeOfSupplier.MessageParser;
+using SenderAuthorizer = CimMessageAdapter.Messages.RequestChangeOfSupplier.SenderAuthorizer;
 
 namespace Messaging.Infrastructure.Configuration;
 
@@ -54,7 +54,7 @@ internal static class IncomingMessageParsingServices
 
     private static void RegisterRequestChangeOfCustomerCharacteristicsMessageHandling(IServiceCollection services)
     {
-        services.AddScoped<Messaging.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics.SenderAuthorizer>();
+        services.AddScoped<CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics.SenderAuthorizer>();
         services.AddScoped<RequestChangeCustomerCharacteristicsReceiver>();
         services
             .AddTransient<IMessageParser<Application.IncomingMessages.RequestChangeCustomerCharacteristics.

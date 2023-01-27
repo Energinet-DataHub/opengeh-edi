@@ -22,7 +22,7 @@ using Api.Configuration.Middleware.Correlation;
 using Application.Actors;
 using Application.OutgoingMessages.Peek;
 using Application.Transactions.MoveIn;
-using Messaging.CimMessageAdapter.Messages.Queues;
+using CimMessageAdapter.Messages.Queues;
 using Messaging.Infrastructure.Configuration;
 using Messaging.Infrastructure.Configuration.Authentication;
 using Messaging.Infrastructure.Configuration.MessageBus.RemoteBusinessServices;

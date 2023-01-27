@@ -19,8 +19,8 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using Application.IncomingMessages.RequestChangeOfSupplier;
-using Messaging.CimMessageAdapter.Errors;
-using Messaging.CimMessageAdapter.Messages;
+using CimMessageAdapter.Errors;
+using CimMessageAdapter.Messages;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.IncomingMessages.SchemaStore;
 

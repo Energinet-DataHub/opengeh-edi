@@ -20,8 +20,8 @@ using System.Transactions;
 using Application.Configuration;
 using Application.IncomingMessages;
 using Azure.Messaging.ServiceBus;
-using Messaging.CimMessageAdapter.Messages;
-using Messaging.CimMessageAdapter.Messages.Queues;
+using CimMessageAdapter.Messages;
+using CimMessageAdapter.Messages.Queues;
 using Messaging.Infrastructure.Configuration.MessageBus;
 using Messaging.Infrastructure.Configuration.Serialization;
 

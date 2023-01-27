@@ -21,8 +21,8 @@ using System.Threading.Tasks;
 using Application.Actors;
 using Application.Configuration.Authentication;
 using Application.IncomingMessages.RequestChangeOfSupplier;
-using Messaging.CimMessageAdapter.Messages;
-using Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
+using CimMessageAdapter.Messages;
+using CimMessageAdapter.Messages.RequestChangeOfSupplier;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Configuration.Authentication;
@@ -30,7 +30,7 @@ using Messaging.IntegrationTests.CimMessageAdapter.Stubs;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
-using Result = Messaging.CimMessageAdapter.Messages.Result;
+using Result = CimMessageAdapter.Messages.Result;
 
 namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
 {
@@ -41,7 +41,7 @@ namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfS
         private readonly IMarketActorAuthenticator _marketActorAuthenticator;
         private readonly ITransactionIds _transactionIds;
         private readonly IMessageIds _messageIds;
-        private MessageQueueDispatcherStub<Messaging.CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction> _messageQueueDispatcherSpy = new();
+        private MessageQueueDispatcherStub<global::CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction> _messageQueueDispatcherSpy = new();
         private List<Claim> _claims = new();
 
         public RequestChangeOfSupplierReceiverTests(DatabaseFixture databaseFixture)
@@ -204,9 +204,9 @@ namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfS
                 .ReceiveAsync(await ParseMessageAsync(message).ConfigureAwait(false));
         }
 
-        private MessageReceiver<Messaging.CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction> CreateMessageReceiver()
+        private MessageReceiver<global::CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction> CreateMessageReceiver()
         {
-            _messageQueueDispatcherSpy = new MessageQueueDispatcherStub<Messaging.CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction>();
+            _messageQueueDispatcherSpy = new MessageQueueDispatcherStub<global::CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction>();
             var messageReceiver = new RequestChangeOfSupplierReceiver(
                 _messageIds,
                 _messageQueueDispatcherSpy,
@@ -215,9 +215,9 @@ namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfS
             return messageReceiver;
         }
 
-        private MessageReceiver<Messaging.CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction> CreateMessageReceiver(IMessageIds messageIds)
+        private MessageReceiver<global::CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction> CreateMessageReceiver(IMessageIds messageIds)
         {
-            _messageQueueDispatcherSpy = new MessageQueueDispatcherStub<Messaging.CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction>();
+            _messageQueueDispatcherSpy = new MessageQueueDispatcherStub<global::CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction>();
             var messageReceiver = new RequestChangeOfSupplierReceiver(messageIds, _messageQueueDispatcherSpy, _transactionIds, new SenderAuthorizer(_marketActorAuthenticator));
             return messageReceiver;
         }

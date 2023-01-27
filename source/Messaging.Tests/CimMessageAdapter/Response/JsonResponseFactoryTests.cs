@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.CimMessageAdapter;
-using Messaging.CimMessageAdapter.Errors;
-using Messaging.CimMessageAdapter.Messages;
-using Messaging.CimMessageAdapter.Response;
+using CimMessageAdapter.Errors;
+using CimMessageAdapter.Messages;
+using CimMessageAdapter.Response;
 using Messaging.Infrastructure.IncomingMessages.Response;
 using Newtonsoft.Json.Linq;
 using Xunit;

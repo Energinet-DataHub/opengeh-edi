@@ -15,8 +15,8 @@
 using System;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
+using CimMessageAdapter.Messages;
 using Dapper;
-using Messaging.CimMessageAdapter.Messages;
 
 namespace Messaging.Infrastructure.IncomingMessages
 {

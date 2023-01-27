@@ -21,8 +21,8 @@ using System.Threading.Tasks;
 using Application.Actors;
 using Application.Configuration.Authentication;
 using Application.IncomingMessages.RequestChangeCustomerCharacteristics;
-using Messaging.CimMessageAdapter.Messages;
-using Messaging.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
+using CimMessageAdapter.Messages;
+using CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.Configuration.Authentication;
@@ -30,8 +30,8 @@ using Messaging.IntegrationTests.CimMessageAdapter.Stubs;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
-using MessageParser = Messaging.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics.MessageParser;
-using Result = Messaging.CimMessageAdapter.Messages.Result;
+using MessageParser = CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics.MessageParser;
+using Result = CimMessageAdapter.Messages.Result;
 
 namespace Messaging.IntegrationTests.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 
@@ -42,7 +42,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
     private readonly IMarketActorAuthenticator _marketActorAuthenticator;
     private readonly ITransactionIds _transactionIds;
     private readonly IMessageIds _messageIds;
-    private MessageQueueDispatcherStub<Messaging.CimMessageAdapter.Messages.Queues.RequestChangeCustomerCharacteristicsTransaction> _messageQueueDispatcherSpy = new();
+    private MessageQueueDispatcherStub<global::CimMessageAdapter.Messages.Queues.RequestChangeCustomerCharacteristicsTransaction> _messageQueueDispatcherSpy = new();
     private List<Claim> _claims = new();
 
     public RequestChangeCustomerCharacteristicsTests(DatabaseFixture databaseFixture)
@@ -226,9 +226,9 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
         return _messageParser.ParseAsync(message, MessageFormat.Xml);
     }
 
-    private MessageReceiver<Messaging.CimMessageAdapter.Messages.Queues.RequestChangeCustomerCharacteristicsTransaction> CreateMessageReceiver()
+    private MessageReceiver<global::CimMessageAdapter.Messages.Queues.RequestChangeCustomerCharacteristicsTransaction> CreateMessageReceiver()
     {
-        _messageQueueDispatcherSpy = new MessageQueueDispatcherStub<Messaging.CimMessageAdapter.Messages.Queues.RequestChangeCustomerCharacteristicsTransaction>();
+        _messageQueueDispatcherSpy = new MessageQueueDispatcherStub<global::CimMessageAdapter.Messages.Queues.RequestChangeCustomerCharacteristicsTransaction>();
         var messageReceiver = new RequestChangeCustomerCharacteristicsReceiver(
             _messageIds,
             _messageQueueDispatcherSpy,
@@ -237,9 +237,9 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
         return messageReceiver;
     }
 
-    private MessageReceiver<Messaging.CimMessageAdapter.Messages.Queues.RequestChangeCustomerCharacteristicsTransaction> CreateMessageReceiver(IMessageIds messageIds)
+    private MessageReceiver<global::CimMessageAdapter.Messages.Queues.RequestChangeCustomerCharacteristicsTransaction> CreateMessageReceiver(IMessageIds messageIds)
     {
-        _messageQueueDispatcherSpy = new MessageQueueDispatcherStub<Messaging.CimMessageAdapter.Messages.Queues.RequestChangeCustomerCharacteristicsTransaction>();
+        _messageQueueDispatcherSpy = new MessageQueueDispatcherStub<global::CimMessageAdapter.Messages.Queues.RequestChangeCustomerCharacteristicsTransaction>();
         var messageReceiver = new RequestChangeCustomerCharacteristicsReceiver(messageIds, _messageQueueDispatcherSpy, _transactionIds, new SenderAuthorizer(_marketActorAuthenticator));
         return messageReceiver;
     }
