@@ -12,17 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Linq;
+using System.Text.RegularExpressions;
 
-namespace Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.Helpers
+namespace ApplyDBMigrationsApp.Helpers
 {
-    public static class ConnectionStringFactory
+    public static class NamingConvention
     {
-        private const string DefaultConnectionString = "Server=(local); Database=sqldb-marketroles-endk; Trusted_connection=true";
-
-        public static string GetConnectionString(string[] args)
-        {
-            return args.FirstOrDefault() ?? DefaultConnectionString;
-        }
+        // Matches                                                  {type} {timestamp } {name}
+        // Energinet.DataHub.MarketData.ApplyDBMigrationsApp.Scripts.Model.202103021434 First.sql
+        public static readonly Regex Regex = new Regex(@".*Scripts\.(?<type>Model|Seed|Test)\.(?<timestamp>\d{12}) (?<name>\D*).sql");
     }
 }

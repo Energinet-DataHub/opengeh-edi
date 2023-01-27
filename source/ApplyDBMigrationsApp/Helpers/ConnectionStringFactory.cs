@@ -12,19 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Linq;
 
-namespace Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.Helpers
+namespace ApplyDBMigrationsApp.Helpers
 {
-    public static class EnvironmentFilter
+    public static class ConnectionStringFactory
     {
-        public static Func<string, bool> GetFilter(string[] args)
+        private const string DefaultConnectionString = "Server=(local); Database=sqldb-marketroles-endk; Trusted_connection=true";
+
+        public static string GetConnectionString(string[] args)
         {
-            return file => file.EndsWith(".sql", StringComparison.OrdinalIgnoreCase) &&
-                           ((file.Contains(".Scripts.Seed.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeSeedData")) ||
-                            (file.Contains(".Scripts.Test.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeTestData")) ||
-                            file.Contains(".Scripts.Model.", StringComparison.OrdinalIgnoreCase));
+            return args.FirstOrDefault() ?? DefaultConnectionString;
         }
     }
 }

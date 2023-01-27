@@ -15,7 +15,7 @@
 using System;
 using DbUp.Reboot.Engine;
 
-namespace Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.Helpers
+namespace ApplyDBMigrationsApp.Helpers
 {
     public static class ResultReporter
     {

@@ -14,23 +14,17 @@
 
 using System;
 using System.Linq;
-using Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp.Helpers;
 
-namespace Energinet.DataHub.MarketRoles.ApplyDBMigrationsApp
+namespace ApplyDBMigrationsApp.Helpers
 {
-    public static class Program
+    public static class EnvironmentFilter
     {
-        public static int Main(string[] args)
+        public static Func<string, bool> GetFilter(string[] args)
         {
-            var connectionString = ConnectionStringFactory.GetConnectionString(args);
-            var filter = EnvironmentFilter.GetFilter(args);
-            var isDryRun = args.Contains("dryRun");
-
-            var upgrader = UpgradeFactory.GetUpgradeEngine(connectionString, filter, isDryRun);
-
-            var result = upgrader.PerformUpgrade();
-
-            return ResultReporter.ReportResult(result);
+            return file => file.EndsWith(".sql", StringComparison.OrdinalIgnoreCase) &&
+                           ((file.Contains(".Scripts.Seed.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeSeedData")) ||
+                            (file.Contains(".Scripts.Test.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeTestData")) ||
+                            file.Contains(".Scripts.Model.", StringComparison.OrdinalIgnoreCase));
         }
     }
 }
