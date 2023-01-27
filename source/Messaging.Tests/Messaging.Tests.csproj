@@ -38,7 +38,7 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Messaging.Infrastructure\Messaging.Infrastructure.csproj" />
+      <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
       <ProjectReference Include="..\Application\Application.csproj" />
     </ItemGroup>
 

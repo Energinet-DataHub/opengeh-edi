@@ -16,8 +16,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Application.Configuration.Commands.Commands;
-using Messaging.Infrastructure.Configuration;
-using Messaging.Infrastructure.Configuration.InternalCommands;
+using Infrastructure.Configuration;
+using Infrastructure.Configuration.InternalCommands;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 

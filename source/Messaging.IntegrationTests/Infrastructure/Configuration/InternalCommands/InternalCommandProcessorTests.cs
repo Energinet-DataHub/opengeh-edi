@@ -19,7 +19,7 @@ using Application.Configuration.Commands;
 using Application.Configuration.Commands.Commands;
 using Application.Configuration.DataAccess;
 using Dapper;
-using Messaging.Infrastructure.Configuration.InternalCommands;
+using Infrastructure.Configuration.InternalCommands;
 using Messaging.IntegrationTests.Fixtures;
 using NodaTime;
 using Xunit;

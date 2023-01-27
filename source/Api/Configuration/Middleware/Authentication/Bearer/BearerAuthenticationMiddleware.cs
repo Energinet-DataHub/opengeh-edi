@@ -15,7 +15,7 @@
 using System;
 using System.Text;
 using System.Threading.Tasks;
-using Messaging.Infrastructure.Configuration.Authentication;
+using Infrastructure.Configuration.Authentication;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;

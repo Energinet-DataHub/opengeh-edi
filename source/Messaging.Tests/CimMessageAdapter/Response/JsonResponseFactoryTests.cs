@@ -15,7 +15,7 @@
 using CimMessageAdapter.Errors;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.Response;
-using Messaging.Infrastructure.IncomingMessages.Response;
+using Infrastructure.IncomingMessages.Response;
 using Newtonsoft.Json.Linq;
 using Xunit;
 using Xunit.Categories;

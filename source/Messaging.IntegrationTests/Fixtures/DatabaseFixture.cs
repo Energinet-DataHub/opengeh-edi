@@ -15,8 +15,8 @@
 using System;
 using System.Threading.Tasks;
 using ApplyDBMigrationsApp.Helpers;
-using Messaging.Infrastructure.Configuration.DataAccess;
-using Messaging.Infrastructure.Configuration.Serialization;
+using Infrastructure.Configuration.DataAccess;
+using Infrastructure.Configuration.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 

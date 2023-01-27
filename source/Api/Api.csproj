@@ -66,6 +66,6 @@ limitations under the License.
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\EnergySupplying.Contracts\EnergySupplying.Contracts.csproj" />
-      <ProjectReference Include="..\Messaging.Infrastructure\Messaging.Infrastructure.csproj" />
+      <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
     </ItemGroup>
 </Project>

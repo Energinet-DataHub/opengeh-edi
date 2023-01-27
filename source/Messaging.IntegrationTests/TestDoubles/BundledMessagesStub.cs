@@ -14,11 +14,11 @@
 
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
+using Infrastructure.Configuration.DataAccess;
+using Infrastructure.OutgoingMessages.Peek;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.Peek;
-using Messaging.Infrastructure.Configuration.DataAccess;
-using Messaging.Infrastructure.OutgoingMessages.Peek;
 
 namespace Messaging.IntegrationTests.TestDoubles;
 

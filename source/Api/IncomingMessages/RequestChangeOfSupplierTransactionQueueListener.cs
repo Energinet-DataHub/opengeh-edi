@@ -18,8 +18,8 @@ using System.Threading.Tasks;
 using Api.Configuration;
 using Application.Configuration;
 using Application.IncomingMessages.RequestChangeOfSupplier;
+using Infrastructure.Configuration.Serialization;
 using MediatR;
-using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 

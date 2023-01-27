@@ -18,7 +18,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Application.Transactions.MoveIn;
 using EnergySupplying.Contracts.BusinessRequests.MoveIn;
-using Messaging.Infrastructure.Transactions;
+using Infrastructure.Transactions;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.TestDoubles;
 using NodaTime;

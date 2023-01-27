@@ -17,7 +17,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
-using Messaging.Infrastructure.Configuration.MessageBus;
+using Infrastructure.Configuration.MessageBus;
 
 namespace Messaging.IntegrationTests.TestDoubles
 {

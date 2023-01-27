@@ -18,7 +18,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Application.Configuration.Commands.Commands;
-using Messaging.Infrastructure.Configuration;
+using Infrastructure.Configuration;
 using Xunit;
 
 namespace ArchitectureTests.Application;

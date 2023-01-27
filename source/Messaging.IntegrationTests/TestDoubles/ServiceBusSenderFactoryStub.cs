@@ -16,7 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Messaging.Infrastructure.Configuration.MessageBus;
+using Infrastructure.Configuration.MessageBus;
 
 namespace Messaging.IntegrationTests.TestDoubles
 {

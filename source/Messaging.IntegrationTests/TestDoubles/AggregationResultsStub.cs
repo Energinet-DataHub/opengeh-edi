@@ -18,8 +18,8 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.Transactions.Aggregations;
+using Infrastructure.Transactions.Aggregations;
 using Messaging.Domain.Transactions.Aggregations;
-using Messaging.Infrastructure.Transactions.Aggregations;
 
 namespace Messaging.IntegrationTests.TestDoubles;
 

@@ -15,12 +15,12 @@
 using System;
 using System.Threading.Tasks;
 using Application.Actors;
+using Infrastructure.Configuration.DataAccess;
 using MediatR;
 using Messaging.Domain.Actors;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.Transactions;
 using Messaging.Domain.Transactions.MoveIn;
-using Messaging.Infrastructure.Configuration.DataAccess;
 using NodaTime;
 
 namespace Messaging.IntegrationTests.Application.Transactions.MoveIn;

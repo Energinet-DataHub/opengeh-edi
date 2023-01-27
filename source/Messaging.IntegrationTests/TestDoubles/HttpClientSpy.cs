@@ -18,7 +18,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using EnergySupplying.Contracts.BusinessRequests.MoveIn;
-using Messaging.Infrastructure.Transactions;
+using Infrastructure.Transactions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;

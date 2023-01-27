@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 using Application.Configuration;
 using CimMessageAdapter.Messages.RequestChangeOfSupplier;
 using CimMessageAdapter.Response;
-using Messaging.Infrastructure.IncomingMessages;
+using Infrastructure.IncomingMessages;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;

@@ -17,7 +17,7 @@ using Application.Configuration.DataAccess;
 using Dapper;
 using Energinet.DataHub.EnergySupplying.IntegrationEvents;
 using Energinet.DataHub.MeteringPoints.IntegrationEvents.CreateMeteringPoint;
-using Messaging.Infrastructure.MarketEvaluationPoints;
+using Infrastructure.MarketEvaluationPoints;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 
