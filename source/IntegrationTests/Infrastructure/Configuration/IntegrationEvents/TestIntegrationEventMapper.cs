@@ -13,10 +13,10 @@
 // limitations under the License.
 
 using System.Text.Json;
+using Infrastructure.Configuration.IntegrationEvents;
 using MediatR;
-using Messaging.Infrastructure.Configuration.IntegrationEvents;
 
-namespace Messaging.IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
+namespace IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 
 #pragma warning disable
 public class TestIntegrationEventMapper : IIntegrationEventMapper

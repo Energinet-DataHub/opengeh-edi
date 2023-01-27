@@ -16,7 +16,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Messaging.Infrastructure.Configuration.Processing.Inbox;
+namespace Infrastructure.Configuration.Processing.Inbox;
 
 public class InboxMessageEntityConfiguration : IEntityTypeConfiguration<InboxMessage>
 {

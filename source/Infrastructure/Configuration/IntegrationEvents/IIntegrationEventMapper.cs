@@ -14,7 +14,7 @@
 
 using MediatR;
 
-namespace Messaging.Infrastructure.Configuration.IntegrationEvents;
+namespace Infrastructure.Configuration.IntegrationEvents;
 
 /// <summary>
 /// Maps from an integration event to a notification

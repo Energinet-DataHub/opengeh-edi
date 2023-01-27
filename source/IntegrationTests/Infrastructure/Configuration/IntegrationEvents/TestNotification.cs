@@ -14,7 +14,7 @@
 
 using MediatR;
 
-namespace Messaging.IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
+namespace IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 
 #pragma warning disable
 public class TestNotification : INotification

@@ -13,11 +13,11 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Messaging.Application.Configuration;
-using Messaging.Infrastructure.Configuration.DataAccess;
-using Messaging.Infrastructure.Configuration.Processing.Inbox;
+using Application.Configuration;
+using Infrastructure.Configuration.DataAccess;
+using Infrastructure.Configuration.Processing.Inbox;
 
-namespace Messaging.Infrastructure.Configuration.IntegrationEvents;
+namespace Infrastructure.Configuration.IntegrationEvents;
 
 public class IntegrationEventReceiver
 {

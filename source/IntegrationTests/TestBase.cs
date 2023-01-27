@@ -30,6 +30,7 @@ using Infrastructure.Configuration.MessageBus;
 using Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Infrastructure.Transactions.MoveIn;
 using IntegrationTests.Fixtures;
+using IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 using IntegrationTests.Infrastructure.Configuration.InternalCommands;
 using IntegrationTests.TestDoubles;
 using MediatR;

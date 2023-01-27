@@ -16,14 +16,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Application.Configuration;
+using Application.Configuration.DataAccess;
 using Dapper;
+using Infrastructure.Configuration.IntegrationEvents;
 using MediatR;
-using Messaging.Application.Configuration;
-using Messaging.Application.Configuration.DataAccess;
-using Messaging.Infrastructure.Configuration.IntegrationEvents;
-using Polly;
 
-namespace Messaging.Infrastructure.Configuration.Processing.Inbox;
+namespace Infrastructure.Configuration.Processing.Inbox;
 
 public class InboxProcessor
 {

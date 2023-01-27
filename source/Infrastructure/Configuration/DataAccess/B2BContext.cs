@@ -25,6 +25,7 @@ using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Domain.Transactions.Aggregations;
 using Domain.Transactions.MoveIn;
 using Infrastructure.Configuration.InternalCommands;
+using Infrastructure.Configuration.Processing.Inbox;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.MasterData.MarketEvaluationPoints;
 using Infrastructure.OutgoingMessages;

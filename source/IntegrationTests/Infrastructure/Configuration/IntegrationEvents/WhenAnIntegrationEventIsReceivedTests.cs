@@ -14,17 +14,17 @@
 
 using System.Text.Json;
 using System.Threading.Tasks;
+using Application.Configuration;
+using Application.Configuration.DataAccess;
 using Dapper;
+using Infrastructure.Configuration.DataAccess;
+using Infrastructure.Configuration.IntegrationEvents;
+using Infrastructure.Configuration.Processing.Inbox;
+using IntegrationTests.Fixtures;
 using MediatR;
-using Messaging.Application.Configuration;
-using Messaging.Application.Configuration.DataAccess;
-using Messaging.Infrastructure.Configuration.DataAccess;
-using Messaging.Infrastructure.Configuration.IntegrationEvents;
-using Messaging.Infrastructure.Configuration.Processing.Inbox;
-using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 
-namespace Messaging.IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
+namespace IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 
 public class WhenAnIntegrationEventIsReceivedTests : TestBase
 {
