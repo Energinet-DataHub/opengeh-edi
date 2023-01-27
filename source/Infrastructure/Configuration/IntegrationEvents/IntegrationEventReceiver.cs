@@ -43,7 +43,7 @@ public class IntegrationEventReceiver
 
     private async Task RegisterAsync(string eventId, string eventType, byte[] eventPayload)
     {
-        _context.InboxMessages.Add(new InboxMessage(eventId, eventType, eventPayload, _dateTimeProvider.Now()));
+        _context.InboxMessages.Add(new ReceivedIntegrationEvent(eventId, eventType, eventPayload, _dateTimeProvider.Now()));
         await _context.SaveChangesAsync().ConfigureAwait(false);
     }
 }

@@ -18,9 +18,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Configuration.Processing.Inbox;
 
-public class InboxMessageEntityConfiguration : IEntityTypeConfiguration<InboxMessage>
+public class InboxMessageEntityConfiguration : IEntityTypeConfiguration<ReceivedIntegrationEvent>
 {
-    public void Configure(EntityTypeBuilder<InboxMessage> builder)
+    public void Configure(EntityTypeBuilder<ReceivedIntegrationEvent> builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
 

@@ -58,7 +58,7 @@ public class IntegrationEventsProcessor
         }
     }
 
-    private async Task MarkAsProcessedAsync(InboxMessage message)
+    private async Task MarkAsProcessedAsync(ReceivedIntegrationEvent message)
     {
         var updateStatement = $"UPDATE b2b.InboxMessages " +
                               "SET ProcessedDate = @Now " +
@@ -71,7 +71,7 @@ public class IntegrationEventsProcessor
         }).ConfigureAwait(false);
     }
 
-    private async Task MarkAsFailedAsync(InboxMessage message, Exception exception)
+    private async Task MarkAsFailedAsync(ReceivedIntegrationEvent message, Exception exception)
     {
         var updateStatement = $"UPDATE b2b.InboxMessages " +
                               "SET ProcessedDate = @Now, " +
@@ -86,18 +86,18 @@ public class IntegrationEventsProcessor
         }).ConfigureAwait(false);
     }
 
-    private async Task<IReadOnlyList<InboxMessage>> FindPendingMessagesAsync()
+    private async Task<IReadOnlyList<ReceivedIntegrationEvent>> FindPendingMessagesAsync()
     {
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         var sql = "SELECT " +
-                  $"Id AS {nameof(InboxMessage.Id)}, " +
-                  $"EventType AS {nameof(InboxMessage.EventType)}, " +
-                  $"EventPayload AS {nameof(InboxMessage.EventPayload)} " +
+                  $"Id AS {nameof(ReceivedIntegrationEvent.Id)}, " +
+                  $"EventType AS {nameof(ReceivedIntegrationEvent.EventType)}, " +
+                  $"EventPayload AS {nameof(ReceivedIntegrationEvent.EventPayload)} " +
                   "FROM b2b.InboxMessages " +
                   "WHERE ProcessedDate IS NULL " +
                   "ORDER BY OccurredOn";
 
-        var messages = await connection.QueryAsync<InboxMessage>(sql).ConfigureAwait(false);
+        var messages = await connection.QueryAsync<ReceivedIntegrationEvent>(sql).ConfigureAwait(false);
         return messages.ToList();
     }
 
