@@ -24,7 +24,7 @@ public class ReceivedIntegrationEventEntityConfiguration : IEntityTypeConfigurat
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        builder.ToTable("InboxMessages", "b2b");
+        builder.ToTable("ReceivedIntegrationEvents", "b2b");
         builder.HasKey(entity => entity.Id);
         builder.Property(entity => entity.Id);
         builder.Property(entity => entity.OccurredOn);
