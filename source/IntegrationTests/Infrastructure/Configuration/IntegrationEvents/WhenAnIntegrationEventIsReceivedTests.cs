@@ -114,7 +114,7 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
 
     private Task ProcessInboxMessages()
     {
-        var inboxProcessor = new InboxProcessor(
+        var inboxProcessor = new IntegrationEventsProcessor(
             GetService<IDatabaseConnectionFactory>(),
             GetService<IMediator>(),
             GetService<ISystemDateTimeProvider>(),

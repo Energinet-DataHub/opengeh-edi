@@ -24,14 +24,14 @@ using MediatR;
 
 namespace Infrastructure.Configuration.Processing.Inbox;
 
-public class InboxProcessor
+public class IntegrationEventsProcessor
 {
     private readonly IDatabaseConnectionFactory _connectionFactory;
     private readonly IMediator _mediator;
     private readonly ISystemDateTimeProvider _dateTimeProvider;
     private readonly List<IIntegrationEventMapper> _mappers;
 
-    public InboxProcessor(IDatabaseConnectionFactory connectionFactory, IMediator mediator, ISystemDateTimeProvider dateTimeProvider, IEnumerable<IIntegrationEventMapper> mappers)
+    public IntegrationEventsProcessor(IDatabaseConnectionFactory connectionFactory, IMediator mediator, ISystemDateTimeProvider dateTimeProvider, IEnumerable<IIntegrationEventMapper> mappers)
     {
         _connectionFactory = connectionFactory;
         _mediator = mediator;

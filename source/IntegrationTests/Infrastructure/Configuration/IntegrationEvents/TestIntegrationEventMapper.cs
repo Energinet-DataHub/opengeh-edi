@@ -12,23 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Text.Json;
 using Infrastructure.Configuration.IntegrationEvents;
 using MediatR;
 
 namespace IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 
-#pragma warning disable
 public class TestIntegrationEventMapper : IIntegrationEventMapper
 {
     public INotification MapFrom(byte[] payload)
     {
         var integrationEvent = JsonSerializer.Deserialize<TestIntegrationEvent>(payload);
-        return new TestNotification(integrationEvent.Property1);
+        return new TestNotification(integrationEvent!.Property1);
     }
 
     public bool CanHandle(string eventType)
     {
-        return eventType.Equals(nameof(TestIntegrationEvent));
+        ArgumentNullException.ThrowIfNull(eventType);
+        return eventType.Equals(nameof(TestIntegrationEvent), StringComparison.OrdinalIgnoreCase);
     }
 }
