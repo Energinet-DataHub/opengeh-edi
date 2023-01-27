@@ -16,9 +16,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Application.Configuration.DataAccess;
+using Application.OutgoingMessages.Common.Reasons;
 using Dapper;
-using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.OutgoingMessages.Common.Reasons;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 

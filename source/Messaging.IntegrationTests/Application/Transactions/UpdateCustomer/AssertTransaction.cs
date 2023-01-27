@@ -15,8 +15,8 @@
 using System;
 using System.Data;
 using System.Threading.Tasks;
+using Application.Configuration.DataAccess;
 using Dapper;
-using Messaging.Application.Configuration.DataAccess;
 using Xunit;
 
 namespace Messaging.IntegrationTests.Application.Transactions.UpdateCustomer;

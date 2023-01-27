@@ -14,10 +14,10 @@
 
 using System;
 using System.Threading.Tasks;
-using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.Transactions;
-using Messaging.Application.Transactions.MoveIn;
-using Messaging.Application.Transactions.MoveIn.Notifications;
+using Application.Configuration.DataAccess;
+using Application.Transactions;
+using Application.Transactions.MoveIn;
+using Application.Transactions.MoveIn.Notifications;
 using Messaging.Domain.Actors;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.Transactions;

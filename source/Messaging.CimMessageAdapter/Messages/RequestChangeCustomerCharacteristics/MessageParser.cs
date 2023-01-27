@@ -17,7 +17,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Messaging.Application.IncomingMessages.RequestChangeCustomerCharacteristics;
+using Application.IncomingMessages.RequestChangeCustomerCharacteristics;
 using Messaging.Domain.OutgoingMessages;
 
 namespace Messaging.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;

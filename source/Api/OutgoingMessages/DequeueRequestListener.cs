@@ -15,8 +15,8 @@
 using System;
 using System.Net;
 using System.Threading.Tasks;
+using Application.OutgoingMessages.Dequeue;
 using MediatR;
-using Messaging.Application.OutgoingMessages.Dequeue;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 

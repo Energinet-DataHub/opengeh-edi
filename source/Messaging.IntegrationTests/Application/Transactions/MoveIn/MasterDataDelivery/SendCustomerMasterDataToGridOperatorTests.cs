@@ -13,11 +13,9 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
+using Application.Configuration.DataAccess;
+using Application.Transactions.MoveIn.MasterDataDelivery;
 using MediatR;
-using Messaging.Application.Configuration;
-using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.OutgoingMessages;
-using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;

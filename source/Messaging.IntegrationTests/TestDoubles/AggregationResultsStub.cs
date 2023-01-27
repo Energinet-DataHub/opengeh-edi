@@ -17,7 +17,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using Messaging.Application.Transactions.Aggregations;
+using Application.Transactions.Aggregations;
 using Messaging.Domain.Transactions.Aggregations;
 using Messaging.Infrastructure.Transactions.Aggregations;
 

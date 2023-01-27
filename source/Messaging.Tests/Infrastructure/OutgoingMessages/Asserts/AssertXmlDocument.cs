@@ -22,7 +22,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
 using System.Xml.XPath;
-using Messaging.Application.Xml;
+using Application.Xml;
 using Xunit;
 
 namespace Messaging.Tests.Infrastructure.OutgoingMessages.Asserts;

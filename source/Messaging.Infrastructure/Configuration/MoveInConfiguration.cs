@@ -13,14 +13,14 @@
 // limitations under the License.
 
 using System;
+using Application.Configuration.TimeEvents;
+using Application.IncomingMessages.RequestChangeOfSupplier;
+using Application.Transactions.MoveIn;
+using Application.Transactions.MoveIn.MasterDataDelivery;
+using Application.Transactions.MoveIn.Notifications;
+using Application.Transactions.MoveIn.UpdateCustomer;
+using Application.Transactions.UpdateCustomer;
 using MediatR;
-using Messaging.Application.Configuration.TimeEvents;
-using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
-using Messaging.Application.Transactions.MoveIn;
-using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
-using Messaging.Application.Transactions.MoveIn.Notifications;
-using Messaging.Application.Transactions.MoveIn.UpdateCustomer;
-using Messaging.Application.Transactions.UpdateCustomer;
 using Messaging.Domain.Transactions.MoveIn.Events;
 using Messaging.Infrastructure.Transactions.MoveIn;
 using Messaging.Infrastructure.Transactions.MoveIn.UpdateCustomer;

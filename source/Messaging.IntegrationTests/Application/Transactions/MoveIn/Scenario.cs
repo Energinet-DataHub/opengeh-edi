@@ -14,8 +14,8 @@
 
 using System;
 using System.Threading.Tasks;
+using Application.Actors;
 using MediatR;
-using Messaging.Application.Actors;
 using Messaging.Domain.Actors;
 using Messaging.Domain.MasterData.MarketEvaluationPoints;
 using Messaging.Domain.Transactions;

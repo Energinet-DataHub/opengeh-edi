@@ -15,10 +15,10 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Configuration;
+using Application.Configuration.Commands.Commands;
+using Application.Configuration.DataAccess;
 using MediatR;
-using Messaging.Application.Configuration;
-using Messaging.Application.Configuration.Commands.Commands;
-using Messaging.Application.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 

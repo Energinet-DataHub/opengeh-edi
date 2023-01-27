@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System;
-using Messaging.Application.Configuration;
+using Application.Configuration;
 
 namespace Api.Configuration.Middleware.Correlation
 {

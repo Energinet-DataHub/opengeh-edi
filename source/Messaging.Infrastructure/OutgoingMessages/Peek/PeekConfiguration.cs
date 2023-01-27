@@ -13,11 +13,11 @@
 // limitations under the License.
 
 using System;
+using Application.Configuration.Queries;
+using Application.OutgoingMessages;
+using Application.OutgoingMessages.MessageCount;
+using Application.OutgoingMessages.Peek;
 using MediatR;
-using Messaging.Application.Configuration.Queries;
-using Messaging.Application.OutgoingMessages;
-using Messaging.Application.OutgoingMessages.MessageCount;
-using Messaging.Application.OutgoingMessages.Peek;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Messaging.Infrastructure.OutgoingMessages.Peek;

@@ -13,12 +13,11 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
+using Application.Configuration.DataAccess;
+using Application.Configuration.TimeEvents;
+using Application.Transactions.MoveIn;
+using Application.Transactions.MoveIn.MasterDataDelivery;
 using MediatR;
-using Messaging.Application.Configuration;
-using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.Configuration.TimeEvents;
-using Messaging.Application.Transactions.MoveIn;
-using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.InternalCommands;
 using Messaging.IntegrationTests.Assertions;

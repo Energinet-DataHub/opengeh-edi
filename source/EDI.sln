@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api", "Api\Api.csproj", "{B
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.IntegrationTests", "Messaging.IntegrationTests\Messaging.IntegrationTests.csproj", "{76FA7684-27E1-4022-9FB3-F72811E45C60}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.Application", "Messaging.Application\Messaging.Application.csproj", "{FB4D9AE5-FCF2-442D-97EC-8AED1F9DDD2E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application", "Application\Application.csproj", "{FB4D9AE5-FCF2-442D-97EC-8AED1F9DDD2E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.Infrastructure", "Messaging.Infrastructure\Messaging.Infrastructure.csproj", "{8B1DCD6E-013F-4B45-B9EB-167F1D874793}"
 EndProject

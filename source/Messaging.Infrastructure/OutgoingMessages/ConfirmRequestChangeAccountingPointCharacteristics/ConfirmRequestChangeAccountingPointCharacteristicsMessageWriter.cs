@@ -16,8 +16,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
-using Messaging.Application.OutgoingMessages.Common;
-using Messaging.Application.OutgoingMessages.Common.Xml;
+using Application.OutgoingMessages.Common;
+using Application.OutgoingMessages.Common.Xml;
 using Messaging.Infrastructure.OutgoingMessages.Common.Xml;
 using MarketActivityRecord = Messaging.Domain.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics.MarketActivityRecord;
 

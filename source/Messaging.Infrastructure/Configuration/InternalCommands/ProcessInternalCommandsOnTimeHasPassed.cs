@@ -15,8 +15,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Configuration.TimeEvents;
 using MediatR;
-using Messaging.Application.Configuration.TimeEvents;
 
 namespace Messaging.Infrastructure.Configuration.InternalCommands
 {

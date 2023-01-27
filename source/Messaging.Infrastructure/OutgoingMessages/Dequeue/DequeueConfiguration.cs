@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Application.OutgoingMessages.Dequeue;
 using MediatR;
-using Messaging.Application.OutgoingMessages.Dequeue;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Messaging.Infrastructure.OutgoingMessages.Dequeue;

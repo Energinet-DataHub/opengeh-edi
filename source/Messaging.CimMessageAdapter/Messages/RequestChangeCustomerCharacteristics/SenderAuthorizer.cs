@@ -15,7 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Messaging.Application.Configuration.Authentication;
+using Application.Configuration.Authentication;
 using Messaging.CimMessageAdapter.Errors;
 using Messaging.Domain.Actors;
 

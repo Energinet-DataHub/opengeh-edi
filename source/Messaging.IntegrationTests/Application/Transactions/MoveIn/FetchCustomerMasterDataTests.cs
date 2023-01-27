@@ -14,8 +14,8 @@
 
 using System;
 using System.Threading.Tasks;
+using Application.Transactions.MoveIn;
 using Energinet.DataHub.EnergySupplying.RequestResponse.Requests;
-using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.MessageBus;
 using Messaging.IntegrationTests.Fixtures;
 using Messaging.IntegrationTests.TestDoubles;

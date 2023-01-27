@@ -16,11 +16,11 @@ using System;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Application.Configuration.DataAccess;
+using Application.MasterData;
+using Application.OutgoingMessages.Common;
+using Application.Transactions.MoveIn.MasterDataDelivery;
 using MediatR;
-using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.MasterData;
-using Messaging.Application.OutgoingMessages.Common;
-using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 using Messaging.Domain.MasterData.Dictionaries;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.AccountingPointCharacteristics;
@@ -29,8 +29,8 @@ using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.IntegrationTests.Fixtures;
 using NodaTime.Extensions;
 using Xunit;
-using Address = Messaging.Application.MasterData.Address;
-using Series = Messaging.Application.MasterData.Series;
+using Address = Application.MasterData.Address;
+using Series = Application.MasterData.Series;
 
 namespace Messaging.IntegrationTests.Application.Transactions.MoveIn.MasterDataDelivery;
 

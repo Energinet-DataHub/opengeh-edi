@@ -14,8 +14,8 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Messaging.Application.Transactions;
-using Messaging.Application.Transactions.MoveIn;
+using Application.Transactions;
+using Application.Transactions.MoveIn;
 
 namespace Messaging.Infrastructure.Transactions.MoveIn;
 

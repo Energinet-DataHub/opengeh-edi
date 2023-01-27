@@ -14,8 +14,8 @@
 
 using System.Net;
 using System.Threading.Tasks;
-using Messaging.Application.Configuration.Authentication;
-using Messaging.Application.OutgoingMessages.Peek;
+using Application.Configuration.Authentication;
+using Application.OutgoingMessages.Peek;
 using Messaging.Domain.OutgoingMessages.Peek;
 using Messaging.Domain.SeedWork;
 using Microsoft.Azure.Functions.Worker;

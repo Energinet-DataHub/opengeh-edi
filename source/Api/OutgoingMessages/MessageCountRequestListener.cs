@@ -17,9 +17,9 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Application.Configuration.Authentication;
+using Application.OutgoingMessages.MessageCount;
 using MediatR;
-using Messaging.Application.Configuration.Authentication;
-using Messaging.Application.OutgoingMessages.MessageCount;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 

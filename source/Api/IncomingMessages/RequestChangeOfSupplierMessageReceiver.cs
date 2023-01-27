@@ -18,7 +18,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using Messaging.Application.Configuration;
+using Application.Configuration;
 using Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 using Messaging.CimMessageAdapter.Response;
 using Messaging.Infrastructure.IncomingMessages;

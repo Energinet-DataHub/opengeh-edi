@@ -16,9 +16,9 @@ using System;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Application.Transactions;
+using Application.Transactions.MoveIn;
 using EnergySupplying.Contracts.BusinessRequests.MoveIn;
-using Messaging.Application.Transactions;
-using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.Extensions.Logging;
 

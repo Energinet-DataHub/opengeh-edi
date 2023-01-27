@@ -13,12 +13,9 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
+using Application.Configuration.DataAccess;
+using Application.Transactions.MoveIn.Notifications;
 using MediatR;
-using Messaging.Application.Configuration;
-using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.OutgoingMessages;
-using Messaging.Application.OutgoingMessages.Common;
-using Messaging.Application.Transactions.MoveIn.Notifications;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.Transactions.MoveIn;

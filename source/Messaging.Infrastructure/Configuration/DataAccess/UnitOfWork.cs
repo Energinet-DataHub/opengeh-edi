@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Messaging.Application.Configuration.DataAccess;
+using Application.Configuration.DataAccess;
 
 namespace Messaging.Infrastructure.Configuration.DataAccess
 {

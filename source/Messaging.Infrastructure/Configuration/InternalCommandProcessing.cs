@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Application.Actors;
+using Application.Configuration.Commands;
+using Application.Configuration.TimeEvents;
+using Application.Transactions.Aggregations;
+using Application.Transactions.MoveIn;
+using Application.Transactions.MoveIn.MasterDataDelivery;
+using Application.Transactions.MoveIn.Notifications;
+using Application.Transactions.UpdateCustomer;
 using MediatR;
-using Messaging.Application.Actors;
-using Messaging.Application.Configuration.Commands;
-using Messaging.Application.Configuration.TimeEvents;
-using Messaging.Application.Transactions.Aggregations;
-using Messaging.Application.Transactions.MoveIn;
-using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
-using Messaging.Application.Transactions.MoveIn.Notifications;
-using Messaging.Application.Transactions.UpdateCustomer;
 using Messaging.Infrastructure.Configuration.InternalCommands;
 using Microsoft.Extensions.DependencyInjection;
 

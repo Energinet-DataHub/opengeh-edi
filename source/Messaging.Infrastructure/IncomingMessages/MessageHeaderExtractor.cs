@@ -14,7 +14,7 @@
 
 using System.Threading.Tasks;
 using System.Xml;
-using Messaging.Application.IncomingMessages;
+using Application.IncomingMessages;
 
 namespace Messaging.Infrastructure.IncomingMessages;
 

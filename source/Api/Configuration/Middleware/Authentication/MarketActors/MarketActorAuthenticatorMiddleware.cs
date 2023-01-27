@@ -14,7 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
-using Messaging.Application.Configuration.Authentication;
+using Application.Configuration.Authentication;
 using Messaging.Infrastructure.Configuration.Authentication;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.Azure.Functions.Worker;

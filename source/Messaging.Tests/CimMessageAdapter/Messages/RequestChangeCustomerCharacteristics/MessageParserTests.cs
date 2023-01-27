@@ -18,18 +18,17 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Messaging.Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
-using Messaging.Application.IncomingMessages.RequestChangeCustomerCharacteristics;
+using Application.IncomingMessages.RequestChangeCustomerCharacteristics;
 using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.IncomingMessages.RequestChangeCustomerCharacteristics;
 using Xunit;
-using Address = Messaging.Application.IncomingMessages.RequestChangeCustomerCharacteristics.Address;
-using MarketActivityRecord = Messaging.Application.IncomingMessages.RequestChangeCustomerCharacteristics.MarketActivityRecord;
-using MarketEvaluationPoint = Messaging.Application.IncomingMessages.RequestChangeCustomerCharacteristics.MarketEvaluationPoint;
-using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
+using Address = Application.IncomingMessages.RequestChangeCustomerCharacteristics.Address;
+using MarketActivityRecord = Application.IncomingMessages.RequestChangeCustomerCharacteristics.MarketActivityRecord;
+using MarketEvaluationPoint = Application.IncomingMessages.RequestChangeCustomerCharacteristics.MarketEvaluationPoint;
+using MessageHeader = Application.IncomingMessages.MessageHeader;
 
 namespace Messaging.Tests.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 

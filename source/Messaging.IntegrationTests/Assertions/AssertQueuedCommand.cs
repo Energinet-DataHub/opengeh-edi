@@ -15,8 +15,8 @@
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Application.Configuration.DataAccess;
 using Dapper;
-using Messaging.Application.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.InternalCommands;
 using Xunit;
 

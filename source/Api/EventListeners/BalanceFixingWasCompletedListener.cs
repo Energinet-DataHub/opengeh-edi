@@ -14,8 +14,8 @@
 
 using System;
 using System.Threading.Tasks;
-using Messaging.Application.Configuration.Commands;
-using Messaging.Application.Transactions.Aggregations;
+using Application.Configuration.Commands;
+using Application.Transactions.Aggregations;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using NodaTime.Serialization.Protobuf;

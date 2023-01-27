@@ -15,8 +15,8 @@
 using System;
 using System.Data;
 using System.Threading.Tasks;
+using Application.Configuration.DataAccess;
 using Dapper;
-using Messaging.Application.Configuration.DataAccess;
 using Messaging.Domain.Transactions;
 using Messaging.Domain.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.Serialization;

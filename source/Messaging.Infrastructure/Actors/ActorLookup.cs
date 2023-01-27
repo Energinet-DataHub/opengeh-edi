@@ -14,9 +14,9 @@
 
 using System;
 using System.Threading.Tasks;
+using Application.Actors;
+using Application.Configuration.DataAccess;
 using Dapper;
-using Messaging.Application.Actors;
-using Messaging.Application.Configuration.DataAccess;
 using Messaging.Domain.Actors;
 
 namespace Messaging.Infrastructure.Actors;

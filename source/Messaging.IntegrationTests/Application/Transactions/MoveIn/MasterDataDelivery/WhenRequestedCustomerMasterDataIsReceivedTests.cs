@@ -14,10 +14,10 @@
 
 using System;
 using System.Threading.Tasks;
+using Application.Configuration.DataAccess;
+using Application.MasterData;
+using Application.Transactions.MoveIn.MasterDataDelivery;
 using MediatR;
-using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.MasterData;
-using Messaging.Application.Transactions.MoveIn.MasterDataDelivery;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;

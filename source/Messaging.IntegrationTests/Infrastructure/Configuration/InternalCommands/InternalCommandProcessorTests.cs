@@ -14,11 +14,11 @@
 
 using System.Data;
 using System.Threading.Tasks;
+using Application.Configuration;
+using Application.Configuration.Commands;
+using Application.Configuration.Commands.Commands;
+using Application.Configuration.DataAccess;
 using Dapper;
-using Messaging.Application.Configuration;
-using Messaging.Application.Configuration.Commands;
-using Messaging.Application.Configuration.Commands.Commands;
-using Messaging.Application.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.InternalCommands;
 using Messaging.IntegrationTests.Fixtures;
 using NodaTime;

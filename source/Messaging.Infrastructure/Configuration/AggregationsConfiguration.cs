@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System;
+using Application.Transactions.Aggregations;
 using MediatR;
-using Messaging.Application.Transactions.Aggregations;
 using Messaging.Domain.Transactions.Aggregations;
 using Messaging.Infrastructure.Transactions.Aggregations;
 using Microsoft.Extensions.DependencyInjection;

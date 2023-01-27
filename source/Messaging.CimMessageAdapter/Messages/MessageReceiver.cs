@@ -16,10 +16,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Messaging.Application.IncomingMessages;
+using Application.IncomingMessages;
 using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Messages.Queues;
-using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
+using MessageHeader = Application.IncomingMessages.MessageHeader;
 
 namespace Messaging.CimMessageAdapter.Messages
 {

@@ -17,7 +17,7 @@ using System.Net.Http;
 using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
-using Messaging.Application.Transactions.Aggregations;
+using Application.Transactions.Aggregations;
 using Messaging.Domain.Transactions.Aggregations;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Polly;

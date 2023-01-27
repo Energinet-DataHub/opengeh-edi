@@ -14,10 +14,10 @@
 
 using System;
 using System.Threading.Tasks;
+using Application.Transactions.MoveIn;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MeteringPoints.RequestResponse.Requests;
 using Google.Protobuf;
-using Messaging.Application.Transactions.MoveIn;
 using Messaging.Infrastructure.Configuration.MessageBus;
 
 namespace Messaging.Infrastructure.Transactions.MoveIn;

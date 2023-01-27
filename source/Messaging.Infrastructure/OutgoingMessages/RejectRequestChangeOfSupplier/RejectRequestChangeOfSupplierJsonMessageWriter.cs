@@ -16,7 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Messaging.Application.OutgoingMessages.Common;
+using Application.OutgoingMessages.Common;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Messaging.Infrastructure.OutgoingMessages.Common.Json;

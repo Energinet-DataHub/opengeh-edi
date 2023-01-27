@@ -15,7 +15,7 @@
 using System;
 using System.Data;
 using System.Threading.Tasks;
-using Messaging.Application.Configuration.DataAccess;
+using Application.Configuration.DataAccess;
 using Microsoft.Data.SqlClient;
 
 namespace Messaging.Infrastructure.Configuration.DataAccess

@@ -14,11 +14,11 @@
 
 using System;
 using System.Threading.Tasks;
+using Application.Actors;
+using Application.Configuration.DataAccess;
 using Dapper;
 using JetBrains.Annotations;
 using MediatR;
-using Messaging.Application.Actors;
-using Messaging.Application.Configuration.DataAccess;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 

@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
+using Application.Configuration;
+using Application.Configuration.TimeEvents;
 using MediatR;
-using Messaging.Application.Configuration;
-using Messaging.Application.Configuration.TimeEvents;
 using Microsoft.Azure.Functions.Worker;
 
 namespace Api.Configuration

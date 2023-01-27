@@ -14,9 +14,9 @@
 
 using System;
 using System.Threading.Tasks;
-using Messaging.Application.Configuration;
-using Messaging.Application.Configuration.Commands;
-using Messaging.Application.Configuration.Commands.Commands;
+using Application.Configuration;
+using Application.Configuration.Commands;
+using Application.Configuration.Commands.Commands;
 using Messaging.Infrastructure.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.Serialization;
 using NodaTime;

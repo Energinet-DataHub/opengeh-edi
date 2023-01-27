@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Messaging.Application.IncomingMessages.RequestChangeCustomerCharacteristics;
-using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
+using Application.IncomingMessages.RequestChangeCustomerCharacteristics;
+using Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 using Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier;
@@ -22,7 +22,7 @@ using Messaging.Infrastructure.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.Infrastructure.IncomingMessages.Response;
 using Messaging.Infrastructure.IncomingMessages.SchemaStore;
 using Microsoft.Extensions.DependencyInjection;
-using MarketActivityRecord = Messaging.Application.IncomingMessages.RequestChangeOfSupplier.MarketActivityRecord;
+using MarketActivityRecord = Application.IncomingMessages.RequestChangeOfSupplier.MarketActivityRecord;
 using MessageParser = Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier.MessageParser;
 using SenderAuthorizer = Messaging.CimMessageAdapter.Messages.RequestChangeOfSupplier.SenderAuthorizer;
 

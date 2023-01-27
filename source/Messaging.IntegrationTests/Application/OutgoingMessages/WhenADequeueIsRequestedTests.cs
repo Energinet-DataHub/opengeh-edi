@@ -14,10 +14,10 @@
 
 using System;
 using System.Threading.Tasks;
+using Application.Configuration.DataAccess;
+using Application.OutgoingMessages.Dequeue;
+using Application.OutgoingMessages.Peek;
 using Dapper;
-using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.OutgoingMessages.Dequeue;
-using Messaging.Application.OutgoingMessages.Peek;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.OutgoingMessages.Peek;

@@ -17,7 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Messaging.Application.Actors;
+using Application.Actors;
 using Messaging.Infrastructure.Actors;
 
 namespace Messaging.Infrastructure.Configuration.Authentication;

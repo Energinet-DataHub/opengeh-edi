@@ -18,15 +18,15 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Messaging.Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
+using Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
 using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.CimMessageAdapter.Messages.RequestChangeAccountingPointCharacteristics;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.IncomingMessages.RequestChangeAccountingPointCharacteristics;
 using Xunit;
-using MarketActivityRecord = Messaging.Application.IncomingMessages.RequestChangeAccountPointCharacteristics.MarketActivityRecord;
-using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
+using MarketActivityRecord = Application.IncomingMessages.RequestChangeAccountPointCharacteristics.MarketActivityRecord;
+using MessageHeader = Application.IncomingMessages.MessageHeader;
 
 namespace Messaging.Tests.CimMessageAdapter.Messages.RequestChangeAccountingPointCharacteristics;
 

@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.Transactions.UpdateCustomer;
+using Application.Configuration.DataAccess;
+using Application.Transactions.UpdateCustomer;
 using Messaging.IntegrationTests.Fixtures;
 using Xunit;
 

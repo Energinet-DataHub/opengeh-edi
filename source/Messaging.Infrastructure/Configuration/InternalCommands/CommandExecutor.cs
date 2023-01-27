@@ -14,8 +14,8 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Configuration.Commands.Commands;
 using MediatR;
-using Messaging.Application.Configuration.Commands.Commands;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Messaging.Infrastructure.Configuration.InternalCommands

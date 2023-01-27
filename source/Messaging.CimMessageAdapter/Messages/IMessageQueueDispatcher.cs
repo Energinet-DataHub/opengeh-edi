@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Messaging.Application.IncomingMessages;
+using Application.IncomingMessages;
 using Messaging.CimMessageAdapter.Messages.Queues;
 
 namespace Messaging.CimMessageAdapter.Messages

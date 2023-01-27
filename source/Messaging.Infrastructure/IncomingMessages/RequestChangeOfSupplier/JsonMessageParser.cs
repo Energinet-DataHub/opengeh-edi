@@ -18,8 +18,8 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Application.IncomingMessages.RequestChangeOfSupplier;
 using Json.Schema;
-using Messaging.Application.IncomingMessages.RequestChangeOfSupplier;
 using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.Domain.OutgoingMessages;
@@ -28,7 +28,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using JsonException = Newtonsoft.Json.JsonException;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
-using MessageHeader = Messaging.Application.IncomingMessages.MessageHeader;
+using MessageHeader = Application.IncomingMessages.MessageHeader;
 
 namespace Messaging.Infrastructure.IncomingMessages.RequestChangeOfSupplier;
 

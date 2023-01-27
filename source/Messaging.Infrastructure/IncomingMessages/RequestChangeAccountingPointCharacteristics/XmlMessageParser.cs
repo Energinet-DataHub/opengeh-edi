@@ -18,12 +18,12 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
-using Messaging.Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
+using Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
 using Messaging.CimMessageAdapter.Errors;
 using Messaging.CimMessageAdapter.Messages;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Infrastructure.IncomingMessages.SchemaStore;
-using MarketActivityRecord = Messaging.Application.IncomingMessages.RequestChangeAccountPointCharacteristics.MarketActivityRecord;
+using MarketActivityRecord = Application.IncomingMessages.RequestChangeAccountPointCharacteristics.MarketActivityRecord;
 
 namespace Messaging.Infrastructure.IncomingMessages.RequestChangeAccountingPointCharacteristics;
 

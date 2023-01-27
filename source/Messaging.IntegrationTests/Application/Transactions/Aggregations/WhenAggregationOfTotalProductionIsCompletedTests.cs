@@ -14,9 +14,9 @@
 
 using System.Threading.Tasks;
 using System.Transactions;
+using Application.Configuration.DataAccess;
+using Application.Transactions.Aggregations;
 using Dapper;
-using Messaging.Application.Configuration.DataAccess;
-using Messaging.Application.Transactions.Aggregations;
 using Messaging.Domain.Actors;
 using Messaging.Domain.OutgoingMessages;
 using Messaging.Domain.SeedWork;

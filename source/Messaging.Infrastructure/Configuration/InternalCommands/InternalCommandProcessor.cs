@@ -15,9 +15,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Configuration.Commands.Commands;
+using Application.Configuration.DataAccess;
 using Dapper;
-using Messaging.Application.Configuration.Commands.Commands;
-using Messaging.Application.Configuration.DataAccess;
 using Messaging.Infrastructure.Configuration.Serialization;
 using Microsoft.Extensions.Logging;
 using Polly;

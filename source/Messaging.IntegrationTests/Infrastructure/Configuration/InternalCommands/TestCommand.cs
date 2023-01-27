@@ -14,7 +14,7 @@
 
 using System;
 using System.Text.Json.Serialization;
-using Messaging.Application.Configuration.Commands.Commands;
+using Application.Configuration.Commands.Commands;
 
 namespace Messaging.IntegrationTests.Infrastructure.Configuration.InternalCommands
 {
