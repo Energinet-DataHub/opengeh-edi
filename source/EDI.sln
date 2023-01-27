@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastru
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArchitectureTests", "ArchitectureTests\ArchitectureTests.csproj", "{D0C39286-C7BE-4714-8CA1-5654B68A9529}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.Tests", "Messaging.Tests\Messaging.Tests.csproj", "{87BCDB76-76A4-46A3-9F67-571847541C90}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{87BCDB76-76A4-46A3-9F67-571847541C90}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EnergySupplying.Contracts", "EnergySupplying.Contracts\EnergySupplying.Contracts.csproj", "{4AA95CA9-C2EB-4F47-88D5-8E320F62142C}"
 EndProject
