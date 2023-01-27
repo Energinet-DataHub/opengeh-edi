@@ -14,6 +14,7 @@
 
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,6 +30,7 @@ using Infrastructure.Configuration.MessageBus;
 using Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Infrastructure.Transactions.MoveIn;
 using IntegrationTests.Fixtures;
+using IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 using IntegrationTests.Infrastructure.Configuration.InternalCommands;
 using IntegrationTests.TestDoubles;
 using MediatR;
@@ -44,7 +46,7 @@ namespace IntegrationTests
         private readonly ServiceBusSenderFactoryStub _serviceBusSenderFactoryStub;
         private readonly HttpClientSpy _httpClientSpy;
         private ServiceCollection? _services;
-        private IServiceProvider? _serviceProvider;
+        private IServiceProvider _serviceProvider = default!;
         private bool _disposed;
 
         protected TestBase(DatabaseFixture databaseFixture)
@@ -54,8 +56,11 @@ namespace IntegrationTests
             _httpClientSpy = new HttpClientSpy();
             _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
             _aggregationResultsStub = new AggregationResultsStub();
+            NotificationHandlerSpy = new TestNotificationHandlerSpy();
             BuildServices();
         }
+
+        protected TestNotificationHandlerSpy NotificationHandlerSpy { get; }
 
         public void Dispose()
         {
@@ -108,9 +113,11 @@ namespace IntegrationTests
 
             _services.AddSingleton(new EnergySupplyingServiceBusClientConfiguration("Fake"));
             _services.AddSingleton<IServiceBusSenderFactory>(_serviceBusSenderFactoryStub);
-
             _services.AddSingleton(
                 _ => new ServiceBusClient(CreateFakeServiceBusConnectionString()));
+
+            _services.AddTransient<INotificationHandler<TestNotification>>(_ => NotificationHandlerSpy);
+
             CompositionRoot.Initialize(_services)
                 .AddAuthentication()
                 .AddAggregationsConfiguration(_ => _aggregationResultsStub)

@@ -45,10 +45,6 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Configuration\SystemTime" />
-    </ItemGroup>
-
-    <ItemGroup>
       <None Update="IncomingMessages\SchemaStore\Schemas\Xml\urn-ediel-org-structure-requestchangeaccountingpointcharacteristics-0-1.xsd">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
