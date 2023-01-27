@@ -108,8 +108,8 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
     private async Task EventIsMarkedAsFailed(string eventId)
     {
         var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
-        var isProcessed = connection.ExecuteScalar<bool>($"SELECT COUNT(*) FROM b2b.InboxMessages WHERE Id = @EventId AND ProcessedDate IS NOT NULL AND ErrorMessage IS NOT NULL", new { EventId = eventId, });
-        Assert.True(isProcessed);
+        var isFailed = connection.ExecuteScalar<bool>($"SELECT COUNT(*) FROM b2b.InboxMessages WHERE Id = @EventId AND ProcessedDate IS NOT NULL AND ErrorMessage IS NOT NULL", new { EventId = eventId, });
+        Assert.True(isFailed);
     }
 
     private Task ProcessInboxMessages()
