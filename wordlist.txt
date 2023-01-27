@@ -12,6 +12,8 @@ DataHub
 DDD
 deserialize
 DTO
+Ebix
+EDI
 eg
 Eg
 Energinet
@@ -128,6 +130,7 @@ Azurite
 Powershell
 ps
 setupazure
+structurizr
 yourUserName
 yyy
 zzz
