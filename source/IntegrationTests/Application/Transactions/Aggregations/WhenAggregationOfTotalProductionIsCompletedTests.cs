@@ -44,7 +44,7 @@ public class WhenAggregationOfTotalProductionIsCompletedTests : TestBase
         var integrationEvent = new Energinet.DataHub.Wholesale.Contracts.Events.ProcessCompleted()
         {
             GridAreaCode = SampleData.GridAreaCode,
-            BatchId = Guid.NewGuid().ToString(),
+            BatchId = SampleData.ResultId.ToString(),
             PeriodStartUtc = Timestamp.FromDateTime(SampleData.StartOfPeriod.ToDateTimeUtc()),
             PeriodEndUtc = Timestamp.FromDateTime(SampleData.EndOfPeriod.ToDateTimeUtc()),
         };
