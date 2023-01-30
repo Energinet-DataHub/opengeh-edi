@@ -24,6 +24,7 @@ using Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Domain.Transactions.Aggregations;
 using Domain.Transactions.MoveIn;
+using Infrastructure.Configuration.IntegrationEvents;
 using Infrastructure.Configuration.InternalCommands;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.MasterData.MarketEvaluationPoints;
@@ -66,6 +67,8 @@ namespace Infrastructure.Configuration.DataAccess
 
         public DbSet<BundledMessage> BundledMessages { get; private set; }
 
+        public DbSet<ReceivedIntegrationEvent> ReceivedIntegrationEvents { get; private set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
@@ -76,6 +79,7 @@ namespace Infrastructure.Configuration.DataAccess
             modelBuilder.ApplyConfiguration(new OutgoingMessageEntityConfiguration());
             modelBuilder.ApplyConfiguration(new EnqueuedMessageEntityConfiguration());
             modelBuilder.ApplyConfiguration(new QueuedInternalCommandEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new ReceivedIntegrationEventEntityConfiguration());
             modelBuilder.ApplyConfiguration(new MarketEvaluationPointEntityConfiguration());
             modelBuilder.ApplyConfiguration(new BundledMessageConfiguration());
 
