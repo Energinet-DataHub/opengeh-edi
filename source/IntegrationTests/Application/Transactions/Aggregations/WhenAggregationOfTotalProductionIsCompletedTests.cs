@@ -42,8 +42,7 @@ public class WhenAggregationOfTotalProductionIsCompletedTests : TestBase
     [Fact]
     public async Task A_transaction_is_started()
     {
-        var integrationEvent = BalanceFixingCompletedIntegrationEvent();
-        await HavingReceivedIntegrationEventAsync(SampleData.NameOfReceivedIntegrationEvent, integrationEvent)
+        await HavingReceivedIntegrationEventAsync(SampleData.NameOfBalanceFixingCompletedIntegrationEvent, BalanceFixingCompletedIntegrationEvent())
             .ConfigureAwait(false);
 
         var gridAreaLookup = GetService<IGridAreaLookup>();
