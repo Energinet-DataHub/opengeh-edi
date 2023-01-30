@@ -22,6 +22,7 @@ limitations under the License.
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="2.0.2" />
         <PackageReference Include="EntityFrameworkCore.SqlServer.NodaTime" Version="5.0.1" />
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Core" Version="1.4.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
