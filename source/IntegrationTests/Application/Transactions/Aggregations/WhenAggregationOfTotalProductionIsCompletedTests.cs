@@ -20,6 +20,7 @@ using Dapper;
 using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.SeedWork;
+using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Infrastructure.Configuration.IntegrationEvents;
@@ -41,13 +42,7 @@ public class WhenAggregationOfTotalProductionIsCompletedTests : TestBase
     [Fact]
     public async Task A_transaction_is_started()
     {
-        var integrationEvent = new Energinet.DataHub.Wholesale.Contracts.Events.ProcessCompleted()
-        {
-            GridAreaCode = SampleData.GridAreaCode,
-            BatchId = SampleData.ResultId.ToString(),
-            PeriodStartUtc = Timestamp.FromDateTime(SampleData.StartOfPeriod.ToDateTimeUtc()),
-            PeriodEndUtc = Timestamp.FromDateTime(SampleData.EndOfPeriod.ToDateTimeUtc()),
-        };
+        var integrationEvent = BalanceFixingCompletedIntegrationEvent();
         await HavingReceivedIntegrationEventAsync(SampleData.NameOfReceivedIntegrationEvent, integrationEvent)
             .ConfigureAwait(false);
 
@@ -71,6 +66,17 @@ public class WhenAggregationOfTotalProductionIsCompletedTests : TestBase
         await StartTransaction().ConfigureAwait(false);
 
         AssertQueuedCommand.QueuedCommand<RetrieveAggregationResult>(GetService<IDatabaseConnectionFactory>(), GetService<InternalCommandMapper>());
+    }
+
+    private static ProcessCompleted BalanceFixingCompletedIntegrationEvent()
+    {
+        return new ProcessCompleted()
+        {
+            GridAreaCode = SampleData.GridAreaCode,
+            BatchId = SampleData.ResultId.ToString(),
+            PeriodStartUtc = Timestamp.FromDateTime(SampleData.StartOfPeriod.ToDateTimeUtc()),
+            PeriodEndUtc = Timestamp.FromDateTime(SampleData.EndOfPeriod.ToDateTimeUtc()),
+        };
     }
 
     private async Task StartTransaction()
