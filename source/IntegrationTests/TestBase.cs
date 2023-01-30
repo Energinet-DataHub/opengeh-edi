@@ -24,6 +24,7 @@ using Application.Configuration.DataAccess;
 using Application.Configuration.Queries;
 using Application.Transactions.MoveIn;
 using Azure.Messaging.ServiceBus;
+using Google.Protobuf;
 using Infrastructure.Configuration;
 using Infrastructure.Configuration.DataAccess;
 using Infrastructure.Configuration.IntegrationEvents;
@@ -109,9 +110,9 @@ namespace IntegrationTests
             return GetService<IntegrationEventsProcessor>().ProcessMessagesAsync();
         }
 
-        protected Task HavingReceivedIntegrationEventAsync(string eventType, byte[] eventPayload)
+        protected Task HavingReceivedIntegrationEventAsync(string eventType, IMessage eventPayload)
         {
-            return GetService<IntegrationEventReceiver>().ReceiveAsync(Guid.NewGuid().ToString(), eventType, eventPayload);
+            return GetService<IntegrationEventReceiver>().ReceiveAsync(Guid.NewGuid().ToString(), eventType, eventPayload.ToByteArray());
         }
 
         private static string CreateFakeServiceBusConnectionString()

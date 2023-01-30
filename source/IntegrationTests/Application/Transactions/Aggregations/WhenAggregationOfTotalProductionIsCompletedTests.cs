@@ -48,7 +48,7 @@ public class WhenAggregationOfTotalProductionIsCompletedTests : TestBase
             PeriodStartUtc = Timestamp.FromDateTime(SampleData.StartOfPeriod.ToDateTimeUtc()),
             PeriodEndUtc = Timestamp.FromDateTime(SampleData.EndOfPeriod.ToDateTimeUtc()),
         };
-        await HavingReceivedIntegrationEventAsync("BalanceFixingCompleted", integrationEvent.ToByteArray())
+        await HavingReceivedIntegrationEventAsync("BalanceFixingCompleted", integrationEvent)
             .ConfigureAwait(false);
         await ProcessReceivedIntegrationEventsAsync().ConfigureAwait(false);
         await ProcessScheduledCommandsAsync().ConfigureAwait(false);
