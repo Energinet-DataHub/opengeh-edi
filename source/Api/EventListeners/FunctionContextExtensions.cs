@@ -12,12 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Api.Configuration.IntegrationEvents;
+using Microsoft.Azure.Functions.Worker;
 
-public record EventDetails(string EventId, string EventType)
+namespace Api.EventListeners;
+
+internal static class FunctionContextExtensions
 {
-    public static EventDetails Empty()
+    internal static EventDetails ExtractEventDetails(this FunctionContext context)
     {
-        return new EventDetails(string.Empty, string.Empty);
+        context.BindingContext.BindingData.TryGetValue("MessageId", out var messageId);
+        context.BindingContext.BindingData.TryGetValue("Label", out var subject);
+
+        return messageId is string eventId && subject is string eventType ? new EventDetails(eventId, eventType) : EventDetails.Empty();
     }
 }

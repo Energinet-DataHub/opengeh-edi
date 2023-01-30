@@ -14,7 +14,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Api.Configuration.IntegrationEvents;
 using Infrastructure.Configuration.IntegrationEvents;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
