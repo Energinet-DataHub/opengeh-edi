@@ -100,19 +100,11 @@ namespace IntegrationTests
             return GetService<IMediator>().Send(query, CancellationToken.None);
         }
 
-        protected Task ProcessScheduledCommandsAsync()
+        protected async Task HavingReceivedIntegrationEventAsync(string eventType, IMessage eventPayload)
         {
-            return GetService<InternalCommandProcessor>().ProcessPendingAsync();
-        }
-
-        protected Task ProcessReceivedIntegrationEventsAsync()
-        {
-            return GetService<IntegrationEventsProcessor>().ProcessMessagesAsync();
-        }
-
-        protected Task HavingReceivedIntegrationEventAsync(string eventType, IMessage eventPayload)
-        {
-            return GetService<IntegrationEventReceiver>().ReceiveAsync(Guid.NewGuid().ToString(), eventType, eventPayload.ToByteArray());
+            await GetService<IntegrationEventReceiver>().ReceiveAsync(Guid.NewGuid().ToString(), eventType, eventPayload.ToByteArray()).ConfigureAwait(false);
+            await ProcessReceivedIntegrationEventsAsync().ConfigureAwait(false);
+            await ProcessScheduledCommandsAsync().ConfigureAwait(false);
         }
 
         private static string CreateFakeServiceBusConnectionString()
@@ -122,6 +114,16 @@ namespace IntegrationTests
                 .Append("SharedAccessKeyName=send;")
                 .Append(CultureInfo.InvariantCulture, $"SharedAccessKey={Guid.NewGuid():N}")
                 .ToString();
+        }
+
+        private Task ProcessScheduledCommandsAsync()
+        {
+            return GetService<InternalCommandProcessor>().ProcessPendingAsync();
+        }
+
+        private Task ProcessReceivedIntegrationEventsAsync()
+        {
+            return GetService<IntegrationEventsProcessor>().ProcessMessagesAsync();
         }
 
         private void BuildServices()
