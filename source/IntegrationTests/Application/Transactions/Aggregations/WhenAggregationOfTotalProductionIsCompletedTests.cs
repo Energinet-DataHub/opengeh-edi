@@ -53,7 +53,7 @@ public class WhenAggregationOfTotalProductionIsCompletedTests : TestBase
             .ReceiveAsync(Guid.NewGuid().ToString(), "BalanceFixingCompleted", integrationEvent.ToByteArray())
             .ConfigureAwait(false);
 
-        await GetService<IntegrationEventsProcessor>().ProcessMessagesAsync().ConfigureAwait(false);
+        await ProcessReceivedIntegrationEventsAsync().ConfigureAwait(false);
         await ProcessScheduledCommandsAsync().ConfigureAwait(false);
 
         var gridAreaLookup = GetService<IGridAreaLookup>();
