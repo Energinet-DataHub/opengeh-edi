@@ -76,6 +76,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202227101354 Add period start and end.sql" />
     <EmbeddedResource Include="Scripts\Model\202227101355 Add received integration events.sql" />
     <EmbeddedResource Include="Scripts\Model\202301301240 Delete unused tables in dbo schema.sql" />
+    <EmbeddedResource Include="Scripts\Model\202301301336 Move tables to dbo schema.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281100 Seed cleanup.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281101 Insert Reasons.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241100 Consolidated dbo model.sql" />
