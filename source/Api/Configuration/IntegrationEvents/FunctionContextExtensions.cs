@@ -20,8 +20,8 @@ internal static class FunctionContextExtensions
 {
     internal static EventDetails ExtractEventDetails(this FunctionContext context)
     {
-        context.BindingContext.BindingData.TryGetValue("messageId", out var messageId);
-        context.BindingContext.BindingData.TryGetValue("subject", out var subject);
+        context.BindingContext.BindingData.TryGetValue("MessageId", out var messageId);
+        context.BindingContext.BindingData.TryGetValue("Label", out var subject);
 
         return messageId is string eventId && subject is string eventType ? new EventDetails(eventId, eventType) : EventDetails.Empty();
     }
