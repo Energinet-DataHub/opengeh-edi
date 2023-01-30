@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Api.Configuration.IntegrationEvents;
 using Application.Configuration.Commands;
 using Application.Transactions.Aggregations;
 using Microsoft.Azure.Functions.Worker;
@@ -42,6 +43,11 @@ public class BalanceFixingWasCompletedListener
         byte[] eventData,
         FunctionContext context)
     {
+        ArgumentNullException.ThrowIfNull(context);
+
+        var eventDetails = context.ExtractEventDetails();
+        _logger.LogInformation($"Integration event details: {eventDetails}");
+
         var processCompletedEvent =
             Energinet.DataHub.Wholesale.Contracts.Events.ProcessCompleted.Parser.ParseFrom(eventData);
         _logger.LogInformation($"Received ProcessCompleted event: {processCompletedEvent}");
