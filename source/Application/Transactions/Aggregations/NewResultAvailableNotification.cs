@@ -12,17 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Infrastructure.Transactions.Aggregations;
-using Microsoft.Extensions.DependencyInjection;
+using System;
+using MediatR;
+using NodaTime;
 
-namespace Infrastructure.Configuration.IntegrationEvents;
+namespace Application.Transactions.Aggregations;
 
-public static class IntegrationEventsConfiguration
+public class NewResultAvailableNotification : INotification
 {
-    public static void Configure(IServiceCollection services)
+    public NewResultAvailableNotification(Guid resultId, string gridAreaCode, Instant periodStartDate, Instant periodEndDate)
     {
-        services.AddSingleton<IntegrationEventReceiver>();
-        services.AddSingleton<IntegrationEventsProcessor>();
-        services.AddTransient<IIntegrationEventMapper, BalanceFixingCompletedEventMapper>();
+        ResultId = resultId;
+        GridAreaCode = gridAreaCode;
+        PeriodStartDate = periodStartDate;
+        PeriodEndDate = periodEndDate;
     }
+
+    public Guid ResultId { get; }
+
+    public string GridAreaCode { get; }
+
+    public Instant PeriodStartDate { get; }
+
+    public Instant PeriodEndDate { get; }
 }

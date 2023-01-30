@@ -55,6 +55,7 @@ using Infrastructure.OutgoingMessages.Peek;
 using Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 using Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Infrastructure.Transactions;
+using Infrastructure.Transactions.Aggregations;
 using Infrastructure.Transactions.MoveIn;
 using Infrastructure.Transactions.UpdateCustomer;
 using MediatR;

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Application.Transactions.Aggregations;
@@ -19,9 +20,13 @@ using Dapper;
 using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.SeedWork;
+using Google.Protobuf;
+using Google.Protobuf.WellKnownTypes;
+using Infrastructure.Configuration.IntegrationEvents;
 using Infrastructure.Configuration.InternalCommands;
 using IntegrationTests.Assertions;
 using IntegrationTests.Fixtures;
+using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using Xunit;
 
 namespace IntegrationTests.Application.Transactions.Aggregations;
@@ -36,9 +41,23 @@ public class WhenAggregationOfTotalProductionIsCompletedTests : TestBase
     [Fact]
     public async Task A_transaction_is_started()
     {
+        var integrationEvent = new Energinet.DataHub.Wholesale.Contracts.Events.ProcessCompleted()
+        {
+            GridAreaCode = SampleData.GridAreaCode,
+            BatchId = Guid.NewGuid().ToString(),
+            PeriodStartUtc = Timestamp.FromDateTime(SampleData.StartOfPeriod.ToDateTimeUtc()),
+            PeriodEndUtc = Timestamp.FromDateTime(SampleData.EndOfPeriod.ToDateTimeUtc()),
+        };
+        var integrationEventReceiver = GetService<IntegrationEventReceiver>();
+        await integrationEventReceiver
+            .ReceiveAsync(Guid.NewGuid().ToString(), "BalanceFixingCompleted", integrationEvent.ToByteArray())
+            .ConfigureAwait(false);
+
+        await GetService<IntegrationEventsProcessor>().ProcessMessagesAsync().ConfigureAwait(false);
+        await GetService<InternalCommandProcessor>().ProcessPendingAsync().ConfigureAwait(false);
+
         var gridAreaLookup = GetService<IGridAreaLookup>();
         var gridOperatorNumber = await gridAreaLookup.GetGridOperatorForAsync(SampleData.GridAreaCode).ConfigureAwait(false);
-        await StartTransaction().ConfigureAwait(false);
 
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
         var transaction = await connection

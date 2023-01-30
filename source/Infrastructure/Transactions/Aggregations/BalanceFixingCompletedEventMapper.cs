@@ -13,8 +13,10 @@
 // limitations under the License.
 
 using System;
+using Application.Transactions.Aggregations;
 using Infrastructure.Configuration.IntegrationEvents;
 using MediatR;
+using NodaTime.Serialization.Protobuf;
 
 namespace Infrastructure.Transactions.Aggregations;
 
@@ -22,7 +24,12 @@ public class BalanceFixingCompletedEventMapper : IIntegrationEventMapper
 {
     public INotification MapFrom(byte[] payload)
     {
-        throw new System.NotImplementedException();
+        var integrationEvent = Energinet.DataHub.Wholesale.Contracts.Events.ProcessCompleted.Parser.ParseFrom(payload);
+        return new NewResultAvailableNotification(
+            Guid.Parse(integrationEvent.BatchId),
+            integrationEvent.GridAreaCode,
+            integrationEvent.PeriodStartUtc.ToInstant(),
+            integrationEvent.PeriodEndUtc.ToInstant());
     }
 
     public bool CanHandle(string eventType)
