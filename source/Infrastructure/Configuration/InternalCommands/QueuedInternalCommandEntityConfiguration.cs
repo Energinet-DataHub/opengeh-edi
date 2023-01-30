@@ -24,7 +24,7 @@ namespace Infrastructure.Configuration.InternalCommands
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            builder.ToTable("QueuedInternalCommands", "b2b");
+            builder.ToTable("QueuedInternalCommands", "dbo");
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Data)
                 .HasColumnName("Data");

@@ -142,7 +142,7 @@ public class AssertTransaction
     private static dynamic? GetTransaction(ActorProvidedId actorProvidedId, IDbConnection connection)
     {
         return connection.QuerySingle(
-            $"SELECT * FROM b2b.MoveInTransactions WHERE ActorProvidedId = @ActorProvidedId",
+            $"SELECT * FROM dbo.MoveInTransactions WHERE ActorProvidedId = @ActorProvidedId",
             new
             {
                 ActorProvidedId = actorProvidedId.Id,

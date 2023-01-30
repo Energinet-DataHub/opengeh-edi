@@ -25,7 +25,7 @@ namespace Infrastructure.OutgoingMessages
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            builder.ToTable("EnqueuedMessages", "b2b");
+            builder.ToTable("EnqueuedMessages", "dbo");
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id)
                 .ValueGeneratedNever();

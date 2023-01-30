@@ -223,7 +223,7 @@ namespace IntegrationTests.Application.Transactions.MoveIn
             using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
             return await connection
                 .QueryFirstAsync<Guid>(
-                    "SELECT TOP(1) TransactionId FROM b2b.MoveInTransactions WHERE ActorProvidedId = @ActorProvidedId",
+                    "SELECT TOP(1) TransactionId FROM dbo.MoveInTransactions WHERE ActorProvidedId = @ActorProvidedId",
                     new { ActorProvidedId = SampleData.ActorProvidedId.Id }).ConfigureAwait(false);
         }
     }

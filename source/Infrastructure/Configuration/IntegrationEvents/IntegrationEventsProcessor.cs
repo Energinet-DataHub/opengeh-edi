@@ -59,7 +59,7 @@ public class IntegrationEventsProcessor
 
     private async Task MarkAsProcessedAsync(ReceivedIntegrationEvent message)
     {
-        var updateStatement = $"UPDATE b2b.ReceivedIntegrationEvents " +
+        var updateStatement = $"UPDATE dbo.ReceivedIntegrationEvents " +
                               "SET ProcessedDate = @Now " +
                               "WHERE Id = @Id";
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
@@ -72,7 +72,7 @@ public class IntegrationEventsProcessor
 
     private async Task MarkAsFailedAsync(ReceivedIntegrationEvent message, Exception exception)
     {
-        var updateStatement = $"UPDATE b2b.ReceivedIntegrationEvents " +
+        var updateStatement = $"UPDATE dbo.ReceivedIntegrationEvents " +
                               "SET ProcessedDate = @Now, " +
                               "ErrorMessage = @ErrorMessage " +
                               "WHERE Id = @Id";
@@ -92,7 +92,7 @@ public class IntegrationEventsProcessor
                   $"Id AS {nameof(ReceivedIntegrationEvent.Id)}, " +
                   $"EventType AS {nameof(ReceivedIntegrationEvent.EventType)}, " +
                   $"EventPayload AS {nameof(ReceivedIntegrationEvent.EventPayload)} " +
-                  "FROM b2b.ReceivedIntegrationEvents " +
+                  "FROM dbo.ReceivedIntegrationEvents " +
                   "WHERE ProcessedDate IS NULL " +
                   "ORDER BY OccurredOn";
 

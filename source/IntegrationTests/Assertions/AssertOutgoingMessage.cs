@@ -41,7 +41,7 @@ namespace IntegrationTests.Assertions
             var message = connection.QuerySingle(
                 $"SELECT m.Id, m.RecordId, m.MessageType, m.ReceiverId, m.TransactionId, m.ProcessType," +
                 $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MessageRecord " +
-                $" FROM [b2b].[OutgoingMessages] m" +
+                $" FROM [dbo].[OutgoingMessages] m" +
                 $" WHERE m.TransactionId = '{transactionId}' AND m.MessageType = '{messageType}' AND m.ProcessType = '{processType}'");
 
             Assert.NotNull(message);
@@ -56,7 +56,7 @@ namespace IntegrationTests.Assertions
             var message = connection.QuerySingle(
                 $"SELECT m.Id, m.RecordId, m.MessageType, m.ReceiverId, m.TransactionId, m.ProcessType," +
                 $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MessageRecord " +
-                $" FROM [b2b].[OutgoingMessages] m" +
+                $" FROM [dbo].[OutgoingMessages] m" +
                 $" WHERE m.TransactionId = '{transactionId}' AND m.MessageType = '{messageType}' AND m.ProcessType = '{processType}' AND m.ReceiverRole = '{receiverRole.Name}'");
 
             Assert.NotNull(message);
@@ -71,7 +71,7 @@ namespace IntegrationTests.Assertions
             var message = connection.QuerySingle(
                 $"SELECT m.Id, m.RecordId, m.MessageType, m.ReceiverId, m.TransactionId, m.ProcessType," +
                 $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MessageRecord " +
-                $" FROM [b2b].[OutgoingMessages] m" +
+                $" FROM [dbo].[OutgoingMessages] m" +
                 $" WHERE m.MessageType = '{messageType}' AND m.ProcessType = '{processType}' AND m.ReceiverRole = '{receiverRole.Name}'");
 
             Assert.NotNull(message);

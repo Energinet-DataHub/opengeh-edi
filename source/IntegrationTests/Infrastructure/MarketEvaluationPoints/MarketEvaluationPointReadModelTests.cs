@@ -73,7 +73,7 @@ public class MarketEvaluationPointReadModelTests : TestBase
         using var connection = await connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         return await connection
             .QuerySingleOrDefaultAsync(
-                "SELECT * FROM b2b.MarketEvaluationPoints WHERE Id = @Id AND MarketEvaluationPointNumber = @MarketEvaluationPointNumber",
+                "SELECT * FROM dbo.MarketEvaluationPoints WHERE Id = @Id AND MarketEvaluationPointNumber = @MarketEvaluationPointNumber",
                 new
                 {
                     Id = SampleData.MeteringPointId,

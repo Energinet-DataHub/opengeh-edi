@@ -29,7 +29,7 @@ public class BundledMessageConfiguration : IEntityTypeConfiguration<BundledMessa
     public void Configure(EntityTypeBuilder<BundledMessage> builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
-        builder.ToTable("BundledMessages", "B2B");
+        builder.ToTable("BundledMessages", "dbo");
 
         builder.HasKey(entity => entity.Id);
         builder.Property(entity => entity.Id)

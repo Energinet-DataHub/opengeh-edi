@@ -35,7 +35,7 @@ public class ActorLookup : IActorLookup
         using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         return await connection
             .ExecuteScalarAsync<Guid>(
-                "SELECT Id FROM [b2b].[Actor] WHERE IdentificationNumber = @Number",
+                "SELECT Id FROM [dbo].[Actor] WHERE IdentificationNumber = @Number",
                 new { ActorNumber = actorNumber, }).ConfigureAwait(false);
     }
 
@@ -44,7 +44,7 @@ public class ActorLookup : IActorLookup
         using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         return await connection
             .ExecuteScalarAsync<string>(
-                "SELECT IdentificationNumber FROM [b2b].[Actor] WHERE Id = @ActorId",
+                "SELECT IdentificationNumber FROM [dbo].[Actor] WHERE Id = @ActorId",
                 new { ActorId = actorId, }).ConfigureAwait(false);
     }
 
@@ -53,7 +53,7 @@ public class ActorLookup : IActorLookup
         using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         var actorNumber = await connection
             .ExecuteScalarAsync<string>(
-                "SELECT IdentificationNumber AS Identifier FROM [b2b].[Actor] WHERE B2CId=@ActorId",
+                "SELECT IdentificationNumber AS Identifier FROM [dbo].[Actor] WHERE B2CId=@ActorId",
                 new { ActorId = actorId, })
             .ConfigureAwait(false);
         if (string.IsNullOrWhiteSpace(actorNumber))

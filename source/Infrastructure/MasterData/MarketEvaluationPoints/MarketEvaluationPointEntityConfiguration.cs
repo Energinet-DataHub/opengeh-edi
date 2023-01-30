@@ -25,7 +25,7 @@ public class MarketEvaluationPointEntityConfiguration : IEntityTypeConfiguration
     public void Configure(EntityTypeBuilder<MarketEvaluationPoint> builder)
     {
         if (builder == null) throw new ArgumentNullException(nameof(builder));
-        builder.ToTable("MarketEvaluationPoints", "b2b");
+        builder.ToTable("MarketEvaluationPoints", "dbo");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.EnergySupplierNumber)
             .HasConversion(
