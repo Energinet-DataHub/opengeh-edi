@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Application.Configuration;
 using Infrastructure.Configuration.DataAccess;
@@ -20,24 +22,36 @@ namespace Infrastructure.Configuration.IntegrationEvents;
 
 public class IntegrationEventReceiver
 {
+    private readonly IReadOnlyList<IIntegrationEventMapper> _mappers;
     private readonly B2BContext _context;
     private readonly ISystemDateTimeProvider _dateTimeProvider;
 
-    public IntegrationEventReceiver(B2BContext context, ISystemDateTimeProvider dateTimeProvider)
+    public IntegrationEventReceiver(B2BContext context, ISystemDateTimeProvider dateTimeProvider, IEnumerable<IIntegrationEventMapper> mappers)
     {
         _context = context;
         _dateTimeProvider = dateTimeProvider;
+        _mappers = mappers.ToList();
     }
 
     public async Task ReceiveAsync(string eventId, string eventType, byte[] eventPayload)
     {
-        var inboxMessage = await _context.ReceivedIntegrationEvents.FindAsync(eventId).ConfigureAwait(false);
-        if (inboxMessage is not null)
-        {
-            return;
-        }
+        if (!EventIsKnown(eventType)) return;
 
-        await RegisterAsync(eventId, eventType, eventPayload).ConfigureAwait(false);
+        if (await EventIsAlreadyRegisteredAsync(eventId).ConfigureAwait(false) == false)
+        {
+            await RegisterAsync(eventId, eventType, eventPayload).ConfigureAwait(false);
+        }
+    }
+
+    private async Task<bool> EventIsAlreadyRegisteredAsync(string eventId)
+    {
+        var inboxMessage = await _context.ReceivedIntegrationEvents.FindAsync(eventId).ConfigureAwait(false);
+        return inboxMessage is not null;
+    }
+
+    private bool EventIsKnown(string eventType)
+    {
+        return _mappers.Any(handler => handler.CanHandle(eventType));
     }
 
     private async Task RegisterAsync(string eventId, string eventType, byte[] eventPayload)

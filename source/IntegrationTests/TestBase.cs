@@ -24,8 +24,11 @@ using Application.Configuration.DataAccess;
 using Application.Configuration.Queries;
 using Application.Transactions.MoveIn;
 using Azure.Messaging.ServiceBus;
+using Google.Protobuf;
 using Infrastructure.Configuration;
 using Infrastructure.Configuration.DataAccess;
+using Infrastructure.Configuration.IntegrationEvents;
+using Infrastructure.Configuration.InternalCommands;
 using Infrastructure.Configuration.MessageBus;
 using Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Infrastructure.Transactions.MoveIn;
@@ -97,6 +100,13 @@ namespace IntegrationTests
             return GetService<IMediator>().Send(query, CancellationToken.None);
         }
 
+        protected async Task HavingReceivedIntegrationEventAsync(string eventType, IMessage eventPayload)
+        {
+            await GetService<IntegrationEventReceiver>().ReceiveAsync(Guid.NewGuid().ToString(), eventType, eventPayload.ToByteArray()).ConfigureAwait(false);
+            await ProcessReceivedIntegrationEventsAsync().ConfigureAwait(false);
+            await ProcessScheduledCommandsAsync().ConfigureAwait(false);
+        }
+
         private static string CreateFakeServiceBusConnectionString()
         {
             return new StringBuilder()
@@ -104,6 +114,16 @@ namespace IntegrationTests
                 .Append("SharedAccessKeyName=send;")
                 .Append(CultureInfo.InvariantCulture, $"SharedAccessKey={Guid.NewGuid():N}")
                 .ToString();
+        }
+
+        private Task ProcessScheduledCommandsAsync()
+        {
+            return GetService<InternalCommandProcessor>().ProcessPendingAsync();
+        }
+
+        private Task ProcessReceivedIntegrationEventsAsync()
+        {
+            return GetService<IntegrationEventsProcessor>().ProcessMessagesAsync();
         }
 
         private void BuildServices()

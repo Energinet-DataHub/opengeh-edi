@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Microsoft.Azure.Functions.Worker;
+using Infrastructure.Transactions.Aggregations;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Api.Configuration.IntegrationEvents;
+namespace Infrastructure.Configuration.IntegrationEvents;
 
-internal static class FunctionContextExtensions
+public static class IntegrationEventsConfiguration
 {
-    internal static EventDetails ExtractEventDetails(this FunctionContext context)
+    public static void Configure(IServiceCollection services)
     {
-        context.BindingContext.BindingData.TryGetValue("MessageId", out var messageId);
-        context.BindingContext.BindingData.TryGetValue("Label", out var subject);
-
-        return messageId is string eventId && subject is string eventType ? new EventDetails(eventId, eventType) : EventDetails.Empty();
+        services.AddSingleton<IntegrationEventReceiver>();
+        services.AddSingleton<IntegrationEventsProcessor>();
+        services.AddTransient<IIntegrationEventMapper, BalanceFixingCompletedEventMapper>();
     }
 }
