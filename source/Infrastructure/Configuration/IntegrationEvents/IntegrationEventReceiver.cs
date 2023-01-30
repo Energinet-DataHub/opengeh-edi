@@ -37,13 +37,15 @@ public class IntegrationEventReceiver
     {
         if (!EventIsKnown(eventType)) return;
 
-        var inboxMessage = await _context.ReceivedIntegrationEvents.FindAsync(eventId).ConfigureAwait(false);
-        if (inboxMessage is not null)
-        {
-            return;
-        }
+        if (await EventIsAlreadyRegisteredAsync(eventId).ConfigureAwait(false)) return;
 
         await RegisterAsync(eventId, eventType, eventPayload).ConfigureAwait(false);
+    }
+
+    private async Task<bool> EventIsAlreadyRegisteredAsync(string eventId)
+    {
+        var inboxMessage = await _context.ReceivedIntegrationEvents.FindAsync(eventId).ConfigureAwait(false);
+        return inboxMessage is not null;
     }
 
     private bool EventIsKnown(string eventType)
