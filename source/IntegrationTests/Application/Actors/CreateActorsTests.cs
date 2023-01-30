@@ -59,7 +59,7 @@ public class CreateActorsTests : TestBase
     private async Task<Actor> GetActor()
     {
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
-        var sql = $"SELECT Id, B2CId, IdentificationNUmber FROM [b2b].[Actor] WHERE Id = '{SampleData.ActorId}'";
+        var sql = $"SELECT Id, B2CId, IdentificationNUmber FROM [dbo].[Actor] WHERE Id = '{SampleData.ActorId}'";
         return await connection.QuerySingleOrDefaultAsync<Actor>(sql).ConfigureAwait(false);
     }
 

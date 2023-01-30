@@ -34,8 +34,8 @@ namespace Infrastructure.IncomingMessages
             using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
 
             var result = await connection.ExecuteAsync(
-                    $"IF NOT EXISTS (SELECT * FROM b2b.TransactionIds WHERE TransactionId = @TransactionId)" +
-                    $"INSERT INTO b2b.TransactionIds(TransactionId) VALUES(@TransactionId)",
+                    $"IF NOT EXISTS (SELECT * FROM dbo.TransactionIds WHERE TransactionId = @TransactionId)" +
+                    $"INSERT INTO dbo.TransactionIds(TransactionId) VALUES(@TransactionId)",
                     new { TransactionId = transactionId })
                 .ConfigureAwait(false);
 

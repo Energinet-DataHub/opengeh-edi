@@ -66,7 +66,7 @@ public class ValidationErrorTranslatorTests : TestBase
     {
         var connectionFactory = GetService<IDatabaseConnectionFactory>();
         using var connection = await connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
-        const string insertStatement = $"INSERT INTO [b2b].[ReasonTranslations] (Id, ErrorCode, Code, Text, LanguageCode) " +
+        const string insertStatement = $"INSERT INTO [dbo].[ReasonTranslations] (Id, ErrorCode, Code, Text, LanguageCode) " +
                                        $"VALUES (@Id, @ErrorCode, @Code, @Text, 'dk');";
 
         await connection.ExecuteAsync(insertStatement, new

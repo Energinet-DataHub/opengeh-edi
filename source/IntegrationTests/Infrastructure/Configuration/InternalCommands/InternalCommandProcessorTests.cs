@@ -77,14 +77,14 @@ public class InternalCommandProcessorTests : TestBase
     private void AssertIsProcessed(InternalCommand command)
     {
         var checkStatement =
-            $"SELECT COUNT(1) FROM [b2b].[QueuedInternalCommands] WHERE Id = '{command.Id}' AND ProcessedDate IS NOT NULL";
+            $"SELECT COUNT(1) FROM [dbo].[QueuedInternalCommands] WHERE Id = '{command.Id}' AND ProcessedDate IS NOT NULL";
         AssertSqlStatement(checkStatement);
     }
 
     private void AssertHasException(InternalCommand command)
     {
         var checkStatement =
-            $"SELECT COUNT(1) FROM [b2b].[QueuedInternalCommands] WHERE Id = '{command.Id}' AND [ErrorMessage] IS NOT NULL";
+            $"SELECT COUNT(1) FROM [dbo].[QueuedInternalCommands] WHERE Id = '{command.Id}' AND [ErrorMessage] IS NOT NULL";
         AssertSqlStatement(checkStatement);
     }
 

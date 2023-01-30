@@ -89,7 +89,7 @@ namespace Infrastructure.Configuration.InternalCommands
         {
             using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
             await connection.ExecuteScalarAsync(
-                "UPDATE [b2b].[QueuedInternalCommands] " +
+                "UPDATE [dbo].[QueuedInternalCommands] " +
                 "SET ProcessedDate = @NowDate, " +
                 "ErrorMessage = @Error " +
                 "WHERE [Id] = @Id",
@@ -105,7 +105,7 @@ namespace Infrastructure.Configuration.InternalCommands
         {
             using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
             await connection.ExecuteScalarAsync(
-                "UPDATE [b2b].[QueuedInternalCommands] " +
+                "UPDATE [dbo].[QueuedInternalCommands] " +
                 "SET ProcessedDate = @NowDate " +
                 "WHERE [Id] = @Id",
                 new

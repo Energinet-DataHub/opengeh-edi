@@ -72,7 +72,7 @@ public class WhenAggregationOfTotalProductionIsCompletedTests : TestBase
         using var connection =
             await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
         var transaction = await connection
-            .QueryFirstOrDefaultAsync("SELECT * FROM b2b.AggregatedTimeSeriesTransactions");
+            .QueryFirstOrDefaultAsync("SELECT * FROM dbo.AggregatedTimeSeriesTransactions");
         Assert.NotNull(transaction);
         Assert.Equal(MarketRole.GridOperator, EnumerationType.FromName<MarketRole>(transaction.ReceivingActorRole));
         Assert.Equal(ProcessType.BalanceFixing, EnumerationType.FromName<ProcessType>(transaction.ProcessType));
