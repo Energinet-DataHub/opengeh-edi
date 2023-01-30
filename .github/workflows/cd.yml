@@ -40,12 +40,6 @@ jobs:
       TESTS_FILTER_EXPRESSION: 'FullyQualifiedName!~LearningTests' # Filter => Skip all tests within namespace 'LearningTests'
       USE_SQLLOCALDB_2019: true
       ENVIRONMENT: AzureAuth
-    secrets:
-      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      AZURE_SPN_ID: ${{ secrets.AZURE_SPN_ID_OIDC }}
-      AZURE_KEYVAULT_URL: ${{ secrets.AZURE_KEYVAULT_URL }}
-      AZURE_B2CSECRETS_KEYVAULT_URL: ${{ secrets.AZURE_B2CSECRETS_KEYVAULT_URL }}
 
   dotnet_promote_prerelease:
     needs: changes
