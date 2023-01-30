@@ -54,7 +54,7 @@ public class WhenAggregationOfTotalProductionIsCompletedTests : TestBase
             .ConfigureAwait(false);
 
         await GetService<IntegrationEventsProcessor>().ProcessMessagesAsync().ConfigureAwait(false);
-        await GetService<InternalCommandProcessor>().ProcessPendingAsync().ConfigureAwait(false);
+        await ProcessScheduledCommandsAsync().ConfigureAwait(false);
 
         var gridAreaLookup = GetService<IGridAreaLookup>();
         var gridOperatorNumber = await gridAreaLookup.GetGridOperatorForAsync(SampleData.GridAreaCode).ConfigureAwait(false);

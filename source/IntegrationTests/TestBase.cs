@@ -26,6 +26,7 @@ using Application.Transactions.MoveIn;
 using Azure.Messaging.ServiceBus;
 using Infrastructure.Configuration;
 using Infrastructure.Configuration.DataAccess;
+using Infrastructure.Configuration.InternalCommands;
 using Infrastructure.Configuration.MessageBus;
 using Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Infrastructure.Transactions.MoveIn;
@@ -95,6 +96,11 @@ namespace IntegrationTests
         protected Task<TResult> QueryAsync<TResult>(IQuery<TResult> query)
         {
             return GetService<IMediator>().Send(query, CancellationToken.None);
+        }
+
+        protected Task ProcessScheduledCommandsAsync()
+        {
+            return GetService<InternalCommandProcessor>().ProcessPendingAsync();
         }
 
         private static string CreateFakeServiceBusConnectionString()
