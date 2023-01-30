@@ -60,7 +60,7 @@ public class EnqueuedMessages : IEnqueuedMessages
             MessageType AS {nameof(EnqueuedMessage.MessageType)},
             MessageCategory AS {nameof(EnqueuedMessage.Category)},
             ProcessType AS {nameof(EnqueuedMessage.ProcessType)},
-            MessageRecord FROM [b2b].[EnqueuedMessages]
+            MessageRecord FROM [dbo].[EnqueuedMessages]
             WHERE ProcessType = @ProcessType AND ReceiverId = @ReceiverId AND ReceiverRole = @ReceiverRole AND MessageType = @MessageType AND MessageCategory = @MessageCategory";
 
         var messages = await connection.QueryAsync<EnqueuedMessage>(
@@ -83,7 +83,7 @@ public class EnqueuedMessages : IEnqueuedMessages
         ArgumentNullException.ThrowIfNull(actorNumber);
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         return await connection.QuerySingleAsync<int>(
-            @"SELECT count(*) from [b2b].[EnqueuedMessages] WHERE ReceiverId = @ActorNumber",
+            @"SELECT count(*) from [dbo].[EnqueuedMessages] WHERE ReceiverId = @ActorNumber",
             new
             {
                 ActorNumber = actorNumber.Value,
@@ -94,7 +94,7 @@ public class EnqueuedMessages : IEnqueuedMessages
     {
         return await connection
             .QuerySingleOrDefaultAsync<OldestMessage>(
-                @$"SELECT TOP(1) {nameof(OldestMessage.ProcessType)}, {nameof(OldestMessage.MessageType)}, {nameof(OldestMessage.ReceiverRole)} FROM [b2b].[EnqueuedMessages]
+                @$"SELECT TOP(1) {nameof(OldestMessage.ProcessType)}, {nameof(OldestMessage.MessageType)}, {nameof(OldestMessage.ReceiverRole)} FROM [dbo].[EnqueuedMessages]
                 WHERE ReceiverId = @ReceiverId AND MessageCategory = @MessageCategory",
                 new
             {

@@ -34,7 +34,7 @@ namespace Infrastructure.Transactions
 
         public void Configure(EntityTypeBuilder<MoveInTransaction> builder)
         {
-            builder.ToTable("MoveInTransactions", "b2b");
+            builder.ToTable("MoveInTransactions", "dbo");
             builder.HasKey(x => x.TransactionId);
             builder.Property(entity => entity.TransactionId)
                 .HasConversion(

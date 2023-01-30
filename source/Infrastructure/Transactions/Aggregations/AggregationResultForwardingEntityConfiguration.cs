@@ -34,7 +34,7 @@ internal class AggregationResultForwardingEntityConfiguration : IEntityTypeConfi
 
     public void Configure(EntityTypeBuilder<AggregationResultForwarding> builder)
     {
-        builder.ToTable("AggregatedTimeSeriesTransactions", "b2b");
+        builder.ToTable("AggregatedTimeSeriesTransactions", "dbo");
         builder.HasKey(entity => entity.Id);
         builder.Property(entity => entity.Id)
             .HasConversion(toDbValue => toDbValue.Id, fromDbValue => TransactionId.Create(fromDbValue));

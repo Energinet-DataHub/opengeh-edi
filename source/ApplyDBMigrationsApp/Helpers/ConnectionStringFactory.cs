@@ -18,7 +18,7 @@ namespace ApplyDBMigrationsApp.Helpers
 {
     public static class ConnectionStringFactory
     {
-        private const string DefaultConnectionString = "Server=(local); Database=sqldb-marketroles-endk; Trusted_connection=true";
+        private const string DefaultConnectionString = @"Server=(LocalDB)\MSSQLLocalDB;Database=B2BTransactions;Integrated Security=true;";
 
         public static string GetConnectionString(string[] args)
         {

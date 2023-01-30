@@ -50,12 +50,12 @@ public class BundledMessages : IBundledMessages
     public async Task<DequeueResult> DequeueAsync(Guid messageId)
     {
         const string deleteStmt = @"
-DELETE E FROM [b2b].[EnqueuedMessages] E JOIN
-(SELECT EnqueuedMessageId = value FROM [b2b].[BundledMessages]
+DELETE E FROM [dbo].[EnqueuedMessages] E JOIN
+(SELECT EnqueuedMessageId = value FROM [dbo].[BundledMessages]
 CROSS APPLY STRING_SPLIT(MessageIdsIncluded, ',') WHERE Id = @Id) AS P
 ON E.Id = P.EnqueuedMessageId;
 
-DELETE FROM [b2b].[BundledMessages] WHERE Id = @Id;
+DELETE FROM [dbo].[BundledMessages] WHERE Id = @Id;
 ";
 
         using var connection = (SqlConnection)await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
@@ -88,7 +88,7 @@ DELETE FROM [b2b].[BundledMessages] WHERE Id = @Id;
 
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         using var command = CreateCommand(
-            $"SELECT Id, ReceiverNumber, MessageCategory, MessageIdsIncluded, GeneratedDocument FROM b2b.BundledMessages WHERE ReceiverNumber = @ReceiverNumber AND MessageCategory = @MessageCategory",
+            $"SELECT Id, ReceiverNumber, MessageCategory, MessageIdsIncluded, GeneratedDocument FROM dbo.BundledMessages WHERE ReceiverNumber = @ReceiverNumber AND MessageCategory = @MessageCategory",
             new List<KeyValuePair<string, object>>
             {
                 new("@ReceiverNumber", receiverNumber.Value),

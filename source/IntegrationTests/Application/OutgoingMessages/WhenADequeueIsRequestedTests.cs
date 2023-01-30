@@ -54,9 +54,9 @@ public class WhenADequeueIsRequestedTests : TestBase
 
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
         var found = await connection
-            .QuerySingleOrDefaultAsync("SELECT * FROM [B2B].BundledMessages")
+            .QuerySingleOrDefaultAsync("SELECT * FROM [dbo].BundledMessages")
             .ConfigureAwait(false);
-        var sqlCountStatement = $"SELECT COUNT(*) FROM [B2B].EnqueuedMessages WHERE ReceiverId = {SampleData.NewEnergySupplierNumber}";
+        var sqlCountStatement = $"SELECT COUNT(*) FROM [dbo].EnqueuedMessages WHERE ReceiverId = {SampleData.NewEnergySupplierNumber}";
         var messagesInQueue = await connection
             .ExecuteScalarAsync<int>(sqlCountStatement);
 

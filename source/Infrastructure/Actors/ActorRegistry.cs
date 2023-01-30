@@ -34,7 +34,7 @@ public class ActorRegistry : IActorRegistry
     {
         using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         if (identificationNumber == null) throw new ArgumentNullException(nameof(identificationNumber));
-        var sqlStatement = @$"SELECT B2CId FROM [b2b].[Actor]  WHERE IdentificationNumber = @IdentificationNumber";
+        var sqlStatement = @$"SELECT B2CId FROM [dbo].[Actor]  WHERE IdentificationNumber = @IdentificationNumber";
         var b2CId = await connection.QueryFirstOrDefaultAsync<Guid?>(sqlStatement, new { IdentificationNumber = identificationNumber }).ConfigureAwait(false);
         return b2CId;
     }
@@ -43,7 +43,7 @@ public class ActorRegistry : IActorRegistry
     {
         if (createActor == null) throw new ArgumentNullException(nameof(createActor));
         using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
-        var sqlStatement = @$"INSERT INTO [b2b].[Actor] ([Id], [B2CId], [IdentificationNumber]) VALUES ('{createActor.ActorId}', '{createActor.B2CId}', '{createActor.IdentificationNumber}')";
+        var sqlStatement = @$"INSERT INTO [dbo].[Actor] ([Id], [B2CId], [IdentificationNumber]) VALUES ('{createActor.ActorId}', '{createActor.B2CId}', '{createActor.IdentificationNumber}')";
         try
         {
             await connection.ExecuteAsync(sqlStatement)
