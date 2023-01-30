@@ -18,7 +18,6 @@ on:
   push:
     branches:
       - main
-      - djorgensen/fix-cd
 
 jobs:
   #
@@ -42,47 +41,47 @@ jobs:
       USE_SQLLOCALDB_2019: true
       ENVIRONMENT: AzureAuth
 
-  # dotnet_promote_prerelease:
-  #   needs: changes
-  #   if: ${{ needs.changes.outputs.dotnet == 'true' }}
-  #   uses: Energinet-DataHub/.github/.github/workflows/promote-prerelease.yml@v10
-  #   with:
-  #     RELEASE_NAME_PREFIX: dotnet
+  dotnet_promote_prerelease:
+    needs: changes
+    if: ${{ needs.changes.outputs.dotnet == 'true' }}
+    uses: Energinet-DataHub/.github/.github/workflows/promote-prerelease.yml@v10
+    with:
+      RELEASE_NAME_PREFIX: dotnet
 
   #
   # Dispatch deployment request
   #
 
-  # dispatch_deploment_event:
-  #   runs-on: ubuntu-latest
-  #   needs: dotnet_promote_prerelease
-  #   steps:
-  #     - name: Find associated pull request
-  #       uses: Energinet-DataHub/.github/.github/actions/find-related-pr-number@v10
-  #       id: find_pull_request
+  dispatch_deploment_event:
+    runs-on: ubuntu-latest
+    needs: dotnet_promote_prerelease
+    steps:
+      - name: Find associated pull request
+        uses: Energinet-DataHub/.github/.github/actions/find-related-pr-number@v10
+        id: find_pull_request
 
-  #     - name: Repository Dispatch
-  #       uses: peter-evans/repository-dispatch@v2
-  #       with:
-  #         token: ${{ secrets.PAT_TOKEN }}
-  #         repository: '${{ secrets.ENVIRONMENT_REPOSITORY_PATH }}'
-  #         event-type: 'edi-deployment-request-domain'
-  #         client-payload: '{"domain_pr": "${{ steps.find_pull_request.outputs.pull_request_number }}"}'
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          repository: '${{ secrets.ENVIRONMENT_REPOSITORY_PATH }}'
+          event-type: 'edi-deployment-request-domain'
+          client-payload: '{"domain_pr": "${{ steps.find_pull_request.outputs.pull_request_number }}"}'
 
   #
   # Send notification to teams channel if deployment dispatch failed
   #
 
-  # dispatch_failed:
-  #   needs: [
-  #     dotnet_promote_prerelease,
-  #     dispatch_deploment_event,
-  #   ]
-  #   if: |
-  #     always() &&
-  #     contains(needs.*.result, 'failure')
-  #   uses: Energinet-DataHub/.github/.github/workflows/notify-team.yml@v10
-  #   with:
-  #     TEAM_NAME: 'Batman'
-  #     SUBJECT: 'Deployment dispatch failed: EDI'
-  #   secrets: inherit
+  dispatch_failed:
+    needs: [
+      dotnet_promote_prerelease,
+      dispatch_deploment_event,
+    ]
+    if: |
+      always() &&
+      contains(needs.*.result, 'failure')
+    uses: Energinet-DataHub/.github/.github/workflows/notify-team.yml@v10
+    with:
+      TEAM_NAME: 'Batman'
+      SUBJECT: 'Deployment dispatch failed: EDI'
+    secrets: inherit
