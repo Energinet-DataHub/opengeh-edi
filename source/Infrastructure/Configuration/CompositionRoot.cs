@@ -34,6 +34,7 @@ using Infrastructure.Actors;
 using Infrastructure.Configuration.Authentication;
 using Infrastructure.Configuration.DataAccess;
 using Infrastructure.Configuration.FeatureFlag;
+using Infrastructure.Configuration.IntegrationEvents;
 using Infrastructure.Configuration.MessageBus;
 using Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Infrastructure.Configuration.Processing;
@@ -92,6 +93,7 @@ namespace Infrastructure.Configuration
             ReadModelHandlingConfiguration.AddReadModelHandling(services);
             UpdateCustomerMasterDataConfiguration.Configure(services);
             DequeueConfiguration.Configure(services);
+            IntegrationEventsConfiguration.Configure(services);
         }
 
         public static CompositionRoot Initialize(IServiceCollection services)

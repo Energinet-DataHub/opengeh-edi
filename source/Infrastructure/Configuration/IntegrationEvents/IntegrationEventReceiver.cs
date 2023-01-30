@@ -26,11 +26,11 @@ public class IntegrationEventReceiver
     private readonly B2BContext _context;
     private readonly ISystemDateTimeProvider _dateTimeProvider;
 
-    public IntegrationEventReceiver(B2BContext context, ISystemDateTimeProvider dateTimeProvider, IReadOnlyList<IIntegrationEventMapper> mappers)
+    public IntegrationEventReceiver(B2BContext context, ISystemDateTimeProvider dateTimeProvider, IEnumerable<IIntegrationEventMapper> mappers)
     {
         _context = context;
         _dateTimeProvider = dateTimeProvider;
-        _mappers = mappers;
+        _mappers = mappers.ToList();
     }
 
     public async Task ReceiveAsync(string eventId, string eventType, byte[] eventPayload)
