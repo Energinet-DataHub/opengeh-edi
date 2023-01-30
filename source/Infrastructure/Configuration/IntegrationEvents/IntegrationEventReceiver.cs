@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Application.Configuration;
 using Infrastructure.Configuration.DataAccess;
@@ -20,17 +22,23 @@ namespace Infrastructure.Configuration.IntegrationEvents;
 
 public class IntegrationEventReceiver
 {
+    private readonly IReadOnlyList<IIntegrationEventMapper> _mappers;
     private readonly B2BContext _context;
     private readonly ISystemDateTimeProvider _dateTimeProvider;
 
-    public IntegrationEventReceiver(B2BContext context, ISystemDateTimeProvider dateTimeProvider)
+    public IntegrationEventReceiver(B2BContext context, ISystemDateTimeProvider dateTimeProvider, IReadOnlyList<IIntegrationEventMapper> mappers)
     {
         _context = context;
         _dateTimeProvider = dateTimeProvider;
+        _mappers = mappers;
     }
 
     public async Task ReceiveAsync(string eventId, string eventType, byte[] eventPayload)
     {
+        var shouldHandleEvent = _mappers.Any(handler => handler.CanHandle(eventType));
+        if (!shouldHandleEvent)
+            return;
+
         var inboxMessage = await _context.ReceivedIntegrationEvents.FindAsync(eventId).ConfigureAwait(false);
         if (inboxMessage is not null)
         {

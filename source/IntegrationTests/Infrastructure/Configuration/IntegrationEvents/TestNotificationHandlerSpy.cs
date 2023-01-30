@@ -38,4 +38,9 @@ public class TestNotificationHandlerSpy : INotificationHandler<TestNotification>
     {
         _shouldThrowException = true;
     }
+
+    public void CannotHandleEvent()
+    {
+        throw new NotImplementedException();
+    }
 }
