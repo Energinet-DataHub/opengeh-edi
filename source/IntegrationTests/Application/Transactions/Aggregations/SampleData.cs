@@ -20,6 +20,8 @@ namespace IntegrationTests.Application.Transactions.Aggregations;
 
 internal class SampleData
 {
+    internal static string NameOfReceivedIntegrationEvent => "BalanceFixingCompleted";
+
     internal static string GridOperatorNumber => "8200000007739";
 
     internal static string GridAreaCode => "805";
