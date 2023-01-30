@@ -37,9 +37,10 @@ public class IntegrationEventReceiver
     {
         if (!EventIsKnown(eventType)) return;
 
-        if (await EventIsAlreadyRegisteredAsync(eventId).ConfigureAwait(false)) return;
-
-        await RegisterAsync(eventId, eventType, eventPayload).ConfigureAwait(false);
+        if (await EventIsAlreadyRegisteredAsync(eventId).ConfigureAwait(false) == false)
+        {
+            await RegisterAsync(eventId, eventType, eventPayload).ConfigureAwait(false);
+        }
     }
 
     private async Task<bool> EventIsAlreadyRegisteredAsync(string eventId)
