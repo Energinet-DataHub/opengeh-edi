@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using Api.Configuration.IntegrationEvents;
 using Application.Configuration.Commands;
 using Application.Transactions.Aggregations;
+using Infrastructure.Configuration.IntegrationEvents;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using NodaTime.Serialization.Protobuf;
@@ -26,12 +27,12 @@ namespace Api.EventListeners;
 public class BalanceFixingWasCompletedListener
 {
     private readonly ILogger<BalanceFixingWasCompletedListener> _logger;
-    private readonly CommandSchedulerFacade _commandScheduler;
+    private readonly IntegrationEventReceiver _eventReceiver;
 
-    public BalanceFixingWasCompletedListener(ILogger<BalanceFixingWasCompletedListener> logger, CommandSchedulerFacade commandScheduler)
+    public BalanceFixingWasCompletedListener(ILogger<BalanceFixingWasCompletedListener> logger, IntegrationEventReceiver eventReceiver)
     {
         _logger = logger;
-        _commandScheduler = commandScheduler;
+        _eventReceiver = eventReceiver;
     }
 
     [Function(nameof(BalanceFixingWasCompletedListener))]
@@ -48,10 +49,6 @@ public class BalanceFixingWasCompletedListener
         var eventDetails = context.ExtractEventDetails();
         _logger.LogInformation($"Integration event details: {eventDetails}");
 
-        var processCompletedEvent =
-            Energinet.DataHub.Wholesale.Contracts.Events.ProcessCompleted.Parser.ParseFrom(eventData);
-        _logger.LogInformation($"Received ProcessCompleted event: {processCompletedEvent}");
-        return _commandScheduler.EnqueueAsync(
-            new StartTransaction(processCompletedEvent.GridAreaCode, Guid.Parse(processCompletedEvent.BatchId), processCompletedEvent.PeriodStartUtc.ToInstant(), processCompletedEvent.PeriodEndUtc.ToInstant()));
+        return _eventReceiver.ReceiveAsync(eventDetails.EventId, eventDetails.EventType, eventData);
     }
 }
