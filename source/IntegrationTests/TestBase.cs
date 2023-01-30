@@ -109,6 +109,11 @@ namespace IntegrationTests
             return GetService<IntegrationEventsProcessor>().ProcessMessagesAsync();
         }
 
+        protected Task HavingReceivedIntegrationEventAsync(string eventType, byte[] eventPayload)
+        {
+            return GetService<IntegrationEventReceiver>().ReceiveAsync(Guid.NewGuid().ToString(), eventType, eventPayload);
+        }
+
         private static string CreateFakeServiceBusConnectionString()
         {
             return new StringBuilder()
