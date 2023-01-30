@@ -35,9 +35,7 @@ public class IntegrationEventReceiver
 
     public async Task ReceiveAsync(string eventId, string eventType, byte[] eventPayload)
     {
-        var shouldHandleEvent = _mappers.Any(handler => handler.CanHandle(eventType));
-        if (!shouldHandleEvent)
-            return;
+        if (!EventIsKnown(eventType)) return;
 
         var inboxMessage = await _context.ReceivedIntegrationEvents.FindAsync(eventId).ConfigureAwait(false);
         if (inboxMessage is not null)
@@ -46,6 +44,11 @@ public class IntegrationEventReceiver
         }
 
         await RegisterAsync(eventId, eventType, eventPayload).ConfigureAwait(false);
+    }
+
+    private bool EventIsKnown(string eventType)
+    {
+        return _mappers.Any(handler => handler.CanHandle(eventType));
     }
 
     private async Task RegisterAsync(string eventId, string eventType, byte[] eventPayload)
