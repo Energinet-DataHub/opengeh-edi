@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Application.Configuration;
@@ -27,26 +28,40 @@ namespace IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 
 public class WhenAnIntegrationEventIsReceivedTests : TestBase
 {
-    private readonly IntegrationEventReceiver _receiver;
     private readonly string _eventType = nameof(TestIntegrationEvent);
     private readonly TestIntegrationEvent _event;
     private readonly byte[] _eventPayload;
     private readonly string _eventId = "1";
+    private IntegrationEventReceiver _receiver;
 
     public WhenAnIntegrationEventIsReceivedTests(DatabaseFixture databaseFixture)
      : base(databaseFixture)
     {
-        _receiver = new IntegrationEventReceiver(GetService<B2BContext>(), GetService<ISystemDateTimeProvider>());
+        _receiver = new IntegrationEventReceiver(GetService<B2BContext>(), GetService<ISystemDateTimeProvider>(), new IIntegrationEventMapper[]
+        {
+            new TestIntegrationEventMapper(),
+        });
         _event = new TestIntegrationEvent();
         _eventPayload = CreateEventPayload(_event);
     }
 
     [Fact]
-    public async Task Event_is_registered()
+    public async Task Event_is_registered_if_it_is_a_known_event()
     {
         await EventIsReceived(_eventId);
 
         await EventIsRegisteredWithInbox(_eventId);
+    }
+
+    [Fact]
+    public async Task Event_is_not_registered_if_it_is_unknown()
+    {
+        var noIntegrationEventMappers = new List<IIntegrationEventMapper>();
+        _receiver = new IntegrationEventReceiver(GetService<B2BContext>(), GetService<ISystemDateTimeProvider>(), noIntegrationEventMappers);
+
+        await EventIsReceived(_eventId);
+
+        await EventIsRegisteredWithInbox(_eventId, false);
     }
 
     [Fact]
@@ -90,24 +105,24 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
         return _receiver.ReceiveAsync(eventId, _eventType, _eventPayload);
     }
 
-    private async Task EventIsRegisteredWithInbox(string eventId)
+    private async Task EventIsRegisteredWithInbox(string eventId, bool isExpectedToBeRegistered = true)
     {
         var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
-        var isRegistered = connection.ExecuteScalar<bool>($"SELECT COUNT(*) FROM dbo.ReceivedIntegrationEvents WHERE Id = @EventId", new { EventId = eventId, });
-        Assert.True(isRegistered);
+        var isRegistered = connection.ExecuteScalar<bool>($"SELECT COUNT(*) FROM b2b.ReceivedIntegrationEvents WHERE Id = @EventId", new { EventId = eventId, });
+        Assert.Equal(isExpectedToBeRegistered, isRegistered);
     }
 
     private async Task EventIsMarkedAsProcessed(string eventId)
     {
         var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
-        var isProcessed = connection.ExecuteScalar<bool>($"SELECT COUNT(*) FROM dbo.ReceivedIntegrationEvents WHERE Id = @EventId AND ProcessedDate IS NOT NULL", new { EventId = eventId, });
+        var isProcessed = connection.ExecuteScalar<bool>($"SELECT COUNT(*) FROM b2b.ReceivedIntegrationEvents WHERE Id = @EventId AND ProcessedDate IS NOT NULL", new { EventId = eventId, });
         Assert.True(isProcessed);
     }
 
     private async Task EventIsMarkedAsFailed(string eventId)
     {
         var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
-        var isFailed = connection.ExecuteScalar<bool>($"SELECT COUNT(*) FROM dbo.ReceivedIntegrationEvents WHERE Id = @EventId AND ProcessedDate IS NOT NULL AND ErrorMessage IS NOT NULL", new { EventId = eventId, });
+        var isFailed = connection.ExecuteScalar<bool>($"SELECT COUNT(*) FROM b2b.ReceivedIntegrationEvents WHERE Id = @EventId AND ProcessedDate IS NOT NULL AND ErrorMessage IS NOT NULL", new { EventId = eventId, });
         Assert.True(isFailed);
     }
 

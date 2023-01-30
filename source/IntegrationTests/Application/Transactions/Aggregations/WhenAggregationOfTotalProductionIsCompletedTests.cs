@@ -19,6 +19,8 @@ using Dapper;
 using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.SeedWork;
+using Energinet.DataHub.Wholesale.Contracts.Events;
+using Google.Protobuf.WellKnownTypes;
 using Infrastructure.Configuration.InternalCommands;
 using IntegrationTests.Assertions;
 using IntegrationTests.Fixtures;
@@ -36,19 +38,10 @@ public class WhenAggregationOfTotalProductionIsCompletedTests : TestBase
     [Fact]
     public async Task A_transaction_is_started()
     {
-        var gridAreaLookup = GetService<IGridAreaLookup>();
-        var gridOperatorNumber = await gridAreaLookup.GetGridOperatorForAsync(SampleData.GridAreaCode).ConfigureAwait(false);
-        await StartTransaction().ConfigureAwait(false);
+        await HavingReceivedIntegrationEventAsync(SampleData.NameOfBalanceFixingCompletedIntegrationEvent, BalanceFixingCompletedIntegrationEvent())
+            .ConfigureAwait(false);
 
-        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
-        var transaction = await connection
-            .QueryFirstOrDefaultAsync("SELECT * FROM dbo.AggregatedTimeSeriesTransactions");
-        Assert.NotNull(transaction);
-        Assert.Equal(MarketRole.GridOperator, EnumerationType.FromName<MarketRole>(transaction.ReceivingActorRole));
-        Assert.Equal(ProcessType.BalanceFixing, EnumerationType.FromName<ProcessType>(transaction.ProcessType));
-        Assert.Equal(gridOperatorNumber.Value, transaction.ReceivingActor);
-        Assert.Equal(SampleData.StartOfPeriod.ToDateTimeUtc(), transaction.PeriodStart);
-        Assert.Equal(SampleData.EndOfPeriod.ToDateTimeUtc(), transaction.PeriodEnd);
+        await ForwardAggregationResultTransactionHasBeenStarted().ConfigureAwait(false);
     }
 
     [Fact]
@@ -57,6 +50,35 @@ public class WhenAggregationOfTotalProductionIsCompletedTests : TestBase
         await StartTransaction().ConfigureAwait(false);
 
         AssertQueuedCommand.QueuedCommand<RetrieveAggregationResult>(GetService<IDatabaseConnectionFactory>(), GetService<InternalCommandMapper>());
+    }
+
+    private static ProcessCompleted BalanceFixingCompletedIntegrationEvent()
+    {
+        return new ProcessCompleted()
+        {
+            GridAreaCode = SampleData.GridAreaCode,
+            BatchId = SampleData.ResultId.ToString(),
+            PeriodStartUtc = Timestamp.FromDateTime(SampleData.StartOfPeriod.ToDateTimeUtc()),
+            PeriodEndUtc = Timestamp.FromDateTime(SampleData.EndOfPeriod.ToDateTimeUtc()),
+        };
+    }
+
+    private async Task ForwardAggregationResultTransactionHasBeenStarted()
+    {
+        var gridAreaLookup = GetService<IGridAreaLookup>();
+        var gridOperatorNumber =
+            await gridAreaLookup.GetGridOperatorForAsync(SampleData.GridAreaCode).ConfigureAwait(false);
+
+        using var connection =
+            await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
+        var transaction = await connection
+            .QueryFirstOrDefaultAsync("SELECT * FROM dbo.AggregatedTimeSeriesTransactions");
+        Assert.NotNull(transaction);
+        Assert.Equal(MarketRole.GridOperator, EnumerationType.FromName<MarketRole>(transaction.ReceivingActorRole));
+        Assert.Equal(ProcessType.BalanceFixing, EnumerationType.FromName<ProcessType>(transaction.ProcessType));
+        Assert.Equal(gridOperatorNumber.Value, transaction.ReceivingActor);
+        Assert.Equal(SampleData.StartOfPeriod.ToDateTimeUtc(), transaction.PeriodStart);
+        Assert.Equal(SampleData.EndOfPeriod.ToDateTimeUtc(), transaction.PeriodEnd);
     }
 
     private async Task StartTransaction()

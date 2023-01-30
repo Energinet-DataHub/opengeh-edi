@@ -34,6 +34,7 @@ using Infrastructure.Actors;
 using Infrastructure.Configuration.Authentication;
 using Infrastructure.Configuration.DataAccess;
 using Infrastructure.Configuration.FeatureFlag;
+using Infrastructure.Configuration.IntegrationEvents;
 using Infrastructure.Configuration.MessageBus;
 using Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Infrastructure.Configuration.Processing;
@@ -54,6 +55,7 @@ using Infrastructure.OutgoingMessages.Peek;
 using Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 using Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Infrastructure.Transactions;
+using Infrastructure.Transactions.Aggregations;
 using Infrastructure.Transactions.MoveIn;
 using Infrastructure.Transactions.UpdateCustomer;
 using MediatR;
@@ -92,6 +94,7 @@ namespace Infrastructure.Configuration
             ReadModelHandlingConfiguration.AddReadModelHandling(services);
             UpdateCustomerMasterDataConfiguration.Configure(services);
             DequeueConfiguration.Configure(services);
+            IntegrationEventsConfiguration.Configure(services);
         }
 
         public static CompositionRoot Initialize(IServiceCollection services)

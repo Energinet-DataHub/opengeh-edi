@@ -12,12 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Api.Configuration.IntegrationEvents;
+using System;
+using MediatR;
+using NodaTime;
 
-public record EventDetails(string EventId, string EventType)
+namespace Application.Transactions.Aggregations;
+
+public class NewResultAvailableNotification : INotification
 {
-    public static EventDetails Empty()
+    public NewResultAvailableNotification(Guid resultId, string gridAreaCode, Instant periodStartDate, Instant periodEndDate)
     {
-        return new EventDetails(string.Empty, string.Empty);
+        ResultId = resultId;
+        GridAreaCode = gridAreaCode;
+        PeriodStartDate = periodStartDate;
+        PeriodEndDate = periodEndDate;
     }
+
+    public Guid ResultId { get; }
+
+    public string GridAreaCode { get; }
+
+    public Instant PeriodStartDate { get; }
+
+    public Instant PeriodEndDate { get; }
 }
