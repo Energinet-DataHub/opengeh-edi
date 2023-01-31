@@ -80,13 +80,7 @@ public class NotifyAggregatedMeasureDataMessageWriter : MessageWriter
                     await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity", null, point.Quantity.ToString()!).ConfigureAwait(false);
                 }
 
-                if (point.Quality is not null)
-                {
-                    if (point.Quality != "A04")
-                    {
-                        await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quality", null, point.Quality).ConfigureAwait(false);
-                    }
-                }
+                await WriteQualityIfRequiredAsync(writer, point).ConfigureAwait(false);
 
                 await writer.WriteEndElementAsync().ConfigureAwait(false);
             }
@@ -99,5 +93,16 @@ public class NotifyAggregatedMeasureDataMessageWriter : MessageWriter
     private static string ParsePeriodDateFrom(Instant instant)
     {
         return instant.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture);
+    }
+
+    private Task WriteQualityIfRequiredAsync(XmlWriter writer, Point point)
+    {
+        if (point.Quality is null)
+            return Task.CompletedTask;
+
+        if (point.Quality == "A04")
+            return Task.CompletedTask;
+
+        return writer.WriteElementStringAsync(DocumentDetails.Prefix, "quality", null, point.Quality);
     }
 }
