@@ -100,7 +100,8 @@ public class NotifyAggregatedMeasureDataMessageWriter : MessageWriter
         if (point.Quality is null)
             return Task.CompletedTask;
 
-        if (point.Quality == "A04")
+        const string pointIsMeasured = "A04";
+        if (point.Quality == pointIsMeasured)
             return Task.CompletedTask;
 
         return writer.WriteElementStringAsync(DocumentDetails.Prefix, "quality", null, point.Quality);
