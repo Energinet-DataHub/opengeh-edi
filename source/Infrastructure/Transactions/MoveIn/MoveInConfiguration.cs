@@ -21,12 +21,11 @@ using Application.Transactions.MoveIn.Notifications;
 using Application.Transactions.MoveIn.UpdateCustomer;
 using Application.Transactions.UpdateCustomer;
 using Domain.Transactions.MoveIn.Events;
-using Infrastructure.Transactions.MoveIn;
 using Infrastructure.Transactions.MoveIn.UpdateCustomer;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Infrastructure.Configuration;
+namespace Infrastructure.Transactions.MoveIn;
 
 internal static class MoveInConfiguration
 {
