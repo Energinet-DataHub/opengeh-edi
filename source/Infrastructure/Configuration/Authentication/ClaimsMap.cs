@@ -25,6 +25,7 @@ public static class ClaimsMap
     {
         { "electricalsupplier", MarketRole.EnergySupplier },
         { "gridoperator", MarketRole.GridOperator },
+        { "metereddataresponsible", MarketRole.MeteredDataResponsible },
     };
 
     public static string UserId => "azp";
