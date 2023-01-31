@@ -12,22 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading;
+using System.Threading.Tasks;
 using Application.Configuration.TimeEvents;
-using Infrastructure.Transactions.Aggregations;
 using MediatR;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure.Configuration.IntegrationEvents;
 
-public static class IntegrationEventsConfiguration
+public class ProcessIntegrationEventsOnTenSecondsHasPassed : INotificationHandler<TenSecondsHasHasPassed>
 {
-    public static void Configure(IServiceCollection services)
+    private readonly IntegrationEventsProcessor _processor;
+
+    public ProcessIntegrationEventsOnTenSecondsHasPassed(IntegrationEventsProcessor processor)
     {
-        services
-            .AddTransient<INotificationHandler<TenSecondsHasHasPassed>,
-                ProcessIntegrationEventsOnTenSecondsHasPassed>();
-        services.AddSingleton<IntegrationEventReceiver>();
-        services.AddSingleton<IntegrationEventsProcessor>();
-        services.AddTransient<IIntegrationEventMapper, BalanceFixingCompletedEventMapper>();
+        _processor = processor;
+    }
+
+    public Task Handle(TenSecondsHasHasPassed notification, CancellationToken cancellationToken)
+    {
+        return _processor.ProcessMessagesAsync();
     }
 }

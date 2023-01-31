@@ -14,21 +14,21 @@
 
 using System;
 using System.Globalization;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Api.Configuration.Middleware.Correlation;
+using Application.Configuration;
 using Application.Configuration.Commands.Commands;
 using Application.Configuration.DataAccess;
 using Application.Configuration.Queries;
+using Application.Configuration.TimeEvents;
 using Application.Transactions.MoveIn;
 using Azure.Messaging.ServiceBus;
 using Google.Protobuf;
 using Infrastructure.Configuration;
 using Infrastructure.Configuration.DataAccess;
 using Infrastructure.Configuration.IntegrationEvents;
-using Infrastructure.Configuration.InternalCommands;
 using Infrastructure.Configuration.MessageBus;
 using Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Infrastructure.Transactions.MoveIn;
@@ -118,12 +118,18 @@ namespace IntegrationTests
 
         private Task ProcessScheduledCommandsAsync()
         {
-            return GetService<InternalCommandProcessor>().ProcessPendingAsync();
+            return ProcessBackgroundTasksAsync();
         }
 
         private Task ProcessReceivedIntegrationEventsAsync()
         {
-            return GetService<IntegrationEventsProcessor>().ProcessMessagesAsync();
+            return ProcessBackgroundTasksAsync();
+        }
+
+        private Task ProcessBackgroundTasksAsync()
+        {
+            var datetimeProvider = GetService<ISystemDateTimeProvider>();
+            return GetService<IMediator>().Publish(new TenSecondsHasHasPassed(datetimeProvider.Now()));
         }
 
         private void BuildServices()
