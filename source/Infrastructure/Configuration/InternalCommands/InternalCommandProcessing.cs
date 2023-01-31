@@ -20,11 +20,10 @@ using Application.Transactions.MoveIn;
 using Application.Transactions.MoveIn.MasterDataDelivery;
 using Application.Transactions.MoveIn.Notifications;
 using Application.Transactions.UpdateCustomer;
-using Infrastructure.Configuration.InternalCommands;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Infrastructure.Configuration;
+namespace Infrastructure.Configuration.InternalCommands;
 
 internal static class InternalCommandProcessing
 {

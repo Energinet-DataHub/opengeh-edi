@@ -35,6 +35,7 @@ using Infrastructure.Configuration.Authentication;
 using Infrastructure.Configuration.DataAccess;
 using Infrastructure.Configuration.FeatureFlag;
 using Infrastructure.Configuration.IntegrationEvents;
+using Infrastructure.Configuration.InternalCommands;
 using Infrastructure.Configuration.MessageBus;
 using Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 using Infrastructure.Configuration.Processing;
