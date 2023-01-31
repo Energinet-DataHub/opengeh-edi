@@ -54,7 +54,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
         var header = new MessageHeader(
             ProcessType.BalanceFixing.Code,
             "1234567890123",
-            MarketRole.MeteringPointAdministrator.Name,
+            MarketRole.MeteredDataResponsible.Name,
             "1234567890321",
             MarketRole.GridOperator.Name,
             Guid.NewGuid().ToString(),
