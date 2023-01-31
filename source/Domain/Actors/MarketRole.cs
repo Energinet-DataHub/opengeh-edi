@@ -21,7 +21,8 @@ public class MarketRole : EnumerationType
     public static readonly MarketRole MeteringPointAdministrator = new(0, "DDZ");
     public static readonly MarketRole EnergySupplier = new(1, "DDQ");
     public static readonly MarketRole GridOperator = new(2, "DDM");
-    public static readonly MarketRole MeteringDataAdministrator = new(2, "DGL");
+    public static readonly MarketRole MeteringDataAdministrator = new(3, "DGL");
+    public static readonly MarketRole MeteredDataResponsible = new(4, "MDR");
 
     private MarketRole(int id, string name)
         : base(id, name)

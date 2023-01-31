@@ -50,7 +50,7 @@ public class StartTransactionHandler : IRequestHandler<StartTransaction, Unit>
         var transaction = new AggregationResultForwarding(
             TransactionId.New(),
             gridOperatorNumber,
-            MarketRole.GridOperator,
+            MarketRole.MeteredDataResponsible,
             ProcessType.BalanceFixing,
             new Period(request.PeriodStart, request.PeriodEnd));
 
