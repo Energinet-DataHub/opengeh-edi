@@ -93,6 +93,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             .HasValue("Series[1]/mRID", timeSeries[0].TransactionId.ToString())
             .HasValue("Series[1]/meteringGridArea_Domain.mRID", timeSeries[0].GridAreaCode)
             .HasValue("Series[1]/marketEvaluationPoint.type", timeSeries[0].MeteringPointType)
+            .HasValue("Series[1]/product", "8716867000030")
             .HasValue("Series[1]/quantity_Measure_Unit.name", timeSeries[0].MeasureUnitType)
             .HasValue("Series[1]/Period/resolution", timeSeries[0].Resolution)
             .HasValue("Series[1]/Period/timeInterval/start", "2022-02-12T23:00Z")

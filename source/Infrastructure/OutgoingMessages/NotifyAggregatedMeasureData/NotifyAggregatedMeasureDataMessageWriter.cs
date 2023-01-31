@@ -57,6 +57,8 @@ public class NotifyAggregatedMeasureDataMessageWriter : MessageWriter
             await writer.WriteStringAsync(timeSeries.GridAreaCode).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
 
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "product", null, "8716867000030").ConfigureAwait(false);
+
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity_Measure_Unit.name", null, timeSeries.MeasureUnitType).ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Period", null).ConfigureAwait(false);
