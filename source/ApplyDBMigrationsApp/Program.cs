@@ -21,7 +21,7 @@ namespace ApplyDBMigrationsApp
     {
         public static int Main(string[] args)
         {
-            var connectionString = ConnectionStringFactory.GetConnectionString(args);
+            var connectionString = ParseConnectionStringFrom(args);
             var filter = EnvironmentFilter.GetFilter(args);
             var isDryRun = args.Contains("dryRun");
 
@@ -30,6 +30,11 @@ namespace ApplyDBMigrationsApp
             var result = upgrader.PerformUpgrade();
 
             return ResultReporter.ReportResult(result);
+        }
+
+        private static string ParseConnectionStringFrom(string[] args)
+        {
+            return args.First();
         }
     }
 }
