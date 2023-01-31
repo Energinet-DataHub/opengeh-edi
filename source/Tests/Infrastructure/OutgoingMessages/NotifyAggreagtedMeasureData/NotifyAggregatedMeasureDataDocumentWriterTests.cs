@@ -73,6 +73,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
                 {
                     new(1, 11, "A05", "2022-02-12T23:00Z"),
                     new(2, null, null, "2022-02-13T23:00Z"),
+                    new(2, null, "A04", "2022-02-13T23:00Z"),
                 }),
         };
 
@@ -104,6 +105,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             .HasValue("Series[1]/Period/Point[2]/position", timeSeries[0].Point[1].Position.ToString(NumberFormatInfo.InvariantInfo))
             .IsNotPresent("Series[1]/Period/Point[2]/quantity")
             .IsNotPresent("Series[1]/Period/Point[2]/quality")
+            .IsNotPresent("Series[1]/Period/Point[3]/quality")
             .HasValidStructureAsync((await GetSchema().ConfigureAwait(false))!).ConfigureAwait(false);
     }
 
