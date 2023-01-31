@@ -49,10 +49,10 @@ public class RetrieveAggregationResultTests : TestBase
                  transactionId,
                  MessageType.NotifyAggregatedMeasureData.Name,
                  ProcessType.BalanceFixing.Code,
-                 MarketRole.GridOperator,
+                 MarketRole.MeteredDataResponsible,
                  GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
         message.HasReceiverId(SampleData.GridOperatorNumber)
-                 .HasReceiverRole(MarketRole.GridOperator.Name)
+                 .HasReceiverRole(MarketRole.MeteredDataResponsible.Name)
                  .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
                  .HasSenderId(DataHubDetails.IdentificationNumber.Value)
                  .HasMessageRecordValue<TimeSeries>(x => x.TransactionId, transactionId)

@@ -27,6 +27,8 @@ namespace Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 
 public class NotifyAggregatedMeasureDataMessageWriter : MessageWriter
 {
+    private const string ActiveEnergy = "8716867000030";
+
     public NotifyAggregatedMeasureDataMessageWriter(IMessageRecordParser parser)
         : base(
             new DocumentDetails(
@@ -56,6 +58,8 @@ public class NotifyAggregatedMeasureDataMessageWriter : MessageWriter
             await writer.WriteAttributeStringAsync(null, "codingScheme", null, "NDK").ConfigureAwait(false);
             await writer.WriteStringAsync(timeSeries.GridAreaCode).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
+
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "product", null, ActiveEnergy).ConfigureAwait(false);
 
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity_Measure_Unit.name", null, timeSeries.MeasureUnitType).ConfigureAwait(false);
 

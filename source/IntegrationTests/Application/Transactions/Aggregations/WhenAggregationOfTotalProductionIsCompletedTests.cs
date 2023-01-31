@@ -74,7 +74,7 @@ public class WhenAggregationOfTotalProductionIsCompletedTests : TestBase
         var transaction = await connection
             .QueryFirstOrDefaultAsync("SELECT * FROM dbo.AggregatedTimeSeriesTransactions");
         Assert.NotNull(transaction);
-        Assert.Equal(MarketRole.GridOperator, EnumerationType.FromName<MarketRole>(transaction.ReceivingActorRole));
+        Assert.Equal(MarketRole.MeteredDataResponsible, EnumerationType.FromName<MarketRole>(transaction.ReceivingActorRole));
         Assert.Equal(ProcessType.BalanceFixing, EnumerationType.FromName<ProcessType>(transaction.ProcessType));
         Assert.Equal(gridOperatorNumber.Value, transaction.ReceivingActor);
         Assert.Equal(SampleData.StartOfPeriod.ToDateTimeUtc(), transaction.PeriodStart);
