@@ -82,7 +82,10 @@ public class NotifyAggregatedMeasureDataMessageWriter : MessageWriter
 
                 if (point.Quality is not null)
                 {
-                    await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quality", null, point.Quality).ConfigureAwait(false);
+                    if (point.Quality != "A04")
+                    {
+                        await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quality", null, point.Quality).ConfigureAwait(false);
+                    }
                 }
 
                 await writer.WriteEndElementAsync().ConfigureAwait(false);
