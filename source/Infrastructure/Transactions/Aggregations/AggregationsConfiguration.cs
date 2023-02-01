@@ -14,6 +14,7 @@
 
 using System;
 using Application.Transactions.Aggregations;
+using Application.Transactions.Aggregations.HourlyConsumption;
 using Domain.Transactions.Aggregations;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +25,7 @@ internal static class AggregationsConfiguration
 {
     internal static void Configure(IServiceCollection services, Func<IServiceProvider, IAggregationResults> aggregationResultsBuilder)
     {
+        services.AddTransient(typeof(INotificationHandler<NewResultAvailableNotification>), typeof(ScheduleResultRetrievalWhenAggregationIsCompleted));
         services.AddTransient(typeof(INotificationHandler<NewResultAvailableNotification>), typeof(NewResultAvailableNotificationHandler));
         services.AddScoped<AggregationResultMapper>();
         services.AddTransient<IRequestHandler<StartTransaction, Unit>, StartTransactionHandler>();

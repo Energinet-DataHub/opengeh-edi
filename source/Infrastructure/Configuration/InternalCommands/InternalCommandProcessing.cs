@@ -16,6 +16,7 @@ using Application.Actors;
 using Application.Configuration.Commands;
 using Application.Configuration.TimeEvents;
 using Application.Transactions.Aggregations;
+using Application.Transactions.Aggregations.HourlyConsumption;
 using Application.Transactions.MoveIn;
 using Application.Transactions.MoveIn.MasterDataDelivery;
 using Application.Transactions.MoveIn.Notifications;
@@ -53,6 +54,7 @@ internal static class InternalCommandProcessing
         mapper.Add("UpdateCustomerMasterData", typeof(UpdateCustomerMasterData));
         mapper.Add("StartTransaction", typeof(StartTransaction));
         mapper.Add("RetrieveAggregationResult", typeof(RetrieveAggregationResult));
+        mapper.Add("FetchResultOfHourlyConsumption", typeof(FetchResultOfHourlyConsumption));
 
         return mapper;
     }
