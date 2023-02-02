@@ -17,14 +17,11 @@ using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Application.Transactions.Aggregations;
 using Application.Transactions.Aggregations.HourlyConsumption;
-using Domain.Actors;
-using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions.Aggregations;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf.WellKnownTypes;
 using Infrastructure.Configuration.InternalCommands;
-using Infrastructure.Transactions.Aggregations;
 using IntegrationTests.Assertions;
 using IntegrationTests.Fixtures;
 using IntegrationTests.TestDoubles;
@@ -42,8 +39,7 @@ public class WhenBalanceFixingIsCompletedTests : TestBase
     [Fact]
     public async Task Aggregation_result_retrieval_is_scheduled()
     {
-        var integrationEvent = BalanceFixingCompletedIntegrationEvent();
-        await HavingReceivedIntegrationEventAsync("BalanceFixingCompleted", integrationEvent).ConfigureAwait(false);
+        await WhenBalanceFixingIsCompleted();
 
         AssertQueuedCommand.QueuedCommand<FetchResultOfHourlyConsumption>(
             GetService<IDatabaseConnectionFactory>(),
@@ -55,8 +51,7 @@ public class WhenBalanceFixingIsCompletedTests : TestBase
     {
         SetupFakeAggregationResult();
 
-        var integrationEvent = BalanceFixingCompletedIntegrationEvent();
-        await HavingReceivedIntegrationEventAsync("BalanceFixingCompleted", integrationEvent).ConfigureAwait(false);
+        await WhenBalanceFixingIsCompleted();
 
         await HavingProcessedInternalTasksAsync().ConfigureAwait(false);
 
@@ -66,15 +61,16 @@ public class WhenBalanceFixingIsCompletedTests : TestBase
             .CountIs(2);
     }
 
-    private static ProcessCompleted BalanceFixingCompletedIntegrationEvent()
+    private async Task WhenBalanceFixingIsCompleted()
     {
-        return new ProcessCompleted()
+        var integrationEvent = new ProcessCompleted()
         {
             GridAreaCode = SampleData.GridAreaCode,
             BatchId = SampleData.ResultId.ToString(),
             PeriodStartUtc = Timestamp.FromDateTime(SampleData.StartOfPeriod.ToDateTimeUtc()),
             PeriodEndUtc = Timestamp.FromDateTime(SampleData.EndOfPeriod.ToDateTimeUtc()),
         };
+        await HavingReceivedIntegrationEventAsync("BalanceFixingCompleted", integrationEvent).ConfigureAwait(false);
     }
 
     private void SetupFakeAggregationResult()
