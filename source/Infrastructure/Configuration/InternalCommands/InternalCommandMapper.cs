@@ -20,24 +20,29 @@ namespace Infrastructure.Configuration.InternalCommands
 {
     public class InternalCommandMapper
     {
-        private readonly HashSet<CommandMetadata> _values = new();
+        private readonly Dictionary<string, CommandMetadata> _values = new();
 
         public void Add(string eventName, Type eventType)
         {
-            _values.Add(new CommandMetadata(eventName, eventType));
+            var metadata = new CommandMetadata(eventName, eventType);
+            _values.Add(metadata.CommandName, metadata);
         }
 
         public CommandMetadata GetByName(string commandName)
         {
-            return _values
-                .FirstOrDefault(metadata => metadata.CommandName.Equals(commandName, StringComparison.OrdinalIgnoreCase)) ?? throw new InvalidOperationException(
-                $"No event metadata is registered for event {commandName}");
+            if (_values.TryGetValue(commandName, out var metadata) == false)
+            {
+                throw new InvalidOperationException(
+                    $"No event metadata is registered for event {commandName}");
+            }
+
+            return metadata;
         }
 
         public CommandMetadata GetByType(Type commandType)
         {
             if (commandType == null) throw new ArgumentNullException(nameof(commandType));
-            return _values
+            return _values.Values
                        .FirstOrDefault(metadata => metadata.CommandType == commandType) ??
                    throw new InvalidOperationException(
                        $"No command metadata is registered for type {commandType.FullName}");
