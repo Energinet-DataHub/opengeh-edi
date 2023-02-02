@@ -43,7 +43,7 @@ public class WhenBalanceFixingIsCompletedTests : TestBase
     {
         await WhenBalanceFixingIsCompleted();
 
-        CheckHasEnqueuedCommand<FetchResultOfHourlyConsumption>();
+        CheckHasEnqueuedCommand<PrepareTransactions>();
     }
 
     [Fact]

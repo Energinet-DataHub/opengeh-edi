@@ -18,17 +18,17 @@ using Application.Configuration.Commands.Commands;
 
 namespace Application.Transactions.Aggregations.HourlyConsumption;
 
-public class FetchResultOfHourlyConsumption : InternalCommand
+public class PrepareTransactions : InternalCommand
 {
     [JsonConstructor]
-    public FetchResultOfHourlyConsumption(Guid id, Guid resultId, string gridArea)
+    public PrepareTransactions(Guid id, Guid resultId, string gridArea)
         : base(id)
     {
         ResultId = resultId;
         GridArea = gridArea;
     }
 
-    public FetchResultOfHourlyConsumption(Guid resultId, string gridArea)
+    public PrepareTransactions(Guid resultId, string gridArea)
     {
         ResultId = resultId;
         GridArea = gridArea;

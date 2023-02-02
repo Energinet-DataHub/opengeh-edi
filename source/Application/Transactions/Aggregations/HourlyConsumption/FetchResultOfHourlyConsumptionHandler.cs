@@ -21,7 +21,7 @@ using MediatR;
 
 namespace Application.Transactions.Aggregations.HourlyConsumption;
 
-public class FetchResultOfHourlyConsumptionHandler : IRequestHandler<FetchResultOfHourlyConsumption, Unit>
+public class FetchResultOfHourlyConsumptionHandler : IRequestHandler<PrepareTransactions, Unit>
 {
     private readonly IAggregationResults _aggregationResults;
     private readonly ICommandScheduler _commandScheduler;
@@ -32,7 +32,7 @@ public class FetchResultOfHourlyConsumptionHandler : IRequestHandler<FetchResult
         _commandScheduler = commandScheduler;
     }
 
-    public async Task<Unit> Handle(FetchResultOfHourlyConsumption request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(PrepareTransactions request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 

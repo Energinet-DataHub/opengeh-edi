@@ -32,6 +32,6 @@ public class ScheduleResultRetrievalWhenAggregationIsCompleted : INotificationHa
     public Task Handle(NewResultAvailableNotification notification, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(notification);
-        return _commandScheduler.EnqueueAsync(new FetchResultOfHourlyConsumption(notification.ResultId, notification.GridAreaCode));
+        return _commandScheduler.EnqueueAsync(new PrepareTransactions(notification.ResultId, notification.GridAreaCode));
     }
 }

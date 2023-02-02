@@ -55,7 +55,7 @@ internal static class InternalCommandProcessing
         mapper.Add("UpdateCustomerMasterData", typeof(UpdateCustomerMasterData));
         mapper.Add("StartTransaction", typeof(Application.Transactions.Aggregations.StartTransaction));
         mapper.Add("RetrieveAggregationResult", typeof(RetrieveAggregationResult));
-        mapper.Add("FetchResultOfHourlyConsumption", typeof(FetchResultOfHourlyConsumption));
+        mapper.Add("Aggregations.HourlyConsumption.PrepareTransactions", typeof(PrepareTransactions));
         mapper.Add("Aggregations.HourlyConsumption.StartTransaction", typeof(StartTransaction));
 
         return mapper;
