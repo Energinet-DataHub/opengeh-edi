@@ -55,9 +55,7 @@ public class WhenBalanceFixingIsCompletedTests : TestBase
 
         await HavingProcessedInternalTasksAsync().ConfigureAwait(false);
 
-        AssertQueuedCommand.QueuedCommand<FetchHourlyConsumption>(
-                GetService<IDatabaseConnectionFactory>(),
-                GetService<InternalCommandMapper>())
+        HasEnqueuedCommand<FetchHourlyConsumption>()
             .CountIs(2);
     }
 
