@@ -42,9 +42,7 @@ public class WhenBalanceFixingIsCompletedTests : TestBase
     {
         await WhenBalanceFixingIsCompleted();
 
-        AssertQueuedCommand.QueuedCommand<FetchResultOfHourlyConsumption>(
-            GetService<IDatabaseConnectionFactory>(),
-            GetService<InternalCommandMapper>());
+        HasEnqueuedCommand<FetchResultOfHourlyConsumption>();
     }
 
     [Fact]
@@ -95,5 +93,12 @@ public class WhenBalanceFixingIsCompletedTests : TestBase
         var results = GetService<IAggregationResults>() as AggregationResultsStub;
 
         results?.Add(result, energySupplierNumber);
+    }
+
+    private AssertQueuedCommand HasEnqueuedCommand<TCommandType>()
+    {
+        return AssertQueuedCommand.QueuedCommand<TCommandType>(
+            GetService<IDatabaseConnectionFactory>(),
+            GetService<InternalCommandMapper>());
     }
 }
