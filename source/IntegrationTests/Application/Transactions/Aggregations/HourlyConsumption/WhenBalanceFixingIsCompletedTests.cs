@@ -46,7 +46,7 @@ public class WhenBalanceFixingIsCompletedTests : TestBase
     }
 
     [Fact]
-    public async Task Retrieval_of_aggregation_result_for_each_energy_supplier_is_scheduled()
+    public async Task Aggregation_result_forwarding_transactions_are_prepared_and_scheduled()
     {
         MakeAggregationResultAvailableFor(SampleData.EnergySupplierNumber);
         MakeAggregationResultAvailableFor(SampleData.EnergySupplierNumber2);
