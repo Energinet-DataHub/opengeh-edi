@@ -23,6 +23,7 @@ using Application.Transactions.MoveIn.Notifications;
 using Application.Transactions.UpdateCustomer;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using StartTransaction = Application.Transactions.Aggregations.HourlyConsumption.StartTransaction;
 
 namespace Infrastructure.Configuration.InternalCommands;
 
@@ -52,10 +53,10 @@ internal static class InternalCommandProcessing
         mapper.Add("NotifyGridOperator", typeof(NotifyGridOperator));
         mapper.Add("SetConsumerHasMovedIn", typeof(SetConsumerHasMovedIn));
         mapper.Add("UpdateCustomerMasterData", typeof(UpdateCustomerMasterData));
-        mapper.Add("StartTransaction", typeof(StartTransaction));
+        mapper.Add("StartTransaction", typeof(Application.Transactions.Aggregations.StartTransaction));
         mapper.Add("RetrieveAggregationResult", typeof(RetrieveAggregationResult));
         mapper.Add("FetchResultOfHourlyConsumption", typeof(FetchResultOfHourlyConsumption));
-        mapper.Add("FetchHourlyConsumption", typeof(FetchHourlyConsumption));
+        mapper.Add("Aggregations.HourlyConsumption.StartTransaction", typeof(StartTransaction));
 
         return mapper;
     }

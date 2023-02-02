@@ -43,7 +43,7 @@ public class FetchResultOfHourlyConsumptionHandler : IRequestHandler<FetchResult
         var commandsToEnqueue = new List<Task>();
         foreach (var energySupplierNumber in energySupplierNumbers)
         {
-            commandsToEnqueue.Add(_commandScheduler.EnqueueAsync(new FetchHourlyConsumption()));
+            commandsToEnqueue.Add(_commandScheduler.EnqueueAsync(new StartTransaction()));
         }
 
         await Task.WhenAll(commandsToEnqueue).ConfigureAwait(false);

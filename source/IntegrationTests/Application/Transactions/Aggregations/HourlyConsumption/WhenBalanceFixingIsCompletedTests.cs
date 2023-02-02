@@ -27,6 +27,7 @@ using IntegrationTests.Assertions;
 using IntegrationTests.Fixtures;
 using IntegrationTests.TestDoubles;
 using Xunit;
+using StartTransaction = Application.Transactions.Aggregations.HourlyConsumption.StartTransaction;
 
 namespace IntegrationTests.Application.Transactions.Aggregations.HourlyConsumption;
 
@@ -55,7 +56,7 @@ public class WhenBalanceFixingIsCompletedTests : TestBase
 
         await HavingProcessedInternalTasksAsync().ConfigureAwait(false);
 
-        CheckHasEnqueuedCommand<FetchHourlyConsumption>()
+        CheckHasEnqueuedCommand<StartTransaction>()
             .CountIs(2);
     }
 

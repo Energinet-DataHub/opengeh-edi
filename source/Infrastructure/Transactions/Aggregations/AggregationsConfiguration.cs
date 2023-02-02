@@ -18,6 +18,7 @@ using Application.Transactions.Aggregations.HourlyConsumption;
 using Domain.Transactions.Aggregations;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using StartTransaction = Application.Transactions.Aggregations.StartTransaction;
 
 namespace Infrastructure.Transactions.Aggregations;
 

@@ -12,10 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Text.Json.Serialization;
 using Application.Configuration.Commands.Commands;
 
 namespace Application.Transactions.Aggregations.HourlyConsumption;
 
-public class FetchHourlyConsumption : InternalCommand
+public class StartTransaction : InternalCommand
 {
+    [JsonConstructor]
+    public StartTransaction(Guid id)
+        : base(id)
+    {
+    }
+
+    public StartTransaction()
+    {
+    }
 }
