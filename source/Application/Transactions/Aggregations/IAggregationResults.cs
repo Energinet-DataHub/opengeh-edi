@@ -28,5 +28,6 @@ public interface IAggregationResults
     /// </summary>
     /// <param name="resultId"></param>
     /// <param name="gridArea"></param>
-    Task<AggregationResult> GetResultAsync(Guid resultId, string gridArea);
+    /// <param name="period"></param>
+    Task<AggregationResult> GetResultAsync(Guid resultId, string gridArea, Domain.Transactions.Aggregations.Period period);
 }

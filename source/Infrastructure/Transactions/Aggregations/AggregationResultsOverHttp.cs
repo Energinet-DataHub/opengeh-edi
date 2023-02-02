@@ -44,7 +44,7 @@ public class AggregationResultsOverHttp : IAggregationResults
         AggregateProductionPerGridArea = 25,
     }
 
-    public async Task<AggregationResult> GetResultAsync(Guid resultId, string gridArea)
+    public async Task<AggregationResult> GetResultAsync(Guid resultId, string gridArea, Domain.Transactions.Aggregations.Period period)
     {
         var executionPolicy = Policy
             .Handle<Exception>()

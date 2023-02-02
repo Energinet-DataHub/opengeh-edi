@@ -39,7 +39,7 @@ public class RetrieveAggregationResultHandler : IRequestHandler<RetrieveAggregat
     public async Task<Unit> Handle(RetrieveAggregationResult request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        var aggregationResult = await _aggregationResults.GetResultAsync(request.ResultId, request.GridArea).ConfigureAwait(false);
+        var aggregationResult = await _aggregationResults.GetResultAsync(request.ResultId, request.GridArea, new Domain.Transactions.Aggregations.Period(request.Period.Start, request.Period.End)).ConfigureAwait(false);
         var transaction = await _transactions.GetAsync(TransactionId.Create(request.TransactionId)).ConfigureAwait(false);
         if (transaction is null) throw TransactionNotFoundException.TransactionIdNotFound(request.Id);
         transaction.SendResult(aggregationResult);

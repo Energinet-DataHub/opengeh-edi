@@ -13,10 +13,13 @@
 // limitations under the License.
 
 using System.Reflection;
+using Domain.Transactions.Aggregations;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.Transactions;
 using Infrastructure.Transactions.Aggregations;
 using Microsoft.Extensions.Configuration;
+using NodaTime;
+using Period = Domain.Transactions.Aggregations.Period;
 
 namespace LearningTests.Infrastructure.Transactions.Aggregations;
 
@@ -42,7 +45,7 @@ public class AggregationResultOverHttpTests
         using var httpClient = new HttpClient();
         var service = new AggregationResultsOverHttp(new HttpClientAdapter(httpClient), new Uri($"{_configuration["ServiceUri"]!}/WrongUri"), _mapper, _serializer);
 
-        await Assert.ThrowsAnyAsync<Exception>(() => service.GetResultAsync(Guid.Parse(_configuration["BatchId"]!), _configuration["GridArea"]!)).ConfigureAwait(false);
+        await Assert.ThrowsAnyAsync<Exception>(() => GetResultAsync(service)).ConfigureAwait(false);
     }
 
     [Fact]
@@ -51,8 +54,13 @@ public class AggregationResultOverHttpTests
         using var httpClient = new HttpClient();
         var service = new AggregationResultsOverHttp(new HttpClientAdapter(httpClient), new Uri(_configuration["ServiceUri"]!), _mapper, _serializer);
 
-        var result = await service.GetResultAsync(Guid.Parse(_configuration["BatchId"]!), _configuration["GridArea"]!).ConfigureAwait(false);
+        var result = await GetResultAsync(service).ConfigureAwait(false);
 
         Assert.NotNull(result);
+    }
+
+    private Task<AggregationResult> GetResultAsync(AggregationResultsOverHttp service)
+    {
+        return service.GetResultAsync(Guid.Parse(_configuration["BatchId"]!), _configuration["GridArea"]!, new Period(SystemClock.Instance.GetCurrentInstant(), SystemClock.Instance.GetCurrentInstant()));
     }
 }

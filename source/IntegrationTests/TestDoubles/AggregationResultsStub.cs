@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using Application.Transactions.Aggregations;
 using Domain.Transactions.Aggregations;
 using Infrastructure.Transactions.Aggregations;
+using Period = Domain.Transactions.Aggregations.Period;
 
 namespace IntegrationTests.TestDoubles;
 
@@ -27,7 +28,7 @@ public class AggregationResultsStub : IAggregationResults
 {
     private readonly List<AggregationResult> _results = new();
 
-    public Task<AggregationResult> GetResultAsync(Guid resultId, string gridArea)
+    public Task<AggregationResult> GetResultAsync(Guid resultId, string gridArea, Period period)
     {
         return Task.FromResult(_results.First(result =>
             result.Id.Equals(resultId) &&
