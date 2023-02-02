@@ -33,6 +33,17 @@ builder.Services.AddSingleton(builder.Configuration);
 
 builder.Services.AddHealthChecks();
 
+builder.Services.AddLogging();
+
+// CONCLUSION:
+//  * Logging using ILogger<T> will work, but notice that by default we need to log as "Warning" for it to appear in Application Insights (can be configured).
+//    See "How do I customize ILogger logs collection" at https://docs.microsoft.com/en-us/azure/azure-monitor/faq#how-do-i-customize-ilogger-logs-collection-
+
+// CONCLUSION:
+//  * We can see Trace, Request, Dependencies and other entries in App Insights out-of-box.
+//    See https://docs.microsoft.com/en-us/azure/azure-monitor/app/asp-net-core
+builder.Services.AddApplicationInsightsTelemetry();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
