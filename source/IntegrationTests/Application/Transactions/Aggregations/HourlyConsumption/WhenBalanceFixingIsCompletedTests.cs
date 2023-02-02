@@ -53,7 +53,6 @@ public class WhenBalanceFixingIsCompletedTests : TestBase
         MakeAggregationResultAvailableFor(SampleData.EnergySupplierNumber2);
 
         await WhenBalanceFixingIsCompleted();
-
         await HavingProcessedInternalTasksAsync().ConfigureAwait(false);
 
         CheckHasEnqueuedCommand<StartTransaction>()

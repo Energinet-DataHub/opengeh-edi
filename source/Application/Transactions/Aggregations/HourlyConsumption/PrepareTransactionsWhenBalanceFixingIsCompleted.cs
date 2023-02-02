@@ -20,11 +20,11 @@ using MediatR;
 
 namespace Application.Transactions.Aggregations.HourlyConsumption;
 
-public class ScheduleResultRetrievalWhenAggregationIsCompleted : INotificationHandler<NewResultAvailableNotification>
+public class PrepareTransactionsWhenBalanceFixingIsCompleted : INotificationHandler<NewResultAvailableNotification>
 {
     private readonly ICommandScheduler _commandScheduler;
 
-    public ScheduleResultRetrievalWhenAggregationIsCompleted(ICommandScheduler commandScheduler)
+    public PrepareTransactionsWhenBalanceFixingIsCompleted(ICommandScheduler commandScheduler)
     {
         _commandScheduler = commandScheduler;
     }
