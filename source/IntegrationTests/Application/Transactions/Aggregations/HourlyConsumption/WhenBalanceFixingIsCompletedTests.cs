@@ -42,7 +42,7 @@ public class WhenBalanceFixingIsCompletedTests : TestBase
     {
         await WhenBalanceFixingIsCompleted();
 
-        HasEnqueuedCommand<FetchResultOfHourlyConsumption>();
+        CheckHasEnqueuedCommand<FetchResultOfHourlyConsumption>();
     }
 
     [Fact]
@@ -55,7 +55,7 @@ public class WhenBalanceFixingIsCompletedTests : TestBase
 
         await HavingProcessedInternalTasksAsync().ConfigureAwait(false);
 
-        HasEnqueuedCommand<FetchHourlyConsumption>()
+        CheckHasEnqueuedCommand<FetchHourlyConsumption>()
             .CountIs(2);
     }
 
@@ -93,7 +93,7 @@ public class WhenBalanceFixingIsCompletedTests : TestBase
         results?.Add(result, energySupplierNumber);
     }
 
-    private AssertQueuedCommand HasEnqueuedCommand<TCommandType>()
+    private AssertQueuedCommand CheckHasEnqueuedCommand<TCommandType>()
     {
         return AssertQueuedCommand.QueuedCommand<TCommandType>(
             GetService<IDatabaseConnectionFactory>(),
