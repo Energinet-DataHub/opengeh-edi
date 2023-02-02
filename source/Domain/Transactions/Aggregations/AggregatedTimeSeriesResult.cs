@@ -16,19 +16,6 @@ using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 
 namespace Domain.Transactions.Aggregations;
 
-public class AggregatedTimeSeriesResult
-{
-    public AggregatedTimeSeriesResult(Guid id, IReadOnlyList<AggregationResult> series)
-    {
-        Id = id;
-        Series = series;
-    }
-
-    public Guid Id { get; }
-
-    public IReadOnlyList<AggregationResult> Series { get; }
-}
-
 public class AggregationResult
 {
     public AggregationResult(Guid id, IReadOnlyList<Point> points, string gridAreaCode, string meteringPointType, string measureUnitType, string resolution, Period period)
