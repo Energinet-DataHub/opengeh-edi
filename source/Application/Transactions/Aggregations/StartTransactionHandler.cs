@@ -50,8 +50,7 @@ public class StartTransactionHandler : IRequestHandler<StartTransaction, Unit>
             TransactionId.New(),
             gridOperatorNumber,
             MarketRole.MeteredDataResponsible,
-            ProcessType.BalanceFixing,
-            new Domain.Transactions.Aggregations.Period(request.PeriodStart, request.PeriodEnd));
+            ProcessType.BalanceFixing);
 
         _transactions.Add(transaction);
         await _commandScheduler.EnqueueAsync(new RetrieveAggregationResult(request.ResultId, request.GridAreaCode, transaction.Id.Id, new Period(request.PeriodStart, request.PeriodEnd))).ConfigureAwait(false);

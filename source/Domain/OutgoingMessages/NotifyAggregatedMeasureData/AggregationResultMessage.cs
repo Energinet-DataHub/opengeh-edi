@@ -40,10 +40,8 @@ public class AggregationResultMessage : OutgoingMessage
         MarketRole receiverRole,
         TransactionId transactionId,
         ProcessType processType,
-        Period period,
         AggregationResult result)
     {
-        ArgumentNullException.ThrowIfNull(period);
         ArgumentNullException.ThrowIfNull(transactionId);
         ArgumentNullException.ThrowIfNull(processType);
         ArgumentNullException.ThrowIfNull(result);
@@ -54,7 +52,7 @@ public class AggregationResultMessage : OutgoingMessage
             result.MeteringPointType,
             result.MeasureUnitType,
             result.Resolution,
-            period,
+            result.Period,
             result.Points.Select(p => new Point(p.Position, p.Quantity, p.Quality, p.SampleTime)).ToList());
 
         return new AggregationResultMessage(
