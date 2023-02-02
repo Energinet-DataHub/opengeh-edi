@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Application.Transactions.Aggregations;
 using Application.Transactions.Aggregations.HourlyConsumption;
+using Domain.Actors;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions.Aggregations;
 using Energinet.DataHub.Wholesale.Contracts.Events;
@@ -49,7 +50,8 @@ public class WhenBalanceFixingIsCompletedTests : TestBase
     [Fact]
     public async Task Retrieval_of_aggregation_result_for_each_energy_supplier_is_scheduled()
     {
-        SetupFakeAggregationResult();
+        MakeAggregationResultAvailableFor(SampleData.EnergySupplierNumber);
+        MakeAggregationResultAvailableFor(SampleData.EnergySupplierNumber2);
 
         await WhenBalanceFixingIsCompleted();
 
@@ -73,7 +75,7 @@ public class WhenBalanceFixingIsCompletedTests : TestBase
         await HavingReceivedIntegrationEventAsync("BalanceFixingCompleted", integrationEvent).ConfigureAwait(false);
     }
 
-    private void SetupFakeAggregationResult()
+    private void MakeAggregationResultAvailableFor(ActorNumber energySupplierNumber)
     {
         var result = new AggregationResult(
             SampleData.ResultId,
@@ -91,7 +93,7 @@ public class WhenBalanceFixingIsCompletedTests : TestBase
             SampleData.Resolution);
 
         var results = GetService<IAggregationResults>() as AggregationResultsStub;
-        results?.Add(result, SampleData.EnergySupplierNumber);
-        results?.Add(result, SampleData.EnergySupplierNumber2);
+
+        results?.Add(result, energySupplierNumber);
     }
 }
