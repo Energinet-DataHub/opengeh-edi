@@ -21,12 +21,12 @@ using MediatR;
 
 namespace Application.Transactions.Aggregations.HourlyConsumption;
 
-public class FetchResultOfHourlyConsumptionHandler : IRequestHandler<PrepareTransactions, Unit>
+public class PrepareTransactionsHandler : IRequestHandler<PrepareTransactions, Unit>
 {
     private readonly IAggregationResults _aggregationResults;
     private readonly ICommandScheduler _commandScheduler;
 
-    public FetchResultOfHourlyConsumptionHandler(IAggregationResults aggregationResults, ICommandScheduler commandScheduler)
+    public PrepareTransactionsHandler(IAggregationResults aggregationResults, ICommandScheduler commandScheduler)
     {
         _aggregationResults = aggregationResults;
         _commandScheduler = commandScheduler;
