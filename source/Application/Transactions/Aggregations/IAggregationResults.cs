@@ -13,7 +13,10 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using Domain.Actors;
 using Domain.Transactions.Aggregations;
 
 namespace Application.Transactions.Aggregations;
@@ -29,4 +32,11 @@ public interface IAggregationResults
     /// <param name="resultId"></param>
     /// <param name="gridArea"></param>
     Task<AggregationResult> GetResultAsync(Guid resultId, string gridArea);
+
+    /// <summary>
+    /// Fetch a list of energy supplier numbers for which an aggregation result of hourly consumption is available
+    /// </summary>
+    /// <param name="resultId"></param>
+    /// <param name="gridArea"></param>
+    Task<ReadOnlyCollection<ActorNumber>> EnergySuppliersWithHourlyConsumptionResultAsync(Guid resultId, string gridArea);
 }

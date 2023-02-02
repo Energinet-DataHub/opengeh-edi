@@ -12,16 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
+using Application.Transactions.Aggregations;
 using Application.Transactions.Aggregations.HourlyConsumption;
 using Domain.Actors;
 using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Domain.Transactions.Aggregations;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf.WellKnownTypes;
 using Infrastructure.Configuration.InternalCommands;
+using Infrastructure.Transactions.Aggregations;
 using IntegrationTests.Assertions;
 using IntegrationTests.Fixtures;
+using IntegrationTests.TestDoubles;
 using Xunit;
 
 namespace IntegrationTests.Application.Transactions.Aggregations.HourlyConsumption;
@@ -44,6 +50,22 @@ public class WhenBalanceFixingIsCompletedTests : TestBase
             GetService<InternalCommandMapper>());
     }
 
+    [Fact]
+    public async Task Retrieval_of_aggregation_result_for_each_energy_supplier_is_scheduled()
+    {
+        SetupFakeAggregationResult();
+
+        var integrationEvent = BalanceFixingCompletedIntegrationEvent();
+        await HavingReceivedIntegrationEventAsync("BalanceFixingCompleted", integrationEvent).ConfigureAwait(false);
+
+        await HavingProcessedInternalTasksAsync().ConfigureAwait(false);
+
+        AssertQueuedCommand.QueuedCommand<FetchHourlyConsumption>(
+                GetService<IDatabaseConnectionFactory>(),
+                GetService<InternalCommandMapper>())
+            .CountIs(2);
+    }
+
     private static ProcessCompleted BalanceFixingCompletedIntegrationEvent()
     {
         return new ProcessCompleted()
@@ -53,5 +75,27 @@ public class WhenBalanceFixingIsCompletedTests : TestBase
             PeriodStartUtc = Timestamp.FromDateTime(SampleData.StartOfPeriod.ToDateTimeUtc()),
             PeriodEndUtc = Timestamp.FromDateTime(SampleData.EndOfPeriod.ToDateTimeUtc()),
         };
+    }
+
+    private void SetupFakeAggregationResult()
+    {
+        var result = new AggregationResult(
+            SampleData.ResultId,
+            new List<Point>()
+            {
+                new(
+                    1,
+                    1.1m,
+                    "A02",
+                    "2022-10-31T21:15:00.000Z"),
+            },
+            SampleData.GridAreaCode,
+            SampleData.MeteringPointType,
+            SampleData.MeasureUnitType,
+            SampleData.Resolution);
+
+        var results = GetService<IAggregationResults>() as AggregationResultsStub;
+        results?.Add(result, SampleData.EnergySupplierNumber);
+        results?.Add(result, SampleData.EnergySupplierNumber2);
     }
 }

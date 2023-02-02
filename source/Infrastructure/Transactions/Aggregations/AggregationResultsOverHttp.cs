@@ -13,11 +13,14 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Net.Http;
 using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 using Application.Transactions.Aggregations;
+using Domain.Actors;
 using Domain.Transactions.Aggregations;
 using Infrastructure.Configuration.Serialization;
 using Polly;
@@ -59,6 +62,12 @@ public class AggregationResultsOverHttp : IAggregationResults
 
         return await _aggregationResultMapper.MapFromAsync(
             await response.Content.ReadAsStreamAsync().ConfigureAwait(false), resultId, gridArea).ConfigureAwait(false);
+    }
+
+    #pragma warning disable
+    public Task<ReadOnlyCollection<ActorNumber>> EnergySuppliersWithHourlyConsumptionResultAsync(Guid resultId, string gridArea)
+    {
+        return Task.FromResult(new List<ActorNumber>().AsReadOnly());
     }
 
     private async Task<HttpResponseMessage> CallApiAsync(Guid resultId, string gridArea)

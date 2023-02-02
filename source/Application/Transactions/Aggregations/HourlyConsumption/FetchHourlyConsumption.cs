@@ -12,29 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Text.Json.Serialization;
 using Application.Configuration.Commands.Commands;
 
 namespace Application.Transactions.Aggregations.HourlyConsumption;
 
-public class FetchResultOfHourlyConsumption : InternalCommand
+public class FetchHourlyConsumption : InternalCommand
 {
-    [JsonConstructor]
-    public FetchResultOfHourlyConsumption(Guid id, Guid resultId, string gridArea)
-        : base(id)
-    {
-        ResultId = resultId;
-        GridArea = gridArea;
-    }
-
-    public FetchResultOfHourlyConsumption(Guid resultId, string gridArea)
-    {
-        ResultId = resultId;
-        GridArea = gridArea;
-    }
-
-    public Guid ResultId { get; }
-
-    public string GridArea { get; }
 }

@@ -14,10 +14,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.Transactions.Aggregations;
+using Domain.Actors;
 using Domain.Transactions.Aggregations;
 using Infrastructure.Transactions.Aggregations;
 
@@ -26,12 +28,23 @@ namespace IntegrationTests.TestDoubles;
 public class AggregationResultsStub : IAggregationResults
 {
     private readonly List<AggregationResult> _results = new();
+    private readonly Dictionary<ActorNumber, AggregationResult> _resultsForActors = new();
 
     public Task<AggregationResult> GetResultAsync(Guid resultId, string gridArea)
     {
         return Task.FromResult(_results.First(result =>
             result.Id.Equals(resultId) &&
             result.GridAreaCode.Equals(gridArea, StringComparison.OrdinalIgnoreCase)));
+    }
+
+    public Task<ReadOnlyCollection<ActorNumber>> EnergySuppliersWithHourlyConsumptionResultAsync(Guid resultId, string gridArea)
+    {
+        var actors = _resultsForActors
+            .Where(result => result.Value.GridAreaCode.Equals(gridArea, StringComparison.OrdinalIgnoreCase) && result.Value.Id.Equals(resultId))
+            .Select(result => result.Key)
+            .ToList();
+
+        return Task.FromResult(actors.AsReadOnly());
     }
 
     public void Add(Guid resultId, AggregationResultDto aggregationResultDto)
@@ -45,5 +58,11 @@ public class AggregationResultsStub : IAggregationResults
                 point.QuarterTime));
         var result = new AggregationResult(resultId, points.ToList(), aggregationResultDto.GridAreaCode, aggregationResultDto.MeteringPointType, aggregationResultDto.MeasureUnitType, aggregationResultDto.Resolution);
         _results.Add(result);
+    }
+
+    public void Add(AggregationResult aggregationResult, ActorNumber targetActorNumber)
+    {
+        ArgumentNullException.ThrowIfNull(aggregationResult);
+        _resultsForActors.Add(targetActorNumber, aggregationResult);
     }
 }

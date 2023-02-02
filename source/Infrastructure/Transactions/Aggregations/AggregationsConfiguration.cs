@@ -32,6 +32,7 @@ internal static class AggregationsConfiguration
         services.AddScoped<IAggregationResultForwardingRepository, AggregationResultForwardingRepository>();
         services.AddSingleton<IGridAreaLookup, GridAreaLookup>();
         services.AddTransient<IRequestHandler<RetrieveAggregationResult, Unit>, RetrieveAggregationResultHandler>();
+        services.AddTransient<IRequestHandler<FetchResultOfHourlyConsumption, Unit>, FetchResultOfHourlyConsumptionHandler>();
         services.AddSingleton(aggregationResultsBuilder);
     }
 }
