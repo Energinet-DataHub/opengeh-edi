@@ -58,7 +58,7 @@ public class AggregationResultsOverHttp : IAggregationResults
         var response = await executionPolicy.ExecuteAsync(() => CallApiAsync(resultId, gridArea)).ConfigureAwait(false);
 
         return await _aggregationResultMapper.MapFromAsync(
-            await response.Content.ReadAsStreamAsync().ConfigureAwait(false), resultId, gridArea).ConfigureAwait(false);
+            await response.Content.ReadAsStreamAsync().ConfigureAwait(false), resultId, gridArea, period).ConfigureAwait(false);
     }
 
     private async Task<HttpResponseMessage> CallApiAsync(Guid resultId, string gridArea)

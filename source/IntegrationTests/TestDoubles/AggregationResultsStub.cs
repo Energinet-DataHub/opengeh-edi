@@ -44,7 +44,14 @@ public class AggregationResultsStub : IAggregationResults
                 decimal.Parse(point.Quantity, NumberStyles.Number, CultureInfo.InvariantCulture),
                 point.Quality,
                 point.QuarterTime));
-        var result = new AggregationResult(resultId, points.ToList(), aggregationResultDto.GridAreaCode, aggregationResultDto.MeteringPointType, aggregationResultDto.MeasureUnitType, aggregationResultDto.Resolution);
+        var result = new AggregationResult(
+            resultId,
+            points.ToList(),
+            aggregationResultDto.GridAreaCode,
+            aggregationResultDto.MeteringPointType,
+            aggregationResultDto.MeasureUnitType,
+            aggregationResultDto.Resolution,
+            new Period(aggregationResultDto.PeriodStart, aggregationResultDto.PeriodEnd));
         _results.Add(result);
     }
 }

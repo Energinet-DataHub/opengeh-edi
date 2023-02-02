@@ -31,7 +31,7 @@ public class AggregatedTimeSeriesResult
 
 public class AggregationResult
 {
-    public AggregationResult(Guid id, IReadOnlyList<Point> points, string gridAreaCode, string meteringPointType, string measureUnitType, string resolution)
+    public AggregationResult(Guid id, IReadOnlyList<Point> points, string gridAreaCode, string meteringPointType, string measureUnitType, string resolution, Period period)
     {
         Id = id;
         Points = points;
@@ -39,6 +39,7 @@ public class AggregationResult
         MeteringPointType = meteringPointType;
         MeasureUnitType = measureUnitType;
         Resolution = resolution;
+        Period = period;
     }
 
     public Guid Id { get; }
@@ -52,4 +53,6 @@ public class AggregationResult
     public string MeasureUnitType { get; }
 
     public string Resolution { get; }
+
+    public Period Period { get; }
 }

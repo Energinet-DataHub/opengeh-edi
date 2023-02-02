@@ -82,7 +82,9 @@ public class RetrieveAggregationResultTests : TestBase
                     "1.1",
                     "A02",
                     "2022-10-31T21:15:00.000Z"),
-            });
+            },
+            SampleData.StartOfPeriod,
+            SampleData.EndOfPeriod);
 
         results?.Add(SampleData.ResultId, dto);
     }
