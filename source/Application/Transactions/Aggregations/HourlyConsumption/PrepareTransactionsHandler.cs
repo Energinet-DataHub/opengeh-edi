@@ -43,7 +43,7 @@ public class PrepareTransactionsHandler : IRequestHandler<PrepareTransactions, U
         var commandsToEnqueue = new List<Task>();
         foreach (var energySupplierNumber in energySupplierNumbers)
         {
-            commandsToEnqueue.Add(_commandScheduler.EnqueueAsync(new StartTransaction()));
+            commandsToEnqueue.Add(_commandScheduler.EnqueueAsync(new StartTransaction(request.ResultId, request.GridArea, energySupplierNumber.Value)));
         }
 
         await Task.WhenAll(commandsToEnqueue).ConfigureAwait(false);

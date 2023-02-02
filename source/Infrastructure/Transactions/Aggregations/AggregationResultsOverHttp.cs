@@ -70,6 +70,11 @@ public class AggregationResultsOverHttp : IAggregationResults
         return Task.FromResult(new List<ActorNumber>().AsReadOnly());
     }
 
+    public Task<AggregationResult> HourlyConsumptionForAsync(Guid resultId, string gridArea, ActorNumber energySupplierNumber)
+    {
+        throw new NotImplementedException();
+    }
+
     private async Task<HttpResponseMessage> CallApiAsync(Guid resultId, string gridArea)
     {
         using var httpContent = CreateRequest(resultId, gridArea);

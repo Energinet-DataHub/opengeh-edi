@@ -47,6 +47,11 @@ public class AggregationResultsStub : IAggregationResults
         return Task.FromResult(actors.AsReadOnly());
     }
 
+    public Task<AggregationResult> HourlyConsumptionForAsync(Guid resultId, string gridArea, ActorNumber energySupplierNumber)
+    {
+        return Task.FromResult(_resultsForActors[energySupplierNumber]);
+    }
+
     public void Add(Guid resultId, AggregationResultDto aggregationResultDto)
     {
         ArgumentNullException.ThrowIfNull(aggregationResultDto);

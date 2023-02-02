@@ -21,12 +21,24 @@ namespace Application.Transactions.Aggregations.HourlyConsumption;
 public class StartTransaction : InternalCommand
 {
     [JsonConstructor]
-    public StartTransaction(Guid id)
+    public StartTransaction(Guid id, Guid resultId, string gridArea, string energySupplierNumber)
         : base(id)
     {
+        ResultId = resultId;
+        GridArea = gridArea;
+        EnergySupplierNumber = energySupplierNumber;
     }
 
-    public StartTransaction()
+    public StartTransaction(Guid resultId, string gridArea, string energySupplierNumber)
     {
+        ResultId = resultId;
+        GridArea = gridArea;
+        EnergySupplierNumber = energySupplierNumber;
     }
+
+    public Guid ResultId { get; }
+
+    public string GridArea { get; }
+
+    public string EnergySupplierNumber { get; }
 }

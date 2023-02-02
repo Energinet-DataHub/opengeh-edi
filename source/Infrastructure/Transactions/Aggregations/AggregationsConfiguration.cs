@@ -18,7 +18,6 @@ using Application.Transactions.Aggregations.HourlyConsumption;
 using Domain.Transactions.Aggregations;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using StartTransaction = Application.Transactions.Aggregations.StartTransaction;
 
 namespace Infrastructure.Transactions.Aggregations;
 
@@ -29,11 +28,12 @@ internal static class AggregationsConfiguration
         services.AddTransient(typeof(INotificationHandler<NewResultAvailableNotification>), typeof(PrepareTransactionsWhenBalanceFixingIsCompleted));
         services.AddTransient(typeof(INotificationHandler<NewResultAvailableNotification>), typeof(NewResultAvailableNotificationHandler));
         services.AddScoped<AggregationResultMapper>();
-        services.AddTransient<IRequestHandler<StartTransaction, Unit>, StartTransactionHandler>();
+        services.AddTransient<IRequestHandler<Application.Transactions.Aggregations.StartTransaction, Unit>, Application.Transactions.Aggregations.StartTransactionHandler>();
         services.AddScoped<IAggregationResultForwardingRepository, AggregationResultForwardingRepository>();
         services.AddSingleton<IGridAreaLookup, GridAreaLookup>();
         services.AddTransient<IRequestHandler<RetrieveAggregationResult, Unit>, RetrieveAggregationResultHandler>();
         services.AddTransient<IRequestHandler<PrepareTransactions, Unit>, PrepareTransactionsHandler>();
         services.AddSingleton(aggregationResultsBuilder);
+        services.AddTransient<IRequestHandler<Application.Transactions.Aggregations.HourlyConsumption.StartTransaction, Unit>, Application.Transactions.Aggregations.HourlyConsumption.StartTransactionHandler>();
     }
 }

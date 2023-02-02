@@ -39,4 +39,12 @@ public interface IAggregationResults
     /// <param name="resultId"></param>
     /// <param name="gridArea"></param>
     Task<ReadOnlyCollection<ActorNumber>> EnergySuppliersWithHourlyConsumptionResultAsync(Guid resultId, string gridArea);
+
+    /// <summary>
+    /// Fetch aggregation result of "hourly consumption"
+    /// </summary>
+    /// <param name="resultId"></param>
+    /// <param name="gridArea"></param>
+    /// <param name="energySupplierNumber"></param>
+    Task<AggregationResult> HourlyConsumptionForAsync(Guid resultId, string gridArea, ActorNumber energySupplierNumber);
 }
