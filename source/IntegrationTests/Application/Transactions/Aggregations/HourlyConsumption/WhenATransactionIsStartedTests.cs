@@ -18,6 +18,7 @@ using Application.Configuration.DataAccess;
 using Application.Transactions.Aggregations;
 using Dapper;
 using Domain.Actors;
+using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions.Aggregations;
 using IntegrationTests.Fixtures;
@@ -49,6 +50,7 @@ public class WhenATransactionIsStartedTests : TestBase
         Assert.NotNull(transaction);
         Assert.Equal(SampleData.EnergySupplierNumber.Value, transaction.ReceivingActor);
         Assert.Equal(MarketRole.EnergySupplier.Name, transaction.ReceivingActorRole);
+        Assert.Equal(ProcessType.BalanceFixing.Name, transaction.ProcessType);
     }
 
     private void MakeAggregationResultAvailableFor(ActorNumber energySupplierNumber)
