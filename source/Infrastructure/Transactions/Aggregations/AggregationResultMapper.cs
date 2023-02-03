@@ -36,7 +36,7 @@ public class AggregationResultMapper
         Production = 0,
     }
 
-    public async Task<AggregationResult> MapFromAsync(Stream payload, Guid resultId, string gridArea)
+    public async Task<AggregationResult> MapFromAsync(Stream payload, Guid resultId, string gridArea, Period period)
     {
         var resultDto = (ProcessStepResultDto)await _serializer.DeserializeAsync(payload, typeof(ProcessStepResultDto)).ConfigureAwait(false);
         return new AggregationResult(
@@ -45,7 +45,8 @@ public class AggregationResultMapper
             gridArea,
             "E18",
             "KWH",
-            "PT1H");
+            "PT1H",
+            period);
     }
 
     private static IReadOnlyList<Point> ExtractPoints(TimeSeriesPointDto[] timeSeriesPoints)

@@ -21,6 +21,7 @@ using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using Domain.Transactions.MoveIn;
 using MediatR;
+using NodaTime;
 
 namespace Application.Transactions.Aggregations;
 
@@ -38,7 +39,7 @@ public class RetrieveAggregationResultHandler : IRequestHandler<RetrieveAggregat
     public async Task<Unit> Handle(RetrieveAggregationResult request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        var aggregationResult = await _aggregationResults.GetResultAsync(request.ResultId, request.GridArea).ConfigureAwait(false);
+        var aggregationResult = await _aggregationResults.GetResultAsync(request.ResultId, request.GridArea, new Domain.Transactions.Aggregations.Period(request.Period.Start, request.Period.End)).ConfigureAwait(false);
         var transaction = await _transactions.GetAsync(TransactionId.Create(request.TransactionId)).ConfigureAwait(false);
         if (transaction is null) throw TransactionNotFoundException.TransactionIdNotFound(request.Id);
         transaction.SendResult(aggregationResult);
@@ -49,24 +50,30 @@ public class RetrieveAggregationResultHandler : IRequestHandler<RetrieveAggregat
 public class RetrieveAggregationResult : InternalCommand
 {
     [JsonConstructor]
-    public RetrieveAggregationResult(Guid id, Guid resultId, string gridArea, Guid transactionId)
+    public RetrieveAggregationResult(Guid id, Guid resultId, string gridArea, Guid transactionId, Period period)
         : base(id)
     {
         ResultId = resultId;
         GridArea = gridArea;
         TransactionId = transactionId;
+        Period = period;
     }
 
-    public RetrieveAggregationResult(Guid resultId, string gridArea, Guid transactionId)
+    public RetrieveAggregationResult(Guid resultId, string gridArea, Guid transactionId, Period period)
     {
         ResultId = resultId;
         GridArea = gridArea;
         TransactionId = transactionId;
+        Period = period;
     }
 
     public Guid ResultId { get; }
 
     public string GridArea { get; }
 
+    public Period Period { get; }
+
     public Guid TransactionId { get; }
 }
+
+public record Period(Instant Start, Instant End);

@@ -24,6 +24,7 @@ using Domain.Transactions.Aggregations;
 using IntegrationTests.Fixtures;
 using IntegrationTests.TestDoubles;
 using Xunit;
+using Period = Application.Transactions.Aggregations.Period;
 using StartTransaction = Application.Transactions.Aggregations.HourlyConsumption.StartTransaction;
 
 namespace IntegrationTests.Application.Transactions.Aggregations.HourlyConsumption;
@@ -40,7 +41,11 @@ public class WhenATransactionIsStartedTests : TestBase
     {
         MakeAggregationResultAvailableFor(SampleData.EnergySupplierNumber);
 
-        var startTransaction = new StartTransaction(SampleData.ResultId, SampleData.GridAreaCode, SampleData.EnergySupplierNumber.Value);
+        var startTransaction = new StartTransaction(
+            SampleData.ResultId,
+            SampleData.GridAreaCode,
+            SampleData.EnergySupplierNumber.Value,
+            new Period(SampleData.StartOfPeriod, SampleData.EndOfPeriod));
         await InvokeCommandAsync(startTransaction).ConfigureAwait(false);
 
         using var connection =
@@ -68,7 +73,8 @@ public class WhenATransactionIsStartedTests : TestBase
             SampleData.GridAreaCode,
             SampleData.MeteringPointType,
             SampleData.MeasureUnitType,
-            SampleData.Resolution);
+            SampleData.Resolution,
+            new Domain.Transactions.Aggregations.Period(SampleData.StartOfPeriod, SampleData.EndOfPeriod));
 
         var results = GetService<IAggregationResults>() as AggregationResultsStub;
 

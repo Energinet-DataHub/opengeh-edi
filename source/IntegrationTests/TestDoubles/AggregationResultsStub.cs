@@ -22,6 +22,7 @@ using Application.Transactions.Aggregations;
 using Domain.Actors;
 using Domain.Transactions.Aggregations;
 using Infrastructure.Transactions.Aggregations;
+using Period = Domain.Transactions.Aggregations.Period;
 
 namespace IntegrationTests.TestDoubles;
 
@@ -30,7 +31,7 @@ public class AggregationResultsStub : IAggregationResults
     private readonly List<AggregationResult> _results = new();
     private readonly Dictionary<ActorNumber, AggregationResult> _resultsForActors = new();
 
-    public Task<AggregationResult> GetResultAsync(Guid resultId, string gridArea)
+    public Task<AggregationResult> GetResultAsync(Guid resultId, string gridArea, Domain.Transactions.Aggregations.Period period)
     {
         return Task.FromResult(_results.First(result =>
             result.Id.Equals(resultId) &&
@@ -47,7 +48,7 @@ public class AggregationResultsStub : IAggregationResults
         return Task.FromResult(actors.AsReadOnly());
     }
 
-    public Task<AggregationResult> HourlyConsumptionForAsync(Guid resultId, string gridArea, ActorNumber energySupplierNumber)
+    public Task<AggregationResult> HourlyConsumptionForAsync(Guid resultId, string gridArea, ActorNumber energySupplierNumber, Domain.Transactions.Aggregations.Period period)
     {
         return Task.FromResult(_resultsForActors[energySupplierNumber]);
     }
@@ -61,7 +62,14 @@ public class AggregationResultsStub : IAggregationResults
                 decimal.Parse(point.Quantity, NumberStyles.Number, CultureInfo.InvariantCulture),
                 point.Quality,
                 point.QuarterTime));
-        var result = new AggregationResult(resultId, points.ToList(), aggregationResultDto.GridAreaCode, aggregationResultDto.MeteringPointType, aggregationResultDto.MeasureUnitType, aggregationResultDto.Resolution);
+        var result = new AggregationResult(
+            resultId,
+            points.ToList(),
+            aggregationResultDto.GridAreaCode,
+            aggregationResultDto.MeteringPointType,
+            aggregationResultDto.MeasureUnitType,
+            aggregationResultDto.Resolution,
+            new Period(aggregationResultDto.PeriodStart, aggregationResultDto.PeriodEnd));
         _results.Add(result);
     }
 
