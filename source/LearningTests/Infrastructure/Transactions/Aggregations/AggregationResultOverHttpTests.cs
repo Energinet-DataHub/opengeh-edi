@@ -48,4 +48,16 @@ public class AggregationResultOverHttpTests
 
         Assert.NotNull(result);
     }
+
+    [Fact]
+    public async Task Fetch_list_of_energy_suppliers_for_which_a_flex_consumption_result_is_available()
+    {
+        using var httpClient = new HttpClient();
+        var service = new AggregationResultsOverHttp(new HttpClientAdapter(httpClient), new Uri(_configuration["ServiceUri"]!), _mapper, _serializer);
+
+        var energySuppliers = await service.EnergySuppliersWithHourlyConsumptionResultAsync(_batchId, _gridArea)
+            .ConfigureAwait(false);
+
+        Assert.NotEmpty(energySuppliers);
+    }
 }

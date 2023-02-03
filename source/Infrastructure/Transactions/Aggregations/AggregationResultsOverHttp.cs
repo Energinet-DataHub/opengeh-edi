@@ -15,7 +15,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
@@ -47,6 +49,18 @@ public class AggregationResultsOverHttp : IAggregationResults
         AggregateProductionPerGridArea = 25,
     }
 
+    private enum TimeSeriesType
+    {
+        NonProfiledConsumption = 1,
+        FlexConsumption = 2,
+        Production = 3,
+    }
+
+    private enum MarketRole
+    {
+        EnergySupplier = 0,
+    }
+
     public async Task<AggregationResult> GetResultAsync(Guid resultId, string gridArea)
     {
         var executionPolicy = Policy
@@ -67,10 +81,26 @@ public class AggregationResultsOverHttp : IAggregationResults
             await response.Content.ReadAsStreamAsync().ConfigureAwait(false), resultId, gridArea).ConfigureAwait(false);
     }
 
-    #pragma warning disable
-    public Task<ReadOnlyCollection<ActorNumber>> EnergySuppliersWithHourlyConsumptionResultAsync(Guid resultId, string gridArea)
+    public async Task<ReadOnlyCollection<ActorNumber>> EnergySuppliersWithHourlyConsumptionResultAsync(Guid resultId, string gridArea)
     {
-        return Task.FromResult(new List<ActorNumber>().AsReadOnly());
+        using var request = CreateContentFrom(new ProcessStepActorsRequest(
+            resultId,
+            gridArea,
+            TimeSeriesType.NonProfiledConsumption,
+            MarketRole.EnergySupplier));
+
+        var response = await _httpClient.PostAsync(
+                new Uri(_serviceEndpoint, "v2.3/processstepresult"),
+                request)
+            .ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+
+        var actorNumbers = await response.Content.ReadFromJsonAsync<List<WholesaleActorDto>>().ConfigureAwait(false);
+        return actorNumbers?
+            .Where(actorNumber => !string.IsNullOrEmpty(actorNumber.Gln))
+            .Select(actorNumber => ActorNumber.Create(actorNumber.Gln))
+            .ToList()
+            .AsReadOnly()!;
     }
 
     public Task<AggregationResult> HourlyConsumptionForAsync(Guid resultId, string gridArea, ActorNumber energySupplierNumber)
@@ -86,5 +116,14 @@ public class AggregationResultsOverHttp : IAggregationResults
         return httpContent;
     }
 
+    private StringContent CreateContentFrom<T>(T request)
+    {
+        return new StringContent(_serializer.Serialize(request), Encoding.UTF8, MediaTypeNames.Application.Json);
+    }
+
     private record ProcessStepResultRequestDto(Guid BatchId, string GridAreaCode, ProcessStepType ProcessStepResult);
+
+    private record ProcessStepActorsRequest(Guid BatchId, string GridAreaCode, TimeSeriesType Type, MarketRole MarketRole);
+
+    private record WholesaleActorDto(string Gln);
 }
