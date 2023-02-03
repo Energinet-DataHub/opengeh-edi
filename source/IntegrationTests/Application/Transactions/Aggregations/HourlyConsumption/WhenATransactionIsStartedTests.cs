@@ -48,6 +48,7 @@ public class WhenATransactionIsStartedTests : TestBase
             .QueryFirstOrDefaultAsync("SELECT * FROM dbo.AggregatedTimeSeriesTransactions");
         Assert.NotNull(transaction);
         Assert.Equal(SampleData.EnergySupplierNumber.Value, transaction.ReceivingActor);
+        Assert.Equal(MarketRole.EnergySupplier.Name, transaction.ReceivingActorRole);
     }
 
     private void MakeAggregationResultAvailableFor(ActorNumber energySupplierNumber)
