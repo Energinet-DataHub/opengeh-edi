@@ -73,7 +73,7 @@ public class AggregationResultsOverHttp : IAggregationResults
             });
 
         var response = await executionPolicy.ExecuteAsync(() => _httpClient.PostAsync(
-            new Uri(_serviceEndpoint, "v2.1/processstepresult"),
+            ServiceUriFor("2.1"),
             CreateRequest(resultId, gridArea)))
             .ConfigureAwait(false);
 
@@ -90,7 +90,7 @@ public class AggregationResultsOverHttp : IAggregationResults
             MarketRole.EnergySupplier));
 
         var response = await _httpClient.PostAsync(
-                new Uri(_serviceEndpoint, "v2.3/processstepresult"),
+                ServiceUriFor("2.3"),
                 request)
             .ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
@@ -119,6 +119,11 @@ public class AggregationResultsOverHttp : IAggregationResults
     private StringContent CreateContentFrom<T>(T request)
     {
         return new StringContent(_serializer.Serialize(request), Encoding.UTF8, MediaTypeNames.Application.Json);
+    }
+
+    private Uri ServiceUriFor(string apiVersion)
+    {
+        return new Uri(_serviceEndpoint, $"v{apiVersion}/processstepresult");
     }
 
     private record ProcessStepResultRequestDto(Guid BatchId, string GridAreaCode, ProcessStepType ProcessStepResult);
