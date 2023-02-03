@@ -65,14 +65,14 @@ public class PeekDequeuePerformanceTestController : ControllerBase
         {
             _isDataBuildInProgress = true;
             var actors = _actorService.GetActors();
-            _logger.LogInformation("Start GenerateTestData");
+            _logger.LogWarning("Start GenerateTestData");
             var tasks = new List<Task>(_actorService.GetActorCount());
             try
             {
                 int loopCount = 0;
                 for (var j = 0; j < MoveInsPerActor; j++)
                 {
-                    _logger.LogInformation($"GenerateTestData loopCount: {++loopCount}");
+                    _logger.LogWarning($"GenerateTestData loopCount: {++loopCount}");
                     tasks.Clear();
                     tasks.AddRange(actors.Select(actorNumber => _moveInService.MoveInAsync(actorNumber)));
                     await Task.WhenAll(tasks).ConfigureAwait(false);
@@ -84,7 +84,7 @@ public class PeekDequeuePerformanceTestController : ControllerBase
                 throw;
             }
 
-            _logger.LogInformation("GenerateTestData completed");
+            _logger.LogWarning("GenerateTestData completed");
             _isDataBuildInProgress = false;
         }
     }
