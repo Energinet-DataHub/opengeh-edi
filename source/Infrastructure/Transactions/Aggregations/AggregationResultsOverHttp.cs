@@ -48,8 +48,7 @@ public class AggregationResultsOverHttp : IAggregationResults
     {
         var response = await CallAsync("2.1", new WholeSaleContracts.ProcessStepResultRequestDto(resultId, gridArea, WholeSaleContracts.ProcessStepType.AggregateProductionPerGridArea)).ConfigureAwait(false);
 
-        return await _aggregationResultMapper.MapFromAsync(
-            await response.Content.ReadAsStreamAsync().ConfigureAwait(false), resultId, gridArea).ConfigureAwait(false);
+        return await MapFromAsync(resultId, gridArea, response).ConfigureAwait(false);
     }
 
     public async Task<ReadOnlyCollection<ActorNumber>> EnergySuppliersWithHourlyConsumptionResultAsync(Guid resultId, string gridArea)
@@ -70,9 +69,20 @@ public class AggregationResultsOverHttp : IAggregationResults
             .AsReadOnly()!;
     }
 
-    public Task<AggregationResult> HourlyConsumptionForAsync(Guid resultId, string gridArea, ActorNumber energySupplierNumber)
+    public async Task<AggregationResult> HourlyConsumptionForAsync(Guid resultId, string gridArea, ActorNumber energySupplierNumber)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(energySupplierNumber);
+
+        var response = await CallAsync(
+                "2.2",
+                new WholeSaleContracts.ProcessStepResultRequestDtoV2(
+                    resultId,
+                    gridArea,
+                    WholeSaleContracts.TimeSeriesType.NonProfiledConsumption,
+                    energySupplierNumber.Value))
+            .ConfigureAwait(false);
+
+        return await MapFromAsync(resultId, gridArea, response).ConfigureAwait(false);
     }
 
     private Task<HttpResponseMessage> CallAsync<TRequest>(string apiVersion, TRequest request)
@@ -99,5 +109,11 @@ public class AggregationResultsOverHttp : IAggregationResults
     private StringContent CreateContentFrom<T>(T request)
     {
         return new StringContent(_serializer.Serialize(request), Encoding.UTF8, MediaTypeNames.Application.Json);
+    }
+
+    private async Task<AggregationResult> MapFromAsync(Guid resultId, string gridArea, HttpResponseMessage response)
+    {
+        return await _aggregationResultMapper.MapFromAsync(
+            await response.Content.ReadAsStreamAsync().ConfigureAwait(false), resultId, gridArea).ConfigureAwait(false);
     }
 }

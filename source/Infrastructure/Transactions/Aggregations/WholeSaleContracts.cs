@@ -37,6 +37,8 @@ internal static class WholeSaleContracts
 
     internal record ProcessStepResultRequestDto(Guid BatchId, string GridAreaCode, WholeSaleContracts.ProcessStepType ProcessStepResult);
 
+    internal record ProcessStepResultRequestDtoV2(Guid BatchId, string GridAreaCode, TimeSeriesType TimeSeriesType, string Gln);
+
     internal record ProcessStepActorsRequest(Guid BatchId, string GridAreaCode, WholeSaleContracts.TimeSeriesType Type, MarketRole MarketRole);
 
     internal record WholesaleActorDto(string Gln);
