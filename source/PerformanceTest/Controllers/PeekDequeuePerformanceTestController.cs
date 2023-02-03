@@ -23,16 +23,21 @@ namespace PerformanceTest.Controllers;
 [Route("api")]
 public class PeekDequeuePerformanceTestController : ControllerBase
 {
+    private const int MoveInsPerActor = 2000;
     private readonly IActorService _actorService;
     private readonly IMoveInService _moveInService;
+    private readonly ILogger<PeekDequeuePerformanceTestController> _logger;
     private bool _isDataBuildInProgress;
 
     public PeekDequeuePerformanceTestController(
         IActorService actorService,
-        IMoveInService moveInService)
+        IMoveInService moveInService,
+        ILogger<PeekDequeuePerformanceTestController> logger)
     {
+        ArgumentNullException.ThrowIfNull(logger);
         _actorService = actorService;
         _moveInService = moveInService;
+        _logger = logger;
     }
 
     [HttpGet("ActorNumber", Name = "ActorNumber")]
@@ -60,15 +65,26 @@ public class PeekDequeuePerformanceTestController : ControllerBase
         {
             _isDataBuildInProgress = true;
             var actors = _actorService.GetActors();
-
+            _logger.LogInformation("Start GenerateTestData");
             var tasks = new List<Task>(_actorService.GetActorCount());
-            for (var j = 0; j < 2000; j++)
+            try
             {
-                tasks.Clear();
-                tasks.AddRange(actors.Select(actorNumber => _moveInService.MoveInAsync(actorNumber)));
-                await Task.WhenAll(tasks).ConfigureAwait(false);
+                int loopCount = 0;
+                for (var j = 0; j < MoveInsPerActor; j++)
+                {
+                    _logger.LogInformation($"GenerateTestData loopCount: {++loopCount}");
+                    tasks.Clear();
+                    tasks.AddRange(actors.Select(actorNumber => _moveInService.MoveInAsync(actorNumber)));
+                    await Task.WhenAll(tasks).ConfigureAwait(false);
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("An error occured during GenerateTestData", e);
+                throw;
             }
 
+            _logger.LogInformation("GenerateTestData completed");
             _isDataBuildInProgress = false;
         }
     }
