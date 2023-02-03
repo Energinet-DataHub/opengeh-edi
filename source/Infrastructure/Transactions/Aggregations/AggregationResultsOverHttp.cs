@@ -58,7 +58,10 @@ public class AggregationResultsOverHttp : IAggregationResults
                 TimeSpan.FromSeconds(3),
             });
 
-        var response = await executionPolicy.ExecuteAsync(() => CallApiAsync(resultId, gridArea)).ConfigureAwait(false);
+        var response = await executionPolicy.ExecuteAsync(() => _httpClient.PostAsync(
+            new Uri(_serviceEndpoint, "v2.1/processstepresult"),
+            CreateRequest(resultId, gridArea)))
+            .ConfigureAwait(false);
 
         return await _aggregationResultMapper.MapFromAsync(
             await response.Content.ReadAsStreamAsync().ConfigureAwait(false), resultId, gridArea).ConfigureAwait(false);

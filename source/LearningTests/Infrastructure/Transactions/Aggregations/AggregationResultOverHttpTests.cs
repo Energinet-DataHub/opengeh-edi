@@ -42,15 +42,10 @@ public class AggregationResultOverHttpTests
     public async Task Can_retrieve_result()
     {
         using var httpClient = new HttpClient();
-        var service = new AggregationResultsOverHttp(new HttpClientAdapter(httpClient), ServiceUriForVersion("2.1"), _mapper, _serializer);
+        var service = new AggregationResultsOverHttp(new HttpClientAdapter(httpClient), new Uri(_configuration["ServiceUri"]!), _mapper, _serializer);
 
         var result = await service.GetResultAsync(_batchId, _gridArea).ConfigureAwait(false);
 
         Assert.NotNull(result);
-    }
-
-    private Uri ServiceUriForVersion(string version)
-    {
-        return new Uri($"{_configuration["ServiceUri"]!}/v{version}/processstepresult");
     }
 }
