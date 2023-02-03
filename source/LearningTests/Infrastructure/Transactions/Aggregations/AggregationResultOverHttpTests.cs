@@ -20,13 +20,15 @@ using Microsoft.Extensions.Configuration;
 
 namespace LearningTests.Infrastructure.Transactions.Aggregations;
 
-public class AggregationResultOverHttpTests
+public class AggregationResultOverHttpTests : IDisposable
 {
     private readonly Guid _batchId = Guid.Parse("006d5d41-fd58-4510-9621-122c83044b43");
     private readonly string _gridArea = "543";
     private readonly IConfigurationRoot _configuration;
     private readonly AggregationResultMapper _mapper;
     private readonly ISerializer _serializer;
+    private readonly HttpClient _httpClient;
+    private readonly AggregationResultsOverHttp _service;
 
     public AggregationResultOverHttpTests()
     {
@@ -36,15 +38,19 @@ public class AggregationResultOverHttpTests
 
         _serializer = new Serializer();
         _mapper = new AggregationResultMapper(_serializer);
+        _httpClient = new HttpClient();
+        _service = new AggregationResultsOverHttp(new HttpClientAdapter(_httpClient), new Uri(_configuration["ServiceUri"]!), _mapper, _serializer);
+    }
+
+    ~AggregationResultOverHttpTests()
+    {
+        Dispose(false);
     }
 
     [Fact]
     public async Task Can_retrieve_result()
     {
-        using var httpClient = new HttpClient();
-        var service = new AggregationResultsOverHttp(new HttpClientAdapter(httpClient), new Uri(_configuration["ServiceUri"]!), _mapper, _serializer);
-
-        var result = await service.GetResultAsync(_batchId, _gridArea).ConfigureAwait(false);
+        var result = await _service.GetResultAsync(_batchId, _gridArea).ConfigureAwait(false);
 
         Assert.NotNull(result);
     }
@@ -73,5 +79,19 @@ public class AggregationResultOverHttpTests
             .ConfigureAwait(false);
 
         Assert.NotNull(aggregationResult);
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _httpClient.Dispose();
+        }
     }
 }
