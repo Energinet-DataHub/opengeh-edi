@@ -102,7 +102,7 @@ namespace Api
                         .AddBearerAuthentication(tokenValidationParameters)
                         .AddAuthentication(sp =>
                         {
-                            if (runtime.IsRunningLocally() || runtime.PERFORMANCE_TEST_ENABLED)
+                            if (runtime.IsRunningLocally() || runtime.ALLOW_TEST_TOKENS)
                             {
                                 return new DevMarketActorAuthenticator(
                                     sp.GetRequiredService<IActorLookup>(),
@@ -157,7 +157,7 @@ namespace Api
 
         private static async Task<TokenValidationParameters> GetTokenValidationParametersAsync(RuntimeEnvironment runtime)
         {
-            if (runtime.IsRunningLocally() || runtime.PERFORMANCE_TEST_ENABLED)
+            if (runtime.IsRunningLocally() || runtime.ALLOW_TEST_TOKENS)
             {
 #pragma warning disable CA5404 // Do not disable token validation checks
                 return DevelopmentTokenValidationParameters();

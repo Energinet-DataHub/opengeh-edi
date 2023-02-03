@@ -42,8 +42,8 @@ namespace Api
         public string? SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE =>
             GetEnvironmentVariable(nameof(SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE));
 
-        public virtual bool PERFORMANCE_TEST_ENABLED =>
-            bool.Parse(GetEnvironmentVariable(nameof(PERFORMANCE_TEST_ENABLED)) ?? "false");
+        public virtual bool ALLOW_TEST_TOKENS =>
+            bool.Parse(GetEnvironmentVariable(nameof(ALLOW_TEST_TOKENS)) ?? "false");
 
         public int MAX_NUMBER_OF_PAYLOADS_IN_BUNDLE
         {
