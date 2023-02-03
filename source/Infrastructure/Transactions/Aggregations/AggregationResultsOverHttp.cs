@@ -71,15 +71,11 @@ public class AggregationResultsOverHttp : IAggregationResults
 
     public async Task<ReadOnlyCollection<ActorNumber>> EnergySuppliersWithHourlyConsumptionResultAsync(Guid resultId, string gridArea)
     {
-        using var request = CreateContentFrom(new ProcessStepActorsRequest(
+        var response = await CallAsync("2.3", new ProcessStepActorsRequest(
             resultId,
             gridArea,
             TimeSeriesType.NonProfiledConsumption,
-            MarketRole.EnergySupplier));
-
-        var response = await _httpClient.PostAsync(
-                ServiceUriFor("2.3"),
-                request)
+            MarketRole.EnergySupplier))
             .ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
 
