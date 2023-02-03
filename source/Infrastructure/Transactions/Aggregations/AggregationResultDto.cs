@@ -14,10 +14,18 @@
 
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using NodaTime;
 
 namespace Infrastructure.Transactions.Aggregations;
 
-public record AggregationResultDto(string GridAreaCode, string MeteringPointType, string MeasureUnitType, string Resolution, IEnumerable<PointDto> Points);
+public record AggregationResultDto(
+    string GridAreaCode,
+    string MeteringPointType,
+    string MeasureUnitType,
+    string Resolution,
+    IEnumerable<PointDto> Points,
+    Instant PeriodStart,
+    Instant PeriodEnd);
 
 public class PointDto
 {

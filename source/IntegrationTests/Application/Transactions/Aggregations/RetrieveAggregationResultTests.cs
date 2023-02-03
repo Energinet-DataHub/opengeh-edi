@@ -43,7 +43,7 @@ public class RetrieveAggregationResultTests : TestBase
         await TransactionHasBeenStarted().ConfigureAwait(false);
         var transactionId = await GetTransactionIdAsync().ConfigureAwait(false);
 
-        await InvokeCommandAsync(new RetrieveAggregationResult(SampleData.ResultId, SampleData.GridAreaCode, transactionId)).ConfigureAwait(false);
+        await InvokeCommandAsync(new RetrieveAggregationResult(SampleData.ResultId, SampleData.GridAreaCode, transactionId, new Period(SampleData.StartOfPeriod, SampleData.EndOfPeriod))).ConfigureAwait(false);
 
         var message = await AssertOutgoingMessage.OutgoingMessageAsync(
                  transactionId,
@@ -82,7 +82,9 @@ public class RetrieveAggregationResultTests : TestBase
                     "1.1",
                     "A02",
                     "2022-10-31T21:15:00.000Z"),
-            });
+            },
+            SampleData.StartOfPeriod,
+            SampleData.EndOfPeriod);
 
         results?.Add(SampleData.ResultId, dto);
     }

@@ -86,7 +86,8 @@ public class WhenBalanceFixingIsCompletedTests : TestBase
             SampleData.GridAreaCode,
             SampleData.MeteringPointType,
             SampleData.MeasureUnitType,
-            SampleData.Resolution);
+            SampleData.Resolution,
+            new Domain.Transactions.Aggregations.Period(SampleData.StartOfPeriod, SampleData.EndOfPeriod));
 
         var results = GetService<IAggregationResults>() as AggregationResultsStub;
 

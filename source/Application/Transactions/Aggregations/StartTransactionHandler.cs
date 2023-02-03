@@ -24,7 +24,6 @@ using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using MediatR;
 using NodaTime;
-using Period = Domain.Transactions.Aggregations.Period;
 
 namespace Application.Transactions.Aggregations;
 
@@ -51,11 +50,10 @@ public class StartTransactionHandler : IRequestHandler<StartTransaction, Unit>
             TransactionId.New(),
             gridOperatorNumber,
             MarketRole.MeteredDataResponsible,
-            ProcessType.BalanceFixing,
-            new Period(request.PeriodStart, request.PeriodEnd));
+            ProcessType.BalanceFixing);
 
         _transactions.Add(transaction);
-        await _commandScheduler.EnqueueAsync(new RetrieveAggregationResult(request.ResultId, request.GridAreaCode, transaction.Id.Id)).ConfigureAwait(false);
+        await _commandScheduler.EnqueueAsync(new RetrieveAggregationResult(request.ResultId, request.GridAreaCode, transaction.Id.Id, new Period(request.PeriodStart, request.PeriodEnd))).ConfigureAwait(false);
 
         return Unit.Value;
     }
