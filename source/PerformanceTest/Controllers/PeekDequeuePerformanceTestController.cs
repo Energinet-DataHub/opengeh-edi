@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using PerformanceTest.Actors;
 using PerformanceTest.MoveIn;
@@ -80,7 +81,7 @@ public class PeekDequeuePerformanceTestController : ControllerBase
             }
             catch (Exception e)
             {
-                _logger.LogError("An error occured during GenerateTestData", e);
+                _logger.LogError($"An error occured during GenerateTestData. Message: {e.Message} InnerException: {e.InnerException}");
                 throw;
             }
 
