@@ -20,11 +20,13 @@ using Microsoft.Extensions.Configuration;
 
 namespace LearningTests.Infrastructure.Transactions.Aggregations;
 
-public class AggregationResultOverHttpTests
+public class AggregationResultOverHttpTests : IDisposable
 {
+    private readonly Guid _batchId = Guid.Parse("006d5d41-fd58-4510-9621-122c83044b43");
+    private readonly string _gridArea = "543";
     private readonly IConfigurationRoot _configuration;
-    private readonly AggregationResultMapper _mapper;
-    private readonly ISerializer _serializer;
+    private readonly HttpClient _httpClient;
+    private readonly AggregationResultsOverHttp _service;
 
     public AggregationResultOverHttpTests()
     {
@@ -32,27 +34,56 @@ public class AggregationResultOverHttpTests
             .AddUserSecrets(Assembly.GetExecutingAssembly(), false, false)
             .Build();
 
-        _serializer = new Serializer();
-        _mapper = new AggregationResultMapper(_serializer);
+        ISerializer serializer = new Serializer();
+        _httpClient = new HttpClient();
+        _service = new AggregationResultsOverHttp(new HttpClientAdapter(_httpClient), new Uri(_configuration["ServiceUri"]!), new AggregationResultMapper(serializer), serializer);
     }
 
-    [Fact]
-    public async Task Service_is_unavailable()
+    ~AggregationResultOverHttpTests()
     {
-        using var httpClient = new HttpClient();
-        var service = new AggregationResultsOverHttp(new HttpClientAdapter(httpClient), new Uri($"{_configuration["ServiceUri"]!}/WrongUri"), _mapper, _serializer);
-
-        await Assert.ThrowsAnyAsync<Exception>(() => service.GetResultAsync(Guid.Parse(_configuration["BatchId"]!), _configuration["GridArea"]!)).ConfigureAwait(false);
+        Dispose(false);
     }
 
     [Fact]
     public async Task Can_retrieve_result()
     {
-        using var httpClient = new HttpClient();
-        var service = new AggregationResultsOverHttp(new HttpClientAdapter(httpClient), new Uri(_configuration["ServiceUri"]!), _mapper, _serializer);
-
-        var result = await service.GetResultAsync(Guid.Parse(_configuration["BatchId"]!), _configuration["GridArea"]!).ConfigureAwait(false);
+        var result = await _service.GetResultAsync(_batchId, _gridArea).ConfigureAwait(false);
 
         Assert.NotNull(result);
+    }
+
+    [Fact]
+    public async Task Fetch_list_of_energy_suppliers_for_which_a_non_profiled_consumption_result_is_available()
+    {
+        var energySuppliers = await _service.EnergySuppliersWithHourlyConsumptionResultAsync(_batchId, _gridArea)
+            .ConfigureAwait(false);
+
+        Assert.NotEmpty(energySuppliers);
+    }
+
+    [Fact]
+    public async Task Fetch_non_profiled_consumption_aggregation_result_for_a_single_energy_supplier()
+    {
+        var energySuppliers = await _service.EnergySuppliersWithHourlyConsumptionResultAsync(_batchId, _gridArea)
+            .ConfigureAwait(false);
+
+        var aggregationResult = await _service.HourlyConsumptionForAsync(_batchId, _gridArea, energySuppliers[0])
+            .ConfigureAwait(false);
+
+        Assert.NotNull(aggregationResult);
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _httpClient.Dispose();
+        }
     }
 }

@@ -104,7 +104,12 @@ namespace IntegrationTests
         {
             await GetService<IntegrationEventReceiver>().ReceiveAsync(Guid.NewGuid().ToString(), eventType, eventPayload.ToByteArray()).ConfigureAwait(false);
             await ProcessReceivedIntegrationEventsAsync().ConfigureAwait(false);
-            await ProcessScheduledCommandsAsync().ConfigureAwait(false);
+            await HavingProcessedInternalTasksAsync().ConfigureAwait(false);
+        }
+
+        protected Task HavingProcessedInternalTasksAsync()
+        {
+            return ProcessBackgroundTasksAsync();
         }
 
         private static string CreateFakeServiceBusConnectionString()
@@ -114,11 +119,6 @@ namespace IntegrationTests
                 .Append("SharedAccessKeyName=send;")
                 .Append(CultureInfo.InvariantCulture, $"SharedAccessKey={Guid.NewGuid():N}")
                 .ToString();
-        }
-
-        private Task ProcessScheduledCommandsAsync()
-        {
-            return ProcessBackgroundTasksAsync();
         }
 
         private Task ProcessReceivedIntegrationEventsAsync()

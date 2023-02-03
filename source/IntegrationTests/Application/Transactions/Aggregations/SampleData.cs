@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using Domain.Actors;
 using IntegrationTests.Factories;
 using NodaTime;
 
@@ -37,4 +38,8 @@ internal class SampleData
     internal static Instant StartOfPeriod => EffectiveDateFactory.InstantAsOfToday();
 
     internal static Instant EndOfPeriod => EffectiveDateFactory.OffsetDaysFromToday(1);
+
+    internal static ActorNumber EnergySupplierNumber => ActorNumber.Create("8200000007740");
+
+    internal static ActorNumber EnergySupplierNumber2 => ActorNumber.Create("8200000007742");
 }
