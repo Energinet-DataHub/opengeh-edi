@@ -43,17 +43,15 @@ public class StartTransactionHandler : IRequestHandler<StartTransaction>
         var aggregationResult = await _aggregationResults.HourlyConsumptionForAsync(
                 request.ResultId,
                 request.GridArea,
-                ActorNumber.Create(request.EnergySupplierNumber))
+                ActorNumber.Create(request.EnergySupplierNumber),
+                new Domain.Transactions.Aggregations.Period(request.Period.Start, request.Period.End))
             .ConfigureAwait(false);
 
         var transaction = new AggregationResultForwarding(
             TransactionId.New(),
             ActorNumber.Create(request.EnergySupplierNumber),
             MarketRole.EnergySupplier,
-            ProcessType.BalanceFixing,
-            new Period(
-                SystemClock.Instance.GetCurrentInstant(),
-                SystemClock.Instance.GetCurrentInstant()));
+            ProcessType.BalanceFixing);
 
         _repository.Add(transaction);
 

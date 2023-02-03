@@ -32,6 +32,9 @@ public class PrepareTransactionsWhenBalanceFixingIsCompleted : INotificationHand
     public Task Handle(NewResultAvailableNotification notification, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(notification);
-        return _commandScheduler.EnqueueAsync(new PrepareTransactions(notification.ResultId, notification.GridAreaCode));
+        return _commandScheduler.EnqueueAsync(new PrepareTransactions(
+            notification.ResultId,
+            notification.GridAreaCode,
+            new Period(notification.PeriodStartDate, notification.PeriodEndDate)));
     }
 }

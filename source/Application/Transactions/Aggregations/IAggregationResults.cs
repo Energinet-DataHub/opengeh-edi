@@ -46,5 +46,6 @@ public interface IAggregationResults
     /// <param name="resultId"></param>
     /// <param name="gridArea"></param>
     /// <param name="energySupplierNumber"></param>
-    Task<AggregationResult> HourlyConsumptionForAsync(Guid resultId, string gridArea, ActorNumber energySupplierNumber);
+    /// <param name="period"></param>
+    Task<AggregationResult> HourlyConsumptionForAsync(Guid resultId, string gridArea, ActorNumber energySupplierNumber, Domain.Transactions.Aggregations.Period period);
 }
