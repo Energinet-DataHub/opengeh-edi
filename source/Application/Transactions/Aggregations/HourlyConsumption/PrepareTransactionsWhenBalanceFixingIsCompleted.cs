@@ -22,9 +22,9 @@ namespace Application.Transactions.Aggregations.HourlyConsumption;
 
 public class PrepareTransactionsWhenBalanceFixingIsCompleted : INotificationHandler<NewResultAvailableNotification>
 {
-    private readonly ICommandScheduler _commandScheduler;
+    private readonly CommandSchedulerFacade _commandScheduler;
 
-    public PrepareTransactionsWhenBalanceFixingIsCompleted(ICommandScheduler commandScheduler)
+    public PrepareTransactionsWhenBalanceFixingIsCompleted(CommandSchedulerFacade commandScheduler)
     {
         _commandScheduler = commandScheduler;
     }
