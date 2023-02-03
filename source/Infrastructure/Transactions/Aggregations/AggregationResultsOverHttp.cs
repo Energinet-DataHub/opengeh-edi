@@ -59,7 +59,6 @@ public class AggregationResultsOverHttp : IAggregationResults
             WholeSaleContracts.TimeSeriesType.NonProfiledConsumption,
             WholeSaleContracts.MarketRole.EnergySupplier))
             .ConfigureAwait(false);
-        response.EnsureSuccessStatusCode();
 
         var actorNumbers = await response.Content.ReadFromJsonAsync<List<WholeSaleContracts.WholesaleActorDto>>().ConfigureAwait(false);
         return actorNumbers?
@@ -85,7 +84,7 @@ public class AggregationResultsOverHttp : IAggregationResults
         return await MapFromAsync(resultId, gridArea, response).ConfigureAwait(false);
     }
 
-    private Task<HttpResponseMessage> CallAsync<TRequest>(string apiVersion, TRequest request)
+    private async Task<HttpResponseMessage> CallAsync<TRequest>(string apiVersion, TRequest request)
     {
         var executionPolicy = Policy
             .Handle<Exception>()
@@ -96,9 +95,13 @@ public class AggregationResultsOverHttp : IAggregationResults
                 TimeSpan.FromSeconds(3),
             });
 
-        return executionPolicy.ExecuteAsync(() => _httpClient.PostAsync(
+        var response = await executionPolicy.ExecuteAsync(() => _httpClient.PostAsync(
             ServiceUriFor(apiVersion),
-            CreateContentFrom(request)));
+            CreateContentFrom(request))).ConfigureAwait(false);
+
+        response.EnsureSuccessStatusCode();
+
+        return response;
     }
 
     private Uri ServiceUriFor(string apiVersion)
