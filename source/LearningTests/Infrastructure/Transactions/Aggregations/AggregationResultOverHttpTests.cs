@@ -58,10 +58,7 @@ public class AggregationResultOverHttpTests : IDisposable
     [Fact]
     public async Task Fetch_list_of_energy_suppliers_for_which_a_non_profiled_consumption_result_is_available()
     {
-        using var httpClient = new HttpClient();
-        var service = new AggregationResultsOverHttp(new HttpClientAdapter(httpClient), new Uri(_configuration["ServiceUri"]!), _mapper, _serializer);
-
-        var energySuppliers = await service.EnergySuppliersWithHourlyConsumptionResultAsync(_batchId, _gridArea)
+        var energySuppliers = await _service.EnergySuppliersWithHourlyConsumptionResultAsync(_batchId, _gridArea)
             .ConfigureAwait(false);
 
         Assert.NotEmpty(energySuppliers);
@@ -70,12 +67,10 @@ public class AggregationResultOverHttpTests : IDisposable
     [Fact]
     public async Task Fetch_non_profiled_consumption_aggregation_result_for_a_single_energy_supplier()
     {
-        using var httpClient = new HttpClient();
-        var service = new AggregationResultsOverHttp(new HttpClientAdapter(httpClient), new Uri(_configuration["ServiceUri"]!), _mapper, _serializer);
-        var energySuppliers = await service.EnergySuppliersWithHourlyConsumptionResultAsync(_batchId, _gridArea)
+        var energySuppliers = await _service.EnergySuppliersWithHourlyConsumptionResultAsync(_batchId, _gridArea)
             .ConfigureAwait(false);
 
-        var aggregationResult = await service.HourlyConsumptionForAsync(_batchId, _gridArea, energySuppliers[0])
+        var aggregationResult = await _service.HourlyConsumptionForAsync(_batchId, _gridArea, energySuppliers[0])
             .ConfigureAwait(false);
 
         Assert.NotNull(aggregationResult);
