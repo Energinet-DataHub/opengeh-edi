@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using PerformanceTest.Actors;
 using PerformanceTest.MoveIn;
@@ -65,14 +66,14 @@ public class PeekDequeuePerformanceTestController : ControllerBase
         {
             _isDataBuildInProgress = true;
             var actors = _actorService.GetActors();
-            _logger.LogInformation("Start GenerateTestData");
+            _logger.LogWarning("Start GenerateTestData");
             var tasks = new List<Task>(_actorService.GetActorCount());
             try
             {
                 int loopCount = 0;
                 for (var j = 0; j < MoveInsPerActor; j++)
                 {
-                    _logger.LogInformation($"GenerateTestData loopCount: {++loopCount}");
+                    _logger.LogWarning($"GenerateTestData loopCount: {++loopCount}");
                     tasks.Clear();
                     tasks.AddRange(actors.Select(actorNumber => _moveInService.MoveInAsync(actorNumber)));
                     await Task.WhenAll(tasks).ConfigureAwait(false);
@@ -80,11 +81,11 @@ public class PeekDequeuePerformanceTestController : ControllerBase
             }
             catch (Exception e)
             {
-                _logger.LogError("An error occured during GenerateTestData", e);
+                _logger.LogError($"An error occured during GenerateTestData. Message: {e.Message} InnerException: {e.InnerException}");
                 throw;
             }
 
-            _logger.LogInformation("GenerateTestData completed");
+            _logger.LogWarning("GenerateTestData completed");
             _isDataBuildInProgress = false;
         }
     }

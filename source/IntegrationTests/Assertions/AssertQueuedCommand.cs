@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using Application.Configuration.DataAccess;
 using Dapper;
@@ -23,15 +25,11 @@ namespace IntegrationTests.Assertions;
 
 public class AssertQueuedCommand
 {
-    private readonly IDatabaseConnectionFactory _connectionFactory;
-    private readonly string _commandPayload;
-    private readonly CommandMetadata _commandMetadata;
+    private readonly IReadOnlyList<string> _commandPayload;
 
-    private AssertQueuedCommand(IDatabaseConnectionFactory connectionFactory, string commandPayload, CommandMetadata commandMetadata)
+    private AssertQueuedCommand(IReadOnlyList<string> commandPayload)
     {
-        _connectionFactory = connectionFactory;
         _commandPayload = commandPayload;
-        _commandMetadata = commandMetadata;
     }
 
     public static AssertQueuedCommand QueuedCommand<TCommandType>(IDatabaseConnectionFactory connectionFactory, InternalCommandMapper mapper)
@@ -42,16 +40,19 @@ public class AssertQueuedCommand
         var commandMetadata = mapper.GetByType(typeof(TCommandType));
         var sql =
             $"SELECT Data FROM [dbo].[QueuedInternalCommands] WHERE Type = @CommandType";
-        var commandPayload = connectionFactory.GetConnectionAndOpen().QuerySingleOrDefault<string>(
+        var commandPayloads = connectionFactory.GetConnectionAndOpen()
+            .Query<string>(
             sql,
-            new { CommandType = commandMetadata.CommandName, });
+            new { CommandType = commandMetadata.CommandName, })
+            .ToList();
 
-        Assert.NotNull(commandPayload);
-        return new AssertQueuedCommand(connectionFactory, commandPayload, commandMetadata);
+        Assert.NotEmpty(commandPayloads);
+        return new AssertQueuedCommand(commandPayloads);
     }
 
-    public object Command()
+    public AssertQueuedCommand CountIs(int expectedNumberOfCommands)
     {
-        return JsonSerializer.Deserialize(_commandPayload, _commandMetadata.CommandType)!;
+        Assert.Equal(expectedNumberOfCommands, _commandPayload.Count);
+        return this;
     }
 }

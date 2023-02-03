@@ -14,10 +14,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.Transactions.Aggregations;
+using Domain.Actors;
 using Domain.Transactions.Aggregations;
 using Infrastructure.Transactions.Aggregations;
 using Period = Domain.Transactions.Aggregations.Period;
@@ -27,12 +29,28 @@ namespace IntegrationTests.TestDoubles;
 public class AggregationResultsStub : IAggregationResults
 {
     private readonly List<AggregationResult> _results = new();
+    private readonly Dictionary<ActorNumber, AggregationResult> _resultsForActors = new();
 
     public Task<AggregationResult> GetResultAsync(Guid resultId, string gridArea, Period period)
     {
         return Task.FromResult(_results.First(result =>
             result.Id.Equals(resultId) &&
             result.GridAreaCode.Equals(gridArea, StringComparison.OrdinalIgnoreCase)));
+    }
+
+    public Task<ReadOnlyCollection<ActorNumber>> EnergySuppliersWithHourlyConsumptionResultAsync(Guid resultId, string gridArea)
+    {
+        var actors = _resultsForActors
+            .Where(result => result.Value.GridAreaCode.Equals(gridArea, StringComparison.OrdinalIgnoreCase) && result.Value.Id.Equals(resultId))
+            .Select(result => result.Key)
+            .ToList();
+
+        return Task.FromResult(actors.AsReadOnly());
+    }
+
+    public Task<AggregationResult> HourlyConsumptionForAsync(Guid resultId, string gridArea, ActorNumber energySupplierNumber)
+    {
+        return Task.FromResult(_resultsForActors[energySupplierNumber]);
     }
 
     public void Add(Guid resultId, AggregationResultDto aggregationResultDto)
@@ -53,5 +71,11 @@ public class AggregationResultsStub : IAggregationResults
             aggregationResultDto.Resolution,
             new Period(aggregationResultDto.PeriodStart, aggregationResultDto.PeriodEnd));
         _results.Add(result);
+    }
+
+    public void Add(AggregationResult aggregationResult, ActorNumber targetActorNumber)
+    {
+        ArgumentNullException.ThrowIfNull(aggregationResult);
+        _resultsForActors.Add(targetActorNumber, aggregationResult);
     }
 }
