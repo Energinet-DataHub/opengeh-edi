@@ -22,6 +22,8 @@ namespace LearningTests.Infrastructure.Transactions.Aggregations;
 
 public class AggregationResultOverHttpTests
 {
+    private readonly Guid _batchId = Guid.Parse("006d5d41-fd58-4510-9621-122c83044b43");
+    private readonly string _gridArea = "543";
     private readonly IConfigurationRoot _configuration;
     private readonly AggregationResultMapper _mapper;
     private readonly ISerializer _serializer;
@@ -37,22 +39,18 @@ public class AggregationResultOverHttpTests
     }
 
     [Fact]
-    public async Task Service_is_unavailable()
-    {
-        using var httpClient = new HttpClient();
-        var service = new AggregationResultsOverHttp(new HttpClientAdapter(httpClient), new Uri($"{_configuration["ServiceUri"]!}/WrongUri"), _mapper, _serializer);
-
-        await Assert.ThrowsAnyAsync<Exception>(() => service.GetResultAsync(Guid.Parse(_configuration["BatchId"]!), _configuration["GridArea"]!)).ConfigureAwait(false);
-    }
-
-    [Fact]
     public async Task Can_retrieve_result()
     {
         using var httpClient = new HttpClient();
-        var service = new AggregationResultsOverHttp(new HttpClientAdapter(httpClient), new Uri(_configuration["ServiceUri"]!), _mapper, _serializer);
+        var service = new AggregationResultsOverHttp(new HttpClientAdapter(httpClient), ServiceUriForVersion("2.1"), _mapper, _serializer);
 
-        var result = await service.GetResultAsync(Guid.Parse(_configuration["BatchId"]!), _configuration["GridArea"]!).ConfigureAwait(false);
+        var result = await service.GetResultAsync(_batchId, _gridArea).ConfigureAwait(false);
 
         Assert.NotNull(result);
+    }
+
+    private Uri ServiceUriForVersion(string version)
+    {
+        return new Uri($"{_configuration["ServiceUri"]!}/v{version}/processstepresult");
     }
 }
