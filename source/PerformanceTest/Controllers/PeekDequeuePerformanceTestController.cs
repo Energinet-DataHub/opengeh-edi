@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.ObjectModel;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using PerformanceTest.Actors;
@@ -24,21 +25,28 @@ namespace PerformanceTest.Controllers;
 [Route("api")]
 public class PeekDequeuePerformanceTestController : ControllerBase
 {
-    private const int MoveInsPerActor = 2000;
     private readonly IActorService _actorService;
     private readonly IMoveInService _moveInService;
     private readonly ILogger<PeekDequeuePerformanceTestController> _logger;
+    private readonly bool _runParallel;
+    private readonly int _moveInsPerActor = 2000;
     private bool _isDataBuildInProgress;
 
     public PeekDequeuePerformanceTestController(
         IActorService actorService,
         IMoveInService moveInService,
+        IConfiguration configuration,
         ILogger<PeekDequeuePerformanceTestController> logger)
     {
         ArgumentNullException.ThrowIfNull(logger);
+        ArgumentNullException.ThrowIfNull(configuration);
         _actorService = actorService;
         _moveInService = moveInService;
         _logger = logger;
+        if (bool.TryParse(configuration["RunMoveInParallel"], out var runParallelConfig))
+            _runParallel = runParallelConfig;
+        if (int.TryParse(configuration["MoveInsPerActor"], out var moveInsPerActorConfig))
+            _moveInsPerActor = moveInsPerActorConfig;
     }
 
     [HttpGet("ActorNumber", Name = "ActorNumber")]
@@ -70,13 +78,13 @@ public class PeekDequeuePerformanceTestController : ControllerBase
             var tasks = new List<Task>(_actorService.GetActorCount());
             try
             {
-                int loopCount = 0;
-                for (var j = 0; j < MoveInsPerActor; j++)
+                if (_runParallel)
                 {
-                    _logger.LogWarning($"GenerateTestData loopCount: {++loopCount}");
-                    tasks.Clear();
-                    tasks.AddRange(actors.Select(actorNumber => _moveInService.MoveInAsync(actorNumber)));
-                    await Task.WhenAll(tasks).ConfigureAwait(false);
+                    await RunParallelAsync(tasks, actors).ConfigureAwait(false);
+                }
+                else
+                {
+                    await RunSingleAsync(actors).ConfigureAwait(false);
                 }
             }
             catch (Exception e)
@@ -87,6 +95,29 @@ public class PeekDequeuePerformanceTestController : ControllerBase
 
             _logger.LogWarning("GenerateTestData completed");
             _isDataBuildInProgress = false;
+        }
+    }
+
+    private async Task RunSingleAsync(ReadOnlyCollection<string> actors)
+    {
+        for (var i = 0; i < _moveInsPerActor; i++)
+        {
+            foreach (var actor in actors)
+            {
+                await _moveInService.MoveInAsync(actor).ConfigureAwait(false);
+            }
+        }
+    }
+
+    private async Task RunParallelAsync(List<Task> tasks, ReadOnlyCollection<string> actors)
+    {
+        var loopCount = 0;
+        for (var j = 0; j < _moveInsPerActor; j++)
+        {
+            _logger.LogWarning($"GenerateTestData loopCount: {++loopCount}");
+            tasks.Clear();
+            tasks.AddRange(actors.Select(actorNumber => _moveInService.MoveInAsync(actorNumber)));
+            await Task.WhenAll(tasks).ConfigureAwait(false);
         }
     }
 }
