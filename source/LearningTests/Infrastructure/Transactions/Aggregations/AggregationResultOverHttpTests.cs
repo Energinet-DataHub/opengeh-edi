@@ -25,8 +25,6 @@ public class AggregationResultOverHttpTests : IDisposable
     private readonly Guid _batchId = Guid.Parse("006d5d41-fd58-4510-9621-122c83044b43");
     private readonly string _gridArea = "543";
     private readonly IConfigurationRoot _configuration;
-    private readonly AggregationResultMapper _mapper;
-    private readonly ISerializer _serializer;
     private readonly HttpClient _httpClient;
     private readonly AggregationResultsOverHttp _service;
 
@@ -36,10 +34,9 @@ public class AggregationResultOverHttpTests : IDisposable
             .AddUserSecrets(Assembly.GetExecutingAssembly(), false, false)
             .Build();
 
-        _serializer = new Serializer();
-        _mapper = new AggregationResultMapper(_serializer);
+        ISerializer serializer = new Serializer();
         _httpClient = new HttpClient();
-        _service = new AggregationResultsOverHttp(new HttpClientAdapter(_httpClient), new Uri(_configuration["ServiceUri"]!), _mapper, _serializer);
+        _service = new AggregationResultsOverHttp(new HttpClientAdapter(_httpClient), new Uri(_configuration["ServiceUri"]!), new AggregationResultMapper(serializer), serializer);
     }
 
     ~AggregationResultOverHttpTests()
