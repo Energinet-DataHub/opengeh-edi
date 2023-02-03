@@ -63,19 +63,7 @@ public class AggregationResultsOverHttp : IAggregationResults
 
     public async Task<AggregationResult> GetResultAsync(Guid resultId, string gridArea)
     {
-        var executionPolicy = Policy
-            .Handle<Exception>()
-            .WaitAndRetryAsync(new[]
-            {
-                TimeSpan.FromSeconds(1),
-                TimeSpan.FromSeconds(2),
-                TimeSpan.FromSeconds(3),
-            });
-
-        var response = await executionPolicy.ExecuteAsync(() => _httpClient.PostAsync(
-            ServiceUriFor("2.1"),
-            CreateRequest(resultId, gridArea)))
-            .ConfigureAwait(false);
+        var response = await CallAsync("2.1", new ProcessStepResultRequestDto(resultId, gridArea, ProcessStepType.AggregateProductionPerGridArea)).ConfigureAwait(false);
 
         return await _aggregationResultMapper.MapFromAsync(
             await response.Content.ReadAsStreamAsync().ConfigureAwait(false), resultId, gridArea).ConfigureAwait(false);
@@ -108,22 +96,30 @@ public class AggregationResultsOverHttp : IAggregationResults
         throw new NotImplementedException();
     }
 
-    private StringContent CreateRequest(Guid resultId, string gridArea)
+    private Task<HttpResponseMessage> CallAsync<TRequest>(string apiVersion, TRequest request)
     {
-        var request = new ProcessStepResultRequestDto(resultId, gridArea, ProcessStepType.AggregateProductionPerGridArea);
-        var httpContent =
-            new StringContent(_serializer.Serialize(request), Encoding.UTF8, MediaTypeNames.Application.Json);
-        return httpContent;
-    }
+        var executionPolicy = Policy
+            .Handle<Exception>()
+            .WaitAndRetryAsync(new[]
+            {
+                TimeSpan.FromSeconds(1),
+                TimeSpan.FromSeconds(2),
+                TimeSpan.FromSeconds(3),
+            });
 
-    private StringContent CreateContentFrom<T>(T request)
-    {
-        return new StringContent(_serializer.Serialize(request), Encoding.UTF8, MediaTypeNames.Application.Json);
+        return executionPolicy.ExecuteAsync(() => _httpClient.PostAsync(
+            ServiceUriFor(apiVersion),
+            CreateContentFrom(request)));
     }
 
     private Uri ServiceUriFor(string apiVersion)
     {
         return new Uri(_serviceEndpoint, $"v{apiVersion}/processstepresult");
+    }
+
+    private StringContent CreateContentFrom<T>(T request)
+    {
+        return new StringContent(_serializer.Serialize(request), Encoding.UTF8, MediaTypeNames.Application.Json);
     }
 
     private record ProcessStepResultRequestDto(Guid BatchId, string GridAreaCode, ProcessStepType ProcessStepResult);
