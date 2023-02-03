@@ -13,11 +13,16 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 using Application.Transactions.Aggregations;
+using Domain.Actors;
 using Domain.Transactions.Aggregations;
 using Infrastructure.Configuration.Serialization;
 using Polly;
@@ -39,12 +44,47 @@ public class AggregationResultsOverHttp : IAggregationResults
         _serializer = serializer;
     }
 
-    private enum ProcessStepType
+    public async Task<AggregationResult> GetResultAsync(Guid resultId, string gridArea)
     {
-        AggregateProductionPerGridArea = 25,
+        var response = await CallAsync("2.1", new WholeSaleContracts.ProcessStepResultRequestDto(resultId, gridArea, WholeSaleContracts.ProcessStepType.AggregateProductionPerGridArea)).ConfigureAwait(false);
+
+        return await MapFromAsync(resultId, gridArea, response).ConfigureAwait(false);
     }
 
-    public async Task<AggregationResult> GetResultAsync(Guid resultId, string gridArea)
+    public async Task<ReadOnlyCollection<ActorNumber>> EnergySuppliersWithHourlyConsumptionResultAsync(Guid resultId, string gridArea)
+    {
+        var response = await CallAsync("2.3", new WholeSaleContracts.ProcessStepActorsRequest(
+            resultId,
+            gridArea,
+            WholeSaleContracts.TimeSeriesType.NonProfiledConsumption,
+            WholeSaleContracts.MarketRole.EnergySupplier))
+            .ConfigureAwait(false);
+
+        var actorNumbers = await response.Content.ReadFromJsonAsync<List<WholeSaleContracts.WholesaleActorDto>>().ConfigureAwait(false);
+        return actorNumbers?
+            .Where(actorNumber => !string.IsNullOrEmpty(actorNumber.Gln))
+            .Select(actorNumber => ActorNumber.Create(actorNumber.Gln))
+            .ToList()
+            .AsReadOnly()!;
+    }
+
+    public async Task<AggregationResult> HourlyConsumptionForAsync(Guid resultId, string gridArea, ActorNumber energySupplierNumber)
+    {
+        ArgumentNullException.ThrowIfNull(energySupplierNumber);
+
+        var response = await CallAsync(
+                "2.2",
+                new WholeSaleContracts.ProcessStepResultRequestDtoV2(
+                    resultId,
+                    gridArea,
+                    WholeSaleContracts.TimeSeriesType.NonProfiledConsumption,
+                    energySupplierNumber.Value))
+            .ConfigureAwait(false);
+
+        return await MapFromAsync(resultId, gridArea, response).ConfigureAwait(false);
+    }
+
+    private async Task<HttpResponseMessage> CallAsync<TRequest>(string apiVersion, TRequest request)
     {
         var executionPolicy = Policy
             .Handle<Exception>()
@@ -55,27 +95,28 @@ public class AggregationResultsOverHttp : IAggregationResults
                 TimeSpan.FromSeconds(3),
             });
 
-        var response = await executionPolicy.ExecuteAsync(() => CallApiAsync(resultId, gridArea)).ConfigureAwait(false);
+        var response = await executionPolicy.ExecuteAsync(() => _httpClient.PostAsync(
+            ServiceUriFor(apiVersion),
+            CreateContentFrom(request))).ConfigureAwait(false);
 
-        return await _aggregationResultMapper.MapFromAsync(
-            await response.Content.ReadAsStreamAsync().ConfigureAwait(false), resultId, gridArea).ConfigureAwait(false);
-    }
-
-    private async Task<HttpResponseMessage> CallApiAsync(Guid resultId, string gridArea)
-    {
-        using var httpContent = CreateRequest(resultId, gridArea);
-        var response = await _httpClient.PostAsync(_serviceEndpoint, httpContent).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
+
         return response;
     }
 
-    private StringContent CreateRequest(Guid resultId, string gridArea)
+    private Uri ServiceUriFor(string apiVersion)
     {
-        var request = new ProcessStepResultRequestDto(resultId, gridArea, ProcessStepType.AggregateProductionPerGridArea);
-        var httpContent =
-            new StringContent(_serializer.Serialize(request), Encoding.UTF8, MediaTypeNames.Application.Json);
-        return httpContent;
+        return new Uri(_serviceEndpoint, $"v{apiVersion}/processstepresult");
     }
 
-    private record ProcessStepResultRequestDto(Guid BatchId, string GridAreaCode, ProcessStepType ProcessStepResult);
+    private StringContent CreateContentFrom<T>(T request)
+    {
+        return new StringContent(_serializer.Serialize(request), Encoding.UTF8, MediaTypeNames.Application.Json);
+    }
+
+    private async Task<AggregationResult> MapFromAsync(Guid resultId, string gridArea, HttpResponseMessage response)
+    {
+        return await _aggregationResultMapper.MapFromAsync(
+            await response.Content.ReadAsStreamAsync().ConfigureAwait(false), resultId, gridArea).ConfigureAwait(false);
+    }
 }
