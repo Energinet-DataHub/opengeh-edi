@@ -44,26 +44,9 @@ public class AggregationResultsOverHttp : IAggregationResults
         _serializer = serializer;
     }
 
-    private enum ProcessStepType
-    {
-        AggregateProductionPerGridArea = 25,
-    }
-
-    private enum TimeSeriesType
-    {
-        NonProfiledConsumption = 1,
-        FlexConsumption = 2,
-        Production = 3,
-    }
-
-    private enum MarketRole
-    {
-        EnergySupplier = 0,
-    }
-
     public async Task<AggregationResult> GetResultAsync(Guid resultId, string gridArea)
     {
-        var response = await CallAsync("2.1", new ProcessStepResultRequestDto(resultId, gridArea, ProcessStepType.AggregateProductionPerGridArea)).ConfigureAwait(false);
+        var response = await CallAsync("2.1", new WholeSaleContracts.ProcessStepResultRequestDto(resultId, gridArea, WholeSaleContracts.ProcessStepType.AggregateProductionPerGridArea)).ConfigureAwait(false);
 
         return await _aggregationResultMapper.MapFromAsync(
             await response.Content.ReadAsStreamAsync().ConfigureAwait(false), resultId, gridArea).ConfigureAwait(false);
@@ -71,15 +54,15 @@ public class AggregationResultsOverHttp : IAggregationResults
 
     public async Task<ReadOnlyCollection<ActorNumber>> EnergySuppliersWithHourlyConsumptionResultAsync(Guid resultId, string gridArea)
     {
-        var response = await CallAsync("2.3", new ProcessStepActorsRequest(
+        var response = await CallAsync("2.3", new WholeSaleContracts.ProcessStepActorsRequest(
             resultId,
             gridArea,
-            TimeSeriesType.NonProfiledConsumption,
-            MarketRole.EnergySupplier))
+            WholeSaleContracts.TimeSeriesType.NonProfiledConsumption,
+            WholeSaleContracts.MarketRole.EnergySupplier))
             .ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
 
-        var actorNumbers = await response.Content.ReadFromJsonAsync<List<WholesaleActorDto>>().ConfigureAwait(false);
+        var actorNumbers = await response.Content.ReadFromJsonAsync<List<WholeSaleContracts.WholesaleActorDto>>().ConfigureAwait(false);
         return actorNumbers?
             .Where(actorNumber => !string.IsNullOrEmpty(actorNumber.Gln))
             .Select(actorNumber => ActorNumber.Create(actorNumber.Gln))
@@ -117,10 +100,4 @@ public class AggregationResultsOverHttp : IAggregationResults
     {
         return new StringContent(_serializer.Serialize(request), Encoding.UTF8, MediaTypeNames.Application.Json);
     }
-
-    private record ProcessStepResultRequestDto(Guid BatchId, string GridAreaCode, ProcessStepType ProcessStepResult);
-
-    private record ProcessStepActorsRequest(Guid BatchId, string GridAreaCode, TimeSeriesType Type, MarketRole MarketRole);
-
-    private record WholesaleActorDto(string Gln);
 }
