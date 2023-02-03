@@ -78,14 +78,6 @@ public class AggregationResultsOverHttp : IAggregationResults
         throw new NotImplementedException();
     }
 
-    private async Task<HttpResponseMessage> CallApiAsync(Guid resultId, string gridArea)
-    {
-        using var httpContent = CreateRequest(resultId, gridArea);
-        var response = await _httpClient.PostAsync(_serviceEndpoint, httpContent).ConfigureAwait(false);
-        response.EnsureSuccessStatusCode();
-        return response;
-    }
-
     private StringContent CreateRequest(Guid resultId, string gridArea)
     {
         var request = new ProcessStepResultRequestDto(resultId, gridArea, ProcessStepType.AggregateProductionPerGridArea);
