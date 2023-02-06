@@ -12,44 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: CI
+name: CI dotnet
 
 on:
-  pull_request:
-    branches:
-      - main
+  workflow_call: {}
 
 jobs:
-  #
-  # License and Markdown Check
-  #
-
-  ci_base:
-    uses: Energinet-DataHub/.github/.github/workflows/ci-base.yml@v10
-
-  #
-  # Detect changes to start relevant jobs
-  #
-
-  changes:
-    uses: ./.github/workflows/detect-changes.yml
-
-  #
-  # CI .NET
-  #
-
   # Build all projects within solution
   dotnet_ci_build:
-    needs: changes
-    if: ${{ needs.changes.outputs.dotnet == 'true' }}
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@v10
     with:
       SOLUTION_FILE_PATH: 'source/EDI.sln'
 
   # Run all tests in 'IntegrationTests.dll'
   integration_tests:
-    needs: changes
-    if: ${{ needs.changes.outputs.dotnet == 'true' }}
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v10
     with:
       TESTS_DLL_FILE_PATH: '\source\IntegrationTests\bin\Release\net6.0\IntegrationTests.dll'
@@ -57,8 +33,6 @@ jobs:
 
   # Run all tests in 'ArchitectureTests.dll'
   architecture_tests:
-    needs: changes
-    if: ${{ needs.changes.outputs.dotnet == 'true' }}
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v10
     with:
       TESTS_DLL_FILE_PATH: '\source\ArchitectureTests\bin\Release\net6.0\ArchitectureTests.dll'
@@ -66,8 +40,6 @@ jobs:
 
   # Run all tests in 'Tests.dll'
   tests:
-    needs: changes
-    if: ${{ needs.changes.outputs.dotnet == 'true' }}
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v10
     with:
       TESTS_DLL_FILE_PATH: '\source\Tests\bin\Release\net6.0\Tests.dll'
@@ -80,8 +52,6 @@ jobs:
   allow_merge:
     runs-on: ubuntu-latest
     needs: [
-      ci_base,
-      # .NET
       dotnet_ci_build,
       integration_tests,
       architecture_tests,
