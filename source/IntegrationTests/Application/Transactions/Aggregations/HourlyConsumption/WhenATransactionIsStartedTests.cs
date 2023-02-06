@@ -21,6 +21,7 @@ using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions.Aggregations;
+using IntegrationTests.Assertions;
 using IntegrationTests.Fixtures;
 using IntegrationTests.TestDoubles;
 using Xunit;
@@ -56,6 +57,25 @@ public class WhenATransactionIsStartedTests : TestBase
         Assert.Equal(SampleData.EnergySupplierNumber.Value, transaction.ReceivingActor);
         Assert.Equal(MarketRole.EnergySupplier.Name, transaction.ReceivingActorRole);
         Assert.Equal(ProcessType.BalanceFixing.Name, transaction.ProcessType);
+    }
+
+    [Fact]
+    public async Task Aggregation_result_is_sent_to_energy_suppliers()
+    {
+        MakeAggregationResultAvailableFor(SampleData.EnergySupplierNumber);
+
+        var startTransaction = new StartTransaction(
+            SampleData.ResultId,
+            SampleData.GridAreaCode,
+            SampleData.EnergySupplierNumber.Value,
+            new Period(SampleData.StartOfPeriod, SampleData.EndOfPeriod));
+        await InvokeCommandAsync(startTransaction).ConfigureAwait(false);
+
+        var outgoingMessage = await AssertOutgoingMessage.OutgoingMessageAsync(
+            MessageType.NotifyAggregatedMeasureData.Name,
+            ProcessType.BalanceFixing.Code,
+            MarketRole.EnergySupplier,
+            GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
     }
 
     private void MakeAggregationResultAvailableFor(ActorNumber energySupplierNumber)
