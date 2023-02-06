@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 
 namespace Domain.Transactions.Aggregations;
 
 public class AggregationResult
 {
-    public AggregationResult(Guid id, IReadOnlyList<Point> points, string gridAreaCode, string meteringPointType, string measureUnitType, string resolution, Period period)
+    public AggregationResult(Guid id, IReadOnlyList<Point> points, string gridAreaCode, MeteringPointType meteringPointType, string measureUnitType, string resolution, Period period)
     {
         Id = id;
         Points = points;
@@ -35,7 +36,7 @@ public class AggregationResult
 
     public string GridAreaCode { get; }
 
-    public string MeteringPointType { get; }
+    public MeteringPointType MeteringPointType { get; }
 
     public string MeasureUnitType { get; }
 

@@ -20,6 +20,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Application.Transactions.Aggregations;
 using Domain.Actors;
+using Domain.OutgoingMessages;
+using Domain.SeedWork;
 using Domain.Transactions.Aggregations;
 using Infrastructure.Transactions.Aggregations;
 using Period = Domain.Transactions.Aggregations.Period;
@@ -66,7 +68,7 @@ public class AggregationResultsStub : IAggregationResults
             resultId,
             points.ToList(),
             aggregationResultDto.GridAreaCode,
-            aggregationResultDto.MeteringPointType,
+            EnumerationType.FromName<MeteringPointType>(aggregationResultDto.MeteringPointType),
             aggregationResultDto.MeasureUnitType,
             aggregationResultDto.Resolution,
             new Period(aggregationResultDto.PeriodStart, aggregationResultDto.PeriodEnd));

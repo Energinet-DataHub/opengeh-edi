@@ -18,6 +18,7 @@ using Application.Configuration.DataAccess;
 using Application.Transactions.Aggregations;
 using Application.Transactions.Aggregations.HourlyConsumption;
 using Domain.Actors;
+using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions.Aggregations;
 using Energinet.DataHub.Wholesale.Contracts.Events;
@@ -84,7 +85,7 @@ public class WhenBalanceFixingIsCompletedTests : TestBase
                     "2022-10-31T21:15:00.000Z"),
             },
             SampleData.GridAreaCode,
-            SampleData.MeteringPointType,
+            MeteringPointType.Production,
             SampleData.MeasureUnitType,
             SampleData.Resolution,
             new Domain.Transactions.Aggregations.Period(SampleData.StartOfPeriod, SampleData.EndOfPeriod));
