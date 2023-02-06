@@ -20,14 +20,12 @@ on:
 jobs:
   # Build all projects within solution
   dotnet_ci_build:
-    if: ${{ needs.changes.outputs.dotnet == 'true' }}
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@v10
     with:
       SOLUTION_FILE_PATH: 'source/EDI.sln'
 
   # Run all tests in 'IntegrationTests.dll'
   integration_tests:
-    if: ${{ needs.changes.outputs.dotnet == 'true' }}
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v10
     with:
       TESTS_DLL_FILE_PATH: '\source\IntegrationTests\bin\Release\net6.0\IntegrationTests.dll'
@@ -35,7 +33,6 @@ jobs:
 
   # Run all tests in 'ArchitectureTests.dll'
   architecture_tests:
-    if: ${{ needs.changes.outputs.dotnet == 'true' }}
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v10
     with:
       TESTS_DLL_FILE_PATH: '\source\ArchitectureTests\bin\Release\net6.0\ArchitectureTests.dll'
@@ -43,7 +40,6 @@ jobs:
 
   # Run all tests in 'Tests.dll'
   tests:
-    if: ${{ needs.changes.outputs.dotnet == 'true' }}
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v10
     with:
       TESTS_DLL_FILE_PATH: '\source\Tests\bin\Release\net6.0\Tests.dll'
