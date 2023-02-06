@@ -17,7 +17,7 @@ name: Detect changes
 # DESCRIPTION:
 # This workflow will determine which categories of jobs should be executed,
 # based on detected changes.
-# It should be used by the 'ci.yml' and 'cd.yml' to ensure they both use
+# It should be used by the 'ci-orchestrator.yml' and 'cd.yml' to ensure they both use
 # the same path's to detect changes.
 
 on:
@@ -46,7 +46,7 @@ jobs:
         filters: |
           dotnet:
             - '.github/workflows/cd.yml'
-            - '.github/workflows/ci.yml'
+            - '.github/workflows/ci-dotnet.yml'
             - '.github/workflows/detect-changes.yml'
             - '.github/actions/dotnet-*/**'
             - 'source/!((IntegrationEvents|RequestResponse)/**)/**'
