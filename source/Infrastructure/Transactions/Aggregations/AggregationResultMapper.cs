@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions.Aggregations;
 using Infrastructure.Configuration.Serialization;
@@ -43,7 +44,7 @@ public class AggregationResultMapper
             resultId,
             ExtractPoints(resultDto!.TimeSeriesPoints),
             gridArea,
-            "E18",
+            ParseMeteringPointType(resultDto.ProcessStepMeteringPointType),
             "KWH",
             "PT1H",
             period);
@@ -58,6 +59,15 @@ public class AggregationResultMapper
         }
 
         return points.AsReadOnly();
+    }
+
+    private static MeteringPointType ParseMeteringPointType(ProcessStepMeteringPointType type)
+    {
+        return type switch
+        {
+            ProcessStepMeteringPointType.Production => MeteringPointType.Production,
+            _ => MeteringPointType.Consumption,
+        };
     }
 
     private record ProcessStepResultDto(

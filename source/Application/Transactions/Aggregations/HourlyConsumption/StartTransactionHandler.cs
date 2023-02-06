@@ -53,6 +53,8 @@ public class StartTransactionHandler : IRequestHandler<StartTransaction>
             MarketRole.EnergySupplier,
             ProcessType.BalanceFixing);
 
+        transaction.SendResult(aggregationResult);
+
         _repository.Add(transaction);
 
         return Unit.Value;
