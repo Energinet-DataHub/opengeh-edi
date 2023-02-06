@@ -21,6 +21,7 @@ using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions.Aggregations;
+using Energinet.DataHub.MeteringPoints.IntegrationEvents.CreateMeteringPoint;
 using IntegrationTests.Assertions;
 using IntegrationTests.Fixtures;
 using IntegrationTests.TestDoubles;
@@ -83,7 +84,8 @@ public class WhenATransactionIsStartedTests : TestBase
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasMessageRecordValue<TimeSeries>(timeSeries => timeSeries.Period.Start, SampleData.StartOfPeriod)
             .HasMessageRecordValue<TimeSeries>(timeSeries => timeSeries.Period.End, SampleData.EndOfPeriod)
-            .HasMessageRecordValue<TimeSeries>(timeSeries => timeSeries.GridAreaCode, SampleData.GridAreaCode);
+            .HasMessageRecordValue<TimeSeries>(timeSeries => timeSeries.GridAreaCode, SampleData.GridAreaCode)
+            .HasMessageRecordValue<TimeSeries>(timeSeries => timeSeries.MeteringPointType, MeteringPointType.Consumption.Code);
     }
 
     private void MakeAggregationResultAvailableFor(ActorNumber energySupplierNumber)
@@ -99,7 +101,7 @@ public class WhenATransactionIsStartedTests : TestBase
                     "2022-10-31T21:15:00.000Z"),
             },
             SampleData.GridAreaCode,
-            SampleData.MeteringPointType,
+            MeteringPointType.Consumption.Code,
             SampleData.MeasureUnitType,
             SampleData.Resolution,
             new Domain.Transactions.Aggregations.Period(SampleData.StartOfPeriod, SampleData.EndOfPeriod));
