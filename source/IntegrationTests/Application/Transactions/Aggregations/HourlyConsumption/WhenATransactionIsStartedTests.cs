@@ -80,7 +80,9 @@ public class WhenATransactionIsStartedTests : TestBase
             .HasReceiverId(SampleData.EnergySupplierNumber.Value)
             .HasReceiverRole(MarketRole.EnergySupplier.Name)
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
-            .HasSenderRole(MarketRole.MeteringDataAdministrator.Name);
+            .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
+            .HasMessageRecordValue<TimeSeries>(timeSeries => timeSeries.Period.Start, SampleData.StartOfPeriod)
+            .HasMessageRecordValue<TimeSeries>(timeSeries => timeSeries.Period.End, SampleData.EndOfPeriod);
     }
 
     private void MakeAggregationResultAvailableFor(ActorNumber energySupplierNumber)
