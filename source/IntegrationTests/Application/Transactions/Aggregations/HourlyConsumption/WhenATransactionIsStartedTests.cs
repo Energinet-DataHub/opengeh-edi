@@ -76,7 +76,10 @@ public class WhenATransactionIsStartedTests : TestBase
             ProcessType.BalanceFixing.Code,
             MarketRole.EnergySupplier,
             GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
-        outgoingMessage.HasReceiverId(SampleData.EnergySupplierNumber.Value);
+        outgoingMessage
+            .HasReceiverId(SampleData.EnergySupplierNumber.Value)
+            .HasReceiverRole(MarketRole.EnergySupplier.Name)
+            .HasSenderId(DataHubDetails.IdentificationNumber.Value);
     }
 
     private void MakeAggregationResultAvailableFor(ActorNumber energySupplierNumber)
