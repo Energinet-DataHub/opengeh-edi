@@ -22,6 +22,7 @@ using Application.OutgoingMessages.Common;
 using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Domain.SeedWork;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.IncomingMessages.SchemaStore;
 using Infrastructure.OutgoingMessages.Common;
@@ -65,7 +66,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             new(
                 Guid.NewGuid(),
                 "870",
-                "E18",
+                MeteringPointType.Production.Name,
                 "KWH",
                 "PT1H",
                 new Period(InstantPattern.General.Parse("2022-02-12T23:00:00Z").Value, InstantPattern.General.Parse("2022-02-13T23:00:00Z").Value),
@@ -93,7 +94,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             .HasValue("createdDateTime", header.TimeStamp.ToString())
             .HasValue("Series[1]/mRID", timeSeries[0].TransactionId.ToString())
             .HasValue("Series[1]/meteringGridArea_Domain.mRID", timeSeries[0].GridAreaCode)
-            .HasValue("Series[1]/marketEvaluationPoint.type", timeSeries[0].MeteringPointType)
+            .HasValue("Series[1]/marketEvaluationPoint.type",  EnumerationType.FromName<MeteringPointType>(timeSeries[0].MeteringPointType).Code)
             .HasValue("Series[1]/product", "8716867000030")
             .HasValue("Series[1]/quantity_Measure_Unit.name", timeSeries[0].MeasureUnitType)
             .HasValue("Series[1]/Period/resolution", timeSeries[0].Resolution)

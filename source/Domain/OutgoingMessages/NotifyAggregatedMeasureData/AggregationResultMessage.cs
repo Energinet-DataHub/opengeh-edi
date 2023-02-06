@@ -49,7 +49,7 @@ public class AggregationResultMessage : OutgoingMessage
         var series = new TimeSeries(
             transactionId.Id,
             result.GridAreaCode,
-            result.MeteringPointType,
+            result.MeteringPointType.Name,
             result.MeasureUnitType,
             result.Resolution,
             result.Period,

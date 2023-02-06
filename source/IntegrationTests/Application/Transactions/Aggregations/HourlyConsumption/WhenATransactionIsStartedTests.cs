@@ -85,7 +85,7 @@ public class WhenATransactionIsStartedTests : TestBase
             .HasMessageRecordValue<TimeSeries>(timeSeries => timeSeries.Period.Start, SampleData.StartOfPeriod)
             .HasMessageRecordValue<TimeSeries>(timeSeries => timeSeries.Period.End, SampleData.EndOfPeriod)
             .HasMessageRecordValue<TimeSeries>(timeSeries => timeSeries.GridAreaCode, SampleData.GridAreaCode)
-            .HasMessageRecordValue<TimeSeries>(timeSeries => timeSeries.MeteringPointType, MeteringPointType.Consumption.Code);
+            .HasMessageRecordValue<TimeSeries>(timeSeries => timeSeries.MeteringPointType, MeteringPointType.Consumption.Name);
     }
 
     private void MakeAggregationResultAvailableFor(ActorNumber energySupplierNumber)
@@ -101,7 +101,7 @@ public class WhenATransactionIsStartedTests : TestBase
                     "2022-10-31T21:15:00.000Z"),
             },
             SampleData.GridAreaCode,
-            MeteringPointType.Consumption.Code,
+            MeteringPointType.Consumption,
             SampleData.MeasureUnitType,
             SampleData.Resolution,
             new Domain.Transactions.Aggregations.Period(SampleData.StartOfPeriod, SampleData.EndOfPeriod));

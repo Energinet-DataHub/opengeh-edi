@@ -19,6 +19,7 @@ namespace Domain.OutgoingMessages;
 public class MeteringPointType : EnumerationType
 {
     public static readonly MeteringPointType Consumption = new(0, nameof(Consumption), "E17");
+    public static readonly MeteringPointType Production = new(1, nameof(Consumption), "E18");
 
     private MeteringPointType(int id, string name, string code)
         : base(id, name)
