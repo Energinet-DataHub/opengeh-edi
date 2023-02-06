@@ -79,7 +79,8 @@ public class WhenATransactionIsStartedTests : TestBase
         outgoingMessage
             .HasReceiverId(SampleData.EnergySupplierNumber.Value)
             .HasReceiverRole(MarketRole.EnergySupplier.Name)
-            .HasSenderId(DataHubDetails.IdentificationNumber.Value);
+            .HasSenderId(DataHubDetails.IdentificationNumber.Value)
+            .HasSenderRole(MarketRole.MeteringDataAdministrator.Name);
     }
 
     private void MakeAggregationResultAvailableFor(ActorNumber energySupplierNumber)
