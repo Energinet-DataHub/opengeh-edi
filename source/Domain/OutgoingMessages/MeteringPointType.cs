@@ -28,4 +28,19 @@ public class MeteringPointType : EnumerationType
     }
 
     public string Code { get; }
+
+    public static string ToCode(string valueToParse)
+    {
+        var code = GetAll<MeteringPointType>().Where(
+            type =>
+                type.Name.Equals(valueToParse, StringComparison.OrdinalIgnoreCase) ||
+                type.Code.Equals(valueToParse, StringComparison.OrdinalIgnoreCase))
+            .Select(type => type.Code)
+            .FirstOrDefault();
+
+        if (string.IsNullOrEmpty(code))
+            throw new InvalidCastException($"Could not parse {valueToParse} to metering point type");
+
+        return code;
+    }
 }
