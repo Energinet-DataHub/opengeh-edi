@@ -54,7 +54,7 @@ public class NotifyAggregatedMeasureDataMessageWriter : MessageWriter
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Series", null).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, timeSeries.TransactionId.ToString()).ConfigureAwait(false);
 
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "marketEvaluationPoint.type", null,  EnumerationType.FromName<MeteringPointType>(timeSeries.MeteringPointType).Code).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "marketEvaluationPoint.type", null,  MeteringPointType.ToCode(timeSeries.MeteringPointType)).ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "meteringGridArea_Domain.mRID", null).ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "codingScheme", null, "NDK").ConfigureAwait(false);
