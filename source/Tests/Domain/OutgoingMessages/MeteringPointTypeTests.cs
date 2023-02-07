@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Domain.OutgoingMessages;
 using Xunit;
 
@@ -25,5 +26,11 @@ public class MeteringPointTypeTests
     public void Parse_metering_point_type_code(string valueToParse, string expectedCode)
     {
         Assert.Equal(expectedCode, MeteringPointType.ToCode(valueToParse));
+    }
+
+    [Fact]
+    public void Value_cannot_be_parsed()
+    {
+        Assert.Throws<InvalidCastException>(() => MeteringPointType.ToCode("some invalid value"));
     }
 }

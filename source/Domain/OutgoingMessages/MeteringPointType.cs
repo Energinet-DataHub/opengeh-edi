@@ -39,7 +39,7 @@ public class MeteringPointType : EnumerationType
             .FirstOrDefault();
 
         if (string.IsNullOrEmpty(code))
-            throw new InvalidOperationException($"Could not parse {valueToParse} to metering point type");
+            throw new InvalidCastException($"Could not parse {valueToParse} to metering point type");
 
         return code;
     }
