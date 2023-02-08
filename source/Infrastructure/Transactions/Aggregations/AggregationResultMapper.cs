@@ -37,7 +37,7 @@ public class AggregationResultMapper
         Production = 0,
     }
 
-    public async Task<AggregationResult> MapFromAsync(Stream payload, Guid resultId, string gridArea, Period period)
+    public async Task<AggregationResult> MapProductionResultAsync(Stream payload, Guid resultId, string gridArea, Period period)
     {
         var resultDto = (ProcessStepResultDto)await _serializer.DeserializeAsync(payload, typeof(ProcessStepResultDto)).ConfigureAwait(false);
         return AggregationResult.Production(

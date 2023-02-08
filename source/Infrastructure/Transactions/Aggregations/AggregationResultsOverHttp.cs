@@ -117,7 +117,7 @@ public class AggregationResultsOverHttp : IAggregationResults
 
     private async Task<AggregationResult> MapFromAsync(Guid resultId, string gridArea, Domain.Transactions.Aggregations.Period period, HttpResponseMessage response)
     {
-        return await _aggregationResultMapper.MapFromAsync(
+        return await _aggregationResultMapper.MapProductionResultAsync(
             await response.Content.ReadAsStreamAsync().ConfigureAwait(false), resultId, gridArea, period).ConfigureAwait(false);
     }
 }
