@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using NodaTime;
 using Xunit;
@@ -30,7 +31,7 @@ public class AggregationResultTests
     {
         var result = AggregationResult.Consumption(
             Guid.NewGuid(),
-            "543",
+            GridArea.Create("543"),
             SettlementType.NonProfiled,
             "KWH",
             "PTH1",
@@ -46,7 +47,7 @@ public class AggregationResultTests
     {
         var result = AggregationResult.Production(
             Guid.NewGuid(),
-            "543",
+            GridArea.Create("543"),
             "KWH",
             "PTH1",
             new Period(SystemClock.Instance.GetCurrentInstant(), SystemClock.Instance.GetCurrentInstant()),

@@ -20,6 +20,7 @@ using Application.Transactions.Aggregations.HourlyConsumption;
 using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf.WellKnownTypes;
@@ -76,7 +77,7 @@ public class WhenBalanceFixingIsCompletedTests : TestBase
     {
         var result = AggregationResult.Consumption(
             SampleData.ResultId,
-            SampleData.GridAreaCode,
+            GridArea.Create(SampleData.GridAreaCode),
             SettlementType.NonProfiled,
             SampleData.MeasureUnitType,
             SampleData.Resolution,
