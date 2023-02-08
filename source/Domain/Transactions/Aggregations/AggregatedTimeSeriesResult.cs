@@ -30,6 +30,18 @@ public class AggregationResult
         Period = period;
     }
 
+    public AggregationResult(Guid id, IReadOnlyList<Point> points, string gridAreaCode, MeteringPointType meteringPointType, string measureUnitType, string resolution, Period period, SettlementType settlementType)
+    {
+        Id = id;
+        Points = points;
+        GridAreaCode = gridAreaCode;
+        MeteringPointType = meteringPointType;
+        MeasureUnitType = measureUnitType;
+        Resolution = resolution;
+        Period = period;
+        SettlementType = settlementType;
+    }
+
     public Guid Id { get; }
 
     public IReadOnlyList<Point> Points { get; }
@@ -43,4 +55,26 @@ public class AggregationResult
     public string Resolution { get; }
 
     public Period Period { get; }
+
+    public SettlementType? SettlementType { get; }
+
+    public static AggregationResult Consumption(
+        Guid id,
+        string gridAreaCode,
+        SettlementType settlementType,
+        string measureUnitType,
+        string resolution,
+        Period period,
+        IReadOnlyList<Point> points)
+    {
+        return new AggregationResult(
+            id,
+            points,
+            gridAreaCode,
+            MeteringPointType.Consumption,
+            measureUnitType,
+            resolution,
+            period,
+            settlementType);
+    }
 }
