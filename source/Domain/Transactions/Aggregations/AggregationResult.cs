@@ -19,7 +19,7 @@ namespace Domain.Transactions.Aggregations;
 
 public class AggregationResult
 {
-    public AggregationResult(Guid id, IReadOnlyList<Point> points, string gridAreaCode, MeteringPointType meteringPointType, string measureUnitType, string resolution, Period period)
+    private AggregationResult(Guid id, IReadOnlyList<Point> points, string gridAreaCode, MeteringPointType meteringPointType, string measureUnitType, string resolution, Period period)
     {
         Id = id;
         Points = points;
