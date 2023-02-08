@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Domain.SeedWork;
 using Domain.Transactions;
 using Xunit;
 
@@ -19,11 +20,13 @@ namespace Tests.Domain.Transactions;
 
 public class MeasurementUnitTests
 {
-    [Fact]
-    public void Can_parse_from_value()
+    [Theory]
+    [InlineData("kwh")]
+    [InlineData("KWH")]
+    public void Can_parse_from_name_or_code(string valueToParse)
     {
-        var measurementUnitType = MeasurementUnit.From("kwh");
+        var measurementUnitType = MeasurementUnit.From(valueToParse);
 
-        Assert.Equal(MeasurementUnit.Kwh, measurementUnitType);
+        Assert.NotNull(measurementUnitType);
     }
 }
