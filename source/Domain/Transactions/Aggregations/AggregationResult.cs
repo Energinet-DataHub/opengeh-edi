@@ -30,7 +30,7 @@ public class AggregationResult
         Period = period;
     }
 
-    public AggregationResult(Guid id, IReadOnlyList<Point> points, string gridAreaCode, MeteringPointType meteringPointType, string measureUnitType, string resolution, Period period, SettlementType settlementType)
+    private AggregationResult(Guid id, IReadOnlyList<Point> points, string gridAreaCode, MeteringPointType meteringPointType, string measureUnitType, string resolution, Period period, SettlementType settlementType)
     {
         Id = id;
         Points = points;
