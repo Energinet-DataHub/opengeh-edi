@@ -26,7 +26,7 @@ namespace Tests.Domain.Transactions.Aggregations;
 public class AggregationResultTests
 {
     [Fact]
-    public void Create_a_consumption_result()
+    public void Create_a_result_for_consumption()
     {
         var result = AggregationResult.Consumption(
             Guid.NewGuid(),
