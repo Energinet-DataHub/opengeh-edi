@@ -33,7 +33,7 @@ public class AggregationResultsStub : IAggregationResults
     private readonly List<AggregationResult> _results = new();
     private readonly Dictionary<ActorNumber, AggregationResult> _resultsForActors = new();
 
-    public Task<AggregationResult> GetResultAsync(Guid resultId, string gridArea, Domain.Transactions.Aggregations.Period period)
+    public Task<AggregationResult> ProductionResultForAsync(Guid resultId, string gridArea, Domain.Transactions.Aggregations.Period period)
     {
         return Task.FromResult(_results.First(result =>
             result.Id.Equals(resultId) &&

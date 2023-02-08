@@ -31,7 +31,7 @@ public interface IAggregationResults
     /// <param name="resultId"></param>
     /// <param name="gridArea"></param>
     /// <param name="period"></param>
-    Task<AggregationResult> GetResultAsync(Guid resultId, string gridArea, Domain.Transactions.Aggregations.Period period);
+    Task<AggregationResult> ProductionResultForAsync(Guid resultId, string gridArea, Domain.Transactions.Aggregations.Period period);
 
     /// <summary>
     /// Fetch a list of energy supplier numbers for which an aggregation result of hourly consumption is available
