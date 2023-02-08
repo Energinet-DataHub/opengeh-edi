@@ -74,8 +74,13 @@ public class WhenBalanceFixingIsCompletedTests : TestBase
 
     private void MakeAggregationResultAvailableFor(ActorNumber energySupplierNumber)
     {
-        var result = new AggregationResult(
+        var result = AggregationResult.Consumption(
             SampleData.ResultId,
+            SampleData.GridAreaCode,
+            SettlementType.NonProfiled,
+            SampleData.MeasureUnitType,
+            SampleData.Resolution,
+            new Domain.Transactions.Aggregations.Period(SampleData.StartOfPeriod, SampleData.EndOfPeriod),
             new List<Point>()
             {
                 new(
@@ -83,12 +88,7 @@ public class WhenBalanceFixingIsCompletedTests : TestBase
                     1.1m,
                     "A02",
                     "2022-10-31T21:15:00.000Z"),
-            },
-            SampleData.GridAreaCode,
-            MeteringPointType.Production,
-            SampleData.MeasureUnitType,
-            SampleData.Resolution,
-            new Domain.Transactions.Aggregations.Period(SampleData.StartOfPeriod, SampleData.EndOfPeriod));
+            });
 
         var results = GetService<IAggregationResults>() as AggregationResultsStub;
 
