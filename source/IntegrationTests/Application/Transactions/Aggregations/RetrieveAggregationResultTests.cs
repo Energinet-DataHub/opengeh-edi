@@ -77,7 +77,7 @@ public class RetrieveAggregationResultTests : TestBase
             SampleData.ResultId,
             GridArea.Create(SampleData.GridAreaCode),
             MeasurementUnit.From(SampleData.MeasureUnitType),
-            SampleData.Resolution,
+            Resolution.From(SampleData.Resolution),
             new Domain.Transactions.Aggregations.Period(
                 SampleData.StartOfPeriod,
                 SampleData.EndOfPeriod),

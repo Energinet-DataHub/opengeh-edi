@@ -19,7 +19,7 @@ namespace Domain.Transactions.Aggregations;
 
 public class AggregationResult
 {
-    private AggregationResult(Guid id, IReadOnlyList<Point> points, GridArea gridArea, MeteringPointType meteringPointType, MeasurementUnit measureUnitType, string resolution, Period period)
+    private AggregationResult(Guid id, IReadOnlyList<Point> points, GridArea gridArea, MeteringPointType meteringPointType, MeasurementUnit measureUnitType, Resolution resolution, Period period)
     {
         Id = id;
         Points = points;
@@ -30,7 +30,7 @@ public class AggregationResult
         Period = period;
     }
 
-    private AggregationResult(Guid id, IReadOnlyList<Point> points, GridArea gridArea, MeteringPointType meteringPointType, MeasurementUnit measureUnitType, string resolution, Period period, SettlementType settlementType)
+    private AggregationResult(Guid id, IReadOnlyList<Point> points, GridArea gridArea, MeteringPointType meteringPointType, MeasurementUnit measureUnitType, Resolution resolution, Period period, SettlementType settlementType)
     {
         Id = id;
         Points = points;
@@ -52,7 +52,7 @@ public class AggregationResult
 
     public MeasurementUnit MeasureUnitType { get; }
 
-    public string Resolution { get; }
+    public Resolution Resolution { get; }
 
     public Period Period { get; }
 
@@ -63,7 +63,7 @@ public class AggregationResult
         GridArea gridAreaCode,
         SettlementType settlementType,
         MeasurementUnit measureUnitType,
-        string resolution,
+        Resolution resolution,
         Period period,
         IReadOnlyList<Point> points)
     {
@@ -82,7 +82,7 @@ public class AggregationResult
         Guid id,
         GridArea gridAreaCode,
         MeasurementUnit measurementUnitType,
-        string resolution,
+        Resolution resolution,
         Period period,
         IReadOnlyList<Point> points)
     {
