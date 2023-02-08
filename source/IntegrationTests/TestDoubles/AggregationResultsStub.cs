@@ -50,7 +50,7 @@ public class AggregationResultsStub : IAggregationResults
         return Task.FromResult(actors.AsReadOnly());
     }
 
-    public Task<AggregationResult> HourlyConsumptionForAsync(Guid resultId, string gridArea, ActorNumber energySupplierNumber, Domain.Transactions.Aggregations.Period period)
+    public Task<AggregationResult> NonProfiledConsumptionForAsync(Guid resultId, string gridArea, ActorNumber energySupplierNumber, Domain.Transactions.Aggregations.Period period)
     {
         return Task.FromResult(_resultsForActors[energySupplierNumber]);
     }

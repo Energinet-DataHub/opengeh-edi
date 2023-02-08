@@ -68,7 +68,7 @@ public class AggregationResultsOverHttp : IAggregationResults
             .AsReadOnly()!;
     }
 
-    public async Task<AggregationResult> HourlyConsumptionForAsync(Guid resultId, string gridArea, ActorNumber energySupplierNumber, Domain.Transactions.Aggregations.Period period)
+    public async Task<AggregationResult> NonProfiledConsumptionForAsync(Guid resultId, string gridArea, ActorNumber energySupplierNumber, Domain.Transactions.Aggregations.Period period)
     {
         ArgumentNullException.ThrowIfNull(energySupplierNumber);
 
