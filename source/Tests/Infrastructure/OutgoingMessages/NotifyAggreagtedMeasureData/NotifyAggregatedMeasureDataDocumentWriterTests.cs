@@ -113,6 +113,44 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             .HasValidStructureAsync((await GetSchema().ConfigureAwait(false))!).ConfigureAwait(false);
     }
 
+    [Fact]
+    public async Task Settlement_method_is_not_included()
+    {
+        var header = new MessageHeader(
+            ProcessType.BalanceFixing.Code,
+            "1234567890123",
+            MarketRole.MeteredDataResponsible.Name,
+            "1234567890321",
+            MarketRole.GridOperator.Name,
+            Guid.NewGuid().ToString(),
+            SystemClock.Instance.GetCurrentInstant());
+
+        var timeSeries = new List<TimeSeries>()
+        {
+            new(
+                Guid.NewGuid(),
+                "870",
+                MeteringPointType.Consumption.Name,
+                null,
+                "KWH",
+                "PT1H",
+                new Period(InstantPattern.General.Parse("2022-02-12T23:00:00Z").Value, InstantPattern.General.Parse("2022-02-13T23:00:00Z").Value),
+                new List<Point>()
+                {
+                    new(1, 11, "A05", "2022-02-12T23:00Z"),
+                    new(2, null, null, "2022-02-13T23:00Z"),
+                    new(2, null, "A04", "2022-02-13T23:00Z"),
+                }),
+        };
+
+        var message = await _messageWriter.WriteAsync(header, timeSeries.Select(record => _parser.From(record)).ToList()).ConfigureAwait(false);
+
+        await AssertXmlDocument
+            .Document(message, NamespacePrefix)
+            .IsNotPresent("Series[1]/marketEvaluationPoint.settlementMethod")
+            .HasValidStructureAsync((await GetSchema().ConfigureAwait(false))!).ConfigureAwait(false);
+    }
+
     private Task<XmlSchema?> GetSchema()
     {
         return _schemaProvider.GetSchemaAsync<XmlSchema>("notifyaggregatedmeasuredata", "0.1");

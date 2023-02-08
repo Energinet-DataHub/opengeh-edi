@@ -21,7 +21,6 @@ using Application.OutgoingMessages.Common;
 using Application.OutgoingMessages.Common.Xml;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Domain.SeedWork;
 using Infrastructure.OutgoingMessages.Common.Xml;
 using NodaTime;
 
