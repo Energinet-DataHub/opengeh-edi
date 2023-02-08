@@ -40,14 +40,13 @@ public class AggregationResultMapper
     public async Task<AggregationResult> MapFromAsync(Stream payload, Guid resultId, string gridArea, Period period)
     {
         var resultDto = (ProcessStepResultDto)await _serializer.DeserializeAsync(payload, typeof(ProcessStepResultDto)).ConfigureAwait(false);
-        return new AggregationResult(
+        return AggregationResult.Production(
             resultId,
-            ExtractPoints(resultDto!.TimeSeriesPoints),
             gridArea,
-            ParseMeteringPointType(resultDto.ProcessStepMeteringPointType),
             "KWH",
-            "PT1H",
-            period);
+            "PTH1",
+            period,
+            ExtractPoints(resultDto!.TimeSeriesPoints));
     }
 
     public async Task<AggregationResult> MapToConsumptionResultAsync(Stream payload, Guid resultId, string gridArea, Period period, SettlementType settlementType)
