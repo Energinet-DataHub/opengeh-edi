@@ -77,4 +77,22 @@ public class AggregationResult
             period,
             settlementType);
     }
+
+    public static AggregationResult Production(
+        Guid id,
+        string gridAreaCode,
+        string measurementUnitType,
+        string resolution,
+        Period period,
+        IReadOnlyList<Point> points)
+    {
+        return new AggregationResult(
+            id,
+            points,
+            gridAreaCode,
+            MeteringPointType.Production,
+            measurementUnitType,
+            resolution,
+            period);
+    }
 }

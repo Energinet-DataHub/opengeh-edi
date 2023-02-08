@@ -40,4 +40,19 @@ public class AggregationResultTests
         Assert.Equal(MeteringPointType.Consumption, result.MeteringPointType);
         Assert.Equal(SettlementType.NonProfiled, result.SettlementType);
     }
+
+    [Fact]
+    public void Create_a_result_for_production()
+    {
+        var result = AggregationResult.Production(
+            Guid.NewGuid(),
+            "543",
+            "KWH",
+            "PTH1",
+            new Period(SystemClock.Instance.GetCurrentInstant(), SystemClock.Instance.GetCurrentInstant()),
+            new List<Point>());
+
+        Assert.Equal(MeteringPointType.Production, result.MeteringPointType);
+        Assert.Null(result.SettlementType);
+    }
 }
