@@ -125,7 +125,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             Guid.NewGuid().ToString(),
             SystemClock.Instance.GetCurrentInstant());
 
-        var timeSeries = CreateSeriesFor(MeteringPointType.Consumption);
+        var timeSeries = CreateSeriesFor(MeteringPointType.Production);
 
         var message = await _messageWriter.WriteAsync(header, timeSeries.Select(record => _parser.From(record)).ToList()).ConfigureAwait(false);
 
@@ -143,7 +143,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
                 Guid.NewGuid(),
                 "870",
                 meteringPointType.Name,
-                null,
+                meteringPointType == MeteringPointType.Consumption ? SettlementType.NonProfiled.Code : null,
                 "KWH",
                 "PT1H",
                 new Period(
