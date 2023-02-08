@@ -21,7 +21,6 @@ using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions.Aggregations;
-using Energinet.DataHub.MeteringPoints.IntegrationEvents.CreateMeteringPoint;
 using IntegrationTests.Assertions;
 using IntegrationTests.Fixtures;
 using IntegrationTests.TestDoubles;
@@ -90,8 +89,13 @@ public class WhenATransactionIsStartedTests : TestBase
 
     private void MakeAggregationResultAvailableFor(ActorNumber energySupplierNumber)
     {
-        var result = new AggregationResult(
+        var result = AggregationResult.Consumption(
             SampleData.ResultId,
+            SampleData.GridAreaCode,
+            SettlementType.NonProfiled,
+            SampleData.MeasureUnitType,
+            SampleData.Resolution,
+            new Domain.Transactions.Aggregations.Period(SampleData.StartOfPeriod, SampleData.EndOfPeriod),
             new List<Point>()
             {
                 new(
@@ -99,12 +103,7 @@ public class WhenATransactionIsStartedTests : TestBase
                     1.1m,
                     "A02",
                     "2022-10-31T21:15:00.000Z"),
-            },
-            SampleData.GridAreaCode,
-            MeteringPointType.Consumption,
-            SampleData.MeasureUnitType,
-            SampleData.Resolution,
-            new Domain.Transactions.Aggregations.Period(SampleData.StartOfPeriod, SampleData.EndOfPeriod));
+            });
 
         var results = GetService<IAggregationResults>() as AggregationResultsStub;
 
