@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using Infrastructure.Configuration.Serialization;
 
@@ -41,7 +42,7 @@ public class AggregationResultMapper
         var resultDto = (ProcessStepResultDto)await _serializer.DeserializeAsync(payload, typeof(ProcessStepResultDto)).ConfigureAwait(false);
         return AggregationResult.Production(
             resultId,
-            gridArea,
+            GridArea.Create(gridArea),
             "KWH",
             "PTH1",
             period,
@@ -53,7 +54,7 @@ public class AggregationResultMapper
         var resultDto = (ProcessStepResultDto)await _serializer.DeserializeAsync(payload, typeof(ProcessStepResultDto)).ConfigureAwait(false);
         return AggregationResult.Consumption(
             resultId,
-            gridArea,
+            GridArea.Create(gridArea),
             settlementType,
             "KWH",
             "PT1H",

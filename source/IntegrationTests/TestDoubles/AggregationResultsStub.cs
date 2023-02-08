@@ -32,13 +32,13 @@ public class AggregationResultsStub : IAggregationResults
     {
         return Task.FromResult(_results.First(result =>
             result.Id.Equals(resultId) &&
-            result.GridAreaCode.Equals(gridArea, StringComparison.OrdinalIgnoreCase)));
+            result.GridAreaCode.Code.Equals(gridArea, StringComparison.OrdinalIgnoreCase)));
     }
 
     public Task<ReadOnlyCollection<ActorNumber>> EnergySuppliersWithHourlyConsumptionResultAsync(Guid resultId, string gridArea)
     {
         var actors = _resultsForActors
-            .Where(result => result.Value.GridAreaCode.Equals(gridArea, StringComparison.OrdinalIgnoreCase) && result.Value.Id.Equals(resultId))
+            .Where(result => result.Value.GridAreaCode.Code.Equals(gridArea, StringComparison.OrdinalIgnoreCase) && result.Value.Id.Equals(resultId))
             .Select(result => result.Key)
             .ToList();
 
