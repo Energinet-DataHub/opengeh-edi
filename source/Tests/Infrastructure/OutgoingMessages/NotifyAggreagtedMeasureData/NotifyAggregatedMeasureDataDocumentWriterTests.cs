@@ -62,23 +62,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             Guid.NewGuid().ToString(),
             SystemClock.Instance.GetCurrentInstant());
 
-        var timeSeries = new List<TimeSeries>()
-        {
-            new(
-                Guid.NewGuid(),
-                "870",
-                MeteringPointType.Consumption.Name,
-                SettlementType.NonProfiled.Code,
-                "KWH",
-                "PT1H",
-                new Period(InstantPattern.General.Parse("2022-02-12T23:00:00Z").Value, InstantPattern.General.Parse("2022-02-13T23:00:00Z").Value),
-                new List<Point>()
-                {
-                    new(1, 11, "A05", "2022-02-12T23:00Z"),
-                    new(2, null, null, "2022-02-13T23:00Z"),
-                    new(2, null, "A04", "2022-02-13T23:00Z"),
-                }),
-        };
+        var timeSeries = CreateSeriesFor(MeteringPointType.Consumption);
 
         var message = await _messageWriter.WriteAsync(header, timeSeries.Select(record => _parser.From(record)).ToList()).ConfigureAwait(false);
 
