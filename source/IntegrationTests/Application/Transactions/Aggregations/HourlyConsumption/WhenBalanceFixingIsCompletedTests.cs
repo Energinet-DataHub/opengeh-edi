@@ -80,7 +80,7 @@ public class WhenBalanceFixingIsCompletedTests : TestBase
             GridArea.Create(SampleData.GridAreaCode),
             SettlementType.NonProfiled,
             MeasurementUnit.From(SampleData.MeasureUnitType),
-            SampleData.Resolution,
+            Resolution.From(SampleData.Resolution),
             new Domain.Transactions.Aggregations.Period(SampleData.StartOfPeriod, SampleData.EndOfPeriod),
             new List<Point>()
             {

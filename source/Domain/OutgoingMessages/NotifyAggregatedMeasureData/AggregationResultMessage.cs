@@ -52,7 +52,7 @@ public class AggregationResultMessage : OutgoingMessage
             result.MeteringPointType.Name,
             result.SettlementType?.Code,
             result.MeasureUnitType.Code,
-            result.Resolution,
+            result.Resolution.Code,
             result.Period,
             result.Points.Select(p => new Point(p.Position, p.Quantity, p.Quality, p.SampleTime)).ToList());
 
