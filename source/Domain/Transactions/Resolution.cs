@@ -30,6 +30,8 @@ public class Resolution : EnumerationType
 
     public static Resolution From(string value)
     {
-        return GetAll<Resolution>().First(resolution => resolution.Code.Equals(value, StringComparison.OrdinalIgnoreCase));
+        return GetAll<Resolution>().First(resolution =>
+            resolution.Code.Equals(value, StringComparison.OrdinalIgnoreCase) ||
+            resolution.Name.Equals(value, StringComparison.OrdinalIgnoreCase));
     }
 }

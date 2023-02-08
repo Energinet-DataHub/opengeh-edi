@@ -19,10 +19,12 @@ namespace Tests.Domain.Transactions;
 
 public class ResolutionTests
 {
-    [Fact]
-    public void Can_parse_from_name_or_code()
+    [Theory]
+    [InlineData("pth1")]
+    [InlineData("hourly")]
+    public void Can_parse_from_name_or_code(string valueToParseFrom)
     {
-        var resolution = Resolution.From("pth1");
+        var resolution = Resolution.From(valueToParseFrom);
 
         Assert.Equal(Resolution.Hourly, resolution);
     }
