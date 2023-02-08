@@ -81,7 +81,8 @@ public class AggregationResultsOverHttp : IAggregationResults
                     energySupplierNumber.Value))
             .ConfigureAwait(false);
 
-        return await MapFromAsync(resultId, gridArea, period, response).ConfigureAwait(false);
+        return await _aggregationResultMapper.MapToConsumptionResultAsync(
+            await response.Content.ReadAsStreamAsync().ConfigureAwait(false), resultId, gridArea, period, SettlementType.NonProfiled).ConfigureAwait(false);
     }
 
     private async Task<HttpResponseMessage> CallAsync<TRequest>(string apiVersion, TRequest request)

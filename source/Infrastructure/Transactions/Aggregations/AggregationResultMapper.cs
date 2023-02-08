@@ -50,6 +50,19 @@ public class AggregationResultMapper
             period);
     }
 
+    public async Task<AggregationResult> MapToConsumptionResultAsync(Stream payload, Guid resultId, string gridArea, Period period, SettlementType settlementType)
+    {
+        var resultDto = (ProcessStepResultDto)await _serializer.DeserializeAsync(payload, typeof(ProcessStepResultDto)).ConfigureAwait(false);
+        return AggregationResult.Consumption(
+            resultId,
+            gridArea,
+            settlementType,
+            "KWH",
+            "PT1H",
+            period,
+            ExtractPoints(resultDto!.TimeSeriesPoints));
+    }
+
     private static IReadOnlyList<Point> ExtractPoints(TimeSeriesPointDto[] timeSeriesPoints)
     {
         var points = new List<Point>();
