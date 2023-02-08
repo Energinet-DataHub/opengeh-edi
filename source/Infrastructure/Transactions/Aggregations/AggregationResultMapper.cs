@@ -43,7 +43,7 @@ public class AggregationResultMapper
         return AggregationResult.Production(
             resultId,
             GridArea.Create(gridArea),
-            "KWH",
+            MeasurementUnit.Kwh,
             "PTH1",
             period,
             ExtractPoints(resultDto!.TimeSeriesPoints));
@@ -56,7 +56,7 @@ public class AggregationResultMapper
             resultId,
             GridArea.Create(gridArea),
             settlementType,
-            "KWH",
+            MeasurementUnit.Kwh,
             "PT1H",
             period,
             ExtractPoints(resultDto!.TimeSeriesPoints));
