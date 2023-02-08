@@ -16,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions.Aggregations;
 using Infrastructure.Configuration.Serialization;
@@ -37,17 +36,29 @@ public class AggregationResultMapper
         Production = 0,
     }
 
-    public async Task<AggregationResult> MapFromAsync(Stream payload, Guid resultId, string gridArea, Period period)
+    public async Task<AggregationResult> MapProductionResultAsync(Stream payload, Guid resultId, string gridArea, Period period)
     {
         var resultDto = (ProcessStepResultDto)await _serializer.DeserializeAsync(payload, typeof(ProcessStepResultDto)).ConfigureAwait(false);
-        return new AggregationResult(
+        return AggregationResult.Production(
             resultId,
-            ExtractPoints(resultDto!.TimeSeriesPoints),
             gridArea,
-            ParseMeteringPointType(resultDto.ProcessStepMeteringPointType),
+            "KWH",
+            "PTH1",
+            period,
+            ExtractPoints(resultDto!.TimeSeriesPoints));
+    }
+
+    public async Task<AggregationResult> MapToConsumptionResultAsync(Stream payload, Guid resultId, string gridArea, Period period, SettlementType settlementType)
+    {
+        var resultDto = (ProcessStepResultDto)await _serializer.DeserializeAsync(payload, typeof(ProcessStepResultDto)).ConfigureAwait(false);
+        return AggregationResult.Consumption(
+            resultId,
+            gridArea,
+            settlementType,
             "KWH",
             "PT1H",
-            period);
+            period,
+            ExtractPoints(resultDto!.TimeSeriesPoints));
     }
 
     private static IReadOnlyList<Point> ExtractPoints(TimeSeriesPointDto[] timeSeriesPoints)
@@ -59,15 +70,6 @@ public class AggregationResultMapper
         }
 
         return points.AsReadOnly();
-    }
-
-    private static MeteringPointType ParseMeteringPointType(ProcessStepMeteringPointType type)
-    {
-        return type switch
-        {
-            ProcessStepMeteringPointType.Production => MeteringPointType.Production,
-            _ => MeteringPointType.Consumption,
-        };
     }
 
     private record ProcessStepResultDto(

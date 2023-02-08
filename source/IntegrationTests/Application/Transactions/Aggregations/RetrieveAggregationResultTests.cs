@@ -21,11 +21,12 @@ using Dapper;
 using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Infrastructure.Transactions.Aggregations;
+using Domain.Transactions.Aggregations;
 using IntegrationTests.Assertions;
 using IntegrationTests.Fixtures;
 using IntegrationTests.TestDoubles;
 using Xunit;
+using Period = Application.Transactions.Aggregations.Period;
 
 namespace IntegrationTests.Application.Transactions.Aggregations;
 
@@ -70,23 +71,19 @@ public class RetrieveAggregationResultTests : TestBase
     private void SetupFakeAggregationResult()
     {
         var results = GetService<IAggregationResults>() as AggregationResultsStub;
-        var dto = new AggregationResultDto(
+        results?.Add(
+            AggregationResult.Production(
+            SampleData.ResultId,
             SampleData.GridAreaCode,
-            MeteringPointType.Production.Name,
             SampleData.MeasureUnitType,
             SampleData.Resolution,
-            new List<PointDto>()
+            new Domain.Transactions.Aggregations.Period(
+                SampleData.StartOfPeriod,
+                SampleData.EndOfPeriod),
+            new List<Point>()
             {
-                new(
-                    1,
-                    "1.1",
-                    "A02",
-                    "2022-10-31T21:15:00.000Z"),
-            },
-            SampleData.StartOfPeriod,
-            SampleData.EndOfPeriod);
-
-        results?.Add(SampleData.ResultId, dto);
+                new Point(1, 1.1m, "A02", "2022-10-31T21:15:00.000Z"),
+            }));
     }
 
     private async Task<Guid> GetTransactionIdAsync()

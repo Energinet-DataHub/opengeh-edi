@@ -50,7 +50,7 @@ public class AggregationResultOverHttpTests : IDisposable
     [Fact]
     public async Task Can_retrieve_result()
     {
-        var result = await _service.GetResultAsync(_batchId, _gridArea, new Period(NodaTime.SystemClock.Instance.GetCurrentInstant(), NodaTime.SystemClock.Instance.GetCurrentInstant())).ConfigureAwait(false);
+        var result = await _service.ProductionResultForAsync(_batchId, _gridArea, new Period(NodaTime.SystemClock.Instance.GetCurrentInstant(), NodaTime.SystemClock.Instance.GetCurrentInstant())).ConfigureAwait(false);
 
         Assert.NotNull(result);
     }
@@ -70,7 +70,7 @@ public class AggregationResultOverHttpTests : IDisposable
         var energySuppliers = await _service.EnergySuppliersWithHourlyConsumptionResultAsync(_batchId, _gridArea)
             .ConfigureAwait(false);
 
-        var aggregationResult = await _service.HourlyConsumptionForAsync(_batchId, _gridArea, energySuppliers[0], new Period(NodaTime.SystemClock.Instance.GetCurrentInstant(), NodaTime.SystemClock.Instance.GetCurrentInstant()))
+        var aggregationResult = await _service.NonProfiledConsumptionForAsync(_batchId, _gridArea, energySuppliers[0], new Period(NodaTime.SystemClock.Instance.GetCurrentInstant(), NodaTime.SystemClock.Instance.GetCurrentInstant()))
             .ConfigureAwait(false);
 
         Assert.NotNull(aggregationResult);

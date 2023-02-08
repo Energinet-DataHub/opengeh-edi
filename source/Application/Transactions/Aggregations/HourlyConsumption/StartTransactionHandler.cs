@@ -40,7 +40,7 @@ public class StartTransactionHandler : IRequestHandler<StartTransaction>
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var aggregationResult = await _aggregationResults.HourlyConsumptionForAsync(
+        var aggregationResult = await _aggregationResults.NonProfiledConsumptionForAsync(
                 request.ResultId,
                 request.GridArea,
                 ActorNumber.Create(request.EnergySupplierNumber),
