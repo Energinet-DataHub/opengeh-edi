@@ -80,4 +80,10 @@ public class AggregationResultsStub : IAggregationResults
         ArgumentNullException.ThrowIfNull(aggregationResult);
         _resultsForActors.Add(targetActorNumber, aggregationResult);
     }
+
+    public void Add(AggregationResult aggregationResult)
+    {
+        ArgumentNullException.ThrowIfNull(aggregationResult);
+        _results.Add(aggregationResult);
+    }
 }
