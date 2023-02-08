@@ -23,6 +23,7 @@ using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.SeedWork;
+using Domain.Transactions.Aggregations;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.IncomingMessages.SchemaStore;
 using Infrastructure.OutgoingMessages.Common;
@@ -52,31 +53,8 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
     [Fact]
     public async Task Can_create_document()
     {
-        var header = new MessageHeader(
-            ProcessType.BalanceFixing.Code,
-            "1234567890123",
-            MarketRole.MeteredDataResponsible.Name,
-            "1234567890321",
-            MarketRole.GridOperator.Name,
-            Guid.NewGuid().ToString(),
-            SystemClock.Instance.GetCurrentInstant());
-
-        var timeSeries = new List<TimeSeries>()
-        {
-            new(
-                Guid.NewGuid(),
-                "870",
-                MeteringPointType.Production.Name,
-                "KWH",
-                "PT1H",
-                new Period(InstantPattern.General.Parse("2022-02-12T23:00:00Z").Value, InstantPattern.General.Parse("2022-02-13T23:00:00Z").Value),
-                new List<Point>()
-                {
-                    new(1, 11, "A05", "2022-02-12T23:00Z"),
-                    new(2, null, null, "2022-02-13T23:00Z"),
-                    new(2, null, "A04", "2022-02-13T23:00Z"),
-                }),
-        };
+        var header = CreateHeader();
+        var timeSeries = CreateSeriesFor(MeteringPointType.Consumption);
 
         var message = await _messageWriter.WriteAsync(header, timeSeries.Select(record => _parser.From(record)).ToList()).ConfigureAwait(false);
 
@@ -95,6 +73,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             .HasValue("Series[1]/mRID", timeSeries[0].TransactionId.ToString())
             .HasValue("Series[1]/meteringGridArea_Domain.mRID", timeSeries[0].GridAreaCode)
             .HasValue("Series[1]/marketEvaluationPoint.type",  EnumerationType.FromName<MeteringPointType>(timeSeries[0].MeteringPointType).Code)
+            .HasValue("Series[1]/marketEvaluationPoint.settlementMethod", timeSeries[0].SettlementType!)
             .HasValue("Series[1]/product", "8716867000030")
             .HasValue("Series[1]/quantity_Measure_Unit.name", timeSeries[0].MeasureUnitType)
             .HasValue("Series[1]/Period/resolution", timeSeries[0].Resolution)
@@ -108,6 +87,56 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             .IsNotPresent("Series[1]/Period/Point[2]/quality")
             .IsNotPresent("Series[1]/Period/Point[3]/quality")
             .HasValidStructureAsync((await GetSchema().ConfigureAwait(false))!).ConfigureAwait(false);
+    }
+
+    [Fact]
+    public async Task Settlement_method_is_not_included()
+    {
+        var header = CreateHeader();
+        var timeSeries = CreateSeriesFor(MeteringPointType.Production);
+
+        var message = await _messageWriter.WriteAsync(header, timeSeries.Select(record => _parser.From(record)).ToList()).ConfigureAwait(false);
+
+        await AssertXmlDocument
+            .Document(message, NamespacePrefix)
+            .IsNotPresent("Series[1]/marketEvaluationPoint.settlementMethod")
+            .HasValidStructureAsync((await GetSchema().ConfigureAwait(false))!).ConfigureAwait(false);
+    }
+
+    private static MessageHeader CreateHeader()
+    {
+        return new MessageHeader(
+            ProcessType.BalanceFixing.Code,
+            "1234567890123",
+            MarketRole.MeteredDataResponsible.Name,
+            "1234567890321",
+            MarketRole.GridOperator.Name,
+            Guid.NewGuid().ToString(),
+            SystemClock.Instance.GetCurrentInstant());
+    }
+
+    private static List<TimeSeries> CreateSeriesFor(MeteringPointType meteringPointType)
+    {
+        var timeSeries = new List<TimeSeries>()
+        {
+            new(
+                Guid.NewGuid(),
+                "870",
+                meteringPointType.Name,
+                meteringPointType == MeteringPointType.Consumption ? SettlementType.NonProfiled.Code : null,
+                "KWH",
+                "PT1H",
+                new Period(
+                    InstantPattern.General.Parse("2022-02-12T23:00:00Z").Value,
+                    InstantPattern.General.Parse("2022-02-13T23:00:00Z").Value),
+                new List<Point>()
+                {
+                    new(1, 11, "A05", "2022-02-12T23:00Z"),
+                    new(2, null, null, "2022-02-13T23:00Z"),
+                    new(2, null, "A04", "2022-02-13T23:00Z"),
+                }),
+        };
+        return timeSeries;
     }
 
     private Task<XmlSchema?> GetSchema()
