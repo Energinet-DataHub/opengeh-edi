@@ -53,15 +53,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
     [Fact]
     public async Task Can_create_document()
     {
-        var header = new MessageHeader(
-            ProcessType.BalanceFixing.Code,
-            "1234567890123",
-            MarketRole.MeteredDataResponsible.Name,
-            "1234567890321",
-            MarketRole.GridOperator.Name,
-            Guid.NewGuid().ToString(),
-            SystemClock.Instance.GetCurrentInstant());
-
+        var header = CreateHeader();
         var timeSeries = CreateSeriesFor(MeteringPointType.Consumption);
 
         var message = await _messageWriter.WriteAsync(header, timeSeries.Select(record => _parser.From(record)).ToList()).ConfigureAwait(false);
@@ -100,15 +92,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
     [Fact]
     public async Task Settlement_method_is_not_included()
     {
-        var header = new MessageHeader(
-            ProcessType.BalanceFixing.Code,
-            "1234567890123",
-            MarketRole.MeteredDataResponsible.Name,
-            "1234567890321",
-            MarketRole.GridOperator.Name,
-            Guid.NewGuid().ToString(),
-            SystemClock.Instance.GetCurrentInstant());
-
+        var header = CreateHeader();
         var timeSeries = CreateSeriesFor(MeteringPointType.Production);
 
         var message = await _messageWriter.WriteAsync(header, timeSeries.Select(record => _parser.From(record)).ToList()).ConfigureAwait(false);
@@ -117,6 +101,18 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             .Document(message, NamespacePrefix)
             .IsNotPresent("Series[1]/marketEvaluationPoint.settlementMethod")
             .HasValidStructureAsync((await GetSchema().ConfigureAwait(false))!).ConfigureAwait(false);
+    }
+
+    private static MessageHeader CreateHeader()
+    {
+        return new MessageHeader(
+            ProcessType.BalanceFixing.Code,
+            "1234567890123",
+            MarketRole.MeteredDataResponsible.Name,
+            "1234567890321",
+            MarketRole.GridOperator.Name,
+            Guid.NewGuid().ToString(),
+            SystemClock.Instance.GetCurrentInstant());
     }
 
     private static List<TimeSeries> CreateSeriesFor(MeteringPointType meteringPointType)
