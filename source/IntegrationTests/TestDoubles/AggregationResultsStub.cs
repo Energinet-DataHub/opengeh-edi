@@ -15,16 +15,11 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.Transactions.Aggregations;
 using Domain.Actors;
-using Domain.OutgoingMessages;
-using Domain.SeedWork;
 using Domain.Transactions.Aggregations;
-using Infrastructure.Transactions.Aggregations;
-using Period = Domain.Transactions.Aggregations.Period;
 
 namespace IntegrationTests.TestDoubles;
 
@@ -53,26 +48,6 @@ public class AggregationResultsStub : IAggregationResults
     public Task<AggregationResult> NonProfiledConsumptionForAsync(Guid resultId, string gridArea, ActorNumber energySupplierNumber, Domain.Transactions.Aggregations.Period period)
     {
         return Task.FromResult(_resultsForActors[energySupplierNumber]);
-    }
-
-    public void Add(Guid resultId, AggregationResultDto aggregationResultDto)
-    {
-        ArgumentNullException.ThrowIfNull(aggregationResultDto);
-        var points = aggregationResultDto.Points.Select(point =>
-            new Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point(
-                point.Position,
-                decimal.Parse(point.Quantity, NumberStyles.Number, CultureInfo.InvariantCulture),
-                point.Quality,
-                point.QuarterTime));
-        var result = new AggregationResult(
-            resultId,
-            points.ToList(),
-            aggregationResultDto.GridAreaCode,
-            EnumerationType.FromName<MeteringPointType>(aggregationResultDto.MeteringPointType),
-            aggregationResultDto.MeasureUnitType,
-            aggregationResultDto.Resolution,
-            new Period(aggregationResultDto.PeriodStart, aggregationResultDto.PeriodEnd));
-        _results.Add(result);
     }
 
     public void Add(AggregationResult aggregationResult, ActorNumber targetActorNumber)
