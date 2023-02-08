@@ -21,6 +21,7 @@ using Dapper;
 using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using IntegrationTests.Assertions;
 using IntegrationTests.Fixtures;
@@ -74,7 +75,7 @@ public class RetrieveAggregationResultTests : TestBase
         results?.Add(
             AggregationResult.Production(
             SampleData.ResultId,
-            SampleData.GridAreaCode,
+            GridArea.Create(SampleData.GridAreaCode),
             SampleData.MeasureUnitType,
             SampleData.Resolution,
             new Domain.Transactions.Aggregations.Period(

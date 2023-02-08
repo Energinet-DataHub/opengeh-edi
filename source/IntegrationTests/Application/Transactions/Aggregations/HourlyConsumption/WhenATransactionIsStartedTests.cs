@@ -20,6 +20,7 @@ using Dapper;
 using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using IntegrationTests.Assertions;
 using IntegrationTests.Fixtures;
@@ -91,7 +92,7 @@ public class WhenATransactionIsStartedTests : TestBase
     {
         var result = AggregationResult.Consumption(
             SampleData.ResultId,
-            SampleData.GridAreaCode,
+            GridArea.Create(SampleData.GridAreaCode),
             SettlementType.NonProfiled,
             SampleData.MeasureUnitType,
             SampleData.Resolution,
