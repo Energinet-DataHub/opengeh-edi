@@ -50,6 +50,7 @@ public class AggregationResultMessage : OutgoingMessage
             transactionId.Id,
             result.GridAreaCode,
             result.MeteringPointType.Name,
+            result.SettlementType?.Code,
             result.MeasureUnitType,
             result.Resolution,
             result.Period,
@@ -64,7 +65,14 @@ public class AggregationResultMessage : OutgoingMessage
     }
 }
 
-public record TimeSeries(Guid TransactionId, string GridAreaCode, string MeteringPointType, string MeasureUnitType,
-    string Resolution, Period Period, IReadOnlyList<Point> Point);
+public record TimeSeries(
+    Guid TransactionId,
+    string GridAreaCode,
+    string MeteringPointType,
+    string? SettlementType,
+    string MeasureUnitType,
+    string Resolution,
+    Period Period,
+    IReadOnlyList<Point> Point);
 
 public record Point(int Position, decimal? Quantity, string? Quality, string SampleTime);
