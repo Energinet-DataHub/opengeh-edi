@@ -18,7 +18,7 @@ namespace Domain.Transactions;
 
 public class Resolution : EnumerationType
 {
-    public static readonly Resolution Hourly = new(0, nameof(Hourly), "PTH1");
+    public static readonly Resolution Hourly = new(0, nameof(Hourly), "PT1H");
 
     private Resolution(int id, string name, string code)
         : base(id, name)

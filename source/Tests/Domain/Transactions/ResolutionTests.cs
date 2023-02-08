@@ -20,7 +20,7 @@ namespace Tests.Domain.Transactions;
 public class ResolutionTests
 {
     [Theory]
-    [InlineData("pth1")]
+    [InlineData("pt1h")]
     [InlineData("hourly")]
     public void Can_parse_from_name_or_code(string valueToParseFrom)
     {
