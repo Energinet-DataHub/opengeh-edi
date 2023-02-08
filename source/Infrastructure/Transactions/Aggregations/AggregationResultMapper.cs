@@ -73,15 +73,6 @@ public class AggregationResultMapper
         return points.AsReadOnly();
     }
 
-    private static MeteringPointType ParseMeteringPointType(ProcessStepMeteringPointType type)
-    {
-        return type switch
-        {
-            ProcessStepMeteringPointType.Production => MeteringPointType.Production,
-            _ => MeteringPointType.Consumption,
-        };
-    }
-
     private record ProcessStepResultDto(
         ProcessStepMeteringPointType ProcessStepMeteringPointType,
         decimal Sum,
