@@ -33,7 +33,7 @@ public class AggregationResultTests
             Guid.NewGuid(),
             GridArea.Create("543"),
             SettlementType.NonProfiled,
-            "KWH",
+            MeasurementUnit.Kwh,
             "PTH1",
             new Period(SystemClock.Instance.GetCurrentInstant(), SystemClock.Instance.GetCurrentInstant()),
             new List<Point>());
@@ -48,7 +48,7 @@ public class AggregationResultTests
         var result = AggregationResult.Production(
             Guid.NewGuid(),
             GridArea.Create("543"),
-            "KWH",
+            MeasurementUnit.Kwh,
             "PTH1",
             new Period(SystemClock.Instance.GetCurrentInstant(), SystemClock.Instance.GetCurrentInstant()),
             new List<Point>());
