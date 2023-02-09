@@ -120,6 +120,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             .Document(message, NamespacePrefix)
             .IsNotPresent("Series[1]/marketEvaluationPoint.settlementMethod")
             .IsNotPresent("Series[1]/energySupplier_MarketParticipant.mRID")
+            .IsNotPresent("Series[1]/balanceResponsibleParty_MarketParticipant.mRID")
             .HasValidStructureAsync((await GetSchema().ConfigureAwait(false))!).ConfigureAwait(false);
     }
 
