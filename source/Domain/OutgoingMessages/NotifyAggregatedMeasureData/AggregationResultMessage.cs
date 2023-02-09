@@ -73,7 +73,7 @@ public record TimeSeries(
     string? SettlementType,
     string MeasureUnitType,
     string Resolution,
-    string EnergySupplierNumber,
+    string? EnergySupplierNumber,
     Period Period,
     IReadOnlyList<Point> Point);
 

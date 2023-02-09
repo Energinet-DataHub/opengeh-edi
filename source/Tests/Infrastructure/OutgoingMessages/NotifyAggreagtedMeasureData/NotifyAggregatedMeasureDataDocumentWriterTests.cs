@@ -73,7 +73,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             .HasValue("createdDateTime", header.TimeStamp.ToString())
             .HasValue("Series[1]/mRID", timeSeries[0].TransactionId.ToString())
             .HasValue("Series[1]/meteringGridArea_Domain.mRID", timeSeries[0].GridAreaCode)
-            .HasValue("Series[1]/energySupplier_MarketParticipant.mRID", timeSeries[0].EnergySupplierNumber)
+            .HasValue("Series[1]/energySupplier_MarketParticipant.mRID", timeSeries[0].EnergySupplierNumber!)
             .HasAttributeValue("Series[1]/energySupplier_MarketParticipant.mRID", "codingScheme", "A10")
             .HasValue("Series[1]/marketEvaluationPoint.type",  EnumerationType.FromName<MeteringPointType>(timeSeries[0].MeteringPointType).Code)
             .HasValue("Series[1]/marketEvaluationPoint.settlementMethod", timeSeries[0].SettlementType!)
@@ -93,16 +93,31 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
     }
 
     [Fact]
-    public async Task Settlement_method_is_not_included()
+    public async Task Exclude_optional_attributes_if_value_is_unspecified()
     {
         var header = CreateHeader();
-        var timeSeries = CreateSeriesFor(MeteringPointType.Production);
+        var timeSeries = new List<TimeSeries>()
+        {
+            new(
+                Guid.NewGuid(),
+                "870",
+                MeteringPointType.Production.Code,
+                null,
+                "KWH",
+                "PT1H",
+                null,
+                new Period(
+                    InstantPattern.General.Parse("2022-02-12T23:00:00Z").Value,
+                    InstantPattern.General.Parse("2022-02-13T23:00:00Z").Value),
+                new List<Point> { }),
+        };
 
         var message = await _messageWriter.WriteAsync(header, timeSeries.Select(record => _parser.From(record)).ToList()).ConfigureAwait(false);
 
         await AssertXmlDocument
             .Document(message, NamespacePrefix)
             .IsNotPresent("Series[1]/marketEvaluationPoint.settlementMethod")
+            .IsNotPresent("Series[1]/energySupplier_MarketParticipant.mRID")
             .HasValidStructureAsync((await GetSchema().ConfigureAwait(false))!).ConfigureAwait(false);
     }
 

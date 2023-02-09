@@ -58,16 +58,17 @@ public class NotifyAggregatedMeasureDataMessageWriter : MessageWriter
             await WriteElementIfHasValueAsync("marketEvaluationPoint.settlementMethod", timeSeries.SettlementType, writer).ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "meteringGridArea_Domain.mRID", null).ConfigureAwait(false);
-
             await writer.WriteAttributeStringAsync(null, "codingScheme", null, "NDK").ConfigureAwait(false);
             await writer.WriteStringAsync(timeSeries.GridAreaCode).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
 
-            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "energySupplier_MarketParticipant.mRID", null).ConfigureAwait(false);
-
-            await writer.WriteAttributeStringAsync(null, "codingScheme", null, ResolveActorCodingScheme(timeSeries.EnergySupplierNumber)).ConfigureAwait(false);
-            await writer.WriteStringAsync(timeSeries.EnergySupplierNumber).ConfigureAwait(false);
-            await writer.WriteEndElementAsync().ConfigureAwait(false);
+            if (timeSeries.EnergySupplierNumber is not null)
+            {
+                await writer.WriteStartElementAsync(DocumentDetails.Prefix, "energySupplier_MarketParticipant.mRID", null).ConfigureAwait(false);
+                await writer.WriteAttributeStringAsync(null, "codingScheme", null, ResolveActorCodingScheme(timeSeries.EnergySupplierNumber)).ConfigureAwait(false);
+                await writer.WriteStringAsync(timeSeries.EnergySupplierNumber).ConfigureAwait(false);
+                await writer.WriteEndElementAsync().ConfigureAwait(false);
+            }
 
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "product", null, ActiveEnergy).ConfigureAwait(false);
 
