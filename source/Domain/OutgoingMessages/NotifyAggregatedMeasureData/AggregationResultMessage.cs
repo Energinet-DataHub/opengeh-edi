@@ -53,6 +53,7 @@ public class AggregationResultMessage : OutgoingMessage
             result.SettlementType?.Code,
             result.MeasureUnitType.Code,
             result.Resolution.Code,
+            string.Empty,
             result.Period,
             result.Points.Select(p => new Point(p.Position, p.Quantity, p.Quality, p.SampleTime)).ToList());
 
@@ -72,6 +73,7 @@ public record TimeSeries(
     string? SettlementType,
     string MeasureUnitType,
     string Resolution,
+    string EnergySupplierNumber,
     Period Period,
     IReadOnlyList<Point> Point);
 

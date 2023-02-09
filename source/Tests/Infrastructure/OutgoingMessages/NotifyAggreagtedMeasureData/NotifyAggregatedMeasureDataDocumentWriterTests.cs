@@ -30,6 +30,7 @@ using Infrastructure.OutgoingMessages.Common;
 using Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 using NodaTime;
 using NodaTime.Text;
+using Tests.Domain.Transactions.MoveIn;
 using Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
 using Period = Domain.Transactions.Aggregations.Period;
@@ -72,6 +73,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             .HasValue("createdDateTime", header.TimeStamp.ToString())
             .HasValue("Series[1]/mRID", timeSeries[0].TransactionId.ToString())
             .HasValue("Series[1]/meteringGridArea_Domain.mRID", timeSeries[0].GridAreaCode)
+            .HasValue("Series[1]/energySupplier_MarketParticipant.mRID", timeSeries[0].EnergySupplierNumber)
             .HasValue("Series[1]/marketEvaluationPoint.type",  EnumerationType.FromName<MeteringPointType>(timeSeries[0].MeteringPointType).Code)
             .HasValue("Series[1]/marketEvaluationPoint.settlementMethod", timeSeries[0].SettlementType!)
             .HasValue("Series[1]/product", "8716867000030")
@@ -126,6 +128,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
                 meteringPointType == MeteringPointType.Consumption ? SettlementType.NonProfiled.Code : null,
                 "KWH",
                 "PT1H",
+                SampleData.EnergySupplierNumber,
                 new Period(
                     InstantPattern.General.Parse("2022-02-12T23:00:00Z").Value,
                     InstantPattern.General.Parse("2022-02-13T23:00:00Z").Value),
