@@ -17,4 +17,6 @@ namespace Tests.Infrastructure.OutgoingMessages.NotifyAggreagtedMeasureData;
 internal static class SampleData
 {
     public static string EnergySupplierNumber => "5790001330552";
+
+    public static string BalanceResponsibleNumber => "6790001330551";
 }

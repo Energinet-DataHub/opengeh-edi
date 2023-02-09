@@ -70,6 +70,15 @@ public class NotifyAggregatedMeasureDataMessageWriter : MessageWriter
                 await writer.WriteEndElementAsync().ConfigureAwait(false);
             }
 
+            if (timeSeries.BalanceResponsibleNumber is not null)
+            {
+                await writer
+                    .WriteStartElementAsync(DocumentDetails.Prefix, "balanceResponsibleParty_MarketParticipant.mRID", null).ConfigureAwait(false);
+                await writer.WriteAttributeStringAsync(null, "codingScheme", null, ResolveActorCodingScheme(timeSeries.BalanceResponsibleNumber)).ConfigureAwait(false);
+                await writer.WriteStringAsync(timeSeries.BalanceResponsibleNumber).ConfigureAwait(false);
+                await writer.WriteEndElementAsync().ConfigureAwait(false);
+            }
+
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "product", null, ActiveEnergy).ConfigureAwait(false);
 
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity_Measure_Unit.name", null, timeSeries.MeasureUnitType).ConfigureAwait(false);

@@ -73,6 +73,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             .HasValue("createdDateTime", header.TimeStamp.ToString())
             .HasValue("Series[1]/mRID", timeSeries[0].TransactionId.ToString())
             .HasValue("Series[1]/meteringGridArea_Domain.mRID", timeSeries[0].GridAreaCode)
+            .HasValue("Series[1]/balanceResponsibleParty_MarketParticipant.mRID", timeSeries[0].BalanceResponsibleNumber!)
             .HasValue("Series[1]/energySupplier_MarketParticipant.mRID", timeSeries[0].EnergySupplierNumber!)
             .HasAttributeValue("Series[1]/energySupplier_MarketParticipant.mRID", "codingScheme", "A10")
             .HasValue("Series[1]/marketEvaluationPoint.type",  EnumerationType.FromName<MeteringPointType>(timeSeries[0].MeteringPointType).Code)
@@ -105,6 +106,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
                 null,
                 "KWH",
                 "PT1H",
+                null,
                 null,
                 new Period(
                     InstantPattern.General.Parse("2022-02-12T23:00:00Z").Value,
@@ -145,6 +147,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
                 "KWH",
                 "PT1H",
                 SampleData.EnergySupplierNumber,
+                SampleData.BalanceResponsibleNumber,
                 new Period(
                     InstantPattern.General.Parse("2022-02-12T23:00:00Z").Value,
                     InstantPattern.General.Parse("2022-02-13T23:00:00Z").Value),
