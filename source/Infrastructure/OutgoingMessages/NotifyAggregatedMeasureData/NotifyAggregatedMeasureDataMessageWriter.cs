@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Application.OutgoingMessages.Common;
 using Application.OutgoingMessages.Common.Xml;
+using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Infrastructure.OutgoingMessages.Common.Xml;
@@ -64,7 +65,7 @@ public class NotifyAggregatedMeasureDataMessageWriter : MessageWriter
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "energySupplier_MarketParticipant.mRID", null).ConfigureAwait(false);
 
-            await writer.WriteAttributeStringAsync(null, "codingScheme", null, "NDK").ConfigureAwait(false);
+            await writer.WriteAttributeStringAsync(null, "codingScheme", null, ResolveActorCodingScheme(timeSeries.EnergySupplierNumber)).ConfigureAwait(false);
             await writer.WriteStringAsync(timeSeries.EnergySupplierNumber).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
 
@@ -97,6 +98,11 @@ public class NotifyAggregatedMeasureDataMessageWriter : MessageWriter
             await writer.WriteEndElementAsync().ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
         }
+    }
+
+    private static string ResolveActorCodingScheme(string energySupplierNumber)
+    {
+        return ActorNumber.IsGlnNumber(energySupplierNumber) ? "A10" : "A01";
     }
 
     private static string ParsePeriodDateFrom(Instant instant)

@@ -33,13 +33,15 @@ public class ActorNumber : ValueObject
             : throw InvalidActorNumberException.Create(actorNumber);
     }
 
-    private static bool IsEic(string actorNumber)
+    public static bool IsEic(string actorNumber)
     {
+        ArgumentNullException.ThrowIfNull(actorNumber);
         return actorNumber.Length == 16;
     }
 
-    private static bool IsGlnNumber(string actorNumber)
+    public static bool IsGlnNumber(string actorNumber)
     {
+        ArgumentNullException.ThrowIfNull(actorNumber);
         return actorNumber.Length == 13;
     }
 }
