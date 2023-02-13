@@ -104,7 +104,8 @@ public class WhenATransactionIsStartedTests : TestBase
             GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
         outgoingMessage
             .HasReceiverId(SampleData.BalanceResponsibleNumber.Value)
-            .HasReceiverRole(MarketRole.BalanceResponsible.Name);
+            .HasReceiverRole(MarketRole.BalanceResponsible.Name)
+            .HasSenderId(DataHubDetails.IdentificationNumber.Value);
     }
 
     private static AggregationResult CreateAggregatedConsumptionResult()
