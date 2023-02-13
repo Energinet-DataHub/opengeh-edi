@@ -30,19 +30,7 @@ public class AggregationResultMessageTests
     public void Receiver_id_must_be_included_in_series_if_receiver_is_balance_responsible()
     {
         var receiverNumber = ActorNumber.Create("1234567890123");
-        var message = AggregationResultMessage.Create(
-            receiverNumber,
-            MarketRole.BalanceResponsible,
-            TransactionId.New(),
-            ProcessType.BalanceFixing,
-            AggregationResult.Consumption(
-                Guid.NewGuid(),
-                GridArea.Create("543"),
-                SettlementType.NonProfiled,
-                MeasurementUnit.Kwh,
-                Resolution.Hourly,
-                new Period(EffectiveDateFactory.InstantAsOfToday(), EffectiveDateFactory.InstantAsOfToday()),
-                new List<Point>()));
+        var message = CreateMessageFor(receiverNumber);
 
         Assert.Equal(receiverNumber.Value, message.Series.BalanceResponsibleNumber);
     }
@@ -68,5 +56,22 @@ public class AggregationResultMessageTests
             aggregationResult);
 
         Assert.Equal(aggregationResult.AggregatedForActor?.Value, message.Series.EnergySupplierNumber);
+    }
+
+    private static AggregationResultMessage CreateMessageFor(ActorNumber receiverNumber)
+    {
+        return AggregationResultMessage.Create(
+            receiverNumber,
+            MarketRole.BalanceResponsible,
+            TransactionId.New(),
+            ProcessType.BalanceFixing,
+            AggregationResult.Consumption(
+                Guid.NewGuid(),
+                GridArea.Create("543"),
+                SettlementType.NonProfiled,
+                MeasurementUnit.Kwh,
+                Resolution.Hourly,
+                new Period(EffectiveDateFactory.InstantAsOfToday(), EffectiveDateFactory.InstantAsOfToday()),
+                new List<Point>()));
     }
 }
