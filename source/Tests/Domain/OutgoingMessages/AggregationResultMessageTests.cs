@@ -30,7 +30,7 @@ public class AggregationResultMessageTests
     public void Receiver_id_must_be_included_in_series_if_receiver_is_balance_responsible()
     {
         var receiverNumber = ActorNumber.Create("1234567890123");
-        var message = CreateMessageFor(receiverNumber);
+        var message = CreateMessageFor(receiverNumber, CreateResult());
 
         Assert.Equal(receiverNumber.Value, message.Series.BalanceResponsibleNumber);
     }
@@ -39,18 +39,13 @@ public class AggregationResultMessageTests
     public void Energy_supplier_number_must_be_include_in_series_if_receiver_is_balance_responsible()
     {
         var energySupplierNumber = ActorNumber.Create("1234567890124");
-        var aggregationResult = CreateResultAggregatedFor(energySupplierNumber);
-        var message = AggregationResultMessage.Create(
-            ActorNumber.Create("1234567890123"),
-            MarketRole.BalanceResponsible,
-            TransactionId.New(),
-            ProcessType.BalanceFixing,
-            aggregationResult);
+        var aggregationResult = CreateResult(energySupplierNumber);
+        var message = CreateMessageFor(ActorNumber.Create("1234567890123"), aggregationResult);
 
         Assert.Equal(aggregationResult.AggregatedForActor?.Value, message.Series.EnergySupplierNumber);
     }
 
-    private static AggregationResult CreateResultAggregatedFor(ActorNumber energySupplierNumber)
+    private static AggregationResult CreateResult(ActorNumber? aggregatedForActorNumber = null)
     {
         return AggregationResult.Consumption(
             Guid.NewGuid(),
@@ -60,23 +55,16 @@ public class AggregationResultMessageTests
             Resolution.Hourly,
             new Period(EffectiveDateFactory.InstantAsOfToday(), EffectiveDateFactory.InstantAsOfToday()),
             new List<Point>(),
-            energySupplierNumber);
+            aggregatedForActorNumber ?? null);
     }
 
-    private static AggregationResultMessage CreateMessageFor(ActorNumber receiverNumber)
+    private static AggregationResultMessage CreateMessageFor(ActorNumber receiverNumber, AggregationResult result)
     {
         return AggregationResultMessage.Create(
             receiverNumber,
             MarketRole.BalanceResponsible,
             TransactionId.New(),
             ProcessType.BalanceFixing,
-            AggregationResult.Consumption(
-                Guid.NewGuid(),
-                GridArea.Create("543"),
-                SettlementType.NonProfiled,
-                MeasurementUnit.Kwh,
-                Resolution.Hourly,
-                new Period(EffectiveDateFactory.InstantAsOfToday(), EffectiveDateFactory.InstantAsOfToday()),
-                new List<Point>()));
+            result);
     }
 }
