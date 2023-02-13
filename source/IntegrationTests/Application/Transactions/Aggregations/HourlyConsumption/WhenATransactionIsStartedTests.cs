@@ -102,7 +102,9 @@ public class WhenATransactionIsStartedTests : TestBase
             ProcessType.BalanceFixing.Code,
             MarketRole.BalanceResponsible,
             GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
-        outgoingMessage.HasReceiverId(SampleData.BalanceResponsibleNumber.Value);
+        outgoingMessage
+            .HasReceiverId(SampleData.BalanceResponsibleNumber.Value)
+            .HasReceiverRole(MarketRole.BalanceResponsible.Name);
     }
 
     private static AggregationResult CreateAggregatedConsumptionResult()
