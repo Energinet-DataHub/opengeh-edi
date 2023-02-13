@@ -12,16 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Application.Configuration.Commands.Commands;
-
 namespace Application.Transactions.Aggregations;
 
-public class RetrieveAggregationResults : InternalCommand
+public enum AggregationProcessType
 {
-    public RetrieveAggregationResults(AggregationProcessType aggregationProcess)
-    {
-        AggregationProcess = aggregationProcess;
-    }
-
-    public AggregationProcessType AggregationProcess { get; }
+    BalanceFixing,
 }

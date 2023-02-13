@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.Commands;
@@ -30,6 +31,7 @@ public class RetrieveResultsWhenAnAggregationProcessHasCompleted : INotification
 
     public Task Handle(NewResultAvailableNotification notification, CancellationToken cancellationToken)
     {
-        return _commandScheduler.EnqueueAsync(new RetrieveAggregationResults());
+        ArgumentNullException.ThrowIfNull(notification);
+        return _commandScheduler.EnqueueAsync(new RetrieveAggregationResults(notification.AggregationProcessType));
     }
 }

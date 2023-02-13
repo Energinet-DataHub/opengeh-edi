@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Application.Transactions.Aggregations;
+using Domain.OutgoingMessages;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
@@ -35,17 +36,18 @@ public class WhenAnAggregationProcessHasCompletedTests : TestBase
 
     public static IEnumerable<object[]> AggregationProcessCompletedEvents()
     {
-        return new[] { new object[] { SampleData.NameOfBalanceFixingCompletedIntegrationEvent, BalanceFixingCompletedIntegrationEvent() }, };
+        return new[] { new object[] { SampleData.NameOfBalanceFixingCompletedIntegrationEvent, BalanceFixingCompletedIntegrationEvent(), AggregationProcessType.BalanceFixing }, };
     }
 
     [Theory]
     [MemberData(nameof(AggregationProcessCompletedEvents))]
-    public async Task Aggregation_results_are_retrieved(string nameOfReceivedEvent, IMessage receivedEvent)
+    public async Task Aggregation_results_are_retrieved(string nameOfReceivedEvent, IMessage receivedEvent, AggregationProcessType aggregationProcessType)
     {
         await HavingReceivedIntegrationEventAsync(nameOfReceivedEvent, receivedEvent)
             .ConfigureAwait(false);
 
-        CheckHasEnqueuedCommand<RetrieveAggregationResults>();
+        EnqueuedCommand<RetrieveAggregationResults>()
+            .HasProperty<RetrieveAggregationResults>(command => command.AggregationProcess, aggregationProcessType);
     }
 
     private static IMessage BalanceFixingCompletedIntegrationEvent()
@@ -59,7 +61,7 @@ public class WhenAnAggregationProcessHasCompletedTests : TestBase
         };
     }
 
-    private AssertQueuedCommand CheckHasEnqueuedCommand<TCommandType>()
+    private AssertQueuedCommand EnqueuedCommand<TCommandType>()
     {
         return AssertQueuedCommand.QueuedCommand<TCommandType>(
             GetService<IDatabaseConnectionFactory>(),

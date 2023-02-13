@@ -29,7 +29,8 @@ public class BalanceFixingCompletedEventMapper : IIntegrationEventMapper
             Guid.Parse(integrationEvent.BatchId),
             integrationEvent.GridAreaCode,
             integrationEvent.PeriodStartUtc.ToInstant(),
-            integrationEvent.PeriodEndUtc.ToInstant());
+            integrationEvent.PeriodEndUtc.ToInstant(),
+            AggregationProcessType.BalanceFixing);
     }
 
     public bool CanHandle(string eventType)

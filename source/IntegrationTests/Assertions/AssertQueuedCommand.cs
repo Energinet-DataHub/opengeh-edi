@@ -15,21 +15,25 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using Application.Configuration.DataAccess;
 using Dapper;
 using Infrastructure.Configuration.InternalCommands;
+using Infrastructure.Configuration.Serialization;
 using Xunit;
+using Xunit.Sdk;
 
 namespace IntegrationTests.Assertions;
 
 public class AssertQueuedCommand
 {
+    private readonly ISerializer _serializer = new Serializer();
     private readonly IReadOnlyList<string> _commandPayload;
+    private readonly Type _commandType;
 
-    private AssertQueuedCommand(IReadOnlyList<string> commandPayload)
+    private AssertQueuedCommand(IReadOnlyList<string> commandPayload, Type commandType)
     {
         _commandPayload = commandPayload;
+        _commandType = commandType;
     }
 
     public static AssertQueuedCommand QueuedCommand<TCommandType>(IDatabaseConnectionFactory connectionFactory, InternalCommandMapper mapper)
@@ -47,7 +51,21 @@ public class AssertQueuedCommand
             .ToList();
 
         Assert.NotEmpty(commandPayloads);
-        return new AssertQueuedCommand(commandPayloads);
+        return new AssertQueuedCommand(commandPayloads, typeof(TCommandType));
+    }
+
+    public AssertQueuedCommand HasProperty<TCommandType>(Func<TCommandType, object> propertySelector, object expectedValue)
+    {
+        ArgumentNullException.ThrowIfNull(propertySelector);
+        if (_commandPayload.Count > 1)
+        {
+            throw new XunitException(
+                "Found more than 1 internal command. This assertion can be on single commands only");
+        }
+
+        var sut = _serializer.Deserialize<TCommandType>(_commandPayload[0]);
+        Assert.Equal(expectedValue, propertySelector(sut));
+        return this;
     }
 
     public AssertQueuedCommand CountIs(int expectedNumberOfCommands)

@@ -20,13 +20,16 @@ namespace Application.Transactions.Aggregations;
 
 public class NewResultAvailableNotification : INotification
 {
-    public NewResultAvailableNotification(Guid resultId, string gridAreaCode, Instant periodStartDate, Instant periodEndDate)
+    public NewResultAvailableNotification(Guid resultId, string gridAreaCode, Instant periodStartDate, Instant periodEndDate, AggregationProcessType aggregationProcessType)
     {
         ResultId = resultId;
         GridAreaCode = gridAreaCode;
         PeriodStartDate = periodStartDate;
         PeriodEndDate = periodEndDate;
+        AggregationProcessType = aggregationProcessType;
     }
+
+    public AggregationProcessType AggregationProcessType { get; }
 
     public Guid ResultId { get; }
 
