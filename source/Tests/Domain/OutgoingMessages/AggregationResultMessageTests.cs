@@ -51,7 +51,6 @@ public class AggregationResultMessageTests
     public void Energy_supplier_number_must_be_include_in_series_if_receiver_is_balance_responsible()
     {
         var energySupplierNumber = ActorNumber.Create("1234567890124");
-        var receiverNumber = ActorNumber.Create("1234567890123");
         var aggregationResult = AggregationResult.Consumption(
             Guid.NewGuid(),
             GridArea.Create("543"),
@@ -62,7 +61,7 @@ public class AggregationResultMessageTests
             new List<Point>(),
             energySupplierNumber);
         var message = AggregationResultMessage.Create(
-            receiverNumber,
+            ActorNumber.Create("1234567890123"),
             MarketRole.BalanceResponsible,
             TransactionId.New(),
             ProcessType.BalanceFixing,
