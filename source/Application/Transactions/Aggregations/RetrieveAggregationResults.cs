@@ -12,12 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Text.Json.Serialization;
 using Application.Configuration.Commands.Commands;
 
 namespace Application.Transactions.Aggregations;
 
 public class RetrieveAggregationResults : InternalCommand
 {
+    [JsonConstructor]
+    public RetrieveAggregationResults(Guid id, AggregationProcessType aggregationProcess)
+    : base(id)
+    {
+        AggregationProcess = aggregationProcess;
+    }
+
     public RetrieveAggregationResults(AggregationProcessType aggregationProcess)
     {
         AggregationProcess = aggregationProcess;
