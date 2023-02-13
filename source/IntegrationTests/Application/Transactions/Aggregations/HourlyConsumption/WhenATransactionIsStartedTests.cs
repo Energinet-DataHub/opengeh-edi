@@ -91,7 +91,22 @@ public class WhenATransactionIsStartedTests : TestBase
     [Fact]
     public async Task Consumption_per_energy_supplier_result_is_sent_to_the_balance_responsible()
     {
-        var result = AggregationResult.Consumption(
+        await InvokeCommandAsync(new SendAggregationResult(
+            SampleData.BalanceResponsibleNumber,
+            MarketRole.BalanceResponsible,
+            ProcessType.BalanceFixing,
+            CreateAggregatedConsumptionResult())).ConfigureAwait(false);
+
+        var outgoingMessage = await AssertOutgoingMessage.OutgoingMessageAsync(
+            MessageType.NotifyAggregatedMeasureData.Name,
+            ProcessType.BalanceFixing.Code,
+            MarketRole.BalanceResponsible,
+            GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
+    }
+
+    private static AggregationResult CreateAggregatedConsumptionResult()
+    {
+        return AggregationResult.Consumption(
             SampleData.ResultId,
             GridArea.Create(SampleData.GridAreaCode),
             SettlementType.NonProfiled,
@@ -106,18 +121,6 @@ public class WhenATransactionIsStartedTests : TestBase
                     "A02",
                     "2022-10-31T21:15:00.000Z"),
             });
-
-        await InvokeCommandAsync(new SendAggregationResult(
-            SampleData.BalanceResponsibleNumber,
-            MarketRole.BalanceResponsible,
-            ProcessType.BalanceFixing,
-            result)).ConfigureAwait(false);
-
-        var outgoingMessage = await AssertOutgoingMessage.OutgoingMessageAsync(
-            MessageType.NotifyAggregatedMeasureData.Name,
-            ProcessType.BalanceFixing.Code,
-            MarketRole.BalanceResponsible,
-            GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
     }
 
     private void MakeAggregationResultAvailableFor(ActorNumber energySupplierNumber)
