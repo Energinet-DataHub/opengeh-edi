@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.Commands.Commands;
@@ -26,6 +27,16 @@ namespace Application.Transactions.Aggregations;
 
 public class SendAggregationResult : InternalCommand
 {
+    [JsonConstructor]
+    public SendAggregationResult(Guid id, ActorNumber sendResultTo, MarketRole roleOfReceiver, ProcessType processType, AggregationResult result)
+    : base(id)
+    {
+        SendResultTo = sendResultTo;
+        RoleOfReceiver = roleOfReceiver;
+        ProcessType = processType;
+        Result = result;
+    }
+
     public SendAggregationResult(ActorNumber sendResultTo, MarketRole roleOfReceiver, ProcessType processType, AggregationResult result)
     {
         SendResultTo = sendResultTo;
