@@ -14,6 +14,7 @@
 
 using System;
 using Application.Transactions.Aggregations;
+using Domain.OutgoingMessages;
 using Infrastructure.Configuration.IntegrationEvents;
 using MediatR;
 using NodaTime.Serialization.Protobuf;
@@ -30,7 +31,7 @@ public class BalanceFixingCompletedEventMapper : IIntegrationEventMapper
             integrationEvent.GridAreaCode,
             integrationEvent.PeriodStartUtc.ToInstant(),
             integrationEvent.PeriodEndUtc.ToInstant(),
-            AggregationProcessType.BalanceFixing);
+            ProcessType.BalanceFixing);
     }
 
     public bool CanHandle(string eventType)

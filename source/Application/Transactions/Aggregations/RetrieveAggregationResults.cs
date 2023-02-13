@@ -15,22 +15,23 @@
 using System;
 using System.Text.Json.Serialization;
 using Application.Configuration.Commands.Commands;
+using Domain.OutgoingMessages;
 
 namespace Application.Transactions.Aggregations;
 
 public class RetrieveAggregationResults : InternalCommand
 {
     [JsonConstructor]
-    public RetrieveAggregationResults(Guid id, AggregationProcessType aggregationProcess)
+    public RetrieveAggregationResults(Guid id, ProcessType aggregationProcess)
     : base(id)
     {
         AggregationProcess = aggregationProcess;
     }
 
-    public RetrieveAggregationResults(AggregationProcessType aggregationProcess)
+    public RetrieveAggregationResults(ProcessType aggregationProcess)
     {
         AggregationProcess = aggregationProcess;
     }
 
-    public AggregationProcessType AggregationProcess { get; }
+    public ProcessType AggregationProcess { get; }
 }

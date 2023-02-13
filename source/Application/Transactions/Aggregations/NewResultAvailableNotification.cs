@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using Domain.OutgoingMessages;
 using MediatR;
 using NodaTime;
 
@@ -20,7 +21,7 @@ namespace Application.Transactions.Aggregations;
 
 public class NewResultAvailableNotification : INotification
 {
-    public NewResultAvailableNotification(Guid resultId, string gridAreaCode, Instant periodStartDate, Instant periodEndDate, AggregationProcessType aggregationProcessType)
+    public NewResultAvailableNotification(Guid resultId, string gridAreaCode, Instant periodStartDate, Instant periodEndDate, ProcessType aggregationProcessType)
     {
         ResultId = resultId;
         GridAreaCode = gridAreaCode;
@@ -29,7 +30,7 @@ public class NewResultAvailableNotification : INotification
         AggregationProcessType = aggregationProcessType;
     }
 
-    public AggregationProcessType AggregationProcessType { get; }
+    public ProcessType AggregationProcessType { get; }
 
     public Guid ResultId { get; }
 

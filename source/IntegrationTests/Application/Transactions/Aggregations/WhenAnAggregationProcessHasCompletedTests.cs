@@ -36,12 +36,12 @@ public class WhenAnAggregationProcessHasCompletedTests : TestBase
 
     public static IEnumerable<object[]> AggregationProcessCompletedEvents()
     {
-        return new[] { new object[] { SampleData.NameOfBalanceFixingCompletedIntegrationEvent, BalanceFixingCompletedIntegrationEvent(), AggregationProcessType.BalanceFixing }, };
+        return new[] { new object[] { SampleData.NameOfBalanceFixingCompletedIntegrationEvent, BalanceFixingCompletedIntegrationEvent(), ProcessType.BalanceFixing }, };
     }
 
     [Theory]
     [MemberData(nameof(AggregationProcessCompletedEvents))]
-    public async Task Aggregation_results_are_retrieved(string nameOfReceivedEvent, IMessage receivedEvent, AggregationProcessType aggregationProcessType)
+    public async Task Aggregation_results_are_retrieved(string nameOfReceivedEvent, IMessage receivedEvent, ProcessType aggregationProcessType)
     {
         await HavingReceivedIntegrationEventAsync(nameOfReceivedEvent, receivedEvent)
             .ConfigureAwait(false);
