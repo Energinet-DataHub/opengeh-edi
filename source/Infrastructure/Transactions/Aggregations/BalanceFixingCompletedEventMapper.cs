@@ -26,7 +26,7 @@ public class BalanceFixingCompletedEventMapper : IIntegrationEventMapper
     public INotification MapFrom(byte[] payload)
     {
         var integrationEvent = Energinet.DataHub.Wholesale.Contracts.Events.ProcessCompleted.Parser.ParseFrom(payload);
-        return new NewResultAvailableNotification(
+        return new AggregationProcessHasCompleted(
             Guid.Parse(integrationEvent.BatchId),
             integrationEvent.GridAreaCode,
             integrationEvent.PeriodStartUtc.ToInstant(),

@@ -20,7 +20,7 @@ using MediatR;
 
 namespace Application.Transactions.Aggregations;
 
-public class NewResultAvailableNotificationHandler : INotificationHandler<NewResultAvailableNotification>
+public class NewResultAvailableNotificationHandler : INotificationHandler<AggregationProcessHasCompleted>
 {
     private readonly CommandSchedulerFacade _commandScheduler;
 
@@ -29,7 +29,7 @@ public class NewResultAvailableNotificationHandler : INotificationHandler<NewRes
         _commandScheduler = commandScheduler;
     }
 
-    public Task Handle(NewResultAvailableNotification notification, CancellationToken cancellationToken)
+    public Task Handle(AggregationProcessHasCompleted notification, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(notification);
         return _commandScheduler.EnqueueAsync(

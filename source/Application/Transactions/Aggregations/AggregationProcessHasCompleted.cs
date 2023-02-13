@@ -19,9 +19,9 @@ using NodaTime;
 
 namespace Application.Transactions.Aggregations;
 
-public class NewResultAvailableNotification : INotification
+public class AggregationProcessHasCompleted : INotification
 {
-    public NewResultAvailableNotification(Guid resultId, string gridAreaCode, Instant periodStartDate, Instant periodEndDate, ProcessType aggregationProcessType)
+    public AggregationProcessHasCompleted(Guid resultId, string gridAreaCode, Instant periodStartDate, Instant periodEndDate, ProcessType aggregationProcessType)
     {
         ResultId = resultId;
         GridAreaCode = gridAreaCode;
