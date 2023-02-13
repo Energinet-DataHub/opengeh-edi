@@ -13,16 +13,13 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Application.Transactions.Aggregations;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
-using Infrastructure.Configuration;
 using Infrastructure.Configuration.InternalCommands;
-using Infrastructure.OutgoingMessages.Common.Xml;
 using IntegrationTests.Assertions;
 using IntegrationTests.Fixtures;
 using Xunit;
