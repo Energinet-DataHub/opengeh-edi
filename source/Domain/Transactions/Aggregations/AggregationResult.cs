@@ -31,7 +31,7 @@ public class AggregationResult
         Period = period;
     }
 
-    private AggregationResult(Guid id, IReadOnlyList<Point> points, GridArea gridArea, MeteringPointType meteringPointType, MeasurementUnit measureUnitType, Resolution resolution, Period period, SettlementType settlementType)
+    private AggregationResult(Guid id, IReadOnlyList<Point> points, GridArea gridArea, MeteringPointType meteringPointType, MeasurementUnit measureUnitType, Resolution resolution, Period period, SettlementType settlementType, ActorNumber? aggregatedForActor = null)
     {
         Id = id;
         Points = points;
@@ -41,6 +41,7 @@ public class AggregationResult
         Resolution = resolution;
         Period = period;
         SettlementType = settlementType;
+        AggregatedForActor = aggregatedForActor;
     }
 
     public Guid Id { get; }
@@ -59,6 +60,8 @@ public class AggregationResult
 
     public SettlementType? SettlementType { get; }
 
+    public ActorNumber? AggregatedForActor { get; }
+
     public static AggregationResult Consumption(
         Guid id,
         GridArea gridAreaCode,
@@ -66,7 +69,8 @@ public class AggregationResult
         MeasurementUnit measureUnitType,
         Resolution resolution,
         Period period,
-        IReadOnlyList<Point> points)
+        IReadOnlyList<Point> points,
+        ActorNumber? aggregatedForActor = null)
     {
         return new AggregationResult(
             id,
@@ -76,7 +80,8 @@ public class AggregationResult
             measureUnitType,
             resolution,
             period,
-            settlementType);
+            settlementType,
+            aggregatedForActor);
     }
 
     public static AggregationResult Production(

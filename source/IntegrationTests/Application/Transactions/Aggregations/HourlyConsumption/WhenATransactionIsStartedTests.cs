@@ -109,7 +109,10 @@ public class WhenATransactionIsStartedTests : TestBase
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasMessageRecordValue<TimeSeries>(
                 series => series.BalanceResponsibleNumber!,
-                SampleData.BalanceResponsibleNumber.Value);
+                SampleData.BalanceResponsibleNumber.Value)
+            .HasMessageRecordValue<TimeSeries>(
+                series => series.EnergySupplierNumber!,
+                SampleData.EnergySupplierNumber.Value);
     }
 
     private static AggregationResult CreateAggregatedConsumptionResult()
@@ -128,7 +131,8 @@ public class WhenATransactionIsStartedTests : TestBase
                     1.1m,
                     "A02",
                     "2022-10-31T21:15:00.000Z"),
-            });
+            },
+            SampleData.EnergySupplierNumber);
     }
 
     private void MakeAggregationResultAvailableFor(ActorNumber energySupplierNumber)
