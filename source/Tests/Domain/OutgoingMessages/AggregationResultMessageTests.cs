@@ -30,6 +30,7 @@ public class AggregationResultMessageTests
     public void Receiver_id_must_be_included_in_series_if_receiver_is_balance_responsible()
     {
         var receiverNumber = ActorNumber.Create("1234567890123");
+
         var message = CreateMessageFor(receiverNumber, CreateResult());
 
         Assert.Equal(receiverNumber.Value, message.Series.BalanceResponsibleNumber);
@@ -38,8 +39,8 @@ public class AggregationResultMessageTests
     [Fact]
     public void Energy_supplier_number_must_be_include_in_series_if_receiver_is_balance_responsible()
     {
-        var energySupplierNumber = ActorNumber.Create("1234567890124");
-        var aggregationResult = CreateResult(energySupplierNumber);
+        var aggregationResult = CreateResult(ActorNumber.Create("1234567890124"));
+
         var message = CreateMessageFor(ActorNumber.Create("1234567890123"), aggregationResult);
 
         Assert.Equal(aggregationResult.AggregatedForActor?.Value, message.Series.EnergySupplierNumber);
