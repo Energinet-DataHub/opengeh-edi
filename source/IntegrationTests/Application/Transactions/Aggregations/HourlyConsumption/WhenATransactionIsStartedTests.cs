@@ -88,6 +88,38 @@ public class WhenATransactionIsStartedTests : TestBase
             .HasMessageRecordValue<TimeSeries>(timeSeries => timeSeries.MeteringPointType, MeteringPointType.Consumption.Name);
     }
 
+    [Fact]
+    public async Task Consumption_per_energy_supplier_result_is_sent_to_the_balance_responsible()
+    {
+        var result = AggregationResult.Consumption(
+            SampleData.ResultId,
+            GridArea.Create(SampleData.GridAreaCode),
+            SettlementType.NonProfiled,
+            MeasurementUnit.From(SampleData.MeasureUnitType),
+            Resolution.From(SampleData.Resolution),
+            new Domain.Transactions.Aggregations.Period(SampleData.StartOfPeriod, SampleData.EndOfPeriod),
+            new List<Point>()
+            {
+                new(
+                    1,
+                    1.1m,
+                    "A02",
+                    "2022-10-31T21:15:00.000Z"),
+            });
+
+        await InvokeCommandAsync(new SendAggregationResult(
+            SampleData.BalanceResponsibleNumber,
+            MarketRole.BalanceResponsible,
+            ProcessType.BalanceFixing,
+            result)).ConfigureAwait(false);
+
+        var outgoingMessage = await AssertOutgoingMessage.OutgoingMessageAsync(
+            MessageType.NotifyAggregatedMeasureData.Name,
+            ProcessType.BalanceFixing.Code,
+            MarketRole.BalanceResponsible,
+            GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
+    }
+
     private void MakeAggregationResultAvailableFor(ActorNumber energySupplierNumber)
     {
         var result = AggregationResult.Consumption(
