@@ -25,6 +25,7 @@ internal static class AggregationsConfiguration
 {
     internal static void Configure(IServiceCollection services, Func<IServiceProvider, IAggregationResults> aggregationResultsBuilder)
     {
+        services.AddTransient(typeof(INotificationHandler<NewResultAvailableNotification>), typeof(RetrieveResultsWhenAnAggregationProcessHasCompleted));
         services.AddTransient(typeof(INotificationHandler<NewResultAvailableNotification>), typeof(PrepareTransactionsWhenBalanceFixingIsCompleted));
         services.AddTransient(typeof(INotificationHandler<NewResultAvailableNotification>), typeof(NewResultAvailableNotificationHandler));
         services.AddScoped<AggregationResultMapper>();
