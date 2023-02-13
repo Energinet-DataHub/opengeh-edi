@@ -106,7 +106,10 @@ public class WhenATransactionIsStartedTests : TestBase
             .HasReceiverId(SampleData.BalanceResponsibleNumber.Value)
             .HasReceiverRole(MarketRole.BalanceResponsible.Name)
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
-            .HasSenderRole(MarketRole.MeteringDataAdministrator.Name);
+            .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
+            .HasMessageRecordValue<TimeSeries>(
+                series => series.BalanceResponsibleNumber!,
+                SampleData.BalanceResponsibleNumber.Value);
     }
 
     private static AggregationResult CreateAggregatedConsumptionResult()
