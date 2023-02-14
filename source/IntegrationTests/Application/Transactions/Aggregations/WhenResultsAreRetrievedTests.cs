@@ -59,7 +59,7 @@ public class WhenResultsAreRetrievedTests : TestBase
         await AggregationResultsAreRetrieved(completedAggregationType);
 
         var message = await OutgoingMessageAsync(
-            MessageType.NotifyAggregatedMeasureData, MarketRole.MeteredDataResponsible, completedAggregationType);
+            MarketRole.MeteredDataResponsible, completedAggregationType);
         message.HasReceiverId(SampleData.GridOperatorNumber)
             .HasReceiverRole(MarketRole.MeteredDataResponsible.Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
@@ -89,7 +89,6 @@ public class WhenResultsAreRetrievedTests : TestBase
         await AggregationResultsAreRetrieved(completedAggregationType);
 
         var outgoingMessage = await OutgoingMessageAsync(
-            MessageType.NotifyAggregatedMeasureData,
             MarketRole.BalanceResponsible,
             completedAggregationType);
         outgoingMessage
@@ -111,10 +110,10 @@ public class WhenResultsAreRetrievedTests : TestBase
         await HavingProcessedInternalTasksAsync().ConfigureAwait(false);
     }
 
-    private async Task<AssertOutgoingMessage> OutgoingMessageAsync(MessageType messageType, MarketRole roleOfReceiver, ProcessType completedAggregationType)
+    private async Task<AssertOutgoingMessage> OutgoingMessageAsync(MarketRole roleOfReceiver, ProcessType completedAggregationType)
     {
         return await AssertOutgoingMessage.OutgoingMessageAsync(
-            messageType.Name,
+            MessageType.NotifyAggregatedMeasureData.Name,
             completedAggregationType.Code,
             roleOfReceiver,
             GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
