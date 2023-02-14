@@ -64,12 +64,6 @@ public class AggregationResultsStub : IAggregationResults
         _resultsForActors.Add(targetActorNumber, aggregationResult);
     }
 
-    public void Add(AggregationResult aggregationResult)
-    {
-        ArgumentNullException.ThrowIfNull(aggregationResult);
-        _results.Add(aggregationResult);
-    }
-
     public void HasNonProfiledConsumptionFor(ActorNumber balanceResponsibleNumber, ReadOnlyCollection<ActorNumber> energySuppliers)
     {
         ArgumentNullException.ThrowIfNull(energySuppliers);
