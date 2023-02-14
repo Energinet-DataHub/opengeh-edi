@@ -16,6 +16,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Domain.Actors;
+using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 
 namespace Application.Transactions.Aggregations;
@@ -48,4 +49,13 @@ public interface IAggregationResults
     /// <param name="energySupplierNumber"></param>
     /// <param name="period"></param>
     Task<AggregationResult> NonProfiledConsumptionForAsync(Guid resultId, string gridArea, ActorNumber energySupplierNumber, Domain.Transactions.Aggregations.Period period);
+
+    /// <summary>
+    /// Fetch aggregation result for non-profiled consumption
+    /// </summary>
+    /// <param name="resultId"></param>
+    /// <param name="gridArea"></param>
+    /// <param name="roleOfReceiver"></param>
+    /// <param name="period"></param>
+    Task<ReadOnlyCollection<Result>> NonProfiledConsumptionForAsync(Guid resultId, GridArea gridArea, MarketRole roleOfReceiver, Domain.Transactions.Aggregations.Period period);
 }

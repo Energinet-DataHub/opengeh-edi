@@ -23,9 +23,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Application.Transactions.Aggregations;
 using Domain.Actors;
+using Domain.OutgoingMessages;
+using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using Infrastructure.Configuration.Serialization;
 using Polly;
+using Period = Domain.Transactions.Aggregations.Period;
 
 namespace Infrastructure.Transactions.Aggregations;
 
@@ -83,6 +86,11 @@ public class AggregationResultsOverHttp : IAggregationResults
 
         return await _aggregationResultMapper.MapToConsumptionResultAsync(
             await response.Content.ReadAsStreamAsync().ConfigureAwait(false), resultId, gridArea, period, SettlementType.NonProfiled).ConfigureAwait(false);
+    }
+
+    public Task<ReadOnlyCollection<Result>> NonProfiledConsumptionForAsync(Guid resultId, GridArea gridArea, MarketRole roleOfReceiver, Period period)
+    {
+        return Task.FromResult(new List<Result>().AsReadOnly());
     }
 
     private async Task<HttpResponseMessage> CallAsync<TRequest>(string apiVersion, TRequest request)
