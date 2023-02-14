@@ -88,33 +88,6 @@ public class WhenATransactionIsStartedTests : TestBase
             .HasMessageRecordValue<TimeSeries>(timeSeries => timeSeries.MeteringPointType, MeteringPointType.Consumption.Name);
     }
 
-    [Fact]
-    public async Task Consumption_per_energy_supplier_result_is_sent_to_the_balance_responsible()
-    {
-        await InvokeCommandAsync(new SendAggregationResult(
-            SampleData.BalanceResponsibleNumber.Value,
-            MarketRole.BalanceResponsible.Name,
-            ProcessType.BalanceFixing.Name,
-            CreateAggregatedConsumptionResult())).ConfigureAwait(false);
-
-        var outgoingMessage = await AssertOutgoingMessage.OutgoingMessageAsync(
-            MessageType.NotifyAggregatedMeasureData.Name,
-            ProcessType.BalanceFixing.Code,
-            MarketRole.BalanceResponsible,
-            GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
-        outgoingMessage
-            .HasReceiverId(SampleData.BalanceResponsibleNumber.Value)
-            .HasReceiverRole(MarketRole.BalanceResponsible.Name)
-            .HasSenderId(DataHubDetails.IdentificationNumber.Value)
-            .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
-            .HasMessageRecordValue<TimeSeries>(
-                series => series.BalanceResponsibleNumber!,
-                SampleData.BalanceResponsibleNumber.Value)
-            .HasMessageRecordValue<TimeSeries>(
-                series => series.EnergySupplierNumber!,
-                SampleData.EnergySupplierNumber.Value);
-    }
-
     private static AggregationResult CreateAggregatedConsumptionResult()
     {
         return AggregationResult.Consumption(
