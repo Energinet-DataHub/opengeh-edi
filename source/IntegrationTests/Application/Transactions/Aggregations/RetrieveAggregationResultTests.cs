@@ -81,9 +81,9 @@ public class RetrieveAggregationResultTests : TestBase
             new Domain.Transactions.Aggregations.Period(
                 SampleData.StartOfPeriod,
                 SampleData.EndOfPeriod),
-            new List<Point>()
+            new List<Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point>()
             {
-                new Point(1, 1.1m, "A02", "2022-10-31T21:15:00.000Z"),
+                new(1, 1.1m, "A02", "2022-10-31T21:15:00.000Z"),
             }));
     }
 

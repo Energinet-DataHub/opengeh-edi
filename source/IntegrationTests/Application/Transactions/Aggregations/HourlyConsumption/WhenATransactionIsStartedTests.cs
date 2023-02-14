@@ -124,7 +124,7 @@ public class WhenATransactionIsStartedTests : TestBase
             MeasurementUnit.From(SampleData.MeasureUnitType),
             Resolution.From(SampleData.Resolution),
             new Domain.Transactions.Aggregations.Period(SampleData.StartOfPeriod, SampleData.EndOfPeriod),
-            new List<Point>()
+            new List<Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point>()
             {
                 new(
                     1,
@@ -144,7 +144,7 @@ public class WhenATransactionIsStartedTests : TestBase
             MeasurementUnit.From(SampleData.MeasureUnitType),
             Resolution.From(SampleData.Resolution),
             new Domain.Transactions.Aggregations.Period(SampleData.StartOfPeriod, SampleData.EndOfPeriod),
-            new List<Point>()
+            new List<Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point>()
             {
                 new(
                     1,
