@@ -19,6 +19,7 @@ using Application.Configuration.Commands;
 using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.Transactions;
+using Domain.Transactions.Aggregations;
 
 namespace Application.Transactions.Aggregations;
 
@@ -40,6 +41,14 @@ public sealed class TransactionScheduler
         ArgumentNullException.ThrowIfNull(gridArea);
         ArgumentNullException.ThrowIfNull(aggregationProcess);
 
+        await ScheduleTotalProductionResultAsync(resultsId, aggregationProcess, gridArea, period).ConfigureAwait(false);
+        await ScheduleTransactionsForAsync(
+            aggregationProcess,
+            await _aggregationResults.NonProfiledConsumptionForAsync(resultsId, gridArea, MarketRole.BalanceResponsible, period).ConfigureAwait(false)).ConfigureAwait(false);
+    }
+
+    private async Task ScheduleTotalProductionResultAsync(Guid resultsId, ProcessType aggregationProcess, GridArea gridArea, Domain.Transactions.Aggregations.Period period)
+    {
         var gridOperatorNumber = await _gridAreaLookup.GetGridOperatorForAsync(gridArea.Code).ConfigureAwait(false);
         var result = await _aggregationResults.ProductionResultForAsync(resultsId, gridArea.Code, period).ConfigureAwait(false);
         if (result is not null)
@@ -51,10 +60,6 @@ public sealed class TransactionScheduler
                     aggregationProcess.Name,
                     result)).ConfigureAwait(false);
         }
-
-        await ScheduleTransactionsForAsync(
-            aggregationProcess,
-            await _aggregationResults.NonProfiledConsumptionForAsync(resultsId, gridArea, MarketRole.BalanceResponsible, period).ConfigureAwait(false)).ConfigureAwait(false);
     }
 
     private async Task ScheduleTransactionsForAsync(ProcessType aggregationProcess, ReadOnlyCollection<Result> results)
