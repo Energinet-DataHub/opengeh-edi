@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
@@ -26,6 +27,7 @@ using Xunit;
 
 namespace IntegrationTests.Application.Transactions.Aggregations;
 
+#pragma warning disable CA1062 // To avoid null guards in parameterized tests
 public class WhenResultsAreRetrievedTests : TestBase
 {
     private readonly AggregationResultsStub _aggregationResults;
@@ -36,8 +38,14 @@ public class WhenResultsAreRetrievedTests : TestBase
         _aggregationResults = (AggregationResultsStub)GetService<IAggregationResults>();
     }
 
-    [Fact]
-    public async Task Consumption_per_energy_supplier_result_is_sent_to_the_balance_responsible()
+    public static IEnumerable<object[]> AggregationProcessTypes()
+    {
+        return new[] { new object[] { ProcessType.BalanceFixing }, };
+    }
+
+    [Theory]
+    [MemberData(nameof(AggregationProcessTypes))]
+    public async Task Consumption_per_energy_supplier_result_is_sent_to_the_balance_responsible(ProcessType completedAggregationType)
     {
         _aggregationResults.HasNonProfiledConsumptionFor(
             SampleData.BalanceResponsibleNumber,
@@ -48,7 +56,7 @@ public class WhenResultsAreRetrievedTests : TestBase
 
         await InvokeCommandAsync(new RetrieveAggregationResults(
             SampleData.ResultId,
-            ProcessType.BalanceFixing.Name,
+            completedAggregationType.Name,
             SampleData.GridAreaCode,
             new Period(SampleData.StartOfPeriod, SampleData.EndOfPeriod))).ConfigureAwait(false);
 
@@ -56,7 +64,7 @@ public class WhenResultsAreRetrievedTests : TestBase
 
         var outgoingMessage = await AssertOutgoingMessage.OutgoingMessageAsync(
             MessageType.NotifyAggregatedMeasureData.Name,
-            ProcessType.BalanceFixing.Code,
+            completedAggregationType.Code,
             MarketRole.BalanceResponsible,
             GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
         outgoingMessage
