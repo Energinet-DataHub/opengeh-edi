@@ -71,12 +71,8 @@ public sealed class TransactionScheduler
         var result = await _aggregationResults.ProductionResultForAsync(resultsId, gridArea.Code, period).ConfigureAwait(false);
         if (result is not null)
         {
-            await _commandScheduler
-                .EnqueueAsync(new SendAggregationResult(
-                    gridOperatorNumber.Value,
-                    MarketRole.MeteredDataResponsible.Name,
-                    aggregationProcess.Name,
-                    result)).ConfigureAwait(false);
+            await ScheduleAsync(aggregationProcess, gridOperatorNumber, MarketRole.MeteredDataResponsible, result)
+                .ConfigureAwait(false);
         }
     }
 
