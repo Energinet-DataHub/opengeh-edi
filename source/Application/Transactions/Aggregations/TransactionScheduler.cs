@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Application.Configuration.Commands;
 using Domain.Actors;
@@ -40,6 +41,11 @@ public sealed class TransactionScheduler
             await _aggregationResults.NonProfiledConsumptionForAsync(resultsId, gridArea, MarketRole.BalanceResponsible, period)
                 .ConfigureAwait(false);
 
+        await ScheduleTransactionsForAsync(aggregationProcess, results).ConfigureAwait(false);
+    }
+
+    private async Task ScheduleTransactionsForAsync(ProcessType aggregationProcess, ReadOnlyCollection<Result> results)
+    {
         foreach (var result in results)
         {
             foreach (var aggregationResult in result.AggregationResults)
