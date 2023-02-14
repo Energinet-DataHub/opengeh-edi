@@ -57,11 +57,10 @@ public class WhenResultsAreRetrievedTests : TestBase
         await RetrieveResults(completedAggregationType).ConfigureAwait(false);
         await HavingProcessedInternalTasksAsync().ConfigureAwait(false);
 
-        var outgoingMessage = await AssertOutgoingMessage.OutgoingMessageAsync(
-            MessageType.NotifyAggregatedMeasureData.Name,
-            completedAggregationType.Code,
+        var outgoingMessage = await OutgoingMessageAsync(
+            MessageType.NotifyAggregatedMeasureData,
             MarketRole.BalanceResponsible,
-            GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
+            completedAggregationType);
         outgoingMessage
             .HasReceiverId(SampleData.BalanceResponsibleNumber.Value)
             .HasReceiverRole(MarketRole.BalanceResponsible.Name)
@@ -73,6 +72,15 @@ public class WhenResultsAreRetrievedTests : TestBase
             .HasMessageRecordValue<TimeSeries>(
                 series => series.EnergySupplierNumber!,
                 SampleData.EnergySupplierNumber.Value);
+    }
+
+    private async Task<AssertOutgoingMessage> OutgoingMessageAsync(MessageType messageType, MarketRole roleOfReceiver, ProcessType completedAggregationType)
+    {
+        return await AssertOutgoingMessage.OutgoingMessageAsync(
+            messageType.Name,
+            completedAggregationType.Code,
+            roleOfReceiver,
+            GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
     }
 
     private async Task RetrieveResults(ProcessType completedAggregationType)
