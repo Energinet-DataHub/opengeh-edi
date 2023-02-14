@@ -92,9 +92,9 @@ public class WhenATransactionIsStartedTests : TestBase
     public async Task Consumption_per_energy_supplier_result_is_sent_to_the_balance_responsible()
     {
         await InvokeCommandAsync(new SendAggregationResult(
-            SampleData.BalanceResponsibleNumber,
-            MarketRole.BalanceResponsible,
-            ProcessType.BalanceFixing,
+            SampleData.BalanceResponsibleNumber.Value,
+            MarketRole.BalanceResponsible.Name,
+            ProcessType.BalanceFixing.Name,
             CreateAggregatedConsumptionResult())).ConfigureAwait(false);
 
         var outgoingMessage = await AssertOutgoingMessage.OutgoingMessageAsync(

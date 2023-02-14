@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Application.Configuration.Commands.Commands;
 using Domain.Actors;
 using Domain.OutgoingMessages;
+using Domain.SeedWork;
 using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using MediatR;
@@ -28,7 +29,7 @@ namespace Application.Transactions.Aggregations;
 public class SendAggregationResult : InternalCommand
 {
     [JsonConstructor]
-    public SendAggregationResult(Guid id, ActorNumber sendResultTo, MarketRole roleOfReceiver, ProcessType processType, AggregationResult result)
+    public SendAggregationResult(Guid id, string sendResultTo, string roleOfReceiver, string processType, AggregationResult result)
     : base(id)
     {
         SendResultTo = sendResultTo;
@@ -37,7 +38,7 @@ public class SendAggregationResult : InternalCommand
         Result = result;
     }
 
-    public SendAggregationResult(ActorNumber sendResultTo, MarketRole roleOfReceiver, ProcessType processType, AggregationResult result)
+    public SendAggregationResult(string sendResultTo, string roleOfReceiver, string processType, AggregationResult result)
     {
         SendResultTo = sendResultTo;
         RoleOfReceiver = roleOfReceiver;
@@ -45,11 +46,11 @@ public class SendAggregationResult : InternalCommand
         Result = result;
     }
 
-    public ActorNumber SendResultTo { get; }
+    public string SendResultTo { get; }
 
-    public MarketRole RoleOfReceiver { get; }
+    public string RoleOfReceiver { get; }
 
-    public ProcessType ProcessType { get; }
+    public string ProcessType { get; }
 
     public AggregationResult Result { get; }
 }
@@ -69,9 +70,9 @@ public class SendAggregationResultHandler : IRequestHandler<SendAggregationResul
 
         var transaction = new AggregationResultForwarding(
             TransactionId.New(),
-            request.SendResultTo,
-            request.RoleOfReceiver,
-            request.ProcessType);
+            ActorNumber.Create(request.SendResultTo),
+            EnumerationType.FromName<MarketRole>(request.RoleOfReceiver),
+            EnumerationType.FromName<ProcessType>(request.ProcessType));
 
         transaction.SendResult(request.Result);
 
