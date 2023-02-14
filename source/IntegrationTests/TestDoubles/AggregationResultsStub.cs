@@ -41,7 +41,7 @@ public class AggregationResultsStub : IAggregationResults
     public Task<ReadOnlyCollection<ActorNumber>> EnergySuppliersWithHourlyConsumptionResultAsync(Guid resultId, string gridArea)
     {
         var actors = _resultsForActors
-            .Where(result => result.Value.GridArea.Code.Equals(gridArea, StringComparison.OrdinalIgnoreCase) && result.Value.Id.Equals(resultId))
+            .Where(result => result.Value.GridArea.Code.Equals(gridArea, StringComparison.OrdinalIgnoreCase))
             .Select(result => result.Key)
             .ToList();
 
@@ -94,5 +94,10 @@ public class AggregationResultsStub : IAggregationResults
     public void HasResult(AggregationResult result)
     {
         _results.Add(result);
+    }
+
+    public void HasResultForActor(ActorNumber actorNumber, AggregationResult result)
+    {
+        _resultsForActors.Add(actorNumber, result);
     }
 }
