@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
@@ -43,11 +44,13 @@ public class WhenAnAggregationProcessHasCompletedTests : TestBase
     [MemberData(nameof(AggregationProcessCompletedEvents))]
     public async Task Aggregation_results_are_retrieved(string nameOfReceivedEvent, IMessage receivedEvent, ProcessType aggregationProcessType)
     {
+        ArgumentNullException.ThrowIfNull(aggregationProcessType);
+
         await HavingReceivedIntegrationEventAsync(nameOfReceivedEvent, receivedEvent)
             .ConfigureAwait(false);
 
         EnqueuedCommand<RetrieveAggregationResults>()
-            .HasProperty<RetrieveAggregationResults>(command => command.AggregationProcess, aggregationProcessType);
+            .HasProperty<RetrieveAggregationResults>(command => command.AggregationProcess, aggregationProcessType.Name);
     }
 
     private static IMessage BalanceFixingCompletedIntegrationEvent()

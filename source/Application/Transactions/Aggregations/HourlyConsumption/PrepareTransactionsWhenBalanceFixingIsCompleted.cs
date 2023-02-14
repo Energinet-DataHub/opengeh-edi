@@ -34,7 +34,7 @@ public class PrepareTransactionsWhenBalanceFixingIsCompleted : INotificationHand
         ArgumentNullException.ThrowIfNull(notification);
         return _commandScheduler.EnqueueAsync(new PrepareTransactions(
             notification.ResultId,
-            notification.GridAreaCode,
+            notification.GridArea.Code,
             new Period(notification.PeriodStartDate, notification.PeriodEndDate)));
     }
 }

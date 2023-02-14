@@ -32,6 +32,10 @@ public class RetrieveResultsWhenAnAggregationProcessHasCompleted : INotification
     public Task Handle(AggregationProcessHasCompleted notification, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(notification);
-        return _commandScheduler.EnqueueAsync(new RetrieveAggregationResults(notification.AggregationProcessType));
+        return _commandScheduler.EnqueueAsync(new RetrieveAggregationResults(
+            notification.ResultId,
+            notification.AggregationProcessType.Name,
+            notification.GridArea.Code,
+            new Period(notification.PeriodStartDate, notification.PeriodEndDate)));
     }
 }

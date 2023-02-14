@@ -14,6 +14,7 @@
 
 using System;
 using Domain.OutgoingMessages;
+using Domain.Transactions;
 using MediatR;
 using NodaTime;
 
@@ -21,10 +22,10 @@ namespace Application.Transactions.Aggregations;
 
 public class AggregationProcessHasCompleted : INotification
 {
-    public AggregationProcessHasCompleted(Guid resultId, string gridAreaCode, Instant periodStartDate, Instant periodEndDate, ProcessType aggregationProcessType)
+    public AggregationProcessHasCompleted(Guid resultId, GridArea gridArea, Instant periodStartDate, Instant periodEndDate, ProcessType aggregationProcessType)
     {
         ResultId = resultId;
-        GridAreaCode = gridAreaCode;
+        GridArea = gridArea;
         PeriodStartDate = periodStartDate;
         PeriodEndDate = periodEndDate;
         AggregationProcessType = aggregationProcessType;
@@ -34,7 +35,7 @@ public class AggregationProcessHasCompleted : INotification
 
     public Guid ResultId { get; }
 
-    public string GridAreaCode { get; }
+    public GridArea GridArea { get; }
 
     public Instant PeriodStartDate { get; }
 

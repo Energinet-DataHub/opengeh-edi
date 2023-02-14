@@ -15,6 +15,7 @@
 using System;
 using Application.Transactions.Aggregations;
 using Domain.OutgoingMessages;
+using Domain.Transactions;
 using Infrastructure.Configuration.IntegrationEvents;
 using MediatR;
 using NodaTime.Serialization.Protobuf;
@@ -28,7 +29,7 @@ public class BalanceFixingCompletedEventMapper : IIntegrationEventMapper
         var integrationEvent = Energinet.DataHub.Wholesale.Contracts.Events.ProcessCompleted.Parser.ParseFrom(payload);
         return new AggregationProcessHasCompleted(
             Guid.Parse(integrationEvent.BatchId),
-            integrationEvent.GridAreaCode,
+            GridArea.Create(integrationEvent.GridAreaCode),
             integrationEvent.PeriodStartUtc.ToInstant(),
             integrationEvent.PeriodEndUtc.ToInstant(),
             ProcessType.BalanceFixing);

@@ -34,7 +34,7 @@ public class NewResultAvailableNotificationHandler : INotificationHandler<Aggreg
         ArgumentNullException.ThrowIfNull(notification);
         return _commandScheduler.EnqueueAsync(
             new StartTransaction(
-                notification.GridAreaCode,
+                notification.GridArea.Code,
                 notification.ResultId,
                 notification.PeriodStartDate,
                 notification.PeriodEndDate));

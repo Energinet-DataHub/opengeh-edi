@@ -12,20 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.SeedWork;
+using NodaTime;
 
-namespace Domain.OutgoingMessages;
+namespace Application.Transactions.Aggregations;
 
-public sealed class ProcessType : EnumerationType
-{
-    public static readonly ProcessType MoveIn = new(0, nameof(MoveIn), "E65");
-    public static readonly ProcessType BalanceFixing = new(1, nameof(BalanceFixing), "D04");
-
-    private ProcessType(int id, string name, string code)
-     : base(id, name)
-    {
-        Code = code;
-    }
-
-    public string Code { get; }
-}
+public record Period(Instant Start, Instant End);

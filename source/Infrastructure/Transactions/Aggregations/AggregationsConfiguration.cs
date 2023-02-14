@@ -37,5 +37,7 @@ internal static class AggregationsConfiguration
         services.AddSingleton(aggregationResultsBuilder);
         services.AddTransient<IRequestHandler<Application.Transactions.Aggregations.HourlyConsumption.StartTransaction, Unit>, Application.Transactions.Aggregations.HourlyConsumption.StartTransactionHandler>();
         services.AddTransient<IRequestHandler<SendAggregationResult, Unit>, SendAggregationResultHandler>();
+        services.AddTransient<IRequestHandler<RetrieveAggregationResults, Unit>, RetrieveAggregationResultsHandler>();
+        services.AddTransient<TransactionScheduler>();
     }
 }
