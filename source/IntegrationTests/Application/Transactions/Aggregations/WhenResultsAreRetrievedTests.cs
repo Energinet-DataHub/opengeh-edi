@@ -54,12 +54,7 @@ public class WhenResultsAreRetrievedTests : TestBase
                 SampleData.EnergySupplierNumber,
             }.AsReadOnly());
 
-        await InvokeCommandAsync(new RetrieveAggregationResults(
-            SampleData.ResultId,
-            completedAggregationType.Name,
-            SampleData.GridAreaCode,
-            new Period(SampleData.StartOfPeriod, SampleData.EndOfPeriod))).ConfigureAwait(false);
-
+        await RetrieveResults(completedAggregationType).ConfigureAwait(false);
         await HavingProcessedInternalTasksAsync().ConfigureAwait(false);
 
         var outgoingMessage = await AssertOutgoingMessage.OutgoingMessageAsync(
@@ -78,5 +73,14 @@ public class WhenResultsAreRetrievedTests : TestBase
             .HasMessageRecordValue<TimeSeries>(
                 series => series.EnergySupplierNumber!,
                 SampleData.EnergySupplierNumber.Value);
+    }
+
+    private async Task RetrieveResults(ProcessType completedAggregationType)
+    {
+        await InvokeCommandAsync(new RetrieveAggregationResults(
+            SampleData.ResultId,
+            completedAggregationType.Name,
+            SampleData.GridAreaCode,
+            new Period(SampleData.StartOfPeriod, SampleData.EndOfPeriod))).ConfigureAwait(false);
     }
 }
