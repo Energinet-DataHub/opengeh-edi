@@ -86,8 +86,7 @@ public class WhenResultsAreRetrievedTests : TestBase
                 SampleData.EnergySupplierNumber,
             }.AsReadOnly());
 
-        await RetrieveResults(completedAggregationType).ConfigureAwait(false);
-        await HavingProcessedInternalTasksAsync().ConfigureAwait(false);
+        await AggregationResultsAreRetrieved(completedAggregationType);
 
         var outgoingMessage = await OutgoingMessageAsync(
             MessageType.NotifyAggregatedMeasureData,
