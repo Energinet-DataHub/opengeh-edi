@@ -56,8 +56,7 @@ public class WhenResultsAreRetrievedTests : TestBase
             .WithResolution(SampleData.Resolution)
             .Build());
 
-        await RetrieveResults(completedAggregationType).ConfigureAwait(false);
-        await HavingProcessedInternalTasksAsync().ConfigureAwait(false);
+        await AggregationResultsAreRetrieved(completedAggregationType);
 
         var message = await OutgoingMessageAsync(
             MessageType.NotifyAggregatedMeasureData, MarketRole.MeteredDataResponsible, completedAggregationType);
@@ -105,6 +104,12 @@ public class WhenResultsAreRetrievedTests : TestBase
             .HasMessageRecordValue<TimeSeries>(
                 series => series.EnergySupplierNumber!,
                 SampleData.EnergySupplierNumber.Value);
+    }
+
+    private async Task AggregationResultsAreRetrieved(ProcessType completedAggregationType)
+    {
+        await RetrieveResults(completedAggregationType).ConfigureAwait(false);
+        await HavingProcessedInternalTasksAsync().ConfigureAwait(false);
     }
 
     private async Task<AssertOutgoingMessage> OutgoingMessageAsync(MessageType messageType, MarketRole roleOfReceiver, ProcessType completedAggregationType)
