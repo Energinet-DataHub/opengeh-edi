@@ -61,13 +61,18 @@ public sealed class TransactionScheduler
         {
             var result = await _aggregationResults.NonProfiledConsumptionForAsync(resultsId, gridArea.Code, actorNumber, period)
                 .ConfigureAwait(false);
-            await _commandScheduler.EnqueueAsync(
-                new SendAggregationResult(
-                actorNumber.Value,
-                MarketRole.EnergySupplier.Name,
+            await ScheduleAsync(aggregationProcess, actorNumber, MarketRole.EnergySupplier, result).ConfigureAwait(false);
+        }
+    }
+
+    private async Task ScheduleAsync(ProcessType aggregationProcess, ActorNumber receivingActorNumber, MarketRole roleOfReceiver, AggregationResult result)
+    {
+        await _commandScheduler.EnqueueAsync(
+            new SendAggregationResult(
+                receivingActorNumber.Value,
+                roleOfReceiver.Name,
                 aggregationProcess.Name,
                 result)).ConfigureAwait(false);
-        }
     }
 
     private async Task ScheduleTotalProductionResultAsync(Guid resultsId, ProcessType aggregationProcess, GridArea gridArea, Domain.Transactions.Aggregations.Period period)
