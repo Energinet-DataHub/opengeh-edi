@@ -42,9 +42,13 @@ public sealed class TransactionScheduler
         ArgumentNullException.ThrowIfNull(aggregationProcess);
 
         await ScheduleTotalProductionResultAsync(resultsId, aggregationProcess, gridArea, period).ConfigureAwait(false);
-        await ScheduleTransactionsForAsync(
-            aggregationProcess,
-            await _aggregationResults.NonProfiledConsumptionForAsync(resultsId, gridArea, MarketRole.BalanceResponsible, period).ConfigureAwait(false)).ConfigureAwait(false);
+        await ScheduleNonProfiledConsumptionForBalanceResponsibleAsync(resultsId, aggregationProcess, gridArea, period).ConfigureAwait(false);
+    }
+
+    private async Task ScheduleNonProfiledConsumptionForBalanceResponsibleAsync(
+        Guid resultsId, ProcessType aggregationProcess, GridArea gridArea, Domain.Transactions.Aggregations.Period period)
+    {
+        await ScheduleTransactionsForAsync(aggregationProcess, await _aggregationResults.NonProfiledConsumptionForAsync(resultsId, gridArea, MarketRole.BalanceResponsible, period).ConfigureAwait(false)).ConfigureAwait(false);
     }
 
     private async Task ScheduleTotalProductionResultAsync(Guid resultsId, ProcessType aggregationProcess, GridArea gridArea, Domain.Transactions.Aggregations.Period period)
