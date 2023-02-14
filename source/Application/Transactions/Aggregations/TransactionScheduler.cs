@@ -26,16 +26,31 @@ public sealed class TransactionScheduler
 {
     private readonly IAggregationResults _aggregationResults;
     private readonly ICommandScheduler _commandScheduler;
+    private readonly IGridAreaLookup _gridAreaLookup;
 
-    public TransactionScheduler(IAggregationResults aggregationResults, ICommandScheduler commandScheduler)
+    public TransactionScheduler(IAggregationResults aggregationResults, ICommandScheduler commandScheduler, IGridAreaLookup gridAreaLookup)
     {
         _aggregationResults = aggregationResults;
         _commandScheduler = commandScheduler;
+        _gridAreaLookup = gridAreaLookup;
     }
 
     public async Task ScheduleForAsync(Guid resultsId, ProcessType aggregationProcess, GridArea gridArea, Domain.Transactions.Aggregations.Period period)
     {
+        ArgumentNullException.ThrowIfNull(gridArea);
         ArgumentNullException.ThrowIfNull(aggregationProcess);
+
+        var gridOperatorNumber = await _gridAreaLookup.GetGridOperatorForAsync(gridArea.Code).ConfigureAwait(false);
+        var result = await _aggregationResults.ProductionResultForAsync(resultsId, gridArea.Code, period).ConfigureAwait(false);
+        if (result is not null)
+        {
+            await _commandScheduler
+                .EnqueueAsync(new SendAggregationResult(
+                    gridOperatorNumber.Value,
+                    MarketRole.MeteredDataResponsible.Name,
+                    aggregationProcess.Name,
+                    result)).ConfigureAwait(false);
+        }
 
         await ScheduleTransactionsForAsync(
             aggregationProcess,

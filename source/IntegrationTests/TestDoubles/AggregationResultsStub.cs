@@ -32,10 +32,9 @@ public class AggregationResultsStub : IAggregationResults
     private readonly Dictionary<ActorNumber, AggregationResult> _resultsForActors = new();
     private readonly List<Result> _resultsForBalanceResponsible = new();
 
-    public Task<AggregationResult> ProductionResultForAsync(Guid resultId, string gridArea, Domain.Transactions.Aggregations.Period period)
+    public Task<AggregationResult?> ProductionResultForAsync(Guid resultId, string gridArea, Domain.Transactions.Aggregations.Period period)
     {
-        return Task.FromResult(_results.First(result =>
-            result.Id.Equals(resultId) &&
+        return Task.FromResult(_results.FirstOrDefault(result =>
             result.GridArea.Code.Equals(gridArea, StringComparison.OrdinalIgnoreCase)));
     }
 
@@ -90,5 +89,10 @@ public class AggregationResultsStub : IAggregationResults
         }
 
         _resultsForBalanceResponsible.Add(new Result(balanceResponsibleNumber, aggregationResults.AsReadOnly()));
+    }
+
+    public void HasResult(AggregationResult result)
+    {
+        _results.Add(result);
     }
 }
