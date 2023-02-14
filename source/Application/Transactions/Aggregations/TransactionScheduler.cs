@@ -37,11 +37,9 @@ public sealed class TransactionScheduler
     {
         ArgumentNullException.ThrowIfNull(aggregationProcess);
 
-        var results =
-            await _aggregationResults.NonProfiledConsumptionForAsync(resultsId, gridArea, MarketRole.BalanceResponsible, period)
-                .ConfigureAwait(false);
-
-        await ScheduleTransactionsForAsync(aggregationProcess, results).ConfigureAwait(false);
+        await ScheduleTransactionsForAsync(
+            aggregationProcess,
+            await _aggregationResults.NonProfiledConsumptionForAsync(resultsId, gridArea, MarketRole.BalanceResponsible, period).ConfigureAwait(false)).ConfigureAwait(false);
     }
 
     private async Task ScheduleTransactionsForAsync(ProcessType aggregationProcess, ReadOnlyCollection<Result> results)
