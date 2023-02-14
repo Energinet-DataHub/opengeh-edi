@@ -65,16 +65,6 @@ public sealed class TransactionScheduler
         }
     }
 
-    private async Task ScheduleAsync(ProcessType aggregationProcess, ActorNumber receivingActorNumber, MarketRole roleOfReceiver, AggregationResult result)
-    {
-        await _commandScheduler.EnqueueAsync(
-            new SendAggregationResult(
-                receivingActorNumber.Value,
-                roleOfReceiver.Name,
-                aggregationProcess.Name,
-                result)).ConfigureAwait(false);
-    }
-
     private async Task ScheduleTotalProductionResultAsync(Guid resultsId, ProcessType aggregationProcess, GridArea gridArea, Domain.Transactions.Aggregations.Period period)
     {
         var gridOperatorNumber = await _gridAreaLookup.GetGridOperatorForAsync(gridArea.Code).ConfigureAwait(false);
@@ -96,13 +86,19 @@ public sealed class TransactionScheduler
         {
             foreach (var aggregationResult in result.AggregationResults)
             {
-                await _commandScheduler.EnqueueAsync(
-                    new SendAggregationResult(
-                        result.ReceiverNumber.Value,
-                        MarketRole.BalanceResponsible.Name,
-                        aggregationProcess.Name,
-                        aggregationResult)).ConfigureAwait(false);
+                await ScheduleAsync(aggregationProcess, result.ReceiverNumber, MarketRole.BalanceResponsible, aggregationResult)
+                    .ConfigureAwait(false);
             }
         }
+    }
+
+    private async Task ScheduleAsync(ProcessType aggregationProcess, ActorNumber receivingActorNumber, MarketRole roleOfReceiver, AggregationResult result)
+    {
+        await _commandScheduler.EnqueueAsync(
+            new SendAggregationResult(
+                receivingActorNumber.Value,
+                roleOfReceiver.Name,
+                aggregationProcess.Name,
+                result)).ConfigureAwait(false);
     }
 }
