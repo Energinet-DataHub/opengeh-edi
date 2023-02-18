@@ -19,7 +19,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Application.Transactions.Aggregations;
 using Domain.Actors;
+using Domain.Transactions;
 using Domain.Transactions.Aggregations;
+using NodaTime;
+using Period = Domain.Transactions.Aggregations.Period;
 
 namespace IntegrationTests.TestDoubles;
 
@@ -27,6 +30,7 @@ public class AggregationResultsStub : IAggregationResults
 {
     private readonly List<AggregationResult> _results = new();
     private readonly Dictionary<ActorNumber, AggregationResult> _resultsForActors = new();
+    private readonly List<Result> _resultsForBalanceResponsible = new();
 
     public Task<AggregationResult> ProductionResultForAsync(Guid resultId, string gridArea, Domain.Transactions.Aggregations.Period period)
     {
@@ -50,6 +54,11 @@ public class AggregationResultsStub : IAggregationResults
         return Task.FromResult(_resultsForActors[energySupplierNumber]);
     }
 
+    public Task<ReadOnlyCollection<Result>> NonProfiledConsumptionForAsync(Guid resultId, GridArea gridArea, MarketRole roleOfReceiver, Period period)
+    {
+        return Task.FromResult(_resultsForBalanceResponsible.AsReadOnly());
+    }
+
     public void Add(AggregationResult aggregationResult, ActorNumber targetActorNumber)
     {
         ArgumentNullException.ThrowIfNull(aggregationResult);
@@ -60,5 +69,26 @@ public class AggregationResultsStub : IAggregationResults
     {
         ArgumentNullException.ThrowIfNull(aggregationResult);
         _results.Add(aggregationResult);
+    }
+
+    public void HasNonProfiledConsumptionFor(ActorNumber balanceResponsibleNumber, ReadOnlyCollection<ActorNumber> energySuppliers)
+    {
+        ArgumentNullException.ThrowIfNull(energySuppliers);
+
+        var aggregationResults = new List<AggregationResult>();
+        foreach (var energySupplier in energySuppliers)
+        {
+            aggregationResults.Add(AggregationResult.Consumption(
+                Guid.NewGuid(),
+                GridArea.Create("123"),
+                SettlementType.NonProfiled,
+                MeasurementUnit.Kwh,
+                Resolution.Hourly,
+                new Period(SystemClock.Instance.GetCurrentInstant(), SystemClock.Instance.GetCurrentInstant()),
+                new List<Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point>().AsReadOnly(),
+                energySupplier));
+        }
+
+        _resultsForBalanceResponsible.Add(new Result(balanceResponsibleNumber, aggregationResults.AsReadOnly()));
     }
 }

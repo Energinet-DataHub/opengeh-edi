@@ -25,8 +25,9 @@ internal static class AggregationsConfiguration
 {
     internal static void Configure(IServiceCollection services, Func<IServiceProvider, IAggregationResults> aggregationResultsBuilder)
     {
-        services.AddTransient(typeof(INotificationHandler<NewResultAvailableNotification>), typeof(PrepareTransactionsWhenBalanceFixingIsCompleted));
-        services.AddTransient(typeof(INotificationHandler<NewResultAvailableNotification>), typeof(NewResultAvailableNotificationHandler));
+        services.AddTransient(typeof(INotificationHandler<AggregationProcessHasCompleted>), typeof(RetrieveResultsWhenAnAggregationProcessHasCompleted));
+        services.AddTransient(typeof(INotificationHandler<AggregationProcessHasCompleted>), typeof(PrepareTransactionsWhenBalanceFixingIsCompleted));
+        services.AddTransient(typeof(INotificationHandler<AggregationProcessHasCompleted>), typeof(NewResultAvailableNotificationHandler));
         services.AddScoped<AggregationResultMapper>();
         services.AddTransient<IRequestHandler<Application.Transactions.Aggregations.StartTransaction, Unit>, Application.Transactions.Aggregations.StartTransactionHandler>();
         services.AddScoped<IAggregationResultForwardingRepository, AggregationResultForwardingRepository>();
@@ -35,5 +36,8 @@ internal static class AggregationsConfiguration
         services.AddTransient<IRequestHandler<PrepareTransactions, Unit>, PrepareTransactionsHandler>();
         services.AddSingleton(aggregationResultsBuilder);
         services.AddTransient<IRequestHandler<Application.Transactions.Aggregations.HourlyConsumption.StartTransaction, Unit>, Application.Transactions.Aggregations.HourlyConsumption.StartTransactionHandler>();
+        services.AddTransient<IRequestHandler<SendAggregationResult, Unit>, SendAggregationResultHandler>();
+        services.AddTransient<IRequestHandler<RetrieveAggregationResults, Unit>, RetrieveAggregationResultsHandler>();
+        services.AddTransient<TransactionScheduler>();
     }
 }

@@ -20,7 +20,7 @@ using MediatR;
 
 namespace Application.Transactions.Aggregations.HourlyConsumption;
 
-public class PrepareTransactionsWhenBalanceFixingIsCompleted : INotificationHandler<NewResultAvailableNotification>
+public class PrepareTransactionsWhenBalanceFixingIsCompleted : INotificationHandler<AggregationProcessHasCompleted>
 {
     private readonly CommandSchedulerFacade _commandScheduler;
 
@@ -29,12 +29,12 @@ public class PrepareTransactionsWhenBalanceFixingIsCompleted : INotificationHand
         _commandScheduler = commandScheduler;
     }
 
-    public Task Handle(NewResultAvailableNotification notification, CancellationToken cancellationToken)
+    public Task Handle(AggregationProcessHasCompleted notification, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(notification);
         return _commandScheduler.EnqueueAsync(new PrepareTransactions(
             notification.ResultId,
-            notification.GridAreaCode,
+            notification.GridArea.Code,
             new Period(notification.PeriodStartDate, notification.PeriodEndDate)));
     }
 }
