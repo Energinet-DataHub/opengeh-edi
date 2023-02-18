@@ -25,12 +25,12 @@ Currently we support the CIM XML format. The EDI domain will also support the fo
 
 In this program increment we are working on
 
-- Sending out calculation results for calculated flex consumption for the Energy supplier
-- Fixing minor errors in CIM XML schema
+- Sending out calculation results for calculated flex consumption for the balance responsible party
+- Creating acceptance test for testing message flow
 
 In the next program increment we are working on
 
-- Sending out calculation results for calculated flex consumption for the Balance supplier and balance responsible party
+- Sending out calculation results for calculated flex consumption for the Balance supplier
 
 ## Getting Started
 
