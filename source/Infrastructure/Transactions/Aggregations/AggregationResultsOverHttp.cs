@@ -47,7 +47,7 @@ public class AggregationResultsOverHttp : IAggregationResults
         _serializer = serializer;
     }
 
-    public async Task<AggregationResult> ProductionResultForAsync(Guid resultId, string gridArea, Domain.Transactions.Aggregations.Period period)
+    public async Task<AggregationResult?> ProductionResultForAsync(Guid resultId, string gridArea, Domain.Transactions.Aggregations.Period period)
     {
         var response = await CallAsync("2.1", new WholeSaleContracts.ProcessStepResultRequestDto(resultId, gridArea, WholeSaleContracts.ProcessStepType.AggregateProductionPerGridArea)).ConfigureAwait(false);
 

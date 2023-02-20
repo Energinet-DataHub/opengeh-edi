@@ -27,12 +27,9 @@ internal static class AggregationsConfiguration
     {
         services.AddTransient(typeof(INotificationHandler<AggregationProcessHasCompleted>), typeof(RetrieveResultsWhenAnAggregationProcessHasCompleted));
         services.AddTransient(typeof(INotificationHandler<AggregationProcessHasCompleted>), typeof(PrepareTransactionsWhenBalanceFixingIsCompleted));
-        services.AddTransient(typeof(INotificationHandler<AggregationProcessHasCompleted>), typeof(NewResultAvailableNotificationHandler));
         services.AddScoped<AggregationResultMapper>();
-        services.AddTransient<IRequestHandler<Application.Transactions.Aggregations.StartTransaction, Unit>, Application.Transactions.Aggregations.StartTransactionHandler>();
         services.AddScoped<IAggregationResultForwardingRepository, AggregationResultForwardingRepository>();
         services.AddSingleton<IGridAreaLookup, GridAreaLookup>();
-        services.AddTransient<IRequestHandler<RetrieveAggregationResult, Unit>, RetrieveAggregationResultHandler>();
         services.AddTransient<IRequestHandler<PrepareTransactions, Unit>, PrepareTransactionsHandler>();
         services.AddSingleton(aggregationResultsBuilder);
         services.AddTransient<IRequestHandler<Application.Transactions.Aggregations.HourlyConsumption.StartTransaction, Unit>, Application.Transactions.Aggregations.HourlyConsumption.StartTransactionHandler>();
