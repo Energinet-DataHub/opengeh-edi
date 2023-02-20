@@ -16,14 +16,12 @@ using Application.Actors;
 using Application.Configuration.Commands;
 using Application.Configuration.TimeEvents;
 using Application.Transactions.Aggregations;
-using Application.Transactions.Aggregations.HourlyConsumption;
 using Application.Transactions.MoveIn;
 using Application.Transactions.MoveIn.MasterDataDelivery;
 using Application.Transactions.MoveIn.Notifications;
 using Application.Transactions.UpdateCustomer;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using StartTransaction = Application.Transactions.Aggregations.HourlyConsumption.StartTransaction;
 
 namespace Infrastructure.Configuration.InternalCommands;
 
@@ -53,8 +51,6 @@ internal static class InternalCommandProcessing
         mapper.Add("NotifyGridOperator", typeof(NotifyGridOperator));
         mapper.Add("SetConsumerHasMovedIn", typeof(SetConsumerHasMovedIn));
         mapper.Add("UpdateCustomerMasterData", typeof(UpdateCustomerMasterData));
-        mapper.Add("Aggregations.HourlyConsumption.PrepareTransactions", typeof(PrepareTransactions));
-        mapper.Add("Aggregations.HourlyConsumption.StartTransaction", typeof(StartTransaction));
         mapper.Add("Aggregations.SendAggregationResult", typeof(SendAggregationResult));
         mapper.Add("Aggregations.RetrieveAggregationResults", typeof(RetrieveAggregationResults));
 
