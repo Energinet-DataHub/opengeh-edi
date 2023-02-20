@@ -20,7 +20,9 @@ using Application.Transactions.Aggregations;
 using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Domain.Transactions;
 using IntegrationTests.Assertions;
+using IntegrationTests.Factories;
 using IntegrationTests.Fixtures;
 using IntegrationTests.TestDoubles;
 using Xunit;
@@ -45,6 +47,36 @@ public class WhenResultsAreRetrievedTests : TestBase
 
     [Theory]
     [MemberData(nameof(AggregationProcessTypes))]
+    public async Task Total_production_result_is_sent_to_the_grid_operator(ProcessType completedAggregationType)
+    {
+        _aggregationResults.HasResult(AggregationResultBuilder
+            .Result()
+            .WithGridArea(SampleData.GridAreaCode)
+            .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
+            .WithResolution(SampleData.Resolution)
+            .Build());
+
+        await AggregationResultsAreRetrieved(completedAggregationType);
+
+        var message = await OutgoingMessageAsync(
+            MarketRole.MeteredDataResponsible, completedAggregationType);
+        message.HasReceiverId(SampleData.GridOperatorNumber)
+            .HasReceiverRole(MarketRole.MeteredDataResponsible.Name)
+            .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
+            .HasSenderId(DataHubDetails.IdentificationNumber.Value)
+            .HasMessageRecordValue<TimeSeries>(x => x.GridAreaCode, SampleData.GridAreaCode)
+            .HasMessageRecordValue<TimeSeries>(x => x.Resolution, SampleData.Resolution)
+            .HasMessageRecordValue<TimeSeries>(x => x.MeasureUnitType, MeasurementUnit.Kwh.Code)
+            .HasMessageRecordValue<TimeSeries>(x => x.MeteringPointType, MeteringPointType.Production.Name)
+            .HasMessageRecordValue<TimeSeries>(x => x.Period.Start, SampleData.StartOfPeriod)
+            .HasMessageRecordValue<TimeSeries>(x => x.Period.End, SampleData.EndOfPeriod)
+            .HasMessageRecordValue<TimeSeries>(x => x.Point[0].Position, 1)
+            .HasMessageRecordValue<TimeSeries, decimal?>(x => x.Point[0].Quantity, 1.1m)
+            .HasMessageRecordValue<TimeSeries>(x => x.Point[0].Quality!, "A02");
+    }
+
+    [Theory]
+    [MemberData(nameof(AggregationProcessTypes))]
     public async Task Consumption_per_energy_supplier_result_is_sent_to_the_balance_responsible(ProcessType completedAggregationType)
     {
         _aggregationResults.HasNonProfiledConsumptionFor(
@@ -54,11 +86,9 @@ public class WhenResultsAreRetrievedTests : TestBase
                 SampleData.EnergySupplierNumber,
             }.AsReadOnly());
 
-        await RetrieveResults(completedAggregationType).ConfigureAwait(false);
-        await HavingProcessedInternalTasksAsync().ConfigureAwait(false);
+        await AggregationResultsAreRetrieved(completedAggregationType);
 
         var outgoingMessage = await OutgoingMessageAsync(
-            MessageType.NotifyAggregatedMeasureData,
             MarketRole.BalanceResponsible,
             completedAggregationType);
         outgoingMessage
@@ -74,10 +104,16 @@ public class WhenResultsAreRetrievedTests : TestBase
                 SampleData.EnergySupplierNumber.Value);
     }
 
-    private async Task<AssertOutgoingMessage> OutgoingMessageAsync(MessageType messageType, MarketRole roleOfReceiver, ProcessType completedAggregationType)
+    private async Task AggregationResultsAreRetrieved(ProcessType completedAggregationType)
+    {
+        await RetrieveResults(completedAggregationType).ConfigureAwait(false);
+        await HavingProcessedInternalTasksAsync().ConfigureAwait(false);
+    }
+
+    private async Task<AssertOutgoingMessage> OutgoingMessageAsync(MarketRole roleOfReceiver, ProcessType completedAggregationType)
     {
         return await AssertOutgoingMessage.OutgoingMessageAsync(
-            messageType.Name,
+            MessageType.NotifyAggregatedMeasureData.Name,
             completedAggregationType.Code,
             roleOfReceiver,
             GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);

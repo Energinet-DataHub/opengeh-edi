@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Application.Configuration.Commands;
 using Domain.Actors;
@@ -25,21 +26,39 @@ public sealed class TransactionScheduler
 {
     private readonly IAggregationResults _aggregationResults;
     private readonly ICommandScheduler _commandScheduler;
+    private readonly IGridAreaLookup _gridAreaLookup;
 
-    public TransactionScheduler(IAggregationResults aggregationResults, ICommandScheduler commandScheduler)
+    public TransactionScheduler(IAggregationResults aggregationResults, ICommandScheduler commandScheduler, IGridAreaLookup gridAreaLookup)
     {
         _aggregationResults = aggregationResults;
         _commandScheduler = commandScheduler;
+        _gridAreaLookup = gridAreaLookup;
     }
 
     public async Task ScheduleForAsync(Guid resultsId, ProcessType aggregationProcess, GridArea gridArea, Domain.Transactions.Aggregations.Period period)
     {
+        ArgumentNullException.ThrowIfNull(gridArea);
         ArgumentNullException.ThrowIfNull(aggregationProcess);
 
-        var results =
-            await _aggregationResults.NonProfiledConsumptionForAsync(resultsId, gridArea, MarketRole.BalanceResponsible, period)
-                .ConfigureAwait(false);
+        var gridOperatorNumber = await _gridAreaLookup.GetGridOperatorForAsync(gridArea.Code).ConfigureAwait(false);
+        var result = await _aggregationResults.ProductionResultForAsync(resultsId, gridArea.Code, period).ConfigureAwait(false);
+        if (result is not null)
+        {
+            await _commandScheduler
+                .EnqueueAsync(new SendAggregationResult(
+                    gridOperatorNumber.Value,
+                    MarketRole.MeteredDataResponsible.Name,
+                    aggregationProcess.Name,
+                    result)).ConfigureAwait(false);
+        }
 
+        await ScheduleTransactionsForAsync(
+            aggregationProcess,
+            await _aggregationResults.NonProfiledConsumptionForAsync(resultsId, gridArea, MarketRole.BalanceResponsible, period).ConfigureAwait(false)).ConfigureAwait(false);
+    }
+
+    private async Task ScheduleTransactionsForAsync(ProcessType aggregationProcess, ReadOnlyCollection<Result> results)
+    {
         foreach (var result in results)
         {
             foreach (var aggregationResult in result.AggregationResults)
