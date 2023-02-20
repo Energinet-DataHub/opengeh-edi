@@ -42,4 +42,6 @@ internal class SampleData
     internal static ActorNumber EnergySupplierNumber => ActorNumber.Create("8200000007740");
 
     internal static ActorNumber EnergySupplierNumber2 => ActorNumber.Create("8200000007742");
+
+    internal static ActorNumber BalanceResponsibleNumber => ActorNumber.Create("8200000007743");
 }

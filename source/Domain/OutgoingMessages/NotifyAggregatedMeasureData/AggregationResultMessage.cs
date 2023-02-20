@@ -45,6 +45,7 @@ public class AggregationResultMessage : OutgoingMessage
         ArgumentNullException.ThrowIfNull(transactionId);
         ArgumentNullException.ThrowIfNull(processType);
         ArgumentNullException.ThrowIfNull(result);
+        ArgumentNullException.ThrowIfNull(receiverNumber);
 
         var series = new TimeSeries(
             transactionId.Id,
@@ -53,8 +54,8 @@ public class AggregationResultMessage : OutgoingMessage
             result.SettlementType?.Code,
             result.MeasureUnitType.Code,
             result.Resolution.Code,
-            null,
-            null,
+            receiverRole == MarketRole.BalanceResponsible ? result.AggregatedForActor?.Value : null,
+            receiverRole == MarketRole.BalanceResponsible ? receiverNumber.Value : null,
             result.Period,
             result.Points.Select(p => new Point(p.Position, p.Quantity, p.Quality, p.SampleTime)).ToList());
 

@@ -18,7 +18,6 @@ using Application.Configuration.DataAccess;
 using Application.Transactions.Aggregations;
 using Application.Transactions.Aggregations.HourlyConsumption;
 using Domain.Actors;
-using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions;
 using Domain.Transactions.Aggregations;
@@ -82,7 +81,7 @@ public class WhenBalanceFixingIsCompletedTests : TestBase
             MeasurementUnit.From(SampleData.MeasureUnitType),
             Resolution.From(SampleData.Resolution),
             new Domain.Transactions.Aggregations.Period(SampleData.StartOfPeriod, SampleData.EndOfPeriod),
-            new List<Point>()
+            new List<Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point>()
             {
                 new(
                     1,

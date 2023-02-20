@@ -88,6 +88,26 @@ public class WhenATransactionIsStartedTests : TestBase
             .HasMessageRecordValue<TimeSeries>(timeSeries => timeSeries.MeteringPointType, MeteringPointType.Consumption.Name);
     }
 
+    private static AggregationResult CreateAggregatedConsumptionResult()
+    {
+        return AggregationResult.Consumption(
+            SampleData.ResultId,
+            GridArea.Create(SampleData.GridAreaCode),
+            SettlementType.NonProfiled,
+            MeasurementUnit.From(SampleData.MeasureUnitType),
+            Resolution.From(SampleData.Resolution),
+            new Domain.Transactions.Aggregations.Period(SampleData.StartOfPeriod, SampleData.EndOfPeriod),
+            new List<Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point>()
+            {
+                new(
+                    1,
+                    1.1m,
+                    "A02",
+                    "2022-10-31T21:15:00.000Z"),
+            },
+            SampleData.EnergySupplierNumber);
+    }
+
     private void MakeAggregationResultAvailableFor(ActorNumber energySupplierNumber)
     {
         var result = AggregationResult.Consumption(
@@ -97,7 +117,7 @@ public class WhenATransactionIsStartedTests : TestBase
             MeasurementUnit.From(SampleData.MeasureUnitType),
             Resolution.From(SampleData.Resolution),
             new Domain.Transactions.Aggregations.Period(SampleData.StartOfPeriod, SampleData.EndOfPeriod),
-            new List<Point>()
+            new List<Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point>()
             {
                 new(
                     1,

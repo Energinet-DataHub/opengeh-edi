@@ -75,5 +75,3 @@ public class RetrieveAggregationResult : InternalCommand
 
     public Guid TransactionId { get; }
 }
-
-public record Period(Instant Start, Instant End);

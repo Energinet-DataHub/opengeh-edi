@@ -12,27 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using MediatR;
-using NodaTime;
+using System.Collections.Generic;
 
 namespace Application.Transactions.Aggregations;
 
-public class NewResultAvailableNotification : INotification
-{
-    public NewResultAvailableNotification(Guid resultId, string gridAreaCode, Instant periodStartDate, Instant periodEndDate)
-    {
-        ResultId = resultId;
-        GridAreaCode = gridAreaCode;
-        PeriodStartDate = periodStartDate;
-        PeriodEndDate = periodEndDate;
-    }
+public record Aggregation(
+    IReadOnlyList<Point> Points,
+    string GridArea,
+    string MeteringPointType,
+    string MeasureUnitType,
+    string Resolution,
+    Period Period,
+    string? SettlementType,
+    string? AggregatedForActor = null);
 
-    public Guid ResultId { get; }
-
-    public string GridAreaCode { get; }
-
-    public Instant PeriodStartDate { get; }
-
-    public Instant PeriodEndDate { get; }
-}
+public record Point(int Position, decimal? Quantity, string? Quality, string SampleTime);
