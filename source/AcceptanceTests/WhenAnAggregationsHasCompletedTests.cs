@@ -1,6 +1,6 @@
 ﻿namespace AcceptanceTest;
 
-public class WhenAnAggregationsHasCompletedTests
+public class WhenAnAggregationsHasCompletedTests : IDisposable
 {
     private readonly WholeSale _wholeSale;
     private readonly Edi _edi;
@@ -13,10 +13,24 @@ public class WhenAnAggregationsHasCompletedTests
 
     [Theory]
     [InlineData(DocumentFormat.CimXml)]
-    public void GridOperator_can_fetch_the_result_for_total_production(DocumentFormat documentFormat)
+    public async Task GridOperator_can_fetch_the_result_for_total_production(DocumentFormat documentFormat)
     {
         _wholeSale.AggregationProcessHasCompletedFor("543");
-        _edi.AssertTotalProductionResultIsAvailable("5790000610976", documentFormat);
+        await _edi.AssertTotalProductionResultIsAvailableAsync("5790000610976", documentFormat).ConfigureAwait(false);
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _edi.Dispose();
+        }
     }
 }
 

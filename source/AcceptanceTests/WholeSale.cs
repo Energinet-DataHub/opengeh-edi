@@ -1,4 +1,4 @@
-namespace AcceptanceTest;
+﻿namespace AcceptanceTest;
 
 public class WholeSale
 {
