@@ -3,10 +3,12 @@
 public class WhenAnAggregationsHasCompletedTests
 {
     private readonly Aggregations _aggregations;
+    private readonly Edi _edi;
 
     public WhenAnAggregationsHasCompletedTests()
     {
         _aggregations = new Aggregations();
+        _edi = new Edi();
     }
 
     [Theory]
@@ -14,17 +16,13 @@ public class WhenAnAggregationsHasCompletedTests
     public void GridOperator_can_fetch_the_result_for_total_production(DocumentFormat documentFormat)
     {
         _aggregations.AggregationProcessHasCompletedFor("543");
-        _aggregations.AssertTotalProductionResultIsAvailable("5790000610976", documentFormat);
+        _edi.AssertTotalProductionResultIsAvailable("5790000610976", documentFormat);
     }
 }
 
 public class Aggregations
 {
     #pragma warning disable
-    public void AssertTotalProductionResultIsAvailable(string gridOperatorNumber, DocumentFormat documentFormat)
-    {
-    }
-
     public void AggregationProcessHasCompletedFor(string gridArea)
     {
     }
