@@ -25,6 +25,14 @@ namespace ArchitectureTests.Application;
 
 public class InternalCommandTests
 {
+    public static IEnumerable<object[]> GetInternalCommands()
+    {
+        return ApplicationAssemblies.Application
+            .GetTypes()
+            .Where(t => t.IsSubclassOf(typeof(InternalCommand)))
+            .Select(t => new[] { t });
+    }
+
     [Theory(DisplayName = nameof(Has_json_constructor_attribute))]
     [MemberData(nameof(GetInternalCommands))]
     public void Has_json_constructor_attribute(Type internalCommand)
@@ -36,13 +44,5 @@ public class InternalCommandTests
                 .Where(t => t is JsonConstructorAttribute));
 
         Assert.True(jsonConstructorAttributes.Any());
-    }
-
-    private static IEnumerable<object[]> GetInternalCommands()
-    {
-        return ApplicationAssemblies.Application
-            .GetTypes()
-            .Where(t => t.IsSubclassOf(typeof(InternalCommand)))
-            .Select(t => new[] { t });
     }
 }

@@ -60,7 +60,7 @@ public class AssertMarketActivityRecord
 
     public AssertMarketActivityRecord NotEmpty(string property)
     {
-        Assert.NotEmpty(_payload.Value<string>(property));
+        Assert.NotEmpty(_payload.Value<string>(property)!);
         return this;
     }
 
@@ -72,19 +72,19 @@ public class AssertMarketActivityRecord
 
     public AssertMarketActivityRecord HasDateValue(string path, Instant expectedValue)
     {
-        Assert.Equal(expectedValue.ToDateTimeUtc(), _payload.SelectToken(path).Value<DateTime>());
+        Assert.Equal(expectedValue.ToDateTimeUtc(), _payload.SelectToken(path)!.Value<DateTime>());
         return this;
     }
 
     public AssertMarketActivityRecord HasMarketEvaluationPointDateValue(string path, Instant expectedValue)
     {
-        Assert.Equal(expectedValue.ToDateTimeUtc(), _payload.SelectToken($"MarketEvaluationPoint.{path}").Value<DateTime>());
+        Assert.Equal(expectedValue.ToDateTimeUtc(), _payload.SelectToken($"MarketEvaluationPoint.{path}")!.Value<DateTime>());
         return this;
     }
 
     public AssertMarketActivityRecord HasMarketEvaluationPointValue<T>(string path, T expectedValue)
     {
-        Assert.Equal(expectedValue, _payload.SelectToken($"MarketEvaluationPoint.{path}").Value<T>());
+        Assert.Equal(expectedValue, _payload.SelectToken($"MarketEvaluationPoint.{path}")!.Value<T>());
         return this;
     }
 }
