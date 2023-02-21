@@ -21,7 +21,7 @@ using MessageHeader = Application.IncomingMessages.MessageHeader;
 
 namespace IntegrationTests.Application.IncomingMessages
 {
-    internal class IncomingMessageBuilder
+    internal sealed class IncomingMessageBuilder
     {
         private const string NotSet = "NotSet";
         private readonly string _createdAt = SystemClock.Instance.GetCurrentInstant().ToString();

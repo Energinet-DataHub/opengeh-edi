@@ -23,7 +23,7 @@ using Xunit;
 
 namespace IntegrationTests.Assertions
 {
-    internal class AssertXmlMessage
+    internal sealed class AssertXmlMessage
     {
         private const string MarketActivityRecordElementName = "MktActivityRecord";
         private readonly XDocument _document;

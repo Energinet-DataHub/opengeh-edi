@@ -21,7 +21,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Transactions.Aggregations;
 
-internal class AggregationResultForwardingRepository : IAggregationResultForwardingRepository
+internal sealed class AggregationResultForwardingRepository : IAggregationResultForwardingRepository
 {
     private readonly B2BContext _context;
 

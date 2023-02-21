@@ -21,15 +21,15 @@ using PerformanceTest.MoveIn.Jwt;
 
 namespace PerformanceTest.MoveIn;
 
-internal class MoveInService : IMoveInService
+internal sealed class MoveInService : IMoveInService
 {
     private readonly string _hostname;
     private readonly string _hostport;
 
     public MoveInService(IConfiguration configuration)
     {
-        _hostname = configuration["MessagingApi:Hostname"];
-        _hostport = configuration["MessagingApi:Port"];
+        _hostname = configuration["MessagingApi:Hostname"]!;
+        _hostport = configuration["MessagingApi:Port"]!;
     }
 
     public async Task MoveInAsync(string? uniqueActorNumber)
