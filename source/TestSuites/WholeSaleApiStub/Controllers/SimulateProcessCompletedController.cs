@@ -13,6 +13,9 @@
 // limitations under the License.
 
 using System.Net;
+using Azure.Messaging.ServiceBus;
+using Google.Protobuf;
+using Google.Protobuf.WellKnownTypes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WholeSaleApiStub.Controllers;
@@ -21,10 +24,34 @@ namespace WholeSaleApiStub.Controllers;
 [Route("api")]
 public class SimulateProcessCompletedController : ControllerBase
 {
-    [HttpPost("SimulateProcessCompleted")]
-    public Task<ActionResult> SimulateProcessCompletedAsync(SimulateProcessHasCompleted simulateProcessHasCompleted)
+    private readonly ServiceBusSender _serviceBusSender;
+
+    public SimulateProcessCompletedController(ServiceBusSender serviceBusSender)
     {
-        return Task.FromResult<ActionResult>(Ok());
+        _serviceBusSender = serviceBusSender;
+    }
+
+    [HttpPost("SimulateProcessCompleted")]
+    public async Task<ActionResult> SimulateProcessCompletedAsync(SimulateProcessHasCompleted request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        var processCompletedEvent = new Energinet.DataHub.Wholesale.Contracts.Events.ProcessCompleted()
+        {
+            BatchId = Guid.NewGuid().ToString(),
+            GridAreaCode = request.GridArea,
+            PeriodEndUtc = DateTime.UtcNow.ToTimestamp(),
+            PeriodStartUtc = DateTime.UtcNow.ToTimestamp(),
+        };
+        var serviceBusMessage = new ServiceBusMessage()
+        {
+            Body = new BinaryData(processCompletedEvent.ToByteArray()),
+            ContentType = "application/octet-stream",
+            MessageId = Guid.NewGuid().ToString(),
+            Subject = "balancefixingcompleted",
+        };
+        await _serviceBusSender.SendMessageAsync(serviceBusMessage).ConfigureAwait(false);
+
+        return Ok();
     }
 }
 
