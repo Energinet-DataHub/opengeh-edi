@@ -25,6 +25,7 @@ public class QualityTests
     [InlineData("measured", "A04")]
     [InlineData("incomplete", "A05")]
     [InlineData("calculated", "A06")]
+    [InlineData("a02", "A02")]
     public void Can_parse(string valueToParseFrom, string expectedCode)
     {
         var quality = Quality.From(valueToParseFrom);

@@ -36,6 +36,7 @@ public class Quality : EnumerationType
     {
         return GetAll
                 <Quality>()
-            .First(quality => quality.Name.Equals(valueToParseFrom, StringComparison.OrdinalIgnoreCase));
+            .First(quality => quality.Name.Equals(valueToParseFrom, StringComparison.OrdinalIgnoreCase) ||
+                              quality.Code.Equals(valueToParseFrom, StringComparison.OrdinalIgnoreCase));
     }
 }
