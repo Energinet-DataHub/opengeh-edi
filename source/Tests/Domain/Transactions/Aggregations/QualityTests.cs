@@ -12,18 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using Domain.Transactions.Aggregations;
+using Xunit;
 
-namespace Application.Transactions.Aggregations;
+namespace Tests.Domain.Transactions.Aggregations;
 
-public record Aggregation(
-    IReadOnlyList<Point> Points,
-    string GridArea,
-    string MeteringPointType,
-    string MeasureUnitType,
-    string Resolution,
-    Period Period,
-    string? SettlementType,
-    string? AggregatedForActor = null);
+public class QualityTests
+{
+    [Theory]
+    [InlineData("missing", "A02")]
+    public void Can_parse(string valueToParseFrom, string expectedCode)
+    {
+        var quality = Quality.From(valueToParseFrom);
 
-public record Point(int Position, decimal? Quantity, string Quality, string SampleTime);
+        Assert.Equal(expectedCode, quality.Code);
+    }
+}

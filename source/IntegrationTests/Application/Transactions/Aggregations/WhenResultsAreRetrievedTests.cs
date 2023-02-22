@@ -21,11 +21,13 @@ using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions;
+using Domain.Transactions.Aggregations;
 using IntegrationTests.Assertions;
 using IntegrationTests.Factories;
 using IntegrationTests.Fixtures;
 using IntegrationTests.TestDoubles;
 using Xunit;
+using Period = Application.Transactions.Aggregations.Period;
 
 namespace IntegrationTests.Application.Transactions.Aggregations;
 
@@ -97,7 +99,7 @@ public class WhenResultsAreRetrievedTests : TestBase
             .HasMessageRecordValue<TimeSeries>(x => x.Period.End, SampleData.EndOfPeriod)
             .HasMessageRecordValue<TimeSeries>(x => x.Point[0].Position, 1)
             .HasMessageRecordValue<TimeSeries, decimal?>(x => x.Point[0].Quantity, 1.1m)
-            .HasMessageRecordValue<TimeSeries>(x => x.Point[0].Quality!, "A02");
+            .HasMessageRecordValue<TimeSeries>(x => x.Point[0].Quality!, Quality.Missing);
     }
 
     [Theory]
