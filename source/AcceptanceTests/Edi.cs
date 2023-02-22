@@ -51,8 +51,6 @@ internal class EdiDriver : IDisposable
 
     public Task<HttpResponseMessage> PeekAsync(string token)
     {
-        // Pass System.Uri objects instead of strings
-        #pragma warning disable CA2234
         using var request = new HttpRequestMessage(HttpMethod.Get, "peek/aggregations");
         request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
         return _httpClient.SendAsync(request);
