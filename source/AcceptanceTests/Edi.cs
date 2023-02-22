@@ -19,8 +19,7 @@ public class Edi : IDisposable
 
     public async Task AssertTotalProductionResultIsAvailableAsync(string gridOperatorNumber, DocumentFormat documentFormat)
     {
-        var token = TokenBuilder.ForGridOperator(gridOperatorNumber);
-        var peekResponse = await _driver.PeekAsync(token).ConfigureAwait(false);
+        var peekResponse = await _driver.PeekAsync(TokenBuilder.ForGridOperator(gridOperatorNumber)).ConfigureAwait(false);
         peekResponse.EnsureSuccessStatusCode();
     }
 
