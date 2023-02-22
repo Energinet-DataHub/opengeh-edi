@@ -1,4 +1,7 @@
-﻿namespace AcceptanceTest;
+﻿using System.Net.Http.Headers;
+using AcceptanceTest.Factories;
+
+namespace AcceptanceTest;
 
 public class Edi : IDisposable
 {
@@ -16,7 +19,9 @@ public class Edi : IDisposable
 
     public async Task AssertTotalProductionResultIsAvailableAsync(string gridOperatorNumber, DocumentFormat documentFormat)
     {
-        await _driver.PeekAsync().ConfigureAwait(false);
+        var token = TokenBuilder.ForGridOperator(gridOperatorNumber);
+        var peekResponse = await _driver.PeekAsync(token).ConfigureAwait(false);
+        peekResponse.EnsureSuccessStatusCode();
     }
 
     public void Dispose()
@@ -44,11 +49,13 @@ internal class EdiDriver : IDisposable
         _httpClient.BaseAddress = new Uri("http://localhost:7071/api/");
     }
 
-    public Task<HttpResponseMessage> PeekAsync()
+    public Task<HttpResponseMessage> PeekAsync(string token)
     {
         // Pass System.Uri objects instead of strings
         #pragma warning disable CA2234
-        return _httpClient.GetAsync("peek/aggregations");
+        using var request = new HttpRequestMessage(HttpMethod.Get, "peek/aggregations");
+        request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
+        return _httpClient.SendAsync(request);
     }
 
     public void Dispose()
