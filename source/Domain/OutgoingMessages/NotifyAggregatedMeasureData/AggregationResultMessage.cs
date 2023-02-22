@@ -80,4 +80,4 @@ public record TimeSeries(
     Period Period,
     IReadOnlyList<Point> Point);
 
-public record Point(int Position, decimal? Quantity, string? Quality, string SampleTime);
+public record Point(int Position, decimal? Quantity, Quality Quality, string SampleTime);

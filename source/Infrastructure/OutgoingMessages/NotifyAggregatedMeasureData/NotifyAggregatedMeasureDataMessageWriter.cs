@@ -22,6 +22,7 @@ using Application.OutgoingMessages.Common.Xml;
 using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Domain.Transactions.Aggregations;
 using Infrastructure.OutgoingMessages.Common.Xml;
 using NodaTime;
 
@@ -125,10 +126,9 @@ public class NotifyAggregatedMeasureDataMessageWriter : MessageWriter
         if (point.Quality is null)
             return Task.CompletedTask;
 
-        const string pointIsMeasured = "A04";
-        if (point.Quality == pointIsMeasured)
+        if (point.Quality == Quality.Measured)
             return Task.CompletedTask;
 
-        return writer.WriteElementStringAsync(DocumentDetails.Prefix, "quality", null, point.Quality);
+        return writer.WriteElementStringAsync(DocumentDetails.Prefix, "quality", null, point.Quality.Code);
     }
 }

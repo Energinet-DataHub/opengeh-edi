@@ -67,7 +67,11 @@ public class AggregationResultMapper
         var points = new List<Point>();
         for (int i = 0; i < timeSeriesPoints.Length; i++)
         {
-            points.Add(new Point(i + 1, timeSeriesPoints[i].Quantity, timeSeriesPoints[i].Quality, NodaTime.Instant.FromDateTimeOffset(timeSeriesPoints[i].Time).ToString()));
+            points.Add(new Point(
+                i + 1,
+                timeSeriesPoints[i].Quantity,
+                Quality.From(timeSeriesPoints[i].Quality),
+                NodaTime.Instant.FromDateTimeOffset(timeSeriesPoints[i].Time).ToString()));
         }
 
         return points.AsReadOnly();
