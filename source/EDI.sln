@@ -33,6 +33,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocumentValidation", "Docum
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AcceptanceTests", "AcceptanceTests\AcceptanceTests.csproj", "{2310420F-0099-4FB3-B46A-1A34E7A919F4}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestSuites", "TestSuites", "{380C8ED7-1351-4B9E-9BFD-1D2D80F0965E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WholeSaleApiStub", "TestSuites\WholeSaleApiStub\WholeSaleApiStub.csproj", "{975BBE04-057F-41E2-B69E-F70641FF4325}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -99,11 +103,16 @@ Global
 		{2310420F-0099-4FB3-B46A-1A34E7A919F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2310420F-0099-4FB3-B46A-1A34E7A919F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2310420F-0099-4FB3-B46A-1A34E7A919F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{975BBE04-057F-41E2-B69E-F70641FF4325}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{975BBE04-057F-41E2-B69E-F70641FF4325}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{975BBE04-057F-41E2-B69E-F70641FF4325}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{975BBE04-057F-41E2-B69E-F70641FF4325}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{975BBE04-057F-41E2-B69E-F70641FF4325} = {380C8ED7-1351-4B9E-9BFD-1D2D80F0965E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D7925810-FA85-4F9E-A124-72F36BAEB9F0}
