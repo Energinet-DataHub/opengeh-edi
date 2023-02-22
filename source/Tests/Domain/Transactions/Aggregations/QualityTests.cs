@@ -21,6 +21,7 @@ public class QualityTests
 {
     [Theory]
     [InlineData("missing", "A02")]
+    [InlineData("estimated", "A03")]
     public void Can_parse(string valueToParseFrom, string expectedCode)
     {
         var quality = Quality.From(valueToParseFrom);
