@@ -30,7 +30,7 @@ internal class AggregationResultBuilder
 {
     private static readonly IReadOnlyList<Point> _points = new List<Point>()
     {
-        new(1, 1.1m, "A02", "2022-10-31T21:15:00.000Z"),
+        new(1, 1.1m, Quality.Missing, "2022-10-31T21:15:00.000Z"),
     };
 
     private readonly MeteringPointType _meteringPointType = MeteringPointType.Consumption;

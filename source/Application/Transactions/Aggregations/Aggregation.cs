@@ -26,4 +26,4 @@ public record Aggregation(
     string? SettlementType,
     string? AggregatedForActor = null);
 
-public record Point(int Position, decimal? Quantity, string? Quality, string SampleTime);
+public record Point(int Position, decimal? Quantity, string Quality, string SampleTime);
