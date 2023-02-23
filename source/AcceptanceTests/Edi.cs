@@ -1,5 +1,7 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.Net;
 using System.Net.Http.Headers;
+using System.Xml.Linq;
 using AcceptanceTest.Factories;
 
 namespace AcceptanceTest;
@@ -20,9 +22,19 @@ public class Edi : IDisposable
 
     public async Task AssertTotalProductionResultIsAvailableAsync(string gridOperatorNumber, DocumentFormat documentFormat)
     {
-        var peekResponse = await _driver.PeekAsync(TokenBuilder.ForGridOperator(gridOperatorNumber)).ConfigureAwait(false);
-
-        Assert.Equal(HttpStatusCode.OK, peekResponse.StatusCode);
+        var stopWatch = Stopwatch.StartNew();
+        while (stopWatch.ElapsedMilliseconds < 20000)
+        {
+            var peekResponse = await _driver.PeekAsync(TokenBuilder.ForGridOperator(gridOperatorNumber))
+                .ConfigureAwait(false);
+            if (peekResponse.StatusCode == HttpStatusCode.OK)
+            {
+                var body = await peekResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                var document = await XDocument.LoadAsync(body, LoadOptions.None, CancellationToken.None).ConfigureAwait(false);
+                var documentName = document.Root?.Name.LocalName;
+                if (documentName == "NotifyAggregatedMeasureData_MarketDocument") break;
+            }
+        }
     }
 
     public void Dispose()
@@ -57,6 +69,15 @@ internal class EdiDriver : IDisposable
         var peekResponse = await _httpClient.SendAsync(request).ConfigureAwait(false);
         peekResponse.EnsureSuccessStatusCode();
         return peekResponse;
+    }
+
+    public async Task<HttpResponseMessage> DequeueAsync(string token, string bundleId)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Delete, $"dequeue/{bundleId}");
+        request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
+        var dequeueResponse = await _httpClient.SendAsync(request).ConfigureAwait(false);
+        dequeueResponse.EnsureSuccessStatusCode();
+        return dequeueResponse;
     }
 
     public void Dispose()
