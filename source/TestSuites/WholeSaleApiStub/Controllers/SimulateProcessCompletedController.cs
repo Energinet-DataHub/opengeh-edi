@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Net;
 using Azure.Messaging.ServiceBus;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
@@ -21,7 +20,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace WholeSaleApiStub.Controllers;
 
 [ApiController]
-[Route("api")]
+[Route("api/v{version:apiVersion}")]
 public class SimulateProcessCompletedController : ControllerBase
 {
     private readonly ServiceBusSender _serviceBusSender;
@@ -32,6 +31,7 @@ public class SimulateProcessCompletedController : ControllerBase
     }
 
     [HttpPost("SimulateProcessCompleted")]
+    [ApiVersion("1.0")]
     public async Task<ActionResult> SimulateProcessCompletedAsync(SimulateProcessHasCompleted request)
     {
         ArgumentNullException.ThrowIfNull(request);
