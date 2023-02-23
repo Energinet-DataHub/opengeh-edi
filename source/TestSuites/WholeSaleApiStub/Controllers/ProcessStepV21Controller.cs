@@ -26,7 +26,7 @@ public class ProcessStepV21Controller : ControllerBase
     public async Task<IActionResult> ProcessStepResultAsync([FromBody] ProcessStepResultRequestDto processStepResultRequestDto)
     {
         ArgumentNullException.ThrowIfNull(processStepResultRequestDto);
-        var resultDto = await ProcessStepApplicationService.GetResultAsync(
+        var resultDto = await ProcessStepApplicationServiceV21.GetResultAsync(
             processStepResultRequestDto.BatchId,
             processStepResultRequestDto.GridAreaCode,
             TimeSeriesType.Production,
@@ -36,7 +36,7 @@ public class ProcessStepV21Controller : ControllerBase
     }
 }
 
-internal class ProcessStepApplicationService
+internal class ProcessStepApplicationServiceV21
 {
     public static async Task<ProcessStepResultDto> GetResultAsync(Guid batchId, string gridAreaCode, TimeSeriesType production, string gridArea)
     {
