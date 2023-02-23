@@ -13,6 +13,8 @@ builder.Services.AddSingleton(serviceProvider => new ServiceBusClient(servicePro
 builder.Services.AddSingleton<ServiceBusSender>(serviceProvider =>
     serviceProvider.GetRequiredService<ServiceBusClient>().CreateSender(serviceProvider.GetRequiredService<IConfiguration>().GetValue<string>("ServiceBusTopicName")));
 
+builder.Services.AddApiVersioning();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
