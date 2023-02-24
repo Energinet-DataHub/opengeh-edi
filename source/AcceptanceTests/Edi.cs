@@ -32,12 +32,16 @@ public class Edi : IDisposable
             {
                 var body = await peekResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
                 var document = await XDocument.LoadAsync(body, LoadOptions.None, CancellationToken.None).ConfigureAwait(false);
-                var series = document.Root?.Elements().Where(e => e.Name.LocalName.Equals("Series", StringComparison.Ordinal));
+                var series = document.Root?.Elements().Where(e => e.Name.LocalName.Equals("Series", StringComparison.Ordinal)).ToList();
                 var marketEvaluationPointType = series!.Elements()
                     .Single(e => e.Name.LocalName.Equals("marketEvaluationPoint.type", StringComparison.OrdinalIgnoreCase))
                     .Value;
+                var gridArea = series!.Elements()
+                    .Single(e => e.Name.LocalName.Equals("meteringGridArea_Domain.mRID", StringComparison.OrdinalIgnoreCase))
+                    .Value;
                 Assert.Equal("E18", marketEvaluationPointType);
                 var documentType = document.Root?.Name.LocalName;
+                Assert.Equal("543", gridArea);
                 Assert.Equal("NotifyAggregatedMeasureData_MarketDocument", documentType);
                 var messageId = GetMessageId(peekResponse);
                 await _driver.DequeueAsync(token, messageId).ConfigureAwait(false);
