@@ -33,10 +33,10 @@ internal class AggregationResultBuilder
         new(1, 1.1m, Quality.Missing, "2022-10-31T21:15:00.000Z"),
     };
 
-    private readonly MeteringPointType _meteringPointType = MeteringPointType.Consumption;
     private readonly MeasurementUnit _measureUnit = MeasurementUnit.Kwh;
     private readonly SettlementType? _settlementType = SettlementType.NonProfiled;
     private readonly ActorNumber _aggregatedForActor = default!;
+    private MeteringPointType _meteringPointType = MeteringPointType.Consumption;
     private GridArea _gridArea = GridArea.Create("123");
     private Period _period = new(SystemClock.Instance.GetCurrentInstant(), SystemClock.Instance.GetCurrentInstant());
     private Resolution _resolution = Resolution.Hourly;
@@ -75,6 +75,12 @@ internal class AggregationResultBuilder
     public AggregationResultBuilder WithResolution(string resolution)
     {
         _resolution = Resolution.From(resolution);
+        return this;
+    }
+
+    public AggregationResultBuilder WithMeteringPointType(MeteringPointType meteringPointType)
+    {
+        _meteringPointType = meteringPointType;
         return this;
     }
 }
