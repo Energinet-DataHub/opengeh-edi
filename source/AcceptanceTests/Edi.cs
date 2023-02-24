@@ -25,22 +25,9 @@ public class Edi : IDisposable
         string gridArea,
         DocumentFormat documentFormat)
     {
-        var stopWatch = Stopwatch.StartNew();
-        var token = TokenBuilder.ForGridOperator(gridOperatorNumber);
-        while (stopWatch.ElapsedMilliseconds < 20000)
-        {
-            var peekResponse = await _driver.PeekAsync(token)
-                .ConfigureAwait(false);
-            if (peekResponse.StatusCode == HttpStatusCode.OK)
-            {
-                var body = await peekResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                var assertDocument = new AssertCimXmlDocument(body);
-                assertDocument.IsProductionResultFor(gridArea);
-                var messageId = GetMessageId(peekResponse);
-                await _driver.DequeueAsync(token, messageId).ConfigureAwait(false);
-                break;
-            }
-        }
+        var document = await PeekMessageAsync(gridOperatorNumber).ConfigureAwait(false);
+        var assertDocument = new AssertCimXmlDocument(document);
+        assertDocument.IsProductionResultFor(gridArea);
     }
 
     public void Dispose()
@@ -60,6 +47,25 @@ public class Edi : IDisposable
     private static string GetMessageId(HttpResponseMessage peekResponse)
     {
         return peekResponse.Headers.GetValues("MessageId").First();
+    }
+
+    private async Task<Stream> PeekMessageAsync(string gridOperatorNumber)
+    {
+        var token = TokenBuilder.ForGridOperator(gridOperatorNumber);
+        var stopWatch = Stopwatch.StartNew();
+        while (stopWatch.ElapsedMilliseconds < 20000)
+        {
+            var peekResponse = await _driver.PeekAsync(token)
+                .ConfigureAwait(false);
+            if (peekResponse.StatusCode == HttpStatusCode.OK)
+            {
+                var document = await peekResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                await _driver.DequeueAsync(token, GetMessageId(peekResponse)).ConfigureAwait(false);
+                return document;
+            }
+        }
+
+        throw new TimeoutException("Unable to retrieve peek result within time limit");
     }
 }
 
