@@ -1,8 +1,5 @@
-﻿using System.Diagnostics;
-using System.Net;
-using System.Net.Http.Headers;
-using System.Xml.Linq;
-using AcceptanceTest.Factories;
+﻿using AcceptanceTest.Assertions;
+using AcceptanceTest.Drivers;
 
 namespace AcceptanceTest;
 
@@ -25,7 +22,7 @@ public class Edi : IDisposable
         string gridArea,
         DocumentFormat documentFormat)
     {
-        var document = await PeekMessageAsync(gridOperatorNumber).ConfigureAwait(false);
+        var document = await _driver.PeekMessageAsync(gridOperatorNumber).ConfigureAwait(false);
         var assertDocument = new AssertCimXmlDocument(document);
         assertDocument.IsProductionResultFor(gridArea);
     }
@@ -42,88 +39,5 @@ public class Edi : IDisposable
         {
             _driver.Dispose();
         }
-    }
-
-    private static string GetMessageId(HttpResponseMessage peekResponse)
-    {
-        return peekResponse.Headers.GetValues("MessageId").First();
-    }
-
-    private async Task<Stream> PeekMessageAsync(string gridOperatorNumber)
-    {
-        var token = TokenBuilder.ForGridOperator(gridOperatorNumber);
-        var stopWatch = Stopwatch.StartNew();
-        while (stopWatch.ElapsedMilliseconds < 20000)
-        {
-            var peekResponse = await _driver.PeekAsync(token)
-                .ConfigureAwait(false);
-            if (peekResponse.StatusCode == HttpStatusCode.OK)
-            {
-                var document = await peekResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                await _driver.DequeueAsync(token, GetMessageId(peekResponse)).ConfigureAwait(false);
-                return document;
-            }
-        }
-
-        throw new TimeoutException("Unable to retrieve peek result within time limit");
-    }
-}
-
-public class AssertCimXmlDocument
-{
-    private readonly XDocument _document;
-
-    public AssertCimXmlDocument(Stream body)
-    {
-        _document = XDocument.Load(body, LoadOptions.None);
-    }
-
-    public void IsProductionResultFor(string expectedGridArea)
-    {
-        var series = _document.Root?.Elements().Where(e => e.Name.LocalName.Equals("Series", StringComparison.Ordinal)).ToList();
-        var marketEvaluationPointType = series!.Elements()
-            .Single(e => e.Name.LocalName.Equals("marketEvaluationPoint.type", StringComparison.OrdinalIgnoreCase))
-            .Value;
-        var gridArea = series!.Elements()
-            .Single(e => e.Name.LocalName.Equals("meteringGridArea_Domain.mRID", StringComparison.OrdinalIgnoreCase))
-            .Value;
-        Assert.Equal("E18", marketEvaluationPointType);
-        var documentType = _document.Root?.Name.LocalName;
-        Assert.Equal(expectedGridArea, gridArea);
-        Assert.Equal("NotifyAggregatedMeasureData_MarketDocument", documentType);
-    }
-}
-
-internal class EdiDriver : IDisposable
-{
-    private readonly HttpClient _httpClient;
-
-    public EdiDriver()
-    {
-        _httpClient = new HttpClient();
-        _httpClient.BaseAddress = new Uri("http://localhost:7071/api/");
-    }
-
-    public async Task<HttpResponseMessage> PeekAsync(string token)
-    {
-        using var request = new HttpRequestMessage(HttpMethod.Get, "peek/aggregations");
-        request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
-        var peekResponse = await _httpClient.SendAsync(request).ConfigureAwait(false);
-        peekResponse.EnsureSuccessStatusCode();
-        return peekResponse;
-    }
-
-    public async Task<HttpResponseMessage> DequeueAsync(string token, string messageId)
-    {
-        using var request = new HttpRequestMessage(HttpMethod.Delete, $"dequeue/{messageId}");
-        request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
-        var dequeueResponse = await _httpClient.SendAsync(request).ConfigureAwait(false);
-        dequeueResponse.EnsureSuccessStatusCode();
-        return dequeueResponse;
-    }
-
-    public void Dispose()
-    {
-        _httpClient.Dispose();
     }
 }
