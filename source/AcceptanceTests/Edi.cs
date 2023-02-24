@@ -20,7 +20,10 @@ public class Edi : IDisposable
         Dispose(false);
     }
 
-    public async Task AssertTotalProductionResultIsAvailableAsync(string gridOperatorNumber, DocumentFormat documentFormat)
+    public async Task AssertTotalProductionResultIsAvailableAsync(
+        string gridOperatorNumber,
+        string gridArea,
+        DocumentFormat documentFormat)
     {
         var stopWatch = Stopwatch.StartNew();
         var token = TokenBuilder.ForGridOperator(gridOperatorNumber);
@@ -31,18 +34,8 @@ public class Edi : IDisposable
             if (peekResponse.StatusCode == HttpStatusCode.OK)
             {
                 var body = await peekResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                var document = await XDocument.LoadAsync(body, LoadOptions.None, CancellationToken.None).ConfigureAwait(false);
-                var series = document.Root?.Elements().Where(e => e.Name.LocalName.Equals("Series", StringComparison.Ordinal)).ToList();
-                var marketEvaluationPointType = series!.Elements()
-                    .Single(e => e.Name.LocalName.Equals("marketEvaluationPoint.type", StringComparison.OrdinalIgnoreCase))
-                    .Value;
-                var gridArea = series!.Elements()
-                    .Single(e => e.Name.LocalName.Equals("meteringGridArea_Domain.mRID", StringComparison.OrdinalIgnoreCase))
-                    .Value;
-                Assert.Equal("E18", marketEvaluationPointType);
-                var documentType = document.Root?.Name.LocalName;
-                Assert.Equal("543", gridArea);
-                Assert.Equal("NotifyAggregatedMeasureData_MarketDocument", documentType);
+                var assertDocument = new AssertCimXmlDocument(body);
+                assertDocument.IsProductionResultFor(gridArea);
                 var messageId = GetMessageId(peekResponse);
                 await _driver.DequeueAsync(token, messageId).ConfigureAwait(false);
                 break;
@@ -67,6 +60,31 @@ public class Edi : IDisposable
     private static string GetMessageId(HttpResponseMessage peekResponse)
     {
         return peekResponse.Headers.GetValues("MessageId").First();
+    }
+}
+
+public class AssertCimXmlDocument
+{
+    private readonly XDocument _document;
+
+    public AssertCimXmlDocument(Stream body)
+    {
+        _document = XDocument.Load(body, LoadOptions.None);
+    }
+
+    public void IsProductionResultFor(string expectedGridArea)
+    {
+        var series = _document.Root?.Elements().Where(e => e.Name.LocalName.Equals("Series", StringComparison.Ordinal)).ToList();
+        var marketEvaluationPointType = series!.Elements()
+            .Single(e => e.Name.LocalName.Equals("marketEvaluationPoint.type", StringComparison.OrdinalIgnoreCase))
+            .Value;
+        var gridArea = series!.Elements()
+            .Single(e => e.Name.LocalName.Equals("meteringGridArea_Domain.mRID", StringComparison.OrdinalIgnoreCase))
+            .Value;
+        Assert.Equal("E18", marketEvaluationPointType);
+        var documentType = _document.Root?.Name.LocalName;
+        Assert.Equal(expectedGridArea, gridArea);
+        Assert.Equal("NotifyAggregatedMeasureData_MarketDocument", documentType);
     }
 }
 
