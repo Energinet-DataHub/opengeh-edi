@@ -23,9 +23,10 @@ public class Edi : IDisposable
     public async Task AssertTotalProductionResultIsAvailableAsync(string gridOperatorNumber, DocumentFormat documentFormat)
     {
         var stopWatch = Stopwatch.StartNew();
+        var token = TokenBuilder.ForGridOperator(gridOperatorNumber);
         while (stopWatch.ElapsedMilliseconds < 20000)
         {
-            var peekResponse = await _driver.PeekAsync(TokenBuilder.ForGridOperator(gridOperatorNumber))
+            var peekResponse = await _driver.PeekAsync(token)
                 .ConfigureAwait(false);
             if (peekResponse.StatusCode == HttpStatusCode.OK)
             {
@@ -35,6 +36,8 @@ public class Edi : IDisposable
                 var documentType = document.Root?.Name.LocalName;
                 Assert.Equal("D04", processType);
                 Assert.Equal("NotifyAggregatedMeasureData_MarketDocument", documentType);
+                var messageId = GetMessageId(peekResponse);
+                await _driver.DequeueAsync(token, messageId).ConfigureAwait(false);
                 break;
             }
         }
@@ -52,6 +55,11 @@ public class Edi : IDisposable
         {
             _driver.Dispose();
         }
+    }
+
+    private static string GetMessageId(HttpResponseMessage peekResponse)
+    {
+        return peekResponse.Headers.GetValues("MessageId").First();
     }
 }
 
@@ -74,9 +82,9 @@ internal class EdiDriver : IDisposable
         return peekResponse;
     }
 
-    public async Task<HttpResponseMessage> DequeueAsync(string token, string bundleId)
+    public async Task<HttpResponseMessage> DequeueAsync(string token, string messageId)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Delete, $"dequeue/{bundleId}");
+        using var request = new HttpRequestMessage(HttpMethod.Delete, $"dequeue/{messageId}");
         request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
         var dequeueResponse = await _httpClient.SendAsync(request).ConfigureAwait(false);
         dequeueResponse.EnsureSuccessStatusCode();
