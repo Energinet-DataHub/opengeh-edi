@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
@@ -81,6 +80,7 @@ public class WhenResultsAreRetrievedTests : TestBase
             .WithGridArea(SampleData.GridAreaCode)
             .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
             .WithResolution(SampleData.Resolution)
+            .WithMeteringPointType(MeteringPointType.Production)
             .Build());
 
         await AggregationResultsAreRetrieved(completedAggregationType);

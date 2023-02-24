@@ -22,7 +22,9 @@ public class MeteringPointTypeTests
 {
     [Theory]
     [InlineData("E17", "E17")]
+    [InlineData("E18", "E18")]
     [InlineData("consumption", "E17")]
+    [InlineData("production", "E18")]
     public void Parse_metering_point_type_code(string valueToParse, string expectedCode)
     {
         Assert.Equal(expectedCode, MeteringPointType.ToCode(valueToParse));
