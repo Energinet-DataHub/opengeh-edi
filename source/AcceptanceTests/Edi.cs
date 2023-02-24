@@ -31,8 +31,11 @@ public class Edi : IDisposable
             {
                 var body = await peekResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
                 var document = await XDocument.LoadAsync(body, LoadOptions.None, CancellationToken.None).ConfigureAwait(false);
-                var documentName = document.Root?.Name.LocalName;
-                if (documentName == "NotifyAggregatedMeasureData_MarketDocument") break;
+                var processType = document.Root?.Elements().Single(e => e.Name.LocalName.Equals("process.ProcessType", StringComparison.OrdinalIgnoreCase)).Value;
+                var documentType = document.Root?.Name.LocalName;
+                Assert.Equal("D04", processType);
+                Assert.Equal("NotifyAggregatedMeasureData_MarketDocument", documentType);
+                break;
             }
         }
     }
