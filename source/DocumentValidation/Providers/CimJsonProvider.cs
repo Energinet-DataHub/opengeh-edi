@@ -16,13 +16,13 @@ using Json.Schema;
 
 namespace DocumentValidation.Providers;
 
-public sealed class CimJsonSchemas : SchemaBase, ISchema
+public sealed class CimJsonProvider : SchemaBase, ISchema
 {
     private const string SchemaBaseUri = @"file:///C:/Users/Public/Documents/iec.ch/TC57/2020/";
     private static readonly string _schemaPath = $"Schemas{Path.DirectorySeparatorChar}Json{Path.DirectorySeparatorChar}";
     private static readonly Mutex _mutex = new();
 
-    public CimJsonSchemas()
+    public CimJsonProvider()
     {
         InitializeSchemas(FillSchemaDictionary(_schemaPath));
     }

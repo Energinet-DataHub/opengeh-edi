@@ -48,7 +48,7 @@ public class JsonDocumentWriterTests
         _systemDateTimeProvider = new SystemDateTimeProvider();
         _messageRecordParser = new MessageRecordParser(new Serializer());
         _messageWriter = new RejectRequestChangeOfSupplierJsonMessageWriter(_messageRecordParser);
-        _documentValidator = new JsonDocumentValidator(new CimJsonSchemas());
+        _documentValidator = new JsonDocumentValidator(new CimJsonProvider());
     }
 
     [Fact]

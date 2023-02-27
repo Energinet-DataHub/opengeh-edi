@@ -20,11 +20,11 @@ namespace DocumentValidation.Validators;
 
 public class JsonDocumentValidator : IzzDocumentValidator
 {
-    private readonly ISchema _schema;
+    private readonly ISchema _provider;
 
-    public JsonDocumentValidator(CimJsonSchemas schemas)
+    public JsonDocumentValidator(CimJsonProvider provider)
     {
-        _schema = schemas;
+        _provider = provider;
     }
 
     public override DocumentFormat HandledFormat => DocumentFormat.CimJson;
@@ -32,7 +32,7 @@ public class JsonDocumentValidator : IzzDocumentValidator
     public override Task<T?> GetSchemaAsync<T>(string businessProcessType, string version)
         where T : default
     {
-        var schemaName = _schema.GetSchemaLocation(businessProcessType, version);
+        var schemaName = _provider.GetSchemaLocation(businessProcessType, version);
 
         if (schemaName == null)
         {

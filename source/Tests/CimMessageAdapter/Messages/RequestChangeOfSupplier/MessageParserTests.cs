@@ -41,7 +41,7 @@ public class MessageParserTests
         _messageParser = new MessageParser(
             new IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>[]
             {
-                new JsonMessageParser(new JsonDocumentValidator(new CimJsonSchemas())),
+                new JsonMessageParser(new JsonDocumentValidator(new CimJsonProvider())),
                 new XmlMessageParser(),
             });
     }
