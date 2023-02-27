@@ -14,7 +14,7 @@
 
 using Json.Schema;
 
-namespace DocumentValidation;
+namespace DocumentValidation.Providers;
 
 public sealed class CimJsonSchemas : SchemaBase, ISchema
 {

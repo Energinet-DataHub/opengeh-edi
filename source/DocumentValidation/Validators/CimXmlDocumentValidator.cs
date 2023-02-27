@@ -14,6 +14,7 @@
 
 using System.Xml;
 using System.Xml.Schema;
+using DocumentValidation.Providers;
 using DocumentValidation.Xml;
 
 namespace DocumentValidation.Validators;

@@ -24,6 +24,7 @@ using CimMessageAdapter.Errors;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.Messages.RequestChangeOfSupplier;
 using DocumentValidation;
+using DocumentValidation.Providers;
 using DocumentValidation.Validators;
 using Domain.OutgoingMessages;
 using Infrastructure.IncomingMessages.RequestChangeOfSupplier;

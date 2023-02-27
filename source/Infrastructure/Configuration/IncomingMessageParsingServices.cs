@@ -19,6 +19,7 @@ using CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 using CimMessageAdapter.Messages.RequestChangeOfSupplier;
 using CimMessageAdapter.Response;
 using DocumentValidation;
+using DocumentValidation.Providers;
 using DocumentValidation.Validators;
 using Infrastructure.IncomingMessages.RequestChangeOfSupplier;
 using Infrastructure.IncomingMessages.Response;

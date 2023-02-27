@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using Application.Configuration;
 using Application.OutgoingMessages.Common;
 using DocumentValidation;
+using DocumentValidation.Providers;
 using DocumentValidation.Validators;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;

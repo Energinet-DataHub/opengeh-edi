@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace DocumentValidation
+using System.Xml;
+using System.Xml.Schema;
+
+namespace DocumentValidation.Providers
 {
-    public sealed class CimXmlSchemas : SchemaBase, ISchema
+    public sealed class CimXmlSchemas : SchemaBase, ISchema, ISchemaProvider<XmlSchema>
     {
         private static readonly string _schemaPath = $"Schemas{Path.DirectorySeparatorChar}Xml{Path.DirectorySeparatorChar}";
 
@@ -28,6 +31,31 @@ namespace DocumentValidation
         string? ISchema.GetSchemaLocation(string businessProcessType, string version)
         {
             return GetSchemaLocation(businessProcessType, version);
+        }
+
+        public async Task<XmlSchema> GetSchemaForAsync(SchemaDetails details)
+        {
+            ArgumentNullException.ThrowIfNull(details);
+
+            using var reader = new XmlTextReader(details.Location);
+            var xmlSchema = XmlSchema.Read(reader, null);
+            if (xmlSchema is null)
+            {
+                throw new XmlSchemaException($"Could not read schema at {details.Location}");
+            }
+
+            foreach (XmlSchemaExternal external in xmlSchema.Includes)
+            {
+                if (external.SchemaLocation == null)
+                {
+                    continue;
+                }
+
+                external.Schema =
+                    await LoadSchemaWithDependentSchemasAsync(_schemaPath + external.SchemaLocation).ConfigureAwait(false);
+            }
+
+            return xmlSchema;
         }
 
         protected override Dictionary<KeyValuePair<string, string>, string> FillSchemaDictionary(string schemaPath)
@@ -51,6 +79,29 @@ namespace DocumentValidation
             }
 
             return schemaDictionary;
+        }
+
+        private async Task<XmlSchema> LoadSchemaWithDependentSchemasAsync(string location)
+        {
+            using var reader = new XmlTextReader(location);
+            var xmlSchema = XmlSchema.Read(reader, null);
+            if (xmlSchema is null)
+            {
+                throw new XmlSchemaException($"Could not read schema at {location}");
+            }
+
+            foreach (XmlSchemaExternal external in xmlSchema.Includes)
+            {
+                if (external.SchemaLocation == null)
+                {
+                    continue;
+                }
+
+                external.Schema =
+                    await LoadSchemaWithDependentSchemasAsync(_schemaPath + external.SchemaLocation).ConfigureAwait(false);
+            }
+
+            return xmlSchema;
         }
     }
 }

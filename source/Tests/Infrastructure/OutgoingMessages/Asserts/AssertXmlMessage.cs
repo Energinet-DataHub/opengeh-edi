@@ -19,6 +19,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
+using DocumentValidation;
+using DocumentValidation.Validators;
 using DocumentValidation.Xml;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
@@ -82,6 +84,12 @@ namespace Tests.Infrastructure.OutgoingMessages.Asserts
         {
             if (schema == null) throw new ArgumentNullException(nameof(schema));
             var validationResult = await MessageValidator.ValidateAsync(message, schema).ConfigureAwait(false);
+            Assert.True(validationResult.IsValid);
+        }
+
+        internal static async Task AssertConformsToSchemaAsync(Stream message, DocumentType documentType, DocumentValidator validator)
+        {
+            var validationResult = await validator.ValidateAsync(message, documentType, DocumentFormat.CimXml).ConfigureAwait(false);
             Assert.True(validationResult.IsValid);
         }
 

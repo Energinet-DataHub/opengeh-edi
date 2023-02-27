@@ -15,7 +15,7 @@
 using DocumentValidation.Validators;
 using DocumentValidation.Xml;
 
-namespace DocumentValidation
+namespace DocumentValidation.Providers
 {
     public abstract class IzzDocumentValidator : IZDocumentValidator
     {
