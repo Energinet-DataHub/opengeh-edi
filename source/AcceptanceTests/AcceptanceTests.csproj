@@ -36,4 +36,10 @@
       </Reference>
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="WholesaleApiMock\appsettings.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

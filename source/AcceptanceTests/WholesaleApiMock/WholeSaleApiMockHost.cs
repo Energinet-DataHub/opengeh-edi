@@ -41,10 +41,12 @@ public class WholeSaleApiMockHost : IDisposable
                         config.DefaultApiVersion = ApiVersion.Default;
                         config.AssumeDefaultVersionWhenUnspecified = true;
                     });
-                    services.AddSingleton(serviceProvider => new ServiceBusClient(serviceProvider.GetRequiredService<IConfiguration>().GetValue<string>("ServiceBusConnectionString")));
+                    services.AddSingleton(serviceProvider =>
+                        new ServiceBusClient(serviceProvider.GetRequiredService<IConfiguration>().GetValue<string>("ServiceBusConnectionString")));
                     services.AddSingleton<ServiceBusSender>(serviceProvider =>
                         serviceProvider.GetRequiredService<ServiceBusClient>().CreateSender(serviceProvider.GetRequiredService<IConfiguration>().GetValue<string>("ServiceBusTopicName")));
                 });
+                webBuilder.ConfigureAppConfiguration(x => x.AddJsonFile("WholesaleApiMock\\appsettings.json").Build());
                 webBuilder.Configure(app =>
                         app.UseRouting()
                             .UseEndpoints(opt => opt.MapControllers()))
