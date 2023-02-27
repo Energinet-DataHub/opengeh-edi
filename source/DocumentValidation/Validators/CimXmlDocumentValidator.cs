@@ -26,7 +26,7 @@ public class CimXmlDocumentValidator : IzzDocumentValidator
 
     public CimXmlDocumentValidator()
     {
-        _schema = new CimXmlSchemas();
+        _schema = new CimXmlProvider();
         _schemaMap.Add(DocumentType.GenericNotification, _schema.GetDetailsFor("genericnotification"));
     }
 
