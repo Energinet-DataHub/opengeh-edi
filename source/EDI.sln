@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearningTests", "LearningTe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApplyDBMigrationsApp", "ApplyDBMigrationsApp\ApplyDBMigrationsApp.csproj", "{600E0CAA-23B7-493D-90D0-6DDA72104673}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CimDocumentSchemas", "CimDocumentSchemas\CimDocumentSchemas.csproj", "{96322587-41C7-4C6D-BBBD-E1E71AD16EFB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{600E0CAA-23B7-493D-90D0-6DDA72104673}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{600E0CAA-23B7-493D-90D0-6DDA72104673}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{600E0CAA-23B7-493D-90D0-6DDA72104673}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96322587-41C7-4C6D-BBBD-E1E71AD16EFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96322587-41C7-4C6D-BBBD-E1E71AD16EFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96322587-41C7-4C6D-BBBD-E1E71AD16EFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96322587-41C7-4C6D-BBBD-E1E71AD16EFB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
