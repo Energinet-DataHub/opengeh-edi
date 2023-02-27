@@ -39,7 +39,7 @@ public class RejectRequestChangeAccountingPointCharacteristicsDocumentWriterTest
     private readonly RejectRequestChangeAccountingPointCharacteristicsMessageWriter _xmlMessageWriter;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMessageRecordParser _messageRecordParser;
-    private ISchemaProvider? _schemaProvider;
+    private IZDocumentValidator? _schemaProvider;
 
     public RejectRequestChangeAccountingPointCharacteristicsDocumentWriterTests()
     {
@@ -88,7 +88,7 @@ public class RejectRequestChangeAccountingPointCharacteristicsDocumentWriterTest
 
     private async Task AssertMessage(Stream message, MessageHeader header, List<MarketActivityRecord> marketActivityRecords)
     {
-        _schemaProvider = new XmlSchemaProvider();
+        _schemaProvider = new XmlIzzDocumentValidator();
         var document = XDocument.Load(message);
         AssertXmlMessage.AssertHeader(header, document);
         AssertXmlMessage.AssertHasHeaderValue(document, "type", "A80");

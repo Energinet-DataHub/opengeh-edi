@@ -38,7 +38,7 @@ public class RejectRequestChangeOfSupplierDocumentWriterTests
     private readonly RejectRequestChangeOfSupplierXmlMessageWriter _xmlMessageWriter;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMessageRecordParser _messageRecordParser;
-    private ISchemaProvider? _schemaProvider;
+    private IZDocumentValidator? _schemaProvider;
 
     public RejectRequestChangeOfSupplierDocumentWriterTests()
     {
@@ -87,7 +87,7 @@ public class RejectRequestChangeOfSupplierDocumentWriterTests
 
     private async Task AssertMessage(Stream message, MessageHeader header, List<MarketActivityRecord> marketActivityRecords)
     {
-        _schemaProvider = new XmlSchemaProvider();
+        _schemaProvider = new XmlIzzDocumentValidator();
         var document = XDocument.Load(message);
         AssertXmlMessage.AssertHeader(header, document);
         AssertXmlMessage.AssertHasHeaderValue(document, "type", "414");

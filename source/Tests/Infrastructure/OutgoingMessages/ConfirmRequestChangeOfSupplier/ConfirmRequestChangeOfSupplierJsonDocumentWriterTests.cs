@@ -39,14 +39,14 @@ public class ConfirmRequestChangeOfSupplierJsonDocumentWriterTests
     private readonly ConfirmChangeOfSupplierJsonMessageWriter _messageWriter;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMessageRecordParser _messageRecordParser;
-    private JsonSchemaProvider _schemaProvider;
+    private JsonIzzDocumentValidator _izzDocumentValidator;
 
     public ConfirmRequestChangeOfSupplierJsonDocumentWriterTests()
     {
         _systemDateTimeProvider = new SystemDateTimeProvider();
         _messageRecordParser = new MessageRecordParser(new Serializer());
         _messageWriter = new ConfirmChangeOfSupplierJsonMessageWriter(_messageRecordParser);
-        _schemaProvider = new JsonSchemaProvider(new CimJsonSchemas());
+        _izzDocumentValidator = new JsonIzzDocumentValidator(new CimJsonSchemas());
     }
 
     [Fact]
@@ -83,8 +83,8 @@ public class ConfirmRequestChangeOfSupplierJsonDocumentWriterTests
 
     private async Task AssertMessage(Stream message, MessageHeader header, List<MarketActivityRecord> marketActivityRecords)
     {
-        _schemaProvider = new JsonSchemaProvider(new CimJsonSchemas());
-        var schema = await _schemaProvider.GetSchemaAsync<JsonSchema>("confirmrequestchangeofsupplier", "0").ConfigureAwait(false);
+        _izzDocumentValidator = new JsonIzzDocumentValidator(new CimJsonSchemas());
+        var schema = await _izzDocumentValidator.GetSchemaAsync<JsonSchema>("confirmrequestchangeofsupplier", "0").ConfigureAwait(false);
         if (schema == null) throw new InvalidCastException("Json schema not found for process ConfirmRequestChangeOfSupplier");
         var document = await JsonDocument.ParseAsync(message).ConfigureAwait(false);
         AssertJsonMessage.AssertConformsToSchema(document, schema, DocumentType);

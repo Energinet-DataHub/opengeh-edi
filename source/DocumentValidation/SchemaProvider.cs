@@ -16,7 +16,7 @@ using DocumentValidation.Xml;
 
 namespace DocumentValidation
 {
-    public abstract class SchemaProvider : ISchemaProvider
+    public abstract class IzzDocumentValidator : IZDocumentValidator
     {
         public abstract DocumentFormat HandledFormat { get; }
 

@@ -41,7 +41,7 @@ namespace Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
         private readonly CharacteristicsOfACustomerAtAnApMessageWriter _messageWriter;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
         private readonly IMessageRecordParser _messageRecordParser;
-        private ISchemaProvider? _schemaProvider;
+        private IZDocumentValidator? _schemaProvider;
 
         public CharacteristicsOfACustomerAtAnApDocumentWriterTests()
         {
@@ -195,7 +195,7 @@ namespace Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
 
         private Task<XmlSchema?> GetSchema()
         {
-            _schemaProvider = new XmlSchemaProvider();
+            _schemaProvider = new XmlIzzDocumentValidator();
             return _schemaProvider.GetSchemaAsync<XmlSchema>("characteristicsofacustomeratanap", "0.1");
         }
 

@@ -39,7 +39,7 @@ public class AccountingPointCharacteristicsDocumentWriterTests
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMessageRecordParser _messageRecordParser;
     private readonly SampleData _sampleData;
-    private ISchemaProvider? _schemaProvider;
+    private IZDocumentValidator? _schemaProvider;
 
     public AccountingPointCharacteristicsDocumentWriterTests()
     {
@@ -89,7 +89,7 @@ public class AccountingPointCharacteristicsDocumentWriterTests
 
     private async Task AssertConformsToSchema(Stream message)
     {
-        _schemaProvider = new XmlSchemaProvider();
+        _schemaProvider = new XmlIzzDocumentValidator();
         var schema = await _schemaProvider.GetSchemaAsync<XmlSchema>("accountingpointcharacteristics", "0.1")
             .ConfigureAwait(false);
         await AssertXmlMessage.AssertConformsToSchemaAsync(message, schema!).ConfigureAwait(false);

@@ -32,11 +32,11 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
     private const string MarketActivityRecordElementName = "MktActivityRecord";
     private const string HeaderElementName = "RequestChangeAccountingPointCharacteristics_MarketDocument";
     private readonly List<ValidationError> _errors = new();
-    private readonly ISchemaProvider _schemaProvider;
+    private readonly IZDocumentValidator _izzDocumentValidator;
 
     public XmlMessageParser()
     {
-        _schemaProvider = new XmlSchemaProvider();
+        _izzDocumentValidator = new XmlIzzDocumentValidator();
     }
 
     public MessageFormat HandledFormat => MessageFormat.Xml;
@@ -62,7 +62,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
             return InvalidXmlFailure(generalException);
         }
 
-        var xmlSchema = await _schemaProvider.GetSchemaAsync<XmlSchema>(businessProcessType, version)
+        var xmlSchema = await _izzDocumentValidator.GetSchemaAsync<XmlSchema>(businessProcessType, version)
             .ConfigureAwait(true);
         if (xmlSchema is null)
         {

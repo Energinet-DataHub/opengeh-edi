@@ -41,13 +41,13 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
 {
     private const string NamespacePrefix = "cim";
     private readonly IMessageWriter _messageWriter;
-    private readonly ISchemaProvider _schemaProvider;
+    private readonly IZDocumentValidator _izzDocumentValidator;
     private readonly IMessageRecordParser _parser;
 
     public NotifyAggregatedMeasureDataDocumentWriterTests()
     {
         _parser = new MessageRecordParser(new Serializer());
-        _schemaProvider = new XmlSchemaProvider();
+        _izzDocumentValidator = new XmlIzzDocumentValidator();
         _messageWriter = new NotifyAggregatedMeasureDataMessageWriter(_parser);
     }
 
@@ -164,6 +164,6 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
 
     private Task<XmlSchema?> GetSchema()
     {
-        return _schemaProvider.GetSchemaAsync<XmlSchema>("notifyaggregatedmeasuredata", "0.1");
+        return _izzDocumentValidator.GetSchemaAsync<XmlSchema>("notifyaggregatedmeasuredata", "0.1");
     }
 }

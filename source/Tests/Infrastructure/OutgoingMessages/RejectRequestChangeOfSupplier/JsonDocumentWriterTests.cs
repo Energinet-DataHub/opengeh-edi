@@ -39,14 +39,14 @@ public class JsonDocumentWriterTests
     private readonly RejectRequestChangeOfSupplierJsonMessageWriter _messageWriter;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMessageRecordParser _messageRecordParser;
-    private readonly JsonSchemaProvider _schemaProvider;
+    private readonly JsonIzzDocumentValidator _izzDocumentValidator;
 
     public JsonDocumentWriterTests()
     {
         _systemDateTimeProvider = new SystemDateTimeProvider();
         _messageRecordParser = new MessageRecordParser(new Serializer());
         _messageWriter = new RejectRequestChangeOfSupplierJsonMessageWriter(_messageRecordParser);
-        _schemaProvider = new JsonSchemaProvider(new CimJsonSchemas());
+        _izzDocumentValidator = new JsonIzzDocumentValidator(new CimJsonSchemas());
     }
 
     [Fact]
@@ -110,7 +110,7 @@ public class JsonDocumentWriterTests
 
     private async Task AssertMessage(Stream message, MessageHeader header, List<MarketActivityRecord> marketActivityRecords)
     {
-        var schema = await _schemaProvider.GetSchemaAsync<JsonSchema>("rejectrequestchangeofsupplier", "0").ConfigureAwait(false);
+        var schema = await _izzDocumentValidator.GetSchemaAsync<JsonSchema>("rejectrequestchangeofsupplier", "0").ConfigureAwait(false);
         if (schema == null) throw new InvalidCastException("Json schema not found for process RejectRequestChangeOfSupplier");
         var document = await JsonDocument.ParseAsync(message).ConfigureAwait(false);
         AssertJsonMessage.AssertConformsToSchema(document, schema, DocumentType);
