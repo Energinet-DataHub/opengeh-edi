@@ -20,7 +20,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Application.Configuration;
 using Application.OutgoingMessages.Common;
-using CimDocumentSchemas;
+using DocumentValidation;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Infrastructure.Configuration;

@@ -21,7 +21,7 @@ using System.Xml.Linq;
 using System.Xml.Schema;
 using Application.Configuration;
 using Application.OutgoingMessages.Common;
-using CimDocumentSchemas;
+using DocumentValidation;
 using Domain.OutgoingMessages;
 using Infrastructure.Configuration;
 using Infrastructure.Configuration.Serialization;

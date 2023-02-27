@@ -29,7 +29,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearningTests", "LearningTe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApplyDBMigrationsApp", "ApplyDBMigrationsApp\ApplyDBMigrationsApp.csproj", "{600E0CAA-23B7-493D-90D0-6DDA72104673}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CimDocumentSchemas", "CimDocumentSchemas\CimDocumentSchemas.csproj", "{96322587-41C7-4C6D-BBBD-E1E71AD16EFB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocumentValidation", "DocumentValidation\DocumentValidation.csproj", "{96322587-41C7-4C6D-BBBD-E1E71AD16EFB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

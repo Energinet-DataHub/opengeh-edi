@@ -14,11 +14,11 @@
 
 using Application.IncomingMessages.RequestChangeCustomerCharacteristics;
 using Application.IncomingMessages.RequestChangeOfSupplier;
-using CimDocumentSchemas;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 using CimMessageAdapter.Messages.RequestChangeOfSupplier;
 using CimMessageAdapter.Response;
+using DocumentValidation;
 using Infrastructure.IncomingMessages.RequestChangeOfSupplier;
 using Infrastructure.IncomingMessages.Response;
 using Microsoft.Extensions.DependencyInjection;

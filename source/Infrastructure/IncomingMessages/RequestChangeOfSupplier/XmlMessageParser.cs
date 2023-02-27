@@ -19,9 +19,9 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using Application.IncomingMessages.RequestChangeOfSupplier;
-using CimDocumentSchemas;
 using CimMessageAdapter.Errors;
 using CimMessageAdapter.Messages;
+using DocumentValidation;
 using Domain.OutgoingMessages;
 
 namespace Infrastructure.IncomingMessages.RequestChangeOfSupplier;

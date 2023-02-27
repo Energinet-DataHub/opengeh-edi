@@ -15,7 +15,7 @@
 using System.Xml;
 using System.Xml.Schema;
 
-namespace CimDocumentSchemas.Xml
+namespace DocumentValidation.Xml
 {
     public static class MessageValidator
     {

@@ -22,7 +22,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
 using System.Xml.XPath;
-using CimDocumentSchemas.Xml;
+using DocumentValidation.Xml;
 using Xunit;
 
 namespace Tests.Infrastructure.OutgoingMessages.Asserts;

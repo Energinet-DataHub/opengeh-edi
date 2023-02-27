@@ -12,12 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CimDocumentSchemas
-{
-    public abstract class SchemaProvider : ISchemaProvider
-    {
-        public abstract Task<T?> GetSchemaAsync<T>(string businessProcessType, string version);
+namespace DocumentValidation;
 
-        protected abstract Task<T?> LoadSchemaWithDependentSchemasAsync<T>(string location);
-    }
+/// <summary>
+/// bla
+/// </summary>
+public interface ISchema
+{
+    /// <summary>
+    /// bla
+    /// </summary>
+    public string SchemaPath { get; }
+
+    /// <summary>
+    /// bla
+    /// </summary>
+    /// <param name="businessProcessType"></param>
+    /// <param name="version"></param>
+    /// <returns><see cref="string"/></returns>
+    public string? GetSchemaLocation(string businessProcessType, string version);
 }

@@ -19,7 +19,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Schema;
 using Application.OutgoingMessages.Common;
-using CimDocumentSchemas;
+using DocumentValidation;
 using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;

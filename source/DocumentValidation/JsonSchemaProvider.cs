@@ -14,7 +14,7 @@
 
 using Json.Schema;
 
-namespace CimDocumentSchemas;
+namespace DocumentValidation;
 
 public class JsonSchemaProvider : SchemaProvider
 {

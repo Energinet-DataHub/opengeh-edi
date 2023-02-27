@@ -21,7 +21,7 @@ using System.Xml.Schema;
 using Application.Configuration;
 using Application.OutgoingMessages;
 using Application.OutgoingMessages.Common;
-using CimDocumentSchemas;
+using DocumentValidation;
 using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
