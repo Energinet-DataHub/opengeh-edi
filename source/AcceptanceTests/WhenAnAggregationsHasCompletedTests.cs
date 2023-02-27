@@ -1,12 +1,16 @@
-﻿namespace AcceptanceTest;
+﻿using AcceptanceTest.WholesaleApiMock;
+
+namespace AcceptanceTest;
 
 public class WhenAnAggregationsHasCompletedTests : IDisposable
 {
+    private readonly WholeSaleApiMockHost _wholeSaleApiMockHost;
     private readonly WholeSaleDsl _wholeSaleDsl;
     private readonly Edi _edi;
 
     public WhenAnAggregationsHasCompletedTests()
     {
+        _wholeSaleApiMockHost = new WholeSaleApiMockHost();
         _wholeSaleDsl = new WholeSaleDsl();
         _edi = new Edi();
     }
@@ -30,6 +34,7 @@ public class WhenAnAggregationsHasCompletedTests : IDisposable
     {
         if (disposing)
         {
+            _wholeSaleApiMockHost.Dispose();
             _edi.Dispose();
         }
     }
