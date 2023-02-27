@@ -37,7 +37,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
 
     public XmlMessageParser()
     {
-        _izzDocumentValidator = new XmlIzzDocumentValidator();
+        _izzDocumentValidator = new CimXmlDocumentValidator();
     }
 
     public MessageFormat HandledFormat => MessageFormat.Xml;

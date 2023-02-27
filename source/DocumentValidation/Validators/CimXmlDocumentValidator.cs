@@ -18,12 +18,12 @@ using DocumentValidation.Xml;
 
 namespace DocumentValidation.Validators;
 
-public class XmlIzzDocumentValidator : IzzDocumentValidator
+public class CimXmlDocumentValidator : IzzDocumentValidator
 {
     private readonly Dictionary<DocumentType, SchemaDetails> _schemaMap = new();
     private readonly ISchema _schema;
 
-    public XmlIzzDocumentValidator()
+    public CimXmlDocumentValidator()
     {
         _schema = new CimXmlSchemas();
         _schemaMap.Add(DocumentType.GenericNotification, _schema.GetDetailsFor("genericnotification"));

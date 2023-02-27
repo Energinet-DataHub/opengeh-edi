@@ -48,7 +48,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
     public NotifyAggregatedMeasureDataDocumentWriterTests()
     {
         _parser = new MessageRecordParser(new Serializer());
-        _izzDocumentValidator = new XmlIzzDocumentValidator();
+        _izzDocumentValidator = new CimXmlDocumentValidator();
         _messageWriter = new NotifyAggregatedMeasureDataMessageWriter(_parser);
     }
 

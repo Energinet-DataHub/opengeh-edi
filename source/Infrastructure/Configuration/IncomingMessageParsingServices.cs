@@ -49,7 +49,7 @@ internal static class IncomingMessageParsingServices
     private static void RegisterSchemaProviders(IServiceCollection services)
     {
         services.AddSingleton<CimJsonSchemas>();
-        services.AddSingleton<XmlIzzDocumentValidator>();
+        services.AddSingleton<CimXmlDocumentValidator>();
         services.AddSingleton<JsonDocumentValidator>();
     }
 

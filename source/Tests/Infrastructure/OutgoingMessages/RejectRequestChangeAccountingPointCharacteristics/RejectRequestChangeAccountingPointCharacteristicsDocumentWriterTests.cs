@@ -89,7 +89,7 @@ public class RejectRequestChangeAccountingPointCharacteristicsDocumentWriterTest
 
     private async Task AssertMessage(Stream message, MessageHeader header, List<MarketActivityRecord> marketActivityRecords)
     {
-        _schemaProvider = new XmlIzzDocumentValidator();
+        _schemaProvider = new CimXmlDocumentValidator();
         var document = XDocument.Load(message);
         AssertXmlMessage.AssertHeader(header, document);
         AssertXmlMessage.AssertHasHeaderValue(document, "type", "A80");
