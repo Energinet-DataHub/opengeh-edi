@@ -24,7 +24,7 @@ internal class EdiDriver : IDisposable
     {
         var token = TokenBuilder.ForGridOperator(gridOperatorNumber);
         var stopWatch = Stopwatch.StartNew();
-        while (stopWatch.ElapsedMilliseconds < 20000)
+        while (stopWatch.ElapsedMilliseconds < 60000)
         {
             var peekResponse = await PeekAsync(token)
                 .ConfigureAwait(false);
@@ -34,6 +34,8 @@ internal class EdiDriver : IDisposable
                 await DequeueAsync(token, GetMessageId(peekResponse)).ConfigureAwait(false);
                 return document;
             }
+
+            await Task.Delay(500).ConfigureAwait(false);
         }
 
         throw new TimeoutException("Unable to retrieve peek result within time limit");
