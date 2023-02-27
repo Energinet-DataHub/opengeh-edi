@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using DocumentValidation.Xml;
 using Json.Schema;
 
 namespace DocumentValidation;
@@ -25,6 +26,8 @@ public class JsonSchemaProvider : SchemaProvider
         _schema = schemas;
     }
 
+    public override DocumentFormat HandledFormat => DocumentFormat.CimJson;
+
     public override Task<T?> GetSchemaAsync<T>(string businessProcessType, string version)
         where T : default
     {
@@ -36,6 +39,11 @@ public class JsonSchemaProvider : SchemaProvider
         }
 
         return (Task<T?>)(object)LoadSchemaWithDependentSchemasAsync<JsonSchema>(schemaName);
+    }
+
+    public override Task<ValidationResult> ValidateAsync(Stream document, DocumentType type)
+    {
+        throw new NotImplementedException();
     }
 
     protected override Task<T?> LoadSchemaWithDependentSchemasAsync<T>(string location)

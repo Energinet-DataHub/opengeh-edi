@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Xml.Schema;
+using DocumentValidation.Xml;
 
 namespace DocumentValidation
 {
@@ -22,11 +23,24 @@ namespace DocumentValidation
     public interface ISchemaProvider
     {
         /// <summary>
+        /// Indicates the document format handled by the provider
+        /// </summary>
+        DocumentFormat HandledFormat { get; }
+
+        /// <summary>
         /// Get schema for specific business process and version
         /// </summary>
         /// <param name="businessProcessType"></param>
         /// <param name="version"></param>
         /// <returns><see cref="XmlSchema"/></returns>
         Task<T?> GetSchemaAsync<T>(string businessProcessType, string version);
+
+        /// <summary>
+        /// Validates the input document
+        /// </summary>
+        /// <param name="document"></param>
+        /// <param name="type"></param>
+        /// <returns><see cref="ValidationResult"/></returns>
+        Task<ValidationResult> ValidateAsync(Stream document, DocumentType type);
     }
 }

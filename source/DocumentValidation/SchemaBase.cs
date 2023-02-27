@@ -16,10 +16,22 @@ namespace DocumentValidation;
 
 public abstract class SchemaBase
 {
+    private readonly List<SchemaDetails> _schemaDetails = new();
     private Dictionary<KeyValuePair<string, string>, string>? _schemas;
 
     protected SchemaBase()
     {
+    }
+
+    public SchemaDetails GetDetailsFor(string documentName)
+    {
+        return _schemaDetails.FirstOrDefault(detail => detail.DocumentName.Equals(documentName, StringComparison.OrdinalIgnoreCase))
+               ?? throw new InvalidOperationException("Unknown document type");
+    }
+
+    protected void AddDetails(SchemaDetails details)
+    {
+        _schemaDetails.Add(details);
     }
 
     protected void InitializeSchemas(Dictionary<KeyValuePair<string, string>, string> schemas)

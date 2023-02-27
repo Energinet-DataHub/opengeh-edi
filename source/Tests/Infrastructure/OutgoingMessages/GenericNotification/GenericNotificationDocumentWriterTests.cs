@@ -93,6 +93,10 @@ namespace Tests.Infrastructure.OutgoingMessages.GenericNotification
             var schema = await _schemaProvider.GetSchemaAsync<XmlSchema>("genericnotification", "0.1")
                 .ConfigureAwait(false);
             await AssertXmlMessage.AssertConformsToSchemaAsync(message, schema!).ConfigureAwait(false);
+
+            var documentValidator = new DocumentValidator(new List<ISchemaProvider>() { _schemaProvider, });
+            var validationResult = await documentValidator.ValidateAsync(message, DocumentType.GenericNotification, DocumentFormat.CimXml).ConfigureAwait(false);
+            Assert.True(validationResult.IsValid);
         }
     }
 }

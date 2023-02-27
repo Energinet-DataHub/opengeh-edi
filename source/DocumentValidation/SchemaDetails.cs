@@ -12,18 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using DocumentValidation.Xml;
+namespace DocumentValidation;
 
-namespace DocumentValidation
-{
-    public abstract class SchemaProvider : ISchemaProvider
-    {
-        public abstract DocumentFormat HandledFormat { get; }
-
-        public abstract Task<T?> GetSchemaAsync<T>(string businessProcessType, string version);
-
-        public abstract Task<ValidationResult> ValidateAsync(Stream document, DocumentType type);
-
-        protected abstract Task<T?> LoadSchemaWithDependentSchemasAsync<T>(string location);
-    }
-}
+public record SchemaDetails(string DocumentName, string Version, string Location);

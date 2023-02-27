@@ -43,6 +43,10 @@ namespace DocumentValidation
                     schemaDictionary.Add(
                         new KeyValuePair<string, string>(filenameSplit[4], filenameSplit[5] + "." + filenameSplit[6]),
                         schema);
+                    AddDetails(new SchemaDetails(
+                        filenameSplit[4],
+                        filenameSplit[5] + "." + filenameSplit[6],
+                        schema));
                 }
             }
 

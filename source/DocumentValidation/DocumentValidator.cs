@@ -14,16 +14,20 @@
 
 using DocumentValidation.Xml;
 
-namespace DocumentValidation
+namespace DocumentValidation;
+
+public class DocumentValidator
 {
-    public abstract class SchemaProvider : ISchemaProvider
+    private readonly IReadOnlyCollection<ISchemaProvider> _providers;
+
+    public DocumentValidator(IReadOnlyCollection<ISchemaProvider> providers)
     {
-        public abstract DocumentFormat HandledFormat { get; }
+        _providers = providers;
+    }
 
-        public abstract Task<T?> GetSchemaAsync<T>(string businessProcessType, string version);
-
-        public abstract Task<ValidationResult> ValidateAsync(Stream document, DocumentType type);
-
-        protected abstract Task<T?> LoadSchemaWithDependentSchemasAsync<T>(string location);
+    public Task<ValidationResult> ValidateAsync(Stream document, DocumentType type, DocumentFormat format)
+    {
+        var provider = _providers.First(provider => provider.HandledFormat == format);
+        return provider.ValidateAsync(document, type);
     }
 }

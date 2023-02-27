@@ -31,4 +31,11 @@ public interface ISchema
     /// <param name="version"></param>
     /// <returns><see cref="string"/></returns>
     public string? GetSchemaLocation(string businessProcessType, string version);
+
+    /// <summary>
+    /// Return schema details for the specified document type
+    /// </summary>
+    /// <param name="documentName"></param>
+    /// <returns><see cref="SchemaDetails"/></returns>
+    SchemaDetails GetDetailsFor(string documentName);
 }

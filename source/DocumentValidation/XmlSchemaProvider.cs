@@ -14,17 +14,22 @@
 
 using System.Xml;
 using System.Xml.Schema;
+using DocumentValidation.Xml;
 
 namespace DocumentValidation;
 
 public class XmlSchemaProvider : SchemaProvider
 {
+    private readonly Dictionary<DocumentType, SchemaDetails> _schemaMap = new();
     private readonly ISchema _schema;
 
     public XmlSchemaProvider()
     {
         _schema = new CimXmlSchemas();
+        _schemaMap.Add(DocumentType.GenericNotification, _schema.GetDetailsFor("genericnotification"));
     }
+
+    public override DocumentFormat HandledFormat => DocumentFormat.CimXml;
 
     public override Task<T?> GetSchemaAsync<T>(string businessProcessType, string version)
         where T : default
@@ -37,6 +42,15 @@ public class XmlSchemaProvider : SchemaProvider
         }
 
         return (Task<T?>)(object)LoadSchemaWithDependentSchemasAsync<XmlSchema>(schemaName);
+    }
+
+    public override async Task<ValidationResult> ValidateAsync(Stream document, DocumentType type)
+    {
+        var schema = await GetSchemaAsync<XmlSchema>(_schemaMap[type].DocumentName, _schemaMap[type].Version).ConfigureAwait(false);
+
+        return schema is null
+            ? throw new InvalidOperationException($"Could not find schema for document '{type}'")
+            : await MessageValidator.ValidateAsync(document, schema).ConfigureAwait(false);
     }
 
     protected override async Task<T?> LoadSchemaWithDependentSchemasAsync<T>(string location)
