@@ -17,11 +17,11 @@ using Json.Schema;
 
 namespace DocumentValidation.Validators;
 
-public class JsonIzzDocumentValidator : IzzDocumentValidator
+public class JsonDocumentValidator : IzzDocumentValidator
 {
     private readonly ISchema _schema;
 
-    public JsonIzzDocumentValidator(CimJsonSchemas schemas)
+    public JsonDocumentValidator(CimJsonSchemas schemas)
     {
         _schema = schemas;
     }

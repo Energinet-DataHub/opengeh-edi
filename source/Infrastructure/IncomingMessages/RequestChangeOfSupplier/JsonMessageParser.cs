@@ -37,12 +37,12 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
 {
     private const string MarketActivityRecordElementName = "MktActivityRecord";
     private const string HeaderElementName = "RequestChangeOfSupplier_MarketDocument";
-    private readonly IZDocumentValidator _izzDocumentValidator;
+    private readonly IZDocumentValidator _documentValidator;
     private readonly List<ValidationError> _errors = new();
 
-    public JsonMessageParser(JsonIzzDocumentValidator izzDocumentValidator)
+    public JsonMessageParser(JsonDocumentValidator documentValidator)
     {
-        _izzDocumentValidator = izzDocumentValidator;
+        _documentValidator = documentValidator;
     }
 
     public MessageFormat HandledFormat => MessageFormat.Json;
@@ -61,7 +61,7 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
             return InvalidJsonFailure(exception);
         }
 
-        var schema = await _izzDocumentValidator.GetSchemaAsync<JsonSchema>(processType, "0").ConfigureAwait(false);
+        var schema = await _documentValidator.GetSchemaAsync<JsonSchema>(processType, "0").ConfigureAwait(false);
         if (schema is null)
         {
             return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(new UnknownBusinessProcessTypeOrVersion(processType, "0"));

@@ -50,7 +50,7 @@ internal static class IncomingMessageParsingServices
     {
         services.AddSingleton<CimJsonSchemas>();
         services.AddSingleton<XmlIzzDocumentValidator>();
-        services.AddSingleton<JsonIzzDocumentValidator>();
+        services.AddSingleton<JsonDocumentValidator>();
     }
 
     private static void RegisterRequestChangeOfCustomerCharacteristicsMessageHandling(IServiceCollection services)
