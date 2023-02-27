@@ -16,7 +16,7 @@ using Json.Schema;
 
 namespace DocumentValidation.Providers;
 
-public sealed class CimJsonProvider : SchemaBase, ISchema
+public sealed class CimJsonProvider : ProviderBase, ISchema
 {
     private const string SchemaBaseUri = @"file:///C:/Users/Public/Documents/iec.ch/TC57/2020/";
     private static readonly string _schemaPath = $"Schemas{Path.DirectorySeparatorChar}Json{Path.DirectorySeparatorChar}";

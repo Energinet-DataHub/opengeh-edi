@@ -14,12 +14,12 @@
 
 namespace DocumentValidation.Providers;
 
-public abstract class SchemaBase
+public abstract class ProviderBase
 {
     private readonly List<SchemaDetails> _schemaDetails = new();
     private Dictionary<KeyValuePair<string, string>, string>? _schemas;
 
-    protected SchemaBase()
+    protected ProviderBase()
     {
     }
 
