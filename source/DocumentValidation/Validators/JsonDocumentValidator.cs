@@ -18,7 +18,7 @@ using Json.Schema;
 
 namespace DocumentValidation.Validators;
 
-public class JsonDocumentValidator : IzzDocumentValidator
+public class JsonDocumentValidator : SchemaProvider
 {
     private readonly ISchema _provider;
 

@@ -19,7 +19,7 @@ using DocumentValidation.Xml;
 
 namespace DocumentValidation.Validators;
 
-public class CimXmlDocumentValidator : IzzDocumentValidator
+public class CimXmlDocumentValidator : SchemaProvider
 {
     private readonly Dictionary<DocumentType, SchemaDetails> _schemaMap = new();
     private readonly ISchema _schema;
