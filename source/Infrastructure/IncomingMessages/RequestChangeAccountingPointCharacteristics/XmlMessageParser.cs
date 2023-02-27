@@ -33,7 +33,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
     private const string MarketActivityRecordElementName = "MktActivityRecord";
     private const string HeaderElementName = "RequestChangeAccountingPointCharacteristics_MarketDocument";
     private readonly List<ValidationError> _errors = new();
-    private readonly IZDocumentValidator _izzDocumentValidator;
+    private readonly IValidator _izzDocumentValidator;
 
     public XmlMessageParser()
     {

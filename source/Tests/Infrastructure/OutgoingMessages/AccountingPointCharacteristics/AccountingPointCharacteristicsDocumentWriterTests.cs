@@ -40,7 +40,7 @@ public class AccountingPointCharacteristicsDocumentWriterTests
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMessageRecordParser _messageRecordParser;
     private readonly SampleData _sampleData;
-    private IZDocumentValidator? _schemaProvider;
+    private IValidator? _schemaProvider;
 
     public AccountingPointCharacteristicsDocumentWriterTests()
     {

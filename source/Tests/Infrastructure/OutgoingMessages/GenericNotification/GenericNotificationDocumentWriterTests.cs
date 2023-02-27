@@ -39,7 +39,7 @@ namespace Tests.Infrastructure.OutgoingMessages.GenericNotification
         private readonly GenericNotificationMessageWriter _messageWriter;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
         private readonly IMessageRecordParser _messageRecordParser;
-        private IZDocumentValidator? _schemaProvider;
+        private IValidator? _schemaProvider;
 
         public GenericNotificationDocumentWriterTests()
         {
@@ -95,7 +95,7 @@ namespace Tests.Infrastructure.OutgoingMessages.GenericNotification
                 .ConfigureAwait(false);
             await AssertXmlMessage.AssertConformsToSchemaAsync(message, schema!).ConfigureAwait(false);
 
-            var documentValidator = new DocumentValidator(new List<IZDocumentValidator>() { _schemaProvider, });
+            var documentValidator = new DocumentValidator(new List<IValidator>() { _schemaProvider, });
             var validationResult = await documentValidator.ValidateAsync(message, DocumentType.GenericNotification, DocumentFormat.CimXml).ConfigureAwait(false);
             Assert.True(validationResult.IsValid);
         }

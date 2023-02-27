@@ -42,7 +42,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
 {
     private const string NamespacePrefix = "cim";
     private readonly IMessageWriter _messageWriter;
-    private readonly IZDocumentValidator _izzDocumentValidator;
+    private readonly IValidator _izzDocumentValidator;
     private readonly IMessageRecordParser _parser;
 
     public NotifyAggregatedMeasureDataDocumentWriterTests()

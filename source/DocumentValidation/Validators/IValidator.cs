@@ -20,7 +20,7 @@ namespace DocumentValidation.Validators
     /// <summary>
     /// Provides XML schemas for CIM messages
     /// </summary>
-    public interface IZDocumentValidator
+    public interface IValidator
     {
         /// <summary>
         /// Indicates the document format handled by the provider

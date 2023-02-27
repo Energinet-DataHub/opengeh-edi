@@ -39,7 +39,7 @@ namespace Tests.Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier
         private readonly ConfirmChangeOfSupplierXmlMessageWriter _xmlMessageWriter;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
         private readonly IMessageRecordParser _messageRecordParser;
-        private IZDocumentValidator? _schemaProvider;
+        private IValidator? _schemaProvider;
 
         public ConfirmRequestChangeOfSupplierDocumentWriterTests()
         {

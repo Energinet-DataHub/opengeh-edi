@@ -40,7 +40,7 @@ public class RejectRequestChangeAccountingPointCharacteristicsDocumentWriterTest
     private readonly RejectRequestChangeAccountingPointCharacteristicsMessageWriter _xmlMessageWriter;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMessageRecordParser _messageRecordParser;
-    private IZDocumentValidator? _schemaProvider;
+    private IValidator? _schemaProvider;
 
     public RejectRequestChangeAccountingPointCharacteristicsDocumentWriterTests()
     {

@@ -39,7 +39,7 @@ public class ConfirmRequestChangeAccountingPointCharacteristicsDocumentWriterTes
     private readonly ConfirmRequestChangeAccountingPointCharacteristicsMessageWriter _messageWriter;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMessageRecordParser _messageRecordParser;
-    private IZDocumentValidator? _schemaProvider;
+    private IValidator? _schemaProvider;
 
     public ConfirmRequestChangeAccountingPointCharacteristicsDocumentWriterTests()
     {

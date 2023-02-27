@@ -39,7 +39,7 @@ public class RejectRequestChangeOfSupplierDocumentWriterTests
     private readonly RejectRequestChangeOfSupplierXmlMessageWriter _xmlMessageWriter;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMessageRecordParser _messageRecordParser;
-    private IZDocumentValidator? _schemaProvider;
+    private IValidator? _schemaProvider;
 
     public RejectRequestChangeOfSupplierDocumentWriterTests()
     {

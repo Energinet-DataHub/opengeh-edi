@@ -18,9 +18,9 @@ namespace DocumentValidation.Validators;
 
 public class DocumentValidator
 {
-    private readonly IReadOnlyCollection<IZDocumentValidator> _providers;
+    private readonly IReadOnlyCollection<IValidator> _providers;
 
-    public DocumentValidator(IReadOnlyCollection<IZDocumentValidator> providers)
+    public DocumentValidator(IReadOnlyCollection<IValidator> providers)
     {
         _providers = providers;
     }

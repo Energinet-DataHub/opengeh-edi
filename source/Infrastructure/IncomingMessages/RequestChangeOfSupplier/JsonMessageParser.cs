@@ -37,7 +37,7 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
 {
     private const string MarketActivityRecordElementName = "MktActivityRecord";
     private const string HeaderElementName = "RequestChangeOfSupplier_MarketDocument";
-    private readonly IZDocumentValidator _documentValidator;
+    private readonly IValidator _documentValidator;
     private readonly List<ValidationError> _errors = new();
 
     public JsonMessageParser(JsonDocumentValidator documentValidator)

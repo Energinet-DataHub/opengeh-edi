@@ -42,7 +42,7 @@ namespace Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
         private readonly CharacteristicsOfACustomerAtAnApMessageWriter _messageWriter;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
         private readonly IMessageRecordParser _messageRecordParser;
-        private IZDocumentValidator? _schemaProvider;
+        private IValidator? _schemaProvider;
 
         public CharacteristicsOfACustomerAtAnApDocumentWriterTests()
         {
