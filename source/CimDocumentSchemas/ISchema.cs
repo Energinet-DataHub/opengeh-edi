@@ -12,22 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using System.Xml.Schema;
+namespace CimDocumentSchemas;
 
-namespace Infrastructure.IncomingMessages.SchemaStore
+/// <summary>
+/// bla
+/// </summary>
+public interface ISchema
 {
     /// <summary>
-    /// Provides XML schemas for CIM messages
+    /// bla
     /// </summary>
-    public interface ISchemaProvider
-    {
-        /// <summary>
-        /// Get schema for specific business process and version
-        /// </summary>
-        /// <param name="businessProcessType"></param>
-        /// <param name="version"></param>
-        /// <returns><see cref="XmlSchema"/></returns>
-        Task<T?> GetSchemaAsync<T>(string businessProcessType, string version);
-    }
+    public string SchemaPath { get; }
+
+    /// <summary>
+    /// bla
+    /// </summary>
+    /// <param name="businessProcessType"></param>
+    /// <param name="version"></param>
+    /// <returns><see cref="string"/></returns>
+    public string? GetSchemaLocation(string businessProcessType, string version);
 }

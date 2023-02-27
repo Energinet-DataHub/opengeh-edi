@@ -14,13 +14,13 @@
 
 using Application.IncomingMessages.RequestChangeCustomerCharacteristics;
 using Application.IncomingMessages.RequestChangeOfSupplier;
+using CimDocumentSchemas;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 using CimMessageAdapter.Messages.RequestChangeOfSupplier;
 using CimMessageAdapter.Response;
 using Infrastructure.IncomingMessages.RequestChangeOfSupplier;
 using Infrastructure.IncomingMessages.Response;
-using Infrastructure.IncomingMessages.SchemaStore;
 using Microsoft.Extensions.DependencyInjection;
 using MarketActivityRecord = Application.IncomingMessages.RequestChangeOfSupplier.MarketActivityRecord;
 using MessageParser = CimMessageAdapter.Messages.RequestChangeOfSupplier.MessageParser;

@@ -19,10 +19,10 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using Application.IncomingMessages.RequestChangeOfSupplier;
+using CimDocumentSchemas;
 using CimMessageAdapter.Errors;
 using CimMessageAdapter.Messages;
 using Domain.OutgoingMessages;
-using Infrastructure.IncomingMessages.SchemaStore;
 
 namespace Infrastructure.IncomingMessages.RequestChangeOfSupplier;
 
