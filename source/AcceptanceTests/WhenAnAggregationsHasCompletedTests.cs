@@ -2,12 +2,12 @@
 
 public class WhenAnAggregationsHasCompletedTests : IDisposable
 {
-    private readonly WholeSale _wholeSale;
+    private readonly WholeSaleDsl _wholeSaleDsl;
     private readonly Edi _edi;
 
     public WhenAnAggregationsHasCompletedTests()
     {
-        _wholeSale = new WholeSale();
+        _wholeSaleDsl = new WholeSaleDsl();
         _edi = new Edi();
     }
 
@@ -16,7 +16,7 @@ public class WhenAnAggregationsHasCompletedTests : IDisposable
     public async Task GridOperator_can_fetch_the_result_for_total_production(DocumentFormat documentFormat)
     {
         var gridArea = "543";
-        await _wholeSale.AggregationProcessHasCompletedForAsync(gridArea).ConfigureAwait(false);
+        await _wholeSaleDsl.AggregationProcessHasCompletedForAsync(gridArea).ConfigureAwait(false);
         await _edi.AssertTotalProductionResultIsAvailableAsync("5790000610976", gridArea, documentFormat).ConfigureAwait(false);
     }
 

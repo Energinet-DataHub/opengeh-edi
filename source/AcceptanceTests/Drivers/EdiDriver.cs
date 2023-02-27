@@ -15,23 +15,6 @@ internal class EdiDriver : IDisposable
         _httpClient.BaseAddress = new Uri("http://localhost:7071/api/");
     }
 
-    private async Task<HttpResponseMessage> PeekAsync(string token)
-    {
-        using var request = new HttpRequestMessage(HttpMethod.Get, "peek/aggregations");
-        request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
-        var peekResponse = await _httpClient.SendAsync(request).ConfigureAwait(false);
-        peekResponse.EnsureSuccessStatusCode();
-        return peekResponse;
-    }
-
-    private async Task DequeueAsync(string token, string messageId)
-    {
-        using var request = new HttpRequestMessage(HttpMethod.Delete, $"dequeue/{messageId}");
-        request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
-        var dequeueResponse = await _httpClient.SendAsync(request).ConfigureAwait(false);
-        dequeueResponse.EnsureSuccessStatusCode();
-    }
-
     public void Dispose()
     {
         _httpClient.Dispose();
@@ -59,5 +42,22 @@ internal class EdiDriver : IDisposable
     private static string GetMessageId(HttpResponseMessage peekResponse)
     {
         return peekResponse.Headers.GetValues("MessageId").First();
+    }
+
+    private async Task<HttpResponseMessage> PeekAsync(string token)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, "peek/aggregations");
+        request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
+        var peekResponse = await _httpClient.SendAsync(request).ConfigureAwait(false);
+        peekResponse.EnsureSuccessStatusCode();
+        return peekResponse;
+    }
+
+    private async Task DequeueAsync(string token, string messageId)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Delete, $"dequeue/{messageId}");
+        request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
+        var dequeueResponse = await _httpClient.SendAsync(request).ConfigureAwait(false);
+        dequeueResponse.EnsureSuccessStatusCode();
     }
 }
