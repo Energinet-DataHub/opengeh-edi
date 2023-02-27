@@ -15,7 +15,7 @@
 using DocumentValidation.Xml;
 using Json.Schema;
 
-namespace DocumentValidation;
+namespace DocumentValidation.Validators;
 
 public class JsonIzzDocumentValidator : IzzDocumentValidator
 {

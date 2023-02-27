@@ -22,6 +22,7 @@ using Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
 using CimMessageAdapter.Errors;
 using CimMessageAdapter.Messages;
 using DocumentValidation;
+using DocumentValidation.Validators;
 using Domain.OutgoingMessages;
 using MarketActivityRecord = Application.IncomingMessages.RequestChangeAccountPointCharacteristics.MarketActivityRecord;
 

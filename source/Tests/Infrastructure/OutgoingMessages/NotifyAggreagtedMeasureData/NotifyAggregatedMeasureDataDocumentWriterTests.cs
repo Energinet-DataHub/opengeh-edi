@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using System.Xml.Schema;
 using Application.OutgoingMessages.Common;
 using DocumentValidation;
+using DocumentValidation.Validators;
 using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;

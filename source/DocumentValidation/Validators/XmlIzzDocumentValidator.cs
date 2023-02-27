@@ -16,7 +16,7 @@ using System.Xml;
 using System.Xml.Schema;
 using DocumentValidation.Xml;
 
-namespace DocumentValidation;
+namespace DocumentValidation.Validators;
 
 public class XmlIzzDocumentValidator : IzzDocumentValidator
 {

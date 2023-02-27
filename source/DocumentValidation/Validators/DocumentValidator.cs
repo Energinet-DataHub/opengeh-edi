@@ -14,7 +14,7 @@
 
 using DocumentValidation.Xml;
 
-namespace DocumentValidation;
+namespace DocumentValidation.Validators;
 
 public class DocumentValidator
 {

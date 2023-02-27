@@ -15,7 +15,7 @@
 using System.Xml.Schema;
 using DocumentValidation.Xml;
 
-namespace DocumentValidation
+namespace DocumentValidation.Validators
 {
     /// <summary>
     /// Provides XML schemas for CIM messages
