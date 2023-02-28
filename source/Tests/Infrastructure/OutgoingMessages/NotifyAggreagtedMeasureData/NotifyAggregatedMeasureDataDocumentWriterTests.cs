@@ -85,10 +85,10 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             .HasValue("Series[1]/Period/timeInterval/end", "2022-02-13T23:00Z")
             .HasValue("Series[1]/Period/Point[1]/position", timeSeries[0].Point[0].Position.ToString(NumberFormatInfo.InvariantInfo))
             .HasValue("Series[1]/Period/Point[1]/quantity", timeSeries[0].Point[0].Quantity.ToString()!)
-            .HasValue("Series[1]/Period/Point[1]/quality", timeSeries[0].Point[0].Quality.Code)
+            .HasValue("Series[1]/Period/Point[1]/quality",  Quality.From(timeSeries[0].Point[0].Quality).Code)
             .HasValue("Series[1]/Period/Point[2]/position", timeSeries[0].Point[1].Position.ToString(NumberFormatInfo.InvariantInfo))
             .IsNotPresent("Series[1]/Period/Point[2]/quantity")
-            .HasValue("Series[1]/Period/Point[2]/quality", timeSeries[0].Point[1].Quality.Code)
+            .HasValue("Series[1]/Period/Point[2]/quality", Quality.From(timeSeries[0].Point[1].Quality).Code)
             .IsNotPresent("Series[1]/Period/Point[3]/quality")
             .HasValidStructureAsync((await GetSchema().ConfigureAwait(false))!).ConfigureAwait(false);
     }
@@ -154,9 +154,9 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
                     InstantPattern.General.Parse("2022-02-13T23:00:00Z").Value),
                 new List<Point>()
                 {
-                    new(1, 11, Quality.Incomplete, "2022-02-12T23:00Z"),
-                    new(2, null, Quality.Missing, "2022-02-13T23:00Z"),
-                    new(2, null, Quality.Measured, "2022-02-13T23:00Z"),
+                    new(1, 11, Quality.Incomplete.Name, "2022-02-12T23:00Z"),
+                    new(2, null, Quality.Missing.Name, "2022-02-13T23:00Z"),
+                    new(2, null, Quality.Measured.Name, "2022-02-13T23:00Z"),
                 }),
         };
         return timeSeries;
