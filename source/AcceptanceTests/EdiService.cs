@@ -3,16 +3,16 @@ using AcceptanceTest.Drivers;
 
 namespace AcceptanceTest;
 
-public class Edi : IDisposable
+public class EdiService : IDisposable
 {
     private readonly EdiDriver _driver;
 
-    public Edi()
+    public EdiService()
     {
         _driver = new EdiDriver();
     }
 
-    ~Edi()
+    ~EdiService()
     {
         Dispose(false);
     }

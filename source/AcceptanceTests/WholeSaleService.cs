@@ -2,7 +2,7 @@
 
 namespace AcceptanceTest;
 
-public class WholeSale
+public class WholeSaleService
 {
     #pragma warning disable
     public async Task AggregationProcessHasCompletedForAsync(string gridArea)
