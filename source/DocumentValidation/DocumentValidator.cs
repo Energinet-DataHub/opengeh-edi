@@ -19,32 +19,21 @@ namespace DocumentValidation;
 
 public class DocumentValidator
 {
-    private readonly ISchemaProvider _xmlSchemaProvider;
+    private readonly IEnumerable<IValidator> _validators;
 
-    public DocumentValidator(ISchemaProvider xmlSchemaProvider)
+    public DocumentValidator(IEnumerable<IValidator> validators)
     {
-        _xmlSchemaProvider = xmlSchemaProvider;
+        _validators = validators;
     }
 
     public async Task<ValidationResult> ValidateAsync(Stream message, DocumentFormat format, DocumentType document, string version = "0.1")
     {
-        if (format == DocumentFormat.CimXml)
-        {
-            var schema = await _xmlSchemaProvider
-                .GetSchemaAsync<XmlSchema>(ParseDocumentType(document), version)
-                .ConfigureAwait(false) ?? throw new InvalidOperationException($"Could find schema for {document}");
-            return await MessageValidator.ValidateAsync(message, schema).ConfigureAwait(false);
-        }
-
-        return ValidationResult.Invalid(new[] { "Unknown document format" });
+        var validator = ValidatorFor(format);
+        return await validator.ValidateAsync(message, document, version).ConfigureAwait(false);
     }
 
-    private static string ParseDocumentType(DocumentType document)
+    private IValidator ValidatorFor(DocumentFormat format)
     {
-        return document switch
-        {
-            DocumentType.AggregationResult => "notifyaggregatedmeasuredata",
-            _ => throw new InvalidOperationException("Unknown document type"),
-        };
+        return _validators.First(validator => validator.HandledFormat == format);
     }
 }

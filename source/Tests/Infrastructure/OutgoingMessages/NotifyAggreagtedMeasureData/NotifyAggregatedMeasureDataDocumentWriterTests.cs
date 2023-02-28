@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using System.Xml.Schema;
 using Application.OutgoingMessages.Common;
 using DocumentValidation;
+using DocumentValidation.Validators;
 using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
@@ -91,7 +92,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             .HasValue("Series[1]/Period/Point[2]/quality", Quality.From(timeSeries[0].Point[1].Quality).Code)
             .IsNotPresent("Series[1]/Period/Point[3]/quality")
             .HasValidStructureAsync((await GetSchema().ConfigureAwait(false))!).ConfigureAwait(false);
-        var validationResult = await new DocumentValidator(_schemaProvider).ValidateAsync(message, DocumentFormat.CimXml, DocumentType.AggregationResult).ConfigureAwait(false);
+        var validationResult = await new DocumentValidator(new[] { new CimXmlValidator((XmlSchemaProvider)_schemaProvider) }).ValidateAsync(message, DocumentFormat.CimXml, DocumentType.AggregationResult).ConfigureAwait(false);
         Assert.True(validationResult.IsValid);
     }
 
