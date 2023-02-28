@@ -54,7 +54,7 @@ public class SendAggregationResult : InternalCommand
         RoleOfReceiver = roleOfReceiver;
         ProcessType = processType;
         Result = new Aggregation(
-            result.Points.Select(point => new Point(point.Position, point.Quantity, point.Quality.Name, point.SampleTime)).ToList(),
+            result.Points.Select(point => new Point(point.Position, point.Quantity, point.Quality, point.SampleTime)).ToList(),
             result.GridArea.Code,
             result.MeteringPointType.Name,
             result.MeasureUnitType.Name,
@@ -106,7 +106,7 @@ public class SendAggregationResultHandler : IRequestHandler<SendAggregationResul
                 new Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point(
                     point.Position,
                     point.Quantity,
-                    Quality.From(point.Quality),
+                    point.Quality,
                     point.SampleTime)).ToList(),
             GridArea.Create(result.GridArea),
             EnumerationType.FromName<MeteringPointType>(result.MeteringPointType),

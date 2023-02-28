@@ -126,9 +126,9 @@ public class NotifyAggregatedMeasureDataMessageWriter : MessageWriter
         if (point.Quality is null)
             return Task.CompletedTask;
 
-        if (point.Quality == Quality.Measured)
+        if (Quality.From(point.Quality) == Quality.Measured)
             return Task.CompletedTask;
 
-        return writer.WriteElementStringAsync(DocumentDetails.Prefix, "quality", null, point.Quality.Code);
+        return writer.WriteElementStringAsync(DocumentDetails.Prefix, "quality", null, Quality.From(point.Quality).Code);
     }
 }

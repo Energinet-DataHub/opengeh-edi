@@ -70,7 +70,7 @@ public class AggregationResultMapper
             points.Add(new Point(
                 i + 1,
                 timeSeriesPoints[i].Quantity,
-                Quality.From(timeSeriesPoints[i].Quality),
+                timeSeriesPoints[i].Quality,
                 NodaTime.Instant.FromDateTimeOffset(timeSeriesPoints[i].Time).ToString()));
         }
 
