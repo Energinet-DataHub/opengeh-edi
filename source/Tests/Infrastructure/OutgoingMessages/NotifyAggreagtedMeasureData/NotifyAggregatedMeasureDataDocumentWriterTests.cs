@@ -95,8 +95,6 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
             .HasValue("Series[1]/Period/Point[2]/quality", Quality.From(timeSeries[0].Point[1].Quality).Code)
             .IsNotPresent("Series[1]/Period/Point[3]/quality")
             .HasValidStructureAsync(DocumentType.AggregationResult).ConfigureAwait(false);
-        var validationResult = await new DocumentValidator(new[] { new CimXmlValidator((CimXmlSchemaProvider)_schemaProvider) }).ValidateAsync(message, DocumentFormat.CimXml, DocumentType.AggregationResult).ConfigureAwait(false);
-        Assert.True(validationResult.IsValid);
     }
 
     [Fact]
