@@ -33,6 +33,6 @@ public class CimXmlValidator : IValidator
         var schema = await _schemaProvider
             .GetAsync(type, version)
             .ConfigureAwait(false) ?? throw new InvalidOperationException($"Could find schema for {document}");
-        return await MessageValidator.ValidateAsync(document, schema).ConfigureAwait(false);
+        return await XmlDocumentValidator.ValidateAsync(document, schema).ConfigureAwait(false);
     }
 }

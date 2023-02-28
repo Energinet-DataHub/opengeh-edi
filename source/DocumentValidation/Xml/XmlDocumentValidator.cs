@@ -17,7 +17,7 @@ using System.Xml.Schema;
 
 namespace DocumentValidation.Xml
 {
-    public static class MessageValidator
+    public static class XmlDocumentValidator
     {
         public static async Task<ValidationResult> ValidateAsync(Stream message, XmlSchema schema)
         {
