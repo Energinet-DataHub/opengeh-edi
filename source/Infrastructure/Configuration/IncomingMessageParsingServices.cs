@@ -48,7 +48,7 @@ internal static class IncomingMessageParsingServices
     private static void RegisterSchemaProviders(IServiceCollection services)
     {
         services.AddSingleton<CimJsonSchemas>();
-        services.AddSingleton<XmlSchemaProvider>();
+        services.AddSingleton<CimXmlSchemaProvider>();
         services.AddSingleton<JsonSchemaProvider>();
     }
 

@@ -48,7 +48,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
     public NotifyAggregatedMeasureDataDocumentWriterTests()
     {
         _parser = new MessageRecordParser(new Serializer());
-        _schemaProvider = new XmlSchemaProvider();
+        _schemaProvider = new CimXmlSchemaProvider();
         _messageWriter = new NotifyAggregatedMeasureDataMessageWriter(_parser);
     }
 
@@ -92,7 +92,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             .HasValue("Series[1]/Period/Point[2]/quality", Quality.From(timeSeries[0].Point[1].Quality).Code)
             .IsNotPresent("Series[1]/Period/Point[3]/quality")
             .HasValidStructureAsync((await GetSchema().ConfigureAwait(false))!).ConfigureAwait(false);
-        var validationResult = await new DocumentValidator(new[] { new CimXmlValidator((XmlSchemaProvider)_schemaProvider) }).ValidateAsync(message, DocumentFormat.CimXml, DocumentType.AggregationResult).ConfigureAwait(false);
+        var validationResult = await new DocumentValidator(new[] { new CimXmlValidator((CimXmlSchemaProvider)_schemaProvider) }).ValidateAsync(message, DocumentFormat.CimXml, DocumentType.AggregationResult).ConfigureAwait(false);
         Assert.True(validationResult.IsValid);
     }
 

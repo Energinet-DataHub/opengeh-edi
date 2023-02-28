@@ -17,11 +17,11 @@ using System.Xml.Schema;
 
 namespace DocumentValidation;
 
-public class XmlSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
+public class CimXmlSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
 {
     private readonly ISchema _schema;
 
-    public XmlSchemaProvider()
+    public CimXmlSchemaProvider()
     {
         _schema = new CimXmlSchemas();
     }

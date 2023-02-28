@@ -195,7 +195,7 @@ namespace Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
 
         private Task<XmlSchema?> GetSchema()
         {
-            _schemaProvider = new XmlSchemaProvider();
+            _schemaProvider = new CimXmlSchemaProvider();
             return _schemaProvider.GetSchemaAsync<XmlSchema>("characteristicsofacustomeratanap", "0.1");
         }
 

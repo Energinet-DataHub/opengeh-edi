@@ -89,7 +89,7 @@ public class AccountingPointCharacteristicsDocumentWriterTests
 
     private async Task AssertConformsToSchema(Stream message)
     {
-        _schemaProvider = new XmlSchemaProvider();
+        _schemaProvider = new CimXmlSchemaProvider();
         var schema = await _schemaProvider.GetSchemaAsync<XmlSchema>("accountingpointcharacteristics", "0.1")
             .ConfigureAwait(false);
         await AssertXmlMessage.AssertConformsToSchemaAsync(message, schema!).ConfigureAwait(false);

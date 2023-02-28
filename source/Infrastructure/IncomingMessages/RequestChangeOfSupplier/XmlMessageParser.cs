@@ -35,7 +35,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
 
     public XmlMessageParser()
     {
-        _schemaProvider = new XmlSchemaProvider();
+        _schemaProvider = new CimXmlSchemaProvider();
     }
 
     public MessageFormat HandledFormat => MessageFormat.Xml;
