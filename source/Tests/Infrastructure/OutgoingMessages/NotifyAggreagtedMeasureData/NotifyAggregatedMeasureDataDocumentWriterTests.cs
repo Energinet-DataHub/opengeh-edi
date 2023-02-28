@@ -17,10 +17,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Xml.Schema;
 using Application.OutgoingMessages.Common;
 using DocumentValidation;
-using DocumentValidation.CimXml;
 using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
@@ -31,7 +29,6 @@ using Infrastructure.OutgoingMessages.Common;
 using Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 using NodaTime;
 using NodaTime.Text;
-using Tests.Domain.Transactions.MoveIn;
 using Tests.Fixtures;
 using Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
@@ -44,14 +41,12 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
     private const string NamespacePrefix = "cim";
     private readonly DocumentValidationFixture _documentValidation;
     private readonly IMessageWriter _messageWriter;
-    private readonly ISchemaProvider _schemaProvider;
     private readonly IMessageRecordParser _parser;
 
     public NotifyAggregatedMeasureDataDocumentWriterTests(DocumentValidationFixture documentValidation)
     {
         _documentValidation = documentValidation;
         _parser = new MessageRecordParser(new Serializer());
-        _schemaProvider = new CimXmlSchemaProvider();
         _messageWriter = new NotifyAggregatedMeasureDataMessageWriter(_parser);
     }
 
@@ -121,11 +116,11 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
         var message = await _messageWriter.WriteAsync(header, timeSeries.Select(record => _parser.From(record)).ToList()).ConfigureAwait(false);
 
         await AssertXmlDocument
-            .Document(message, NamespacePrefix)
+            .Document(message, NamespacePrefix, _documentValidation.Validator)
             .IsNotPresent("Series[1]/marketEvaluationPoint.settlementMethod")
             .IsNotPresent("Series[1]/energySupplier_MarketParticipant.mRID")
             .IsNotPresent("Series[1]/balanceResponsibleParty_MarketParticipant.mRID")
-            .HasValidStructureAsync((await GetSchema().ConfigureAwait(false))!).ConfigureAwait(false);
+            .HasValidStructureAsync(DocumentType.AggregationResult).ConfigureAwait(false);
     }
 
     private static MessageHeader CreateHeader()
@@ -164,10 +159,5 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
                 }),
         };
         return timeSeries;
-    }
-
-    private Task<XmlSchema?> GetSchema()
-    {
-        return _schemaProvider.GetSchemaAsync<XmlSchema>("notifyaggregatedmeasuredata", "0.1");
     }
 }
