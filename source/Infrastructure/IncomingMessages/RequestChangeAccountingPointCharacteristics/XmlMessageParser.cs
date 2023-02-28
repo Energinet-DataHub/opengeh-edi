@@ -21,8 +21,8 @@ using System.Xml.Schema;
 using Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
 using CimMessageAdapter.Errors;
 using CimMessageAdapter.Messages;
+using DocumentValidation;
 using Domain.OutgoingMessages;
-using Infrastructure.IncomingMessages.SchemaStore;
 using MarketActivityRecord = Application.IncomingMessages.RequestChangeAccountPointCharacteristics.MarketActivityRecord;
 
 namespace Infrastructure.IncomingMessages.RequestChangeAccountingPointCharacteristics;
