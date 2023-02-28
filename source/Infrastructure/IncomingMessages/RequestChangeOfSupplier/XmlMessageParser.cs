@@ -21,8 +21,8 @@ using System.Xml.Schema;
 using Application.IncomingMessages.RequestChangeOfSupplier;
 using CimMessageAdapter.Errors;
 using CimMessageAdapter.Messages;
+using DocumentValidation;
 using Domain.OutgoingMessages;
-using Infrastructure.IncomingMessages.SchemaStore;
 
 namespace Infrastructure.IncomingMessages.RequestChangeOfSupplier;
 

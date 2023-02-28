@@ -12,19 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
 using Json.Schema;
 
-namespace Infrastructure.IncomingMessages.SchemaStore;
+namespace DocumentValidation;
 
 public sealed class CimJsonSchemas : SchemaBase, ISchema
 {
     private const string SchemaBaseUri = @"file:///C:/Users/Public/Documents/iec.ch/TC57/2020/";
-    private static readonly string _schemaPath = $"IncomingMessages{Path.DirectorySeparatorChar}SchemaStore{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}Json{Path.DirectorySeparatorChar}";
+    private static readonly string _schemaPath = $"Schemas{Path.DirectorySeparatorChar}Json{Path.DirectorySeparatorChar}";
     private static readonly Mutex _mutex = new();
 
     public CimJsonSchemas()
