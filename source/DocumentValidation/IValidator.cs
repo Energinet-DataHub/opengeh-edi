@@ -12,13 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using DocumentValidation.Xml;
-
 namespace DocumentValidation;
 
-#pragma warning disable
+/// <summary>
+/// Validates a document
+/// </summary>
 public interface IValidator
 {
+    /// <summary>
+    /// Specifies the format handled
+    /// </summary>
     DocumentFormat HandledFormat { get; }
+
+    /// <summary>
+    /// Validates a document
+    /// </summary>
+    /// <param name="document"></param>
+    /// <param name="type"></param>
+    /// <param name="version"></param>
+    /// <returns><see cref="ValidationResult"/></returns>
     Task<ValidationResult> ValidateAsync(Stream document, DocumentType type, string version);
 }
