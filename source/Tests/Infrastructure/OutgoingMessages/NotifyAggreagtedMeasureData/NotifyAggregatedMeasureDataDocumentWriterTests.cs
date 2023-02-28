@@ -91,6 +91,8 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             .HasValue("Series[1]/Period/Point[2]/quality", Quality.From(timeSeries[0].Point[1].Quality).Code)
             .IsNotPresent("Series[1]/Period/Point[3]/quality")
             .HasValidStructureAsync((await GetSchema().ConfigureAwait(false))!).ConfigureAwait(false);
+        var validationResult = await new DocumentValidator(_schemaProvider).ValidateAsync(message, DocumentFormat.CimXml, DocumentType.AggregationResult).ConfigureAwait(false);
+        Assert.True(validationResult.IsValid);
     }
 
     [Fact]
