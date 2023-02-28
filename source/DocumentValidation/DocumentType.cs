@@ -14,4 +14,8 @@
 
 namespace DocumentValidation;
 
-public enum DocumentType { AggregationResult }
+public enum DocumentType
+{
+    AggregationResult,
+    CustomerMasterData,
+}
