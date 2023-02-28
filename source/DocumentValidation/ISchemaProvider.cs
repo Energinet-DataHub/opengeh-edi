@@ -30,9 +30,17 @@ namespace DocumentValidation
         Task<T?> GetSchemaAsync<T>(string businessProcessType, string version);
     }
 
-    #pragma warning disable
+    /// <summary>
+    /// Provider for CIM XML schemas
+    /// </summary>
+    /// <typeparam name="TSchema">Schema object type</typeparam>
     public interface ISchemaProvider<TSchema>
     {
+        /// <summary>
+        /// Get the schema for the specified document type and version
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="version"></param>
         Task<TSchema?> GetAsync(DocumentType type, string version);
     }
 }
