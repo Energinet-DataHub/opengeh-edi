@@ -1,14 +1,36 @@
-﻿namespace AcceptanceTest;
+﻿using AcceptanceTest.Fixtures;
+using Xunit.Abstractions;
+using Xunit.Categories;
 
-public class WhenAnAggregationsHasCompletedTests : IDisposable
+namespace AcceptanceTest;
+
+[IntegrationTest]
+[Collection(nameof(TestCommonCollectionFixture))]
+public sealed class WhenAnAggregationsHasCompletedTests : IAsyncLifetime, IDisposable
 {
     private readonly WholeSaleService _wholeSaleService;
     private readonly EdiService _ediService;
 
-    public WhenAnAggregationsHasCompletedTests()
+    private readonly TestCommonHostFixture _fixture;
+
+    public WhenAnAggregationsHasCompletedTests(TestCommonHostFixture fixture, ITestOutputHelper testOutputHelper)
     {
         _wholeSaleService = new WholeSaleService();
         _ediService = new EdiService();
+        _fixture = fixture;
+        _fixture.SetTestOutputHelper(testOutputHelper);
+        _fixture.App01HostManager.ClearHostLog();
+    }
+
+    public Task InitializeAsync()
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task DisposeAsync()
+    {
+        _fixture.SetTestOutputHelper(null!);
+        return Task.CompletedTask;
     }
 
     [Theory]
@@ -26,7 +48,7 @@ public class WhenAnAggregationsHasCompletedTests : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    protected virtual void Dispose(bool disposing)
+    private void Dispose(bool disposing)
     {
         if (disposing)
         {

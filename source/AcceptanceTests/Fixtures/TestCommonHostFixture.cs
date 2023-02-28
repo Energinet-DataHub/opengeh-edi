@@ -56,7 +56,7 @@ namespace AcceptanceTest.Fixtures
         {
             // => Storage emulator
             AzuriteManager.StartAzurite();
-            var port = 8000;
+            var port = 7070;
             var app01HostSettings = CreateAppHostSettings("Api", ref port);
 
             // => Integration events
