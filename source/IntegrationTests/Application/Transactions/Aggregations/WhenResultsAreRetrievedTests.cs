@@ -99,7 +99,7 @@ public class WhenResultsAreRetrievedTests : TestBase
             .HasMessageRecordValue<TimeSeries>(x => x.Period.End, SampleData.EndOfPeriod)
             .HasMessageRecordValue<TimeSeries>(x => x.Point[0].Position, 1)
             .HasMessageRecordValue<TimeSeries, decimal?>(x => x.Point[0].Quantity, 1.1m)
-            .HasMessageRecordValue<TimeSeries>(x => x.Point[0].Quality!, Quality.Missing);
+            .HasMessageRecordValue<TimeSeries>(x => x.Point[0].Quality!, Quality.Missing.Name);
     }
 
     [Theory]

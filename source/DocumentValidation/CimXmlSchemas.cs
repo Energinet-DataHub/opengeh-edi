@@ -12,15 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
-namespace Infrastructure.IncomingMessages.SchemaStore
+namespace DocumentValidation
 {
     public sealed class CimXmlSchemas : SchemaBase, ISchema
     {
-        private static readonly string _schemaPath = $"IncomingMessages{Path.DirectorySeparatorChar}SchemaStore{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}Xml{Path.DirectorySeparatorChar}";
+        private static readonly string _schemaPath = $"Schemas{Path.DirectorySeparatorChar}Xml{Path.DirectorySeparatorChar}";
 
         public CimXmlSchemas()
         {

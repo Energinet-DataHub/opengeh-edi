@@ -12,23 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Infrastructure.IncomingMessages.SchemaStore;
+using System.Xml.Schema;
 
-/// <summary>
-/// bla
-/// </summary>
-public interface ISchema
+namespace DocumentValidation
 {
     /// <summary>
-    /// bla
+    /// Provides XML schemas for CIM messages
     /// </summary>
-    public string SchemaPath { get; }
-
-    /// <summary>
-    /// bla
-    /// </summary>
-    /// <param name="businessProcessType"></param>
-    /// <param name="version"></param>
-    /// <returns><see cref="string"/></returns>
-    public string? GetSchemaLocation(string businessProcessType, string version);
+    public interface ISchemaProvider
+    {
+        /// <summary>
+        /// Get schema for specific business process and version
+        /// </summary>
+        /// <param name="businessProcessType"></param>
+        /// <param name="version"></param>
+        /// <returns><see cref="XmlSchema"/></returns>
+        Task<T?> GetSchemaAsync<T>(string businessProcessType, string version);
+    }
 }

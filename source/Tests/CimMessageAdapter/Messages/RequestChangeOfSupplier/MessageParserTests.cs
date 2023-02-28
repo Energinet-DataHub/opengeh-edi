@@ -23,9 +23,9 @@ using Application.IncomingMessages.RequestChangeOfSupplier;
 using CimMessageAdapter.Errors;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.Messages.RequestChangeOfSupplier;
+using DocumentValidation;
 using Domain.OutgoingMessages;
 using Infrastructure.IncomingMessages.RequestChangeOfSupplier;
-using Infrastructure.IncomingMessages.SchemaStore;
 using Xunit;
 
 namespace Tests.CimMessageAdapter.Messages.RequestChangeOfSupplier;
