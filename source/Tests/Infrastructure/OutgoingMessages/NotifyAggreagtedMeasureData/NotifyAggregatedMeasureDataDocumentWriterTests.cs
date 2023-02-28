@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Xml.Schema;
 using Application.OutgoingMessages.Common;
 using DocumentValidation;
 using Domain.Actors;
@@ -30,24 +29,24 @@ using Infrastructure.OutgoingMessages.Common;
 using Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 using NodaTime;
 using NodaTime.Text;
-using Tests.Domain.Transactions.MoveIn;
+using Tests.Fixtures;
 using Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
 using Period = Domain.Transactions.Aggregations.Period;
 
 namespace Tests.Infrastructure.OutgoingMessages.NotifyAggreagtedMeasureData;
 
-public class NotifyAggregatedMeasureDataDocumentWriterTests
+public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<DocumentValidationFixture>
 {
     private const string NamespacePrefix = "cim";
+    private readonly DocumentValidationFixture _documentValidation;
     private readonly IMessageWriter _messageWriter;
-    private readonly ISchemaProvider _schemaProvider;
     private readonly IMessageRecordParser _parser;
 
-    public NotifyAggregatedMeasureDataDocumentWriterTests()
+    public NotifyAggregatedMeasureDataDocumentWriterTests(DocumentValidationFixture documentValidation)
     {
+        _documentValidation = documentValidation;
         _parser = new MessageRecordParser(new Serializer());
-        _schemaProvider = new XmlSchemaProvider();
         _messageWriter = new NotifyAggregatedMeasureDataMessageWriter(_parser);
     }
 
@@ -60,7 +59,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
         var message = await _messageWriter.WriteAsync(header, timeSeries.Select(record => _parser.From(record)).ToList()).ConfigureAwait(false);
 
         await AssertXmlDocument
-            .Document(message, NamespacePrefix)
+            .Document(message, NamespacePrefix, _documentValidation.Validator)
             .HasValue("type", "E31")
             .HasValue("mRID", header.MessageId)
             .HasValue("process.processType", header.ProcessType)
@@ -90,7 +89,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
             .IsNotPresent("Series[1]/Period/Point[2]/quantity")
             .HasValue("Series[1]/Period/Point[2]/quality", Quality.From(timeSeries[0].Point[1].Quality).Code)
             .IsNotPresent("Series[1]/Period/Point[3]/quality")
-            .HasValidStructureAsync((await GetSchema().ConfigureAwait(false))!).ConfigureAwait(false);
+            .HasValidStructureAsync(DocumentType.AggregationResult).ConfigureAwait(false);
     }
 
     [Fact]
@@ -117,11 +116,11 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
         var message = await _messageWriter.WriteAsync(header, timeSeries.Select(record => _parser.From(record)).ToList()).ConfigureAwait(false);
 
         await AssertXmlDocument
-            .Document(message, NamespacePrefix)
+            .Document(message, NamespacePrefix, _documentValidation.Validator)
             .IsNotPresent("Series[1]/marketEvaluationPoint.settlementMethod")
             .IsNotPresent("Series[1]/energySupplier_MarketParticipant.mRID")
             .IsNotPresent("Series[1]/balanceResponsibleParty_MarketParticipant.mRID")
-            .HasValidStructureAsync((await GetSchema().ConfigureAwait(false))!).ConfigureAwait(false);
+            .HasValidStructureAsync(DocumentType.AggregationResult).ConfigureAwait(false);
     }
 
     private static MessageHeader CreateHeader()
@@ -160,10 +159,5 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests
                 }),
         };
         return timeSeries;
-    }
-
-    private Task<XmlSchema?> GetSchema()
-    {
-        return _schemaProvider.GetSchemaAsync<XmlSchema>("notifyaggregatedmeasuredata", "0.1");
     }
 }

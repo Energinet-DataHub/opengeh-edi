@@ -22,6 +22,7 @@ using System.Xml.Schema;
 using Application.Configuration;
 using Application.OutgoingMessages.Common;
 using DocumentValidation;
+using DocumentValidation.CimXml;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.GenericNotification;
 using Infrastructure.Configuration;
@@ -89,7 +90,7 @@ namespace Tests.Infrastructure.OutgoingMessages.GenericNotification
 
         private async Task AssertConformsToSchema(Stream message)
         {
-            _schemaProvider = new XmlSchemaProvider();
+            _schemaProvider = new CimXmlSchemaProvider();
             var schema = await _schemaProvider.GetSchemaAsync<XmlSchema>("genericnotification", "0.1")
                 .ConfigureAwait(false);
             await AssertXmlMessage.AssertConformsToSchemaAsync(message, schema!).ConfigureAwait(false);

@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Xml.Schema;
 using Application.Configuration;
 using Application.OutgoingMessages;
 using Application.OutgoingMessages.Common;
@@ -30,21 +29,23 @@ using Infrastructure.Configuration.Serialization;
 using Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Infrastructure.OutgoingMessages.Common;
 using NodaTime;
+using Tests.Fixtures;
 using Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
 
 namespace Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
 {
-    public class CharacteristicsOfACustomerAtAnApDocumentWriterTests
+    public class CharacteristicsOfACustomerAtAnApDocumentWriterTests : IClassFixture<DocumentValidationFixture>
     {
         private const string NamespacePrefix = "cim";
         private readonly CharacteristicsOfACustomerAtAnApMessageWriter _messageWriter;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
         private readonly IMessageRecordParser _messageRecordParser;
-        private ISchemaProvider? _schemaProvider;
+        private readonly DocumentValidationFixture _documentValidation;
 
-        public CharacteristicsOfACustomerAtAnApDocumentWriterTests()
+        public CharacteristicsOfACustomerAtAnApDocumentWriterTests(DocumentValidationFixture documentValidation)
         {
+            _documentValidation = documentValidation;
             _systemDateTimeProvider = new SystemDateTimeProvider();
             _messageRecordParser = new MessageRecordParser(new Serializer());
             _messageWriter = new CharacteristicsOfACustomerAtAnApMessageWriter(_messageRecordParser);
@@ -62,9 +63,8 @@ namespace Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
             var header = CreateHeader(MarketRole.EnergySupplier);
             var message = await WriteDocumentAsync(header, marketActivityRecords.ToArray()).ConfigureAwait(false);
 
-            var schema = await GetSchema().ConfigureAwait(false);
             var assertDocument = await AssertXmlDocument
-                .Document(message, NamespacePrefix)
+                .Document(message, NamespacePrefix, _documentValidation.Validator)
                 .HasValue("type", "E21")
                 .HasValue("process.processType", header.ProcessType)
                 .HasValue("businessSector.type", "23")
@@ -73,7 +73,7 @@ namespace Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
                 .HasValue("receiver_MarketParticipant.mRID", header.ReceiverId)
                 .HasValue("receiver_MarketParticipant.marketRole.type", header.ReceiverRole)
                 .NumberOfMarketActivityRecordsIs(2)
-                .HasValidStructureAsync(schema!).ConfigureAwait(false);
+                .HasValidStructureAsync(DocumentType.CustomerMasterData).ConfigureAwait(false);
             AssertMarketActivityRecord(marketActivityRecords.First(), assertDocument);
         }
 
@@ -191,12 +191,6 @@ namespace Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
                             "SomeEmailAddress",
                             false),
                     }));
-        }
-
-        private Task<XmlSchema?> GetSchema()
-        {
-            _schemaProvider = new XmlSchemaProvider();
-            return _schemaProvider.GetSchemaAsync<XmlSchema>("characteristicsofacustomeratanap", "0.1");
         }
 
         private MessageHeader CreateHeader(MarketRole messageReceiverRole)

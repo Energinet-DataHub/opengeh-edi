@@ -22,7 +22,8 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
 using System.Xml.XPath;
-using Application.Xml;
+using DocumentValidation;
+using DocumentValidation.Xml;
 using Xunit;
 
 namespace Tests.Infrastructure.OutgoingMessages.Asserts;
@@ -32,6 +33,7 @@ public class AssertXmlDocument
     private const string MarketActivityRecordElementName = "MktActivityRecord";
     private readonly Stream _stream;
     private readonly string _prefix;
+    private readonly DocumentValidator? _documentValidator;
     private readonly XDocument _document;
     private readonly XmlReader _reader;
     private readonly XmlNamespaceManager _xmlNamespaceManager;
@@ -46,9 +48,20 @@ public class AssertXmlDocument
         _xmlNamespaceManager.AddNamespace(prefix, _document.Root!.Name.NamespaceName);
     }
 
+    private AssertXmlDocument(Stream stream, string prefix, DocumentValidator documentValidator)
+        : this(stream, prefix)
+    {
+        _documentValidator = documentValidator;
+    }
+
     public static AssertXmlDocument Document(Stream document, string prefix)
     {
         return new AssertXmlDocument(document, prefix);
+    }
+
+    public static AssertXmlDocument Document(Stream document, string prefix, DocumentValidator validator)
+    {
+        return new AssertXmlDocument(document, prefix, validator);
     }
 
     public AssertXmlDocument NumberOfMarketActivityRecordsIs(int expectedNumber)
@@ -87,7 +100,14 @@ public class AssertXmlDocument
     public async Task<AssertXmlDocument> HasValidStructureAsync(XmlSchema schema)
     {
         if (schema == null) throw new ArgumentNullException(nameof(schema));
-        var validationResult = await MessageValidator.ValidateAsync(_stream, schema).ConfigureAwait(false);
+        var validationResult = await XmlDocumentValidator.ValidateAsync(_stream, schema).ConfigureAwait(false);
+        Assert.True(validationResult.IsValid);
+        return this;
+    }
+
+    public async Task<AssertXmlDocument> HasValidStructureAsync(DocumentType type, string version = "0.1")
+    {
+        var validationResult = await _documentValidator!.ValidateAsync(_stream, DocumentFormat.CimXml, type, version).ConfigureAwait(false);
         Assert.True(validationResult.IsValid);
         return this;
     }
