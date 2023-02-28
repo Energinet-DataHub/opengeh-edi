@@ -19,9 +19,9 @@ namespace DocumentValidation.Validators;
 
 public class CimXmlValidator : IValidator
 {
-    private readonly XmlSchemaProvider _schemaProvider;
+    private readonly ISchemaProvider<XmlSchema> _schemaProvider;
 
-    public CimXmlValidator(XmlSchemaProvider schemaProvider)
+    public CimXmlValidator(ISchemaProvider<XmlSchema> schemaProvider)
     {
         _schemaProvider = schemaProvider;
     }
@@ -31,17 +31,8 @@ public class CimXmlValidator : IValidator
     public async Task<ValidationResult> ValidateAsync(Stream document, DocumentType type, string version)
     {
         var schema = await _schemaProvider
-            .GetSchemaAsync<XmlSchema>(ParseDocumentType(type), version)
+            .GetAsync(type, version)
             .ConfigureAwait(false) ?? throw new InvalidOperationException($"Could find schema for {document}");
         return await MessageValidator.ValidateAsync(document, schema).ConfigureAwait(false);
-    }
-
-    private static string ParseDocumentType(DocumentType document)
-    {
-        return document switch
-        {
-            DocumentType.AggregationResult => "notifyaggregatedmeasuredata",
-            _ => throw new InvalidOperationException("Unknown document type"),
-        };
     }
 }

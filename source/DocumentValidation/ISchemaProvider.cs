@@ -29,4 +29,10 @@ namespace DocumentValidation
         /// <returns><see cref="XmlSchema"/></returns>
         Task<T?> GetSchemaAsync<T>(string businessProcessType, string version);
     }
+
+    #pragma warning disable
+    public interface ISchemaProvider<TSchema>
+    {
+        Task<TSchema?> GetAsync(DocumentType type, string version);
+    }
 }
