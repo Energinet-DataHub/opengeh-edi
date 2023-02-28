@@ -2,13 +2,13 @@
 
 public class WhenAnAggregationsHasCompletedTests : IDisposable
 {
-    private readonly WholeSale _wholeSale;
-    private readonly Edi _edi;
+    private readonly WholeSaleService _wholeSaleService;
+    private readonly EdiService _ediService;
 
     public WhenAnAggregationsHasCompletedTests()
     {
-        _wholeSale = new WholeSale();
-        _edi = new Edi();
+        _wholeSaleService = new WholeSaleService();
+        _ediService = new EdiService();
     }
 
     [Theory]
@@ -16,8 +16,8 @@ public class WhenAnAggregationsHasCompletedTests : IDisposable
     public async Task GridOperator_can_fetch_the_result_for_total_production(DocumentFormat documentFormat)
     {
         var gridArea = "543";
-        await _wholeSale.AggregationProcessHasCompletedForAsync(gridArea).ConfigureAwait(false);
-        await _edi.AssertTotalProductionResultIsAvailableAsync("5790000610976", gridArea, documentFormat).ConfigureAwait(false);
+        await _wholeSaleService.AggregationProcessHasCompletedForAsync(gridArea).ConfigureAwait(false);
+        await _ediService.AssertTotalProductionResultIsAvailableAsync("5790000610976", gridArea, documentFormat).ConfigureAwait(false);
     }
 
     public void Dispose()
@@ -30,7 +30,7 @@ public class WhenAnAggregationsHasCompletedTests : IDisposable
     {
         if (disposing)
         {
-            _edi.Dispose();
+            _ediService.Dispose();
         }
     }
 }
