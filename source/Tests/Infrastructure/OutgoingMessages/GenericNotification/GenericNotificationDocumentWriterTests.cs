@@ -22,6 +22,7 @@ using System.Xml.Schema;
 using Application.Configuration;
 using Application.OutgoingMessages.Common;
 using DocumentValidation;
+using DocumentValidation.CimXml;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.GenericNotification;
 using Infrastructure.Configuration;

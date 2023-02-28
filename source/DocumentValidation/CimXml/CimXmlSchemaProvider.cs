@@ -15,7 +15,7 @@
 using System.Xml;
 using System.Xml.Schema;
 
-namespace DocumentValidation;
+namespace DocumentValidation.CimXml;
 
 public class CimXmlSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
 {

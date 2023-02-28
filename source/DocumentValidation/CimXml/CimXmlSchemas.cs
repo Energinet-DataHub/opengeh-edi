@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace DocumentValidation
+namespace DocumentValidation.CimXml
 {
     public sealed class CimXmlSchemas : SchemaBase, ISchema
     {
-        private static readonly string _schemaPath = $"Schemas{Path.DirectorySeparatorChar}Xml{Path.DirectorySeparatorChar}";
+        private static readonly string _schemaPath = $"CimXml{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}";
 
         public CimXmlSchemas()
         {

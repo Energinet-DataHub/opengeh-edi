@@ -15,7 +15,7 @@
 using System.Xml.Schema;
 using DocumentValidation.Xml;
 
-namespace DocumentValidation.Validators;
+namespace DocumentValidation.CimXml;
 
 public class CimXmlValidator : IValidator
 {

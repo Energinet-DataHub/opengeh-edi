@@ -22,6 +22,7 @@ using Application.Configuration;
 using Application.OutgoingMessages;
 using Application.OutgoingMessages.Common;
 using DocumentValidation;
+using DocumentValidation.CimXml;
 using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
