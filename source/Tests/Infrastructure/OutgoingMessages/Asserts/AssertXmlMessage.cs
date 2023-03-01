@@ -19,7 +19,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
-using Application.Xml;
+using DocumentValidation.Xml;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Xunit;
@@ -81,7 +81,7 @@ namespace Tests.Infrastructure.OutgoingMessages.Asserts
         internal static async Task AssertConformsToSchemaAsync(Stream message, XmlSchema schema)
         {
             if (schema == null) throw new ArgumentNullException(nameof(schema));
-            var validationResult = await MessageValidator.ValidateAsync(message, schema).ConfigureAwait(false);
+            var validationResult = await XmlDocumentValidator.ValidateAsync(message, schema).ConfigureAwait(false);
             Assert.True(validationResult.IsValid);
         }
 

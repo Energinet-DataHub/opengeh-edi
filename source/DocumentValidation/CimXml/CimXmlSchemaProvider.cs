@@ -15,15 +15,27 @@
 using System.Xml;
 using System.Xml.Schema;
 
-namespace DocumentValidation;
+namespace DocumentValidation.CimXml;
 
-public class XmlSchemaProvider : SchemaProvider
+public class CimXmlSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
 {
     private readonly ISchema _schema;
 
-    public XmlSchemaProvider()
+    public CimXmlSchemaProvider()
     {
         _schema = new CimXmlSchemas();
+    }
+
+    public Task<XmlSchema?> GetAsync(DocumentType type, string version)
+    {
+        var schemaName = _schema.GetSchemaLocation(ParseDocumentType(type), version);
+
+        if (schemaName == null)
+        {
+            return Task.FromResult(default(XmlSchema));
+        }
+
+        return LoadSchemaWithDependentSchemasAsync<XmlSchema>(schemaName);
     }
 
     public override Task<T?> GetSchemaAsync<T>(string businessProcessType, string version)
@@ -61,5 +73,15 @@ public class XmlSchemaProvider : SchemaProvider
         }
 
         return (T)(object)xmlSchema;
+    }
+
+    private static string ParseDocumentType(DocumentType document)
+    {
+        return document switch
+        {
+            DocumentType.AggregationResult => "notifyaggregatedmeasuredata",
+            DocumentType.CustomerMasterData => "CharacteristicsOfACustomerAtAnAp",
+            _ => throw new InvalidOperationException("Unknown document type"),
+        };
     }
 }

@@ -22,6 +22,7 @@ using System.Xml.Schema;
 using Application.Configuration;
 using Application.OutgoingMessages.Common;
 using DocumentValidation;
+using DocumentValidation.CimXml;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Infrastructure.Configuration;
@@ -88,7 +89,7 @@ public class RejectRequestChangeAccountingPointCharacteristicsDocumentWriterTest
 
     private async Task AssertMessage(Stream message, MessageHeader header, List<MarketActivityRecord> marketActivityRecords)
     {
-        _schemaProvider = new XmlSchemaProvider();
+        _schemaProvider = new CimXmlSchemaProvider();
         var document = XDocument.Load(message);
         AssertXmlMessage.AssertHeader(header, document);
         AssertXmlMessage.AssertHasHeaderValue(document, "type", "A80");

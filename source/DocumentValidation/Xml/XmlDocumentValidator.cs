@@ -12,16 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 
-namespace Application.Xml
+namespace DocumentValidation.Xml
 {
-    public static class MessageValidator
+    public static class XmlDocumentValidator
     {
         public static async Task<ValidationResult> ValidateAsync(Stream message, XmlSchema schema)
         {
