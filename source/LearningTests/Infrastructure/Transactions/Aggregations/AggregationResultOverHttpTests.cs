@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System.Reflection;
+using Domain.OutgoingMessages;
+using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.Transactions;
@@ -65,12 +67,40 @@ public class AggregationResultOverHttpTests : IDisposable
     }
 
     [Fact]
+    public async Task Fetch_list_of_balance_responsibles_for_which_a_total_non_profiled_consumption_result_is_available()
+    {
+        var batchId = Guid.Parse("607B9862-9273-4A06-9382-E7194BF57A1B");
+        var balanceResponsibles =
+            await _service.BalanceResponsiblesWithTotalNonProfiledConsumptionAsync(batchId,  GridArea.Create("543")).ConfigureAwait(false);
+
+        Assert.NotEmpty(balanceResponsibles);
+    }
+
+    [Fact]
     public async Task Fetch_non_profiled_consumption_aggregation_result_for_a_single_energy_supplier()
     {
         var energySuppliers = await _service.EnergySuppliersWithHourlyConsumptionResultAsync(_batchId, _gridArea)
             .ConfigureAwait(false);
 
         var aggregationResult = await _service.NonProfiledConsumptionForAsync(_batchId, _gridArea, energySuppliers[0], new Period(NodaTime.SystemClock.Instance.GetCurrentInstant(), NodaTime.SystemClock.Instance.GetCurrentInstant()))
+            .ConfigureAwait(false);
+
+        Assert.NotNull(aggregationResult);
+    }
+
+    [Fact]
+    public async Task Fetch_total_non_profiled_consumption_result_for_balance_responsible()
+    {
+        var batchId = Guid.Parse("607B9862-9273-4A06-9382-E7194BF57A1B");
+        var balanceResponsibles =
+            await _service.BalanceResponsiblesWithTotalNonProfiledConsumptionAsync(batchId,  GridArea.Create("543")).ConfigureAwait(false);
+
+        var aggregationResult = await _service.TotalNonProfiledConsumptionForBalanceResponsibleAsync(
+                _batchId,
+                ProcessType.BalanceFixing,
+                GridArea.Create(_gridArea),
+                new Period(NodaTime.SystemClock.Instance.GetCurrentInstant(), NodaTime.SystemClock.Instance.GetCurrentInstant()),
+                balanceResponsibles[0])
             .ConfigureAwait(false);
 
         Assert.NotNull(aggregationResult);

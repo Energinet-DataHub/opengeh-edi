@@ -131,6 +131,40 @@ public class WhenResultsAreRetrievedTests : TestBase
                 SampleData.EnergySupplierNumber.Value);
     }
 
+    [Theory]
+    [MemberData(nameof(AggregationProcessTypes))]
+    public async Task Total_non_profiled_consumption_result_is_sent_to_the_balance_responsible(ProcessType completedAggregationType)
+    {
+        _aggregationResults.HasResultForActor(
+            SampleData.BalanceResponsibleNumber,
+            AggregationResultBuilder.Result()
+                .WithGridArea(SampleData.GridAreaCode)
+                .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
+                .WithResolution(SampleData.Resolution)
+                .WithMeteringPointType(MeteringPointType.Consumption)
+                .WithSettlementMethod(SettlementType.NonProfiled)
+                .WithReceivingActorNumber(SampleData.BalanceResponsibleNumber)
+                .WithReceivingActorRole(MarketRole.BalanceResponsible)
+                .Build());
+
+        await AggregationResultsAreRetrieved(completedAggregationType);
+
+        var outgoingMessage = await OutgoingMessageAsync(
+            MarketRole.BalanceResponsible,
+            completedAggregationType);
+        outgoingMessage
+            .HasReceiverId(SampleData.BalanceResponsibleNumber.Value)
+            .HasReceiverRole(MarketRole.BalanceResponsible.Name)
+            .HasSenderId(DataHubDetails.IdentificationNumber.Value)
+            .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
+            .HasMessageRecordValue<TimeSeries>(
+                series => series.BalanceResponsibleNumber!,
+                SampleData.BalanceResponsibleNumber.Value)
+            .HasMessageRecordValue<TimeSeries>(
+                series => series.EnergySupplierNumber!,
+                null!);
+    }
+
     private async Task AggregationResultsAreRetrieved(ProcessType completedAggregationType)
     {
         await RetrieveResults(completedAggregationType).ConfigureAwait(false);

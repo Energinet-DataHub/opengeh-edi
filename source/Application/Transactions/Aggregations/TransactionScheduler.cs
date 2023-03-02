@@ -44,6 +44,20 @@ public sealed class TransactionScheduler
         await ScheduleTotalProductionResultAsync(resultsId, aggregationProcess, gridArea, period).ConfigureAwait(false);
         await ScheduleNonProfiledConsumptionForBalanceResponsibleAsync(resultsId, aggregationProcess, gridArea, period).ConfigureAwait(false);
         await ScheduleNonProfiledConsumptionForEnergySupplierAsync(resultsId, aggregationProcess, gridArea, period).ConfigureAwait(false);
+        await ScheduleTotalNonProfiledConsumptionForBalanceResponsibleAsync(resultsId, aggregationProcess, gridArea, period).ConfigureAwait(false);
+    }
+
+    private async Task ScheduleTotalNonProfiledConsumptionForBalanceResponsibleAsync(Guid resultsId, ProcessType aggregationProcess, GridArea gridArea, Domain.Transactions.Aggregations.Period period)
+    {
+        var balanceResponsibles = await _aggregationResults
+            .BalanceResponsiblesWithTotalNonProfiledConsumptionAsync(resultsId, gridArea).ConfigureAwait(false);
+
+        foreach (var actorNumber in balanceResponsibles)
+        {
+            var result = await _aggregationResults.TotalNonProfiledConsumptionForBalanceResponsibleAsync(resultsId, aggregationProcess, gridArea, period, actorNumber)
+                .ConfigureAwait(false);
+            await ScheduleAsync(aggregationProcess, actorNumber, MarketRole.BalanceResponsible, result).ConfigureAwait(false);
+        }
     }
 
     private async Task ScheduleNonProfiledConsumptionForBalanceResponsibleAsync(

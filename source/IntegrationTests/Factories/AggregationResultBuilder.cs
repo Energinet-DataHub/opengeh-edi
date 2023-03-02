@@ -34,12 +34,14 @@ internal class AggregationResultBuilder
     };
 
     private readonly MeasurementUnit _measureUnit = MeasurementUnit.Kwh;
-    private readonly SettlementType? _settlementType = SettlementType.NonProfiled;
     private readonly ActorNumber _aggregatedForActor = default!;
+    private SettlementType? _settlementType = SettlementType.NonProfiled;
     private MeteringPointType _meteringPointType = MeteringPointType.Consumption;
     private GridArea _gridArea = GridArea.Create("123");
     private Period _period = new(SystemClock.Instance.GetCurrentInstant(), SystemClock.Instance.GetCurrentInstant());
     private Resolution _resolution = Resolution.Hourly;
+    private ActorNumber _receivingActorNumber = default!;
+    private MarketRole _receivingActorRole = default!;
 
     public static AggregationResultBuilder Result()
     {
@@ -57,7 +59,9 @@ internal class AggregationResultBuilder
             _resolution,
             _period,
             _settlementType,
-            _aggregatedForActor);
+            _aggregatedForActor,
+            _receivingActorNumber,
+            _receivingActorRole);
     }
 
     public AggregationResultBuilder WithGridArea(string gridAreaCode)
@@ -81,6 +85,24 @@ internal class AggregationResultBuilder
     public AggregationResultBuilder WithMeteringPointType(MeteringPointType meteringPointType)
     {
         _meteringPointType = meteringPointType;
+        return this;
+    }
+
+    public AggregationResultBuilder WithReceivingActorNumber(ActorNumber receivingActorNumber)
+    {
+        _receivingActorNumber = receivingActorNumber;
+        return this;
+    }
+
+    public AggregationResultBuilder WithReceivingActorRole(MarketRole receivingActorRole)
+    {
+        _receivingActorRole = receivingActorRole;
+        return this;
+    }
+
+    public AggregationResultBuilder WithSettlementMethod(SettlementType settlementType)
+    {
+        _settlementType = settlementType;
         return this;
     }
 }
