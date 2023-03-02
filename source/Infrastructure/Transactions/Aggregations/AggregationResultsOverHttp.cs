@@ -93,14 +93,20 @@ public class AggregationResultsOverHttp : IAggregationResults
         return Task.FromResult(new List<Result>().AsReadOnly());
     }
 
-    public Task<AggregationResult> TotalNonProfiledConsumptionForBalanceResponsibleAsync(
+    public async Task<AggregationResult> TotalNonProfiledConsumptionForBalanceResponsibleAsync(
         Guid resultsId,
         ProcessType aggregationProcess,
         GridArea gridArea,
         Domain.Transactions.Aggregations.Period period,
         ActorNumber balanceResponsible)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(gridArea);
+        var requestUri = new Uri(
+            _serviceEndpoint, $"v3/batches/{resultsId}/processes/{gridArea.Code}/time-series-types/1");
+        var response = await _httpClient.GetAsync(requestUri).ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+        return await _aggregationResultMapper.MapToConsumptionResultAsync(
+            await response.Content.ReadAsStreamAsync().ConfigureAwait(false),  resultsId, gridArea.Code, period, SettlementType.NonProfiled).ConfigureAwait(false);
     }
 
     public async Task<ReadOnlyCollection<ActorNumber>> BalanceResponsiblesWithTotalNonProfiledConsumptionAsync(Guid resultsId, GridArea gridArea)
