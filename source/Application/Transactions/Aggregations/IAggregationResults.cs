@@ -16,6 +16,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Domain.Actors;
+using Domain.OutgoingMessages;
 using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 
@@ -58,4 +59,8 @@ public interface IAggregationResults
     /// <param name="roleOfReceiver"></param>
     /// <param name="period"></param>
     Task<ReadOnlyCollection<Result>> NonProfiledConsumptionForAsync(Guid resultId, GridArea gridArea, MarketRole roleOfReceiver, Domain.Transactions.Aggregations.Period period);
+
+    #pragma warning disable
+    Task<AggregationResult> TotalNonProfiledConsumptionForBalanceResponsibleAsync(Guid resultsId, ProcessType aggregationProcess, GridArea gridArea, Domain.Transactions.Aggregations.Period period, ActorNumber balanceResponsible);
+    Task<ReadOnlyCollection<ActorNumber>> BalanceResponsiblesWithTotalNonProfiledConsumptionAsync(Guid resultsId, GridArea gridArea);
 }
