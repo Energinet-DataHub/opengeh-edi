@@ -19,6 +19,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Application.Transactions.Aggregations;
 using Domain.Actors;
+using Domain.OutgoingMessages;
 using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using NodaTime;
@@ -56,6 +57,27 @@ public class AggregationResultsStub : IAggregationResults
     public Task<ReadOnlyCollection<Result>> NonProfiledConsumptionForAsync(Guid resultId, GridArea gridArea, MarketRole roleOfReceiver, Period period)
     {
         return Task.FromResult(_resultsForBalanceResponsible.AsReadOnly());
+    }
+
+    public Task<AggregationResult> TotalNonProfiledConsumptionForBalanceResponsibleAsync(
+        Guid resultsId,
+        ProcessType aggregationProcess,
+        GridArea gridArea,
+        Period period,
+        ActorNumber balanceResponsible)
+    {
+        return Task.FromResult(_resultsForActors[balanceResponsible]);
+    }
+
+    public Task<ReadOnlyCollection<ActorNumber>> BalanceResponsiblesWithTotalNonProfiledConsumptionAsync(Guid resultsId, GridArea gridArea)
+    {
+        return Task.FromResult(_resultsForActors.Where(
+            result => result.Value.ReceivingActorRole! == MarketRole.BalanceResponsible &&
+                      result.Value.MeteringPointType == MeteringPointType.Consumption &&
+                      result.Value.SettlementType! == SettlementType.NonProfiled)
+            .Select(x => x.Key)
+            .ToList()
+            .AsReadOnly());
     }
 
     public void Add(AggregationResult aggregationResult, ActorNumber targetActorNumber)

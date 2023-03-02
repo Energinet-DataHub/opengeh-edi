@@ -93,6 +93,35 @@ public class AggregationResultsOverHttp : IAggregationResults
         return Task.FromResult(new List<Result>().AsReadOnly());
     }
 
+    public async Task<AggregationResult> TotalNonProfiledConsumptionForBalanceResponsibleAsync(
+        Guid resultsId,
+        ProcessType aggregationProcess,
+        GridArea gridArea,
+        Domain.Transactions.Aggregations.Period period,
+        ActorNumber balanceResponsible)
+    {
+        ArgumentNullException.ThrowIfNull(gridArea);
+        var requestUri = new Uri(
+            _serviceEndpoint, $"v3/batches/{resultsId}/processes/{gridArea.Code}/time-series-types/1");
+        var response = await _httpClient.GetAsync(requestUri).ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+        return await _aggregationResultMapper.MapToConsumptionResultAsync(
+            await response.Content.ReadAsStreamAsync().ConfigureAwait(false),  resultsId, gridArea.Code, period, SettlementType.NonProfiled).ConfigureAwait(false);
+    }
+
+    public async Task<ReadOnlyCollection<ActorNumber>> BalanceResponsiblesWithTotalNonProfiledConsumptionAsync(Guid resultsId, GridArea gridArea)
+    {
+        ArgumentNullException.ThrowIfNull(gridArea);
+        var requestUri = new Uri(_serviceEndpoint, $"v3/batches/{resultsId}/processes/{gridArea.Code}/time-series-types/1/balance-responsible-parties");
+        var response = await _httpClient.GetAsync(requestUri).ConfigureAwait(false);
+        var actorNumbers = await response.Content.ReadFromJsonAsync<List<WholeSaleContracts.WholesaleActorDto>>().ConfigureAwait(false);
+        return actorNumbers?
+            .Where(actorNumber => !string.IsNullOrEmpty(actorNumber.Gln))
+            .Select(actorNumber => ActorNumber.Create(actorNumber.Gln))
+            .ToList()
+            .AsReadOnly()!;
+    }
+
     private async Task<HttpResponseMessage> CallAsync<TRequest>(string apiVersion, TRequest request)
     {
         var executionPolicy = Policy

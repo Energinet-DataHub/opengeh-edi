@@ -20,7 +20,18 @@ namespace Domain.Transactions.Aggregations;
 
 public class AggregationResult
 {
-    public AggregationResult(Guid id, IReadOnlyList<Point> points, GridArea gridArea, MeteringPointType meteringPointType, MeasurementUnit measureUnitType, Resolution resolution, Period period, SettlementType? settlementType, ActorNumber? aggregatedForActor = null)
+    public AggregationResult(
+        Guid id,
+        IReadOnlyList<Point> points,
+        GridArea gridArea,
+        MeteringPointType meteringPointType,
+        MeasurementUnit measureUnitType,
+        Resolution resolution,
+        Period period,
+        SettlementType? settlementType,
+        ActorNumber? aggregatedForActor = null,
+        ActorNumber? receivingActorNumber = null,
+        MarketRole? receivingActorRole = null)
     {
         Id = id;
         Points = points;
@@ -31,6 +42,8 @@ public class AggregationResult
         Period = period;
         SettlementType = settlementType;
         AggregatedForActor = aggregatedForActor;
+        ReceivingActorNumber = receivingActorNumber;
+        ReceivingActorRole = receivingActorRole;
     }
 
     public Guid Id { get; }
@@ -50,6 +63,10 @@ public class AggregationResult
     public SettlementType? SettlementType { get; }
 
     public ActorNumber? AggregatedForActor { get; }
+
+    public ActorNumber? ReceivingActorNumber { get; }
+
+    public MarketRole? ReceivingActorRole { get; }
 
     public static AggregationResult Consumption(
         Guid id,
