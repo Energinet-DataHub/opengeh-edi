@@ -31,4 +31,9 @@ public class HttpClientAdapter : IHttpClientAdapter
     {
         return _httpClient.PostAsync(uri, content);
     }
+
+    public Task<HttpResponseMessage> GetAsync(Uri uri)
+    {
+        return _httpClient.GetAsync(uri);
+    }
 }

@@ -103,9 +103,17 @@ public class AggregationResultsOverHttp : IAggregationResults
         throw new NotImplementedException();
     }
 
-    public Task<ReadOnlyCollection<ActorNumber>> BalanceResponsiblesWithTotalNonProfiledConsumptionAsync(Guid resultsId, GridArea gridArea)
+    public async Task<ReadOnlyCollection<ActorNumber>> BalanceResponsiblesWithTotalNonProfiledConsumptionAsync(Guid resultsId, GridArea gridArea)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(gridArea);
+        var requestUri = new Uri(_serviceEndpoint, $"v3/batches/{resultsId}/processes/{gridArea.Code}/time-series-types/1/balance-responsible-parties");
+        var response = await _httpClient.GetAsync(requestUri).ConfigureAwait(false);
+        var actorNumbers = await response.Content.ReadFromJsonAsync<List<WholeSaleContracts.WholesaleActorDto>>().ConfigureAwait(false);
+        return actorNumbers?
+            .Where(actorNumber => !string.IsNullOrEmpty(actorNumber.Gln))
+            .Select(actorNumber => ActorNumber.Create(actorNumber.Gln))
+            .ToList()
+            .AsReadOnly()!;
     }
 
     private async Task<HttpResponseMessage> CallAsync<TRequest>(string apiVersion, TRequest request)
