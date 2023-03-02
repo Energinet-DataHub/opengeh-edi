@@ -85,6 +85,26 @@ public class AggregationResultsStub : IAggregationResults
         _resultsForBalanceResponsible.Add(new Result(balanceResponsibleNumber, aggregationResults.AsReadOnly()));
     }
 
+    public void HasNonProfiledConsumptionForBalanceResponsibles(ReadOnlyCollection<ActorNumber> balanceResponsibles)
+    {
+        ArgumentNullException.ThrowIfNull(balanceResponsibles);
+
+        var aggregationResults = new List<AggregationResult>();
+        foreach (var balanceSupplier in balanceResponsibles)
+        {
+            aggregationResults.Add(AggregationResult.Consumption(
+                Guid.NewGuid(),
+                GridArea.Create("123"),
+                SettlementType.NonProfiled,
+                MeasurementUnit.Kwh,
+                Resolution.Hourly,
+                new Period(SystemClock.Instance.GetCurrentInstant(), SystemClock.Instance.GetCurrentInstant()),
+                new List<Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point>().AsReadOnly(),
+                balanceSupplier));
+            _resultsForBalanceResponsible.Add(new Result(balanceSupplier, aggregationResults.AsReadOnly()));
+        }
+    }
+
     public void HasResult(AggregationResult result)
     {
         _results.Add(result);

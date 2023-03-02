@@ -20,7 +20,16 @@ namespace Domain.Transactions.Aggregations;
 
 public class AggregationResult
 {
-    public AggregationResult(Guid id, IReadOnlyList<Point> points, GridArea gridArea, MeteringPointType meteringPointType, MeasurementUnit measureUnitType, Resolution resolution, Period period, SettlementType? settlementType, ActorNumber? aggregatedForActor = null)
+    public AggregationResult(
+        Guid id,
+        IReadOnlyList<Point> points,
+        GridArea gridArea,
+        MeteringPointType meteringPointType,
+        MeasurementUnit measureUnitType,
+        Resolution resolution,
+        Period period,
+        SettlementType? settlementType,
+        ActorNumber? aggregatedForActor = null)
     {
         Id = id;
         Points = points;

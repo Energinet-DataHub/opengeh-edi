@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Application.Transactions.Aggregations;
@@ -104,6 +105,34 @@ public class WhenResultsAreRetrievedTests : TestBase
 
     [Theory]
     [MemberData(nameof(AggregationProcessTypes))]
+    public async Task Total_non_profiled_consumption_result_is_sent_to_each_balance_responsible(ProcessType completedAggregationType)
+    {
+        var balanceResponsibles = new List<ActorNumber>()
+        {
+            SampleData.BalanceResponsibleNumber,
+        }.AsReadOnly();
+        _aggregationResults.HasNonProfiledConsumptionForBalanceResponsibles(
+            balanceResponsibles);
+
+        await AggregationResultsAreRetrieved(completedAggregationType);
+
+        var outgoingMessage = await OutgoingMessageAsync(
+            MarketRole.BalanceResponsible,
+            completedAggregationType);
+
+        Assert.NotNull(outgoingMessage);
+        outgoingMessage
+                .HasReceiverId(SampleData.BalanceResponsibleNumber.Value)
+                .HasReceiverRole(MarketRole.BalanceResponsible.Name)
+                .HasSenderId(DataHubDetails.IdentificationNumber.Value)
+                .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
+                .HasMessageRecordValue<TimeSeries>(
+                    series => series.EnergySupplierNumber!,
+                    null!);
+    }
+
+    [Theory]
+    [MemberData(nameof(AggregationProcessTypes))]
     public async Task Consumption_per_energy_supplier_result_is_sent_to_the_balance_responsible(ProcessType completedAggregationType)
     {
         _aggregationResults.HasNonProfiledConsumptionFor(
@@ -140,6 +169,15 @@ public class WhenResultsAreRetrievedTests : TestBase
     private async Task<AssertOutgoingMessage> OutgoingMessageAsync(MarketRole roleOfReceiver, ProcessType completedAggregationType)
     {
         return await AssertOutgoingMessage.OutgoingMessageAsync(
+            MessageType.NotifyAggregatedMeasureData.Name,
+            completedAggregationType.Code,
+            roleOfReceiver,
+            GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
+    }
+
+    private async Task<IEnumerable<AssertOutgoingMessage>> OutgoingMessagesAsync(MarketRole roleOfReceiver, ProcessType completedAggregationType)
+    {
+        return await AssertOutgoingMessage.OutgoingMessagesAsync(
             MessageType.NotifyAggregatedMeasureData.Name,
             completedAggregationType.Code,
             roleOfReceiver,

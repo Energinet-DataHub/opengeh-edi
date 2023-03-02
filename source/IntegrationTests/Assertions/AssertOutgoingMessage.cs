@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Dapper;
@@ -75,7 +76,29 @@ namespace IntegrationTests.Assertions
                 $" WHERE m.MessageType = '{messageType}' AND m.ProcessType = '{processType}' AND m.ReceiverRole = '{receiverRole.Name}'");
 
             Assert.NotNull(message);
+
             return new AssertOutgoingMessage(message);
+        }
+
+        public static async Task<IEnumerable<AssertOutgoingMessage>> OutgoingMessagesAsync(string messageType, string processType, MarketRole receiverRole, IDatabaseConnectionFactory connectionFactoryFactory)
+        {
+            if (connectionFactoryFactory == null) throw new ArgumentNullException(nameof(connectionFactoryFactory));
+            ArgumentNullException.ThrowIfNull(receiverRole);
+            using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+            var messages = connection.Query(
+                $"SELECT m.Id, m.RecordId, m.MessageType, m.ReceiverId, m.TransactionId, m.ProcessType," +
+                $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MessageRecord " +
+                $" FROM [dbo].[OutgoingMessages] m" +
+                $" WHERE m.MessageType = '{messageType}' AND m.ProcessType = '{processType}' AND m.ReceiverRole = '{receiverRole.Name}'");
+
+            var results = new List<AssertOutgoingMessage>();
+            foreach (var message in messages)
+            {
+                Assert.NotNull(message);
+                results.Add(new AssertOutgoingMessage(message));
+            }
+
+            return results;
         }
 
         public AssertOutgoingMessage HasReceiverId(string receiverId)
