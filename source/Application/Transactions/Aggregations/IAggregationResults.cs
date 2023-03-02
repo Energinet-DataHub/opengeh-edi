@@ -60,7 +60,20 @@ public interface IAggregationResults
     /// <param name="period"></param>
     Task<ReadOnlyCollection<Result>> NonProfiledConsumptionForAsync(Guid resultId, GridArea gridArea, MarketRole roleOfReceiver, Domain.Transactions.Aggregations.Period period);
 
-    #pragma warning disable
+    /// <summary>
+    /// Fetch result for non-profiled consumption for balance responsible
+    /// </summary>
+    /// <param name="resultsId"></param>
+    /// <param name="aggregationProcess"></param>
+    /// <param name="gridArea"></param>
+    /// <param name="period"></param>
+    /// <param name="balanceResponsible"></param>
     Task<AggregationResult> TotalNonProfiledConsumptionForBalanceResponsibleAsync(Guid resultsId, ProcessType aggregationProcess, GridArea gridArea, Domain.Transactions.Aggregations.Period period, ActorNumber balanceResponsible);
+
+    /// <summary>
+    /// Fetch the list of balance responsibles having a total non-profiled consumption result
+    /// </summary>
+    /// <param name="resultsId"></param>
+    /// <param name="gridArea"></param>
     Task<ReadOnlyCollection<ActorNumber>> BalanceResponsiblesWithTotalNonProfiledConsumptionAsync(Guid resultsId, GridArea gridArea);
 }
