@@ -100,9 +100,10 @@ public class AggregationResultsOverHttp : IAggregationResults
         Domain.Transactions.Aggregations.Period period,
         ActorNumber balanceResponsible)
     {
+        ArgumentNullException.ThrowIfNull(balanceResponsible);
         ArgumentNullException.ThrowIfNull(gridArea);
         var requestUri = new Uri(
-            _serviceEndpoint, $"v3/batches/{resultsId}/processes/{gridArea.Code}/time-series-types/1");
+            _serviceEndpoint, $"v3/batches/{resultsId}/processes/{gridArea.Code}/time-series-types/1?balanceResponsiblePartyGln={balanceResponsible.Value}");
         var response = await _httpClient.GetAsync(requestUri).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
         return await _aggregationResultMapper.MapToConsumptionResultAsync(
