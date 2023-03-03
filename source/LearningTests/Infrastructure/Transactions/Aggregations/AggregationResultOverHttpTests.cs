@@ -91,12 +91,12 @@ public class AggregationResultOverHttpTests : IDisposable
     [Fact]
     public async Task Fetch_total_non_profiled_consumption_result_for_balance_responsible()
     {
-        var batchId = Guid.Parse("607B9862-9273-4A06-9382-E7194BF57A1B");
+        var batchId = Guid.Parse("5C9C5BEB-BBF7-45F0-B435-2FFA1FD56C1C");
         var balanceResponsibles =
             await _service.BalanceResponsiblesWithTotalNonProfiledConsumptionAsync(batchId,  GridArea.Create("543")).ConfigureAwait(false);
 
         var aggregationResult = await _service.TotalNonProfiledConsumptionForBalanceResponsibleAsync(
-                _batchId,
+                batchId,
                 ProcessType.BalanceFixing,
                 GridArea.Create(_gridArea),
                 new Period(NodaTime.SystemClock.Instance.GetCurrentInstant(), NodaTime.SystemClock.Instance.GetCurrentInstant()),
