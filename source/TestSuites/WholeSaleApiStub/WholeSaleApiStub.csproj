@@ -20,5 +20,7 @@
         <Link>.dockerignore</Link>
       </Content>
     </ItemGroup>
+  
+    <ItemGroup><InternalsVisibleTo Include="AcceptanceTests" /></ItemGroup>
 
 </Project>

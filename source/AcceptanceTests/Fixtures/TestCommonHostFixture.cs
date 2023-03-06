@@ -19,17 +19,23 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ResourceProvider;
 using Energinet.DataHub.Core.TestCommon.Diagnostics;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Hosting;
 using Xunit.Abstractions;
 
 namespace AcceptanceTest.Fixtures
 {
-    /// <summary>
-    /// Support testing flows between multiple Function App hosts.
-    /// </summary>
     public class TestCommonHostFixture : IAsyncLifetime
     {
         public TestCommonHostFixture()
         {
+            var web01BaseUrl = "http://localhost:5000";
+
+            WholeSaleApiStubHost = WebHost.CreateDefaultBuilder()
+                .UseStartup<WholeSaleApiStub.Startup>()
+                .UseUrls(web01BaseUrl)
+                .Build();
+
             TestLogger = new TestDiagnosticsLogger();
 
             AzuriteManager = new AzuriteManager();
@@ -42,7 +48,7 @@ namespace AcceptanceTest.Fixtures
         public ITestDiagnosticsLogger TestLogger { get; }
 
         [NotNull]
-        public FunctionAppHostManager? App01HostManager { get; private set; }
+        public FunctionAppHostManager? ApiHostManager { get; private set; }
 
         private AzuriteManager AzuriteManager { get; }
 
@@ -52,28 +58,31 @@ namespace AcceptanceTest.Fixtures
 
         private FunctionAppHostConfigurationBuilder HostConfigurationBuilder { get; }
 
+        private IWebHost WholeSaleApiStubHost { get; }
+
         public async Task InitializeAsync()
         {
             // => Storage emulator
             AzuriteManager.StartAzurite();
             var port = 7070;
-            var app01HostSettings = CreateAppHostSettings("Api", ref port);
+            var apiHostSettings = CreateAppHostSettings("Api", ref port);
 
             // => Integration events
-            app01HostSettings.ProcessEnvironmentVariables.Add("INTEGRATIONEVENT_CONNECTION_STRING", ServiceBusResourceProvider.ConnectionString);
+            apiHostSettings.ProcessEnvironmentVariables.Add("INTEGRATIONEVENT_CONNECTION_STRING", ServiceBusResourceProvider.ConnectionString);
 
             await ServiceBusResourceProvider
                 .BuildTopic("integrationevent-topic")
                     .Do(topicProperties =>
                     {
-                        app01HostSettings.ProcessEnvironmentVariables.Add("INTEGRATIONEVENT_TOPIC_NAME", topicProperties.Name);
+                        apiHostSettings.ProcessEnvironmentVariables.Add("INTEGRATIONEVENT_TOPIC_NAME", topicProperties.Name);
                     })
                 .CreateAsync().ConfigureAwait(false);
 
             // => Create and start host's
-            App01HostManager = new FunctionAppHostManager(app01HostSettings, TestLogger);
+            ApiHostManager = new FunctionAppHostManager(apiHostSettings, TestLogger);
 
-            StartHost(App01HostManager);
+            StartHost(ApiHostManager);
+            await WholeSaleApiStubHost.StartAsync().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -90,25 +99,20 @@ namespace AcceptanceTest.Fixtures
 
         public async Task DisposeAsync()
         {
-            App01HostManager.Dispose();
+            ApiHostManager.Dispose();
             AzuriteManager.Dispose();
+            WholeSaleApiStubHost.Dispose();
             await ServiceBusResourceProvider.DisposeAsync().ConfigureAwait(false);
         }
 
         private static void StartHost(FunctionAppHostManager hostManager)
         {
-            IEnumerable<string> hostStartupLog;
-
             try
             {
                 hostManager.StartHost();
             }
             catch (Exception)
             {
-                // Function App Host failed during startup.
-                // Exception has already been logged by host manager.
-                hostStartupLog = hostManager.GetHostLogSnapshot();
-
                 if (Debugger.IsAttached)
                 {
                     Debugger.Break();
@@ -117,9 +121,6 @@ namespace AcceptanceTest.Fixtures
                 // Rethrow
                 throw;
             }
-
-            // Function App Host started.
-            hostStartupLog = hostManager.GetHostLogSnapshot();
         }
 
         private static string GetBuildConfiguration()

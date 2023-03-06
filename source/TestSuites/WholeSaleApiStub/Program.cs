@@ -1,4 +1,5 @@
 ﻿using Azure.Messaging.ServiceBus;
+using WholeSaleApiStub;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,4 +30,12 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+var startup = new Startup(builder.Configuration);
+
+startup.ConfigureServices(builder.Services);
+
+startup.Configure(app);
+
 app.Run();
+
+public partial class Program { }

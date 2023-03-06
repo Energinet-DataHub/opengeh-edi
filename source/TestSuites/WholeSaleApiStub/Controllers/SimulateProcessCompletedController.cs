@@ -20,7 +20,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace WholeSaleApiStub.Controllers;
 
 [ApiController]
-[Route("api/v{version:apiVersion}")]
+[Route("api/v{version:apiVersion}/SimulateProcessCompleted")]
 public class SimulateProcessCompletedController : ControllerBase
 {
     private readonly ServiceBusSender _serviceBusSender;
@@ -30,7 +30,7 @@ public class SimulateProcessCompletedController : ControllerBase
         _serviceBusSender = serviceBusSender;
     }
 
-    [HttpPost("SimulateProcessCompleted")]
+    [HttpPost]
     [ApiVersion("1.0")]
     public async Task<ActionResult> SimulateProcessCompletedAsync(SimulateProcessHasCompleted request)
     {

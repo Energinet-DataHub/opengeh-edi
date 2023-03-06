@@ -1,4 +1,5 @@
-﻿using AcceptanceTest.Fixtures;
+﻿using System.Diagnostics;
+using AcceptanceTest.Fixtures;
 using Xunit.Abstractions;
 using Xunit.Categories;
 
@@ -19,7 +20,10 @@ public sealed class WhenAnAggregationsHasCompletedTests : IAsyncLifetime, IDispo
         _ediService = new EdiService();
         _fixture = fixture;
         _fixture.SetTestOutputHelper(testOutputHelper);
-        _fixture.App01HostManager.ClearHostLog();
+        _fixture.ApiHostManager.ClearHostLog();
+        #if DEBUG
+        Debugger.Break();
+        #endif
     }
 
     public Task InitializeAsync()
