@@ -23,7 +23,7 @@ jobs:
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@v10
     with:
       SOLUTION_FILE_PATH: 'source/EDI.sln'
-      DOTNET_VERSION: 7.0.201 # Ubuntu and Windows runners does not currently have the same version pre-installed
+      DOTNET_VERSION: 7.0.200
 
   # Run all tests in 'IntegrationTests.dll'
   integration_tests:
@@ -31,7 +31,7 @@ jobs:
     with:
       TESTS_DLL_FILE_PATH: '\source\IntegrationTests\bin\Release\net7.0\IntegrationTests.dll'
       DOWNLOAD_ATTEMPT_LIMIT: 12
-      DOTNET_VERSION: 7.0.200 # Ubuntu and Windows runners does not currently have the same version pre-installed
+      DOTNET_VERSION: 7.0.200
 
   # Run all tests in 'ArchitectureTests.dll'
   architecture_tests:
@@ -39,7 +39,7 @@ jobs:
     with:
       TESTS_DLL_FILE_PATH: '\source\ArchitectureTests\bin\Release\net7.0\ArchitectureTests.dll'
       DOWNLOAD_ATTEMPT_LIMIT: 12
-      DOTNET_VERSION: 7.0.200 # Ubuntu and Windows runners does not currently have the same version pre-installed
+      DOTNET_VERSION: 7.0.200
 
   # Run all tests in 'Tests.dll'
   tests:
@@ -47,7 +47,7 @@ jobs:
     with:
       TESTS_DLL_FILE_PATH: '\source\Tests\bin\Release\net7.0\Tests.dll'
       DOWNLOAD_ATTEMPT_LIMIT: 12
-      DOTNET_VERSION: 7.0.200 # Ubuntu and Windows runners does not currently have the same version pre-installed
+      DOTNET_VERSION: 7.0.200
 
   #
   # Branch policy status check
