@@ -40,6 +40,7 @@ jobs:
       TESTS_FILTER_EXPRESSION: 'FullyQualifiedName!~LearningTests' # Filter => Skip all tests within namespace 'LearningTests'
       USE_SQLLOCALDB_2019: true
       ENVIRONMENT: AzureAuth
+      DOTNET_VERSION: 7.0.200 # Ubuntu and Windows runners does not currently have the same version pre-installed
 
   dotnet_promote_prerelease:
     needs: changes
