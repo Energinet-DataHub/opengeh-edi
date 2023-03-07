@@ -33,19 +33,19 @@ public class InternalCommandRegistrationTests : TestBase
         _mapper = GetService<InternalCommandMapper>();
     }
 
+    public static IEnumerable<object[]> GetInternalCommands()
+    {
+        var allTypes = ApplicationAssemblies.Application.GetTypes().Concat(ApplicationAssemblies.Infrastructure.GetTypes());
+        return allTypes
+            .Where(x => x.BaseType == typeof(InternalCommand))
+            .Select(x => new[] { x });
+    }
+
     [Theory(DisplayName = nameof(Internal_commands_are_registered))]
     [MemberData(nameof(GetInternalCommands))]
     public void Internal_commands_are_registered(Type internalCommand)
     {
         Assert.True(IsRegistered(internalCommand));
-    }
-
-    private static IEnumerable<object[]> GetInternalCommands()
-    {
-        var allTypes = ApplicationAssemblies.Application.GetTypes().Concat(ApplicationAssemblies.Infrastructure.GetTypes());
-        return allTypes
-            .Where(x => x.BaseType == typeof(InternalCommand))
-                .Select(x => new[] { x });
     }
 
     private bool IsRegistered(Type commandType)

@@ -17,7 +17,7 @@ using NodaTime;
 
 namespace Tests.Domain.Transactions.MoveIn;
 
-internal class SampleData
+internal sealed class SampleData
 {
     internal static Guid TransactionId => Guid.Parse("17DE02FC-6A83-436F-BC89-779ABBD6AB35");
 

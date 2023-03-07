@@ -23,7 +23,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Transactions
 {
-    internal class MoveInTransactionEntityConfiguration : IEntityTypeConfiguration<MoveInTransaction>
+    internal sealed class MoveInTransactionEntityConfiguration : IEntityTypeConfiguration<MoveInTransaction>
     {
         private readonly ISerializer _serializer;
 

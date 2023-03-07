@@ -104,5 +104,5 @@ public class EnqueuedMessages : IEnqueuedMessages
             .ConfigureAwait(false);
     }
 
-    private record OldestMessage(string ProcessType, string MessageType, string ReceiverRole);
+    private sealed record OldestMessage(string ProcessType, string MessageType, string ReceiverRole);
 }

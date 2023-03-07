@@ -77,14 +77,14 @@ public class AggregationResultMapper
         return points.AsReadOnly();
     }
 
-    private record ProcessStepResultDto(
+    private sealed record ProcessStepResultDto(
         ProcessStepMeteringPointType ProcessStepMeteringPointType,
         decimal Sum,
         decimal Min,
         decimal Max,
         TimeSeriesPointDto[] TimeSeriesPoints);
 
-    private record TimeSeriesPointDto(
+    private sealed record TimeSeriesPointDto(
         DateTimeOffset Time,
         decimal Quantity,
         string Quality);
