@@ -14,6 +14,6 @@
 
 namespace Energinet.DataHub.EnergySupplying.RequestResponse;
 
-internal class AssemblyInfo
+internal sealed class AssemblyInfo
 {
 }

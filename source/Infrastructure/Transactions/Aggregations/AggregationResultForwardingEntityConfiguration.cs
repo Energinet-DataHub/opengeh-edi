@@ -23,7 +23,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Transactions.Aggregations;
 
-internal class AggregationResultForwardingEntityConfiguration : IEntityTypeConfiguration<AggregationResultForwarding>
+internal sealed class AggregationResultForwardingEntityConfiguration : IEntityTypeConfiguration<AggregationResultForwarding>
 {
     private readonly ISerializer _serializer;
 

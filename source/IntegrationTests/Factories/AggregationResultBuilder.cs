@@ -26,7 +26,7 @@ using Period = Domain.Transactions.Aggregations.Period;
 
 namespace IntegrationTests.Factories;
 
-internal class AggregationResultBuilder
+internal sealed class AggregationResultBuilder
 {
     private static readonly IReadOnlyList<Point> _points = new List<Point>()
     {
