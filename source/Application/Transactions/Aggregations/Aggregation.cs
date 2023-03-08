@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using NodaTime;
 
 namespace Application.Transactions.Aggregations;
 
@@ -29,3 +29,5 @@ public record Aggregation(
     string? AggregatedForActor = null);
 
 public record Point(int Position, decimal? Quantity, string Quality, string SampleTime);
+
+public record Period(Instant Start, Instant End);
