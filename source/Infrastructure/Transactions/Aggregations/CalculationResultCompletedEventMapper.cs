@@ -146,7 +146,7 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
             QuantityQuality.Incomplete => Quality.Incomplete.Name,
             QuantityQuality.Measured => Quality.Measured.Name,
             QuantityQuality.Missing => Quality.Missing.Name,
-            QuantityQuality.Read => Quality.Estimated.Name,
+            QuantityQuality.Estimated => Quality.Estimated.Name,
             QuantityQuality.Unspecified => throw new InvalidOperationException("Quality is not specified"),
             _ => throw new InvalidOperationException("Unknown quality type"),
         };
