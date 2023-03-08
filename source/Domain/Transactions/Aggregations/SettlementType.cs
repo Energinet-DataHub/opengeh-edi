@@ -19,6 +19,7 @@ namespace Domain.Transactions.Aggregations;
 public class SettlementType : EnumerationType
 {
     public static readonly SettlementType NonProfiled = new(0, nameof(NonProfiled), "E02");
+    public static readonly SettlementType Flex = new(0, nameof(Flex), "XXX");
 
     private SettlementType(int id, string name, string code)
         : base(id, name)
