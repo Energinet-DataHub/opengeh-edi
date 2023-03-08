@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using Application.IncomingMessages.RequestChangeOfSupplier;
 using CimMessageAdapter.Errors;
@@ -24,10 +25,6 @@ using CimMessageAdapter.Messages;
 using DocumentValidation;
 using Domain.OutgoingMessages;
 using Json.Schema;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using JsonException = Newtonsoft.Json.JsonException;
-using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 using MessageHeader = Application.IncomingMessages.MessageHeader;
 
 namespace Infrastructure.IncomingMessages.RequestChangeOfSupplier;
@@ -75,10 +72,9 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
             return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(_errors.ToArray());
         }
 
-        var streamReader = new StreamReader(message, leaveOpen: true);
         try
         {
-            using (var jsonTextReader = new JsonTextReader(streamReader))
+            using (var jsonTextReader = new Utf8JsonReader(message))
             {
                 try
                 {
@@ -100,7 +96,6 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
         }
         finally
         {
-            streamReader.Dispose();
         }
     }
 
@@ -110,14 +105,11 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
 
         string[] split;
         ResetMessagePosition(message);
-        var streamReader = new StreamReader(message, leaveOpen: true);
-        using (var jsonTextReader = new JsonTextReader(streamReader))
-        {
-            var serializer = new JsonSerializer();
-            var deserialized = (JObject)serializer.Deserialize(jsonTextReader);
-            var path = deserialized.First.Path;
-            split = path.Split('_');
-        }
+        var options = new JsonSerializerOptions();
+        var deserialized = JsonSerializer.Deserialize<JsonObject>(message, options);
+        if (deserialized is null) throw new InvalidOperationException("Unable to read first node");
+        var path = deserialized.First().Value?.ToString();
+        split = path.Split('_');
 
         return split;
     }
@@ -130,11 +122,10 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
         return processType;
     }
 
-    private static MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction> ParseJsonData(JsonTextReader jsonTextReader)
+    private static MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction> ParseJsonData(Utf8JsonReader jsonTextReader)
     {
         var marketActivityRecords = new List<MarketActivityRecord>();
-        var serializer = new JsonSerializer();
-        var jsonRequest = serializer.Deserialize<JObject>(jsonTextReader);
+        var jsonRequest = JsonSerializer.Deserialize(jsonTextReader, JsonObject, new JsonSerializerOptions());
         var headerToken = jsonRequest.SelectToken(HeaderElementName);
         var messageHeader = MessageHeaderFrom(headerToken);
         marketActivityRecords.AddRange(headerToken[MarketActivityRecordElementName].Select(MarketActivityRecordFrom));

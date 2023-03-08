@@ -15,12 +15,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Application.OutgoingMessages.Common;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Infrastructure.OutgoingMessages.Common.Json;
-using Newtonsoft.Json;
 
 namespace Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 
@@ -49,29 +49,28 @@ public class ConfirmChangeOfSupplierJsonMessageWriter : IMessageWriter
     public async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
     {
         var stream = new MemoryStream();
-        var streamWriter = new StreamWriter(stream, leaveOpen: true);
-        using var writer = new JsonTextWriter(streamWriter);
+        var options = new JsonWriterOptions() { Indented = true };
+        using var writer = new Utf8JsonWriter(stream, options);
 
         WriteHeader(header, writer);
         WriteMarketActivityRecords(marketActivityRecords, writer);
         WriteEnd(writer);
-        writer.Flush();
-        await streamWriter.FlushAsync().ConfigureAwait(false);
+        await writer.FlushAsync().ConfigureAwait(false);
         stream.Position = 0;
         return stream;
     }
 
-    private static void WriteEnd(JsonTextWriter writer)
+    private static void WriteEnd(Utf8JsonWriter writer)
     {
         writer.WriteEndObject();
     }
 
-    private static void WriteHeader(MessageHeader header, JsonTextWriter writer)
+    private static void WriteHeader(MessageHeader header, Utf8JsonWriter writer)
     {
         JsonHeaderWriter.Write(header, DocumentType, TypeCode, "A01", writer);
     }
 
-    private void WriteMarketActivityRecords(IReadOnlyCollection<string> marketActivityRecords, JsonTextWriter writer)
+    private void WriteMarketActivityRecords(IReadOnlyCollection<string> marketActivityRecords, Utf8JsonWriter writer)
     {
         if (marketActivityRecords == null) throw new ArgumentNullException(nameof(marketActivityRecords));
         if (writer == null) throw new ArgumentNullException(nameof(writer));
@@ -83,16 +82,16 @@ public class ConfirmChangeOfSupplierJsonMessageWriter : IMessageWriter
         {
             writer.WriteStartObject();
             writer.WritePropertyName("mRID");
-            writer.WriteValue(marketActivityRecord.Id);
+            writer.WriteStringValue(marketActivityRecord.Id);
             writer.WritePropertyName("marketEvaluationPoint.mRID");
             writer.WriteStartObject();
             writer.WritePropertyName("codingScheme");
-            writer.WriteValue("A10");
+            writer.WriteStringValue("A10");
             writer.WritePropertyName("value");
-            writer.WriteValue(marketActivityRecord.MarketEvaluationPointId);
+            writer.WriteStringValue(marketActivityRecord.MarketEvaluationPointId);
             writer.WriteEndObject();
             writer.WritePropertyName("originalTransactionIDReference_MktActivityRecord.mRID");
-            writer.WriteValue(marketActivityRecord.OriginalTransactionId);
+            writer.WriteStringValue(marketActivityRecord.OriginalTransactionId);
             writer.WriteEndObject();
         }
 
