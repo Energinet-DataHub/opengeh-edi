@@ -97,26 +97,6 @@ public class AggregationResultMessage : OutgoingMessage
             receiverRole,
             series);
     }
-
-    public static AggregationResultMessage Create(
-        ActorNumber receiverNumber,
-        MarketRole receiverRole,
-        TransactionId transactionId,
-        ProcessType processType,
-        TimeSeries result)
-    {
-        ArgumentNullException.ThrowIfNull(transactionId);
-        ArgumentNullException.ThrowIfNull(processType);
-        ArgumentNullException.ThrowIfNull(result);
-        ArgumentNullException.ThrowIfNull(receiverNumber);
-
-        return new AggregationResultMessage(
-            receiverNumber,
-            transactionId,
-            processType.Code,
-            receiverRole,
-            result);
-    }
 }
 
 public record TimeSeries(
