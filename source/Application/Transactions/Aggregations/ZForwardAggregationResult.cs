@@ -63,10 +63,11 @@ public class ZForwardAggregationResultHandler : IRequestHandler<ZForwardAggregat
     {
         ArgumentNullException.ThrowIfNull(request);
         var gridOperator = await _gridAreaLookup.GetGridOperatorForAsync(request.Result.GridArea).ConfigureAwait(false);
-        var transaction = new AggregationResultForwarding(TransactionId.New(), gridOperator, MarketRole.MeteredDataResponsible, EnumerationType.FromName<ProcessType>(request.Result.ProcessType));
+        var processType = EnumerationType.FromName<ProcessType>(request.Result.ProcessType);
+        var transaction = new AggregationResultForwarding(TransactionId.New(), gridOperator, MarketRole.MeteredDataResponsible, processType);
         _transactions.Add(transaction);
 
-        var outgoingMessage = AggregationResultMessage.Create(gridOperator, MarketRole.MeteredDataResponsible, transaction.Id, ProcessType.BalanceFixing, CreateFrom(transaction.Id, request.Result));
+        var outgoingMessage = AggregationResultMessage.Create(gridOperator, MarketRole.MeteredDataResponsible, transaction.Id, processType, CreateFrom(transaction.Id, request.Result));
         _outgoingMessageStore.Add(outgoingMessage);
 
         return Unit.Value;
