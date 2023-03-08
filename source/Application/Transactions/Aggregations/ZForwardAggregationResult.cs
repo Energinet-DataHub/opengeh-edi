@@ -65,28 +65,8 @@ public class ZForwardAggregationResultHandler : IRequestHandler<ZForwardAggregat
         var gridOperator = await _gridAreaLookup.GetGridOperatorForAsync(request.Result.GridArea).ConfigureAwait(false);
         var factory = new TransactionFactory(gridOperator);
         var transaction = factory.CreateFrom(request.Result);
-        var processType = EnumerationType.FromName<ProcessType>(request.Result.ProcessType);
         _transactions.Add(transaction);
-
-        var tmpOutgoingMessage = transaction.CreateMessage(request.Result);
-        var outgoingMessage = AggregationResultMessage.Create(gridOperator, MarketRole.MeteredDataResponsible, transaction.Id, processType, CreateFrom(transaction.Id, request.Result));
-        _outgoingMessageStore.Add(outgoingMessage);
-
+        _outgoingMessageStore.Add(transaction.CreateMessage(request.Result));
         return Unit.Value;
-    }
-
-    private static TimeSeries CreateFrom(TransactionId transactionId, Aggregation result)
-    {
-        return new TimeSeries(
-            transactionId.Id,
-            result.GridArea,
-            result.MeteringPointType,
-            result.SettlementType,
-            result.MeasureUnitType,
-            result.Resolution,
-            null,
-            null,
-            new Domain.Transactions.Aggregations.Period(result.Period.Start, result.Period.End),
-            result.Points.Select(point => new Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point(point.Position, point.Quantity, point.Quality, point.SampleTime)).ToList());
     }
 }
