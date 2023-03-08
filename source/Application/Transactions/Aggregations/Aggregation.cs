@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 
 namespace Application.Transactions.Aggregations;
 
@@ -24,6 +25,7 @@ public record Aggregation(
     string Resolution,
     Period Period,
     string? SettlementType,
+    string ProcessType,
     string? AggregatedForActor = null);
 
 public record Point(int Position, decimal? Quantity, string Quality, string SampleTime);

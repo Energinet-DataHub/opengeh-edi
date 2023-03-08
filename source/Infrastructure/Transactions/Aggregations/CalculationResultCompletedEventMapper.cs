@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using Application.Transactions.Aggregations;
 using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using Energinet.DataHub.Wholesale.Contracts.Events;
@@ -24,6 +25,8 @@ using Infrastructure.Configuration.IntegrationEvents;
 using MediatR;
 using NodaTime.Serialization.Protobuf;
 using Period = Application.Transactions.Aggregations.Period;
+using Point = Application.Transactions.Aggregations.Point;
+using ProcessType = Domain.OutgoingMessages.ProcessType;
 using Resolution = Energinet.DataHub.Wholesale.Contracts.Events.Resolution;
 
 namespace Infrastructure.Transactions.Aggregations;
@@ -42,7 +45,8 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
                 MapUnitType(integrationEvent),
                 MapResolution(integrationEvent),
                 MapPeriod(integrationEvent),
-                MapSettlementMethod(integrationEvent)));
+                MapSettlementMethod(integrationEvent),
+                MapProcessType(integrationEvent)));
     }
 
     public bool CanHandle(string eventType)
@@ -124,6 +128,16 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
         }
 
         return points.AsReadOnly();
+    }
+
+    private static string MapProcessType(CalculationResultCompleted integrationEvent)
+    {
+        return integrationEvent.ProcessType switch
+        {
+            Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing => ProcessType.BalanceFixing.Name,
+            Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.Unspecified => throw new InvalidOperationException("Process type is not specified"),
+            _ => throw new InvalidOperationException("Unknown process type"),
+        };
     }
 
     private static string MapQuality(QuantityQuality quality)

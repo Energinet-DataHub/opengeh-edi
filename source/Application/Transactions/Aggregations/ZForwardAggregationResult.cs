@@ -22,6 +22,7 @@ using Application.OutgoingMessages;
 using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Domain.SeedWork;
 using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using MediatR;
@@ -62,7 +63,7 @@ public class ZForwardAggregationResultHandler : IRequestHandler<ZForwardAggregat
     {
         ArgumentNullException.ThrowIfNull(request);
         var gridOperator = await _gridAreaLookup.GetGridOperatorForAsync(request.Result.GridArea).ConfigureAwait(false);
-        var transaction = new AggregationResultForwarding(TransactionId.New(), gridOperator, MarketRole.MeteredDataResponsible, ProcessType.BalanceFixing);
+        var transaction = new AggregationResultForwarding(TransactionId.New(), gridOperator, MarketRole.MeteredDataResponsible, EnumerationType.FromName<ProcessType>(request.Result.ProcessType));
         _transactions.Add(transaction);
 
         var outgoingMessage = AggregationResultMessage.Create(gridOperator, MarketRole.MeteredDataResponsible, transaction.Id, ProcessType.BalanceFixing, CreateFrom(transaction.Id, request.Result));

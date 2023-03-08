@@ -76,9 +76,8 @@ public class WhenResultsAreRetrievedTests : TestBase
             .HasMessageRecordValue<TimeSeries>(timeSeries => timeSeries.MeteringPointType, MeteringPointType.Consumption.Name);
     }
 
-    [Theory]
-    [MemberData(nameof(AggregationProcessTypes))]
-    public async Task Total_flex_consumption_is_sent_to_the_grid_operator(ProcessType completedAggregationType)
+    [Fact]
+    public async Task Total_flex_consumption_is_sent_to_the_grid_operator()
     {
         var @event = new CalculationResultCompleted()
         {
@@ -104,7 +103,7 @@ public class WhenResultsAreRetrievedTests : TestBase
         await HavingReceivedIntegrationEventAsync("CalculationResultCompleted", @event).ConfigureAwait(false);
 
         var message = await OutgoingMessageAsync(
-            MarketRole.MeteredDataResponsible, completedAggregationType);
+            MarketRole.MeteredDataResponsible, ProcessType.BalanceFixing);
         message.HasReceiverId(SampleData.GridOperatorNumber)
             .HasReceiverRole(MarketRole.MeteredDataResponsible.Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
