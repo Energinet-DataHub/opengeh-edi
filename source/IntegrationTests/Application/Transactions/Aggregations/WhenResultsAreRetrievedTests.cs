@@ -29,7 +29,6 @@ using IntegrationTests.Factories;
 using IntegrationTests.Fixtures;
 using IntegrationTests.TestDoubles;
 using Xunit;
-using Period = Application.Transactions.Aggregations.Period;
 using ProcessType = Domain.OutgoingMessages.ProcessType;
 using Resolution = Energinet.DataHub.Wholesale.Contracts.Events.Resolution;
 
@@ -227,6 +226,6 @@ public class WhenResultsAreRetrievedTests : TestBase
             SampleData.ResultId,
             completedAggregationType.Name,
             SampleData.GridAreaCode,
-            new Period(SampleData.StartOfPeriod, SampleData.EndOfPeriod))).ConfigureAwait(false);
+            new ZPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod))).ConfigureAwait(false);
     }
 }

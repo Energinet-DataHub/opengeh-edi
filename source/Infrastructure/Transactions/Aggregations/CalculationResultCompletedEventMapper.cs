@@ -24,7 +24,6 @@ using Google.Protobuf.Collections;
 using Infrastructure.Configuration.IntegrationEvents;
 using MediatR;
 using NodaTime.Serialization.Protobuf;
-using Period = Application.Transactions.Aggregations.Period;
 using Point = Application.Transactions.Aggregations.Point;
 using ProcessType = Domain.OutgoingMessages.ProcessType;
 using Resolution = Energinet.DataHub.Wholesale.Contracts.Events.Resolution;
@@ -66,9 +65,9 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
         };
     }
 
-    private static Period MapPeriod(CalculationResultCompleted integrationEvent)
+    private static ZPeriod MapPeriod(CalculationResultCompleted integrationEvent)
     {
-        return new Period(integrationEvent.PeriodStartUtc.ToInstant(), integrationEvent.PeriodEndUtc.ToInstant());
+        return new ZPeriod(integrationEvent.PeriodStartUtc.ToInstant(), integrationEvent.PeriodEndUtc.ToInstant());
     }
 
     private static string MapResolution(CalculationResultCompleted integrationEvent)

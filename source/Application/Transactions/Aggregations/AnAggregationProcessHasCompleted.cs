@@ -36,6 +36,6 @@ public class RetrieveResultsWhenAnAggregationProcessHasCompleted : INotification
             notification.ResultId,
             notification.AggregationProcessType.Name,
             notification.GridArea.Code,
-            new Period(notification.PeriodStartDate, notification.PeriodEndDate)));
+            new ZPeriod(notification.PeriodStartDate, notification.PeriodEndDate)));
     }
 }
