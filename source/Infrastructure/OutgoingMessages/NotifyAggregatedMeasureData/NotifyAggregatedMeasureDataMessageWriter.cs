@@ -25,6 +25,7 @@ using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions.Aggregations;
 using Infrastructure.OutgoingMessages.Common.Xml;
 using NodaTime;
+using Point = Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
 
 namespace Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 

@@ -20,6 +20,7 @@ using Application.Configuration.Commands.Commands;
 using Domain.OutgoingMessages;
 using Domain.SeedWork;
 using Domain.Transactions;
+using Domain.Transactions.Aggregations;
 using MediatR;
 
 namespace Application.Transactions.Aggregations;

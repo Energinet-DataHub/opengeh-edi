@@ -23,6 +23,7 @@ using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using NodaTime;
 using Period = Domain.Transactions.Aggregations.Period;
+using Point = Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
 
 namespace IntegrationTests.Factories;
 

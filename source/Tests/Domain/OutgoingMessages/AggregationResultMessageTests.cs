@@ -21,6 +21,7 @@ using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using Tests.Factories;
 using Xunit;
+using Point = Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
 
 namespace Tests.Domain.OutgoingMessages;
 

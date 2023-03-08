@@ -24,7 +24,7 @@ using Google.Protobuf.Collections;
 using Infrastructure.Configuration.IntegrationEvents;
 using MediatR;
 using NodaTime.Serialization.Protobuf;
-using Point = Application.Transactions.Aggregations.Point;
+using Point = Domain.Transactions.Aggregations.Point;
 using ProcessType = Domain.OutgoingMessages.ProcessType;
 using Resolution = Energinet.DataHub.Wholesale.Contracts.Events.Resolution;
 

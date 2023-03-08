@@ -16,6 +16,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.Commands;
+using Domain.Transactions.Aggregations;
 using MediatR;
 
 namespace Application.Transactions.Aggregations;
