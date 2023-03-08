@@ -68,6 +68,7 @@ public class ZForwardAggregationResultHandler : IRequestHandler<ZForwardAggregat
         var processType = EnumerationType.FromName<ProcessType>(request.Result.ProcessType);
         _transactions.Add(transaction);
 
+        var tmpOutgoingMessage = transaction.CreateMessage(request.Result);
         var outgoingMessage = AggregationResultMessage.Create(gridOperator, MarketRole.MeteredDataResponsible, transaction.Id, processType, CreateFrom(transaction.Id, request.Result));
         _outgoingMessageStore.Add(outgoingMessage);
 
