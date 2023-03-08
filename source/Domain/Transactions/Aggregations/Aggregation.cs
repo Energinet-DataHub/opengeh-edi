@@ -22,11 +22,11 @@ public record Aggregation(
     string MeteringPointType,
     string MeasureUnitType,
     string Resolution,
-    ZPeriod Period,
+    Period Period,
     string? SettlementType,
     string ProcessType,
     string? AggregatedForActor = null);
 
 public record Point(int Position, decimal? Quantity, string Quality, string SampleTime);
 
-public record ZPeriod(Instant Start, Instant End);
+public record Period(Instant Start, Instant End);

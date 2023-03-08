@@ -59,7 +59,7 @@ public class SendAggregationResult : InternalCommand
             result.MeteringPointType.Name,
             result.MeasureUnitType.Name,
             result.Resolution.Name,
-            new ZPeriod(result.Period.Start, result.Period.End),
+            new Period(result.Period.Start, result.Period.End),
             result.SettlementType?.Name,
             ProcessType,
             result.AggregatedForActor?.Value);

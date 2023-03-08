@@ -226,6 +226,6 @@ public class WhenResultsAreRetrievedTests : TestBase
             SampleData.ResultId,
             completedAggregationType.Name,
             SampleData.GridAreaCode,
-            new ZPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod))).ConfigureAwait(false);
+            new Period(SampleData.StartOfPeriod, SampleData.EndOfPeriod))).ConfigureAwait(false);
     }
 }

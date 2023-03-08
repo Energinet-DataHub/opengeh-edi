@@ -65,9 +65,9 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
         };
     }
 
-    private static ZPeriod MapPeriod(CalculationResultCompleted integrationEvent)
+    private static Period MapPeriod(CalculationResultCompleted integrationEvent)
     {
-        return new ZPeriod(integrationEvent.PeriodStartUtc.ToInstant(), integrationEvent.PeriodEndUtc.ToInstant());
+        return new Period(integrationEvent.PeriodStartUtc.ToInstant(), integrationEvent.PeriodEndUtc.ToInstant());
     }
 
     private static string MapResolution(CalculationResultCompleted integrationEvent)

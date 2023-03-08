@@ -28,7 +28,7 @@ namespace Application.Transactions.Aggregations;
 public class RetrieveAggregationResults : InternalCommand
 {
     [JsonConstructor]
-    public RetrieveAggregationResults(Guid id, Guid resultsId, string aggregationProcess, string gridArea, ZPeriod period)
+    public RetrieveAggregationResults(Guid id, Guid resultsId, string aggregationProcess, string gridArea, Period period)
     : base(id)
     {
         AggregationProcess = aggregationProcess;
@@ -37,7 +37,7 @@ public class RetrieveAggregationResults : InternalCommand
         ResultsId = resultsId;
     }
 
-    public RetrieveAggregationResults(Guid resultsId, string aggregationProcess, string gridArea, ZPeriod period)
+    public RetrieveAggregationResults(Guid resultsId, string aggregationProcess, string gridArea, Period period)
     {
         AggregationProcess = aggregationProcess;
         GridArea = gridArea;
@@ -51,7 +51,7 @@ public class RetrieveAggregationResults : InternalCommand
 
     public string GridArea { get; }
 
-    public ZPeriod Period { get; }
+    public Period Period { get; }
 }
 
 public class RetrieveAggregationResultsHandler : IRequestHandler<RetrieveAggregationResults, Unit>
