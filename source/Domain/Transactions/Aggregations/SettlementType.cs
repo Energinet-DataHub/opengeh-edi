@@ -28,4 +28,18 @@ public class SettlementType : EnumerationType
     }
 
     public string Code { get; }
+
+    public static SettlementType From(string settlementType)
+    {
+        var code = GetAll<SettlementType>().Where(
+                type =>
+                    type.Name.Equals(settlementType, StringComparison.OrdinalIgnoreCase) ||
+                    type.Code.Equals(settlementType, StringComparison.OrdinalIgnoreCase))
+            .FirstOrDefault();
+
+        if (string.IsNullOrEmpty(code))
+            throw new InvalidCastException($"Could not parse {settlementType} to metering point type");
+
+        return code;
+    }
 }

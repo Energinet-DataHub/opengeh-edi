@@ -124,6 +124,37 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
             .HasValidStructureAsync(DocumentType.AggregationResult).ConfigureAwait(false);
     }
 
+    [Theory]
+    [InlineData(nameof(SettlementType.Flex), "D01")]
+    public async Task Ensure_settlement_method(string settlementType, string expectedCode)
+    {
+        var header = CreateHeader();
+        var timeSeries = new List<TimeSeries>()
+        {
+            new(
+                Guid.NewGuid(),
+                "870",
+                MeteringPointType.Consumption.Code,
+                settlementType,
+                "KWH",
+                "PT1H",
+                null,
+                null,
+                new Period(
+                    InstantPattern.General.Parse("2022-02-12T23:00:00Z").Value,
+                    InstantPattern.General.Parse("2022-02-13T23:00:00Z").Value),
+                new List<Point> { }),
+        };
+
+        var document = await _messageWriter.WriteAsync(header, timeSeries.Select(record => _parser.From(record)).ToList()).ConfigureAwait(false);
+
+        await AssertXmlDocument
+            .Document(document, NamespacePrefix, _documentValidation.Validator)
+            .HasValue("Series[1]/marketEvaluationPoint.settlementMethod", expectedCode)
+            .HasValidStructureAsync(DocumentType.AggregationResult)
+            .ConfigureAwait(false);
+    }
+
     private static MessageHeader CreateHeader()
     {
         return new MessageHeader(

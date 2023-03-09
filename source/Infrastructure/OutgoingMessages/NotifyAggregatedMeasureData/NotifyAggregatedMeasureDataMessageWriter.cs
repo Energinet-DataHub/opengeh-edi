@@ -57,7 +57,7 @@ public class NotifyAggregatedMeasureDataMessageWriter : MessageWriter
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, timeSeries.TransactionId.ToString()).ConfigureAwait(false);
 
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "marketEvaluationPoint.type", null,  MeteringPointType.ToCode(timeSeries.MeteringPointType)).ConfigureAwait(false);
-            await WriteElementIfHasValueAsync("marketEvaluationPoint.settlementMethod", timeSeries.SettlementType, writer).ConfigureAwait(false);
+            await WriteElementIfHasValueAsync("marketEvaluationPoint.settlementMethod", ToCode(SettlementType.From(timeSeries.SettlementType)), writer).ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "meteringGridArea_Domain.mRID", null).ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "codingScheme", null, "NDK").ConfigureAwait(false);
@@ -110,6 +110,11 @@ public class NotifyAggregatedMeasureDataMessageWriter : MessageWriter
             await writer.WriteEndElementAsync().ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
         }
+    }
+
+    private static string ToCode(SettlementType settlementType)
+    {
+        return settlementType.Code;
     }
 
     private static string ResolveActorCodingScheme(string energySupplierNumber)
