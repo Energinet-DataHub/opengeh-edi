@@ -133,23 +133,6 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
         var aggregationResultBuilder = AggregationResultBuilder
             .AggregationResult();
 
-        var timeSeries = new List<TimeSeries>()
-        {
-            new(
-                Guid.NewGuid(),
-                "870",
-                MeteringPointType.Consumption.Code,
-                settlementType,
-                "KWH",
-                "PT1H",
-                null,
-                null,
-                new Period(
-                    InstantPattern.General.Parse("2022-02-12T23:00:00Z").Value,
-                    InstantPattern.General.Parse("2022-02-13T23:00:00Z").Value),
-                new List<Point> { }),
-        };
-
         var document = await _messageWriter.WriteAsync(
             aggregationResultBuilder.BuildHeader(),
             new[]
