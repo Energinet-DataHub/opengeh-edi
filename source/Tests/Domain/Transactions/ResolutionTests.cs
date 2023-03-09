@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Domain.Transactions;
+using Domain.Transactions.Aggregations;
 using Xunit;
 
 namespace Tests.Domain.Transactions;

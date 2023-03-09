@@ -74,7 +74,7 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
     {
         return integrationEvent.Resolution switch
         {
-            Resolution.Quarter => Domain.Transactions.Resolution.QuarterHourly.Name,
+            Resolution.Quarter => Domain.Transactions.Aggregations.Resolution.QuarterHourly.Name,
             Resolution.Unspecified => throw new InvalidOperationException("Could not map resolution type"),
             _ => throw new InvalidOperationException("Unknown resolution type"),
         };

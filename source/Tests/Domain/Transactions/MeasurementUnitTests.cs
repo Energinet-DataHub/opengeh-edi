@@ -14,6 +14,7 @@
 
 using Domain.SeedWork;
 using Domain.Transactions;
+using Domain.Transactions.Aggregations;
 using Xunit;
 
 namespace Tests.Domain.Transactions;
