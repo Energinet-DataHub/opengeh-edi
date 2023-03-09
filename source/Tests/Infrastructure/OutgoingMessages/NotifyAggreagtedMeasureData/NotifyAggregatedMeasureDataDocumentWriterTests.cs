@@ -126,7 +126,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
 
     [Theory]
     [InlineData(nameof(SettlementType.Flex), "D01")]
-    public async Task Ensure_settlement_method(string settlementType, string expectedCode)
+    public async Task Settlement_method_is_translated(string settlementType, string expectedCode)
     {
         var header = CreateHeader();
         var timeSeries = new List<TimeSeries>()
