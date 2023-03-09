@@ -126,6 +126,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
 
     [Theory]
     [InlineData(nameof(SettlementType.Flex), "D01")]
+    [InlineData(nameof(SettlementType.NonProfiled), "E02")]
     public async Task Settlement_method_is_translated(string settlementType, string expectedCode)
     {
         var header = CreateHeader();
