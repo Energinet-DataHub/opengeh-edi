@@ -29,6 +29,7 @@ using Infrastructure.OutgoingMessages.Common;
 using Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 using NodaTime;
 using NodaTime.Text;
+using Tests.Factories;
 using Tests.Fixtures;
 using Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
@@ -129,7 +130,9 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
     [InlineData(nameof(SettlementType.NonProfiled), "E02")]
     public async Task Settlement_method_is_translated(string settlementType, string expectedCode)
     {
-        var header = CreateHeader();
+        var aggregationResultBuilder = AggregationResultBuilder
+            .AggregationResult();
+
         var timeSeries = new List<TimeSeries>()
         {
             new(
@@ -147,7 +150,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
                 new List<Point> { }),
         };
 
-        var document = await _messageWriter.WriteAsync(header, timeSeries.Select(record => _parser.From(record)).ToList()).ConfigureAwait(false);
+        var document = await _messageWriter.WriteAsync(aggregationResultBuilder.BuildHeader(), timeSeries.Select(record => _parser.From(record)).ToList()).ConfigureAwait(false);
 
         await AssertXmlDocument
             .Document(document, NamespacePrefix, _documentValidation.Validator)
