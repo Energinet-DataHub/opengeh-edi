@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.OutgoingMessages.Common;
@@ -44,12 +45,15 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
     private readonly DocumentValidationFixture _documentValidation;
     private readonly IMessageWriter _messageWriter;
     private readonly IMessageRecordParser _parser;
+    private readonly AggregationResultBuilder _aggregationResultBuilder;
 
     public NotifyAggregatedMeasureDataDocumentWriterTests(DocumentValidationFixture documentValidation)
     {
         _documentValidation = documentValidation;
         _parser = new MessageRecordParser(new Serializer());
         _messageWriter = new NotifyAggregatedMeasureDataMessageWriter(_parser);
+        _aggregationResultBuilder = AggregationResultBuilder
+            .AggregationResult();
     }
 
     [Fact]
@@ -130,15 +134,10 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
     [InlineData(nameof(SettlementType.NonProfiled), "E02")]
     public async Task Settlement_method_is_translated(string settlementType, string expectedCode)
     {
-        var aggregationResultBuilder = AggregationResultBuilder
-            .AggregationResult();
+        _aggregationResultBuilder
+            .WithSettlementMethod(SettlementType.From(settlementType));
 
-        var document = await _messageWriter.WriteAsync(
-            aggregationResultBuilder.BuildHeader(),
-            new[]
-            {
-                _parser.From(aggregationResultBuilder.WithSettlementMethod(SettlementType.From(settlementType)).BuildTimeSeries()),
-            }).ConfigureAwait(false);
+        var document = await CreateDocument(_aggregationResultBuilder).ConfigureAwait(false);
 
         await AssertXmlDocument
             .Document(document, NamespacePrefix, _documentValidation.Validator)
@@ -183,5 +182,15 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
                 }),
         };
         return timeSeries;
+    }
+
+    private Task<Stream> CreateDocument(AggregationResultBuilder resultBuilder)
+    {
+        return _messageWriter.WriteAsync(
+            resultBuilder.BuildHeader(),
+            new[]
+            {
+                _parser.From(resultBuilder.BuildTimeSeries()),
+            });
     }
 }
