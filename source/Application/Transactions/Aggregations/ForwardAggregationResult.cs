@@ -29,16 +29,16 @@ using MediatR;
 
 namespace Application.Transactions.Aggregations;
 
-public class ZForwardAggregationResult : InternalCommand
+public class ForwardAggregationResult : InternalCommand
 {
     [JsonConstructor]
-    public ZForwardAggregationResult(Guid id, Aggregation result)
+    public ForwardAggregationResult(Guid id, Aggregation result)
     : base(id)
     {
         Result = result;
     }
 
-    public ZForwardAggregationResult(Aggregation result)
+    public ForwardAggregationResult(Aggregation result)
     {
         Result = result;
     }
@@ -46,20 +46,20 @@ public class ZForwardAggregationResult : InternalCommand
     public Aggregation Result { get; }
 }
 
-public class ZForwardAggregationResultHandler : IRequestHandler<ZForwardAggregationResult, Unit>
+public class ForwardAggregationResultHandler : IRequestHandler<ForwardAggregationResult, Unit>
 {
     private readonly IGridAreaLookup _gridAreaLookup;
     private readonly IAggregationResultForwardingRepository _transactions;
     private readonly IOutgoingMessageStore _outgoingMessageStore;
 
-    public ZForwardAggregationResultHandler(IGridAreaLookup gridAreaLookup, IAggregationResultForwardingRepository transactions, IOutgoingMessageStore outgoingMessageStore)
+    public ForwardAggregationResultHandler(IGridAreaLookup gridAreaLookup, IAggregationResultForwardingRepository transactions, IOutgoingMessageStore outgoingMessageStore)
     {
         _gridAreaLookup = gridAreaLookup;
         _transactions = transactions;
         _outgoingMessageStore = outgoingMessageStore;
     }
 
-    public async Task<Unit> Handle(ZForwardAggregationResult request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(ForwardAggregationResult request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
         var gridOperator = await _gridAreaLookup.GetGridOperatorForAsync(request.Result.GridArea).ConfigureAwait(false);

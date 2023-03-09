@@ -32,6 +32,6 @@ public class WhenAnAggregationResultIsAvailable : INotificationHandler<Aggregati
     public Task Handle(AggregationResultAvailable notification, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(notification);
-        return _commandSchedulerFacade.EnqueueAsync(new ZForwardAggregationResult(notification.Result));
+        return _commandSchedulerFacade.EnqueueAsync(new ForwardAggregationResult(notification.Result));
     }
 }

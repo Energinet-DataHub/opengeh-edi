@@ -31,7 +31,7 @@ internal static class AggregationsConfiguration
         services.AddSingleton<IGridAreaLookup, GridAreaLookup>();
         services.AddSingleton(aggregationResultsBuilder);
         services.AddTransient<IRequestHandler<SendAggregationResult, Unit>, SendAggregationResultHandler>();
-        services.AddTransient<IRequestHandler<ZForwardAggregationResult, Unit>, ZForwardAggregationResultHandler>();
+        services.AddTransient<IRequestHandler<ForwardAggregationResult, Unit>, ForwardAggregationResultHandler>();
         services.AddTransient<IRequestHandler<RetrieveAggregationResults, Unit>, RetrieveAggregationResultsHandler>();
         services.AddTransient<TransactionScheduler>();
     }
