@@ -45,14 +45,14 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
     private readonly DocumentValidationFixture _documentValidation;
     private readonly IMessageWriter _messageWriter;
     private readonly IMessageRecordParser _parser;
-    private readonly AggregationResultBuilder _aggregationResultBuilder;
+    private readonly AggregationResultBuilder _aggregationResult;
 
     public NotifyAggregatedMeasureDataDocumentWriterTests(DocumentValidationFixture documentValidation)
     {
         _documentValidation = documentValidation;
         _parser = new MessageRecordParser(new Serializer());
         _messageWriter = new NotifyAggregatedMeasureDataMessageWriter(_parser);
-        _aggregationResultBuilder = AggregationResultBuilder
+        _aggregationResult = AggregationResultBuilder
             .AggregationResult();
     }
 
@@ -134,10 +134,10 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
     [InlineData(nameof(SettlementType.NonProfiled), "E02")]
     public async Task Settlement_method_is_translated(string settlementType, string expectedCode)
     {
-        _aggregationResultBuilder
+        _aggregationResult
             .WithSettlementMethod(SettlementType.From(settlementType));
 
-        var document = await CreateDocument(_aggregationResultBuilder).ConfigureAwait(false);
+        var document = await CreateDocument(_aggregationResult).ConfigureAwait(false);
 
         await AssertXmlDocument
             .Document(document, NamespacePrefix, _documentValidation.Validator)
