@@ -150,7 +150,12 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
                 new List<Point> { }),
         };
 
-        var document = await _messageWriter.WriteAsync(aggregationResultBuilder.BuildHeader(), timeSeries.Select(record => _parser.From(record)).ToList()).ConfigureAwait(false);
+        var document = await _messageWriter.WriteAsync(
+            aggregationResultBuilder.BuildHeader(),
+            new[]
+            {
+                _parser.From(aggregationResultBuilder.WithSettlementMethod(SettlementType.From(settlementType)).BuildTimeSeries()),
+            }).ConfigureAwait(false);
 
         await AssertXmlDocument
             .Document(document, NamespacePrefix, _documentValidation.Validator)

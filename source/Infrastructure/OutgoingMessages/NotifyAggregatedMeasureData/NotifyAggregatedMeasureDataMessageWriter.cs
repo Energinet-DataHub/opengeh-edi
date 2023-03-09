@@ -23,8 +23,10 @@ using Application.OutgoingMessages.Common.Xml;
 using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using Infrastructure.OutgoingMessages.Common.Xml;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 using NodaTime;
 using Point = Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
 
@@ -84,10 +86,10 @@ public class NotifyAggregatedMeasureDataMessageWriter : MessageWriter
 
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "product", null, ActiveEnergy).ConfigureAwait(false);
 
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity_Measure_Unit.name", null, timeSeries.MeasureUnitType).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity_Measure_Unit.name", null, MeasureUnitTypeCodeFrom(timeSeries.MeasureUnitType)).ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Period", null).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "resolution", null, timeSeries.Resolution).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "resolution", null, ResolutionCodeFrom(timeSeries.Resolution)).ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "timeInterval", null).ConfigureAwait(false);
 
@@ -111,6 +113,25 @@ public class NotifyAggregatedMeasureDataMessageWriter : MessageWriter
             await writer.WriteEndElementAsync().ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
         }
+    }
+
+    private static string ResolutionCodeFrom(string valueToParse)
+    {
+        var resolution = Resolution.From(valueToParse);
+        if (resolution == Resolution.QuarterHourly)
+            return "PT15M";
+        if (resolution == Resolution.Hourly)
+            return "PT1H";
+        return valueToParse;
+    }
+
+    private static string MeasureUnitTypeCodeFrom(string valueToParse)
+    {
+        var measureUnitType = MeasurementUnit.From(valueToParse);
+        if (measureUnitType == MeasurementUnit.Kwh)
+            return "KWH";
+
+        return valueToParse;
     }
 
     private static string? SettlementMethodToCode(string? value)

@@ -13,14 +13,22 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Domain.Actors;
 using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
+using Domain.Transactions;
+using Domain.Transactions.Aggregations;
 using NodaTime;
+using Period = Domain.Transactions.Aggregations.Period;
+using Point = Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
 
 namespace Tests.Factories;
 
 public class AggregationResultBuilder
 {
+    private readonly List<Point> _points = new();
     private readonly string _messageId = Guid.NewGuid().ToString();
     private readonly Instant _timeStamp = SystemClock.Instance.GetCurrentInstant();
     private ProcessType _processType = ProcessType.BalanceFixing;
@@ -28,6 +36,15 @@ public class AggregationResultBuilder
     private MarketRole _receiverRole = MarketRole.MeteredDataResponsible;
     private string _senderNumber = "1234567890321";
     private MarketRole _senderRole = MarketRole.MeteringDataAdministrator;
+    private Guid _transactionId = Guid.NewGuid();
+    private string _gridAreaCode = "870";
+    private MeteringPointType _meteringPointType = MeteringPointType.Consumption;
+    private SettlementType _settlementMethod = SettlementType.NonProfiled;
+    private MeasurementUnit _measurementUnit = MeasurementUnit.Kwh;
+    private Resolution _resolution = Resolution.QuarterHourly;
+    private string? _energySupplierNumber;
+    private string? _balanceResponsibleNumber;
+    private Period _period = new(SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(5)), SystemClock.Instance.GetCurrentInstant());
 
     public static AggregationResultBuilder AggregationResult()
     {
@@ -54,6 +71,60 @@ public class AggregationResultBuilder
         return this;
     }
 
+    public AggregationResultBuilder WithTransactionId(Guid transactionId)
+    {
+        _transactionId = transactionId;
+        return this;
+    }
+
+    public AggregationResultBuilder WithGridArea(string gridAreaCode)
+    {
+        _gridAreaCode = gridAreaCode;
+        return this;
+    }
+
+    public AggregationResultBuilder WithMeteringPointType(MeteringPointType meteringPointType)
+    {
+        _meteringPointType = meteringPointType;
+        return this;
+    }
+
+    public AggregationResultBuilder WithSettlementMethod(SettlementType settlementType)
+    {
+        _settlementMethod = settlementType;
+        return this;
+    }
+
+    public AggregationResultBuilder WithMeasurementUnit(MeasurementUnit measurementUnit)
+    {
+        _measurementUnit = measurementUnit;
+        return this;
+    }
+
+    public AggregationResultBuilder WithResolution(Resolution resolution)
+    {
+        _resolution = resolution;
+        return this;
+    }
+
+    public AggregationResultBuilder WithEnergySupplierNumber(string balanceResponsibleNumber)
+    {
+        _energySupplierNumber = balanceResponsibleNumber;
+        return this;
+    }
+
+    public AggregationResultBuilder WithBalanceResponsibleNumber(string balanceResponsibleNumber)
+    {
+        _balanceResponsibleNumber = balanceResponsibleNumber;
+        return this;
+    }
+
+    public AggregationResultBuilder WithPeriod(Period period)
+    {
+        _period = period;
+        return this;
+    }
+
     public MessageHeader BuildHeader()
     {
         return new MessageHeader(
@@ -64,5 +135,20 @@ public class AggregationResultBuilder
             _receiverRole.Name,
             _messageId,
             _timeStamp);
+    }
+
+    public TimeSeries BuildTimeSeries()
+    {
+        return new TimeSeries(
+            _transactionId,
+            _gridAreaCode,
+            _meteringPointType.Name,
+            _settlementMethod.Name,
+            _measurementUnit.Name,
+            _resolution.Name,
+            _energySupplierNumber,
+            _balanceResponsibleNumber,
+            _period,
+            _points);
     }
 }
