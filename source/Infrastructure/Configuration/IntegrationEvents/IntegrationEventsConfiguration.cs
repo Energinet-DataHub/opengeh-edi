@@ -29,5 +29,6 @@ public static class IntegrationEventsConfiguration
         services.AddSingleton<IntegrationEventReceiver>();
         services.AddSingleton<IntegrationEventsProcessor>();
         services.AddTransient<IIntegrationEventMapper, BalanceFixingCompletedEventMapper>();
+        services.AddTransient<IIntegrationEventMapper, CalculationResultCompletedEventMapper>();
     }
 }

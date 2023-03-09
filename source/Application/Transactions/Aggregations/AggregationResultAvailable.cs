@@ -12,18 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using Domain.Transactions.Aggregations;
+using MediatR;
 
 namespace Application.Transactions.Aggregations;
 
-public record Aggregation(
-    IReadOnlyList<Point> Points,
-    string GridArea,
-    string MeteringPointType,
-    string MeasureUnitType,
-    string Resolution,
-    Period Period,
-    string? SettlementType,
-    string? AggregatedForActor = null);
+public class AggregationResultAvailable : INotification
+{
+    public AggregationResultAvailable(Aggregation result)
+    {
+        Result = result;
+    }
 
-public record Point(int Position, decimal? Quantity, string Quality, string SampleTime);
+    public Aggregation Result { get; }
+}

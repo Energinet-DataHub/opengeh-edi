@@ -12,20 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Domain.Actors;
+using Domain.OutgoingMessages;
 using Domain.SeedWork;
 
 namespace Domain.Transactions.Aggregations;
 
-public class SettlementType : EnumerationType
+public class TransactionFactory
 {
-    public static readonly SettlementType NonProfiled = new(0, nameof(NonProfiled), "E02");
-    public static readonly SettlementType Flex = new(0, nameof(Flex), "XXX");
+    private readonly ActorNumber _gridOperator;
 
-    private SettlementType(int id, string name, string code)
-        : base(id, name)
+    public TransactionFactory(ActorNumber gridOperator)
     {
-        Code = code;
+        _gridOperator = gridOperator;
     }
 
-    public string Code { get; }
+    public AggregationResultForwarding CreateFrom(Aggregation result)
+    {
+        ArgumentNullException.ThrowIfNull(result);
+        var processType = EnumerationType.FromName<ProcessType>(result.ProcessType);
+        return new AggregationResultForwarding(TransactionId.New(), _gridOperator, MarketRole.MeteredDataResponsible, processType);
+    }
 }

@@ -16,15 +16,17 @@ using NodaTime;
 
 namespace Domain.Transactions.Aggregations;
 
-public class Period
-{
-    public Period(Instant start, Instant end)
-    {
-        Start = start;
-        End = end;
-    }
+public record Aggregation(
+    IReadOnlyList<Point> Points,
+    string GridArea,
+    string MeteringPointType,
+    string MeasureUnitType,
+    string Resolution,
+    Period Period,
+    string? SettlementType,
+    string ProcessType,
+    string? AggregatedForActor = null);
 
-    public Instant Start { get; }
+public record Point(int Position, decimal? Quantity, string Quality, string SampleTime);
 
-    public Instant End { get; }
-}
+public record Period(Instant Start, Instant End);

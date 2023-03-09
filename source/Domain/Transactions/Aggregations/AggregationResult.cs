@@ -22,7 +22,7 @@ public class AggregationResult
 {
     public AggregationResult(
         Guid id,
-        IReadOnlyList<Point> points,
+        IReadOnlyList<OutgoingMessages.NotifyAggregatedMeasureData.Point> points,
         GridArea gridArea,
         MeteringPointType meteringPointType,
         MeasurementUnit measureUnitType,
@@ -48,7 +48,7 @@ public class AggregationResult
 
     public Guid Id { get; }
 
-    public IReadOnlyList<Point> Points { get; }
+    public IReadOnlyList<OutgoingMessages.NotifyAggregatedMeasureData.Point> Points { get; }
 
     public GridArea GridArea { get; }
 
@@ -75,7 +75,7 @@ public class AggregationResult
         MeasurementUnit measureUnitType,
         Resolution resolution,
         Period period,
-        IReadOnlyList<Point> points,
+        IReadOnlyList<OutgoingMessages.NotifyAggregatedMeasureData.Point> points,
         ActorNumber? aggregatedForActor = null)
     {
         return new AggregationResult(
@@ -96,7 +96,7 @@ public class AggregationResult
         MeasurementUnit measurementUnitType,
         Resolution resolution,
         Period period,
-        IReadOnlyList<Point> points)
+        IReadOnlyList<OutgoingMessages.NotifyAggregatedMeasureData.Point> points)
     {
         return new AggregationResult(
             id,

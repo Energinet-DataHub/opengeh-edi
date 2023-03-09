@@ -47,4 +47,10 @@ public class AggregationResultForwarding : Entity
     {
         _messages.Add(AggregationResultMessage.Create(_receivingActor, _receivingActorRole, Id, _processType, aggregationResult));
     }
+
+    public AggregationResultMessage CreateMessage(Aggregation result)
+    {
+        ArgumentNullException.ThrowIfNull(result);
+        return AggregationResultMessage.Create(_receivingActor, _receivingActorRole, Id, result);
+    }
 }
