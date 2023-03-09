@@ -14,6 +14,7 @@
 
 using Domain.Actors;
 using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions.Aggregations;
 using Tests.Factories;
 using Xunit;
@@ -22,20 +23,31 @@ namespace Tests.Domain.Transactions.Aggregations;
 
 public class TransactionFactoryTests
 {
+    private readonly AggregationResultBuilder _aggregationResult;
+
+    public TransactionFactoryTests()
+    {
+        _aggregationResult = new AggregationResultBuilder();
+    }
+
     [Fact]
     public void Create_transaction_for_grid_operator_when_result_is_total_production()
     {
         var gridOperatorNumber = ActorNumber.Create("1234567890123");
         var factory = new TransactionFactory(gridOperatorNumber);
-        var aggregationResult = new AggregationResultBuilder();
-        aggregationResult
+        _aggregationResult
             .WithMeteringPointType(MeteringPointType.Production);
-        var aggregation = aggregationResult.Build();
-        var transaction = factory.CreateFrom(aggregation);
 
-        var message = transaction.CreateMessage(aggregation);
+        var message = CreateMessage(factory);
 
         Assert.Equal(MarketRole.MeteredDataResponsible, message.ReceiverRole);
         Assert.Equal(gridOperatorNumber, message.ReceiverId);
+    }
+
+    private AggregationResultMessage CreateMessage(TransactionFactory factory)
+    {
+        var aggregation = _aggregationResult.Build();
+        var transaction = factory.CreateFrom(aggregation);
+        return transaction.CreateMessage(aggregation);
     }
 }
