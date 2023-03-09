@@ -14,6 +14,7 @@
 
 using System.Text.Json;
 using Domain.Actors;
+using Domain.SeedWork;
 using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 
@@ -63,6 +64,36 @@ public class AggregationResultMessage : OutgoingMessage
             receiverNumber,
             transactionId,
             processType.Code,
+            receiverRole,
+            series);
+    }
+
+    public static AggregationResultMessage Create(
+        ActorNumber receiverNumber,
+        MarketRole receiverRole,
+        TransactionId transactionId,
+        Aggregation result)
+    {
+        ArgumentNullException.ThrowIfNull(transactionId);
+        ArgumentNullException.ThrowIfNull(result);
+        ArgumentNullException.ThrowIfNull(receiverNumber);
+
+        var series = new TimeSeries(
+            transactionId.Id,
+            result.GridArea,
+            result.MeteringPointType,
+            result.SettlementType,
+            result.MeasureUnitType,
+            result.Resolution,
+            null,
+            null,
+            result.Period,
+            result.Points.Select(p => new Point(p.Position, p.Quantity, p.Quality, p.SampleTime)).ToList());
+
+        return new AggregationResultMessage(
+            receiverNumber,
+            transactionId,
+            EnumerationType.FromName<ProcessType>(result.ProcessType).Code,
             receiverRole,
             series);
     }

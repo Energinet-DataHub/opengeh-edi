@@ -61,6 +61,7 @@ public class SendAggregationResult : InternalCommand
             result.Resolution.Name,
             new Period(result.Period.Start, result.Period.End),
             result.SettlementType?.Name,
+            ProcessType,
             result.AggregatedForActor?.Value);
     }
 

@@ -21,6 +21,7 @@ using Domain.Transactions.Aggregations;
 using NodaTime;
 using Xunit;
 using Period = Domain.Transactions.Aggregations.Period;
+using Point = Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
 
 namespace Tests.Domain.Transactions.Aggregations;
 

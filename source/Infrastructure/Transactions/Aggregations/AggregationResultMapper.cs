@@ -20,6 +20,7 @@ using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using Infrastructure.Configuration.Serialization;
+using Point = Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
 
 namespace Infrastructure.Transactions.Aggregations;
 
