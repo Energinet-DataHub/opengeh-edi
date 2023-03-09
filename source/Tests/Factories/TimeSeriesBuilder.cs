@@ -26,7 +26,7 @@ using Point = Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
 
 namespace Tests.Factories;
 
-public class AggregationResultBuilder
+public class TimeSeriesBuilder
 {
     private readonly List<Point> _points = new();
     private readonly string _messageId = Guid.NewGuid().ToString();
@@ -46,80 +46,80 @@ public class AggregationResultBuilder
     private string? _balanceResponsibleNumber;
     private Period _period = new(SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(5)), SystemClock.Instance.GetCurrentInstant());
 
-    public static AggregationResultBuilder AggregationResult()
+    public static TimeSeriesBuilder AggregationResult()
     {
-        return new AggregationResultBuilder();
+        return new TimeSeriesBuilder();
     }
 
-    public AggregationResultBuilder WithProcessType(ProcessType processType)
+    public TimeSeriesBuilder WithProcessType(ProcessType processType)
     {
         _processType = processType;
         return this;
     }
 
-    public AggregationResultBuilder WithReceiver(string receiverNumber, MarketRole marketRole)
+    public TimeSeriesBuilder WithReceiver(string receiverNumber, MarketRole marketRole)
     {
         _receiverNumber = receiverNumber;
         _receiverRole = marketRole;
         return this;
     }
 
-    public AggregationResultBuilder WithSender(string senderNumber, MarketRole marketRole)
+    public TimeSeriesBuilder WithSender(string senderNumber, MarketRole marketRole)
     {
         _senderNumber = senderNumber;
         _senderRole = marketRole;
         return this;
     }
 
-    public AggregationResultBuilder WithTransactionId(Guid transactionId)
+    public TimeSeriesBuilder WithTransactionId(Guid transactionId)
     {
         _transactionId = transactionId;
         return this;
     }
 
-    public AggregationResultBuilder WithGridArea(string gridAreaCode)
+    public TimeSeriesBuilder WithGridArea(string gridAreaCode)
     {
         _gridAreaCode = gridAreaCode;
         return this;
     }
 
-    public AggregationResultBuilder WithMeteringPointType(MeteringPointType meteringPointType)
+    public TimeSeriesBuilder WithMeteringPointType(MeteringPointType meteringPointType)
     {
         _meteringPointType = meteringPointType;
         return this;
     }
 
-    public AggregationResultBuilder WithSettlementMethod(SettlementType settlementType)
+    public TimeSeriesBuilder WithSettlementMethod(SettlementType settlementType)
     {
         _settlementMethod = settlementType;
         return this;
     }
 
-    public AggregationResultBuilder WithMeasurementUnit(MeasurementUnit measurementUnit)
+    public TimeSeriesBuilder WithMeasurementUnit(MeasurementUnit measurementUnit)
     {
         _measurementUnit = measurementUnit;
         return this;
     }
 
-    public AggregationResultBuilder WithResolution(Resolution resolution)
+    public TimeSeriesBuilder WithResolution(Resolution resolution)
     {
         _resolution = resolution;
         return this;
     }
 
-    public AggregationResultBuilder WithEnergySupplierNumber(string balanceResponsibleNumber)
+    public TimeSeriesBuilder WithEnergySupplierNumber(string balanceResponsibleNumber)
     {
         _energySupplierNumber = balanceResponsibleNumber;
         return this;
     }
 
-    public AggregationResultBuilder WithBalanceResponsibleNumber(string balanceResponsibleNumber)
+    public TimeSeriesBuilder WithBalanceResponsibleNumber(string balanceResponsibleNumber)
     {
         _balanceResponsibleNumber = balanceResponsibleNumber;
         return this;
     }
 
-    public AggregationResultBuilder WithPeriod(Period period)
+    public TimeSeriesBuilder WithPeriod(Period period)
     {
         _period = period;
         return this;

@@ -45,14 +45,14 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
     private readonly DocumentValidationFixture _documentValidation;
     private readonly IMessageWriter _messageWriter;
     private readonly IMessageRecordParser _parser;
-    private readonly AggregationResultBuilder _aggregationResult;
+    private readonly TimeSeriesBuilder _timeSeries;
 
     public NotifyAggregatedMeasureDataDocumentWriterTests(DocumentValidationFixture documentValidation)
     {
         _documentValidation = documentValidation;
         _parser = new MessageRecordParser(new Serializer());
         _messageWriter = new NotifyAggregatedMeasureDataMessageWriter(_parser);
-        _aggregationResult = AggregationResultBuilder
+        _timeSeries = TimeSeriesBuilder
             .AggregationResult();
     }
 
@@ -134,10 +134,10 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
     [InlineData(nameof(SettlementType.NonProfiled), "E02")]
     public async Task Settlement_method_is_translated(string settlementType, string expectedCode)
     {
-        _aggregationResult
+        _timeSeries
             .WithSettlementMethod(SettlementType.From(settlementType));
 
-        var document = await CreateDocument(_aggregationResult).ConfigureAwait(false);
+        var document = await CreateDocument(_timeSeries).ConfigureAwait(false);
 
         await AssertXmlDocument
             .Document(document, NamespacePrefix, _documentValidation.Validator)
@@ -184,7 +184,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
         return timeSeries;
     }
 
-    private Task<Stream> CreateDocument(AggregationResultBuilder resultBuilder)
+    private Task<Stream> CreateDocument(TimeSeriesBuilder resultBuilder)
     {
         return _messageWriter.WriteAsync(
             resultBuilder.BuildHeader(),
