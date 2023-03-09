@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.OutgoingMessages.Common;
@@ -29,6 +30,7 @@ using Infrastructure.OutgoingMessages.Common;
 using Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 using NodaTime;
 using NodaTime.Text;
+using Tests.Factories;
 using Tests.Fixtures;
 using Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
@@ -43,12 +45,15 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
     private readonly DocumentValidationFixture _documentValidation;
     private readonly IMessageWriter _messageWriter;
     private readonly IMessageRecordParser _parser;
+    private readonly TimeSeriesBuilder _timeSeries;
 
     public NotifyAggregatedMeasureDataDocumentWriterTests(DocumentValidationFixture documentValidation)
     {
         _documentValidation = documentValidation;
         _parser = new MessageRecordParser(new Serializer());
         _messageWriter = new NotifyAggregatedMeasureDataMessageWriter(_parser);
+        _timeSeries = TimeSeriesBuilder
+            .AggregationResult();
     }
 
     [Fact]
@@ -124,6 +129,23 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
             .HasValidStructureAsync(DocumentType.AggregationResult).ConfigureAwait(false);
     }
 
+    [Theory]
+    [InlineData(nameof(SettlementType.Flex), "D01")]
+    [InlineData(nameof(SettlementType.NonProfiled), "E02")]
+    public async Task Settlement_method_is_translated(string settlementType, string expectedCode)
+    {
+        _timeSeries
+            .WithSettlementMethod(SettlementType.From(settlementType));
+
+        var document = await CreateDocument(_timeSeries).ConfigureAwait(false);
+
+        await AssertXmlDocument
+            .Document(document, NamespacePrefix, _documentValidation.Validator)
+            .HasValue("Series[1]/marketEvaluationPoint.settlementMethod", expectedCode)
+            .HasValidStructureAsync(DocumentType.AggregationResult)
+            .ConfigureAwait(false);
+    }
+
     private static MessageHeader CreateHeader()
     {
         return new MessageHeader(
@@ -160,5 +182,15 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
                 }),
         };
         return timeSeries;
+    }
+
+    private Task<Stream> CreateDocument(TimeSeriesBuilder resultBuilder)
+    {
+        return _messageWriter.WriteAsync(
+            resultBuilder.BuildHeader(),
+            new[]
+            {
+                _parser.From(resultBuilder.BuildTimeSeries()),
+            });
     }
 }
