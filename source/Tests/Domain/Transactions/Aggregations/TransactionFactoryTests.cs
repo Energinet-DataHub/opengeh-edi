@@ -31,7 +31,7 @@ public class TransactionFactoryTests
     }
 
     [Fact]
-    public void Create_transaction_for_grid_operator_when_result_is_total_production()
+    public void Create_message_for_grid_operator_when_result_is_total_production()
     {
         var gridOperatorNumber = ActorNumber.Create("1234567890123");
         var factory = new TransactionFactory(gridOperatorNumber);
