@@ -146,6 +146,22 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
             .ConfigureAwait(false);
     }
 
+    [Theory]
+    [InlineData(nameof(ProcessType.BalanceFixing), "D04")]
+    public async Task ProcessType_is_translated(string processType, string expectedCode)
+    {
+        _timeSeries
+            .WithProcessType(ProcessType.From(processType));
+
+        var document = await CreateDocument(_timeSeries).ConfigureAwait(false);
+
+        await AssertXmlDocument
+            .Document(document, NamespacePrefix, _documentValidation.Validator)
+            .HasValue("process.processType", expectedCode)
+            .HasValidStructureAsync(DocumentType.AggregationResult)
+            .ConfigureAwait(false);
+    }
+
     private static MessageHeader CreateHeader()
     {
         return new MessageHeader(
