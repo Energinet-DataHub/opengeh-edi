@@ -162,6 +162,23 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
             .ConfigureAwait(false);
     }
 
+    [Theory]
+    [InlineData(nameof(MeteringPointType.Consumption), "E17")]
+    [InlineData(nameof(MeteringPointType.Production), "E18")]
+    public async Task MeteringPointType_is_translated(string meteringPointType, string expectedCode)
+    {
+        _timeSeries
+            .WithMeteringPointType(EnumerationType.FromName<MeteringPointType>(meteringPointType));
+
+        var document = await CreateDocument(_timeSeries).ConfigureAwait(false);
+
+        await AssertXmlDocument
+            .Document(document, NamespacePrefix, _documentValidation.Validator)
+            .HasValue("Series[1]/marketEvaluationPoint.type", expectedCode)
+            .HasValidStructureAsync(DocumentType.AggregationResult)
+            .ConfigureAwait(false);
+    }
+
     private static MessageHeader CreateHeader()
     {
         return new MessageHeader(
