@@ -24,6 +24,7 @@ using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.SeedWork;
+using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.OutgoingMessages.Common;
@@ -175,6 +176,39 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
         await AssertXmlDocument
             .Document(document, NamespacePrefix, _documentValidation.Validator)
             .HasValue("Series[1]/marketEvaluationPoint.type", expectedCode)
+            .HasValidStructureAsync(DocumentType.AggregationResult)
+            .ConfigureAwait(false);
+    }
+
+    [Theory]
+    [InlineData(nameof(MeasurementUnit.Kwh), "KWH")]
+    public async Task MeasurementUnit_is_translated(string measurementUnit, string expectedCode)
+    {
+        _timeSeries
+            .WithMeasurementUnit(EnumerationType.FromName<MeasurementUnit>(measurementUnit));
+
+        var document = await CreateDocument(_timeSeries).ConfigureAwait(false);
+
+        await AssertXmlDocument
+            .Document(document, NamespacePrefix, _documentValidation.Validator)
+            .HasValue("Series[1]/quantity_Measure_Unit.name", expectedCode)
+            .HasValidStructureAsync(DocumentType.AggregationResult)
+            .ConfigureAwait(false);
+    }
+
+    [Theory]
+    [InlineData(nameof(Resolution.Hourly), "PT1H")]
+    [InlineData(nameof(Resolution.QuarterHourly), "PT15M")]
+    public async Task Resolution_is_translated(string resolution, string expectedCode)
+    {
+        _timeSeries
+            .WithResolution(EnumerationType.FromName<Resolution>(resolution));
+
+        var document = await CreateDocument(_timeSeries).ConfigureAwait(false);
+
+        await AssertXmlDocument
+            .Document(document, NamespacePrefix, _documentValidation.Validator)
+            .HasValue("Series[1]/Period/resolution", expectedCode)
             .HasValidStructureAsync(DocumentType.AggregationResult)
             .ConfigureAwait(false);
     }
