@@ -23,14 +23,14 @@ Currently we support the CIM XML format. The EDI domain will also support the fo
 
 ## Domain Roadmap
 
-In this program increment we are working on
+In this sprint we are working on
 
-- Sending out calculation results for calculated flex consumption for the balance responsible party
+- Send out results for non-profiled consumption per gridarea to the balance supplier.
+
+In the next sprint we are working on
+
+- Actors are able to receive messages in CIM JSON format. 
 - Creating acceptance test for testing message flow
-
-In the next program increment we are working on
-
-- Sending out calculation results for calculated flex consumption for the Balance supplier
 
 ## Getting Started
 
