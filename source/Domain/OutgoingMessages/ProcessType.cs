@@ -29,15 +29,10 @@ public sealed class ProcessType : EnumerationType
 
     public string Code { get; }
 
-    public static ProcessType From(string valueToParse)
+    public static ProcessType? From(string valueToParse)
     {
-        var processType = GetAll<ProcessType>().FirstOrDefault(processType =>
+        return GetAll<ProcessType>().FirstOrDefault(processType =>
             processType.Name.Equals(valueToParse, StringComparison.OrdinalIgnoreCase) ||
             processType.Code.Equals(valueToParse, StringComparison.OrdinalIgnoreCase));
-
-        if (processType is null)
-            throw new InvalidCastException($"Could not parse {valueToParse} to process type");
-
-        return processType;
     }
 }

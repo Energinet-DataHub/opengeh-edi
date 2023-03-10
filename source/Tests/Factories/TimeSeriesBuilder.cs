@@ -59,8 +59,9 @@ public class TimeSeriesBuilder
         return this;
     }
 
-    public TimeSeriesBuilder WithProcessType(ProcessType processType)
+    public TimeSeriesBuilder WithProcessType(ProcessType? processType)
     {
+        ArgumentNullException.ThrowIfNull(processType);
         _processType = processType;
         return this;
     }
