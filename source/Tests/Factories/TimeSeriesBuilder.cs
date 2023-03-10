@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Domain.Actors;
 using Domain.OutgoingMessages;
@@ -28,9 +29,9 @@ namespace Tests.Factories;
 
 public class TimeSeriesBuilder
 {
-    private readonly List<Point> _points = new();
     private readonly string _messageId = Guid.NewGuid().ToString();
     private readonly Instant _timeStamp = SystemClock.Instance.GetCurrentInstant();
+    private readonly List<Point> _points = new();
     private ProcessType _processType = ProcessType.BalanceFixing;
     private string _receiverNumber = "1234567890123";
     private MarketRole _receiverRole = MarketRole.MeteredDataResponsible;
@@ -49,6 +50,13 @@ public class TimeSeriesBuilder
     public static TimeSeriesBuilder AggregationResult()
     {
         return new TimeSeriesBuilder();
+    }
+
+    public TimeSeriesBuilder WithPoint(Point point)
+    {
+        _points.Add(point);
+
+        return this;
     }
 
     public TimeSeriesBuilder WithProcessType(ProcessType processType)

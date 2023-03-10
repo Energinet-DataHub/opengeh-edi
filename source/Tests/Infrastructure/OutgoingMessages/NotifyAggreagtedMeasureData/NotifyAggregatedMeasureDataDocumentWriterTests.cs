@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -209,6 +210,26 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
         await AssertXmlDocument
             .Document(document, NamespacePrefix, _documentValidation.Validator)
             .HasValue("Series[1]/Period/resolution", expectedCode)
+            .HasValidStructureAsync(DocumentType.AggregationResult)
+            .ConfigureAwait(false);
+    }
+
+    [Theory]
+    [InlineData(nameof(Quality.Missing), "A02")]
+    [InlineData(nameof(Quality.Estimated), "A03")]
+    [InlineData(nameof(Quality.Incomplete), "A05")]
+    [InlineData(nameof(Quality.Calculated), "A06")]
+    public async Task Quality_is_translated(string quality, string expectedCode)
+    {
+        var point = new Point(1, 1111, EnumerationType.FromName<Quality>(quality).Code, "SampleTime");
+        _timeSeries
+            .WithPoint(point);
+
+        var document = await CreateDocument(_timeSeries).ConfigureAwait(false);
+
+        await AssertXmlDocument
+            .Document(document, NamespacePrefix, _documentValidation.Validator)
+            .HasValue("Series[1]/Period/Point[1]/quality", expectedCode)
             .HasValidStructureAsync(DocumentType.AggregationResult)
             .ConfigureAwait(false);
     }
