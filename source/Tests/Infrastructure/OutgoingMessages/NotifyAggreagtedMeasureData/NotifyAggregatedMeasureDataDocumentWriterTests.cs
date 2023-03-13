@@ -14,7 +14,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.OutgoingMessages.Common;
@@ -23,12 +25,14 @@ using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.SeedWork;
+using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.OutgoingMessages.Common;
 using Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 using NodaTime;
 using NodaTime.Text;
+using Tests.Factories;
 using Tests.Fixtures;
 using Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
@@ -43,12 +47,15 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
     private readonly DocumentValidationFixture _documentValidation;
     private readonly IMessageWriter _messageWriter;
     private readonly IMessageRecordParser _parser;
+    private readonly TimeSeriesBuilder _timeSeries;
 
     public NotifyAggregatedMeasureDataDocumentWriterTests(DocumentValidationFixture documentValidation)
     {
         _documentValidation = documentValidation;
         _parser = new MessageRecordParser(new Serializer());
         _messageWriter = new NotifyAggregatedMeasureDataMessageWriter(_parser);
+        _timeSeries = TimeSeriesBuilder
+            .AggregationResult();
     }
 
     [Fact]
@@ -124,6 +131,109 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
             .HasValidStructureAsync(DocumentType.AggregationResult).ConfigureAwait(false);
     }
 
+    [Theory]
+    [InlineData(nameof(SettlementType.Flex), "D01")]
+    [InlineData(nameof(SettlementType.NonProfiled), "E02")]
+    public async Task Settlement_method_is_translated(string settlementType, string expectedCode)
+    {
+        _timeSeries
+            .WithSettlementMethod(SettlementType.From(settlementType));
+
+        var document = await CreateDocument(_timeSeries).ConfigureAwait(false);
+
+        await AssertXmlDocument
+            .Document(document, NamespacePrefix, _documentValidation.Validator)
+            .HasValue("Series[1]/marketEvaluationPoint.settlementMethod", expectedCode)
+            .HasValidStructureAsync(DocumentType.AggregationResult)
+            .ConfigureAwait(false);
+    }
+
+    [Theory]
+    [InlineData(nameof(ProcessType.BalanceFixing), "D04")]
+    public async Task ProcessType_is_translated(string processType, string expectedCode)
+    {
+        _timeSeries
+            .WithProcessType(ProcessType.From(processType));
+
+        var document = await CreateDocument(_timeSeries).ConfigureAwait(false);
+
+        await AssertXmlDocument
+            .Document(document, NamespacePrefix, _documentValidation.Validator)
+            .HasValue("process.processType", expectedCode)
+            .HasValidStructureAsync(DocumentType.AggregationResult)
+            .ConfigureAwait(false);
+    }
+
+    [Theory]
+    [InlineData(nameof(MeteringPointType.Consumption), "E17")]
+    [InlineData(nameof(MeteringPointType.Production), "E18")]
+    public async Task MeteringPointType_is_translated(string meteringPointType, string expectedCode)
+    {
+        _timeSeries
+            .WithMeteringPointType(EnumerationType.FromName<MeteringPointType>(meteringPointType));
+
+        var document = await CreateDocument(_timeSeries).ConfigureAwait(false);
+
+        await AssertXmlDocument
+            .Document(document, NamespacePrefix, _documentValidation.Validator)
+            .HasValue("Series[1]/marketEvaluationPoint.type", expectedCode)
+            .HasValidStructureAsync(DocumentType.AggregationResult)
+            .ConfigureAwait(false);
+    }
+
+    [Theory]
+    [InlineData(nameof(MeasurementUnit.Kwh), "KWH")]
+    public async Task MeasurementUnit_is_translated(string measurementUnit, string expectedCode)
+    {
+        _timeSeries
+            .WithMeasurementUnit(EnumerationType.FromName<MeasurementUnit>(measurementUnit));
+
+        var document = await CreateDocument(_timeSeries).ConfigureAwait(false);
+
+        await AssertXmlDocument
+            .Document(document, NamespacePrefix, _documentValidation.Validator)
+            .HasValue("Series[1]/quantity_Measure_Unit.name", expectedCode)
+            .HasValidStructureAsync(DocumentType.AggregationResult)
+            .ConfigureAwait(false);
+    }
+
+    [Theory]
+    [InlineData(nameof(Resolution.Hourly), "PT1H")]
+    [InlineData(nameof(Resolution.QuarterHourly), "PT15M")]
+    public async Task Resolution_is_translated(string resolution, string expectedCode)
+    {
+        _timeSeries
+            .WithResolution(EnumerationType.FromName<Resolution>(resolution));
+
+        var document = await CreateDocument(_timeSeries).ConfigureAwait(false);
+
+        await AssertXmlDocument
+            .Document(document, NamespacePrefix, _documentValidation.Validator)
+            .HasValue("Series[1]/Period/resolution", expectedCode)
+            .HasValidStructureAsync(DocumentType.AggregationResult)
+            .ConfigureAwait(false);
+    }
+
+    [Theory]
+    [InlineData(nameof(Quality.Missing), "A02")]
+    [InlineData(nameof(Quality.Estimated), "A03")]
+    [InlineData(nameof(Quality.Incomplete), "A05")]
+    [InlineData(nameof(Quality.Calculated), "A06")]
+    public async Task Quality_is_translated(string quality, string expectedCode)
+    {
+        var point = new Point(1, 1111, EnumerationType.FromName<Quality>(quality).Code, "SampleTime");
+        _timeSeries
+            .WithPoint(point);
+
+        var document = await CreateDocument(_timeSeries).ConfigureAwait(false);
+
+        await AssertXmlDocument
+            .Document(document, NamespacePrefix, _documentValidation.Validator)
+            .HasValue("Series[1]/Period/Point[1]/quality", expectedCode)
+            .HasValidStructureAsync(DocumentType.AggregationResult)
+            .ConfigureAwait(false);
+    }
+
     private static MessageHeader CreateHeader()
     {
         return new MessageHeader(
@@ -160,5 +270,15 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
                 }),
         };
         return timeSeries;
+    }
+
+    private Task<Stream> CreateDocument(TimeSeriesBuilder resultBuilder)
+    {
+        return _messageWriter.WriteAsync(
+            resultBuilder.BuildHeader(),
+            new[]
+            {
+                _parser.From(resultBuilder.BuildTimeSeries()),
+            });
     }
 }

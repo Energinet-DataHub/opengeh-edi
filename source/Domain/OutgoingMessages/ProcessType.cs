@@ -28,4 +28,11 @@ public sealed class ProcessType : EnumerationType
     }
 
     public string Code { get; }
+
+    public static ProcessType? From(string valueToParse)
+    {
+        return GetAll<ProcessType>().FirstOrDefault(processType =>
+            processType.Name.Equals(valueToParse, StringComparison.OrdinalIgnoreCase) ||
+            processType.Code.Equals(valueToParse, StringComparison.OrdinalIgnoreCase));
+    }
 }
