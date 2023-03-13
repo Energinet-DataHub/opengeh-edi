@@ -38,9 +38,8 @@ public class AggregationResultForwardingTests
             .ForProduction()
             .WithGridAreaDetails(GridArea.Create("870"), ActorNumber.Create("1234567890123"))
             .Build();
-        var transaction = CreateTransaction();
 
-        var message = transaction.CreateMessage(result);
+        var message = CreateMessage(result);
 
         Assert.Equal(MarketRole.MeteredDataResponsible, message.ReceiverRole);
         Assert.Equal(result.GridAreaDetails?.OperatorNumber, message.ReceiverId.Value);
@@ -52,9 +51,8 @@ public class AggregationResultForwardingTests
         var result = _aggregationResult
             .ForConsumption(SettlementType.NonProfiled)
             .Build();
-        var transaction = CreateTransaction();
 
-        var message = transaction.CreateMessage(result);
+        var message = CreateMessage(result);
 
         Assert.Equal(MarketRole.MeteredDataResponsible, message.ReceiverRole);
         Assert.Equal(result.GridAreaDetails?.OperatorNumber, message.ReceiverId.Value);
