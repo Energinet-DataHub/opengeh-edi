@@ -36,7 +36,7 @@ public class SettlementType : EnumerationType
                                     type.Code.Equals(valueToParse, StringComparison.OrdinalIgnoreCase));
 
         if (settlementType is null)
-            throw new InvalidCastException($"Could not parse {valueToParse} to metering point type");
+            throw new InvalidCastException($"Could not parse {valueToParse} to settlement type");
 
         return settlementType;
     }
