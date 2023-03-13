@@ -54,7 +54,7 @@ public class AggregationResultForwarding : Entity
 
         if (IsTotalResultPerGridArea(result))
         {
-            return AggregationResultMessage.Create(ActorNumber.Create(result.GridAreaDetails!.OperatorNumber), MarketRole.MeteredDataResponsible, Id, result);
+            return MessageForTheGridOperator(result);
         }
 
         if (ResultIsForTheEnergySupplier(result))
@@ -85,5 +85,10 @@ public class AggregationResultForwarding : Entity
     private static bool ResultIsForTheBalanceResponsible(Aggregation result)
     {
         return result.ActorGrouping!.BalanceResponsibleNumber is not null;
+    }
+
+    private AggregationResultMessage MessageForTheGridOperator(Aggregation result)
+    {
+        return AggregationResultMessage.Create(ActorNumber.Create(result.GridAreaDetails!.OperatorNumber), MarketRole.MeteredDataResponsible, Id, result);
     }
 }
