@@ -59,12 +59,12 @@ public class AggregationResultForwarding : Entity
 
         if (ResultIsForTheEnergySupplier(result))
         {
-            return AggregationResultMessage.Create(ActorNumber.Create(result.ActorGrouping!.EnergySupplierNumber!), MarketRole.EnergySupplier, Id, result);
+            return MessageForTheEnergySupplier(result);
         }
 
         if (ResultIsForTheBalanceResponsible(result))
         {
-            return AggregationResultMessage.Create(ActorNumber.Create(result.ActorGrouping!.BalanceResponsibleNumber!), MarketRole.BalanceResponsible, Id, result);
+            return MessageForTheBalanceResponsible(result);
         }
 
         return AggregationResultMessage.Create(_receivingActor, _receivingActorRole, Id, result);
@@ -90,5 +90,15 @@ public class AggregationResultForwarding : Entity
     private AggregationResultMessage MessageForTheGridOperator(Aggregation result)
     {
         return AggregationResultMessage.Create(ActorNumber.Create(result.GridAreaDetails!.OperatorNumber), MarketRole.MeteredDataResponsible, Id, result);
+    }
+
+    private AggregationResultMessage MessageForTheEnergySupplier(Aggregation result)
+    {
+        return AggregationResultMessage.Create(ActorNumber.Create(result.ActorGrouping!.EnergySupplierNumber!), MarketRole.EnergySupplier, Id, result);
+    }
+
+    private AggregationResultMessage MessageForTheBalanceResponsible(Aggregation result)
+    {
+        return AggregationResultMessage.Create(ActorNumber.Create(result.ActorGrouping!.BalanceResponsibleNumber!), MarketRole.BalanceResponsible, Id, result);
     }
 }
