@@ -39,11 +39,7 @@ public class TransactionFactoryTests
             .WithMeteringPointType(MeteringPointType.Production)
             .WithGridAreaDetails(GridArea.Create("870"), ActorNumber.Create("1234567890123"));
 
-        var transaction = new AggregationResultForwarding(
-            TransactionId.New(),
-            gridOperatorNumber,
-            MarketRole.EnergySupplier,
-            ProcessType.MoveIn);
+        var transaction = CreateTransaction();
         var message = transaction.CreateMessage(_aggregationResult.Build());
 
         Assert.Equal(MarketRole.MeteredDataResponsible, message.ReceiverRole);
@@ -68,10 +64,13 @@ public class TransactionFactoryTests
         Assert.Equal(gridOperatorNumber, message.ReceiverId);
     }
 
-    private AggregationResultMessage CreateMessage(TransactionFactory factory)
+    private static AggregationResultForwarding CreateTransaction()
     {
-        var aggregation = _aggregationResult.Build();
-        var transaction = factory.CreateFrom(aggregation);
-        return transaction.CreateMessage(aggregation);
+        var transaction = new AggregationResultForwarding(
+            TransactionId.New(),
+            ActorNumber.Create("1234567890123"),
+            MarketRole.EnergySupplier,
+            ProcessType.MoveIn);
+        return transaction;
     }
 }
