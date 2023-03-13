@@ -71,6 +71,7 @@ public class AggregationResultForwardingTests
 
         Assert.Equal(MarketRole.EnergySupplier, message.ReceiverRole);
         Assert.Equal(result.ActorGrouping?.EnergySupplierNumber, message.ReceiverId.Value);
+        Assert.Equal(SettlementType.NonProfiled.Name, message.Series.SettlementType);
     }
 
     private static AggregationResultMessage CreateMessage(Aggregation result)
