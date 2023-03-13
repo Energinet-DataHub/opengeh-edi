@@ -58,6 +58,7 @@ public class TransactionFactoryTests
 
         Assert.Equal(MarketRole.MeteredDataResponsible, message.ReceiverRole);
         Assert.Equal(result.GridAreaDetails?.OperatorNumber, message.ReceiverId.Value);
+        Assert.Equal(SettlementType.NonProfiled.Name, message.Series.SettlementType);
     }
 
     private static AggregationResultForwarding CreateTransaction()
