@@ -25,8 +25,14 @@ public record Aggregation(
     Period Period,
     string? SettlementType,
     string ProcessType,
-    string? AggregatedForActor = null);
+    string? AggregatedForActor = null,
+    ActorGrouping? ActorGrouping = null,
+    GridAreaDetails? GridAreaDetails = null);
 
 public record Point(int Position, decimal? Quantity, string Quality, string SampleTime);
 
 public record Period(Instant Start, Instant End);
+
+public record ActorGrouping(string? EnergySupplierNumber, string? BalanceResponsibleNumber);
+
+public record GridAreaDetails(string GridAreaCode, string OperatorNumber);

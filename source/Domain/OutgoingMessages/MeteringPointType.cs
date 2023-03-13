@@ -43,4 +43,10 @@ public class MeteringPointType : EnumerationType
 
         return code;
     }
+
+    public static MeteringPointType From(string valueToParse)
+    {
+        return GetAll<MeteringPointType>().First(type => type.Name.Equals(valueToParse, StringComparison.OrdinalIgnoreCase) ||
+                                                                  type.Code.Equals(valueToParse, StringComparison.OrdinalIgnoreCase));
+    }
 }

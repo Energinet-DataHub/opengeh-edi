@@ -14,7 +14,7 @@
 
 using Domain.SeedWork;
 
-namespace Domain.Transactions;
+namespace Domain.Transactions.Aggregations;
 
 public class Resolution : EnumerationType
 {

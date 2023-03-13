@@ -12,20 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.Transactions;
-using Xunit;
+using Domain.SeedWork;
 
-namespace Tests.Domain.Transactions;
+namespace Domain.Transactions.Aggregations;
 
-public class ResolutionTests
+public class MeasurementUnit : EnumerationType
 {
-    [Theory]
-    [InlineData("pt1h")]
-    [InlineData("hourly")]
-    public void Can_parse_from_name_or_code(string valueToParseFrom)
-    {
-        var resolution = Resolution.From(valueToParseFrom);
+    public static readonly MeasurementUnit Kwh = new(0, nameof(Kwh), "KWH");
 
-        Assert.Equal(Resolution.Hourly, resolution);
+    private MeasurementUnit(int id, string name, string code)
+        : base(id, name)
+    {
+        Code = code;
+    }
+
+    public string Code { get; }
+
+    public static MeasurementUnit From(string value)
+    {
+        return GetAll<MeasurementUnit>().First(type =>
+            type.Code.Equals(value, StringComparison.OrdinalIgnoreCase) ||
+            type.Name.Equals(value, StringComparison.OrdinalIgnoreCase));
     }
 }
