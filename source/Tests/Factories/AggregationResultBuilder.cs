@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using Domain.Actors;
 using Domain.OutgoingMessages;
+using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using NodaTime;
 using Period = Domain.Transactions.Aggregations.Period;
@@ -23,6 +25,8 @@ namespace Tests.Factories;
 public class AggregationResultBuilder
 {
     private MeteringPointType _meteringPointType = MeteringPointType.Consumption;
+    private GridArea _gridArea = GridArea.Create("870");
+    private ActorNumber _gridOperator = ActorNumber.Create("1234567890123");
 
     public AggregationResultBuilder WithMeteringPointType(MeteringPointType meteringPointType)
     {
@@ -44,6 +48,14 @@ public class AggregationResultBuilder
                 SystemClock.Instance.GetCurrentInstant()),
             SettlementType.NonProfiled.Name,
             ProcessType.BalanceFixing.Name,
-            null);
+            null,
+            new ActorGrouping(null, null),
+            new GridAreaDetails(_gridArea.Code, _gridOperator.Value));
+    }
+
+    public void WithGridAreaDetails(GridArea gridArea, ActorNumber gridOperator)
+    {
+        _gridArea = gridArea;
+        _gridOperator = gridOperator;
     }
 }
