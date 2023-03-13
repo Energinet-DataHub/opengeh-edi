@@ -34,30 +34,30 @@ public class TransactionFactoryTests
     [Fact]
     public void Create_message_for_grid_operator_when_result_is_total_production()
     {
-        var gridOperatorNumber = ActorNumber.Create("1234567890123");
-        _aggregationResult
+        var result = _aggregationResult
             .WithMeteringPointType(MeteringPointType.Production)
-            .WithGridAreaDetails(GridArea.Create("870"), ActorNumber.Create("1234567890123"));
-
+            .WithGridAreaDetails(GridArea.Create("870"), ActorNumber.Create("1234567890123"))
+            .Build();
         var transaction = CreateTransaction();
-        var message = transaction.CreateMessage(_aggregationResult.Build());
+
+        var message = transaction.CreateMessage(result);
 
         Assert.Equal(MarketRole.MeteredDataResponsible, message.ReceiverRole);
-        Assert.Equal(gridOperatorNumber, message.ReceiverId);
+        Assert.Equal(result.GridAreaDetails?.OperatorNumber, message.ReceiverId.Value);
     }
 
     [Fact]
     public void Create_message_for_grid_operator_when_result_is_total_non_profiled_consumption()
     {
-        var gridOperatorNumber = ActorNumber.Create("1234567890123");
-        _aggregationResult
-            .ForConsumption(SettlementType.NonProfiled);
-
+        var result = _aggregationResult
+            .ForConsumption(SettlementType.NonProfiled)
+            .Build();
         var transaction = CreateTransaction();
-        var message = transaction.CreateMessage(_aggregationResult.Build());
+
+        var message = transaction.CreateMessage(result);
 
         Assert.Equal(MarketRole.MeteredDataResponsible, message.ReceiverRole);
-        Assert.Equal(gridOperatorNumber, message.ReceiverId);
+        Assert.Equal(result.GridAreaDetails?.OperatorNumber, message.ReceiverId.Value);
     }
 
     private static AggregationResultForwarding CreateTransaction()
