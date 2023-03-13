@@ -53,7 +53,7 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
                 MapSettlementMethod(integrationEvent),
                 MapProcessType(integrationEvent),
                 null,
-                null,
+                MapActorGrouping(integrationEvent),
                 await MapGridAreaDetailsAsync(integrationEvent).ConfigureAwait(false)));
     }
 
@@ -61,6 +61,19 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
     {
         ArgumentNullException.ThrowIfNull(eventType);
         return eventType.Equals("calculationresultcompleted", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static ActorGrouping MapActorGrouping(CalculationResultCompleted integrationEvent)
+    {
+        return integrationEvent.AggregationLevelCase switch
+        {
+            CalculationResultCompleted.AggregationLevelOneofCase.AggregationPerGridarea => new ActorGrouping(null, null),
+            CalculationResultCompleted.AggregationLevelOneofCase.AggregationPerBalanceresponsiblepartyPerGridarea => new ActorGrouping(null, integrationEvent.AggregationPerBalanceresponsiblepartyPerGridarea.BalanceResponsiblePartyGlnOrEic),
+            CalculationResultCompleted.AggregationLevelOneofCase.AggregationPerEnergysupplierPerGridarea => new ActorGrouping(integrationEvent.AggregationPerEnergysupplierPerGridarea.EnergySupplierGlnOrEic, null),
+            CalculationResultCompleted.AggregationLevelOneofCase.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea => new ActorGrouping(integrationEvent.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea.EnergySupplierGlnOrEic, integrationEvent.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea.BalanceResponsiblePartyGlnOrEic),
+            CalculationResultCompleted.AggregationLevelOneofCase.None => throw new InvalidOperationException("Aggregation level is not specified"),
+            _ => throw new InvalidOperationException("Aggregation level is unknown"),
+        };
     }
 
     private static string? MapSettlementMethod(CalculationResultCompleted integrationEvent)
