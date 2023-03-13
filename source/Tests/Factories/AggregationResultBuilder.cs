@@ -54,9 +54,10 @@ public class AggregationResultBuilder
         return this;
     }
 
-    public AggregationResultBuilder WithMeteringPointType(MeteringPointType meteringPointType)
+    public AggregationResultBuilder ForProduction()
     {
-        _meteringPointType = meteringPointType;
+        _meteringPointType = MeteringPointType.Production;
+        _settlementType = null;
         return this;
     }
 

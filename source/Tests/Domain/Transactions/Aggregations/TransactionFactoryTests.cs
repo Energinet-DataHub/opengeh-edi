@@ -35,7 +35,7 @@ public class TransactionFactoryTests
     public void Create_message_for_grid_operator_when_result_is_total_production()
     {
         var result = _aggregationResult
-            .WithMeteringPointType(MeteringPointType.Production)
+            .ForProduction()
             .WithGridAreaDetails(GridArea.Create("870"), ActorNumber.Create("1234567890123"))
             .Build();
         var transaction = CreateTransaction();
