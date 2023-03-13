@@ -14,10 +14,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Application.Transactions.Aggregations;
 using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf.Collections;
@@ -32,7 +31,14 @@ namespace Infrastructure.Transactions.Aggregations;
 
 public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
 {
-    public INotification MapFrom(byte[] payload)
+    private readonly IGridAreaLookup _gridAreaLookup;
+
+    public CalculationResultCompletedEventMapper(IGridAreaLookup gridAreaLookup)
+    {
+        _gridAreaLookup = gridAreaLookup;
+    }
+
+    public async Task<INotification> MapFromAsync(byte[] payload)
     {
         var integrationEvent =
             CalculationResultCompleted.Parser.ParseFrom(payload);
@@ -45,13 +51,29 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
                 MapResolution(integrationEvent),
                 MapPeriod(integrationEvent),
                 MapSettlementMethod(integrationEvent),
-                MapProcessType(integrationEvent)));
+                MapProcessType(integrationEvent),
+                null,
+                MapActorGrouping(integrationEvent),
+                await MapGridAreaDetailsAsync(integrationEvent).ConfigureAwait(false)));
     }
 
     public bool CanHandle(string eventType)
     {
         ArgumentNullException.ThrowIfNull(eventType);
         return eventType.Equals("calculationresultcompleted", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static ActorGrouping MapActorGrouping(CalculationResultCompleted integrationEvent)
+    {
+        return integrationEvent.AggregationLevelCase switch
+        {
+            CalculationResultCompleted.AggregationLevelOneofCase.AggregationPerGridarea => new ActorGrouping(null, null),
+            CalculationResultCompleted.AggregationLevelOneofCase.AggregationPerBalanceresponsiblepartyPerGridarea => new ActorGrouping(null, integrationEvent.AggregationPerBalanceresponsiblepartyPerGridarea.BalanceResponsiblePartyGlnOrEic),
+            CalculationResultCompleted.AggregationLevelOneofCase.AggregationPerEnergysupplierPerGridarea => new ActorGrouping(integrationEvent.AggregationPerEnergysupplierPerGridarea.EnergySupplierGlnOrEic, null),
+            CalculationResultCompleted.AggregationLevelOneofCase.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea => new ActorGrouping(integrationEvent.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea.EnergySupplierGlnOrEic, integrationEvent.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea.BalanceResponsiblePartyGlnOrEic),
+            CalculationResultCompleted.AggregationLevelOneofCase.None => throw new InvalidOperationException("Aggregation level is not specified"),
+            _ => throw new InvalidOperationException("Aggregation level is unknown"),
+        };
     }
 
     private static string? MapSettlementMethod(CalculationResultCompleted integrationEvent)
@@ -74,7 +96,7 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
     {
         return integrationEvent.Resolution switch
         {
-            Resolution.Quarter => Domain.Transactions.Resolution.QuarterHourly.Name,
+            Resolution.Quarter => Domain.Transactions.Aggregations.Resolution.QuarterHourly.Name,
             Resolution.Unspecified => throw new InvalidOperationException("Could not map resolution type"),
             _ => throw new InvalidOperationException("Unknown resolution type"),
         };
@@ -161,5 +183,22 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
 
         const decimal nanoFactor = 1_000_000_000;
         return input.Units + (input.Nanos / nanoFactor);
+    }
+
+    private async Task<GridAreaDetails> MapGridAreaDetailsAsync(CalculationResultCompleted integrationEvent)
+    {
+        var gridAreaCode = integrationEvent.AggregationLevelCase switch
+        {
+            CalculationResultCompleted.AggregationLevelOneofCase.AggregationPerGridarea => integrationEvent.AggregationPerGridarea.GridAreaCode,
+            CalculationResultCompleted.AggregationLevelOneofCase.AggregationPerBalanceresponsiblepartyPerGridarea => integrationEvent.AggregationPerBalanceresponsiblepartyPerGridarea.GridAreaCode,
+            CalculationResultCompleted.AggregationLevelOneofCase.AggregationPerEnergysupplierPerGridarea => integrationEvent.AggregationPerEnergysupplierPerGridarea.GridAreaCode,
+            CalculationResultCompleted.AggregationLevelOneofCase.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea => integrationEvent.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea.GridAreaCode,
+            CalculationResultCompleted.AggregationLevelOneofCase.None => throw new InvalidOperationException("Aggregation level was not specified"),
+            _ => throw new InvalidOperationException("Unknown aggregation level"),
+        };
+
+        var gridOperatorNumber = await _gridAreaLookup.GetGridOperatorForAsync(gridAreaCode).ConfigureAwait(false);
+
+        return new GridAreaDetails(gridAreaCode, gridOperatorNumber.Value);
     }
 }
