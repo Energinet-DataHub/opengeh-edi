@@ -57,23 +57,33 @@ public class AggregationResultForwarding : Entity
             return AggregationResultMessage.Create(ActorNumber.Create(result.GridAreaDetails!.OperatorNumber), MarketRole.MeteredDataResponsible, Id, result);
         }
 
-        if (result.ActorGrouping!.EnergySupplierNumber is not null &&
-            result.ActorGrouping?.BalanceResponsibleNumber is null)
+        if (ResultIsForTheEnergySupplier(result))
         {
-            return AggregationResultMessage.Create(ActorNumber.Create(result.ActorGrouping!.EnergySupplierNumber), MarketRole.EnergySupplier, Id, result);
+            return AggregationResultMessage.Create(ActorNumber.Create(result.ActorGrouping!.EnergySupplierNumber!), MarketRole.EnergySupplier, Id, result);
         }
 
-        if (result.ActorGrouping!.BalanceResponsibleNumber is not null)
+        if (ResultIsForBalanceResponsible(result))
         {
-            return AggregationResultMessage.Create(ActorNumber.Create(result.ActorGrouping!.BalanceResponsibleNumber), MarketRole.BalanceResponsible, Id, result);
+            return AggregationResultMessage.Create(ActorNumber.Create(result.ActorGrouping!.BalanceResponsibleNumber!), MarketRole.BalanceResponsible, Id, result);
         }
 
         return AggregationResultMessage.Create(_receivingActor, _receivingActorRole, Id, result);
+    }
+
+    private static bool ResultIsForTheEnergySupplier(Aggregation result)
+    {
+        return result.ActorGrouping!.EnergySupplierNumber is not null &&
+               result.ActorGrouping?.BalanceResponsibleNumber is null;
     }
 
     private static bool IsTotalResultPerGridArea(Aggregation result)
     {
         return result.ActorGrouping?.BalanceResponsibleNumber == null &&
                result.ActorGrouping?.EnergySupplierNumber == null;
+    }
+
+    private static bool ResultIsForBalanceResponsible(Aggregation result)
+    {
+        return result.ActorGrouping!.BalanceResponsibleNumber is not null;
     }
 }
