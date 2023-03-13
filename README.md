@@ -29,7 +29,7 @@ In this sprint we are working on
 
 In the next sprint we are working on
 
-- Actors are able to receive messages in CIM JSON format. 
+- Actors are able to receive messages in CIM JSON format.
 - Creating acceptance test for testing message flow
 
 ## Getting Started
