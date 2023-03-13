@@ -74,6 +74,21 @@ public class AggregationResultForwardingTests
         Assert.Equal(SettlementType.NonProfiled.Name, message.Series.SettlementType);
     }
 
+    [Fact]
+    public void Create_message_for_balance_responsible_when_result_is_non_profiled_consumption()
+    {
+        var result = _aggregationResult
+            .ForConsumption(SettlementType.NonProfiled)
+            .WithGrouping(ActorNumber.Create("1234567890123"), ActorNumber.Create("1234567890124"))
+            .Build();
+
+        var message = CreateMessage(result);
+
+        Assert.Equal(MarketRole.BalanceResponsible, message.ReceiverRole);
+        Assert.Equal(result.ActorGrouping?.BalanceResponsibleNumber, message.ReceiverId.Value);
+        Assert.Equal(SettlementType.NonProfiled.Name, message.Series.SettlementType);
+    }
+
     private static AggregationResultMessage CreateMessage(Aggregation result)
     {
         var transaction = CreateTransaction();

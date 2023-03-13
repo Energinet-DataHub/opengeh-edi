@@ -63,6 +63,11 @@ public class AggregationResultForwarding : Entity
             return AggregationResultMessage.Create(ActorNumber.Create(result.ActorGrouping!.EnergySupplierNumber), MarketRole.EnergySupplier, Id, result);
         }
 
+        if (result.ActorGrouping!.BalanceResponsibleNumber is not null)
+        {
+            return AggregationResultMessage.Create(ActorNumber.Create(result.ActorGrouping!.BalanceResponsibleNumber), MarketRole.BalanceResponsible, Id, result);
+        }
+
         return AggregationResultMessage.Create(_receivingActor, _receivingActorRole, Id, result);
     }
 
