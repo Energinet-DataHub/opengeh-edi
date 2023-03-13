@@ -50,6 +50,24 @@ public class TransactionFactoryTests
         Assert.Equal(gridOperatorNumber, message.ReceiverId);
     }
 
+    [Fact]
+    public void Create_message_for_grid_operator_when_result_is_total_non_profiled_consumption()
+    {
+        var gridOperatorNumber = ActorNumber.Create("1234567890123");
+        _aggregationResult
+            .ForConsumption(SettlementType.NonProfiled);
+
+        var transaction = new AggregationResultForwarding(
+            TransactionId.New(),
+            gridOperatorNumber,
+            MarketRole.EnergySupplier,
+            ProcessType.MoveIn);
+        var message = transaction.CreateMessage(_aggregationResult.Build());
+
+        Assert.Equal(MarketRole.MeteredDataResponsible, message.ReceiverRole);
+        Assert.Equal(gridOperatorNumber, message.ReceiverId);
+    }
+
     private AggregationResultMessage CreateMessage(TransactionFactory factory)
     {
         var aggregation = _aggregationResult.Build();

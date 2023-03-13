@@ -27,14 +27,8 @@ public class AggregationResultBuilder
     private MeteringPointType _meteringPointType = MeteringPointType.Consumption;
     private GridArea _gridArea = GridArea.Create("870");
     private ActorNumber _gridOperator = ActorNumber.Create("1234567890123");
+    private SettlementType? _settlementType;
 
-    public AggregationResultBuilder WithMeteringPointType(MeteringPointType meteringPointType)
-    {
-        _meteringPointType = meteringPointType;
-        return this;
-    }
-
-    #pragma warning disable
     public Aggregation Build()
     {
         return new Aggregation(
@@ -53,9 +47,23 @@ public class AggregationResultBuilder
             new GridAreaDetails(_gridArea.Code, _gridOperator.Value));
     }
 
-    public void WithGridAreaDetails(GridArea gridArea, ActorNumber gridOperator)
+    public AggregationResultBuilder WithGridAreaDetails(GridArea gridArea, ActorNumber gridOperator)
     {
         _gridArea = gridArea;
         _gridOperator = gridOperator;
+        return this;
+    }
+
+    public AggregationResultBuilder WithMeteringPointType(MeteringPointType meteringPointType)
+    {
+        _meteringPointType = meteringPointType;
+        return this;
+    }
+
+    public AggregationResultBuilder ForConsumption(SettlementType settlementType)
+    {
+        _meteringPointType = MeteringPointType.Consumption;
+        _settlementType = settlementType;
+        return this;
     }
 }

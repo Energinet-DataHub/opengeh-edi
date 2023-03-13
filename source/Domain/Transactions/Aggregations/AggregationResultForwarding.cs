@@ -57,6 +57,13 @@ public class AggregationResultForwarding : Entity
             return AggregationResultMessage.Create(ActorNumber.Create(result.GridAreaDetails!.OperatorNumber), MarketRole.MeteredDataResponsible, Id, result);
         }
 
+        if (MeteringPointType.From(result.MeteringPointType) == MeteringPointType.Consumption &&
+            result.ActorGrouping?.EnergySupplierNumber is null &&
+            result.ActorGrouping?.BalanceResponsibleNumber is null)
+        {
+            return AggregationResultMessage.Create(ActorNumber.Create(result.GridAreaDetails!.OperatorNumber), MarketRole.MeteredDataResponsible, Id, result);
+        }
+
         return AggregationResultMessage.Create(_receivingActor, _receivingActorRole, Id, result);
     }
 }
