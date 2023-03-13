@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Threading.Tasks;
 using Application.Transactions.Aggregations;
 using Domain.OutgoingMessages;
 using Domain.Transactions;
@@ -24,15 +25,15 @@ namespace Infrastructure.Transactions.Aggregations;
 
 public class BalanceFixingCompletedEventMapper : IIntegrationEventMapper
 {
-    public INotification MapFrom(byte[] payload)
+    public Task<INotification> MapFromAsync(byte[] payload)
     {
         var integrationEvent = Energinet.DataHub.Wholesale.Contracts.Events.ProcessCompleted.Parser.ParseFrom(payload);
-        return new AggregationProcessHasCompleted(
+        return Task.FromResult((INotification)new AggregationProcessHasCompleted(
             Guid.Parse(integrationEvent.BatchId),
             GridArea.Create(integrationEvent.GridAreaCode),
             integrationEvent.PeriodStartUtc.ToInstant(),
             integrationEvent.PeriodEndUtc.ToInstant(),
-            ProcessType.BalanceFixing);
+            ProcessType.BalanceFixing));
     }
 
     public bool CanHandle(string eventType)

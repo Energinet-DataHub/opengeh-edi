@@ -14,10 +14,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Application.Transactions.Aggregations;
 using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf.Collections;
@@ -32,7 +31,14 @@ namespace Infrastructure.Transactions.Aggregations;
 
 public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
 {
-    public INotification MapFrom(byte[] payload)
+    private readonly IGridAreaLookup _gridAreaLookup;
+
+    public CalculationResultCompletedEventMapper(IGridAreaLookup gridAreaLookup)
+    {
+        _gridAreaLookup = gridAreaLookup;
+    }
+
+    public async Task<INotification> MapFromAsync(byte[] payload)
     {
         var integrationEvent =
             CalculationResultCompleted.Parser.ParseFrom(payload);
@@ -45,7 +51,10 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
                 MapResolution(integrationEvent),
                 MapPeriod(integrationEvent),
                 MapSettlementMethod(integrationEvent),
-                MapProcessType(integrationEvent)));
+                MapProcessType(integrationEvent),
+                null,
+                null,
+                await MapGridAreaDetailsAsync(integrationEvent).ConfigureAwait(false)));
     }
 
     public bool CanHandle(string eventType)
@@ -161,5 +170,22 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
 
         const decimal nanoFactor = 1_000_000_000;
         return input.Units + (input.Nanos / nanoFactor);
+    }
+
+    private async Task<GridAreaDetails> MapGridAreaDetailsAsync(CalculationResultCompleted integrationEvent)
+    {
+        var gridAreaCode = integrationEvent.AggregationLevelCase switch
+        {
+            CalculationResultCompleted.AggregationLevelOneofCase.AggregationPerGridarea => integrationEvent.AggregationPerGridarea.GridAreaCode,
+            CalculationResultCompleted.AggregationLevelOneofCase.AggregationPerBalanceresponsiblepartyPerGridarea => integrationEvent.AggregationPerBalanceresponsiblepartyPerGridarea.GridAreaCode,
+            CalculationResultCompleted.AggregationLevelOneofCase.AggregationPerEnergysupplierPerGridarea => integrationEvent.AggregationPerEnergysupplierPerGridarea.GridAreaCode,
+            CalculationResultCompleted.AggregationLevelOneofCase.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea => integrationEvent.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea.GridAreaCode,
+            CalculationResultCompleted.AggregationLevelOneofCase.None => throw new InvalidOperationException("Aggregation level was not specified"),
+            _ => throw new InvalidOperationException("Unknown aggregation level"),
+        };
+
+        var gridOperatorNumber = await _gridAreaLookup.GetGridOperatorForAsync(gridAreaCode).ConfigureAwait(false);
+
+        return new GridAreaDetails(gridAreaCode, gridOperatorNumber.Value);
     }
 }

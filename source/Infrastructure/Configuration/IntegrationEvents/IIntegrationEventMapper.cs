@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading.Tasks;
 using MediatR;
 
 namespace Infrastructure.Configuration.IntegrationEvents;
@@ -26,7 +27,7 @@ public interface IIntegrationEventMapper
     /// </summary>
     /// <param name="payload"></param>
     /// <returns><see cref="INotification"/></returns>
-    INotification MapFrom(byte[] payload);
+    Task<INotification> MapFromAsync(byte[] payload);
 
     /// <summary>
     /// Determines whether the specified event type can be handled by the mapper
