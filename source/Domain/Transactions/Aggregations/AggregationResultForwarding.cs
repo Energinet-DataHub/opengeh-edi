@@ -62,7 +62,7 @@ public class AggregationResultForwarding : Entity
             return AggregationResultMessage.Create(ActorNumber.Create(result.ActorGrouping!.EnergySupplierNumber!), MarketRole.EnergySupplier, Id, result);
         }
 
-        if (ResultIsForBalanceResponsible(result))
+        if (ResultIsForTheBalanceResponsible(result))
         {
             return AggregationResultMessage.Create(ActorNumber.Create(result.ActorGrouping!.BalanceResponsibleNumber!), MarketRole.BalanceResponsible, Id, result);
         }
@@ -82,7 +82,7 @@ public class AggregationResultForwarding : Entity
                result.ActorGrouping?.EnergySupplierNumber == null;
     }
 
-    private static bool ResultIsForBalanceResponsible(Aggregation result)
+    private static bool ResultIsForTheBalanceResponsible(Aggregation result)
     {
         return result.ActorGrouping!.BalanceResponsibleNumber is not null;
     }
