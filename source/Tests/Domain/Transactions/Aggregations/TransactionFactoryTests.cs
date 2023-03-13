@@ -53,11 +53,7 @@ public class TransactionFactoryTests
         _aggregationResult
             .ForConsumption(SettlementType.NonProfiled);
 
-        var transaction = new AggregationResultForwarding(
-            TransactionId.New(),
-            gridOperatorNumber,
-            MarketRole.EnergySupplier,
-            ProcessType.MoveIn);
+        var transaction = CreateTransaction();
         var message = transaction.CreateMessage(_aggregationResult.Build());
 
         Assert.Equal(MarketRole.MeteredDataResponsible, message.ReceiverRole);
