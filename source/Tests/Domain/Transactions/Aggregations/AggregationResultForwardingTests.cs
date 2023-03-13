@@ -14,6 +14,7 @@
 
 using Domain.Actors;
 using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using Tests.Factories;
@@ -58,6 +59,26 @@ public class AggregationResultForwardingTests
         Assert.Equal(MarketRole.MeteredDataResponsible, message.ReceiverRole);
         Assert.Equal(result.GridAreaDetails?.OperatorNumber, message.ReceiverId.Value);
         Assert.Equal(SettlementType.NonProfiled.Name, message.Series.SettlementType);
+    }
+
+    [Fact]
+    public void Create_message_for_energy_supplier_when_result_is_non_profiled_consumption()
+    {
+        var result = _aggregationResult
+            .ForConsumption(SettlementType.NonProfiled)
+            .WithGrouping(ActorNumber.Create("1234567890123"), null)
+            .Build();
+
+        var message = CreateMessage(result);
+
+        Assert.Equal(MarketRole.EnergySupplier, message.ReceiverRole);
+        Assert.Equal(result.ActorGrouping?.EnergySupplierNumber, message.ReceiverId.Value);
+    }
+
+    private static AggregationResultMessage CreateMessage(Aggregation result)
+    {
+        var transaction = CreateTransaction();
+        return transaction.CreateMessage(result);
     }
 
     private static AggregationResultForwarding CreateTransaction()

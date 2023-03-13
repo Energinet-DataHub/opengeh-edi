@@ -28,6 +28,7 @@ public class AggregationResultBuilder
     private GridArea _gridArea = GridArea.Create("870");
     private ActorNumber _gridOperator = ActorNumber.Create("1234567890123");
     private SettlementType? _settlementType;
+    private ActorGrouping _actorGrouping = new ActorGrouping(null, null);
 
     public Aggregation Build()
     {
@@ -43,7 +44,7 @@ public class AggregationResultBuilder
             SettlementType.NonProfiled.Name,
             ProcessType.BalanceFixing.Name,
             null,
-            new ActorGrouping(null, null),
+            _actorGrouping,
             new GridAreaDetails(_gridArea.Code, _gridOperator.Value));
     }
 
@@ -65,6 +66,12 @@ public class AggregationResultBuilder
     {
         _meteringPointType = MeteringPointType.Consumption;
         _settlementType = settlementType;
+        return this;
+    }
+
+    public AggregationResultBuilder WithGrouping(ActorNumber? energySupplierNumber, ActorNumber? balanceResponsibleNumber)
+    {
+        _actorGrouping = new ActorGrouping(energySupplierNumber?.Value, balanceResponsibleNumber?.Value);
         return this;
     }
 }
