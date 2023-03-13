@@ -52,18 +52,17 @@ public class AggregationResultForwarding : Entity
     {
         ArgumentNullException.ThrowIfNull(result);
 
-        if (MeteringPointType.From(result.MeteringPointType) == MeteringPointType.Production && result.ActorGrouping?.EnergySupplierNumber is null && result.ActorGrouping?.BalanceResponsibleNumber is null)
-        {
-            return AggregationResultMessage.Create(ActorNumber.Create(result.GridAreaDetails!.OperatorNumber), MarketRole.MeteredDataResponsible, Id, result);
-        }
-
-        if (MeteringPointType.From(result.MeteringPointType) == MeteringPointType.Consumption &&
-            result.ActorGrouping?.EnergySupplierNumber is null &&
-            result.ActorGrouping?.BalanceResponsibleNumber is null)
+        if (IsTotalResultPerGridArea(result))
         {
             return AggregationResultMessage.Create(ActorNumber.Create(result.GridAreaDetails!.OperatorNumber), MarketRole.MeteredDataResponsible, Id, result);
         }
 
         return AggregationResultMessage.Create(_receivingActor, _receivingActorRole, Id, result);
+    }
+
+    private static bool IsTotalResultPerGridArea(Aggregation result)
+    {
+        return result.ActorGrouping?.BalanceResponsibleNumber == null &&
+               result.ActorGrouping?.EnergySupplierNumber == null;
     }
 }
