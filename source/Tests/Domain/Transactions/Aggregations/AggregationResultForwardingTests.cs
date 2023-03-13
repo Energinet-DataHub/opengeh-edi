@@ -14,7 +14,6 @@
 
 using Domain.Actors;
 using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using Tests.Factories;
@@ -22,11 +21,11 @@ using Xunit;
 
 namespace Tests.Domain.Transactions.Aggregations;
 
-public class TransactionFactoryTests
+public class AggregationResultForwardingTests
 {
     private readonly AggregationResultBuilder _aggregationResult;
 
-    public TransactionFactoryTests()
+    public AggregationResultForwardingTests()
     {
         _aggregationResult = new AggregationResultBuilder();
     }
