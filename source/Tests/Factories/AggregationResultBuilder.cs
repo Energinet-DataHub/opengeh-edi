@@ -36,7 +36,7 @@ public class AggregationResultBuilder
         return new Aggregation(
             new List<Point>(),
             "870",
-            MeteringPointType.Consumption.Name,
+            _meteringPointType.Name,
             MeasurementUnit.Kwh.Name,
             Resolution.QuarterHourly.Name,
             new Period(
