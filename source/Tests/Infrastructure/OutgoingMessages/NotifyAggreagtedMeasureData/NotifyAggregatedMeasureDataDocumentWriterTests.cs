@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -25,7 +24,6 @@ using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.SeedWork;
-using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.OutgoingMessages.Common;
@@ -83,7 +81,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
             .HasValue("Series[1]/balanceResponsibleParty_MarketParticipant.mRID", timeSeries[0].BalanceResponsibleNumber!)
             .HasValue("Series[1]/energySupplier_MarketParticipant.mRID", timeSeries[0].EnergySupplierNumber!)
             .HasAttributeValue("Series[1]/energySupplier_MarketParticipant.mRID", "codingScheme", "A10")
-            .HasValue("Series[1]/marketEvaluationPoint.type",  EnumerationType.FromName<MeteringPointType>(timeSeries[0].MeteringPointType).Code)
+            .HasValue("Series[1]/marketEvaluationPoint.type", CimCode.Of(MeteringPointType.From(timeSeries[0].MeteringPointType)))
             .HasValue("Series[1]/marketEvaluationPoint.settlementMethod", timeSeries[0].SettlementType!)
             .HasValue("Series[1]/product", "8716867000030")
             .HasValue("Series[1]/quantity_Measure_Unit.name", timeSeries[0].MeasureUnitType)
@@ -109,7 +107,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
             new(
                 Guid.NewGuid(),
                 "870",
-                MeteringPointType.Production.Code,
+                MeteringPointType.Production.Name,
                 null,
                 "KWH",
                 "PT1H",
