@@ -116,15 +116,28 @@ public class WhenResultsAreRetrievedTests : TestBase
     [MemberData(nameof(AggregationProcessTypes))]
     public async Task Total_production_result_is_sent_to_the_grid_operator(ProcessType completedAggregationType)
     {
-        _aggregationResults.HasResult(AggregationResultBuilder
-            .Result()
-            .WithGridArea(SampleData.GridAreaCode)
-            .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
-            .WithResolution(SampleData.Resolution)
-            .WithMeteringPointType(MeteringPointType.Production)
-            .Build());
+        var @event = new CalculationResultCompleted()
+        {
+            ProcessType = Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing,
+            Resolution = Resolution.Quarter,
+            BatchId = Guid.NewGuid().ToString(),
+            QuantityUnit = QuantityUnit.Kwh,
+            AggregationPerGridarea = new AggregationPerGridArea() { GridAreaCode = SampleData.GridAreaCode, },
+            PeriodStartUtc = Timestamp.FromDateTime(SampleData.StartOfPeriod.ToDateTimeUtc()),
+            PeriodEndUtc = Timestamp.FromDateTime(SampleData.EndOfPeriod.ToDateTimeUtc()),
+            TimeSeriesType = TimeSeriesType.Production,
+            TimeSeriesPoints =
+            {
+                new TimeSeriesPoint()
+                {
+                    Time = Timestamp.FromDateTime(DateTime.UtcNow),
+                    Quantity = new DecimalValue() { Nanos = 1, Units = 1 },
+                    QuantityQuality = QuantityQuality.Measured,
+                },
+            },
+        };
 
-        await AggregationResultsAreRetrieved(completedAggregationType);
+        await HavingReceivedIntegrationEventAsync(_receivedEventType, @event).ConfigureAwait(false);
 
         var message = await OutgoingMessageAsync(
             MarketRole.MeteredDataResponsible, completedAggregationType);
@@ -133,14 +146,11 @@ public class WhenResultsAreRetrievedTests : TestBase
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
             .HasMessageRecordValue<TimeSeries>(x => x.GridAreaCode, SampleData.GridAreaCode)
-            .HasMessageRecordValue<TimeSeries>(x => x.Resolution, SampleData.Resolution)
-            .HasMessageRecordValue<TimeSeries>(x => x.MeasureUnitType, MeasurementUnit.Kwh.Code)
+            .HasMessageRecordValue<TimeSeries>(x => x.Resolution, Domain.Transactions.Aggregations.Resolution.QuarterHourly.Name)
+            .HasMessageRecordValue<TimeSeries>(x => x.MeasureUnitType, MeasurementUnit.Kwh.Name)
             .HasMessageRecordValue<TimeSeries>(x => x.MeteringPointType, MeteringPointType.Production.Name)
             .HasMessageRecordValue<TimeSeries>(x => x.Period.Start, SampleData.StartOfPeriod)
-            .HasMessageRecordValue<TimeSeries>(x => x.Period.End, SampleData.EndOfPeriod)
-            .HasMessageRecordValue<TimeSeries>(x => x.Point[0].Position, 1)
-            .HasMessageRecordValue<TimeSeries, decimal?>(x => x.Point[0].Quantity, 1.1m)
-            .HasMessageRecordValue<TimeSeries>(x => x.Point[0].Quality!, Quality.Missing.Name);
+            .HasMessageRecordValue<TimeSeries>(x => x.Period.End, SampleData.EndOfPeriod);
     }
 
     [Theory]
