@@ -38,6 +38,7 @@ namespace IntegrationTests.Application.Transactions.Aggregations;
 public class WhenResultsAreRetrievedTests : TestBase
 {
     private readonly AggregationResultsStub _aggregationResults;
+    private readonly string _receivedEventType = "BalanceFixingCalculationResultCompleted";
 
     public WhenResultsAreRetrievedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
@@ -99,7 +100,7 @@ public class WhenResultsAreRetrievedTests : TestBase
             },
         };
 
-        await HavingReceivedIntegrationEventAsync("CalculationResultCompleted", @event).ConfigureAwait(false);
+        await HavingReceivedIntegrationEventAsync(_receivedEventType, @event).ConfigureAwait(false);
 
         var message = await OutgoingMessageAsync(
             MarketRole.MeteredDataResponsible, ProcessType.BalanceFixing);
