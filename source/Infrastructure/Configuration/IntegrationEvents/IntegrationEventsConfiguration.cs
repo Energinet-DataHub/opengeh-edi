@@ -26,9 +26,8 @@ public static class IntegrationEventsConfiguration
         services
             .AddTransient<INotificationHandler<TenSecondsHasHasPassed>,
                 ProcessIntegrationEventsOnTenSecondsHasPassed>();
-        services.AddSingleton<IntegrationEventReceiver>();
-        services.AddSingleton<IntegrationEventsProcessor>();
-        services.AddTransient<IIntegrationEventMapper, BalanceFixingCompletedEventMapper>();
+        services.AddTransient<IntegrationEventReceiver>();
+        services.AddTransient<IntegrationEventsProcessor>();
         services.AddTransient<IIntegrationEventMapper, CalculationResultCompletedEventMapper>();
     }
 }
