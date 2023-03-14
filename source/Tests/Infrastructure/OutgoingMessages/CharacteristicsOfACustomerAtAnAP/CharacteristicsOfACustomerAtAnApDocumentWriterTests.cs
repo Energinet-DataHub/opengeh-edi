@@ -66,7 +66,7 @@ namespace Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
             var assertDocument = await AssertXmlDocument
                 .Document(message, NamespacePrefix, _documentValidation.Validator)
                 .HasValue("type", "E21")
-                .HasValue("process.processType", header.ProcessType)
+                .HasValue("process.processType",  CimCode.Of(ProcessType.From(header.ProcessType)))
                 .HasValue("businessSector.type", "23")
                 .HasValue("sender_MarketParticipant.mRID", header.SenderId)
                 .HasValue("sender_MarketParticipant.marketRole.type", header.SenderRole)
@@ -195,7 +195,7 @@ namespace Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
 
         private MessageHeader CreateHeader(MarketRole messageReceiverRole)
         {
-            return new MessageHeader("E03", "SenderId", "DDZ", "ReceiverId", messageReceiverRole.Name, Guid.NewGuid().ToString(), _systemDateTimeProvider.Now());
+            return new MessageHeader(ProcessType.MoveIn.Name, "SenderId", "DDZ", "ReceiverId", messageReceiverRole.Name, Guid.NewGuid().ToString(), _systemDateTimeProvider.Now());
         }
 
         private Task<Stream> WriteDocumentAsync(MessageHeader header, params MarketActivityRecord[] marketActivityRecords)

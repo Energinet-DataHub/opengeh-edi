@@ -53,7 +53,7 @@ public class AccountingPointCharacteristicsDocumentWriterTests
     [Fact]
     public async Task Document_is_valid()
     {
-        var header = new MessageHeader("E03", "SenderId", "DDZ", "ReceiverId", "DDQ", Guid.NewGuid().ToString(), _systemDateTimeProvider.Now());
+        var header = new MessageHeader(ProcessType.MoveIn.Name, "SenderId", "DDZ", "ReceiverId", "DDQ", Guid.NewGuid().ToString(), _systemDateTimeProvider.Now());
         var marketActivityRecord = _sampleData.CreateMarketActivityRecord();
         var marketActivityRecords = new List<MarketActivityRecord>()
         {
@@ -71,7 +71,6 @@ public class AccountingPointCharacteristicsDocumentWriterTests
             var marketActivityRecord = AssertXmlMessage.GetMarketActivityRecordById(document, activityRecord.Id)!;
 
             Assert.NotNull(marketActivityRecord);
-          //  AssertXmlMessage.AssertMarketActivityRecordValue(marketActivityRecord, "originalTransactionIDReference_MktActivityRecord.mRID", activityRecord.OriginalTransactionId);
             AssertXmlMessage.AssertMarketActivityRecordValue(marketActivityRecord, "mRID", activityRecord.Id);
             AssertXmlMessage.AssertMarketActivityRecordValue(marketActivityRecord, "validityStart_DateAndOrTime.dateTime", activityRecord.ValidityStartDate.ToString());
         }

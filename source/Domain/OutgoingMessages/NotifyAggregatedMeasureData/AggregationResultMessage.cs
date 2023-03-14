@@ -63,7 +63,7 @@ public class AggregationResultMessage : OutgoingMessage
         return new AggregationResultMessage(
             receiverNumber,
             transactionId,
-            processType.Code,
+            processType.Name,
             receiverRole,
             series);
     }
@@ -93,7 +93,7 @@ public class AggregationResultMessage : OutgoingMessage
         return new AggregationResultMessage(
             receiverNumber,
             transactionId,
-            EnumerationType.FromName<ProcessType>(result.ProcessType).Code,
+            EnumerationType.FromName<ProcessType>(result.ProcessType).Name,
             receiverRole,
             series);
     }

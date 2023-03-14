@@ -215,7 +215,7 @@ public class WhenResultsAreRetrievedTests : TestBase
     {
         return await AssertOutgoingMessage.OutgoingMessageAsync(
             MessageType.NotifyAggregatedMeasureData.Name,
-            completedAggregationType.Code,
+            completedAggregationType.Name,
             roleOfReceiver,
             GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
     }

@@ -70,7 +70,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
             .Document(message, NamespacePrefix, _documentValidation.Validator)
             .HasValue("type", "E31")
             .HasValue("mRID", header.MessageId)
-            .HasValue("process.processType", header.ProcessType)
+            .HasValue("process.processType", CimCode.Of(ProcessType.From(header.ProcessType)))
             .HasValue("sender_MarketParticipant.mRID", header.SenderId)
             .HasAttributeValue("sender_MarketParticipant.mRID", "codingScheme", "A10")
             .HasValue("sender_MarketParticipant.marketRole.type", header.SenderRole)
@@ -237,7 +237,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
     private static MessageHeader CreateHeader()
     {
         return new MessageHeader(
-            ProcessType.BalanceFixing.Code,
+            ProcessType.BalanceFixing.Name,
             "1234567890123",
             MarketRole.MeteredDataResponsible.Name,
             "1234567890321",
