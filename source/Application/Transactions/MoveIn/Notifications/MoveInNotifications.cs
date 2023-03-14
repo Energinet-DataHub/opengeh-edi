@@ -69,7 +69,7 @@ public class MoveInNotifications
             MessageType.GenericNotification,
             ActorNumber.Create(gridOperatorNumber),
             transaction.TransactionId,
-            ProcessType.MoveIn.Code,
+            ProcessType.MoveIn.Name,
             MarketRole.GridOperator,
             DataHubDetails.IdentificationNumber,
             MarketRole.MeteringPointAdministrator,
