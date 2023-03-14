@@ -41,7 +41,6 @@ public sealed class TransactionScheduler
         ArgumentNullException.ThrowIfNull(gridArea);
         ArgumentNullException.ThrowIfNull(aggregationProcess);
 
-        await ScheduleTotalProductionResultAsync(resultsId, aggregationProcess, gridArea, period).ConfigureAwait(false);
         await ScheduleNonProfiledConsumptionForBalanceResponsibleAsync(resultsId, aggregationProcess, gridArea, period).ConfigureAwait(false);
         await ScheduleNonProfiledConsumptionForEnergySupplierAsync(resultsId, aggregationProcess, gridArea, period).ConfigureAwait(false);
         await ScheduleTotalNonProfiledConsumptionForBalanceResponsibleAsync(resultsId, aggregationProcess, gridArea, period).ConfigureAwait(false);
@@ -76,17 +75,6 @@ public sealed class TransactionScheduler
             var result = await _aggregationResults.NonProfiledConsumptionForAsync(resultsId, gridArea.Code, actorNumber, period)
                 .ConfigureAwait(false);
             await ScheduleAsync(aggregationProcess, actorNumber, MarketRole.EnergySupplier, result).ConfigureAwait(false);
-        }
-    }
-
-    private async Task ScheduleTotalProductionResultAsync(Guid resultsId, ProcessType aggregationProcess, GridArea gridArea, Domain.Transactions.Aggregations.Period period)
-    {
-        var gridOperatorNumber = await _gridAreaLookup.GetGridOperatorForAsync(gridArea.Code).ConfigureAwait(false);
-        var result = await _aggregationResults.ProductionResultForAsync(resultsId, gridArea.Code, period).ConfigureAwait(false);
-        if (result is not null)
-        {
-            await ScheduleAsync(aggregationProcess, gridOperatorNumber, MarketRole.MeteredDataResponsible, result)
-                .ConfigureAwait(false);
         }
     }
 
