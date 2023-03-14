@@ -25,6 +25,7 @@ using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions;
 using Domain.Transactions.Aggregations;
+using Infrastructure.OutgoingMessages.Common;
 using Infrastructure.OutgoingMessages.Common.Xml;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 using NodaTime;
@@ -59,7 +60,7 @@ public class NotifyAggregatedMeasureDataMessageWriter : MessageWriter
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Series", null).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, timeSeries.TransactionId.ToString()).ConfigureAwait(false);
 
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "marketEvaluationPoint.type", null,  MeteringPointType.ToCode(timeSeries.MeteringPointType)).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "marketEvaluationPoint.type", null, CimCode.Of(MeteringPointType.From(timeSeries.MeteringPointType))).ConfigureAwait(false);
             await WriteElementIfHasValueAsync("marketEvaluationPoint.settlementMethod", SettlementMethodToCode(timeSeries.SettlementType), writer).ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "meteringGridArea_Domain.mRID", null).ConfigureAwait(false);

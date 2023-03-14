@@ -31,4 +31,17 @@ public static class CimCode
 
         throw new InvalidOperationException($"No code has been defined for {processType.Name}");
     }
+
+    public static string Of(MeteringPointType meteringPointType)
+    {
+        ArgumentNullException.ThrowIfNull(meteringPointType);
+
+        if (meteringPointType == MeteringPointType.Consumption)
+            return "E17";
+
+        if (meteringPointType == MeteringPointType.Production)
+            return "E18";
+
+        throw new InvalidOperationException($"No code has been defined for {meteringPointType.Name}");
+    }
 }

@@ -18,35 +18,18 @@ namespace Domain.OutgoingMessages;
 
 public class MeteringPointType : EnumerationType
 {
-    public static readonly MeteringPointType Consumption = new(0, nameof(Consumption), "E17");
-    public static readonly MeteringPointType Production = new(1, nameof(Production), "E18");
+    public static readonly MeteringPointType Consumption = new(0, nameof(Consumption));
+    public static readonly MeteringPointType Production = new(1, nameof(Production));
 
-    private MeteringPointType(int id, string name, string code)
+    private MeteringPointType(int id, string name)
         : base(id, name)
     {
-        Code = code;
-    }
-
-    public string Code { get; }
-
-    public static string ToCode(string valueToParse)
-    {
-        var code = GetAll<MeteringPointType>().Where(
-            type =>
-                type.Name.Equals(valueToParse, StringComparison.OrdinalIgnoreCase) ||
-                type.Code.Equals(valueToParse, StringComparison.OrdinalIgnoreCase))
-            .Select(type => type.Code)
-            .FirstOrDefault();
-
-        if (string.IsNullOrEmpty(code))
-            throw new InvalidCastException($"Could not parse {valueToParse} to metering point type");
-
-        return code;
     }
 
     public static MeteringPointType From(string valueToParse)
     {
-        return GetAll<MeteringPointType>().First(type => type.Name.Equals(valueToParse, StringComparison.OrdinalIgnoreCase) ||
-                                                                  type.Code.Equals(valueToParse, StringComparison.OrdinalIgnoreCase));
+        var meteringPointType = GetAll<MeteringPointType>().FirstOrDefault(type => type.Name.Equals(valueToParse, StringComparison.OrdinalIgnoreCase)) ?? throw new InvalidOperationException($"{valueToParse} is not a valid metering point type");
+
+        return meteringPointType;
     }
 }
