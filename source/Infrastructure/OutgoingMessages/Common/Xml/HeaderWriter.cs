@@ -43,7 +43,7 @@ internal static class HeaderWriter
             .ConfigureAwait(false);
         await writer.WriteElementStringAsync(documentDetails.Prefix, "mRID", null, messageHeader.MessageId).ConfigureAwait(false);
         await writer.WriteElementStringAsync(documentDetails.Prefix, "type", null, documentDetails.TypeCode).ConfigureAwait(false);
-        await writer.WriteElementStringAsync(documentDetails.Prefix, "process.processType", null, ProcessTypeCodeFrom(messageHeader.ProcessType))
+        await writer.WriteElementStringAsync(documentDetails.Prefix, "process.processType", null, CimCode.Of(ProcessType.From(messageHeader.ProcessType)))
             .ConfigureAwait(false);
         await writer.WriteElementStringAsync(documentDetails.Prefix, "businessSector.type", null, "23").ConfigureAwait(false);
 
@@ -68,20 +68,5 @@ internal static class HeaderWriter
         {
             await writer.WriteElementStringAsync(documentDetails.Prefix, "reason.code", null, reasonCode).ConfigureAwait(false);
         }
-    }
-
-    private static string ProcessTypeCodeFrom(string valueToParse)
-    {
-        var processType = ProcessType.From(valueToParse);
-        if (processType is null)
-            return valueToParse;
-
-        if (processType == ProcessType.BalanceFixing)
-            return "D04";
-
-        if (processType == ProcessType.MoveIn)
-            return "E65";
-
-        return valueToParse;
     }
 }
