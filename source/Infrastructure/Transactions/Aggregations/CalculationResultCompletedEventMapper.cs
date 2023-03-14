@@ -60,7 +60,7 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
     public bool CanHandle(string eventType)
     {
         ArgumentNullException.ThrowIfNull(eventType);
-        return eventType.Equals("calculationresultcompleted", StringComparison.OrdinalIgnoreCase);
+        return eventType.Equals("BalanceFixingCalculationResultCompleted", StringComparison.OrdinalIgnoreCase);
     }
 
     private static ActorGrouping MapActorGrouping(CalculationResultCompleted integrationEvent)
