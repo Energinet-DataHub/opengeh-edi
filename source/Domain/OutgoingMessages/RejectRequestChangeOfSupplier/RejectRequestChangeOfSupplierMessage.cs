@@ -62,7 +62,7 @@ public class RejectRequestChangeOfSupplierMessage : OutgoingMessage
         return new RejectRequestChangeOfSupplierMessage(
             energySupplierNumber,
             transactionId,
-            processType.Code,
+            processType.Name,
             marketActivityRecord);
     }
 }

@@ -18,21 +18,18 @@ namespace Domain.OutgoingMessages;
 
 public sealed class ProcessType : EnumerationType
 {
-    public static readonly ProcessType MoveIn = new(0, nameof(MoveIn), "E65");
-    public static readonly ProcessType BalanceFixing = new(1, nameof(BalanceFixing), "D04");
+    public static readonly ProcessType MoveIn = new(0, nameof(MoveIn));
+    public static readonly ProcessType BalanceFixing = new(1, nameof(BalanceFixing));
 
-    private ProcessType(int id, string name, string code)
+    private ProcessType(int id, string name)
      : base(id, name)
     {
-        Code = code;
     }
 
-    public string Code { get; }
-
-    public static ProcessType? From(string valueToParse)
+    public static ProcessType From(string valueToParse)
     {
-        return GetAll<ProcessType>().FirstOrDefault(processType =>
-            processType.Name.Equals(valueToParse, StringComparison.OrdinalIgnoreCase) ||
-            processType.Code.Equals(valueToParse, StringComparison.OrdinalIgnoreCase));
+        var processType = GetAll<ProcessType>().FirstOrDefault(processType =>
+            processType.Name.Equals(valueToParse, StringComparison.OrdinalIgnoreCase)) ?? throw new InvalidOperationException($"{valueToParse} is not a valid process type");
+        return processType;
     }
 }

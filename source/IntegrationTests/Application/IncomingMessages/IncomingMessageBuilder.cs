@@ -56,9 +56,9 @@ namespace IntegrationTests.Application.IncomingMessages
             return this;
         }
 
-        internal IncomingMessageBuilder WithProcessType(string processType)
+        internal IncomingMessageBuilder WithProcessType(ProcessType processType)
         {
-            _processType = processType;
+            _processType = processType.Name;
             return this;
         }
 

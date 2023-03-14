@@ -22,6 +22,7 @@ using System.Xml.Schema;
 using DocumentValidation.Xml;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Infrastructure.OutgoingMessages.Common;
 using Xunit;
 
 namespace Tests.Infrastructure.OutgoingMessages.Asserts
@@ -65,7 +66,7 @@ namespace Tests.Infrastructure.OutgoingMessages.Asserts
         internal static void AssertHeader(MessageHeader header, XDocument document)
         {
             Assert.NotEmpty(AssertXmlMessage.GetMessageHeaderValue(document, "mRID")!);
-            AssertHasHeaderValue(document, "process.processType", header.ProcessType);
+            AssertHasHeaderValue(document, "process.processType", CimCode.Of(ProcessType.From(header.ProcessType)));
             AssertHasHeaderValue(document, "businessSector.type", "23");
             AssertHasHeaderValue(document, "sender_MarketParticipant.mRID", header.SenderId);
             AssertHasHeaderValue(document, "sender_MarketParticipant.marketRole.type", header.SenderRole);

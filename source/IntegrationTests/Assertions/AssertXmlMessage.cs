@@ -19,6 +19,7 @@ using System.Linq;
 using System.Xml.Linq;
 using Domain.Actors;
 using Domain.OutgoingMessages;
+using Infrastructure.OutgoingMessages.Common;
 using Xunit;
 
 namespace IntegrationTests.Assertions
@@ -92,7 +93,7 @@ namespace IntegrationTests.Assertions
 
         internal AssertXmlMessage IsProcesType(ProcessType processType)
         {
-            Assert.Equal(processType.Code, GetMessageHeaderValue("process.processType"));
+            Assert.Equal(CimCode.Of(processType), GetMessageHeaderValue("process.processType"));
             return this;
         }
 
