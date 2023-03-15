@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Domain.Actors;
-using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.SeedWork;
 
@@ -21,32 +20,13 @@ namespace Domain.Transactions.Aggregations;
 
 public class AggregationResultForwarding : Entity
 {
-    private readonly List<OutgoingMessage> _messages = new();
-
-    private readonly ActorNumber _receivingActor;
-
-    private readonly MarketRole _receivingActorRole;
-
-    private readonly ProcessType _processType;
-
     public AggregationResultForwarding(
-        TransactionId id,
-        ActorNumber receivingActor,
-        MarketRole receivingActorRole,
-        ProcessType processType)
+        TransactionId id)
     {
-        _receivingActor = receivingActor;
-        _receivingActorRole = receivingActorRole;
-        _processType = processType;
         Id = id;
     }
 
     public TransactionId Id { get; }
-
-    public void SendResult(AggregationResult aggregationResult)
-    {
-        _messages.Add(AggregationResultMessage.Create(_receivingActor, _receivingActorRole, Id, _processType, aggregationResult));
-    }
 
     public AggregationResultMessage CreateMessage(Aggregation result)
     {
@@ -67,7 +47,7 @@ public class AggregationResultForwarding : Entity
             return MessageForTheBalanceResponsible(result);
         }
 
-        return AggregationResultMessage.Create(_receivingActor, _receivingActorRole, Id, result);
+        throw new InvalidOperationException("Could not determine the receiver of the aggregation result");
     }
 
     private static bool ResultIsForTheEnergySupplier(Aggregation result)

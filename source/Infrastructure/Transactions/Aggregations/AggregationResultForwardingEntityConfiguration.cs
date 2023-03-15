@@ -38,18 +38,6 @@ internal sealed class AggregationResultForwardingEntityConfiguration : IEntityTy
         builder.HasKey(entity => entity.Id);
         builder.Property(entity => entity.Id)
             .HasConversion(toDbValue => toDbValue.Id, fromDbValue => TransactionId.Create(fromDbValue));
-        builder.Property<ProcessType>("_processType")
-            .HasColumnName("ProcessType")
-            .HasConversion(toDbValue => toDbValue.Name, fromDbValue => EnumerationType.FromName<ProcessType>(fromDbValue));
-        builder.Property<ActorNumber>("_receivingActor")
-            .HasColumnName("ReceivingActor")
-            .HasConversion(toDbValue => toDbValue.Value, fromDbValue => ActorNumber.Create(fromDbValue));
-        builder.Property<MarketRole>("_receivingActorRole")
-            .HasColumnName("ReceivingActorRole")
-            .HasConversion(toDbValue => toDbValue.Name, fromDbValue => EnumerationType.FromName<MarketRole>(fromDbValue));
-        builder.HasMany<OutgoingMessage>("_messages")
-            .WithOne()
-            .HasForeignKey("TransactionId");
         builder.Ignore(entity => entity.DomainEvents);
     }
 }
