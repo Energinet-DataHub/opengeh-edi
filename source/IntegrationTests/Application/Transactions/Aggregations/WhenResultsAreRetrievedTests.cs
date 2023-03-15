@@ -12,22 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
-using Application.Transactions.Aggregations;
 using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using Energinet.DataHub.Wholesale.Contracts.Events;
-using Google.Protobuf.WellKnownTypes;
 using IntegrationTests.Assertions;
 using IntegrationTests.Factories;
 using IntegrationTests.Fixtures;
-using IntegrationTests.TestDoubles;
 using Xunit;
 using ProcessType = Domain.OutgoingMessages.ProcessType;
 using Resolution = Energinet.DataHub.Wholesale.Contracts.Events.Resolution;
@@ -37,19 +31,12 @@ namespace IntegrationTests.Application.Transactions.Aggregations;
 #pragma warning disable CA1062 // To avoid null guards in parameterized tests
 public class WhenResultsAreRetrievedTests : TestBase
 {
-    private readonly AggregationResultsStub _aggregationResults;
     private readonly CalculationResultCompletedEventBuilder _eventBuilder = new();
     private readonly string _receivedEventType = "BalanceFixingCalculationResultCompleted";
 
     public WhenResultsAreRetrievedTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _aggregationResults = (AggregationResultsStub)GetService<IAggregationResults>();
-    }
-
-    public static IEnumerable<object[]> AggregationProcessTypes()
-    {
-        return new[] { new object[] { ProcessType.BalanceFixing }, };
     }
 
     [Fact]
@@ -184,12 +171,6 @@ public class WhenResultsAreRetrievedTests : TestBase
                 null!);
     }
 
-    private async Task AggregationResultsAreRetrieved(ProcessType completedAggregationType)
-    {
-        await RetrieveResults(completedAggregationType).ConfigureAwait(false);
-        await HavingProcessedInternalTasksAsync().ConfigureAwait(false);
-    }
-
     private async Task<AssertOutgoingMessage> OutgoingMessageAsync(MarketRole roleOfReceiver, ProcessType completedAggregationType)
     {
         return await AssertOutgoingMessage.OutgoingMessageAsync(
@@ -197,14 +178,5 @@ public class WhenResultsAreRetrievedTests : TestBase
             completedAggregationType.Name,
             roleOfReceiver,
             GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
-    }
-
-    private async Task RetrieveResults(ProcessType completedAggregationType)
-    {
-        await InvokeCommandAsync(new RetrieveAggregationResults(
-            SampleData.ResultId,
-            completedAggregationType.Name,
-            SampleData.GridAreaCode,
-            new Period(SampleData.StartOfPeriod, SampleData.EndOfPeriod))).ConfigureAwait(false);
     }
 }
