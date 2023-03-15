@@ -99,35 +99,21 @@ public class WhenResultsAreRetrievedTests : TestBase
             .HasMessageRecordValue<TimeSeries>(property => property.SettlementType!, SettlementType.NonProfiled.Name);
     }
 
-    [Theory]
-    [MemberData(nameof(AggregationProcessTypes))]
-    public async Task Total_production_result_is_sent_to_the_grid_operator(ProcessType completedAggregationType)
+    [Fact]
+    public async Task Total_production_result_is_sent_to_the_grid_operator()
     {
-        var @event = new CalculationResultCompleted()
-        {
-            ProcessType = Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing,
-            Resolution = Resolution.Quarter,
-            BatchId = Guid.NewGuid().ToString(),
-            QuantityUnit = QuantityUnit.Kwh,
-            AggregationPerGridarea = new AggregationPerGridArea() { GridAreaCode = SampleData.GridAreaCode, },
-            PeriodStartUtc = Timestamp.FromDateTime(SampleData.StartOfPeriod.ToDateTimeUtc()),
-            PeriodEndUtc = Timestamp.FromDateTime(SampleData.EndOfPeriod.ToDateTimeUtc()),
-            TimeSeriesType = TimeSeriesType.Production,
-            TimeSeriesPoints =
-            {
-                new TimeSeriesPoint()
-                {
-                    Time = Timestamp.FromDateTime(DateTime.UtcNow),
-                    Quantity = new DecimalValue() { Nanos = 1, Units = 1 },
-                    QuantityQuality = QuantityQuality.Measured,
-                },
-            },
-        };
+        _eventBuilder
+            .WithProcessType(Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing)
+            .WithResolution(Resolution.Quarter)
+            .WithMeasurementUnit(QuantityUnit.Kwh)
+            .AggregatedBy(SampleData.GridAreaCode, null, null)
+            .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
+            .ResultOf(TimeSeriesType.Production);
 
-        await HavingReceivedIntegrationEventAsync(_receivedEventType, @event).ConfigureAwait(false);
+        await HavingReceivedIntegrationEventAsync(_receivedEventType, _eventBuilder.Build()).ConfigureAwait(false);
 
         var message = await OutgoingMessageAsync(
-            MarketRole.MeteredDataResponsible, completedAggregationType);
+            MarketRole.MeteredDataResponsible, ProcessType.BalanceFixing);
         message.HasReceiverId(SampleData.GridOperatorNumber)
             .HasReceiverRole(MarketRole.MeteredDataResponsible.Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
