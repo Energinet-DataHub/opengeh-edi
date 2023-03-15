@@ -25,8 +25,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequestResponse", "RequestR
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerformanceTest", "PerformanceTest\PerformanceTest.csproj", "{B021EA3C-AB51-4069-AE26-B1F907A0D165}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearningTests", "LearningTests\LearningTests.csproj", "{CDC5AB8C-7D15-4EA6-9FD6-8FAD8C9E35CB}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApplyDBMigrationsApp", "ApplyDBMigrationsApp\ApplyDBMigrationsApp.csproj", "{600E0CAA-23B7-493D-90D0-6DDA72104673}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocumentValidation", "DocumentValidation\DocumentValidation.csproj", "{5AB5E68B-40C5-4FDF-8EA7-99FFD3DCBC13}"
@@ -81,10 +79,6 @@ Global
 		{B021EA3C-AB51-4069-AE26-B1F907A0D165}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B021EA3C-AB51-4069-AE26-B1F907A0D165}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B021EA3C-AB51-4069-AE26-B1F907A0D165}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CDC5AB8C-7D15-4EA6-9FD6-8FAD8C9E35CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CDC5AB8C-7D15-4EA6-9FD6-8FAD8C9E35CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CDC5AB8C-7D15-4EA6-9FD6-8FAD8C9E35CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CDC5AB8C-7D15-4EA6-9FD6-8FAD8C9E35CB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{600E0CAA-23B7-493D-90D0-6DDA72104673}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{600E0CAA-23B7-493D-90D0-6DDA72104673}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{600E0CAA-23B7-493D-90D0-6DDA72104673}.Release|Any CPU.ActiveCfg = Release|Any CPU

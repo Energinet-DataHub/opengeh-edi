@@ -93,11 +93,7 @@ namespace Api
                     CompositionRoot.Initialize(services)
                         .AddMessageBus(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND!)
                         .AddPeekConfiguration(new BundleConfiguration(runtime.MAX_NUMBER_OF_PAYLOADS_IN_BUNDLE))
-                        .AddAggregationsConfiguration(sp => new AggregationResultsOverHttp(
-                            sp.GetRequiredService<IHttpClientAdapter>(),
-                            runtime.AGGREGATION_RESULTS_API_URI,
-                            sp.GetRequiredService<AggregationResultMapper>(),
-                            sp.GetRequiredService<ISerializer>()))
+                        .AddAggregationsConfiguration()
                         .AddRemoteBusinessService<DummyRequest, DummyReply>("Dummy", "Dummy")
                         .AddBearerAuthentication(tokenValidationParameters)
                         .AddAuthentication(sp =>
