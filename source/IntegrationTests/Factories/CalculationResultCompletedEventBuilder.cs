@@ -28,6 +28,7 @@ internal sealed class CalculationResultCompletedEventBuilder
     private Resolution _resolution = Resolution.Quarter;
     private QuantityUnit _measurementUnit = QuantityUnit.Kwh;
     private AggregationPerGridArea? _aggregationPerGridArea;
+    private AggregationPerEnergySupplierPerGridArea? _aggregationPerEnergySupplier;
     private Timestamp _startOfPeriod = SystemClock.Instance.GetCurrentInstant().ToTimestamp();
     private Timestamp _endOfPeriod = SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(1)).ToTimestamp();
     private TimeSeriesType _timeSeriesType = TimeSeriesType.NonProfiledConsumption;
@@ -41,6 +42,7 @@ internal sealed class CalculationResultCompletedEventBuilder
             BatchId = Guid.NewGuid().ToString(),
             QuantityUnit = _measurementUnit,
             AggregationPerGridarea = _aggregationPerGridArea ?? null,
+            AggregationPerEnergysupplierPerGridarea = _aggregationPerEnergySupplier ?? null,
             PeriodStartUtc = _startOfPeriod,
             PeriodEndUtc = _endOfPeriod,
             TimeSeriesType = _timeSeriesType,
@@ -76,9 +78,20 @@ internal sealed class CalculationResultCompletedEventBuilder
 
     internal CalculationResultCompletedEventBuilder AggregatedBy(string gridAreaCode, string? balanceResponsibleNumber = null, string? energySupplierNumber = null)
     {
+        _aggregationPerGridArea = null;
+        _aggregationPerEnergySupplier = null;
+
         if (balanceResponsibleNumber is null && energySupplierNumber is null)
         {
             _aggregationPerGridArea = new AggregationPerGridArea() { GridAreaCode = gridAreaCode, };
+        }
+
+        if (energySupplierNumber is not null && balanceResponsibleNumber is null)
+        {
+            _aggregationPerEnergySupplier = new AggregationPerEnergySupplierPerGridArea()
+            {
+                GridAreaCode = gridAreaCode, EnergySupplierGlnOrEic = energySupplierNumber,
+            };
         }
 
         return this;

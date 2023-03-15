@@ -56,14 +56,13 @@ public class WhenResultsAreRetrievedTests : TestBase
     [MemberData(nameof(AggregationProcessTypes))]
     public async Task Non_profiled_consumption_result_is_sent_the_energy_supplier(ProcessType completedAggregationType)
     {
-        _aggregationResults.HasResultForActor(SampleData.EnergySupplierNumber, AggregationResultBuilder
-            .Result()
-            .WithGridArea(SampleData.GridAreaCode)
-            .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
-            .WithResolution(SampleData.Resolution)
-            .Build());
+        _eventBuilder
+            .AggregatedBy(SampleData.GridAreaCode, null, SampleData.EnergySupplierNumber.Value)
+            .ResultOf(TimeSeriesType.NonProfiledConsumption)
+            .WithResolution(Resolution.Quarter)
+            .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod);
 
-        await AggregationResultsAreRetrieved(completedAggregationType);
+        await HavingReceivedIntegrationEventAsync(_receivedEventType, _eventBuilder.Build()).ConfigureAwait(false);
 
         var outgoingMessage = await OutgoingMessageAsync(MarketRole.EnergySupplier, completedAggregationType);
         outgoingMessage
