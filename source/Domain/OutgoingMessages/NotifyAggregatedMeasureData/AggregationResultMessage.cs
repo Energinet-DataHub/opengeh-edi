@@ -85,8 +85,8 @@ public class AggregationResultMessage : OutgoingMessage
             result.SettlementType,
             result.MeasureUnitType,
             result.Resolution,
-            null,
-            null,
+            result.ActorGrouping?.EnergySupplierNumber,
+            result.ActorGrouping?.BalanceResponsibleNumber,
             result.Period,
             result.Points.Select(p => new Point(p.Position, p.Quantity, p.Quality, p.SampleTime)).ToList());
 
