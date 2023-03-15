@@ -31,6 +31,7 @@ internal sealed class CalculationResultCompletedEventBuilder
     private AggregationPerGridArea? _aggregationPerGridArea;
     private AggregationPerEnergySupplierPerGridArea? _aggregationPerEnergySupplier;
     private AggregationPerEnergySupplierPerBalanceResponsiblePartyPerGridArea? _aggregationPerBalanceResponsiblePerEnergySupplier;
+    private AggregationPerBalanceResponsiblePartyPerGridArea? _aggregationPerBalanceResponsible;
     private Timestamp _startOfPeriod = SystemClock.Instance.GetCurrentInstant().ToTimestamp();
     private Timestamp _endOfPeriod = SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(1)).ToTimestamp();
     private TimeSeriesType _timeSeriesType = TimeSeriesType.NonProfiledConsumption;
@@ -98,6 +99,23 @@ internal sealed class CalculationResultCompletedEventBuilder
             return @event;
         }
 
+        if (_aggregationPerBalanceResponsible is not null)
+        {
+            @event = new CalculationResultCompleted()
+            {
+                ProcessType = _processType,
+                Resolution = _resolution,
+                BatchId = Guid.NewGuid().ToString(),
+                QuantityUnit = _measurementUnit,
+                AggregationPerBalanceresponsiblepartyPerGridarea = _aggregationPerBalanceResponsible,
+                PeriodStartUtc = _startOfPeriod,
+                PeriodEndUtc = _endOfPeriod,
+                TimeSeriesType = _timeSeriesType,
+            };
+            @event.TimeSeriesPoints.Add(_timeSeriesPoints);
+            return @event;
+        }
+
         @event = new CalculationResultCompleted()
         {
             ProcessType = _processType,
@@ -135,6 +153,7 @@ internal sealed class CalculationResultCompletedEventBuilder
         _aggregationPerGridArea = null;
         _aggregationPerEnergySupplier = null;
         _aggregationPerBalanceResponsiblePerEnergySupplier = null;
+        _aggregationPerBalanceResponsible = null;
 
         if (balanceResponsibleNumber is null && energySupplierNumber is null)
         {
@@ -156,6 +175,16 @@ internal sealed class CalculationResultCompletedEventBuilder
                 {
                     GridAreaCode = gridAreaCode,
                     EnergySupplierGlnOrEic = energySupplierNumber,
+                    BalanceResponsiblePartyGlnOrEic = balanceResponsibleNumber,
+                };
+        }
+
+        if (balanceResponsibleNumber is not null && energySupplierNumber is null)
+        {
+            _aggregationPerBalanceResponsible =
+                new AggregationPerBalanceResponsiblePartyPerGridArea()
+                {
+                    GridAreaCode = gridAreaCode,
                     BalanceResponsiblePartyGlnOrEic = balanceResponsibleNumber,
                 };
         }

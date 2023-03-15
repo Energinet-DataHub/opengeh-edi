@@ -138,6 +138,7 @@ public class WhenResultsAreRetrievedTests : TestBase
             .ResultOf(TimeSeriesType.NonProfiledConsumption);
 
         await HavingReceivedIntegrationEventAsync(_receivedEventType, _eventBuilder.Build()).ConfigureAwait(false);
+
         var outgoingMessage = await OutgoingMessageAsync(
             MarketRole.BalanceResponsible,
             ProcessType.BalanceFixing);
@@ -154,27 +155,22 @@ public class WhenResultsAreRetrievedTests : TestBase
                 SampleData.EnergySupplierNumber.Value);
     }
 
-    [Theory]
-    [MemberData(nameof(AggregationProcessTypes))]
-    public async Task Total_non_profiled_consumption_result_is_sent_to_the_balance_responsible(ProcessType completedAggregationType)
+    [Fact]
+    public async Task Total_non_profiled_consumption_result_is_sent_to_the_balance_responsible()
     {
-        _aggregationResults.HasResultForActor(
-            SampleData.BalanceResponsibleNumber,
-            AggregationResultBuilder.Result()
-                .WithGridArea(SampleData.GridAreaCode)
-                .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
-                .WithResolution(SampleData.Resolution)
-                .WithMeteringPointType(MeteringPointType.Consumption)
-                .WithSettlementMethod(SettlementType.NonProfiled)
-                .WithReceivingActorNumber(SampleData.BalanceResponsibleNumber)
-                .WithReceivingActorRole(MarketRole.BalanceResponsible)
-                .Build());
+        _eventBuilder
+            .WithProcessType(Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing)
+            .WithResolution(Resolution.Quarter)
+            .WithMeasurementUnit(QuantityUnit.Kwh)
+            .AggregatedBy(SampleData.GridAreaCode, SampleData.BalanceResponsibleNumber.Value, null)
+            .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
+            .ResultOf(TimeSeriesType.NonProfiledConsumption);
 
-        await AggregationResultsAreRetrieved(completedAggregationType);
+        await HavingReceivedIntegrationEventAsync(_receivedEventType, _eventBuilder.Build()).ConfigureAwait(false);
 
         var outgoingMessage = await OutgoingMessageAsync(
             MarketRole.BalanceResponsible,
-            completedAggregationType);
+            ProcessType.BalanceFixing);
         outgoingMessage
             .HasReceiverId(SampleData.BalanceResponsibleNumber.Value)
             .HasReceiverRole(MarketRole.BalanceResponsible.Name)
