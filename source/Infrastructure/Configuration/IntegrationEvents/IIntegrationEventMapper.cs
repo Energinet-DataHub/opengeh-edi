@@ -27,11 +27,17 @@ public interface IIntegrationEventMapper
     /// </summary>
     /// <param name="payload"></param>
     /// <returns><see cref="INotification"/></returns>
-    Task<INotification> MapFromAsync(byte[] payload);
+    Task<INotification> MapFromAsync(string payload);
 
     /// <summary>
     /// Determines whether the specified event type can be handled by the mapper
     /// </summary>
     /// <param name="eventType"></param>
     bool CanHandle(string eventType);
+
+    /// <summary>
+    /// Parses the event to JSON
+    /// </summary>
+    /// <param name="payload"></param>
+    string ToJson(byte[] payload);
 }
