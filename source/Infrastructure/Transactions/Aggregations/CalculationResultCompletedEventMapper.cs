@@ -52,7 +52,6 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
                 MapPeriod(integrationEvent),
                 MapSettlementMethod(integrationEvent),
                 MapProcessType(integrationEvent),
-                null,
                 MapActorGrouping(integrationEvent),
                 await MapGridAreaDetailsAsync(integrationEvent).ConfigureAwait(false)));
     }

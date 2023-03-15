@@ -25,7 +25,6 @@ public record Aggregation(
     Period Period,
     string? SettlementType,
     string ProcessType,
-    string? AggregatedForActor = null,
     ActorGrouping? ActorGrouping = null,
     GridAreaDetails? GridAreaDetails = null);
 

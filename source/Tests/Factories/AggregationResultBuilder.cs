@@ -43,7 +43,6 @@ public class AggregationResultBuilder
                 SystemClock.Instance.GetCurrentInstant()),
             SettlementType.NonProfiled.Name,
             ProcessType.BalanceFixing.Name,
-            null,
             _actorGrouping,
             new GridAreaDetails(_gridArea.Code, _gridOperator.Value));
     }
