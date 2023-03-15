@@ -15,6 +15,9 @@
 using System;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf.WellKnownTypes;
+using NodaTime;
+using NodaTime.Serialization.Protobuf;
+using Duration = NodaTime.Duration;
 
 namespace IntegrationTests.Factories;
 
@@ -24,6 +27,9 @@ internal sealed class CalculationResultCompletedEventBuilder
     private Resolution _resolution = Resolution.Quarter;
     private QuantityUnit _measurementUnit = QuantityUnit.Kwh;
     private AggregationPerGridArea? _aggregationPerGridArea;
+    private Timestamp _startOfPeriod = SystemClock.Instance.GetCurrentInstant().ToTimestamp();
+    private Timestamp _endOfPeriod = SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(1)).ToTimestamp();
+    private TimeSeriesType _timeSeriesType = TimeSeriesType.NonProfiledConsumption;
 
     internal CalculationResultCompleted Build()
     {
@@ -34,9 +40,9 @@ internal sealed class CalculationResultCompletedEventBuilder
             BatchId = Guid.NewGuid().ToString(),
             QuantityUnit = _measurementUnit,
             AggregationPerGridarea = _aggregationPerGridArea ?? null,
-            PeriodStartUtc = Timestamp.FromDateTime(DateTime.UtcNow),
-            PeriodEndUtc = Timestamp.FromDateTime(DateTime.UtcNow),
-            TimeSeriesType = TimeSeriesType.FlexConsumption,
+            PeriodStartUtc = _startOfPeriod,
+            PeriodEndUtc = _endOfPeriod,
+            TimeSeriesType = _timeSeriesType,
             TimeSeriesPoints =
             {
                 new TimeSeriesPoint()
@@ -74,6 +80,19 @@ internal sealed class CalculationResultCompletedEventBuilder
             _aggregationPerGridArea = new AggregationPerGridArea() { GridAreaCode = gridAreaCode, };
         }
 
+        return this;
+    }
+
+    internal CalculationResultCompletedEventBuilder WithPeriod(Instant startOfPeriod, Instant endOfPeriod)
+    {
+        _startOfPeriod = startOfPeriod.ToTimestamp();
+        _endOfPeriod = endOfPeriod.ToTimestamp();
+        return this;
+    }
+
+    internal CalculationResultCompletedEventBuilder ResultOf(TimeSeriesType timeSeriesType)
+    {
+        _timeSeriesType = timeSeriesType;
         return this;
     }
 }
