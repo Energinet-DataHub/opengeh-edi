@@ -20,12 +20,13 @@ namespace IntegrationTests.Factories;
 
 internal sealed class CalculationResultCompletedEventBuilder
 {
-    #pragma warning disable
+    private ProcessType _processType = ProcessType.BalanceFixing;
+
     internal CalculationResultCompleted Build()
     {
         return new CalculationResultCompleted()
         {
-            ProcessType = Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing,
+            ProcessType = _processType,
             Resolution = Resolution.Quarter,
             BatchId = Guid.NewGuid().ToString(),
             QuantityUnit = QuantityUnit.Kwh,
@@ -43,5 +44,11 @@ internal sealed class CalculationResultCompletedEventBuilder
                 },
             },
         };
+    }
+
+    internal CalculationResultCompletedEventBuilder WithProcessType(ProcessType processType)
+    {
+        _processType = processType;
+        return this;
     }
 }

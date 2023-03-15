@@ -80,6 +80,7 @@ public class WhenResultsAreRetrievedTests : TestBase
     [Fact]
     public async Task Total_flex_consumption_is_sent_to_the_grid_operator()
     {
+        _eventBuilder.WithProcessType(Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing);
         // var @event = new CalculationResultCompleted()
         // {
         //     ProcessType = Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing,
