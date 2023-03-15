@@ -78,7 +78,7 @@ public class WhenResultsAreRetrievedTests : TestBase
     }
 
     [Fact]
-    public async Task Total_flex_consumption_is_sent_to_the_grid_operator()
+    public async Task Total_non_profiled_consumption_is_sent_to_the_grid_operator()
     {
         _eventBuilder
             .WithProcessType(Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing)
@@ -86,7 +86,7 @@ public class WhenResultsAreRetrievedTests : TestBase
             .WithMeasurementUnit(QuantityUnit.Kwh)
             .AggregatedBy(SampleData.GridAreaCode, null, null)
             .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
-            .ResultOf(TimeSeriesType.FlexConsumption);
+            .ResultOf(TimeSeriesType.NonProfiledConsumption);
 
         await HavingReceivedIntegrationEventAsync(_receivedEventType, _eventBuilder.Build()).ConfigureAwait(false);
 
@@ -97,7 +97,7 @@ public class WhenResultsAreRetrievedTests : TestBase
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
             .HasMessageRecordValue<TimeSeries>(x => x.MeteringPointType, MeteringPointType.Consumption.Name)
-            .HasMessageRecordValue<TimeSeries>(property => property.SettlementType!, SettlementType.Flex.Name);
+            .HasMessageRecordValue<TimeSeries>(property => property.SettlementType!, SettlementType.NonProfiled.Name);
     }
 
     [Theory]
