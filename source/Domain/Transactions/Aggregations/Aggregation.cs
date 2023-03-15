@@ -25,8 +25,8 @@ public record Aggregation(
     Period Period,
     string? SettlementType,
     string ProcessType,
-    ActorGrouping? ActorGrouping = null,
-    GridAreaDetails? GridAreaDetails = null);
+    ActorGrouping ActorGrouping,
+    GridAreaDetails GridAreaDetails);
 
 public record Point(int Position, decimal? Quantity, string Quality, string SampleTime);
 
