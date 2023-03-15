@@ -28,13 +28,12 @@ using Resolution = Energinet.DataHub.Wholesale.Contracts.Events.Resolution;
 
 namespace IntegrationTests.Application.Transactions.Aggregations;
 
-#pragma warning disable CA1062 // To avoid null guards in parameterized tests
-public class WhenResultsAreRetrievedTests : TestBase
+public class WhenAnAggregationResultIsAvailableTests : TestBase
 {
     private readonly CalculationResultCompletedEventBuilder _eventBuilder = new();
     private readonly string _receivedEventType = "BalanceFixingCalculationResultCompleted";
 
-    public WhenResultsAreRetrievedTests(DatabaseFixture databaseFixture)
+    public WhenAnAggregationResultIsAvailableTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
     }
