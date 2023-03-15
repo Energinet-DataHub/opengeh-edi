@@ -38,6 +38,7 @@ namespace IntegrationTests.Application.Transactions.Aggregations;
 public class WhenResultsAreRetrievedTests : TestBase
 {
     private readonly AggregationResultsStub _aggregationResults;
+    private readonly CalculationResultCompletedEventBuilder _eventBuilder = new();
     private readonly string _receivedEventType = "BalanceFixingCalculationResultCompleted";
 
     public WhenResultsAreRetrievedTests(DatabaseFixture databaseFixture)
@@ -79,28 +80,27 @@ public class WhenResultsAreRetrievedTests : TestBase
     [Fact]
     public async Task Total_flex_consumption_is_sent_to_the_grid_operator()
     {
-        var @event = new CalculationResultCompleted()
-        {
-            ProcessType = Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing,
-            Resolution = Resolution.Quarter,
-            BatchId = Guid.NewGuid().ToString(),
-            QuantityUnit = QuantityUnit.Kwh,
-            AggregationPerGridarea = new AggregationPerGridArea() { GridAreaCode = SampleData.GridAreaCode, },
-            PeriodStartUtc = Timestamp.FromDateTime(DateTime.UtcNow),
-            PeriodEndUtc = Timestamp.FromDateTime(DateTime.UtcNow),
-            TimeSeriesType = TimeSeriesType.FlexConsumption,
-            TimeSeriesPoints =
-            {
-                new TimeSeriesPoint()
-                {
-                    Time = Timestamp.FromDateTime(DateTime.UtcNow),
-                    Quantity = new DecimalValue() { Nanos = 1, Units = 1 },
-                    QuantityQuality = QuantityQuality.Measured,
-                },
-            },
-        };
-
-        await HavingReceivedIntegrationEventAsync(_receivedEventType, @event).ConfigureAwait(false);
+        // var @event = new CalculationResultCompleted()
+        // {
+        //     ProcessType = Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing,
+        //     Resolution = Resolution.Quarter,
+        //     BatchId = Guid.NewGuid().ToString(),
+        //     QuantityUnit = QuantityUnit.Kwh,
+        //     AggregationPerGridarea = new AggregationPerGridArea() { GridAreaCode = SampleData.GridAreaCode, },
+        //     PeriodStartUtc = Timestamp.FromDateTime(DateTime.UtcNow),
+        //     PeriodEndUtc = Timestamp.FromDateTime(DateTime.UtcNow),
+        //     TimeSeriesType = TimeSeriesType.FlexConsumption,
+        //     TimeSeriesPoints =
+        //     {
+        //         new TimeSeriesPoint()
+        //         {
+        //             Time = Timestamp.FromDateTime(DateTime.UtcNow),
+        //             Quantity = new DecimalValue() { Nanos = 1, Units = 1 },
+        //             QuantityQuality = QuantityQuality.Measured,
+        //         },
+        //     },
+        // };
+        await HavingReceivedIntegrationEventAsync(_receivedEventType, _eventBuilder.Build()).ConfigureAwait(false);
 
         var message = await OutgoingMessageAsync(
             MarketRole.MeteredDataResponsible, ProcessType.BalanceFixing);
