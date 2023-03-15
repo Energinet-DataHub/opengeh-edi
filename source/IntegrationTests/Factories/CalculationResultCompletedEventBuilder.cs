@@ -21,13 +21,14 @@ namespace IntegrationTests.Factories;
 internal sealed class CalculationResultCompletedEventBuilder
 {
     private ProcessType _processType = ProcessType.BalanceFixing;
+    private Resolution _resolution = Resolution.Quarter;
 
     internal CalculationResultCompleted Build()
     {
         return new CalculationResultCompleted()
         {
             ProcessType = _processType,
-            Resolution = Resolution.Quarter,
+            Resolution = _resolution,
             BatchId = Guid.NewGuid().ToString(),
             QuantityUnit = QuantityUnit.Kwh,
             AggregationPerGridarea = new AggregationPerGridArea() { GridAreaCode = "805", },
@@ -49,6 +50,12 @@ internal sealed class CalculationResultCompletedEventBuilder
     internal CalculationResultCompletedEventBuilder WithProcessType(ProcessType processType)
     {
         _processType = processType;
+        return this;
+    }
+
+    internal CalculationResultCompletedEventBuilder WithResolution(Resolution resolution)
+    {
+        _resolution = resolution;
         return this;
     }
 }
