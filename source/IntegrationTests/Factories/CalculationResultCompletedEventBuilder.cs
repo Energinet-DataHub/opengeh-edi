@@ -23,6 +23,7 @@ internal sealed class CalculationResultCompletedEventBuilder
     private ProcessType _processType = ProcessType.BalanceFixing;
     private Resolution _resolution = Resolution.Quarter;
     private QuantityUnit _measurementUnit = QuantityUnit.Kwh;
+    private AggregationPerGridArea? _aggregationPerGridArea;
 
     internal CalculationResultCompleted Build()
     {
@@ -32,7 +33,7 @@ internal sealed class CalculationResultCompletedEventBuilder
             Resolution = _resolution,
             BatchId = Guid.NewGuid().ToString(),
             QuantityUnit = _measurementUnit,
-            AggregationPerGridarea = new AggregationPerGridArea() { GridAreaCode = "805", },
+            AggregationPerGridarea = _aggregationPerGridArea ?? null,
             PeriodStartUtc = Timestamp.FromDateTime(DateTime.UtcNow),
             PeriodEndUtc = Timestamp.FromDateTime(DateTime.UtcNow),
             TimeSeriesType = TimeSeriesType.FlexConsumption,
@@ -63,6 +64,16 @@ internal sealed class CalculationResultCompletedEventBuilder
     internal CalculationResultCompletedEventBuilder WithMeasurementUnit(QuantityUnit measurementUnit)
     {
         _measurementUnit = measurementUnit;
+        return this;
+    }
+
+    internal CalculationResultCompletedEventBuilder AggregatedBy(string gridAreaCode, string? balanceResponsibleNumber = null, string? energySupplierNumber = null)
+    {
+        if (balanceResponsibleNumber is null && energySupplierNumber is null)
+        {
+            _aggregationPerGridArea = new AggregationPerGridArea() { GridAreaCode = gridAreaCode, };
+        }
+
         return this;
     }
 }
