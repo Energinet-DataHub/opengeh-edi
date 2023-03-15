@@ -14,6 +14,7 @@
 
 using System;
 using Energinet.DataHub.Wholesale.Contracts.Events;
+using Google.Protobuf.Collections;
 using Google.Protobuf.WellKnownTypes;
 using NodaTime;
 using NodaTime.Serialization.Protobuf;

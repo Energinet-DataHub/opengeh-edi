@@ -87,26 +87,7 @@ public class WhenResultsAreRetrievedTests : TestBase
             .AggregatedBy(SampleData.GridAreaCode, null, null)
             .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
             .ResultOf(TimeSeriesType.FlexConsumption);
-        // var @event = new CalculationResultCompleted()
-        // {
-        //     ProcessType = Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing,
-        //     Resolution = Resolution.Quarter,
-        //     BatchId = Guid.NewGuid().ToString(),
-        //     QuantityUnit = QuantityUnit.Kwh,
-        //     AggregationPerGridarea = new AggregationPerGridArea() { GridAreaCode = SampleData.GridAreaCode, },
-        //     PeriodStartUtc = Timestamp.FromDateTime(DateTime.UtcNow),
-        //     PeriodEndUtc = Timestamp.FromDateTime(DateTime.UtcNow),
-        //     TimeSeriesType = TimeSeriesType.FlexConsumption,
-        //     TimeSeriesPoints =
-        //     {
-        //         new TimeSeriesPoint()
-        //         {
-        //             Time = Timestamp.FromDateTime(DateTime.UtcNow),
-        //             Quantity = new DecimalValue() { Nanos = 1, Units = 1 },
-        //             QuantityQuality = QuantityQuality.Measured,
-        //         },
-        //     },
-        // };
+
         await HavingReceivedIntegrationEventAsync(_receivedEventType, _eventBuilder.Build()).ConfigureAwait(false);
 
         var message = await OutgoingMessageAsync(
