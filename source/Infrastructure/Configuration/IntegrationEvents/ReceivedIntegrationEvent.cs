@@ -18,7 +18,7 @@ namespace Infrastructure.Configuration.IntegrationEvents;
 
 public class ReceivedIntegrationEvent
 {
-    public ReceivedIntegrationEvent(string id, string eventType, byte[] eventPayload, Instant occurredOn)
+    public ReceivedIntegrationEvent(string id, string eventType, string eventPayload, Instant occurredOn)
     {
         Id = id;
         OccurredOn = occurredOn;
@@ -38,5 +38,5 @@ public class ReceivedIntegrationEvent
     public string EventType { get; }
 
     #pragma warning disable CA1819
-    public byte[] EventPayload { get; }
+    public string EventPayload { get; }
 }

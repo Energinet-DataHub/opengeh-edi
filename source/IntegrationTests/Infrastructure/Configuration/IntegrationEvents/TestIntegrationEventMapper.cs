@@ -23,7 +23,7 @@ namespace IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 public class TestIntegrationEventMapper : IIntegrationEventMapper
 {
     #pragma warning disable // Method cannot be static since inherited from the interface
-    public Task<INotification> MapFromAsync(byte[] payload)
+    public Task<INotification> MapFromAsync(string payload)
     {
         var integrationEvent = JsonSerializer.Deserialize<TestIntegrationEvent>(payload);
         return Task.FromResult((INotification)new TestNotification(integrationEvent!.Property1));
@@ -33,5 +33,11 @@ public class TestIntegrationEventMapper : IIntegrationEventMapper
     {
         ArgumentNullException.ThrowIfNull(eventType);
         return eventType.Equals(nameof(TestIntegrationEvent), StringComparison.OrdinalIgnoreCase);
+    }
+
+    public string ToJson(byte[] payload)
+    {
+        var integrationEvent = JsonSerializer.Deserialize<TestIntegrationEvent>(payload);
+        return JsonSerializer.Serialize(integrationEvent);
     }
 }
