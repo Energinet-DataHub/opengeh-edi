@@ -82,7 +82,8 @@ public class WhenResultsAreRetrievedTests : TestBase
     {
         _eventBuilder
             .WithProcessType(Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing)
-            .WithResolution(Resolution.Quarter);
+            .WithResolution(Resolution.Quarter)
+            .WithMeasurementUnit(QuantityUnit.Kwh);
         // var @event = new CalculationResultCompleted()
         // {
         //     ProcessType = Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing,

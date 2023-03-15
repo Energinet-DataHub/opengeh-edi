@@ -22,6 +22,7 @@ internal sealed class CalculationResultCompletedEventBuilder
 {
     private ProcessType _processType = ProcessType.BalanceFixing;
     private Resolution _resolution = Resolution.Quarter;
+    private QuantityUnit _measurementUnit = QuantityUnit.Kwh;
 
     internal CalculationResultCompleted Build()
     {
@@ -30,7 +31,7 @@ internal sealed class CalculationResultCompletedEventBuilder
             ProcessType = _processType,
             Resolution = _resolution,
             BatchId = Guid.NewGuid().ToString(),
-            QuantityUnit = QuantityUnit.Kwh,
+            QuantityUnit = _measurementUnit,
             AggregationPerGridarea = new AggregationPerGridArea() { GridAreaCode = "805", },
             PeriodStartUtc = Timestamp.FromDateTime(DateTime.UtcNow),
             PeriodEndUtc = Timestamp.FromDateTime(DateTime.UtcNow),
@@ -56,6 +57,12 @@ internal sealed class CalculationResultCompletedEventBuilder
     internal CalculationResultCompletedEventBuilder WithResolution(Resolution resolution)
     {
         _resolution = resolution;
+        return this;
+    }
+
+    internal CalculationResultCompletedEventBuilder WithMeasurementUnit(QuantityUnit measurementUnit)
+    {
+        _measurementUnit = measurementUnit;
         return this;
     }
 }
