@@ -52,11 +52,11 @@ public class WhenResultsAreRetrievedTests : TestBase
         return new[] { new object[] { ProcessType.BalanceFixing }, };
     }
 
-    [Theory]
-    [MemberData(nameof(AggregationProcessTypes))]
-    public async Task Non_profiled_consumption_result_is_sent_the_energy_supplier(ProcessType completedAggregationType)
+    [Fact]
+    public async Task Non_profiled_consumption_result_is_sent_the_energy_supplier()
     {
         _eventBuilder
+            .WithProcessType(Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing)
             .AggregatedBy(SampleData.GridAreaCode, null, SampleData.EnergySupplierNumber.Value)
             .ResultOf(TimeSeriesType.NonProfiledConsumption)
             .WithResolution(Resolution.Quarter)
@@ -64,7 +64,7 @@ public class WhenResultsAreRetrievedTests : TestBase
 
         await HavingReceivedIntegrationEventAsync(_receivedEventType, _eventBuilder.Build()).ConfigureAwait(false);
 
-        var outgoingMessage = await OutgoingMessageAsync(MarketRole.EnergySupplier, completedAggregationType);
+        var outgoingMessage = await OutgoingMessageAsync(MarketRole.EnergySupplier, ProcessType.BalanceFixing);
         outgoingMessage
             .HasReceiverId(SampleData.EnergySupplierNumber.Value)
             .HasReceiverRole(MarketRole.EnergySupplier.Name)

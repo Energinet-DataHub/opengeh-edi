@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using Energinet.DataHub.Wholesale.Contracts.Events;
 using Google.Protobuf.Collections;
 using Google.Protobuf.WellKnownTypes;
@@ -32,30 +33,65 @@ internal sealed class CalculationResultCompletedEventBuilder
     private Timestamp _startOfPeriod = SystemClock.Instance.GetCurrentInstant().ToTimestamp();
     private Timestamp _endOfPeriod = SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(1)).ToTimestamp();
     private TimeSeriesType _timeSeriesType = TimeSeriesType.NonProfiledConsumption;
+    private List<TimeSeriesPoint> _timeSeriesPoints = new List<TimeSeriesPoint>()
+    {
+        new TimeSeriesPoint()
+        {
+            Time = Timestamp.FromDateTime(DateTime.UtcNow),
+            Quantity = new DecimalValue() { Nanos = 1, Units = 1 },
+            QuantityQuality = QuantityQuality.Measured,
+        },
+    };
 
     internal CalculationResultCompleted Build()
     {
-        return new CalculationResultCompleted()
+        CalculationResultCompleted @event;
+        if (_aggregationPerGridArea is not null)
+        {
+            @event = new CalculationResultCompleted()
+            {
+                ProcessType = _processType,
+                Resolution = _resolution,
+                BatchId = Guid.NewGuid().ToString(),
+                QuantityUnit = _measurementUnit,
+                AggregationPerGridarea = _aggregationPerGridArea,
+                PeriodStartUtc = _startOfPeriod,
+                PeriodEndUtc = _endOfPeriod,
+                TimeSeriesType = _timeSeriesType,
+            };
+            @event.TimeSeriesPoints.Add(_timeSeriesPoints);
+            return @event;
+        }
+
+        if (_aggregationPerEnergySupplier is not null)
+        {
+            @event = new CalculationResultCompleted()
+            {
+                ProcessType = _processType,
+                Resolution = _resolution,
+                BatchId = Guid.NewGuid().ToString(),
+                QuantityUnit = _measurementUnit,
+                AggregationPerEnergysupplierPerGridarea = _aggregationPerEnergySupplier,
+                PeriodStartUtc = _startOfPeriod,
+                PeriodEndUtc = _endOfPeriod,
+                TimeSeriesType = _timeSeriesType,
+            };
+            @event.TimeSeriesPoints.Add(_timeSeriesPoints);
+            return @event;
+        }
+
+        @event = new CalculationResultCompleted()
         {
             ProcessType = _processType,
             Resolution = _resolution,
             BatchId = Guid.NewGuid().ToString(),
             QuantityUnit = _measurementUnit,
-            AggregationPerGridarea = _aggregationPerGridArea ?? null,
-            AggregationPerEnergysupplierPerGridarea = _aggregationPerEnergySupplier ?? null,
             PeriodStartUtc = _startOfPeriod,
             PeriodEndUtc = _endOfPeriod,
             TimeSeriesType = _timeSeriesType,
-            TimeSeriesPoints =
-            {
-                new TimeSeriesPoint()
-                {
-                    Time = Timestamp.FromDateTime(DateTime.UtcNow),
-                    Quantity = new DecimalValue() { Nanos = 1, Units = 1 },
-                    QuantityQuality = QuantityQuality.Measured,
-                },
-            },
         };
+        @event.TimeSeriesPoints.Add(_timeSeriesPoints);
+        return @event;
     }
 
     internal CalculationResultCompletedEventBuilder WithProcessType(ProcessType processType)
