@@ -38,10 +38,10 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
         _gridAreaLookup = gridAreaLookup;
     }
 
-    public async Task<INotification> MapFromAsync(byte[] payload)
+    public async Task<INotification> MapFromAsync(string payload)
     {
         var integrationEvent =
-            CalculationResultCompleted.Parser.ParseFrom(payload);
+            CalculationResultCompleted.Parser.ParseJson(payload);
         return new AggregationResultAvailable(
             new Aggregation(
                 MapPoints(integrationEvent.TimeSeriesPoints),
@@ -61,6 +61,12 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
     {
         ArgumentNullException.ThrowIfNull(eventType);
         return eventType.Equals("BalanceFixingCalculationResultCompleted", StringComparison.OrdinalIgnoreCase);
+    }
+
+    public string ToJson(byte[] payload)
+    {
+        var integrationEvent = CalculationResultCompleted.Parser.ParseFrom(payload);
+        return integrationEvent.ToString();
     }
 
     private static ActorGrouping MapActorGrouping(CalculationResultCompleted integrationEvent)
