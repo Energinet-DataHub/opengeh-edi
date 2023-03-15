@@ -18,7 +18,6 @@ namespace Domain.Transactions.Aggregations;
 
 public record Aggregation(
     IReadOnlyList<Point> Points,
-    string GridArea,
     string MeteringPointType,
     string MeasureUnitType,
     string Resolution,
