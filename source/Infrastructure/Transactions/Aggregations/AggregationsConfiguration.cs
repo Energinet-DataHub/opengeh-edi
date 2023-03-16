@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Application.Transactions.Aggregations;
 using Domain.Transactions.Aggregations;
 using MediatR;
@@ -25,7 +24,6 @@ internal static class AggregationsConfiguration
     internal static void Configure(IServiceCollection services)
     {
         services.AddTransient(typeof(INotificationHandler<AggregationResultAvailable>), typeof(WhenAnAggregationResultIsAvailable));
-        services.AddScoped<AggregationResultMapper>();
         services.AddScoped<IAggregationResultForwardingRepository, AggregationResultForwardingRepository>();
         services.AddSingleton<IGridAreaLookup, GridAreaLookup>();
         services.AddTransient<IRequestHandler<ForwardAggregationResult, Unit>, ForwardAggregationResultHandler>();
