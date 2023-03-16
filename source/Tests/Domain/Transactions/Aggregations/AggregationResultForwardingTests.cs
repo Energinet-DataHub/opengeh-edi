@@ -97,11 +97,7 @@ public class AggregationResultForwardingTests
 
     private static AggregationResultForwarding CreateTransaction()
     {
-        var transaction = new AggregationResultForwarding(
-            TransactionId.New(),
-            ActorNumber.Create("1234567890123"),
-            MarketRole.EnergySupplier,
-            ProcessType.MoveIn);
-        return transaction;
+        return new AggregationResultForwarding(
+            TransactionId.New());
     }
 }
