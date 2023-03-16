@@ -45,14 +45,12 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
         return new AggregationResultAvailable(
             new Aggregation(
                 MapPoints(integrationEvent.TimeSeriesPoints),
-                MapGridArea(integrationEvent),
                 MapMeteringPointType(integrationEvent),
                 MapUnitType(integrationEvent),
                 MapResolution(integrationEvent),
                 MapPeriod(integrationEvent),
                 MapSettlementMethod(integrationEvent),
                 MapProcessType(integrationEvent),
-                null,
                 MapActorGrouping(integrationEvent),
                 await MapGridAreaDetailsAsync(integrationEvent).ConfigureAwait(false)));
     }
@@ -127,19 +125,6 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
             TimeSeriesType.NonProfiledConsumption => MeteringPointType.Consumption.Name,
             TimeSeriesType.Unspecified => throw new InvalidOperationException("Unknown metering point type"),
             _ => throw new InvalidOperationException("Could not determine metering point type"),
-        };
-    }
-
-    private static string MapGridArea(CalculationResultCompleted integrationEvent)
-    {
-        return integrationEvent.AggregationLevelCase switch
-        {
-            CalculationResultCompleted.AggregationLevelOneofCase.AggregationPerBalanceresponsiblepartyPerGridarea => integrationEvent.AggregationPerBalanceresponsiblepartyPerGridarea.GridAreaCode,
-            CalculationResultCompleted.AggregationLevelOneofCase.AggregationPerEnergysupplierPerGridarea => integrationEvent.AggregationPerEnergysupplierPerGridarea.GridAreaCode,
-            CalculationResultCompleted.AggregationLevelOneofCase.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea => integrationEvent.AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea.GridAreaCode,
-            CalculationResultCompleted.AggregationLevelOneofCase.AggregationPerGridarea => integrationEvent.AggregationPerGridarea.GridAreaCode,
-            CalculationResultCompleted.AggregationLevelOneofCase.None => throw new InvalidOperationException("Could not determine grid area since aggregation level is not specified"),
-            _ => throw new InvalidOperationException("Unknown aggregation level"),
         };
     }
 

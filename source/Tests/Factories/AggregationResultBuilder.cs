@@ -34,7 +34,6 @@ public class AggregationResultBuilder
     {
         return new Aggregation(
             new List<Point>(),
-            "870",
             _meteringPointType.Name,
             MeasurementUnit.Kwh.Name,
             Resolution.QuarterHourly.Name,
@@ -43,7 +42,6 @@ public class AggregationResultBuilder
                 SystemClock.Instance.GetCurrentInstant()),
             SettlementType.NonProfiled.Name,
             ProcessType.BalanceFixing.Name,
-            null,
             _actorGrouping,
             new GridAreaDetails(_gridArea.Code, _gridOperator.Value));
     }

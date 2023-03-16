@@ -18,16 +18,14 @@ namespace Domain.Transactions.Aggregations;
 
 public record Aggregation(
     IReadOnlyList<Point> Points,
-    string GridArea,
     string MeteringPointType,
     string MeasureUnitType,
     string Resolution,
     Period Period,
     string? SettlementType,
     string ProcessType,
-    string? AggregatedForActor = null,
-    ActorGrouping? ActorGrouping = null,
-    GridAreaDetails? GridAreaDetails = null);
+    ActorGrouping ActorGrouping,
+    GridAreaDetails GridAreaDetails);
 
 public record Point(int Position, decimal? Quantity, string Quality, string SampleTime);
 

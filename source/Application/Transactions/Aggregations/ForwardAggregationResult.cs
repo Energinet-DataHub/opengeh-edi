@@ -48,25 +48,22 @@ public class ForwardAggregationResult : InternalCommand
 
 public class ForwardAggregationResultHandler : IRequestHandler<ForwardAggregationResult, Unit>
 {
-    private readonly IGridAreaLookup _gridAreaLookup;
     private readonly IAggregationResultForwardingRepository _transactions;
     private readonly IOutgoingMessageStore _outgoingMessageStore;
 
-    public ForwardAggregationResultHandler(IGridAreaLookup gridAreaLookup, IAggregationResultForwardingRepository transactions, IOutgoingMessageStore outgoingMessageStore)
+    public ForwardAggregationResultHandler(IAggregationResultForwardingRepository transactions, IOutgoingMessageStore outgoingMessageStore)
     {
-        _gridAreaLookup = gridAreaLookup;
         _transactions = transactions;
         _outgoingMessageStore = outgoingMessageStore;
     }
 
-    public async Task<Unit> Handle(ForwardAggregationResult request, CancellationToken cancellationToken)
+    public Task<Unit> Handle(ForwardAggregationResult request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        var gridOperator = await _gridAreaLookup.GetGridOperatorForAsync(request.Result.GridArea).ConfigureAwait(false);
-        var factory = new TransactionFactory(gridOperator);
+        var factory = new TransactionFactory(ActorNumber.Create(request.Result.GridAreaDetails.OperatorNumber));
         var transaction = factory.CreateFrom(request.Result);
         _transactions.Add(transaction);
         _outgoingMessageStore.Add(transaction.CreateMessage(request.Result));
-        return Unit.Value;
+        return Unit.Task;
     }
 }
