@@ -1,0 +1,16 @@
+name: Render C4 models with structurizr
+
+on:
+  pull_request:
+    branches:
+      main
+
+jobs:
+  render-c4:
+    permissions:
+      # Give the default GITHUB_TOKEN write permission to commit and push the changed files back to the repository.
+      contents: write
+      
+    uses: Energinet-DataHub/.github/.github/workflows/structurizr.yml@v10
+    with:
+      dsl: 'docs/c4-model-edi-component-level.dsl'
