@@ -18,7 +18,7 @@ namespace Domain.Actors;
 
 public class MarketRole : EnumerationType
 {
-    public static readonly MarketRole MeteringPointAdministrator = new(0, "DDZ");
+    public static readonly MarketRole MeteringPointAdministrator = new(0, "MeteringPointAdministrator");
     public static readonly MarketRole EnergySupplier = new(1, "DDQ");
     public static readonly MarketRole GridOperator = new(2, "DDM");
     public static readonly MarketRole MeteringDataAdministrator = new(3, "DGL");
