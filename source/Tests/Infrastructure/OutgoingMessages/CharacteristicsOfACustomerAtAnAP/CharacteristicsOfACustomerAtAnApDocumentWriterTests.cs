@@ -24,6 +24,7 @@ using DocumentValidation;
 using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
+using Domain.SeedWork;
 using Infrastructure.Configuration;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
@@ -71,7 +72,7 @@ namespace Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
                 .HasValue("sender_MarketParticipant.mRID", header.SenderId)
                 .HasValue("sender_MarketParticipant.marketRole.type", header.SenderRole)
                 .HasValue("receiver_MarketParticipant.mRID", header.ReceiverId)
-                .HasValue("receiver_MarketParticipant.marketRole.type", header.ReceiverRole)
+                .HasValue("receiver_MarketParticipant.marketRole.type",  CimCode.Of(EnumerationType.FromName<MarketRole>(header.ReceiverRole)))
                 .NumberOfMarketActivityRecordsIs(2)
                 .HasValidStructureAsync(DocumentType.CustomerMasterData).ConfigureAwait(false);
             AssertMarketActivityRecord(marketActivityRecords.First(), assertDocument);

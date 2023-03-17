@@ -18,17 +18,20 @@ namespace Domain.Actors;
 
 public class MarketRole : EnumerationType
 {
-    public static readonly MarketRole MeteringPointAdministrator = new(0, "MeteringPointAdministrator");
-    public static readonly MarketRole EnergySupplier = new(1, "DDQ");
-    public static readonly MarketRole GridOperator = new(2, "DDM");
-    public static readonly MarketRole MeteringDataAdministrator = new(3, "DGL");
-    public static readonly MarketRole MeteredDataResponsible = new(4, "MDR");
-    public static readonly MarketRole BalanceResponsible = new(5, "DDK");
+    public static readonly MarketRole MeteringPointAdministrator = new(0, "MeteringPointAdministrator", "DDZ");
+    public static readonly MarketRole EnergySupplier = new(1, "EnergySupplier", "DDQ");
+    public static readonly MarketRole GridOperator = new(2, "DDM", "DDM");
+    public static readonly MarketRole MeteringDataAdministrator = new(3, "DGL", "DGL");
+    public static readonly MarketRole MeteredDataResponsible = new(4, "MDR", "MDR");
+    public static readonly MarketRole BalanceResponsible = new(5, "DDK", "DDK");
 
-    private MarketRole(int id, string name)
+    private MarketRole(int id, string name, string code)
         : base(id, name)
     {
+        Code = code;
     }
+
+    public string Code { get; }
 
     public override string ToString()
     {

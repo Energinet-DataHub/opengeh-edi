@@ -23,6 +23,7 @@ using Application.Configuration;
 using Application.OutgoingMessages.Common;
 using DocumentValidation;
 using DocumentValidation.CimXml;
+using Domain.Actors;
 using Domain.OutgoingMessages;
 using Infrastructure.Configuration;
 using Infrastructure.Configuration.Serialization;
@@ -51,7 +52,7 @@ public class ConfirmRequestChangeAccountingPointCharacteristicsDocumentWriterTes
     [Fact]
     public async Task Document_is_valid()
     {
-        var header = new MessageHeader(ProcessType.MoveIn.Name, "SenderId", "DDZ", "ReceiverId", "DDQ", Guid.NewGuid().ToString(), _systemDateTimeProvider.Now());
+        var header = new MessageHeader(ProcessType.MoveIn.Name, "SenderId", "DDZ", "ReceiverId", MarketRole.EnergySupplier.Name, Guid.NewGuid().ToString(), _systemDateTimeProvider.Now());
         var marketActivityRecords = new List<MarketActivityRecord>()
         {
             new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId"),

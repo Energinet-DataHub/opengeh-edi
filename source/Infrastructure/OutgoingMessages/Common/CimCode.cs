@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using Domain.Actors;
 using Domain.OutgoingMessages;
 
 namespace Infrastructure.OutgoingMessages.Common;
@@ -43,5 +44,19 @@ public static class CimCode
             return "E18";
 
         throw new InvalidOperationException($"No code has been defined for {meteringPointType.Name}");
+    }
+
+    public static string Of(MarketRole marketRole)
+    {
+        ArgumentNullException.ThrowIfNull(marketRole);
+
+        if (marketRole == MarketRole.EnergySupplier)
+            return "DDQ";
+        if (marketRole == MarketRole.GridOperator)
+            return "DDM";
+        if (marketRole == MarketRole.MeteredDataResponsible)
+            return "MDR";
+
+        throw new InvalidOperationException($"No code has been defined for {marketRole.Name}");
     }
 }
