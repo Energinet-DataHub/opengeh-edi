@@ -60,6 +60,8 @@ public static class CimCode
             return "DGL";
         if (marketRole == MarketRole.MeteringPointAdministrator)
             return "DDZ";
+        if (marketRole == MarketRole.BalanceResponsible)
+            return "DDK";
 
         throw new InvalidOperationException($"No code has been defined for {marketRole.Name}");
     }
