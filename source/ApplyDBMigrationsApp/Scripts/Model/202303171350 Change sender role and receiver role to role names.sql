@@ -1,4 +1,5 @@
-﻿    UPDATE dbo.OutgoingMessages
+﻿BEGIN TRANSACTION    
+UPDATE dbo.OutgoingMessages
         SET SenderRole = CASE
                             WHEN SenderRole = 'DDZ' THEN 'MeteringPointAdministrator'
                             WHEN SenderRole = 'DDQ' THEN 'EnergySupplier'
@@ -32,3 +33,4 @@
                            WHEN ReceiverRole = 'MDR' THEN 'MeteredDataResponsible'
                            WHEN ReceiverRole = 'DDK' THEN 'BalanceResponsible'
             END
+COMMIT TRANSACTION
