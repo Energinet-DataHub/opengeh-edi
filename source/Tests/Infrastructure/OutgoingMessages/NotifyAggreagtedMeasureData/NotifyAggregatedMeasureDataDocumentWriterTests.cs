@@ -74,7 +74,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
             .HasValue("sender_MarketParticipant.marketRole.type", header.SenderRole)
             .HasValue("receiver_MarketParticipant.mRID", header.ReceiverId)
             .HasAttributeValue("receiver_MarketParticipant.mRID", "codingScheme", "A10")
-            .HasValue("receiver_MarketParticipant.marketRole.type", header.ReceiverRole)
+            .HasValue("receiver_MarketParticipant.marketRole.type", CimCode.Of(EnumerationType.FromName<MarketRole>(header.ReceiverRole)))
             .HasValue("createdDateTime", header.TimeStamp.ToString())
             .HasValue("Series[1]/mRID", timeSeries[0].TransactionId.ToString())
             .HasValue("Series[1]/meteringGridArea_Domain.mRID", timeSeries[0].GridAreaCode)
