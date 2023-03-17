@@ -71,7 +71,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
             .HasValue("process.processType", CimCode.Of(ProcessType.From(header.ProcessType)))
             .HasValue("sender_MarketParticipant.mRID", header.SenderId)
             .HasAttributeValue("sender_MarketParticipant.mRID", "codingScheme", "A10")
-            .HasValue("sender_MarketParticipant.marketRole.type", header.SenderRole)
+            .HasValue("sender_MarketParticipant.marketRole.type", CimCode.Of(EnumerationType.FromName<MarketRole>(header.SenderRole)))
             .HasValue("receiver_MarketParticipant.mRID", header.ReceiverId)
             .HasAttributeValue("receiver_MarketParticipant.mRID", "codingScheme", "A10")
             .HasValue("receiver_MarketParticipant.marketRole.type", CimCode.Of(EnumerationType.FromName<MarketRole>(header.ReceiverRole)))
