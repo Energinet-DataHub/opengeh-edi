@@ -71,7 +71,7 @@ namespace Tests.Infrastructure.OutgoingMessages.Asserts
             AssertHasHeaderValue(document, "process.processType", CimCode.Of(ProcessType.From(header.ProcessType)));
             AssertHasHeaderValue(document, "businessSector.type", "23");
             AssertHasHeaderValue(document, "sender_MarketParticipant.mRID", header.SenderId);
-            AssertHasHeaderValue(document, "sender_MarketParticipant.marketRole.type", header.SenderRole);
+            AssertHasHeaderValue(document, "sender_MarketParticipant.marketRole.type", CimCode.Of(EnumerationType.FromName<MarketRole>(header.SenderRole)));
             AssertHasHeaderValue(document, "receiver_MarketParticipant.mRID", header.ReceiverId);
             AssertHasHeaderValue(document, "receiver_MarketParticipant.marketRole.type", CimCode.Of(EnumerationType.FromName<MarketRole>(header.ReceiverRole)));
         }

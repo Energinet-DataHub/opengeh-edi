@@ -54,7 +54,7 @@ internal static class HeaderWriter
         writer.WriteValue(messageHeader.SenderId);
         await writer.WriteEndElementAsync().ConfigureAwait(false);
 
-        await writer.WriteElementStringAsync(documentDetails.Prefix, "sender_MarketParticipant.marketRole.type", null, messageHeader.SenderRole)
+        await writer.WriteElementStringAsync(documentDetails.Prefix, "sender_MarketParticipant.marketRole.type", null, CimCode.Of(EnumerationType.FromName<MarketRole>(messageHeader.SenderRole)))
             .ConfigureAwait(false);
 
         await writer.WriteStartElementAsync(documentDetails.Prefix, "receiver_MarketParticipant.mRID", null).ConfigureAwait(false);

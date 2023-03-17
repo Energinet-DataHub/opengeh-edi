@@ -56,6 +56,10 @@ public static class CimCode
             return "DDM";
         if (marketRole == MarketRole.MeteredDataResponsible)
             return "MDR";
+        if (marketRole == MarketRole.MeteringDataAdministrator)
+            return "DGL";
+        if (marketRole == MarketRole.MeteringPointAdministrator)
+            return "DDZ";
 
         throw new InvalidOperationException($"No code has been defined for {marketRole.Name}");
     }
