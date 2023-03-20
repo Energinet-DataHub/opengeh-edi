@@ -234,14 +234,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
 
     private static MessageHeader CreateHeader()
     {
-        return new MessageHeader(
-            ProcessType.BalanceFixing.Name,
-            "1234567890123",
-            MarketRole.MeteredDataResponsible.Name,
-            "1234567890321",
-            MarketRole.GridOperator.Name,
-            Guid.NewGuid().ToString(),
-            SystemClock.Instance.GetCurrentInstant());
+        return MessageHeaderFactory.Create(ProcessType.BalanceFixing, MarketRole.MeteredDataResponsible);
     }
 
     private static List<TimeSeries> CreateSeriesFor(MeteringPointType meteringPointType)
