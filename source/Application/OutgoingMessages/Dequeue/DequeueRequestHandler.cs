@@ -34,10 +34,10 @@ public class DequeueRequestHandler : IRequestHandler<DequeueRequest, DequeueResu
     {
        ArgumentNullException.ThrowIfNull(request);
 
-       return _bundledMessages.DequeueAsync(request.MessageId);
+       return _bundledMessages.DequeueAsync(Guid.Parse(request.MessageId));
     }
 }
 
-public record DequeueRequest(Guid MessageId) : ICommand<DequeueResult>;
+public record DequeueRequest(string MessageId) : ICommand<DequeueResult>;
 
 public record DequeueResult(bool Success);
