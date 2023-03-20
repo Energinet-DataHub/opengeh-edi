@@ -13,22 +13,25 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Application.Actors;
+using Application.Configuration.DataAccess;
+using Dapper;
 
 namespace Infrastructure.Configuration.Authentication;
 
 public class DevMarketActorAuthenticator : MarketActorAuthenticator
 {
     private readonly IActorRegistry _actorRegistry;
+    private readonly IDatabaseConnectionFactory _connectionFactory;
 
-    public DevMarketActorAuthenticator(IActorLookup actorLookup, IActorRegistry actorRegistry)
+    public DevMarketActorAuthenticator(IActorLookup actorLookup, IActorRegistry actorRegistry, IDatabaseConnectionFactory connectionFactory)
         : base(actorLookup)
     {
         _actorRegistry = actorRegistry;
+        _connectionFactory = connectionFactory;
     }
 
     public override async Task AuthenticateAsync(ClaimsPrincipal claimsPrincipal)
@@ -36,27 +39,50 @@ public class DevMarketActorAuthenticator : MarketActorAuthenticator
         ArgumentNullException.ThrowIfNull(claimsPrincipal);
 
         var actorNumberClaim = claimsPrincipal.FindFirst(claim => claim.Type.Equals("test-actornumber", StringComparison.OrdinalIgnoreCase));
-        var userIdClaim = claimsPrincipal.FindFirst(claim => claim.Type.Equals(ClaimsMap.UserId, StringComparison.OrdinalIgnoreCase));
-        if (actorNumberClaim is not null && userIdClaim is not null)
+        if (actorNumberClaim is not null)
         {
-            var b2CId = await _actorRegistry.IfActorExistsGetB2CIdAsync(actorNumberClaim.Value).ConfigureAwait(false);
-            if (b2CId is null)
+            var actor = await FindActorAsync(actorNumberClaim.Value).ConfigureAwait(false);
+            if (actor is null)
             {
-                await _actorRegistry.TryStoreAsync(
-                    new CreateActor(
-                        Guid.NewGuid().ToString(),
-                        userIdClaim.Value,
-                        actorNumberClaim.Value)).ConfigureAwait(false);
+                actor = new Actor(Guid.NewGuid(), actorNumberClaim.Value);
+                await RegisterActorAsync(actor).ConfigureAwait(false);
             }
-            else
-            {
-                var modifiedClaimsPrincipal = claimsPrincipal.Claims.Where(claim => !claim.Type.Equals(ClaimsMap.UserId, StringComparison.OrdinalIgnoreCase)).ToList();
-                modifiedClaimsPrincipal.Add(new Claim(ClaimsMap.UserId, b2CId.ToString() ?? throw new InvalidOperationException()));
-                var claimsIdentities = new List<ClaimsIdentity> { new(modifiedClaimsPrincipal) };
-                claimsPrincipal = new ClaimsPrincipal(claimsIdentities);
-            }
-        }
 
-        await base.AuthenticateAsync(claimsPrincipal).ConfigureAwait(false);
+            await base.AuthenticateAsync(ReplaceCurrent(claimsPrincipal, actor)).ConfigureAwait(false);
+        }
+        else
+        {
+            await base.AuthenticateAsync(claimsPrincipal).ConfigureAwait(false);
+        }
     }
+
+    private static ClaimsPrincipal ReplaceCurrent(ClaimsPrincipal currentClaimsPrincipal, Actor actor)
+    {
+        var claims = currentClaimsPrincipal.Claims.Where(claim => !claim.Type.Equals(ClaimsMap.UserId, StringComparison.OrdinalIgnoreCase)).ToList();
+        claims.Add(new Claim(ClaimsMap.UserId, actor.Id.ToString()));
+
+        var identity = new ClaimsIdentity(claims);
+        return new ClaimsPrincipal(identity);
+    }
+
+    private async Task<Actor?> FindActorAsync(string actorNumber)
+    {
+        using var connection = await _connectionFactory
+            .GetConnectionAndOpenAsync()
+            .ConfigureAwait(false);
+
+        return await connection
+            .QueryFirstOrDefaultAsync<Actor>(
+                "SELECT B2CId AS Id, IdentificationNumber AS Number FROM dbo.Actor WHERE IdentificationNumber = @ActorNumber",
+                new { ActorNumber = actorNumber })
+            .ConfigureAwait(false);
+    }
+
+    private Task RegisterActorAsync(Actor actor)
+    {
+        return _actorRegistry.TryStoreAsync(new CreateActor(Guid.NewGuid().ToString(),  actor.Id.ToString(), actor.Number));
+    }
+
+    #pragma warning disable
+    private record Actor(Guid Id, string Number);
 }
