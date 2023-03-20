@@ -37,7 +37,7 @@ public class WhenADequeueIsRequestedTests : TestBase
     [Fact]
     public async Task Dequeue_is_unsuccessful_when_bundle_does_not_exist()
     {
-        var dequeueResult = await InvokeCommandAsync(new DequeueRequest(Guid.NewGuid())).ConfigureAwait(false);
+        var dequeueResult = await InvokeCommandAsync(new DequeueRequest(Guid.NewGuid().ToString())).ConfigureAwait(false);
 
         Assert.False(dequeueResult.Success);
     }
@@ -50,7 +50,7 @@ public class WhenADequeueIsRequestedTests : TestBase
             ActorNumber.Create(SampleData.NewEnergySupplierNumber),
             MessageCategory.MasterData)).ConfigureAwait(false);
 
-        var dequeueResult = await InvokeCommandAsync(new DequeueRequest(peekResult.MessageId.GetValueOrDefault())).ConfigureAwait(false);
+        var dequeueResult = await InvokeCommandAsync(new DequeueRequest(peekResult.MessageId.GetValueOrDefault().ToString())).ConfigureAwait(false);
 
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
         var found = await connection
