@@ -20,6 +20,7 @@ using Api.Configuration.Middleware.Authentication.Bearer;
 using Api.Configuration.Middleware.Authentication.MarketActors;
 using Api.Configuration.Middleware.Correlation;
 using Application.Actors;
+using Application.Configuration.DataAccess;
 using Application.OutgoingMessages.Peek;
 using Application.Transactions.MoveIn;
 using CimMessageAdapter.Messages.Queues;
@@ -102,7 +103,8 @@ namespace Api
                             {
                                 return new DevMarketActorAuthenticator(
                                     sp.GetRequiredService<IActorLookup>(),
-                                    sp.GetRequiredService<IActorRegistry>());
+                                    sp.GetRequiredService<IActorRegistry>(),
+                                    sp.GetRequiredService<IDatabaseConnectionFactory>());
                             }
 
                             return new MarketActorAuthenticator(sp.GetRequiredService<IActorLookup>());
