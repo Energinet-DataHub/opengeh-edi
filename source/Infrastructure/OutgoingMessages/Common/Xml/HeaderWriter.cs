@@ -16,7 +16,9 @@ using System;
 using System.Threading.Tasks;
 using System.Xml;
 using Application.OutgoingMessages.Common.Xml;
+using Domain.Actors;
 using Domain.OutgoingMessages;
+using Domain.SeedWork;
 
 namespace Infrastructure.OutgoingMessages.Common.Xml;
 
@@ -52,7 +54,7 @@ internal static class HeaderWriter
         writer.WriteValue(messageHeader.SenderId);
         await writer.WriteEndElementAsync().ConfigureAwait(false);
 
-        await writer.WriteElementStringAsync(documentDetails.Prefix, "sender_MarketParticipant.marketRole.type", null, messageHeader.SenderRole)
+        await writer.WriteElementStringAsync(documentDetails.Prefix, "sender_MarketParticipant.marketRole.type", null, CimCode.Of(EnumerationType.FromName<MarketRole>(messageHeader.SenderRole)))
             .ConfigureAwait(false);
 
         await writer.WriteStartElementAsync(documentDetails.Prefix, "receiver_MarketParticipant.mRID", null).ConfigureAwait(false);
@@ -61,7 +63,7 @@ internal static class HeaderWriter
         await writer.WriteEndElementAsync().ConfigureAwait(false);
 
         await writer
-            .WriteElementStringAsync(documentDetails.Prefix, "receiver_MarketParticipant.marketRole.type", null, messageHeader.ReceiverRole)
+            .WriteElementStringAsync(documentDetails.Prefix, "receiver_MarketParticipant.marketRole.type", null, CimCode.Of(EnumerationType.FromName<MarketRole>(messageHeader.ReceiverRole)))
             .ConfigureAwait(false);
         await writer.WriteElementStringAsync(documentDetails.Prefix, "createdDateTime", null, messageHeader.TimeStamp.ToString()).ConfigureAwait(false);
         if (reasonCode is not null)

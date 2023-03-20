@@ -89,6 +89,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202303141135 Change process type from code to name.sql" />
     <EmbeddedResource Include="Scripts\Model\202303151517 Change payload column to nvarchar.sql" />
     <EmbeddedResource Include="Scripts\Model\202303151605 Remove unused columns for aggregation result forwarding.sql" />
+    <EmbeddedResource Include="Scripts\Model\202303171350 Change sender role and receiver role to role names.sql" />
     <EmbeddedResource Include="Scripts\Seed\202206281100 Seed cleanup.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241100 Consolidated dbo model.sql" />
     <EmbeddedResource Include="Scripts\Model\202205241101 Consolidated BtwoB model.sql" />

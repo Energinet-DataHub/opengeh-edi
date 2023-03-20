@@ -24,6 +24,7 @@ using DocumentValidation;
 using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
+using Domain.SeedWork;
 using Infrastructure.Configuration;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
@@ -69,9 +70,9 @@ namespace Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
                 .HasValue("process.processType",  CimCode.Of(ProcessType.From(header.ProcessType)))
                 .HasValue("businessSector.type", "23")
                 .HasValue("sender_MarketParticipant.mRID", header.SenderId)
-                .HasValue("sender_MarketParticipant.marketRole.type", header.SenderRole)
+                .HasValue("sender_MarketParticipant.marketRole.type", CimCode.Of(EnumerationType.FromName<MarketRole>(header.SenderRole)))
                 .HasValue("receiver_MarketParticipant.mRID", header.ReceiverId)
-                .HasValue("receiver_MarketParticipant.marketRole.type", header.ReceiverRole)
+                .HasValue("receiver_MarketParticipant.marketRole.type",  CimCode.Of(EnumerationType.FromName<MarketRole>(header.ReceiverRole)))
                 .NumberOfMarketActivityRecordsIs(2)
                 .HasValidStructureAsync(DocumentType.CustomerMasterData).ConfigureAwait(false);
             AssertMarketActivityRecord(marketActivityRecords.First(), assertDocument);
@@ -195,7 +196,7 @@ namespace Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
 
         private MessageHeader CreateHeader(MarketRole messageReceiverRole)
         {
-            return new MessageHeader(ProcessType.MoveIn.Name, "SenderId", "DDZ", "ReceiverId", messageReceiverRole.Name, Guid.NewGuid().ToString(), _systemDateTimeProvider.Now());
+            return new MessageHeader(ProcessType.MoveIn.Name, "SenderId", MarketRole.MeteringPointAdministrator.Name, "ReceiverId", messageReceiverRole.Name, Guid.NewGuid().ToString(), _systemDateTimeProvider.Now());
         }
 
         private Task<Stream> WriteDocumentAsync(MessageHeader header, params MarketActivityRecord[] marketActivityRecords)
