@@ -21,7 +21,7 @@ namespace Tests.Factories;
 
 public static class MessageHeaderFactory
 {
-    public static MessageHeader Create(ProcessType? processType = null, MarketRole? senderRole = null, MarketRole? receiverRole = null)
+    public static MessageHeader Create(ProcessType? processType = null, MarketRole? receiverRole = null, MarketRole? senderRole = null)
     {
         return new MessageHeader(
             processType is null ? ProcessType.MoveIn.Name : processType.Name,
