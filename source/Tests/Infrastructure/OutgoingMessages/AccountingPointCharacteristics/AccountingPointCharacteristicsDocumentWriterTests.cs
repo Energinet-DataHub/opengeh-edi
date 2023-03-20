@@ -96,12 +96,12 @@ public class AccountingPointCharacteristicsDocumentWriterTests
         await AssertXmlMessage.AssertConformsToSchemaAsync(message, schema!).ConfigureAwait(false);
     }
 
-    private MessageHeader CreateHeader(ProcessType? processType = null)
+    private MessageHeader CreateHeader(ProcessType? processType = null, MarketRole? senderRole = null)
     {
         return new MessageHeader(
             processType is null ? ProcessType.MoveIn.Name : processType.Name,
             "SenderId",
-            MarketRole.MeteringPointAdministrator.Name,
+            senderRole is null ? MarketRole.MeteringPointAdministrator.Name : senderRole.Name,
             "ReceiverId",
             MarketRole.EnergySupplier.Name,
             Guid.NewGuid().ToString(),
