@@ -30,6 +30,7 @@ using Infrastructure.Configuration;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.OutgoingMessages.Common;
 using Infrastructure.OutgoingMessages.GenericNotification;
+using Tests.Factories;
 using Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
 
@@ -52,7 +53,7 @@ namespace Tests.Infrastructure.OutgoingMessages.GenericNotification
         [Fact]
         public async Task Document_is_valid()
         {
-            var header = new MessageHeader(ProcessType.MoveIn.Name, "SenderId", MarketRole.MeteringPointAdministrator.Name, "ReceiverId", MarketRole.EnergySupplier.Name, Guid.NewGuid().ToString(), _systemDateTimeProvider.Now());
+            var header = MessageHeaderFactory.Create();
             var marketActivityRecords = new List<MarketActivityRecord>()
             {
                 new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId", _systemDateTimeProvider.Now()),

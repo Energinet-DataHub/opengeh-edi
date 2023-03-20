@@ -19,17 +19,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
-using Application.Configuration;
 using Application.OutgoingMessages.Common;
 using DocumentValidation;
 using DocumentValidation.CimXml;
-using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
-using Infrastructure.Configuration;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.OutgoingMessages.Common;
 using Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Tests.Factories;
 using Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
 
@@ -38,13 +36,11 @@ namespace Tests.Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
 public class RejectRequestChangeOfSupplierDocumentWriterTests
 {
     private readonly RejectRequestChangeOfSupplierXmlMessageWriter _xmlMessageWriter;
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMessageRecordParser _messageRecordParser;
     private ISchemaProvider? _schemaProvider;
 
     public RejectRequestChangeOfSupplierDocumentWriterTests()
     {
-        _systemDateTimeProvider = new SystemDateTimeProvider();
         _messageRecordParser = new MessageRecordParser(new Serializer());
         _xmlMessageWriter = new RejectRequestChangeOfSupplierXmlMessageWriter(_messageRecordParser);
     }
@@ -52,7 +48,7 @@ public class RejectRequestChangeOfSupplierDocumentWriterTests
     [Fact]
     public async Task Document_is_valid()
     {
-        var header = new MessageHeader(ProcessType.MoveIn.Name, "SenderId", MarketRole.MeteringPointAdministrator.Name, "ReceiverId", MarketRole.EnergySupplier.Name, Guid.NewGuid().ToString(), _systemDateTimeProvider.Now());
+        var header = MessageHeaderFactory.Create();
         var marketActivityRecords = new List<MarketActivityRecord>()
         {
             new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId", new List<Reason>()
