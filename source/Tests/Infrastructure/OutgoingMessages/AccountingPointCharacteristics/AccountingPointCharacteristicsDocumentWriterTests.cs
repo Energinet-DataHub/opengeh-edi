@@ -54,7 +54,7 @@ public class AccountingPointCharacteristicsDocumentWriterTests
     [Fact]
     public async Task Document_is_valid()
     {
-        var header = CreateHeader();
+        var header = MessageHeaderFactory.Create();
         var marketActivityRecord = _sampleData.CreateMarketActivityRecord();
         var marketActivityRecords = new List<MarketActivityRecord>()
         {
@@ -62,11 +62,6 @@ public class AccountingPointCharacteristicsDocumentWriterTests
         };
         var message = await _messageWriter.WriteAsync(header, marketActivityRecords.Select(record => _messageRecordParser.From(record)).ToList()).ConfigureAwait(false);
         await AssertMessage(message, header, marketActivityRecords).ConfigureAwait(false);
-    }
-
-    private static MessageHeader CreateHeader(ProcessType? processType = null, MarketRole? senderRole = null, MarketRole? receiverRole = null)
-    {
-        return MessageHeaderFactory.Create(processType, senderRole, receiverRole);
     }
 
     private static void AssertMarketActivityRecords(List<MarketActivityRecord> marketActivityRecords, XDocument document)
