@@ -30,6 +30,7 @@ using Infrastructure.Configuration.Serialization;
 using Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
 using Infrastructure.OutgoingMessages.Common;
 using NodaTime;
+using Tests.Factories;
 using Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
 using MarketActivityRecord = Domain.OutgoingMessages.AccountingPointCharacteristics.MarketActivityRecord;
@@ -65,14 +66,7 @@ public class AccountingPointCharacteristicsDocumentWriterTests
 
     private static MessageHeader CreateHeader(ProcessType? processType = null, MarketRole? senderRole = null, MarketRole? receiverRole = null)
     {
-        return new MessageHeader(
-            processType is null ? ProcessType.MoveIn.Name : processType.Name,
-            "SenderId",
-            senderRole is null ? MarketRole.MeteringPointAdministrator.Name : senderRole.Name,
-            "ReceiverId",
-            receiverRole is null ? MarketRole.EnergySupplier.Name : receiverRole.Name,
-            Guid.NewGuid().ToString(),
-            SystemClock.Instance.GetCurrentInstant());
+        return MessageHeaderFactory.Create(processType, senderRole, receiverRole);
     }
 
     private static void AssertMarketActivityRecords(List<MarketActivityRecord> marketActivityRecords, XDocument document)
