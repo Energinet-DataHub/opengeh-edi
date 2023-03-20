@@ -29,6 +29,7 @@ using Infrastructure.Configuration;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
 using Infrastructure.OutgoingMessages.Common;
+using NodaTime;
 using Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
 using MarketActivityRecord = Domain.OutgoingMessages.AccountingPointCharacteristics.MarketActivityRecord;
@@ -38,14 +39,12 @@ namespace Tests.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
 public class AccountingPointCharacteristicsDocumentWriterTests
 {
     private readonly AccountingPointCharacteristicsMessageWriter _messageWriter;
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMessageRecordParser _messageRecordParser;
     private readonly SampleData _sampleData;
     private ISchemaProvider? _schemaProvider;
 
     public AccountingPointCharacteristicsDocumentWriterTests()
     {
-        _systemDateTimeProvider = new SystemDateTimeProvider();
         _messageRecordParser = new MessageRecordParser(new Serializer());
         _messageWriter = new AccountingPointCharacteristicsMessageWriter(_messageRecordParser);
         _sampleData = new SampleData();
@@ -62,6 +61,18 @@ public class AccountingPointCharacteristicsDocumentWriterTests
         };
         var message = await _messageWriter.WriteAsync(header, marketActivityRecords.Select(record => _messageRecordParser.From(record)).ToList()).ConfigureAwait(false);
         await AssertMessage(message, header, marketActivityRecords).ConfigureAwait(false);
+    }
+
+    private static MessageHeader CreateHeader(ProcessType? processType = null, MarketRole? senderRole = null, MarketRole? receiverRole = null)
+    {
+        return new MessageHeader(
+            processType is null ? ProcessType.MoveIn.Name : processType.Name,
+            "SenderId",
+            senderRole is null ? MarketRole.MeteringPointAdministrator.Name : senderRole.Name,
+            "ReceiverId",
+            receiverRole is null ? MarketRole.EnergySupplier.Name : receiverRole.Name,
+            Guid.NewGuid().ToString(),
+            SystemClock.Instance.GetCurrentInstant());
     }
 
     private static void AssertMarketActivityRecords(List<MarketActivityRecord> marketActivityRecords, XDocument document)
@@ -94,17 +105,5 @@ public class AccountingPointCharacteristicsDocumentWriterTests
         var schema = await _schemaProvider.GetSchemaAsync<XmlSchema>("accountingpointcharacteristics", "0.1")
             .ConfigureAwait(false);
         await AssertXmlMessage.AssertConformsToSchemaAsync(message, schema!).ConfigureAwait(false);
-    }
-
-    private MessageHeader CreateHeader(ProcessType? processType = null, MarketRole? senderRole = null, MarketRole? receiverRole = null)
-    {
-        return new MessageHeader(
-            processType is null ? ProcessType.MoveIn.Name : processType.Name,
-            "SenderId",
-            senderRole is null ? MarketRole.MeteringPointAdministrator.Name : senderRole.Name,
-            "ReceiverId",
-            receiverRole is null ? MarketRole.EnergySupplier.Name : receiverRole.Name,
-            Guid.NewGuid().ToString(),
-            _systemDateTimeProvider.Now());
     }
 }
