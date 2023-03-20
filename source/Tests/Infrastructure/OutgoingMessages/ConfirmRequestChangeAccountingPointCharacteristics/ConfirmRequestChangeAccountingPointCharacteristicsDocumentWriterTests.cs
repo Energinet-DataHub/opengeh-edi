@@ -29,6 +29,7 @@ using Infrastructure.Configuration;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.OutgoingMessages.Common;
 using Infrastructure.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
+using Tests.Factories;
 using Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
 using MarketActivityRecord = Domain.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics.MarketActivityRecord;
@@ -52,7 +53,7 @@ public class ConfirmRequestChangeAccountingPointCharacteristicsDocumentWriterTes
     [Fact]
     public async Task Document_is_valid()
     {
-        var header = new MessageHeader(ProcessType.MoveIn.Name, "SenderId", MarketRole.MeteringPointAdministrator.Name, "ReceiverId", MarketRole.EnergySupplier.Name, Guid.NewGuid().ToString(), _systemDateTimeProvider.Now());
+        var header = MessageHeaderFactory.Create();
         var marketActivityRecords = new List<MarketActivityRecord>()
         {
             new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId"),
