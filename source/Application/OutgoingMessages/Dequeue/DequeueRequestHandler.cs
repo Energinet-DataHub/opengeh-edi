@@ -34,7 +34,12 @@ public class DequeueRequestHandler : IRequestHandler<DequeueRequest, DequeueResu
     {
        ArgumentNullException.ThrowIfNull(request);
 
-       return _bundledMessages.DequeueAsync(Guid.Parse(request.MessageId));
+       if (Guid.TryParse(request.MessageId, out var messageId) == false)
+       {
+           return Task.FromResult(new DequeueResult(false));
+       }
+
+       return _bundledMessages.DequeueAsync(messageId);
     }
 }
 
