@@ -54,7 +54,7 @@ public class AccountingPointCharacteristicsDocumentWriterTests
     [Fact]
     public async Task Document_is_valid()
     {
-        var header = new MessageHeader(ProcessType.MoveIn.Name, "SenderId", MarketRole.MeteringPointAdministrator.Name, "ReceiverId", MarketRole.EnergySupplier.Name, Guid.NewGuid().ToString(), _systemDateTimeProvider.Now());
+        var header = CreateHeader();
         var marketActivityRecord = _sampleData.CreateMarketActivityRecord();
         var marketActivityRecords = new List<MarketActivityRecord>()
         {
@@ -94,5 +94,17 @@ public class AccountingPointCharacteristicsDocumentWriterTests
         var schema = await _schemaProvider.GetSchemaAsync<XmlSchema>("accountingpointcharacteristics", "0.1")
             .ConfigureAwait(false);
         await AssertXmlMessage.AssertConformsToSchemaAsync(message, schema!).ConfigureAwait(false);
+    }
+
+    private MessageHeader CreateHeader(ProcessType? processType = null)
+    {
+        return new MessageHeader(
+            processType is null ? ProcessType.MoveIn.Name : processType.Name,
+            "SenderId",
+            MarketRole.MeteringPointAdministrator.Name,
+            "ReceiverId",
+            MarketRole.EnergySupplier.Name,
+            Guid.NewGuid().ToString(),
+            _systemDateTimeProvider.Now());
     }
 }
