@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Threading.Tasks;
 
 namespace Application.Actors;
@@ -22,13 +21,6 @@ namespace Application.Actors;
 /// </summary>
 public interface IActorRegistry
 {
-    /// <summary>
-    ///  Query if actor GLN number already exists
-    /// </summary>
-    /// <param name="identificationNumber"></param>
-    /// <returns>true is if actor GLN number already exists</returns>
-    Task<Guid?> IfActorExistsGetB2CIdAsync(string identificationNumber);
-
     /// <summary>
     /// Store actors
     /// </summary>

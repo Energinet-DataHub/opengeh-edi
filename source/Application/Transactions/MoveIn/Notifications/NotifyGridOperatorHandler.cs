@@ -23,7 +23,7 @@ using MediatR;
 
 namespace Application.Transactions.MoveIn.Notifications;
 
-public class NotifyGridOperatorHandler : IRequestHandler<NotifyGridOperator>
+public class NotifyGridOperatorHandler : IRequestHandler<NotifyGridOperator, Unit>
 {
     private readonly IMoveInTransactionRepository _transactionRepository;
     private readonly IMarketEvaluationPointRepository _marketEvaluationPointRepository;
