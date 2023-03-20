@@ -14,7 +14,10 @@
 
 using System;
 using System.Text.Json;
+using Domain.Actors;
 using Domain.OutgoingMessages;
+using Domain.SeedWork;
+using Infrastructure.OutgoingMessages.Common;
 using Json.Schema;
 using Xunit;
 
@@ -42,12 +45,12 @@ public static class AssertJsonMessage
         if (header == null) throw new ArgumentNullException(nameof(header));
         var root = document.RootElement.GetProperty(documentType);
         Assert.Equal(header.MessageId, root.GetProperty("mRID").ToString());
-        Assert.Equal(header.ProcessType, root.GetProperty("process.processType").GetProperty("value").ToString());
+        Assert.Equal(CimCode.Of(ProcessType.From(header.ProcessType)), root.GetProperty("process.processType").GetProperty("value").ToString());
         Assert.Equal("23", root.GetProperty("businessSector.type").GetProperty("value").ToString());
         Assert.Equal(header.SenderId, root.GetProperty("sender_MarketParticipant.mRID").GetProperty("value").ToString());
-        Assert.Equal(header.SenderRole, root.GetProperty("sender_MarketParticipant.marketRole.type").GetProperty("value").ToString());
+        Assert.Equal(CimCode.Of(EnumerationType.FromName<MarketRole>(header.SenderRole)), root.GetProperty("sender_MarketParticipant.marketRole.type").GetProperty("value").ToString());
         Assert.Equal(header.ReceiverId, root.GetProperty("receiver_MarketParticipant.mRID").GetProperty("value").ToString());
-        Assert.Equal(header.ReceiverRole, root.GetProperty("receiver_MarketParticipant.marketRole.type").GetProperty("value").ToString());
+        Assert.Equal(CimCode.Of(EnumerationType.FromName<MarketRole>(header.ReceiverRole)), root.GetProperty("receiver_MarketParticipant.marketRole.type").GetProperty("value").ToString());
     }
 
     public static void HasReasonCode(JsonDocument document, string documentType, string expectedReasonCode)
