@@ -19,13 +19,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
-using Application.Configuration;
 using Application.OutgoingMessages.Common;
 using DocumentValidation;
 using DocumentValidation.CimXml;
-using Domain.Actors;
 using Domain.OutgoingMessages;
-using Infrastructure.Configuration;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.OutgoingMessages.Common;
 using Infrastructure.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
@@ -39,13 +36,11 @@ namespace Tests.Infrastructure.OutgoingMessages.ConfirmRequestChangeAccountingPo
 public class ConfirmRequestChangeAccountingPointCharacteristicsDocumentWriterTests
 {
     private readonly ConfirmRequestChangeAccountingPointCharacteristicsMessageWriter _messageWriter;
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMessageRecordParser _messageRecordParser;
     private ISchemaProvider? _schemaProvider;
 
     public ConfirmRequestChangeAccountingPointCharacteristicsDocumentWriterTests()
     {
-        _systemDateTimeProvider = new SystemDateTimeProvider();
         _messageRecordParser = new MessageRecordParser(new Serializer());
         _messageWriter = new ConfirmRequestChangeAccountingPointCharacteristicsMessageWriter(_messageRecordParser);
     }
