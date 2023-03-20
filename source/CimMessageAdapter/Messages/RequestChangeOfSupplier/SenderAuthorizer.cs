@@ -52,7 +52,7 @@ namespace CimMessageAdapter.Messages.RequestChangeOfSupplier
 
         private void EnsureSenderRole(string senderRole)
         {
-            if (senderRole.Equals(MarketRole.EnergySupplier.Name, StringComparison.OrdinalIgnoreCase) == false)
+            if (senderRole.Equals(MarketRole.EnergySupplier.Code, StringComparison.OrdinalIgnoreCase) == false)
             {
                 _validationErrors.Add(new SenderRoleTypeIsNotAuthorized());
             }
