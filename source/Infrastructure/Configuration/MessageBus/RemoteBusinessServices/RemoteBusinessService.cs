@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
-using Newtonsoft.Json;
 
 namespace Infrastructure.Configuration.MessageBus.RemoteBusinessServices;
 
@@ -35,13 +35,13 @@ public class RemoteBusinessService<TRequest, TReply>
     public Task SendRequestAsync(TRequest message, string correlationId)
     {
         ArgumentNullException.ThrowIfNull(message);
-        var serviceBusMessage = new ServiceBusMessage(JsonConvert.SerializeObject(message))
+
+        var serviceBusMessage = new ServiceBusMessage(JsonSerializer.Serialize(message))
         {
             ContentType = "application/json",
             CorrelationId = correlationId,
             ReplyTo = _responseQueueName,
         };
-
         return _requestSender.SendAsync(serviceBusMessage);
     }
 
