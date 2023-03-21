@@ -14,20 +14,19 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
+using System.Xml;
 using Application.IncomingMessages.RequestChangeOfSupplier;
 using CimMessageAdapter.Errors;
 using CimMessageAdapter.Messages;
 using DocumentValidation;
 using Domain.OutgoingMessages;
 using Json.Schema;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using JsonException = Newtonsoft.Json.JsonException;
-using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 using MessageHeader = Application.IncomingMessages.MessageHeader;
 
 namespace Infrastructure.IncomingMessages.RequestChangeOfSupplier;
@@ -36,6 +35,7 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
 {
     private const string MarketActivityRecordElementName = "MktActivityRecord";
     private const string HeaderElementName = "RequestChangeOfSupplier_MarketDocument";
+    private const string DocumentName = "RequestChangeOfSupplier";
     private readonly ISchemaProvider _schemaProvider;
     private readonly List<ValidationError> _errors = new();
 
@@ -50,20 +50,10 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
 
-        string processType;
-        try
-        {
-            processType = GetBusinessProcessType(message);
-        }
-        catch (JsonException exception)
-        {
-            return InvalidJsonFailure(exception);
-        }
-
-        var schema = await _schemaProvider.GetSchemaAsync<JsonSchema>(processType, "0").ConfigureAwait(false);
+        var schema = await _schemaProvider.GetSchemaAsync<JsonSchema>(DocumentName.ToUpper(CultureInfo.InvariantCulture), "0").ConfigureAwait(false);
         if (schema is null)
         {
-            return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(new UnknownBusinessProcessTypeOrVersion(processType, "0"));
+            return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(new UnknownBusinessProcessTypeOrVersion(DocumentName, "0"));
         }
 
         ResetMessagePosition(message);
@@ -75,14 +65,13 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
             return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(_errors.ToArray());
         }
 
-        var streamReader = new StreamReader(message, leaveOpen: true);
         try
         {
-            using (var jsonTextReader = new JsonTextReader(streamReader))
+            using (var document = await JsonDocument.ParseAsync(message).ConfigureAwait(false))
             {
                 try
                 {
-                    return ParseJsonData(jsonTextReader);
+                    return ParseJsonData(document);
                 }
                 catch (JsonException exception)
                 {
@@ -100,44 +89,19 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
         }
         finally
         {
-            streamReader.Dispose();
         }
     }
 
-    private static string[] SplitNamespace(Stream message)
-    {
-        if (message == null) throw new ArgumentNullException(nameof(message));
-
-        string[] split;
-        ResetMessagePosition(message);
-        var streamReader = new StreamReader(message, leaveOpen: true);
-        using (var jsonTextReader = new JsonTextReader(streamReader))
-        {
-            var serializer = new JsonSerializer();
-            var deserialized = (JObject)serializer.Deserialize(jsonTextReader);
-            var path = deserialized.First.Path;
-            split = path.Split('_');
-        }
-
-        return split;
-    }
-
-    private static string GetBusinessProcessType(Stream message)
-    {
-        if (message == null) throw new ArgumentNullException(nameof(message));
-        var split = SplitNamespace(message);
-        var processType = split[0];
-        return processType;
-    }
-
-    private static MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction> ParseJsonData(JsonTextReader jsonTextReader)
+    private static MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction> ParseJsonData(JsonDocument document)
     {
         var marketActivityRecords = new List<MarketActivityRecord>();
-        var serializer = new JsonSerializer();
-        var jsonRequest = serializer.Deserialize<JObject>(jsonTextReader);
-        var headerToken = jsonRequest.SelectToken(HeaderElementName);
-        var messageHeader = MessageHeaderFrom(headerToken);
-        marketActivityRecords.AddRange(headerToken[MarketActivityRecordElementName].Select(MarketActivityRecordFrom));
+        var messageHeader = MessageHeaderFrom(document.RootElement.GetProperty(HeaderElementName));
+        var marketActivityRecord = document.RootElement.GetProperty(HeaderElementName).GetProperty(MarketActivityRecordElementName);
+        var records = marketActivityRecord.EnumerateArray();
+        foreach (var jsonElement in records)
+        {
+            marketActivityRecords.Add(MarketActivityRecordFrom(jsonElement));
+        }
 
         return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(new RequestChangeOfSupplierIncomingMarketDocument(messageHeader, marketActivityRecords));
     }
@@ -153,36 +117,36 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
         return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(InvalidMessageStructure.From(exception));
     }
 
-    private static MessageHeader MessageHeaderFrom(JToken token)
+    private static MessageHeader MessageHeaderFrom(JsonElement element)
     {
         return new MessageHeader(
-            token["mRID"].ToString(),
-            token["process.processType"]["value"].ToString(),
-            token["sender_MarketParticipant.mRID"]["value"].ToString(),
-            token["sender_MarketParticipant.marketRole.type"]["value"].ToString(),
-            token["receiver_MarketParticipant.mRID"]["value"].ToString(),
-            token["receiver_MarketParticipant.marketRole.type"]["value"].ToString(),
-            GetJsonDateStringWithoutQuotes(token["createdDateTime"]));
+            element.GetProperty("mRID").ToString(),
+            element.GetProperty("process.processType").GetProperty("value").ToString(),
+            element.GetProperty("sender_MarketParticipant.mRID").GetProperty("value").ToString(),
+            element.GetProperty("sender_MarketParticipant.marketRole.type").GetProperty("value").ToString(),
+            element.GetProperty("receiver_MarketParticipant.mRID").GetProperty("value").ToString(),
+            element.GetProperty("receiver_MarketParticipant.marketRole.type").GetProperty("value").ToString(),
+            GetJsonDateStringWithoutQuotes(element.GetProperty("createdDateTime")));
     }
 
-    private static MarketActivityRecord MarketActivityRecordFrom(JToken token)
+    private static MarketActivityRecord MarketActivityRecordFrom(JsonElement element)
     {
         return new MarketActivityRecord()
         {
-            Id = token["mRID"].ToString(),
-            ConsumerId = token["marketEvaluationPoint.customer_MarketParticipant.mRID"]["value"].ToString(),
-            ConsumerIdType = token["marketEvaluationPoint.customer_MarketParticipant.mRID"]["codingScheme"].ToString(),
-            BalanceResponsibleId = token["marketEvaluationPoint.balanceResponsibleParty_MarketParticipant.mRID"]["value"].ToString(),
-            EnergySupplierId = token["marketEvaluationPoint.energySupplier_MarketParticipant.mRID"]["value"].ToString(),
-            MarketEvaluationPointId = token["marketEvaluationPoint.mRID"]["value"].ToString(),
-            ConsumerName = token["marketEvaluationPoint.customer_MarketParticipant.name"].ToString(),
-            EffectiveDate = GetJsonDateStringWithoutQuotes(token["start_DateAndOrTime.dateTime"]),
+            Id = element.GetProperty("mRID").ToString(),
+            ConsumerId = element.GetProperty("marketEvaluationPoint.customer_MarketParticipant.mRID").GetProperty("value").ToString(),
+            ConsumerIdType = element.GetProperty("marketEvaluationPoint.customer_MarketParticipant.mRID").GetProperty("codingScheme").ToString(),
+            BalanceResponsibleId = element.GetProperty("marketEvaluationPoint.balanceResponsibleParty_MarketParticipant.mRID").GetProperty("value").ToString(),
+            EnergySupplierId = element.GetProperty("marketEvaluationPoint.energySupplier_MarketParticipant.mRID").GetProperty("value").ToString(),
+            MarketEvaluationPointId = element.GetProperty("marketEvaluationPoint.mRID").GetProperty("value").ToString(),
+            ConsumerName = element.GetProperty("marketEvaluationPoint.customer_MarketParticipant.name").ToString(),
+            EffectiveDate = GetJsonDateStringWithoutQuotes(element.GetProperty("start_DateAndOrTime.dateTime")),
         };
     }
 
-    private static string GetJsonDateStringWithoutQuotes(JToken token)
+    private static string GetJsonDateStringWithoutQuotes(JsonElement element)
     {
-        return token.ToString(Formatting.None).Trim('"');
+        return element.ToString().Trim('"');
     }
 
     private static bool IsValid(JsonDocument document, JsonSchema schema)
