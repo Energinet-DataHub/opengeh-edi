@@ -29,12 +29,12 @@ public static class AssertJsonMessage
     {
         if (schema == null) throw new InvalidOperationException($"Schema not found for business process type {documentType}");
 
-        var validationOptions = new ValidationOptions()
+        var validationOptions = new EvaluationOptions()
         {
-            OutputFormat = OutputFormat.Detailed,
+            OutputFormat = OutputFormat.List,
         };
 
-        var validationResult = schema.Validate(document, validationOptions);
+        var validationResult = schema.Evaluate(document, validationOptions);
 
         Assert.True(validationResult.IsValid);
     }
