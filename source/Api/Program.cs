@@ -20,6 +20,7 @@ using Api.Configuration.Middleware.Authentication.Bearer;
 using Api.Configuration.Middleware.Authentication.MarketActors;
 using Api.Configuration.Middleware.Correlation;
 using Application.Actors;
+using Application.Configuration.DataAccess;
 using Application.OutgoingMessages.Peek;
 using Application.Transactions.MoveIn;
 using CimMessageAdapter.Messages.Queues;
@@ -93,11 +94,7 @@ namespace Api
                     CompositionRoot.Initialize(services)
                         .AddMessageBus(runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND!)
                         .AddPeekConfiguration(new BundleConfiguration(runtime.MAX_NUMBER_OF_PAYLOADS_IN_BUNDLE))
-                        .AddAggregationsConfiguration(sp => new AggregationResultsOverHttp(
-                            sp.GetRequiredService<IHttpClientAdapter>(),
-                            runtime.AGGREGATION_RESULTS_API_URI,
-                            sp.GetRequiredService<AggregationResultMapper>(),
-                            sp.GetRequiredService<ISerializer>()))
+                        .AddAggregationsConfiguration()
                         .AddRemoteBusinessService<DummyRequest, DummyReply>("Dummy", "Dummy")
                         .AddBearerAuthentication(tokenValidationParameters)
                         .AddAuthentication(sp =>
@@ -106,7 +103,8 @@ namespace Api
                             {
                                 return new DevMarketActorAuthenticator(
                                     sp.GetRequiredService<IActorLookup>(),
-                                    sp.GetRequiredService<IActorRegistry>());
+                                    sp.GetRequiredService<IActorRegistry>(),
+                                    sp.GetRequiredService<IDatabaseConnectionFactory>());
                             }
 
                             return new MarketActorAuthenticator(sp.GetRequiredService<IActorLookup>());

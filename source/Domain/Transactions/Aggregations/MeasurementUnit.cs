@@ -12,27 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Domain.OutgoingMessages;
-using Xunit;
+using Domain.SeedWork;
 
-namespace Tests.Domain.OutgoingMessages;
+namespace Domain.Transactions.Aggregations;
 
-public class MeteringPointTypeTests
+public class MeasurementUnit : EnumerationType
 {
-    [Theory]
-    [InlineData("E17", "E17")]
-    [InlineData("E18", "E18")]
-    [InlineData("consumption", "E17")]
-    [InlineData("production", "E18")]
-    public void Parse_metering_point_type_code(string valueToParse, string expectedCode)
+    public static readonly MeasurementUnit Kwh = new(0, nameof(Kwh), "KWH");
+
+    private MeasurementUnit(int id, string name, string code)
+        : base(id, name)
     {
-        Assert.Equal(expectedCode, MeteringPointType.ToCode(valueToParse));
+        Code = code;
     }
 
-    [Fact]
-    public void Value_cannot_be_parsed()
+    public string Code { get; }
+
+    public static MeasurementUnit From(string value)
     {
-        Assert.Throws<InvalidCastException>(() => MeteringPointType.ToCode("some invalid value"));
+        return GetAll<MeasurementUnit>().First(type =>
+            type.Code.Equals(value, StringComparison.OrdinalIgnoreCase) ||
+            type.Name.Equals(value, StringComparison.OrdinalIgnoreCase));
     }
 }

@@ -36,7 +36,8 @@ namespace Application.Configuration.Authentication
 
         public bool HasRole(string role)
         {
-            return _roles.Any(marketRole => marketRole.Name.Equals(role, StringComparison.OrdinalIgnoreCase));
+            return _roles.Any(marketRole => marketRole.Name.Equals(role, StringComparison.OrdinalIgnoreCase) ||
+                                            marketRole.Code.Equals(role, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

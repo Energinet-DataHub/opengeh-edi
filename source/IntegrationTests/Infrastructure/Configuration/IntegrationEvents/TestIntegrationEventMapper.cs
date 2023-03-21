@@ -14,6 +14,7 @@
 
 using System;
 using System.Text.Json;
+using System.Threading.Tasks;
 using Infrastructure.Configuration.IntegrationEvents;
 using MediatR;
 
@@ -21,15 +22,22 @@ namespace IntegrationTests.Infrastructure.Configuration.IntegrationEvents;
 
 public class TestIntegrationEventMapper : IIntegrationEventMapper
 {
-    public INotification MapFrom(byte[] payload)
+    #pragma warning disable // Method cannot be static since inherited from the interface
+    public Task<INotification> MapFromAsync(string payload)
     {
         var integrationEvent = JsonSerializer.Deserialize<TestIntegrationEvent>(payload);
-        return new TestNotification(integrationEvent!.Property1);
+        return Task.FromResult((INotification)new TestNotification(integrationEvent!.Property1));
     }
 
     public bool CanHandle(string eventType)
     {
         ArgumentNullException.ThrowIfNull(eventType);
         return eventType.Equals(nameof(TestIntegrationEvent), StringComparison.OrdinalIgnoreCase);
+    }
+
+    public string ToJson(byte[] payload)
+    {
+        var integrationEvent = JsonSerializer.Deserialize<TestIntegrationEvent>(payload);
+        return JsonSerializer.Serialize(integrationEvent);
     }
 }

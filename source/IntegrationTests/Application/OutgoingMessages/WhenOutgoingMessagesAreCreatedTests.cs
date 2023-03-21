@@ -17,6 +17,7 @@ using Application.Configuration.DataAccess;
 using Dapper;
 using Domain.Actors;
 using Domain.OutgoingMessages;
+using Infrastructure.OutgoingMessages.Common;
 using IntegrationTests.Application.IncomingMessages;
 using IntegrationTests.Fixtures;
 using Xunit;
@@ -48,7 +49,7 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase
         Assert.Equal(result.ReceiverRole, MarketRole.EnergySupplier.Name);
         Assert.Equal(result.SenderId, DataHubDetails.IdentificationNumber.Value);
         Assert.Equal(result.SenderRole, MarketRole.MeteringPointAdministrator.Name);
-        Assert.Equal(result.ProcessType, ProcessType.MoveIn.Code);
+        Assert.Equal(ProcessType.MoveIn.Name, result.ProcessType);
         Assert.NotNull(result.MessageRecord);
     }
 
@@ -63,7 +64,7 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase
     private async Task GivenRequestHasBeenAccepted()
     {
         var incomingMessage = MessageBuilder()
-            .WithProcessType(ProcessType.MoveIn.Code)
+            .WithProcessType(ProcessType.MoveIn)
             .WithReceiver(SampleData.ReceiverId)
             .WithSenderId(SampleData.SenderId)
             .WithConsumerName(SampleData.ConsumerName)

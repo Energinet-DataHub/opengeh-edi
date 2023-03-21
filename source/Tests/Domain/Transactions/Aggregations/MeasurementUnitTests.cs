@@ -12,26 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.SeedWork;
+using Domain.Transactions.Aggregations;
+using Xunit;
 
-namespace Domain.Transactions;
+namespace Tests.Domain.Transactions.Aggregations;
 
-public class MeasurementUnit : EnumerationType
+public class MeasurementUnitTests
 {
-    public static readonly MeasurementUnit Kwh = new(0, nameof(Kwh), "KWH");
-
-    private MeasurementUnit(int id, string name, string code)
-        : base(id, name)
+    [Theory]
+    [InlineData("kwh")]
+    [InlineData("KWH")]
+    public void Can_parse_from_name_or_code(string valueToParse)
     {
-        Code = code;
-    }
+        var measurementUnitType = MeasurementUnit.From(valueToParse);
 
-    public string Code { get; }
-
-    public static MeasurementUnit From(string value)
-    {
-        return GetAll<MeasurementUnit>().First(type =>
-            type.Code.Equals(value, StringComparison.OrdinalIgnoreCase) ||
-            type.Name.Equals(value, StringComparison.OrdinalIgnoreCase));
+        Assert.NotNull(measurementUnitType);
     }
 }

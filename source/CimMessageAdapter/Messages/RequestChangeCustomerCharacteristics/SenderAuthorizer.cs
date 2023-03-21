@@ -55,7 +55,7 @@ public class SenderAuthorizer : ISenderAuthorizer
 
     private void EnsureSenderRoleMatches(string senderRole)
     {
-        if (senderRole.Equals(MarketRole.EnergySupplier.Name, StringComparison.OrdinalIgnoreCase) == false)
+        if (senderRole.Equals(MarketRole.EnergySupplier.Code, StringComparison.OrdinalIgnoreCase) == false)
         {
             _validationErrors.Add(new SenderRoleTypeIsNotAuthorized());
         }

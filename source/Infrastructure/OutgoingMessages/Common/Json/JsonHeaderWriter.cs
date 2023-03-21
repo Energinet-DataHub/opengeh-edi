@@ -13,9 +13,11 @@
 // limitations under the License.
 
 using System;
+using Domain.Actors;
 using System.Text.Json;
 using System.Xml;
 using Domain.OutgoingMessages;
+using Domain.SeedWork;
 
 namespace Infrastructure.OutgoingMessages.Common.Json;
 
@@ -45,7 +47,7 @@ internal static class JsonHeaderWriter
         writer.WritePropertyName("process.processType");
         writer.WriteStartObject();
         writer.WritePropertyName("value");
-        writer.WriteStringValue(messageHeader.ProcessType);
+        writer.WriteStringValue(CimCode.Of(ProcessType.From(messageHeader.ProcessType)));
         writer.WriteEndObject();
 
         writer.WritePropertyName("reason.code");
@@ -65,7 +67,7 @@ internal static class JsonHeaderWriter
         writer.WritePropertyName("receiver_MarketParticipant.marketRole.type");
         writer.WriteStartObject();
         writer.WritePropertyName("value");
-        writer.WriteStringValue(messageHeader.ReceiverRole);
+        writer.WriteStringValue(CimCode.Of(EnumerationType.FromName<MarketRole>(messageHeader.ReceiverRole)));
         writer.WriteEndObject();
 
         writer.WritePropertyName("sender_MarketParticipant.mRID");
@@ -79,7 +81,7 @@ internal static class JsonHeaderWriter
         writer.WritePropertyName("sender_MarketParticipant.marketRole.type");
         writer.WriteStartObject();
         writer.WritePropertyName("value");
-        writer.WriteStringValue(messageHeader.SenderRole);
+        writer.WriteStringValue(CimCode.Of(EnumerationType.FromName<MarketRole>(messageHeader.SenderRole)));
         writer.WriteEndObject();
 
         writer.WritePropertyName("type");

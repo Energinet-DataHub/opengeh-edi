@@ -176,35 +176,39 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
         return token.ToString(Formatting.None).Trim('"');
     }
 
+    private static bool IsValid(JsonDocument document, JsonSchema schema)
+    {
+        return schema.Evaluate(document, new EvaluationOptions() { OutputFormat = OutputFormat.Flag, }).IsValid;
+    }
+
     private async Task ValidateMessageAsync(JsonSchema schema, Stream message)
     {
         var jsonDocument = await JsonDocument.ParseAsync(message).ConfigureAwait(false);
 
-        var validationOptions = new ValidationOptions()
+        if (IsValid(jsonDocument, schema) == false)
         {
-            OutputFormat = OutputFormat.Detailed,
-        };
-
-        var validationResult = schema.Validate(jsonDocument, validationOptions);
-
-        if (!validationResult.IsValid)
-        {
-            AddValidationErrors(validationResult);
+            ExtractValidationErrors(jsonDocument, schema);
         }
 
         ResetMessagePosition(message);
     }
 
-    private void AddValidationErrors(ValidationResults validationResult)
+    private void ExtractValidationErrors(JsonDocument jsonDocument, JsonSchema schema)
     {
-        AddValidationError(validationResult.Message);
+        var result = schema.Evaluate(jsonDocument, new EvaluationOptions() { OutputFormat = OutputFormat.List, });
+        result
+            .Details
+            .Where(detail => detail.HasErrors)
+            .ToList().ForEach(AddValidationErrors);
+    }
 
-        if (validationResult.HasNestedResults)
+    private void AddValidationErrors(EvaluationResults validationResult)
+    {
+        var propertyName = validationResult.InstanceLocation.ToString();
+        var errorsValues = validationResult.Errors ?? new Dictionary<string, string>();
+        foreach (var error in errorsValues)
         {
-            foreach (var result in validationResult.NestedResults)
-            {
-                AddValidationError(result.Message);
-            }
+            AddValidationError($"{propertyName}: {error}");
         }
     }
 

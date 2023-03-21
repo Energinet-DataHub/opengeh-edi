@@ -53,7 +53,7 @@ public class ConfirmRequestChangeOfSupplierMessage : OutgoingMessage
         return new ConfirmRequestChangeOfSupplierMessage(
             energySupplierNumber,
             transactionId,
-            processType.Code,
+            processType.Name,
             marketActivityRecord);
     }
 }

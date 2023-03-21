@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Domain.Actors;
-using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.SeedWork;
 
@@ -21,30 +20,65 @@ namespace Domain.Transactions.Aggregations;
 
 public class AggregationResultForwarding : Entity
 {
-    private readonly List<OutgoingMessage> _messages = new();
-
-    private readonly ActorNumber _receivingActor;
-
-    private readonly MarketRole _receivingActorRole;
-
-    private readonly ProcessType _processType;
-
     public AggregationResultForwarding(
-        TransactionId id,
-        ActorNumber receivingActor,
-        MarketRole receivingActorRole,
-        ProcessType processType)
+        TransactionId id)
     {
-        _receivingActor = receivingActor;
-        _receivingActorRole = receivingActorRole;
-        _processType = processType;
         Id = id;
     }
 
     public TransactionId Id { get; }
 
-    public void SendResult(AggregationResult aggregationResult)
+    public AggregationResultMessage CreateMessage(Aggregation result)
     {
-        _messages.Add(AggregationResultMessage.Create(_receivingActor, _receivingActorRole, Id, _processType, aggregationResult));
+        ArgumentNullException.ThrowIfNull(result);
+
+        if (IsTotalResultPerGridArea(result))
+        {
+            return MessageForTheGridOperator(result);
+        }
+
+        if (ResultIsForTheEnergySupplier(result))
+        {
+            return MessageForTheEnergySupplier(result);
+        }
+
+        if (ResultIsForTheBalanceResponsible(result))
+        {
+            return MessageForTheBalanceResponsible(result);
+        }
+
+        throw new InvalidOperationException("Could not determine the receiver of the aggregation result");
+    }
+
+    private static bool ResultIsForTheEnergySupplier(Aggregation result)
+    {
+        return result.ActorGrouping!.EnergySupplierNumber is not null &&
+               result.ActorGrouping?.BalanceResponsibleNumber is null;
+    }
+
+    private static bool IsTotalResultPerGridArea(Aggregation result)
+    {
+        return result.ActorGrouping?.BalanceResponsibleNumber == null &&
+               result.ActorGrouping?.EnergySupplierNumber == null;
+    }
+
+    private static bool ResultIsForTheBalanceResponsible(Aggregation result)
+    {
+        return result.ActorGrouping!.BalanceResponsibleNumber is not null;
+    }
+
+    private AggregationResultMessage MessageForTheGridOperator(Aggregation result)
+    {
+        return AggregationResultMessage.Create(ActorNumber.Create(result.GridAreaDetails!.OperatorNumber), MarketRole.MeteredDataResponsible, Id, result);
+    }
+
+    private AggregationResultMessage MessageForTheEnergySupplier(Aggregation result)
+    {
+        return AggregationResultMessage.Create(ActorNumber.Create(result.ActorGrouping!.EnergySupplierNumber!), MarketRole.EnergySupplier, Id, result);
+    }
+
+    private AggregationResultMessage MessageForTheBalanceResponsible(Aggregation result)
+    {
+        return AggregationResultMessage.Create(ActorNumber.Create(result.ActorGrouping!.BalanceResponsibleNumber!), MarketRole.BalanceResponsible, Id, result);
     }
 }

@@ -12,22 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
-using Application.Configuration;
 using Application.OutgoingMessages.Common;
 using DocumentValidation;
 using DocumentValidation.CimXml;
 using Domain.OutgoingMessages;
-using Infrastructure.Configuration;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
 using Infrastructure.OutgoingMessages.Common;
+using Tests.Factories;
 using Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
 using MarketActivityRecord = Domain.OutgoingMessages.AccountingPointCharacteristics.MarketActivityRecord;
@@ -37,14 +35,12 @@ namespace Tests.Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
 public class AccountingPointCharacteristicsDocumentWriterTests
 {
     private readonly AccountingPointCharacteristicsMessageWriter _messageWriter;
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMessageRecordParser _messageRecordParser;
     private readonly SampleData _sampleData;
     private ISchemaProvider? _schemaProvider;
 
     public AccountingPointCharacteristicsDocumentWriterTests()
     {
-        _systemDateTimeProvider = new SystemDateTimeProvider();
         _messageRecordParser = new MessageRecordParser(new Serializer());
         _messageWriter = new AccountingPointCharacteristicsMessageWriter(_messageRecordParser);
         _sampleData = new SampleData();
@@ -53,7 +49,7 @@ public class AccountingPointCharacteristicsDocumentWriterTests
     [Fact]
     public async Task Document_is_valid()
     {
-        var header = new MessageHeader("E03", "SenderId", "DDZ", "ReceiverId", "DDQ", Guid.NewGuid().ToString(), _systemDateTimeProvider.Now());
+        var header = MessageHeaderFactory.Create();
         var marketActivityRecord = _sampleData.CreateMarketActivityRecord();
         var marketActivityRecords = new List<MarketActivityRecord>()
         {
@@ -71,7 +67,6 @@ public class AccountingPointCharacteristicsDocumentWriterTests
             var marketActivityRecord = AssertXmlMessage.GetMarketActivityRecordById(document, activityRecord.Id)!;
 
             Assert.NotNull(marketActivityRecord);
-          //  AssertXmlMessage.AssertMarketActivityRecordValue(marketActivityRecord, "originalTransactionIDReference_MktActivityRecord.mRID", activityRecord.OriginalTransactionId);
             AssertXmlMessage.AssertMarketActivityRecordValue(marketActivityRecord, "mRID", activityRecord.Id);
             AssertXmlMessage.AssertMarketActivityRecordValue(marketActivityRecord, "validityStart_DateAndOrTime.dateTime", activityRecord.ValidityStartDate.ToString());
         }

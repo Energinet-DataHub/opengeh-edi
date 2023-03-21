@@ -14,11 +14,12 @@
 
 using Domain.SeedWork;
 
-namespace Domain.Transactions;
+namespace Domain.Transactions.Aggregations;
 
 public class Resolution : EnumerationType
 {
     public static readonly Resolution Hourly = new(0, nameof(Hourly), "PT1H");
+    public static readonly Resolution QuarterHourly = new(1, nameof(QuarterHourly), "XXXX");
 
     private Resolution(int id, string name, string code)
         : base(id, name)

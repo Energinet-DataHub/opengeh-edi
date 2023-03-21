@@ -20,22 +20,18 @@ using MediatR;
 
 namespace Application.Transactions.Aggregations;
 
-public class RetrieveResultsWhenAnAggregationProcessHasCompleted : INotificationHandler<AggregationProcessHasCompleted>
+public class WhenAnAggregationResultIsAvailable : INotificationHandler<AggregationResultAvailable>
 {
-    private readonly CommandSchedulerFacade _commandScheduler;
+    private readonly CommandSchedulerFacade _commandSchedulerFacade;
 
-    public RetrieveResultsWhenAnAggregationProcessHasCompleted(CommandSchedulerFacade commandScheduler)
+    public WhenAnAggregationResultIsAvailable(CommandSchedulerFacade commandSchedulerFacade)
     {
-        _commandScheduler = commandScheduler;
+        _commandSchedulerFacade = commandSchedulerFacade;
     }
 
-    public Task Handle(AggregationProcessHasCompleted notification, CancellationToken cancellationToken)
+    public Task Handle(AggregationResultAvailable notification, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(notification);
-        return _commandScheduler.EnqueueAsync(new RetrieveAggregationResults(
-            notification.ResultId,
-            notification.AggregationProcessType.Name,
-            notification.GridArea.Code,
-            new Period(notification.PeriodStartDate, notification.PeriodEndDate)));
+        return _commandSchedulerFacade.EnqueueAsync(new ForwardAggregationResult(notification.Result));
     }
 }

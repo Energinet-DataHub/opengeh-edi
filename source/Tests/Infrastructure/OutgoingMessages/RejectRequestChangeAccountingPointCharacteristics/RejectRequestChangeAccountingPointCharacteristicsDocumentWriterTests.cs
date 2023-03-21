@@ -23,12 +23,14 @@ using Application.Configuration;
 using Application.OutgoingMessages.Common;
 using DocumentValidation;
 using DocumentValidation.CimXml;
+using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Infrastructure.Configuration;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.OutgoingMessages.Common;
 using Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
+using Tests.Factories;
 using Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
 using MarketActivityRecord = Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics.MarketActivityRecord;
@@ -38,13 +40,11 @@ namespace Tests.Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPoi
 public class RejectRequestChangeAccountingPointCharacteristicsDocumentWriterTests
 {
     private readonly RejectRequestChangeAccountingPointCharacteristicsMessageWriter _xmlMessageWriter;
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMessageRecordParser _messageRecordParser;
     private ISchemaProvider? _schemaProvider;
 
     public RejectRequestChangeAccountingPointCharacteristicsDocumentWriterTests()
     {
-        _systemDateTimeProvider = new SystemDateTimeProvider();
         _messageRecordParser = new MessageRecordParser(new Serializer());
         _xmlMessageWriter = new RejectRequestChangeAccountingPointCharacteristicsMessageWriter(_messageRecordParser);
     }
@@ -52,7 +52,7 @@ public class RejectRequestChangeAccountingPointCharacteristicsDocumentWriterTest
     [Fact]
     public async Task Document_is_valid()
     {
-        var header = new MessageHeader("A15", "SenderId", "DDZ", "ReceiverId", "DDQ", Guid.NewGuid().ToString(), _systemDateTimeProvider.Now());
+        var header = MessageHeaderFactory.Create();
         var marketActivityRecords = new List<MarketActivityRecord>()
         {
             new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId", new List<Reason>()

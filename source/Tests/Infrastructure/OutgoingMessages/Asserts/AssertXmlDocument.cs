@@ -97,14 +97,6 @@ public class AssertXmlDocument
         return this;
     }
 
-    public async Task<AssertXmlDocument> HasValidStructureAsync(XmlSchema schema)
-    {
-        if (schema == null) throw new ArgumentNullException(nameof(schema));
-        var validationResult = await XmlDocumentValidator.ValidateAsync(_stream, schema).ConfigureAwait(false);
-        Assert.True(validationResult.IsValid);
-        return this;
-    }
-
     public async Task<AssertXmlDocument> HasValidStructureAsync(DocumentType type, string version = "0.1")
     {
         var validationResult = await _documentValidator!.ValidateAsync(_stream, DocumentFormat.CimXml, type, version).ConfigureAwait(false);

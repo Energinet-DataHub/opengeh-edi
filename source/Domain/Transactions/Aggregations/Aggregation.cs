@@ -12,18 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using NodaTime;
 
-namespace Application.Transactions.Aggregations;
+namespace Domain.Transactions.Aggregations;
 
 public record Aggregation(
     IReadOnlyList<Point> Points,
-    string GridArea,
     string MeteringPointType,
     string MeasureUnitType,
     string Resolution,
     Period Period,
     string? SettlementType,
-    string? AggregatedForActor = null);
+    string ProcessType,
+    ActorGrouping ActorGrouping,
+    GridAreaDetails GridAreaDetails);
 
 public record Point(int Position, decimal? Quantity, string Quality, string SampleTime);
+
+public record Period(Instant Start, Instant End);
+
+public record ActorGrouping(string? EnergySupplierNumber, string? BalanceResponsibleNumber);
+
+public record GridAreaDetails(string GridAreaCode, string OperatorNumber);

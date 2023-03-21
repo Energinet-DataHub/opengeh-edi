@@ -12,19 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using NodaTime;
+using Domain.Transactions.Aggregations;
+using MediatR;
 
-namespace Domain.Transactions.Aggregations;
+namespace Application.Transactions.Aggregations;
 
-public class Period
+public class AggregationResultAvailable : INotification
 {
-    public Period(Instant start, Instant end)
+    public AggregationResultAvailable(Aggregation result)
     {
-        Start = start;
-        End = end;
+        Result = result;
     }
 
-    public Instant Start { get; }
-
-    public Instant End { get; }
+    public Aggregation Result { get; }
 }

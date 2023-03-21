@@ -22,7 +22,7 @@ jobs:
   dotnet_ci_build:
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@v10
     with:
-      SOLUTION_FILE_PATH: 'source/EDI.sln'
+      SOLUTION_FILE_PATH: "source/EDI.sln"
       DOTNET_VERSION: 7.0.200
 
   # Run all tests in 'IntegrationTests.dll'
@@ -48,28 +48,3 @@ jobs:
       TESTS_DLL_FILE_PATH: '\source\Tests\bin\Release\net7.0\Tests.dll'
       DOWNLOAD_ATTEMPT_LIMIT: 12
       DOTNET_VERSION: 7.0.200
-
-  #
-  # Branch policy status check
-  #
-
-  allow_merge:
-    runs-on: ubuntu-latest
-    needs: [
-      dotnet_ci_build,
-      integration_tests,
-      architecture_tests,
-      tests,
-    ]
-    if: |
-      always()
-    steps:
-      - name: Verify if merge is allowed
-        run: |
-          echo "${{ toJSON(needs) }}"
-
-          if [[ ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }} = true ]]; then
-              echo "Failed"
-              exit 1
-          fi
-
