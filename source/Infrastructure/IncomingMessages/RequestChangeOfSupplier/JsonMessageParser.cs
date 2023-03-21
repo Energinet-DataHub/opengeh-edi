@@ -14,11 +14,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
+using System.Xml;
 using Application.IncomingMessages.RequestChangeOfSupplier;
 using CimMessageAdapter.Errors;
 using CimMessageAdapter.Messages;
@@ -47,17 +49,20 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
 
-        string processType;
+        string processType = "RequestChangeOfSupplier";
+
+        /*
         try
         {
-            processType = GetBusinessProcessType(message);
+            processType = GetBusinessProcessType(document);
         }
         catch (JsonException exception)
         {
             return InvalidJsonFailure(exception);
         }
+        */
 
-        var schema = await _schemaProvider.GetSchemaAsync<JsonSchema>(processType, "0").ConfigureAwait(false);
+        var schema = await _schemaProvider.GetSchemaAsync<JsonSchema>(processType.ToUpper(CultureInfo.InvariantCulture), "0").ConfigureAwait(false);
         if (schema is null)
         {
             return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(new UnknownBusinessProcessTypeOrVersion(processType, "0"));
@@ -74,11 +79,11 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
 
         try
         {
-            using (var jsonTextReader = new Utf8JsonReader(message))
+            using (var document = await JsonDocument.ParseAsync(message).ConfigureAwait(false))
             {
                 try
                 {
-                    return ParseJsonData(jsonTextReader);
+                    return ParseJsonData(document);
                 }
                 catch (JsonException exception)
                 {
@@ -109,26 +114,32 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
         var deserialized = JsonSerializer.Deserialize<JsonObject>(message, options);
         if (deserialized is null) throw new InvalidOperationException("Unable to read first node");
         var path = deserialized.First().Value?.ToString();
+        if (path is null) throw new InvalidOperationException("Unable to read path");
         split = path.Split('_');
 
         return split;
     }
 
-    private static string GetBusinessProcessType(Stream message)
+    /*
+    private static string GetBusinessProcessType(JsonDocument document)
     {
-        if (message == null) throw new ArgumentNullException(nameof(message));
-        var split = SplitNamespace(message);
-        var processType = split[0];
+        //if (message == null) throw new ArgumentNullException(nameof(message));
+        //var split = SplitNamespace(message);
+        var processType = document.RootElement.GetProperty()
         return processType;
     }
+    */
 
-    private static MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction> ParseJsonData(Utf8JsonReader jsonTextReader)
+    private static MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction> ParseJsonData(JsonDocument document)
     {
         var marketActivityRecords = new List<MarketActivityRecord>();
-        var jsonRequest = JsonSerializer.Deserialize(jsonTextReader, JsonObject, new JsonSerializerOptions());
-        var headerToken = jsonRequest.SelectToken(HeaderElementName);
-        var messageHeader = MessageHeaderFrom(headerToken);
-        marketActivityRecords.AddRange(headerToken[MarketActivityRecordElementName].Select(MarketActivityRecordFrom));
+        var messageHeader = MessageHeaderFrom(document.RootElement.GetProperty(HeaderElementName));
+        var marketActivityRecord = document.RootElement.GetProperty(HeaderElementName).GetProperty(MarketActivityRecordElementName);
+        var records = marketActivityRecord.EnumerateArray();
+        foreach (var jsonElement in records)
+        {
+            marketActivityRecords.Add(MarketActivityRecordFrom(jsonElement));
+        }
 
         return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(new RequestChangeOfSupplierIncomingMarketDocument(messageHeader, marketActivityRecords));
     }
@@ -144,36 +155,36 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
         return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(InvalidMessageStructure.From(exception));
     }
 
-    private static MessageHeader MessageHeaderFrom(JToken token)
+    private static MessageHeader MessageHeaderFrom(JsonElement element)
     {
         return new MessageHeader(
-            token["mRID"].ToString(),
-            token["process.processType"]["value"].ToString(),
-            token["sender_MarketParticipant.mRID"]["value"].ToString(),
-            token["sender_MarketParticipant.marketRole.type"]["value"].ToString(),
-            token["receiver_MarketParticipant.mRID"]["value"].ToString(),
-            token["receiver_MarketParticipant.marketRole.type"]["value"].ToString(),
-            GetJsonDateStringWithoutQuotes(token["createdDateTime"]));
+            element.GetProperty("mRID").ToString(),
+            element.GetProperty("process.processType").GetProperty("value").ToString(),
+            element.GetProperty("sender_MarketParticipant.mRID").GetProperty("value").ToString(),
+            element.GetProperty("sender_MarketParticipant.marketRole.type").GetProperty("value").ToString(),
+            element.GetProperty("receiver_MarketParticipant.mRID").GetProperty("value").ToString(),
+            element.GetProperty("receiver_MarketParticipant.marketRole.type").GetProperty("value").ToString(),
+            GetJsonDateStringWithoutQuotes(element.GetProperty("createdDateTime")));
     }
 
-    private static MarketActivityRecord MarketActivityRecordFrom(JToken token)
+    private static MarketActivityRecord MarketActivityRecordFrom(JsonElement element)
     {
         return new MarketActivityRecord()
         {
-            Id = token["mRID"].ToString(),
-            ConsumerId = token["marketEvaluationPoint.customer_MarketParticipant.mRID"]["value"].ToString(),
-            ConsumerIdType = token["marketEvaluationPoint.customer_MarketParticipant.mRID"]["codingScheme"].ToString(),
-            BalanceResponsibleId = token["marketEvaluationPoint.balanceResponsibleParty_MarketParticipant.mRID"]["value"].ToString(),
-            EnergySupplierId = token["marketEvaluationPoint.energySupplier_MarketParticipant.mRID"]["value"].ToString(),
-            MarketEvaluationPointId = token["marketEvaluationPoint.mRID"]["value"].ToString(),
-            ConsumerName = token["marketEvaluationPoint.customer_MarketParticipant.name"].ToString(),
-            EffectiveDate = GetJsonDateStringWithoutQuotes(token["start_DateAndOrTime.dateTime"]),
+            Id = element.GetProperty("mRID").ToString(),
+            ConsumerId = element.GetProperty("marketEvaluationPoint.customer_MarketParticipant.mRID").GetProperty("value").ToString(),
+            ConsumerIdType = element.GetProperty("marketEvaluationPoint.customer_MarketParticipant.mRID").GetProperty("codingScheme").ToString(),
+            BalanceResponsibleId = element.GetProperty("marketEvaluationPoint.balanceResponsibleParty_MarketParticipant.mRID").GetProperty("value").ToString(),
+            EnergySupplierId = element.GetProperty("marketEvaluationPoint.energySupplier_MarketParticipant.mRID").GetProperty("value").ToString(),
+            MarketEvaluationPointId = element.GetProperty("marketEvaluationPoint.mRID").GetProperty("value").ToString(),
+            ConsumerName = element.GetProperty("marketEvaluationPoint.customer_MarketParticipant.name").ToString(),
+            EffectiveDate = GetJsonDateStringWithoutQuotes(element.GetProperty("start_DateAndOrTime.dateTime")),
         };
     }
 
-    private static string GetJsonDateStringWithoutQuotes(JToken token)
+    private static string GetJsonDateStringWithoutQuotes(JsonElement element)
     {
-        return token.ToString(Formatting.None).Trim('"');
+        return element.ToString().Trim('"');
     }
 
     private static bool IsValid(JsonDocument document, JsonSchema schema)

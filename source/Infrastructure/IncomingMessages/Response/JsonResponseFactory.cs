@@ -64,12 +64,13 @@ public class JsonResponseFactory : IResponseFactory
                 writer.WriteEndObject();
             }
 
-            writer.WriteEndObject();
+            writer.WriteEndArray();
             writer.WriteEndObject();
         }
 
         writer.WriteEndObject();
         writer.WriteEndObject();
+        writer.Flush();
 
         return Encoding.UTF8.GetString(messageBody.ToArray());
     }
