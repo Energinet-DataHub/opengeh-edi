@@ -16,10 +16,10 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.Response;
 using Domain.OutgoingMessages;
-using Newtonsoft.Json;
 
 namespace Infrastructure.IncomingMessages.Response;
 
@@ -36,18 +36,17 @@ public class JsonResponseFactory : IResponseFactory
     private static string CreateMessageBodyFrom(Result result)
     {
         if (result == null) throw new ArgumentNullException(nameof(result));
-        var messageBody = new StringBuilder();
-        var stringWriter = new StringWriter(messageBody);
-
-        using var writer = new JsonTextWriter(stringWriter);
+        var messageBody = new MemoryStream();
+        var options = new JsonWriterOptions() { Indented = true };
+        using var writer = new Utf8JsonWriter(messageBody, options);
 
         writer.WriteStartObject();
         writer.WritePropertyName("Error");
         writer.WriteStartObject();
         writer.WritePropertyName("Code");
-        writer.WriteValue(result.Errors.Count == 1 ? result.Errors.First().Code : "BadRequest");
+        writer.WriteStringValue(result.Errors.Count == 1 ? result.Errors.First().Code : "BadRequest");
         writer.WritePropertyName("Message");
-        writer.WriteValue(result.Errors.Count == 1 ? result.Errors.First().Message : "Multiple errors in message");
+        writer.WriteStringValue(result.Errors.Count == 1 ? result.Errors.First().Message : "Multiple errors in message");
 
         if (result.Errors.Count > 1)
         {
@@ -59,20 +58,20 @@ public class JsonResponseFactory : IResponseFactory
             {
                 writer.WriteStartObject();
                 writer.WritePropertyName("Code");
-                writer.WriteValue(validationError.Code);
+                writer.WriteStringValue(validationError.Code);
                 writer.WritePropertyName("Message");
-                writer.WriteValue(validationError.Message);
+                writer.WriteStringValue(validationError.Message);
                 writer.WriteEndObject();
             }
 
-            writer.WriteEnd();
+            writer.WriteEndArray();
             writer.WriteEndObject();
         }
 
         writer.WriteEndObject();
         writer.WriteEndObject();
-        writer.Close();
+        writer.Flush();
 
-        return messageBody.ToString();
+        return Encoding.UTF8.GetString(messageBody.ToArray());
     }
 }
