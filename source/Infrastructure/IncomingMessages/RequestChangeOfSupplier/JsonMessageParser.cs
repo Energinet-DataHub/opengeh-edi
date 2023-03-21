@@ -35,6 +35,7 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
 {
     private const string MarketActivityRecordElementName = "MktActivityRecord";
     private const string HeaderElementName = "RequestChangeOfSupplier_MarketDocument";
+    private const string DocumentName = "RequestChangeOfSupplier";
     private readonly ISchemaProvider _schemaProvider;
     private readonly List<ValidationError> _errors = new();
 
@@ -49,23 +50,10 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
 
-        string processType = "RequestChangeOfSupplier";
-
-        /*
-        try
-        {
-            processType = GetBusinessProcessType(document);
-        }
-        catch (JsonException exception)
-        {
-            return InvalidJsonFailure(exception);
-        }
-        */
-
-        var schema = await _schemaProvider.GetSchemaAsync<JsonSchema>(processType.ToUpper(CultureInfo.InvariantCulture), "0").ConfigureAwait(false);
+        var schema = await _schemaProvider.GetSchemaAsync<JsonSchema>(DocumentName.ToUpper(CultureInfo.InvariantCulture), "0").ConfigureAwait(false);
         if (schema is null)
         {
-            return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(new UnknownBusinessProcessTypeOrVersion(processType, "0"));
+            return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(new UnknownBusinessProcessTypeOrVersion(DocumentName, "0"));
         }
 
         ResetMessagePosition(message);
@@ -103,32 +91,6 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
         {
         }
     }
-
-    private static string[] SplitNamespace(Stream message)
-    {
-        if (message == null) throw new ArgumentNullException(nameof(message));
-
-        string[] split;
-        ResetMessagePosition(message);
-        var options = new JsonSerializerOptions();
-        var deserialized = JsonSerializer.Deserialize<JsonObject>(message, options);
-        if (deserialized is null) throw new InvalidOperationException("Unable to read first node");
-        var path = deserialized.First().Value?.ToString();
-        if (path is null) throw new InvalidOperationException("Unable to read path");
-        split = path.Split('_');
-
-        return split;
-    }
-
-    /*
-    private static string GetBusinessProcessType(JsonDocument document)
-    {
-        //if (message == null) throw new ArgumentNullException(nameof(message));
-        //var split = SplitNamespace(message);
-        var processType = document.RootElement.GetProperty()
-        return processType;
-    }
-    */
 
     private static MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction> ParseJsonData(JsonDocument document)
     {
