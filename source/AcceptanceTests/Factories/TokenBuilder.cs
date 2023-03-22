@@ -19,7 +19,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace AcceptanceTest.Factories;
 
-internal class TokenBuilder
+internal sealed class TokenBuilder
 {
     public static string ForGridOperator(string gridOperatorNumber)
     {

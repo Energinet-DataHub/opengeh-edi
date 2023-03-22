@@ -5,7 +5,7 @@ using AcceptanceTest.Factories;
 
 namespace AcceptanceTest.Drivers;
 
-internal class EdiDriver : IDisposable
+internal sealed class EdiDriver : IDisposable
 {
     private readonly HttpClient _httpClient;
 
