@@ -31,7 +31,7 @@ public class RaiseDomainEventsBehaviour<TRequest, TResponse> : IPipelineBehavior
         _domainEventsAccessor = domainEventsAccessor;
     }
 
-    public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
         if (next == null) throw new ArgumentNullException(nameof(next));
 
@@ -39,7 +39,7 @@ public class RaiseDomainEventsBehaviour<TRequest, TResponse> : IPipelineBehavior
         var domainEvents = _domainEventsAccessor.GetAllDomainEvents();
         foreach (var domainEvent in domainEvents)
         {
-            await _mediator.Publish(domainEvent).ConfigureAwait(false);
+            await _mediator.Publish(domainEvent, cancellationToken).ConfigureAwait(false);
         }
 
         _domainEventsAccessor.ClearAllDomainEvents();

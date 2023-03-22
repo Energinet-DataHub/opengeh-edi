@@ -30,15 +30,6 @@ public class ActorRegistry : IActorRegistry
         _databaseConnectionFactory = databaseConnectionFactory;
     }
 
-    public async Task<Guid?> IfActorExistsGetB2CIdAsync(string identificationNumber)
-    {
-        using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
-        if (identificationNumber == null) throw new ArgumentNullException(nameof(identificationNumber));
-        var sqlStatement = @$"SELECT B2CId FROM [dbo].[Actor]  WHERE IdentificationNumber = @IdentificationNumber";
-        var b2CId = await connection.QueryFirstOrDefaultAsync<Guid?>(sqlStatement, new { IdentificationNumber = identificationNumber }).ConfigureAwait(false);
-        return b2CId;
-    }
-
     public async Task<bool> TryStoreAsync(CreateActor createActor)
     {
         if (createActor == null) throw new ArgumentNullException(nameof(createActor));

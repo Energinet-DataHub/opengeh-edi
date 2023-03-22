@@ -16,7 +16,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.Configuration;
+using Google.Protobuf;
 using Infrastructure.Configuration.DataAccess;
+using NodaTime.Serialization.Protobuf;
 
 namespace Infrastructure.Configuration.IntegrationEvents;
 
@@ -56,7 +58,13 @@ public class IntegrationEventReceiver
 
     private async Task RegisterAsync(string eventId, string eventType, byte[] eventPayload)
     {
-        _context.ReceivedIntegrationEvents.Add(new ReceivedIntegrationEvent(eventId, eventType, eventPayload, _dateTimeProvider.Now()));
+        _context.ReceivedIntegrationEvents.Add(new ReceivedIntegrationEvent(eventId, eventType, ToJson(eventType, eventPayload), _dateTimeProvider.Now()));
         await _context.SaveChangesAsync().ConfigureAwait(false);
+    }
+
+    private string ToJson(string eventType, byte[] eventPayload)
+    {
+        var mapper = _mappers.First(mapper => mapper.CanHandle(eventType));
+        return mapper.ToJson(eventPayload);
     }
 }

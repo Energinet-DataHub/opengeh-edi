@@ -28,6 +28,7 @@ using Infrastructure.Configuration.Serialization;
 using Infrastructure.OutgoingMessages.Common;
 using Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Json.Schema;
+using Tests.Factories;
 using Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
 
@@ -52,7 +53,7 @@ public class ConfirmRequestChangeOfSupplierJsonDocumentWriterTests
     [Fact]
     public async Task Document_is_valid()
     {
-        var header = new MessageHeader("E03", "SenderId", "DDZ", "ReceiverId", "DDQ", Guid.NewGuid().ToString(), _systemDateTimeProvider.Now());
+        var header = MessageHeaderFactory.Create();
         var marketActivityRecords = new List<MarketActivityRecord>()
         {
             new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId"),

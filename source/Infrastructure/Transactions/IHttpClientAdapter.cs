@@ -29,4 +29,10 @@ public interface IHttpClientAdapter
     /// <param name="uri"></param>
     /// <param name="content"></param>
     Task<HttpResponseMessage> PostAsync(Uri uri, HttpContent content);
+
+    /// <summary>
+    /// Issue a get request
+    /// </summary>
+    /// <param name="uri"></param>
+    Task<HttpResponseMessage> GetAsync(Uri uri);
 }

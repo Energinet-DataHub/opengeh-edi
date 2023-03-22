@@ -46,7 +46,7 @@ public class IntegrationEventsProcessor
         {
             try
             {
-                await _mediator.Publish(MapperFor(message.EventType).MapFrom(message.EventPayload)).ConfigureAwait(false);
+                await _mediator.Publish(await MapperFor(message.EventType).MapFromAsync(message.EventPayload).ConfigureAwait(false)).ConfigureAwait(false);
                 await MarkAsProcessedAsync(message).ConfigureAwait(false);
             }
             #pragma warning disable CA1031 // We dont' the type of exception here

@@ -94,7 +94,7 @@ namespace IntegrationTests.Application.Transactions.MoveIn
             httpClientMock.RespondWithValidationErrors(new List<string> { "InvalidConsumer" });
 
             var incomingMessage = MessageBuilder()
-                .WithProcessType(ProcessType.MoveIn.Code)
+                .WithProcessType(ProcessType.MoveIn)
                 .WithReceiver(SampleData.ReceiverId)
                 .WithSenderId(SampleData.SenderId)
                 .WithConsumerName(null)
@@ -109,7 +109,7 @@ namespace IntegrationTests.Application.Transactions.MoveIn
         public async Task A_reject_message_is_created_when_the_sender_id_does_not_match_energy_supplier_id()
         {
             var incomingMessage = MessageBuilder()
-                .WithProcessType(ProcessType.MoveIn.Code)
+                .WithProcessType(ProcessType.MoveIn)
                 .WithReceiver(SampleData.ReceiverId)
                 .WithSenderId("1234567890123")
                 .WithConsumerName(null)
@@ -125,7 +125,7 @@ namespace IntegrationTests.Application.Transactions.MoveIn
         public async Task A_reject_message_is_created_when_the_energy_supplier_id_is_empty()
         {
             var incomingMessage = MessageBuilder()
-                .WithProcessType(ProcessType.MoveIn.Code)
+                .WithProcessType(ProcessType.MoveIn)
                 .WithReceiver(SampleData.ReceiverId)
                 .WithSenderId(SampleData.SenderId)
                 .WithEnergySupplierId(null)
@@ -149,7 +149,7 @@ namespace IntegrationTests.Application.Transactions.MoveIn
         private async Task GivenRequestHasBeenAccepted()
         {
             var incomingMessage = MessageBuilder()
-                .WithProcessType(ProcessType.MoveIn.Code)
+                .WithProcessType(ProcessType.MoveIn)
                 .WithReceiver(SampleData.ReceiverId)
                 .WithSenderId(SampleData.SenderId)
                 .WithConsumerName(SampleData.ConsumerName)
@@ -178,7 +178,7 @@ namespace IntegrationTests.Application.Transactions.MoveIn
             var assertMessage = await AssertOutgoingMessage.OutgoingMessageAsync(
                     currentTransactionId,
                     MessageType.ConfirmRequestChangeOfSupplier.Name,
-                    ProcessType.MoveIn.Code,
+                    ProcessType.MoveIn.Name,
                     MarketRole.EnergySupplier,
                     GetService<IDatabaseConnectionFactory>())
                 .ConfigureAwait(false);
@@ -204,7 +204,7 @@ namespace IntegrationTests.Application.Transactions.MoveIn
             var assertMessage = await AssertOutgoingMessage
                 .OutgoingMessageAsync(
                     MessageType.RejectRequestChangeOfSupplier.Name,
-                    ProcessType.MoveIn.Code,
+                    ProcessType.MoveIn.Name,
                     MarketRole.EnergySupplier,
                     GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
             assertMessage.HasReceiverRole(MarketRole.EnergySupplier.Name);

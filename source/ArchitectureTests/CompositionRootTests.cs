@@ -134,7 +134,7 @@ namespace ArchitectureTests
                 .Select(type => new object[] { new Requirement(type.Name, getGenericTypeDefinition(type, targetType)) });
         }
 
-        private class TestEnvironment : RuntimeEnvironment
+        private sealed class TestEnvironment : RuntimeEnvironment
         {
             public override string? SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND =>
                 CreateFakeServiceBusConnectionString();

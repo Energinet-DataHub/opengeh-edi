@@ -19,6 +19,7 @@ namespace Domain.Transactions.Aggregations;
 public class SettlementType : EnumerationType
 {
     public static readonly SettlementType NonProfiled = new(0, nameof(NonProfiled), "E02");
+    public static readonly SettlementType Flex = new(1, nameof(Flex), "XXX");
 
     private SettlementType(int id, string name, string code)
         : base(id, name)
@@ -27,4 +28,16 @@ public class SettlementType : EnumerationType
     }
 
     public string Code { get; }
+
+    public static SettlementType From(string valueToParse)
+    {
+        var settlementType = GetAll<SettlementType>()
+            .FirstOrDefault(type => type.Name.Equals(valueToParse, StringComparison.OrdinalIgnoreCase) ||
+                                    type.Code.Equals(valueToParse, StringComparison.OrdinalIgnoreCase));
+
+        if (settlementType is null)
+            throw new InvalidCastException($"Could not parse {valueToParse} to settlement type");
+
+        return settlementType;
+    }
 }

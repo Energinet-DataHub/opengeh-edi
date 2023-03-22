@@ -35,11 +35,11 @@ internal static class WholeSaleContracts
         EnergySupplier = 0,
     }
 
-    internal record ProcessStepResultRequestDto(Guid BatchId, string GridAreaCode, WholeSaleContracts.ProcessStepType ProcessStepResult);
+    internal sealed record ProcessStepResultRequestDto(Guid BatchId, string GridAreaCode, WholeSaleContracts.ProcessStepType ProcessStepResult);
 
-    internal record ProcessStepResultRequestDtoV2(Guid BatchId, string GridAreaCode, TimeSeriesType TimeSeriesType, string Gln);
+    internal sealed record ProcessStepResultRequestDtoV2(Guid BatchId, string GridAreaCode, TimeSeriesType TimeSeriesType, string Gln);
 
-    internal record ProcessStepActorsRequest(Guid BatchId, string GridAreaCode, WholeSaleContracts.TimeSeriesType Type, MarketRole MarketRole);
+    internal sealed record ProcessStepActorsRequest(Guid BatchId, string GridAreaCode, WholeSaleContracts.TimeSeriesType Type, MarketRole MarketRole);
 
-    internal record WholesaleActorDto(string Gln);
+    internal sealed record WholesaleActorDto(string Gln);
 }

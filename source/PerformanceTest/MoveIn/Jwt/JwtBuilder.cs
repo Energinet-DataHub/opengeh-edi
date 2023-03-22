@@ -19,7 +19,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace PerformanceTest.MoveIn.Jwt;
 
-internal class JwtBuilder
+internal sealed class JwtBuilder
 {
     public static string BuildToken(string uniqueActorNumber)
     {

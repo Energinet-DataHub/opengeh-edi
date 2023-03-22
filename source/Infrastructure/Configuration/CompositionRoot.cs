@@ -116,10 +116,9 @@ namespace Infrastructure.Configuration
             return this;
         }
 
-        public CompositionRoot AddAggregationsConfiguration(
-            Func<IServiceProvider, IAggregationResults> aggregationResultsBuilder)
+        public CompositionRoot AddAggregationsConfiguration()
         {
-            AggregationsConfiguration.Configure(_services, aggregationResultsBuilder);
+            AggregationsConfiguration.Configure(_services);
             return this;
         }
 

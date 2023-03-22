@@ -22,6 +22,7 @@ using Application.IncomingMessages.RequestChangeCustomerCharacteristics;
 using CimMessageAdapter.Errors;
 using CimMessageAdapter.Messages;
 using DocumentValidation;
+using DocumentValidation.CimXml;
 using Domain.OutgoingMessages;
 using MarketActivityRecord = Application.IncomingMessages.RequestChangeCustomerCharacteristics.MarketActivityRecord;
 
@@ -36,7 +37,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
 
     public XmlMessageParser()
     {
-        _schemaProvider = new XmlSchemaProvider();
+        _schemaProvider = new CimXmlSchemaProvider();
     }
 
     public MessageFormat HandledFormat => MessageFormat.Xml;

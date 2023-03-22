@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Application.Transactions.Aggregations;
 using Domain.Transactions.Aggregations;
 using MediatR;
@@ -22,15 +21,11 @@ namespace Infrastructure.Transactions.Aggregations;
 
 internal static class AggregationsConfiguration
 {
-    internal static void Configure(IServiceCollection services, Func<IServiceProvider, IAggregationResults> aggregationResultsBuilder)
+    internal static void Configure(IServiceCollection services)
     {
-        services.AddTransient(typeof(INotificationHandler<AggregationProcessHasCompleted>), typeof(RetrieveResultsWhenAnAggregationProcessHasCompleted));
-        services.AddScoped<AggregationResultMapper>();
+        services.AddTransient(typeof(INotificationHandler<AggregationResultAvailable>), typeof(WhenAnAggregationResultIsAvailable));
         services.AddScoped<IAggregationResultForwardingRepository, AggregationResultForwardingRepository>();
         services.AddSingleton<IGridAreaLookup, GridAreaLookup>();
-        services.AddSingleton(aggregationResultsBuilder);
-        services.AddTransient<IRequestHandler<SendAggregationResult, Unit>, SendAggregationResultHandler>();
-        services.AddTransient<IRequestHandler<RetrieveAggregationResults, Unit>, RetrieveAggregationResultsHandler>();
-        services.AddTransient<TransactionScheduler>();
+        services.AddTransient<IRequestHandler<ForwardAggregationResult, Unit>, ForwardAggregationResultHandler>();
     }
 }

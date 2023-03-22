@@ -32,6 +32,11 @@ public class HttpClientSpy : IHttpClientAdapter
     private HttpStatusCode _responseCode = HttpStatusCode.OK;
     private string _businessProcessId = Guid.NewGuid().ToString();
 
+    public Task<HttpResponseMessage> GetAsync(Uri uri)
+    {
+        return Task.FromResult<HttpResponseMessage>(new HttpResponseMessage());
+    }
+
     public void AssertJsonContent(object expectedContent)
     {
         Assert.True(JToken.DeepEquals(JToken.Parse(JsonConvert.SerializeObject(expectedContent)), JToken.Parse(_messageBody)));

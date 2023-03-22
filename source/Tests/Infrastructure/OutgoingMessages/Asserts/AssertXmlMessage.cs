@@ -19,9 +19,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
-using Application.Xml;
+using DocumentValidation.Xml;
+using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Domain.SeedWork;
+using Infrastructure.OutgoingMessages.Common;
 using Xunit;
 
 namespace Tests.Infrastructure.OutgoingMessages.Asserts
@@ -65,12 +68,12 @@ namespace Tests.Infrastructure.OutgoingMessages.Asserts
         internal static void AssertHeader(MessageHeader header, XDocument document)
         {
             Assert.NotEmpty(AssertXmlMessage.GetMessageHeaderValue(document, "mRID")!);
-            AssertHasHeaderValue(document, "process.processType", header.ProcessType);
+            AssertHasHeaderValue(document, "process.processType", CimCode.Of(ProcessType.From(header.ProcessType)));
             AssertHasHeaderValue(document, "businessSector.type", "23");
             AssertHasHeaderValue(document, "sender_MarketParticipant.mRID", header.SenderId);
-            AssertHasHeaderValue(document, "sender_MarketParticipant.marketRole.type", header.SenderRole);
+            AssertHasHeaderValue(document, "sender_MarketParticipant.marketRole.type", CimCode.Of(EnumerationType.FromName<MarketRole>(header.SenderRole)));
             AssertHasHeaderValue(document, "receiver_MarketParticipant.mRID", header.ReceiverId);
-            AssertHasHeaderValue(document, "receiver_MarketParticipant.marketRole.type", header.ReceiverRole);
+            AssertHasHeaderValue(document, "receiver_MarketParticipant.marketRole.type", CimCode.Of(EnumerationType.FromName<MarketRole>(header.ReceiverRole)));
         }
 
         internal static void HasReasonCode(XDocument document, string expectedReasonCode)
@@ -81,7 +84,7 @@ namespace Tests.Infrastructure.OutgoingMessages.Asserts
         internal static async Task AssertConformsToSchemaAsync(Stream message, XmlSchema schema)
         {
             if (schema == null) throw new ArgumentNullException(nameof(schema));
-            var validationResult = await MessageValidator.ValidateAsync(message, schema).ConfigureAwait(false);
+            var validationResult = await XmlDocumentValidator.ValidateAsync(message, schema).ConfigureAwait(false);
             Assert.True(validationResult.IsValid);
         }
 

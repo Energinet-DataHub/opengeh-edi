@@ -73,8 +73,8 @@ namespace Tests.CimMessageAdapter.Response
             var document = XDocument.Parse(responseMessage.MessageBody);
             var errors = document.Element("Error")?.Element("Details")?.Elements().ToList();
 
-            Assert.Contains(errors, error => error.Element("Code")?.Value == validationError.Code);
-            Assert.Contains(errors, error => error.Element("Message")?.Value == validationError.Message);
+            Assert.Contains(errors!, error => error.Element("Code")?.Value == validationError.Code);
+            Assert.Contains(errors!, error => error.Element("Message")?.Value == validationError.Message);
         }
 
         private ResponseMessage CreateResponse(Result result)

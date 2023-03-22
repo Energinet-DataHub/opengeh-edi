@@ -19,7 +19,7 @@ using NodaTime;
 
 namespace IntegrationTests.Application.Transactions.Aggregations;
 
-internal class SampleData
+internal sealed class SampleData
 {
     internal static string NameOfBalanceFixingCompletedIntegrationEvent => "BalanceFixingCompleted";
 

@@ -15,25 +15,31 @@
 using PerformanceTest.Actors;
 using PerformanceTest.MoveIn;
 
-var builder = WebApplication.CreateBuilder(args);
+namespace PerformanceTest;
+
+public sealed class Program
+{
+    public static void Main(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+        builder.Services.AddControllers();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddSwaggerGen();
+        builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton<IActorService, ActorService>();
+        builder.Services.AddSingleton<IActorService, ActorService>();
 
-builder.Services.AddTransient<IMoveInService, MoveInService>();
+        builder.Services.AddTransient<IMoveInService, MoveInService>();
 
-builder.Services.AddSingleton(builder.Configuration);
+        builder.Services.AddSingleton(builder.Configuration);
 
-builder.Services.AddHealthChecks();
+        builder.Services.AddHealthChecks();
 
-builder.Services.AddLogging();
+        builder.Services.AddLogging();
 
 // CONCLUSION:
 //  * Logging using ILogger<T> will work, but notice that by default we need to log as "Warning" for it to appear in Application Insights (can be configured).
@@ -42,21 +48,23 @@ builder.Services.AddLogging();
 // CONCLUSION:
 //  * We can see Trace, Request, Dependencies and other entries in App Insights out-of-box.
 //    See https://docs.microsoft.com/en-us/azure/azure-monitor/app/asp-net-core
-builder.Services.AddApplicationInsightsTelemetry();
+        builder.Services.AddApplicationInsightsTelemetry();
 
-var app = builder.Build();
+        var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-app.UseSwagger();
+        app.UseSwagger();
 
-app.UseSwaggerUI();
+        app.UseSwaggerUI();
 
-app.UseAuthorization();
+        app.UseAuthorization();
 
-app.MapControllers();
+        app.MapControllers();
 
-app.MapHealthChecks("monitor/live");
+        app.MapHealthChecks("monitor/live");
 
-app.MapHealthChecks("monitor/ready");
+        app.MapHealthChecks("monitor/ready");
 
-app.Run();
+        app.Run();
+    }
+}

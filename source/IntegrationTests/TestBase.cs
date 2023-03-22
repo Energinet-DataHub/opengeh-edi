@@ -45,7 +45,6 @@ namespace IntegrationTests
     [Collection("IntegrationTest")]
     public class TestBase : IDisposable
     {
-        private readonly AggregationResultsStub _aggregationResultsStub;
         private readonly ServiceBusSenderFactoryStub _serviceBusSenderFactoryStub;
         private readonly HttpClientSpy _httpClientSpy;
         private ServiceCollection? _services;
@@ -58,7 +57,6 @@ namespace IntegrationTests
             databaseFixture.CleanupDatabase();
             _httpClientSpy = new HttpClientSpy();
             _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
-            _aggregationResultsStub = new AggregationResultsStub();
             NotificationHandlerSpy = new TestNotificationHandlerSpy();
             BuildServices();
         }
@@ -146,7 +144,7 @@ namespace IntegrationTests
 
             CompositionRoot.Initialize(_services)
                 .AddAuthentication()
-                .AddAggregationsConfiguration(_ => _aggregationResultsStub)
+                .AddAggregationsConfiguration()
                 .AddPeekConfiguration(
                     new BundleConfigurationStub(),
                     sp => new BundledMessagesStub(

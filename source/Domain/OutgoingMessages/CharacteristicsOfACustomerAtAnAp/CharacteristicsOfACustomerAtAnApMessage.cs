@@ -62,7 +62,7 @@ public class CharacteristicsOfACustomerAtAnApMessage : OutgoingMessage
             MessageType.CharacteristicsOfACustomerAtAnAP,
             actorNumber,
             TransactionId.Create(transactionId.Id),
-            processType.Code,
+            processType.Name,
             receivingActorRole,
             DataHubDetails.IdentificationNumber,
             MarketRole.MeteringPointAdministrator,

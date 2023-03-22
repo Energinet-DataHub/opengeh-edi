@@ -13,79 +13,80 @@
 // limitations under the License.
 
 using System;
+using System.Text.Json;
+using Domain.Actors;
 using Domain.OutgoingMessages;
-using Newtonsoft.Json;
+using Domain.SeedWork;
 
 namespace Infrastructure.OutgoingMessages.Common.Json;
 
 internal static class JsonHeaderWriter
 {
-    internal static void Write(MessageHeader messageHeader, string documentType, string typeCode, string? reasonCode, JsonTextWriter writer)
+    internal static void Write(MessageHeader messageHeader, string documentType, string typeCode, string? reasonCode, Utf8JsonWriter writer)
     {
         if (messageHeader == null) throw new ArgumentNullException(nameof(messageHeader));
         if (documentType == null) throw new ArgumentNullException(nameof(documentType));
         if (writer == null) throw new ArgumentNullException(nameof(writer));
-        writer.Formatting = Formatting.Indented;
 
         writer.WriteStartObject();
         writer.WritePropertyName(documentType);
         writer.WriteStartObject();
         writer.WritePropertyName("mRID");
-        writer.WriteValue(messageHeader.MessageId);
+        writer.WriteStringValue(messageHeader.MessageId);
 
         writer.WritePropertyName("businessSector.type");
         writer.WriteStartObject();
         writer.WritePropertyName("value");
-        writer.WriteValue("23");
+        writer.WriteStringValue("23");
         writer.WriteEndObject();
 
         writer.WritePropertyName("createdDateTime");
-        writer.WriteValue(messageHeader.TimeStamp.ToString());
+        writer.WriteStringValue(messageHeader.TimeStamp.ToString());
 
         writer.WritePropertyName("process.processType");
         writer.WriteStartObject();
         writer.WritePropertyName("value");
-        writer.WriteValue(messageHeader.ProcessType);
+        writer.WriteStringValue(CimCode.Of(ProcessType.From(messageHeader.ProcessType)));
         writer.WriteEndObject();
 
         writer.WritePropertyName("reason.code");
         writer.WriteStartObject();
         writer.WritePropertyName("value");
-        writer.WriteValue(reasonCode);
+        writer.WriteStringValue(reasonCode);
         writer.WriteEndObject();
 
         writer.WritePropertyName("receiver_MarketParticipant.mRID");
         writer.WriteStartObject();
         writer.WritePropertyName("codingScheme");
-        writer.WriteValue("A10");
+        writer.WriteStringValue("A10");
         writer.WritePropertyName("value");
-        writer.WriteValue(messageHeader.ReceiverId);
+        writer.WriteStringValue(messageHeader.ReceiverId);
         writer.WriteEndObject();
 
         writer.WritePropertyName("receiver_MarketParticipant.marketRole.type");
         writer.WriteStartObject();
         writer.WritePropertyName("value");
-        writer.WriteValue(messageHeader.ReceiverRole);
+        writer.WriteStringValue(CimCode.Of(EnumerationType.FromName<MarketRole>(messageHeader.ReceiverRole)));
         writer.WriteEndObject();
 
         writer.WritePropertyName("sender_MarketParticipant.mRID");
         writer.WriteStartObject();
         writer.WritePropertyName("codingScheme");
-        writer.WriteValue("A10");
+        writer.WriteStringValue("A10");
         writer.WritePropertyName("value");
-        writer.WriteValue(messageHeader.SenderId);
+        writer.WriteStringValue(messageHeader.SenderId);
         writer.WriteEndObject();
 
         writer.WritePropertyName("sender_MarketParticipant.marketRole.type");
         writer.WriteStartObject();
         writer.WritePropertyName("value");
-        writer.WriteValue(messageHeader.SenderRole);
+        writer.WriteStringValue(CimCode.Of(EnumerationType.FromName<MarketRole>(messageHeader.SenderRole)));
         writer.WriteEndObject();
 
         writer.WritePropertyName("type");
         writer.WriteStartObject();
         writer.WritePropertyName("value");
-        writer.WriteValue(typeCode);
+        writer.WriteStringValue(typeCode);
         writer.WriteEndObject();
     }
 }

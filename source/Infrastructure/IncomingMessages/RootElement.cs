@@ -14,7 +14,7 @@
 
 namespace Infrastructure.IncomingMessages;
 
-internal record RootElement
+internal sealed record RootElement
 {
     internal RootElement(string rootElementName, string defaultNamespace)
     {

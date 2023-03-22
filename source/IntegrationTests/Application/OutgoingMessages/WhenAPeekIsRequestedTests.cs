@@ -136,7 +136,7 @@ public class WhenAPeekIsRequestedTests : TestBase
                 "FakeSenderRole",
                 messageType.Name,
                 category.Name,
-                processType.Code,
+                processType.Name,
                 "MessageRecord");
 
             await messageEnqueuer.EnqueueAsync(message).ConfigureAwait(false);
@@ -147,7 +147,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     {
         var incomingMessage = MessageBuilder()
             .WithMarketEvaluationPointId(SampleData.MeteringPointNumber)
-            .WithProcessType(ProcessType.MoveIn.Code)
+            .WithProcessType(ProcessType.MoveIn)
             .WithReceiver(SampleData.ReceiverId)
             .WithSenderId(SampleData.SenderId)
             .WithConsumerName(SampleData.ConsumerName)
@@ -161,7 +161,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
 
         var message = MessageBuilder()
-            .WithProcessType(ProcessType.MoveIn.Code)
+            .WithProcessType(ProcessType.MoveIn)
             .WithReceiver(SampleData.ReceiverId)
             .WithSenderId(SampleData.SenderId)
             .WithEffectiveDate(EffectiveDateFactory.OffsetDaysFromToday(1))

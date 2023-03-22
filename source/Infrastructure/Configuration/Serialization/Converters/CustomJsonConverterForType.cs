@@ -22,7 +22,7 @@ namespace Infrastructure.Configuration.Serialization.Converters
     /// Workaround for System.Type with System.Text.Json using converters
     /// https://github.com/dotnet/runtime/issues/31567
     /// </summary>
-    internal class CustomJsonConverterForType : JsonConverter<Type>
+    internal sealed class CustomJsonConverterForType : JsonConverter<Type>
     {
         public override Type Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {

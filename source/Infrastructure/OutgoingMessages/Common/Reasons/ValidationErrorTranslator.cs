@@ -23,7 +23,7 @@ using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 
 namespace Infrastructure.OutgoingMessages.Common.Reasons;
 
-internal class ValidationErrorTranslator : IValidationErrorTranslator
+internal sealed class ValidationErrorTranslator : IValidationErrorTranslator
 {
     private readonly IDatabaseConnectionFactory _connectionFactory;
 
@@ -61,5 +61,5 @@ internal class ValidationErrorTranslator : IValidationErrorTranslator
         return result.ToList();
     }
 
-    private record ReasonTranslation(string Text, string Code, string ErrorCode);
+    private sealed record ReasonTranslation(string Text, string Code, string ErrorCode);
 }

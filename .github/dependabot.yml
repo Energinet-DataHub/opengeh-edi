@@ -7,53 +7,44 @@ updates:
   - package-ecosystem: "nuget"
     directory: "/source/ApplyDBMigrationsApp"
     schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 0
+      interval: "monthly"
 
   - package-ecosystem: "nuget"
     directory: "/source/Api"
     schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 0
+      interval: "monthly"
 
   - package-ecosystem: "nuget"
     directory: "/source/Application"
     schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 0
+      interval: "monthly"
 
   - package-ecosystem: "nuget"
     directory: "/source/ArchitectureTests"
     schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 0
+      interval: "monthly"
 
   - package-ecosystem: "nuget"
     directory: "/source/CimMessageAdapter"
     schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 0
+      interval: "monthly"
 
   - package-ecosystem: "nuget"
     directory: "/source/CimMessageAdapter.Tests"
     schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 0
+      interval: "monthly"
 
   - package-ecosystem: "nuget"
     directory: "/source/Infrastructure"
     schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 0
+      interval: "monthly"
 
   - package-ecosystem: "nuget"
     directory: "/source/IntegrationTests"
     schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 0
+      interval: "monthly"
 
   - package-ecosystem: "nuget"
     directory: "/source/Tests"
     schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 0
+      interval: "monthly"

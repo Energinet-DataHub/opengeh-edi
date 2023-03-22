@@ -64,15 +64,15 @@ public class JsonResponseFactoryTests
     private static void AssertHasValue(ResponseMessage response, string path, string expectedValue)
     {
         var jsonObject = JObject.Parse(response.MessageBody);
-        var value = (string)jsonObject.SelectToken(path);
+        var value = (string)jsonObject.SelectToken(path)!;
         Assert.Equal(expectedValue, value);
     }
 
     private static void AssertContainsError(ResponseMessage response, ValidationError validationError, string path)
     {
         var jsonObject = JObject.Parse(response.MessageBody);
-        var code = (string)jsonObject.SelectToken(path + "Code");
-        var message = (string)jsonObject.SelectToken(path + "Message");
+        var code = (string)jsonObject.SelectToken(path + "Code")!;
+        var message = (string)jsonObject.SelectToken(path + "Message")!;
 
         Assert.Equal(validationError.Code, code);
         Assert.Equal(validationError.Message, message);
