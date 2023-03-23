@@ -48,3 +48,14 @@ jobs:
       TESTS_DLL_FILE_PATH: '\source\Tests\bin\Release\net7.0\Tests.dll'
       DOWNLOAD_ATTEMPT_LIMIT: 12
       DOTNET_VERSION: 7.0.200
+
+  # Deploy resources for acceptance testing
+  deploy_acceptance_test_resources:
+    runs-on: windows-2022
+    steps:
+      - name: Deploy base resources
+        shell: pwsh
+        run: Write-Host "Deploying base resources...."
+      - name: Publish acceptance test resources
+        shell: pwsh
+        run: Write-Host "Publishing acceptance test resources...."
