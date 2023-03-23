@@ -55,7 +55,7 @@ jobs:
     steps:
       - name: Deploy base resources
         shell: pwsh
-        run: Write-Host "Deploying base resources. For PR: ${{ github.event.pull_request.number }}"
+        run: Write-Host Deploying base resources. For PR ${{ github.event.pull_request.number }}
       - name: Publish acceptance test resources
         shell: pwsh
-        run: Write-Host "Publishing acceptance test resources. For PR: ${{ github.event.pull_request.number }}"
+        run: Write-Host "Publishing acceptance test resources. For PR ${{ github.event.pull_request.number }}
