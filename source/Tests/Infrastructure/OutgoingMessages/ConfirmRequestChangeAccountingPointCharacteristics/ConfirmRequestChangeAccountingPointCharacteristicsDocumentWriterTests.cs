@@ -19,16 +19,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
-using Application.Configuration;
 using Application.OutgoingMessages.Common;
 using DocumentValidation;
 using DocumentValidation.CimXml;
-using Domain.Actors;
 using Domain.OutgoingMessages;
-using Infrastructure.Configuration;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.OutgoingMessages.Common;
 using Infrastructure.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
+using Tests.Factories;
 using Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
 using MarketActivityRecord = Domain.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics.MarketActivityRecord;
@@ -38,13 +36,11 @@ namespace Tests.Infrastructure.OutgoingMessages.ConfirmRequestChangeAccountingPo
 public class ConfirmRequestChangeAccountingPointCharacteristicsDocumentWriterTests
 {
     private readonly ConfirmRequestChangeAccountingPointCharacteristicsMessageWriter _messageWriter;
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMessageRecordParser _messageRecordParser;
     private ISchemaProvider? _schemaProvider;
 
     public ConfirmRequestChangeAccountingPointCharacteristicsDocumentWriterTests()
     {
-        _systemDateTimeProvider = new SystemDateTimeProvider();
         _messageRecordParser = new MessageRecordParser(new Serializer());
         _messageWriter = new ConfirmRequestChangeAccountingPointCharacteristicsMessageWriter(_messageRecordParser);
     }
@@ -52,7 +48,7 @@ public class ConfirmRequestChangeAccountingPointCharacteristicsDocumentWriterTes
     [Fact]
     public async Task Document_is_valid()
     {
-        var header = new MessageHeader(ProcessType.MoveIn.Name, "SenderId", MarketRole.MeteringPointAdministrator.Name, "ReceiverId", MarketRole.EnergySupplier.Name, Guid.NewGuid().ToString(), _systemDateTimeProvider.Now());
+        var header = MessageHeaderFactory.Create();
         var marketActivityRecords = new List<MarketActivityRecord>()
         {
             new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId"),
