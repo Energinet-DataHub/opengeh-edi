@@ -1,0 +1,11 @@
+name: Render C4 models with Structurizr
+
+on:
+  workflow_call: {}
+
+jobs:
+  render_c4:
+    uses: Energinet-DataHub/.github/.github/workflows/structurizr.yml@v10
+    with:
+      dsl: source/datahub3-model/model.dsl
+    secrets: inherit

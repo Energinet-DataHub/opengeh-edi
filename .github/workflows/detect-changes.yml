@@ -25,6 +25,8 @@ on:
     outputs:
       dotnet:
         value: ${{ jobs.changes.outputs.dotnet }}
+      render_diagrams:
+        value: ${{ jobs.changes.outputs.render_diagrams }}
 
 jobs:
   changes:
@@ -33,6 +35,7 @@ jobs:
     # Set job outputs to values from filter step
     outputs:
       dotnet: ${{ steps.filter.outputs.dotnet }}
+      render_diagrams: ${{ steps.filter.outputs.render_diagrams }}
     steps:
       # For pull requests it's not necessary to checkout the code because GitHub REST API is used to determine changes
       - name: Checkout repository
@@ -50,3 +53,7 @@ jobs:
               - '.github/workflows/detect-changes.yml'
               - '.github/actions/dotnet-*/**'
               - 'source/!((IntegrationEvents|RequestResponse)/**)/**'
+            render_diagrams:
+              - 'docs/c4-model-edi-component-level.dsl'
+              - '.github/workflows/render-diagrams.yml'
+              - '.github/workflows/detect-changes.yml'
