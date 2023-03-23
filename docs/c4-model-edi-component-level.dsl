@@ -30,7 +30,7 @@ workspace extends https://raw.githubusercontent.com/Energinet-DataHub/opengeh-ar
             }
             performanceTest = group "PerformanceTest" {
                 testApi = container "API component" "Exposes performance test helper functions" "ASP.NET web API" {
-                }                
+                }
                 simulationComponent = container "Simulation" "Simulates actors" "Grafana K6" {
                     this -> testApi "Fecth actor numbers and tokens"
                     this -> peekComponent "Peek messages"
