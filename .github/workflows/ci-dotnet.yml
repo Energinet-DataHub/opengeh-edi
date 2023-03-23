@@ -55,6 +55,12 @@ jobs:
     env: 
       PrNumber: ${{ github.event.pull_request.number }}
     steps:
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_SPN_ID_OIDC }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       - name: Deploy base resources
         shell: pwsh
         run: Write-Host Deploying base resources. For PR $Env:PrNumber
