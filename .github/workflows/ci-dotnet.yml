@@ -51,13 +51,13 @@ jobs:
 
   # Deploy resources for acceptance testing
   deploy_acceptance_test_resources:
-    runs-on: windows-2022
+    runs-on: ubuntu-22.04
     env: 
       PrNumber: ${{ github.event.pull_request.number }}
     steps:
       - name: Deploy base resources
         shell: pwsh
-        run: Write-Host Deploying base resources. For PR $PrNumber
+        run: Write-Host Deploying base resources. For PR $Env:PrNumber
       - name: Publish acceptance test resources
         shell: pwsh
         run: Write-Host Publishing acceptance test resources. For PR ${{ github.event.pull_request.number }}
