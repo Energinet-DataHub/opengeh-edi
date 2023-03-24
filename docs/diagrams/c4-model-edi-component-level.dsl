@@ -4,7 +4,7 @@ workspace extends https://raw.githubusercontent.com/Energinet-DataHub/opengeh-ar
         !ref dh3 {
             wholesale = container "Wholesale
 
-            edi = group "EDI" {
+            edi = group "EDI." {
                 peekComponent = container "Peek component." "Handles peek requests from actors" "C#, Azure function" {
                     actor -> this "Peek messages"
                     tags "Microsoft Azure - Function Apps"
