@@ -75,6 +75,7 @@ jobs:
           $namespaceName = $(az keyvault secret show --vault-name ${{ secrets.AZURE_KEYVAULT_NAME }} --name "AZURE-SERVICEBUS-NAMESPACE" --query value -o tsv)
           $(az servicebus topic create --resource-group $resourceGroup  --namespace-name $namespaceName --name $integrationEventsTopic) | Out-Null
           $(az servicebus topic subscription create --resource-group $resourceGroup --namespace-name $namespaceName --topic-name $integrationEventsTopic --name All-Events) | Out-Null
+          $(az servicebus queue create --resource-group $resourceGroup --namespace-name $namespaceName --name "Command-$Env:PrNumber") | Out-Null
       - name: Publish acceptance test resources
         shell: pwsh
         run: Write-Host Publishing acceptance test resources. For PR ${{ github.event.pull_request.number }}
