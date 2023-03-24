@@ -65,18 +65,15 @@ jobs:
           client-id: ${{ secrets.AZURE_SPN_ID_OIDC }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      - uses: Azure/get-keyvault-secrets@v1
-        with:
-          keyvault: ${{ secrets.AZURE_KEYVAULT_URL }}
-          secrets: 'AZURE-SERVICEBUS-CONNECTIONSTRING, AZURE-SHARED-RESOURCEGROUP'
-        id: keyVault
       - name: Deploy base resources
         shell: pwsh
         run: |
           Write-Host Deploying base resources. For PR $Env:PrNumber
           az account set -s ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           $integrationEventsTopic = "IntegrationEvents-$prNumber"
-          az servicebus topic create --resource-group ${{ steps.keyVault.outputs.AZURE-SHARED-RESOURCEGROUP }}  --namespace-name ${{ steps.keyVault.outputs.AZURE-SERVICEBUS-CONNECTIONSTRING }} --name $integrationEventsTopic
+          $resourceGroup = $(az keyvault secret show --vault-name ${{ secrets.AZURE_KEYVAULT_NAME }} --name AZURE-SHARED-RESOURCEGROUP)
+          $namespaceName = $(az keyvault secret show --vault-name ${{ secrets.AZURE_KEYVAULT_NAME }} --name AZURE-SERVICEBUS-CONNECTIONSTRING)
+          az servicebus topic create --resource-group $resourceGroup --namespace-name $namespaceName --name $integrationEventsTopic
       - name: Publish acceptance test resources
         shell: pwsh
         run: Write-Host Publishing acceptance test resources. For PR ${{ github.event.pull_request.number }}
