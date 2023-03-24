@@ -16,6 +16,10 @@ name: CI dotnet
 
 on:
   workflow_call: {}
+  
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   # Build all projects within solution
