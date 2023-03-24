@@ -56,6 +56,7 @@ jobs:
   # Deploy resources for acceptance testing
   deploy_acceptance_test_resources:
     runs-on: ubuntu-22.04
+    environment: AzureAuth
     env: 
       PrNumber: ${{ github.event.pull_request.number }}
     steps:
