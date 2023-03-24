@@ -7,5 +7,5 @@ jobs:
   render_c4:
     uses: Energinet-DataHub/.github/.github/workflows/structurizr.yml@fix-structurizr-workflow
     with:
-      dsl: docs/diagrams/c4-model-edi-component-level.dsl
+      dsl: docs/c4-dsl/c4-model-edi-component-level.dsl
     secrets: inherit
