@@ -1,4 +1,4 @@
-param ($subscription, $resourceGroup, $sqlServerName, $namespaceName, $prNumber)
+param ($Subscription, $ResourceGroup, $SqlServerName, $NamespaceName, $PrNumber)
 
 az account set -s $subscription
 
@@ -7,16 +7,16 @@ CreateServiceBusTopics
 CreateServiceBusQueues
 
 function CreateDatabase {
-    $databaseName = "Test-$prNumber"
-    az sql db create --resource-group $resourceGroup --server $sqlServerName --name $databaseName --edition Basic
+    $DatabaseName = "Test-$PrNumber"
+    az sql db create --resource-group $ResourceGroup --server $SqlServerName --name $DatabaseName --edition Basic
 }
 
 function CreateServiceBusTopics {
-    $integrationEventsTopic = "IntegrationEvents-$prNumber"
-    $(az servicebus topic create --resource-group $resourceGroup  --namespace-name $namespaceName --name $integrationEventsTopic) | Out-Null
-    $(az servicebus topic subscription create --resource-group $resourceGroup --namespace-name $namespaceName --topic-name $integrationEventsTopic --name All-Events) | Out-Null
+    $IntegrationEventsTopic = "IntegrationEvents-$PrNumber"
+    $(az servicebus topic create --resource-group $ResourceGroup  --namespace-name $NamespaceName --name $IntegrationEventsTopic) | Out-Null
+    $(az servicebus topic subscription create --resource-group $ResourceGroup --namespace-name $NamespaceName --topic-name $IntegrationEventsTopic --name All-Events) | Out-Null
 }
 
 function CreateServiceBusQueues {
-    az servicebus queue create --resource-group $resourceGroup --namespace-name $namespaceName --name "Command-$prNumber"
+    az servicebus queue create --resource-group $ResourceGroup --namespace-name $NamespaceName --name "Command-$PrNumber"
 }
