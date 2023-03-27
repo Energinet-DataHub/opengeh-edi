@@ -75,6 +75,7 @@ jobs:
   
   # Deploy resources for acceptance testing
   deploy_acceptance_test_resources:
+    needs: configure_environment_details
     runs-on: ubuntu-22.04
     environment: AzureAuth
     permissions:
@@ -95,11 +96,9 @@ jobs:
           Write-Host Deploying base resources. For PR $Env:PrNumber
           az account set -s ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           $integrationEventsTopic = "IntegrationEvents-$Env:PrNumber"
-          $resourceGroup = $(az keyvault secret show --vault-name ${{ secrets.AZURE_KEYVAULT_NAME }} --name "AZURE-SHARED-RESOURCEGROUP" --query value -o tsv)
-          $namespaceName = $(az keyvault secret show --vault-name ${{ secrets.AZURE_KEYVAULT_NAME }} --name "AZURE-SERVICEBUS-NAMESPACE" --query value -o tsv)
-          $(az servicebus topic create --resource-group $resourceGroup  --namespace-name $namespaceName --name $integrationEventsTopic) | Out-Null
-          $(az servicebus topic subscription create --resource-group $resourceGroup --namespace-name $namespaceName --topic-name $integrationEventsTopic --name All-Events) | Out-Null
-          $(az servicebus queue create --resource-group $resourceGroup --namespace-name $namespaceName --name "Command-$Env:PrNumber") | Out-Null
+          $(az servicebus topic create --resource-group ${{ needs.configure_environment_details.outputs.resourceGroup }}  --namespace-name ${{ needs.configure_environment_details.outputs.namespaceName }} --name $integrationEventsTopic) | Out-Null
+          $(az servicebus topic subscription create --resource-group ${{ needs.configure_environment_details.outputs.resourceGroup }} --namespace-name ${{ needs.configure_environment_details.outputs.namespaceName }} --topic-name $integrationEventsTopic --name All-Events) | Out-Null
+          $(az servicebus queue create --resource-group ${{ needs.configure_environment_details.outputs.resourceGroup }} --namespace-name ${{ needs.configure_environment_details.outputs.namespaceName }} --name "Command-$Env:PrNumber") | Out-Null
       - name: Publish acceptance test resources
         shell: pwsh
         run: Write-Host Publishing acceptance test resources. For PR ${{ github.event.pull_request.number }}
