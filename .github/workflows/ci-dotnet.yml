@@ -49,6 +49,22 @@ jobs:
       DOWNLOAD_ATTEMPT_LIMIT: 12
       DOTNET_VERSION: 7.0.200
 
+  # Configure environment details
+  configure_environment_details:
+    runs-on: ubuntu-22.04
+    environment: AzureAuth
+    permissions:
+      id-token: write
+      contents: read
+    outputs:
+      resourceGroup: ${{ steps.getResourceGroup.outputs.resourceGroup }}
+      namespaceName: ${{ steps.getServiceBusNamespace.outputs.namespaceName }}
+    steps:
+      - id: getResourceGroup
+        run: Write-Output "resourceGroup=$(az keyvault secret show --vault-name ${{ secrets.AZURE_KEYVAULT_NAME }} --name "AZURE-SHARED-RESOURCEGROUP" --query value -o tsv)" >> $Env:GITHUB_OUTPUT  
+      - id: getServiceBusNamespace
+        run: Write-Output "namespaceName=$(az keyvault secret show --vault-name ${{ secrets.AZURE_KEYVAULT_NAME }} --name "AZURE-SERVICEBUS-NAMESPACE" --query value -o tsv)" >> $Env:GITHUB_OUTPUT
+  
   # Deploy resources for acceptance testing
   deploy_acceptance_test_resources:
     runs-on: ubuntu-22.04
