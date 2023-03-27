@@ -1,11 +1,5 @@
 param ($Subscription, $ResourceGroup, $SqlServerName, $NamespaceName, $PrNumber)
 
-az account set -s $subscription
-
-#CreateDatabase
-CreateServiceBusTopics
-CreateServiceBusQueues
-
 function CreateDatabase {
     $DatabaseName = "Test-$PrNumber"
     az sql db create --resource-group $ResourceGroup --server $SqlServerName --name $DatabaseName --edition Basic
@@ -20,3 +14,9 @@ function CreateServiceBusTopics {
 function CreateServiceBusQueues {
     az servicebus queue create --resource-group $ResourceGroup --namespace-name $NamespaceName --name "Command-$PrNumber"
 }
+
+az account set -s $Subscription
+
+#CreateDatabase
+CreateServiceBusTopics
+CreateServiceBusQueues
