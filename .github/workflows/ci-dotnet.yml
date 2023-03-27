@@ -95,6 +95,7 @@ jobs:
       - name: Deploy base resources
         shell: pwsh
         run: |
+          ls
           .\source\deployment\deploy.ps1 `
             -PrNumber $Env:PrNumber `
             -Subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }} `
