@@ -114,7 +114,7 @@ jobs:
         shell: pwsh
         run: Write-Host Publishing acceptance test resources. For PR ${{ github.event.pull_request.number }}
 
-# Delete resources for acceptance testing
+  # Delete resources for acceptance testing
   delete_acceptance_test_resources:
     needs: deploy_acceptance_test_resources
     runs-on: ubuntu-22.04
