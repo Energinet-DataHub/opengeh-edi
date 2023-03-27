@@ -6,12 +6,6 @@ param(
     [string] $prNumber = $(throw "-prNumber is required")
 )
 
-az account set -s $subscription
-
-#DeleteDatabase
-DeleteServiceBusTopics
-#DeleteServiceBusQueues
-
 function DeleteDatabase {
     $databaseName = "Test-$prNumber"
     az sql db delete --name $databaseName  --resource-group $resourceGroup --server $sqlServerName | Out-Null
@@ -26,3 +20,9 @@ function DeleteServiceBusTopics {
 function DeleteServiceBusQueues {
     az servicebus queue delete --resource-group $resourceGroup --namespace-name $namespaceName --name "Command-$prNumber" | Out-Null
 }
+
+az account set -s $subscription
+
+#DeleteDatabase
+DeleteServiceBusTopics
+#DeleteServiceBusQueues
