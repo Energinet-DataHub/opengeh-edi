@@ -68,10 +68,10 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       - id: getResourceGroup
         shell: pwsh
-        run: Write-Output "resourceGroup=$(az keyvault secret show --vault-name ${{ secrets.AZURE_KEYVAULT_NAME }} --name "AZURE-SHARED-RESOURCEGROUP" --query value -o tsv)" >> $Env:GITHUB_OUTPUT  
+        run: Write-Output "::add-mask::resourceGroup=$(az keyvault secret show --vault-name ${{ secrets.AZURE_KEYVAULT_NAME }} --name "AZURE-SHARED-RESOURCEGROUP" --query value -o tsv)" >> $Env:GITHUB_OUTPUT  
       - id: getServiceBusNamespace
         shell: pwsh
-        run: Write-Output "namespaceName=$(az keyvault secret show --vault-name ${{ secrets.AZURE_KEYVAULT_NAME }} --name "AZURE-SERVICEBUS-NAMESPACE" --query value -o tsv)" >> $Env:GITHUB_OUTPUT
+        run: Write-Output "::add-mask::namespaceName=$(az keyvault secret show --vault-name ${{ secrets.AZURE_KEYVAULT_NAME }} --name "AZURE-SERVICEBUS-NAMESPACE" --query value -o tsv)" >> $Env:GITHUB_OUTPUT
   
   # Deploy resources for acceptance testing
   deploy_acceptance_test_resources:
@@ -93,7 +93,7 @@ jobs:
       - name: Deploy base resources
         shell: pwsh
         run: |
-          ./deploy.ps1 -prNumber $Env:PrNumber -subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }} -resourceGroup ${{ needs.configure_environment_details.outputs.resourceGroup }} -sqlServerName "" -namespaceName ${{ needs.configure_environment_details.outputs.namespaceName }}
+          ./.github/deploy.ps1 -prNumber $Env:PrNumber -subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }} -resourceGroup ${{ needs.configure_environment_details.outputs.resourceGroup }} -sqlServerName "" -namespaceName ${{ needs.configure_environment_details.outputs.namespaceName }}
       - name: Publish acceptance test resources
         shell: pwsh
         run: Write-Host Publishing acceptance test resources. For PR ${{ github.event.pull_request.number }}
