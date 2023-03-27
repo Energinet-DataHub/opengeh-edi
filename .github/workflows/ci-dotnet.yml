@@ -116,7 +116,7 @@ jobs:
 
   # Delete resources for acceptance testing
   delete_acceptance_test_resources:
-    needs: deploy_acceptance_test_resources
+    needs: [deploy_acceptance_test_resources, configure_environment_details]
     runs-on: ubuntu-22.04
     environment: AzureAuth
     permissions:
