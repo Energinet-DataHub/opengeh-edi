@@ -25,4 +25,4 @@ az account set -s $subscription
 
 #DeleteDatabase
 DeleteServiceBusTopics
-#DeleteServiceBusQueues
+DeleteServiceBusQueues
