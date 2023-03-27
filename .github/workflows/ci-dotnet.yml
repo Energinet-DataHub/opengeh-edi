@@ -142,7 +142,4 @@ jobs:
             -ResourceGroup ${{ needs.configure_environment_details.outputs.resourceGroup }} `
             -SqlServerName " " `
             -NamespaceName ${{ needs.configure_environment_details.outputs.namespaceName }}
-      - name: Delete acceptance test resources
-        shell: pwsh
-        run: Write-Host Deleting acceptance test resources. For PR ${{ github.event.pull_request.number }}
 
