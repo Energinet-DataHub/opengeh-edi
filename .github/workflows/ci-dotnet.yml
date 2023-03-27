@@ -69,7 +69,7 @@ jobs:
       - id: getResourceGroup
         shell: pwsh
         run: |
-          Write-Output "$resourceGroup=::add-mask::$(`
+          Write-Output "resourceGroup=::add-mask::$(`
           az keyvault secret show `
             --vault-name ${{ secrets.AZURE_KEYVAULT_NAME }} `
             --name "AZURE-SHARED-RESOURCEGROUP" `
