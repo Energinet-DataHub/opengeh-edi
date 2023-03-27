@@ -60,6 +60,12 @@ jobs:
       resourceGroup: ${{ steps.getResourceGroup.outputs.resourceGroup }}
       namespaceName: ${{ steps.getServiceBusNamespace.outputs.namespaceName }}
     steps:
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_SPN_ID_OIDC }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       - id: getResourceGroup
         run: Write-Output "resourceGroup=$(az keyvault secret show --vault-name ${{ secrets.AZURE_KEYVAULT_NAME }} --name "AZURE-SHARED-RESOURCEGROUP" --query value -o tsv)" >> $Env:GITHUB_OUTPUT  
       - id: getServiceBusNamespace
