@@ -68,14 +68,15 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       - id: getResourceGroup
         shell: pwsh
-        run: Write-Output "resourceGroup=$(`
+        run: |
+          Write-Output "::add-mask::resourceGroup=$(`
           az keyvault secret show `
             --vault-name ${{ secrets.AZURE_KEYVAULT_NAME }} `
             --name "AZURE-SHARED-RESOURCEGROUP" `
             --query value -o tsv)" >> $Env:GITHUB_OUTPUT  
       - id: getServiceBusNamespace
         shell: pwsh
-        run: Write-Output "namespaceName=$(`
+        run: Write-Output "::add-mask::namespaceName=$(`
           az keyvault secret show `
             --vault-name ${{ secrets.AZURE_KEYVAULT_NAME }} `
             --name "AZURE-SERVICEBUS-NAMESPACE" `
