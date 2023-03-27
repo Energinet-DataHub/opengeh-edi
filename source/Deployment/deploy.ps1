@@ -12,7 +12,7 @@ function CreateServiceBusTopics {
 }
 
 function CreateServiceBusQueues {
-    az servicebus queue create --resource-group $ResourceGroup --namespace-name $NamespaceName --name "Command-$PrNumber"
+    $(az servicebus queue create --resource-group $ResourceGroup --namespace-name $NamespaceName --name "Command-$PrNumber") | Out-Null
 }
 
 az account set -s $Subscription
