@@ -99,7 +99,6 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
         assertXmlDocument
             .HasValue("sender_MarketParticipant.marketRole.type", CimCode.Of(EnumerationType.FromName<MarketRole>(SampleData.SenderRole.Name)))
             .HasValue("receiver_MarketParticipant.marketRole.type", CimCode.Of(EnumerationType.FromName<MarketRole>(SampleData.ReceiverRole.Name)))
-            .HasAttributeValue("Series[1]/energySupplier_MarketParticipant.mRID", "codingScheme", "A10")
             .HasValue("Series[1]/Period/Point[1]/quality", Quality.Calculated.Code);
     }
 
@@ -131,6 +130,18 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
 
         new AssertAggregationResultXmlDocument(AssertXmlDocument.Document(document, NamespacePrefix, _documentValidation.Validator))
             .HasReceiverIdCodingScheme(expectedCodingScheme);
+    }
+
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml), "A10")]
+    public async Task Energy_supplier_id_coding_scheme_is_translated(string documentFormat, string expectedCodingScheme)
+    {
+        var document = await CreateDocument(
+            _timeSeries.WithEnergySupplierNumber(SampleData.EnergySupplierNumber),
+            DocumentFormat.From(documentFormat)).ConfigureAwait(false);
+
+        new AssertAggregationResultXmlDocument(AssertXmlDocument.Document(document, NamespacePrefix, _documentValidation.Validator))
+            .HasEnergySupplierCodingScheme(expectedCodingScheme);
     }
 
     [Fact]
@@ -411,6 +422,12 @@ public class AssertAggregationResultXmlDocument
     public AssertAggregationResultXmlDocument HasReceiverIdCodingScheme(string expectedCodingScheme)
     {
         _documentAsserter.HasAttributeValue("receiver_MarketParticipant.mRID", "codingScheme", expectedCodingScheme);
+        return this;
+    }
+
+    public AssertAggregationResultXmlDocument HasEnergySupplierCodingScheme(string expectedCodingScheme)
+    {
+        _documentAsserter.HasAttributeValue("Series[1]/energySupplier_MarketParticipant.mRID", "codingScheme", expectedCodingScheme);
         return this;
     }
 }
