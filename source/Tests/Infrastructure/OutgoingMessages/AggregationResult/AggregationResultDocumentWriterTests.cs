@@ -33,6 +33,7 @@ using Tests.Factories;
 using Tests.Fixtures;
 using Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
+using DocumentFormat = Domain.OutgoingMessages.DocumentFormat;
 using Period = Domain.Transactions.Aggregations.Period;
 using Point = Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
 
@@ -55,10 +56,12 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
             .AggregationResult();
     }
 
-    [Fact]
-    public async Task Can_create_document()
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml))]
+    public async Task Can_create_document(string documentFormat)
     {
-        var document = await CreateDocument(_timeSeries
+        var document = await CreateDocument(
+                _timeSeries
             .WithMessageId(SampleData.MessageId)
             .WithTimestamp(SampleData.Timestamp)
             .WithSender(SampleData.SenderId, SampleData.SenderRole)
@@ -68,7 +71,9 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
             .WithBalanceResponsibleNumber(SampleData.BalanceResponsibleNumber)
             .WithEnergySupplierNumber(SampleData.EnergySupplierNumber)
             .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
-            .WithPoint(new Point(1, 1m, Quality.Calculated.Name, "2022-12-12T23:00:00Z"))).ConfigureAwait(false);
+            .WithPoint(new Point(1, 1m, Quality.Calculated.Name, "2022-12-12T23:00:00Z")),
+                DocumentFormat.From(documentFormat))
+            .ConfigureAwait(false);
 
         await AssertXmlDocument
             .Document(document, NamespacePrefix, _documentValidation.Validator)
@@ -260,7 +265,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
         return MessageHeaderFactory.Create(ProcessType.BalanceFixing, MarketRole.MeteredDataResponsible);
     }
 
-    private Task<Stream> CreateDocument(TimeSeriesBuilder resultBuilder)
+    private Task<Stream> CreateDocument(TimeSeriesBuilder resultBuilder, DocumentFormat? documentFormat = null)
     {
         return _messageWriter.WriteAsync(
             resultBuilder.BuildHeader(),
