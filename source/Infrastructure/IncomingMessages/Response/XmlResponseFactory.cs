@@ -24,7 +24,7 @@ namespace Infrastructure.IncomingMessages.Response
 {
     public class XmlResponseFactory : IResponseFactory
     {
-        public MessageFormat HandledFormat => MessageFormat.Xml;
+        public DocumentFormat HandledFormat => DocumentFormat.Xml;
 
         public ResponseMessage From(Result result)
         {

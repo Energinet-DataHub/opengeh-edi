@@ -25,7 +25,7 @@ public interface IResponseFactory
     /// <summary>
     /// Specifies the handled CIM format
     /// </summary>
-    public MessageFormat HandledFormat { get; }
+    public DocumentFormat HandledFormat { get; }
 
     /// <summary>
     /// Create response message

@@ -16,12 +16,12 @@ using Domain.SeedWork;
 
 namespace Domain.OutgoingMessages;
 
-public class MessageFormat : EnumerationType
+public class DocumentFormat : EnumerationType
 {
-    public static readonly MessageFormat Xml = new(0, nameof(Xml));
-    public static readonly MessageFormat Json = new(1, nameof(Json));
+    public static readonly DocumentFormat Xml = new(0, nameof(Xml));
+    public static readonly DocumentFormat Json = new(1, nameof(Json));
 
-    private MessageFormat(int id, string name)
+    private DocumentFormat(int id, string name)
         : base(id, name)
     {
     }

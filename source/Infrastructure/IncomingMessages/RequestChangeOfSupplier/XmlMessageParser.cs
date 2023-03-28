@@ -24,6 +24,7 @@ using CimMessageAdapter.Messages;
 using DocumentValidation;
 using DocumentValidation.CimXml;
 using Domain.OutgoingMessages;
+using DocumentFormat = Domain.OutgoingMessages.DocumentFormat;
 
 namespace Infrastructure.IncomingMessages.RequestChangeOfSupplier;
 
@@ -39,7 +40,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         _schemaProvider = new CimXmlSchemaProvider();
     }
 
-    public MessageFormat HandledFormat => MessageFormat.Xml;
+    public DocumentFormat HandledFormat => DocumentFormat.Xml;
 
     public async Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>> ParseAsync(Stream message)
     {
