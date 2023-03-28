@@ -75,10 +75,12 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
                 DocumentFormat.From(documentFormat))
             .ConfigureAwait(false);
 
-        await AssertXmlDocument
-            .Document(document, NamespacePrefix, _documentValidation.Validator)
+        var assertXmlDocument = AssertXmlDocument.Document(document, NamespacePrefix, _documentValidation.Validator);
+        var assert = new AssertAggregationResultXmlDocument(assertXmlDocument)
+            .HasMessageId(SampleData.MessageId);
+
+        await assertXmlDocument
             .HasValue("type", "E31")
-            .HasValue("mRID", SampleData.MessageId)
             .HasValue("sender_MarketParticipant.mRID", SampleData.SenderId)
             .HasAttributeValue("sender_MarketParticipant.mRID", "codingScheme", "A10")
             .HasValue("sender_MarketParticipant.marketRole.type", CimCode.Of(EnumerationType.FromName<MarketRole>(SampleData.SenderRole.Name)))
@@ -273,5 +275,22 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
             {
                 _parser.From(resultBuilder.BuildTimeSeries()),
             });
+    }
+}
+
+#pragma warning disable
+public class AssertAggregationResultXmlDocument
+{
+    private readonly AssertXmlDocument _documentAsserter;
+
+    public AssertAggregationResultXmlDocument(AssertXmlDocument documentAsserter)
+    {
+        _documentAsserter = documentAsserter;
+    }
+
+    public AssertAggregationResultXmlDocument HasMessageId(string expectedMessageId)
+    {
+        _documentAsserter.HasValue("mRID", expectedMessageId);
+        return this;
     }
 }
