@@ -28,7 +28,6 @@ using Domain.Transactions.Aggregations;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.OutgoingMessages.Common;
 using Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
-using NodaTime;
 using NodaTime.Text;
 using Tests.Factories;
 using Tests.Fixtures;
@@ -37,9 +36,9 @@ using Xunit;
 using Period = Domain.Transactions.Aggregations.Period;
 using Point = Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
 
-namespace Tests.Infrastructure.OutgoingMessages.NotifyAggreagtedMeasureData;
+namespace Tests.Infrastructure.OutgoingMessages.AggregationResult;
 
-public class NotifyAggregatedMeasureDataXmlDocumentWriterTests : IClassFixture<DocumentValidationFixture>
+public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValidationFixture>
 {
     private const string NamespacePrefix = "cim";
     private readonly DocumentValidationFixture _documentValidation;
@@ -47,7 +46,7 @@ public class NotifyAggregatedMeasureDataXmlDocumentWriterTests : IClassFixture<D
     private readonly IMessageRecordParser _parser;
     private readonly TimeSeriesBuilder _timeSeries;
 
-    public NotifyAggregatedMeasureDataXmlDocumentWriterTests(DocumentValidationFixture documentValidation)
+    public AggregationResultDocumentWriterTests(DocumentValidationFixture documentValidation)
     {
         _documentValidation = documentValidation;
         _parser = new MessageRecordParser(new Serializer());
