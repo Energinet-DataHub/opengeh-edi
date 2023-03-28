@@ -32,7 +32,7 @@ public class ResponseFactoryTests
         var responseFactory = new ResponseFactory(new[] { new XmlResponseFactory() });
         var result = Result.Succeeded();
 
-        var response = responseFactory.From(result, MessageFormat.Xml);
+        var response = responseFactory.From(result, DocumentFormat.Xml);
 
         Assert.False(response.IsErrorResponse);
         Assert.Empty(response.MessageBody);
@@ -44,6 +44,6 @@ public class ResponseFactoryTests
         var responseFactory = new ResponseFactory(new List<IResponseFactory>());
         var result = Result.Succeeded();
 
-        Assert.Throws<InvalidOperationException>(() => responseFactory.From(result, MessageFormat.Json));
+        Assert.Throws<InvalidOperationException>(() => responseFactory.From(result, DocumentFormat.Json));
     }
 }
