@@ -126,7 +126,7 @@ jobs:
           .\source\Deployment\delete.ps1 `
             -PrNumber $Env:PrNumber `
             -Subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }} `
-            -ResourceGroup ${{ needs.configure_environment_details.outputs.resourceGroup }} `
+            -ResourceGroup ${{ needs.deploy_acceptance_test_resources.outputs.resourceGroup }} `
             -SqlServerName " " `
-            -NamespaceName ${{ needs.configure_environment_details.outputs.namespaceName }}
+            -NamespaceName ${{ needs.deploy_acceptance_test_resources.outputs.namespaceName }}
 
