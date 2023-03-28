@@ -92,8 +92,6 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
             .HasValue("Series[1]/Period/Point[1]/position", "1")
             .HasValue("Series[1]/Period/Point[1]/quantity", "1")
             .HasValue("Series[1]/Period/Point[1]/quality",  Quality.Calculated.Code)
-            // .HasValue("Series[1]/Period/Point[2]/quality", Quality.From(timeSeries[0].Point[1].Quality).Code)
-            // .IsNotPresent("Series[1]/Period/Point[3]/quality")
             .HasValidStructureAsync(DocumentType.AggregationResult).ConfigureAwait(false);
     }
 
@@ -108,6 +106,19 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
         AssertXmlDocument
             .Document(document, NamespacePrefix, _documentValidation.Validator)
             .IsNotPresent("Series[1]/Period/Point[1]/quantity");
+    }
+
+    [Fact]
+    public async Task Quality_element_is_excluded_if_value_is_measured()
+    {
+        _timeSeries
+            .WithPoint(new Point(1, 1, Quality.Measured.Name, "2022-12-12T23:00:00Z"));
+
+        var document = await CreateDocument(_timeSeries).ConfigureAwait(false);
+
+        AssertXmlDocument
+            .Document(document, NamespacePrefix, _documentValidation.Validator)
+            .IsNotPresent("Series[1]/Period/Point[1]/quality");
     }
 
     [Fact]
