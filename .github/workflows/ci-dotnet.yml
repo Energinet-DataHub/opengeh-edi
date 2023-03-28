@@ -98,8 +98,8 @@ jobs:
             -SqlServerName " " `
             -NamespaceName ${{ steps.getServiceBusNamespace.outputs.namespaceName }}
 
-  # Delete resources for acceptance testing
-  delete_acceptance_test_resources:
+  # Teardown resources for acceptance testing
+  teardown_acceptance_test_resources:
     needs: [deploy_acceptance_test_resources]
     runs-on: ubuntu-22.04
     environment: AzureAuth
