@@ -255,16 +255,16 @@ namespace Infrastructure.Configuration
         private void AddMessageGenerationServices()
         {
             _services.AddScoped<DocumentFactory>();
-            _services.AddScoped<IMessageWriter, ConfirmChangeOfSupplierXmlMessageWriter>();
+            _services.AddScoped<IMessageWriter, ConfirmChangeOfSupplierXmlDocumentWriter>();
             _services.AddScoped<IMessageWriter, ConfirmChangeOfSupplierJsonMessageWriter>();
-            _services.AddScoped<IMessageWriter, RejectRequestChangeOfSupplierXmlMessageWriter>();
-            _services.AddScoped<IMessageWriter, GenericNotificationMessageWriter>();
-            _services.AddScoped<IMessageWriter, AccountingPointCharacteristicsMessageWriter>();
-            _services.AddScoped<IMessageWriter, ConfirmRequestChangeAccountingPointCharacteristicsMessageWriter>();
-            _services.AddScoped<IMessageWriter, RejectRequestChangeAccountingPointCharacteristicsMessageWriter>();
-            _services.AddScoped<IMessageWriter, CharacteristicsOfACustomerAtAnApMessageWriter>();
-            _services.AddScoped<IMessageWriter, RejectRequestChangeOfSupplierJsonMessageWriter>();
-            _services.AddScoped<IMessageWriter, NotifyAggregatedMeasureDataMessageWriter>();
+            _services.AddScoped<IMessageWriter, RejectRequestChangeOfSupplierXmlDocumentWriter>();
+            _services.AddScoped<IMessageWriter, GenericNotificationXmlDocumentWriter>();
+            _services.AddScoped<IMessageWriter, AccountingPointCharacteristicsXmlDocumentWriter>();
+            _services.AddScoped<IMessageWriter, ConfirmRequestChangeAccountingPointCharacteristicsXmlDocumentWriter>();
+            _services.AddScoped<IMessageWriter, RejectRequestChangeAccountingPointCharacteristicsXmlDocumentWriter>();
+            _services.AddScoped<IMessageWriter, CharacteristicsOfACustomerAtAnApDocumentWriter>();
+            _services.AddScoped<IMessageWriter, RejectRequestChangeOfSupplierJsonDocumentWriter>();
+            _services.AddScoped<IMessageWriter, NotifyAggregatedMeasureDataXmlDocumentWriter>();
             _services.AddScoped<IValidationErrorTranslator, ValidationErrorTranslator>();
             _services.AddScoped<IMessageRecordParser, MessageRecordParser>();
         }

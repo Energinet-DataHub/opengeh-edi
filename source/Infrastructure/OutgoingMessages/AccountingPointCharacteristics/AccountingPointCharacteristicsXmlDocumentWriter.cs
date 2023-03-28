@@ -24,9 +24,9 @@ using Infrastructure.OutgoingMessages.Common.Xml;
 
 namespace Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
 
-public class AccountingPointCharacteristicsMessageWriter : MessageWriter
+public class AccountingPointCharacteristicsXmlDocumentWriter : MessageWriter
 {
-    public AccountingPointCharacteristicsMessageWriter(IMessageRecordParser parser)
+    public AccountingPointCharacteristicsXmlDocumentWriter(IMessageRecordParser parser)
         : base(
             new DocumentDetails(
                 "AccountingPointCharacteristics_MarketDocument",

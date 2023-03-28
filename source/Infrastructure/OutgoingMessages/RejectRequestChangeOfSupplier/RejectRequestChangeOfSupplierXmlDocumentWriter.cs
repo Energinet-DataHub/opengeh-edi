@@ -18,23 +18,23 @@ using System.Threading.Tasks;
 using System.Xml;
 using Application.OutgoingMessages.Common;
 using Application.OutgoingMessages.Common.Xml;
-using Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
+using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Infrastructure.OutgoingMessages.Common.Xml;
 
-namespace Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier;
+namespace Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
 
-public class ConfirmChangeOfSupplierXmlMessageWriter : MessageWriter
+public class RejectRequestChangeOfSupplierXmlDocumentWriter : MessageWriter
 {
-    public ConfirmChangeOfSupplierXmlMessageWriter(IMessageRecordParser parser)
-    : base(
-        new DocumentDetails(
-            "ConfirmRequestChangeOfSupplier_MarketDocument",
-            "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1 urn-ediel-org-structure-confirmrequestchangeofsupplier-0-1.xsd",
-            "urn:ediel.org:structure:confirmrequestchangeofsupplier:0:1",
-            "cim",
-            "414"),
-        parser,
-        "A01")
+    public RejectRequestChangeOfSupplierXmlDocumentWriter(IMessageRecordParser parser)
+        : base(
+            new DocumentDetails(
+                "RejectRequestChangeOfSupplier_MarketDocument",
+                "urn:ediel.org:structure:rejectrequestchangeofsupplier:0:1 urn-ediel-org-structure-rejectrequestchangeofsupplier-0-1.xsd",
+                "urn:ediel.org:structure:rejectrequestchangeofsupplier:0:1",
+                "cim",
+                "414"),
+            parser,
+            "A02")
     {
     }
 
@@ -56,6 +56,14 @@ public class ConfirmChangeOfSupplierXmlMessageWriter : MessageWriter
             await writer.WriteAttributeStringAsync(null, "codingScheme", null, "A10").ConfigureAwait(false);
             writer.WriteValue(marketActivityRecord.MarketEvaluationPointId);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
+            foreach (var reason in marketActivityRecord.Reasons)
+            {
+                await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Reason", null).ConfigureAwait(false);
+                await writer.WriteElementStringAsync(DocumentDetails.Prefix, "code", null, reason.Code).ConfigureAwait(false);
+                await writer.WriteElementStringAsync(DocumentDetails.Prefix, "text", null, reason.Text).ConfigureAwait(false);
+                await writer.WriteEndElementAsync().ConfigureAwait(false);
+            }
+
             await writer.WriteEndElementAsync().ConfigureAwait(false);
         }
     }

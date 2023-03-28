@@ -36,16 +36,16 @@ using Xunit;
 
 namespace Tests.Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier
 {
-    public class ConfirmRequestChangeOfSupplierDocumentWriterTests
+    public class ConfirmRequestChangeOfSupplierXmlDocumentWriterTests
     {
-        private readonly ConfirmChangeOfSupplierXmlMessageWriter _xmlMessageWriter;
+        private readonly ConfirmChangeOfSupplierXmlDocumentWriter _xmlDocumentWriter;
         private readonly IMessageRecordParser _messageRecordParser;
         private ISchemaProvider? _schemaProvider;
 
-        public ConfirmRequestChangeOfSupplierDocumentWriterTests()
+        public ConfirmRequestChangeOfSupplierXmlDocumentWriterTests()
         {
             _messageRecordParser = new MessageRecordParser(new Serializer());
-            _xmlMessageWriter = new ConfirmChangeOfSupplierXmlMessageWriter(_messageRecordParser);
+            _xmlDocumentWriter = new ConfirmChangeOfSupplierXmlDocumentWriter(_messageRecordParser);
         }
 
         [Fact]
@@ -58,7 +58,7 @@ namespace Tests.Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier
                 new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId"),
             };
 
-            var message = await _xmlMessageWriter.WriteAsync(header, marketActivityRecords.Select(record => _messageRecordParser.From(record)).ToList()).ConfigureAwait(false);
+            var message = await _xmlDocumentWriter.WriteAsync(header, marketActivityRecords.Select(record => _messageRecordParser.From(record)).ToList()).ConfigureAwait(false);
 
             await AssertMessage(message, header, marketActivityRecords).ConfigureAwait(false);
         }

@@ -24,13 +24,13 @@ using Infrastructure.OutgoingMessages.Common.Json;
 
 namespace Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
 
-public class RejectRequestChangeOfSupplierJsonMessageWriter : IMessageWriter
+public class RejectRequestChangeOfSupplierJsonDocumentWriter : IMessageWriter
 {
     private const string DocumentType = "RejectRequestChangeOfSupplier_MarketDocument";
     private const string TypeCode = "414";
     private readonly IMessageRecordParser _parser;
 
-    public RejectRequestChangeOfSupplierJsonMessageWriter(IMessageRecordParser parser)
+    public RejectRequestChangeOfSupplierJsonDocumentWriter(IMessageRecordParser parser)
     {
         _parser = parser;
     }

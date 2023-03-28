@@ -37,20 +37,20 @@ using Xunit;
 
 namespace Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
 {
-    public class CharacteristicsOfACustomerAtAnApDocumentWriterTests : IClassFixture<DocumentValidationFixture>
+    public class CharacteristicsOfACustomerAtAnApXmlDocumentWriterTests : IClassFixture<DocumentValidationFixture>
     {
         private const string NamespacePrefix = "cim";
-        private readonly CharacteristicsOfACustomerAtAnApMessageWriter _messageWriter;
+        private readonly CharacteristicsOfACustomerAtAnApDocumentWriter _documentWriter;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
         private readonly IMessageRecordParser _messageRecordParser;
         private readonly DocumentValidationFixture _documentValidation;
 
-        public CharacteristicsOfACustomerAtAnApDocumentWriterTests(DocumentValidationFixture documentValidation)
+        public CharacteristicsOfACustomerAtAnApXmlDocumentWriterTests(DocumentValidationFixture documentValidation)
         {
             _documentValidation = documentValidation;
             _systemDateTimeProvider = new SystemDateTimeProvider();
             _messageRecordParser = new MessageRecordParser(new Serializer());
-            _messageWriter = new CharacteristicsOfACustomerAtAnApMessageWriter(_messageRecordParser);
+            _documentWriter = new CharacteristicsOfACustomerAtAnApDocumentWriter(_messageRecordParser);
         }
 
         [Fact]
@@ -197,7 +197,7 @@ namespace Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
 
         private Task<Stream> WriteDocumentAsync(MessageHeader header, params MarketActivityRecord[] marketActivityRecords)
         {
-            return _messageWriter.WriteAsync(header, marketActivityRecords.Select(record => _messageRecordParser.From(record)).ToList());
+            return _documentWriter.WriteAsync(header, marketActivityRecords.Select(record => _messageRecordParser.From(record)).ToList());
         }
     }
 }
