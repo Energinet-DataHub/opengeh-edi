@@ -254,12 +254,11 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
         var assertXmlDocument = AssertXmlDocument.Document(document, NamespacePrefix, _documentValidation.Validator);
         var assert = new AssertAggregationResultXmlDocument(assertXmlDocument)
             .HasType("E31")
-            .HasMessageId(SampleData.MessageId);
+            .HasMessageId(SampleData.MessageId)
+            .HasSenderId(SampleData.SenderId, "A10")
+            .HasSenderRole(CimCode.Of(EnumerationType.FromName<MarketRole>(SampleData.SenderRole.Name)));
 
         await assertXmlDocument
-            .HasValue("sender_MarketParticipant.mRID", SampleData.SenderId)
-            .HasAttributeValue("sender_MarketParticipant.mRID", "codingScheme", "A10")
-            .HasValue("sender_MarketParticipant.marketRole.type", CimCode.Of(EnumerationType.FromName<MarketRole>(SampleData.SenderRole.Name)))
             .HasValue("receiver_MarketParticipant.mRID", SampleData.ReceiverId)
             .HasAttributeValue("receiver_MarketParticipant.mRID", "codingScheme", "A10")
             .HasValue("receiver_MarketParticipant.marketRole.type", CimCode.Of(EnumerationType.FromName<MarketRole>(SampleData.ReceiverRole.Name)))
@@ -299,6 +298,19 @@ public class AssertAggregationResultXmlDocument
     public AssertAggregationResultXmlDocument HasType(string expectedType)
     {
         _documentAsserter.HasValue("type", expectedType);
+        return this;
+    }
+
+    public AssertAggregationResultXmlDocument HasSenderId(string expectedSenderId, string expectedCodingScheme)
+    {
+        _documentAsserter.HasValue("sender_MarketParticipant.mRID", SampleData.SenderId);
+        _documentAsserter.HasAttributeValue("sender_MarketParticipant.mRID", "codingScheme", "A10");
+        return this;
+    }
+
+    public AssertAggregationResultXmlDocument HasSenderRole(string expectedSenderRole)
+    {
+        _documentAsserter.HasValue("sender_MarketParticipant.marketRole.type", expectedSenderRole);
         return this;
     }
 }
