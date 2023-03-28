@@ -48,43 +48,9 @@ jobs:
       TESTS_DLL_FILE_PATH: '\source\Tests\bin\Release\net7.0\Tests.dll'
       DOWNLOAD_ATTEMPT_LIMIT: 12
       DOTNET_VERSION: 7.0.200
-
-  # Configure environment details
-  configure_environment_details:
-    runs-on: ubuntu-22.04
-    environment: AzureAuth
-    permissions:
-      id-token: write
-      contents: read
-    outputs:
-      resourceGroup: ${{ steps.getResourceGroup.outputs.resourceGroup }}
-      namespaceName: ${{ steps.getServiceBusNamespace.outputs.namespaceName }}
-    steps:
-      - name: Login to Azure
-        uses: azure/login@v1
-        with:
-          client-id: ${{ secrets.AZURE_SPN_ID_OIDC }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      - id: getResourceGroup
-        shell: pwsh
-        run: |
-          Write-Output "resourceGroup=$(`
-          az keyvault secret show `
-            --vault-name ${{ secrets.AZURE_KEYVAULT_NAME }} `
-            --name "AZURE-SHARED-RESOURCEGROUP" `
-            --query value -o tsv)" >> $Env:GITHUB_OUTPUT  
-      - id: getServiceBusNamespace
-        shell: pwsh
-        run: Write-Output "namespaceName=$(`
-          az keyvault secret show `
-            --vault-name ${{ secrets.AZURE_KEYVAULT_NAME }} `
-            --name "AZURE-SERVICEBUS-NAMESPACE" `
-            --query value -o tsv)" >> $Env:GITHUB_OUTPUT
   
   # Deploy resources for acceptance testing
   deploy_acceptance_test_resources:
-    needs: configure_environment_details
     runs-on: ubuntu-22.04
     environment: AzureAuth
     permissions:
@@ -92,6 +58,9 @@ jobs:
       contents: read
     env: 
       PrNumber: ${{ github.event.pull_request.number }}
+    outputs:
+      resourceGroup: ${{ steps.getResourceGroup.outputs.resourceGroup }}
+      namespaceName: ${{ steps.getServiceBusNamespace.outputs.namespaceName }}
     steps:
       - uses: actions/checkout@v3
       
@@ -101,6 +70,24 @@ jobs:
           client-id: ${{ secrets.AZURE_SPN_ID_OIDC }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - id: getResourceGroup
+        shell: pwsh
+        run: |
+          Write-Output "resourceGroup=$(`
+          az keyvault secret show `
+            --vault-name ${{ secrets.AZURE_KEYVAULT_NAME }} `
+            --name "AZURE-SHARED-RESOURCEGROUP" `
+            --query value -o tsv)" >> $Env:GITHUB_OUTPUT  
+      
+      - id: getServiceBusNamespace
+        shell: pwsh
+        run: Write-Output "namespaceName=$(`
+          az keyvault secret show `
+          --vault-name ${{ secrets.AZURE_KEYVAULT_NAME }} `
+          --name "AZURE-SERVICEBUS-NAMESPACE" `
+          --query value -o tsv)" >> $Env:GITHUB_OUTPUT
+      
       - name: Deploy base resources
         shell: pwsh
         run: |
@@ -116,7 +103,7 @@ jobs:
 
   # Delete resources for acceptance testing
   delete_acceptance_test_resources:
-    needs: [deploy_acceptance_test_resources, configure_environment_details]
+    needs: [deploy_acceptance_test_resources]
     runs-on: ubuntu-22.04
     environment: AzureAuth
     permissions:
