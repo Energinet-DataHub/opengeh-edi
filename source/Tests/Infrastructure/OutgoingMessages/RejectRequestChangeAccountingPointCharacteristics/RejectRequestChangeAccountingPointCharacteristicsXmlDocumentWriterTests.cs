@@ -19,30 +19,34 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
+using Application.Configuration;
 using Application.OutgoingMessages.Common;
 using DocumentValidation;
 using DocumentValidation.CimXml;
+using Domain.Actors;
 using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
+using Infrastructure.Configuration;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.OutgoingMessages.Common;
-using Infrastructure.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
+using Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 using Tests.Factories;
 using Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
-using MarketActivityRecord = Domain.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics.MarketActivityRecord;
+using MarketActivityRecord = Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics.MarketActivityRecord;
 
-namespace Tests.Infrastructure.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
+namespace Tests.Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 
-public class ConfirmRequestChangeAccountingPointCharacteristicsDocumentWriterTests
+public class RejectRequestChangeAccountingPointCharacteristicsXmlDocumentWriterTests
 {
-    private readonly ConfirmRequestChangeAccountingPointCharacteristicsMessageWriter _messageWriter;
+    private readonly RejectRequestChangeAccountingPointCharacteristicsXmlDocumentWriter _xmlXmlDocumentWriter;
     private readonly IMessageRecordParser _messageRecordParser;
     private ISchemaProvider? _schemaProvider;
 
-    public ConfirmRequestChangeAccountingPointCharacteristicsDocumentWriterTests()
+    public RejectRequestChangeAccountingPointCharacteristicsXmlDocumentWriterTests()
     {
         _messageRecordParser = new MessageRecordParser(new Serializer());
-        _messageWriter = new ConfirmRequestChangeAccountingPointCharacteristicsMessageWriter(_messageRecordParser);
+        _xmlXmlDocumentWriter = new RejectRequestChangeAccountingPointCharacteristicsXmlDocumentWriter(_messageRecordParser);
     }
 
     [Fact]
@@ -51,10 +55,21 @@ public class ConfirmRequestChangeAccountingPointCharacteristicsDocumentWriterTes
         var header = MessageHeaderFactory.Create();
         var marketActivityRecords = new List<MarketActivityRecord>()
         {
-            new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId"),
-            new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId"),
+            new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId", new List<Reason>()
+            {
+                new Reason("Reason1", "999"),
+                new Reason("Reason2", "999"),
+            }),
+            new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId",
+            new List<Reason>()
+            {
+                new Reason("Reason3", "999"),
+                new Reason("Reason4", "999"),
+            }),
         };
-        var message = await _messageWriter.WriteAsync(header, marketActivityRecords.Select(record => _messageRecordParser.From(record)).ToList()).ConfigureAwait(false);
+
+        var message = await _xmlXmlDocumentWriter.WriteAsync(header, marketActivityRecords.Select(record => _messageRecordParser.From(record)).ToList()).ConfigureAwait(false);
+
         await AssertMessage(message, header, marketActivityRecords).ConfigureAwait(false);
     }
 
@@ -66,27 +81,23 @@ public class ConfirmRequestChangeAccountingPointCharacteristicsDocumentWriterTes
             var marketActivityRecord = AssertXmlMessage.GetMarketActivityRecordById(document, activityRecord.Id)!;
 
             Assert.NotNull(marketActivityRecord);
-            AssertXmlMessage.AssertMarketActivityRecordValue(marketActivityRecord, "mRID", activityRecord.Id);
             AssertXmlMessage.AssertMarketActivityRecordValue(marketActivityRecord, "originalTransactionIDReference_MktActivityRecord.mRID", activityRecord.OriginalTransactionId);
             AssertXmlMessage.AssertMarketActivityRecordValue(marketActivityRecord, "marketEvaluationPoint.mRID", activityRecord.MarketEvaluationPointId);
+            AssertXmlMessage.AssertReasons(marketActivityRecord, activityRecord.Reasons.ToList());
         }
     }
 
     private async Task AssertMessage(Stream message, MessageHeader header, List<MarketActivityRecord> marketActivityRecords)
     {
+        _schemaProvider = new CimXmlSchemaProvider();
         var document = XDocument.Load(message);
         AssertXmlMessage.AssertHeader(header, document);
-        AssertXmlMessage.AssertHasHeaderValue(document, "type", "E59");
+        AssertXmlMessage.AssertHasHeaderValue(document, "type", "A80");
+        AssertXmlMessage.HasReasonCode(document, "A02");
 
         AssertMarketActivityRecords(marketActivityRecords, document);
 
-        await AssertConformsToSchema(message).ConfigureAwait(false);
-    }
-
-    private async Task AssertConformsToSchema(Stream message)
-    {
-        _schemaProvider = new CimXmlSchemaProvider();
-        var schema = await _schemaProvider.GetSchemaAsync<XmlSchema>("confirmrequestchangeaccountingpointcharacteristics", "0.1")
+        var schema = await _schemaProvider.GetSchemaAsync<XmlSchema>("rejectrequestchangeaccountingpointcharacteristics", "0.1")
             .ConfigureAwait(false);
         await AssertXmlMessage.AssertConformsToSchemaAsync(message, schema!).ConfigureAwait(false);
     }

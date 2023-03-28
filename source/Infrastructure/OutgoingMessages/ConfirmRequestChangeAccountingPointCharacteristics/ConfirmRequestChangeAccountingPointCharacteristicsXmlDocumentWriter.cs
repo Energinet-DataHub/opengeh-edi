@@ -23,9 +23,9 @@ using MarketActivityRecord = Domain.OutgoingMessages.ConfirmRequestChangeAccount
 
 namespace Infrastructure.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteristics;
 
-public class ConfirmRequestChangeAccountingPointCharacteristicsMessageWriter : MessageWriter
+public class ConfirmRequestChangeAccountingPointCharacteristicsXmlDocumentWriter : MessageWriter
 {
-    public ConfirmRequestChangeAccountingPointCharacteristicsMessageWriter(IMessageRecordParser parser)
+    public ConfirmRequestChangeAccountingPointCharacteristicsXmlDocumentWriter(IMessageRecordParser parser)
         : base(
             new DocumentDetails(
                 "ConfirmRequestChangeAccountingPointCharacteristics_MarketDocument",

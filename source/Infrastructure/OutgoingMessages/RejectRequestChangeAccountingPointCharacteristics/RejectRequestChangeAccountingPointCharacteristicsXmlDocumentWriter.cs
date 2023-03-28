@@ -23,9 +23,9 @@ using Infrastructure.OutgoingMessages.Common.Xml;
 
 namespace Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 
-public class RejectRequestChangeAccountingPointCharacteristicsMessageWriter : MessageWriter
+public class RejectRequestChangeAccountingPointCharacteristicsXmlDocumentWriter : MessageWriter
 {
-    public RejectRequestChangeAccountingPointCharacteristicsMessageWriter(IMessageRecordParser parser)
+    public RejectRequestChangeAccountingPointCharacteristicsXmlDocumentWriter(IMessageRecordParser parser)
         : base(
             new DocumentDetails(
                 "RejectRequestChangeAccountingPointCharacteristics_MarketDocument",

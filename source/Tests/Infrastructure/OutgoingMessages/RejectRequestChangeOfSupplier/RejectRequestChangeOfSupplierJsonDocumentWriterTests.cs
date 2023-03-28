@@ -34,19 +34,19 @@ using Xunit;
 
 namespace Tests.Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
 
-public class JsonDocumentWriterTests
+public class RejectRequestChangeOfSupplierJsonDocumentWriterTests
 {
     private const string DocumentType = "RejectRequestChangeOfSupplier_MarketDocument";
-    private readonly RejectRequestChangeOfSupplierJsonMessageWriter _messageWriter;
+    private readonly RejectRequestChangeOfSupplierJsonDocumentWriter _documentWriter;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMessageRecordParser _messageRecordParser;
     private readonly JsonSchemaProvider _schemaProvider;
 
-    public JsonDocumentWriterTests()
+    public RejectRequestChangeOfSupplierJsonDocumentWriterTests()
     {
         _systemDateTimeProvider = new SystemDateTimeProvider();
         _messageRecordParser = new MessageRecordParser(new Serializer());
-        _messageWriter = new RejectRequestChangeOfSupplierJsonMessageWriter(_messageRecordParser);
+        _documentWriter = new RejectRequestChangeOfSupplierJsonDocumentWriter(_messageRecordParser);
         _schemaProvider = new JsonSchemaProvider(new CimJsonSchemas());
     }
 
@@ -69,7 +69,7 @@ public class JsonDocumentWriterTests
             }),
         };
 
-        var message = await _messageWriter.WriteAsync(
+        var message = await _documentWriter.WriteAsync(
             header,
             marketActivityRecords.Select(record => _messageRecordParser.From(record)).ToList()).ConfigureAwait(false);
 

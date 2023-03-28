@@ -29,11 +29,11 @@ using Infrastructure.OutgoingMessages.Common.Xml;
 
 namespace Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 
-public class CharacteristicsOfACustomerAtAnApMessageWriter : MessageWriter
+public class CharacteristicsOfACustomerAtAnApDocumentWriter : MessageWriter
 {
     private MessageHeader? _header;
 
-    public CharacteristicsOfACustomerAtAnApMessageWriter(IMessageRecordParser parser)
+    public CharacteristicsOfACustomerAtAnApDocumentWriter(IMessageRecordParser parser)
         : base(
             new DocumentDetails(
             "CharacteristicsOfACustomerAtAnAP_MarketDocument",
