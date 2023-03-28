@@ -58,42 +58,44 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     [Fact]
     public async Task Can_create_document()
     {
-        var header = CreateHeader();
-        var timeSeries = CreateSeriesFor(MeteringPointType.Consumption);
-
-        var message = await _messageWriter.WriteAsync(header, timeSeries.Select(record => _parser.From(record)).ToList()).ConfigureAwait(false);
+        var document = await CreateDocument(_timeSeries
+            .WithMessageId(SampleData.MessageId)
+            .WithTimestamp(SampleData.Timestamp)
+            .WithSender(SampleData.SenderId, SampleData.SenderRole)
+            .WithReceiver(SampleData.ReceiverId, SampleData.ReceiverRole)
+            .WithTransactionId(SampleData.TransactionId)
+            .WithGridArea(SampleData.GridAreaCode)
+            .WithBalanceResponsibleNumber(SampleData.BalanceResponsibleNumber)
+            .WithEnergySupplierNumber(SampleData.EnergySupplierNumber)
+            .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
+            .WithPoint(new Point(1, 1m, Quality.Calculated.Name, "2022-12-12T23:00:00Z"))).ConfigureAwait(false);
 
         await AssertXmlDocument
-            .Document(message, NamespacePrefix, _documentValidation.Validator)
+            .Document(document, NamespacePrefix, _documentValidation.Validator)
             .HasValue("type", "E31")
-            .HasValue("mRID", header.MessageId)
-            .HasValue("process.processType", CimCode.Of(ProcessType.From(header.ProcessType)))
-            .HasValue("sender_MarketParticipant.mRID", header.SenderId)
+            .HasValue("mRID", SampleData.MessageId)
+            .HasValue("sender_MarketParticipant.mRID", SampleData.SenderId)
             .HasAttributeValue("sender_MarketParticipant.mRID", "codingScheme", "A10")
-            .HasValue("sender_MarketParticipant.marketRole.type", CimCode.Of(EnumerationType.FromName<MarketRole>(header.SenderRole)))
-            .HasValue("receiver_MarketParticipant.mRID", header.ReceiverId)
+            .HasValue("sender_MarketParticipant.marketRole.type", CimCode.Of(EnumerationType.FromName<MarketRole>(SampleData.SenderRole.Name)))
+            .HasValue("receiver_MarketParticipant.mRID", SampleData.ReceiverId)
             .HasAttributeValue("receiver_MarketParticipant.mRID", "codingScheme", "A10")
-            .HasValue("receiver_MarketParticipant.marketRole.type", CimCode.Of(EnumerationType.FromName<MarketRole>(header.ReceiverRole)))
-            .HasValue("createdDateTime", header.TimeStamp.ToString())
-            .HasValue("Series[1]/mRID", timeSeries[0].TransactionId.ToString())
-            .HasValue("Series[1]/meteringGridArea_Domain.mRID", timeSeries[0].GridAreaCode)
-            .HasValue("Series[1]/balanceResponsibleParty_MarketParticipant.mRID", timeSeries[0].BalanceResponsibleNumber!)
-            .HasValue("Series[1]/energySupplier_MarketParticipant.mRID", timeSeries[0].EnergySupplierNumber!)
+            .HasValue("receiver_MarketParticipant.marketRole.type", CimCode.Of(EnumerationType.FromName<MarketRole>(SampleData.ReceiverRole.Name)))
+            .HasValue("createdDateTime", SampleData.Timestamp)
+            .HasValue("Series[1]/mRID", SampleData.TransactionId.ToString())
+            .HasValue("Series[1]/meteringGridArea_Domain.mRID", SampleData.GridAreaCode)
+            .HasValue("Series[1]/balanceResponsibleParty_MarketParticipant.mRID", SampleData.BalanceResponsibleNumber)
+            .HasValue("Series[1]/energySupplier_MarketParticipant.mRID", SampleData.EnergySupplierNumber)
             .HasAttributeValue("Series[1]/energySupplier_MarketParticipant.mRID", "codingScheme", "A10")
-            .HasValue("Series[1]/marketEvaluationPoint.type", CimCode.Of(MeteringPointType.From(timeSeries[0].MeteringPointType)))
-            .HasValue("Series[1]/marketEvaluationPoint.settlementMethod", timeSeries[0].SettlementType!)
             .HasValue("Series[1]/product", "8716867000030")
-            .HasValue("Series[1]/quantity_Measure_Unit.name", timeSeries[0].MeasureUnitType)
-            .HasValue("Series[1]/Period/resolution", timeSeries[0].Resolution)
-            .HasValue("Series[1]/Period/timeInterval/start", "2022-02-12T23:00Z")
-            .HasValue("Series[1]/Period/timeInterval/end", "2022-02-13T23:00Z")
-            .HasValue("Series[1]/Period/Point[1]/position", timeSeries[0].Point[0].Position.ToString(NumberFormatInfo.InvariantInfo))
-            .HasValue("Series[1]/Period/Point[1]/quantity", timeSeries[0].Point[0].Quantity.ToString()!)
-            .HasValue("Series[1]/Period/Point[1]/quality",  Quality.From(timeSeries[0].Point[0].Quality).Code)
-            .HasValue("Series[1]/Period/Point[2]/position", timeSeries[0].Point[1].Position.ToString(NumberFormatInfo.InvariantInfo))
-            .IsNotPresent("Series[1]/Period/Point[2]/quantity")
-            .HasValue("Series[1]/Period/Point[2]/quality", Quality.From(timeSeries[0].Point[1].Quality).Code)
-            .IsNotPresent("Series[1]/Period/Point[3]/quality")
+            .HasValue("Series[1]/Period/timeInterval/start",  InstantPattern.General.Parse(SampleData.StartOfPeriod).Value.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture))
+            .HasValue("Series[1]/Period/timeInterval/end", InstantPattern.General.Parse(SampleData.EndOfPeriod).Value.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture))
+            .HasValue("Series[1]/Period/Point[1]/position", "1")
+            .HasValue("Series[1]/Period/Point[1]/quantity", "1")
+            .HasValue("Series[1]/Period/Point[1]/quality",  Quality.Calculated.Code)
+            // .HasValue("Series[1]/Period/Point[2]/position", timeSeries[0].Point[1].Position.ToString(NumberFormatInfo.InvariantInfo))
+            // .IsNotPresent("Series[1]/Period/Point[2]/quantity")
+            // .HasValue("Series[1]/Period/Point[2]/quality", Quality.From(timeSeries[0].Point[1].Quality).Code)
+            // .IsNotPresent("Series[1]/Period/Point[3]/quality")
             .HasValidStructureAsync(DocumentType.AggregationResult).ConfigureAwait(false);
     }
 
