@@ -39,7 +39,7 @@ using Point = Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
 
 namespace Tests.Infrastructure.OutgoingMessages.NotifyAggreagtedMeasureData;
 
-public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<DocumentValidationFixture>
+public class NotifyAggregatedMeasureDataXmlDocumentWriterTests : IClassFixture<DocumentValidationFixture>
 {
     private const string NamespacePrefix = "cim";
     private readonly DocumentValidationFixture _documentValidation;
@@ -47,11 +47,11 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
     private readonly IMessageRecordParser _parser;
     private readonly TimeSeriesBuilder _timeSeries;
 
-    public NotifyAggregatedMeasureDataDocumentWriterTests(DocumentValidationFixture documentValidation)
+    public NotifyAggregatedMeasureDataXmlDocumentWriterTests(DocumentValidationFixture documentValidation)
     {
         _documentValidation = documentValidation;
         _parser = new MessageRecordParser(new Serializer());
-        _messageWriter = new NotifyAggregatedMeasureDataMessageWriter(_parser);
+        _messageWriter = new NotifyAggregatedMeasureDataXmlDocumentWriter(_parser);
         _timeSeries = TimeSeriesBuilder
             .AggregationResult();
     }

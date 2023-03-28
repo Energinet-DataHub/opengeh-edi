@@ -19,34 +19,30 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
-using Application.Configuration;
 using Application.OutgoingMessages.Common;
 using DocumentValidation;
 using DocumentValidation.CimXml;
-using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
-using Infrastructure.Configuration;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.OutgoingMessages.Common;
-using Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
+using Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Tests.Factories;
 using Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
-using MarketActivityRecord = Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics.MarketActivityRecord;
 
-namespace Tests.Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
+namespace Tests.Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
 
-public class RejectRequestChangeAccountingPointCharacteristicsDocumentWriterTests
+public class RejectRequestChangeOfSupplierXmlDocumentWriterTests
 {
-    private readonly RejectRequestChangeAccountingPointCharacteristicsMessageWriter _xmlMessageWriter;
+    private readonly RejectRequestChangeOfSupplierXmlDocumentWriter _xmlDocumentWriter;
     private readonly IMessageRecordParser _messageRecordParser;
     private ISchemaProvider? _schemaProvider;
 
-    public RejectRequestChangeAccountingPointCharacteristicsDocumentWriterTests()
+    public RejectRequestChangeOfSupplierXmlDocumentWriterTests()
     {
         _messageRecordParser = new MessageRecordParser(new Serializer());
-        _xmlMessageWriter = new RejectRequestChangeAccountingPointCharacteristicsMessageWriter(_messageRecordParser);
+        _xmlDocumentWriter = new RejectRequestChangeOfSupplierXmlDocumentWriter(_messageRecordParser);
     }
 
     [Fact]
@@ -55,12 +51,12 @@ public class RejectRequestChangeAccountingPointCharacteristicsDocumentWriterTest
         var header = MessageHeaderFactory.Create();
         var marketActivityRecords = new List<MarketActivityRecord>()
         {
-            new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId", new List<Reason>()
+            new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId", new List<Reason>()
             {
                 new Reason("Reason1", "999"),
                 new Reason("Reason2", "999"),
             }),
-            new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId",
+            new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId",
             new List<Reason>()
             {
                 new Reason("Reason3", "999"),
@@ -68,7 +64,7 @@ public class RejectRequestChangeAccountingPointCharacteristicsDocumentWriterTest
             }),
         };
 
-        var message = await _xmlMessageWriter.WriteAsync(header, marketActivityRecords.Select(record => _messageRecordParser.From(record)).ToList()).ConfigureAwait(false);
+        var message = await _xmlDocumentWriter.WriteAsync(header, marketActivityRecords.Select(record => _messageRecordParser.From(record)).ToList()).ConfigureAwait(false);
 
         await AssertMessage(message, header, marketActivityRecords).ConfigureAwait(false);
     }
@@ -92,12 +88,12 @@ public class RejectRequestChangeAccountingPointCharacteristicsDocumentWriterTest
         _schemaProvider = new CimXmlSchemaProvider();
         var document = XDocument.Load(message);
         AssertXmlMessage.AssertHeader(header, document);
-        AssertXmlMessage.AssertHasHeaderValue(document, "type", "A80");
+        AssertXmlMessage.AssertHasHeaderValue(document, "type", "414");
         AssertXmlMessage.HasReasonCode(document, "A02");
 
         AssertMarketActivityRecords(marketActivityRecords, document);
 
-        var schema = await _schemaProvider.GetSchemaAsync<XmlSchema>("rejectrequestchangeaccountingpointcharacteristics", "0.1")
+        var schema = await _schemaProvider.GetSchemaAsync<XmlSchema>("rejectrequestchangeofsupplier", "0.1")
             .ConfigureAwait(false);
         await AssertXmlMessage.AssertConformsToSchemaAsync(message, schema!).ConfigureAwait(false);
     }

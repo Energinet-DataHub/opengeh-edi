@@ -33,11 +33,11 @@ using Point = Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
 
 namespace Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 
-public class NotifyAggregatedMeasureDataMessageWriter : MessageWriter
+public class NotifyAggregatedMeasureDataXmlDocumentWriter : MessageWriter
 {
     private const string ActiveEnergy = "8716867000030";
 
-    public NotifyAggregatedMeasureDataMessageWriter(IMessageRecordParser parser)
+    public NotifyAggregatedMeasureDataXmlDocumentWriter(IMessageRecordParser parser)
         : base(
             new DocumentDetails(
             "NotifyAggregatedMeasureData_MarketDocument",

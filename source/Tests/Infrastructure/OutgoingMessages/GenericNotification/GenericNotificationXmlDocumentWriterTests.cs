@@ -36,18 +36,18 @@ using Xunit;
 
 namespace Tests.Infrastructure.OutgoingMessages.GenericNotification
 {
-    public class GenericNotificationDocumentWriterTests
+    public class GenericNotificationXmlDocumentWriterTests
     {
-        private readonly GenericNotificationMessageWriter _messageWriter;
+        private readonly GenericNotificationXmlDocumentWriter _xmlDocumentWriter;
         private readonly ISystemDateTimeProvider _systemDateTimeProvider;
         private readonly IMessageRecordParser _messageRecordParser;
         private ISchemaProvider? _schemaProvider;
 
-        public GenericNotificationDocumentWriterTests()
+        public GenericNotificationXmlDocumentWriterTests()
         {
             _systemDateTimeProvider = new SystemDateTimeProvider();
             _messageRecordParser = new MessageRecordParser(new Serializer());
-            _messageWriter = new GenericNotificationMessageWriter(_messageRecordParser);
+            _xmlDocumentWriter = new GenericNotificationXmlDocumentWriter(_messageRecordParser);
         }
 
         [Fact]
@@ -60,7 +60,7 @@ namespace Tests.Infrastructure.OutgoingMessages.GenericNotification
                 new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId", _systemDateTimeProvider.Now()),
             };
 
-            var message = await _messageWriter.WriteAsync(header, marketActivityRecords.Select(record => _messageRecordParser.From(record)).ToList()).ConfigureAwait(false);
+            var message = await _xmlDocumentWriter.WriteAsync(header, marketActivityRecords.Select(record => _messageRecordParser.From(record)).ToList()).ConfigureAwait(false);
 
             await AssertMessage(message, header, marketActivityRecords).ConfigureAwait(false);
         }
