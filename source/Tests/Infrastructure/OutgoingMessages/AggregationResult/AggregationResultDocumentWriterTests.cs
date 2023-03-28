@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -253,28 +254,34 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
 
         var assertXmlDocument = AssertXmlDocument.Document(document, NamespacePrefix, _documentValidation.Validator);
         var assert = new AssertAggregationResultXmlDocument(assertXmlDocument)
-            .HasType("E31")
             .HasMessageId(SampleData.MessageId)
-            .HasSenderId(SampleData.SenderId, "A10")
-            .HasSenderRole(CimCode.Of(EnumerationType.FromName<MarketRole>(SampleData.SenderRole.Name)));
+            .HasSenderId(SampleData.SenderId)
+            .HasReceiverId(SampleData.ReceiverId)
+            .HasTimestamp(SampleData.Timestamp)
+            .HasTransactionId(SampleData.TransactionId)
+            .HasGridAreaCode(SampleData.GridAreaCode)
+            .HasBalanceResponsibleNumber(SampleData.BalanceResponsibleNumber)
+            .HasEnergySupplierNumber(SampleData.EnergySupplierNumber)
+            .HasProductCode("8716867000030")
+            .HasPeriod(
+                InstantPattern.General.Parse(SampleData.StartOfPeriod).Value
+                    .ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture),
+                InstantPattern.General.Parse(SampleData.EndOfPeriod).Value
+                    .ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture))
+            .HasPoint(1, 1);
 
-        await assertXmlDocument
-            .HasValue("receiver_MarketParticipant.mRID", SampleData.ReceiverId)
-            .HasAttributeValue("receiver_MarketParticipant.mRID", "codingScheme", "A10")
-            .HasValue("receiver_MarketParticipant.marketRole.type", CimCode.Of(EnumerationType.FromName<MarketRole>(SampleData.ReceiverRole.Name)))
-            .HasValue("createdDateTime", SampleData.Timestamp)
-            .HasValue("Series[1]/mRID", SampleData.TransactionId.ToString())
-            .HasValue("Series[1]/meteringGridArea_Domain.mRID", SampleData.GridAreaCode)
-            .HasValue("Series[1]/balanceResponsibleParty_MarketParticipant.mRID", SampleData.BalanceResponsibleNumber)
-            .HasValue("Series[1]/energySupplier_MarketParticipant.mRID", SampleData.EnergySupplierNumber)
-            .HasAttributeValue("Series[1]/energySupplier_MarketParticipant.mRID", "codingScheme", "A10")
-            .HasValue("Series[1]/product", "8716867000030")
-            .HasValue("Series[1]/Period/timeInterval/start",  InstantPattern.General.Parse(SampleData.StartOfPeriod).Value.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture))
-            .HasValue("Series[1]/Period/timeInterval/end", InstantPattern.General.Parse(SampleData.EndOfPeriod).Value.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture))
-            .HasValue("Series[1]/Period/Point[1]/position", "1")
-            .HasValue("Series[1]/Period/Point[1]/quantity", "1")
-            .HasValue("Series[1]/Period/Point[1]/quality",  Quality.Calculated.Code)
-            .HasValidStructureAsync(DocumentType.AggregationResult).ConfigureAwait(false);
+            await assert.DocumentIsValidAsync().ConfigureAwait(false);
+
+            assertXmlDocument
+                .HasValue("type", "E31")
+                .HasAttributeValue("sender_MarketParticipant.mRID", "codingScheme", "A10")
+                .HasValue("sender_MarketParticipant.marketRole.type",
+                    CimCode.Of(EnumerationType.FromName<MarketRole>(SampleData.SenderRole.Name)))
+                .HasAttributeValue("receiver_MarketParticipant.mRID", "codingScheme", "A10")
+                .HasValue("receiver_MarketParticipant.marketRole.type",
+                    CimCode.Of(EnumerationType.FromName<MarketRole>(SampleData.ReceiverRole.Name)))
+                .HasAttributeValue("Series[1]/energySupplier_MarketParticipant.mRID", "codingScheme", "A10")
+                .HasValue("Series[1]/Period/Point[1]/quality", Quality.Calculated.Code);
     }
 
 }
@@ -295,22 +302,74 @@ public class AssertAggregationResultXmlDocument
         return this;
     }
 
-    public AssertAggregationResultXmlDocument HasType(string expectedType)
+    public AssertAggregationResultXmlDocument HasSenderId(string expectedSenderId)
     {
-        _documentAsserter.HasValue("type", expectedType);
+        _documentAsserter.HasValue("sender_MarketParticipant.mRID", expectedSenderId);
         return this;
     }
 
-    public AssertAggregationResultXmlDocument HasSenderId(string expectedSenderId, string expectedCodingScheme)
+    public AssertAggregationResultXmlDocument HasReceiverId(string expectedReceiverId)
     {
-        _documentAsserter.HasValue("sender_MarketParticipant.mRID", SampleData.SenderId);
-        _documentAsserter.HasAttributeValue("sender_MarketParticipant.mRID", "codingScheme", "A10");
+        _documentAsserter.HasValue("receiver_MarketParticipant.mRID", expectedReceiverId);
         return this;
     }
 
-    public AssertAggregationResultXmlDocument HasSenderRole(string expectedSenderRole)
+    public AssertAggregationResultXmlDocument HasTimestamp(string expectedTimestamp)
     {
-        _documentAsserter.HasValue("sender_MarketParticipant.marketRole.type", expectedSenderRole);
+        _documentAsserter.HasValue("createdDateTime", expectedTimestamp);
+        return this;
+    }
+
+    public AssertAggregationResultXmlDocument HasTransactionId(Guid expectedTransactionId)
+    {
+        _documentAsserter.HasValue("Series[1]/mRID", expectedTransactionId.ToString());
+        return this;
+    }
+
+    public AssertAggregationResultXmlDocument HasGridAreaCode(string expectedGridAreaCode)
+    {
+        _documentAsserter.HasValue("Series[1]/meteringGridArea_Domain.mRID", expectedGridAreaCode);
+        return this;
+    }
+
+    public AssertAggregationResultXmlDocument HasBalanceResponsibleNumber(string expectedBalanceResponsibleNumber)
+    {
+        _documentAsserter.HasValue("Series[1]/balanceResponsibleParty_MarketParticipant.mRID",
+            expectedBalanceResponsibleNumber);
+        return this;
+    }
+
+    public AssertAggregationResultXmlDocument HasEnergySupplierNumber(string expectedEnergySupplierNumber)
+    {
+        _documentAsserter.HasValue("Series[1]/energySupplier_MarketParticipant.mRID", expectedEnergySupplierNumber);
+        return this;
+    }
+
+    public AssertAggregationResultXmlDocument HasProductCode(string expectedProductCode)
+    {
+        _documentAsserter.HasValue("Series[1]/product", expectedProductCode);
+        return this;
+    }
+
+    public AssertAggregationResultXmlDocument HasPeriod(string expectedStartOfPeriod, string expectedEndOfPeriod)
+    {
+        _documentAsserter
+            .HasValue("Series[1]/Period/timeInterval/start", expectedStartOfPeriod)
+            .HasValue("Series[1]/Period/timeInterval/end", expectedEndOfPeriod);
+        return this;
+    }
+
+    public AssertAggregationResultXmlDocument HasPoint(int position, int quantity)
+    {
+        _documentAsserter
+            .HasValue("Series[1]/Period/Point[1]/position", position.ToString())
+            .HasValue("Series[1]/Period/Point[1]/quantity", quantity.ToString());
+        return this;
+    }
+
+    public async Task<AssertAggregationResultXmlDocument> DocumentIsValidAsync()
+    {
+        await _documentAsserter.HasValidStructureAsync(DocumentType.AggregationResult).ConfigureAwait(false);
         return this;
     }
 }
