@@ -88,7 +88,7 @@ jobs:
           --name "AZURE-SERVICEBUS-NAMESPACE" `
           --query value -o tsv)" >> $Env:GITHUB_OUTPUT
       
-      - name: Deploy base resources
+      - name: Publish acceptance test resources
         shell: pwsh
         run: |
           .\source\Deployment\deploy.ps1 `
@@ -97,9 +97,6 @@ jobs:
             -ResourceGroup ${{ steps.getResourceGroup.outputs.resourceGroup }} `
             -SqlServerName " " `
             -NamespaceName ${{ steps.getServiceBusNamespace.outputs.namespaceName }}
-      - name: Publish acceptance test resources
-        shell: pwsh
-        run: Write-Host Publishing acceptance test resources. For PR ${{ github.event.pull_request.number }}
 
   # Delete resources for acceptance testing
   delete_acceptance_test_resources:
@@ -120,7 +117,7 @@ jobs:
           client-id: ${{ secrets.AZURE_SPN_ID_OIDC }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      - name: Delete base resources
+      - name: Teardown acceptance test resources
         shell: pwsh
         run: |
           .\source\Deployment\delete.ps1 `
