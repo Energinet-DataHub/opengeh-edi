@@ -12,14 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Linq;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Application.Configuration.Authentication;
 using Application.OutgoingMessages.Peek;
 using Domain.OutgoingMessages.Peek;
 using Domain.SeedWork;
+using Infrastructure.IncomingMessages;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Extensions.Logging;
 
 namespace Api.OutgoingMessages;
 
@@ -27,11 +32,13 @@ public class PeekRequestListener
 {
     private readonly MessagePeeker _messagePeeker;
     private readonly IMarketActorAuthenticator _authenticator;
+    private readonly ILogger<PeekRequestListener> _logger;
 
-    public PeekRequestListener(MessagePeeker messagePeeker, IMarketActorAuthenticator authenticator)
+    public PeekRequestListener(MessagePeeker messagePeeker, IMarketActorAuthenticator authenticator, ILogger<PeekRequestListener> logger)
     {
         _messagePeeker = messagePeeker;
         _authenticator = authenticator;
+        _logger = logger;
     }
 
     [Function("PeekRequestListener")]
@@ -44,9 +51,20 @@ public class PeekRequestListener
         FunctionContext executionContext,
         string messageCategory)
     {
+        ArgumentNullException.ThrowIfNull(request);
+
+        var contentType = GetContentType(request.Headers);
+        var desiredDocumentFormat = CimFormatParser.ParseFromContentTypeHeaderValue(contentType);
+        if (desiredDocumentFormat is null)
+        {
+            _logger.LogInformation($"Could not parse desired CIM format from Content-Type header value: {contentType}");
+            return request.CreateResponse(HttpStatusCode.UnsupportedMediaType);
+        }
+
         var result = await _messagePeeker.PeekAsync(
                 _authenticator.CurrentIdentity.Number,
-                EnumerationType.FromName<MessageCategory>(messageCategory))
+                EnumerationType.FromName<MessageCategory>(messageCategory),
+                desiredDocumentFormat)
             .ConfigureAwait(false);
 
         var response = HttpResponseData.CreateResponse(request);
@@ -67,5 +85,12 @@ public class PeekRequestListener
         response.Headers.Add("MessageId", result.MessageId.ToString());
         response.StatusCode = HttpStatusCode.OK;
         return response;
+    }
+
+    private static string GetContentType(HttpHeaders headers)
+    {
+        var contentHeader = headers.GetValues("Content-Type").FirstOrDefault();
+        if (contentHeader == null) throw new InvalidOperationException("No Content-Type found in request headers");
+        return contentHeader;
     }
 }

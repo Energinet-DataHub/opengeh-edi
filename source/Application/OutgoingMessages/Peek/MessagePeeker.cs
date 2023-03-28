@@ -14,6 +14,7 @@
 
 using System.Threading.Tasks;
 using Domain.Actors;
+using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.Peek;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -29,11 +30,11 @@ public class MessagePeeker
         _mediator = mediator;
     }
 
-    public async Task<PeekResult> PeekAsync(ActorNumber actorNumber, MessageCategory messageCategory)
+    public async Task<PeekResult> PeekAsync(ActorNumber actorNumber, MessageCategory messageCategory, DocumentFormat desiredDocumentFormat)
     {
         try
         {
-            return await _mediator.Send(new PeekRequest(actorNumber, messageCategory)).ConfigureAwait(false);
+            return await _mediator.Send(new PeekRequest(actorNumber, messageCategory, desiredDocumentFormat)).ConfigureAwait(false);
         }
         catch (DbUpdateException)
         {

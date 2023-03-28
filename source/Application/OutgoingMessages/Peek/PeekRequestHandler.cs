@@ -77,6 +77,6 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
     }
 }
 
-public record PeekRequest(ActorNumber ActorNumber, MessageCategory MessageCategory) : ICommand<PeekResult>;
+public record PeekRequest(ActorNumber ActorNumber, MessageCategory MessageCategory, DocumentFormat DesiredDocumentFormat) : ICommand<PeekResult>;
 
 public record PeekResult(Stream? Bundle, Guid? MessageId = default);
