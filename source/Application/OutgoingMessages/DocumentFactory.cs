@@ -31,7 +31,7 @@ public class DocumentFactory
         _documentWriters = documentWriters.ToList();
     }
 
-    public Task<Stream> CreateFromAsync(BundledMessageId bundledMessageId, MessageRecords messageRecords, MessageFormat documentFormat, Instant timestamp)
+    public Task<Stream> CreateFromAsync(BundledMessageId bundledMessageId, MessageRecords messageRecords, DocumentFormat documentFormat, Instant timestamp)
     {
         ArgumentNullException.ThrowIfNull(bundledMessageId);
         ArgumentNullException.ThrowIfNull(messageRecords);

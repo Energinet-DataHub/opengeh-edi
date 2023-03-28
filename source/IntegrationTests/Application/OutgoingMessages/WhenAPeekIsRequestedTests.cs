@@ -109,11 +109,6 @@ public class WhenAPeekIsRequestedTests : TestBase
         Assert.Null(peekResult.Bundle);
     }
 
-    private static PeekRequest CreatePeekRequest(MessageCategory messageCategory)
-    {
-        return new PeekRequest(ActorNumber.Create(SampleData.NewEnergySupplierNumber), messageCategory);
-    }
-
     private static IncomingMessageBuilder MessageBuilder()
     {
         return new IncomingMessageBuilder()
@@ -188,6 +183,6 @@ public class WhenAPeekIsRequestedTests : TestBase
 
     private Task<PeekResult> PeekMessage(MessageCategory category)
     {
-        return _messagePeeker.PeekAsync(ActorNumber.Create(SampleData.NewEnergySupplierNumber), category);
+        return _messagePeeker.PeekAsync(ActorNumber.Create(SampleData.NewEnergySupplierNumber), category, DocumentFormat.Xml);
     }
 }

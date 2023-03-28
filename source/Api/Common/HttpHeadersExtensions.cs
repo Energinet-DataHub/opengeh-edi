@@ -12,17 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.SeedWork;
+using System;
+using System.Linq;
+using System.Net.Http.Headers;
 
-namespace Domain.OutgoingMessages;
+namespace Api.Common;
 
-public class MessageFormat : EnumerationType
+internal static class HttpHeadersExtensions
 {
-    public static readonly MessageFormat Xml = new(0, nameof(Xml));
-    public static readonly MessageFormat Json = new(1, nameof(Json));
-
-    private MessageFormat(int id, string name)
-        : base(id, name)
+    internal static string GetContentType(this HttpHeaders headers)
     {
+        var contentHeader = headers.GetValues("Content-Type").FirstOrDefault();
+        if (contentHeader == null) throw new InvalidOperationException("No Content-Type found in request headers");
+        return contentHeader;
     }
 }

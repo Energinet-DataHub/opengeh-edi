@@ -62,21 +62,21 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
             return new PeekResult(null);
         }
 
-        bundledMessage = await CreateBundledMessageAsync(messageRecords).ConfigureAwait(false);
+        bundledMessage = await CreateBundledMessageAsync(messageRecords, request.DesiredDocumentFormat).ConfigureAwait(false);
         await _bundledMessages.AddAsync(bundledMessage).ConfigureAwait(false);
 
         return new PeekResult(bundledMessage.GeneratedDocument, bundledMessage.Id.Value);
     }
 
-    private async Task<BundledMessage> CreateBundledMessageAsync(MessageRecords messageRecords)
+    private async Task<BundledMessage> CreateBundledMessageAsync(MessageRecords messageRecords, DocumentFormat desiredDocumentFormat)
     {
         var id = BundledMessageId.New();
-        var document = await _documentFactory.CreateFromAsync(id, messageRecords, MessageFormat.Xml, _systemDateTimeProvider.Now())
+        var document = await _documentFactory.CreateFromAsync(id, messageRecords, desiredDocumentFormat, _systemDateTimeProvider.Now())
             .ConfigureAwait(false);
         return BundledMessage.CreateFrom(id, messageRecords, document);
     }
 }
 
-public record PeekRequest(ActorNumber ActorNumber, MessageCategory MessageCategory) : ICommand<PeekResult>;
+public record PeekRequest(ActorNumber ActorNumber, MessageCategory MessageCategory, DocumentFormat DesiredDocumentFormat) : ICommand<PeekResult>;
 
 public record PeekResult(Stream? Bundle, Guid? MessageId = default);

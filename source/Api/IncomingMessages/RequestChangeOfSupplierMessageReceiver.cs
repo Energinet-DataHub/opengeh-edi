@@ -13,11 +13,10 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Net;
-using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Api.Common;
 using Application.Configuration;
 using CimMessageAdapter.Messages.RequestChangeOfSupplier;
 using CimMessageAdapter.Response;
@@ -59,7 +58,7 @@ namespace Api.IncomingMessages
 
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            var contentType = GetContentType(request.Headers);
+            var contentType = request.Headers.GetContentType();
             var cimFormat = CimFormatParser.ParseFromContentTypeHeaderValue(contentType);
             if (cimFormat is null)
             {
@@ -73,13 +72,6 @@ namespace Api.IncomingMessages
 
             var httpStatusCode = result.Success ? HttpStatusCode.Accepted : HttpStatusCode.BadRequest;
             return CreateResponse(request, httpStatusCode, _responseFactory.From(result, cimFormat));
-        }
-
-        private static string GetContentType(HttpHeaders headers)
-        {
-            var contentHeader = headers.GetValues("Content-Type").FirstOrDefault();
-            if (contentHeader == null) throw new InvalidOperationException("No Content-Type found in request headers");
-            return contentHeader;
         }
 
         private HttpResponseData CreateResponse(HttpRequestData request, HttpStatusCode statusCode, ResponseMessage responseMessage)
