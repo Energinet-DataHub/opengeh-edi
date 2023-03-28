@@ -57,7 +57,6 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
             .AggregationResult();
     }
 
-    #pragma warning disable
     [Theory]
     [InlineData(nameof(DocumentFormat.Xml))]
     public async Task Can_create_document(string documentFormat)
@@ -95,28 +94,43 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
                     .ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture))
             .HasPoint(1, 1);
 
-            await assert.DocumentIsValidAsync().ConfigureAwait(false);
+        await assert.DocumentIsValidAsync().ConfigureAwait(false);
 
-            assertXmlDocument
-                .HasAttributeValue("sender_MarketParticipant.mRID", "codingScheme", "A10")
-                .HasValue("sender_MarketParticipant.marketRole.type",
-                    CimCode.Of(EnumerationType.FromName<MarketRole>(SampleData.SenderRole.Name)))
-                .HasAttributeValue("receiver_MarketParticipant.mRID", "codingScheme", "A10")
-                .HasValue("receiver_MarketParticipant.marketRole.type",
-                    CimCode.Of(EnumerationType.FromName<MarketRole>(SampleData.ReceiverRole.Name)))
-                .HasAttributeValue("Series[1]/energySupplier_MarketParticipant.mRID", "codingScheme", "A10")
-                .HasValue("Series[1]/Period/Point[1]/quality", Quality.Calculated.Code);
+        assertXmlDocument
+            .HasValue("sender_MarketParticipant.marketRole.type", CimCode.Of(EnumerationType.FromName<MarketRole>(SampleData.SenderRole.Name)))
+            .HasValue("receiver_MarketParticipant.marketRole.type", CimCode.Of(EnumerationType.FromName<MarketRole>(SampleData.ReceiverRole.Name)))
+            .HasAttributeValue("Series[1]/energySupplier_MarketParticipant.mRID", "codingScheme", "A10")
+            .HasValue("Series[1]/Period/Point[1]/quality", Quality.Calculated.Code);
     }
 
     [Theory]
     [InlineData(nameof(DocumentFormat.Xml), "E31")]
     public async Task Type_is_translated(string documentFormat, string expectedType)
     {
-        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat));
+        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat)).ConfigureAwait(false);
 
-        new AssertAggregationResultXmlDocument(AssertXmlDocument.Document(document, NamespacePrefix,
-                _documentValidation.Validator))
+        new AssertAggregationResultXmlDocument(AssertXmlDocument.Document(document, NamespacePrefix, _documentValidation.Validator))
             .HasType(expectedType);
+    }
+
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml), "A10")]
+    public async Task Sender_id_coding_scheme_is_translated(string documentFormat, string expectedCodingScheme)
+    {
+        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat)).ConfigureAwait(false);
+
+        new AssertAggregationResultXmlDocument(AssertXmlDocument.Document(document, NamespacePrefix, _documentValidation.Validator))
+            .HasSenderIdCodingScheme(expectedCodingScheme);
+    }
+
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml), "A10")]
+    public async Task Receiver_id_coding_scheme_is_translated(string documentFormat, string expectedCodingScheme)
+    {
+        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat)).ConfigureAwait(false);
+
+        new AssertAggregationResultXmlDocument(AssertXmlDocument.Document(document, NamespacePrefix, _documentValidation.Validator))
+            .HasReceiverIdCodingScheme(expectedCodingScheme);
     }
 
     [Fact]
@@ -385,6 +399,18 @@ public class AssertAggregationResultXmlDocument
     public AssertAggregationResultXmlDocument HasType(string expectedType)
     {
         _documentAsserter.HasValue("type", expectedType);
+        return this;
+    }
+
+    public AssertAggregationResultXmlDocument HasSenderIdCodingScheme(string expectedCodingScheme)
+    {
+        _documentAsserter.HasAttributeValue("sender_MarketParticipant.mRID", "codingScheme", expectedCodingScheme);
+        return this;
+    }
+
+    public AssertAggregationResultXmlDocument HasReceiverIdCodingScheme(string expectedCodingScheme)
+    {
+        _documentAsserter.HasAttributeValue("receiver_MarketParticipant.mRID", "codingScheme", expectedCodingScheme);
         return this;
     }
 }
