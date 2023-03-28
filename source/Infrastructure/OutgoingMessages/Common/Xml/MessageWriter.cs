@@ -57,9 +57,9 @@ public abstract class MessageWriter : IMessageWriter
         return messageType.Name.Equals(_documentDetails.Type.Split("_")[0], StringComparison.OrdinalIgnoreCase);
     }
 
-    public bool HandlesFormat(MessageFormat format)
+    public bool HandlesFormat(DocumentFormat format)
     {
-        return format == MessageFormat.Xml;
+        return format == DocumentFormat.Xml;
     }
 
     protected abstract Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer);

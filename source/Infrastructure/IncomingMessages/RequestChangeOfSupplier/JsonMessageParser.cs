@@ -27,6 +27,7 @@ using CimMessageAdapter.Messages;
 using DocumentValidation;
 using Domain.OutgoingMessages;
 using Json.Schema;
+using DocumentFormat = Domain.OutgoingMessages.DocumentFormat;
 using MessageHeader = Application.IncomingMessages.MessageHeader;
 
 namespace Infrastructure.IncomingMessages.RequestChangeOfSupplier;
@@ -44,7 +45,7 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
         _schemaProvider = schemaProvider;
     }
 
-    public MessageFormat HandledFormat => MessageFormat.Json;
+    public DocumentFormat HandledFormat => DocumentFormat.Json;
 
     public async Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>> ParseAsync(Stream message)
     {

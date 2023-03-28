@@ -25,7 +25,7 @@ namespace Infrastructure.IncomingMessages.Response;
 
 public class JsonResponseFactory : IResponseFactory
 {
-    public MessageFormat HandledFormat => MessageFormat.Json;
+    public DocumentFormat HandledFormat => DocumentFormat.Json;
 
     public ResponseMessage From(Result result)
     {
