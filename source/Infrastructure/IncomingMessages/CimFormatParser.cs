@@ -21,13 +21,13 @@ namespace Infrastructure.IncomingMessages;
 
 public static class CimFormatParser
 {
-    public static MessageFormat? ParseFromContentTypeHeaderValue(string value)
+    public static DocumentFormat? ParseFromContentTypeHeaderValue(string value)
     {
         if (value == null) throw new ArgumentNullException(nameof(value));
         var contentType = ParseContentTypeName(value);
 
         return EnumerationType.GetAll
-                <MessageFormat>()
+                <DocumentFormat>()
             .FirstOrDefault(v => v.Name.Equals(contentType, StringComparison.OrdinalIgnoreCase));
     }
 

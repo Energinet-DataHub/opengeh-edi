@@ -29,7 +29,7 @@ public class ResponseFactory
         _factories = factories;
     }
 
-    public ResponseMessage From(Result result, MessageFormat format)
+    public ResponseMessage From(Result result, DocumentFormat format)
     {
         if (result == null) throw new ArgumentNullException(nameof(result));
         if (format == null) throw new ArgumentNullException(nameof(format));

@@ -48,7 +48,8 @@ public class WhenADequeueIsRequestedTests : TestBase
         await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
         var peekResult = await InvokeCommandAsync(new PeekRequest(
             ActorNumber.Create(SampleData.NewEnergySupplierNumber),
-            MessageCategory.MasterData)).ConfigureAwait(false);
+            MessageCategory.MasterData,
+            DocumentFormat.Xml)).ConfigureAwait(false);
 
         var dequeueResult = await InvokeCommandAsync(new DequeueRequest(peekResult.MessageId.GetValueOrDefault().ToString())).ConfigureAwait(false);
 

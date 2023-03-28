@@ -24,6 +24,7 @@ using CimMessageAdapter.Messages;
 using DocumentValidation;
 using DocumentValidation.CimXml;
 using Domain.OutgoingMessages;
+using DocumentFormat = Domain.OutgoingMessages.DocumentFormat;
 using MarketActivityRecord = Application.IncomingMessages.RequestChangeCustomerCharacteristics.MarketActivityRecord;
 
 namespace Infrastructure.IncomingMessages.RequestChangeCustomerCharacteristics;
@@ -40,7 +41,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         _schemaProvider = new CimXmlSchemaProvider();
     }
 
-    public MessageFormat HandledFormat => MessageFormat.Xml;
+    public DocumentFormat HandledFormat => DocumentFormat.Xml;
 
     public async Task<MessageParserResult<MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>> ParseAsync(Stream message)
     {

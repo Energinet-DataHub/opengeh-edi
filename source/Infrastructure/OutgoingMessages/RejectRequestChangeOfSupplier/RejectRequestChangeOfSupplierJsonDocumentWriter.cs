@@ -35,9 +35,9 @@ public class RejectRequestChangeOfSupplierJsonDocumentWriter : IMessageWriter
         _parser = parser;
     }
 
-    public bool HandlesFormat(MessageFormat format)
+    public bool HandlesFormat(DocumentFormat format)
     {
-        return format == MessageFormat.Json;
+        return format == DocumentFormat.Json;
     }
 
     public bool HandlesType(MessageType messageType)
