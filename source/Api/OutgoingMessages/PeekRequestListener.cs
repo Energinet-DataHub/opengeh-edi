@@ -17,6 +17,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Api.Common;
 using Application.Configuration.Authentication;
 using Application.OutgoingMessages.Peek;
 using Domain.OutgoingMessages.Peek;
@@ -53,7 +54,7 @@ public class PeekRequestListener
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var contentType = GetContentType(request.Headers);
+        var contentType = request.Headers.GetContentType();
         var desiredDocumentFormat = CimFormatParser.ParseFromContentTypeHeaderValue(contentType);
         if (desiredDocumentFormat is null)
         {
@@ -85,12 +86,5 @@ public class PeekRequestListener
         response.Headers.Add("MessageId", result.MessageId.ToString());
         response.StatusCode = HttpStatusCode.OK;
         return response;
-    }
-
-    private static string GetContentType(HttpHeaders headers)
-    {
-        var contentHeader = headers.GetValues("Content-Type").FirstOrDefault();
-        if (contentHeader == null) throw new InvalidOperationException("No Content-Type found in request headers");
-        return contentHeader;
     }
 }
