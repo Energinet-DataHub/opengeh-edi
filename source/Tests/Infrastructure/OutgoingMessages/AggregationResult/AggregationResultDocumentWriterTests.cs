@@ -97,9 +97,25 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
         await assert.DocumentIsValidAsync().ConfigureAwait(false);
 
         assertXmlDocument
-            .HasValue("sender_MarketParticipant.marketRole.type", CimCode.Of(EnumerationType.FromName<MarketRole>(SampleData.SenderRole.Name)))
             .HasValue("receiver_MarketParticipant.marketRole.type", CimCode.Of(EnumerationType.FromName<MarketRole>(SampleData.ReceiverRole.Name)))
             .HasValue("Series[1]/Period/Point[1]/quality", Quality.Calculated.Code);
+    }
+
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml), nameof(MarketRole.MeteredDataResponsible), "MDR")]
+    [InlineData(nameof(DocumentFormat.Xml), nameof(MarketRole.EnergySupplier), "DDQ")]
+    [InlineData(nameof(DocumentFormat.Xml), nameof(MarketRole.GridOperator), "DDM")]
+    [InlineData(nameof(DocumentFormat.Xml), nameof(MarketRole.MeteringDataAdministrator), "DGL")]
+    [InlineData(nameof(DocumentFormat.Xml), nameof(MarketRole.MeteringPointAdministrator), "DDZ")]
+    [InlineData(nameof(DocumentFormat.Xml), nameof(MarketRole.BalanceResponsible), "DDK")]
+    public async Task Sender_role_is_translated(string documentFormat, string marketRole, string expectedCode)
+    {
+        var document = await CreateDocument(
+            _timeSeries.WithSender(SampleData.SenderId, EnumerationType.FromName<MarketRole>(marketRole)),
+            DocumentFormat.From(documentFormat)).ConfigureAwait(false);
+
+        new AssertAggregationResultXmlDocument(AssertXmlDocument.Document(document, NamespacePrefix, _documentValidation.Validator))
+            .HasSenderRole(expectedCode);
     }
 
     [Theory]
@@ -428,6 +444,12 @@ public class AssertAggregationResultXmlDocument
     public AssertAggregationResultXmlDocument HasEnergySupplierCodingScheme(string expectedCodingScheme)
     {
         _documentAsserter.HasAttributeValue("Series[1]/energySupplier_MarketParticipant.mRID", "codingScheme", expectedCodingScheme);
+        return this;
+    }
+
+    public AssertAggregationResultXmlDocument HasSenderRole(string expectedCode)
+    {
+        _documentAsserter.HasValue("sender_MarketParticipant.marketRole.type", expectedCode);
         return this;
     }
 }
