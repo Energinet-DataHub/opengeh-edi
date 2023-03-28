@@ -56,52 +56,6 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
             .AggregationResult();
     }
 
-    [Theory]
-    [InlineData(nameof(DocumentFormat.Xml))]
-    public async Task Can_create_document(string documentFormat)
-    {
-        var document = await CreateDocument(
-                _timeSeries
-            .WithMessageId(SampleData.MessageId)
-            .WithTimestamp(SampleData.Timestamp)
-            .WithSender(SampleData.SenderId, SampleData.SenderRole)
-            .WithReceiver(SampleData.ReceiverId, SampleData.ReceiverRole)
-            .WithTransactionId(SampleData.TransactionId)
-            .WithGridArea(SampleData.GridAreaCode)
-            .WithBalanceResponsibleNumber(SampleData.BalanceResponsibleNumber)
-            .WithEnergySupplierNumber(SampleData.EnergySupplierNumber)
-            .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
-            .WithPoint(new Point(1, 1m, Quality.Calculated.Name, "2022-12-12T23:00:00Z")),
-                DocumentFormat.From(documentFormat))
-            .ConfigureAwait(false);
-
-        var assertXmlDocument = AssertXmlDocument.Document(document, NamespacePrefix, _documentValidation.Validator);
-        var assert = new AssertAggregationResultXmlDocument(assertXmlDocument)
-            .HasMessageId(SampleData.MessageId);
-
-        await assertXmlDocument
-            .HasValue("type", "E31")
-            .HasValue("sender_MarketParticipant.mRID", SampleData.SenderId)
-            .HasAttributeValue("sender_MarketParticipant.mRID", "codingScheme", "A10")
-            .HasValue("sender_MarketParticipant.marketRole.type", CimCode.Of(EnumerationType.FromName<MarketRole>(SampleData.SenderRole.Name)))
-            .HasValue("receiver_MarketParticipant.mRID", SampleData.ReceiverId)
-            .HasAttributeValue("receiver_MarketParticipant.mRID", "codingScheme", "A10")
-            .HasValue("receiver_MarketParticipant.marketRole.type", CimCode.Of(EnumerationType.FromName<MarketRole>(SampleData.ReceiverRole.Name)))
-            .HasValue("createdDateTime", SampleData.Timestamp)
-            .HasValue("Series[1]/mRID", SampleData.TransactionId.ToString())
-            .HasValue("Series[1]/meteringGridArea_Domain.mRID", SampleData.GridAreaCode)
-            .HasValue("Series[1]/balanceResponsibleParty_MarketParticipant.mRID", SampleData.BalanceResponsibleNumber)
-            .HasValue("Series[1]/energySupplier_MarketParticipant.mRID", SampleData.EnergySupplierNumber)
-            .HasAttributeValue("Series[1]/energySupplier_MarketParticipant.mRID", "codingScheme", "A10")
-            .HasValue("Series[1]/product", "8716867000030")
-            .HasValue("Series[1]/Period/timeInterval/start",  InstantPattern.General.Parse(SampleData.StartOfPeriod).Value.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture))
-            .HasValue("Series[1]/Period/timeInterval/end", InstantPattern.General.Parse(SampleData.EndOfPeriod).Value.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture))
-            .HasValue("Series[1]/Period/Point[1]/position", "1")
-            .HasValue("Series[1]/Period/Point[1]/quantity", "1")
-            .HasValue("Series[1]/Period/Point[1]/quality",  Quality.Calculated.Code)
-            .HasValidStructureAsync(DocumentType.AggregationResult).ConfigureAwait(false);
-    }
-
     [Fact]
     public async Task Point_quantity_element_is_excluded_if_no_value()
     {
@@ -276,6 +230,54 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
                 _parser.From(resultBuilder.BuildTimeSeries()),
             });
     }
+
+    #pragma warning disable
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml))]
+    public async Task Can_create_document(string documentFormat)
+    {
+        var document = await CreateDocument(
+                _timeSeries
+            .WithMessageId(SampleData.MessageId)
+            .WithTimestamp(SampleData.Timestamp)
+            .WithSender(SampleData.SenderId, SampleData.SenderRole)
+            .WithReceiver(SampleData.ReceiverId, SampleData.ReceiverRole)
+            .WithTransactionId(SampleData.TransactionId)
+            .WithGridArea(SampleData.GridAreaCode)
+            .WithBalanceResponsibleNumber(SampleData.BalanceResponsibleNumber)
+            .WithEnergySupplierNumber(SampleData.EnergySupplierNumber)
+            .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
+            .WithPoint(new Point(1, 1m, Quality.Calculated.Name, "2022-12-12T23:00:00Z")),
+                DocumentFormat.From(documentFormat))
+            .ConfigureAwait(false);
+
+        var assertXmlDocument = AssertXmlDocument.Document(document, NamespacePrefix, _documentValidation.Validator);
+        var assert = new AssertAggregationResultXmlDocument(assertXmlDocument)
+            .HasType("E31")
+            .HasMessageId(SampleData.MessageId);
+
+        await assertXmlDocument
+            .HasValue("sender_MarketParticipant.mRID", SampleData.SenderId)
+            .HasAttributeValue("sender_MarketParticipant.mRID", "codingScheme", "A10")
+            .HasValue("sender_MarketParticipant.marketRole.type", CimCode.Of(EnumerationType.FromName<MarketRole>(SampleData.SenderRole.Name)))
+            .HasValue("receiver_MarketParticipant.mRID", SampleData.ReceiverId)
+            .HasAttributeValue("receiver_MarketParticipant.mRID", "codingScheme", "A10")
+            .HasValue("receiver_MarketParticipant.marketRole.type", CimCode.Of(EnumerationType.FromName<MarketRole>(SampleData.ReceiverRole.Name)))
+            .HasValue("createdDateTime", SampleData.Timestamp)
+            .HasValue("Series[1]/mRID", SampleData.TransactionId.ToString())
+            .HasValue("Series[1]/meteringGridArea_Domain.mRID", SampleData.GridAreaCode)
+            .HasValue("Series[1]/balanceResponsibleParty_MarketParticipant.mRID", SampleData.BalanceResponsibleNumber)
+            .HasValue("Series[1]/energySupplier_MarketParticipant.mRID", SampleData.EnergySupplierNumber)
+            .HasAttributeValue("Series[1]/energySupplier_MarketParticipant.mRID", "codingScheme", "A10")
+            .HasValue("Series[1]/product", "8716867000030")
+            .HasValue("Series[1]/Period/timeInterval/start",  InstantPattern.General.Parse(SampleData.StartOfPeriod).Value.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture))
+            .HasValue("Series[1]/Period/timeInterval/end", InstantPattern.General.Parse(SampleData.EndOfPeriod).Value.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture))
+            .HasValue("Series[1]/Period/Point[1]/position", "1")
+            .HasValue("Series[1]/Period/Point[1]/quantity", "1")
+            .HasValue("Series[1]/Period/Point[1]/quality",  Quality.Calculated.Code)
+            .HasValidStructureAsync(DocumentType.AggregationResult).ConfigureAwait(false);
+    }
+
 }
 
 #pragma warning disable
@@ -291,6 +293,12 @@ public class AssertAggregationResultXmlDocument
     public AssertAggregationResultXmlDocument HasMessageId(string expectedMessageId)
     {
         _documentAsserter.HasValue("mRID", expectedMessageId);
+        return this;
+    }
+
+    public AssertAggregationResultXmlDocument HasType(string expectedType)
+    {
+        _documentAsserter.HasValue("type", expectedType);
         return this;
     }
 }
