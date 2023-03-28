@@ -260,32 +260,6 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
         return MessageHeaderFactory.Create(ProcessType.BalanceFixing, MarketRole.MeteredDataResponsible);
     }
 
-    private static List<TimeSeries> CreateSeriesFor(MeteringPointType meteringPointType)
-    {
-        var timeSeries = new List<TimeSeries>()
-        {
-            new(
-                Guid.NewGuid(),
-                "870",
-                meteringPointType.Name,
-                meteringPointType == MeteringPointType.Consumption ? SettlementType.NonProfiled.Code : null,
-                "KWH",
-                "PT1H",
-                SampleData.EnergySupplierNumber,
-                SampleData.BalanceResponsibleNumber,
-                new Period(
-                    InstantPattern.General.Parse("2022-02-12T23:00:00Z").Value,
-                    InstantPattern.General.Parse("2022-02-13T23:00:00Z").Value),
-                new List<Point>()
-                {
-                    new(1, 11, Quality.Incomplete.Name, "2022-02-12T23:00Z"),
-                    new(2, null, Quality.Missing.Name, "2022-02-13T23:00Z"),
-                    new(2, null, Quality.Measured.Name, "2022-02-13T23:00Z"),
-                }),
-        };
-        return timeSeries;
-    }
-
     private Task<Stream> CreateDocument(TimeSeriesBuilder resultBuilder)
     {
         return _messageWriter.WriteAsync(
