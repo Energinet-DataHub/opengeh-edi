@@ -14,10 +14,6 @@
 
 using System;
 using Domain.Actors;
-using Domain.OutgoingMessages;
-using Domain.Transactions.Aggregations;
-using NodaTime;
-using NodaTime.Text;
 
 namespace Tests.Infrastructure.OutgoingMessages.AggregationResult;
 
