@@ -32,7 +32,7 @@ public static class CimCode
         if (processType == ProcessType.MoveIn)
             return "E65";
 
-        throw new InvalidOperationException($"No code has been defined for {processType.Name}");
+        throw NoCodeFound(processType.Name);
     }
 
     public static string Of(MeteringPointType meteringPointType)
@@ -45,7 +45,7 @@ public static class CimCode
         if (meteringPointType == MeteringPointType.Production)
             return "E18";
 
-        throw new InvalidOperationException($"No code has been defined for {meteringPointType.Name}");
+        throw NoCodeFound(meteringPointType.Name);
     }
 
     public static string Of(MarketRole marketRole)
@@ -65,7 +65,7 @@ public static class CimCode
         if (marketRole == MarketRole.BalanceResponsible)
             return "DDK";
 
-        throw new InvalidOperationException($"No code has been defined for {marketRole.Name}");
+        throw NoCodeFound(marketRole.Name);
     }
 
     public static string Of(SettlementType settlementType)
@@ -77,7 +77,7 @@ public static class CimCode
         if (settlementType == SettlementType.NonProfiled)
             return "E02";
 
-        throw new InvalidOperationException($"No code has been defined for {settlementType.Name}");
+        throw NoCodeFound(settlementType.Name);
     }
 
     public static string Of(MeasurementUnit measurementUnit)
@@ -87,6 +87,11 @@ public static class CimCode
         if (measurementUnit == MeasurementUnit.Kwh)
             return "KWH";
 
-        throw new InvalidOperationException($"No code has been defined for {measurementUnit.Name}");
+        throw NoCodeFound(measurementUnit.Name);
+    }
+
+    private static Exception NoCodeFound(string domainType)
+    {
+        return new InvalidOperationException($"No code has been defined for {domainType}");
     }
 }
