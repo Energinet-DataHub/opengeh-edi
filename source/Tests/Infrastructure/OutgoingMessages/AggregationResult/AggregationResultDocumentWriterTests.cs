@@ -19,8 +19,8 @@ using Application.OutgoingMessages.Common;
 using Domain.OutgoingMessages;
 using Domain.Transactions.Aggregations;
 using Infrastructure.Configuration.Serialization;
+using Infrastructure.OutgoingMessages.AggregationResult;
 using Infrastructure.OutgoingMessages.Common;
-using Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 using NodaTime.Text;
 using Tests.Factories;
 using Tests.Fixtures;
@@ -42,7 +42,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     {
         _documentValidation = documentValidation;
         _parser = new MessageRecordParser(new Serializer());
-        _messageWriter = new NotifyAggregatedMeasureDataXmlDocumentWriter(_parser);
+        _messageWriter = new AggregationResultXmlDocumentWriter(_parser);
         _timeSeries = TimeSeriesBuilder
             .AggregationResult();
     }
