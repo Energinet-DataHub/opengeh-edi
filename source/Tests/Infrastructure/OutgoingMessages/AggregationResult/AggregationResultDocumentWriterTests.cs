@@ -162,5 +162,3 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
         return new AssertAggregationResultXmlDocument(assertXmlDocument);
     }
 }
-
-#pragma warning disable
