@@ -84,4 +84,12 @@ public class CimCodeTests
     {
         Assert.Equal(expectedCode, CimCode.Of(Quality.From(quality)));
     }
+
+    [Theory]
+    [InlineData("1234567890123", "A10")]
+    [InlineData("1234567890123456", "A01")]
+    public void Translate_actor_number_coding_scheme(string actorNumber, string expectedCode)
+    {
+        Assert.Equal(expectedCode, CimCode.CodingSchemeOf(ActorNumber.Create(actorNumber)));
+    }
 }

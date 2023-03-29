@@ -12,11 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Tests.Infrastructure.OutgoingMessages.NotifyAggreagtedMeasureData;
+using System;
+using Domain.Actors;
+
+namespace Tests.Infrastructure.OutgoingMessages.AggregationResult;
 
 internal static class SampleData
 {
     public static string EnergySupplierNumber => "5790001330552";
 
     public static string BalanceResponsibleNumber => "6790001330551";
+
+    public static string MessageId => "12345678";
+
+    public static string SenderId => "1234567890123";
+
+    public static MarketRole SenderRole => MarketRole.MeteringDataAdministrator;
+
+    public static string ReceiverId => "1234567890987";
+
+    public static MarketRole ReceiverRole => MarketRole.BalanceResponsible;
+
+    public static string Timestamp => "2022-12-20T23:00:00Z";
+
+    public static string GridAreaCode => "234";
+
+    public static Guid TransactionId => Guid.Parse("4E85A732-85FD-4D92-8FF3-72C052802716");
+
+    public static string StartOfPeriod => "2022-02-12T23:00:00Z";
+
+    public static string EndOfPeriod => "2022-02-13T23:00:00Z";
 }

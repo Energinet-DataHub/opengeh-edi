@@ -14,14 +14,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using NodaTime;
+using NodaTime.Text;
 using Period = Domain.Transactions.Aggregations.Period;
 using Point = Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
 
@@ -29,9 +27,9 @@ namespace Tests.Factories;
 
 public class TimeSeriesBuilder
 {
-    private readonly string _messageId = Guid.NewGuid().ToString();
-    private readonly Instant _timeStamp = SystemClock.Instance.GetCurrentInstant();
     private readonly List<Point> _points = new();
+    private string _messageId = Guid.NewGuid().ToString();
+    private Instant _timeStamp = SystemClock.Instance.GetCurrentInstant();
     private ProcessType _processType = ProcessType.BalanceFixing;
     private string _receiverNumber = "1234567890123";
     private MarketRole _receiverRole = MarketRole.MeteredDataResponsible;
@@ -40,7 +38,7 @@ public class TimeSeriesBuilder
     private Guid _transactionId = Guid.NewGuid();
     private string _gridAreaCode = "870";
     private MeteringPointType _meteringPointType = MeteringPointType.Consumption;
-    private SettlementType _settlementMethod = SettlementType.NonProfiled;
+    private SettlementType? _settlementMethod = SettlementType.NonProfiled;
     private MeasurementUnit _measurementUnit = MeasurementUnit.Kwh;
     private Resolution _resolution = Resolution.QuarterHourly;
     private string? _energySupplierNumber;
@@ -98,7 +96,7 @@ public class TimeSeriesBuilder
         return this;
     }
 
-    public TimeSeriesBuilder WithSettlementMethod(SettlementType settlementType)
+    public TimeSeriesBuilder WithSettlementMethod(SettlementType? settlementType)
     {
         _settlementMethod = settlementType;
         return this;
@@ -116,21 +114,33 @@ public class TimeSeriesBuilder
         return this;
     }
 
-    public TimeSeriesBuilder WithEnergySupplierNumber(string balanceResponsibleNumber)
+    public TimeSeriesBuilder WithEnergySupplierNumber(string? balanceResponsibleNumber)
     {
         _energySupplierNumber = balanceResponsibleNumber;
         return this;
     }
 
-    public TimeSeriesBuilder WithBalanceResponsibleNumber(string balanceResponsibleNumber)
+    public TimeSeriesBuilder WithBalanceResponsibleNumber(string? balanceResponsibleNumber)
     {
         _balanceResponsibleNumber = balanceResponsibleNumber;
         return this;
     }
 
-    public TimeSeriesBuilder WithPeriod(Period period)
+    public TimeSeriesBuilder WithPeriod(string startOfPeriod, string endOfPeriod)
     {
-        _period = period;
+        _period = new Period(ParseTimeStamp(startOfPeriod), ParseTimeStamp(endOfPeriod));
+        return this;
+    }
+
+    public TimeSeriesBuilder WithMessageId(string messageId)
+    {
+        _messageId = messageId;
+        return this;
+    }
+
+    public TimeSeriesBuilder WithTimestamp(string timestamp)
+    {
+        _timeStamp = ParseTimeStamp(timestamp);
         return this;
     }
 
@@ -152,12 +162,17 @@ public class TimeSeriesBuilder
             _transactionId,
             _gridAreaCode,
             _meteringPointType.Name,
-            _settlementMethod.Name,
+            _settlementMethod?.Name,
             _measurementUnit.Name,
             _resolution.Name,
             _energySupplierNumber,
             _balanceResponsibleNumber,
             _period,
             _points);
+    }
+
+    private static Instant ParseTimeStamp(string timestamp)
+    {
+        return InstantPattern.General.Parse(timestamp).Value;
     }
 }
