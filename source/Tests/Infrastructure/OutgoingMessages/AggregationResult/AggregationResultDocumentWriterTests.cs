@@ -130,6 +130,19 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     }
 
     [Fact]
+    public async Task Settlement_method_is_excluded()
+    {
+        _timeSeries
+            .WithMeteringPointType(MeteringPointType.Production)
+            .WithSettlementMethod(null);
+
+        var document = await CreateDocument(_timeSeries).ConfigureAwait(false);
+
+        AssertDocument(document, DocumentFormat.Xml)
+            .SettlementMethodIsNotPresent();
+    }
+
+    [Fact]
     public async Task Exclude_optional_attributes_if_value_is_unspecified()
     {
         var header = CreateHeader();
@@ -154,7 +167,6 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
 
         await AssertXmlDocument
             .Document(message, NamespacePrefix, _documentValidation.Validator)
-            .IsNotPresent("Series[1]/marketEvaluationPoint.settlementMethod")
             .IsNotPresent("Series[1]/energySupplier_MarketParticipant.mRID")
             .IsNotPresent("Series[1]/balanceResponsibleParty_MarketParticipant.mRID")
             .HasValidStructureAsync(DocumentType.AggregationResult).ConfigureAwait(false);
@@ -302,6 +314,12 @@ public class AssertAggregationResultXmlDocument
     public AssertAggregationResultXmlDocument HasReceiverRole(string expectedCode)
     {
         _documentAsserter.HasValue("receiver_MarketParticipant.marketRole.type", expectedCode);
+        return this;
+    }
+
+    public AssertAggregationResultXmlDocument SettlementMethodIsNotPresent()
+    {
+        _documentAsserter.IsNotPresent("Series[1]/marketEvaluationPoint.settlementMethod");
         return this;
     }
 }

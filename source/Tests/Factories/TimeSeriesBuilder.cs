@@ -38,7 +38,7 @@ public class TimeSeriesBuilder
     private Guid _transactionId = Guid.NewGuid();
     private string _gridAreaCode = "870";
     private MeteringPointType _meteringPointType = MeteringPointType.Consumption;
-    private SettlementType _settlementMethod = SettlementType.NonProfiled;
+    private SettlementType? _settlementMethod = SettlementType.NonProfiled;
     private MeasurementUnit _measurementUnit = MeasurementUnit.Kwh;
     private Resolution _resolution = Resolution.QuarterHourly;
     private string? _energySupplierNumber;
@@ -96,7 +96,7 @@ public class TimeSeriesBuilder
         return this;
     }
 
-    public TimeSeriesBuilder WithSettlementMethod(SettlementType settlementType)
+    public TimeSeriesBuilder WithSettlementMethod(SettlementType? settlementType)
     {
         _settlementMethod = settlementType;
         return this;
@@ -162,7 +162,7 @@ public class TimeSeriesBuilder
             _transactionId,
             _gridAreaCode,
             _meteringPointType.Name,
-            _settlementMethod.Name,
+            _settlementMethod?.Name,
             _measurementUnit.Name,
             _resolution.Name,
             _energySupplierNumber,
