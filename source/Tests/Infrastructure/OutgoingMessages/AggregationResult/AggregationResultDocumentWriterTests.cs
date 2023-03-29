@@ -87,16 +87,6 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
             .DocumentIsValidAsync().ConfigureAwait(false);
     }
 
-    [Theory]
-    [InlineData(nameof(DocumentFormat.Xml), "E31")]
-    public async Task Type_is_translated(string documentFormat, string expectedType)
-    {
-        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat)).ConfigureAwait(false);
-
-        new AssertAggregationResultXmlDocument(AssertXmlDocument.Document(document, "cim", _documentValidation.Validator))
-            .HasType(expectedType);
-    }
-
     [Fact]
     public async Task Point_quantity_element_is_excluded_if_no_value()
     {
@@ -183,6 +173,7 @@ public class AssertAggregationResultXmlDocument
     public AssertAggregationResultXmlDocument(AssertXmlDocument documentAsserter)
     {
         _documentAsserter = documentAsserter;
+        _documentAsserter.HasValue("type", "E31");
     }
 
     public AssertAggregationResultXmlDocument HasMessageId(string expectedMessageId)
