@@ -18,7 +18,7 @@ on:
   push:
     branches:
       - main
-      - kerbou/997-publish-test-report
+      - kerbou/997-publish-test-report-cd
 
 jobs:
   #
