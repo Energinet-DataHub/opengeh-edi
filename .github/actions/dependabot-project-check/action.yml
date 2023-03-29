@@ -11,10 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-name: "Check Dependabot projects"
-description: "Checks that dependabot.yml gets updated with any added or removed csproj files"
+name: Check Dependabot projects
+description: Checks that dependabot.yml gets updated with any added or removed csproj files
+
 runs:
-  using: "composite"
+  using: composite
   steps:
     # Code comments for each line:
     # Fetch all changed files in this PR
