@@ -35,7 +35,6 @@ namespace Tests.Infrastructure.OutgoingMessages.AggregationResult;
 
 public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValidationFixture>
 {
-    private const string NamespacePrefix = "cim";
     private readonly DocumentValidationFixture _documentValidation;
     private readonly IMessageWriter _messageWriter;
     private readonly IMessageRecordParser _parser;
@@ -94,7 +93,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     {
         var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat)).ConfigureAwait(false);
 
-        new AssertAggregationResultXmlDocument(AssertXmlDocument.Document(document, NamespacePrefix, _documentValidation.Validator))
+        new AssertAggregationResultXmlDocument(AssertXmlDocument.Document(document, "cim", _documentValidation.Validator))
             .HasType(expectedType);
     }
 
@@ -171,7 +170,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
 
     private AssertAggregationResultXmlDocument AssertDocument(Stream document, DocumentFormat documentFormat)
     {
-        var assertXmlDocument = AssertXmlDocument.Document(document, NamespacePrefix, _documentValidation.Validator);
+        var assertXmlDocument = AssertXmlDocument.Document(document, "cim", _documentValidation.Validator);
         return new AssertAggregationResultXmlDocument(assertXmlDocument);
     }
 }
