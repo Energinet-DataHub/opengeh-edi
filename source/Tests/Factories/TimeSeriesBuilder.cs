@@ -120,7 +120,7 @@ public class TimeSeriesBuilder
         return this;
     }
 
-    public TimeSeriesBuilder WithBalanceResponsibleNumber(string balanceResponsibleNumber)
+    public TimeSeriesBuilder WithBalanceResponsibleNumber(string? balanceResponsibleNumber)
     {
         _balanceResponsibleNumber = balanceResponsibleNumber;
         return this;

@@ -155,37 +155,15 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     }
 
     [Fact]
-    public async Task Exclude_optional_attributes_if_value_is_unspecified()
+    public async Task Balance_responsible_number_is_excluded()
     {
-        var header = CreateHeader();
-        var timeSeries = new List<TimeSeries>()
-        {
-            new(
-                Guid.NewGuid(),
-                "870",
-                MeteringPointType.Production.Name,
-                null,
-                "KWH",
-                "PT1H",
-                null,
-                null,
-                new Period(
-                    InstantPattern.General.Parse("2022-02-12T23:00:00Z").Value,
-                    InstantPattern.General.Parse("2022-02-13T23:00:00Z").Value),
-                new List<Point> { }),
-        };
+        _timeSeries
+            .WithBalanceResponsibleNumber(null);
 
-        var message = await _messageWriter.WriteAsync(header, timeSeries.Select(record => _parser.From(record)).ToList()).ConfigureAwait(false);
+        var document = await CreateDocument(_timeSeries).ConfigureAwait(false);
 
-        await AssertXmlDocument
-            .Document(message, NamespacePrefix, _documentValidation.Validator)
-            .IsNotPresent("Series[1]/balanceResponsibleParty_MarketParticipant.mRID")
-            .HasValidStructureAsync(DocumentType.AggregationResult).ConfigureAwait(false);
-    }
-
-    private static MessageHeader CreateHeader()
-    {
-        return MessageHeaderFactory.Create(ProcessType.BalanceFixing, MarketRole.MeteredDataResponsible);
+        AssertDocument(document, DocumentFormat.Xml)
+            .BalanceResponsibleNumberIsNotPresent();
     }
 
     private Task<Stream> CreateDocument(TimeSeriesBuilder resultBuilder, DocumentFormat? documentFormat = null)
@@ -337,6 +315,12 @@ public class AssertAggregationResultXmlDocument
     public AssertAggregationResultXmlDocument EnergySupplierNumberIsNotPresent()
     {
         _documentAsserter.IsNotPresent("Series[1]/energySupplier_MarketParticipant.mRID");
+        return this;
+    }
+
+    public AssertAggregationResultXmlDocument BalanceResponsibleNumberIsNotPresent()
+    {
+        _documentAsserter.IsNotPresent("Series[1]/balanceResponsibleParty_MarketParticipant.mRID");
         return this;
     }
 }
