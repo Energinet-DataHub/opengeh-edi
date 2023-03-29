@@ -253,42 +253,6 @@ public class AssertAggregationResultXmlDocument
         return this;
     }
 
-    public AssertAggregationResultXmlDocument HasType(string expectedType)
-    {
-        _documentAsserter.HasValue("type", expectedType);
-        return this;
-    }
-
-    public AssertAggregationResultXmlDocument HasSenderIdCodingScheme(string expectedCodingScheme)
-    {
-        _documentAsserter.HasAttributeValue("sender_MarketParticipant.mRID", "codingScheme", expectedCodingScheme);
-        return this;
-    }
-
-    public AssertAggregationResultXmlDocument HasReceiverIdCodingScheme(string expectedCodingScheme)
-    {
-        _documentAsserter.HasAttributeValue("receiver_MarketParticipant.mRID", "codingScheme", expectedCodingScheme);
-        return this;
-    }
-
-    public AssertAggregationResultXmlDocument HasEnergySupplierCodingScheme(string expectedCodingScheme)
-    {
-        _documentAsserter.HasAttributeValue("Series[1]/energySupplier_MarketParticipant.mRID", "codingScheme", expectedCodingScheme);
-        return this;
-    }
-
-    public AssertAggregationResultXmlDocument HasSenderRole(string expectedCode)
-    {
-        _documentAsserter.HasValue("sender_MarketParticipant.marketRole.type", expectedCode);
-        return this;
-    }
-
-    public AssertAggregationResultXmlDocument HasReceiverRole(string expectedCode)
-    {
-        _documentAsserter.HasValue("receiver_MarketParticipant.marketRole.type", expectedCode);
-        return this;
-    }
-
     public AssertAggregationResultXmlDocument SettlementMethodIsNotPresent()
     {
         _documentAsserter.IsNotPresent("Series[1]/marketEvaluationPoint.settlementMethod");
