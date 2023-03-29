@@ -11,22 +11,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-name: 'Check Dependabot projects'
-description: 'Checks that dependabot.yml gets updated with any added or removed csproj files'
+name: "Check Dependabot projects"
+description: "Checks that dependabot.yml gets updated with any added or removed csproj files"
 runs:
   using: "composite"
   steps:
-      # Code comments for each line:
-      # Fetch all changed files in this PR
-      # Return a concatenated string containing status and filename for each object
-      # Search for all strings containing .csproj - return true if none are found to avoid script exiting
-      # Return only the directory for all strings (dirname basically just cuts off the filename at the end and doesn't care about the start of our concatenated string) and only run if grep returned any values
-      #
-      # If no files are found tell the user and exit this step
-      #
-      # Encode all line breaks
-      #
-      # Use the dirs variable as output from this step
+    # Code comments for each line:
+    # Fetch all changed files in this PR
+    # Return a concatenated string containing status and filename for each object
+    # Search for all strings containing .csproj - return true if none are found to avoid script exiting
+    # Return only the directory for all strings (dirname basically just cuts off the filename at the end and doesn't care about the start of our concatenated string) and only run if grep returned any values
+    #
+    # If no files are found tell the user and exit this step
+    #
+    # Encode all line breaks
+    #
+    # Use the dirs variable as output from this step
     - name: Fetch csproj dirs with changes
       id: fetchCsprojDirs
       run: |
