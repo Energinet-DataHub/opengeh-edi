@@ -13,16 +13,12 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Application.OutgoingMessages.Common;
 using DocumentValidation;
-using Domain.Actors;
 using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions.Aggregations;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.OutgoingMessages.Common;
@@ -33,7 +29,6 @@ using Tests.Fixtures;
 using Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
 using DocumentFormat = Domain.OutgoingMessages.DocumentFormat;
-using Period = Domain.Transactions.Aggregations.Period;
 using Point = Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
 
 namespace Tests.Infrastructure.OutgoingMessages.AggregationResult;
@@ -123,9 +118,8 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
 
         var document = await CreateDocument(_timeSeries).ConfigureAwait(false);
 
-        AssertXmlDocument
-            .Document(document, NamespacePrefix, _documentValidation.Validator)
-            .IsNotPresent("Series[1]/Period/Point[1]/quality");
+        AssertDocument(document, DocumentFormat.Xml)
+            .QualityIsNotPresentForPosition(1);
     }
 
     [Fact]
@@ -326,6 +320,12 @@ public class AssertAggregationResultXmlDocument
     public AssertAggregationResultXmlDocument QuantityIsNotPresentForPosition(int position)
     {
         _documentAsserter.IsNotPresent($"Series[1]/Period/Point[{position}]/quantity");
+        return this;
+    }
+
+    public AssertAggregationResultXmlDocument QualityIsNotPresentForPosition(int position)
+    {
+        _documentAsserter.IsNotPresent($"Series[1]/Period/Point[{position}]/quality");
         return this;
     }
 }
