@@ -102,6 +102,24 @@ public static class CimCode
         throw NoCodeFoundFor(resolution.Name);
     }
 
+    public static string Of(Quality quality)
+    {
+        ArgumentNullException.ThrowIfNull(quality);
+
+        if (quality == Quality.Estimated)
+            return "A03";
+        if (quality == Quality.Incomplete)
+            return "A05";
+        if (quality == Quality.Calculated)
+            return "A06";
+        if (quality == Quality.Measured)
+            return "A04";
+        if (quality == Quality.Missing)
+            return "A02";
+
+        throw NoCodeFoundFor(quality.Name);
+    }
+
     private static Exception NoCodeFoundFor(string domainType)
     {
         return new InvalidOperationException($"No code has been defined for {domainType}");

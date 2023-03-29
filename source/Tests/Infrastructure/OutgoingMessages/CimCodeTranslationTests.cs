@@ -73,4 +73,15 @@ public class CimCodeTests
     {
         Assert.Equal(expectedCode, CimCode.Of(Resolution.From(resolution)));
     }
+
+    [Theory]
+    [InlineData(nameof(Quality.Missing), "A02")]
+    [InlineData(nameof(Quality.Estimated), "A03")]
+    [InlineData(nameof(Quality.Incomplete), "A05")]
+    [InlineData(nameof(Quality.Calculated), "A06")]
+    [InlineData(nameof(Quality.Measured), "A04")]
+    public void Translate_quality(string quality, string expectedCode)
+    {
+        Assert.Equal(expectedCode, CimCode.Of(Quality.From(quality)));
+    }
 }
