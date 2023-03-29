@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Domain.Actors;
 using Domain.OutgoingMessages;
+using Domain.SeedWork;
 using Infrastructure.OutgoingMessages.Common;
 using Xunit;
 
@@ -31,8 +33,20 @@ public class CimCodeTests
     [Theory]
     [InlineData(nameof(MeteringPointType.Production), "E18")]
     [InlineData(nameof(MeteringPointType.Consumption), "E17")]
-    public void Translate_metering_point_type(string processType, string expectedCode)
+    public void Translate_metering_point_type(string meteringPointType, string expectedCode)
     {
-        Assert.Equal(expectedCode, CimCode.Of(MeteringPointType.From(processType)));
+        Assert.Equal(expectedCode, CimCode.Of(MeteringPointType.From(meteringPointType)));
+    }
+
+    [Theory]
+    [InlineData(nameof(MarketRole.MeteredDataResponsible), "MDR")]
+    [InlineData(nameof(MarketRole.MeteringDataAdministrator), "DGL")]
+    [InlineData(nameof(MarketRole.GridOperator), "DDM")]
+    [InlineData(nameof(MarketRole.BalanceResponsible), "DDK")]
+    [InlineData(nameof(MarketRole.EnergySupplier), "DDQ")]
+    [InlineData(nameof(MarketRole.MeteringPointAdministrator), "DDZ")]
+    public void Translate_market_role(string marketRole, string expectedCode)
+    {
+        Assert.Equal(expectedCode, CimCode.Of(EnumerationType.FromName<MarketRole>(marketRole)));
     }
 }
