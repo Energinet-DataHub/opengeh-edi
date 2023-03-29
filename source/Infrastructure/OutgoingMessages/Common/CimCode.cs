@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.Transactions.Aggregations;
@@ -77,5 +78,15 @@ public static class CimCode
             return "E02";
 
         throw new InvalidOperationException($"No code has been defined for {settlementType.Name}");
+    }
+
+    public static string Of(MeasurementUnit measurementUnit)
+    {
+        ArgumentNullException.ThrowIfNull(measurementUnit);
+
+        if (measurementUnit == MeasurementUnit.Kwh)
+            return "KWH";
+
+        throw new InvalidOperationException($"No code has been defined for {measurementUnit.Name}");
     }
 }

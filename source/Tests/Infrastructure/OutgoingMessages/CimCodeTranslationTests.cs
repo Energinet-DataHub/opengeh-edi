@@ -58,4 +58,11 @@ public class CimCodeTests
     {
         Assert.Equal(expectedCode, CimCode.Of(SettlementType.From(settlementType)));
     }
+
+    [Theory]
+    [InlineData(nameof(MeasurementUnit.Kwh), "KWH")]
+    public void Translate_measurement_unit(string measurementUnit, string expectedCode)
+    {
+        Assert.Equal(expectedCode, CimCode.Of(MeasurementUnit.From(measurementUnit)));
+    }
 }
