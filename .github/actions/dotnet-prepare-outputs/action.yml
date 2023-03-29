@@ -26,7 +26,7 @@ name: Prepare dotnet outputs
 #
 
 inputs:
-  OUTPUT_PATH:
+  output_path:
     required: true
 
 runs:
@@ -40,7 +40,7 @@ runs:
           --no-build \
           --no-restore \
           --configuration Release \
-          --output '${{ inputs.OUTPUT_PATH }}\migration\databasemigration'
+          --output '${{ inputs.output_path }}\migration\databasemigration'
 
     - name: Publish API
       shell: bash
@@ -50,7 +50,7 @@ runs:
           --no-build \
           --no-restore \
           --configuration Release \
-          --output '${{ inputs.OUTPUT_PATH }}\functions\api'
+          --output '${{ inputs.output_path }}\functions\api'
 
     - name: Publish PerformanceTest
       shell: bash
@@ -60,4 +60,4 @@ runs:
           --no-build \
           --no-restore \
           --configuration Release \
-          --output '${{ inputs.OUTPUT_PATH }}\functions\performancetest'
+          --output '${{ inputs.output_path }}\functions\performancetest'

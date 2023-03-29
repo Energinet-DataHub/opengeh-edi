@@ -32,4 +32,3 @@ coverage:
         informational: true
         flags:
           - integration
-
