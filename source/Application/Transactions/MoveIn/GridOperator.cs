@@ -12,19 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-
 namespace Application.Transactions.MoveIn;
 
-public class MoveInSettings
+public class GridOperator
 {
-    public MoveInSettings(MessageDelivery messageDelivery, BusinessService businessService)
-    {
-        MessageDelivery = messageDelivery;
-        BusinessService = businessService;
-    }
-
-    public BusinessService BusinessService { get; set; }
-
-    public MessageDelivery MessageDelivery { get; set; }
+    public int GracePeriodInDaysAfterEffectiveDateIfNotUpdated { get; set; }
 }

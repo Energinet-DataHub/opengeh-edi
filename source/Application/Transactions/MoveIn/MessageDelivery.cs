@@ -12,19 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-
 namespace Application.Transactions.MoveIn;
 
-public class MoveInSettings
+public class MessageDelivery
 {
-    public MoveInSettings(MessageDelivery messageDelivery, BusinessService businessService)
+    public MessageDelivery(GridOperator gridOperator)
     {
-        MessageDelivery = messageDelivery;
-        BusinessService = businessService;
+        GridOperator = gridOperator;
     }
 
-    public BusinessService BusinessService { get; set; }
-
-    public MessageDelivery MessageDelivery { get; set; }
+    public GridOperator GridOperator { get; set; }
 }
