@@ -120,6 +120,17 @@ public static class CimCode
         throw NoCodeFoundFor(quality.Name);
     }
 
+    public static string CodingSchemeOf(ActorNumber actorNumber)
+    {
+        ArgumentNullException.ThrowIfNull(actorNumber);
+        if (ActorNumber.IsGlnNumber(actorNumber.Value))
+            return "A10";
+        if (ActorNumber.IsEic(actorNumber.Value))
+            return "A01";
+
+        throw NoCodeFoundFor(actorNumber.Value);
+    }
+
     private static Exception NoCodeFoundFor(string domainType)
     {
         return new InvalidOperationException($"No code has been defined for {domainType}");

@@ -25,4 +25,10 @@ public class DocumentFormat : EnumerationType
         : base(id, name)
     {
     }
+
+    public static DocumentFormat From(string valueToParse)
+    {
+        return GetAll<DocumentFormat>()
+            .First(format => format.Name.Equals(valueToParse, StringComparison.OrdinalIgnoreCase));
+    }
 }
