@@ -25,11 +25,11 @@ Currently we support the CIM XML format. The EDI domain will also support the fo
 
 In this sprint we are working on
 
-- Send out results for non-profiled consumption per gridarea to the balance supplier.
+- Send out results using the CIM JSON format
 
 In the next sprint we are working on
 
-- Actors are able to receive messages in CIM JSON format.
+- Be able to search for outgoing messages in frontend
 - Creating acceptance test for testing message flow
 
 ## Getting Started
