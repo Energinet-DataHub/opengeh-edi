@@ -111,9 +111,8 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
 
         var document = await CreateDocument(_timeSeries).ConfigureAwait(false);
 
-        AssertXmlDocument
-            .Document(document, NamespacePrefix, _documentValidation.Validator)
-            .IsNotPresent("Series[1]/Period/Point[1]/quantity");
+        AssertDocument(document, DocumentFormat.Xml)
+            .QuantityIsNotPresentForPosition(1);
     }
 
     [Fact]
@@ -321,6 +320,12 @@ public class AssertAggregationResultXmlDocument
     public AssertAggregationResultXmlDocument BalanceResponsibleNumberIsNotPresent()
     {
         _documentAsserter.IsNotPresent("Series[1]/balanceResponsibleParty_MarketParticipant.mRID");
+        return this;
+    }
+
+    public AssertAggregationResultXmlDocument QuantityIsNotPresentForPosition(int position)
+    {
+        _documentAsserter.IsNotPresent($"Series[1]/Period/Point[{position}]/quantity");
         return this;
     }
 }
