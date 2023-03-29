@@ -49,6 +49,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
 
     [Theory]
     [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
     public async Task Can_create_document(string documentFormat)
     {
         var document = await CreateDocument(
@@ -156,7 +157,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
             });
     }
 
-    private AssertAggregationResultXmlDocument AssertDocument(Stream document, DocumentFormat documentFormat)
+    private IAssertAggregationResultDocument AssertDocument(Stream document, DocumentFormat documentFormat)
     {
         var assertXmlDocument = AssertXmlDocument.Document(document, "cim", _documentValidation.Validator);
         return new AssertAggregationResultXmlDocument(assertXmlDocument);
