@@ -36,18 +36,18 @@ jobs:
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@v10
     with:
-      SOLUTION_FILE_PATH: source/EDI.sln
-      TESTS_FILTER_EXPRESSION: FullyQualifiedName!~LearningTests # Filter => Skip all tests within namespace 'LearningTests'
-      USE_SQLLOCALDB_2019: true
-      ENVIRONMENT: AzureAuth
-      DOTNET_VERSION: 7.0.200
+      solution_file_path: source/EDI.sln
+      tests_filter_expression: FullyQualifiedName!~LearningTests # Filter => Skip all tests within namespace 'LearningTests'
+      use_sqllocaldb_2019: true
+      environment: AzureAuth
+      dotnet_version: 7.0.200
 
   dotnet_promote_prerelease:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
     uses: Energinet-DataHub/.github/.github/workflows/promote-prerelease.yml@v10
     with:
-      RELEASE_NAME_PREFIX: dotnet
+      release_name_prefix: dotnet
 
   #
   # Dispatch deployment request
@@ -64,8 +64,8 @@ jobs:
       - name: Repository Dispatch
         uses: peter-evans/repository-dispatch@v2
         with:
-          token: ${{ secrets.PAT_TOKEN }}
-          repository: ${{ secrets.ENVIRONMENT_REPOSITORY_PATH }}
+          token: ${{ secrets.pat_token }}
+          repository: ${{ secrets.environment_repository_path }}
           event-type: edi-deployment-request-domain
           client-payload: '{"domain_pr": "${{ steps.find_pull_request.outputs.pull_request_number }}"}' # yamllint disable-line rule:quoted-strings
 
