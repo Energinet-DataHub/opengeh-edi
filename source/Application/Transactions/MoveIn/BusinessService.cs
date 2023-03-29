@@ -16,15 +16,12 @@ using System;
 
 namespace Application.Transactions.MoveIn;
 
-public class MoveInSettings
+public class BusinessService
 {
-    public MoveInSettings(MessageDelivery messageDelivery, BusinessService businessService)
+    public BusinessService(Uri requestEndPoint)
     {
-        MessageDelivery = messageDelivery;
-        BusinessService = businessService;
+        RequestEndPoint = requestEndPoint;
     }
 
-    public BusinessService BusinessService { get; set; }
-
-    public MessageDelivery MessageDelivery { get; set; }
+    public Uri RequestEndPoint { get; set; }
 }

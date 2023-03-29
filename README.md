@@ -11,7 +11,7 @@ When a actor wished to peek a message from DataHub. EDI is responsible for gener
 
 ## Architecture
 
-![structurizr-EDI-Container](https://github.com/Energinet-DataHub/opengeh-edi/blob/main/diagrams/c4-model-edi-component-level/Container-001.png?raw=true)
+![image](https://github.com/Energinet-DataHub/opengeh-edi/blob/main/docs/diagrams/edi/Container-001.png?raw=true)
 
 ## Business diagram of EDI
 
@@ -25,11 +25,11 @@ Currently we support the CIM XML format. The EDI domain will also support the fo
 
 In this sprint we are working on
 
-- Send out results for non-profiled consumption per gridarea to the balance supplier.
+- Send out results using the CIM JSON format
 
 In the next sprint we are working on
 
-- Actors are able to receive messages in CIM JSON format.
+- Be able to search for outgoing messages in frontend
 - Creating acceptance test for testing message flow
 
 ## Getting Started
