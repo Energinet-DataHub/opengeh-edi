@@ -15,6 +15,7 @@
 using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.SeedWork;
+using Domain.Transactions.Aggregations;
 using Infrastructure.OutgoingMessages.Common;
 using Xunit;
 
@@ -48,5 +49,13 @@ public class CimCodeTests
     public void Translate_market_role(string marketRole, string expectedCode)
     {
         Assert.Equal(expectedCode, CimCode.Of(EnumerationType.FromName<MarketRole>(marketRole)));
+    }
+
+    [Theory]
+    [InlineData(nameof(SettlementType.NonProfiled), "E02")]
+    [InlineData(nameof(SettlementType.Flex), "D01")]
+    public void Translate_settlement_type(string settlementType, string expectedCode)
+    {
+        Assert.Equal(expectedCode, CimCode.Of(SettlementType.From(settlementType)));
     }
 }

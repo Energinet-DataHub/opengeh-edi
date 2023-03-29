@@ -15,6 +15,7 @@
 using System;
 using Domain.Actors;
 using Domain.OutgoingMessages;
+using Domain.Transactions.Aggregations;
 
 namespace Infrastructure.OutgoingMessages.Common;
 
@@ -64,5 +65,17 @@ public static class CimCode
             return "DDK";
 
         throw new InvalidOperationException($"No code has been defined for {marketRole.Name}");
+    }
+
+    public static string Of(SettlementType settlementType)
+    {
+        ArgumentNullException.ThrowIfNull(settlementType);
+
+        if (settlementType == SettlementType.Flex)
+            return "D01";
+        if (settlementType == SettlementType.NonProfiled)
+            return "E02";
+
+        throw new InvalidOperationException($"No code has been defined for {settlementType.Name}");
     }
 }
