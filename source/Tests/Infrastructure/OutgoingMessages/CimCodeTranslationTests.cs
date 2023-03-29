@@ -27,4 +27,12 @@ public class CimCodeTests
     {
         Assert.Equal(expectedCode, CimCode.Of(ProcessType.From(processType)));
     }
+
+    [Theory]
+    [InlineData(nameof(MeteringPointType.Production), "E18")]
+    [InlineData(nameof(MeteringPointType.Consumption), "E17")]
+    public void Translate_metering_point_type(string processType, string expectedCode)
+    {
+        Assert.Equal(expectedCode, CimCode.Of(MeteringPointType.From(processType)));
+    }
 }
