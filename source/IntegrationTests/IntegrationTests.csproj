@@ -22,9 +22,9 @@ limitations under the License.
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="2.2.1" />
-        <PackageReference Include="Microsoft.Azure.Functions.Worker.Core" Version="1.8.1" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
+        <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="2.2.4" />
+        <PackageReference Include="Microsoft.Azure.Functions.Worker.Core" Version="1.11.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0-preview-20230223-05" />
         <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
         <PackageReference Include="xunit" Version="2.4.2" />
         <PackageReference Include="xunit.categories" Version="2.0.6" />
@@ -40,7 +40,11 @@ limitations under the License.
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Update="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4">
+        <PackageReference Update="Microsoft.CodeAnalysis.Analyzers" Version="3.3.5-beta1.23121.1">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Update="StyleCop.Analyzers" Version="1.2.0-beta.435">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
