@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Globalization;
 using System.IO;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Application.OutgoingMessages.Common;
 using Domain.OutgoingMessages;
@@ -92,7 +94,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
         _timeSeries
             .WithPoint(new Point(1, null, Quality.Missing.Name, "2022-12-12T23:00:00Z"));
 
-        var document = await CreateDocument(_timeSeries).ConfigureAwait(false);
+        var document = await CreateDocument(_timeSeries, DocumentFormat.Xml).ConfigureAwait(false);
 
         AssertDocument(document, DocumentFormat.Xml)
             .QuantityIsNotPresentForPosition(1);
@@ -104,7 +106,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
         _timeSeries
             .WithPoint(new Point(1, 1, Quality.Measured.Name, "2022-12-12T23:00:00Z"));
 
-        var document = await CreateDocument(_timeSeries).ConfigureAwait(false);
+        var document = await CreateDocument(_timeSeries, DocumentFormat.Xml).ConfigureAwait(false);
 
         AssertDocument(document, DocumentFormat.Xml)
             .QualityIsNotPresentForPosition(1);
@@ -117,7 +119,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
             .WithMeteringPointType(MeteringPointType.Production)
             .WithSettlementMethod(null);
 
-        var document = await CreateDocument(_timeSeries).ConfigureAwait(false);
+        var document = await CreateDocument(_timeSeries, DocumentFormat.Xml).ConfigureAwait(false);
 
         AssertDocument(document, DocumentFormat.Xml)
             .SettlementMethodIsNotPresent();
@@ -129,7 +131,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
         _timeSeries
             .WithEnergySupplierNumber(null);
 
-        var document = await CreateDocument(_timeSeries).ConfigureAwait(false);
+        var document = await CreateDocument(_timeSeries, DocumentFormat.Xml).ConfigureAwait(false);
 
         AssertDocument(document, DocumentFormat.Xml)
             .EnergySupplierNumberIsNotPresent();
@@ -141,25 +143,138 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
         _timeSeries
             .WithBalanceResponsibleNumber(null);
 
-        var document = await CreateDocument(_timeSeries).ConfigureAwait(false);
+        var document = await CreateDocument(_timeSeries, DocumentFormat.Xml).ConfigureAwait(false);
 
         AssertDocument(document, DocumentFormat.Xml)
             .BalanceResponsibleNumberIsNotPresent();
     }
 
-    private Task<Stream> CreateDocument(TimeSeriesBuilder resultBuilder, DocumentFormat? documentFormat = null)
+    private Task<Stream> CreateDocument(TimeSeriesBuilder resultBuilder, DocumentFormat documentFormat)
     {
-        return _messageWriter.WriteAsync(
-            resultBuilder.BuildHeader(),
-            new[]
-            {
-                _parser.From(resultBuilder.BuildTimeSeries()),
-            });
+        if (documentFormat == DocumentFormat.Xml)
+        {
+            return _messageWriter.WriteAsync(
+                resultBuilder.BuildHeader(),
+                new[] { _parser.From(resultBuilder.BuildTimeSeries()), });
+        }
+        else
+        {
+            var jsonDocumentWriter = new AggregationResultJsonDocumentWriter();
+            return jsonDocumentWriter.WriteAsync(
+                resultBuilder.BuildHeader(),
+                new[] { _parser.From(resultBuilder.BuildTimeSeries()), });
+        }
     }
 
     private IAssertAggregationResultDocument AssertDocument(Stream document, DocumentFormat documentFormat)
     {
-        var assertXmlDocument = AssertXmlDocument.Document(document, "cim", _documentValidation.Validator);
-        return new AssertAggregationResultXmlDocument(assertXmlDocument);
+        if (documentFormat == DocumentFormat.Xml)
+        {
+            var assertXmlDocument = AssertXmlDocument.Document(document, "cim", _documentValidation.Validator);
+            return new AssertAggregationResultXmlDocument(assertXmlDocument);
+        }
+        else
+        {
+            return new AssertAggregationResultJsonDocument(document);
+        }
+    }
+}
+
+#pragma warning disable
+internal sealed class AssertAggregationResultJsonDocument : IAssertAggregationResultDocument
+{
+    private readonly JsonDocument _document;
+    private readonly JsonElement _root;
+
+    public AssertAggregationResultJsonDocument(Stream document)
+    {
+        _document = JsonDocument.Parse(document);
+        _root = _document.RootElement.GetProperty("NotifyAggregatedMeasureData_MarketDocument");
+    }
+
+    public IAssertAggregationResultDocument HasMessageId(string expectedMessageId)
+    {
+        Assert.Equal(expectedMessageId, _root.GetProperty("mRID").ToString());
+        return this;
+    }
+
+    public IAssertAggregationResultDocument HasSenderId(string expectedSenderId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IAssertAggregationResultDocument HasReceiverId(string expectedReceiverId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IAssertAggregationResultDocument HasTimestamp(string expectedTimestamp)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IAssertAggregationResultDocument HasTransactionId(Guid expectedTransactionId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IAssertAggregationResultDocument HasGridAreaCode(string expectedGridAreaCode)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IAssertAggregationResultDocument HasBalanceResponsibleNumber(string expectedBalanceResponsibleNumber)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IAssertAggregationResultDocument HasEnergySupplierNumber(string expectedEnergySupplierNumber)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IAssertAggregationResultDocument HasProductCode(string expectedProductCode)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IAssertAggregationResultDocument HasPeriod(string expectedStartOfPeriod, string expectedEndOfPeriod)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IAssertAggregationResultDocument HasPoint(int position, int quantity)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<IAssertAggregationResultDocument> DocumentIsValidAsync()
+    {
+        throw new NotImplementedException();
+    }
+
+    public IAssertAggregationResultDocument SettlementMethodIsNotPresent()
+    {
+        throw new NotImplementedException();
+    }
+
+    public IAssertAggregationResultDocument EnergySupplierNumberIsNotPresent()
+    {
+        throw new NotImplementedException();
+    }
+
+    public IAssertAggregationResultDocument BalanceResponsibleNumberIsNotPresent()
+    {
+        throw new NotImplementedException();
+    }
+
+    public IAssertAggregationResultDocument QuantityIsNotPresentForPosition(int position)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IAssertAggregationResultDocument QualityIsNotPresentForPosition(int position)
+    {
+        throw new NotImplementedException();
     }
 }
