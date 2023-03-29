@@ -15,7 +15,6 @@
 using System;
 using Application.Configuration.Queries;
 using Application.OutgoingMessages;
-using Application.OutgoingMessages.MessageCount;
 using Application.OutgoingMessages.Peek;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,7 +27,6 @@ internal static class PeekConfiguration
     {
         services.AddTransient<MessagePeeker>();
         services.AddTransient<IRequestHandler<PeekRequest, PeekResult>, PeekRequestHandler>();
-        services.AddTransient<IRequestHandler<MessageCountQuery, QueryResult<MessageCountData>>, MessageCountRequestHandler>();
         services.AddScoped<IEnqueuedMessages, EnqueuedMessages>();
         services.AddScoped(_ => bundleConfiguration);
 
