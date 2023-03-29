@@ -60,8 +60,12 @@ public class RejectRequestChangeAccountingPointCharacteristicsXmlDocumentWriterT
                 new Reason("Reason1", "999"),
                 new Reason("Reason2", "999"),
             }),
-            new(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "FakeMarketEvaluationPointId",
-            new List<Reason>()
+            new(
+               Guid.NewGuid().ToString(),
+               Guid.NewGuid().ToString(),
+               Guid.NewGuid().ToString(),
+               "FakeMarketEvaluationPointId",
+               new List<Reason>()
             {
                 new Reason("Reason3", "999"),
                 new Reason("Reason4", "999"),
