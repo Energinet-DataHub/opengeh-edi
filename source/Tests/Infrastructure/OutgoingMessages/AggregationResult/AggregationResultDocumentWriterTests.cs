@@ -74,8 +74,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
                 DocumentFormat.From(documentFormat))
             .ConfigureAwait(false);
 
-        var assertXmlDocument = AssertXmlDocument.Document(document, NamespacePrefix, _documentValidation.Validator);
-        var assert = new AssertAggregationResultXmlDocument(assertXmlDocument)
+        await AssertDocument(document, DocumentFormat.From(documentFormat))
             .HasMessageId(SampleData.MessageId)
             .HasSenderId(SampleData.SenderId)
             .HasReceiverId(SampleData.ReceiverId)
@@ -90,9 +89,8 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
                     .ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture),
                 InstantPattern.General.Parse(SampleData.EndOfPeriod).Value
                     .ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture))
-            .HasPoint(1, 1);
-
-        await assert.DocumentIsValidAsync().ConfigureAwait(false);
+            .HasPoint(1, 1)
+            .DocumentIsValidAsync().ConfigureAwait(false);
     }
 
     [Theory]
@@ -175,6 +173,12 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
             {
                 _parser.From(resultBuilder.BuildTimeSeries()),
             });
+    }
+
+    private AssertAggregationResultXmlDocument AssertDocument(Stream document, DocumentFormat documentFormat)
+    {
+        var assertXmlDocument = AssertXmlDocument.Document(document, NamespacePrefix, _documentValidation.Validator);
+        return new AssertAggregationResultXmlDocument(assertXmlDocument);
     }
 }
 
