@@ -70,17 +70,17 @@ jobs:
   #         event-type: edi-deployment-request-domain
   #         client-payload: '{"domain_pr": "${{ steps.find_pull_request.outputs.pull_request_number }}"}' # yamllint disable-line rule:quoted-strings
 
-  #
-  # Send notification to teams channel if deployment dispatch failed
-  #
+  # #
+  # # Send notification to teams channel if deployment dispatch failed
+  # #
 
-  dispatch_failed:
-    needs: [dotnet_promote_prerelease, dispatch_deploment_event]
-    if: |
-      always() &&
-      contains(needs.*.result, 'failure')
-    uses: Energinet-DataHub/.github/.github/workflows/notify-team.yml@v10
-    with:
-      team_name: Batman
-      subject: "Deployment dispatch failed: EDI"
-    secrets: inherit
+  # dispatch_failed:
+  #   needs: [dotnet_promote_prerelease, dispatch_deploment_event]
+  #   if: |
+  #     always() &&
+  #     contains(needs.*.result, 'failure')
+  #   uses: Energinet-DataHub/.github/.github/workflows/notify-team.yml@v10
+  #   with:
+  #     team_name: Batman
+  #     subject: "Deployment dispatch failed: EDI"
+  #   secrets: inherit
