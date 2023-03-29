@@ -57,8 +57,8 @@ jobs:
       id-token: write
       contents: read
     outputs:
-      resourceGroup: ${{ steps.getResourceGroup.outputs.resourceGroup }}
-      namespaceName: ${{ steps.getServiceBusNamespace.outputs.namespaceName }}
+      resource_group: ${{ steps.getResourceGroup.outputs.resource_group }}
+      namespace_name: ${{ steps.getServiceBusNamespace.outputs.namespace_name }}
     steps:
       - uses: actions/checkout@v3
 
@@ -72,7 +72,7 @@ jobs:
       - id: getResourceGroup
         shell: pwsh
         run: |
-          Write-Output "resourceGroup=$(`
+          Write-Output "resource_group=$(`
           az keyvault secret show `
             --vault-name ${{ secrets.azure_keyvault_name }} `
             --name "AZURE-SHARED-RESOURCEGROUP" `
@@ -80,7 +80,7 @@ jobs:
 
       - id: getServiceBusNamespace
         shell: pwsh
-        run: Write-Output "namespaceName=$(`
+        run: Write-Output "namespace_name=$(`
           az keyvault secret show `
           --vault-name ${{ secrets.azure_keyvault_name }} `
           --name "AZURE-SERVICEBUS-NAMESPACE" `
@@ -92,9 +92,9 @@ jobs:
           .\source\AcceptanceTests\deploy\deploy.ps1 `
             -PrNumber ${{ github.event.pull_request.number }} `
             -Subscription ${{ secrets.azure_subscription_id }} `
-            -ResourceGroup ${{ steps.getResourceGroup.outputs.resourceGroup }} `
+            -ResourceGroup ${{ steps.getResourceGroup.outputs.resource_group }} `
             -SqlServerName " " `
-            -NamespaceName ${{ steps.getServiceBusNamespace.outputs.namespaceName }}
+            -NamespaceName ${{ steps.getServiceBusNamespace.outputs.namespace_name }}
 
   # Teardown resources for acceptance testing
   teardown_acceptance_test_resources:
@@ -120,6 +120,6 @@ jobs:
           .\source\AcceptanceTests\deploy\teardown.ps1 `
             -PrNumber ${{ github.event.pull_request.number }} `
             -Subscription ${{ secrets.azure_subscription_id }} `
-            -ResourceGroup ${{ needs.deploy_acceptance_test_resources.outputs.resourceGroup }} `
+            -ResourceGroup ${{ needs.deploy_acceptance_test_resources.outputs.resource_group }} `
             -SqlServerName " " `
-            -NamespaceName ${{ needs.deploy_acceptance_test_resources.outputs.namespaceName }}
+            -NamespaceName ${{ needs.deploy_acceptance_test_resources.outputs.namespace_name }}
