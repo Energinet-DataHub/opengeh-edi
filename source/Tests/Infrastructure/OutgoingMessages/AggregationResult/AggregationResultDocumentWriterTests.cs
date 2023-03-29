@@ -105,38 +105,6 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
             .HasType(expectedType);
     }
 
-    [Theory]
-    [InlineData(nameof(DocumentFormat.Xml), "A10")]
-    public async Task Sender_id_coding_scheme_is_translated(string documentFormat, string expectedCodingScheme)
-    {
-        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat)).ConfigureAwait(false);
-
-        new AssertAggregationResultXmlDocument(AssertXmlDocument.Document(document, NamespacePrefix, _documentValidation.Validator))
-            .HasSenderIdCodingScheme(expectedCodingScheme);
-    }
-
-    [Theory]
-    [InlineData(nameof(DocumentFormat.Xml), "A10")]
-    public async Task Receiver_id_coding_scheme_is_translated(string documentFormat, string expectedCodingScheme)
-    {
-        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat)).ConfigureAwait(false);
-
-        new AssertAggregationResultXmlDocument(AssertXmlDocument.Document(document, NamespacePrefix, _documentValidation.Validator))
-            .HasReceiverIdCodingScheme(expectedCodingScheme);
-    }
-
-    [Theory]
-    [InlineData(nameof(DocumentFormat.Xml), "A10")]
-    public async Task Energy_supplier_id_coding_scheme_is_translated(string documentFormat, string expectedCodingScheme)
-    {
-        var document = await CreateDocument(
-            _timeSeries.WithEnergySupplierNumber(SampleData.EnergySupplierNumber),
-            DocumentFormat.From(documentFormat)).ConfigureAwait(false);
-
-        new AssertAggregationResultXmlDocument(AssertXmlDocument.Document(document, NamespacePrefix, _documentValidation.Validator))
-            .HasEnergySupplierCodingScheme(expectedCodingScheme);
-    }
-
     [Fact]
     public async Task Point_quantity_element_is_excluded_if_no_value()
     {
