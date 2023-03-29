@@ -65,4 +65,12 @@ public class CimCodeTests
     {
         Assert.Equal(expectedCode, CimCode.Of(MeasurementUnit.From(measurementUnit)));
     }
+
+    [Theory]
+    [InlineData(nameof(Resolution.Hourly), "PT1H")]
+    [InlineData(nameof(Resolution.QuarterHourly), "PT15M")]
+    public void Translate_resolution(string resolution, string expectedCode)
+    {
+        Assert.Equal(expectedCode, CimCode.Of(Resolution.From(resolution)));
+    }
 }

@@ -90,6 +90,18 @@ public static class CimCode
         throw NoCodeFoundFor(measurementUnit.Name);
     }
 
+    public static string Of(Resolution resolution)
+    {
+        ArgumentNullException.ThrowIfNull(resolution);
+
+        if (resolution == Resolution.QuarterHourly)
+            return "PT15M";
+        if (resolution == Resolution.Hourly)
+            return "PT1H";
+
+        throw NoCodeFoundFor(resolution.Name);
+    }
+
     private static Exception NoCodeFoundFor(string domainType)
     {
         return new InvalidOperationException($"No code has been defined for {domainType}");
