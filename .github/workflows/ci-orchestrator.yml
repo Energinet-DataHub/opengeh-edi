@@ -16,7 +16,7 @@ name: CI orchestrator
 on:
   pull_request:
     branches:
-      - foobarX
+      - foobarXY
 
 jobs:
   #
