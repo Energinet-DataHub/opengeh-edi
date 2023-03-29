@@ -36,8 +36,8 @@ jobs:
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@v10
     with:
-      SOLUTION_FILE_PATH: "source/EDI.sln"
-      TESTS_FILTER_EXPRESSION: "FullyQualifiedName!~LearningTests" # Filter => Skip all tests within namespace 'LearningTests'
+      SOLUTION_FILE_PATH: source/EDI.sln
+      TESTS_FILTER_EXPRESSION: FullyQualifiedName!~LearningTests # Filter => Skip all tests within namespace 'LearningTests'
       USE_SQLLOCALDB_2019: true
       ENVIRONMENT: AzureAuth
       DOTNET_VERSION: 7.0.200
@@ -65,9 +65,9 @@ jobs:
         uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.PAT_TOKEN }}
-          repository: "${{ secrets.ENVIRONMENT_REPOSITORY_PATH }}"
-          event-type: "edi-deployment-request-domain"
-          client-payload: '{"domain_pr": "${{ steps.find_pull_request.outputs.pull_request_number }}"}'
+          repository: ${{ secrets.ENVIRONMENT_REPOSITORY_PATH }}
+          event-type: edi-deployment-request-domain
+          client-payload: '{"domain_pr": "${{ steps.find_pull_request.outputs.pull_request_number }}"}' # yamllint disable-line rule:quoted-strings
 
   #
   # Send notification to teams channel if deployment dispatch failed
@@ -80,6 +80,6 @@ jobs:
       contains(needs.*.result, 'failure')
     uses: Energinet-DataHub/.github/.github/workflows/notify-team.yml@v10
     with:
-      TEAM_NAME: "Batman"
+      TEAM_NAME: Batman
       SUBJECT: "Deployment dispatch failed: EDI"
     secrets: inherit
