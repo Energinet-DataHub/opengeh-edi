@@ -57,8 +57,8 @@ jobs:
       id-token: write
       contents: read
     outputs:
-      resource_group: ${{ steps.getResourceGroup.outputs.resource_group }}
-      namespace_name: ${{ steps.getServiceBusNamespace.outputs.namespace_name }}
+      resource_group: ${{ steps.get_resource_group.outputs.resource_group }}
+      namespace_name: ${{ steps.get_servicebus_namespace.outputs.namespace_name }}
     steps:
       - uses: actions/checkout@v3
 
@@ -69,7 +69,8 @@ jobs:
           tenant-id: ${{ secrets.azure_tenant_id }}
           subscription-id: ${{ secrets.azure_subscription_id }}
 
-      - id: getResourceGroup
+      - name: Get Resource Group
+        id: get_resource_group
         shell: pwsh
         run: |
           Write-Output "resource_group=$(`
@@ -78,7 +79,8 @@ jobs:
             --name "AZURE-SHARED-RESOURCEGROUP" `
             --query value -o tsv)" >> $Env:GITHUB_OUTPUT
 
-      - id: getServiceBusNamespace
+      - name: Get ServiceBus Namespace
+        id: get_servicebus_namespace
         shell: pwsh
         run: Write-Output "namespace_name=$(`
           az keyvault secret show `
@@ -92,9 +94,9 @@ jobs:
           .\source\AcceptanceTests\deploy\deploy.ps1 `
             -PrNumber ${{ github.event.pull_request.number }} `
             -Subscription ${{ secrets.azure_subscription_id }} `
-            -ResourceGroup ${{ steps.getResourceGroup.outputs.resource_group }} `
+            -ResourceGroup ${{ steps.get_resource_group.outputs.resource_group }} `
             -SqlServerName " " `
-            -NamespaceName ${{ steps.getServiceBusNamespace.outputs.namespace_name }}
+            -NamespaceName ${{ steps.get_servicebus_namespace.outputs.namespace_name }}
 
   # Teardown resources for acceptance testing
   teardown_acceptance_test_resources:
