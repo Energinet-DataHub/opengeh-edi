@@ -114,7 +114,7 @@ public class TimeSeriesBuilder
         return this;
     }
 
-    public TimeSeriesBuilder WithEnergySupplierNumber(string balanceResponsibleNumber)
+    public TimeSeriesBuilder WithEnergySupplierNumber(string? balanceResponsibleNumber)
     {
         _energySupplierNumber = balanceResponsibleNumber;
         return this;

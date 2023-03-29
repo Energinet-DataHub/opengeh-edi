@@ -143,6 +143,18 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     }
 
     [Fact]
+    public async Task Energy_supplier_number_is_excluded()
+    {
+        _timeSeries
+            .WithEnergySupplierNumber(null);
+
+        var document = await CreateDocument(_timeSeries).ConfigureAwait(false);
+
+        AssertDocument(document, DocumentFormat.Xml)
+            .EnergySupplierNumberIsNotPresent();
+    }
+
+    [Fact]
     public async Task Exclude_optional_attributes_if_value_is_unspecified()
     {
         var header = CreateHeader();
@@ -167,7 +179,6 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
 
         await AssertXmlDocument
             .Document(message, NamespacePrefix, _documentValidation.Validator)
-            .IsNotPresent("Series[1]/energySupplier_MarketParticipant.mRID")
             .IsNotPresent("Series[1]/balanceResponsibleParty_MarketParticipant.mRID")
             .HasValidStructureAsync(DocumentType.AggregationResult).ConfigureAwait(false);
     }
@@ -320,6 +331,12 @@ public class AssertAggregationResultXmlDocument
     public AssertAggregationResultXmlDocument SettlementMethodIsNotPresent()
     {
         _documentAsserter.IsNotPresent("Series[1]/marketEvaluationPoint.settlementMethod");
+        return this;
+    }
+
+    public AssertAggregationResultXmlDocument EnergySupplierNumberIsNotPresent()
+    {
+        _documentAsserter.IsNotPresent("Series[1]/energySupplier_MarketParticipant.mRID");
         return this;
     }
 }
