@@ -61,8 +61,11 @@ public class RejectRequestChangeOfSupplierJsonDocumentWriterTests
                 new Reason("Reason1", "999"),
                 new Reason("Reason2", "999"),
             }),
-            new("mrid2", "FakeTransactionId", "FakeMarketEvaluationPointId",
-            new List<Reason>()
+            new(
+               "mrid2",
+               "FakeTransactionId",
+               "FakeMarketEvaluationPointId",
+               new List<Reason>()
             {
                 new Reason("Reason3", "999"),
                 new Reason("Reason4", "999"),

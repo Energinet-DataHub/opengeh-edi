@@ -13,35 +13,32 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration.Commands.Commands;
 using Application.OutgoingMessages;
-using Domain.Actors;
-using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Domain.SeedWork;
 using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using MediatR;
 
 namespace Application.Transactions.Aggregations;
 
-public class ForwardAggregationResult : InternalCommand
+public class ForwardAggregationResultHandler : IRequestHandler<ForwardAggregationResult, Unit>
 {
-    [JsonConstructor]
-    public ForwardAggregationResult(Guid id, Aggregation result)
-    : base(id)
+    private readonly IAggregationResultForwardingRepository _transactions;
+    private readonly IOutgoingMessageStore _outgoingMessageStore;
+
+    public ForwardAggregationResultHandler(IAggregationResultForwardingRepository transactions, IOutgoingMessageStore outgoingMessageStore)
     {
-        Result = result;
+        _transactions = transactions;
+        _outgoingMessageStore = outgoingMessageStore;
     }
 
-    public ForwardAggregationResult(Aggregation result)
+    public Task<Unit> Handle(ForwardAggregationResult request, CancellationToken cancellationToken)
     {
-        Result = result;
+        ArgumentNullException.ThrowIfNull(request);
+        var transaction = new AggregationResultForwarding(TransactionId.New());
+        _transactions.Add(transaction);
+        _outgoingMessageStore.Add(transaction.CreateMessage(request.Result));
+        return Unit.Task;
     }
-
-    public Aggregation Result { get; }
 }
