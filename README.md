@@ -11,7 +11,7 @@ When a actor wished to peek a message from DataHub. EDI is responsible for gener
 
 ## Architecture
 
-![structurizr-EDI-Container](https://github.com/Energinet-DataHub/opengeh-edi/blob/main/diagrams/c4-model-edi-component-level/Container-001.png?raw=true)
+![structurizr-EDI-Container](https://github.com/Energinet-DataHub/opengeh-edi/blob/main/docs/diagrams/edi/Container-001.png?raw=true)
 
 ## Business diagram of EDI
 
