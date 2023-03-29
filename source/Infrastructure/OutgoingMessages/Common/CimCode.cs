@@ -13,8 +13,10 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using Domain.Actors;
 using Domain.OutgoingMessages;
+using Domain.Transactions.Aggregations;
 
 namespace Infrastructure.OutgoingMessages.Common;
 
@@ -30,7 +32,7 @@ public static class CimCode
         if (processType == ProcessType.MoveIn)
             return "E65";
 
-        throw new InvalidOperationException($"No code has been defined for {processType.Name}");
+        throw NoCodeFoundFor(processType.Name);
     }
 
     public static string Of(MeteringPointType meteringPointType)
@@ -43,7 +45,7 @@ public static class CimCode
         if (meteringPointType == MeteringPointType.Production)
             return "E18";
 
-        throw new InvalidOperationException($"No code has been defined for {meteringPointType.Name}");
+        throw NoCodeFoundFor(meteringPointType.Name);
     }
 
     public static string Of(MarketRole marketRole)
@@ -63,6 +65,63 @@ public static class CimCode
         if (marketRole == MarketRole.BalanceResponsible)
             return "DDK";
 
-        throw new InvalidOperationException($"No code has been defined for {marketRole.Name}");
+        throw NoCodeFoundFor(marketRole.Name);
+    }
+
+    public static string Of(SettlementType settlementType)
+    {
+        ArgumentNullException.ThrowIfNull(settlementType);
+
+        if (settlementType == SettlementType.Flex)
+            return "D01";
+        if (settlementType == SettlementType.NonProfiled)
+            return "E02";
+
+        throw NoCodeFoundFor(settlementType.Name);
+    }
+
+    public static string Of(MeasurementUnit measurementUnit)
+    {
+        ArgumentNullException.ThrowIfNull(measurementUnit);
+
+        if (measurementUnit == MeasurementUnit.Kwh)
+            return "KWH";
+
+        throw NoCodeFoundFor(measurementUnit.Name);
+    }
+
+    public static string Of(Resolution resolution)
+    {
+        ArgumentNullException.ThrowIfNull(resolution);
+
+        if (resolution == Resolution.QuarterHourly)
+            return "PT15M";
+        if (resolution == Resolution.Hourly)
+            return "PT1H";
+
+        throw NoCodeFoundFor(resolution.Name);
+    }
+
+    public static string Of(Quality quality)
+    {
+        ArgumentNullException.ThrowIfNull(quality);
+
+        if (quality == Quality.Estimated)
+            return "A03";
+        if (quality == Quality.Incomplete)
+            return "A05";
+        if (quality == Quality.Calculated)
+            return "A06";
+        if (quality == Quality.Measured)
+            return "A04";
+        if (quality == Quality.Missing)
+            return "A02";
+
+        throw NoCodeFoundFor(quality.Name);
+    }
+
+    private static Exception NoCodeFoundFor(string domainType)
+    {
+        return new InvalidOperationException($"No code has been defined for {domainType}");
     }
 }
