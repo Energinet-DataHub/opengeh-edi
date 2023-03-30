@@ -19,7 +19,7 @@ using Tests.Infrastructure.OutgoingMessages.Asserts;
 
 namespace Tests.Infrastructure.OutgoingMessages.AggregationResult;
 
-public class AssertAggregationResultXmlDocument
+public class AssertAggregationResultXmlDocument : IAssertAggregationResultDocument
 {
     private readonly AssertXmlDocument _documentAsserter;
 
@@ -29,61 +29,61 @@ public class AssertAggregationResultXmlDocument
         _documentAsserter.HasValue("type", "E31");
     }
 
-    public AssertAggregationResultXmlDocument HasMessageId(string expectedMessageId)
+    public IAssertAggregationResultDocument HasMessageId(string expectedMessageId)
     {
         _documentAsserter.HasValue("mRID", expectedMessageId);
         return this;
     }
 
-    public AssertAggregationResultXmlDocument HasSenderId(string expectedSenderId)
+    public IAssertAggregationResultDocument HasSenderId(string expectedSenderId)
     {
         _documentAsserter.HasValue("sender_MarketParticipant.mRID", expectedSenderId);
         return this;
     }
 
-    public AssertAggregationResultXmlDocument HasReceiverId(string expectedReceiverId)
+    public IAssertAggregationResultDocument HasReceiverId(string expectedReceiverId)
     {
         _documentAsserter.HasValue("receiver_MarketParticipant.mRID", expectedReceiverId);
         return this;
     }
 
-    public AssertAggregationResultXmlDocument HasTimestamp(string expectedTimestamp)
+    public IAssertAggregationResultDocument HasTimestamp(string expectedTimestamp)
     {
         _documentAsserter.HasValue("createdDateTime", expectedTimestamp);
         return this;
     }
 
-    public AssertAggregationResultXmlDocument HasTransactionId(Guid expectedTransactionId)
+    public IAssertAggregationResultDocument HasTransactionId(Guid expectedTransactionId)
     {
-        _documentAsserter.HasValue("Series[1]/mRID", expectedTransactionId.ToString());
+        _documentAsserter.HasValue($"Series[1]/mRID", expectedTransactionId.ToString());
         return this;
     }
 
-    public AssertAggregationResultXmlDocument HasGridAreaCode(string expectedGridAreaCode)
+    public IAssertAggregationResultDocument HasGridAreaCode(string expectedGridAreaCode)
     {
         _documentAsserter.HasValue("Series[1]/meteringGridArea_Domain.mRID", expectedGridAreaCode);
         return this;
     }
 
-    public AssertAggregationResultXmlDocument HasBalanceResponsibleNumber(string expectedBalanceResponsibleNumber)
+    public IAssertAggregationResultDocument HasBalanceResponsibleNumber(string expectedBalanceResponsibleNumber)
     {
         _documentAsserter.HasValue("Series[1]/balanceResponsibleParty_MarketParticipant.mRID", expectedBalanceResponsibleNumber);
         return this;
     }
 
-    public AssertAggregationResultXmlDocument HasEnergySupplierNumber(string expectedEnergySupplierNumber)
+    public IAssertAggregationResultDocument HasEnergySupplierNumber(string expectedEnergySupplierNumber)
     {
         _documentAsserter.HasValue("Series[1]/energySupplier_MarketParticipant.mRID", expectedEnergySupplierNumber);
         return this;
     }
 
-    public AssertAggregationResultXmlDocument HasProductCode(string expectedProductCode)
+    public IAssertAggregationResultDocument HasProductCode(string expectedProductCode)
     {
         _documentAsserter.HasValue("Series[1]/product", expectedProductCode);
         return this;
     }
 
-    public AssertAggregationResultXmlDocument HasPeriod(string expectedStartOfPeriod, string expectedEndOfPeriod)
+    public IAssertAggregationResultDocument HasPeriod(string expectedStartOfPeriod, string expectedEndOfPeriod)
     {
         _documentAsserter
             .HasValue("Series[1]/Period/timeInterval/start", expectedStartOfPeriod)
@@ -91,7 +91,7 @@ public class AssertAggregationResultXmlDocument
         return this;
     }
 
-    public AssertAggregationResultXmlDocument HasPoint(int position, int quantity)
+    public IAssertAggregationResultDocument HasPoint(int position, int quantity)
     {
         _documentAsserter
             .HasValue("Series[1]/Period/Point[1]/position", position.ToString(CultureInfo.InvariantCulture))
@@ -99,37 +99,37 @@ public class AssertAggregationResultXmlDocument
         return this;
     }
 
-    public async Task<AssertAggregationResultXmlDocument> DocumentIsValidAsync()
+    public async Task<IAssertAggregationResultDocument> DocumentIsValidAsync()
     {
         await _documentAsserter.HasValidStructureAsync(DocumentType.AggregationResult).ConfigureAwait(false);
         return this;
     }
 
-    public AssertAggregationResultXmlDocument SettlementMethodIsNotPresent()
+    public IAssertAggregationResultDocument SettlementMethodIsNotPresent()
     {
         _documentAsserter.IsNotPresent("Series[1]/marketEvaluationPoint.settlementMethod");
         return this;
     }
 
-    public AssertAggregationResultXmlDocument EnergySupplierNumberIsNotPresent()
+    public IAssertAggregationResultDocument EnergySupplierNumberIsNotPresent()
     {
         _documentAsserter.IsNotPresent("Series[1]/energySupplier_MarketParticipant.mRID");
         return this;
     }
 
-    public AssertAggregationResultXmlDocument BalanceResponsibleNumberIsNotPresent()
+    public IAssertAggregationResultDocument BalanceResponsibleNumberIsNotPresent()
     {
         _documentAsserter.IsNotPresent("Series[1]/balanceResponsibleParty_MarketParticipant.mRID");
         return this;
     }
 
-    public AssertAggregationResultXmlDocument QuantityIsNotPresentForPosition(int position)
+    public IAssertAggregationResultDocument QuantityIsNotPresentForPosition(int position)
     {
         _documentAsserter.IsNotPresent($"Series[1]/Period/Point[{position}]/quantity");
         return this;
     }
 
-    public AssertAggregationResultXmlDocument QualityIsNotPresentForPosition(int position)
+    public IAssertAggregationResultDocument QualityIsNotPresentForPosition(int position)
     {
         _documentAsserter.IsNotPresent($"Series[1]/Period/Point[{position}]/quality");
         return this;

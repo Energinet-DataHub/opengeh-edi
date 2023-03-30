@@ -44,6 +44,7 @@ using Infrastructure.IncomingMessages;
 using Infrastructure.MasterData.MarketEvaluationPoints;
 using Infrastructure.OutgoingMessages;
 using Infrastructure.OutgoingMessages.AccountingPointCharacteristics;
+using Infrastructure.OutgoingMessages.AggregationResult;
 using Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Infrastructure.OutgoingMessages.Common;
 using Infrastructure.OutgoingMessages.Common.Reasons;
@@ -51,7 +52,6 @@ using Infrastructure.OutgoingMessages.ConfirmRequestChangeAccountingPointCharact
 using Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Infrastructure.OutgoingMessages.Dequeue;
 using Infrastructure.OutgoingMessages.GenericNotification;
-using Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 using Infrastructure.OutgoingMessages.Peek;
 using Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 using Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
@@ -264,7 +264,7 @@ namespace Infrastructure.Configuration
             _services.AddScoped<IMessageWriter, RejectRequestChangeAccountingPointCharacteristicsXmlDocumentWriter>();
             _services.AddScoped<IMessageWriter, CharacteristicsOfACustomerAtAnApDocumentWriter>();
             _services.AddScoped<IMessageWriter, RejectRequestChangeOfSupplierJsonDocumentWriter>();
-            _services.AddScoped<IMessageWriter, NotifyAggregatedMeasureDataXmlDocumentWriter>();
+            _services.AddScoped<IMessageWriter, AggregationResultXmlDocumentWriter>();
             _services.AddScoped<IValidationErrorTranslator, ValidationErrorTranslator>();
             _services.AddScoped<IMessageRecordParser, MessageRecordParser>();
         }
