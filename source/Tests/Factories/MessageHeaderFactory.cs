@@ -25,9 +25,9 @@ public static class MessageHeaderFactory
     {
         return new MessageHeader(
             processType is null ? ProcessType.MoveIn.Name : processType.Name,
-            "SenderId",
+            "1234567890123",
             senderRole is null ? MarketRole.MeteringPointAdministrator.Name : senderRole.Name,
-            "ReceiverId",
+            "1234567890124",
             receiverRole is null ? MarketRole.EnergySupplier.Name : receiverRole.Name,
             Guid.NewGuid().ToString(),
             SystemClock.Instance.GetCurrentInstant());
