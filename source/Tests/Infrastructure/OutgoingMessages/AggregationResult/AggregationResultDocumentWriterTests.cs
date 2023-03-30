@@ -54,16 +54,16 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     {
         var document = await CreateDocument(
                 _timeSeries
-            .WithMessageId(SampleData.MessageId)
-            .WithTimestamp(SampleData.Timestamp)
-            .WithSender(SampleData.SenderId, SampleData.SenderRole)
-            .WithReceiver(SampleData.ReceiverId, SampleData.ReceiverRole)
-            .WithTransactionId(SampleData.TransactionId)
-            .WithGridArea(SampleData.GridAreaCode)
-            .WithBalanceResponsibleNumber(SampleData.BalanceResponsibleNumber)
-            .WithEnergySupplierNumber(SampleData.EnergySupplierNumber)
-            .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
-            .WithPoint(new Point(1, 1m, Quality.Calculated.Name, "2022-12-12T23:00:00Z")),
+                    .WithMessageId(SampleData.MessageId)
+                    .WithTimestamp(SampleData.Timestamp)
+                    .WithSender(SampleData.SenderId, SampleData.SenderRole)
+                    .WithReceiver(SampleData.ReceiverId, SampleData.ReceiverRole)
+                    .WithTransactionId(SampleData.TransactionId)
+                    .WithGridArea(SampleData.GridAreaCode)
+                    .WithBalanceResponsibleNumber(SampleData.BalanceResponsibleNumber)
+                    .WithEnergySupplierNumber(SampleData.EnergySupplierNumber)
+                    .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
+                    .WithPoint(new Point(1, 1m, Quality.Calculated.Name, "2022-12-12T23:00:00Z")),
                 DocumentFormat.From(documentFormat))
             .ConfigureAwait(false);
 
@@ -177,5 +177,3 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
         }
     }
 }
-
-#pragma warning disable
