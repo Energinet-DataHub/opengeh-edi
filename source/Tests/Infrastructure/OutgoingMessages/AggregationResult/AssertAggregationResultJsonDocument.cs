@@ -164,7 +164,12 @@ internal sealed class AssertAggregationResultJsonDocument : IAssertAggregationRe
 
     public IAssertAggregationResultDocument QualityIsNotPresentForPosition(int position)
     {
-        throw new NotImplementedException();
+        var point = FirstTimeSeriesElement()
+            .GetProperty("Period")
+            .GetProperty("Point").EnumerateArray().ToList()[position - 1];
+
+        Assert.Throws<KeyNotFoundException>(() => point.GetProperty("quality"));
+        return this;
     }
 
     private JsonElement FirstTimeSeriesElement()

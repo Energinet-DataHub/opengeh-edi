@@ -98,15 +98,17 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
             .QuantityIsNotPresentForPosition(1);
     }
 
-    [Fact]
-    public async Task Quality_element_is_excluded_if_value_is_measured()
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
+    public async Task Quality_element_is_excluded_if_value_is_measured(string documentFormat)
     {
         _timeSeries
             .WithPoint(new Point(1, 1, Quality.Measured.Name, "2022-12-12T23:00:00Z"));
 
-        var document = await CreateDocument(_timeSeries, DocumentFormat.Xml).ConfigureAwait(false);
+        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat)).ConfigureAwait(false);
 
-        AssertDocument(document, DocumentFormat.Xml)
+        AssertDocument(document, DocumentFormat.From(documentFormat))
             .QualityIsNotPresentForPosition(1);
     }
 
