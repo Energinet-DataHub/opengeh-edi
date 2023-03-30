@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -153,7 +154,12 @@ internal sealed class AssertAggregationResultJsonDocument : IAssertAggregationRe
 
     public IAssertAggregationResultDocument QuantityIsNotPresentForPosition(int position)
     {
-        throw new NotImplementedException();
+        var point = FirstTimeSeriesElement()
+            .GetProperty("Period")
+            .GetProperty("Point").EnumerateArray().ToList()[position - 1];
+
+        Assert.Throws<KeyNotFoundException>(() => point.GetProperty("quantity"));
+        return this;
     }
 
     public IAssertAggregationResultDocument QualityIsNotPresentForPosition(int position)

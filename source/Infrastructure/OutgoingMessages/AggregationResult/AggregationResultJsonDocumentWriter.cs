@@ -155,8 +155,12 @@ public class AggregationResultJsonDocumentWriter : IMessageWriter
                 writer.WritePropertyName("value");
                 writer.WriteNumberValue(point.Position);
                 writer.WriteEndObject();
-                writer.WritePropertyName("quantity");
-                writer.WriteNumberValue(point.Quantity.GetValueOrDefault());
+                if (point.Quantity.HasValue)
+                {
+                    writer.WritePropertyName("quantity");
+                    writer.WriteNumberValue(point.Quantity.GetValueOrDefault());
+                }
+
                 writer.WriteEndObject();
             }
 
