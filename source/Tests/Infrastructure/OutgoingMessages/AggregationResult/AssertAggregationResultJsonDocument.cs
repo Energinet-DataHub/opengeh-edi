@@ -61,13 +61,13 @@ internal sealed class AssertAggregationResultJsonDocument : IAssertAggregationRe
 
     public IAssertAggregationResultDocument HasTransactionId(Guid expectedTransactionId)
     {
-        Assert.Equal(expectedTransactionId, _root.GetProperty("Series").EnumerateArray().ToList()[0].GetProperty("mRID").GetGuid());
+        Assert.Equal(expectedTransactionId, FirstTimeSeriesElement().GetProperty("mRID").GetGuid());
         return this;
     }
 
     public IAssertAggregationResultDocument HasGridAreaCode(string expectedGridAreaCode)
     {
-        Assert.Equal(expectedGridAreaCode, _root.GetProperty("Series").EnumerateArray().ToList()[0]
+        Assert.Equal(expectedGridAreaCode, FirstTimeSeriesElement()
             .GetProperty("meteringGridArea_Domain.mRID")
             .GetProperty("value")
             .ToString());
@@ -76,7 +76,7 @@ internal sealed class AssertAggregationResultJsonDocument : IAssertAggregationRe
 
     public IAssertAggregationResultDocument HasBalanceResponsibleNumber(string expectedBalanceResponsibleNumber)
     {
-        Assert.Equal(expectedBalanceResponsibleNumber, _root.GetProperty("Series").EnumerateArray().ToList()[0]
+        Assert.Equal(expectedBalanceResponsibleNumber, FirstTimeSeriesElement()
             .GetProperty("balanceResponsibleParty_MarketParticipant.mRID")
             .GetProperty("value").ToString());
         return this;
@@ -84,7 +84,7 @@ internal sealed class AssertAggregationResultJsonDocument : IAssertAggregationRe
 
     public IAssertAggregationResultDocument HasEnergySupplierNumber(string expectedEnergySupplierNumber)
     {
-        Assert.Equal(expectedEnergySupplierNumber, _root.GetProperty("Series").EnumerateArray().ToList()[0]
+        Assert.Equal(expectedEnergySupplierNumber, FirstTimeSeriesElement()
             .GetProperty("energySupplier_MarketParticipant.mRID")
             .GetProperty("value").ToString());
         return this;
@@ -92,18 +92,18 @@ internal sealed class AssertAggregationResultJsonDocument : IAssertAggregationRe
 
     public IAssertAggregationResultDocument HasProductCode(string expectedProductCode)
     {
-        Assert.Equal(expectedProductCode, _root.GetProperty("Series").EnumerateArray().ToList()[0].GetProperty("product").ToString());
+        Assert.Equal(expectedProductCode, FirstTimeSeriesElement().GetProperty("product").ToString());
         return this;
     }
 
     public IAssertAggregationResultDocument HasPeriod(string expectedStartOfPeriod, string expectedEndOfPeriod)
     {
-        Assert.Equal(expectedStartOfPeriod, _root.GetProperty("Series").EnumerateArray().ToList()[0]
+        Assert.Equal(expectedStartOfPeriod, FirstTimeSeriesElement()
             .GetProperty("Period")
             .GetProperty("timeInterval")
             .GetProperty("start")
             .GetProperty("value").ToString());
-        Assert.Equal(expectedEndOfPeriod, _root.GetProperty("Series").EnumerateArray().ToList()[0]
+        Assert.Equal(expectedEndOfPeriod, FirstTimeSeriesElement()
             .GetProperty("Period")
             .GetProperty("timeInterval")
             .GetProperty("end")
@@ -113,7 +113,7 @@ internal sealed class AssertAggregationResultJsonDocument : IAssertAggregationRe
 
     public IAssertAggregationResultDocument HasPoint(int position, int quantity)
     {
-        var point = _root.GetProperty("Series").EnumerateArray().ToList()[0]
+        var point = FirstTimeSeriesElement()
             .GetProperty("Period")
             .GetProperty("Point").EnumerateArray().ToList()[position - 1];
 
@@ -159,5 +159,10 @@ internal sealed class AssertAggregationResultJsonDocument : IAssertAggregationRe
     public IAssertAggregationResultDocument QualityIsNotPresentForPosition(int position)
     {
         throw new NotImplementedException();
+    }
+
+    private JsonElement FirstTimeSeriesElement()
+    {
+        return _root.GetProperty("Series").EnumerateArray().ToList()[0];
     }
 }
