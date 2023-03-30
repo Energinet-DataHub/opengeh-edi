@@ -34,7 +34,7 @@ jobs:
   dotnet_update_coverage_report:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@v10
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@997/publish-test-results
     with:
       solution_file_path: source/EDI.sln
       tests_filter_expression: FullyQualifiedName!~LearningTests # Filter => Skip all tests within namespace 'LearningTests'
