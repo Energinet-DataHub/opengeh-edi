@@ -17,6 +17,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Application.OutgoingMessages.Common;
 using Domain.OutgoingMessages;
+using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions.Aggregations;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.OutgoingMessages.AggregationResult;
@@ -150,8 +151,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     private Task<Stream> CreateDocument(TimeSeriesBuilder resultBuilder, DocumentFormat documentFormat)
     {
         var documentHeader = resultBuilder.BuildHeader();
-        var timeSeries = resultBuilder.BuildTimeSeries();
-        var records = _parser.From(timeSeries);
+        var records = _parser.From(resultBuilder.BuildTimeSeries());
         if (documentFormat == DocumentFormat.Xml)
         {
             return new AggregationResultXmlDocumentWriter(_parser).WriteAsync(
