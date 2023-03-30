@@ -110,11 +110,9 @@ public class AggregationResultJsonDocumentWriter : IMessageWriter
 
             writer.WritePropertyName("timeInterval");
             writer.WriteStartObject();
-            writer.WritePropertyName("start");
-            writer.WriteStartObject();
-            writer.WritePropertyName("value");
-            writer.WriteStringValue(series.Period.Start.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture));
-            writer.WriteEndObject();
+
+            writer.WriteObject("start", new KeyValuePair<string, string>("value", series.Period.Start.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture)));
+
             writer.WritePropertyName("end");
             writer.WriteStartObject();
             writer.WritePropertyName("value");
