@@ -82,7 +82,7 @@ public class AggregationResultXmlDocumentWriter : MessageWriter
 
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "product", null, GeneralValues.ProductCode).ConfigureAwait(false);
 
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity_Measure_Unit.name", null, MeasureUnitTypeCodeFrom(timeSeries.MeasureUnitType)).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity_Measure_Unit.name", null, CimCode.Of(MeasurementUnit.From(timeSeries.MeasureUnitType))).ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Period", null).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "resolution", null, CimCode.Of(Resolution.From(timeSeries.Resolution))).ConfigureAwait(false);
@@ -109,15 +109,6 @@ public class AggregationResultXmlDocumentWriter : MessageWriter
             await writer.WriteEndElementAsync().ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
         }
-    }
-
-    private static string MeasureUnitTypeCodeFrom(string valueToParse)
-    {
-        var measureUnitType = MeasurementUnit.From(valueToParse);
-        if (measureUnitType == MeasurementUnit.Kwh)
-            return "KWH";
-
-        return valueToParse;
     }
 
     private static string? SettlementMethodToCode(string? value)
