@@ -35,7 +35,7 @@ jobs:
   dotnet_update_coverage_report:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@997/publish-test-results
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@v10
     with:
       solution_file_path: source/EDI.sln
       tests_filter_expression: FullyQualifiedName!~LearningTests # Filter => Skip all tests within namespace 'LearningTests'
@@ -43,44 +43,44 @@ jobs:
       environment: AzureAuth
       dotnet_version: 7.0.200
 
-  # dotnet_promote_prerelease:
-  #   needs: changes
-  #   if: ${{ needs.changes.outputs.dotnet == 'true' }}
-  #   uses: Energinet-DataHub/.github/.github/workflows/promote-prerelease.yml@v10
-  #   with:
-  #     release_name_prefix: dotnet
+  dotnet_promote_prerelease:
+    needs: changes
+    if: ${{ needs.changes.outputs.dotnet == 'true' }}
+    uses: Energinet-DataHub/.github/.github/workflows/promote-prerelease.yml@v10
+    with:
+      release_name_prefix: dotnet
 
-  # #
-  # # Dispatch deployment request
-  # #
+  #
+  # Dispatch deployment request
+  #
 
-  # dispatch_deploment_event:
-  #   runs-on: ubuntu-latest
-  #   needs: dotnet_promote_prerelease
-  #   steps:
-  #     - name: Find associated pull request
-  #       uses: Energinet-DataHub/.github/.github/actions/find-related-pr-number@v10
-  #       id: find_pull_request
+  dispatch_deploment_event:
+    runs-on: ubuntu-latest
+    needs: dotnet_promote_prerelease
+    steps:
+      - name: Find associated pull request
+        uses: Energinet-DataHub/.github/.github/actions/find-related-pr-number@v10
+        id: find_pull_request
 
-  #     - name: Repository Dispatch
-  #       uses: peter-evans/repository-dispatch@v2
-  #       with:
-  #         token: ${{ secrets.pat_token }}
-  #         repository: ${{ secrets.environment_repository_path }}
-  #         event-type: edi-deployment-request-domain
-  #         client-payload: '{"domain_pr": "${{ steps.find_pull_request.outputs.pull_request_number }}"}' # yamllint disable-line rule:quoted-strings
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.pat_token }}
+          repository: ${{ secrets.environment_repository_path }}
+          event-type: edi-deployment-request-domain
+          client-payload: '{"domain_pr": "${{ steps.find_pull_request.outputs.pull_request_number }}"}' # yamllint disable-line rule:quoted-strings
 
-  # #
-  # # Send notification to teams channel if deployment dispatch failed
-  # #
+  #
+  # Send notification to teams channel if deployment dispatch failed
+  #
 
-  # dispatch_failed:
-  #   needs: [dotnet_promote_prerelease, dispatch_deploment_event]
-  #   if: |
-  #     always() &&
-  #     contains(needs.*.result, 'failure')
-  #   uses: Energinet-DataHub/.github/.github/workflows/notify-team.yml@v10
-  #   with:
-  #     team_name: Batman
-  #     subject: "Deployment dispatch failed: EDI"
-  #   secrets: inherit
+  dispatch_failed:
+    needs: [dotnet_promote_prerelease, dispatch_deploment_event]
+    if: |
+      always() &&
+      contains(needs.*.result, 'failure')
+    uses: Energinet-DataHub/.github/.github/workflows/notify-team.yml@v10
+    with:
+      team_name: Batman
+      subject: "Deployment dispatch failed: EDI"
+    secrets: inherit
