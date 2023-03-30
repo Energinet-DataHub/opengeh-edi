@@ -154,7 +154,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
         var records = _parser.From(timeSeries);
         if (documentFormat == DocumentFormat.Xml)
         {
-            return _messageWriter.WriteAsync(
+            return new AggregationResultXmlDocumentWriter(_parser).WriteAsync(
                 documentHeader,
                 new[] { records, });
         }
