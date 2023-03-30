@@ -32,7 +32,6 @@ namespace Infrastructure.OutgoingMessages.AggregationResult;
 
 public class AggregationResultJsonDocumentWriter : IMessageWriter
 {
-    private const string ActiveEnergy = "8716867000030";
     private const string DocumentType = "NotifyAggregatedMeasureData_MarketDocument";
     private const string TypeCode = "E31";
     private readonly IMessageRecordParser _parser;
@@ -117,7 +116,7 @@ public class AggregationResultJsonDocumentWriter : IMessageWriter
             writer.WriteEndObject();
 
             writer.WritePropertyName("product");
-            writer.WriteStringValue(ActiveEnergy);
+            writer.WriteStringValue(GeneralValues.ProductCode);
 
             writer.WritePropertyName("quantity_Measure_Unit.name");
             writer.WriteStartObject();
