@@ -149,18 +149,20 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
 
     private Task<Stream> CreateDocument(TimeSeriesBuilder resultBuilder, DocumentFormat documentFormat)
     {
+        var documentHeader = resultBuilder.BuildHeader();
+        var timeSeries = resultBuilder.BuildTimeSeries();
         if (documentFormat == DocumentFormat.Xml)
         {
             return _messageWriter.WriteAsync(
-                resultBuilder.BuildHeader(),
-                new[] { _parser.From(resultBuilder.BuildTimeSeries()), });
+                documentHeader,
+                new[] { _parser.From(timeSeries), });
         }
         else
         {
             var jsonDocumentWriter = new AggregationResultJsonDocumentWriter(_parser);
             return jsonDocumentWriter.WriteAsync(
-                resultBuilder.BuildHeader(),
-                new[] { _parser.From(resultBuilder.BuildTimeSeries()), });
+                documentHeader,
+                new[] { _parser.From(timeSeries), });
         }
     }
 
