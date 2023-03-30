@@ -17,7 +17,6 @@ using System.IO;
 using System.Threading.Tasks;
 using Application.OutgoingMessages.Common;
 using Domain.OutgoingMessages;
-using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions.Aggregations;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.OutgoingMessages.AggregationResult;
@@ -35,7 +34,6 @@ namespace Tests.Infrastructure.OutgoingMessages.AggregationResult;
 public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValidationFixture>
 {
     private readonly DocumentValidationFixture _documentValidation;
-    private readonly IMessageWriter _messageWriter;
     private readonly IMessageRecordParser _parser;
     private readonly TimeSeriesBuilder _timeSeries;
 
@@ -43,7 +41,6 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     {
         _documentValidation = documentValidation;
         _parser = new MessageRecordParser(new Serializer());
-        _messageWriter = new AggregationResultXmlDocumentWriter(_parser);
         _timeSeries = TimeSeriesBuilder
             .AggregationResult();
     }
