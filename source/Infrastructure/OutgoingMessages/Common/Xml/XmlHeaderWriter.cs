@@ -22,7 +22,7 @@ using Domain.SeedWork;
 
 namespace Infrastructure.OutgoingMessages.Common.Xml;
 
-internal static class HeaderWriter
+internal static class XmlHeaderWriter
 {
     internal static async Task WriteAsync(XmlWriter writer, MessageHeader messageHeader, DocumentDetails documentDetails, string? reasonCode)
     {
