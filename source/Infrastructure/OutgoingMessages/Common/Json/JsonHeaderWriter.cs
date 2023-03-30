@@ -39,8 +39,7 @@ internal static class JsonHeaderWriter
             "businessSector.type",
             new KeyValuePair<string, string>("value", "23"));
 
-        writer.WritePropertyName("createdDateTime");
-        writer.WriteStringValue(messageHeader.TimeStamp.ToString());
+        writer.WriteProperty("createdDateTime", messageHeader.TimeStamp.ToString());
 
         writer.WritePropertyName("process.processType");
         writer.WriteStartObject();
