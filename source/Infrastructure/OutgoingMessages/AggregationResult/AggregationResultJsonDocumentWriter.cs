@@ -93,13 +93,10 @@ public class AggregationResultJsonDocumentWriter : IMessageWriter
 
             if (series.EnergySupplierNumber is not null)
             {
-                writer.WritePropertyName("energySupplier_MarketParticipant.mRID");
-                writer.WriteStartObject();
-                writer.WritePropertyName("codingScheme");
-                writer.WriteStringValue(CimCode.CodingSchemeOf(ActorNumber.Create(series.EnergySupplierNumber)));
-                writer.WritePropertyName("value");
-                writer.WriteStringValue(series.EnergySupplierNumber);
-                writer.WriteEndObject();
+                writer.WriteObject(
+                    "energySupplier_MarketParticipant.mRID",
+                    new KeyValuePair<string, string>("codingScheme", CimCode.CodingSchemeOf(ActorNumber.Create(series.EnergySupplierNumber))),
+                    new KeyValuePair<string, string>("value", series.EnergySupplierNumber));
             }
 
             writer.WritePropertyName("marketEvaluationPoint.type");
