@@ -54,7 +54,7 @@ internal static class JsonHeaderWriter
 
         writer.WriteObject(
             "sender_MarketParticipant.mRID",
-            new KeyValuePair<string, string>("codingScheme", "A10"),
+            new KeyValuePair<string, string>("codingScheme", CimCode.CodingSchemeOf(ActorNumber.Create(messageHeader.SenderId))),
             new KeyValuePair<string, string>("value", messageHeader.SenderId));
 
         writer.WriteObject(
