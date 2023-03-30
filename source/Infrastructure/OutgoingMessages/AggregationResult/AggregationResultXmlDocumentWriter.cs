@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
 using System.Xml;
@@ -23,21 +22,19 @@ using Application.OutgoingMessages.Common.Xml;
 using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
-using Domain.Transactions;
 using Domain.Transactions.Aggregations;
 using Infrastructure.OutgoingMessages.Common;
 using Infrastructure.OutgoingMessages.Common.Xml;
-using Microsoft.EntityFrameworkCore.Query.Internal;
 using NodaTime;
 using Point = Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
 
-namespace Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
+namespace Infrastructure.OutgoingMessages.AggregationResult;
 
-public class NotifyAggregatedMeasureDataXmlDocumentWriter : MessageWriter
+public class AggregationResultXmlDocumentWriter : MessageWriter
 {
     private const string ActiveEnergy = "8716867000030";
 
-    public NotifyAggregatedMeasureDataXmlDocumentWriter(IMessageRecordParser parser)
+    public AggregationResultXmlDocumentWriter(IMessageRecordParser parser)
         : base(
             new DocumentDetails(
             "NotifyAggregatedMeasureData_MarketDocument",

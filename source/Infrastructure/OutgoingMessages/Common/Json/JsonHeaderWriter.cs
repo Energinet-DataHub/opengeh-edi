@@ -49,11 +49,14 @@ internal static class JsonHeaderWriter
         writer.WriteStringValue(CimCode.Of(ProcessType.From(messageHeader.ProcessType)));
         writer.WriteEndObject();
 
-        writer.WritePropertyName("reason.code");
-        writer.WriteStartObject();
-        writer.WritePropertyName("value");
-        writer.WriteStringValue(reasonCode);
-        writer.WriteEndObject();
+        if (reasonCode is not null)
+        {
+            writer.WritePropertyName("reason.code");
+            writer.WriteStartObject();
+            writer.WritePropertyName("value");
+            writer.WriteStringValue(reasonCode);
+            writer.WriteEndObject();
+        }
 
         writer.WritePropertyName("receiver_MarketParticipant.mRID");
         writer.WriteStartObject();

@@ -19,8 +19,8 @@ using Application.OutgoingMessages.Common;
 using Domain.OutgoingMessages;
 using Domain.Transactions.Aggregations;
 using Infrastructure.Configuration.Serialization;
+using Infrastructure.OutgoingMessages.AggregationResult;
 using Infrastructure.OutgoingMessages.Common;
-using Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 using NodaTime.Text;
 using Tests.Factories;
 using Tests.Fixtures;
@@ -34,7 +34,6 @@ namespace Tests.Infrastructure.OutgoingMessages.AggregationResult;
 public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValidationFixture>
 {
     private readonly DocumentValidationFixture _documentValidation;
-    private readonly IMessageWriter _messageWriter;
     private readonly IMessageRecordParser _parser;
     private readonly TimeSeriesBuilder _timeSeries;
 
@@ -42,27 +41,27 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
     {
         _documentValidation = documentValidation;
         _parser = new MessageRecordParser(new Serializer());
-        _messageWriter = new NotifyAggregatedMeasureDataXmlDocumentWriter(_parser);
         _timeSeries = TimeSeriesBuilder
             .AggregationResult();
     }
 
     [Theory]
     [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
     public async Task Can_create_document(string documentFormat)
     {
         var document = await CreateDocument(
                 _timeSeries
-            .WithMessageId(SampleData.MessageId)
-            .WithTimestamp(SampleData.Timestamp)
-            .WithSender(SampleData.SenderId, SampleData.SenderRole)
-            .WithReceiver(SampleData.ReceiverId, SampleData.ReceiverRole)
-            .WithTransactionId(SampleData.TransactionId)
-            .WithGridArea(SampleData.GridAreaCode)
-            .WithBalanceResponsibleNumber(SampleData.BalanceResponsibleNumber)
-            .WithEnergySupplierNumber(SampleData.EnergySupplierNumber)
-            .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
-            .WithPoint(new Point(1, 1m, Quality.Calculated.Name, "2022-12-12T23:00:00Z")),
+                    .WithMessageId(SampleData.MessageId)
+                    .WithTimestamp(SampleData.Timestamp)
+                    .WithSender(SampleData.SenderId, SampleData.SenderRole)
+                    .WithReceiver(SampleData.ReceiverId, SampleData.ReceiverRole)
+                    .WithTransactionId(SampleData.TransactionId)
+                    .WithGridArea(SampleData.GridAreaCode)
+                    .WithBalanceResponsibleNumber(SampleData.BalanceResponsibleNumber)
+                    .WithEnergySupplierNumber(SampleData.EnergySupplierNumber)
+                    .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
+                    .WithPoint(new Point(1, 1m, Quality.Calculated.Name, "2022-12-12T23:00:00Z")),
                 DocumentFormat.From(documentFormat))
             .ConfigureAwait(false);
 
@@ -91,7 +90,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
         _timeSeries
             .WithPoint(new Point(1, null, Quality.Missing.Name, "2022-12-12T23:00:00Z"));
 
-        var document = await CreateDocument(_timeSeries).ConfigureAwait(false);
+        var document = await CreateDocument(_timeSeries, DocumentFormat.Xml).ConfigureAwait(false);
 
         AssertDocument(document, DocumentFormat.Xml)
             .QuantityIsNotPresentForPosition(1);
@@ -103,7 +102,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
         _timeSeries
             .WithPoint(new Point(1, 1, Quality.Measured.Name, "2022-12-12T23:00:00Z"));
 
-        var document = await CreateDocument(_timeSeries).ConfigureAwait(false);
+        var document = await CreateDocument(_timeSeries, DocumentFormat.Xml).ConfigureAwait(false);
 
         AssertDocument(document, DocumentFormat.Xml)
             .QualityIsNotPresentForPosition(1);
@@ -116,7 +115,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
             .WithMeteringPointType(MeteringPointType.Production)
             .WithSettlementMethod(null);
 
-        var document = await CreateDocument(_timeSeries).ConfigureAwait(false);
+        var document = await CreateDocument(_timeSeries, DocumentFormat.Xml).ConfigureAwait(false);
 
         AssertDocument(document, DocumentFormat.Xml)
             .SettlementMethodIsNotPresent();
@@ -128,7 +127,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
         _timeSeries
             .WithEnergySupplierNumber(null);
 
-        var document = await CreateDocument(_timeSeries).ConfigureAwait(false);
+        var document = await CreateDocument(_timeSeries, DocumentFormat.Xml).ConfigureAwait(false);
 
         AssertDocument(document, DocumentFormat.Xml)
             .EnergySupplierNumberIsNotPresent();
@@ -140,25 +139,40 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
         _timeSeries
             .WithBalanceResponsibleNumber(null);
 
-        var document = await CreateDocument(_timeSeries).ConfigureAwait(false);
+        var document = await CreateDocument(_timeSeries, DocumentFormat.Xml).ConfigureAwait(false);
 
         AssertDocument(document, DocumentFormat.Xml)
             .BalanceResponsibleNumberIsNotPresent();
     }
 
-    private Task<Stream> CreateDocument(TimeSeriesBuilder resultBuilder, DocumentFormat? documentFormat = null)
+    private Task<Stream> CreateDocument(TimeSeriesBuilder resultBuilder, DocumentFormat documentFormat)
     {
-        return _messageWriter.WriteAsync(
-            resultBuilder.BuildHeader(),
-            new[]
-            {
-                _parser.From(resultBuilder.BuildTimeSeries()),
-            });
+        var documentHeader = resultBuilder.BuildHeader();
+        var records = _parser.From(resultBuilder.BuildTimeSeries());
+        if (documentFormat == DocumentFormat.Xml)
+        {
+            return new AggregationResultXmlDocumentWriter(_parser).WriteAsync(
+                documentHeader,
+                new[] { records, });
+        }
+        else
+        {
+            return new AggregationResultJsonDocumentWriter(_parser).WriteAsync(
+                documentHeader,
+                new[] { records, });
+        }
     }
 
-    private AssertAggregationResultXmlDocument AssertDocument(Stream document, DocumentFormat documentFormat)
+    private IAssertAggregationResultDocument AssertDocument(Stream document, DocumentFormat documentFormat)
     {
-        var assertXmlDocument = AssertXmlDocument.Document(document, "cim", _documentValidation.Validator);
-        return new AssertAggregationResultXmlDocument(assertXmlDocument);
+        if (documentFormat == DocumentFormat.Xml)
+        {
+            var assertXmlDocument = AssertXmlDocument.Document(document, "cim", _documentValidation.Validator);
+            return new AssertAggregationResultXmlDocument(assertXmlDocument);
+        }
+        else
+        {
+            return new AssertAggregationResultJsonDocument(document);
+        }
     }
 }
