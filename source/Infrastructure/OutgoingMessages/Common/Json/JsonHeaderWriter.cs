@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Text.Json;
 using Domain.Actors;
 using Domain.OutgoingMessages;
@@ -31,65 +32,35 @@ internal static class JsonHeaderWriter
         writer.WriteStartObject();
         writer.WritePropertyName(documentType);
         writer.WriteStartObject();
-        writer.WritePropertyName("mRID");
-        writer.WriteStringValue(messageHeader.MessageId);
 
-        writer.WritePropertyName("businessSector.type");
-        writer.WriteStartObject();
-        writer.WritePropertyName("value");
-        writer.WriteStringValue("23");
-        writer.WriteEndObject();
-
-        writer.WritePropertyName("createdDateTime");
-        writer.WriteStringValue(messageHeader.TimeStamp.ToString());
-
-        writer.WritePropertyName("process.processType");
-        writer.WriteStartObject();
-        writer.WritePropertyName("value");
-        writer.WriteStringValue(CimCode.Of(ProcessType.From(messageHeader.ProcessType)));
-        writer.WriteEndObject();
+        writer.WriteProperty("mRID", messageHeader.MessageId);
+        writer.WriteObject("businessSector.type", new KeyValuePair<string, string>("value", "23"));
+        writer.WriteProperty("createdDateTime", messageHeader.TimeStamp.ToString());
+        writer.WriteObject("process.processType", new KeyValuePair<string, string>("value", CimCode.Of(ProcessType.From(messageHeader.ProcessType))));
 
         if (reasonCode is not null)
         {
-            writer.WritePropertyName("reason.code");
-            writer.WriteStartObject();
-            writer.WritePropertyName("value");
-            writer.WriteStringValue(reasonCode);
-            writer.WriteEndObject();
+            writer.WriteObject("reason.code", new KeyValuePair<string, string>("value", reasonCode));
         }
 
-        writer.WritePropertyName("receiver_MarketParticipant.mRID");
-        writer.WriteStartObject();
-        writer.WritePropertyName("codingScheme");
-        writer.WriteStringValue("A10");
-        writer.WritePropertyName("value");
-        writer.WriteStringValue(messageHeader.ReceiverId);
-        writer.WriteEndObject();
+        writer.WriteObject(
+            "receiver_MarketParticipant.mRID",
+            new KeyValuePair<string, string>("codingScheme", CimCode.CodingSchemeOf(ActorNumber.Create(messageHeader.ReceiverId))),
+            new KeyValuePair<string, string>("value", messageHeader.ReceiverId));
 
-        writer.WritePropertyName("receiver_MarketParticipant.marketRole.type");
-        writer.WriteStartObject();
-        writer.WritePropertyName("value");
-        writer.WriteStringValue(CimCode.Of(EnumerationType.FromName<MarketRole>(messageHeader.ReceiverRole)));
-        writer.WriteEndObject();
+        writer.WriteObject(
+            "receiver_MarketParticipant.marketRole.type",
+            new KeyValuePair<string, string>("value", CimCode.Of(EnumerationType.FromName<MarketRole>(messageHeader.ReceiverRole))));
 
-        writer.WritePropertyName("sender_MarketParticipant.mRID");
-        writer.WriteStartObject();
-        writer.WritePropertyName("codingScheme");
-        writer.WriteStringValue("A10");
-        writer.WritePropertyName("value");
-        writer.WriteStringValue(messageHeader.SenderId);
-        writer.WriteEndObject();
+        writer.WriteObject(
+            "sender_MarketParticipant.mRID",
+            new KeyValuePair<string, string>("codingScheme", CimCode.CodingSchemeOf(ActorNumber.Create(messageHeader.SenderId))),
+            new KeyValuePair<string, string>("value", messageHeader.SenderId));
 
-        writer.WritePropertyName("sender_MarketParticipant.marketRole.type");
-        writer.WriteStartObject();
-        writer.WritePropertyName("value");
-        writer.WriteStringValue(CimCode.Of(EnumerationType.FromName<MarketRole>(messageHeader.SenderRole)));
-        writer.WriteEndObject();
+        writer.WriteObject(
+            "sender_MarketParticipant.marketRole.type",
+            new KeyValuePair<string, string>("value", CimCode.Of(EnumerationType.FromName<MarketRole>(messageHeader.SenderRole))));
 
-        writer.WritePropertyName("type");
-        writer.WriteStartObject();
-        writer.WritePropertyName("value");
-        writer.WriteStringValue(typeCode);
-        writer.WriteEndObject();
+        writer.WriteObject("type", new KeyValuePair<string, string>("value", typeCode));
     }
 }
