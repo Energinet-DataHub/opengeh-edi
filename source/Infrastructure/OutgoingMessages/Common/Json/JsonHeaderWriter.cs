@@ -32,8 +32,8 @@ internal static class JsonHeaderWriter
         writer.WriteStartObject();
         writer.WritePropertyName(documentType);
         writer.WriteStartObject();
-        writer.WritePropertyName("mRID");
-        writer.WriteStringValue(messageHeader.MessageId);
+
+        writer.WriteProperty("mRID", messageHeader.MessageId);
 
         writer.WriteObject(
             "businessSector.type",
@@ -104,5 +104,11 @@ internal static class JsonHeaderWriter
         }
 
         writer.WriteEndObject();
+    }
+
+    private static void WriteProperty(this Utf8JsonWriter writer, string name, string value)
+    {
+        writer.WritePropertyName(name);
+        writer.WriteStringValue(value);
     }
 }
