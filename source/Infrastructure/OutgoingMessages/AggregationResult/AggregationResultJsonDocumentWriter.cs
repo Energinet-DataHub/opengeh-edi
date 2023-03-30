@@ -85,13 +85,9 @@ public class AggregationResultJsonDocumentWriter : IMessageWriter
 
             if (series.BalanceResponsibleNumber is not null)
             {
-                writer.WritePropertyName("balanceResponsibleParty_MarketParticipant.mRID");
-                writer.WriteStartObject();
-                writer.WritePropertyName("codingScheme");
-                writer.WriteStringValue(CimCode.CodingSchemeOf(ActorNumber.Create(series.BalanceResponsibleNumber)));
-                writer.WritePropertyName("value");
-                writer.WriteStringValue(series.BalanceResponsibleNumber);
-                writer.WriteEndObject();
+                writer.WriteObject(
+                    "balanceResponsibleParty_MarketParticipant.mRID",
+                    new KeyValuePair<string, string>("codingScheme", CimCode.CodingSchemeOf(ActorNumber.Create(series.BalanceResponsibleNumber))));
             }
 
             if (series.EnergySupplierNumber is not null)
