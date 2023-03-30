@@ -109,6 +109,6 @@ public abstract class MessageWriter : IMessageWriter
 
     private Task WriteHeaderAsync(MessageHeader header, DocumentDetails documentDetails, XmlWriter writer)
     {
-        return HeaderWriter.WriteAsync(writer, header, documentDetails, _reasonCode);
+        return XmlHeaderWriter.WriteAsync(writer, header, documentDetails, _reasonCode);
     }
 }
