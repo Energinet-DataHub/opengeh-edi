@@ -160,8 +160,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
         }
         else
         {
-            var jsonDocumentWriter = new AggregationResultJsonDocumentWriter(_parser);
-            return jsonDocumentWriter.WriteAsync(
+            return new AggregationResultJsonDocumentWriter(_parser).WriteAsync(
                 documentHeader,
                 new[] { records, });
         }
