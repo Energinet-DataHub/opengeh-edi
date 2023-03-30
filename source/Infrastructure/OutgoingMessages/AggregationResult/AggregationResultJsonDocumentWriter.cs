@@ -101,8 +101,7 @@ public class AggregationResultJsonDocumentWriter : IMessageWriter
 
             writer.WriteObject("marketEvaluationPoint.type", new KeyValuePair<string, string>("value", CimCode.Of(MeteringPointType.From(series.MeteringPointType))));
 
-            writer.WritePropertyName("product");
-            writer.WriteStringValue(GeneralValues.ProductCode);
+            writer.WriteProperty("product", GeneralValues.ProductCode);
 
             writer.WritePropertyName("quantity_Measure_Unit.name");
             writer.WriteStartObject();
