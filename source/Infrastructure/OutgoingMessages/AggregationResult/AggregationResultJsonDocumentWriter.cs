@@ -78,13 +78,10 @@ public class AggregationResultJsonDocumentWriter : IMessageWriter
 
             writer.WriteProperty("mRID", series.TransactionId.ToString());
 
-            writer.WritePropertyName("meteringGridArea_Domain.mRID");
-            writer.WriteStartObject();
-            writer.WritePropertyName("codingScheme");
-            writer.WriteStringValue("NDK");
-            writer.WritePropertyName("value");
-            writer.WriteStringValue(series.GridAreaCode);
-            writer.WriteEndObject();
+            writer.WriteObject(
+                "meteringGridArea_Domain.mRID",
+                new KeyValuePair<string, string>("codingScheme", "NDK"),
+                new KeyValuePair<string, string>("value", series.GridAreaCode));
 
             if (series.BalanceResponsibleNumber is not null)
             {
