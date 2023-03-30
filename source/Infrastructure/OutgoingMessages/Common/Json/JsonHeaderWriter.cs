@@ -40,11 +40,7 @@ internal static class JsonHeaderWriter
 
         if (reasonCode is not null)
         {
-            writer.WritePropertyName("reason.code");
-            writer.WriteStartObject();
-            writer.WritePropertyName("value");
-            writer.WriteStringValue(reasonCode);
-            writer.WriteEndObject();
+            writer.WriteObject("reason.code", new KeyValuePair<string, string>("value", reasonCode));
         }
 
         writer.WritePropertyName("receiver_MarketParticipant.mRID");
