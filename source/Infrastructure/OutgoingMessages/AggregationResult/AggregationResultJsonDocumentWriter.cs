@@ -75,8 +75,8 @@ public class AggregationResultJsonDocumentWriter : IMessageWriter
         foreach (var series in ParseFrom(marketActivityRecords))
         {
             writer.WriteStartObject();
-            writer.WritePropertyName("mRID");
-            writer.WriteStringValue(series.TransactionId);
+
+            writer.WriteProperty("mRID", series.TransactionId.ToString());
 
             writer.WritePropertyName("meteringGridArea_Domain.mRID");
             writer.WriteStartObject();
