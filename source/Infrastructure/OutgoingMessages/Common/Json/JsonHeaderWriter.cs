@@ -43,13 +43,10 @@ internal static class JsonHeaderWriter
             writer.WriteObject("reason.code", new KeyValuePair<string, string>("value", reasonCode));
         }
 
-        writer.WritePropertyName("receiver_MarketParticipant.mRID");
-        writer.WriteStartObject();
-        writer.WritePropertyName("codingScheme");
-        writer.WriteStringValue("A10");
-        writer.WritePropertyName("value");
-        writer.WriteStringValue(messageHeader.ReceiverId);
-        writer.WriteEndObject();
+        writer.WriteObject(
+            "receiver_MarketParticipant.mRID",
+            new KeyValuePair<string, string>("codingScheme", "A10"),
+            new KeyValuePair<string, string>("value", messageHeader.ReceiverId));
 
         writer.WritePropertyName("receiver_MarketParticipant.marketRole.type");
         writer.WriteStartObject();
