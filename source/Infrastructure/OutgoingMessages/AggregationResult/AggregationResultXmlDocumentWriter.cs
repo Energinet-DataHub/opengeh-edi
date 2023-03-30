@@ -32,8 +32,6 @@ namespace Infrastructure.OutgoingMessages.AggregationResult;
 
 public class AggregationResultXmlDocumentWriter : MessageWriter
 {
-    private const string ActiveEnergy = "8716867000030";
-
     public AggregationResultXmlDocumentWriter(IMessageRecordParser parser)
         : base(
             new DocumentDetails(
@@ -82,7 +80,7 @@ public class AggregationResultXmlDocumentWriter : MessageWriter
                 await writer.WriteEndElementAsync().ConfigureAwait(false);
             }
 
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "product", null, ActiveEnergy).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "product", null, GeneralValues.ProductCode).ConfigureAwait(false);
 
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity_Measure_Unit.name", null, MeasureUnitTypeCodeFrom(timeSeries.MeasureUnitType)).ConfigureAwait(false);
 
