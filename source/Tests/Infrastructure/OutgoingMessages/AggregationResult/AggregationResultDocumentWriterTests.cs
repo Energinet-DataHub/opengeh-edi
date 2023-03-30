@@ -15,14 +15,17 @@
 using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Application.OutgoingMessages.Common;
+using DocumentValidation;
 using Domain.OutgoingMessages;
 using Domain.Transactions.Aggregations;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.OutgoingMessages.AggregationResult;
 using Infrastructure.OutgoingMessages.Common;
+using Json.Schema;
 using NodaTime.Text;
 using Tests.Factories;
 using Tests.Fixtures;
@@ -159,7 +162,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
         }
         else
         {
-            var jsonDocumentWriter = new AggregationResultJsonDocumentWriter();
+            var jsonDocumentWriter = new AggregationResultJsonDocumentWriter(_parser);
             return jsonDocumentWriter.WriteAsync(
                 resultBuilder.BuildHeader(),
                 new[] { _parser.From(resultBuilder.BuildTimeSeries()), });
@@ -183,6 +186,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
 #pragma warning disable
 internal sealed class AssertAggregationResultJsonDocument : IAssertAggregationResultDocument
 {
+    private readonly JsonSchemaProvider _schemas = new(new CimJsonSchemas());
     private readonly JsonDocument _document;
     private readonly JsonElement _root;
 
@@ -200,57 +204,98 @@ internal sealed class AssertAggregationResultJsonDocument : IAssertAggregationRe
 
     public IAssertAggregationResultDocument HasSenderId(string expectedSenderId)
     {
-        throw new NotImplementedException();
+        Assert.Equal(expectedSenderId, _root.GetProperty("sender_MarketParticipant.mRID").GetProperty("value").ToString());
+        return this;
     }
 
     public IAssertAggregationResultDocument HasReceiverId(string expectedReceiverId)
     {
-        throw new NotImplementedException();
+        Assert.Equal(expectedReceiverId, _root.GetProperty("receiver_MarketParticipant.mRID").GetProperty("value").ToString());
+        return this;
     }
 
     public IAssertAggregationResultDocument HasTimestamp(string expectedTimestamp)
     {
-        throw new NotImplementedException();
+        Assert.Equal(expectedTimestamp, _root.GetProperty("createdDateTime").ToString());
+        return this;
     }
 
     public IAssertAggregationResultDocument HasTransactionId(Guid expectedTransactionId)
     {
-        throw new NotImplementedException();
+        Assert.Equal(expectedTransactionId, _root.GetProperty("Series").EnumerateArray().ToList()[0].GetProperty("mRID").GetGuid());
+        return this;
     }
 
     public IAssertAggregationResultDocument HasGridAreaCode(string expectedGridAreaCode)
     {
-        throw new NotImplementedException();
+        Assert.Equal(expectedGridAreaCode, _root.GetProperty("Series").EnumerateArray().ToList()[0]
+            .GetProperty("meteringGridArea_Domain.mRID")
+            .GetProperty("value")
+            .ToString());
+        return this;
     }
 
     public IAssertAggregationResultDocument HasBalanceResponsibleNumber(string expectedBalanceResponsibleNumber)
     {
-        throw new NotImplementedException();
+        Assert.Equal(expectedBalanceResponsibleNumber, _root.GetProperty("Series").EnumerateArray().ToList()[0]
+            .GetProperty("balanceResponsibleParty_MarketParticipant.mRID")
+            .GetProperty("value").ToString());
+        return this;
     }
 
     public IAssertAggregationResultDocument HasEnergySupplierNumber(string expectedEnergySupplierNumber)
     {
-        throw new NotImplementedException();
+        Assert.Equal(expectedEnergySupplierNumber, _root.GetProperty("Series").EnumerateArray().ToList()[0]
+            .GetProperty("energySupplier_MarketParticipant.mRID")
+            .GetProperty("value").ToString());
+        return this;
     }
 
     public IAssertAggregationResultDocument HasProductCode(string expectedProductCode)
     {
-        throw new NotImplementedException();
+        Assert.Equal(expectedProductCode, _root.GetProperty("Series").EnumerateArray().ToList()[0].GetProperty("product").ToString());
+        return this;
     }
 
     public IAssertAggregationResultDocument HasPeriod(string expectedStartOfPeriod, string expectedEndOfPeriod)
     {
-        throw new NotImplementedException();
+        Assert.Equal(expectedStartOfPeriod, _root.GetProperty("Series").EnumerateArray().ToList()[0]
+            .GetProperty("Period")
+            .GetProperty("timeInterval")
+            .GetProperty("start")
+            .GetProperty("value").ToString());
+        Assert.Equal(expectedEndOfPeriod, _root.GetProperty("Series").EnumerateArray().ToList()[0]
+            .GetProperty("Period")
+            .GetProperty("timeInterval")
+            .GetProperty("end")
+            .GetProperty("value").ToString());
+        return this;
     }
 
     public IAssertAggregationResultDocument HasPoint(int position, int quantity)
     {
-        throw new NotImplementedException();
+        var point = _root.GetProperty("Series").EnumerateArray().ToList()[0]
+            .GetProperty("Period")
+            .GetProperty("Point").EnumerateArray().ToList()[position - 1];
+
+        Assert.NotNull(point);
+        Assert.Equal(position, point.GetProperty("position").GetProperty("value").GetInt32());
+        Assert.Equal(quantity, point.GetProperty("quantity").GetInt32());
+        return this;
     }
 
-    public Task<IAssertAggregationResultDocument> DocumentIsValidAsync()
+    public async Task<IAssertAggregationResultDocument> DocumentIsValidAsync()
     {
-        throw new NotImplementedException();
+        var schema = await _schemas.GetSchemaAsync<JsonSchema>("NOTIFYAGGREGATEDMEASUREDATA", "0").ConfigureAwait(false);
+        var validationOptions = new EvaluationOptions()
+        {
+            OutputFormat = OutputFormat.List,
+        };
+        var validationResult = schema.Evaluate(_document, validationOptions);
+        var errors = validationResult.Details.Where(detail => detail.HasErrors).Select(x => x.Errors).ToList()
+            .SelectMany(e => e.Values).ToList();
+        Assert.True(validationResult.IsValid, string.Join("\n", errors));
+        return this;
     }
 
     public IAssertAggregationResultDocument SettlementMethodIsNotPresent()

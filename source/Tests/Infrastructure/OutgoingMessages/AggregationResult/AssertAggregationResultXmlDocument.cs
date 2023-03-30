@@ -55,7 +55,7 @@ public class AssertAggregationResultXmlDocument : IAssertAggregationResultDocume
 
     public IAssertAggregationResultDocument HasTransactionId(Guid expectedTransactionId)
     {
-        _documentAsserter.HasValue("Series[1]/mRID", expectedTransactionId.ToString());
+        _documentAsserter.HasValue($"Series[1]/mRID", expectedTransactionId.ToString());
         return this;
     }
 

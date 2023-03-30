@@ -74,6 +74,10 @@
       <EmbeddedResource Include="Schemas\Json\urn-entsoe-eu-wgedi-codelists.schema.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
+      <None Remove="Schemas\Json\Notify-Aggregated-Measure-Data-assembly-model.schema.json" />
+      <EmbeddedResource Include="Schemas\Json\Notify-Aggregated-Measure-Data-assembly-model.schema.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
