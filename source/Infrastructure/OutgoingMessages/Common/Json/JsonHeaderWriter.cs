@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Text.Json;
 using Domain.Actors;
 using Domain.OutgoingMessages;
@@ -34,11 +35,9 @@ internal static class JsonHeaderWriter
         writer.WritePropertyName("mRID");
         writer.WriteStringValue(messageHeader.MessageId);
 
-        writer.WritePropertyName("businessSector.type");
-        writer.WriteStartObject();
-        writer.WritePropertyName("value");
-        writer.WriteStringValue("23");
-        writer.WriteEndObject();
+        writer.WriteObject(
+            "businessSector.type",
+            new KeyValuePair<string, string>("value", "23"));
 
         writer.WritePropertyName("createdDateTime");
         writer.WriteStringValue(messageHeader.TimeStamp.ToString());
@@ -90,6 +89,20 @@ internal static class JsonHeaderWriter
         writer.WriteStartObject();
         writer.WritePropertyName("value");
         writer.WriteStringValue(typeCode);
+        writer.WriteEndObject();
+    }
+
+    private static void WriteObject(this Utf8JsonWriter writer, string name, params KeyValuePair<string, string>[] values)
+    {
+        writer.WritePropertyName(name);
+        writer.WriteStartObject();
+
+        foreach (var value in values)
+        {
+            writer.WritePropertyName(value.Key);
+            writer.WriteStringValue(value.Value);
+        }
+
         writer.WriteEndObject();
     }
 }
