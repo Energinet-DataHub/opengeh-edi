@@ -63,24 +63,4 @@ internal static class JsonHeaderWriter
 
         writer.WriteObject("type", new KeyValuePair<string, string>("value", typeCode));
     }
-
-    private static void WriteObject(this Utf8JsonWriter writer, string name, params KeyValuePair<string, string>[] values)
-    {
-        writer.WritePropertyName(name);
-        writer.WriteStartObject();
-
-        foreach (var value in values)
-        {
-            writer.WritePropertyName(value.Key);
-            writer.WriteStringValue(value.Value);
-        }
-
-        writer.WriteEndObject();
-    }
-
-    private static void WriteProperty(this Utf8JsonWriter writer, string name, string value)
-    {
-        writer.WritePropertyName(name);
-        writer.WriteStringValue(value);
-    }
 }
