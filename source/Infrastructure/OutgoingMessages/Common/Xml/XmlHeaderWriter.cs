@@ -22,7 +22,7 @@ using Domain.SeedWork;
 
 namespace Infrastructure.OutgoingMessages.Common.Xml;
 
-internal static class HeaderWriter
+internal static class XmlHeaderWriter
 {
     internal static async Task WriteAsync(XmlWriter writer, MessageHeader messageHeader, DocumentDetails documentDetails, string? reasonCode)
     {
@@ -50,7 +50,7 @@ internal static class HeaderWriter
         await writer.WriteElementStringAsync(documentDetails.Prefix, "businessSector.type", null, "23").ConfigureAwait(false);
 
         await writer.WriteStartElementAsync(documentDetails.Prefix, "sender_MarketParticipant.mRID", null).ConfigureAwait(false);
-        await writer.WriteAttributeStringAsync(null, "codingScheme", null, "A10").ConfigureAwait(false);
+        await writer.WriteAttributeStringAsync(null, "codingScheme", null, CimCode.CodingSchemeOf(ActorNumber.Create(messageHeader.SenderId))).ConfigureAwait(false);
         writer.WriteValue(messageHeader.SenderId);
         await writer.WriteEndElementAsync().ConfigureAwait(false);
 
@@ -58,7 +58,7 @@ internal static class HeaderWriter
             .ConfigureAwait(false);
 
         await writer.WriteStartElementAsync(documentDetails.Prefix, "receiver_MarketParticipant.mRID", null).ConfigureAwait(false);
-        await writer.WriteAttributeStringAsync(null, "codingScheme", null, "A10").ConfigureAwait(false);
+        await writer.WriteAttributeStringAsync(null, "codingScheme", null, CimCode.CodingSchemeOf(ActorNumber.Create(messageHeader.ReceiverId))).ConfigureAwait(false);
         writer.WriteValue(messageHeader.ReceiverId);
         await writer.WriteEndElementAsync().ConfigureAwait(false);
 
