@@ -265,6 +265,8 @@ namespace Infrastructure.Configuration
             _services.AddScoped<IMessageWriter, CharacteristicsOfACustomerAtAnApDocumentWriter>();
             _services.AddScoped<IMessageWriter, RejectRequestChangeOfSupplierJsonDocumentWriter>();
             _services.AddScoped<IMessageWriter, AggregationResultXmlDocumentWriter>();
+            _services.AddScoped<IMessageWriter, AggregationResultJsonDocumentWriter>();
+
             _services.AddScoped<IValidationErrorTranslator, ValidationErrorTranslator>();
             _services.AddScoped<IMessageRecordParser, MessageRecordParser>();
         }
