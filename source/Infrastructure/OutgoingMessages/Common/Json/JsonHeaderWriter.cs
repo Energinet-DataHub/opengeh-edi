@@ -61,11 +61,7 @@ internal static class JsonHeaderWriter
             "sender_MarketParticipant.marketRole.type",
             new KeyValuePair<string, string>("value", CimCode.Of(EnumerationType.FromName<MarketRole>(messageHeader.SenderRole))));
 
-        writer.WritePropertyName("type");
-        writer.WriteStartObject();
-        writer.WritePropertyName("value");
-        writer.WriteStringValue(typeCode);
-        writer.WriteEndObject();
+        writer.WriteObject("type", new KeyValuePair<string, string>("value", typeCode));
     }
 
     private static void WriteObject(this Utf8JsonWriter writer, string name, params KeyValuePair<string, string>[] values)
