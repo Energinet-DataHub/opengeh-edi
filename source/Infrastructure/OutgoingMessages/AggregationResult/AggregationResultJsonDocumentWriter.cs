@@ -110,13 +110,10 @@ public class AggregationResultJsonDocumentWriter : IMessageWriter
 
             writer.WritePropertyName("timeInterval");
             writer.WriteStartObject();
-
             writer.WriteObject("start", new KeyValuePair<string, string>("value", series.Period.Start.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture)));
             writer.WriteObject("end", new KeyValuePair<string, string>("value", series.Period.End.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture)));
-
             writer.WriteEndObject();
 
-            // Points
             writer.WritePropertyName("Point");
             writer.WriteStartArray();
             foreach (var point in series.Point)
@@ -133,8 +130,7 @@ public class AggregationResultJsonDocumentWriter : IMessageWriter
             }
 
             writer.WriteEndArray();
-            // Points
-            writer.WriteEndObject(); // Period end
+            writer.WriteEndObject();
 
             writer.WriteEndObject();
         }
