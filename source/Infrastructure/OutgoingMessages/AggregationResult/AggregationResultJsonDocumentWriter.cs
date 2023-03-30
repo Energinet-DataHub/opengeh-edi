@@ -112,12 +112,8 @@ public class AggregationResultJsonDocumentWriter : IMessageWriter
             writer.WriteStartObject();
 
             writer.WriteObject("start", new KeyValuePair<string, string>("value", series.Period.Start.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture)));
+            writer.WriteObject("end", new KeyValuePair<string, string>("value", series.Period.End.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture)));
 
-            writer.WritePropertyName("end");
-            writer.WriteStartObject();
-            writer.WritePropertyName("value");
-            writer.WriteStringValue(series.Period.End.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture));
-            writer.WriteEndObject();
             writer.WriteEndObject();
 
             // Points
