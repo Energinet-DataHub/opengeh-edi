@@ -56,7 +56,8 @@ public class AggregationResultXmlDocumentWriter : MessageWriter
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, timeSeries.TransactionId.ToString()).ConfigureAwait(false);
 
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "marketEvaluationPoint.type", null, CimCode.Of(MeteringPointType.From(timeSeries.MeteringPointType))).ConfigureAwait(false);
-            await WriteElementIfHasValueAsync("marketEvaluationPoint.settlementMethod", SettlementMethodToCode(timeSeries.SettlementType), writer).ConfigureAwait(false);
+            await WriteElementIfHasValueAsync(
+                "marketEvaluationPoint.settlementMethod", timeSeries.SettlementType is null ? null : CimCode.Of(SettlementType.From(timeSeries.SettlementType)), writer).ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "meteringGridArea_Domain.mRID", null).ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "codingScheme", null, "NDK").ConfigureAwait(false);
@@ -109,26 +110,6 @@ public class AggregationResultXmlDocumentWriter : MessageWriter
             await writer.WriteEndElementAsync().ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
         }
-    }
-
-    private static string? SettlementMethodToCode(string? value)
-    {
-        if (value is null)
-            return null;
-
-        var settlementType = SettlementType.From(value);
-
-        if (settlementType == SettlementType.Flex)
-        {
-            return "D01";
-        }
-
-        if (settlementType == SettlementType.NonProfiled)
-        {
-            return "E02";
-        }
-
-        throw new InvalidOperationException("Invalid settlement type");
     }
 
     private static string ParsePeriodDateFrom(Instant instant)
