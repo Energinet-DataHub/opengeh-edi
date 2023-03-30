@@ -48,11 +48,9 @@ internal static class JsonHeaderWriter
             new KeyValuePair<string, string>("codingScheme", "A10"),
             new KeyValuePair<string, string>("value", messageHeader.ReceiverId));
 
-        writer.WritePropertyName("receiver_MarketParticipant.marketRole.type");
-        writer.WriteStartObject();
-        writer.WritePropertyName("value");
-        writer.WriteStringValue(CimCode.Of(EnumerationType.FromName<MarketRole>(messageHeader.ReceiverRole)));
-        writer.WriteEndObject();
+        writer.WriteObject(
+            "receiver_MarketParticipant.marketRole.type",
+            new KeyValuePair<string, string>("value", CimCode.Of(EnumerationType.FromName<MarketRole>(messageHeader.ReceiverRole))));
 
         writer.WritePropertyName("sender_MarketParticipant.mRID");
         writer.WriteStartObject();
