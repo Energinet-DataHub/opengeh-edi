@@ -105,8 +105,8 @@ public class AggregationResultJsonDocumentWriter : IMessageWriter
 
             writer.WritePropertyName("Period");
             writer.WriteStartObject();
-            writer.WritePropertyName("resolution");
-            writer.WriteStringValue(CimCode.Of(Resolution.From(series.Resolution)));
+
+            writer.WriteProperty("resolution", CimCode.Of(Resolution.From(series.Resolution)));
 
             writer.WritePropertyName("timeInterval");
             writer.WriteStartObject();
