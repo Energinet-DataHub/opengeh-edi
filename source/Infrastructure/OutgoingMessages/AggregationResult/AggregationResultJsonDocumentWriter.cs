@@ -99,11 +99,7 @@ public class AggregationResultJsonDocumentWriter : IMessageWriter
                     new KeyValuePair<string, string>("value", series.EnergySupplierNumber));
             }
 
-            writer.WritePropertyName("marketEvaluationPoint.type");
-            writer.WriteStartObject();
-            writer.WritePropertyName("value");
-            writer.WriteStringValue(CimCode.Of(MeteringPointType.From(series.MeteringPointType)));
-            writer.WriteEndObject();
+            writer.WriteObject("marketEvaluationPoint.type", new KeyValuePair<string, string>("value", CimCode.Of(MeteringPointType.From(series.MeteringPointType))));
 
             writer.WritePropertyName("product");
             writer.WriteStringValue(GeneralValues.ProductCode);
