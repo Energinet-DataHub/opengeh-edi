@@ -47,7 +47,7 @@ internal static class HeaderWriter
         await writer.WriteElementStringAsync(documentDetails.Prefix, "type", null, documentDetails.TypeCode).ConfigureAwait(false);
         await writer.WriteElementStringAsync(documentDetails.Prefix, "process.processType", null, CimCode.Of(ProcessType.From(messageHeader.ProcessType)))
             .ConfigureAwait(false);
-        await writer.WriteElementStringAsync(documentDetails.Prefix, "businessSector.type", null, "23").ConfigureAwait(false);
+        await writer.WriteElementStringAsync(documentDetails.Prefix, "businessSector.type", null, GeneralValues.SectorTypeCode).ConfigureAwait(false);
 
         await writer.WriteStartElementAsync(documentDetails.Prefix, "sender_MarketParticipant.mRID", null).ConfigureAwait(false);
         await writer.WriteAttributeStringAsync(null, "codingScheme", null, "A10").ConfigureAwait(false);
