@@ -66,7 +66,7 @@ public class AggregationResultXmlDocumentWriter : MessageWriter
             if (timeSeries.EnergySupplierNumber is not null)
             {
                 await writer.WriteStartElementAsync(DocumentDetails.Prefix, "energySupplier_MarketParticipant.mRID", null).ConfigureAwait(false);
-                await writer.WriteAttributeStringAsync(null, "codingScheme", null, ResolveActorCodingScheme(timeSeries.EnergySupplierNumber)).ConfigureAwait(false);
+                await writer.WriteAttributeStringAsync(null, "codingScheme", null, CimCode.CodingSchemeOf(ActorNumber.Create(timeSeries.EnergySupplierNumber))).ConfigureAwait(false);
                 await writer.WriteStringAsync(timeSeries.EnergySupplierNumber).ConfigureAwait(false);
                 await writer.WriteEndElementAsync().ConfigureAwait(false);
             }
@@ -75,7 +75,7 @@ public class AggregationResultXmlDocumentWriter : MessageWriter
             {
                 await writer
                     .WriteStartElementAsync(DocumentDetails.Prefix, "balanceResponsibleParty_MarketParticipant.mRID", null).ConfigureAwait(false);
-                await writer.WriteAttributeStringAsync(null, "codingScheme", null, ResolveActorCodingScheme(timeSeries.BalanceResponsibleNumber)).ConfigureAwait(false);
+                await writer.WriteAttributeStringAsync(null, "codingScheme", null, CimCode.CodingSchemeOf(ActorNumber.Create(timeSeries.BalanceResponsibleNumber))).ConfigureAwait(false);
                 await writer.WriteStringAsync(timeSeries.BalanceResponsibleNumber).ConfigureAwait(false);
                 await writer.WriteEndElementAsync().ConfigureAwait(false);
             }
@@ -148,11 +148,6 @@ public class AggregationResultXmlDocumentWriter : MessageWriter
         }
 
         throw new InvalidOperationException("Invalid settlement type");
-    }
-
-    private static string ResolveActorCodingScheme(string energySupplierNumber)
-    {
-        return ActorNumber.IsGlnNumber(energySupplierNumber) ? "A10" : "A01";
     }
 
     private static string ParsePeriodDateFrom(Instant instant)
