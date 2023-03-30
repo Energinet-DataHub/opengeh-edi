@@ -85,7 +85,7 @@ public class AggregationResultXmlDocumentWriter : MessageWriter
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity_Measure_Unit.name", null, MeasureUnitTypeCodeFrom(timeSeries.MeasureUnitType)).ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Period", null).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "resolution", null, ResolutionCodeFrom(timeSeries.Resolution)).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "resolution", null, CimCode.Of(Resolution.From(timeSeries.Resolution))).ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "timeInterval", null).ConfigureAwait(false);
 
@@ -109,16 +109,6 @@ public class AggregationResultXmlDocumentWriter : MessageWriter
             await writer.WriteEndElementAsync().ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
         }
-    }
-
-    private static string ResolutionCodeFrom(string valueToParse)
-    {
-        var resolution = Resolution.From(valueToParse);
-        if (resolution == Resolution.QuarterHourly)
-            return "PT15M";
-        if (resolution == Resolution.Hourly)
-            return "PT1H";
-        return valueToParse;
     }
 
     private static string MeasureUnitTypeCodeFrom(string valueToParse)
