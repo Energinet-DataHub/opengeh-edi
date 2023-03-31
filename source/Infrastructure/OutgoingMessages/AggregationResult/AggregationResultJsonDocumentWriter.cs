@@ -32,7 +32,6 @@ namespace Infrastructure.OutgoingMessages.AggregationResult;
 
 public class AggregationResultJsonDocumentWriter : IMessageWriter
 {
-    private const string ActiveEnergy = "8716867000030";
     private const string DocumentType = "NotifyAggregatedMeasureData_MarketDocument";
     private const string TypeCode = "E31";
     private readonly IMessageRecordParser _parser;
@@ -103,27 +102,11 @@ public class AggregationResultJsonDocumentWriter : IMessageWriter
 
             if (series.SettlementType is not null)
             {
-                writer.WritePropertyName("marketEvaluationPoint.settlementMethod");
-                writer.WriteStartObject();
-                writer.WritePropertyName("value");
-                writer.WriteStringValue(CimCode.Of(SettlementType.From(series.SettlementType)));
-                writer.WriteEndObject();
+                writer.WriteObject(
+                    "marketEvaluationPoint.settlementMethod",
+                    new KeyValuePair<string, string>("value", CimCode.Of(SettlementType.From(series.SettlementType))));
             }
 
-            writer.WritePropertyName("marketEvaluationPoint.type");
-            writer.WriteStartObject();
-            writer.WritePropertyName("value");
-            writer.WriteStringValue(CimCode.Of(MeteringPointType.From(series.MeteringPointType)));
-            writer.WriteEndObject();
-
-            writer.WritePropertyName("product");
-            writer.WriteStringValue(ActiveEnergy);
-
-            writer.WritePropertyName("quantity_Measure_Unit.name");
-            writer.WriteStartObject();
-            writer.WritePropertyName("value");
-            writer.WriteStringValue(CimCode.Of(MeasurementUnit.From(series.MeasureUnitType)));
-            writer.WriteEndObject();
             writer.WriteObject("marketEvaluationPoint.type", new KeyValuePair<string, string>("value", CimCode.Of(MeteringPointType.From(series.MeteringPointType))));
             writer.WriteProperty("product", GeneralValues.ProductCode);
             writer.WriteObject("quantity_Measure_Unit.name", new KeyValuePair<string, string>("value", CimCode.Of(MeasurementUnit.From(series.MeasureUnitType))));
@@ -153,11 +136,9 @@ public class AggregationResultJsonDocumentWriter : IMessageWriter
 
                 if (Quality.From(point.Quality) != Quality.Measured)
                 {
-                    writer.WritePropertyName("quality");
-                    writer.WriteStartObject();
-                    writer.WritePropertyName("value");
-                    writer.WriteStringValue(Quality.From(point.Quality).Code);
-                    writer.WriteEndObject();
+                    writer.WriteObject(
+                        "quality",
+                        new KeyValuePair<string, string>("value", Quality.From(point.Quality).Code));
                 }
 
                 if (point.Quantity.HasValue)
