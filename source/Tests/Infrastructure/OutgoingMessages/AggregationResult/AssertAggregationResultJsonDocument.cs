@@ -151,7 +151,8 @@ internal sealed class AssertAggregationResultJsonDocument : IAssertAggregationRe
 
     public IAssertAggregationResultDocument BalanceResponsibleNumberIsNotPresent()
     {
-        throw new NotImplementedException();
+        Assert.Throws<KeyNotFoundException>(() => FirstTimeSeriesElement().GetProperty("balanceResponsibleParty_MarketParticipant.mRID"));
+        return this;
     }
 
     public IAssertAggregationResultDocument QuantityIsNotPresentForPosition(int position)

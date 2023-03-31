@@ -141,15 +141,17 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
             .EnergySupplierNumberIsNotPresent();
     }
 
-    [Fact]
-    public async Task Balance_responsible_number_is_excluded()
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
+    public async Task Balance_responsible_number_is_excluded(string documentFormat)
     {
         _timeSeries
             .WithBalanceResponsibleNumber(null);
 
-        var document = await CreateDocument(_timeSeries, DocumentFormat.Xml).ConfigureAwait(false);
+        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat)).ConfigureAwait(false);
 
-        AssertDocument(document, DocumentFormat.Xml)
+        AssertDocument(document, DocumentFormat.From(documentFormat))
             .BalanceResponsibleNumberIsNotPresent();
     }
 
