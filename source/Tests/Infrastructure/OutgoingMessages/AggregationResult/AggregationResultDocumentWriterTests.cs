@@ -112,16 +112,18 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
             .QualityIsNotPresentForPosition(1);
     }
 
-    [Fact]
-    public async Task Settlement_method_is_excluded()
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
+    public async Task Settlement_method_is_excluded(string documentFormat)
     {
         _timeSeries
             .WithMeteringPointType(MeteringPointType.Production)
             .WithSettlementMethod(null);
 
-        var document = await CreateDocument(_timeSeries, DocumentFormat.Xml).ConfigureAwait(false);
+        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat)).ConfigureAwait(false);
 
-        AssertDocument(document, DocumentFormat.Xml)
+        AssertDocument(document, DocumentFormat.From(documentFormat))
             .SettlementMethodIsNotPresent();
     }
 

@@ -139,7 +139,8 @@ internal sealed class AssertAggregationResultJsonDocument : IAssertAggregationRe
 
     public IAssertAggregationResultDocument SettlementMethodIsNotPresent()
     {
-        throw new NotImplementedException();
+        Assert.Throws<KeyNotFoundException>(() => FirstTimeSeriesElement().GetProperty("marketEvaluationPoint.settlementMethod"));
+        return this;
     }
 
     public IAssertAggregationResultDocument EnergySupplierNumberIsNotPresent()

@@ -110,6 +110,15 @@ public class AggregationResultJsonDocumentWriter : IMessageWriter
                 writer.WriteEndObject();
             }
 
+            if (series.SettlementType is not null)
+            {
+                writer.WritePropertyName("marketEvaluationPoint.settlementMethod");
+                writer.WriteStartObject();
+                writer.WritePropertyName("value");
+                writer.WriteStringValue(CimCode.Of(SettlementType.From(series.SettlementType)));
+                writer.WriteEndObject();
+            }
+
             writer.WritePropertyName("marketEvaluationPoint.type");
             writer.WriteStartObject();
             writer.WritePropertyName("value");
