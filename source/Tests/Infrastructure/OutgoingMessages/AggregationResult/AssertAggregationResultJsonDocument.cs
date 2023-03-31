@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -138,27 +139,40 @@ internal sealed class AssertAggregationResultJsonDocument : IAssertAggregationRe
 
     public IAssertAggregationResultDocument SettlementMethodIsNotPresent()
     {
-        throw new NotImplementedException();
+        Assert.Throws<KeyNotFoundException>(() => FirstTimeSeriesElement().GetProperty("marketEvaluationPoint.settlementMethod"));
+        return this;
     }
 
     public IAssertAggregationResultDocument EnergySupplierNumberIsNotPresent()
     {
-        throw new NotImplementedException();
+        Assert.Throws<KeyNotFoundException>(() => FirstTimeSeriesElement().GetProperty("energySupplier_MarketParticipant.mRID"));
+        return this;
     }
 
     public IAssertAggregationResultDocument BalanceResponsibleNumberIsNotPresent()
     {
-        throw new NotImplementedException();
+        Assert.Throws<KeyNotFoundException>(() => FirstTimeSeriesElement().GetProperty("balanceResponsibleParty_MarketParticipant.mRID"));
+        return this;
     }
 
     public IAssertAggregationResultDocument QuantityIsNotPresentForPosition(int position)
     {
-        throw new NotImplementedException();
+        var point = FirstTimeSeriesElement()
+            .GetProperty("Period")
+            .GetProperty("Point").EnumerateArray().ToList()[position - 1];
+
+        Assert.Throws<KeyNotFoundException>(() => point.GetProperty("quantity"));
+        return this;
     }
 
     public IAssertAggregationResultDocument QualityIsNotPresentForPosition(int position)
     {
-        throw new NotImplementedException();
+        var point = FirstTimeSeriesElement()
+            .GetProperty("Period")
+            .GetProperty("Point").EnumerateArray().ToList()[position - 1];
+
+        Assert.Throws<KeyNotFoundException>(() => point.GetProperty("quality"));
+        return this;
     }
 
     private JsonElement FirstTimeSeriesElement()

@@ -25,6 +25,7 @@ using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions.Aggregations;
 using Infrastructure.OutgoingMessages.Common;
 using Infrastructure.OutgoingMessages.Common.Json;
+using Json.More;
 using DocumentFormat = Domain.OutgoingMessages.DocumentFormat;
 
 namespace Infrastructure.OutgoingMessages.AggregationResult;
@@ -99,6 +100,13 @@ public class AggregationResultJsonDocumentWriter : IMessageWriter
                     new KeyValuePair<string, string>("value", series.EnergySupplierNumber));
             }
 
+            if (series.SettlementType is not null)
+            {
+                writer.WriteObject(
+                    "marketEvaluationPoint.settlementMethod",
+                    new KeyValuePair<string, string>("value", CimCode.Of(SettlementType.From(series.SettlementType))));
+            }
+
             writer.WriteObject("marketEvaluationPoint.type", new KeyValuePair<string, string>("value", CimCode.Of(MeteringPointType.From(series.MeteringPointType))));
             writer.WriteProperty("product", GeneralValues.ProductCode);
             writer.WriteObject("quantity_Measure_Unit.name", new KeyValuePair<string, string>("value", CimCode.Of(MeasurementUnit.From(series.MeasureUnitType))));
@@ -114,6 +122,7 @@ public class AggregationResultJsonDocumentWriter : IMessageWriter
             writer.WriteObject("end", new KeyValuePair<string, string>("value", series.Period.End.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture)));
             writer.WriteEndObject();
 
+            // Points
             writer.WritePropertyName("Point");
             writer.WriteStartArray();
             foreach (var point in series.Point)
@@ -124,8 +133,20 @@ public class AggregationResultJsonDocumentWriter : IMessageWriter
                 writer.WritePropertyName("value");
                 writer.WriteNumberValue(point.Position);
                 writer.WriteEndObject();
-                writer.WritePropertyName("quantity");
-                writer.WriteNumberValue(point.Quantity.GetValueOrDefault());
+
+                if (Quality.From(point.Quality) != Quality.Measured)
+                {
+                    writer.WriteObject(
+                        "quality",
+                        new KeyValuePair<string, string>("value", Quality.From(point.Quality).Code));
+                }
+
+                if (point.Quantity.HasValue)
+                {
+                    writer.WritePropertyName("quantity");
+                    writer.WriteNumberValue(point.Quantity.GetValueOrDefault());
+                }
+
                 writer.WriteEndObject();
             }
 

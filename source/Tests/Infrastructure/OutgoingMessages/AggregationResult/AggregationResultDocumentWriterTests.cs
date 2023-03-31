@@ -84,64 +84,74 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
             .DocumentIsValidAsync().ConfigureAwait(false);
     }
 
-    [Fact]
-    public async Task Point_quantity_element_is_excluded_if_no_value()
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
+    public async Task Point_quantity_element_is_excluded_if_no_value(string documentFormat)
     {
         _timeSeries
             .WithPoint(new Point(1, null, Quality.Missing.Name, "2022-12-12T23:00:00Z"));
 
-        var document = await CreateDocument(_timeSeries, DocumentFormat.Xml).ConfigureAwait(false);
+        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat)).ConfigureAwait(false);
 
-        AssertDocument(document, DocumentFormat.Xml)
+        AssertDocument(document, DocumentFormat.From(documentFormat))
             .QuantityIsNotPresentForPosition(1);
     }
 
-    [Fact]
-    public async Task Quality_element_is_excluded_if_value_is_measured()
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
+    public async Task Quality_element_is_excluded_if_value_is_measured(string documentFormat)
     {
         _timeSeries
             .WithPoint(new Point(1, 1, Quality.Measured.Name, "2022-12-12T23:00:00Z"));
 
-        var document = await CreateDocument(_timeSeries, DocumentFormat.Xml).ConfigureAwait(false);
+        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat)).ConfigureAwait(false);
 
-        AssertDocument(document, DocumentFormat.Xml)
+        AssertDocument(document, DocumentFormat.From(documentFormat))
             .QualityIsNotPresentForPosition(1);
     }
 
-    [Fact]
-    public async Task Settlement_method_is_excluded()
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
+    public async Task Settlement_method_is_excluded(string documentFormat)
     {
         _timeSeries
             .WithMeteringPointType(MeteringPointType.Production)
             .WithSettlementMethod(null);
 
-        var document = await CreateDocument(_timeSeries, DocumentFormat.Xml).ConfigureAwait(false);
+        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat)).ConfigureAwait(false);
 
-        AssertDocument(document, DocumentFormat.Xml)
+        AssertDocument(document, DocumentFormat.From(documentFormat))
             .SettlementMethodIsNotPresent();
     }
 
-    [Fact]
-    public async Task Energy_supplier_number_is_excluded()
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
+    public async Task Energy_supplier_number_is_excluded(string documentFormat)
     {
         _timeSeries
             .WithEnergySupplierNumber(null);
 
-        var document = await CreateDocument(_timeSeries, DocumentFormat.Xml).ConfigureAwait(false);
+        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat)).ConfigureAwait(false);
 
-        AssertDocument(document, DocumentFormat.Xml)
+        AssertDocument(document, DocumentFormat.From(documentFormat))
             .EnergySupplierNumberIsNotPresent();
     }
 
-    [Fact]
-    public async Task Balance_responsible_number_is_excluded()
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
+    public async Task Balance_responsible_number_is_excluded(string documentFormat)
     {
         _timeSeries
             .WithBalanceResponsibleNumber(null);
 
-        var document = await CreateDocument(_timeSeries, DocumentFormat.Xml).ConfigureAwait(false);
+        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat)).ConfigureAwait(false);
 
-        AssertDocument(document, DocumentFormat.Xml)
+        AssertDocument(document, DocumentFormat.From(documentFormat))
             .BalanceResponsibleNumberIsNotPresent();
     }
 
