@@ -32,8 +32,6 @@ namespace Infrastructure.OutgoingMessages.AggregationResult;
 
 public class AggregationResultXmlDocumentWriter : MessageWriter
 {
-    private const string ActiveEnergy = "8716867000030";
-
     public AggregationResultXmlDocumentWriter(IMessageRecordParser parser)
         : base(
             new DocumentDetails(
@@ -58,7 +56,8 @@ public class AggregationResultXmlDocumentWriter : MessageWriter
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, timeSeries.TransactionId.ToString()).ConfigureAwait(false);
 
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "marketEvaluationPoint.type", null, CimCode.Of(MeteringPointType.From(timeSeries.MeteringPointType))).ConfigureAwait(false);
-            await WriteElementIfHasValueAsync("marketEvaluationPoint.settlementMethod", SettlementMethodToCode(timeSeries.SettlementType), writer).ConfigureAwait(false);
+            await WriteElementIfHasValueAsync(
+                "marketEvaluationPoint.settlementMethod", timeSeries.SettlementType is null ? null : CimCode.Of(SettlementType.From(timeSeries.SettlementType)), writer).ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "meteringGridArea_Domain.mRID", null).ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "codingScheme", null, "NDK").ConfigureAwait(false);
@@ -68,7 +67,7 @@ public class AggregationResultXmlDocumentWriter : MessageWriter
             if (timeSeries.EnergySupplierNumber is not null)
             {
                 await writer.WriteStartElementAsync(DocumentDetails.Prefix, "energySupplier_MarketParticipant.mRID", null).ConfigureAwait(false);
-                await writer.WriteAttributeStringAsync(null, "codingScheme", null, ResolveActorCodingScheme(timeSeries.EnergySupplierNumber)).ConfigureAwait(false);
+                await writer.WriteAttributeStringAsync(null, "codingScheme", null, CimCode.CodingSchemeOf(ActorNumber.Create(timeSeries.EnergySupplierNumber))).ConfigureAwait(false);
                 await writer.WriteStringAsync(timeSeries.EnergySupplierNumber).ConfigureAwait(false);
                 await writer.WriteEndElementAsync().ConfigureAwait(false);
             }
@@ -77,17 +76,17 @@ public class AggregationResultXmlDocumentWriter : MessageWriter
             {
                 await writer
                     .WriteStartElementAsync(DocumentDetails.Prefix, "balanceResponsibleParty_MarketParticipant.mRID", null).ConfigureAwait(false);
-                await writer.WriteAttributeStringAsync(null, "codingScheme", null, ResolveActorCodingScheme(timeSeries.BalanceResponsibleNumber)).ConfigureAwait(false);
+                await writer.WriteAttributeStringAsync(null, "codingScheme", null, CimCode.CodingSchemeOf(ActorNumber.Create(timeSeries.BalanceResponsibleNumber))).ConfigureAwait(false);
                 await writer.WriteStringAsync(timeSeries.BalanceResponsibleNumber).ConfigureAwait(false);
                 await writer.WriteEndElementAsync().ConfigureAwait(false);
             }
 
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "product", null, ActiveEnergy).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "product", null, GeneralValues.ProductCode).ConfigureAwait(false);
 
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity_Measure_Unit.name", null, MeasureUnitTypeCodeFrom(timeSeries.MeasureUnitType)).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity_Measure_Unit.name", null, CimCode.Of(MeasurementUnit.From(timeSeries.MeasureUnitType))).ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Period", null).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "resolution", null, ResolutionCodeFrom(timeSeries.Resolution)).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "resolution", null, CimCode.Of(Resolution.From(timeSeries.Resolution))).ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "timeInterval", null).ConfigureAwait(false);
 
@@ -111,50 +110,6 @@ public class AggregationResultXmlDocumentWriter : MessageWriter
             await writer.WriteEndElementAsync().ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
         }
-    }
-
-    private static string ResolutionCodeFrom(string valueToParse)
-    {
-        var resolution = Resolution.From(valueToParse);
-        if (resolution == Resolution.QuarterHourly)
-            return "PT15M";
-        if (resolution == Resolution.Hourly)
-            return "PT1H";
-        return valueToParse;
-    }
-
-    private static string MeasureUnitTypeCodeFrom(string valueToParse)
-    {
-        var measureUnitType = MeasurementUnit.From(valueToParse);
-        if (measureUnitType == MeasurementUnit.Kwh)
-            return "KWH";
-
-        return valueToParse;
-    }
-
-    private static string? SettlementMethodToCode(string? value)
-    {
-        if (value is null)
-            return null;
-
-        var settlementType = SettlementType.From(value);
-
-        if (settlementType == SettlementType.Flex)
-        {
-            return "D01";
-        }
-
-        if (settlementType == SettlementType.NonProfiled)
-        {
-            return "E02";
-        }
-
-        throw new InvalidOperationException("Invalid settlement type");
-    }
-
-    private static string ResolveActorCodingScheme(string energySupplierNumber)
-    {
-        return ActorNumber.IsGlnNumber(energySupplierNumber) ? "A10" : "A01";
     }
 
     private static string ParsePeriodDateFrom(Instant instant)

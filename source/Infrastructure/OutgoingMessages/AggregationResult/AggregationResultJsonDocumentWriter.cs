@@ -77,37 +77,28 @@ public class AggregationResultJsonDocumentWriter : IMessageWriter
         foreach (var series in ParseFrom(marketActivityRecords))
         {
             writer.WriteStartObject();
-            writer.WritePropertyName("mRID");
-            writer.WriteStringValue(series.TransactionId);
 
-            writer.WritePropertyName("meteringGridArea_Domain.mRID");
-            writer.WriteStartObject();
-            writer.WritePropertyName("codingScheme");
-            writer.WriteStringValue("NDK");
-            writer.WritePropertyName("value");
-            writer.WriteStringValue(series.GridAreaCode);
-            writer.WriteEndObject();
+            writer.WriteProperty("mRID", series.TransactionId.ToString());
+
+            writer.WriteObject(
+                "meteringGridArea_Domain.mRID",
+                new KeyValuePair<string, string>("codingScheme", "NDK"),
+                new KeyValuePair<string, string>("value", series.GridAreaCode));
 
             if (series.BalanceResponsibleNumber is not null)
             {
-                writer.WritePropertyName("balanceResponsibleParty_MarketParticipant.mRID");
-                writer.WriteStartObject();
-                writer.WritePropertyName("codingScheme");
-                writer.WriteStringValue(CimCode.CodingSchemeOf(ActorNumber.Create(series.BalanceResponsibleNumber)));
-                writer.WritePropertyName("value");
-                writer.WriteStringValue(series.BalanceResponsibleNumber);
-                writer.WriteEndObject();
+                writer.WriteObject(
+                    "balanceResponsibleParty_MarketParticipant.mRID",
+                    new KeyValuePair<string, string>("codingScheme", CimCode.CodingSchemeOf(ActorNumber.Create(series.BalanceResponsibleNumber))),
+                    new KeyValuePair<string, string>("value", series.BalanceResponsibleNumber));
             }
 
             if (series.EnergySupplierNumber is not null)
             {
-                writer.WritePropertyName("energySupplier_MarketParticipant.mRID");
-                writer.WriteStartObject();
-                writer.WritePropertyName("codingScheme");
-                writer.WriteStringValue(CimCode.CodingSchemeOf(ActorNumber.Create(series.EnergySupplierNumber)));
-                writer.WritePropertyName("value");
-                writer.WriteStringValue(series.EnergySupplierNumber);
-                writer.WriteEndObject();
+                writer.WriteObject(
+                    "energySupplier_MarketParticipant.mRID",
+                    new KeyValuePair<string, string>("codingScheme", CimCode.CodingSchemeOf(ActorNumber.Create(series.EnergySupplierNumber))),
+                    new KeyValuePair<string, string>("value", series.EnergySupplierNumber));
             }
 
             if (series.SettlementType is not null)
@@ -133,24 +124,19 @@ public class AggregationResultJsonDocumentWriter : IMessageWriter
             writer.WritePropertyName("value");
             writer.WriteStringValue(CimCode.Of(MeasurementUnit.From(series.MeasureUnitType)));
             writer.WriteEndObject();
+            writer.WriteObject("marketEvaluationPoint.type", new KeyValuePair<string, string>("value", CimCode.Of(MeteringPointType.From(series.MeteringPointType))));
+            writer.WriteProperty("product", GeneralValues.ProductCode);
+            writer.WriteObject("quantity_Measure_Unit.name", new KeyValuePair<string, string>("value", CimCode.Of(MeasurementUnit.From(series.MeasureUnitType))));
 
             writer.WritePropertyName("Period");
             writer.WriteStartObject();
-            writer.WritePropertyName("resolution");
-            writer.WriteStringValue(CimCode.Of(Resolution.From(series.Resolution)));
+
+            writer.WriteProperty("resolution", CimCode.Of(Resolution.From(series.Resolution)));
 
             writer.WritePropertyName("timeInterval");
             writer.WriteStartObject();
-            writer.WritePropertyName("start");
-            writer.WriteStartObject();
-            writer.WritePropertyName("value");
-            writer.WriteStringValue(series.Period.Start.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture));
-            writer.WriteEndObject();
-            writer.WritePropertyName("end");
-            writer.WriteStartObject();
-            writer.WritePropertyName("value");
-            writer.WriteStringValue(series.Period.End.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture));
-            writer.WriteEndObject();
+            writer.WriteObject("start", new KeyValuePair<string, string>("value", series.Period.Start.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture)));
+            writer.WriteObject("end", new KeyValuePair<string, string>("value", series.Period.End.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture)));
             writer.WriteEndObject();
 
             // Points
@@ -184,8 +170,7 @@ public class AggregationResultJsonDocumentWriter : IMessageWriter
             }
 
             writer.WriteEndArray();
-            // Points
-            writer.WriteEndObject(); // Period end
+            writer.WriteEndObject();
 
             writer.WriteEndObject();
         }
