@@ -127,15 +127,17 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
             .SettlementMethodIsNotPresent();
     }
 
-    [Fact]
-    public async Task Energy_supplier_number_is_excluded()
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
+    public async Task Energy_supplier_number_is_excluded(string documentFormat)
     {
         _timeSeries
             .WithEnergySupplierNumber(null);
 
-        var document = await CreateDocument(_timeSeries, DocumentFormat.Xml).ConfigureAwait(false);
+        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat)).ConfigureAwait(false);
 
-        AssertDocument(document, DocumentFormat.Xml)
+        AssertDocument(document, DocumentFormat.From(documentFormat))
             .EnergySupplierNumberIsNotPresent();
     }
 
