@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using NodaTime;
-
 namespace Domain.Transactions.Aggregations;
 
 public record Aggregation(
@@ -28,8 +26,6 @@ public record Aggregation(
     GridAreaDetails GridAreaDetails);
 
 public record Point(int Position, decimal? Quantity, string Quality, string SampleTime);
-
-public record Period(Instant Start, Instant End);
 
 public record ActorGrouping(string? EnergySupplierNumber, string? BalanceResponsibleNumber);
 
