@@ -25,7 +25,6 @@ using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions.Aggregations;
 using Infrastructure.OutgoingMessages.Common;
 using Infrastructure.OutgoingMessages.Common.Xml;
-using NodaTime;
 using Point = Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
 
 namespace Infrastructure.OutgoingMessages.AggregationResult;
@@ -90,8 +89,8 @@ public class AggregationResultXmlDocumentWriter : MessageWriter
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "timeInterval", null).ConfigureAwait(false);
 
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "start", null, ParsePeriodDateFrom(timeSeries.Period.Start)).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "end", null, ParsePeriodDateFrom(timeSeries.Period.End)).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "start", null, timeSeries.Period.StartToString()).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "end", null, timeSeries.Period.EndToString()).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
             foreach (var point in timeSeries.Point)
             {
@@ -110,11 +109,6 @@ public class AggregationResultXmlDocumentWriter : MessageWriter
             await writer.WriteEndElementAsync().ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
         }
-    }
-
-    private static string ParsePeriodDateFrom(Instant instant)
-    {
-        return instant.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture);
     }
 
     private Task WriteQualityIfRequiredAsync(XmlWriter writer, Point point)

@@ -14,6 +14,8 @@
 
 using System;
 using System.Threading.Tasks;
+using NodaTime;
+using Period = Domain.Transactions.Aggregations.Period;
 
 namespace Tests.Infrastructure.OutgoingMessages.AggregationResult;
 
@@ -79,9 +81,8 @@ public interface IAssertAggregationResultDocument
     /// <summary>
     /// Asserts period
     /// </summary>
-    /// <param name="expectedStartOfPeriod"></param>
-    /// <param name="expectedEndOfPeriod"></param>
-    IAssertAggregationResultDocument HasPeriod(string expectedStartOfPeriod, string expectedEndOfPeriod);
+    /// <param name="expectedPeriod"></param>
+    IAssertAggregationResultDocument HasPeriod(Period expectedPeriod);
 
     /// <summary>
     /// Asserts a point

@@ -126,9 +126,9 @@ public class TimeSeriesBuilder
         return this;
     }
 
-    public TimeSeriesBuilder WithPeriod(string startOfPeriod, string endOfPeriod)
+    public TimeSeriesBuilder WithPeriod(Instant startOfPeriod, Instant endOfPeriod)
     {
-        _period = new Period(ParseTimeStamp(startOfPeriod), ParseTimeStamp(endOfPeriod));
+        _period = new Period(startOfPeriod, endOfPeriod);
         return this;
     }
 

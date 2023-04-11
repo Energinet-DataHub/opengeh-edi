@@ -14,6 +14,8 @@
 
 using System;
 using Domain.Actors;
+using NodaTime;
+using NodaTime.Text;
 
 namespace Tests.Infrastructure.OutgoingMessages.AggregationResult;
 
@@ -39,7 +41,7 @@ internal static class SampleData
 
     public static Guid TransactionId => Guid.Parse("4E85A732-85FD-4D92-8FF3-72C052802716");
 
-    public static string StartOfPeriod => "2022-02-12T23:00:00Z";
+    public static Instant StartOfPeriod => InstantPattern.General.Parse("2022-02-12T23:00:00Z").Value;
 
-    public static string EndOfPeriod => "2022-02-13T23:00:00Z";
+    public static Instant EndOfPeriod => InstantPattern.General.Parse("2022-02-13T23:00:00Z").Value;
 }

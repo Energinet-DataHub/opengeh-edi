@@ -19,6 +19,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using DocumentValidation;
+using Domain.Transactions.Aggregations;
 using Json.Schema;
 using Xunit;
 
@@ -97,14 +98,14 @@ internal sealed class AssertAggregationResultJsonDocument : IAssertAggregationRe
         return this;
     }
 
-    public IAssertAggregationResultDocument HasPeriod(string expectedStartOfPeriod, string expectedEndOfPeriod)
+    public IAssertAggregationResultDocument HasPeriod(Period expectedPeriod)
     {
-        Assert.Equal(expectedStartOfPeriod, FirstTimeSeriesElement()
+        Assert.Equal(expectedPeriod.StartToString(), FirstTimeSeriesElement()
             .GetProperty("Period")
             .GetProperty("timeInterval")
             .GetProperty("start")
             .GetProperty("value").ToString());
-        Assert.Equal(expectedEndOfPeriod, FirstTimeSeriesElement()
+        Assert.Equal(expectedPeriod.EndToString(), FirstTimeSeriesElement()
             .GetProperty("Period")
             .GetProperty("timeInterval")
             .GetProperty("end")

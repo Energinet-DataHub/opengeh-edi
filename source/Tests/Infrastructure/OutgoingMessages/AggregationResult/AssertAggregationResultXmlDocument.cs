@@ -15,6 +15,7 @@ using System;
 using System.Globalization;
 using System.Threading.Tasks;
 using DocumentValidation;
+using Domain.Transactions.Aggregations;
 using Tests.Infrastructure.OutgoingMessages.Asserts;
 
 namespace Tests.Infrastructure.OutgoingMessages.AggregationResult;
@@ -83,11 +84,12 @@ public class AssertAggregationResultXmlDocument : IAssertAggregationResultDocume
         return this;
     }
 
-    public IAssertAggregationResultDocument HasPeriod(string expectedStartOfPeriod, string expectedEndOfPeriod)
+    public IAssertAggregationResultDocument HasPeriod(Period expectedPeriod)
     {
+        ArgumentNullException.ThrowIfNull(expectedPeriod);
         _documentAsserter
-            .HasValue("Series[1]/Period/timeInterval/start", expectedStartOfPeriod)
-            .HasValue("Series[1]/Period/timeInterval/end", expectedEndOfPeriod);
+            .HasValue("Series[1]/Period/timeInterval/start", expectedPeriod.StartToString())
+            .HasValue("Series[1]/Period/timeInterval/end", expectedPeriod.EndToString());
         return this;
     }
 
