@@ -1,4 +1,4 @@
-﻿<!--
+<!--
 Copyright 2020 Energinet DataHub A/S
 
 Licensed under the Apache License, Version 2.0 (the "License2");
@@ -32,7 +32,7 @@ limitations under the License.
     <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="2.2.5" />
     <PackageReference Include="MediatR" Version="12.0.1" />
     <PackageReference Include="Microsoft.Extensions.Azure" Version="1.6.3" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0-preview.2.23128.3" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0-preview.3.23174.8" />
     <PackageReference Include="NodaTime.Serialization.Protobuf" Version="2.0.0" />
     <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.0.0" />
     <PackageReference Include="Polly" Version="7.2.3" />
