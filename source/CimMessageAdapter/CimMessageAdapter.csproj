@@ -21,7 +21,7 @@ limitations under the License.
 
     <ItemGroup>
       <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.13.1" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0-preview.2.23128.3" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0-preview.3.23174.2" />
       <PackageReference Update="Microsoft.VisualStudio.Threading.Analyzers" Version="17.5.22">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
