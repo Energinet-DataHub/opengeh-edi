@@ -12,21 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Globalization;
+using NodaTime;
+
 namespace Domain.Transactions.Aggregations;
 
-public record Aggregation(
-    IReadOnlyList<Point> Points,
-    string MeteringPointType,
-    string MeasureUnitType,
-    string Resolution,
-    Period Period,
-    string? SettlementType,
-    string ProcessType,
-    ActorGrouping ActorGrouping,
-    GridAreaDetails GridAreaDetails);
+public record Period(Instant Start, Instant End)
+{
+    public string StartToString()
+    {
+        return ParsePeriodDateFrom(Start);
+    }
 
-public record Point(int Position, decimal? Quantity, string Quality, string SampleTime);
+    public string EndToString()
+    {
+        return ParsePeriodDateFrom(End);
+    }
 
-public record ActorGrouping(string? EnergySupplierNumber, string? BalanceResponsibleNumber);
-
-public record GridAreaDetails(string GridAreaCode, string OperatorNumber);
+    private static string ParsePeriodDateFrom(Instant instant)
+    {
+        return instant.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture);
+    }
+}

@@ -12,21 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Domain.Transactions.Aggregations;
+using Domain.Transactions.Aggregations;
+using NodaTime.Text;
+using Xunit;
 
-public record Aggregation(
-    IReadOnlyList<Point> Points,
-    string MeteringPointType,
-    string MeasureUnitType,
-    string Resolution,
-    Period Period,
-    string? SettlementType,
-    string ProcessType,
-    ActorGrouping ActorGrouping,
-    GridAreaDetails GridAreaDetails);
+namespace Tests.Domain.Transactions.Aggregations;
 
-public record Point(int Position, decimal? Quantity, string Quality, string SampleTime);
+public class PeriodTests
+{
+    [Fact]
+    public void Adhere_to_format_rules()
+    {
+        var start = InstantPattern.General.Parse("2022-02-12T23:00:10Z").Value;
+        var end = InstantPattern.General.Parse("2022-02-13T23:00:10Z").Value;
 
-public record ActorGrouping(string? EnergySupplierNumber, string? BalanceResponsibleNumber);
+        var period = new Period(start, end);
 
-public record GridAreaDetails(string GridAreaCode, string OperatorNumber);
+        Assert.Equal("2022-02-12T23:00Z", period.StartToString());
+        Assert.Equal("2022-02-13T23:00Z", period.EndToString());
+    }
+}

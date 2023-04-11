@@ -76,10 +76,7 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
             .HasEnergySupplierNumber(SampleData.EnergySupplierNumber)
             .HasProductCode("8716867000030")
             .HasPeriod(
-                InstantPattern.General.Parse(SampleData.StartOfPeriod).Value
-                    .ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture),
-                InstantPattern.General.Parse(SampleData.EndOfPeriod).Value
-                    .ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture))
+                new Period(SampleData.StartOfPeriod, SampleData.EndOfPeriod))
             .HasPoint(1, 1)
             .DocumentIsValidAsync().ConfigureAwait(false);
     }
