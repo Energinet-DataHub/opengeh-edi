@@ -4,47 +4,7 @@
 
 version: 2
 updates:
-  - package-ecosystem: nuget
-    directory: /source/ApplyDBMigrationsApp
+  - package-ecosystem: "nuget"
+    directory: "/source"
     schedule:
-      interval: monthly
-
-  - package-ecosystem: nuget
-    directory: /source/Api
-    schedule:
-      interval: monthly
-
-  - package-ecosystem: nuget
-    directory: /source/Application
-    schedule:
-      interval: monthly
-
-  - package-ecosystem: nuget
-    directory: /source/ArchitectureTests
-    schedule:
-      interval: monthly
-
-  - package-ecosystem: nuget
-    directory: /source/CimMessageAdapter
-    schedule:
-      interval: monthly
-
-  - package-ecosystem: nuget
-    directory: /source/CimMessageAdapter.Tests
-    schedule:
-      interval: monthly
-
-  - package-ecosystem: nuget
-    directory: /source/Infrastructure
-    schedule:
-      interval: monthly
-
-  - package-ecosystem: nuget
-    directory: /source/IntegrationTests
-    schedule:
-      interval: monthly
-
-  - package-ecosystem: nuget
-    directory: /source/Tests
-    schedule:
-      interval: monthly
+      interval: "monthly"
