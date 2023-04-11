@@ -25,7 +25,6 @@ using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions.Aggregations;
 using Infrastructure.OutgoingMessages.Common;
 using Infrastructure.OutgoingMessages.Common.Json;
-using Json.More;
 using DocumentFormat = Domain.OutgoingMessages.DocumentFormat;
 
 namespace Infrastructure.OutgoingMessages.AggregationResult;
@@ -118,8 +117,8 @@ public class AggregationResultJsonDocumentWriter : IMessageWriter
 
             writer.WritePropertyName("timeInterval");
             writer.WriteStartObject();
-            writer.WriteObject("start", new KeyValuePair<string, string>("value", series.Period.Start.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture)));
-            writer.WriteObject("end", new KeyValuePair<string, string>("value", series.Period.End.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture)));
+            writer.WriteObject("start", new KeyValuePair<string, string>("value", series.Period.StartToString()));
+            writer.WriteObject("end", new KeyValuePair<string, string>("value", series.Period.EndToString()));
             writer.WriteEndObject();
 
             // Points
