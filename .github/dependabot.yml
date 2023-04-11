@@ -4,7 +4,7 @@
 
 version: 2
 updates:
-  - package-ecosystem: "nuget"
-    directory: "/source"
+  - package-ecosystem: nuget
+    directory: /source
     schedule:
-      interval: "monthly"
+      interval: monthly
