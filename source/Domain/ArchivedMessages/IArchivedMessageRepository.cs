@@ -10,26 +10,25 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
-// limitations under the License.using System.Threading.Tasks;
+// limitations under the License.
 
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
-using Domain.ArchivedMessages;
 
-namespace Infrastructure.SearchMessages;
+namespace Domain.ArchivedMessages;
 
-public class ArchivedMessageRepository
+/// <summary>
+/// Responsible for archiving messages.
+/// </summary>
+public interface IArchivedMessageRepository
 {
-    private readonly List<ArchivedMessage> _messages = new();
+    /// <summary>
+    /// Archiving a message.
+    /// </summary>
+    /// <param name="message"></param>
+    void Add(ArchivedMessage message);
 
-    public void Add(ArchivedMessage message)
-    {
-        _messages.Add(message);
-    }
-
-    public Task<ReadOnlyCollection<ArchivedMessage>> GetAllAsync()
-    {
-        return Task.FromResult(_messages.AsReadOnly());
-    }
+    /// <summary>
+    /// Fetching all messages
+    /// </summary>
+    Task<ReadOnlyCollection<ArchivedMessage>> GetAllAsync();
 }

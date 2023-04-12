@@ -13,11 +13,9 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Application.SearchMessages;
 using Domain.ArchivedMessages;
-using Infrastructure.SearchMessages;
 using IntegrationTests.Fixtures;
 using Xunit;
 
@@ -25,12 +23,12 @@ namespace IntegrationTests.Application.SearchMessages;
 
 public class SearchMessagesTests : TestBase
 {
-    private readonly ArchivedMessageRepository _repository;
+    private readonly IArchivedMessageRepository _repository;
 
     public SearchMessagesTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _repository = new ArchivedMessageRepository();
+        _repository = GetService<IArchivedMessageRepository>();
     }
 
     [Fact]
@@ -39,16 +37,9 @@ public class SearchMessagesTests : TestBase
         var messageId = Guid.NewGuid();
         _repository.Add(new ArchivedMessage(messageId));
 
-        var result = await InvokeQueryAsync(new GetMessagesQuery()).ConfigureAwait(false);
+        var result = await QueryAsync(new GetMessagesQuery()).ConfigureAwait(false);
 
         Assert.NotNull(result);
         Assert.Contains(result.Messages, message => message.MessageId == messageId);
-    }
-
-    #pragma warning disable
-    private async Task<MessageSearchResult?> InvokeQueryAsync(GetMessagesQuery query)
-    {
-        var messages = await _repository.GetAllAsync().ConfigureAwait(false);
-        return new MessageSearchResult(messages.Select(message => new MessageInfo(message.MessageId)).ToList().AsReadOnly());
     }
 }
