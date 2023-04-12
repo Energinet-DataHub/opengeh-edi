@@ -13,11 +13,12 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.Configuration.Queries;
+using Domain.ArchivedMessages;
+using Infrastructure.SearchMessages;
 using IntegrationTests.Fixtures;
 using Xunit;
 
@@ -50,23 +51,6 @@ public class SearchMessagesTests : TestBase
     {
         var messages = await _repository.GetAllAsync().ConfigureAwait(false);
         return new MessageSearchResult(messages.Select(message => new MessageInfo(message.MessageId)).ToList().AsReadOnly());
-    }
-}
-
-public record ArchivedMessage(Guid MessageId);
-
-public class ArchivedMessageRepository
-{
-    private List<ArchivedMessage> _messages = new();
-
-    public void Add(ArchivedMessage message)
-    {
-        _messages.Add(message);
-    }
-
-    public Task<ReadOnlyCollection<ArchivedMessage>> GetAllAsync()
-    {
-        return Task.FromResult(_messages.AsReadOnly());
     }
 }
 
