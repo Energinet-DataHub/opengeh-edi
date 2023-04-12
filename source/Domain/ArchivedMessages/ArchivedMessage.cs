@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Domain.OutgoingMessages;
+
 namespace Domain.ArchivedMessages;
 
-public record ArchivedMessage(Guid MessageId);
+public record ArchivedMessage(Guid MessageId, MessageType DocumentType);

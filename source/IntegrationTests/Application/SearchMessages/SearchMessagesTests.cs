@@ -13,9 +13,11 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Application.SearchMessages;
 using Domain.ArchivedMessages;
+using Domain.OutgoingMessages;
 using IntegrationTests.Fixtures;
 using Xunit;
 
@@ -34,12 +36,14 @@ public class SearchMessagesTests : TestBase
     [Fact]
     public async Task Can_fetch_messages()
     {
-        var messageId = Guid.NewGuid();
-        _repository.Add(new ArchivedMessage(messageId));
+        var archivedMessage = new ArchivedMessage(Guid.NewGuid(), MessageType.AccountingPointCharacteristics);
+        _repository.Add(archivedMessage);
 
         var result = await QueryAsync(new GetMessagesQuery()).ConfigureAwait(false);
 
-        Assert.NotNull(result);
-        Assert.Contains(result.Messages, message => message.MessageId == messageId);
+        var messageInfo = result.Messages.FirstOrDefault(message => message.MessageId == archivedMessage.MessageId);
+
+        Assert.NotNull(messageInfo);
+        Assert.Equal(archivedMessage.DocumentType.Name, messageInfo.DocumentType);
     }
 }
