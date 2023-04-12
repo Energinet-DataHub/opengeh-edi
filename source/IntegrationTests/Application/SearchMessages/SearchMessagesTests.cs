@@ -13,10 +13,9 @@
 // limitations under the License.
 
 using System;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using Application.Configuration.Queries;
+using Application.SearchMessages;
 using Domain.ArchivedMessages;
 using Infrastructure.SearchMessages;
 using IntegrationTests.Fixtures;
@@ -52,12 +51,4 @@ public class SearchMessagesTests : TestBase
         var messages = await _repository.GetAllAsync().ConfigureAwait(false);
         return new MessageSearchResult(messages.Select(message => new MessageInfo(message.MessageId)).ToList().AsReadOnly());
     }
-}
-
-internal sealed record MessageSearchResult(ReadOnlyCollection<MessageInfo> Messages);
-
-public record MessageInfo(Guid MessageId);
-
-public sealed record GetMessagesQuery : IQuery<MessageSearchResult>
-{
 }
