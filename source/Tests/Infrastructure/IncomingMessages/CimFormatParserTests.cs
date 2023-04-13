@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Domain.Documents;
 using Domain.OutgoingMessages;
 using Domain.SeedWork;
 using Infrastructure.IncomingMessages;

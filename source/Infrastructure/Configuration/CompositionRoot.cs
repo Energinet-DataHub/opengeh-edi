@@ -26,6 +26,7 @@ using Application.Transactions.Aggregations;
 using Application.Transactions.MoveIn;
 using Azure.Messaging.ServiceBus;
 using CimMessageAdapter.Messages;
+using Domain.Documents;
 using Domain.MasterData.MarketEvaluationPoints;
 using Domain.OutgoingMessages;
 using Domain.Transactions.MoveIn;

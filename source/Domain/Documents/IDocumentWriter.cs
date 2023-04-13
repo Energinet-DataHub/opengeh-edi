@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.Documents;
+using Domain.OutgoingMessages;
 
-namespace Domain.OutgoingMessages;
+namespace Domain.Documents;
 
 /// <summary>
 /// Writes outgoing messages

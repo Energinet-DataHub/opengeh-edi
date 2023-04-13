@@ -26,7 +26,7 @@ using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions.Aggregations;
 using Infrastructure.OutgoingMessages.Common;
 using Infrastructure.OutgoingMessages.Common.Json;
-using DocumentFormat = Domain.OutgoingMessages.DocumentFormat;
+using DocumentFormat = Domain.Documents.DocumentFormat;
 
 namespace Infrastructure.OutgoingMessages.AggregationResult;
 

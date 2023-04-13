@@ -19,6 +19,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Api;
+using Domain.Documents;
 using Domain.OutgoingMessages;
 using Infrastructure.Configuration;
 using Infrastructure.OutgoingMessages.Common.Xml;

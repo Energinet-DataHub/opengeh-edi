@@ -22,6 +22,7 @@ using Application.IncomingMessages.RequestChangeCustomerCharacteristics;
 using CimMessageAdapter.Errors;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
+using Domain.Documents;
 using Domain.OutgoingMessages;
 using Infrastructure.IncomingMessages.RequestChangeCustomerCharacteristics;
 using Xunit;

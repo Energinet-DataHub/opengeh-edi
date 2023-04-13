@@ -14,7 +14,7 @@
 
 using Domain.SeedWork;
 
-namespace Domain.OutgoingMessages;
+namespace Domain.Documents;
 
 public class DocumentFormat : EnumerationType
 {
