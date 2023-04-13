@@ -29,7 +29,7 @@ using Point = Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
 
 namespace Infrastructure.OutgoingMessages.AggregationResult;
 
-public class AggregationResultXmlDocumentWriter : MessageWriter
+public class AggregationResultXmlDocumentWriter : DocumentWriter
 {
     public AggregationResultXmlDocumentWriter(IMessageRecordParser parser)
         : base(

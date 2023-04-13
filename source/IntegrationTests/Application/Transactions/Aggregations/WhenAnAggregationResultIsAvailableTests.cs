@@ -15,6 +15,7 @@
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Domain.Actors;
+using Domain.Documents;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions.Aggregations;
@@ -173,7 +174,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
     private async Task<AssertOutgoingMessage> OutgoingMessageAsync(MarketRole roleOfReceiver, ProcessType completedAggregationType)
     {
         return await AssertOutgoingMessage.OutgoingMessageAsync(
-            MessageType.NotifyAggregatedMeasureData.Name,
+            DocumentType.NotifyAggregatedMeasureData.Name,
             completedAggregationType.Name,
             roleOfReceiver,
             GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);

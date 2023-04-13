@@ -20,16 +20,17 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Application.OutgoingMessages.Common;
 using Domain.Actors;
+using Domain.Documents;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions.Aggregations;
 using Infrastructure.OutgoingMessages.Common;
 using Infrastructure.OutgoingMessages.Common.Json;
-using DocumentFormat = Domain.OutgoingMessages.DocumentFormat;
+using DocumentFormat = Domain.Documents.DocumentFormat;
 
 namespace Infrastructure.OutgoingMessages.AggregationResult;
 
-public class AggregationResultJsonDocumentWriter : IMessageWriter
+public class AggregationResultJsonDocumentWriter : IDocumentWriter
 {
     private const string DocumentType = "NotifyAggregatedMeasureData_MarketDocument";
     private const string TypeCode = "E31";
@@ -45,9 +46,9 @@ public class AggregationResultJsonDocumentWriter : IMessageWriter
         return format == DocumentFormat.Json;
     }
 
-    public bool HandlesType(MessageType messageType)
+    public bool HandlesType(DocumentType documentType)
     {
-        return messageType == MessageType.NotifyAggregatedMeasureData;
+        return documentType == Domain.Documents.DocumentType.NotifyAggregatedMeasureData;
     }
 
     public async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)

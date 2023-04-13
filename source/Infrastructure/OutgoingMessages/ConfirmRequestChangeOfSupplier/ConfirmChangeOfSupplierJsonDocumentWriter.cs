@@ -18,19 +18,20 @@ using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Application.OutgoingMessages.Common;
+using Domain.Documents;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Infrastructure.OutgoingMessages.Common.Json;
 
 namespace Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 
-public class ConfirmChangeOfSupplierJsonMessageWriter : IMessageWriter
+public class ConfirmChangeOfSupplierJsonDocumentWriter : IDocumentWriter
 {
     private const string DocumentType = "ConfirmRequestChangeOfSupplier_MarketDocument";
     private const string TypeCode = "414";
     private readonly IMessageRecordParser _parser;
 
-    public ConfirmChangeOfSupplierJsonMessageWriter(IMessageRecordParser parser)
+    public ConfirmChangeOfSupplierJsonDocumentWriter(IMessageRecordParser parser)
     {
         _parser = parser;
     }
@@ -40,10 +41,10 @@ public class ConfirmChangeOfSupplierJsonMessageWriter : IMessageWriter
         return format == DocumentFormat.Json;
     }
 
-    public bool HandlesType(MessageType messageType)
+    public bool HandlesType(DocumentType documentType)
     {
-        if (messageType == null) throw new ArgumentNullException(nameof(messageType));
-        return messageType.Name.Equals(DocumentType.Split("_")[0], StringComparison.OrdinalIgnoreCase);
+        if (documentType == null) throw new ArgumentNullException(nameof(documentType));
+        return documentType.Name.Equals(DocumentType.Split("_")[0], StringComparison.OrdinalIgnoreCase);
     }
 
     public async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)

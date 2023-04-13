@@ -20,6 +20,7 @@ using Application.MasterData;
 using Application.OutgoingMessages;
 using Application.OutgoingMessages.Common;
 using Domain.Actors;
+using Domain.Documents;
 using Domain.MasterData.Dictionaries;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.AccountingPointCharacteristics;
@@ -125,7 +126,7 @@ public class ForwardMeteringPointMasterDataHandler : IRequestHandler<ForwardMete
     private static OutgoingMessage CreateOutgoingMessage(Guid id, string processType, string receiverId, string marketActivityRecordPayload)
     {
         return new OutgoingMessage(
-            MessageType.AccountingPointCharacteristics,
+            DocumentType.AccountingPointCharacteristics,
             ActorNumber.Create(receiverId),
             TransactionId.Create(id),
             processType,

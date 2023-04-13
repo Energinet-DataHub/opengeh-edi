@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.Response;
+using Domain.Documents;
 using Domain.OutgoingMessages;
 using Infrastructure.IncomingMessages.Response;
 using Xunit;

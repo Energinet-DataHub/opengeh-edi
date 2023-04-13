@@ -24,7 +24,7 @@ using CimMessageAdapter.Messages;
 using DocumentValidation;
 using DocumentValidation.CimXml;
 using Domain.OutgoingMessages;
-using DocumentFormat = Domain.OutgoingMessages.DocumentFormat;
+using DocumentFormat = Domain.Documents.DocumentFormat;
 
 namespace Infrastructure.IncomingMessages.RequestChangeOfSupplier;
 

@@ -18,6 +18,7 @@ using Application.Configuration.DataAccess;
 using Application.MasterData;
 using Application.Transactions.MoveIn.MasterDataDelivery;
 using Domain.Actors;
+using Domain.Documents;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Domain.Transactions.MoveIn;
@@ -142,7 +143,7 @@ public class WhenRequestedCustomerMasterDataIsReceivedTests
     {
         var assertMessage = await AssertOutgoingMessage.OutgoingMessageAsync(
             SampleData.TransactionId,
-            MessageType.CharacteristicsOfACustomerAtAnAP.Name,
+            DocumentType.CharacteristicsOfACustomerAtAnAP.Name,
             ProcessType.MoveIn.Name,
             GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
         return assertMessage;

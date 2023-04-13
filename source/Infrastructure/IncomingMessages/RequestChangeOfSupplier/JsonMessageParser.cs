@@ -27,7 +27,7 @@ using CimMessageAdapter.Messages;
 using DocumentValidation;
 using Domain.OutgoingMessages;
 using Json.Schema;
-using DocumentFormat = Domain.OutgoingMessages.DocumentFormat;
+using DocumentFormat = Domain.Documents.DocumentFormat;
 using MessageHeader = Application.IncomingMessages.MessageHeader;
 
 namespace Infrastructure.IncomingMessages.RequestChangeOfSupplier;

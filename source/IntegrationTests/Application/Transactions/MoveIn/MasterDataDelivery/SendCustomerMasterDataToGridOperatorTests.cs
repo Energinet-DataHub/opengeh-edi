@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Application.Transactions.MoveIn.MasterDataDelivery;
 using Domain.Actors;
+using Domain.Documents;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Domain.Transactions.MoveIn;
@@ -108,7 +109,7 @@ public class SendCustomerMasterDataToGridOperatorTests
     {
         var assertMessage = await Assertions.AssertOutgoingMessage.OutgoingMessageAsync(
             SampleData.TransactionId,
-            MessageType.CharacteristicsOfACustomerAtAnAP.Name,
+            DocumentType.CharacteristicsOfACustomerAtAnAP.Name,
             ProcessType.MoveIn.Name,
             MarketRole.GridOperator,
             GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
