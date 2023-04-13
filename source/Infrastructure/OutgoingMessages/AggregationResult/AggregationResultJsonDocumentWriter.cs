@@ -20,6 +20,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Application.OutgoingMessages.Common;
 using Domain.Actors;
+using Domain.Documents;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions.Aggregations;

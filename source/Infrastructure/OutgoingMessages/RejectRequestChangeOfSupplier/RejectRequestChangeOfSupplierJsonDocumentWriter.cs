@@ -18,6 +18,7 @@ using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Application.OutgoingMessages.Common;
+using Domain.Documents;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Infrastructure.OutgoingMessages.Common.Json;

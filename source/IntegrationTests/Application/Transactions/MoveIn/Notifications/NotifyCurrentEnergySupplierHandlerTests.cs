@@ -17,6 +17,7 @@ using Application.Configuration.DataAccess;
 using Application.OutgoingMessages;
 using Application.Transactions.MoveIn.Notifications;
 using Domain.Actors;
+using Domain.Documents;
 using Domain.OutgoingMessages;
 using Domain.Transactions.MoveIn;
 using Infrastructure.Configuration.DataAccess;

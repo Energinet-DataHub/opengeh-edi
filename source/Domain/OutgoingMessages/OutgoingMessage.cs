@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Domain.Actors;
+using Domain.Documents;
 using Domain.Transactions;
 
 namespace Domain.OutgoingMessages

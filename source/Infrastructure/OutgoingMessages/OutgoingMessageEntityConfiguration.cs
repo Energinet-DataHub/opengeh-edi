@@ -14,6 +14,7 @@
 
 using System;
 using Domain.Actors;
+using Domain.Documents;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.AccountingPointCharacteristics;
 using Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;

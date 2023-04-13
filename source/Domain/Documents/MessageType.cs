@@ -15,7 +15,7 @@
 using Domain.OutgoingMessages.Peek;
 using Domain.SeedWork;
 
-namespace Domain.OutgoingMessages;
+namespace Domain.Documents;
 
 public class MessageType : EnumerationType
 {

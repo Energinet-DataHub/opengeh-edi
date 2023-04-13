@@ -15,6 +15,7 @@
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Domain.Actors;
+using Domain.Documents;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 using Domain.Transactions.Aggregations;

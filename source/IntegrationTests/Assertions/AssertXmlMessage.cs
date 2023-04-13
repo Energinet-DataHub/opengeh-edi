@@ -18,6 +18,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using Domain.Actors;
+using Domain.Documents;
 using Domain.OutgoingMessages;
 using Infrastructure.OutgoingMessages.Common;
 using Xunit;

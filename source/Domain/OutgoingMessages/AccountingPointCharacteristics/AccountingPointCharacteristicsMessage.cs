@@ -14,6 +14,7 @@
 
 using System.Text.Json;
 using Domain.Actors;
+using Domain.Documents;
 using Domain.Transactions;
 
 namespace Domain.OutgoingMessages.AccountingPointCharacteristics;

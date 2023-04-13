@@ -19,6 +19,7 @@ using Application.Configuration.DataAccess;
 using Application.Transactions.MoveIn;
 using Dapper;
 using Domain.Actors;
+using Domain.Documents;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 using Domain.Transactions.MoveIn;

@@ -16,6 +16,7 @@ using System;
 using Application.OutgoingMessages;
 using Application.OutgoingMessages.Common;
 using Domain.Actors;
+using Domain.Documents;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.GenericNotification;
 using Domain.Transactions.MoveIn;

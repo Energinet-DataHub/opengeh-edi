@@ -19,6 +19,7 @@ using Application.Configuration.DataAccess;
 using Application.OutgoingMessages.Peek;
 using Dapper;
 using Domain.Actors;
+using Domain.Documents;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.Peek;
 using Infrastructure.OutgoingMessages;

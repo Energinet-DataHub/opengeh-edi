@@ -20,6 +20,7 @@ using Application.Configuration.DataAccess;
 using Application.MasterData;
 using Application.OutgoingMessages.Common;
 using Application.Transactions.MoveIn.MasterDataDelivery;
+using Domain.Documents;
 using Domain.MasterData.Dictionaries;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.AccountingPointCharacteristics;

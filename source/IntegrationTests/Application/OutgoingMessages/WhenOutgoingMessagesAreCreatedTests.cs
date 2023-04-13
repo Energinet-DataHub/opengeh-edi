@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Dapper;
 using Domain.Actors;
+using Domain.Documents;
 using Domain.OutgoingMessages;
 using Infrastructure.OutgoingMessages.Common;
 using IntegrationTests.Application.IncomingMessages;

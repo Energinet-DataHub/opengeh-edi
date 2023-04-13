@@ -18,6 +18,7 @@ using Application.Configuration.DataAccess;
 using Application.MasterData;
 using Application.Transactions.MoveIn.MasterDataDelivery;
 using Domain.Actors;
+using Domain.Documents;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 using Domain.Transactions.MoveIn;
