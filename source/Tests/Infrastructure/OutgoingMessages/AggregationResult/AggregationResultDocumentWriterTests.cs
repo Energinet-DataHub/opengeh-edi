@@ -26,7 +26,7 @@ using Tests.Factories;
 using Tests.Fixtures;
 using Tests.Infrastructure.OutgoingMessages.Asserts;
 using Xunit;
-using DocumentFormat = Domain.OutgoingMessages.DocumentFormat;
+using DocumentFormat = Domain.Documents.DocumentFormat;
 using Point = Domain.OutgoingMessages.NotifyAggregatedMeasureData.Point;
 
 namespace Tests.Infrastructure.OutgoingMessages.AggregationResult;

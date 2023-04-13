@@ -27,7 +27,7 @@ using DocumentValidation;
 using Domain.OutgoingMessages;
 using Infrastructure.IncomingMessages.RequestChangeOfSupplier;
 using Xunit;
-using DocumentFormat = Domain.OutgoingMessages.DocumentFormat;
+using DocumentFormat = Domain.Documents.DocumentFormat;
 
 namespace Tests.CimMessageAdapter.Messages.RequestChangeOfSupplier;
 

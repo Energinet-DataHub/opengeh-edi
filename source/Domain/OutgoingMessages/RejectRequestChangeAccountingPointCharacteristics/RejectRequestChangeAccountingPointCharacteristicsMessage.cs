@@ -14,20 +14,21 @@
 
 using System.Text.Json;
 using Domain.Actors;
+using Domain.Documents;
 using Domain.Transactions;
 
 namespace Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 
 public class RejectRequestChangeAccountingPointCharacteristicsMessage : OutgoingMessage
 {
-    public RejectRequestChangeAccountingPointCharacteristicsMessage(MessageType messageType, ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
-        : base(messageType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, messageRecord)
+    public RejectRequestChangeAccountingPointCharacteristicsMessage(DocumentType documentType, ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
+        : base(documentType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, messageRecord)
     {
         MarketActivityRecord = JsonSerializer.Deserialize<MarketActivityRecord>(messageRecord)!;
     }
 
-    public RejectRequestChangeAccountingPointCharacteristicsMessage(MessageType messageType, ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, MarketActivityRecord marketActivityRecord)
-        : base(messageType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, JsonSerializer.Serialize(marketActivityRecord))
+    public RejectRequestChangeAccountingPointCharacteristicsMessage(DocumentType documentType, ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, MarketActivityRecord marketActivityRecord)
+        : base(documentType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, JsonSerializer.Serialize(marketActivityRecord))
     {
         MarketActivityRecord = marketActivityRecord;
     }
