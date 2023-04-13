@@ -45,7 +45,7 @@ public class SearchMessagesTests : TestBase
 
         var result = await QueryAsync(new GetMessagesQuery()).ConfigureAwait(false);
 
-        var messageInfo = result.Messages.FirstOrDefault(message => message.MessageId == archivedMessage.MessageId);
+        var messageInfo = result.Messages.FirstOrDefault(message => message.MessageId == archivedMessage.Id);
 
         Assert.NotNull(messageInfo);
         Assert.Equal(archivedMessage.DocumentType.Name, messageInfo.DocumentType);

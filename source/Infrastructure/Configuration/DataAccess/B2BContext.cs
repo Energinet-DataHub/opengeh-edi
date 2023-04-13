@@ -24,6 +24,7 @@ using Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Domain.Transactions.Aggregations;
 using Domain.Transactions.MoveIn;
+using Infrastructure.ArchivedMessages;
 using Infrastructure.Configuration.IntegrationEvents;
 using Infrastructure.Configuration.InternalCommands;
 using Infrastructure.Configuration.Serialization;
@@ -82,6 +83,7 @@ namespace Infrastructure.Configuration.DataAccess
             modelBuilder.ApplyConfiguration(new ReceivedIntegrationEventEntityConfiguration());
             modelBuilder.ApplyConfiguration(new MarketEvaluationPointEntityConfiguration());
             modelBuilder.ApplyConfiguration(new BundledMessageConfiguration());
+            modelBuilder.ApplyConfiguration(new ArchivedMessageEntityConfiguration());
 
             modelBuilder.Entity<GenericNotificationMessage>()
                 .Ignore(entity => entity.MarketActivityRecord);
