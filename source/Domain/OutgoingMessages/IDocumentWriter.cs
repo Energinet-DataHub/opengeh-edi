@@ -19,7 +19,7 @@ namespace Domain.OutgoingMessages;
 /// <summary>
 /// Writes outgoing messages
 /// </summary>
-public interface IMessageWriter
+public interface IDocumentWriter
 {
     /// <summary>
     /// Determine if specified format can be handled by message writer

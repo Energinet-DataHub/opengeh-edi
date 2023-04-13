@@ -25,13 +25,13 @@ using Infrastructure.OutgoingMessages.Common.Json;
 
 namespace Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 
-public class ConfirmChangeOfSupplierJsonMessageWriter : IMessageWriter
+public class ConfirmChangeOfSupplierJsonDocumentWriter : IDocumentWriter
 {
     private const string DocumentType = "ConfirmRequestChangeOfSupplier_MarketDocument";
     private const string TypeCode = "414";
     private readonly IMessageRecordParser _parser;
 
-    public ConfirmChangeOfSupplierJsonMessageWriter(IMessageRecordParser parser)
+    public ConfirmChangeOfSupplierJsonDocumentWriter(IMessageRecordParser parser)
     {
         _parser = parser;
     }

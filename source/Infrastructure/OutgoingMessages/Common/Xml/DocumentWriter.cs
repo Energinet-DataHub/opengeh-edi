@@ -25,13 +25,13 @@ using Domain.OutgoingMessages;
 
 namespace Infrastructure.OutgoingMessages.Common.Xml;
 
-public abstract class MessageWriter : IMessageWriter
+public abstract class DocumentWriter : IDocumentWriter
 {
     private readonly DocumentDetails _documentDetails;
     private readonly IMessageRecordParser _parser;
     private readonly string? _reasonCode;
 
-    protected MessageWriter(DocumentDetails documentDetails, IMessageRecordParser parser, string? reasonCode = null)
+    protected DocumentWriter(DocumentDetails documentDetails, IMessageRecordParser parser, string? reasonCode = null)
     {
         _documentDetails = documentDetails;
         _parser = parser;

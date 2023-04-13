@@ -255,17 +255,17 @@ namespace Infrastructure.Configuration
         private void AddMessageGenerationServices()
         {
             _services.AddScoped<DocumentFactory>();
-            _services.AddScoped<IMessageWriter, ConfirmChangeOfSupplierXmlDocumentWriter>();
-            _services.AddScoped<IMessageWriter, ConfirmChangeOfSupplierJsonMessageWriter>();
-            _services.AddScoped<IMessageWriter, RejectRequestChangeOfSupplierXmlDocumentWriter>();
-            _services.AddScoped<IMessageWriter, GenericNotificationXmlDocumentWriter>();
-            _services.AddScoped<IMessageWriter, AccountingPointCharacteristicsXmlDocumentWriter>();
-            _services.AddScoped<IMessageWriter, ConfirmRequestChangeAccountingPointCharacteristicsXmlDocumentWriter>();
-            _services.AddScoped<IMessageWriter, RejectRequestChangeAccountingPointCharacteristicsXmlDocumentWriter>();
-            _services.AddScoped<IMessageWriter, CharacteristicsOfACustomerAtAnApDocumentWriter>();
-            _services.AddScoped<IMessageWriter, RejectRequestChangeOfSupplierJsonDocumentWriter>();
-            _services.AddScoped<IMessageWriter, AggregationResultXmlDocumentWriter>();
-            _services.AddScoped<IMessageWriter, AggregationResultJsonDocumentWriter>();
+            _services.AddScoped<IDocumentWriter, ConfirmChangeOfSupplierXmlDocumentWriter>();
+            _services.AddScoped<IDocumentWriter, ConfirmChangeOfSupplierJsonDocumentWriter>();
+            _services.AddScoped<IDocumentWriter, RejectRequestChangeOfSupplierXmlDocumentWriter>();
+            _services.AddScoped<IDocumentWriter, GenericNotificationXmlDocumentWriter>();
+            _services.AddScoped<IDocumentWriter, AccountingPointCharacteristicsXmlDocumentWriter>();
+            _services.AddScoped<IDocumentWriter, ConfirmRequestChangeAccountingPointCharacteristicsXmlDocumentWriter>();
+            _services.AddScoped<IDocumentWriter, RejectRequestChangeAccountingPointCharacteristicsXmlDocumentWriter>();
+            _services.AddScoped<IDocumentWriter, CharacteristicsOfACustomerAtAnApDocumentWriter>();
+            _services.AddScoped<IDocumentWriter, RejectRequestChangeOfSupplierJsonDocumentWriter>();
+            _services.AddScoped<IDocumentWriter, AggregationResultXmlDocumentWriter>();
+            _services.AddScoped<IDocumentWriter, AggregationResultJsonDocumentWriter>();
 
             _services.AddScoped<IValidationErrorTranslator, ValidationErrorTranslator>();
             _services.AddScoped<IMessageRecordParser, MessageRecordParser>();

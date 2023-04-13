@@ -30,7 +30,7 @@ using DocumentFormat = Domain.OutgoingMessages.DocumentFormat;
 
 namespace Infrastructure.OutgoingMessages.AggregationResult;
 
-public class AggregationResultJsonDocumentWriter : IMessageWriter
+public class AggregationResultJsonDocumentWriter : IDocumentWriter
 {
     private const string DocumentType = "NotifyAggregatedMeasureData_MarketDocument";
     private const string TypeCode = "E31";

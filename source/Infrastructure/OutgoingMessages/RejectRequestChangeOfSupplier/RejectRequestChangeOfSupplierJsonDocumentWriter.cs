@@ -25,7 +25,7 @@ using Infrastructure.OutgoingMessages.Common.Json;
 
 namespace Infrastructure.OutgoingMessages.RejectRequestChangeOfSupplier;
 
-public class RejectRequestChangeOfSupplierJsonDocumentWriter : IMessageWriter
+public class RejectRequestChangeOfSupplierJsonDocumentWriter : IDocumentWriter
 {
     private const string DocumentType = "RejectRequestChangeOfSupplier_MarketDocument";
     private const string TypeCode = "414";

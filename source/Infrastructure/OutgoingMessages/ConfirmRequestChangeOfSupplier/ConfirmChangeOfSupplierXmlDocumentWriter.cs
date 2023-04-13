@@ -23,7 +23,7 @@ using Infrastructure.OutgoingMessages.Common.Xml;
 
 namespace Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 
-public class ConfirmChangeOfSupplierXmlDocumentWriter : MessageWriter
+public class ConfirmChangeOfSupplierXmlDocumentWriter : DocumentWriter
 {
     public ConfirmChangeOfSupplierXmlDocumentWriter(IMessageRecordParser parser)
     : base(
