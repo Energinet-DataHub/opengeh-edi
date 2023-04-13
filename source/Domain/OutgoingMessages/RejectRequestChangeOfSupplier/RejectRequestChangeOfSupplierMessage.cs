@@ -14,21 +14,22 @@
 
 using System.Text.Json;
 using Domain.Actors;
+using Domain.Documents;
 using Domain.Transactions;
 
 namespace Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 
 public class RejectRequestChangeOfSupplierMessage : OutgoingMessage
 {
-    private RejectRequestChangeOfSupplierMessage(MessageType messageType, ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
-        : base(messageType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, messageRecord)
+    private RejectRequestChangeOfSupplierMessage(DocumentType documentType, ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
+        : base(documentType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, messageRecord)
     {
         ArgumentNullException.ThrowIfNull(messageRecord);
         MarketActivityRecord = JsonSerializer.Deserialize<MarketActivityRecord>(messageRecord)!;
     }
 
     private RejectRequestChangeOfSupplierMessage(ActorNumber receiverId, TransactionId transactionId, string processType, MarketActivityRecord marketActivityRecord)
-        : base(MessageType.RejectRequestChangeOfSupplier, receiverId, transactionId, processType, MarketRole.EnergySupplier, DataHubDetails.IdentificationNumber, MarketRole.MeteringPointAdministrator, JsonSerializer.Serialize(marketActivityRecord))
+        : base(DocumentType.RejectRequestChangeOfSupplier, receiverId, transactionId, processType, MarketRole.EnergySupplier, DataHubDetails.IdentificationNumber, MarketRole.MeteringPointAdministrator, JsonSerializer.Serialize(marketActivityRecord))
     {
         MarketActivityRecord = marketActivityRecord;
     }

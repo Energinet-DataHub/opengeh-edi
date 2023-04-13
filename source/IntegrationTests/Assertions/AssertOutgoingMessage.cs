@@ -34,30 +34,30 @@ namespace IntegrationTests.Assertions
             _message = message;
         }
 
-        public static async Task<AssertOutgoingMessage> OutgoingMessageAsync(Guid transactionId, string messageType, string processType, IDatabaseConnectionFactory connectionFactoryFactory)
+        public static async Task<AssertOutgoingMessage> OutgoingMessageAsync(Guid transactionId, string documentType, string processType, IDatabaseConnectionFactory connectionFactoryFactory)
         {
             if (connectionFactoryFactory == null) throw new ArgumentNullException(nameof(connectionFactoryFactory));
             using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
             var message = connection.QuerySingle(
-                $"SELECT m.Id, m.RecordId, m.MessageType, m.ReceiverId, m.TransactionId, m.ProcessType," +
+                $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.TransactionId, m.ProcessType," +
                 $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MessageRecord " +
                 $" FROM [dbo].[OutgoingMessages] m" +
-                $" WHERE m.TransactionId = '{transactionId}' AND m.MessageType = '{messageType}' AND m.ProcessType = '{processType}'");
+                $" WHERE m.TransactionId = '{transactionId}' AND m.DocumentType = '{documentType}' AND m.ProcessType = '{processType}'");
 
             Assert.NotNull(message);
             return new AssertOutgoingMessage(message);
         }
 
-        public static async Task<AssertOutgoingMessage> OutgoingMessageAsync(Guid transactionId, string messageType, string processType, MarketRole receiverRole, IDatabaseConnectionFactory connectionFactoryFactory)
+        public static async Task<AssertOutgoingMessage> OutgoingMessageAsync(Guid transactionId, string documentType, string processType, MarketRole receiverRole, IDatabaseConnectionFactory connectionFactoryFactory)
         {
             if (connectionFactoryFactory == null) throw new ArgumentNullException(nameof(connectionFactoryFactory));
             ArgumentNullException.ThrowIfNull(receiverRole);
             using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
             var message = connection.QuerySingle(
-                $"SELECT m.Id, m.RecordId, m.MessageType, m.ReceiverId, m.TransactionId, m.ProcessType," +
+                $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.TransactionId, m.ProcessType," +
                 $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MessageRecord " +
                 $" FROM [dbo].[OutgoingMessages] m" +
-                $" WHERE m.TransactionId = '{transactionId}' AND m.MessageType = '{messageType}' AND m.ProcessType = '{processType}' AND m.ReceiverRole = '{receiverRole.Name}'");
+                $" WHERE m.TransactionId = '{transactionId}' AND m.DocumentType = '{documentType}' AND m.ProcessType = '{processType}' AND m.ReceiverRole = '{receiverRole.Name}'");
 
             Assert.NotNull(message);
             return new AssertOutgoingMessage(message);
@@ -69,10 +69,10 @@ namespace IntegrationTests.Assertions
             ArgumentNullException.ThrowIfNull(receiverRole);
             using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
             var message = connection.QuerySingle(
-                $"SELECT m.Id, m.RecordId, m.MessageType, m.ReceiverId, m.TransactionId, m.ProcessType," +
+                $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.TransactionId, m.ProcessType," +
                 $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MessageRecord " +
                 $" FROM [dbo].[OutgoingMessages] m" +
-                $" WHERE m.MessageType = '{messageType}' AND m.ProcessType = '{processType}' AND m.ReceiverRole = '{receiverRole.Name}'");
+                $" WHERE m.DocumentType = '{messageType}' AND m.ProcessType = '{processType}' AND m.ReceiverRole = '{receiverRole.Name}'");
 
             Assert.NotNull(message);
             return new AssertOutgoingMessage(message);

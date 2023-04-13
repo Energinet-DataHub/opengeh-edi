@@ -14,6 +14,7 @@
 
 using System.Text.Json;
 using Domain.Actors;
+using Domain.Documents;
 using Domain.SeedWork;
 using Domain.Transactions;
 using Domain.Transactions.Aggregations;
@@ -22,14 +23,14 @@ namespace Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 
 public class AggregationResultMessage : OutgoingMessage
 {
-    private AggregationResultMessage(MessageType messageType, ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
-        : base(messageType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, JsonSerializer.Serialize(messageRecord))
+    private AggregationResultMessage(DocumentType documentType, ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
+        : base(documentType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, JsonSerializer.Serialize(messageRecord))
     {
         Series = new Serializer().Deserialize<TimeSeries>(messageRecord)!;
     }
 
     private AggregationResultMessage(ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, TimeSeries series)
-        : base(MessageType.NotifyAggregatedMeasureData, receiverId, transactionId, processType, receiverRole, DataHubDetails.IdentificationNumber, MarketRole.MeteringDataAdministrator, new Serializer().Serialize(series))
+        : base(DocumentType.NotifyAggregatedMeasureData, receiverId, transactionId, processType, receiverRole, DataHubDetails.IdentificationNumber, MarketRole.MeteringDataAdministrator, new Serializer().Serialize(series))
     {
         Series = series;
     }

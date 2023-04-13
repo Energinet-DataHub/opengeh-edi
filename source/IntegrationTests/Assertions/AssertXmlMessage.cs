@@ -18,6 +18,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using Domain.Actors;
+using Domain.Documents;
 using Domain.OutgoingMessages;
 using Infrastructure.OutgoingMessages.Common;
 using Xunit;
@@ -85,9 +86,9 @@ namespace IntegrationTests.Assertions
             return this;
         }
 
-        internal AssertXmlMessage IsDocumentType(MessageType messageType)
+        internal AssertXmlMessage IsDocumentType(DocumentType documentType)
         {
-            Assert.Equal(messageType.Name + "_MarketDocument", _document.Root!.Name.LocalName);
+            Assert.Equal(documentType.Name + "_MarketDocument", _document.Root!.Name.LocalName);
             return this;
         }
 

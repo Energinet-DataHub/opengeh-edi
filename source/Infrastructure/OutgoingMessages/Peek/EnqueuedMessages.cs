@@ -57,11 +57,11 @@ public class EnqueuedMessages : IEnqueuedMessages
             ReceiverRole AS {nameof(EnqueuedMessage.ReceiverRole)},
             SenderId AS {nameof(EnqueuedMessage.SenderId)},
             SenderRole AS {nameof(EnqueuedMessage.SenderRole)},
-            MessageType AS {nameof(EnqueuedMessage.MessageType)},
+            DocumentType AS {nameof(EnqueuedMessage.DocumentType)},
             MessageCategory AS {nameof(EnqueuedMessage.Category)},
             ProcessType AS {nameof(EnqueuedMessage.ProcessType)},
             MessageRecord FROM [dbo].[EnqueuedMessages]
-            WHERE ProcessType = @ProcessType AND ReceiverId = @ReceiverId AND ReceiverRole = @ReceiverRole AND MessageType = @MessageType AND MessageCategory = @MessageCategory";
+            WHERE ProcessType = @ProcessType AND ReceiverId = @ReceiverId AND ReceiverRole = @ReceiverRole AND DocumentType = @DocumentType AND MessageCategory = @MessageCategory";
 
         var messages = await connection.QueryAsync<EnqueuedMessage>(
             sqlStatement,
@@ -69,7 +69,7 @@ public class EnqueuedMessages : IEnqueuedMessages
             {
                 ReceiverRole = oldestMessage.ReceiverRole,
                 ProcessType = oldestMessage.ProcessType,
-                MessageType = oldestMessage.MessageType,
+                DocumentType = oldestMessage.DocumentType,
                 MessageCategory = messageCategory.Name,
                 ReceiverId = actorNumber.Value,
             }).ConfigureAwait(false);
@@ -94,7 +94,7 @@ public class EnqueuedMessages : IEnqueuedMessages
     {
         return await connection
             .QuerySingleOrDefaultAsync<OldestMessage>(
-                @$"SELECT TOP(1) {nameof(OldestMessage.ProcessType)}, {nameof(OldestMessage.MessageType)}, {nameof(OldestMessage.ReceiverRole)} FROM [dbo].[EnqueuedMessages]
+                @$"SELECT TOP(1) {nameof(OldestMessage.ProcessType)}, {nameof(OldestMessage.DocumentType)}, {nameof(OldestMessage.ReceiverRole)} FROM [dbo].[EnqueuedMessages]
                 WHERE ReceiverId = @ReceiverId AND MessageCategory = @MessageCategory",
                 new
             {
@@ -104,5 +104,5 @@ public class EnqueuedMessages : IEnqueuedMessages
             .ConfigureAwait(false);
     }
 
-    private sealed record OldestMessage(string ProcessType, string MessageType, string ReceiverRole);
+    private sealed record OldestMessage(string ProcessType, string DocumentType, string ReceiverRole);
 }

@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Application.Configuration;
 using Application.Configuration.Commands.Commands;
 using Domain.Actors;
+using Domain.Documents;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.Peek;
 using MediatR;

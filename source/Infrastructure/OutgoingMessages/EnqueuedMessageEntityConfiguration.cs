@@ -29,7 +29,7 @@ namespace Infrastructure.OutgoingMessages
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id)
                 .ValueGeneratedNever();
-            builder.Property(x => x.MessageType);
+            builder.Property(x => x.DocumentType);
             builder.Property(x => x.ReceiverId);
             builder.Property(x => x.ReceiverRole);
             builder.Property(x => x.ProcessType);

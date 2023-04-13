@@ -24,6 +24,7 @@ using Application.IncomingMessages.RequestChangeOfSupplier;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.Messages.RequestChangeOfSupplier;
 using Domain.Actors;
+using Domain.Documents;
 using Domain.OutgoingMessages;
 using Infrastructure.Configuration.Authentication;
 using IntegrationTests.CimMessageAdapter.Stubs;

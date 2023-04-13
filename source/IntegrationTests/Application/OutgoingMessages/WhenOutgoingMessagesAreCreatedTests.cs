@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Dapper;
 using Domain.Actors;
+using Domain.Documents;
 using Domain.OutgoingMessages;
 using Infrastructure.OutgoingMessages.Common;
 using IntegrationTests.Application.IncomingMessages;
@@ -44,7 +45,7 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase
             .ConfigureAwait(false);
 
         Assert.NotNull(result);
-        Assert.Equal(result.MessageType, MessageType.ConfirmRequestChangeOfSupplier.Name);
+        Assert.Equal(result.DocumentType, DocumentType.ConfirmRequestChangeOfSupplier.Name);
         Assert.Equal(result.ReceiverId, SampleData.NewEnergySupplierNumber);
         Assert.Equal(result.ReceiverRole, MarketRole.EnergySupplier.Name);
         Assert.Equal(result.SenderId, DataHubDetails.IdentificationNumber.Value);

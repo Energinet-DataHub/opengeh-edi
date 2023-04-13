@@ -13,15 +13,16 @@
 // limitations under the License.
 
 using Domain.Actors;
+using Domain.Documents;
 using Domain.Transactions;
 
 namespace Domain.OutgoingMessages
 {
     public class OutgoingMessage
     {
-        public OutgoingMessage(MessageType messageType, ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
+        public OutgoingMessage(DocumentType documentType, ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
         {
-            MessageType = messageType;
+            DocumentType = documentType;
             ReceiverId = receiverId;
             TransactionId = transactionId;
             ProcessType = processType;
@@ -38,7 +39,7 @@ namespace Domain.OutgoingMessages
 
         public ActorNumber ReceiverId { get; }
 
-        public MessageType MessageType { get; }
+        public DocumentType DocumentType { get; }
 
         public TransactionId TransactionId { get; }
 

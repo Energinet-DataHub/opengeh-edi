@@ -18,6 +18,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
+using Domain.Documents;
 using Domain.OutgoingMessages;
 
 namespace CimMessageAdapter.Messages.RequestChangeAccountingPointCharacteristics;

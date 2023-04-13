@@ -20,6 +20,7 @@ using Application.Configuration.DataAccess;
 using Application.MasterData;
 using Application.OutgoingMessages.Common;
 using Application.Transactions.MoveIn.MasterDataDelivery;
+using Domain.Documents;
 using Domain.MasterData.Dictionaries;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.AccountingPointCharacteristics;
@@ -85,7 +86,7 @@ public class ForwardMeteringPointMasterDataTests : TestBase, IAsyncLifetime
         var forwardMeteringPointMasterData = new ForwardMeteringPointMasterData(SampleData.TransactionId, masterData);
         await InvokeCommandAsync(forwardMeteringPointMasterData).ConfigureAwait(false);
 
-        var marketActivityRecord = await GetMarketActivityRecordAsync(MessageType.AccountingPointCharacteristics).ConfigureAwait(false);
+        var marketActivityRecord = await GetMarketActivityRecordAsync(DocumentType.AccountingPointCharacteristics).ConfigureAwait(false);
         AssertMarketEvaluationPoint(masterData, marketActivityRecord.MarketEvaluationPt);
     }
 
@@ -97,7 +98,7 @@ public class ForwardMeteringPointMasterDataTests : TestBase, IAsyncLifetime
         var forwardMeteringPointMasterData = new ForwardMeteringPointMasterData(SampleData.TransactionId, masterData);
         await InvokeCommandAsync(forwardMeteringPointMasterData).ConfigureAwait(false);
 
-        var marketActivityRecord = await GetMarketActivityRecordAsync(MessageType.AccountingPointCharacteristics).ConfigureAwait(false);
+        var marketActivityRecord = await GetMarketActivityRecordAsync(DocumentType.AccountingPointCharacteristics).ConfigureAwait(false);
         AssertMarketEvaluationPoint(masterData, marketActivityRecord.MarketEvaluationPt);
     }
 
@@ -244,10 +245,10 @@ public class ForwardMeteringPointMasterDataTests : TestBase, IAsyncLifetime
             null);
     }
 
-    private Task<MarketActivityRecord> GetMarketActivityRecordAsync(MessageType messageType)
+    private Task<MarketActivityRecord> GetMarketActivityRecordAsync(DocumentType documentType)
     {
         var parser = GetService<IMessageRecordParser>();
-        var message = GetService<B2BContext>().OutgoingMessages.First(m => m.MessageType == messageType);
+        var message = GetService<B2BContext>().OutgoingMessages.First(m => m.DocumentType == documentType);
         var marketActivityRecord =
             parser.From<MarketActivityRecord>(
                 message!.MessageRecord);
