@@ -45,7 +45,7 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase
             .ConfigureAwait(false);
 
         Assert.NotNull(result);
-        Assert.Equal(result.MessageType, DocumentType.ConfirmRequestChangeOfSupplier.Name);
+        Assert.Equal(result.DocumentType, DocumentType.ConfirmRequestChangeOfSupplier.Name);
         Assert.Equal(result.ReceiverId, SampleData.NewEnergySupplierNumber);
         Assert.Equal(result.ReceiverRole, MarketRole.EnergySupplier.Name);
         Assert.Equal(result.SenderId, DataHubDetails.IdentificationNumber.Value);

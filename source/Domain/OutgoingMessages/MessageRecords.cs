@@ -52,7 +52,7 @@ public class MessageRecords : ValueObject
 
     public string ReceiverRole => _messages[0].ReceiverRole;
 
-    public DocumentType DocumentType => EnumerationType.FromName<DocumentType>(_messages[0].MessageType);
+    public DocumentType DocumentType => EnumerationType.FromName<DocumentType>(_messages[0].DocumentType);
 
     public string Category => _messages[0].Category;
 
@@ -138,9 +138,9 @@ public class MessageRecords : ValueObject
 
     private static void EnsureMessageTypeMatches(IReadOnlyList<EnqueuedMessage> messages)
     {
-        var messageType = messages[0].MessageType;
+        var messageType = messages[0].DocumentType;
         var messagesNotMatching = messages
-            .Where(message => message.MessageType.Equals(messageType, StringComparison.OrdinalIgnoreCase) == false)
+            .Where(message => message.DocumentType.Equals(messageType, StringComparison.OrdinalIgnoreCase) == false)
             .Select(message => message.Id)
             .ToList();
 
