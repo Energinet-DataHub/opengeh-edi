@@ -32,6 +32,6 @@ public class GetMessageQueryHandler : IRequestHandler<GetMessagesQuery, MessageS
     public async Task<MessageSearchResult> Handle(GetMessagesQuery request, CancellationToken cancellationToken)
     {
         var messages = await _archivedMessageRepository.GetAllAsync().ConfigureAwait(false);
-        return new MessageSearchResult(messages.Select(message => new MessageInfo(message.MessageId, message.DocumentType.Name, message.SenderNumber.Value, message.ReceiverNumber.Value)).ToList().AsReadOnly());
+        return new MessageSearchResult(messages.Select(message => new MessageInfo(message.MessageId, message.DocumentType.Name, message.SenderNumber.Value, message.ReceiverNumber.Value, message.CreatedAt.ToString())).ToList().AsReadOnly());
     }
 }

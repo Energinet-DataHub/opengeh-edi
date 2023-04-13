@@ -15,6 +15,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Application.Configuration;
 using Application.SearchMessages;
 using Domain.Actors;
 using Domain.ArchivedMessages;
@@ -27,17 +28,19 @@ namespace IntegrationTests.Application.SearchMessages;
 public class SearchMessagesTests : TestBase
 {
     private readonly IArchivedMessageRepository _repository;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
     public SearchMessagesTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
         _repository = GetService<IArchivedMessageRepository>();
+        _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
     }
 
     [Fact]
     public async Task Can_fetch_messages()
     {
-        var archivedMessage = new ArchivedMessage(Guid.NewGuid(), DocumentType.AccountingPointCharacteristics, ActorNumber.Create("1234512345123"), ActorNumber.Create("1234512345123"));
+        var archivedMessage = new ArchivedMessage(Guid.NewGuid(), DocumentType.AccountingPointCharacteristics, ActorNumber.Create("1234512345123"), ActorNumber.Create("1234512345124"), _systemDateTimeProvider.Now());
         _repository.Add(archivedMessage);
 
         var result = await QueryAsync(new GetMessagesQuery()).ConfigureAwait(false);
@@ -48,5 +51,6 @@ public class SearchMessagesTests : TestBase
         Assert.Equal(archivedMessage.DocumentType.Name, messageInfo.DocumentType);
         Assert.Equal(archivedMessage.SenderNumber.Value, messageInfo.SenderNumber);
         Assert.Equal(archivedMessage.ReceiverNumber.Value, messageInfo.ReceiverNumber);
+        Assert.Equal(archivedMessage.CreatedAt.ToString(), messageInfo.CreatedAt);
     }
 }
