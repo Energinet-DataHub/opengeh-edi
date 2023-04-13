@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.SearchMessages;
+using Domain.Actors;
 using Domain.ArchivedMessages;
 using Domain.Documents;
 using IntegrationTests.Fixtures;
@@ -36,7 +37,7 @@ public class SearchMessagesTests : TestBase
     [Fact]
     public async Task Can_fetch_messages()
     {
-        var archivedMessage = new ArchivedMessage(Guid.NewGuid(), DocumentType.AccountingPointCharacteristics);
+        var archivedMessage = new ArchivedMessage(Guid.NewGuid(), DocumentType.AccountingPointCharacteristics, ActorNumber.Create("1234512345123"));
         _repository.Add(archivedMessage);
 
         var result = await QueryAsync(new GetMessagesQuery()).ConfigureAwait(false);
@@ -45,5 +46,6 @@ public class SearchMessagesTests : TestBase
 
         Assert.NotNull(messageInfo);
         Assert.Equal(archivedMessage.DocumentType.Name, messageInfo.DocumentType);
+        Assert.Equal(archivedMessage.SenderNumber.Value, messageInfo.SenderNumber);
     }
 }

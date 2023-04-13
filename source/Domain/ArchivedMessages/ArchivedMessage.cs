@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Domain.Actors;
 using Domain.Documents;
 
 namespace Domain.ArchivedMessages;
 
-public record ArchivedMessage(Guid MessageId, DocumentType DocumentType);
+public record ArchivedMessage(Guid MessageId, DocumentType DocumentType, ActorNumber SenderNumber);
