@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Domain.Documents;
 using Domain.OutgoingMessages.Peek;
 using Domain.SeedWork;
 
@@ -51,7 +52,7 @@ public class MessageRecords : ValueObject
 
     public string ReceiverRole => _messages[0].ReceiverRole;
 
-    public MessageType MessageType => EnumerationType.FromName<MessageType>(_messages[0].MessageType);
+    public DocumentType DocumentType => EnumerationType.FromName<DocumentType>(_messages[0].DocumentType);
 
     public string Category => _messages[0].Category;
 
@@ -137,9 +138,9 @@ public class MessageRecords : ValueObject
 
     private static void EnsureMessageTypeMatches(IReadOnlyList<EnqueuedMessage> messages)
     {
-        var messageType = messages[0].MessageType;
+        var messageType = messages[0].DocumentType;
         var messagesNotMatching = messages
-            .Where(message => message.MessageType.Equals(messageType, StringComparison.OrdinalIgnoreCase) == false)
+            .Where(message => message.DocumentType.Equals(messageType, StringComparison.OrdinalIgnoreCase) == false)
             .Select(message => message.Id)
             .ToList();
 

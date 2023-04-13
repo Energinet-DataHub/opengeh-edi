@@ -19,6 +19,7 @@ using System.Text;
 using System.Text.Json;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.Response;
+using Domain.Documents;
 using Domain.OutgoingMessages;
 
 namespace Infrastructure.IncomingMessages.Response;

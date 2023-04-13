@@ -20,17 +20,18 @@ using System.Threading.Tasks;
 using System.Xml;
 using Application.OutgoingMessages.Common;
 using Application.OutgoingMessages.Common.Xml;
+using Domain.Documents;
 using Domain.OutgoingMessages;
 
 namespace Infrastructure.OutgoingMessages.Common.Xml;
 
-public abstract class MessageWriter : IMessageWriter
+public abstract class DocumentWriter : IDocumentWriter
 {
     private readonly DocumentDetails _documentDetails;
     private readonly IMessageRecordParser _parser;
     private readonly string? _reasonCode;
 
-    protected MessageWriter(DocumentDetails documentDetails, IMessageRecordParser parser, string? reasonCode = null)
+    protected DocumentWriter(DocumentDetails documentDetails, IMessageRecordParser parser, string? reasonCode = null)
     {
         _documentDetails = documentDetails;
         _parser = parser;
@@ -51,10 +52,10 @@ public abstract class MessageWriter : IMessageWriter
         return stream;
     }
 
-    public bool HandlesType(MessageType messageType)
+    public bool HandlesType(DocumentType documentType)
     {
-        if (messageType == null) throw new ArgumentNullException(nameof(messageType));
-        return messageType.Name.Equals(_documentDetails.Type.Split("_")[0], StringComparison.OrdinalIgnoreCase);
+        if (documentType == null) throw new ArgumentNullException(nameof(documentType));
+        return documentType.Name.Equals(_documentDetails.Type.Split("_")[0], StringComparison.OrdinalIgnoreCase);
     }
 
     public bool HandlesFormat(DocumentFormat format)

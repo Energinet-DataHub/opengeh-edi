@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using CimMessageAdapter.Messages;
+using Domain.Documents;
 using Domain.OutgoingMessages;
 
 namespace CimMessageAdapter.Response;

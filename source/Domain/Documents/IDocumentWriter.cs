@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Domain.OutgoingMessages;
+using Domain.OutgoingMessages;
+
+namespace Domain.Documents;
 
 /// <summary>
 /// Writes outgoing messages
 /// </summary>
-public interface IMessageWriter
+public interface IDocumentWriter
 {
     /// <summary>
     /// Determine if specified format can be handled by message writer
@@ -28,8 +30,8 @@ public interface IMessageWriter
     /// <summary>
     /// Determine if specified message type can be handles by the writer
     /// </summary>
-    /// <param name="messageType"></param>
-    bool HandlesType(MessageType messageType);
+    /// <param name="documentType"></param>
+    bool HandlesType(DocumentType documentType);
 
     /// <summary>
     /// Writes the message
