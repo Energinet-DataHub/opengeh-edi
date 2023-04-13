@@ -17,4 +17,4 @@ using Domain.Documents;
 
 namespace Domain.ArchivedMessages;
 
-public record ArchivedMessage(Guid MessageId, DocumentType DocumentType, ActorNumber SenderNumber);
+public record ArchivedMessage(Guid MessageId, DocumentType DocumentType, ActorNumber SenderNumber, ActorNumber ReceiverNumber);

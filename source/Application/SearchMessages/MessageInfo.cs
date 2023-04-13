@@ -16,4 +16,4 @@ using System;
 
 namespace Application.SearchMessages;
 
-public record MessageInfo(Guid MessageId, string DocumentType, string SenderNumber);
+public record MessageInfo(Guid MessageId, string DocumentType, string SenderNumber, string ReceiverNumber);
