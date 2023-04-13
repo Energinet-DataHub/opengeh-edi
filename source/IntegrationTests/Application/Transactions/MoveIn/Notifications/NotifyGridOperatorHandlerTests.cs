@@ -71,7 +71,7 @@ public class NotifyGridOperatorHandlerTests
         transaction.HasGridOperatorNotificationState(MoveInTransaction.NotificationState.WasNotified);
         var outgoingMessageTransaction = await AssertOutgoingMessage.OutgoingMessageAsync(
             SampleData.TransactionId,
-            MessageType.GenericNotification.Name,
+            DocumentType.GenericNotification.Name,
             ProcessType.MoveIn.Name,
             GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
         outgoingMessageTransaction.HasSenderId(DataHubDetails.IdentificationNumber.Value)

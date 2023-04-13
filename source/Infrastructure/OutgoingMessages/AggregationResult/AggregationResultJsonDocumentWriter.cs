@@ -46,9 +46,9 @@ public class AggregationResultJsonDocumentWriter : IMessageWriter
         return format == DocumentFormat.Json;
     }
 
-    public bool HandlesType(MessageType messageType)
+    public bool HandlesType(DocumentType documentType)
     {
-        return messageType == MessageType.NotifyAggregatedMeasureData;
+        return documentType == Domain.Documents.DocumentType.NotifyAggregatedMeasureData;
     }
 
     public async Task<Stream> WriteAsync(MessageHeader header, IReadOnlyCollection<string> marketActivityRecords)

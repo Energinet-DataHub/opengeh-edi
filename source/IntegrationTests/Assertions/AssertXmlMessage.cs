@@ -86,9 +86,9 @@ namespace IntegrationTests.Assertions
             return this;
         }
 
-        internal AssertXmlMessage IsDocumentType(MessageType messageType)
+        internal AssertXmlMessage IsDocumentType(DocumentType documentType)
         {
-            Assert.Equal(messageType.Name + "_MarketDocument", _document.Root!.Name.LocalName);
+            Assert.Equal(documentType.Name + "_MarketDocument", _document.Root!.Name.LocalName);
             return this;
         }
 

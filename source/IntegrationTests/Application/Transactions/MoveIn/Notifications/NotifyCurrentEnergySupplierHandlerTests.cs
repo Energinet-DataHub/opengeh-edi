@@ -69,7 +69,7 @@ public class NotifyCurrentEnergySupplierHandlerTests
 
         var assertTransaction = await AssertTransactionAsync().ConfigureAwait(false);
         assertTransaction.HasEndOfSupplyNotificationState(MoveInTransaction.NotificationState.WasNotified);
-        var assertOutgoingMessage = await AssertMessageAsync(MessageType.GenericNotification, BusinessReasonCode.CustomerMoveInOrMoveOut.Code).ConfigureAwait(false);
+        var assertOutgoingMessage = await AssertMessageAsync(DocumentType.GenericNotification, BusinessReasonCode.CustomerMoveInOrMoveOut.Code).ConfigureAwait(false);
         assertOutgoingMessage.HasReceiverId(SampleData.CurrentEnergySupplierNumber)
             .HasReceiverRole(MarketRole.EnergySupplier.ToString())
             .HasSenderId(DataHubDetails.IdentificationNumber.Value)
@@ -90,9 +90,9 @@ public class NotifyCurrentEnergySupplierHandlerTests
             SampleData.CurrentEnergySupplierNumber);
     }
 
-    private async Task<AssertOutgoingMessage> AssertMessageAsync(MessageType messageType, string processType)
+    private async Task<AssertOutgoingMessage> AssertMessageAsync(DocumentType documentType, string processType)
     {
-        return await AssertOutgoingMessage.OutgoingMessageAsync(SampleData.TransactionId, messageType.Name, processType, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
+        return await AssertOutgoingMessage.OutgoingMessageAsync(SampleData.TransactionId, documentType.Name, processType, GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
     }
 
     private async Task<AssertTransaction> AssertTransactionAsync()

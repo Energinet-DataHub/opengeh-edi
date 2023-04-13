@@ -38,12 +38,12 @@ public class DocumentFactory
 
         var documentWriter =
             _documentWriters.FirstOrDefault(writer =>
-                writer.HandlesType(messageRecords.MessageType) &&
+                writer.HandlesType(messageRecords.DocumentType) &&
                 writer.HandlesFormat(documentFormat));
 
         if (documentWriter is null)
         {
-            throw new OutgoingMessageException($"Could not handle document type {messageRecords.MessageType.Name}");
+            throw new OutgoingMessageException($"Could not handle document type {messageRecords.DocumentType.Name}");
         }
 
         return documentWriter.WriteAsync(

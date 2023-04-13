@@ -65,7 +65,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         Assert.NotNull(result.Bundle);
 
         AssertXmlMessage.Document(XDocument.Load(result.Bundle!))
-            .IsDocumentType(MessageType.ConfirmRequestChangeOfSupplier)
+            .IsDocumentType(DocumentType.ConfirmRequestChangeOfSupplier)
             .IsProcesType(ProcessType.MoveIn)
             .HasMarketActivityRecordCount(2);
     }
@@ -75,12 +75,12 @@ public class WhenAPeekIsRequestedTests : TestBase
     {
         SetMaximumNumberOfPayloadsInBundle(1);
         await GivenTwoMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
-        await InsertFakeMessagesAsync(SampleData.NewEnergySupplierNumber, MarketRole.EnergySupplier, MessageCategory.MasterData, ProcessType.MoveIn, MessageType.ConfirmRequestChangeOfSupplier).ConfigureAwait(false);
+        await InsertFakeMessagesAsync(SampleData.NewEnergySupplierNumber, MarketRole.EnergySupplier, MessageCategory.MasterData, ProcessType.MoveIn, DocumentType.ConfirmRequestChangeOfSupplier).ConfigureAwait(false);
 
         var result = await PeekMessage(MessageCategory.MasterData).ConfigureAwait(false);
 
         AssertXmlMessage.Document(XDocument.Load(result.Bundle!))
-            .IsDocumentType(MessageType.ConfirmRequestChangeOfSupplier)
+            .IsDocumentType(DocumentType.ConfirmRequestChangeOfSupplier)
             .IsProcesType(ProcessType.MoveIn)
             .HasMarketActivityRecordCount(1);
     }
@@ -118,7 +118,7 @@ public class WhenAPeekIsRequestedTests : TestBase
             .WithTransactionId(SampleData.TransactionId);
     }
 
-    private async Task InsertFakeMessagesAsync(string receiverId, MarketRole receiverRole, MessageCategory category, ProcessType processType, MessageType messageType)
+    private async Task InsertFakeMessagesAsync(string receiverId, MarketRole receiverRole, MessageCategory category, ProcessType processType, DocumentType documentType)
     {
         var messageEnqueuer = GetService<OutgoingMessageEnqueuer>();
 
@@ -130,7 +130,7 @@ public class WhenAPeekIsRequestedTests : TestBase
                 receiverRole.Name,
                 Guid.NewGuid().ToString(),
                 "FakeSenderRole",
-                messageType.Name,
+                documentType.Name,
                 category.Name,
                 processType.Name,
                 "MessageRecord");

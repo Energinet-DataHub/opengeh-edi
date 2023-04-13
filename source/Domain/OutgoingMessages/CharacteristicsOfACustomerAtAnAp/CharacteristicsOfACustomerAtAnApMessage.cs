@@ -22,16 +22,16 @@ namespace Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
 
 public class CharacteristicsOfACustomerAtAnApMessage : OutgoingMessage
 {
-    private CharacteristicsOfACustomerAtAnApMessage(MessageType messageType, ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
-        : base(messageType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, messageRecord)
+    private CharacteristicsOfACustomerAtAnApMessage(DocumentType documentType, ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
+        : base(documentType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, messageRecord)
     {
         MarketActivityRecord =
             new Serializer().Deserialize<MarketActivityRecord>(
                 messageRecord);
     }
 
-    private CharacteristicsOfACustomerAtAnApMessage(MessageType messageType, ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, MarketActivityRecord marketActivityRecord)
-        : base(messageType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, new Serializer().Serialize(marketActivityRecord))
+    private CharacteristicsOfACustomerAtAnApMessage(DocumentType documentType, ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, MarketActivityRecord marketActivityRecord)
+        : base(documentType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, new Serializer().Serialize(marketActivityRecord))
     {
         MarketActivityRecord = marketActivityRecord;
     }
@@ -60,7 +60,7 @@ public class CharacteristicsOfACustomerAtAnApMessage : OutgoingMessage
             marketEvaluationPoint);
 
         return new CharacteristicsOfACustomerAtAnApMessage(
-            MessageType.CharacteristicsOfACustomerAtAnAP,
+            DocumentType.CharacteristicsOfACustomerAtAnAP,
             actorNumber,
             TransactionId.Create(transactionId.Id),
             processType.Name,

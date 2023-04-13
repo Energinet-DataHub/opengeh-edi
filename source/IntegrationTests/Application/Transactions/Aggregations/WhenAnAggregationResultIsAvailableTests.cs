@@ -174,7 +174,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
     private async Task<AssertOutgoingMessage> OutgoingMessageAsync(MarketRole roleOfReceiver, ProcessType completedAggregationType)
     {
         return await AssertOutgoingMessage.OutgoingMessageAsync(
-            MessageType.NotifyAggregatedMeasureData.Name,
+            DocumentType.NotifyAggregatedMeasureData.Name,
             completedAggregationType.Name,
             roleOfReceiver,
             GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);

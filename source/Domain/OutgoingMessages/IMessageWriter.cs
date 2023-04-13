@@ -30,8 +30,8 @@ public interface IMessageWriter
     /// <summary>
     /// Determine if specified message type can be handles by the writer
     /// </summary>
-    /// <param name="messageType"></param>
-    bool HandlesType(MessageType messageType);
+    /// <param name="documentType"></param>
+    bool HandlesType(DocumentType documentType);
 
     /// <summary>
     /// Writes the message

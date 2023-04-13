@@ -42,10 +42,11 @@ namespace Infrastructure.OutgoingMessages
             builder.Property(x => x.Id)
                 .ValueGeneratedNever();
 
-            builder.Property(x => x.MessageType)
+            builder.Property(x => x.DocumentType)
+                .HasColumnName("MessageType")
                 .HasConversion(
                     toDbValue => toDbValue.Name,
-                    fromDbValue => EnumerationType.FromName<MessageType>(fromDbValue));
+                    fromDbValue => EnumerationType.FromName<DocumentType>(fromDbValue));
             builder.Property(x => x.IsPublished);
             builder.Property(x => x.ReceiverId)
                 .HasConversion(
@@ -73,14 +74,14 @@ namespace Infrastructure.OutgoingMessages
             builder
                 .HasDiscriminator<string>("Discriminator")
                 .HasValue<OutgoingMessage>(nameof(OutgoingMessage))
-                .HasValue<ConfirmRequestChangeOfSupplierMessage>(MessageType.ConfirmRequestChangeOfSupplier.Name)
-                .HasValue<RejectRequestChangeOfSupplierMessage>(MessageType.RejectRequestChangeOfSupplier.Name)
-                .HasValue<GenericNotificationMessage>(MessageType.GenericNotification.Name)
-                .HasValue<AccountingPointCharacteristicsMessage>(MessageType.AccountingPointCharacteristics.Name)
-                .HasValue<CharacteristicsOfACustomerAtAnApMessage>(MessageType.CharacteristicsOfACustomerAtAnAP.Name)
-                .HasValue<ConfirmRequestChangeAccountingPointCharacteristicsMessage>(MessageType.ConfirmRequestChangeAccountingPointCharacteristics.Name)
-                .HasValue<RejectRequestChangeAccountingPointCharacteristicsMessage>(MessageType.RejectRequestChangeAccountingPointCharacteristics.Name)
-                .HasValue<AggregationResultMessage>(MessageType.NotifyAggregatedMeasureData.Name)
+                .HasValue<ConfirmRequestChangeOfSupplierMessage>(DocumentType.ConfirmRequestChangeOfSupplier.Name)
+                .HasValue<RejectRequestChangeOfSupplierMessage>(DocumentType.RejectRequestChangeOfSupplier.Name)
+                .HasValue<GenericNotificationMessage>(DocumentType.GenericNotification.Name)
+                .HasValue<AccountingPointCharacteristicsMessage>(DocumentType.AccountingPointCharacteristics.Name)
+                .HasValue<CharacteristicsOfACustomerAtAnApMessage>(DocumentType.CharacteristicsOfACustomerAtAnAP.Name)
+                .HasValue<ConfirmRequestChangeAccountingPointCharacteristicsMessage>(DocumentType.ConfirmRequestChangeAccountingPointCharacteristics.Name)
+                .HasValue<RejectRequestChangeAccountingPointCharacteristicsMessage>(DocumentType.RejectRequestChangeAccountingPointCharacteristics.Name)
+                .HasValue<AggregationResultMessage>(DocumentType.NotifyAggregatedMeasureData.Name)
                 .IsComplete(false);
         }
     }

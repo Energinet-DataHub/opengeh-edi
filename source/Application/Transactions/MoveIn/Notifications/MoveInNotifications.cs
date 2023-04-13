@@ -45,7 +45,7 @@ public class MoveInNotifications
             transaction.EffectiveDate);
 
         var message = new OutgoingMessage(
-            MessageType.GenericNotification,
+            DocumentType.GenericNotification,
             ActorNumber.Create(transaction.CurrentEnergySupplierId!),
             transaction.TransactionId,
             BusinessReasonCode.CustomerMoveInOrMoveOut.Code,
@@ -67,7 +67,7 @@ public class MoveInNotifications
             transaction.EffectiveDate);
 
         var message = new OutgoingMessage(
-            MessageType.GenericNotification,
+            DocumentType.GenericNotification,
             ActorNumber.Create(gridOperatorNumber),
             transaction.TransactionId,
             ProcessType.MoveIn.Name,

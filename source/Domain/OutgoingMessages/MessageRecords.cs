@@ -52,7 +52,7 @@ public class MessageRecords : ValueObject
 
     public string ReceiverRole => _messages[0].ReceiverRole;
 
-    public MessageType MessageType => EnumerationType.FromName<MessageType>(_messages[0].MessageType);
+    public DocumentType DocumentType => EnumerationType.FromName<DocumentType>(_messages[0].MessageType);
 
     public string Category => _messages[0].Category;
 

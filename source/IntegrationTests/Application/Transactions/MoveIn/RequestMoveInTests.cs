@@ -178,7 +178,7 @@ namespace IntegrationTests.Application.Transactions.MoveIn
             var currentTransactionId = await GetTransactionIdAsync().ConfigureAwait(false);
             var assertMessage = await AssertOutgoingMessage.OutgoingMessageAsync(
                     currentTransactionId,
-                    MessageType.ConfirmRequestChangeOfSupplier.Name,
+                    DocumentType.ConfirmRequestChangeOfSupplier.Name,
                     ProcessType.MoveIn.Name,
                     MarketRole.EnergySupplier,
                     GetService<IDatabaseConnectionFactory>())
@@ -204,7 +204,7 @@ namespace IntegrationTests.Application.Transactions.MoveIn
         {
             var assertMessage = await AssertOutgoingMessage
                 .OutgoingMessageAsync(
-                    MessageType.RejectRequestChangeOfSupplier.Name,
+                    DocumentType.RejectRequestChangeOfSupplier.Name,
                     ProcessType.MoveIn.Name,
                     MarketRole.EnergySupplier,
                     GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
