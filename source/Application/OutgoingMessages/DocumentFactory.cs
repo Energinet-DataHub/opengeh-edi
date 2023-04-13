@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Domain.Documents;
 using Domain.OutgoingMessages;
 using NodaTime;
 
@@ -24,9 +25,9 @@ namespace Application.OutgoingMessages;
 
 public class DocumentFactory
 {
-    private readonly IReadOnlyCollection<IMessageWriter> _documentWriters;
+    private readonly IReadOnlyCollection<IDocumentWriter> _documentWriters;
 
-    public DocumentFactory(IEnumerable<IMessageWriter> documentWriters)
+    public DocumentFactory(IEnumerable<IDocumentWriter> documentWriters)
     {
         _documentWriters = documentWriters.ToList();
     }
@@ -38,12 +39,12 @@ public class DocumentFactory
 
         var documentWriter =
             _documentWriters.FirstOrDefault(writer =>
-                writer.HandlesType(messageRecords.MessageType) &&
+                writer.HandlesType(messageRecords.DocumentType) &&
                 writer.HandlesFormat(documentFormat));
 
         if (documentWriter is null)
         {
-            throw new OutgoingMessageException($"Could not handle document type {messageRecords.MessageType.Name}");
+            throw new OutgoingMessageException($"Could not handle document type {messageRecords.DocumentType.Name}");
         }
 
         return documentWriter.WriteAsync(

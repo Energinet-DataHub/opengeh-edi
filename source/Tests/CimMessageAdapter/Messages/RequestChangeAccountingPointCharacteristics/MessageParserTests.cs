@@ -22,6 +22,7 @@ using Application.IncomingMessages.RequestChangeAccountPointCharacteristics;
 using CimMessageAdapter.Errors;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.Messages.RequestChangeAccountingPointCharacteristics;
+using Domain.Documents;
 using Domain.OutgoingMessages;
 using Infrastructure.IncomingMessages.RequestChangeAccountingPointCharacteristics;
 using Xunit;

@@ -18,6 +18,7 @@ using System.Text;
 using System.Xml;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.Response;
+using Domain.Documents;
 using Domain.OutgoingMessages;
 
 namespace Infrastructure.IncomingMessages.Response

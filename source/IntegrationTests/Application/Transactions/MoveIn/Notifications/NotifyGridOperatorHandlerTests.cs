@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Application.Transactions.MoveIn.Notifications;
 using Domain.Actors;
+using Domain.Documents;
 using Domain.OutgoingMessages;
 using Domain.Transactions.MoveIn;
 using Infrastructure.Configuration.DataAccess;
@@ -70,7 +71,7 @@ public class NotifyGridOperatorHandlerTests
         transaction.HasGridOperatorNotificationState(MoveInTransaction.NotificationState.WasNotified);
         var outgoingMessageTransaction = await AssertOutgoingMessage.OutgoingMessageAsync(
             SampleData.TransactionId,
-            MessageType.GenericNotification.Name,
+            DocumentType.GenericNotification.Name,
             ProcessType.MoveIn.Name,
             GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
         outgoingMessageTransaction.HasSenderId(DataHubDetails.IdentificationNumber.Value)
