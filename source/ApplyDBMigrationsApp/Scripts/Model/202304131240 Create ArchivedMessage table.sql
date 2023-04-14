@@ -1,4 +1,4 @@
-﻿CREATE TABLE [B2B].ArchivedMessages(
+﻿CREATE TABLE [dbo].ArchivedMessages(
     [RecordId]                        [int] IDENTITY (1,1) NOT NULL,
     [Id]                              [uniqueIdentifier] NOT NULL,
     [DocumentType]                    [VARCHAR](255)     NOT NULL,
@@ -11,4 +11,4 @@
 ) WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF) ON [PRIMARY]
     ) ON [PRIMARY];
 
-CREATE INDEX IX_FindMessages ON [B2B].[EnqueuedMessages] (Id, DocumentType, ReceiverNumber, SenderNumber, CreatedAt);
+CREATE INDEX IX_FindMessages ON [dbo].[ArchivedMessages] (Id, DocumentType, ReceiverNumber, SenderNumber, CreatedAt);

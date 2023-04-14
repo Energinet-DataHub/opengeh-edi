@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using Domain.ArchivedMessages;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.AccountingPointCharacteristics;
 using Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
@@ -67,6 +68,8 @@ namespace Infrastructure.Configuration.DataAccess
         public DbSet<EnqueuedMessage> EnqueuedMessages { get; private set; }
 
         public DbSet<BundledMessage> BundledMessages { get; private set; }
+
+        public DbSet<ArchivedMessage> ArchivedMessages { get; private set; }
 
         public DbSet<ReceivedIntegrationEvent> ReceivedIntegrationEvents { get; private set; }
 

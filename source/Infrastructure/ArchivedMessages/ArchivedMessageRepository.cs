@@ -14,22 +14,30 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using Domain.ArchivedMessages;
+using Infrastructure.Configuration.DataAccess;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.ArchivedMessages;
 
 public class ArchivedMessageRepository : IArchivedMessageRepository
 {
-    private readonly List<ArchivedMessage> _messages = new();
+    private readonly B2BContext _dbContext;
+
+    public ArchivedMessageRepository(B2BContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
 
     public void Add(ArchivedMessage message)
     {
-        _messages.Add(message);
+        _dbContext.ArchivedMessages.Add(message);
     }
 
-    public Task<ReadOnlyCollection<ArchivedMessage>> GetAllAsync()
+    public async Task<ReadOnlyCollection<ArchivedMessage>> GetAllAsync()
     {
-        return Task.FromResult(_messages.AsReadOnly());
+        return (await _dbContext.ArchivedMessages.ToListAsync().ConfigureAwait(false)).AsReadOnly();
     }
 }
