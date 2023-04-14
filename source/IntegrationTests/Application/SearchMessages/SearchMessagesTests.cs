@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.Configuration;
+using Application.Configuration.DataAccess;
 using Application.SearchMessages;
 using Domain.Actors;
 using Domain.ArchivedMessages;
@@ -42,6 +43,7 @@ public class SearchMessagesTests : TestBase
     {
         var archivedMessage = new ArchivedMessage(Guid.NewGuid(), DocumentType.AccountingPointCharacteristics, ActorNumber.Create("1234512345123"), ActorNumber.Create("1234512345124"), _systemDateTimeProvider.Now());
         _repository.Add(archivedMessage);
+        await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
 
         var result = await QueryAsync(new GetMessagesQuery()).ConfigureAwait(false);
 
