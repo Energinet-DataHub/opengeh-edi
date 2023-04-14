@@ -22,16 +22,19 @@ using Application.OutgoingMessages;
 using Application.OutgoingMessages.Common;
 using Application.OutgoingMessages.Common.Reasons;
 using Application.OutgoingMessages.Peek;
+using Application.SearchMessages;
 using Application.Transactions.Aggregations;
 using Application.Transactions.MoveIn;
 using Azure.Messaging.ServiceBus;
 using CimMessageAdapter.Messages;
+using Domain.ArchivedMessages;
 using Domain.Documents;
 using Domain.MasterData.MarketEvaluationPoints;
 using Domain.OutgoingMessages;
 using Domain.Transactions.MoveIn;
 using Energinet.DataHub.Core.Logging.RequestResponseMiddleware.Storage;
 using Infrastructure.Actors;
+using Infrastructure.ArchivedMessages;
 using Infrastructure.Configuration.Authentication;
 using Infrastructure.Configuration.DataAccess;
 using Infrastructure.Configuration.FeatureFlag;
@@ -97,6 +100,7 @@ namespace Infrastructure.Configuration
             UpdateCustomerMasterDataConfiguration.Configure(services);
             DequeueConfiguration.Configure(services);
             IntegrationEventsConfiguration.Configure(services);
+            ArchivedMessageConfiguration.Configure(services);
         }
 
         public static CompositionRoot Initialize(IServiceCollection services)
