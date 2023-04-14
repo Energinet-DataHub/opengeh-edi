@@ -110,6 +110,20 @@ public class WhenAPeekIsRequestedTests : TestBase
         Assert.Null(peekResult.Bundle);
     }
 
+    [Fact]
+    public async Task The_generated_document_is_archived()
+    {
+        await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
+
+        await PeekMessage(MessageCategory.MasterData).ConfigureAwait(false);
+
+        var sqlStatement =
+            $"SELECT COUNT(*) FROM [dbo].[ArchivedMessages] WHERE DocumentType = '{DocumentType.ConfirmRequestChangeOfSupplier.Name}'";
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
+        var found = await connection.ExecuteScalarAsync<bool>(sqlStatement).ConfigureAwait(false);
+        Assert.True(found);
+    }
+
     private static IncomingMessageBuilder MessageBuilder()
     {
         return new IncomingMessageBuilder()
