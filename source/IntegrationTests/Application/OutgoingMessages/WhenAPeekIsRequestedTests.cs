@@ -110,6 +110,16 @@ public class WhenAPeekIsRequestedTests : TestBase
         Assert.Null(peekResult.Bundle);
     }
 
+    [Fact]
+    public async Task The_generated_document_is_archived()
+    {
+        await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
+
+        var result = await PeekMessage(MessageCategory.MasterData).ConfigureAwait(false);
+
+        await AssertMessageIsArchived(result.MessageId);
+    }
+
     private static IncomingMessageBuilder MessageBuilder()
     {
         return new IncomingMessageBuilder()
@@ -185,5 +195,15 @@ public class WhenAPeekIsRequestedTests : TestBase
     private Task<PeekResult> PeekMessage(MessageCategory category)
     {
         return _messagePeeker.PeekAsync(ActorNumber.Create(SampleData.NewEnergySupplierNumber), category, DocumentFormat.Xml);
+    }
+
+    private async Task AssertMessageIsArchived(Guid? messageId)
+    {
+        var sqlStatement =
+            $"SELECT COUNT(*) FROM [dbo].[ArchivedMessages] WHERE Id = '{messageId}'";
+        using var connection =
+            await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
+        var found = await connection.ExecuteScalarAsync<bool>(sqlStatement).ConfigureAwait(false);
+        Assert.True(found);
     }
 }

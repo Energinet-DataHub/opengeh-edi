@@ -73,7 +73,8 @@ namespace IntegrationTests.Fixtures
                 $"DELETE FROM [dbo].[Actor]" +
                 $"DELETE FROM [dbo].[BundledMessages]" +
                 $"DELETE FROM [dbo].[ReceivedIntegrationEvents]" +
-                $"DELETE FROM [dbo].[EnqueuedMessages]";
+                $"DELETE FROM [dbo].[EnqueuedMessages]" +
+                $"DELETE FROM [dbo].[ArchivedMessages]";
 
             _context.Database.ExecuteSqlRaw(cleanupStatement);
         }

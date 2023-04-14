@@ -23,7 +23,6 @@ using Application.Configuration.Commands.Commands;
 using Application.Configuration.DataAccess;
 using Application.Configuration.Queries;
 using Application.Configuration.TimeEvents;
-using Application.SearchMessages;
 using Application.Transactions.MoveIn;
 using Azure.Messaging.ServiceBus;
 using Google.Protobuf;

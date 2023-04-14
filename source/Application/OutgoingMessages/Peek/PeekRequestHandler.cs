@@ -19,10 +19,12 @@ using System.Threading.Tasks;
 using Application.Configuration;
 using Application.Configuration.Commands.Commands;
 using Domain.Actors;
+using Domain.ArchivedMessages;
 using Domain.Documents;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.Peek;
 using MediatR;
+using NodaTime;
 
 namespace Application.OutgoingMessages.Peek;
 
@@ -32,17 +34,20 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
     private readonly DocumentFactory _documentFactory;
     private readonly IEnqueuedMessages _enqueuedMessages;
     private readonly IBundledMessages _bundledMessages;
+    private readonly IArchivedMessageRepository _messageArchive;
 
     public PeekRequestHandler(
         ISystemDateTimeProvider systemDateTimeProvider,
         DocumentFactory documentFactory,
         IEnqueuedMessages enqueuedMessages,
-        IBundledMessages bundledMessages)
+        IBundledMessages bundledMessages,
+        IArchivedMessageRepository messageArchive)
     {
         _systemDateTimeProvider = systemDateTimeProvider;
         _documentFactory = documentFactory;
         _enqueuedMessages = enqueuedMessages;
         _bundledMessages = bundledMessages;
+        _messageArchive = messageArchive;
     }
 
     public async Task<PeekResult> Handle(PeekRequest request, CancellationToken cancellationToken)
@@ -63,16 +68,24 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
             return new PeekResult(null);
         }
 
-        bundledMessage = await CreateBundledMessageAsync(messageRecords, request.DesiredDocumentFormat).ConfigureAwait(false);
+        var timestamp = _systemDateTimeProvider.Now();
+        bundledMessage = await CreateBundledMessageAsync(messageRecords, request.DesiredDocumentFormat, timestamp).ConfigureAwait(false);
         await _bundledMessages.AddAsync(bundledMessage).ConfigureAwait(false);
+
+        _messageArchive.Add(new ArchivedMessage(
+            bundledMessage.Id.Value,
+            messageRecords.DocumentType,
+            ActorNumber.Create(messageRecords.SenderNumber),
+            ActorNumber.Create(messageRecords.ReceiverNumber),
+            timestamp));
 
         return new PeekResult(bundledMessage.GeneratedDocument, bundledMessage.Id.Value);
     }
 
-    private async Task<BundledMessage> CreateBundledMessageAsync(MessageRecords messageRecords, DocumentFormat desiredDocumentFormat)
+    private async Task<BundledMessage> CreateBundledMessageAsync(MessageRecords messageRecords, DocumentFormat desiredDocumentFormat, Instant timestamp)
     {
         var id = BundledMessageId.New();
-        var document = await _documentFactory.CreateFromAsync(id, messageRecords, desiredDocumentFormat, _systemDateTimeProvider.Now())
+        var document = await _documentFactory.CreateFromAsync(id, messageRecords, desiredDocumentFormat, timestamp)
             .ConfigureAwait(false);
         return BundledMessage.CreateFrom(id, messageRecords, document);
     }
