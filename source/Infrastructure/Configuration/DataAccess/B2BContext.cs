@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using Domain.ArchivedMessages;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.AccountingPointCharacteristics;
 using Domain.OutgoingMessages.CharacteristicsOfACustomerAtAnAp;
@@ -24,6 +25,7 @@ using Domain.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
 using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 using Domain.Transactions.Aggregations;
 using Domain.Transactions.MoveIn;
+using Infrastructure.ArchivedMessages;
 using Infrastructure.Configuration.IntegrationEvents;
 using Infrastructure.Configuration.InternalCommands;
 using Infrastructure.Configuration.Serialization;
@@ -67,6 +69,8 @@ namespace Infrastructure.Configuration.DataAccess
 
         public DbSet<BundledMessage> BundledMessages { get; private set; }
 
+        public DbSet<ArchivedMessage> ArchivedMessages { get; private set; }
+
         public DbSet<ReceivedIntegrationEvent> ReceivedIntegrationEvents { get; private set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -82,6 +86,7 @@ namespace Infrastructure.Configuration.DataAccess
             modelBuilder.ApplyConfiguration(new ReceivedIntegrationEventEntityConfiguration());
             modelBuilder.ApplyConfiguration(new MarketEvaluationPointEntityConfiguration());
             modelBuilder.ApplyConfiguration(new BundledMessageConfiguration());
+            modelBuilder.ApplyConfiguration(new ArchivedMessageEntityConfiguration());
 
             modelBuilder.Entity<GenericNotificationMessage>()
                 .Ignore(entity => entity.MarketActivityRecord);
