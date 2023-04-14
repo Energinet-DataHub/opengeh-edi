@@ -42,17 +42,21 @@ public class SearchMessagesTests : TestBase
     public async Task Can_fetch_messages()
     {
         var archivedMessage = new ArchivedMessage(Guid.NewGuid(), DocumentType.AccountingPointCharacteristics, ActorNumber.Create("1234512345123"), ActorNumber.Create("1234512345124"), _systemDateTimeProvider.Now());
-        _repository.Add(archivedMessage);
-        await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
+        await ArchiveMessage(archivedMessage);
 
         var result = await QueryAsync(new GetMessagesQuery()).ConfigureAwait(false);
 
         var messageInfo = result.Messages.FirstOrDefault(message => message.MessageId == archivedMessage.Id);
-
         Assert.NotNull(messageInfo);
         Assert.Equal(archivedMessage.DocumentType.Name, messageInfo.DocumentType);
         Assert.Equal(archivedMessage.SenderNumber.Value, messageInfo.SenderNumber);
         Assert.Equal(archivedMessage.ReceiverNumber.Value, messageInfo.ReceiverNumber);
         Assert.Equal(archivedMessage.CreatedAt.ToString(), messageInfo.CreatedAt);
+    }
+
+    private async Task ArchiveMessage(ArchivedMessage archivedMessage)
+    {
+        _repository.Add(archivedMessage);
+        await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
     }
 }
