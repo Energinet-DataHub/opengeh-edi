@@ -89,7 +89,7 @@ namespace IntegrationTests.Infrastructure.Authentication.MarketActors
 
             Assert.IsType<Authenticated>(_authenticator.CurrentIdentity);
             Assert.Equal(GetClaimValue(claimsPrincipal, ClaimsMap.UserId), _authenticator.CurrentIdentity.Id);
-            Assert.Equal(_authenticator.CurrentIdentity.Number.Value, SampleData.ActorNumber);
+            Assert.Equal(_authenticator.CurrentIdentity.Number?.Value, SampleData.ActorNumber);
             Assert.True(_authenticator.CurrentIdentity.HasRole(MarketRole.GridOperator.Name));
             Assert.True(_authenticator.CurrentIdentity.HasRole(MarketRole.EnergySupplier.Name));
         }

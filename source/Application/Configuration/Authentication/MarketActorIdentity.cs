@@ -23,7 +23,7 @@ namespace Application.Configuration.Authentication
     {
         private readonly IEnumerable<MarketRole> _roles;
 
-        protected MarketActorIdentity(string id, ActorNumber number, IEnumerable<MarketRole> roles)
+        protected MarketActorIdentity(string id, ActorNumber? number, IEnumerable<MarketRole> roles)
         {
             Id = id;
             Number = number;
@@ -32,7 +32,7 @@ namespace Application.Configuration.Authentication
 
         public string Id { get; }
 
-        public ActorNumber Number { get; }
+        public ActorNumber? Number { get; }
 
         public bool HasRole(string role)
         {

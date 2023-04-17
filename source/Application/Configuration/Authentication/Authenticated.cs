@@ -19,7 +19,7 @@ namespace Application.Configuration.Authentication
 {
     public class Authenticated : MarketActorIdentity
     {
-        public Authenticated(string id, ActorNumber number, IEnumerable<MarketRole> roles)
+        public Authenticated(string id, ActorNumber? number, IEnumerable<MarketRole> roles)
             : base(id, number, roles)
         {
         }

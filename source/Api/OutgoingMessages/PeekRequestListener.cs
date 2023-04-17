@@ -63,7 +63,7 @@ public class PeekRequestListener
         }
 
         var result = await _messagePeeker.PeekAsync(
-                _authenticator.CurrentIdentity.Number,
+                _authenticator.CurrentIdentity.Number!,
                 EnumerationType.FromName<MessageCategory>(messageCategory),
                 desiredDocumentFormat)
             .ConfigureAwait(false);
