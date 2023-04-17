@@ -45,6 +45,13 @@ namespace Infrastructure.Configuration.Authentication
                 return;
             }
 
+            // TODO: Temporarly hack for authorizing users originating from portal. Remove when JWT is updated
+            if (UserOriginatesFromPortal(claimsPrincipal))
+            {
+                CurrentIdentity = new Authenticated(userIdFromSts, null, new List<MarketRole>());
+                return;
+            }
+
             var actorNumber = await _actorLookup.GetActorNumberByB2CIdAsync(Guid.Parse(userIdFromSts)).ConfigureAwait(false);
             if (actorNumber is null)
             {
@@ -60,6 +67,12 @@ namespace Infrastructure.Configuration.Authentication
             }
 
             CurrentIdentity = new Authenticated(userIdFromSts, actorNumber, roles);
+        }
+
+        // TODO: Temporarly hack for authorizing users originating from portal. Remove when JWT is updated
+        private static bool UserOriginatesFromPortal(ClaimsPrincipal claimsPrincipal)
+        {
+            return claimsPrincipal.FindFirst(claim => claim.Type.Equals("tfp", StringComparison.OrdinalIgnoreCase)) is not null;
         }
 
         private static string? GetClaimValueFrom(ClaimsPrincipal claimsPrincipal, string claimName)
