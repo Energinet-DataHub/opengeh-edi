@@ -41,7 +41,7 @@ namespace Infrastructure.Configuration.Authentication
             // TODO: Temporarly hack for authorizing users originating from portal. Remove when JWT is updated
             if (UserOriginatesFromPortal(claimsPrincipal))
             {
-                CurrentIdentity = new Authenticated(GetClaimValueFrom(claimsPrincipal, "emails")!, null, new List<MarketRole>());
+                CurrentIdentity = new Authenticated(GetClaimValueFrom(claimsPrincipal, ClaimsMap.UserId)!, null, new List<MarketRole>());
                 return;
             }
 
@@ -72,7 +72,7 @@ namespace Infrastructure.Configuration.Authentication
         // TODO: Temporarly hack for authorizing users originating from portal. Remove when JWT is updated
         private static bool UserOriginatesFromPortal(ClaimsPrincipal claimsPrincipal)
         {
-            return claimsPrincipal.FindFirst(claim => claim.Type.Equals("tfp", StringComparison.OrdinalIgnoreCase)) is not null;
+            return claimsPrincipal.FindFirst(claim => claim.Type.Equals("token", StringComparison.OrdinalIgnoreCase)) is not null;
         }
 
         private static string? GetClaimValueFrom(ClaimsPrincipal claimsPrincipal, string claimName)
