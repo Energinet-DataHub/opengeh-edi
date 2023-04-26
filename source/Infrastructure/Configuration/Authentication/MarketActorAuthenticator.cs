@@ -38,17 +38,17 @@ namespace Infrastructure.Configuration.Authentication
         {
             if (claimsPrincipal == null) throw new ArgumentNullException(nameof(claimsPrincipal));
 
+            // TODO: Temporarly hack for authorizing users originating from portal. Remove when JWT is updated
+            if (UserOriginatesFromPortal(claimsPrincipal))
+            {
+                CurrentIdentity = new Authenticated(GetClaimValueFrom(claimsPrincipal, "emails")!, null, new List<MarketRole>());
+                return;
+            }
+
             var userIdFromSts = GetClaimValueFrom(claimsPrincipal, ClaimsMap.UserId);
             if (string.IsNullOrWhiteSpace(userIdFromSts))
             {
                 ActorIsNotAuthorized();
-                return;
-            }
-
-            // TODO: Temporarly hack for authorizing users originating from portal. Remove when JWT is updated
-            if (UserOriginatesFromPortal(claimsPrincipal))
-            {
-                CurrentIdentity = new Authenticated(userIdFromSts, null, new List<MarketRole>());
                 return;
             }
 
