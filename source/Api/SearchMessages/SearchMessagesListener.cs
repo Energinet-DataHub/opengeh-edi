@@ -12,22 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using Application.SearchMessages;
+using Infrastructure.Configuration.Serialization;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using NodaTime;
 
 namespace Api.SearchMessages;
 
 public class SearchMessagesListener
 {
     private readonly IMediator _mediator;
+    private readonly ISerializer _serializer;
 
-    public SearchMessagesListener(IMediator mediator)
+    public SearchMessagesListener(IMediator mediator, ISerializer serializer)
     {
         _mediator = mediator;
+        _serializer = serializer;
     }
 
     [Function("messages")]
@@ -41,4 +47,39 @@ public class SearchMessagesListener
         await response.WriteAsJsonAsync(result.Messages).ConfigureAwait(false);
         return response;
     }
+
+    [Function("ArchivedMessages")]
+    public async Task<HttpResponseData> SearchArchivedMessagesAsync(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
+        HttpRequestData request,
+        FunctionContext executionContext)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+
+        if (request.Body == Stream.Null)
+        {
+            return request.CreateResponse(HttpStatusCode.BadRequest);
+        }
+
+        var searchCriteria = await _serializer.DeserializeAsync(request.Body, typeof(SearchArchivedMessages))
+            .ConfigureAwait(false) as SearchArchivedMessages;
+
+        var query = new GetMessagesQuery
+        {
+            CreationPeriod = searchCriteria?.CreatedDuringPeriod is not null
+                ? new Application.SearchMessages.MessageCreationPeriod(
+                    searchCriteria.CreatedDuringPeriod.Start,
+                    searchCriteria.CreatedDuringPeriod.End)
+                : null,
+        };
+
+        var result = await _mediator.Send(query).ConfigureAwait(false);
+        var response = request.CreateResponse(HttpStatusCode.OK);
+        await response.WriteAsJsonAsync(result.Messages).ConfigureAwait(false);
+        return response;
+    }
 }
+
+public record SearchArchivedMessages(MessageCreationPeriod? CreatedDuringPeriod);
+
+public record MessageCreationPeriod(Instant Start, Instant End);
