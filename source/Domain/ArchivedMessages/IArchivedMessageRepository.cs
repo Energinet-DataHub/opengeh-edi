@@ -26,9 +26,4 @@ public interface IArchivedMessageRepository
     /// </summary>
     /// <param name="message"></param>
     void Add(ArchivedMessage message);
-
-    /// <summary>
-    /// Fetching all messages
-    /// </summary>
-    Task<ReadOnlyCollection<ArchivedMessage>> GetAllAsync();
 }

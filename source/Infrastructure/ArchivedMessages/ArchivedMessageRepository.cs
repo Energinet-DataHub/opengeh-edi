@@ -12,13 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
 using Domain.ArchivedMessages;
 using Infrastructure.Configuration.DataAccess;
-using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.ArchivedMessages;
 
@@ -34,10 +29,5 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
     public void Add(ArchivedMessage message)
     {
         _dbContext.ArchivedMessages.Add(message);
-    }
-
-    public async Task<ReadOnlyCollection<ArchivedMessage>> GetAllAsync()
-    {
-        return (await _dbContext.ArchivedMessages.ToListAsync().ConfigureAwait(false)).AsReadOnly();
     }
 }
