@@ -22,6 +22,7 @@ using Domain.Actors;
 using Domain.ArchivedMessages;
 using Domain.Documents;
 using IntegrationTests.Fixtures;
+using NodaTime;
 using Xunit;
 
 namespace IntegrationTests.Application.SearchMessages;
@@ -51,7 +52,28 @@ public class SearchMessagesTests : TestBase
         Assert.Equal(archivedMessage.DocumentType.Name, messageInfo.DocumentType);
         Assert.Equal(archivedMessage.SenderNumber.Value, messageInfo.SenderNumber);
         Assert.Equal(archivedMessage.ReceiverNumber.Value, messageInfo.ReceiverNumber);
-        Assert.Equal(archivedMessage.CreatedAt.ToString(), messageInfo.CreatedAt);
+        Assert.Equal(archivedMessage.CreatedAt, messageInfo.CreatedAt);
+    }
+
+    [Fact]
+    public async Task Can_filter_by_creation_date_period()
+    {
+        var createdAt = NodaTime.Text.InstantPattern.General.Parse("2023-04-01T22:00:00Z").Value;
+        var archivedMessage = new ArchivedMessage(Guid.NewGuid(), DocumentType.AccountingPointCharacteristics, ActorNumber.Create("1234512345123"), ActorNumber.Create("1234512345124"), createdAt);
+        await ArchiveMessage(archivedMessage);
+        await ArchiveMessage(
+            new ArchivedMessage(
+                Guid.NewGuid(),
+                DocumentType.AccountingPointCharacteristics,
+                ActorNumber.Create("1234512345123"),
+                ActorNumber.Create("1234512345124"),
+                _systemDateTimeProvider.Now()));
+
+        var startOfPeriod = NodaTime.Text.InstantPattern.General.Parse("2023-05-01T22:00:00Z").Value;
+        var endOfPeriod = NodaTime.Text.InstantPattern.General.Parse("2023-05-02T22:00:00Z").Value;
+        var result = await QueryAsync(new GetMessagesQuery(startOfPeriod, endOfPeriod)).ConfigureAwait(false);
+
+        Assert.Single(result.Messages);
     }
 
     private async Task ArchiveMessage(ArchivedMessage archivedMessage)

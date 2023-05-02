@@ -27,6 +27,8 @@ using Application.Transactions.Aggregations;
 using Application.Transactions.MoveIn;
 using Azure.Messaging.ServiceBus;
 using CimMessageAdapter.Messages;
+using Dapper;
+using Dapper.NodaTime;
 using Domain.ArchivedMessages;
 using Domain.Documents;
 using Domain.MasterData.MarketEvaluationPoints;
@@ -101,6 +103,8 @@ namespace Infrastructure.Configuration
             DequeueConfiguration.Configure(services);
             IntegrationEventsConfiguration.Configure(services);
             ArchivedMessageConfiguration.Configure(services);
+
+            SqlMapper.AddTypeHandler(InstantHandler.Default);
         }
 
         public static CompositionRoot Initialize(IServiceCollection services)

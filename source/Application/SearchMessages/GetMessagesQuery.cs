@@ -13,9 +13,23 @@
 // limitations under the License.
 
 using Application.Configuration.Queries;
+using NodaTime;
 
 namespace Application.SearchMessages;
 
-public sealed record GetMessagesQuery : IQuery<MessageSearchResult>
+public sealed class GetMessagesQuery : IQuery<MessageSearchResult>
 {
+    public GetMessagesQuery()
+    {
+    }
+
+    public GetMessagesQuery(Instant startOfPeriod, Instant endOfPeriod)
+    {
+        StartOfPeriod = startOfPeriod;
+        EndOfPeriod = endOfPeriod;
+    }
+
+    public Instant? StartOfPeriod { get; }
+
+    public Instant? EndOfPeriod { get; }
 }
