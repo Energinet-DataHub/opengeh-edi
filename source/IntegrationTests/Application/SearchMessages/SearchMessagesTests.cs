@@ -61,9 +61,9 @@ public class SearchMessagesTests : TestBase
         await ArchiveMessage(CreateArchivedMessage(NodaTime.Text.InstantPattern.General.Parse("2023-04-01T22:00:00Z").Value));
         await ArchiveMessage(CreateArchivedMessage(_systemDateTimeProvider.Now()));
 
-        var startOfPeriod = NodaTime.Text.InstantPattern.General.Parse("2023-05-01T22:00:00Z").Value;
-        var endOfPeriod = NodaTime.Text.InstantPattern.General.Parse("2023-05-02T22:00:00Z").Value;
-        var result = await QueryAsync(new GetMessagesQuery(startOfPeriod, endOfPeriod)).ConfigureAwait(false);
+        var dateToSearchFrom = NodaTime.Text.InstantPattern.General.Parse("2023-05-01T22:00:00Z").Value;
+        var dateToSearchTo = NodaTime.Text.InstantPattern.General.Parse("2023-05-02T22:00:00Z").Value;
+        var result = await QueryAsync(new GetMessagesQuery(dateToSearchFrom, dateToSearchTo)).ConfigureAwait(false);
 
         Assert.Single(result.Messages);
     }
