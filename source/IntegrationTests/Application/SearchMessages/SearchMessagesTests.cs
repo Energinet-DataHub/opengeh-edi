@@ -42,7 +42,7 @@ public class SearchMessagesTests : TestBase
     [Fact]
     public async Task Can_fetch_messages()
     {
-        var archivedMessage = new ArchivedMessage(Guid.NewGuid(), DocumentType.AccountingPointCharacteristics, ActorNumber.Create("1234512345123"), ActorNumber.Create("1234512345124"), _systemDateTimeProvider.Now());
+        var archivedMessage = CreateArchivedMessage(_systemDateTimeProvider.Now());
         await ArchiveMessage(archivedMessage);
 
         var result = await QueryAsync(new GetMessagesQuery()).ConfigureAwait(false);
