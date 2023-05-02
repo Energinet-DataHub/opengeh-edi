@@ -12,18 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.ObjectModel;
+using Dapper;
+using Dapper.NodaTime;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Domain.ArchivedMessages;
+namespace Infrastructure.Configuration;
 
-/// <summary>
-/// Responsible for archiving messages.
-/// </summary>
-public interface IArchivedMessageRepository
+internal static class QueryHandlingConfiguration
 {
-    /// <summary>
-    /// Archiving a message.
-    /// </summary>
-    /// <param name="message"></param>
-    void Add(ArchivedMessage message);
+    internal static void Configure(IServiceCollection services)
+    {
+        ConfigureDapper();
+    }
+
+    private static void ConfigureDapper()
+    {
+        SqlMapper.AddTypeHandler(InstantHandler.Default);
+    }
 }
