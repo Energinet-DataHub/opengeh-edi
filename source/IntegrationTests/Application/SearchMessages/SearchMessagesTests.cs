@@ -60,13 +60,7 @@ public class SearchMessagesTests : TestBase
     {
         var createdAt = NodaTime.Text.InstantPattern.General.Parse("2023-04-01T22:00:00Z").Value;
         await ArchiveMessage(CreateArchivedMessage(createdAt));
-        await ArchiveMessage(
-            new ArchivedMessage(
-                Guid.NewGuid(),
-                DocumentType.AccountingPointCharacteristics,
-                ActorNumber.Create("1234512345123"),
-                ActorNumber.Create("1234512345124"),
-                _systemDateTimeProvider.Now()));
+        await ArchiveMessage(CreateArchivedMessage(_systemDateTimeProvider.Now()));
 
         var startOfPeriod = NodaTime.Text.InstantPattern.General.Parse("2023-05-01T22:00:00Z").Value;
         var endOfPeriod = NodaTime.Text.InstantPattern.General.Parse("2023-05-02T22:00:00Z").Value;
