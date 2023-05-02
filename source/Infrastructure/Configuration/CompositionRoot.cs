@@ -103,8 +103,7 @@ namespace Infrastructure.Configuration
             DequeueConfiguration.Configure(services);
             IntegrationEventsConfiguration.Configure(services);
             ArchivedMessageConfiguration.Configure(services);
-
-            SqlMapper.AddTypeHandler(InstantHandler.Default);
+            QueryHandlingConfiguration.Configure(services);
         }
 
         public static CompositionRoot Initialize(IServiceCollection services)
