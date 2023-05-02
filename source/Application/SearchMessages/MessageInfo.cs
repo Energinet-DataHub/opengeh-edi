@@ -13,7 +13,8 @@
 // limitations under the License.
 
 using System;
+using NodaTime;
 
 namespace Application.SearchMessages;
 
-public record MessageInfo(Guid MessageId, string DocumentType, string SenderNumber, string ReceiverNumber, string CreatedAt);
+public record MessageInfo(Guid MessageId, string DocumentType, string SenderNumber, string ReceiverNumber, Instant CreatedAt);
