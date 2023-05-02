@@ -17,19 +17,18 @@ using NodaTime;
 
 namespace Application.SearchMessages;
 
-public sealed class GetMessagesQuery : IQuery<MessageSearchResult>
+public sealed record GetMessagesQuery : IQuery<MessageSearchResult>
 {
     public GetMessagesQuery()
     {
     }
 
-    public GetMessagesQuery(Instant startOfPeriod, Instant endOfPeriod)
+    public GetMessagesQuery(MessageCreationPeriod? creationPeriod)
     {
-        StartOfPeriod = startOfPeriod;
-        EndOfPeriod = endOfPeriod;
+        CreationPeriod = creationPeriod;
     }
 
-    public Instant? StartOfPeriod { get; }
-
-    public Instant? EndOfPeriod { get; }
+    public MessageCreationPeriod? CreationPeriod { get; }
 }
+
+public record MessageCreationPeriod(Instant DateToSearchFrom, Instant DateToSearchTo);

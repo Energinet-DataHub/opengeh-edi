@@ -38,7 +38,7 @@ public class GetMessageQueryHandler : IRequestHandler<GetMessagesQuery, MessageS
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        if (request.StartOfPeriod.HasValue && request.EndOfPeriod.HasValue)
+        if (request.CreationPeriod is not null)
         {
             using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
             var archivedMessages =
@@ -46,8 +46,8 @@ public class GetMessageQueryHandler : IRequestHandler<GetMessagesQuery, MessageS
                     "SELECT Id AS MessageId, DocumentType, SenderNumber, ReceiverNumber, CreatedAt FROM dbo.ArchivedMessages WHERE CreatedAt BETWEEN @StartOfPeriod AND @EndOfPeriod",
                     new
                     {
-                        StartOfPeriod = request.StartOfPeriod.Value.ToString(),
-                        EndOfPeriod = request.EndOfPeriod.Value.ToString(),
+                        StartOfPeriod = request.CreationPeriod.DateToSearchFrom.ToString(),
+                        EndOfPeriod = request.CreationPeriod.DateToSearchTo.ToString(),
                     })
                     .ConfigureAwait(false);
             return new MessageSearchResult(archivedMessages.ToList().AsReadOnly());
