@@ -58,15 +58,15 @@ public class SearchMessagesTests : TestBase
     [Fact]
     public async Task Can_filter_by_creation_date_period()
     {
-        await ArchiveMessage(CreateArchivedMessage(NodaTime.Text.InstantPattern.General.Parse("2023-04-01T22:00:00Z").Value));
-        await ArchiveMessage(CreateArchivedMessage(NodaTime.Text.InstantPattern.General.Parse("2023-05-01T22:00:00Z").Value));
+        await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-04-01T22:00:00Z")));
+        await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-05-01T22:00:00Z")));
 
-        var dateToSearchFrom = NodaTime.Text.InstantPattern.General.Parse("2023-05-01T22:00:00Z").Value;
-        var dateToSearchTo = NodaTime.Text.InstantPattern.General.Parse("2023-05-02T22:00:00Z").Value;
+        var dateToSearchFrom = CreatedAt("2023-05-01T22:00:00Z");
+        var dateToSearchTo = CreatedAt("2023-05-02T22:00:00Z");
         var result = await QueryAsync(new GetMessagesQuery(dateToSearchFrom, dateToSearchTo)).ConfigureAwait(false);
 
         Assert.Single(result.Messages);
-        Assert.Equal(NodaTime.Text.InstantPattern.General.Parse("2023-05-01T22:00:00Z").Value, result.Messages[0].CreatedAt);
+        Assert.Equal(CreatedAt("2023-05-01T22:00:00Z"), result.Messages[0].CreatedAt);
     }
 
     private static ArchivedMessage CreateArchivedMessage(Instant createdAt)
@@ -77,6 +77,11 @@ public class SearchMessagesTests : TestBase
             ActorNumber.Create("1234512345123"),
             ActorNumber.Create("1234512345124"),
             createdAt);
+    }
+
+    private static Instant CreatedAt(string date)
+    {
+        return NodaTime.Text.InstantPattern.General.Parse(date).Value;
     }
 
     private async Task ArchiveMessage(ArchivedMessage archivedMessage)
