@@ -59,8 +59,7 @@ public class SearchMessagesTests : TestBase
     public async Task Can_filter_by_creation_date_period()
     {
         var createdAt = NodaTime.Text.InstantPattern.General.Parse("2023-04-01T22:00:00Z").Value;
-        var archivedMessage = CreateArchivedMessage(createdAt);
-        await ArchiveMessage(archivedMessage);
+        await ArchiveMessage(CreateArchivedMessage(createdAt));
         await ArchiveMessage(
             new ArchivedMessage(
                 Guid.NewGuid(),
