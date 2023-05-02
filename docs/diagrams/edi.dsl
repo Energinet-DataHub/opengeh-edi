@@ -6,11 +6,11 @@ workspace extends https://raw.githubusercontent.com/Energinet-DataHub/opengeh-ar
 
             edi = group "EDI" {
                 peekComponent = container "Peek component" "Handles peek requests from actors" "C#, Azure function" {
-                    extSoftSystem -> this "Peek messages"
+                    actorB2BSystem -> this "Peek messages"
                     tags "Microsoft Azure - Function Apps"
                 }
                 dequeueComponent = container "Dequeue component" "Handles dequeue requests from actors" "C#, Azure function" {
-                    extSoftSystem -> this "Dequeue messages"
+                    actorB2BSystem -> this "Dequeue messages"
                     tags "Microsoft Azure - Function Apps"
                 }
                 timeSeriesListener = container "TimeSeries listener" "Listens for integration events indicating time series data is ready" "C#, Azure function" {
