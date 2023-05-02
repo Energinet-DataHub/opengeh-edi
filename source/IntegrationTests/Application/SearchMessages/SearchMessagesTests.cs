@@ -56,7 +56,7 @@ public class SearchMessagesTests : TestBase
     }
 
     [Fact]
-    public async Task Can_filter_by_creation_date_period()
+    public async Task Filter_messages_by_creation_date_period()
     {
         await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-04-01T22:00:00Z")));
         await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-05-01T22:00:00Z")));
