@@ -12,26 +12,49 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.ArchivedMessages;
+using Application.Configuration.DataAccess;
+using Dapper;
 using MediatR;
 
 namespace Application.SearchMessages;
 
 public class GetMessageQueryHandler : IRequestHandler<GetMessagesQuery, MessageSearchResult>
 {
-    private readonly IArchivedMessageRepository _archivedMessageRepository;
+    private readonly IDatabaseConnectionFactory _connectionFactory;
 
-    public GetMessageQueryHandler(IArchivedMessageRepository archivedMessageRepository)
+    public GetMessageQueryHandler(IDatabaseConnectionFactory connectionFactory)
     {
-        _archivedMessageRepository = archivedMessageRepository;
+        _connectionFactory = connectionFactory;
     }
 
     public async Task<MessageSearchResult> Handle(GetMessagesQuery request, CancellationToken cancellationToken)
     {
-        var messages = await _archivedMessageRepository.GetAllAsync().ConfigureAwait(false);
-        return new MessageSearchResult(messages.Select(message => new MessageInfo(message.Id, message.DocumentType.Name, message.SenderNumber.Value, message.ReceiverNumber.Value, message.CreatedAt.ToString())).ToList().AsReadOnly());
+        ArgumentNullException.ThrowIfNull(request);
+
+        var selectStatement =
+            "SELECT Id AS MessageId, DocumentType, SenderNumber, ReceiverNumber, CreatedAt FROM dbo.ArchivedMessages";
+        object queryParameters = new();
+
+        if (request.CreationPeriod is not null)
+        {
+            selectStatement += " WHERE CreatedAt BETWEEN @StartOfPeriod AND @EndOfPeriod";
+            queryParameters = new
+            {
+                StartOfPeriod = request.CreationPeriod.DateToSearchFrom.ToString(),
+                EndOfPeriod = request.CreationPeriod.DateToSearchTo.ToString(),
+            };
+        }
+
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        var archivedMessages =
+            await connection.QueryAsync<MessageInfo>(
+                    selectStatement,
+                    queryParameters)
+                .ConfigureAwait(false);
+        return new MessageSearchResult(archivedMessages.ToList().AsReadOnly());
     }
 }
