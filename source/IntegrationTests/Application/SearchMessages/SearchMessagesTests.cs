@@ -59,18 +59,24 @@ public class SearchMessagesTests : TestBase
     public async Task Can_filter_by_creation_date_period()
     {
         await ArchiveMessage(CreateArchivedMessage(NodaTime.Text.InstantPattern.General.Parse("2023-04-01T22:00:00Z").Value));
-        await ArchiveMessage(CreateArchivedMessage(_systemDateTimeProvider.Now()));
+        await ArchiveMessage(CreateArchivedMessage(NodaTime.Text.InstantPattern.General.Parse("2023-05-01T22:00:00Z").Value));
 
         var dateToSearchFrom = NodaTime.Text.InstantPattern.General.Parse("2023-05-01T22:00:00Z").Value;
         var dateToSearchTo = NodaTime.Text.InstantPattern.General.Parse("2023-05-02T22:00:00Z").Value;
         var result = await QueryAsync(new GetMessagesQuery(dateToSearchFrom, dateToSearchTo)).ConfigureAwait(false);
 
         Assert.Single(result.Messages);
+        Assert.Equal(NodaTime.Text.InstantPattern.General.Parse("2023-05-01T22:00:00Z").Value, result.Messages[0].CreatedAt);
     }
 
     private static ArchivedMessage CreateArchivedMessage(Instant createdAt)
     {
-        return new ArchivedMessage(Guid.NewGuid(), DocumentType.AccountingPointCharacteristics, ActorNumber.Create("1234512345123"), ActorNumber.Create("1234512345124"), createdAt);
+        return new ArchivedMessage(
+            Guid.NewGuid(),
+            DocumentType.AccountingPointCharacteristics,
+            ActorNumber.Create("1234512345123"),
+            ActorNumber.Create("1234512345124"),
+            createdAt);
     }
 
     private async Task ArchiveMessage(ArchivedMessage archivedMessage)
