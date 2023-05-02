@@ -61,9 +61,9 @@ public class SearchMessagesTests : TestBase
         await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-04-01T22:00:00Z")));
         await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-05-01T22:00:00Z")));
 
-        var dateToSearchFrom = CreatedAt("2023-05-01T22:00:00Z");
-        var dateToSearchTo = CreatedAt("2023-05-02T22:00:00Z");
-        var result = await QueryAsync(new GetMessagesQuery(new MessageCreationPeriod(dateToSearchFrom, dateToSearchTo))).ConfigureAwait(false);
+        var result = await QueryAsync(new GetMessagesQuery(new MessageCreationPeriod(
+            CreatedAt("2023-05-01T22:00:00Z"),
+            CreatedAt("2023-05-02T22:00:00Z")))).ConfigureAwait(false);
 
         Assert.Single(result.Messages);
         Assert.Equal(CreatedAt("2023-05-01T22:00:00Z"), result.Messages[0].CreatedAt);
