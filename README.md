@@ -25,12 +25,12 @@ Currently we support the CIM XML format. The EDI domain will also support the fo
 
 In this sprint we are working on
 
-- Send out results using the CIM JSON format
+- Be able to search for outgoing messages in frontend
 
 In the next sprint we are working on
 
-- Be able to search for outgoing messages in frontend
-- Creating acceptance test for testing message flow
+- Support new proces type
+- New outgoing message. Net exchange pr. grid
 
 ## Getting Started
 
