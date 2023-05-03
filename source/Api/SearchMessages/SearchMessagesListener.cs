@@ -43,9 +43,8 @@ public class SearchMessagesListener
         FunctionContext executionContext)
     {
         var result = await _mediator.Send(new GetMessagesQuery()).ConfigureAwait(false);
-        var response = request.CreateResponse(HttpStatusCode.OK);
-        await response.WriteAsJsonAsync(result.Messages).ConfigureAwait(false);
-        return response;
+
+        return await SearchResultResponseAsync(request, result).ConfigureAwait(false);
     }
 
     [Function("ArchivedMessages")]
@@ -74,8 +73,16 @@ public class SearchMessagesListener
         };
 
         var result = await _mediator.Send(query).ConfigureAwait(false);
+
+        return await SearchResultResponseAsync(request, result).ConfigureAwait(false);
+    }
+
+    private async Task<HttpResponseData> SearchResultResponseAsync(HttpRequestData request, MessageSearchResult result)
+    {
+        var responseBody = _serializer.Serialize(result.Messages);
         var response = request.CreateResponse(HttpStatusCode.OK);
-        await response.WriteAsJsonAsync(result.Messages).ConfigureAwait(false);
+        await response.WriteStringAsync(responseBody).ConfigureAwait(false);
+        response.Headers.Add("content-type", "application/json");
         return response;
     }
 }
