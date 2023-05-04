@@ -26,14 +26,14 @@ internal static class QueryBuilder
         return new QueryInput(BuildStatement(statement), queryParameters);
     }
 
-    private static string BuildStatement(IReadOnlyCollection<string> dic)
+    private static string BuildStatement(IReadOnlyCollection<string> statement)
     {
-        var statement = "SELECT Id AS MessageId, DocumentType, SenderNumber, ReceiverNumber, CreatedAt FROM dbo.ArchivedMessages";
-        if (dic.Count > 0)
+        var selectStatement = "SELECT Id AS MessageId, DocumentType, SenderNumber, ReceiverNumber, CreatedAt FROM dbo.ArchivedMessages";
+        if (statement.Count > 0)
         {
-            statement += " WHERE " + string.Join(" AND ", dic);
+            selectStatement += " WHERE " + string.Join(" AND ", statement);
         }
 
-        return statement;
+        return selectStatement;
     }
 }
