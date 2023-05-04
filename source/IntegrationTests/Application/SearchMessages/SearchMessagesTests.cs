@@ -69,10 +69,30 @@ public class SearchMessagesTests : TestBase
         Assert.Equal(CreatedAt("2023-05-01T22:00:00Z"), result.Messages[0].CreatedAt);
     }
 
-    private static ArchivedMessage CreateArchivedMessage(Instant createdAt)
+    [Fact]
+    public async Task Filter_messages_by_message_id()
+    {
+        //Arrange
+        var messageId = Guid.NewGuid();
+
+        await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-05-01T22:00:00Z"), messageId));
+        await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-05-01T22:00:00Z")));
+
+        //Act
+        var result = await QueryAsync(new GetMessagesQuery(
+            new MessageCreationPeriod(
+            CreatedAt("2023-05-01T22:00:00Z"),
+            CreatedAt("2023-05-02T22:00:00Z")),
+            messageId)).ConfigureAwait(false);
+
+        //Assert
+        Assert.Equal(messageId, result.Messages[0].MessageId);
+    }
+
+    private static ArchivedMessage CreateArchivedMessage(Instant createdAt, Guid? messageId = null)
     {
         return new ArchivedMessage(
-            Guid.NewGuid(),
+            messageId.GetValueOrDefault(Guid.NewGuid()),
             DocumentType.AccountingPointCharacteristics,
             ActorNumber.Create("1234512345123"),
             ActorNumber.Create("1234512345124"),

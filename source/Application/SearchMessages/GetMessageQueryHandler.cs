@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,16 +38,19 @@ public class GetMessageQueryHandler : IRequestHandler<GetMessagesQuery, MessageS
 
         var selectStatement =
             "SELECT Id AS MessageId, DocumentType, SenderNumber, ReceiverNumber, CreatedAt FROM dbo.ArchivedMessages";
-        object queryParameters = new();
+        var queryParameters = new DynamicParameters();
 
         if (request.CreationPeriod is not null)
         {
             selectStatement += " WHERE CreatedAt BETWEEN @StartOfPeriod AND @EndOfPeriod";
-            queryParameters = new
-            {
-                StartOfPeriod = request.CreationPeriod.DateToSearchFrom.ToString(),
-                EndOfPeriod = request.CreationPeriod.DateToSearchTo.ToString(),
-            };
+            queryParameters.Add("StartOfPeriod", request.CreationPeriod.DateToSearchFrom.ToString());
+            queryParameters.Add("EndOfPeriod", request.CreationPeriod.DateToSearchTo.ToString());
+        }
+
+        if (request.MessageId is not null)
+        {
+            selectStatement += " AND Id = @MessageId";
+            queryParameters.Add("MessageId", request.MessageId.Value.ToString());
         }
 
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
