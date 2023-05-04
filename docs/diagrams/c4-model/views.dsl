@@ -24,7 +24,7 @@ workspace extends https://raw.githubusercontent.com/Energinet-DataHub/opengeh-ar
             !include https://raw.githubusercontent.com/Energinet-DataHub/geh-market-participant/dstenroejl/align-c4-models/docs/diagrams/c4-model/model.dsl
 
             # Include EDI model
-            !include https://raw.githubusercontent.com/Energinet-DataHub/
+            !include https://raw.githubusercontent.com/Energinet-DataHub/opengeh-edi/dstenroejl/align-c4-models/docs/diagrams/c4-model/model.dsl
 
             # Include Wholesale model
             !include https://raw.githubusercontent.com/Energinet-DataHub/
