@@ -74,7 +74,6 @@ public class SearchMessagesTests : TestBase
     {
         //Arrange
         var messageId = Guid.NewGuid();
-
         await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-05-01T22:00:00Z"), messageId));
         await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-05-01T22:00:00Z")));
 

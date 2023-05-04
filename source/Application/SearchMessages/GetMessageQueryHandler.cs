@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -36,33 +35,13 @@ public class GetMessageQueryHandler : IRequestHandler<GetMessagesQuery, MessageS
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var selectStatement =
-            "SELECT Id AS MessageId, DocumentType, SenderNumber, ReceiverNumber, CreatedAt FROM dbo.ArchivedMessages";
-        var queryParameters = new DynamicParameters();
-
-        if (request.CreationPeriod is null && request.MessageId is not null)
-        {
-            selectStatement += " WHERE CreatedAt = CreatedAt";
-        }
-
-        if (request.CreationPeriod is not null)
-        {
-            selectStatement += " WHERE CreatedAt BETWEEN @StartOfPeriod AND @EndOfPeriod";
-            queryParameters.Add("StartOfPeriod", request.CreationPeriod.DateToSearchFrom.ToString());
-            queryParameters.Add("EndOfPeriod", request.CreationPeriod.DateToSearchTo.ToString());
-        }
-
-        if (request.MessageId is not null)
-        {
-            selectStatement += " AND Id = @MessageId";
-            queryParameters.Add("MessageId", request.MessageId.Value.ToString());
-        }
+        var input = QueryBuilder.BuildFrom(request);
 
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
         var archivedMessages =
             await connection.QueryAsync<MessageInfo>(
-                    selectStatement,
-                    queryParameters)
+                    input.SqlStatement,
+                    input.Parameters)
                 .ConfigureAwait(false);
         return new MessageSearchResult(archivedMessages.ToList().AsReadOnly());
     }
