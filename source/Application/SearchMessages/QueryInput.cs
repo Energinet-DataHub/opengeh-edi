@@ -12,12 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Application.Configuration.Queries;
-using NodaTime;
+using Dapper;
 
 namespace Application.SearchMessages;
 
-public sealed record GetMessagesQuery(MessageCreationPeriod? CreationPeriod = null, Guid? MessageId = null) : IQuery<MessageSearchResult>;
-
-public record MessageCreationPeriod(Instant DateToSearchFrom, Instant DateToSearchTo);
+public record QueryInput(string SqlStatement, DynamicParameters Parameters);
