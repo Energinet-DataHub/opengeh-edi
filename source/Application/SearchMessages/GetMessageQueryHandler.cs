@@ -40,6 +40,11 @@ public class GetMessageQueryHandler : IRequestHandler<GetMessagesQuery, MessageS
             "SELECT Id AS MessageId, DocumentType, SenderNumber, ReceiverNumber, CreatedAt FROM dbo.ArchivedMessages";
         var queryParameters = new DynamicParameters();
 
+        if (request.CreationPeriod is null && request.MessageId is not null)
+        {
+            selectStatement += " WHERE CreatedAt = CreatedAt";
+        }
+
         if (request.CreationPeriod is not null)
         {
             selectStatement += " WHERE CreatedAt BETWEEN @StartOfPeriod AND @EndOfPeriod";
