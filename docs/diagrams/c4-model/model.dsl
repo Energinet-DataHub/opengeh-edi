@@ -1,4 +1,4 @@
-# Read description in the '<domain name>-views.dsl' file.
+# Read description in the 'views.dsl' file.
 
 ediDomain = group "EDI" {
     ediDb = container "EDI Database" {
