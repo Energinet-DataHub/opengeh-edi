@@ -22,7 +22,6 @@ using Domain.Actors;
 using Domain.ArchivedMessages;
 using Domain.Documents;
 using IntegrationTests.Fixtures;
-using Microsoft.Azure.Amqp.Framing;
 using NodaTime;
 using Xunit;
 
