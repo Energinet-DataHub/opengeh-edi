@@ -37,6 +37,12 @@ internal static class QueryBuilder
             queryParameters.Add("MessageId", request.MessageId.Value.ToString());
         }
 
+        if (request.SenderNumber is not null)
+        {
+            statement.Add("SenderNumber=@SenderNumber");
+            queryParameters.Add("SenderNumber", request.SenderNumber);
+        }
+
         return new QueryInput(BuildStatement(statement), queryParameters);
     }
 
