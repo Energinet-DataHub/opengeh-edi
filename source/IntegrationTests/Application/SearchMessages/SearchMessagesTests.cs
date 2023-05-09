@@ -104,17 +104,33 @@ public class SearchMessagesTests : TestBase
         Assert.Equal(messageId, result.Messages[0].MessageId);
     }
 
+    [Fact]
+    public async Task Filter_messages_by_sender_number()
+    {
+        //Arrange
+        var senderNumber = "1234512345128";
+        await ArchiveMessage(CreateArchivedMessage(senderNumber: senderNumber));
+        await ArchiveMessage(CreateArchivedMessage());
+
+        //Act
+        var result = await QueryAsync(new GetMessagesQuery(SenderNumber: senderNumber)).ConfigureAwait(false);
+
+        //Assert
+        Assert.Single(result.Messages);
+        Assert.Equal(senderNumber, result.Messages[0].SenderNumber);
+    }
+
     private static Instant CreatedAt(string date)
     {
         return NodaTime.Text.InstantPattern.General.Parse(date).Value;
     }
 
-    private ArchivedMessage CreateArchivedMessage(Instant? createdAt = null, Guid? messageId = null)
+    private ArchivedMessage CreateArchivedMessage(Instant? createdAt = null, Guid? messageId = null, string? senderNumber = null)
     {
         return new ArchivedMessage(
             messageId.GetValueOrDefault(Guid.NewGuid()),
             DocumentType.AccountingPointCharacteristics,
-            ActorNumber.Create("1234512345123"),
+            ActorNumber.Create(senderNumber ?? "1234512345123"),
             ActorNumber.Create("1234512345124"),
             createdAt.GetValueOrDefault(_systemDateTimeProvider.Now()));
     }

@@ -71,6 +71,7 @@ public class SearchMessagesListener
                     searchCriteria.CreatedDuringPeriod.End)
                 : null,
             MessageId = searchCriteria?.MessageId,
+            SenderNumber = searchCriteria?.SenderNumber,
         };
 
         var result = await _mediator.Send(query).ConfigureAwait(false);
@@ -88,6 +89,6 @@ public class SearchMessagesListener
     }
 }
 
-public record SearchArchivedMessages(MessageCreationPeriod? CreatedDuringPeriod, Guid? MessageId);
+public record SearchArchivedMessages(MessageCreationPeriod? CreatedDuringPeriod, Guid? MessageId, string? SenderNumber);
 
 public record MessageCreationPeriod(Instant Start, Instant End);
