@@ -15,7 +15,9 @@ using System;
 using System.Globalization;
 using System.Threading.Tasks;
 using DocumentValidation;
+using Domain.OutgoingMessages;
 using Domain.Transactions.Aggregations;
+using Infrastructure.OutgoingMessages.Common;
 using Tests.Infrastructure.OutgoingMessages.Asserts;
 
 namespace Tests.Infrastructure.OutgoingMessages.AggregationResult;
@@ -134,6 +136,12 @@ public class AssertAggregationResultXmlDocument : IAssertAggregationResultDocume
     public IAssertAggregationResultDocument QualityIsNotPresentForPosition(int position)
     {
         _documentAsserter.IsNotPresent($"Series[1]/Period/Point[{position}]/quality");
+        return this;
+    }
+
+    public IAssertAggregationResultDocument HasProcessType(ProcessType processType)
+    {
+        _documentAsserter.HasValue("process.processType", CimCode.Of(processType));
         return this;
     }
 }

@@ -19,7 +19,9 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using DocumentValidation;
+using Domain.OutgoingMessages;
 using Domain.Transactions.Aggregations;
+using Infrastructure.OutgoingMessages.Common;
 using Json.Schema;
 using Xunit;
 
@@ -173,6 +175,12 @@ internal sealed class AssertAggregationResultJsonDocument : IAssertAggregationRe
             .GetProperty("Point").EnumerateArray().ToList()[position - 1];
 
         Assert.Throws<KeyNotFoundException>(() => point.GetProperty("quality"));
+        return this;
+    }
+
+    public IAssertAggregationResultDocument HasProcessType(ProcessType processType)
+    {
+        Assert.Equal(CimCode.Of(processType), _root.GetProperty("process.processType").GetProperty("value").ToString());
         return this;
     }
 
