@@ -152,14 +152,16 @@ public class AggregationResultDocumentWriterTests : IClassFixture<DocumentValida
             .BalanceResponsibleNumberIsNotPresent();
     }
 
-    [Fact]
-    public async Task Process_type_is_translated()
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
+    public async Task Process_type_is_translated(string documentFormat)
     {
         _timeSeries.WithProcessType(ProcessType.PreliminaryAggregation);
 
-        var document = await CreateDocument(_timeSeries, DocumentFormat.Xml).ConfigureAwait(false);
+        var document = await CreateDocument(_timeSeries, DocumentFormat.From(documentFormat)).ConfigureAwait(false);
 
-        AssertDocument(document, DocumentFormat.Xml)
+        AssertDocument(document, DocumentFormat.From(documentFormat))
             .HasProcessType(ProcessType.PreliminaryAggregation);
     }
 
