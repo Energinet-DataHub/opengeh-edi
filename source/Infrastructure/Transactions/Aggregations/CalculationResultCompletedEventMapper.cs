@@ -146,6 +146,7 @@ public class CalculationResultCompletedEventMapper : IIntegrationEventMapper
     {
         return integrationEvent.ProcessType switch
         {
+            Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.Aggregation => ProcessType.PreliminaryAggregation.Name,
             Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.BalanceFixing => ProcessType.BalanceFixing.Name,
             Energinet.DataHub.Wholesale.Contracts.Events.ProcessType.Unspecified => throw new InvalidOperationException("Process type is not specified"),
             _ => throw new InvalidOperationException("Unknown process type"),
