@@ -20,6 +20,7 @@ public sealed class ProcessType : EnumerationType
 {
     public static readonly ProcessType MoveIn = new(0, nameof(MoveIn));
     public static readonly ProcessType BalanceFixing = new(1, nameof(BalanceFixing));
+    public static readonly ProcessType PreliminaryAggregation = new(2, nameof(PreliminaryAggregation));
 
     private ProcessType(int id, string name)
      : base(id, name)
