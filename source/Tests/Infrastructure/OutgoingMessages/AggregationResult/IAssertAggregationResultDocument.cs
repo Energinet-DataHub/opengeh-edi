@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Domain.OutgoingMessages;
 using NodaTime;
 using Period = Domain.Transactions.Aggregations.Period;
 
@@ -122,4 +123,10 @@ public interface IAssertAggregationResultDocument
     /// </summary>
     /// <param name="position"></param>
     IAssertAggregationResultDocument QualityIsNotPresentForPosition(int position);
+
+    /// <summary>
+    /// Asserts the process type.
+    /// </summary>
+    /// <param name="processType"></param>
+    IAssertAggregationResultDocument HasProcessType(ProcessType processType);
 }

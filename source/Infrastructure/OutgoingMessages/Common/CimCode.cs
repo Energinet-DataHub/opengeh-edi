@@ -32,6 +32,9 @@ public static class CimCode
         if (processType == ProcessType.MoveIn)
             return "E65";
 
+        if (processType == ProcessType.PreliminaryAggregation)
+            return "D03";
+
         throw NoCodeFoundFor(processType.Name);
     }
 
