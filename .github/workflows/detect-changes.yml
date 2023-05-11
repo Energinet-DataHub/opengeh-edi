@@ -54,6 +54,7 @@ jobs:
               - '.github/actions/dotnet-*/**'
               - 'source/!((IntegrationEvents|RequestResponse)/**)/**'
             render_diagrams:
-              - 'docs/diagrams/c4-model-edi-component-level.dsl'
+              - 'docs/diagrams/c4-model/views.dsl'
+              - 'docs/diagrams/c4-model/model.dsl'
               - '.github/workflows/render-diagrams.yml'
               - '.github/workflows/detect-changes.yml'
