@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApplyDBMigrationsApp", "App
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocumentValidation", "DocumentValidation\DocumentValidation.csproj", "{5AB5E68B-40C5-4FDF-8EA7-99FFD3DCBC13}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AcceptanceTests", "AcceptanceTests\AcceptanceTests.csproj", "{2310420F-0099-4FB3-B46A-1A34E7A919F4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{5AB5E68B-40C5-4FDF-8EA7-99FFD3DCBC13}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5AB5E68B-40C5-4FDF-8EA7-99FFD3DCBC13}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5AB5E68B-40C5-4FDF-8EA7-99FFD3DCBC13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2310420F-0099-4FB3-B46A-1A34E7A919F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2310420F-0099-4FB3-B46A-1A34E7A919F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2310420F-0099-4FB3-B46A-1A34E7A919F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2310420F-0099-4FB3-B46A-1A34E7A919F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

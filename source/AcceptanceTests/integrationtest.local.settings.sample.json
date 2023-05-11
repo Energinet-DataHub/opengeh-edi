@@ -1,0 +1,6 @@
+﻿{
+  "IntegrationEvents": {
+    "ServiceBusConnectionString": "<Azure ServiceBus connection string>",
+    "TopicName": "<name of topic to publish to>"
+  }
+}
