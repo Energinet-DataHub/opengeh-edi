@@ -50,7 +50,6 @@ jobs:
             dotnet:
               - '.github/workflows/cd.yml'
               - '.github/workflows/ci-dotnet.yml'
-              - '.github/workflows/detect-changes.yml'
               - '.github/actions/dotnet-*/**'
               - 'source/!((IntegrationEvents|RequestResponse)/**)/**'
             render_c4model_views:
