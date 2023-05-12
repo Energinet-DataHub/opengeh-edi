@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.IncomingMessages;
 using CimMessageAdapter.Messages;
@@ -29,7 +30,7 @@ namespace IntegrationTests.CimMessageAdapter.Stubs
 
         public IReadOnlyCollection<IMarketTransaction> CommittedItems => _committedItems.AsReadOnly();
 
-        public Task AddAsync(IMarketTransaction message)
+        public Task AddAsync(IMarketTransaction message, CancellationToken cancellationToken)
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
             _committedItems.Clear();
@@ -37,7 +38,7 @@ namespace IntegrationTests.CimMessageAdapter.Stubs
             return Task.CompletedTask;
         }
 
-        public Task CommitAsync()
+        public Task CommitAsync(CancellationToken cancellationToken)
         {
             _committedItems.Clear();
             _committedItems.AddRange(_uncommittedItems);

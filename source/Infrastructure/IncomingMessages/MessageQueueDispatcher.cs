@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
 using Application.Configuration;
@@ -48,17 +49,17 @@ namespace Infrastructure.IncomingMessages
             _transactionQueue = new List<ServiceBusMessage>();
         }
 
-        public Task AddAsync(IMarketTransaction message)
+        public Task AddAsync(IMarketTransaction message, CancellationToken cancellationToken)
         {
             _transactionQueue.Add(CreateMessage(message));
             return Task.CompletedTask;
         }
 
-        public async Task CommitAsync()
+        public async Task CommitAsync(CancellationToken cancellationToken)
         {
             using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                await _senderCreator.SendAsync(_transactionQueue.AsReadOnly()).ConfigureAwait(false);
+                await _senderCreator.SendAsync(_transactionQueue.AsReadOnly(), cancellationToken).ConfigureAwait(false);
                 scope.Complete();
             }
         }

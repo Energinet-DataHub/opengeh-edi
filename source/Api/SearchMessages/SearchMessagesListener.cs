@@ -15,6 +15,7 @@
 using System;
 using System.IO;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.SearchMessages;
 using Infrastructure.Configuration.Serialization;
@@ -40,28 +41,47 @@ public class SearchMessagesListener
     public async Task<HttpResponseData> RunAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get")]
         HttpRequestData request,
-        FunctionContext executionContext)
+        FunctionContext executionContext,
+        CancellationToken hostCancellationToken)
     {
-        var result = await _mediator.Send(new GetMessagesQuery()).ConfigureAwait(false);
+        ArgumentNullException.ThrowIfNull(request);
 
-        return await SearchResultResponseAsync(request, result).ConfigureAwait(false);
+        using var cancellationTokenSource =
+            CancellationTokenSource.CreateLinkedTokenSource(
+                hostCancellationToken,
+                request.FunctionContext.CancellationToken);
+
+        var cancellationToken = cancellationTokenSource.Token;
+
+        var result = await _mediator.Send(new GetMessagesQuery(), cancellationToken).ConfigureAwait(false);
+
+        return await SearchResultResponseAsync(request, result, cancellationToken).ConfigureAwait(false);
     }
 
     [Function("ArchivedMessages")]
     public async Task<HttpResponseData> SearchArchivedMessagesAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
         HttpRequestData request,
-        FunctionContext executionContext)
+        FunctionContext executionContext,
+        CancellationToken hostCancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
+
+        using var cancellationTokenSource =
+            CancellationTokenSource.CreateLinkedTokenSource(
+                hostCancellationToken,
+                request.FunctionContext.CancellationToken);
+
+        var cancellationToken = cancellationTokenSource.Token;
 
         if (request.Body == Stream.Null)
         {
             return request.CreateResponse(HttpStatusCode.BadRequest);
         }
 
-        var searchCriteria = await _serializer.DeserializeAsync(request.Body, typeof(SearchArchivedMessages))
-            .ConfigureAwait(false) as SearchArchivedMessages;
+        var searchCriteria = await _serializer
+            .DeserializeAsync<SearchArchivedMessages>(request.Body, cancellationToken)
+            .ConfigureAwait(false);
 
         var query = new GetMessagesQuery
         {
@@ -74,16 +94,19 @@ public class SearchMessagesListener
             SenderNumber = searchCriteria?.SenderNumber,
         };
 
-        var result = await _mediator.Send(query).ConfigureAwait(false);
+        var result = await _mediator.Send(query, cancellationToken).ConfigureAwait(false);
 
-        return await SearchResultResponseAsync(request, result).ConfigureAwait(false);
+        return await SearchResultResponseAsync(request, result, cancellationToken).ConfigureAwait(false);
     }
 
-    private async Task<HttpResponseData> SearchResultResponseAsync(HttpRequestData request, MessageSearchResult result)
+    private async Task<HttpResponseData> SearchResultResponseAsync(
+        HttpRequestData request,
+        MessageSearchResult result,
+        CancellationToken cancellationToken)
     {
         var responseBody = _serializer.Serialize(result.Messages);
         var response = request.CreateResponse(HttpStatusCode.OK);
-        await response.WriteStringAsync(responseBody).ConfigureAwait(false);
+        await response.WriteStringAsync(responseBody, cancellationToken).ConfigureAwait(false);
         response.Headers.Add("content-type", "application/json");
         return response;
     }

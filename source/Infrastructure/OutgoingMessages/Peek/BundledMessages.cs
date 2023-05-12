@@ -18,6 +18,7 @@ using System.Data;
 using System.Data.Common;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Application.OutgoingMessages.Dequeue;
@@ -41,24 +42,25 @@ public class BundledMessages : IBundledMessages
         _context = context;
     }
 
-    public Task AddAsync(BundledMessage bundledMessage)
+    public Task AddAsync(BundledMessage bundledMessage, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(bundledMessage);
-        return _context.BundledMessages.AddAsync(bundledMessage).AsTask();
+        return _context.BundledMessages.AddAsync(bundledMessage, cancellationToken).AsTask();
     }
 
-    public async Task<DequeueResult> DequeueAsync(Guid messageId)
+    public async Task<DequeueResult> DequeueAsync(Guid messageId, CancellationToken cancellationToken)
     {
         const string deleteStmt = @"
-DELETE E FROM [dbo].[EnqueuedMessages] E JOIN
-(SELECT EnqueuedMessageId = value FROM [dbo].[BundledMessages]
-CROSS APPLY STRING_SPLIT(MessageIdsIncluded, ',') WHERE Id = @Id) AS P
-ON E.Id = P.EnqueuedMessageId;
+            DELETE E FROM [dbo].[EnqueuedMessages] E JOIN
+            (SELECT EnqueuedMessageId = value FROM [dbo].[BundledMessages]
+            CROSS APPLY STRING_SPLIT(MessageIdsIncluded, ',') WHERE Id = @Id) AS P
+            ON E.Id = P.EnqueuedMessageId;
 
-DELETE FROM [dbo].[BundledMessages] WHERE Id = @Id;
-";
+            DELETE FROM [dbo].[BundledMessages] WHERE Id = @Id;
+        ";
 
-        using var connection = (SqlConnection)await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection =
+            (SqlConnection)await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
         using var transaction = connection.BeginTransaction();
         using var command = connection.CreateCommand();
         command.Transaction = transaction;
@@ -68,36 +70,37 @@ DELETE FROM [dbo].[BundledMessages] WHERE Id = @Id;
 
         try
         {
-            result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
-            await transaction.CommitAsync().ConfigureAwait(false);
+            result = await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+            await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
         }
         catch (DbException)
         {
             // Add exception logging
-            await transaction.RollbackAsync().ConfigureAwait(false);
+            await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
             throw; // re-throw exception
         }
 
         return result > 0 ? new DequeueResult(true) : new DequeueResult(false);
     }
 
-    public virtual async Task<BundledMessage?> GetAsync(MessageCategory category, ActorNumber receiverNumber)
+    public virtual async Task<BundledMessage?> GetAsync(
+        MessageCategory category, ActorNumber receiverNumber, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(category);
         ArgumentNullException.ThrowIfNull(receiverNumber);
 
-        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection =
+            await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
         using var command = CreateCommand(
             $"SELECT Id, ReceiverNumber, MessageCategory, MessageIdsIncluded, GeneratedDocument FROM dbo.BundledMessages WHERE ReceiverNumber = @ReceiverNumber AND MessageCategory = @MessageCategory",
             new List<KeyValuePair<string, object>>
             {
-                new("@ReceiverNumber", receiverNumber.Value),
-                new("@MessageCategory", category.Name),
+                new("@ReceiverNumber", receiverNumber.Value), new("@MessageCategory", category.Name),
             },
             connection);
 
-        using var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
-        await reader.ReadAsync().ConfigureAwait(false);
+        using var reader = await command.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+        await reader.ReadAsync(cancellationToken).ConfigureAwait(false);
         if (reader.HasRows == false)
         {
             return null;
@@ -118,7 +121,8 @@ DELETE FROM [dbo].[BundledMessages] WHERE Id = @Id;
         document.Position = 0;
     }
 
-    private static SqlCommand CreateCommand(string sqlStatement, List<KeyValuePair<string, object>> parameters, IDbConnection connection)
+    private static SqlCommand CreateCommand(
+        string sqlStatement, List<KeyValuePair<string, object>> parameters, IDbConnection connection)
     {
         var command = connection.CreateCommand();
 

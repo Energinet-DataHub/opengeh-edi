@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Application.OutgoingMessages.Common.Reasons;
@@ -46,7 +47,7 @@ public class ValidationErrorTranslatorTests : TestBase
             errorCode,
         };
 
-        var reasons = await _validationErrorTranslator.TranslateAsync(validationErrors).ConfigureAwait(false);
+        var reasons = await _validationErrorTranslator.TranslateAsync(validationErrors, CancellationToken.None).ConfigureAwait(false);
 
         Assert.NotEmpty(reasons);
         Assert.Equal(code, reasons.FirstOrDefault()?.Code);
@@ -57,7 +58,7 @@ public class ValidationErrorTranslatorTests : TestBase
     {
         var validationErrors = new List<string>() { "unknown error code" };
 
-        var reasons = await _validationErrorTranslator.TranslateAsync(validationErrors).ConfigureAwait(false);
+        var reasons = await _validationErrorTranslator.TranslateAsync(validationErrors, CancellationToken.None).ConfigureAwait(false);
 
         Assert.Equal("999", reasons.First().Code);
     }
@@ -65,7 +66,7 @@ public class ValidationErrorTranslatorTests : TestBase
     private async Task RegisterTranslation(string errorCode, string code, string text)
     {
         var connectionFactory = GetService<IDatabaseConnectionFactory>();
-        using var connection = await connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
         const string insertStatement = $"INSERT INTO [dbo].[ReasonTranslations] (Id, ErrorCode, Code, Text, LanguageCode) " +
                                        $"VALUES (@Id, @ErrorCode, @Code, @Text, 'dk');";
 

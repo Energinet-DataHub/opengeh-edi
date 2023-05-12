@@ -26,8 +26,9 @@ namespace DocumentValidation
         /// </summary>
         /// <param name="businessProcessType"></param>
         /// <param name="version"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns><see cref="XmlSchema"/></returns>
-        Task<T?> GetSchemaAsync<T>(string businessProcessType, string version);
+        Task<T?> GetSchemaAsync<T>(string businessProcessType, string version, CancellationToken cancellationToken);
     }
 
     /// <summary>
@@ -41,6 +42,7 @@ namespace DocumentValidation
         /// </summary>
         /// <param name="type"></param>
         /// <param name="version"></param>
-        Task<TSchema?> GetAsync(DocumentType type, string version);
+        /// <param name="cancellationToken"></param>
+        Task<TSchema?> GetAsync(DocumentType type, string version, CancellationToken cancellationToken);
     }
 }

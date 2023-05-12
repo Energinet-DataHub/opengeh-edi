@@ -13,10 +13,10 @@
 // limitations under the License.
 
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.IncomingMessages;
 using Domain.Documents;
-using Domain.OutgoingMessages;
 
 namespace CimMessageAdapter.Messages;
 
@@ -36,5 +36,7 @@ public interface IMessageParser<TMarketActivityRecordType, TMarketTransactionTyp
     /// Parse from stream
     /// </summary>
     /// <param name="message"></param>
-    Task<MessageParserResult<TMarketActivityRecordType, TMarketTransactionType>> ParseAsync(Stream message);
+    /// <param name="cancellationToken"></param>
+    Task<MessageParserResult<TMarketActivityRecordType, TMarketTransactionType>> ParseAsync(
+        Stream message, CancellationToken cancellationToken);
 }

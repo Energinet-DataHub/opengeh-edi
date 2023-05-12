@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Data;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Microsoft.Data.SqlClient;
@@ -32,6 +33,14 @@ namespace Infrastructure.Configuration.DataAccess
         {
             var connection = new SqlConnection(_connectionString);
             connection.Open();
+
+            return connection;
+        }
+
+        public async ValueTask<IDbConnection> GetConnectionAndOpenAsync(CancellationToken cancellationToken)
+        {
+            var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
 
             return connection;
         }

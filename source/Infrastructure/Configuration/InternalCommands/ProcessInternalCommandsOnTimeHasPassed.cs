@@ -31,7 +31,7 @@ namespace Infrastructure.Configuration.InternalCommands
 
         public Task Handle(TenSecondsHasHasPassed notification, CancellationToken cancellationToken)
         {
-            return _internalCommandProcessor.ProcessPendingAsync();
+            return _internalCommandProcessor.ProcessPendingAsync(cancellationToken);
         }
     }
 }

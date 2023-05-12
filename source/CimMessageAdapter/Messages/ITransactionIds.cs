@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CimMessageAdapter.Messages
@@ -25,6 +26,7 @@ namespace CimMessageAdapter.Messages
         /// Store transaction id
         /// </summary>
         /// <param name="transactionId"></param>
-        Task<bool> TryStoreAsync(string transactionId);
+        /// <param name="cancellationToken"></param>
+        Task<bool> TryStoreAsync(string transactionId, CancellationToken cancellationToken);
     }
 }

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Actors;
 using Application.Configuration.DataAccess;
@@ -30,27 +31,27 @@ public class ActorLookup : IActorLookup
         _databaseConnectionFactory = databaseConnectionFactory;
     }
 
-    public async Task<Guid> GetIdByActorNumberAsync(string actorNumber)
+    public async Task<Guid> GetIdByActorNumberAsync(string actorNumber, CancellationToken cancellationToken)
     {
-        using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
         return await connection
             .ExecuteScalarAsync<Guid>(
                 "SELECT Id FROM [dbo].[Actor] WHERE IdentificationNumber = @Number",
                 new { ActorNumber = actorNumber, }).ConfigureAwait(false);
     }
 
-    public async Task<string> GetActorNumberByIdAsync(Guid actorId)
+    public async Task<string> GetActorNumberByIdAsync(Guid actorId, CancellationToken cancellationToken)
     {
-        using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
         return await connection
             .ExecuteScalarAsync<string>(
                 "SELECT IdentificationNumber FROM [dbo].[Actor] WHERE Id = @ActorId",
                 new { ActorId = actorId, }).ConfigureAwait(false);
     }
 
-    public async Task<ActorNumber?> GetActorNumberByB2CIdAsync(Guid actorId)
+    public async Task<ActorNumber?> GetActorNumberByB2CIdAsync(Guid actorId, CancellationToken cancellationToken)
     {
-        using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
         var actorNumber = await connection
             .ExecuteScalarAsync<string>(
                 "SELECT IdentificationNumber AS Identifier FROM [dbo].[Actor] WHERE B2CId=@ActorId",

@@ -17,13 +17,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
-using Application.Configuration;
 using Application.OutgoingMessages.Common;
 using DocumentValidation;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
-using Infrastructure.Configuration;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.OutgoingMessages.Common;
 using Infrastructure.OutgoingMessages.ConfirmRequestChangeOfSupplier;
@@ -38,13 +37,11 @@ public class ConfirmRequestChangeOfSupplierJsonDocumentWriterTests
 {
     private const string DocumentType = "ConfirmRequestChangeOfSupplier_MarketDocument";
     private readonly ConfirmChangeOfSupplierJsonDocumentWriter _documentWriter;
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IMessageRecordParser _messageRecordParser;
     private JsonSchemaProvider _schemaProvider;
 
     public ConfirmRequestChangeOfSupplierJsonDocumentWriterTests()
     {
-        _systemDateTimeProvider = new SystemDateTimeProvider();
         _messageRecordParser = new MessageRecordParser(new Serializer());
         _documentWriter = new ConfirmChangeOfSupplierJsonDocumentWriter(_messageRecordParser);
         _schemaProvider = new JsonSchemaProvider(new CimJsonSchemas());
@@ -85,7 +82,7 @@ public class ConfirmRequestChangeOfSupplierJsonDocumentWriterTests
     private async Task AssertMessage(Stream message, MessageHeader header, List<MarketActivityRecord> marketActivityRecords)
     {
         _schemaProvider = new JsonSchemaProvider(new CimJsonSchemas());
-        var schema = await _schemaProvider.GetSchemaAsync<JsonSchema>("confirmrequestchangeofsupplier", "0").ConfigureAwait(false);
+        var schema = await _schemaProvider.GetSchemaAsync<JsonSchema>("confirmrequestchangeofsupplier", "0", CancellationToken.None).ConfigureAwait(false);
         if (schema == null) throw new InvalidCastException("Json schema not found for process ConfirmRequestChangeOfSupplier");
         var document = await JsonDocument.ParseAsync(message).ConfigureAwait(false);
         AssertJsonMessage.AssertConformsToSchema(document, schema, DocumentType);

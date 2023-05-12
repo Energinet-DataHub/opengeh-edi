@@ -26,7 +26,7 @@ public class CimXmlSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
         _schema = new CimXmlSchemas();
     }
 
-    public Task<XmlSchema?> GetAsync(DocumentType type, string version)
+    public Task<XmlSchema?> GetAsync(DocumentType type, string version, CancellationToken cancellationToken)
     {
         var schemaName = _schema.GetSchemaLocation(ParseDocumentType(type), version);
 
@@ -35,10 +35,11 @@ public class CimXmlSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
             return Task.FromResult(default(XmlSchema));
         }
 
-        return LoadSchemaWithDependentSchemasAsync<XmlSchema>(schemaName);
+        return LoadSchemaWithDependentSchemasAsync<XmlSchema>(schemaName, cancellationToken);
     }
 
-    public override Task<T?> GetSchemaAsync<T>(string businessProcessType, string version)
+    public override Task<T?> GetSchemaAsync<T>(
+        string businessProcessType, string version, CancellationToken cancellationToken)
         where T : default
     {
         var schemaName = _schema.GetSchemaLocation(businessProcessType, version);
@@ -48,10 +49,11 @@ public class CimXmlSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
             return Task.FromResult(default(T));
         }
 
-        return (Task<T?>)(object)LoadSchemaWithDependentSchemasAsync<XmlSchema>(schemaName);
+        return (Task<T?>)(object)LoadSchemaWithDependentSchemasAsync<XmlSchema>(schemaName, cancellationToken);
     }
 
-    protected override async Task<T?> LoadSchemaWithDependentSchemasAsync<T>(string location)
+    protected override async Task<T?> LoadSchemaWithDependentSchemasAsync<T>(
+        string location, CancellationToken cancellationToken)
         where T : default
     {
         using var reader = new XmlTextReader(location);
@@ -69,7 +71,9 @@ public class CimXmlSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
             }
 
             external.Schema =
-                await LoadSchemaWithDependentSchemasAsync<XmlSchema>(_schema.SchemaPath + external.SchemaLocation).ConfigureAwait(false);
+                await LoadSchemaWithDependentSchemasAsync<XmlSchema>(
+                        _schema.SchemaPath + external.SchemaLocation, cancellationToken)
+                    .ConfigureAwait(false);
         }
 
         return (T)(object)xmlSchema;

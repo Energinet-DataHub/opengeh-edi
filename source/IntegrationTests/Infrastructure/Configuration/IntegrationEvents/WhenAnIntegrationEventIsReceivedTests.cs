@@ -14,6 +14,7 @@
 
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration;
 using Application.Configuration.DataAccess;
@@ -107,21 +108,21 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
 
     private async Task EventIsRegisteredWithInbox(string eventId, bool isExpectedToBeRegistered = true)
     {
-        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
+        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
         var isRegistered = connection.ExecuteScalar<bool>($"SELECT COUNT(*) FROM dbo.ReceivedIntegrationEvents WHERE Id = @EventId", new { EventId = eventId, });
         Assert.Equal(isExpectedToBeRegistered, isRegistered);
     }
 
     private async Task EventIsMarkedAsProcessed(string eventId)
     {
-        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
+        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
         var isProcessed = connection.ExecuteScalar<bool>($"SELECT COUNT(*) FROM dbo.ReceivedIntegrationEvents WHERE Id = @EventId AND ProcessedDate IS NOT NULL", new { EventId = eventId, });
         Assert.True(isProcessed);
     }
 
     private async Task EventIsMarkedAsFailed(string eventId)
     {
-        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
+        var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
         var isFailed = connection.ExecuteScalar<bool>($"SELECT COUNT(*) FROM dbo.ReceivedIntegrationEvents WHERE Id = @EventId AND ProcessedDate IS NOT NULL AND ErrorMessage IS NOT NULL", new { EventId = eventId, });
         Assert.True(isFailed);
     }
@@ -133,7 +134,7 @@ public class WhenAnIntegrationEventIsReceivedTests : TestBase
             GetService<IMediator>(),
             GetService<ISystemDateTimeProvider>(),
             new[] { new TestIntegrationEventMapper(), });
-        return inboxProcessor.ProcessMessagesAsync();
+        return inboxProcessor.ProcessMessagesAsync(CancellationToken.None);
     }
 
     private void ExceptEventHandlerToFail()

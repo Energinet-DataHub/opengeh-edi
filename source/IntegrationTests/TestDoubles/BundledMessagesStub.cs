@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Domain.Actors;
@@ -31,7 +32,8 @@ public class BundledMessagesStub : BundledMessages
     {
     }
 
-    public override Task<BundledMessage?> GetAsync(MessageCategory category, ActorNumber receiverNumber)
+    public override Task<BundledMessage?> GetAsync(
+        MessageCategory category, ActorNumber receiverNumber, CancellationToken cancellationToken)
     {
         if (_shouldReturnEmptyMessage)
         {
@@ -39,7 +41,7 @@ public class BundledMessagesStub : BundledMessages
             return Task.FromResult(default(BundledMessage));
         }
 
-        return base.GetAsync(category, receiverNumber);
+        return base.GetAsync(category, receiverNumber, cancellationToken);
     }
 
     public void ReturnsEmptyMessage()

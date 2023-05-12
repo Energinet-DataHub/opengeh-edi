@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Application.Transactions.MoveIn;
@@ -25,6 +26,7 @@ public interface IMeteringPointMasterDataClient
     /// Request Master data for a market evaluation point
     /// </summary>
     /// <param name="fetchMeteringPointMasterData"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
-    Task RequestAsync(FetchMeteringPointMasterData fetchMeteringPointMasterData);
+    Task RequestAsync(FetchMeteringPointMasterData fetchMeteringPointMasterData, CancellationToken cancellationToken);
 }

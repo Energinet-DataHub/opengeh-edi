@@ -15,6 +15,7 @@
 using System;
 using System.IO;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Infrastructure.Configuration.Serialization.Converters;
 using NodaTime.Serialization.SystemTextJson;
@@ -37,9 +38,9 @@ namespace Infrastructure.Configuration.Serialization
             _options.Converters.Add(new ObjectToInferredTypesConverter());
         }
 
-        public ValueTask<object> DeserializeAsync(Stream utf8Json, Type returnType)
+        public ValueTask<TValue> DeserializeAsync<TValue>(Stream json, CancellationToken cancellationToken)
         {
-            return System.Text.Json.JsonSerializer.DeserializeAsync(utf8Json, returnType, _options)!;
+            return System.Text.Json.JsonSerializer.DeserializeAsync<TValue>(json, _options, cancellationToken)!;
         }
 
         public TValue Deserialize<TValue>(string json)

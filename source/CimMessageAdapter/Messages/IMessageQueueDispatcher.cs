@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading;
 using System.Threading.Tasks;
 using Application.IncomingMessages;
 using CimMessageAdapter.Messages.Queues;
@@ -28,11 +29,12 @@ namespace CimMessageAdapter.Messages
         /// Adds a message to collection
         /// </summary>
         /// <param name="message"></param>
-        Task AddAsync(IMarketTransaction message);
+        /// <param name="cancellationToken"></param>
+        Task AddAsync(IMarketTransaction message, CancellationToken cancellationToken);
 
         /// <summary>
         /// Commits added transactions to queue
         /// </summary>
-        Task CommitAsync();
+        Task CommitAsync(CancellationToken cancellationToken);
     }
 }

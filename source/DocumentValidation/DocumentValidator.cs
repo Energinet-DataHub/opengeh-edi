@@ -26,10 +26,15 @@ public class DocumentValidator
         _validators = validators;
     }
 
-    public async Task<ValidationResult> ValidateAsync(Stream message, DocumentFormat format, DocumentType document, string version = "0.1")
+    public async Task<ValidationResult> ValidateAsync(
+        Stream message,
+        DocumentFormat format,
+        DocumentType document,
+        CancellationToken cancellationToken,
+        string version = "0.1")
     {
         var validator = ValidatorFor(format);
-        return await validator.ValidateAsync(message, document, version).ConfigureAwait(false);
+        return await validator.ValidateAsync(message, document, version, cancellationToken).ConfigureAwait(false);
     }
 
     private IValidator ValidatorFor(DocumentFormat format)

@@ -16,8 +16,8 @@ namespace DocumentValidation
 {
     public abstract class SchemaProvider : ISchemaProvider
     {
-        public abstract Task<T?> GetSchemaAsync<T>(string businessProcessType, string version);
+        public abstract Task<T?> GetSchemaAsync<T>(string businessProcessType, string version, CancellationToken cancellationToken);
 
-        protected abstract Task<T?> LoadSchemaWithDependentSchemasAsync<T>(string location);
+        protected abstract Task<T?> LoadSchemaWithDependentSchemasAsync<T>(string location, CancellationToken cancellationToken);
     }
 }
