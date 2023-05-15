@@ -32,7 +32,7 @@ public class CreateActorHandler : IRequestHandler<CreateActor, Unit>
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
 
-        await _actorRegistry.TryStoreAsync(request).ConfigureAwait(false);
+        await _actorRegistry.TryStoreAsync(request, cancellationToken).ConfigureAwait(false);
 
         return Unit.Value;
     }

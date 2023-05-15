@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Actors;
 using Application.Configuration.Authentication;
@@ -53,7 +54,7 @@ namespace IntegrationTests.Infrastructure.Authentication.MarketActors
             };
             var claimsPrincipal = CreateIdentity(claims);
 
-            await _authenticator.AuthenticateAsync(claimsPrincipal);
+            await _authenticator.AuthenticateAsync(claimsPrincipal, CancellationToken.None);
 
             Assert.IsType<NotAuthenticated>(_authenticator.CurrentIdentity);
         }
@@ -68,7 +69,7 @@ namespace IntegrationTests.Infrastructure.Authentication.MarketActors
             };
             var claimsPrincipal = CreateIdentity(claims);
 
-            await _authenticator.AuthenticateAsync(claimsPrincipal);
+            await _authenticator.AuthenticateAsync(claimsPrincipal, CancellationToken.None);
 
             Assert.IsType<NotAuthenticated>(_authenticator.CurrentIdentity);
         }
@@ -85,7 +86,7 @@ namespace IntegrationTests.Infrastructure.Authentication.MarketActors
             };
             var claimsPrincipal = CreateIdentity(claims);
 
-            await _authenticator.AuthenticateAsync(claimsPrincipal);
+            await _authenticator.AuthenticateAsync(claimsPrincipal, CancellationToken.None);
 
             Assert.IsType<Authenticated>(_authenticator.CurrentIdentity);
             Assert.Equal(GetClaimValue(claimsPrincipal, ClaimsMap.UserId), _authenticator.CurrentIdentity.Id);

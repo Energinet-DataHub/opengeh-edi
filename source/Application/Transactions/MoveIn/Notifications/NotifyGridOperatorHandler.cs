@@ -45,30 +45,24 @@ public class NotifyGridOperatorHandler : IRequestHandler<NotifyGridOperator, Uni
     public async Task<Unit> Handle(NotifyGridOperator request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        var transaction = _transactionRepository.GetById(TransactionId.Create(request.TransactionId));
-        if (transaction is null)
-        {
-            throw TransactionNotFoundException.TransactionIdNotFound(request.TransactionId);
-        }
+        var transaction = _transactionRepository.GetById(TransactionId.Create(request.TransactionId))
+                          ?? throw TransactionNotFoundException.TransactionIdNotFound(request.TransactionId);
 
-        var gridOperatorNumber = await GetGridOperatorNumberAsync(transaction.MarketEvaluationPointId).ConfigureAwait(false);
+        var gridOperatorNumber = await GetGridOperatorNumberAsync(transaction.MarketEvaluationPointId, cancellationToken).ConfigureAwait(false);
         _notifications.NotifyGridOperator(transaction, gridOperatorNumber);
         transaction.SetGridOperatorWasNotified();
 
         return Unit.Value;
     }
 
-    private async Task<string> GetGridOperatorNumberAsync(string marketEvaluationPointNumber)
+    private async Task<string> GetGridOperatorNumberAsync(string marketEvaluationPointNumber, CancellationToken cancellationToken)
     {
         var marketEvaluationPoint =
             await _marketEvaluationPointRepository.GetByNumberAsync(marketEvaluationPointNumber)
-                .ConfigureAwait(false);
-
-        if (marketEvaluationPoint is null)
-            throw new MoveInException($"Could not find market evaluation point with number {marketEvaluationPointNumber}");
+                .ConfigureAwait(false) ?? throw new MoveInException($"Could not find market evaluation point with number {marketEvaluationPointNumber}");
 
         return await _actorLookup
-            .GetActorNumberByIdAsync(marketEvaluationPoint.GridOperatorId.GetValueOrDefault())
+            .GetActorNumberByIdAsync(marketEvaluationPoint.GridOperatorId.GetValueOrDefault(), cancellationToken)
             .ConfigureAwait(false);
     }
 }

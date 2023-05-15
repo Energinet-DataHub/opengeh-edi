@@ -14,6 +14,7 @@
 
 using System;
 using System.Data;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Dapper;
@@ -48,7 +49,7 @@ public class AssertTransaction
     {
         ArgumentNullException.ThrowIfNull(actorProvidedId);
         if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
-        using var connection = await connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
         return new AssertTransaction(GetTransaction(actorProvidedId, connection));
     }
 
@@ -56,7 +57,7 @@ public class AssertTransaction
     {
         ArgumentNullException.ThrowIfNull(actorProvidedId);
         if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
-        using var connection = await connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
         return new AssertTransaction(GetTransaction(actorProvidedId, connection), serializer);
     }
 

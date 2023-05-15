@@ -61,7 +61,7 @@ namespace Api.Configuration.Middleware.Authentication.MarketActors
                 return;
             }
 
-            await marketActorAuthenticator.AuthenticateAsync(currentClaimsPrincipal.ClaimsPrincipal!).ConfigureAwait(false);
+            await marketActorAuthenticator.AuthenticateAsync(currentClaimsPrincipal.ClaimsPrincipal!, context.CancellationToken).ConfigureAwait(false);
             if (marketActorAuthenticator.CurrentIdentity is NotAuthenticated)
             {
                 _logger.LogError("Could not authenticate market actor identity. This is due to the current claims identity does hold the required claims.");

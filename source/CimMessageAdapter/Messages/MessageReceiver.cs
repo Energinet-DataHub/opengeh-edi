@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.IncomingMessages;
 using CimMessageAdapter.Errors;
@@ -41,7 +42,9 @@ namespace CimMessageAdapter.Messages
             _senderAuthorizer = senderAuthorizer;
         }
 
-        public async Task<Result> ReceiveAsync<TMarketActivityRecordType, TMarketTransactionType>(MessageParserResult<TMarketActivityRecordType, TMarketTransactionType> messageParserResult)
+        public async Task<Result> ReceiveAsync<TMarketActivityRecordType, TMarketTransactionType>(
+            MessageParserResult<TMarketActivityRecordType, TMarketTransactionType> messageParserResult,
+            CancellationToken cancellationToken)
             where TMarketActivityRecordType : IMarketActivityRecord
             where TMarketTransactionType : IMarketTransaction<TMarketActivityRecordType>
         {
@@ -65,7 +68,7 @@ namespace CimMessageAdapter.Messages
                 return Result.Failure(_errors.ToArray());
             }
 
-            await CheckMessageIdAsync(messageHeader.MessageId).ConfigureAwait(false);
+            await CheckMessageIdAsync(messageHeader.MessageId, cancellationToken).ConfigureAwait(false);
             if (_errors.Count > 0)
             {
                 return Result.Failure(_errors.ToArray());
@@ -78,15 +81,15 @@ namespace CimMessageAdapter.Messages
                     return Result.Failure(new EmptyTransactionId(transaction.MarketActivityRecord.Id));
                 }
 
-                if (await CheckTransactionIdAsync(transaction.MarketActivityRecord.Id).ConfigureAwait(false) == false)
+                if (await CheckTransactionIdAsync(transaction.MarketActivityRecord.Id, cancellationToken).ConfigureAwait(false) == false)
                 {
                     return Result.Failure(new DuplicateTransactionIdDetected(transaction.MarketActivityRecord.Id));
                 }
 
-                await AddToTransactionQueueAsync(transaction).ConfigureAwait(false);
+                await AddToTransactionQueueAsync(transaction, cancellationToken).ConfigureAwait(false);
             }
 
-            await _messageQueueDispatcher.CommitAsync().ConfigureAwait(false);
+            await _messageQueueDispatcher.CommitAsync(cancellationToken).ConfigureAwait(false);
             return Result.Succeeded();
         }
 
@@ -95,15 +98,15 @@ namespace CimMessageAdapter.Messages
             return header is null;
         }
 
-        private Task<bool> CheckTransactionIdAsync(string transactionId)
+        private Task<bool> CheckTransactionIdAsync(string transactionId, CancellationToken cancellationToken)
         {
             if (transactionId == null) throw new ArgumentNullException(nameof(transactionId));
-            return _transactionIds.TryStoreAsync(transactionId);
+            return _transactionIds.TryStoreAsync(transactionId, cancellationToken);
         }
 
-        private Task AddToTransactionQueueAsync(IMarketTransaction transaction)
+        private Task AddToTransactionQueueAsync(IMarketTransaction transaction, CancellationToken cancellationToken)
         {
-            return _messageQueueDispatcher.AddAsync(transaction);
+            return _messageQueueDispatcher.AddAsync(transaction, cancellationToken);
         }
 
         private bool MessageIdIsEmpty(string messageId)
@@ -118,10 +121,10 @@ namespace CimMessageAdapter.Messages
             return false;
         }
 
-        private async Task CheckMessageIdAsync(string messageId)
+        private async Task CheckMessageIdAsync(string messageId, CancellationToken cancellationToken)
         {
             if (messageId == null) throw new ArgumentNullException(nameof(messageId));
-            if (await _messageIds.TryStoreAsync(messageId).ConfigureAwait(false) == false)
+            if (await _messageIds.TryStoreAsync(messageId, cancellationToken).ConfigureAwait(false) == false)
             {
                 _errors.Add(new DuplicateMessageIdDetected(messageId));
             }

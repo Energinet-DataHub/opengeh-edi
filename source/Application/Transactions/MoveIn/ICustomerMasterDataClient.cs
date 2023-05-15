@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Application.Transactions.MoveIn;
@@ -25,6 +26,7 @@ public interface ICustomerMasterDataClient
     /// Request master data for a customer
     /// </summary>
     /// <param name="fetchCustomerMasterData"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns><see cref="Task"/></returns>
-    Task RequestAsync(FetchCustomerMasterData fetchCustomerMasterData);
+    Task RequestAsync(FetchCustomerMasterData fetchCustomerMasterData, CancellationToken cancellationToken);
 }

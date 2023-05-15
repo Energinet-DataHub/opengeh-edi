@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Dapper;
@@ -37,7 +38,7 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase
     {
         await GivenRequestHasBeenAccepted().ConfigureAwait(false);
 
-        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
         var sql = $"SELECT * FROM [dbo].[EnqueuedMessages]";
         var result = await
             connection

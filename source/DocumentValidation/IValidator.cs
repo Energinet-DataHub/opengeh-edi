@@ -30,6 +30,8 @@ public interface IValidator
     /// <param name="document"></param>
     /// <param name="type"></param>
     /// <param name="version"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns><see cref="ValidationResult"/></returns>
-    Task<ValidationResult> ValidateAsync(Stream document, DocumentType type, string version);
+    Task<ValidationResult> ValidateAsync(
+        Stream document, DocumentType type, string version, CancellationToken cancellationToken);
 }

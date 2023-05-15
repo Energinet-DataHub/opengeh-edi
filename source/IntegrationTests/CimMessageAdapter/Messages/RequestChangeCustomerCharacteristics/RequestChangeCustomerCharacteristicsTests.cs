@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Actors;
 using Application.Configuration.Authentication;
@@ -67,7 +68,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
             ClaimsMap.RoleFrom(MarketRole.EnergySupplier),
         };
 
-        await _marketActorAuthenticator.AuthenticateAsync(CreateIdentity());
+        await _marketActorAuthenticator.AuthenticateAsync(CreateIdentity(), CancellationToken.None);
     }
 
     public Task DisposeAsync()
@@ -118,7 +119,7 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
     [Fact]
     public async Task Authenticated_user_must_hold_the_role_type_as_specified_in_message()
     {
-        await _marketActorAuthenticator.AuthenticateAsync(CreateIdentityWithoutRoles());
+        await _marketActorAuthenticator.AuthenticateAsync(CreateIdentityWithoutRoles(), CancellationToken.None);
         await using var message = BusinessMessageBuilder
             .RequestChangeCustomerCharacteristics()
             .Message();
@@ -208,23 +209,23 @@ public class RequestChangeCustomerCharacteristicsTests : TestBase, IAsyncLifetim
         var messageBuilder = BusinessMessageBuilder.RequestChangeCustomerCharacteristics();
 
         using var originalMessage = messageBuilder.Message();
-        await CreateMessageReceiver(messageIds).ReceiveAsync(await ParseMessageAsync(originalMessage).ConfigureAwait(false))
+        await CreateMessageReceiver(messageIds).ReceiveAsync(await ParseMessageAsync(originalMessage).ConfigureAwait(false), CancellationToken.None)
             .ConfigureAwait(false);
 
         using var duplicateMessage = messageBuilder.Message();
-        await CreateMessageReceiver(messageIds).ReceiveAsync(await ParseMessageAsync(duplicateMessage).ConfigureAwait(false))
+        await CreateMessageReceiver(messageIds).ReceiveAsync(await ParseMessageAsync(duplicateMessage).ConfigureAwait(false), CancellationToken.None)
             .ConfigureAwait(false);
     }
 
     private async Task<Result> ReceiveRequestChangeCustomerCharacteristicsMessage(Stream message)
     {
         return await CreateMessageReceiver()
-            .ReceiveAsync(await ParseMessageAsync(message).ConfigureAwait(false));
+            .ReceiveAsync(await ParseMessageAsync(message).ConfigureAwait(false), CancellationToken.None);
     }
 
     private Task<MessageParserResult<MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>> ParseMessageAsync(Stream message)
     {
-        return _messageParser.ParseAsync(message, DocumentFormat.Xml);
+        return _messageParser.ParseAsync(message, DocumentFormat.Xml, CancellationToken.None);
     }
 
     private MessageReceiver<global::CimMessageAdapter.Messages.Queues.RequestChangeCustomerCharacteristicsTransaction> CreateMessageReceiver()

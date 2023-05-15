@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Actors;
 using Application.Configuration.Authentication;
@@ -63,7 +64,7 @@ namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
                 ClaimsMap.RoleFrom(MarketRole.EnergySupplier),
             };
 
-            await _marketActorAuthenticator.AuthenticateAsync(CreateIdentity());
+            await _marketActorAuthenticator.AuthenticateAsync(CreateIdentity(), CancellationToken.None);
         }
 
         public Task DisposeAsync()
@@ -114,7 +115,7 @@ namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
         [Fact]
         public async Task Authenticated_user_must_hold_the_role_type_as_specified_in_message()
         {
-            await _marketActorAuthenticator.AuthenticateAsync(CreateIdentityWithoutRoles());
+            await _marketActorAuthenticator.AuthenticateAsync(CreateIdentityWithoutRoles(), CancellationToken.None);
             await using var message = BusinessMessageBuilder
                 .RequestChangeOfSupplier()
                 .Message();
@@ -202,7 +203,7 @@ namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
         private async Task<Result> ReceiveRequestChangeOfSupplierMessage(Stream message)
         {
             return await CreateMessageReceiver()
-                .ReceiveAsync(await ParseMessageAsync(message).ConfigureAwait(false));
+                .ReceiveAsync(await ParseMessageAsync(message).ConfigureAwait(false), CancellationToken.None);
         }
 
         private MessageReceiver<global::CimMessageAdapter.Messages.Queues.RequestChangeOfSupplierTransaction> CreateMessageReceiver()
@@ -228,17 +229,17 @@ namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
             var messageBuilder = BusinessMessageBuilder.RequestChangeOfSupplier();
 
             using var originalMessage = messageBuilder.Message();
-            await CreateMessageReceiver(messageIds).ReceiveAsync(await ParseMessageAsync(originalMessage).ConfigureAwait(false))
+            await CreateMessageReceiver(messageIds).ReceiveAsync(await ParseMessageAsync(originalMessage).ConfigureAwait(false), CancellationToken.None)
                 .ConfigureAwait(false);
 
             using var duplicateMessage = messageBuilder.Message();
-            await CreateMessageReceiver(messageIds).ReceiveAsync(await ParseMessageAsync(duplicateMessage).ConfigureAwait(false))
+            await CreateMessageReceiver(messageIds).ReceiveAsync(await ParseMessageAsync(duplicateMessage).ConfigureAwait(false), CancellationToken.None)
                 .ConfigureAwait(false);
         }
 
         private Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>> ParseMessageAsync(Stream message)
         {
-            return _messageParser.ParseAsync(message, DocumentFormat.Xml);
+            return _messageParser.ParseAsync(message, DocumentFormat.Xml, CancellationToken.None);
         }
 
         private ClaimsPrincipal CreateIdentity()

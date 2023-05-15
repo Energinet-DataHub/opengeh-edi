@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Application.IncomingMessages.RequestChangeOfSupplier;
@@ -24,7 +25,6 @@ using CimMessageAdapter.Errors;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.Messages.RequestChangeOfSupplier;
 using DocumentValidation;
-using Domain.OutgoingMessages;
 using Infrastructure.IncomingMessages.RequestChangeOfSupplier;
 using Xunit;
 using DocumentFormat = Domain.Documents.DocumentFormat;
@@ -67,7 +67,7 @@ public class MessageParserTests
     [MemberData(nameof(CreateMessages))]
     public async Task Can_parse(DocumentFormat format, Stream message)
     {
-        var result = await _messageParser.ParseAsync(message, format).ConfigureAwait(false);
+        var result = await _messageParser.ParseAsync(message, format, CancellationToken.None).ConfigureAwait(false);
 
         Assert.True(result.Success);
         var header = result.IncomingMarketDocument?.Header;
@@ -93,7 +93,7 @@ public class MessageParserTests
     [MemberData(nameof(CreateMessagesWithInvalidStructure))]
     public async Task Return_error_when_structure_is_invalid(DocumentFormat format, Stream message)
     {
-        var result = await _messageParser.ParseAsync(message, format).ConfigureAwait(false);
+        var result = await _messageParser.ParseAsync(message, format, CancellationToken.None).ConfigureAwait(false);
 
         Assert.False(result.Success);
         Assert.Contains(result.Errors, error => error is InvalidMessageStructure);
@@ -104,7 +104,7 @@ public class MessageParserTests
     {
         var parser = new MessageParser(new List<IMessageParser<MarketActivityRecord, RequestChangeOfSupplierTransaction>>());
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => parser.ParseAsync(CreateXmlMessage(), DocumentFormat.Xml)).ConfigureAwait(false);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => parser.ParseAsync(CreateXmlMessage(), DocumentFormat.Xml, CancellationToken.None)).ConfigureAwait(false);
     }
 
     private static Stream CreateXmlMessage()

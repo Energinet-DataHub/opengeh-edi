@@ -18,14 +18,12 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-using System.Text.Json.Nodes;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Xml;
 using Application.IncomingMessages.RequestChangeOfSupplier;
 using CimMessageAdapter.Errors;
 using CimMessageAdapter.Messages;
 using DocumentValidation;
-using Domain.OutgoingMessages;
 using Json.Schema;
 using DocumentFormat = Domain.Documents.DocumentFormat;
 using MessageHeader = Application.IncomingMessages.MessageHeader;
@@ -47,14 +45,18 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
 
     public DocumentFormat HandledFormat => DocumentFormat.Json;
 
-    public async Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>> ParseAsync(Stream message)
+    public async Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>> ParseAsync(
+        Stream message, CancellationToken cancellationToken)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
 
-        var schema = await _schemaProvider.GetSchemaAsync<JsonSchema>(DocumentName.ToUpper(CultureInfo.InvariantCulture), "0").ConfigureAwait(false);
+        var schema = await _schemaProvider
+            .GetSchemaAsync<JsonSchema>(DocumentName.ToUpper(CultureInfo.InvariantCulture), "0", cancellationToken)
+            .ConfigureAwait(false);
         if (schema is null)
         {
-            return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(new UnknownBusinessProcessTypeOrVersion(DocumentName, "0"));
+            return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(
+                new UnknownBusinessProcessTypeOrVersion(DocumentName, "0"));
         }
 
         ResetMessagePosition(message);
@@ -68,7 +70,8 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
 
         try
         {
-            using (var document = await JsonDocument.ParseAsync(message).ConfigureAwait(false))
+            using (var document = await JsonDocument.ParseAsync(message, cancellationToken: cancellationToken)
+                       .ConfigureAwait(false))
             {
                 try
                 {
@@ -93,18 +96,21 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
         }
     }
 
-    private static MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction> ParseJsonData(JsonDocument document)
+    private static MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction> ParseJsonData(
+        JsonDocument document)
     {
         var marketActivityRecords = new List<MarketActivityRecord>();
         var messageHeader = MessageHeaderFrom(document.RootElement.GetProperty(HeaderElementName));
-        var marketActivityRecord = document.RootElement.GetProperty(HeaderElementName).GetProperty(MarketActivityRecordElementName);
+        var marketActivityRecord = document.RootElement.GetProperty(HeaderElementName)
+            .GetProperty(MarketActivityRecordElementName);
         var records = marketActivityRecord.EnumerateArray();
         foreach (var jsonElement in records)
         {
             marketActivityRecords.Add(MarketActivityRecordFrom(jsonElement));
         }
 
-        return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(new RequestChangeOfSupplierIncomingMarketDocument(messageHeader, marketActivityRecords));
+        return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(
+            new RequestChangeOfSupplierIncomingMarketDocument(messageHeader, marketActivityRecords));
     }
 
     private static void ResetMessagePosition(Stream message)
@@ -113,9 +119,11 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
             message.Position = 0;
     }
 
-    private static MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction> InvalidJsonFailure(Exception exception)
+    private static MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction> InvalidJsonFailure(
+        Exception exception)
     {
-        return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(InvalidMessageStructure.From(exception));
+        return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(
+            InvalidMessageStructure.From(exception));
     }
 
     private static MessageHeader MessageHeaderFrom(JsonElement element)
@@ -135,10 +143,18 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
         return new MarketActivityRecord()
         {
             Id = element.GetProperty("mRID").ToString(),
-            ConsumerId = element.GetProperty("marketEvaluationPoint.customer_MarketParticipant.mRID").GetProperty("value").ToString(),
-            ConsumerIdType = element.GetProperty("marketEvaluationPoint.customer_MarketParticipant.mRID").GetProperty("codingScheme").ToString(),
-            BalanceResponsibleId = element.GetProperty("marketEvaluationPoint.balanceResponsibleParty_MarketParticipant.mRID").GetProperty("value").ToString(),
-            EnergySupplierId = element.GetProperty("marketEvaluationPoint.energySupplier_MarketParticipant.mRID").GetProperty("value").ToString(),
+            ConsumerId =
+                element.GetProperty("marketEvaluationPoint.customer_MarketParticipant.mRID").GetProperty("value")
+                    .ToString(),
+            ConsumerIdType =
+                element.GetProperty("marketEvaluationPoint.customer_MarketParticipant.mRID").GetProperty("codingScheme")
+                    .ToString(),
+            BalanceResponsibleId =
+                element.GetProperty("marketEvaluationPoint.balanceResponsibleParty_MarketParticipant.mRID")
+                    .GetProperty("value").ToString(),
+            EnergySupplierId =
+                element.GetProperty("marketEvaluationPoint.energySupplier_MarketParticipant.mRID").GetProperty("value")
+                    .ToString(),
             MarketEvaluationPointId = element.GetProperty("marketEvaluationPoint.mRID").GetProperty("value").ToString(),
             ConsumerName = element.GetProperty("marketEvaluationPoint.customer_MarketParticipant.name").ToString(),
             EffectiveDate = GetJsonDateStringWithoutQuotes(element.GetProperty("start_DateAndOrTime.dateTime")),

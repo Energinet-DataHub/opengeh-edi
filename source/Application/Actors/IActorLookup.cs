@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Domain.Actors;
 
@@ -24,20 +25,16 @@ namespace Application.Actors;
 public interface IActorLookup
 {
     /// <summary>
-    /// Get actor unique id by actor number
+    /// Get actor number by id
     /// </summary>
-    /// <param name="actorNumber"></param>
-    Task<Guid> GetIdByActorNumberAsync(string actorNumber);
+    /// <param name="actorId"></param>
+    /// <param name="cancellationToken"></param>
+    Task<string> GetActorNumberByIdAsync(Guid actorId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Get actor number by id
     /// </summary>
     /// <param name="actorId"></param>
-    Task<string> GetActorNumberByIdAsync(Guid actorId);
-
-    /// <summary>
-    /// Get actor number by id
-    /// </summary>
-    /// <param name="actorId"></param>
-    Task<ActorNumber?> GetActorNumberByB2CIdAsync(Guid actorId);
+    /// <param name="cancellationToken"></param>
+    Task<ActorNumber?> GetActorNumberByB2CIdAsync(Guid actorId, CancellationToken cancellationToken);
 }

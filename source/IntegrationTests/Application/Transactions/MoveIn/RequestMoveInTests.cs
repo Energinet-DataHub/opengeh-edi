@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Application.Transactions.MoveIn;
@@ -221,7 +222,7 @@ namespace IntegrationTests.Application.Transactions.MoveIn
 
         private async Task<Guid> GetTransactionIdAsync()
         {
-            using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
+            using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
             return await connection
                 .QueryFirstAsync<Guid>(
                     "SELECT TOP(1) TransactionId FROM dbo.MoveInTransactions WHERE ActorProvidedId = @ActorProvidedId",

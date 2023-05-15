@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration;
 using Application.OutgoingMessages.Common;
@@ -114,7 +115,9 @@ public class RejectRequestChangeOfSupplierJsonDocumentWriterTests
 
     private async Task AssertMessage(Stream message, MessageHeader header, List<MarketActivityRecord> marketActivityRecords)
     {
-        var schema = await _schemaProvider.GetSchemaAsync<JsonSchema>("rejectrequestchangeofsupplier", "0").ConfigureAwait(false);
+        var schema = await _schemaProvider
+            .GetSchemaAsync<JsonSchema>("rejectrequestchangeofsupplier", "0", CancellationToken.None)
+            .ConfigureAwait(false);
         if (schema == null) throw new InvalidCastException("Json schema not found for process RejectRequestChangeOfSupplier");
         var document = await JsonDocument.ParseAsync(message).ConfigureAwait(false);
         AssertJsonMessage.AssertConformsToSchema(document, schema, DocumentType);

@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Actors;
 using Application.Configuration.Authentication;
@@ -34,7 +35,7 @@ namespace Infrastructure.Configuration.Authentication
 
         public MarketActorIdentity CurrentIdentity { get; private set; } = new NotAuthenticated();
 
-        public virtual async Task AuthenticateAsync(ClaimsPrincipal claimsPrincipal)
+        public virtual async Task AuthenticateAsync(ClaimsPrincipal claimsPrincipal, CancellationToken cancellationToken)
         {
             if (claimsPrincipal == null) throw new ArgumentNullException(nameof(claimsPrincipal));
 
@@ -52,7 +53,7 @@ namespace Infrastructure.Configuration.Authentication
                 return;
             }
 
-            var actorNumber = await _actorLookup.GetActorNumberByB2CIdAsync(Guid.Parse(userIdFromSts)).ConfigureAwait(false);
+            var actorNumber = await _actorLookup.GetActorNumberByB2CIdAsync(Guid.Parse(userIdFromSts), cancellationToken).ConfigureAwait(false);
             if (actorNumber is null)
             {
                 ActorIsNotAuthorized();
