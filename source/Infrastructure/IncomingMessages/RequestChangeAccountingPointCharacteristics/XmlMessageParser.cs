@@ -29,8 +29,7 @@ using MarketActivityRecord = Application.IncomingMessages.RequestChangeAccountPo
 
 namespace Infrastructure.IncomingMessages.RequestChangeAccountingPointCharacteristics;
 
-public class
-    XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>
+public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChangeAccountingPointCharacteristicsTransaction>
 {
     private const string MarketActivityRecordElementName = "MktActivityRecord";
     private const string HeaderElementName = "RequestChangeAccountingPointCharacteristics_MarketDocument";
