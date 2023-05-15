@@ -18,6 +18,6 @@ using NodaTime;
 
 namespace Application.SearchMessages;
 
-public sealed record GetMessagesQuery(MessageCreationPeriod? CreationPeriod = null, Guid? MessageId = null, string? SenderNumber = null) : IQuery<MessageSearchResult>;
+public sealed record GetMessagesQuery(MessageCreationPeriod? CreationPeriod = null, Guid? MessageId = null, string? SenderNumber = null, string? ReceiverNumber = null) : IQuery<MessageSearchResult>;
 
 public record MessageCreationPeriod(Instant DateToSearchFrom, Instant DateToSearchTo);
