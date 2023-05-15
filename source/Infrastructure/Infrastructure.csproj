@@ -22,15 +22,15 @@ limitations under the License.
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.AzureServiceBus" Version="6.1.0" />
     <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="6.0.2" />
-    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.13.1" />
+    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.14.0" />
     <PackageReference Include="Dapper-NodaTime" Version="0.1.0" />
-    <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="7.4.1" />
-    <PackageReference Include="Energinet.DataHub.Core.Logging" Version="2.2.5" />
+    <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="7.4.3" />
+    <PackageReference Include="Energinet.DataHub.Core.Logging" Version="2.2.6" />
     <PackageReference Include="Energinet.DataHub.EnergySupplying.IntegrationEvents" Version="1.0.2" />
     <PackageReference Include="Energinet.DataHub.EnergySupplying.RequestResponse" Version="1.2.0" />
     <PackageReference Include="Energinet.DataHub.MeteringPoints.IntegrationEvents" Version="1.0.4" />
     <PackageReference Include="Energinet.DataHub.MeteringPoints.RequestResponse" Version="1.0.4" />
-    <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="2.2.5" />
+    <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="2.2.7" />
     <PackageReference Include="MediatR" Version="12.0.1" />
     <PackageReference Include="Microsoft.Extensions.Azure" Version="1.6.3" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
