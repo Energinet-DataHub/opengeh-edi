@@ -43,6 +43,12 @@ internal static class QueryBuilder
             queryParameters.Add("SenderNumber", request.SenderNumber);
         }
 
+        if (request.ReceiverNumber is not null)
+        {
+            statement.Add("ReceiverNumber=@ReceiverNumber");
+            queryParameters.Add("ReceiverNumber", request.ReceiverNumber);
+        }
+
         return new QueryInput(BuildStatement(statement), queryParameters);
     }
 
