@@ -22,7 +22,7 @@ limitations under the License.
         <_FunctionsSkipCleanOutput>true</_FunctionsSkipCleanOutput>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Energinet.DataHub.Core.App.Common.Security" Version="7.4.1" />
+        <PackageReference Include="Energinet.DataHub.Core.App.Common.Security" Version="7.4.3" />
         <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="7.4.1" />
         <PackageReference Include="Energinet.DataHub.Core.Logging" Version="2.2.5" />
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Abstractions" Version="1.1.1" />
