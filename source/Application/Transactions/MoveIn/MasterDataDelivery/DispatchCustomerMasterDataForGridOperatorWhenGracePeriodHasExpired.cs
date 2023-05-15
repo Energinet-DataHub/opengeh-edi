@@ -46,7 +46,7 @@ public class DispatchCustomerMasterDataForGridOperatorWhenGracePeriodHasExpired 
     {
         ArgumentNullException.ThrowIfNull(notification);
 
-        var transactionIds = await TransactionsWhereCustomerMasterDataDispatchIsPendingAsync(notification.Now)
+        var transactionIds = await TransactionsWhereCustomerMasterDataDispatchIsPendingAsync(notification.Now, cancellationToken)
             .ConfigureAwait(false);
 
         foreach (var transactionId in transactionIds)
@@ -56,9 +56,9 @@ public class DispatchCustomerMasterDataForGridOperatorWhenGracePeriodHasExpired 
         }
     }
 
-    private async Task<IEnumerable<Guid>> TransactionsWhereCustomerMasterDataDispatchIsPendingAsync(Instant now)
+    private async Task<IEnumerable<Guid>> TransactionsWhereCustomerMasterDataDispatchIsPendingAsync(Instant now, CancellationToken cancellationToken)
     {
-        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
         return await connection.QueryAsync<Guid>(
                 @$"SELECT TransactionId FROM [dbo].[MoveInTransactions] " +
                 $"WHERE GridOperator_MessageDeliveryState_CustomerMasterData = '{MoveInTransaction.MasterDataState.Pending}' " +

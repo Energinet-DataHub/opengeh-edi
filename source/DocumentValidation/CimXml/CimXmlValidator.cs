@@ -28,10 +28,11 @@ public class CimXmlValidator : IValidator
 
     public DocumentFormat HandledFormat => DocumentFormat.CimXml;
 
-    public async Task<ValidationResult> ValidateAsync(Stream document, DocumentType type, string version)
+    public async Task<ValidationResult> ValidateAsync(
+        Stream document, DocumentType type, string version, CancellationToken cancellationToken)
     {
         var schema = await _schemaProvider
-            .GetAsync(type, version)
+            .GetAsync(type, version, cancellationToken)
             .ConfigureAwait(false) ?? throw new InvalidOperationException($"Could find schema for {document}");
         return await XmlDocumentValidator.ValidateAsync(document, schema).ConfigureAwait(false);
     }

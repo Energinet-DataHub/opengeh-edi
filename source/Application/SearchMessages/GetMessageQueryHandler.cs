@@ -37,7 +37,7 @@ public class GetMessageQueryHandler : IRequestHandler<GetMessagesQuery, MessageS
 
         var input = QueryBuilder.BuildFrom(request);
 
-        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
         var archivedMessages =
             await connection.QueryAsync<MessageInfo>(
                     input.SqlStatement,

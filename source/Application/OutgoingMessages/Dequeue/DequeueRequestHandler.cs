@@ -39,7 +39,7 @@ public class DequeueRequestHandler : IRequestHandler<DequeueRequest, DequeueResu
            return Task.FromResult(new DequeueResult(false));
        }
 
-       return _bundledMessages.DequeueAsync(messageId);
+       return _bundledMessages.DequeueAsync(messageId, cancellationToken);
     }
 }
 

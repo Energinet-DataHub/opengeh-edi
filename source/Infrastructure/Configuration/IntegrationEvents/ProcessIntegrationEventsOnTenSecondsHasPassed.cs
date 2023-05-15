@@ -30,6 +30,6 @@ public class ProcessIntegrationEventsOnTenSecondsHasPassed : INotificationHandle
 
     public Task Handle(TenSecondsHasHasPassed notification, CancellationToken cancellationToken)
     {
-        return _processor.ProcessMessagesAsync();
+        return _processor.ProcessMessagesAsync(cancellationToken);
     }
 }

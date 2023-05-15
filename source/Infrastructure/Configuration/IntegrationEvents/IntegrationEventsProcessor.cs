@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration;
 using Application.Configuration.DataAccess;
@@ -38,31 +39,31 @@ public class IntegrationEventsProcessor
         _mappers = mappers.ToList();
     }
 
-    public async Task ProcessMessagesAsync()
+    public async Task ProcessMessagesAsync(CancellationToken cancellationToken)
     {
-        var messages = await FindPendingMessagesAsync().ConfigureAwait(false);
+        var messages = await FindPendingMessagesAsync(cancellationToken).ConfigureAwait(false);
 
         foreach (var message in messages)
         {
             try
             {
-                await _mediator.Publish(await MapperFor(message.EventType).MapFromAsync(message.EventPayload).ConfigureAwait(false)).ConfigureAwait(false);
-                await MarkAsProcessedAsync(message).ConfigureAwait(false);
+                await _mediator.Publish(await MapperFor(message.EventType).MapFromAsync(message.EventPayload).ConfigureAwait(false), cancellationToken).ConfigureAwait(false);
+                await MarkAsProcessedAsync(message, cancellationToken).ConfigureAwait(false);
             }
             #pragma warning disable CA1031 // We dont' the type of exception here
             catch (Exception e)
             {
-                await MarkAsFailedAsync(message, e).ConfigureAwait(false);
+                await MarkAsFailedAsync(message, e, cancellationToken).ConfigureAwait(false);
             }
         }
     }
 
-    private async Task MarkAsProcessedAsync(ReceivedIntegrationEvent message)
+    private async Task MarkAsProcessedAsync(ReceivedIntegrationEvent message, CancellationToken cancellationToken)
     {
         var updateStatement = $"UPDATE dbo.ReceivedIntegrationEvents " +
                               "SET ProcessedDate = @Now " +
                               "WHERE Id = @Id";
-        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
         await connection.ExecuteAsync(updateStatement, new
         {
             Id = message.Id,
@@ -70,13 +71,13 @@ public class IntegrationEventsProcessor
         }).ConfigureAwait(false);
     }
 
-    private async Task MarkAsFailedAsync(ReceivedIntegrationEvent message, Exception exception)
+    private async Task MarkAsFailedAsync(ReceivedIntegrationEvent message, Exception exception, CancellationToken cancellationToken)
     {
         var updateStatement = $"UPDATE dbo.ReceivedIntegrationEvents " +
                               "SET ProcessedDate = @Now, " +
                               "ErrorMessage = @ErrorMessage " +
                               "WHERE Id = @Id";
-        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
         await connection.ExecuteAsync(updateStatement, new
         {
             Id = message.Id,
@@ -85,9 +86,9 @@ public class IntegrationEventsProcessor
         }).ConfigureAwait(false);
     }
 
-    private async Task<IReadOnlyList<ReceivedIntegrationEvent>> FindPendingMessagesAsync()
+    private async Task<IReadOnlyList<ReceivedIntegrationEvent>> FindPendingMessagesAsync(CancellationToken cancellationToken)
     {
-        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
         var sql = "SELECT " +
                   $"Id AS {nameof(ReceivedIntegrationEvent.Id)}, " +
                   $"EventType AS {nameof(ReceivedIntegrationEvent.EventType)}, " +

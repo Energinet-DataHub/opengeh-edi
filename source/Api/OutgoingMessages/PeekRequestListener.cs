@@ -13,9 +13,7 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Net;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Api.Common;
 using Application.Configuration.Authentication;
@@ -35,11 +33,12 @@ public class PeekRequestListener
     private readonly IMarketActorAuthenticator _authenticator;
     private readonly ILogger<PeekRequestListener> _logger;
 
-    public PeekRequestListener(MessagePeeker messagePeeker, IMarketActorAuthenticator authenticator, ILogger<PeekRequestListener> logger)
+    public PeekRequestListener(
+        MessagePeeker messagePeeker, IMarketActorAuthenticator authenticator, ILogger<PeekRequestListener> logger)
     {
         _messagePeeker = messagePeeker;
         _authenticator = authenticator;
-        _logger = logger;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     [Function("PeekRequestListener")]
@@ -58,7 +57,8 @@ public class PeekRequestListener
         var desiredDocumentFormat = CimFormatParser.ParseFromContentTypeHeaderValue(contentType);
         if (desiredDocumentFormat is null)
         {
-            _logger.LogInformation($"Could not parse desired CIM format from Content-Type header value: {contentType}");
+            _logger.LogInformation(
+                "Could not parse desired CIM format from Content-Type header value: {ContentType}", contentType);
             return request.CreateResponse(HttpStatusCode.UnsupportedMediaType);
         }
 
@@ -82,7 +82,7 @@ public class PeekRequestListener
         }
 
         response.Body = result.Bundle;
-        response.Headers.Add("content-type", "application/xml");
+        response.Headers.Add("content-type", contentType);
         response.Headers.Add("MessageId", result.MessageId.ToString());
         response.StatusCode = HttpStatusCode.OK;
         return response;

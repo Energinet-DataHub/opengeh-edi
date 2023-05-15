@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading;
 using System.Threading.Tasks;
 using Domain.Actors;
 using Domain.OutgoingMessages;
@@ -29,13 +30,15 @@ public interface IEnqueuedMessages
     /// </summary>
     /// <param name="actorNumber">Actor number of requesting actor</param>
     /// /// /// <param name="messageCategory">The category of messages to include in message</param>
+    /// <param name="cancellationToken"></param>
     /// <returns>List of enqueued messages</returns>
-    Task<MessageRecords?> GetByAsync(ActorNumber actorNumber, MessageCategory messageCategory);
+    Task<MessageRecords?> GetByAsync(ActorNumber actorNumber, MessageCategory messageCategory, CancellationToken cancellationToken);
 
     /// <summary>
     /// Get the number of messages available for an actor
     /// </summary>
     /// <param name="actorNumber"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns>Number of available messages</returns>
-    Task<int> GetAvailableMessageCountAsync(ActorNumber actorNumber);
+    Task<int> GetAvailableMessageCountAsync(ActorNumber actorNumber, CancellationToken cancellationToken);
 }

@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Application.IncomingMessages.RequestChangeCustomerCharacteristics;
@@ -23,7 +24,6 @@ using CimMessageAdapter.Errors;
 using CimMessageAdapter.Messages;
 using CimMessageAdapter.Messages.RequestChangeCustomerCharacteristics;
 using Domain.Documents;
-using Domain.OutgoingMessages;
 using Infrastructure.IncomingMessages.RequestChangeCustomerCharacteristics;
 using Xunit;
 using Address = Application.IncomingMessages.RequestChangeCustomerCharacteristics.Address;
@@ -66,7 +66,7 @@ public class MessageParserTests
     [MemberData(nameof(CreateMessages))]
     public async Task Can_parse(DocumentFormat format, Stream message)
     {
-        var result = await _messageParser.ParseAsync(message, format).ConfigureAwait(false);
+        var result = await _messageParser.ParseAsync(message, format, CancellationToken.None).ConfigureAwait(false);
 
         Assert.True(result.Success);
         AssertHeader(result.IncomingMarketDocument?.Header);
@@ -77,7 +77,7 @@ public class MessageParserTests
     [MemberData(nameof(CreateMessagesWithInvalidStructure))]
     public async Task Return_error_when_structure_is_invalid(DocumentFormat format, Stream message)
     {
-        var result = await _messageParser.ParseAsync(message, format).ConfigureAwait(false);
+        var result = await _messageParser.ParseAsync(message, format, CancellationToken.None).ConfigureAwait(false);
 
         Assert.False(result.Success);
         Assert.Contains(result.Errors, error => error is InvalidMessageStructure);
@@ -88,7 +88,7 @@ public class MessageParserTests
     {
         var parser = new MessageParser(new List<IMessageParser<MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>>());
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => parser.ParseAsync(CreateXmlMessage(), DocumentFormat.Xml)).ConfigureAwait(false);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => parser.ParseAsync(CreateXmlMessage(), DocumentFormat.Xml, CancellationToken.None)).ConfigureAwait(false);
     }
 
     private static Stream CreateXmlMessage()

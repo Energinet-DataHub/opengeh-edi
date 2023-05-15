@@ -29,7 +29,7 @@ public class FetchMeteringPointMasterDataHandler : IRequestHandler<FetchMetering
 
     public async Task<Unit> Handle(FetchMeteringPointMasterData request, CancellationToken cancellationToken)
     {
-        await _meteringPointMasterDataClient.RequestAsync(request).ConfigureAwait(false);
+        await _meteringPointMasterDataClient.RequestAsync(request, cancellationToken).ConfigureAwait(false);
         return await Task.FromResult(Unit.Value).ConfigureAwait(false);
     }
 }

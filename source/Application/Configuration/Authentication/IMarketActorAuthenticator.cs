@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Application.Configuration.Authentication
@@ -31,6 +32,7 @@ namespace Application.Configuration.Authentication
         /// Authenticates a claims principal
         /// </summary>
         /// <param name="claimsPrincipal"></param>
-        Task AuthenticateAsync(ClaimsPrincipal claimsPrincipal);
+        /// <param name="cancellationToken"></param>
+        Task AuthenticateAsync(ClaimsPrincipal claimsPrincipal, CancellationToken cancellationToken);
     }
 }

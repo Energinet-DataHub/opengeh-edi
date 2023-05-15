@@ -54,13 +54,13 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var bundledMessage = await _bundledMessages.GetAsync(request.MessageCategory, request.ActorNumber).ConfigureAwait(false);
+        var bundledMessage = await _bundledMessages.GetAsync(request.MessageCategory, request.ActorNumber, cancellationToken).ConfigureAwait(false);
         if (bundledMessage is not null)
         {
             return new PeekResult(bundledMessage.GeneratedDocument, bundledMessage.Id.Value);
         }
 
-        var messageRecords = await _enqueuedMessages.GetByAsync(request.ActorNumber, request.MessageCategory)
+        var messageRecords = await _enqueuedMessages.GetByAsync(request.ActorNumber, request.MessageCategory, cancellationToken)
             .ConfigureAwait(false);
 
         if (messageRecords is null)
@@ -70,7 +70,7 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
 
         var timestamp = _systemDateTimeProvider.Now();
         bundledMessage = await CreateBundledMessageAsync(messageRecords, request.DesiredDocumentFormat, timestamp).ConfigureAwait(false);
-        await _bundledMessages.AddAsync(bundledMessage).ConfigureAwait(false);
+        await _bundledMessages.AddAsync(bundledMessage, cancellationToken).ConfigureAwait(false);
 
         _messageArchive.Add(new ArchivedMessage(
             bundledMessage.Id.Value,
