@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.Configuration;
@@ -21,6 +22,7 @@ using Application.SearchMessages;
 using Domain.Actors;
 using Domain.ArchivedMessages;
 using Domain.Documents;
+using Domain.SeedWork;
 using IntegrationTests.Fixtures;
 using NodaTime;
 using Xunit;
@@ -136,16 +138,32 @@ public class SearchMessagesTests : TestBase
         Assert.Equal(receiverNumber, result.Messages[0].ReceiverNumber);
     }
 
+    [Fact]
+    public async Task Filter_messages_by_documenttype()
+    {
+        // Arrange
+        var documentType = DocumentType.ConfirmRequestChangeOfSupplier.Name;
+        await ArchiveMessage(CreateArchivedMessage(documentType: documentType));
+        await ArchiveMessage(CreateArchivedMessage());
+
+        // Act
+        var result = await QueryAsync(new GetMessagesQuery(DocumentTypes: new List<string>() { documentType })).ConfigureAwait(false);
+
+        // Assert
+        Assert.Single(result.Messages);
+        Assert.Equal(documentType, result.Messages[0].DocumentType);
+    }
+
     private static Instant CreatedAt(string date)
     {
         return NodaTime.Text.InstantPattern.General.Parse(date).Value;
     }
 
-    private ArchivedMessage CreateArchivedMessage(Instant? createdAt = null, Guid? messageId = null, string? senderNumber = null, string? receiverNumber = null)
+    private ArchivedMessage CreateArchivedMessage(Instant? createdAt = null, Guid? messageId = null, string? senderNumber = null, string? receiverNumber = null, string? documentType = null)
     {
         return new ArchivedMessage(
             messageId.GetValueOrDefault(Guid.NewGuid()),
-            DocumentType.AccountingPointCharacteristics,
+            EnumerationType.FromName<DocumentType>(documentType ?? DocumentType.AccountingPointCharacteristics.Name),
             ActorNumber.Create(senderNumber ?? "1234512345123"),
             ActorNumber.Create(receiverNumber ?? "1234512345128"),
             createdAt.GetValueOrDefault(_systemDateTimeProvider.Now()));

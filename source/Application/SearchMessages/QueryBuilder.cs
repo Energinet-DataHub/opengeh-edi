@@ -49,6 +49,15 @@ internal static class QueryBuilder
             queryParameters.Add("ReceiverNumber", request.ReceiverNumber);
         }
 
+        if (request.DocumentTypes is not null)
+        {
+            foreach (var documentType in request.DocumentTypes)
+            {
+                statement.Add("DocumentType=@DocumentType");
+                queryParameters.Add("DocumentType", documentType);
+            }
+        }
+
         return new QueryInput(BuildStatement(statement), queryParameters);
     }
 
