@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Data;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Application.Configuration.DataAccess
@@ -34,6 +35,6 @@ namespace Application.Configuration.DataAccess
         /// </summary>
         /// <remarks>Returned connection must be disposed</remarks>
         /// <returns><see cref="IDbConnection"/></returns>
-        ValueTask<IDbConnection> GetConnectionAndOpenAsync();
+        ValueTask<IDbConnection> GetConnectionAndOpenAsync(CancellationToken cancellationToken);
     }
 }

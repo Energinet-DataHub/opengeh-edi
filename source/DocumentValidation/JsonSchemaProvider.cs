@@ -25,7 +25,8 @@ public class JsonSchemaProvider : SchemaProvider
         _schema = schemas;
     }
 
-    public override Task<T?> GetSchemaAsync<T>(string businessProcessType, string version)
+    public override Task<T?> GetSchemaAsync<T>(
+        string businessProcessType, string version, CancellationToken cancellationToken)
         where T : default
     {
         var schemaName = _schema.GetSchemaLocation(businessProcessType, version);
@@ -35,10 +36,11 @@ public class JsonSchemaProvider : SchemaProvider
             return Task.FromResult(default(T));
         }
 
-        return (Task<T?>)(object)LoadSchemaWithDependentSchemasAsync<JsonSchema>(schemaName);
+        return (Task<T?>)(object)LoadSchemaWithDependentSchemasAsync<JsonSchema>(schemaName, cancellationToken);
     }
 
-    protected override Task<T?> LoadSchemaWithDependentSchemasAsync<T>(string location)
+    protected override Task<T?> LoadSchemaWithDependentSchemasAsync<T>(
+        string location, CancellationToken cancellationToken)
         where T : default
     {
         var schema = JsonSchema.FromFile(location);

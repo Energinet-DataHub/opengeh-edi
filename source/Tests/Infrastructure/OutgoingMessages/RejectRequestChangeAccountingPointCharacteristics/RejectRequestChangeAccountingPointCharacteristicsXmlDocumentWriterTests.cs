@@ -16,17 +16,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
-using Application.Configuration;
 using Application.OutgoingMessages.Common;
 using DocumentValidation;
 using DocumentValidation.CimXml;
-using Domain.Actors;
 using Domain.OutgoingMessages;
 using Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
-using Infrastructure.Configuration;
 using Infrastructure.Configuration.Serialization;
 using Infrastructure.OutgoingMessages.Common;
 using Infrastructure.OutgoingMessages.RejectRequestChangeAccountingPointCharacteristics;
@@ -101,7 +99,7 @@ public class RejectRequestChangeAccountingPointCharacteristicsXmlDocumentWriterT
 
         AssertMarketActivityRecords(marketActivityRecords, document);
 
-        var schema = await _schemaProvider.GetSchemaAsync<XmlSchema>("rejectrequestchangeaccountingpointcharacteristics", "0.1")
+        var schema = await _schemaProvider.GetSchemaAsync<XmlSchema>("rejectrequestchangeaccountingpointcharacteristics", "0.1", CancellationToken.None)
             .ConfigureAwait(false);
         await AssertXmlMessage.AssertConformsToSchemaAsync(message, schema!).ConfigureAwait(false);
     }

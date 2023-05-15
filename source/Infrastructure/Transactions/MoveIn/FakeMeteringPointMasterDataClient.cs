@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Transactions.MoveIn;
 
@@ -19,7 +20,7 @@ namespace Infrastructure.Transactions.MoveIn;
 
 public class FakeMeteringPointMasterDataClient : IMeteringPointMasterDataClient
 {
-    public Task RequestAsync(FetchMeteringPointMasterData fetchMeteringPointMasterData)
+    public Task RequestAsync(FetchMeteringPointMasterData fetchMeteringPointMasterData, CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
     }

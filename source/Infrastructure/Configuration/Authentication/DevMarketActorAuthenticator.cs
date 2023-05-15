@@ -15,6 +15,7 @@
 using System;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Actors;
 using Application.Configuration.DataAccess;
@@ -34,25 +35,25 @@ public class DevMarketActorAuthenticator : MarketActorAuthenticator
         _connectionFactory = connectionFactory;
     }
 
-    public override async Task AuthenticateAsync(ClaimsPrincipal claimsPrincipal)
+    public override async Task AuthenticateAsync(ClaimsPrincipal claimsPrincipal, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(claimsPrincipal);
 
         var actorNumberClaim = claimsPrincipal.FindFirst(claim => claim.Type.Equals("test-actornumber", StringComparison.OrdinalIgnoreCase));
         if (actorNumberClaim is not null)
         {
-            var actor = await FindActorAsync(actorNumberClaim.Value).ConfigureAwait(false);
+            var actor = await FindActorAsync(actorNumberClaim.Value, cancellationToken).ConfigureAwait(false);
             if (actor is null)
             {
                 actor = new Actor(Guid.NewGuid(), actorNumberClaim.Value);
-                await RegisterActorAsync(actor).ConfigureAwait(false);
+                await RegisterActorAsync(actor, cancellationToken).ConfigureAwait(false);
             }
 
-            await base.AuthenticateAsync(ReplaceCurrent(claimsPrincipal, actor)).ConfigureAwait(false);
+            await base.AuthenticateAsync(ReplaceCurrent(claimsPrincipal, actor), cancellationToken).ConfigureAwait(false);
         }
         else
         {
-            await base.AuthenticateAsync(claimsPrincipal).ConfigureAwait(false);
+            await base.AuthenticateAsync(claimsPrincipal, cancellationToken).ConfigureAwait(false);
         }
     }
 
@@ -65,10 +66,10 @@ public class DevMarketActorAuthenticator : MarketActorAuthenticator
         return new ClaimsPrincipal(identity);
     }
 
-    private async Task<Actor?> FindActorAsync(string actorNumber)
+    private async Task<Actor?> FindActorAsync(string actorNumber, CancellationToken cancellationToken)
     {
         using var connection = await _connectionFactory
-            .GetConnectionAndOpenAsync()
+            .GetConnectionAndOpenAsync(cancellationToken)
             .ConfigureAwait(false);
 
         return await connection
@@ -78,9 +79,9 @@ public class DevMarketActorAuthenticator : MarketActorAuthenticator
             .ConfigureAwait(false);
     }
 
-    private Task RegisterActorAsync(Actor actor)
+    private Task RegisterActorAsync(Actor actor, CancellationToken cancellationToken)
     {
-        return _actorRegistry.TryStoreAsync(new CreateActor(Guid.NewGuid().ToString(),  actor.Id.ToString(), actor.Number));
+        return _actorRegistry.TryStoreAsync(new CreateActor(Guid.NewGuid().ToString(),  actor.Id.ToString(), actor.Number), cancellationToken);
     }
 
     #pragma warning disable

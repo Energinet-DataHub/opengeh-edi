@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Data;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration;
 using Application.Configuration.Commands;
@@ -95,7 +96,7 @@ public class InternalCommandProcessorTests : TestBase
 
     private async Task ProcessPendingCommands()
     {
-        await _processor.ProcessPendingAsync().ConfigureAwait(false);
+        await _processor.ProcessPendingAsync(CancellationToken.None).ConfigureAwait(false);
     }
 
     private async Task Schedule(InternalCommand command)

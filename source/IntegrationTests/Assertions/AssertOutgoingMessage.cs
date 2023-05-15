@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Dapper;
@@ -37,7 +38,7 @@ namespace IntegrationTests.Assertions
         public static async Task<AssertOutgoingMessage> OutgoingMessageAsync(Guid transactionId, string documentType, string processType, IDatabaseConnectionFactory connectionFactoryFactory)
         {
             if (connectionFactoryFactory == null) throw new ArgumentNullException(nameof(connectionFactoryFactory));
-            using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+            using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
             var message = connection.QuerySingle(
                 $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.TransactionId, m.ProcessType," +
                 $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MessageRecord " +
@@ -52,7 +53,7 @@ namespace IntegrationTests.Assertions
         {
             if (connectionFactoryFactory == null) throw new ArgumentNullException(nameof(connectionFactoryFactory));
             ArgumentNullException.ThrowIfNull(receiverRole);
-            using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+            using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
             var message = connection.QuerySingle(
                 $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.TransactionId, m.ProcessType," +
                 $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MessageRecord " +
@@ -67,7 +68,7 @@ namespace IntegrationTests.Assertions
         {
             if (connectionFactoryFactory == null) throw new ArgumentNullException(nameof(connectionFactoryFactory));
             ArgumentNullException.ThrowIfNull(receiverRole);
-            using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+            using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
             var message = connection.QuerySingle(
                 $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.TransactionId, m.ProcessType," +
                 $"m.ReceiverRole, m.SenderId, m.SenderRole, m.MessageRecord " +

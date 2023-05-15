@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
@@ -96,7 +97,7 @@ public class RejectRequestChangeOfSupplierXmlDocumentWriterTests
 
         AssertMarketActivityRecords(marketActivityRecords, document);
 
-        var schema = await _schemaProvider.GetSchemaAsync<XmlSchema>("rejectrequestchangeofsupplier", "0.1")
+        var schema = await _schemaProvider.GetSchemaAsync<XmlSchema>("rejectrequestchangeofsupplier", "0.1", CancellationToken.None)
             .ConfigureAwait(false);
         await AssertXmlMessage.AssertConformsToSchemaAsync(message, schema!).ConfigureAwait(false);
     }

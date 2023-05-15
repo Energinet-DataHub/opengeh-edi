@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.ObjectModel;
+using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 
@@ -32,14 +33,14 @@ namespace Infrastructure.Configuration.MessageBus
 
         public string TopicName { get; }
 
-        public Task SendAsync(ServiceBusMessage message)
+        public Task SendAsync(ServiceBusMessage message, CancellationToken cancellationToken)
         {
-            return _serviceBusSender.SendMessageAsync(message);
+            return _serviceBusSender.SendMessageAsync(message, cancellationToken);
         }
 
-        public Task SendAsync(ReadOnlyCollection<ServiceBusMessage> messages)
+        public Task SendAsync(ReadOnlyCollection<ServiceBusMessage> messages, CancellationToken cancellationToken)
         {
-            return _serviceBusSender.SendMessagesAsync(messages);
+            return _serviceBusSender.SendMessagesAsync(messages, cancellationToken);
         }
 
         public async ValueTask DisposeAsync()

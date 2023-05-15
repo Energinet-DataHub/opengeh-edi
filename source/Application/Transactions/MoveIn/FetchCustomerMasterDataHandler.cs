@@ -29,7 +29,7 @@ public class FetchCustomerMasterDataHandler : IRequestHandler<FetchCustomerMaste
 
     public async Task<Unit> Handle(FetchCustomerMasterData request, CancellationToken cancellationToken)
     {
-        await _customerMasterDataClient.RequestAsync(request).ConfigureAwait(false);
+        await _customerMasterDataClient.RequestAsync(request, cancellationToken).ConfigureAwait(false);
         return await Task.FromResult(Unit.Value).ConfigureAwait(false);
     }
 }
