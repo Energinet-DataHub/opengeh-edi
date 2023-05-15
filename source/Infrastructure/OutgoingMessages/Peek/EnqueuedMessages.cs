@@ -15,6 +15,7 @@
 using System;
 using System.Data;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Application.OutgoingMessages;
@@ -37,12 +38,13 @@ public class EnqueuedMessages : IEnqueuedMessages
         _bundleConfiguration = bundleConfiguration;
     }
 
-    public async Task<MessageRecords?> GetByAsync(ActorNumber actorNumber, MessageCategory messageCategory)
+    public async Task<MessageRecords?> GetByAsync(
+        ActorNumber actorNumber, MessageCategory messageCategory, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(messageCategory);
         ArgumentNullException.ThrowIfNull(actorNumber);
 
-        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
         var oldestMessage = await FindOldestMessageAsync(actorNumber, messageCategory, connection).ConfigureAwait(false);
 
         if (oldestMessage is null)
@@ -78,10 +80,10 @@ public class EnqueuedMessages : IEnqueuedMessages
             messages.ToList());
     }
 
-    public async Task<int> GetAvailableMessageCountAsync(ActorNumber actorNumber)
+    public async Task<int> GetAvailableMessageCountAsync(ActorNumber actorNumber, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(actorNumber);
-        using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
         return await connection.QuerySingleAsync<int>(
             @"SELECT count(*) from [dbo].[EnqueuedMessages] WHERE ReceiverId = @ActorNumber",
             new

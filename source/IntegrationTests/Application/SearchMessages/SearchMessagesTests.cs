@@ -29,13 +29,13 @@ namespace IntegrationTests.Application.SearchMessages;
 
 public class SearchMessagesTests : TestBase
 {
-    private readonly IArchivedMessageRepository _repository;
+    private readonly IArchivedMessageRepository _archivedMessageRepository;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
     public SearchMessagesTests(DatabaseFixture databaseFixture)
         : base(databaseFixture)
     {
-        _repository = GetService<IArchivedMessageRepository>();
+        _archivedMessageRepository = GetService<IArchivedMessageRepository>();
         _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
     }
 
@@ -137,7 +137,7 @@ public class SearchMessagesTests : TestBase
 
     private async Task ArchiveMessage(ArchivedMessage archivedMessage)
     {
-        _repository.Add(archivedMessage);
+        _archivedMessageRepository.Add(archivedMessage);
         await GetService<IUnitOfWork>().CommitAsync().ConfigureAwait(false);
     }
 }

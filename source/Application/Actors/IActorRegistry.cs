@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Application.Actors;
@@ -25,5 +26,6 @@ public interface IActorRegistry
     /// Store actors
     /// </summary>
     /// <param name="createActor"></param>
-    Task<bool> TryStoreAsync(CreateActor createActor);
+    /// <param name="cancellationToken"></param>
+    Task<bool> TryStoreAsync(CreateActor createActor, CancellationToken cancellationToken);
 }

@@ -70,7 +70,7 @@ namespace Application.Transactions.MoveIn
 
             if (string.IsNullOrEmpty(request.MarketActivityRecord.EnergySupplierId))
             {
-                return await RejectInvalidRequestMessageAsync(transaction, request, "EnergySupplierIdIsEmpty")
+                return await RejectInvalidRequestMessageAsync(transaction, "EnergySupplierIdIsEmpty", cancellationToken)
                     .ConfigureAwait(false);
             }
 
@@ -78,13 +78,13 @@ namespace Application.Transactions.MoveIn
                     request.MarketActivityRecord.EnergySupplierId,
                     request.Message.SenderId))
             {
-               return await RejectInvalidRequestMessageAsync(transaction, request, "EnergySupplierDoesNotMatchSender").ConfigureAwait(false);
+               return await RejectInvalidRequestMessageAsync(transaction, "EnergySupplierDoesNotMatchSender", cancellationToken).ConfigureAwait(false);
             }
 
             var businessProcessResult = await InvokeBusinessProcessAsync(transaction).ConfigureAwait(false);
             if (businessProcessResult.Success == false)
             {
-                var reasons = await CreateReasonsFromAsync(businessProcessResult.ValidationErrors).ConfigureAwait(false);
+                var reasons = await CreateReasonsFromAsync(businessProcessResult.ValidationErrors, cancellationToken).ConfigureAwait(false);
                 transaction.Reject(reasons);
             }
             else
@@ -102,9 +102,9 @@ namespace Application.Transactions.MoveIn
             return energySupplierId == senderId;
         }
 
-        private async Task<Unit> RejectInvalidRequestMessageAsync(MoveInTransaction transaction, RequestChangeOfSupplierTransaction request, string error)
+        private async Task<Unit> RejectInvalidRequestMessageAsync(MoveInTransaction transaction, string error, CancellationToken cancellationToken)
         {
-            var reasons = await CreateReasonsFromAsync(new Collection<string>() { error }).ConfigureAwait(false);
+            var reasons = await CreateReasonsFromAsync(new Collection<string>() { error }, cancellationToken).ConfigureAwait(false);
             transaction.Reject(reasons);
 
             _moveInTransactionRepository.Add(transaction);
@@ -122,9 +122,9 @@ namespace Application.Transactions.MoveIn
             return _moveInRequester.InvokeAsync(businessProcess);
         }
 
-        private Task<ReadOnlyCollection<Reason>> CreateReasonsFromAsync(IReadOnlyCollection<string> validationErrors)
+        private Task<ReadOnlyCollection<Reason>> CreateReasonsFromAsync(IReadOnlyCollection<string> validationErrors, CancellationToken cancellationToken)
         {
-            return _validationErrorTranslator.TranslateAsync(validationErrors);
+            return _validationErrorTranslator.TranslateAsync(validationErrors, cancellationToken);
         }
     }
 }

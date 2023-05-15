@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using Application.IncomingMessages;
@@ -24,7 +25,8 @@ internal static class MessageHeaderExtractor
         XmlReader reader,
         RootElement rootElement,
         string headerElementName,
-        string marketActivityRecordElementName)
+        string marketActivityRecordElementName,
+        CancellationToken cancellationToken)
     {
         var messageId = string.Empty;
         var processType = string.Empty;

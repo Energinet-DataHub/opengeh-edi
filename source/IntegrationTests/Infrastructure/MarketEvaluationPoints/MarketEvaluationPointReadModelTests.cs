@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Configuration.DataAccess;
 using Dapper;
@@ -70,7 +71,7 @@ public class MarketEvaluationPointReadModelTests : TestBase
     private async Task<dynamic?> GetStoredMarketEvaluationPointModelAsync()
     {
         var connectionFactory = GetService<IDatabaseConnectionFactory>();
-        using var connection = await connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
         return await connection
             .QuerySingleOrDefaultAsync(
                 "SELECT * FROM dbo.MarketEvaluationPoints WHERE Id = @Id AND MarketEvaluationPointNumber = @MarketEvaluationPointNumber",

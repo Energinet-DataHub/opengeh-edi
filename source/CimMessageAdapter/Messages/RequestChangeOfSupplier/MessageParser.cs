@@ -16,10 +16,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.IncomingMessages.RequestChangeOfSupplier;
 using Domain.Documents;
-using Domain.OutgoingMessages;
 
 namespace CimMessageAdapter.Messages.RequestChangeOfSupplier;
 
@@ -32,10 +32,12 @@ public class MessageParser
         _parsers = parsers;
     }
 
-    public Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>> ParseAsync(Stream message, DocumentFormat documentFormat)
+    public Task<MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>> ParseAsync(
+        Stream message, DocumentFormat documentFormat, CancellationToken cancellationToken)
     {
         var parser = _parsers.FirstOrDefault(parser => parser.HandledFormat.Equals(documentFormat));
-        if (parser is null) throw new InvalidOperationException($"No message parser found for message format '{documentFormat}'");
-        return parser.ParseAsync(message);
+        if (parser is null)
+            throw new InvalidOperationException($"No message parser found for message format '{documentFormat}'");
+        return parser.ParseAsync(message, cancellationToken);
     }
 }

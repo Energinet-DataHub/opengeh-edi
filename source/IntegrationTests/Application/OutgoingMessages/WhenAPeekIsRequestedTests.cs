@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Application.Configuration.DataAccess;
@@ -186,7 +187,7 @@ public class WhenAPeekIsRequestedTests : TestBase
 
     private async Task<bool> BundleIsRegistered()
     {
-        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
         var numberOfBundles = await connection
             .ExecuteScalarAsync<int>("SELECT COUNT(*) FROM dbo.BundledMessages").ConfigureAwait(false);
         return numberOfBundles == 1;
@@ -202,7 +203,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         var sqlStatement =
             $"SELECT COUNT(*) FROM [dbo].[ArchivedMessages] WHERE Id = '{messageId}'";
         using var connection =
-            await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync().ConfigureAwait(false);
+            await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
         var found = await connection.ExecuteScalarAsync<bool>(sqlStatement).ConfigureAwait(false);
         Assert.True(found);
     }

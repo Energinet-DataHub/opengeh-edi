@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.ObjectModel;
+using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Infrastructure.Configuration.MessageBus;
@@ -31,13 +32,13 @@ namespace IntegrationTests.TestDoubles
 
         public ServiceBusMessage? Message { get; private set; }
 
-        public Task SendAsync(ServiceBusMessage message)
+        public Task SendAsync(ServiceBusMessage message, CancellationToken cancellationToken)
         {
             Message = message;
             return Task.CompletedTask;
         }
 
-        public Task SendAsync(ReadOnlyCollection<ServiceBusMessage> messages)
+        public Task SendAsync(ReadOnlyCollection<ServiceBusMessage> messages, CancellationToken cancellationToken)
         {
             return Task.CompletedTask;
         }

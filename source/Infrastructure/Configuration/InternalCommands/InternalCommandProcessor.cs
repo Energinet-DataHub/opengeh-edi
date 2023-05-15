@@ -49,7 +49,7 @@ namespace Infrastructure.Configuration.InternalCommands
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
         }
 
-        public async Task ProcessPendingAsync()
+        public async Task ProcessPendingAsync(CancellationToken cancellationToken)
         {
             var pendingCommands = await _internalCommandAccessor.GetPendingAsync().ConfigureAwait(false);
 
@@ -68,12 +68,12 @@ namespace Infrastructure.Configuration.InternalCommands
                 if (result.Outcome == OutcomeType.Failure)
                 {
                     var exception = result.FinalException.ToString();
-                    await MarkAsFailedAsync(queuedCommand, exception).ConfigureAwait(false);
+                    await MarkAsFailedAsync(queuedCommand, exception, cancellationToken).ConfigureAwait(false);
                     _logger?.Log(LogLevel.Error, result.FinalException, $"Failed to process internal command {queuedCommand.Id}");
                 }
                 else
                 {
-                    await MarkAsProcessedAsync(queuedCommand).ConfigureAwait(false);
+                    await MarkAsProcessedAsync(queuedCommand, cancellationToken).ConfigureAwait(false);
                 }
             }
         }
@@ -85,9 +85,9 @@ namespace Infrastructure.Configuration.InternalCommands
             return _commandExecutor.ExecuteAsync(command, CancellationToken.None);
         }
 
-        private async Task MarkAsFailedAsync(QueuedInternalCommand queuedCommand, string exception)
+        private async Task MarkAsFailedAsync(QueuedInternalCommand queuedCommand, string exception, CancellationToken cancellationToken)
         {
-            using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+            using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
             await connection.ExecuteScalarAsync(
                 "UPDATE [dbo].[QueuedInternalCommands] " +
                 "SET ProcessedDate = @NowDate, " +
@@ -101,9 +101,9 @@ namespace Infrastructure.Configuration.InternalCommands
                 }).ConfigureAwait(false);
         }
 
-        private async Task MarkAsProcessedAsync(QueuedInternalCommand queuedCommand)
+        private async Task MarkAsProcessedAsync(QueuedInternalCommand queuedCommand, CancellationToken cancellationToken)
         {
-            using var connection = await _connectionFactory.GetConnectionAndOpenAsync().ConfigureAwait(false);
+            using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
             await connection.ExecuteScalarAsync(
                 "UPDATE [dbo].[QueuedInternalCommands] " +
                 "SET ProcessedDate = @NowDate " +

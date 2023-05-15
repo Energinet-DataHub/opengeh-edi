@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.OutgoingMessages.Dequeue;
 using Domain.Actors;
@@ -30,21 +31,24 @@ public interface IBundledMessages
     /// Adds a bundled message to repository
     /// </summary>
     /// <param name="bundledMessage"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns>void</returns>
-    Task AddAsync(BundledMessage bundledMessage);
+    Task AddAsync(BundledMessage bundledMessage, CancellationToken cancellationToken);
 
     /// <summary>
     /// Dequeue bundled message
     /// </summary>
     /// <param name="messageId"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns>DequeueResult</returns>
-    Task<DequeueResult> DequeueAsync(Guid messageId);
+    Task<DequeueResult> DequeueAsync(Guid messageId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Retrieve a bundled message from repository
     /// </summary>
     /// <param name="category"></param>
     /// <param name="receiverNumber"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns><see cref="BundledMessage"/></returns>
-    Task<BundledMessage?> GetAsync(MessageCategory category, ActorNumber receiverNumber);
+    Task<BundledMessage?> GetAsync(MessageCategory category, ActorNumber receiverNumber, CancellationToken cancellationToken);
 }

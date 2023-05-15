@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.IncomingMessages.RequestChangeCustomerCharacteristics;
 using Domain.Documents;
@@ -32,10 +33,11 @@ public class MessageParser
         _parsers = parsers;
     }
 
-    public Task<MessageParserResult<MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>> ParseAsync(Stream message, DocumentFormat documentFormat)
+    public Task<MessageParserResult<MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>> ParseAsync(
+        Stream message, DocumentFormat documentFormat, CancellationToken cancellationToken)
     {
         var parser = _parsers.FirstOrDefault(parser => parser.HandledFormat.Equals(documentFormat));
         if (parser is null) throw new InvalidOperationException($"No message parser found for message format '{documentFormat}'");
-        return parser.ParseAsync(message);
+        return parser.ParseAsync(message, cancellationToken);
     }
 }

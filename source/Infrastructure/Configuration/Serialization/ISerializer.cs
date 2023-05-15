@@ -15,6 +15,7 @@
 using System;
 using System.IO;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Infrastructure.Configuration.Serialization
@@ -25,21 +26,23 @@ namespace Infrastructure.Configuration.Serialization
     public interface ISerializer
     {
         /// <summary>
-        /// Read the UTF-8 encoded text representing a single JSON value into a <paramref name="returnType"/>.
-        /// The Stream will be read to completion.
+        /// Parse the text representing a single JSON value into a <typeparamref name="TValue"/>.
         /// </summary>
-        /// <returns>A <paramref name="returnType"/> representation of the JSON value.</returns>
-        /// <param name="utf8Json">JSON data to parse.</param>
-        /// <param name="returnType">The type of the object to convert to and return.</param>
+        /// <returns>A <typeparamref name="TValue"/> representation of the JSON value.</returns>
+        /// <param name="json">JSON text to parse.</param>
+        /// <param name="cancellationToken"></param>
         /// <exception cref="System.ArgumentNullException">
-        /// Thrown if <paramref name="utf8Json"/> or <paramref name="returnType"/> is null.
+        /// Thrown if <paramref name="json"/> is null.
         /// </exception>
         /// <exception cref="JsonException">
         /// Thrown when the JSON is invalid,
-        /// the <paramref name="returnType"/> is not compatible with the JSON,
+        /// <typeparamref name="TValue"/> is not compatible with the JSON,
         /// or when there is remaining data in the Stream.
         /// </exception>
-        ValueTask<object> DeserializeAsync(Stream utf8Json, Type returnType);
+        /// <remarks>Using a <see cref="string"/> is not as efficient as using the
+        /// UTF-8 methods since the implementation natively uses UTF-8.
+        /// </remarks>
+        ValueTask<TValue> DeserializeAsync<TValue>(Stream json, CancellationToken cancellationToken);
 
         /// <summary>
         /// Parse the text representing a single JSON value into a <typeparamref name="TValue"/>.

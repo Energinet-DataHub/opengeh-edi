@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Transactions.MoveIn;
 using Azure.Messaging.ServiceBus;
@@ -33,13 +34,13 @@ public class MeteringPointMasterDataClient : IMeteringPointMasterDataClient
         _serviceBusSenderFactory = serviceBusSenderFactory;
     }
 
-    public Task RequestAsync(FetchMeteringPointMasterData fetchMeteringPointMasterData)
+    public Task RequestAsync(FetchMeteringPointMasterData fetchMeteringPointMasterData, CancellationToken cancellationToken)
     {
         if (fetchMeteringPointMasterData == null) throw new ArgumentNullException(nameof(fetchMeteringPointMasterData));
         var message = CreateFrom(fetchMeteringPointMasterData);
         return _serviceBusSenderFactory
             .GetSender(_configuration.QueueName)
-            .SendAsync(message);
+            .SendAsync(message, cancellationToken);
     }
 
     private static ServiceBusMessage CreateFrom(FetchMeteringPointMasterData fetchMeteringPointMasterData)
