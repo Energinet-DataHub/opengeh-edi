@@ -51,8 +51,8 @@ limitations under the License.
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Google.Protobuf" Version="3.22.1" />
-      <PackageReference Include="Grpc.Tools" Version="2.53.0">
+      <PackageReference Include="Google.Protobuf" Version="3.23.0" />
+      <PackageReference Include="Grpc.Tools" Version="2.54.0">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
