@@ -35,7 +35,7 @@ public class GetMessageQueryHandler : IRequestHandler<GetMessagesQuery, MessageS
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var input = QueryBuilder.BuildFrom(request);
+        var input = new QueryBuilder().BuildFrom(request);
 
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
         var archivedMessages =

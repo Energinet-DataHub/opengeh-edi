@@ -13,62 +13,84 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using System.Linq;
 using Dapper;
 
 namespace Application.SearchMessages;
 
-internal static class QueryBuilder
+internal sealed class QueryBuilder
 {
-    public static QueryInput BuildFrom(GetMessagesQuery request)
-    {
-        var queryParameters = new DynamicParameters();
-        var statement = new List<string>();
+    private readonly DynamicParameters _queryParameters = new();
+    private readonly List<string> _statement = new();
 
+    public QueryInput BuildFrom(GetMessagesQuery request)
+    {
         if (request.CreationPeriod is not null)
         {
-            statement.Add("CreatedAt BETWEEN @StartOfPeriod AND @EndOfPeriod");
-            queryParameters.Add("StartOfPeriod", request.CreationPeriod.DateToSearchFrom.ToString());
-            queryParameters.Add("EndOfPeriod", request.CreationPeriod.DateToSearchTo.ToString());
+            AddFilter(
+                "CreatedAt BETWEEN @StartOfPeriod AND @EndOfPeriod",
+                new KeyValuePair<string, string>("StartOfPeriod", request.CreationPeriod.DateToSearchFrom.ToString()),
+                new KeyValuePair<string, string>("EndOfPeriod", request.CreationPeriod.DateToSearchTo.ToString()));
         }
 
         if (request.MessageId is not null)
         {
-            statement.Add("Id=@MessageId");
-            queryParameters.Add("MessageId", request.MessageId.Value.ToString());
+            AddFilter(
+                "Id=@MessageId",
+                new KeyValuePair<string, string>("MessageId", request.MessageId.Value.ToString()));
         }
 
         if (request.SenderNumber is not null)
         {
-            statement.Add("SenderNumber=@SenderNumber");
-            queryParameters.Add("SenderNumber", request.SenderNumber);
+            AddFilter(
+                "SenderNumber=@SenderNumber",
+                new KeyValuePair<string, string>("SenderNumber", request.SenderNumber));
         }
 
         if (request.ReceiverNumber is not null)
         {
-            statement.Add("ReceiverNumber=@ReceiverNumber");
-            queryParameters.Add("ReceiverNumber", request.ReceiverNumber);
+            AddFilter(
+                "ReceiverNumber=@ReceiverNumber",
+                new KeyValuePair<string, string>("ReceiverNumber", request.ReceiverNumber));
         }
 
         if (request.DocumentTypes is not null)
         {
             foreach (var documentType in request.DocumentTypes)
             {
-                statement.Add("DocumentType=@DocumentType");
-                queryParameters.Add("DocumentType", documentType);
+                AddFilter(
+                    "DocumentType=@DocumentType",
+                    new KeyValuePair<string, string>("DocumentType", documentType));
             }
         }
 
-        return new QueryInput(BuildStatement(statement), queryParameters);
+        return new QueryInput(BuildStatement(), _queryParameters);
     }
 
-    private static string BuildStatement(IReadOnlyCollection<string> statement)
+    private string BuildStatement()
     {
         var selectStatement = "SELECT Id AS MessageId, DocumentType, SenderNumber, ReceiverNumber, CreatedAt FROM dbo.ArchivedMessages";
-        if (statement.Count > 0)
+
+        if (_statement.Count > 0)
         {
-            selectStatement += " WHERE " + string.Join(" AND ", statement);
+            selectStatement += " WHERE " + string.Join(" AND ", _statement);
         }
 
         return selectStatement;
+    }
+
+    private void AddFilter(string whereStatement, params KeyValuePair<string, string>[] queryParameters)
+    {
+        if (!queryParameters.Any())
+        {
+            return;
+        }
+
+        _statement.Add(whereStatement);
+
+        foreach (var queryParameter in queryParameters)
+        {
+            _queryParameters.Add(queryParameter.Key, queryParameter.Value);
+        }
     }
 }
