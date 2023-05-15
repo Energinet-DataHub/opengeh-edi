@@ -25,8 +25,8 @@ on:
     outputs:
       dotnet:
         value: ${{ jobs.changes.outputs.dotnet }}
-      render_diagrams:
-        value: ${{ jobs.changes.outputs.render_diagrams }}
+      render_c4model_views:
+        value: ${{ jobs.changes.outputs.render_c4model_views }}
 
 jobs:
   changes:
@@ -35,7 +35,7 @@ jobs:
     # Set job outputs to values from filter step
     outputs:
       dotnet: ${{ steps.filter.outputs.dotnet }}
-      render_diagrams: ${{ steps.filter.outputs.render_diagrams }}
+      render_c4model_views: ${{ steps.filter.outputs.render_c4model_views }}
     steps:
       # For pull requests it's not necessary to checkout the code because GitHub REST API is used to determine changes
       - name: Checkout repository
@@ -50,10 +50,9 @@ jobs:
             dotnet:
               - '.github/workflows/cd.yml'
               - '.github/workflows/ci-dotnet.yml'
-              - '.github/workflows/detect-changes.yml'
               - '.github/actions/dotnet-*/**'
               - 'source/!((IntegrationEvents|RequestResponse)/**)/**'
-            render_diagrams:
-              - 'docs/diagrams/c4-model-edi-component-level.dsl'
-              - '.github/workflows/render-diagrams.yml'
-              - '.github/workflows/detect-changes.yml'
+            render_c4model_views:
+              - 'docs/diagrams/c4-model/views.dsl'
+              - 'docs/diagrams/c4-model/views.json'
+              - 'docs/diagrams/c4-model/model.dsl'
