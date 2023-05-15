@@ -29,39 +29,36 @@ internal sealed class QueryBuilder
         {
             AddFilter(
                 "CreatedAt BETWEEN @StartOfPeriod AND @EndOfPeriod",
-                new KeyValuePair<string, string>("StartOfPeriod", request.CreationPeriod.DateToSearchFrom.ToString()),
-                new KeyValuePair<string, string>("EndOfPeriod", request.CreationPeriod.DateToSearchTo.ToString()));
+                new KeyValuePair<string, object>("StartOfPeriod", request.CreationPeriod.DateToSearchFrom.ToString()),
+                new KeyValuePair<string, object>("EndOfPeriod", request.CreationPeriod.DateToSearchTo.ToString()));
         }
 
         if (request.MessageId is not null)
         {
             AddFilter(
                 "Id=@MessageId",
-                new KeyValuePair<string, string>("MessageId", request.MessageId.Value.ToString()));
+                new KeyValuePair<string, object>("MessageId", request.MessageId.Value.ToString()));
         }
 
         if (request.SenderNumber is not null)
         {
             AddFilter(
                 "SenderNumber=@SenderNumber",
-                new KeyValuePair<string, string>("SenderNumber", request.SenderNumber));
+                new KeyValuePair<string, object>("SenderNumber", request.SenderNumber));
         }
 
         if (request.ReceiverNumber is not null)
         {
             AddFilter(
                 "ReceiverNumber=@ReceiverNumber",
-                new KeyValuePair<string, string>("ReceiverNumber", request.ReceiverNumber));
+                new KeyValuePair<string, object>("ReceiverNumber", request.ReceiverNumber));
         }
 
         if (request.DocumentTypes is not null)
         {
-            foreach (var documentType in request.DocumentTypes)
-            {
-                AddFilter(
-                    "DocumentType=@DocumentType",
-                    new KeyValuePair<string, string>("DocumentType", documentType));
-            }
+            AddFilter(
+                "DocumentType in @DocumentType",
+                new KeyValuePair<string, object>("DocumentType", request.DocumentTypes));
         }
 
         return new QueryInput(BuildStatement(), _queryParameters);
@@ -79,7 +76,7 @@ internal sealed class QueryBuilder
         return selectStatement;
     }
 
-    private void AddFilter(string whereStatement, params KeyValuePair<string, string>[] queryParameters)
+    private void AddFilter(string whereStatement, params KeyValuePair<string, object>[] queryParameters)
     {
         if (!queryParameters.Any())
         {

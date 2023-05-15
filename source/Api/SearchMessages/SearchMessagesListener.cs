@@ -115,6 +115,11 @@ public class SearchMessagesListener
     }
 }
 
-public record SearchArchivedMessages(MessageCreationPeriod? CreatedDuringPeriod, Guid? MessageId, string? SenderNumber, string? ReceiverNumber, IReadOnlyList<string>? DocumentTypes);
+public record SearchArchivedMessages(
+    MessageCreationPeriod? CreatedDuringPeriod,
+    Guid? MessageId,
+    string? SenderNumber,
+    string? ReceiverNumber,
+    IReadOnlyList<string>? DocumentTypes);
 
 public record MessageCreationPeriod(Instant Start, Instant End);

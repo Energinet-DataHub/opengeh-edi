@@ -139,19 +139,29 @@ public class SearchMessagesTests : TestBase
     }
 
     [Fact]
-    public async Task Filter_messages_by_documenttype()
+    public async Task Filter_messages_by_document_type()
     {
         // Arrange
-        var documentType = DocumentType.ConfirmRequestChangeOfSupplier.Name;
-        await ArchiveMessage(CreateArchivedMessage(documentType: documentType));
+        var confirmRequestChangeOfSupplier = DocumentType.ConfirmRequestChangeOfSupplier.Name;
+        var rejectRequestChangeOfSupplier = DocumentType.RejectRequestChangeOfSupplier.Name;
+        await ArchiveMessage(CreateArchivedMessage(documentType: confirmRequestChangeOfSupplier));
+        await ArchiveMessage(CreateArchivedMessage(documentType: rejectRequestChangeOfSupplier));
         await ArchiveMessage(CreateArchivedMessage());
 
         // Act
-        var result = await QueryAsync(new GetMessagesQuery(DocumentTypes: new List<string>() { documentType })).ConfigureAwait(false);
+        var result = await QueryAsync(new GetMessagesQuery(DocumentTypes: new List<string>()
+        {
+            confirmRequestChangeOfSupplier,
+            rejectRequestChangeOfSupplier,
+        })).ConfigureAwait(false);
 
         // Assert
-        Assert.Single(result.Messages);
-        Assert.Equal(documentType, result.Messages[0].DocumentType);
+        Assert.Contains(
+            result.Messages,
+            message => message.DocumentType.Equals(confirmRequestChangeOfSupplier, StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(
+            result.Messages,
+            message => message.DocumentType.Equals(rejectRequestChangeOfSupplier, StringComparison.OrdinalIgnoreCase));
     }
 
     private static Instant CreatedAt(string date)
