@@ -14,8 +14,15 @@
 
 using Domain.Actors;
 using Domain.Documents;
+using Domain.OutgoingMessages;
 using NodaTime;
 
 namespace Domain.ArchivedMessages;
 
-public record ArchivedMessage(Guid Id, DocumentType DocumentType, ActorNumber SenderNumber, ActorNumber ReceiverNumber, Instant CreatedAt);
+public record ArchivedMessage(
+    Guid Id,
+    DocumentType DocumentType,
+    ActorNumber SenderNumber,
+    ActorNumber ReceiverNumber,
+    Instant CreatedAt,
+    ProcessType? ProcessType);

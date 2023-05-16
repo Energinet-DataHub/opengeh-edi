@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.Configuration;
@@ -21,6 +22,8 @@ using Application.SearchMessages;
 using Domain.Actors;
 using Domain.ArchivedMessages;
 using Domain.Documents;
+using Domain.OutgoingMessages;
+using Domain.SeedWork;
 using IntegrationTests.Fixtures;
 using NodaTime;
 using Xunit;
@@ -136,19 +139,78 @@ public class SearchMessagesTests : TestBase
         Assert.Equal(receiverNumber, result.Messages[0].ReceiverNumber);
     }
 
+    [Fact]
+    public async Task Filter_messages_by_document_types()
+    {
+        // Arrange
+        var confirmRequestChangeOfSupplier = DocumentType.ConfirmRequestChangeOfSupplier.Name;
+        var rejectRequestChangeOfSupplier = DocumentType.RejectRequestChangeOfSupplier.Name;
+        await ArchiveMessage(CreateArchivedMessage(documentType: confirmRequestChangeOfSupplier));
+        await ArchiveMessage(CreateArchivedMessage(documentType: rejectRequestChangeOfSupplier));
+        await ArchiveMessage(CreateArchivedMessage());
+
+        // Act
+        var result = await QueryAsync(new GetMessagesQuery(DocumentTypes: new List<string>()
+        {
+            confirmRequestChangeOfSupplier,
+            rejectRequestChangeOfSupplier,
+        })).ConfigureAwait(false);
+
+        // Assert
+        Assert.Contains(
+            result.Messages,
+            message => message.DocumentType.Equals(confirmRequestChangeOfSupplier, StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(
+            result.Messages,
+            message => message.DocumentType.Equals(rejectRequestChangeOfSupplier, StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public async Task Filter_messages_by_business_reasons()
+    {
+        // Arrange
+        var moveIn = ProcessType.MoveIn;
+        var balanceFixing = ProcessType.BalanceFixing;
+        await ArchiveMessage(CreateArchivedMessage(processType: moveIn.Name));
+        await ArchiveMessage(CreateArchivedMessage(processType: balanceFixing.Name));
+        await ArchiveMessage(CreateArchivedMessage());
+
+        // Act
+        var result = await QueryAsync(new GetMessagesQuery(ProcessTypes: new List<string>()
+        {
+            moveIn.Name,
+            balanceFixing.Name,
+        })).ConfigureAwait(false);
+
+        // Assert
+        Assert.Contains(
+            result.Messages,
+            message => message.ProcessType!.Equals(moveIn.Name, StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(
+            result.Messages,
+            message => message.ProcessType!.Equals(balanceFixing.Name, StringComparison.OrdinalIgnoreCase));
+    }
+
     private static Instant CreatedAt(string date)
     {
         return NodaTime.Text.InstantPattern.General.Parse(date).Value;
     }
 
-    private ArchivedMessage CreateArchivedMessage(Instant? createdAt = null, Guid? messageId = null, string? senderNumber = null, string? receiverNumber = null)
+    private ArchivedMessage CreateArchivedMessage(
+        Instant? createdAt = null,
+        Guid? messageId = null,
+        string? senderNumber = null,
+        string? receiverNumber = null,
+        string? documentType = null,
+        string? processType = null)
     {
         return new ArchivedMessage(
             messageId.GetValueOrDefault(Guid.NewGuid()),
-            DocumentType.AccountingPointCharacteristics,
+            EnumerationType.FromName<DocumentType>(documentType ?? DocumentType.AccountingPointCharacteristics.Name),
             ActorNumber.Create(senderNumber ?? "1234512345123"),
             ActorNumber.Create(receiverNumber ?? "1234512345128"),
-            createdAt.GetValueOrDefault(_systemDateTimeProvider.Now()));
+            createdAt.GetValueOrDefault(_systemDateTimeProvider.Now()),
+            ProcessType.From(processType ?? ProcessType.BalanceFixing.Name));
     }
 
     private async Task ArchiveMessage(ArchivedMessage archivedMessage)

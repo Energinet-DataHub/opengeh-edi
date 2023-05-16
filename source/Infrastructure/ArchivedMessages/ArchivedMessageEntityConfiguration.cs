@@ -16,10 +16,10 @@ using System;
 using Domain.Actors;
 using Domain.ArchivedMessages;
 using Domain.Documents;
+using Domain.OutgoingMessages;
 using Domain.SeedWork;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using NodaTime.Text;
 
 namespace Infrastructure.ArchivedMessages;
 
@@ -46,5 +46,9 @@ public class ArchivedMessageEntityConfiguration : IEntityTypeConfiguration<Archi
             toDbValue => toDbValue.Value,
             fromDbValue => ActorNumber.Create(fromDbValue));
         builder.Property(x => x.CreatedAt);
+        builder.Property(x => x.ProcessType)
+            .HasConversion(
+                toDbValue => toDbValue == null ? null : toDbValue.Name,
+                fromDbValue => !string.IsNullOrWhiteSpace(fromDbValue) ? ProcessType.From(fromDbValue) : null);
     }
 }
