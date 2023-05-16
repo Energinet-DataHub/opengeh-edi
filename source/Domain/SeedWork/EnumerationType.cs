@@ -28,7 +28,7 @@ namespace Domain.SeedWork
 
         public int Id { get; }
 
-        public static bool operator ==(EnumerationType left, EnumerationType? right)
+        public static bool operator ==(EnumerationType? left, EnumerationType? right)
         {
             if (ReferenceEquals(left, null))
             {

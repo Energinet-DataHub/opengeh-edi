@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Threading;
@@ -93,6 +94,8 @@ public class SearchMessagesListener
             MessageId = searchCriteria?.MessageId,
             SenderNumber = searchCriteria?.SenderNumber,
             ReceiverNumber = searchCriteria?.ReceiverNumber,
+            DocumentTypes = searchCriteria?.DocumentTypes,
+            ProcessTypes = searchCriteria?.ProcessTypes,
         };
 
         var result = await _mediator.Send(query, cancellationToken).ConfigureAwait(false);
@@ -113,6 +116,12 @@ public class SearchMessagesListener
     }
 }
 
-public record SearchArchivedMessages(MessageCreationPeriod? CreatedDuringPeriod, Guid? MessageId, string? SenderNumber, string? ReceiverNumber);
+public record SearchArchivedMessages(
+    MessageCreationPeriod? CreatedDuringPeriod,
+    Guid? MessageId,
+    string? SenderNumber,
+    string? ReceiverNumber,
+    IReadOnlyList<string>? DocumentTypes,
+    IReadOnlyList<string>? ProcessTypes);
 
 public record MessageCreationPeriod(Instant Start, Instant End);

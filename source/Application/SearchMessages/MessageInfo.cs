@@ -17,4 +17,9 @@ using NodaTime;
 
 namespace Application.SearchMessages;
 
-public record MessageInfo(Guid MessageId, string DocumentType, string SenderNumber, string ReceiverNumber, Instant CreatedAt);
+public record MessageInfo(Guid MessageId,
+    string DocumentType,
+    string SenderNumber,
+    string ReceiverNumber,
+    Instant CreatedAt,
+    string? ProcessType);
