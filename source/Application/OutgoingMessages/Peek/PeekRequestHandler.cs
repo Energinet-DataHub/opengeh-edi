@@ -77,7 +77,8 @@ public class PeekRequestHandler : IRequestHandler<PeekRequest, PeekResult>
             messageRecords.DocumentType,
             ActorNumber.Create(messageRecords.SenderNumber),
             ActorNumber.Create(messageRecords.ReceiverNumber),
-            timestamp));
+            timestamp,
+            ProcessType.From(messageRecords.ProcessType)));
 
         return new PeekResult(bundledMessage.GeneratedDocument, bundledMessage.Id.Value);
     }
