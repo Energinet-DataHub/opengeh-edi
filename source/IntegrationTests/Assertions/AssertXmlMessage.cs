@@ -92,9 +92,9 @@ namespace IntegrationTests.Assertions
             return this;
         }
 
-        internal AssertXmlMessage IsProcesType(ProcessType processType)
+        internal AssertXmlMessage IsBusinessReason(BusinessReason businessReason)
         {
-            Assert.Equal(CimCode.Of(processType), GetMessageHeaderValue("process.processType"));
+            Assert.Equal(CimCode.Of(businessReason), GetMessageHeaderValue("process.processType"));
             return this;
         }
 

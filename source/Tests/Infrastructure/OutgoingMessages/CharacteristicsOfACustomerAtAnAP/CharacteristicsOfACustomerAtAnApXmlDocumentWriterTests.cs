@@ -62,13 +62,13 @@ namespace Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
                 CreateMarketActivityRecord(null, null, _systemDateTimeProvider.Now()),
             };
 
-            var header = MessageHeaderFactory.Create(ProcessType.MoveIn);
+            var header = MessageHeaderFactory.Create(BusinessReason.MoveIn);
             var message = await WriteDocumentAsync(header, marketActivityRecords.ToArray()).ConfigureAwait(false);
 
             var assertDocument = await AssertXmlDocument
                 .Document(message, NamespacePrefix, _documentValidation.Validator)
                 .HasValue("type", "E21")
-                .HasValue("process.processType",  CimCode.Of(ProcessType.From(header.ProcessType)))
+                .HasValue("process.processType",  CimCode.Of(BusinessReason.From(header.BusinessReason)))
                 .HasValue("businessSector.type", "23")
                 .HasValue("sender_MarketParticipant.mRID", header.SenderId)
                 .HasValue("sender_MarketParticipant.marketRole.type", CimCode.Of(EnumerationType.FromName<MarketRole>(header.SenderRole)))
@@ -82,7 +82,7 @@ namespace Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
         [Fact]
         public async Task Eletrical_heating_date_is_excluded_when_no_date_is_specified()
         {
-            var document = await WriteDocumentAsync(MessageHeaderFactory.Create(ProcessType.MoveIn, MarketRole.GridOperator), CreateMarketActivityRecord(null, null, null)).ConfigureAwait(false);
+            var document = await WriteDocumentAsync(MessageHeaderFactory.Create(BusinessReason.MoveIn, MarketRole.GridOperator), CreateMarketActivityRecord(null, null, null)).ConfigureAwait(false);
 
             AssertXmlDocument.Document(document, NamespacePrefix)
                 .IsNotPresent("MktActivityRecord[1]/MarketEvaluationPoint/eletricalHeating_DateAndOrTime.dateTime");
@@ -91,7 +91,7 @@ namespace Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
         [Fact]
         public async Task Second_customer_id_is_not_allowed_when_receiver_is_a_grid_operator()
         {
-            var message = await WriteDocumentAsync(MessageHeaderFactory.Create(ProcessType.MoveIn, MarketRole.GridOperator), CreateMarketActivityRecord())
+            var message = await WriteDocumentAsync(MessageHeaderFactory.Create(BusinessReason.MoveIn, MarketRole.GridOperator), CreateMarketActivityRecord())
                 .ConfigureAwait(false);
 
             AssertXmlDocument
@@ -102,7 +102,7 @@ namespace Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
         [Fact]
         public async Task Supply_start_is_not_allowed_when_receiver_is_a_grid_operator()
         {
-            var message = await WriteDocumentAsync(MessageHeaderFactory.Create(ProcessType.MoveIn, MarketRole.GridOperator), CreateMarketActivityRecord()).ConfigureAwait(false);
+            var message = await WriteDocumentAsync(MessageHeaderFactory.Create(BusinessReason.MoveIn, MarketRole.GridOperator), CreateMarketActivityRecord()).ConfigureAwait(false);
 
             AssertXmlDocument
                 .Document(message, NamespacePrefix)
@@ -113,7 +113,7 @@ namespace Tests.Infrastructure.OutgoingMessages.CharacteristicsOfACustomerAtAnAP
         public async Task Customer_mrid_is_not_allowed_when_type_is_social_security_number()
         {
             var document =
-                await WriteDocumentAsync(MessageHeaderFactory.Create(ProcessType.MoveIn, MarketRole.EnergySupplier), CreateMarketActivityRecord(new MrId("1", "AAR"), new MrId("1", "AAR")))
+                await WriteDocumentAsync(MessageHeaderFactory.Create(BusinessReason.MoveIn, MarketRole.EnergySupplier), CreateMarketActivityRecord(new MrId("1", "AAR"), new MrId("1", "AAR")))
                     .ConfigureAwait(false);
 
             AssertXmlDocument.Document(document, NamespacePrefix)

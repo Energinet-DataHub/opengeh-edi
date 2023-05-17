@@ -22,4 +22,4 @@ public record MessageInfo(Guid MessageId,
     string SenderNumber,
     string ReceiverNumber,
     Instant CreatedAt,
-    string? ProcessType);
+    string? BusinessReason);

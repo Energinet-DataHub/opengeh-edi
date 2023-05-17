@@ -23,14 +23,14 @@ namespace Domain.OutgoingMessages.NotifyAggregatedMeasureData;
 
 public class AggregationResultMessage : OutgoingMessage
 {
-    private AggregationResultMessage(DocumentType documentType, ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
-        : base(documentType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, JsonSerializer.Serialize(messageRecord))
+    private AggregationResultMessage(DocumentType documentType, ActorNumber receiverId, TransactionId transactionId, string businessReason, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
+        : base(documentType, receiverId, transactionId, businessReason, receiverRole, senderId, senderRole, JsonSerializer.Serialize(messageRecord))
     {
         Series = new Serializer().Deserialize<TimeSeries>(messageRecord)!;
     }
 
-    private AggregationResultMessage(ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, TimeSeries series)
-        : base(DocumentType.NotifyAggregatedMeasureData, receiverId, transactionId, processType, receiverRole, DataHubDetails.IdentificationNumber, MarketRole.MeteringDataAdministrator, new Serializer().Serialize(series))
+    private AggregationResultMessage(ActorNumber receiverId, TransactionId transactionId, string businessReason, MarketRole receiverRole, TimeSeries series)
+        : base(DocumentType.NotifyAggregatedMeasureData, receiverId, transactionId, businessReason, receiverRole, DataHubDetails.IdentificationNumber, MarketRole.MeteringDataAdministrator, new Serializer().Serialize(series))
     {
         Series = series;
     }
@@ -62,7 +62,7 @@ public class AggregationResultMessage : OutgoingMessage
         return new AggregationResultMessage(
             receiverNumber,
             transactionId,
-            EnumerationType.FromName<ProcessType>(result.ProcessType).Name,
+            EnumerationType.FromName<BusinessReason>(result.BusinessReason).Name,
             receiverRole,
             series);
     }

@@ -53,7 +53,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         try
         {
             version = GetVersion(message);
-            businessProcessType = GetBusinessProcessType(message);
+            businessProcessType = GetBusinessReason(message);
         }
         catch (XmlException exception)
         {
@@ -70,7 +70,7 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         {
             return new
                 MessageParserResult<MarketActivityRecord, RequestChangeCustomerCharacteristicsTransaction>(
-                    new UnknownBusinessProcessTypeOrVersion(businessProcessType, version));
+                    new UnknownBusinessReasonOrVersion(businessProcessType, version));
         }
 
         ResetMessagePosition(message);
@@ -131,12 +131,12 @@ public class XmlMessageParser : IMessageParser<MarketActivityRecord, RequestChan
         return split;
     }
 
-    private static string GetBusinessProcessType(Stream message)
+    private static string GetBusinessReason(Stream message)
     {
         if (message == null) throw new ArgumentNullException(nameof(message));
         var split = SplitNamespace(message);
-        var processType = split[3];
-        return processType;
+        var businessReason = split[3];
+        return businessReason;
     }
 
     private static async IAsyncEnumerable<MarketActivityRecord> MarketActivityRecordsFromAsync(

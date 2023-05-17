@@ -16,23 +16,23 @@ using System.Collections;
 
 namespace Domain.OutgoingMessages
 {
-    public class ProcessTypesDoesNotMatchException : Exception
+    public class BusinessReasonsDoesNotMatchException : Exception
     {
-        public ProcessTypesDoesNotMatchException(IEnumerable messageIds)
+        public BusinessReasonsDoesNotMatchException(IEnumerable messageIds)
             : base($"Messages ({messageIds}) does not have matching process types")
         {
         }
 
-        public ProcessTypesDoesNotMatchException()
+        public BusinessReasonsDoesNotMatchException()
         {
         }
 
-        public ProcessTypesDoesNotMatchException(string message, Exception innerException)
+        public BusinessReasonsDoesNotMatchException(string message, Exception innerException)
             : base(message, innerException)
         {
         }
 
-        private ProcessTypesDoesNotMatchException(string message)
+        private BusinessReasonsDoesNotMatchException(string message)
             : base(message)
         {
         }

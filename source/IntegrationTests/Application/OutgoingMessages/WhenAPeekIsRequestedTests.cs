@@ -67,7 +67,7 @@ public class WhenAPeekIsRequestedTests : TestBase
 
         AssertXmlMessage.Document(XDocument.Load(result.Bundle!))
             .IsDocumentType(DocumentType.ConfirmRequestChangeOfSupplier)
-            .IsProcesType(ProcessType.MoveIn)
+            .IsBusinessReason(BusinessReason.MoveIn)
             .HasMarketActivityRecordCount(2);
     }
 
@@ -76,13 +76,13 @@ public class WhenAPeekIsRequestedTests : TestBase
     {
         SetMaximumNumberOfPayloadsInBundle(1);
         await GivenTwoMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
-        await InsertFakeMessagesAsync(SampleData.NewEnergySupplierNumber, MarketRole.EnergySupplier, MessageCategory.MasterData, ProcessType.MoveIn, DocumentType.ConfirmRequestChangeOfSupplier).ConfigureAwait(false);
+        await InsertFakeMessagesAsync(SampleData.NewEnergySupplierNumber, MarketRole.EnergySupplier, MessageCategory.MasterData, BusinessReason.MoveIn, DocumentType.ConfirmRequestChangeOfSupplier).ConfigureAwait(false);
 
         var result = await PeekMessage(MessageCategory.MasterData).ConfigureAwait(false);
 
         AssertXmlMessage.Document(XDocument.Load(result.Bundle!))
             .IsDocumentType(DocumentType.ConfirmRequestChangeOfSupplier)
-            .IsProcesType(ProcessType.MoveIn)
+            .IsBusinessReason(BusinessReason.MoveIn)
             .HasMarketActivityRecordCount(1);
     }
 
@@ -129,7 +129,7 @@ public class WhenAPeekIsRequestedTests : TestBase
             .WithTransactionId(SampleData.TransactionId);
     }
 
-    private async Task InsertFakeMessagesAsync(string receiverId, MarketRole receiverRole, MessageCategory category, ProcessType processType, DocumentType documentType)
+    private async Task InsertFakeMessagesAsync(string receiverId, MarketRole receiverRole, MessageCategory category, BusinessReason businessReason, DocumentType documentType)
     {
         var messageEnqueuer = GetService<OutgoingMessageEnqueuer>();
 
@@ -143,7 +143,7 @@ public class WhenAPeekIsRequestedTests : TestBase
                 "FakeSenderRole",
                 documentType.Name,
                 category.Name,
-                processType.Name,
+                businessReason.Name,
                 "MessageRecord");
 
             await messageEnqueuer.EnqueueAsync(message).ConfigureAwait(false);
@@ -154,7 +154,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     {
         var incomingMessage = MessageBuilder()
             .WithMarketEvaluationPointId(SampleData.MeteringPointNumber)
-            .WithProcessType(ProcessType.MoveIn)
+            .WithBusinessReason(BusinessReason.MoveIn)
             .WithReceiver(SampleData.ReceiverId)
             .WithSenderId(SampleData.SenderId)
             .WithConsumerName(SampleData.ConsumerName)
@@ -168,7 +168,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         await GivenAMoveInTransactionHasBeenAccepted().ConfigureAwait(false);
 
         var message = MessageBuilder()
-            .WithProcessType(ProcessType.MoveIn)
+            .WithBusinessReason(BusinessReason.MoveIn)
             .WithReceiver(SampleData.ReceiverId)
             .WithSenderId(SampleData.SenderId)
             .WithEffectiveDate(EffectiveDateFactory.OffsetDaysFromToday(1))

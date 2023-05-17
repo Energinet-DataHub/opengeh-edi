@@ -24,11 +24,11 @@ namespace Tests.Infrastructure.OutgoingMessages;
 public class CimCodeTests
 {
     [Theory]
-    [InlineData(nameof(ProcessType.BalanceFixing), "D04")]
-    [InlineData(nameof(ProcessType.MoveIn), "E65")]
-    public void Translate_process_type(string processType, string expectedCode)
+    [InlineData(nameof(BusinessReason.BalanceFixing), "D04")]
+    [InlineData(nameof(BusinessReason.MoveIn), "E65")]
+    public void Translate_business_reason(string businessReason, string expectedCode)
     {
-        Assert.Equal(expectedCode, CimCode.Of(ProcessType.From(processType)));
+        Assert.Equal(expectedCode, CimCode.Of(BusinessReason.From(businessReason)));
     }
 
     [Theory]

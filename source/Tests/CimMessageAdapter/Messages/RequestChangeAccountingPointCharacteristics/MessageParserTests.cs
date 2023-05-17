@@ -198,7 +198,7 @@ public class MessageParserTests
     private static void AssertHeader(MessageHeader? header)
     {
         Assert.Equal("253698245", header?.MessageId);
-        Assert.Equal("E02", header?.ProcessType);
+        Assert.Equal("E02", header?.BusinessReason);
         Assert.Equal("5799999933318", header?.SenderId);
         Assert.Equal("DDM", header?.SenderRole);
         Assert.Equal("5790001330552", header?.ReceiverId);

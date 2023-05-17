@@ -22,20 +22,20 @@ namespace Infrastructure.OutgoingMessages.Common;
 
 public static class CimCode
 {
-    public static string Of(ProcessType processType)
+    public static string Of(BusinessReason businessReason)
     {
-        ArgumentNullException.ThrowIfNull(processType);
+        ArgumentNullException.ThrowIfNull(businessReason);
 
-        if (processType == ProcessType.BalanceFixing)
+        if (businessReason == BusinessReason.BalanceFixing)
             return "D04";
 
-        if (processType == ProcessType.MoveIn)
+        if (businessReason == BusinessReason.MoveIn)
             return "E65";
 
-        if (processType == ProcessType.PreliminaryAggregation)
+        if (businessReason == BusinessReason.PreliminaryAggregation)
             return "D03";
 
-        throw NoCodeFoundFor(processType.Name);
+        throw NoCodeFoundFor(businessReason.Name);
     }
 
     public static string Of(MeteringPointType meteringPointType)

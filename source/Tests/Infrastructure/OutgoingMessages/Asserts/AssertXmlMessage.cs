@@ -68,7 +68,7 @@ namespace Tests.Infrastructure.OutgoingMessages.Asserts
         internal static void AssertHeader(MessageHeader header, XDocument document)
         {
             Assert.NotEmpty(AssertXmlMessage.GetMessageHeaderValue(document, "mRID")!);
-            AssertHasHeaderValue(document, "process.processType", CimCode.Of(ProcessType.From(header.ProcessType)));
+            AssertHasHeaderValue(document, "process.processType", CimCode.Of(BusinessReason.From(header.BusinessReason)));
             AssertHasHeaderValue(document, "businessSector.type", "23");
             AssertHasHeaderValue(document, "sender_MarketParticipant.mRID", header.SenderId);
             AssertHasHeaderValue(document, "sender_MarketParticipant.marketRole.type", CimCode.Of(EnumerationType.FromName<MarketRole>(header.SenderRole)));

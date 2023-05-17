@@ -16,20 +16,20 @@ using Domain.SeedWork;
 
 namespace Domain.OutgoingMessages;
 
-public sealed class ProcessType : EnumerationType
+public sealed class BusinessReason : EnumerationType
 {
-    public static readonly ProcessType MoveIn = new(0, nameof(MoveIn));
-    public static readonly ProcessType BalanceFixing = new(1, nameof(BalanceFixing));
-    public static readonly ProcessType PreliminaryAggregation = new(2, nameof(PreliminaryAggregation));
+    public static readonly BusinessReason MoveIn = new(0, nameof(MoveIn));
+    public static readonly BusinessReason BalanceFixing = new(1, nameof(BalanceFixing));
+    public static readonly BusinessReason PreliminaryAggregation = new(2, nameof(PreliminaryAggregation));
 
-    private ProcessType(int id, string name)
+    private BusinessReason(int id, string name)
      : base(id, name)
     {
     }
 
-    public static ProcessType From(string valueToParse)
+    public static BusinessReason From(string valueToParse)
     {
-        var processType = GetAll<ProcessType>().FirstOrDefault(processType =>
+        var processType = GetAll<BusinessReason>().FirstOrDefault(processType =>
             processType.Name.Equals(valueToParse, StringComparison.OrdinalIgnoreCase)) ?? throw new InvalidOperationException($"{valueToParse} is not a valid process type");
         return processType;
     }
