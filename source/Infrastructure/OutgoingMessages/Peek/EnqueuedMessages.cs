@@ -61,16 +61,16 @@ public class EnqueuedMessages : IEnqueuedMessages
             SenderRole AS {nameof(EnqueuedMessage.SenderRole)},
             DocumentType AS {nameof(EnqueuedMessage.DocumentType)},
             MessageCategory AS {nameof(EnqueuedMessage.Category)},
-            ProcessType AS {nameof(EnqueuedMessage.ProcessType)},
+            BusinessReason AS {nameof(EnqueuedMessage.BusinessReason)},
             MessageRecord FROM [dbo].[EnqueuedMessages]
-            WHERE ProcessType = @ProcessType AND ReceiverId = @ReceiverId AND ReceiverRole = @ReceiverRole AND DocumentType = @DocumentType AND MessageCategory = @MessageCategory";
+            WHERE BusinessReason = @BusinessReason AND ReceiverId = @ReceiverId AND ReceiverRole = @ReceiverRole AND DocumentType = @DocumentType AND MessageCategory = @MessageCategory";
 
         var messages = await connection.QueryAsync<EnqueuedMessage>(
             sqlStatement,
             new
             {
                 ReceiverRole = oldestMessage.ReceiverRole,
-                ProcessType = oldestMessage.ProcessType,
+                BusinessReason = oldestMessage.BusinessReason,
                 DocumentType = oldestMessage.DocumentType,
                 MessageCategory = messageCategory.Name,
                 ReceiverId = actorNumber.Value,
@@ -96,7 +96,7 @@ public class EnqueuedMessages : IEnqueuedMessages
     {
         return await connection
             .QuerySingleOrDefaultAsync<OldestMessage>(
-                @$"SELECT TOP(1) {nameof(OldestMessage.ProcessType)}, {nameof(OldestMessage.DocumentType)}, {nameof(OldestMessage.ReceiverRole)} FROM [dbo].[EnqueuedMessages]
+                @$"SELECT TOP(1) {nameof(OldestMessage.BusinessReason)}, {nameof(OldestMessage.DocumentType)}, {nameof(OldestMessage.ReceiverRole)} FROM [dbo].[EnqueuedMessages]
                 WHERE ReceiverId = @ReceiverId AND MessageCategory = @MessageCategory",
                 new
             {
@@ -106,5 +106,5 @@ public class EnqueuedMessages : IEnqueuedMessages
             .ConfigureAwait(false);
     }
 
-    private sealed record OldestMessage(string ProcessType, string DocumentType, string ReceiverRole);
+    private sealed record OldestMessage(string BusinessReason, string DocumentType, string ReceiverRole);
 }

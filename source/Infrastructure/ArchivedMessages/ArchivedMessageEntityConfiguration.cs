@@ -46,9 +46,9 @@ public class ArchivedMessageEntityConfiguration : IEntityTypeConfiguration<Archi
             toDbValue => toDbValue.Value,
             fromDbValue => ActorNumber.Create(fromDbValue));
         builder.Property(x => x.CreatedAt);
-        builder.Property(x => x.ProcessType)
+        builder.Property(x => x.BusinessReason)
             .HasConversion(
                 toDbValue => toDbValue == null ? null : toDbValue.Name,
-                fromDbValue => !string.IsNullOrWhiteSpace(fromDbValue) ? ProcessType.From(fromDbValue) : null);
+                fromDbValue => !string.IsNullOrWhiteSpace(fromDbValue) ? BusinessReason.From(fromDbValue) : null);
     }
 }

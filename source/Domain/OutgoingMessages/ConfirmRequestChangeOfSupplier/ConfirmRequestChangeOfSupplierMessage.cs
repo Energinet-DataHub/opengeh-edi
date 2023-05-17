@@ -21,15 +21,15 @@ namespace Domain.OutgoingMessages.ConfirmRequestChangeOfSupplier;
 
 public class ConfirmRequestChangeOfSupplierMessage : OutgoingMessage
 {
-    private ConfirmRequestChangeOfSupplierMessage(DocumentType documentType, ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
-        : base(documentType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, messageRecord)
+    private ConfirmRequestChangeOfSupplierMessage(DocumentType documentType, ActorNumber receiverId, TransactionId transactionId, string businessReason, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
+        : base(documentType, receiverId, transactionId, businessReason, receiverRole, senderId, senderRole, messageRecord)
     {
         ArgumentNullException.ThrowIfNull(messageRecord);
         MarketActivityRecord = JsonSerializer.Deserialize<MarketActivityRecord>(messageRecord)!;
     }
 
-    private ConfirmRequestChangeOfSupplierMessage(ActorNumber receiverId, TransactionId transactionId, string processType, MarketActivityRecord marketActivityRecord)
-        : base(DocumentType.ConfirmRequestChangeOfSupplier, receiverId, transactionId, processType, MarketRole.EnergySupplier, DataHubDetails.IdentificationNumber, MarketRole.MeteringPointAdministrator, JsonSerializer.Serialize(marketActivityRecord))
+    private ConfirmRequestChangeOfSupplierMessage(ActorNumber receiverId, TransactionId transactionId, string businessReason, MarketActivityRecord marketActivityRecord)
+        : base(DocumentType.ConfirmRequestChangeOfSupplier, receiverId, transactionId, businessReason, MarketRole.EnergySupplier, DataHubDetails.IdentificationNumber, MarketRole.MeteringPointAdministrator, JsonSerializer.Serialize(marketActivityRecord))
     {
         MarketActivityRecord = marketActivityRecord;
     }
@@ -39,11 +39,11 @@ public class ConfirmRequestChangeOfSupplierMessage : OutgoingMessage
     public static OutgoingMessage Create(
         TransactionId transactionId,
         ActorProvidedId actorProvidedId,
-        ProcessType processType,
+        BusinessReason businessReason,
         string marketEvaluationPointNumber,
         ActorNumber energySupplierNumber)
     {
-        ArgumentNullException.ThrowIfNull(processType);
+        ArgumentNullException.ThrowIfNull(businessReason);
         ArgumentNullException.ThrowIfNull(actorProvidedId);
 
         var marketActivityRecord = new MarketActivityRecord(
@@ -54,7 +54,7 @@ public class ConfirmRequestChangeOfSupplierMessage : OutgoingMessage
         return new ConfirmRequestChangeOfSupplierMessage(
             energySupplierNumber,
             transactionId,
-            processType.Name,
+            businessReason.Name,
             marketActivityRecord);
     }
 }

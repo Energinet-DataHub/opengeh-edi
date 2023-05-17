@@ -31,7 +31,7 @@ public class MessageRecords : ValueObject
 
         if (messages.Count > 1)
         {
-            EnsureProcessTypeMatches(messages);
+            EnsureBusinessReasonMatches(messages);
             EnsureReceiverNumberMatches(messages);
             EnsureReceiverRoleMatches(messages);
             EnsureSenderNumberMatches(messages);
@@ -42,7 +42,7 @@ public class MessageRecords : ValueObject
         _messages = messages;
     }
 
-    public string ProcessType => _messages[0].ProcessType;
+    public string BusinessReason => _messages[0].BusinessReason;
 
     public string SenderNumber => _messages[0].SenderId;
 
@@ -66,17 +66,17 @@ public class MessageRecords : ValueObject
         return new MessageRecords(messages);
     }
 
-    private static void EnsureProcessTypeMatches(IReadOnlyList<EnqueuedMessage> messages)
+    private static void EnsureBusinessReasonMatches(IReadOnlyList<EnqueuedMessage> messages)
     {
-        var processType = messages[0].ProcessType;
-        var messagesNotMatchingProcessType = messages
-            .Where(message => message.ProcessType.Equals(processType, StringComparison.OrdinalIgnoreCase) == false)
+        var businessReason = messages[0].BusinessReason;
+        var messagesNotMatchingBusinessReason = messages
+            .Where(message => message.BusinessReason.Equals(businessReason, StringComparison.OrdinalIgnoreCase) == false)
             .Select(message => message.Id)
             .ToList();
 
-        if (messagesNotMatchingProcessType.Count > 0)
+        if (messagesNotMatchingBusinessReason.Count > 0)
         {
-            throw new ProcessTypesDoesNotMatchException(messagesNotMatchingProcessType);
+            throw new BusinessReasonsDoesNotMatchException(messagesNotMatchingBusinessReason);
         }
     }
 

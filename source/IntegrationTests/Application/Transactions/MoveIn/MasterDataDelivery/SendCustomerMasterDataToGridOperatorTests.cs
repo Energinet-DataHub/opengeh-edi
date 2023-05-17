@@ -110,7 +110,7 @@ public class SendCustomerMasterDataToGridOperatorTests
         var assertMessage = await Assertions.AssertOutgoingMessage.OutgoingMessageAsync(
             SampleData.TransactionId,
             DocumentType.CharacteristicsOfACustomerAtAnAP.Name,
-            ProcessType.MoveIn.Name,
+            BusinessReason.MoveIn.Name,
             MarketRole.GridOperator,
             GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
         return assertMessage;

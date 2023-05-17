@@ -169,14 +169,14 @@ public class SearchMessagesTests : TestBase
     public async Task Filter_messages_by_business_reasons()
     {
         // Arrange
-        var moveIn = ProcessType.MoveIn;
-        var balanceFixing = ProcessType.BalanceFixing;
-        await ArchiveMessage(CreateArchivedMessage(processType: moveIn.Name));
-        await ArchiveMessage(CreateArchivedMessage(processType: balanceFixing.Name));
+        var moveIn = BusinessReason.MoveIn;
+        var balanceFixing = BusinessReason.BalanceFixing;
+        await ArchiveMessage(CreateArchivedMessage(businessReason: moveIn.Name));
+        await ArchiveMessage(CreateArchivedMessage(businessReason: balanceFixing.Name));
         await ArchiveMessage(CreateArchivedMessage());
 
         // Act
-        var result = await QueryAsync(new GetMessagesQuery(ProcessTypes: new List<string>()
+        var result = await QueryAsync(new GetMessagesQuery(BusinessReasons: new List<string>()
         {
             moveIn.Name,
             balanceFixing.Name,
@@ -185,10 +185,10 @@ public class SearchMessagesTests : TestBase
         // Assert
         Assert.Contains(
             result.Messages,
-            message => message.ProcessType!.Equals(moveIn.Name, StringComparison.OrdinalIgnoreCase));
+            message => message.BusinessReason!.Equals(moveIn.Name, StringComparison.OrdinalIgnoreCase));
         Assert.Contains(
             result.Messages,
-            message => message.ProcessType!.Equals(balanceFixing.Name, StringComparison.OrdinalIgnoreCase));
+            message => message.BusinessReason!.Equals(balanceFixing.Name, StringComparison.OrdinalIgnoreCase));
     }
 
     private static Instant CreatedAt(string date)
@@ -202,7 +202,7 @@ public class SearchMessagesTests : TestBase
         string? senderNumber = null,
         string? receiverNumber = null,
         string? documentType = null,
-        string? processType = null)
+        string? businessReason = null)
     {
         return new ArchivedMessage(
             messageId.GetValueOrDefault(Guid.NewGuid()),
@@ -210,7 +210,7 @@ public class SearchMessagesTests : TestBase
             ActorNumber.Create(senderNumber ?? "1234512345123"),
             ActorNumber.Create(receiverNumber ?? "1234512345128"),
             createdAt.GetValueOrDefault(_systemDateTimeProvider.Now()),
-            ProcessType.From(processType ?? ProcessType.BalanceFixing.Name));
+            BusinessReason.From(businessReason ?? BusinessReason.BalanceFixing.Name));
     }
 
     private async Task ArchiveMessage(ArchivedMessage archivedMessage)

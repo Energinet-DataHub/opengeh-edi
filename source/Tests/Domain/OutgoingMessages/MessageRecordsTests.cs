@@ -29,7 +29,7 @@ public class MessageRecordsTests
     }
 
     [Fact]
-    public void All_message_records_must_originate_from_the_same_type_of_process()
+    public void All_message_records_must_originate_from_the_same_type_of_business_reason()
     {
         var messages = new List<EnqueuedMessage>()
         {
@@ -37,7 +37,7 @@ public class MessageRecordsTests
             CreateEnqueuedMessage("E66"),
         };
 
-        Assert.Throws<ProcessTypesDoesNotMatchException>(() =>
+        Assert.Throws<BusinessReasonsDoesNotMatchException>(() =>
             MessageRecords.Create(messages));
     }
 
@@ -107,7 +107,7 @@ public class MessageRecordsTests
     }
 
     private static EnqueuedMessage CreateEnqueuedMessage(
-        string processType = "123",
+        string businessReason = "123",
         string receiverNumber = "1234567890123",
         string receiverRole = "Role1",
         string senderNumber = "1234567890123",
@@ -122,7 +122,7 @@ public class MessageRecordsTests
             senderRole,
             messageType,
             "FakeCategory",
-            processType,
+            businessReason,
             string.Empty);
     }
 }

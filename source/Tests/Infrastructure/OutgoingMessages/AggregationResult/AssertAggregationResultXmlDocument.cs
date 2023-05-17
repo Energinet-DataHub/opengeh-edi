@@ -139,9 +139,9 @@ public class AssertAggregationResultXmlDocument : IAssertAggregationResultDocume
         return this;
     }
 
-    public IAssertAggregationResultDocument HasProcessType(ProcessType processType)
+    public IAssertAggregationResultDocument HasBusinessReason(BusinessReason businessReason)
     {
-        _documentAsserter.HasValue("process.processType", CimCode.Of(processType));
+        _documentAsserter.HasValue("process.processType", CimCode.Of(businessReason));
         return this;
     }
 }

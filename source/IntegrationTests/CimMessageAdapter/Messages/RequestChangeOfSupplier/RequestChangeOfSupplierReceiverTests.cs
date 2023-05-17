@@ -138,7 +138,7 @@ namespace IntegrationTests.CimMessageAdapter.Messages.RequestChangeOfSupplier
         }
 
         [Fact]
-        public async Task Return_failure_if_xml_schema_for_business_process_type_does_not_exist()
+        public async Task Return_failure_if_xml_schema_for_business_reason_does_not_exist()
         {
             await using var message = BusinessMessageBuilder
                 .RequestChangeOfSupplier("CimMessageAdapter//Messages//Xml//BadRequestChangeOfSupplier.xml")

@@ -144,7 +144,7 @@ public class WhenRequestedCustomerMasterDataIsReceivedTests
         var assertMessage = await AssertOutgoingMessage.OutgoingMessageAsync(
             SampleData.TransactionId,
             DocumentType.CharacteristicsOfACustomerAtAnAP.Name,
-            ProcessType.MoveIn.Name,
+            BusinessReason.MoveIn.Name,
             GetService<IDatabaseConnectionFactory>()).ConfigureAwait(false);
         return assertMessage;
     }

@@ -59,7 +59,7 @@ namespace Infrastructure.OutgoingMessages
                 .HasConversion(
                     toDbValue => toDbValue.Id,
                     fromDbValue => TransactionId.Create(fromDbValue));
-            builder.Property(x => x.ProcessType);
+            builder.Property(x => x.BusinessReason);
             builder.Property(x => x.SenderId)
                 .HasConversion(
                     toDbValue => toDbValue.Value,

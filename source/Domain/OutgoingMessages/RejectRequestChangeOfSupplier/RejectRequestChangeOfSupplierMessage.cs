@@ -21,15 +21,15 @@ namespace Domain.OutgoingMessages.RejectRequestChangeOfSupplier;
 
 public class RejectRequestChangeOfSupplierMessage : OutgoingMessage
 {
-    private RejectRequestChangeOfSupplierMessage(DocumentType documentType, ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
-        : base(documentType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, messageRecord)
+    private RejectRequestChangeOfSupplierMessage(DocumentType documentType, ActorNumber receiverId, TransactionId transactionId, string businessReason, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
+        : base(documentType, receiverId, transactionId, businessReason, receiverRole, senderId, senderRole, messageRecord)
     {
         ArgumentNullException.ThrowIfNull(messageRecord);
         MarketActivityRecord = JsonSerializer.Deserialize<MarketActivityRecord>(messageRecord)!;
     }
 
-    private RejectRequestChangeOfSupplierMessage(ActorNumber receiverId, TransactionId transactionId, string processType, MarketActivityRecord marketActivityRecord)
-        : base(DocumentType.RejectRequestChangeOfSupplier, receiverId, transactionId, processType, MarketRole.EnergySupplier, DataHubDetails.IdentificationNumber, MarketRole.MeteringPointAdministrator, JsonSerializer.Serialize(marketActivityRecord))
+    private RejectRequestChangeOfSupplierMessage(ActorNumber receiverId, TransactionId transactionId, string businessReason, MarketActivityRecord marketActivityRecord)
+        : base(DocumentType.RejectRequestChangeOfSupplier, receiverId, transactionId, businessReason, MarketRole.EnergySupplier, DataHubDetails.IdentificationNumber, MarketRole.MeteringPointAdministrator, JsonSerializer.Serialize(marketActivityRecord))
     {
         MarketActivityRecord = marketActivityRecord;
     }
@@ -39,13 +39,13 @@ public class RejectRequestChangeOfSupplierMessage : OutgoingMessage
     public static RejectRequestChangeOfSupplierMessage Create(
         TransactionId transactionId,
         ActorProvidedId actorProvidedId,
-        ProcessType processType,
+        BusinessReason businessReason,
         string marketEvaluationPointNumber,
         ActorNumber energySupplierNumber,
         IReadOnlyList<Reason> reasons)
     {
         ArgumentNullException.ThrowIfNull(transactionId);
-        ArgumentNullException.ThrowIfNull(processType);
+        ArgumentNullException.ThrowIfNull(businessReason);
         ArgumentNullException.ThrowIfNull(energySupplierNumber);
         ArgumentNullException.ThrowIfNull(reasons);
         ArgumentNullException.ThrowIfNull(actorProvidedId);
@@ -63,7 +63,7 @@ public class RejectRequestChangeOfSupplierMessage : OutgoingMessage
         return new RejectRequestChangeOfSupplierMessage(
             energySupplierNumber,
             transactionId,
-            processType.Name,
+            businessReason.Name,
             marketActivityRecord);
     }
 }

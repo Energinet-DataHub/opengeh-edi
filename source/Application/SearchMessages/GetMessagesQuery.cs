@@ -25,6 +25,6 @@ public sealed record GetMessagesQuery(
     string? SenderNumber = null,
     string? ReceiverNumber = null,
     IReadOnlyList<string>? DocumentTypes = null,
-    IReadOnlyList<string>? ProcessTypes = null) : IQuery<MessageSearchResult>;
+    IReadOnlyList<string>? BusinessReasons = null) : IQuery<MessageSearchResult>;
 
 public record MessageCreationPeriod(Instant DateToSearchFrom, Instant DateToSearchTo);

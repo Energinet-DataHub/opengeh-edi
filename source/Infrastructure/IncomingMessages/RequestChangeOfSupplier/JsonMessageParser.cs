@@ -56,7 +56,7 @@ public class JsonMessageParser : IMessageParser<MarketActivityRecord, RequestCha
         if (schema is null)
         {
             return new MessageParserResult<MarketActivityRecord, RequestChangeOfSupplierTransaction>(
-                new UnknownBusinessProcessTypeOrVersion(DocumentName, "0"));
+                new UnknownBusinessReasonOrVersion(DocumentName, "0"));
         }
 
         ResetMessagePosition(message);

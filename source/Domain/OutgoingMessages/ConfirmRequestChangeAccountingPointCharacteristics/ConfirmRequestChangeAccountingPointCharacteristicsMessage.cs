@@ -21,14 +21,14 @@ namespace Domain.OutgoingMessages.ConfirmRequestChangeAccountingPointCharacteris
 
 public class ConfirmRequestChangeAccountingPointCharacteristicsMessage : OutgoingMessage
 {
-    public ConfirmRequestChangeAccountingPointCharacteristicsMessage(DocumentType documentType, ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
-        : base(documentType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, messageRecord)
+    public ConfirmRequestChangeAccountingPointCharacteristicsMessage(DocumentType documentType, ActorNumber receiverId, TransactionId transactionId, string businessReason, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, string messageRecord)
+        : base(documentType, receiverId, transactionId, businessReason, receiverRole, senderId, senderRole, messageRecord)
     {
         MarketActivityRecord = JsonSerializer.Deserialize<MarketActivityRecord>(messageRecord)!;
     }
 
-    public ConfirmRequestChangeAccountingPointCharacteristicsMessage(DocumentType documentType, ActorNumber receiverId, TransactionId transactionId, string processType, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, MarketActivityRecord marketActivityRecord)
-        : base(documentType, receiverId, transactionId, processType, receiverRole, senderId, senderRole, JsonSerializer.Serialize(marketActivityRecord))
+    public ConfirmRequestChangeAccountingPointCharacteristicsMessage(DocumentType documentType, ActorNumber receiverId, TransactionId transactionId, string businessReason, MarketRole receiverRole, ActorNumber senderId, MarketRole senderRole, MarketActivityRecord marketActivityRecord)
+        : base(documentType, receiverId, transactionId, businessReason, receiverRole, senderId, senderRole, JsonSerializer.Serialize(marketActivityRecord))
     {
         MarketActivityRecord = marketActivityRecord;
     }

@@ -60,7 +60,7 @@ public class EnqueueOutgoingMessagesBehaviour<TRequest, TResponse> : IPipelineBe
                     message.SenderRole.Name,
                     message.DocumentType.Name,
                     message.DocumentType.Category.Name,
-                    message.ProcessType,
+                    message.BusinessReason,
                     message.MessageRecord)).ConfigureAwait(false);
         }
 

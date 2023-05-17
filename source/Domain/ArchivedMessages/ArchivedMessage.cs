@@ -25,4 +25,4 @@ public record ArchivedMessage(
     ActorNumber SenderNumber,
     ActorNumber ReceiverNumber,
     Instant CreatedAt,
-    ProcessType? ProcessType);
+    BusinessReason? BusinessReason);

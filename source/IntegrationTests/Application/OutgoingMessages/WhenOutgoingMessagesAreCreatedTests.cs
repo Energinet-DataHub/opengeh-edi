@@ -51,7 +51,7 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase
         Assert.Equal(result.ReceiverRole, MarketRole.EnergySupplier.Name);
         Assert.Equal(result.SenderId, DataHubDetails.IdentificationNumber.Value);
         Assert.Equal(result.SenderRole, MarketRole.MeteringPointAdministrator.Name);
-        Assert.Equal(ProcessType.MoveIn.Name, result.ProcessType);
+        Assert.Equal(BusinessReason.MoveIn.Name, result.BusinessReason);
         Assert.NotNull(result.MessageRecord);
     }
 
@@ -66,7 +66,7 @@ public class WhenOutgoingMessagesAreCreatedTests : TestBase
     private async Task GivenRequestHasBeenAccepted()
     {
         var incomingMessage = MessageBuilder()
-            .WithProcessType(ProcessType.MoveIn)
+            .WithBusinessReason(BusinessReason.MoveIn)
             .WithReceiver(SampleData.ReceiverId)
             .WithSenderId(SampleData.SenderId)
             .WithConsumerName(SampleData.ConsumerName)

@@ -24,7 +24,6 @@ using IntegrationTests.Assertions;
 using IntegrationTests.Factories;
 using IntegrationTests.Fixtures;
 using Xunit;
-using ProcessType = Domain.OutgoingMessages.ProcessType;
 using Resolution = Energinet.DataHub.Wholesale.Contracts.Events.Resolution;
 
 namespace IntegrationTests.Application.Transactions.Aggregations;
@@ -51,7 +50,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
 
         await HavingReceivedIntegrationEventAsync(_receivedEventType, _eventBuilder.Build()).ConfigureAwait(false);
 
-        var outgoingMessage = await OutgoingMessageAsync(MarketRole.EnergySupplier, ProcessType.BalanceFixing);
+        var outgoingMessage = await OutgoingMessageAsync(MarketRole.EnergySupplier, BusinessReason.BalanceFixing);
         outgoingMessage
             .HasReceiverId(SampleData.EnergySupplierNumber.Value)
             .HasReceiverRole(MarketRole.EnergySupplier.Name)
@@ -77,7 +76,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         await HavingReceivedIntegrationEventAsync(_receivedEventType, _eventBuilder.Build()).ConfigureAwait(false);
 
         var message = await OutgoingMessageAsync(
-            MarketRole.MeteredDataResponsible, ProcessType.BalanceFixing);
+            MarketRole.MeteredDataResponsible, BusinessReason.BalanceFixing);
         message.HasReceiverId(SampleData.GridOperatorNumber)
             .HasReceiverRole(MarketRole.MeteredDataResponsible.Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
@@ -100,7 +99,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
         await HavingReceivedIntegrationEventAsync(_receivedEventType, _eventBuilder.Build()).ConfigureAwait(false);
 
         var message = await OutgoingMessageAsync(
-            MarketRole.MeteredDataResponsible, ProcessType.BalanceFixing);
+            MarketRole.MeteredDataResponsible, BusinessReason.BalanceFixing);
         message.HasReceiverId(SampleData.GridOperatorNumber)
             .HasReceiverRole(MarketRole.MeteredDataResponsible.Name)
             .HasSenderRole(MarketRole.MeteringDataAdministrator.Name)
@@ -128,7 +127,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
 
         var outgoingMessage = await OutgoingMessageAsync(
             MarketRole.BalanceResponsible,
-            ProcessType.BalanceFixing);
+            BusinessReason.BalanceFixing);
         outgoingMessage
             .HasReceiverId(SampleData.BalanceResponsibleNumber.Value)
             .HasReceiverRole(MarketRole.BalanceResponsible.Name)
@@ -157,7 +156,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
 
         var outgoingMessage = await OutgoingMessageAsync(
             MarketRole.BalanceResponsible,
-            ProcessType.BalanceFixing);
+            BusinessReason.BalanceFixing);
         outgoingMessage
             .HasReceiverId(SampleData.BalanceResponsibleNumber.Value)
             .HasReceiverRole(MarketRole.BalanceResponsible.Name)
@@ -171,7 +170,7 @@ public class WhenAnAggregationResultIsAvailableTests : TestBase
                 null!);
     }
 
-    private async Task<AssertOutgoingMessage> OutgoingMessageAsync(MarketRole roleOfReceiver, ProcessType completedAggregationType)
+    private async Task<AssertOutgoingMessage> OutgoingMessageAsync(MarketRole roleOfReceiver, BusinessReason completedAggregationType)
     {
         return await AssertOutgoingMessage.OutgoingMessageAsync(
             DocumentType.NotifyAggregatedMeasureData.Name,

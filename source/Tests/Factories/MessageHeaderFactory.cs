@@ -21,10 +21,10 @@ namespace Tests.Factories;
 
 public static class MessageHeaderFactory
 {
-    public static MessageHeader Create(ProcessType? processType = null, MarketRole? receiverRole = null, MarketRole? senderRole = null)
+    public static MessageHeader Create(BusinessReason? businessReason = null, MarketRole? receiverRole = null, MarketRole? senderRole = null)
     {
         return new MessageHeader(
-            processType is null ? ProcessType.MoveIn.Name : processType.Name,
+            businessReason is null ? BusinessReason.MoveIn.Name : businessReason.Name,
             "1234567890123",
             senderRole is null ? MarketRole.MeteringPointAdministrator.Name : senderRole.Name,
             "1234567890124",

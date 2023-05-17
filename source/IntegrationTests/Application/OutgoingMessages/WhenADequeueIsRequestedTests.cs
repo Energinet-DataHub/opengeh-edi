@@ -72,7 +72,7 @@ public class WhenADequeueIsRequestedTests : TestBase
     {
         var incomingMessage = new IncomingMessageBuilder()
             .WithMarketEvaluationPointId(SampleData.MeteringPointNumber)
-            .WithProcessType(ProcessType.MoveIn)
+            .WithBusinessReason(BusinessReason.MoveIn)
             .WithReceiver(SampleData.ReceiverId)
             .WithSenderId(SampleData.SenderId)
             .WithConsumerName(SampleData.ConsumerName)

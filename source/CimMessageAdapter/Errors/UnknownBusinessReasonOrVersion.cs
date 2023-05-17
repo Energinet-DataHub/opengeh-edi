@@ -14,10 +14,10 @@
 
 namespace CimMessageAdapter.Errors
 {
-    public class UnknownBusinessProcessTypeOrVersion : ValidationError
+    public class UnknownBusinessReasonOrVersion : ValidationError
     {
-        public UnknownBusinessProcessTypeOrVersion(string businessProcessType, string version)
-            : base($"Schema version {version} for business process type {businessProcessType} does not exist.", "B2B-001")
+        public UnknownBusinessReasonOrVersion(string businessReason, string version)
+            : base($"Schema version {version} for business process type {businessReason} does not exist.", "B2B-001")
         {
         }
     }

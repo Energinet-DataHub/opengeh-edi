@@ -179,9 +179,9 @@ internal sealed class AssertAggregationResultJsonDocument : IAssertAggregationRe
         return this;
     }
 
-    public IAssertAggregationResultDocument HasProcessType(ProcessType processType)
+    public IAssertAggregationResultDocument HasBusinessReason(BusinessReason businessReason)
     {
-        Assert.Equal(CimCode.Of(processType), _root.GetProperty("process.processType").GetProperty("value").ToString());
+        Assert.Equal(CimCode.Of(businessReason), _root.GetProperty("process.processType").GetProperty("value").ToString());
         return this;
     }
 

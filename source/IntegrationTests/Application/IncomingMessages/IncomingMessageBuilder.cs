@@ -29,7 +29,7 @@ namespace IntegrationTests.Application.IncomingMessages
         private readonly string _senderRole = "DDZ";
         private Instant _effectiveDate = SystemClock.Instance.GetCurrentInstant();
         private string? _messageId;
-        private string _processType = NotSet;
+        private string _businessReason = NotSet;
         private string _senderId = NotSet;
         private ActorNumber _receiverId = DataHubDetails.IdentificationNumber;
         private string? _consumerName = NotSet;
@@ -56,9 +56,9 @@ namespace IntegrationTests.Application.IncomingMessages
             return this;
         }
 
-        internal IncomingMessageBuilder WithProcessType(ProcessType processType)
+        internal IncomingMessageBuilder WithBusinessReason(BusinessReason businessReason)
         {
-            _processType = processType.Name;
+            _businessReason = businessReason.Name;
             return this;
         }
 
@@ -123,7 +123,7 @@ namespace IntegrationTests.Application.IncomingMessages
         {
             return new MessageHeader(
                 _messageId ?? Guid.NewGuid().ToString(),
-                _processType,
+                _businessReason,
                 _senderId,
                 _senderRole,
                 _receiverId.Value,
