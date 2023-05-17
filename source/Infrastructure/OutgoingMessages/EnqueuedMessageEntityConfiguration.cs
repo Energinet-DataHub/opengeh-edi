@@ -32,7 +32,7 @@ namespace Infrastructure.OutgoingMessages
             builder.Property(x => x.DocumentType);
             builder.Property(x => x.ReceiverId);
             builder.Property(x => x.ReceiverRole);
-            builder.Property(x => x.ProcessType);
+            builder.Property(x => x.BusinessReason);
             builder.Property(x => x.Category)
                 .HasColumnName("MessageCategory");
             builder.Property(x => x.SenderId);

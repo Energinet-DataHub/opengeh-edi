@@ -61,11 +61,11 @@ internal sealed class QueryBuilder
                 new KeyValuePair<string, object>("DocumentType", request.DocumentTypes));
         }
 
-        if (request.ProcessTypes is not null)
+        if (request.BusinessReasons is not null)
         {
             AddFilter(
-                "ProcessType in @ProcessType",
-                new KeyValuePair<string, object>("ProcessType", request.ProcessTypes));
+                "BusinessReason in @BusinessReason",
+                new KeyValuePair<string, object>("BusinessReason", request.BusinessReasons));
         }
 
         return new QueryInput(BuildStatement(), _queryParameters);
@@ -73,7 +73,7 @@ internal sealed class QueryBuilder
 
     private string BuildStatement()
     {
-        var selectStatement = "SELECT Id AS MessageId, DocumentType, SenderNumber, ReceiverNumber, CreatedAt, ProcessType FROM dbo.ArchivedMessages";
+        var selectStatement = "SELECT Id AS MessageId, DocumentType, SenderNumber, ReceiverNumber, CreatedAt, BusinessReason FROM dbo.ArchivedMessages";
 
         if (_statement.Count > 0)
         {

@@ -21,7 +21,7 @@ public record Aggregation(
     string Resolution,
     Period Period,
     string? SettlementType,
-    string ProcessType,
+    string BusinessReason,
     ActorGrouping ActorGrouping,
     GridAreaDetails GridAreaDetails);
 

@@ -55,7 +55,7 @@ public class DocumentFactory
     private static MessageHeader CreateHeader(BundledMessageId bundledMessageId, MessageRecords messageRecords, Instant timeStamp)
     {
         return new MessageHeader(
-            messageRecords.ProcessType,
+            messageRecords.BusinessReason,
             messageRecords.SenderNumber,
             messageRecords.SenderRole,
             messageRecords.ReceiverNumber,

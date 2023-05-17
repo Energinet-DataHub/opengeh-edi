@@ -95,7 +95,7 @@ public class SearchMessagesListener
             SenderNumber = searchCriteria?.SenderNumber,
             ReceiverNumber = searchCriteria?.ReceiverNumber,
             DocumentTypes = searchCriteria?.DocumentTypes,
-            ProcessTypes = searchCriteria?.ProcessTypes,
+            BusinessReasons = searchCriteria?.BusinessReasons,
         };
 
         var result = await _mediator.Send(query, cancellationToken).ConfigureAwait(false);
@@ -122,6 +122,6 @@ public record SearchArchivedMessages(
     string? SenderNumber,
     string? ReceiverNumber,
     IReadOnlyList<string>? DocumentTypes,
-    IReadOnlyList<string>? ProcessTypes);
+    IReadOnlyList<string>? BusinessReasons);
 
 public record MessageCreationPeriod(Instant Start, Instant End);

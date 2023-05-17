@@ -50,7 +50,7 @@ public class RejectRequestChangeOfSupplierMessageTests
         return RejectRequestChangeOfSupplierMessage.Create(
             TransactionId.New(),
             ActorProvidedId.Create("123456789"),
-            ProcessType.MoveIn,
+            BusinessReason.MoveIn,
             string.Empty,
             ActorNumber.Create("1234567890123"),
             listOfReasons);

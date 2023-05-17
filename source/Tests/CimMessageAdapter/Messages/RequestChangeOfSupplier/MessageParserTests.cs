@@ -72,7 +72,7 @@ public class MessageParserTests
         Assert.True(result.Success);
         var header = result.IncomingMarketDocument?.Header;
         Assert.Equal("78954612", header?.MessageId);
-        Assert.Equal("E65", header?.ProcessType);
+        Assert.Equal("E65", header?.BusinessReason);
         Assert.Equal("5799999933318", header?.SenderId);
         Assert.Equal("DDQ", header?.SenderRole);
         Assert.Equal("5790001330552", header?.ReceiverId);
