@@ -19,7 +19,7 @@ on:
 jobs:
   analyze:
     name: Analyze
-    runs-on: grp-codeql
+    runs-on: codeql-ssg
     permissions:
       actions: read
       contents: read
