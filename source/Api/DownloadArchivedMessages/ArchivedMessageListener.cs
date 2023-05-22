@@ -23,11 +23,11 @@ using Microsoft.Azure.Functions.Worker.Http;
 
 namespace Api.DownloadArchivedMessages
 {
-    public partial class DownloadArchivedMessageListener
+    public partial class ArchivedMessageListener
     {
         private readonly IMediator _mediator;
 
-        public DownloadArchivedMessageListener(IMediator mediator)
+        public ArchivedMessageListener(IMediator mediator)
         {
             _mediator = mediator;
         }
