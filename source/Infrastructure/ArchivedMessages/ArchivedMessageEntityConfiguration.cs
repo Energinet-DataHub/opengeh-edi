@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.IO;
 using Domain.Actors;
 using Domain.ArchivedMessages;
 using Domain.Documents;
@@ -50,5 +51,10 @@ public class ArchivedMessageEntityConfiguration : IEntityTypeConfiguration<Archi
             .HasConversion(
                 toDbValue => toDbValue == null ? null : toDbValue.Name,
                 fromDbValue => !string.IsNullOrWhiteSpace(fromDbValue) ? BusinessReason.From(fromDbValue) : null);
+        builder.Property(x => x.Document)
+            .HasColumnName("Document")
+            .HasConversion(
+                toDbValue => ((MemoryStream)toDbValue).ToArray(),
+                fromDbValue => new MemoryStream(fromDbValue));
     }
 }

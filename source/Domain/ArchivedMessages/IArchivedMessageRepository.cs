@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.ObjectModel;
-
 namespace Domain.ArchivedMessages;
 
 /// <summary>
@@ -26,4 +24,12 @@ public interface IArchivedMessageRepository
     /// </summary>
     /// <param name="message"></param>
     void Add(ArchivedMessage message);
+
+    /// <summary>
+    /// Get document.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Stream</returns>
+    Task<Stream?> GetDocumentAsync(Guid id, CancellationToken cancellationToken);
 }
