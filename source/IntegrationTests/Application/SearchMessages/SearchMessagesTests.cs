@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.Configuration;
@@ -210,7 +211,8 @@ public class SearchMessagesTests : TestBase
             ActorNumber.Create(senderNumber ?? "1234512345123"),
             ActorNumber.Create(receiverNumber ?? "1234512345128"),
             createdAt.GetValueOrDefault(_systemDateTimeProvider.Now()),
-            BusinessReason.From(businessReason ?? BusinessReason.BalanceFixing.Name));
+            BusinessReason.From(businessReason ?? BusinessReason.BalanceFixing.Name),
+            new MemoryStream());
     }
 
     private async Task ArchiveMessage(ArchivedMessage archivedMessage)

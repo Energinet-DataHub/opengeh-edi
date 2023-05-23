@@ -12,18 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Domain.Actors;
-using Domain.Documents;
-using Domain.OutgoingMessages;
-using NodaTime;
+using System;
+using System.IO;
+using Application.Configuration.Queries;
 
-namespace Domain.ArchivedMessages;
+namespace Application.ArchivedMessages;
 
-public record ArchivedMessage(
-    Guid Id,
-    DocumentType DocumentType,
-    ActorNumber SenderNumber,
-    ActorNumber ReceiverNumber,
-    Instant CreatedAt,
-    BusinessReason? BusinessReason,
-    Stream Document);
+public record GetArchivedMessageDocumentQuery(Guid Id) : IQuery<Stream?>;
